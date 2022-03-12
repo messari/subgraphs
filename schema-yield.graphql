@@ -113,6 +113,7 @@ type UsageMetricsDailySnapshot @entity {
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
 
+  " Total number of transaction occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
 
   " Block number of this snapshot "
@@ -374,14 +375,22 @@ type VaultDailySnapshot @entity {
 ##### Transaction-Level Data #####
 ##################################
 
-interface Transaction {
+"""
+An event is any user action that occurs in a protocol. Generally, they are Ethereum events
+emitted by a function in the smart contracts, stored in transaction receipts as event logs.
+However, some user actions of interest are function calls that don't emit events. For example,
+the deposit and withdraw functions in Yearn do not emit any events. In our subgraphs, we still
+store them as events, although they are not technically Ethereum events emitted by smart
+contracts.
+"""
+interface Event {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
-  " Transaction hash "
+  " Transaction hash of the transaction that emitted this event "
   hash: String!
 
-  " Transaction log index "
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
   " The protocol this transaction belongs to "
@@ -398,14 +407,14 @@ interface Transaction {
   timestamp: BigInt!
 }
 
-type Deposit implements Transaction @entity {
+type Deposit implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
-  " Transaction hash "
+  " Transaction hash of the transaction that emitted this event "
   hash: String!
 
-  " Transaction log index "
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
   " The protocol this transaction belongs to "
@@ -436,14 +445,14 @@ type Deposit implements Transaction @entity {
   vault: Vault!
 }
 
-type Withdraw implements Transaction @entity {
+type Withdraw implements Event @entity {
   " { Transaction hash }-{ Log index }"
   id: ID!
 
-  " Transaction hash "
+  " Transaction hash of the transaction that emitted this event "
   hash: String!
 
-  " Transaction log index "
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
   " The protocol this transaction belongs to "
