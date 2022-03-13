@@ -10,9 +10,6 @@ export const PROTOCOL_TYPE_YIELD = "YIELD"
 
 export const MANAGEMENT_FEE = "MANAGEMENT_FEE"
 export const PERFORMANCE_FEE = "PERFORMANCE_FEE"
-
-////////////
-
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const DEFAULT_DECIMALS = 18;
@@ -35,6 +32,10 @@ export let MS_PER_YEAR = DAYS_PER_YEAR.times(
 /////////////////
 /////////////////
 /////////////////
+
+////////////
+
+export const ETH_MAINNET_REGISTRY_ADDRESS = "0xe15461b18ee31b7379019dc523231c57d1cbc18c"
 
 export const ETH_MAINNET_NETWORK = 'mainnet';
 export const FTM_MAINNET_NETWORK = 'fantom';

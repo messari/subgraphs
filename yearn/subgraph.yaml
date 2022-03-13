@@ -11,7 +11,7 @@ dataSources:
       abi: Registry
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - NewVault
@@ -25,6 +25,8 @@ dataSources:
       eventHandlers:
         - event: NewVault(indexed address,indexed uint256,address,string)
           handler: handleNewVault
+        - event: NewExperimentalVault(indexed address,indexed address,address,string)
+          handler: handleNewExperimentalVault
       file: ./src/mappings/registryMappings.ts
 templates:
   - name: Vault
@@ -34,7 +36,7 @@ templates:
       abi: Vault
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/vaultMappings.ts
       entities:
@@ -56,6 +58,12 @@ templates:
           handler: handleDepositEvent
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawEvent
+        - event: UpdatePerformanceFee(uint256)
+          handler: handleUpdatePerformanceFee
+        - event: UpdateManagementFee(uint256)
+          handler: handleUpdateManagementFee
+        # - event: UpdateDepositLimit(uint256)
+        #   handler: handleUpdateDepositLimit
       callHandlers:
         - function: deposit()
           handler: handleDeposit

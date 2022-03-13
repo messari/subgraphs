@@ -1,21 +1,28 @@
 import { BigInt, BigDecimal, Address, ethereum, log } from "@graphprotocol/graph-ts"
 import {
+  Registry as RegistryContract,
+} from "../../generated/Registry/Registry"
+import {
   Vault as VaultContract,
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
   DepositCall, Deposit1Call, Deposit2Call,
   WithdrawCall, Withdraw1Call, Withdraw2Call,
+  UpdateManagementFee as UpdateManagementFeeEvent,
+  UpdatePerformanceFee as UpdatePerformanceFeeEvent,
 } from "../../generated/Registry/Vault"
 import {
   Vault as VaultStore,
+  VaultFee as VaultFeeStore,
   Deposit as DepositTransaction,
   Withdraw as WithdrawTransaction,
   UsageMetricsDailySnapshot,
   Account,
   DailyActiveAccount,
+  FinancialsDailySnapshot,
 } from "../../generated/schema"
-import { BIGINT_MAX, BIGINT_ZERO, PROTOCOL_ID, SECONDS_PER_DAY } from "../common/constants"
-import { getTimestampInMillis } from "../common/utils"
+import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, MANAGEMENT_FEE, PERFORMANCE_FEE, PROTOCOL_ID, SECONDS_PER_DAY } from "../common/constants"
+import { bigIntToPercentage, getTimestampInMillis } from "../common/utils"
 import { getOrCreateToken } from "../common/tokens"
 import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle"
 
@@ -50,6 +57,7 @@ export function handleDeposit(call: DepositCall): void {
     let depositAmount = BIGINT_MAX // Deposit amount has a default argument value of BIGINT_MAX
     deposit(call, vault, depositAmount, sharesMinted)
   }
+  updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
 }
 
@@ -62,6 +70,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
     let depositAmount = call.inputs._amount
     deposit(call, vault, depositAmount, sharesMinted)
   }
+  updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
 }
 
@@ -74,11 +83,12 @@ export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
     let depositAmount = call.inputs._amount
     deposit(call, vault, depositAmount, sharesMinted)
   }
+  updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
 }
 
 function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, sharesMinted: BigInt): void {
-  let vaultAddress = Address.fromString(vault.id)
+  const vaultAddress = Address.fromString(vault.id)
 
   // If _amount is uint256.max, the vault contract treats this like deposit()
   // https://github.com/yearn/yearn-vaults/blob/main/contracts/Vault.vy#L894-L897
@@ -87,9 +97,12 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
   }
 
   const token = getOrCreateToken(Address.fromString(vault.inputTokens[0]))
-  let amountUSD = normalizedUsdcPrice(usdcPrice(token, depositAmount))
+  const amountUSD = normalizedUsdcPrice(usdcPrice(token, depositAmount))
   vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD)
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(amountUSD)
+
+  const vaultContract = VaultContract.bind(call.to)
+  const tvl = vaultContract.totalAssets()
+  vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl))
 
   vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount.toBigDecimal())]
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted.toBigDecimal())
@@ -115,6 +128,7 @@ export function handleWithdraw(call: WithdrawCall): void {
 
       withdraw(call, vault, withdrawAmount, sharesBurnt)
   }
+  updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
 }
 
@@ -129,6 +143,7 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
     const withdrawAmount = call.outputs.value0
     withdraw(call, vault, withdrawAmount, sharesBurnt)
   }
+  updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
 }
 
@@ -146,7 +161,34 @@ export function handleWithdrawWithSharesAndRecipient(
     const withdrawAmount = call.outputs.value0
     withdraw(call, vault, withdrawAmount, sharesBurnt)
   }
+  updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
+}
+
+export function handleUpdatePerformanceFee(event: UpdatePerformanceFeeEvent): void {
+  let vault = VaultStore.load(event.address.toHexString())
+  if (vault) {
+    for (let i = 0; i < vault.fees.length; i++) {
+      let fee = VaultFeeStore.load(vault.fees[i])
+      if (fee && fee.feeType == PERFORMANCE_FEE) {
+        fee.feePercentage = bigIntToPercentage(event.params.performanceFee)
+        fee.save()
+      }
+    }
+  }
+}
+
+export function handleUpdateManagementFee(event: UpdateManagementFeeEvent): void {
+  let vault = VaultStore.load(event.address.toHexString())
+  if (vault) {
+    for (let i = 0; i < vault.fees.length; i++) {
+      let fee = VaultFeeStore.load(vault.fees[i])
+      if (fee && fee.feeType == MANAGEMENT_FEE) {
+        fee.feePercentage = bigIntToPercentage(event.params.managementFee)
+        fee.save()
+      }
+    }
+  }
 }
 
 function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt, sharesBurnt: BigInt): void {
@@ -251,6 +293,33 @@ function calculateAmountDeposited(
   );
   return amount;
 }
+
+function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address): void {
+  // Number of days since Unix epoch
+  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(id.toString());
+    financialMetrics.protocol = PROTOCOL_ID;
+
+    financialMetrics.feesUSD = BIGDECIMAL_ZERO
+    financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
+    financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
+    financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
+  }
+
+  const registry = RegistryContract.bind(Address.fromHexString(ETH_MAINNET_REGISTRY_ADDRESS))  
+  registry.vaults
+  
+  // Update the block number and timestamp to that of the last transaction of that day
+  financialMetrics.blockNumber = blockNumber;
+  financialMetrics.timestamp = timestamp;
+
+  financialMetrics.save();
+}
+
 
 function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from: Address): void {
   // Number of days since Unix epoch
