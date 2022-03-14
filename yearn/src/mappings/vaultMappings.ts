@@ -20,6 +20,7 @@ import {
   Account,
   DailyActiveAccount,
   FinancialsDailySnapshot,
+  YieldAggregator,
 } from "../../generated/schema"
 import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, MANAGEMENT_FEE, PERFORMANCE_FEE, PROTOCOL_ID, SECONDS_PER_DAY } from "../common/constants"
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils"
@@ -27,7 +28,7 @@ import { getOrCreateToken } from "../common/tokens"
 import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle"
 
 export function handleDepositEvent(event: DepositEvent): void {
-  log.warning('[Vault mappings] Handle deposit event', []);
+  log.info('[Vault mappings] Handle deposit event', []);
   let vaultContract = VaultContract.bind(event.address)
 
   let vault = VaultStore.load(event.address.toHexString())
@@ -38,7 +39,7 @@ export function handleDepositEvent(event: DepositEvent): void {
 }
 
 export function handleWithdrawalEvent(event: WithdrawEvent): void {
-  log.warning('[Vault mappings] Handle withdraw event', [])
+  log.info('[Vault mappings] Handle withdraw event', [])
   let vaultContract = VaultContract.bind(event.address)
 
   let vault = VaultStore.load(event.address.toHexString())
@@ -49,7 +50,7 @@ export function handleWithdrawalEvent(event: WithdrawEvent): void {
 }
 
 export function handleDeposit(call: DepositCall): void {
-  log.warning('[Vault mappings] Handle deposit', [])
+  log.info('[Vault mappings] Handle deposit', [])
   const vaultAddress = call.to
   let vault = VaultStore.load(vaultAddress.toString())
   if (vault) {
@@ -62,7 +63,7 @@ export function handleDeposit(call: DepositCall): void {
 }
 
 export function handleDepositWithAmount(call: Deposit1Call): void {
-  log.warning('[Vault mappings] Handle deposit with amount {}, vault {}', [call.inputs._amount.toString(), call.to.toHexString()])
+  log.info('[Vault mappings] Handle deposit with amount {}, vault {}', [call.inputs._amount.toString(), call.to.toHexString()])
   const vaultAddress = call.to;
   let vault = VaultStore.load(vaultAddress.toHexString())
   if (vault) {
@@ -75,7 +76,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
 }
 
 export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
-  log.warning('[Vault mappings] Handle deposit with amount {}, vault {}', [call.inputs._amount.toString(), call.to.toHexString()]);
+  log.info('[Vault mappings] Handle deposit with amount {}, vault {}', [call.inputs._amount.toString(), call.to.toHexString()]);
   const vaultAddress = call.to;
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
@@ -112,7 +113,7 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
-  log.warning('[Vault mappings] Handle withdraw. TX hash: {}', [
+  log.info('[Vault mappings] Handle withdraw. TX hash: {}', [
     call.transaction.hash.toHexString(),
   ]);
   const vaultAddress = call.to;
@@ -133,7 +134,7 @@ export function handleWithdraw(call: WithdrawCall): void {
 }
 
 export function handleWithdrawWithShares(call: Withdraw1Call): void {
-  log.warning('[Vault mappings] Handle withdraw with shares. TX hash: {}', [
+  log.info('[Vault mappings] Handle withdraw with shares. TX hash: {}', [
     call.transaction.hash.toHexString(),
   ]);
   const vaultAddress = call.to;
@@ -150,7 +151,7 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
 export function handleWithdrawWithSharesAndRecipient(
   call: Withdraw2Call
 ): void {
-  log.warning(
+  log.info(
     '[Vault mappings] Handle withdraw with shares and recipient. TX hash: {}',
     [call.transaction.hash.toHexString()]
   );
@@ -192,11 +193,12 @@ export function handleUpdateManagementFee(event: UpdateManagementFeeEvent): void
 }
 
 function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt, sharesBurnt: BigInt): void {
-  const vaultAddress = Address.fromHexString(vault.id)
-
   const token = getOrCreateToken(Address.fromString(vault.inputTokens[0]))
   let amountUSD = normalizedUsdcPrice(usdcPrice(token, withdrawAmount))
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(amountUSD)
+
+  const vaultContract = VaultContract.bind(call.to)
+  const tvl = vaultContract.totalAssets()
+  vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl))
 
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt.toBigDecimal());
   vault.inputTokenBalances = [vault.inputTokenBalances[0].minus(withdrawAmount.toBigDecimal())];
@@ -228,9 +230,12 @@ export function getOrCreateDepositTransactionFromCall(
     transaction.timestamp = getTimestampInMillis(call.block);
     transaction.blockNumber = call.block.number;
     transaction.protocol = PROTOCOL_ID
+    transaction.vault = call.to.toHexString()
 
-    const vault = new VaultStore(call.to.toHexString())
-    // transaction.asset = vault.inputTokens[0]
+    const vault = VaultStore.load(call.to.toHexString())
+    if (vault) {
+      transaction.asset = vault.inputTokens[0]
+    }
     transaction.amount = amount
     transaction.amountUSD = amountUSD
     transaction.save()
@@ -261,9 +266,12 @@ export function getOrCreateWithdrawTransactionFromCall(
     transaction.timestamp = getTimestampInMillis(call.block);
     transaction.blockNumber = call.block.number;
     transaction.protocol = PROTOCOL_ID
+    transaction.vault = call.to.toHexString()
 
-    const vault = new VaultStore(call.to.toHexString())
-    // transaction.asset = vault.inputTokens[0]
+    const vault = VaultStore.load(call.to.toHexString())
+    if (vault) {
+      transaction.asset = vault.inputTokens[0]
+    }
     transaction.amount = amount
     transaction.amountUSD = amountUSD
     transaction.save()
@@ -310,8 +318,25 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
     financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
   }
 
-  const registry = RegistryContract.bind(Address.fromHexString(ETH_MAINNET_REGISTRY_ADDRESS))  
-  registry.vaults
+  let protocolTvlUsd = BIGDECIMAL_ZERO
+  const protocol = YieldAggregator.load(PROTOCOL_ID)
+  // if (protocol) {
+  //   if (!protocol.vaults) {
+  //     log.error(
+  //       '[financials] no vault',
+  //       []
+  //     );
+  //   }
+  //   // for (let i = 0; i < protocol.vaults.length; i++) {
+  //   //   const vaultId = protocol.vaults[i]
+  //   //   const vaultContract = VaultContract.bind(Address.fromString(vaultId))
+  //   //   const vaultTvl = vaultContract.totalAssets()
+  //   //   const token = getOrCreateToken(vaultContract.token())
+  //   //   const vaultTvlUsd = normalizedUsdcPrice(usdcPrice(token, vaultTvl))
+  //   //   protocolTvlUsd = protocolTvlUsd.plus(vaultTvlUsd)
+  //   // }
+  //   financialMetrics.totalValueLockedUSD = protocolTvlUsd
+  // }
   
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
