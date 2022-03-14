@@ -1,6 +1,7 @@
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 
-export const PROTOCOL_ID = "1337"
+// Yearn registry contract
+export const PROTOCOL_ID = "0xe15461b18ee31b7379019dc523231c57d1cbc18c"
 
 export const NETWORK_ETHEREUM = "ETHEREUM"
 
