@@ -16,10 +16,9 @@ import { getOrCreateToken } from "../common/tokens"
 import {
   BIGDECIMAL_ZERO,
   PROTOCOL_ID,
-  NETWORK_ETHEREUM,
-  PROTOCOL_TYPE_YIELD,
-  PERFORMANCE_FEE,
-  MANAGEMENT_FEE
+  Network,
+  ProtocolType,
+  VaultFeeType,
 } from "../common/constants"
 import { bigIntToPercentage } from "../common/utils"
 
@@ -29,8 +28,8 @@ function createProtocol(): void {
     protocol = new YieldAggregator(PROTOCOL_ID)
     protocol.name = "Yearn v2"
     protocol.slug = "yearn-v2"
-    protocol.network = NETWORK_ETHEREUM
-    protocol.type = PROTOCOL_TYPE_YIELD
+    protocol.network = Network.ETHEREUM
+    protocol.type = ProtocolType.YIELD
     protocol.vaultIds = []
     protocol.save()
   }
@@ -69,13 +68,13 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
 
     const managementFeeId = "management-fee-" + vault.id
     let managementFee = new VaultFee(managementFeeId)
-    managementFee.feeType = MANAGEMENT_FEE
+    managementFee.feeType = VaultFeeType.MANAGEMENT_FEE
     managementFee.feePercentage = bigIntToPercentage(vaultContract.managementFee())
     managementFee.save()
 
     const performanceFeeId = "performance-fee-" + vault.id
     let performanceFee = new VaultFee(performanceFeeId)
-    performanceFee.feeType = PERFORMANCE_FEE
+    performanceFee.feeType = VaultFeeType.PERFORMANCE_FEE
     performanceFee.feePercentage = bigIntToPercentage(vaultContract.performanceFee())
     performanceFee.save()
 
