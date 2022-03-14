@@ -266,7 +266,7 @@ type LendingProtocol implements Protocol @entity {
   riskType: RiskType
 }
 
-type Market implements Pool @entity {
+type Market @entity {
   " Smart contract address of the market "
   id: ID!
 
@@ -352,7 +352,7 @@ type Market implements Pool @entity {
   liquidations: [Liquidation!]! @derivedFrom(field: "market")
 }
 
-type MarketDailySnapshot implements PoolDailySnapshot @entity {
+type MarketDailySnapshot @entity {
   " { Smart contract address of the market }-{ # of days since Unix epoch time } "
   id: ID!
 

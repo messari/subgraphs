@@ -106,6 +106,10 @@ type YieldAggregator implements Protocol @entity {
   
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
+
+  # This field is specific to Yearn's subgraph and is used to workaround a subgraph
+  # limitation: https://github.com/graphprotocol/graph-ts/issues/219
+  vaultIds: [String!]!
 }
 
 ###############################

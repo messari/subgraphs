@@ -31,6 +31,7 @@ function createProtocol(): void {
     protocol.slug = "yearn-v2"
     protocol.network = NETWORK_ETHEREUM
     protocol.type = PROTOCOL_TYPE_YIELD
+    protocol.vaultIds = []
     protocol.save()
   }
 }
@@ -80,6 +81,12 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
 
     vault.fees = [managementFeeId, performanceFeeId]
     vault.save()
+
+    let protocol = YieldAggregator.load(PROTOCOL_ID)
+    if (protocol) {
+      protocol.vaultIds.push(vault.id)
+      protocol.save()
+    }
   
     VaultTemplate.create(vaultAddress)
   }
