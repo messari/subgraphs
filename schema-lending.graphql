@@ -55,7 +55,7 @@ type RewardToken @entity {
 #############################
 
 interface Protocol {
-  " UUID "
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
@@ -239,7 +239,7 @@ enum RiskType {
 }
 
 type LendingProtocol implements Protocol @entity {
-  " UUID "
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Aave v2 "
@@ -271,7 +271,7 @@ type Market @entity {
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens

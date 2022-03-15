@@ -1,15 +1,48 @@
 import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 
-export const PROTOCOL_ID = "1337"
+////////////////////////
+///// Schema Enums /////
+////////////////////////
 
-export const NETWORK_ETHEREUM = "ETHEREUM"
+export namespace Network {
+  export const AVALANCHE = "AVALANCHE"
+  export const AURORA = "AURORA"
+  export const BSC = "BSC"
+  export const CELO = "CELO"
+  export const CRONOS = "CRONOS"
+  export const ETHEREUM = "ETHEREUM"
+  export const FANTOM = "FANTOM"
+  export const HARMONY = "HARMONY"
+  export const MOONBEAM = "MOONBEAM"
+  export const MOONRIVER = "MOONRIVER"
+  export const OPTIMISM = "OPTIMISM"
+  export const POLYGON = "POLYGON"
+  export const XDAI = "XDAI"
+}
 
-export const PROTOCOL_TYPE_DEX_AMM = "DEX_AMM"
-export const PROTOCOL_TYPE_LENDING = "LENDING"
-export const PROTOCOL_TYPE_YIELD = "YIELD"
+export namespace ProtocolType {
+  export const EXCHANGE = "EXCHANGE"
+  export const LENDING = "LENDING"
+  export const YIELD = "YIELD"
+  export const BRIDGE = "BRIDGE"
+  export const GENERIC = "GENERIC"
+}
 
-export const MANAGEMENT_FEE = "MANAGEMENT_FEE"
-export const PERFORMANCE_FEE = "PERFORMANCE_FEE"
+export namespace VaultFeeType {
+  export const MANAGEMENT_FEE = "MANAGEMENT_FEE"
+  export const PERFORMANCE_FEE = "PERFORMANCE_FEE"
+  export const DEPOSIT_FEE = "DEPOSIT_FEE"
+  export const WITHDRAWLAL_FEE = "WITHDRAWLAL_FEE"
+}
+
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT"
+  export const BORROW = "BORROW"
+}
+
+// Yearn registry contract
+export const PROTOCOL_ID = "0xe15461b18ee31b7379019dc523231c57d1cbc18c"
+
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const DEFAULT_DECIMALS = 18;

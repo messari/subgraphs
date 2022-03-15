@@ -66,7 +66,7 @@ type RewardToken @entity {
 #############################
 
 interface Protocol {
-  " UUID "
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
@@ -85,7 +85,7 @@ interface Protocol {
 }
 
 type YieldAggregator implements Protocol @entity {
-  " UUID "
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Yearn v3 "
@@ -106,6 +106,10 @@ type YieldAggregator implements Protocol @entity {
   
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
+
+  # This field is specific to Yearn's subgraph and is used to workaround a subgraph
+  # limitation: https://github.com/graphprotocol/graph-ts/issues/219
+  vaultIds: [String!]!
 }
 
 ###############################

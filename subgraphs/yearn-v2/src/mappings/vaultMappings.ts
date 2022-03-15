@@ -22,7 +22,7 @@ import {
   FinancialsDailySnapshot,
   YieldAggregator,
 } from "../../generated/schema"
-import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, MANAGEMENT_FEE, PERFORMANCE_FEE, PROTOCOL_ID, SECONDS_PER_DAY } from "../common/constants"
+import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, PROTOCOL_ID, SECONDS_PER_DAY, VaultFeeType } from "../common/constants"
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils"
 import { getOrCreateToken } from "../common/tokens"
 import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle"
@@ -171,7 +171,7 @@ export function handleUpdatePerformanceFee(event: UpdatePerformanceFeeEvent): vo
   if (vault) {
     for (let i = 0; i < vault.fees.length; i++) {
       let fee = VaultFeeStore.load(vault.fees[i])
-      if (fee && fee.feeType == PERFORMANCE_FEE) {
+      if (fee && fee.feeType == VaultFeeType.PERFORMANCE_FEE) {
         fee.feePercentage = bigIntToPercentage(event.params.performanceFee)
         fee.save()
       }
@@ -184,7 +184,7 @@ export function handleUpdateManagementFee(event: UpdateManagementFeeEvent): void
   if (vault) {
     for (let i = 0; i < vault.fees.length; i++) {
       let fee = VaultFeeStore.load(vault.fees[i])
-      if (fee && fee.feeType == MANAGEMENT_FEE) {
+      if (fee && fee.feeType == VaultFeeType.MANAGEMENT_FEE) {
         fee.feePercentage = bigIntToPercentage(event.params.managementFee)
         fee.save()
       }
@@ -320,23 +320,17 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
 
   let protocolTvlUsd = BIGDECIMAL_ZERO
   const protocol = YieldAggregator.load(PROTOCOL_ID)
-  // if (protocol) {
-  //   if (!protocol.vaults) {
-  //     log.error(
-  //       '[financials] no vault',
-  //       []
-  //     );
-  //   }
-  //   // for (let i = 0; i < protocol.vaults.length; i++) {
-  //   //   const vaultId = protocol.vaults[i]
-  //   //   const vaultContract = VaultContract.bind(Address.fromString(vaultId))
-  //   //   const vaultTvl = vaultContract.totalAssets()
-  //   //   const token = getOrCreateToken(vaultContract.token())
-  //   //   const vaultTvlUsd = normalizedUsdcPrice(usdcPrice(token, vaultTvl))
-  //   //   protocolTvlUsd = protocolTvlUsd.plus(vaultTvlUsd)
-  //   // }
-  //   financialMetrics.totalValueLockedUSD = protocolTvlUsd
-  // }
+  if (protocol) {
+    for (let i = 0; i < protocol.vaultIds.length; i++) {
+      const vaultId = protocol.vaultIds[i]
+      const vaultContract = VaultContract.bind(Address.fromString(vaultId))
+      const vaultTvl = vaultContract.totalAssets()
+      const token = getOrCreateToken(vaultContract.token())
+      const vaultTvlUsd = normalizedUsdcPrice(usdcPrice(token, vaultTvl))
+      protocolTvlUsd = protocolTvlUsd.plus(vaultTvlUsd)
+    }
+    financialMetrics.totalValueLockedUSD = protocolTvlUsd
+  }
   
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
