@@ -42,7 +42,7 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
 
 function startIndexingLendingPool(poolAddress: Address): void {
   // Create a template for an implementation of a Lending Pool/Market
-  // This indexes for events which users act upon a lending pool. Events within the lendingPool.ts mapping script
+  // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
   LendingPoolTemplate.create(poolAddress);
 }
 
@@ -51,10 +51,13 @@ function startIndexingLendingPoolConfigurator(configurator: Address, addrProvide
   // This indexes for events within the lendingPoolConfigurator.ts mapping script
   // The Lending Pool/Market address is added to the context for general accessibility
   // Need to verify that conext is accesible from any file importing dataSource? or just lendingPoolConfigurator.ts?
-  let contract = AddressProviderContract.bind(addrProvider);
-  let lendingPool = contract.getLendingPool();
-  let context = new DataSourceContext();
+  const contract = AddressProviderContract.bind(addrProvider);
+  const lendingPool = contract.getLendingPool();
+  // Get the Address Provider Contract's Price Oracle
+  const priceOracle = contract.getPriceOracle();
+  const context = new DataSourceContext();
   context.setString("lendingPool", lendingPool.toHexString());
+  context.setString("priceOracle", priceOracle.toHexString());
 
   LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
 }

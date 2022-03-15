@@ -93,18 +93,6 @@ export function handleATokenInitialized(event: Initialized): void {
     // Load/Create the Reward Token as an entity
     // SHOULD THE REWARD TOKEN BE CREATED AS A 'Token' ENTITY AS WELL?
     // HOW TO PULL THE REWARD TOKEN 'type'?
-    let rewardToken = RewardToken.load(rewardTokenAddr.toHexString()) as RewardToken;
-    if (rewardToken === null) {
-      rewardToken = initRewardToken(rewardTokenAddr);
-    }
-    // Add the reward token to the market
-    let rewardTokens = market.rewardTokens;
-    if (rewardTokens === null) {
-      rewardTokens = [rewardToken.id]
-    } else {
-      rewardTokens.push(rewardToken.id);
-    }
-    market.rewardTokens = rewardTokens;
-    market.save();
+    initRewardToken(rewardTokenAddr, market);
   }
 }

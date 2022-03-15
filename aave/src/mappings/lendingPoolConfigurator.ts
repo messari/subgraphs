@@ -31,8 +31,6 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     let token = initToken(event.params.asset);
     // The corresponding lending pool AToken is loaded or created as an implementation of a Token entity
     let aToken = initToken(event.params.aToken);
-    // Is this protocol name correct?
-    let protocolName = 'AAVE_POOL';
     // From my understanding, in a lending pool market there is only one input token, which would be the event token implemented above
     let inputTokens: Token[] = [token];
     // Output token is the corresponding aToken
@@ -44,7 +42,6 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     market = createMarket(
         event,
         marketAddr,
-        protocolName,
         inputTokens,
         outputToken,
         rewardTokens
