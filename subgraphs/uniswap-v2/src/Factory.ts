@@ -1,6 +1,6 @@
-import { log } from '@graphprotocol/graph-ts'
-import { PairCreated } from '../generated/Factory/Factory'
-import { DexAmmProtocol, LiquidityPool } from '../generated/schema'
+// import { log } from '@graphprotocol/graph-ts'
+import { PairCreated } from './../generated/Factory/Factory'
+import { DexAmmProtocol, LiquidityPool, Bundle } from './../generated/schema'
 import { Pair as PairTemplate } from '../generated/templates'
 import { getOrCreateToken, getOrCreateRewardToken } from './common/tokens'
 import {
@@ -18,6 +18,11 @@ export function handleNewPair(event: PairCreated): void {
     protocol.slug = "uniswap-v3"
     protocol.network = "ETHEREUM"
     protocol.type = "EXCHANGE"
+
+    // create new bundle
+    let bundle = new Bundle('1')
+    bundle.ethPrice = BIGDECIMAL_ZERO
+    bundle.save()
   }  
 
   // create the tokens

@@ -22,6 +22,7 @@ dataSources:
         - DexAmmProtocol
         - LiquidityPool
         - Protocol
+        - Bundle
       abis:
         - name: Factory
           file: ./abis/factory.json
@@ -46,8 +47,23 @@ templates:
       language: wasm/assemblyscript
       file: ./src/core.ts
       entities:
-        - Pair
+        - LiqudityPool
         - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - DexAmmProtocol
+        - Token
+        - Transaction
+        - Mint 
+        - Burn 
+        - Bundle
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - Account
+        - DailyActiveAccount
+        - PoolDailySnapshot
       abis:
         - name: Pair
           file: ./abis/pair.json
@@ -64,8 +80,4 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-      callHandlers: 
-        - function: burn(address)
-          handler: burnCall
-        - function: mint(address)
-          handler: mintCall
+
