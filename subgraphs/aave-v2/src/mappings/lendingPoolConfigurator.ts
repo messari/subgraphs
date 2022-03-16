@@ -21,8 +21,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
   // Market address is pulled from context, which contains data about the current lendingPoolConfigurator template instance
   // getLendingPoolFromCtx() is imported from utilFunctions.ts
-  let marketAddr = getLendingPoolFromCtx();
-  // Attempt to load a market entity with this address as id
+  const marketAddr = getLendingPoolFromCtx();
   let market = Market.load(marketAddr);
   if (market === null) {
     // If the market entity has not been created yet, send the following data to the createMarket function to initialize a new implementation of a Market entity

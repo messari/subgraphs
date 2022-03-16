@@ -7,7 +7,7 @@ import {
 
 import { Market, RewardToken } from "../../generated/schema";
 
-import { initRewardToken, updateMarketDailySnapshot, zeroAddr } from "./utilFunctions";
+import { initRewardToken, updateMarketDailySnapshot, zeroAddr, getLendingPoolFromCtx, createMarket, metricsDailySnapshot, updateMetricsDailySnapshot } from "./utilFunctions";
 
 export function handleRewardsClaimed(event: RewardsClaimed): void {
   // Handle event emitted when reward tokens are claimed
@@ -21,11 +21,12 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
     const rewardTokenAddr = contract.REWARD_TOKEN().toHexString();
     // Load the reward token entity instance
     const rewardToken = RewardToken.load(rewardTokenAddr);
-    const marketAddr = event.transaction.to.toHexString();
+    const marketAddr = getLendingPoolFromCtx();
+    // Need to revise market creation/loading functions, need to gather all proper arguments to create market if doesnt exist
     const market = Market.load(marketAddr);
 
     // In the case of multiple rewards tokens, get the index of the current reward token address
-    let rewardTokenIndex = market.rewardTokens.length;
+    let rewardTokenIndex = market.rewardTokens?.length || 0;
     if (market.rewardTokens.indexOf(rewardTokenAddr) >= 0) {
       rewardTokenIndex = market.rewardTokens.indexOf(rewardTokenAddr);
     } else {

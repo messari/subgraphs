@@ -12,27 +12,31 @@ import {
   LendingPool as LendingPoolTemplate,
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
 } from "../../generated/templates";
+import { fetchProtocolEntity } from "./utilFunctions";
 
 
 export function handleProxyCreated(event: ProxyCreated): void {
   // Event handler for lending pool or configurator contract creation
   let pool = event.params.id.toString();
   let address = event.params.newAddress;
+  const context = initiateContext(event.address);
 
   if (pool == "LENDING_POOL") {
-    startIndexingLendingPool(address);
+    startIndexingLendingPool(address, context);
   } else if (pool == "LENDING_POOL_CONFIGURATOR") {
-    startIndexingLendingPoolConfigurator(address, event.address);
+    startIndexingLendingPoolConfigurator(address, context);
   }
 }
 
 export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
-  startIndexingLendingPool(event.params.newAddress);
+  const context = initiateContext(event.address);
+  startIndexingLendingPool(event.params.newAddress, context);
 }
 
 
 export function handleLendingPoolConfiguratorUpdated(event: LendingPoolConfiguratorUpdated): void {
-  startIndexingLendingPoolConfigurator(event.params.newAddress, event.address);
+  const context = initiateContext(event.address);
+  startIndexingLendingPoolConfigurator(event.params.newAddress, context);
 }
 
 
@@ -40,24 +44,31 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
   // Needed? Oracle management will need to be implemented for market/token USD values. Still yet to start on that facet of event management for this subgraph
 }
 
-function startIndexingLendingPool(poolAddress: Address): void {
+function startIndexingLendingPool(poolAddress: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool/Market
   // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
-  LendingPoolTemplate.create(poolAddress);
+  LendingPoolTemplate.createWithContext(poolAddress, context);
 }
 
-function startIndexingLendingPoolConfigurator(configurator: Address, addrProvider: Address): void {
+function startIndexingLendingPoolConfigurator(configurator: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool Configurator
   // This indexes for events within the lendingPoolConfigurator.ts mapping script
-  // The Lending Pool/Market address is added to the context for general accessibility
-  // Need to verify that conext is accesible from any file importing dataSource? or just lendingPoolConfigurator.ts?
+  LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
+}
+
+function initiateContext(addrProvider: Address): DataSourceContext {
+  // Add Lending Pool/Market address, price oracle contract address, and protocol id to the context for general accessibility
+  // Need to verify that context is accessible from any file importing dataSource? or just scripts for templates directly called to createWithContext
+  // Is this redundant?
+
   const contract = AddressProviderContract.bind(addrProvider);
   const lendingPool = contract.getLendingPool();
+  const lendingProtocol = fetchProtocolEntity('aave-v2');
   // Get the Address Provider Contract's Price Oracle
   const priceOracle = contract.getPriceOracle();
   const context = new DataSourceContext();
   context.setString("lendingPool", lendingPool.toHexString());
   context.setString("priceOracle", priceOracle.toHexString());
-
-  LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
+  context.setString("protocolId", lendingProtocol.id);
+  return context
 }

@@ -10,7 +10,10 @@ import {
     Token,
     Market,
     RewardToken,
-    MarketDailySnapshot
+    MarketDailySnapshot,
+    LendingProtocol,
+    UsageMetricsDailySnapshot,
+    FinancialsDailySnapshot
 } from "../../generated/schema";
 
 import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
@@ -36,8 +39,10 @@ export function createMarket(
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(new BigDecimal(new BigInt(0)));
         }
+        const protocolId = getProtocolIdFromCtx();
+        const protocol = fetchProtocolEntity(protocolId);
         market = new Market(id);
-        market.protocol = 'AAVE_POOL';
+        market.protocol = protocol.name;
         market.inputTokens = inputTokens.map<string>((t) => t.id);
         market.outputToken = outputToken.id;
         market.rewardTokens = rewardTokens.map<string>((t) => t.id);
@@ -65,6 +70,9 @@ export function createMarket(
         market.repays = [];
         market.liquidations = [];
         market.save();
+
+        protocol.markets.push(market.id);
+        protocol.save();
     }
     return market as Market;
   }
@@ -113,13 +121,9 @@ export function initRewardToken(assetAddr: Address, market: Market): RewardToken
     }
     // Add the reward token to the market
     let rewardTokens = market.rewardTokens;
-    if (rewardTokens.includes(asset.id)) {
-        return asset as RewardToken;
-    }
-
     if (rewardTokens === null) {
         rewardTokens = [asset.id]
-    } else {
+    } else if (!rewardTokens.includes(asset.id)) {
         rewardTokens.push(asset.id);
     }
     
@@ -127,6 +131,28 @@ export function initRewardToken(assetAddr: Address, market: Market): RewardToken
     market.save();
     
     return asset as RewardToken;
+}
+
+export function fetchProtocolEntity(protocolId: string): LendingProtocol {
+    // Load or create the Lending Protocol entity implementation
+    // Protocol Id is currently 'aave-v2' rather than a UUID. Need to ask what the UUID should be, ie. a hash, just a number, mix of values etc
+    let lendingProtocol = LendingProtocol.load(protocolId);
+    if (!lendingProtocol) {
+        lendingProtocol = new LendingProtocol(protocolId);
+        // Should these values be hardcoded?
+        lendingProtocol.name = 'Aave-v2';
+        lendingProtocol.slug = 'aave-v2';
+        lendingProtocol.network = 'ETHEREUM';
+        // Are these options correct?
+        lendingProtocol.type = 'LENDING';
+        lendingProtocol.lendingType = 'POOLED';
+        lendingProtocol.riskType = 'ISOLATED';
+        // Initialize empty arrays
+        lendingProtocol.usageMetrics = [];
+        lendingProtocol.financialMetrics = [];
+        lendingProtocol.markets = [];
+    }    
+    return lendingProtocol as LendingProtocol;
 }
 
 // SNAPSHOT FUNCTIONS
@@ -138,15 +164,16 @@ export function updateMarketDailySnapshot(
     // Create a snapshot of market data throughout the day. One snapshot per market per day.
     // Attempt to load Snapshot entity implementation based on days since epoch in id. 
     // Snapshot is created at the start of a new day and updated after transactions change certain market data.
-    const secondsSinceEpoch = Math.floor( (new Date()).getTime() / 1000 );
-    const daysSinceEpoch = Math.floor(secondsSinceEpoch/3600/24);
+    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
     let id = market.id.concat("-").concat(daysSinceEpoch.toString());
+    const protocolId = getProtocolIdFromCtx();
+    const protocol = fetchProtocolEntity(protocolId);
     let marketSnapshot = MarketDailySnapshot.load(id);
     if (marketSnapshot === null) {
         // Data needed upon Snapshot initialization
         marketSnapshot = new MarketDailySnapshot(id);
         marketSnapshot.market = market.id;
-        marketSnapshot.protocol = 'AAVE_POOL';
+        marketSnapshot.protocol = protocol.id;
         market.snapshots.push(id);
         market.save();
     }
@@ -170,6 +197,54 @@ export function updateMarketDailySnapshot(
     marketSnapshot.save();
 
     return marketSnapshot as MarketDailySnapshot;
+}
+
+export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+    // Load or create the current date's UsageMetricsDailySnapshot implementation
+    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
+    let metricsDailySnapshot = UsageMetricsDailySnapshot.load(daysSinceEpoch);
+    if (!metricsDailySnapshot) {
+        metricsDailySnapshot = new UsageMetricsDailySnapshot(daysSinceEpoch);
+        const protocolId = getProtocolIdFromCtx();
+        const protocol = fetchProtocolEntity(protocolId);
+        metricsDailySnapshot.protocol = protocol.id;
+        // Initialize zero values
+        metricsDailySnapshot.activeUsers = 0;
+        metricsDailySnapshot.totalUniqueUsers = 0;
+        metricsDailySnapshot.dailyTransactionCount = 0;
+        // Push the new day's entity implementation to the protocol array
+        protocol.usageMetrics.push(metricsDailySnapshot.id);
+        protocol.save();
+    }
+    metricsDailySnapshot.blockNumber = event.block.number;
+    metricsDailySnapshot.timestamp = event.block.timestamp;
+    metricsDailySnapshot.save();
+    return metricsDailySnapshot as UsageMetricsDailySnapshot;
+}
+
+export function updateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
+    // Load or create the current date's FinancialsDailySnapshot implementation
+    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
+    const protocolId = getProtocolIdFromCtx();
+    const protocol = fetchProtocolEntity(protocolId);
+    let financialsDailySnapshot = FinancialsDailySnapshot.load(daysSinceEpoch);
+    if (!financialsDailySnapshot) {
+        financialsDailySnapshot = new FinancialsDailySnapshot(daysSinceEpoch);
+        financialsDailySnapshot.protocol = protocol.id;
+        // Initialize zero values
+        financialsDailySnapshot.totalValueLockedUSD = new BigDecimal(new BigInt(0));
+        financialsDailySnapshot.totalVolumeUSD = new BigDecimal(new BigInt(0));
+        financialsDailySnapshot.supplySideRevenueUSD = new BigDecimal(new BigInt(0));
+        financialsDailySnapshot.protocolSideRevenueUSD = new BigDecimal(new BigInt(0));
+        financialsDailySnapshot.feesUSD = new BigDecimal(new BigInt(0));
+        // Push the new day's entity implementation to the protocol array
+        protocol.financialMetrics.push(financialsDailySnapshot.id);
+        protocol.save();
+    }
+    financialsDailySnapshot.blockNumber = event.block.number;
+    financialsDailySnapshot.timestamp = event.block.timestamp;
+    financialsDailySnapshot.save();
+    return financialsDailySnapshot as FinancialsDailySnapshot;
 }
 
 // PRICE/ORACLE FUNCTIONS
@@ -205,6 +280,13 @@ export function getLendingPoolFromCtx(): string {
     return context.getString("lendingPool");
 }
 
+export function getProtocolIdFromCtx(): string {
+    // Get the lending pool/market address with context
+    // Need to verify that context is available here, not just the lendingPoolConfigurator.ts script
+    let context = dataSource.context();
+    return context.getString("protocolId");
+}
+
 // MATH FUNCTIONS
 
 export function rayDivision(a: BigInt, b: BigInt): BigInt {
@@ -222,3 +304,6 @@ export function rayMultiplication(a: BigInt, b: BigInt): BigInt {
   return mult;
 }
 
+export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
+    return (Math.floor(secondsSinceEpoch/86400)).toString();
+}
