@@ -1,0 +1,67 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+# Main registry contract used to locate pools and query information about them as well as registered coins
+  - name: MainRegistry
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Registry
+      address: '0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5'
+      startBlock: 12195750
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/registry.ts
+      entities: [ ]
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.abi
+        - name: PoolInfo
+          file: ./abis/PoolInfo.abi
+        - name: Registry
+          file: ./abis/Registry.abi
+        - name: StableSwap
+          file: ./abis/StableSwap.abi
+      eventHandlers:
+        - event: PoolAdded(indexed address,bytes)
+          handler: handlePoolAdded
+        - event: PoolRemoved(indexed address)
+          handler: handlePoolRemoved
+
+templates:
+  # Main pool contract
+  - name: Pool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+    mapping: &pool_mapping
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: [ ]
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.abi
+        - name: Registry
+          file: ./abis/Registry.abi
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+
+
+  
