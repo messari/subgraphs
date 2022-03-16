@@ -1,11 +1,11 @@
-import { BigInt, Address, BigDecimal, log, typeConversion } from "@graphprotocol/graph-ts"
+import {  Address } from "@graphprotocol/graph-ts"
 import {
   ERC20 as ERC20Contract,
-} from "../../generated/Factory/ERC20"
+} from "./../../generated/Factory/ERC20"
 import {
   Token,
   RewardToken
-} from "../../generated/schema"
+} from "./../../generated/schema"
 
 import { DEFAULT_DECIMALS } from '../common/constants';
 
@@ -45,5 +45,5 @@ export function getOrCreateRewardToken(address: Address, type: string): RewardTo
       token.type = type
       token.save();
     }
-    return token as Token;
+    return token as RewardToken;
   }

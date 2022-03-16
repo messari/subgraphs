@@ -1,4 +1,4 @@
-import { BigInt, BigDecimal, Address, ethereum, log } from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal, Address, log } from "@graphprotocol/graph-ts"
 
 import {
   UsageMetricsDailySnapshot,
@@ -7,74 +7,17 @@ import {
   DailyActiveAccount,
   DexAmmProtocol,
   LiquidityPool,
-  Token,
   PoolDailySnapshot
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
-import { Pair as PoolContract } from '../../generated/templates/Pair/Pair'
 
 import { BIGDECIMAL_ZERO, PROTOCOL_ID, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS } from "../common/constants"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
-// token where amounts should contribute to tracked volume and liquidity
-let USDstablecoins: string[]  = [
-    '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI 
-    '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-    '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
-    '0x0000000000085d4780b73119b644ae5ecd22b376', // TUSD
-    '0x57ab1ec28d129707052df4df418d58a2d46d5f51' // sUSD
-    ]
+// rebass tokens, dont count in tracked volume
+export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
 
-
-function token0PairPrice(pool: LiquidityPool): BigDecimal {
-    return pool.inputTokenBalances[0].div(pool.inputTokenBalances[1])
-}
-function token1PairPrice(pool: LiquidityPool): BigDecimal {
-    return pool.inputTokenBalances[1].div(pool.inputTokenBalances[0])
-}
-
-export function getPriceInUSD(token: Token): BigDecimal {
-  if (token.id in USDstablecoins) {
-    return BIGDECIMAL_ZERO
-  }
-
-  let DAIpoolAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(USDstablecoins[0]))
-  let USDCpoolAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(USDstablecoins[1]))
-  let USDTpoolAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(USDstablecoins[2]))
-
-  // fetch eth prices for each stablecoin
-  let daiPair = LiquidityPool.load(DAIpoolAddress.toHexString()) // dai is token0
-  let usdcPair = LiquidityPool.load(USDCpoolAddress.toHexString()) // usdc is token0
-  let usdtPair = LiquidityPool.load(USDTpoolAddress.toHexString()) // usdt is token1
-
-
-  // all 3 have been created
-  if (daiPair !== null && usdcPair !== null && usdtPair !== null) {
-    let totalLiquidity = daiPair.inputTokenBalances[1].plus(usdcPair.inputTokenBalances[1]).plus(usdtPair.inputTokenBalances[0])
-    let daiWeight = daiPair.inputTokenBalances[1].div(totalLiquidity)
-    let usdcWeight = usdcPair.inputTokenBalances[1].div(totalLiquidity)
-    let usdtWeight = usdtPair.inputTokenBalances[0].div(totalLiquidity)
-   
-    return token0PairPrice(daiPair)
-      .times(daiWeight)
-      .plus(token0PairPrice(usdcPair).times(usdcWeight))
-      .plus(token1PairPrice(usdtPair).times(usdtWeight))
-    // dai and USDC have been created
-  } else if (daiPair !== null && usdcPair !== null) {
-    let totalLiquidity = daiPair.inputTokenBalances[1].plus(usdcPair.inputTokenBalances[1])
-    let daiWeight = daiPair.inputTokenBalances[1].div(totalLiquidity)
-    let usdcWeight = usdcPair.inputTokenBalances[1].div(totalLiquidity)
-    return token0PairPrice(daiPair).times(daiWeight).plus(token0PairPrice(usdcPair).times(usdcWeight))
-    // USDC is the only pair so far
-  } else if (usdcPair !== null) {
-    return token0PairPrice(usdcPair)
-  } else if (daiPair !== null) {
-    return token0PairPrice(daiPair)
-  } else {
-    return BIGDECIMAL_ZERO
-  }
-}
 
 export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
@@ -104,6 +47,7 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
         for (let i = 0; i < protocol.pools.length; i++) {
             const poolId = protocol.pools[i]
             const pool = LiquidityPool.load(poolId)
+            if (pool == null) return
             protocolTvlUsd = protocolTvlUsd.plus(pool.totalValueLockedUSD)
         }
      financialMetrics.totalValueLockedUSD = protocolTvlUsd
@@ -184,8 +128,11 @@ export function updatePoolMetrics(blockNumber: BigInt, timestamp: BigInt, pool: 
 export function updateVolumeAndFees(timestamp: BigInt, trackedAmountUSD: BigDecimal, feeUSD: BigDecimal, pool: LiquidityPool): void {
   // Number of days since Unix epoch
     let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+
     let poolMetrics = PoolDailySnapshot.load(id.toString());
     let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+    if (financialMetrics == null) return
+    if (poolMetrics == null) return
 
     financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feeUSD)

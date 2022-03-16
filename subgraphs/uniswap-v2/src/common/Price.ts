@@ -1,6 +1,6 @@
 /* eslint-disable prefer-const */
 import { BigDecimal, Address, BigInt } from '@graphprotocol/graph-ts/index'
-import { factoryContract } from './helpers'
+import { factoryContract, UNTRACKED_PAIRS } from './helpers'
 import { LiquidityPool, Token, Bundle } from '../../generated/schema'
 import { ZERO_ADDRESS, BIGDECIMAL_ZERO, BIGDECIMAL_ONE } from '../common/constants'
 
@@ -74,7 +74,7 @@ let WHITELIST: string[] = [
 let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('400000')
 
 // minimum liquidity for price to get tracked
-let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('2')
+let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
 
 /**
  * Search through graph to find derived Eth per token.
@@ -82,24 +82,36 @@ let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('2')
  **/
 export function findEthPerToken(token: Token): BigDecimal {
   if (token.id == WETH_ADDRESS) {
-    return ONE_BD
+    return BIGDECIMAL_ONE
   }
   // loop through whitelist and check if paired with any
   for (let i = 0; i < WHITELIST.length; ++i) {
     let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
     if (pairAddress.toHexString() != ZERO_ADDRESS) {
       let pair = LiquidityPool.load(pairAddress.toHexString())
-      if (pair.inputTokens[0] == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token1 = Token.load(pair.inputTokens[1])
-        return token1PairPrice(pair).times(token1.derivedETH as BigDecimal) // return token1 per our token * Eth per token 1
+      if (pair == null){
+        return BIGDECIMAL_ZERO
       }
-      if (pair.inputTokens[1] == token.id && pair.reserveETH.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-        let token0 = Token.load(pair.token0)
-        return token0PairPrice(pair).times(token0.derivedETH as BigDecimal) // return token0 per our token * ETH per token 0
+      let token1 = Token.load(pair.inputTokens[1])
+      if (token1 == null){
+        return BIGDECIMAL_ZERO
+      }
+      let token1EthPrice = findEthPerToken(token1)
+      if (pair.inputTokens[0] == token.id && token1EthPrice.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+        return token1PairPrice(pair).times(token1EthPrice as BigDecimal) // return token1 per our token * Eth per token 1
+      }
+      let token0 = Token.load(pair.inputTokens[0])
+      if (token0 == null){
+        return BIGDECIMAL_ZERO
+      }
+      let token0EthPrice = findEthPerToken(token0)
+
+      if (pair.inputTokens[1] == token.id && token0EthPrice.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
+        return token0PairPrice(pair).times(token0EthPrice as BigDecimal) // return token0 per our token * ETH per token 0
       }
     }
   }
-  return BIGDECIMAL_ONE // nothing was found return 0
+  return BIGDECIMAL_ZERO // nothing was found return 0
 }
 
 
@@ -114,34 +126,36 @@ export function findEthPerToken(token: Token): BigDecimal {
   token0: Token,
   tokenAmount1: BigDecimal,
   token1: Token,
-  pair: Pair
+  pool: LiquidityPool
 ): BigDecimal {
   let bundle = Bundle.load('1')
-  let price0 = token0.derivedETH.times(bundle.ethPrice)
-  let price1 = token1.derivedETH.times(bundle.ethPrice)
+  if (bundle == null) return BIGDECIMAL_ZERO
+  let price0 = findEthPerToken(token0).times(bundle.ethPrice)
+  let price1 = findEthPerToken(token1).times(bundle.ethPrice)
 
   // dont count tracked volume on these pairs - usually rebass tokens
-  if (UNTRACKED_PAIRS.includes(pair.id)) {
-    return ZERO_BD
+  if (UNTRACKED_PAIRS.includes(pool.id)) {
+    return BIGDECIMAL_ZERO
   }
 
   // if less than 5 LPs, require high minimum reserve amount amount or return 0
-  if (pair.liquidityProviderCount.lt(BigInt.fromI32(5))) {
-    let reserve0USD = pair.reserve0.times(price0)
-    let reserve1USD = pair.reserve1.times(price1)
+  // Updated from original subgraph. Number of deposits may not equal number of liquidity providers
+  if (BigInt.fromI32(pool.deposits.length).lt(BigInt.fromI32(5))) {
+    let reserve0USD = pool.inputTokenBalances[0].times(price0)
+    let reserve1USD = pool.inputTokenBalances[1].times(price1)
     if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
       if (reserve0USD.plus(reserve1USD).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
-        return ZERO_BD
+        return BIGDECIMAL_ZERO
       }
     }
     if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
       if (reserve0USD.times(BigDecimal.fromString('2')).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
-        return ZERO_BD
+        return BIGDECIMAL_ZERO
       }
     }
     if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
       if (reserve1USD.times(BigDecimal.fromString('2')).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
-        return ZERO_BD
+        return BIGDECIMAL_ZERO
       }
     }
   }
@@ -165,5 +179,5 @@ export function findEthPerToken(token: Token): BigDecimal {
   }
 
   // neither token is on white list, tracked volume is 0
-  return ZERO_BD
+  return BIGDECIMAL_ZERO
 }
