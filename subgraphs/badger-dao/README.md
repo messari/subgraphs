@@ -35,7 +35,3 @@ yarn run build:<network>
 ```
 yarn run test
 ```
-
-
-
-
