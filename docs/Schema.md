@@ -1,6 +1,13 @@
 # Schema Definition
 
-## 
+## Protocol ID
+
+You can use the factory contract address for a protocol as the protocol ID. Here are some examples:
+
+- Uniswap v2's Factory Contract: 0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f
+- Aave v2's Registry: 0x52D306e36E3B6B02c153d0266ff0f85d18BCD413
+- Yearn v2's Registry: 0xe15461b18ee31b7379019dc523231c57d1cbc18c
+- Curve's Address Provider: 0x0000000022d53366457f9d5e68ec105046fc4383
 
 ## Transaction vs. Event
 
