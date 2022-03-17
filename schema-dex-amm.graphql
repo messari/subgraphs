@@ -81,7 +81,7 @@ type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " # of unique daily active users "
   activeUsers: Int!
@@ -103,7 +103,7 @@ type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   totalValueLockedUSD: BigDecimal!
 
@@ -145,7 +145,7 @@ interface Pool {
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
@@ -196,10 +196,10 @@ type PoolDailySnapshot @entity {
   id: ID!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " The pool this snapshot belongs to "
-  pool: Pool!
+  pool: LiquidityPool!
 
   totalValueLockedUSD: BigDecimal!
 
@@ -207,7 +207,7 @@ type PoolDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: [BigDecimal!]!
 
   " Total supply of output token "
   outputTokenSupply: BigDecimal!
@@ -256,12 +256,12 @@ type DexAmmProtocol implements Protocol @entity {
   pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
-type LiquidityPool implements Pool @entity {
+type LiquidityPool @entity {
   " Smart contract address of the pool "
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
@@ -335,7 +335,7 @@ interface Event {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
@@ -359,7 +359,7 @@ type Deposit implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Market that tokens are deposited into "
   to: String!
@@ -403,7 +403,7 @@ type Withdraw implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
@@ -447,7 +447,7 @@ type Swap implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
