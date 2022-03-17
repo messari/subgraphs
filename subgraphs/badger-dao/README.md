@@ -31,3 +31,11 @@ yarn run prepare:<chain>
 yarn run build:<network>
 ```
 
+4. Running all the tests
+```
+yarn run test
+```
+
+
+
+
