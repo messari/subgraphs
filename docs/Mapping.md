@@ -38,9 +38,25 @@ https://github.com/LimeChain/matchstick/blob/main/README.md
 
 ## Debugging
 
+### Debug Logs
+
+One of the most useful tools to debug is the `log` function in `@graphprotocol/graph-ts`. You can use it like follows in your mapping code:
+
+```
+log.debug('[Test Log] arbitrary argument {}', [123]);
+```
+
+which will show up in the Logs tab of Subgraph Studio:
+
+![Debug Logs](images/logs.png "Debug Logs")
+
+You also have an option of `Error`, `Warning`, `Info`, `Debug` as the log level. I like to use `Warning` so that I can quickly filter for it. The way to filter for logs of a specific level is to click (uncheck) the log levels circled in red above.
+
 ### Indexing Status
 
 You can check the indexing status of your subgraph and surface indexing errors that you may encounter along the way here: https://thegraph.com/docs/en/developer/quick-start/#5-check-your-logs
+
+**Note**: you should use (copy/paste) this endpoint when you use the GraphiQL playground: https://api.thegraph.com/index-node/graphql. If you click into it, it's going to direct you to a different URL which won't work with the GraphiQL playground.
 
 ## Known Issues
 
