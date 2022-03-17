@@ -41,6 +41,7 @@ export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 export const ETH_TOKEN_ADDRESS = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 export const REGISTRY_ADDRESS = '0x0000000022d53366457f9d5e68ec105046fc4383'
 
+
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("100000");
