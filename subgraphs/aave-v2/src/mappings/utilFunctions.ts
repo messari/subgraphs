@@ -19,8 +19,12 @@ import {
 import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
   
 import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
+import { AToken } from "../../generated/templates/AToken/AToken";
 
+const fromWei = new BigInt(1000000000000000000);
 export const zeroAddr = "0x0000000000000000000000000000000000000000";
+export const contractAddrWETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
+export const contractAddrUSDC = "0xBcca60bB61934080951369a648Fb03DF4F96263C";
 
 export function createMarket(
     event: ethereum.Event,
@@ -29,13 +33,13 @@ export function createMarket(
     outputToken: Token,
     rewardTokens: Token[]
   ): Market {
-    // Check if a Market entity implementation has already been created with the provided lending pool address/id
+    // To prevent mistake double creation, check if a Market entity implementation has already been created with the provided lending pool address/id
     let market = Market.load(id);
     if (market === null) {
         // If the market entity has not been created yet, create the instance
         // Populate fields with data that has been passed to the function
         // Other data fields are initialized as 0/[]/false
-        let inputTokenBalances: BigDecimal[] = [];
+        const inputTokenBalances: BigDecimal[] = [];
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(new BigDecimal(new BigInt(0)));
         }
@@ -47,8 +51,8 @@ export function createMarket(
         market.outputToken = outputToken.id;
         market.rewardTokens = rewardTokens.map<string>((t) => t.id);
         market.inputTokenBalances = inputTokenBalances;
-        market.outputTokenSupply = new BigDecimal(new BigInt(0));
-        market.outputTokenPriceUSD = new BigDecimal(new BigInt(0));
+        market.outputTokenSupply = getOutputTokenSupply(Address.fromString(outputToken.id));
+        market.outputTokenPriceUSD = getAssetPriceInUSDC(outputToken);
         market.createdBlockNumber = event.block.number;
         market.createdTimestamp = event.block.timestamp;
         market.snapshots = [];
@@ -70,12 +74,34 @@ export function createMarket(
         market.repays = [];
         market.liquidations = [];
         market.save();
-
+        
         protocol.markets.push(market.id);
         protocol.save();
     }
     return market as Market;
   }
+
+export function loadMarket(): Market {
+    //Function to load the lending pool and update the entity properties that should be checked each time the Market instance is called or modified
+    const marketAddr = getLendingPoolFromCtx();
+    const market = Market.load(marketAddr) as Market;
+    if (market.outputToken) {
+        const outputTokenAddr = Address.fromString(market.outputToken);
+        const outputToken = initToken(outputTokenAddr);
+        // By default for functions that call this function, update the market output token price in USD
+        market.outputTokenSupply = getOutputTokenSupply(outputTokenAddr);
+        market.outputTokenPriceUSD = getAssetPriceInUSDC(outputToken);
+    }
+    market.save();
+    return market;
+}
+
+export function getOutputTokenSupply(outputTokenAddr: Address): BigDecimal {
+    const aTokenInstance = AToken.bind(outputTokenAddr);
+    const outputTokenSupply = new BigDecimal(aTokenInstance.scaledTotalSupply());
+    return outputTokenSupply;
+}
+  
 
 export function initToken(assetAddr: Address): Token {
     // In the schema Token and RewardToken entities, the id is said to be " Smart contract address of the market ". 
@@ -88,35 +114,26 @@ export function initToken(assetAddr: Address): Token {
       // Create a new Token implementation
       asset = new Token(assetAddr.toHex());
       // Instantiate the Token with the IERC20 interface in order to access contract read methods
-      let tokenInstance = IERC20.bind(assetAddr);
-      // Pull the token name from the contract
+      const tokenInstance = IERC20.bind(assetAddr);
       asset.name = tokenInstance.name();
-      // Pull the token symbol from the contract
       asset.symbol = tokenInstance.symbol();
-      // Pull the token decimals from the contract
       asset.decimals = tokenInstance.decimals();
-
       asset.save();
     }
     return asset as Token;
 }
 
-// WILL COMBINE THIS WITH THE initToken FUNCTION INTO ONE DUAL-PURPOSE FUNCTION
 // HOW WOULD ONE GET THE TOKEN TYPE(DEPOSIT/BORROW)? SEE aToken.ts
 export function initRewardToken(assetAddr: Address, market: Market): RewardToken {
     // See initToken() function above
     let asset = RewardToken.load(assetAddr.toHex());
     if (asset === null) {
       asset = new RewardToken(assetAddr.toHex());
-      let tokenInstance = IERC20.bind(assetAddr);
-      // Pull the reward token name from the contract
+      const tokenInstance = IERC20.bind(assetAddr);
       asset.name = tokenInstance.name();
-      // Pull the reward token symbol from the contract
       asset.symbol = tokenInstance.symbol();
-      // Pull the reward token decimals from the contract
       asset.decimals = tokenInstance.decimals();
-      let type = "DEPOSIT"
-      asset.type = type;
+      asset.type = "DEPOSIT"
       asset.save();
     }
     // Add the reward token to the market
@@ -129,7 +146,6 @@ export function initRewardToken(assetAddr: Address, market: Market): RewardToken
     
     market.rewardTokens = rewardTokens;
     market.save();
-    
     return asset as RewardToken;
 }
 
@@ -157,32 +173,36 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
 
 // SNAPSHOT FUNCTIONS
 
-export function updateMarketDailySnapshot(
+export function getMarketDailySnapshotId(event: ethereum.Event, market: Market): string {
+    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
+    let id = market.id.concat("-").concat(daysSinceEpoch.toString());
+    return id;
+}
+
+export function loadMarketDailySnapshot(
     event: ethereum.Event,
     market: Market,
   ): MarketDailySnapshot {
     // Create a snapshot of market data throughout the day. One snapshot per market per day.
     // Attempt to load Snapshot entity implementation based on days since epoch in id. 
     // Snapshot is created at the start of a new day and updated after transactions change certain market data.
-    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
-    let id = market.id.concat("-").concat(daysSinceEpoch.toString());
+    const updateId = getMarketDailySnapshotId(event, market);
     const protocolId = getProtocolIdFromCtx();
     const protocol = fetchProtocolEntity(protocolId);
-    let marketSnapshot = MarketDailySnapshot.load(id);
+    let marketSnapshot = MarketDailySnapshot.load(updateId);
     if (marketSnapshot === null) {
         // Data needed upon Snapshot initialization
-        marketSnapshot = new MarketDailySnapshot(id);
+        marketSnapshot = new MarketDailySnapshot(updateId);
         marketSnapshot.market = market.id;
         marketSnapshot.protocol = protocol.id;
-        market.snapshots.push(id);
+        market.snapshots.push(updateId);
         market.save();
     }
     // Data potentially updated whether the snapshot instance is new or loaded
     // The following fields are pulled from the current Market Entity Implementation's data.
     // As this function is called AFTER a transaction is completed, each snapshot's data will vary from the previous snapshot
     marketSnapshot.inputTokenBalances = market.inputTokenBalances[0];
-    // Market does not have inputTokenPricesUSD property
-    // Either pass in or call getAssetPriceInUSDC() on the input token from here
+    // Either pass in or call getAssetPriceInUSDC() on the input token from here to get input token price in USD
     marketSnapshot.inputTokenPricesUSD = [];
     marketSnapshot.outputTokenSupply = market.outputTokenSupply;
     marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
@@ -255,20 +275,19 @@ export function getPriceOracle(): IPriceOracleGetter {
     return IPriceOracleGetter.bind(Address.fromString(priceOracle));
 }
 
-export function getAssetPriceInUSDC(token: Token): BigInt {
+export function getAssetPriceInUSDC(token: Token): BigDecimal {
     const tokenAddress = Address.fromString(token.id);
     // Get the oracle contract instance
     const oracle = getPriceOracle();
-    // The Aave protocol oracle contracts only contain a method for getting an asset price in ETH
-    // Current idea is to fetch price in ETH, then get the Aave USDC price in ETH to calc an asset price in USDC.
-    // Get the asset price in ETH
-    const assetPriceInEth = oracle.getAssetPrice(tokenAddress);
-    
-    // FETCH USDC PRICE IN ETH
-    // CALCULATE THE ASSET PRICE IN USDC
-
+    // The Aave protocol oracle contracts only contain a method for getting an asset price in ETH, so USDC price must be fetched to convert asset price from Eth to USDC
+    // Get the asset price in Wei and convert it to Eth
+    const assetPriceInEth: BigDecimal = new BigDecimal(oracle.getAssetPrice(tokenAddress).times(fromWei));
+    // Fetch USDC price in Wei and convert it to Eth
+    const priceUSDCInEth: BigDecimal = new BigDecimal(oracle.getAssetPrice(Address.fromString(contractAddrUSDC)).times(fromWei));
+    // Asset price in Eth/USDC priced in Eth = Asset price in in USDC
+    const assetPriceInUSDC = assetPriceInEth.div(priceUSDCInEth);
     // return price per asset in USDC
-    return new BigInt(0);
+    return assetPriceInUSDC;
 }
 
 // CONTEXT FUNCTIONS
@@ -281,13 +300,20 @@ export function getLendingPoolFromCtx(): string {
 }
 
 export function getProtocolIdFromCtx(): string {
-    // Get the lending pool/market address with context
+    // Get the protocol id with context
     // Need to verify that context is available here, not just the lendingPoolConfigurator.ts script
     let context = dataSource.context();
     return context.getString("protocolId");
 }
 
 // MATH FUNCTIONS
+
+export function amountInUSD(token: Token, amount: BigDecimal): BigDecimal {
+    // This function takes in a token and the amount of the token and converts the amount of that token in USD
+    const priceInUSDC = getAssetPriceInUSDC(token);
+    const amountUSD = amount.times(priceInUSDC);
+    return amountUSD;
+  }  
 
 export function rayDivision(a: BigInt, b: BigInt): BigInt {
     let halfB = b.div(BigInt.fromI32(2));

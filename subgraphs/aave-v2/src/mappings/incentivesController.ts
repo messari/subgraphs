@@ -5,9 +5,14 @@ import {
   AaveIncentivesController as IncentivesControllerContract
 } from "../../generated/templates/IncentivesController/AaveIncentivesController";
 
-import { Market, RewardToken } from "../../generated/schema";
+import { Market, MarketDailySnapshot, RewardToken } from "../../generated/schema";
 
-import { initRewardToken, updateMarketDailySnapshot, zeroAddr, getLendingPoolFromCtx, createMarket, metricsDailySnapshot, updateMetricsDailySnapshot } from "./utilFunctions";
+import {
+  initRewardToken,
+  loadMarketDailySnapshot,
+  zeroAddr,
+  loadMarket
+} from "./utilFunctions";
 
 export function handleRewardsClaimed(event: RewardsClaimed): void {
   // Handle event emitted when reward tokens are claimed
@@ -19,33 +24,34 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
     const contract = IncentivesControllerContract.bind(incentiveContAddr);
     // Get the contract Reward Token's address
     const rewardTokenAddr = contract.REWARD_TOKEN().toHexString();
-    // Load the reward token entity instance
-    const rewardToken = RewardToken.load(rewardTokenAddr);
-    const marketAddr = getLendingPoolFromCtx();
     // Need to revise market creation/loading functions, need to gather all proper arguments to create market if doesnt exist
-    const market = Market.load(marketAddr);
+    let market = loadMarket() as Market;
 
-    // In the case of multiple rewards tokens, get the index of the current reward token address
-    let rewardTokenIndex = market.rewardTokens?.length || 0;
-    if (market.rewardTokens.indexOf(rewardTokenAddr) >= 0) {
-      rewardTokenIndex = market.rewardTokens.indexOf(rewardTokenAddr);
-    } else {
-      // If the reward token has not been added to market or as a RewardToken entity
-      // In initRewardToken(), the reward token entity will be instantiated (if not yet instantiated)
-      // Also, the reward token will be added to the mMarket instance rewardToken array
-      // The reward token will have an index equal to the length of market.rewardTokens before the current reward token was pushed to the list
-      initRewardToken(Address.fromHexString(rewardTokenAddr), market);
-    }
-
-    // Update the current market daily snapshot to add to the daily reward token emissions
-    let marketDailySnapshot = updateMarketDailySnapshot(event, market);
-    // THIS SECTION NEEDS TO BE REWRITTEN.
-    // Initialize the length of array of reward tokens for each index to contain a zero value? 
-    // Some days the reward tokens may be claimed in a different order than they are in the rewardTokens Array 
-    if (marketDailySnapshot.rewardTokenEmissionsAmount[rewardTokenIndex]) {
-      marketDailySnapshot.rewardTokenEmissionsAmount[rewardTokenIndex].plus(new BigDecimal(event.params.amount));
-    } else {
-      marketDailySnapshot.rewardTokenEmissionsAmount = [new BigDecimal(event.params.amount)];
+    // If the initRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
+    // Therefore the market needs to be pulled again to account for the updated RewardToken field 
+    initRewardToken(Address.fromHexString(rewardTokenAddr), market);
+    market = loadMarket() as Market;
+    // Load/Create the daily market snapshot entity instance
+    const marketDailySnapshot = loadMarketDailySnapshot(event, market) as MarketDailySnapshot;
+    if (market.rewardTokens) {
+      if (!marketDailySnapshot.rewardTokenEmissionsAmount || marketDailySnapshot.rewardTokenEmissionsAmount.length < market.rewardTokens.length) {
+        // If the current day's snapshot "rewardTokenEmissionsAmount" has not been initialized or is the incorrect length
+        const rewardEmissionsAmounts: BigDecimal[] = [];
+        market.rewardTokens.forEach(() => {
+          // For each reward token, create a zero value to initialize the amount of reward emissions for that day
+          rewardEmissionsAmounts.push(new BigDecimal(new BigInt(0)));
+        });
+        marketDailySnapshot.rewardTokenEmissionsAmount = rewardEmissionsAmounts;
+      }
+      for (let i = 0; i < market.rewardTokens.length; i++) {
+        // Loop through the reward tokens on the market entity instance to compare the addresses to the reward token address
+        const token = market.rewardTokens[i];
+        if (rewardTokenAddr === token) {
+          // If the current token iteration is the reward token address which is to be updated-
+          // Add the rewardTokenEmissionsAmount of that index by the amount of reward tokens claimed
+          marketDailySnapshot.rewardTokenEmissionsAmount[i].plus(new BigDecimal(event.params.amount));
+        }
+      }
     }
     marketDailySnapshot.save();
   }

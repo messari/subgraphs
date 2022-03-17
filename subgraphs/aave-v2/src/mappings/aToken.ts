@@ -7,8 +7,7 @@ import {
 
 import {
   Address,
-  BigDecimal,
-  BigInt
+  BigDecimal
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -20,60 +19,41 @@ import { AaveIncentivesController as IncentivesControllerContract } from "../../
 
 import {
   initToken,
+  loadMarket,
   initRewardToken,
   zeroAddr,
-  getLendingPoolFromCtx,
   rayDivision
 } from "./utilFunctions";
 
 // Code written to pull a Token entity by its aToken. Leaving code commented here for now in case needed 
-// let aTokenInstance = AToken.bind(event.address);
-// let tokenAddr = aTokenInstance.UNDERLYING_ASSET_ADDRESS();
-// let token = initToken(tokenAddr);
-
-function initMarket(): Market {
-  //Function to load the lending pool by context
-  let marketAddr = getLendingPoolFromCtx();
-  return Market.load(marketAddr) as Market;
-}
 
 // ALL BELOW EVENT HANDLERS WILL TRIGGER A MARKET SNAPSHOT. VERIFY IF OTHER EVENTS FOR THIS TEMPLATE WILL NEED TO AS WELL
 
-// THE MINT/BURN HANDLERS ARE WHAT MANAGE THE INPUT/OUTPUT TOKEN SUPPLY/BALANCE.
+// THE MINT/BURN HANDLERS ARE WHAT MANAGE THE OUTPUT TOKEN SUPPLY
 // Need to do more research about the scaling, liquidity index etc in order to properly update the balances after burn/mint.
 // The current supply/balance updating is more of a placeholder. These have to be revised and verified
 
 export function handleATokenMint(event: Mint): void {
-  // Event handler for AToken mints. This gets triggered upon deposits, borrows etc
+  // Event handler for AToken mints. This gets triggered upon deposits
 
-  const market = initMarket();
+  const market = loadMarket();
   const mintedAmount = event.params.value;
   const liquidityIndex = event.params.index;
   const scaledMintedAmount = new BigDecimal(rayDivision(mintedAmount, liquidityIndex));
   const beforeScaledSupply = market.outputTokenSupply;
-  const afterScaledSupply = beforeScaledSupply.plus(scaledMintedAmount);
-
-  const inputTokenBals: BigDecimal[] = market.inputTokenBalances;
-  inputTokenBals[0] = afterScaledSupply;
-  market.inputTokenBalances = inputTokenBals;
-  market.outputTokenSupply = scaledMintedAmount;
+  market.outputTokenSupply = beforeScaledSupply.plus(scaledMintedAmount);
   market.save();
 }
 
 export function handleATokenBurn(event: Burn): void {
-  // Event handler for AToken burns. This gets triggered upon withdraws, repays etc
+  // Event handler for AToken burns. This gets triggered upon withdraws
 
-  const market = initMarket();
+  const market = loadMarket();
   const burnedAmount = event.params.value;
   const liquidityIndex = event.params.index;
   const scaledBurnedAmount = new BigDecimal(rayDivision(burnedAmount, liquidityIndex));
   const beforeScaledSupply = market.outputTokenSupply;
-  const afterScaledSupply = beforeScaledSupply.minus(scaledBurnedAmount);
-
-  const inputTokenBals: BigDecimal[] = market.inputTokenBalances;
-  inputTokenBals[0] = afterScaledSupply;
-  market.inputTokenBalances = inputTokenBals;
-  market.outputTokenSupply = scaledBurnedAmount;
+  market.outputTokenSupply = beforeScaledSupply.minus(scaledBurnedAmount);
   market.save();
 }
 
@@ -81,9 +61,7 @@ export function handleATokenInitialized(event: Initialized): void {
   // This function handles when an AToken is initialized in a new lending pool.
   // This function serves to get the reward token for a given market, as the incentives controller is received in the parametes
 
-  // let token = initToken(event.params.underlyingAsset);
-  const marketAddr = event.params.pool.toHexString();
-  const market = Market.load(marketAddr) as Market;
+  const market = loadMarket();
   const incentivesControllerAddr = event.params.incentivesController;
   if (incentivesControllerAddr.toHexString() != zeroAddr) {
     // Instantiate IncentivesController to get access to contract read methods

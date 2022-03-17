@@ -39,11 +39,6 @@ export function handleLendingPoolConfiguratorUpdated(event: LendingPoolConfigura
   startIndexingLendingPoolConfigurator(event.params.newAddress, context);
 }
 
-
-export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  // Needed? Oracle management will need to be implemented for market/token USD values. Still yet to start on that facet of event management for this subgraph
-}
-
 function startIndexingLendingPool(poolAddress: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool/Market
   // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
@@ -59,7 +54,6 @@ function startIndexingLendingPoolConfigurator(configurator: Address, context: Da
 function initiateContext(addrProvider: Address): DataSourceContext {
   // Add Lending Pool/Market address, price oracle contract address, and protocol id to the context for general accessibility
   // Need to verify that context is accessible from any file importing dataSource? or just scripts for templates directly called to createWithContext
-  // Is this redundant?
 
   const contract = AddressProviderContract.bind(addrProvider);
   const lendingPool = contract.getLendingPool();
