@@ -27,8 +27,7 @@ import {
   Repay as RepayEntity,
   Liquidation as LiquidationEntity,
   Market,
-  LendingProtocol,
-  Token
+  UsageMetricsDailySnapshot
 } from '../../generated/schema';
 
 import {
@@ -39,13 +38,13 @@ import {
   initToken,
   loadMarket,
   amountInUSD,
-  updateFinancialsDailySnapshot,
+  updateFinancials,
   loadMarketDailySnapshot,
   updateMetricsDailySnapshot
 } from "./utilFunctions";
 
 // This section needs to be updated once I can figure out what defines these metrics and how to check if they should be incremented
-function updateMetrics(event: ethereum.Event) {
+function updateMetrics(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Update the current date's UsageMetricsDailySnapshot instance
   const metricsDailySnapshot = updateMetricsDailySnapshot(event);
   // Needs conditionals for incrementing
@@ -53,28 +52,7 @@ function updateMetrics(event: ethereum.Event) {
   metricsDailySnapshot.activeUsers += 1;
   metricsDailySnapshot.totalUniqueUsers += 1;
   metricsDailySnapshot.save();
-}
-
-// This function needs to be updated once pulling financial data from oracles
-// Function will be revised later to either calculate data to update within this function, or have it passed in as arguments from call location
-function updateFinancials(
-  event: ethereum.Event,
-  totalValueLockedUSD: BigDecimal,
-  totalVolumeUSD: BigDecimal,
-  supplySideRevenueUSD: BigDecimal,
-  protocolSideRevenueUSD: BigDecimal,
-  feesUSD: BigDecimal
-  ) {
-  // Update the current date's FinancialDailySnapshot instance
-  const financialsDailySnapshot = updateFinancialsDailySnapshot(event);
-  // NEED TO CALCULATE THESE AND PASS THEM AS ARGS TO THIS FUNCTION
-  // STILL NEED TO FIGURE OUT HOW SOME OF THESE ARE CALCULATED/PULLED, SEE NOTES
-  financialsDailySnapshot.totalValueLockedUSD = totalValueLockedUSD;
-  financialsDailySnapshot.totalVolumeUSD = totalVolumeUSD;
-  financialsDailySnapshot.supplySideRevenueUSD = supplySideRevenueUSD;
-  financialsDailySnapshot.protocolSideRevenueUSD = protocolSideRevenueUSD;
-  financialsDailySnapshot.feesUSD = feesUSD;
-  financialsDailySnapshot.save();
+  return metricsDailySnapshot;
 }
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
@@ -125,8 +103,8 @@ export function handleDeposit(event: Deposit): void {
   market.save();
   loadMarketDailySnapshot(event, market);
   updateMetrics(event);
-  // Need to calculate financials to send to the function to update daily financial implementation
-  updateFinancials(event);
+  // Protocol side revenue and fees args need to be set to correct value
+  updateFinancials(event, true, amountUSD, amountUSD, amountUSD );
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -163,8 +141,8 @@ export function handleWithdraw(event: Withdraw): void {
   market.save();
   loadMarketDailySnapshot(event, market);
   updateMetrics(event);
-  updateFinancials(event);
-}
+  // Protocol side revenue and fees args need to be set to correct value
+  updateFinancials(event, false, amountUSD, amountUSD, amountUSD );}
 
 export function handleBorrow(event: Borrow): void {
   // Borrow event from a lending pool to a user triggers this handler
@@ -198,7 +176,8 @@ export function handleBorrow(event: Borrow): void {
   market.save();
   loadMarketDailySnapshot(event, market);
   updateMetrics(event);
-  updateFinancials(event);
+  // Protocol side revenue and fees args need to be set to correct value
+  updateFinancials(event, false, amountUSD, amountUSD, amountUSD );
 }
 
 export function handleRepay(event: Repay): void {
@@ -234,7 +213,8 @@ export function handleRepay(event: Repay): void {
   market.save();
   loadMarketDailySnapshot(event, market);
   updateMetrics(event);
-  updateFinancials(event);
+  // Protocol side revenue and fees args need to be set to correct value
+  updateFinancials(event, true, amountUSD, amountUSD, amountUSD );
 }
 
 export function handleLiquidationCall(event: LiquidationCall): void {
@@ -270,7 +250,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   market.save();
   loadMarketDailySnapshot(event, market);
   updateMetrics(event);
-  updateFinancials(event);
+  // Protocol side revenue and fees args need to be set to correct value
+  updateFinancials(event, true, amountUSD, amountUSD, amountUSD );
 }
 
 export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
