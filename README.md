@@ -44,4 +44,9 @@
 ### Advanced
 
 - Building ambitious subgraphs (Part I): https://www.youtube.com/watch?v=4V2o5YJooOM
+  - Schema design
+  - Error handling
+  - Interface and union types
 - Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
+  - Performance tips and tricks (for both mappings and queries)
+- [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)

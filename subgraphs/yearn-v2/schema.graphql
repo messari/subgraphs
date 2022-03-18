@@ -24,12 +24,12 @@ enum ProtocolType {
 }
 
 # An account is a unique Ethereum address
-type Account @entity {
+type _Account @entity {
   " Address of the account "
   id: ID!
 }
 
-type DailyActiveAccount @entity {
+type _DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }

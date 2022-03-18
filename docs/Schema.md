@@ -45,3 +45,14 @@ There is a `RewardToken` entity in our schemas. This represents the extra token 
 Not all protocols have token rewards. For example, Uniswap doesn't have any token reward. For protocols that do, usually not all pools have token rewards. For example, for Sushiswap, only pools in the Onsen program have token rewards.
 
 It's also common for a single pool to have multiple reward tokens. For example, Sushiswap's MasterChef v2 allows for multiple `Rewarders`. Some Curve pools also have both CRV as a reward and also the pool token (e.g. FXS for FRAX, SNX for sUSD) as another reward.
+
+## Internal Entities
+
+There are situations where you may want to have additional entities in your schema. For example:
+
+- Entities to save internal states of your subgraph for aggregation (e.g. counting)
+- Entities to cached contract call result (e.g. prices)
+
+In general, feel free to add extra entities that tracks the internal state of the subgraph as you see fit. Make sure you prefix these entities with an underscore (e.g. `_User`) to differentiate it from entities in the common schema.
+
+Make sure these changes are **strictly** additive. If you need to **modify** existing entities, please let me know and we can go through it together.
