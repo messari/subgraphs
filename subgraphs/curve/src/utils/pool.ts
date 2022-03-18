@@ -1,6 +1,7 @@
 import {
   Address,
   BigDecimal,
+  dataSource,
   DataSourceContext,
   ethereum,
 } from "@graphprotocol/graph-ts";
@@ -20,6 +21,7 @@ import {
   REGISTRY_ADDRESS,
   getOrNull,
 } from "../utils/constant";
+import { getOrCreateProtocol } from "../mappings/registry";
 
 // Create new pool
 export function getOrCreatePool(
@@ -31,19 +33,20 @@ export function getOrCreatePool(
   rewardTokens: Token[]
 ): LiquidityPool {
   // Check if pool exist
-  let pool = LiquidityPool.load(address.toString());
+  let pool = LiquidityPool.load(address.toHexString());
 
   // If pool doesn't exist, create a new pool
   if (pool == null) {
-    let registryContract = Registry.bind(Address.fromString(REGISTRY_ADDRESS));
+    let protocol = getOrCreateProtocol()
+    let registryContract = Registry.bind(dataSource.address());
 
     let inputTokenBalances: BigDecimal[] = []
     for(let i = 0; i < inputTokens.length; i++) {
         inputTokenBalances.push(BIGDECIMAL_ZERO)
     }
 
-    pool = new LiquidityPool(address.toString());
-    pool.protocol = protocol;
+    pool = new LiquidityPool(address.toHexString());
+    pool.protocol = protocol.id;
     pool.inputTokens = inputTokens.map<string>((t) => t.id);
     pool.outputToken = outputToken.id;
     pool.rewardTokens = rewardTokens.map<string>((t) => t.id);
@@ -56,16 +59,19 @@ export function getOrCreatePool(
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
-    pool.name = registryContract.get_pool_name(address);
+    let name = registryContract.try_get_pool_name(address);
+    if(!name.reverted) {
+      pool.name = name.value
+    }
     pool.symbol = null;
 
     pool.save();
 
-    return pool!;
+    return pool as LiquidityPool
   }
 
   // Return pool if it already exist
-  return pool!;
+  return pool as LiquidityPool
 }
 
 export function updatePool(
@@ -82,8 +88,8 @@ export function updatePool(
     pool.createdBlockNumber = event.block.number
     pool.save();
 
-    return pool!
+    return pool as LiquidityPool
 }
 
-// TODO: Update the DexAmm function
-export function createDexAmmProtocol(pool: LiquidityPool): void {}
+
+

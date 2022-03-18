@@ -15,16 +15,19 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/registry.ts
-      entities: [ ]
+      entities: 
+        - DexAmmProtocol
+        - LiquidityPool
+        - Token
       abis:
         - name: ERC20
-          file: ./abis/ERC20.abi
+          file: ./abis/IERC20.json
         - name: PoolInfo
-          file: ./abis/PoolInfo.abi
+          file: ./abis/PoolInfo.json
         - name: Registry
-          file: ./abis/Registry.abi
+          file: ./abis/Registry.json
         - name: StableSwap
-          file: ./abis/StableSwap.abi
+          file: ./abis/StableSwap.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -46,9 +49,9 @@ templates:
       entities: [ ]
       abis:
         - name: StableSwap
-          file: ./abis/StableSwap.abi
+          file: ./abis/StableSwap.json
         - name: Registry
-          file: ./abis/Registry.abi
+          file: ./abis/Registry.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity

@@ -1,55 +1,42 @@
-import { Address, ethereum } from '@graphprotocol/graph-ts'
+import { Address } from '@graphprotocol/graph-ts'
 
 import { ERC20 } from '../../generated/MainRegistry/ERC20'
 
 import { Token } from '../../generated/schema'
-import { ETH_TOKEN_ADDRESS, DEFAULT_DECIMALS } from './constant'
+import { DEFAULT_DECIMALS, ZERO_ADDRESS } from './constant'
 
 
 class TokenInfo {
-  constructor(readonly name: string, readonly symbol: string, readonly decimals: i32) {}
+  constructor(readonly name: string | null, readonly symbol: string | null, readonly decimals: i32) {}
 }
 
-export function getOrCreateToken(address: Address, event: ethereum.Event): Token {
+export function getOrCreateToken(address: Address): Token {
   // Check if token already exist
-  let token = Token.load(address.toString())
+  let token = Token.load(address.toHexString())
 
   // If token doesn't exist, create a new token
-  if (token == null) {
-    token = new Token(address.toString())
+  if (token == null && address !== Address.fromString(ZERO_ADDRESS)) {
+    token = new Token(address.toHexString())
     
-    // Check if address is the eth address 
-    if (token.id == ETH_TOKEN_ADDRESS) {
-      token.name = 'Ether'
-      token.symbol = 'ETH'
-      token.decimals = DEFAULT_DECIMALS
-    } else {
-      let info = getTokenInfo(address)
-
-      token.name = info.name
-      token.symbol = info.symbol
-      token.decimals = info.decimals
-
+    let tokenInstance = ERC20.bind(address)
+    let tryName = tokenInstance.try_name();
+    if (!tryName.reverted) {
+      token.name = tryName.value;
+    }
+    let trySymbol = tokenInstance.try_symbol();
+    if (!trySymbol.reverted) {
+      token.symbol = trySymbol.value;
+    }
+    let tryDecimals = tokenInstance.try_decimals();
+    if (!tryDecimals.reverted) {
+      token.decimals = tryDecimals.value;
     }
 
     token.save()
+    return token as Token
   }
 
-  return token!
+  return token as Token
 }
 
-// Get token info for ERC20 tokens
-function getTokenInfo(address: Address): TokenInfo {
-  let erc20 = ERC20.bind(address)
-
-  let name = erc20.name()
-  let symbol = erc20.name()
-  let decimals = erc20.try_decimals()
-
-  return new TokenInfo(
-    name,
-    symbol,
-    decimals.reverted ? 18 : decimals.value,
-  )
-}
 

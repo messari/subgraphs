@@ -5,6 +5,7 @@ import {
   store,
   DataSourceContext,
   ethereum,
+  dataSource,
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -23,6 +24,7 @@ import { ERC20 } from "../../generated/MainRegistry/ERC20";
 import { getOrCreatePool, updatePool } from "../utils/pool";
 import { getOrCreateToken } from "../utils/tokens";
 import { REGISTRY_ADDRESS } from "../utils/constant";
+import { getOrCreateProtocol } from "./registry";
 
 export function handleAddLiquidity(event: AddLiquidity) : void {
     let fees = event.params.fees
@@ -31,11 +33,12 @@ export function handleAddLiquidity(event: AddLiquidity) : void {
     let token_amount = event.params.token_amounts
     let token_supply = event.params.token_supply
 
-    let registryContract = Registry.bind(Address.fromString(REGISTRY_ADDRESS));
+    let protocol = getOrCreateProtocol()
+    let registryContract = Registry.bind(Address.fromString(protocol.id));
     let poolContract = StableSwap.bind(event.address);
 
     // Check if pool exist
-    let pool = LiquidityPool.load(event.address.toString())
+    let pool = LiquidityPool.load(event.address.toHexString())
 
     // If liquidity pool exist, update the pool 
     if(pool != null) {
@@ -54,11 +57,13 @@ export function handleAddLiquidity(event: AddLiquidity) : void {
         // If token supply in event is 0, then check directly from contract
         let currentTokenSupply = new BigDecimal(token_supply);
         if (currentTokenSupply == new BigDecimal(BigInt.fromI32(0))) {
-            let lpToken = registryContract.get_lp_token(Address.fromString(pool.id));
-            let contract = ERC20.bind(lpToken);
-            let supply = contract.try_totalSupply();
-            if (!supply.reverted) {
-                currentTokenSupply = new BigDecimal(supply.value);
+            let lpToken = registryContract.try_get_lp_token(Address.fromString(pool.id));
+            if(!lpToken.reverted) {
+                let contract = ERC20.bind(lpToken.value);
+                let supply = contract.try_totalSupply();
+                if (!supply.reverted) {
+                    currentTokenSupply = new BigDecimal(supply.value);
+                }
             }
         }
 
