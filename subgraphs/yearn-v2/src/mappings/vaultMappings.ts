@@ -17,8 +17,8 @@ import {
   Deposit as DepositTransaction,
   Withdraw as WithdrawTransaction,
   UsageMetricsDailySnapshot,
-  Account,
-  DailyActiveAccount,
+  _Account,
+  _DailyActiveAccount,
   FinancialsDailySnapshot,
   YieldAggregator,
 } from "../../generated/schema"
@@ -360,18 +360,18 @@ function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from: Addres
   usageMetrics.dailyTransactionCount += 1;
 
   let accountId = from.toHexString()
-  let account = Account.load(accountId)
+  let account = _Account.load(accountId)
   if (!account) {
-    account = new Account(accountId);
+    account = new _Account(accountId);
     account.save();
     usageMetrics.totalUniqueUsers += 1;
   }
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
-  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
     usageMetrics.activeUsers += 1;
   }
