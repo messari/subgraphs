@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { BigInt, BigDecimal, store } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, store, log } from '@graphprotocol/graph-ts'
 import {
   Deposit,
   Withdraw, 
@@ -217,7 +217,11 @@ export function handleTransfer(event: Transfer): void {
       // TODO: Consider using .slice(0, -1).conc at() to protect against
       // unintended side effects for other code paths.
 
-      if (burns != null) burns[burns.length - 1] = burn.id
+      if (burns != null) {
+        if (burns.length >=1) {
+          burns[burns.length - 1] = burn.id
+        }
+      }
       else burns = [burn.id]
     }
     // else add new one
