@@ -1,0 +1,18 @@
+{
+  "name": "benqi",
+  "license": "UNLICENSED",
+  "scripts": {
+    "eslint": "eslint --ext ts,tsx",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ Cuttlas90/benqi",
+    "create-local": "graph create --node http://localhost:8020/ Cuttlas90/benqi",
+    "remove-local": "graph remove --node http://localhost:8020/ Cuttlas90/benqi",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 Cuttlas90/benqi"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  },
+  "devDependencies": {}
+}
