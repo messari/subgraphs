@@ -1,6 +1,6 @@
 specVersion: 0.0.2
 schema:
-  file: ./schema-lending.graphql
+  file: ./schema.graphql
 dataSources:
   - kind: ethereum
     name: LendingPoolAddressesProviderRegistry
@@ -15,18 +15,12 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - AddressesProviderRegistered
-        - AddressesProviderUnregistered
-        - OwnershipTransferred
       abis:
         - name: LendingPoolAddressesProviderRegistry
           file: ./abis/LendingPoolAddressesProviderRegistry.json
       eventHandlers:
         - event: AddressesProviderRegistered(indexed address)
           handler: handleAddressesProviderRegistered
-        - event: AddressesProviderUnregistered(indexed address)
-          handler: handleAddressesProviderUnregistered
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
       file: ./src/mappings/lendingPoolAddressProvider.ts
 templates:
   - kind: ethereum/contract
@@ -46,8 +40,6 @@ templates:
       eventHandlers:
         - event: ProxyCreated(bytes32,indexed address)
           handler: handleProxyCreated
-        - event: PriceOracleUpdated(indexed address)
-          handler: handlePriceOracleUpdated
         - event: LendingPoolUpdated(indexed address)
           handler: handleLendingPoolUpdated
         - event: LendingPoolConfiguratorUpdated(indexed address)
@@ -92,8 +84,6 @@ templates:
           handler: handleRepay
         - event: Swap(indexed address,indexed address,uint256)
           handler: handleSwap
-        - event: FlashLoan(indexed address,indexed address,indexed address,uint256,uint256,uint16)
-          handler: handleFlashLoan
         - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
           handler: handleLiquidationCall
         - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)

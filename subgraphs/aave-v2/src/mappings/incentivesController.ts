@@ -32,15 +32,16 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
   // Handle event emitted when reward tokens are claimed
   // event.address is the incentiveController address
   const incentiveContAddr = event.address;
+  const marketAddr = event.transaction.to as Address;
   if (incentiveContAddr.toHexString() != zeroAddr) {
     const rewardTokenAddr = getRewardTokenAddr(incentiveContAddr);
-    let market = loadMarket() as Market;
+    let market = loadMarket(marketAddr.toHexString()) as Market;
     // If the initRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
     // Therefore the market needs to be pulled again to account for the updated RewardToken field 
     initRewardToken(Address.fromString(rewardTokenAddr), market);
     const tokenInstance = initToken(Address.fromString(rewardTokenAddr));
     const assetPriceInUSDC = getAssetPriceInUSDC(tokenInstance);
-    market = loadMarket() as Market;
+    market = loadMarket(marketAddr.toHexString()) as Market;
     // Load/Create the daily market snapshot entity instance
     const marketDailySnapshot = loadMarketDailySnapshot(event, market) as MarketDailySnapshot;
     let rewardTokenEmAmount: BigDecimal[] = [];
@@ -92,7 +93,8 @@ export function handleRewardsAccrued(event: RewardsAccrued): void {
   // Handle event emitted when reward tokens are accrued from deposits
   // event.address is the incentiveController address
   const incentiveContAddr = event.address;
-  const market = loadMarket() as Market;
+  const marketAddr = event.transaction.to as Address;
+  const market = loadMarket(marketAddr.toHexString()) as Market;
   const rewardTokenAddr = Address.fromString(getRewardTokenAddr(incentiveContAddr));
   // initRewardToken in case it has not been created as a RewardToken entity yet
   initRewardToken(rewardTokenAddr, market);

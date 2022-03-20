@@ -1,7 +1,9 @@
 import {
   Address,
   BigDecimal,
-  BigInt
+  BigInt,
+  dataSource,
+  log
 } from "@graphprotocol/graph-ts";
 
 import {
@@ -14,14 +16,23 @@ import {
 } from "../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 
 import { Token, Market } from "../../generated/schema";
-import { createMarket, initToken, getLendingPoolFromCtx, loadMarket } from "./utilFunctions";
+import { createMarket, initToken, loadMarket } from "./utilFunctions";
+
+export function getLendingPoolFromCtx(): string {
+  // Get the lending pool/market address with context
+  // Need to verify that context is available here, not just the lendingPoolConfigurator.ts script
+  let context = dataSource.context();
+  return context.getString("lendingPool");
+}
 
 export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market/lending pool/reserve creation
   // Attempt to load the market implementation using the loadMarket() function
-  let market = loadMarket();
+  const marketAddr = getLendingPoolFromCtx();
+  log.info('MarketAddr From Context in lendingPoolConfigurator.ts handleReserveInitialized: ' + marketAddr , [marketAddr])
+  let market = loadMarket(marketAddr);
   if (market === null) {
-    const marketAddr = getLendingPoolFromCtx();
+
     // If the market entity has not been created yet, send the following data to the createMarket function to initialize a new implementation of a Market entity
     // The lending pool asset and corresponding aToken asset are loaded or created as an implementation of a Token entity
     const token = initToken(event.params.asset);
@@ -45,7 +56,9 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
 
 export function handleCollateralConfigurationChanged(event: CollateralConfigurationChanged): void {
   // Adjust market LTV, liquidation, and collateral data when the lending pool's collateral configuration has changed 
-  const market = loadMarket() as Market;
+  const marketAddr = getLendingPoolFromCtx();
+  log.info('MarketAddr From Context in lendingPoolConfigurator.ts handleCollateralConfigurationChanged' + marketAddr , [marketAddr])
+  const market = loadMarket(marketAddr) as Market;
   market.maximumLTV = new BigDecimal(event.params.ltv);
   market.liquidationThreshold = new BigDecimal(event.params.liquidationThreshold);
   market.save();
@@ -53,28 +66,36 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
 
 export function handleBorrowingEnabledOnReserve(event: BorrowingEnabledOnReserve): void {
   // Upon enabling borrowing on this lending pool, set market.canBorrowFrom to true
-  const market = loadMarket() as Market;
+  const marketAddr = getLendingPoolFromCtx();
+  log.info('MarketAddr From Context in lendingPoolConfigurator.ts handleBorrowingEnabledReserve' + marketAddr , [marketAddr])
+  const market = loadMarket(marketAddr) as Market;
   market.canBorrowFrom = true;
   market.save();
 }
 
 export function handleBorrowingDisabledOnReserve(event: BorrowingDisabledOnReserve): void {
   // Upon disabling borrowing on this lending pool, set market.canBorrowFrom to false
-  const market = loadMarket() as Market;
+  const marketAddr = getLendingPoolFromCtx();
+  log.info('MarketAddr From Context in lendingPoolConfigurator.ts handleBorrowingDisabledOnReserve' + marketAddr , [marketAddr])
+  const market = loadMarket(marketAddr) as Market;
   market.canBorrowFrom = false;
   market.save();
 }
 
 export function handleReserveActivated(event: ReserveActivated): void {
   // Upon activating this lending pool, set market.isActive to true
-  const market = loadMarket() as Market;
+  const marketAddr = getLendingPoolFromCtx();
+  log.info('MarketAddr From Context in lendingPoolConfigurator.ts handleReserveActivated' + marketAddr , [marketAddr])
+  const market = loadMarket(marketAddr) as Market;
   market.isActive = true;
   market.save();
 }
 
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
   // Upon deactivating this lending pool, set market.isActive to false
-  const market = loadMarket() as Market;
+  const marketAddr = getLendingPoolFromCtx();
+  log.info('MarketAddr From Context in lendingPoolConfigurator.ts handleReserveDeactivated' + marketAddr , [marketAddr])
+  const market = loadMarket(marketAddr) as Market;
   market.isActive = true;
   market.save();
 }

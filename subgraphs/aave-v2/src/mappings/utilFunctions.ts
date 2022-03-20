@@ -3,7 +3,8 @@ import {
     BigDecimal,
     BigInt,
     dataSource,
-    ethereum
+    ethereum,
+    log
 } from "@graphprotocol/graph-ts";
   
 import {
@@ -13,7 +14,8 @@ import {
     MarketDailySnapshot,
     LendingProtocol,
     UsageMetricsDailySnapshot,
-    FinancialsDailySnapshot
+    FinancialsDailySnapshot,
+    UserAddr
 } from "../../generated/schema";
 
 import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
@@ -34,6 +36,7 @@ export function createMarket(
     rewardTokens: Token[]
   ): Market {
     // To prevent mistake double creation, check if a Market entity implementation has already been created with the provided lending pool address/id
+    log.info('MARKET CREATION, ' + id,[id])
     let market = Market.load(id);
     if (market === null) {
         // If the market entity has not been created yet, create the instance
@@ -81,9 +84,9 @@ export function createMarket(
     return market as Market;
   }
 
-export function loadMarket(): Market {
+export function loadMarket(marketAddr: string): Market {
     //Function to load the lending pool and update the entity properties that should be checked each time the Market instance is called or modified
-    const marketAddr = getLendingPoolFromCtx();
+    log.info('MarketAddr From Context in utilFunctions.ts' + marketAddr , [marketAddr])
     const market = Market.load(marketAddr) as Market;
     let outputTokenAddrStr: string = "";
     if (market.outputToken) {
@@ -245,23 +248,57 @@ export function loadMarketDailySnapshot(
     return marketSnapshot as MarketDailySnapshot;
 }
 
+function getMostRecentMetricSnapshot(daysSinceEpoch: number): UsageMetricsDailySnapshot | null {
+    let mostRecentSnapshot: UsageMetricsDailySnapshot | null = null;
+    for (let i = 0; i < 30; ++i) {
+        mostRecentSnapshot = UsageMetricsDailySnapshot.load((daysSinceEpoch - i).toString()) as UsageMetricsDailySnapshot;
+        if (mostRecentSnapshot) {
+            break;
+        }
+    }
+    if (!mostRecentSnapshot) {
+        return null;
+    }
+    return mostRecentSnapshot;
+}
+
+
 export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
     // Load or create the current date's UsageMetricsDailySnapshot implementation
-    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32()).toString();
-    let metricsDailySnapshot = UsageMetricsDailySnapshot.load(daysSinceEpoch);
+    const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
+    let metricsDailySnapshot = UsageMetricsDailySnapshot.load(daysSinceEpoch.toString());
     if (!metricsDailySnapshot) {
-        metricsDailySnapshot = new UsageMetricsDailySnapshot(daysSinceEpoch);
+        metricsDailySnapshot = new UsageMetricsDailySnapshot(daysSinceEpoch.toString());
         const protocolId = getProtocolIdFromCtx();
         const protocol = fetchProtocolEntity(protocolId);
         metricsDailySnapshot.protocol = protocol.id;
         // Initialize zero values
         metricsDailySnapshot.activeUsers = 0;
-        metricsDailySnapshot.totalUniqueUsers = 0;
+        // NEED SIMILIAR GET MOST RECENT SNAPSHOT FUNCTION TO GET TOTAL CUMULATIVE USERS
+        const recentSnapshot = getMostRecentMetricSnapshot(daysSinceEpoch);
+        if (!recentSnapshot) {
+            // Initialize zero values
+            metricsDailySnapshot.totalUniqueUsers = 0;
+        } else {
+            metricsDailySnapshot.totalUniqueUsers = metricsDailySnapshot.totalUniqueUsers;
+        }
         metricsDailySnapshot.dailyTransactionCount = 0;
         // Push the new day's entity implementation to the protocol array
         protocol.usageMetrics.push(metricsDailySnapshot.id);
         protocol.save();
     }
+
+    const userAddr = event.transaction.from;
+    let user = UserAddr.load(userAddr.toHexString());
+    if (!user) {
+        user = new UserAddr(userAddr.toHexString());
+        metricsDailySnapshot.totalUniqueUsers += 1;
+    }
+    if (user.mostRecentVisit !== new BigInt(daysSinceEpoch as i32)) {
+        user.mostRecentVisit = new BigInt(daysSinceEpoch as i32);
+        metricsDailySnapshot.activeUsers += 1;
+    }
+    user.save();
     metricsDailySnapshot.blockNumber = event.block.number;
     metricsDailySnapshot.timestamp = event.block.timestamp;
     metricsDailySnapshot.save();

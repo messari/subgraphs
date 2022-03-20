@@ -1,4 +1,4 @@
-import { Address, DataSourceContext } from "@graphprotocol/graph-ts";
+import { Address, DataSourceContext, log } from "@graphprotocol/graph-ts";
 
 import {
   ProxyCreated,
@@ -8,17 +8,26 @@ import {
   LendingPoolAddressesProvider as AddressProviderContract,
 } from "../../generated/templates/LendingPoolAddressesProvider/LendingPoolAddressesProvider";
 
+import { AddressesProviderRegistered } from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry"
+
 import {
   LendingPool as LendingPoolTemplate,
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
+  LendingPoolAddressesProvider as LendingPoolAddressesProviderTemplate
 } from "../../generated/templates";
 import { fetchProtocolEntity } from "./utilFunctions";
 
+export function handleAddressesProviderRegistered(event: AddressesProviderRegistered): void {
+  let address = event.params.newAddress;
+  // start indexing the address provider
+  LendingPoolAddressesProviderTemplate.create(address);
+}
 
 export function handleProxyCreated(event: ProxyCreated): void {
   // Event handler for lending pool or configurator contract creation
   let pool = event.params.id.toString();
   let address = event.params.newAddress;
+  log.info('pool:,' + pool + '- address: '+ address.toHexString()+ ' in handleProxyCreated', [pool, address.toHexString()])
   const context = initiateContext(event.address);
 
   if (pool == "LENDING_POOL") {
@@ -60,6 +69,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   const lendingProtocol = fetchProtocolEntity('aave-v2');
   // Get the Address Provider Contract's Price Oracle
   const priceOracle = contract.getPriceOracle();
+  log.info('CREATING CONTEXT ' + lendingPool.toHexString()+ priceOracle.toHexString()+ addrProvider.toHexString() , [lendingPool.toHexString(), priceOracle.toHexString(), addrProvider.toHexString()])
   const context = new DataSourceContext();
   context.setString("lendingPool", lendingPool.toHexString());
   context.setString("priceOracle", priceOracle.toHexString());

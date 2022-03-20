@@ -35,8 +35,10 @@ import {
 
 export function handleATokenMint(event: Mint): void {
   // Event handler for AToken mints. This gets triggered upon deposits
-
-  const market = loadMarket();
+  const aTokenAddr = event.address;
+  const aToken = AToken.bind(aTokenAddr);
+  const marketAddr = aToken.POOL();
+  const market = loadMarket(marketAddr.toHexString());
   const mintedAmount = event.params.value;
   const liquidityIndex = event.params.index;
   const scaledMintedAmount = new BigDecimal(rayDivision(mintedAmount, liquidityIndex));
@@ -47,8 +49,10 @@ export function handleATokenMint(event: Mint): void {
 
 export function handleATokenBurn(event: Burn): void {
   // Event handler for AToken burns. This gets triggered upon withdraws
-
-  const market = loadMarket();
+  const aTokenAddr = event.address;
+  const aToken = AToken.bind(aTokenAddr);
+  const marketAddr = aToken.POOL();
+  const market = loadMarket(marketAddr.toHexString());
   const burnedAmount = event.params.value;
   const liquidityIndex = event.params.index;
   const scaledBurnedAmount = new BigDecimal(rayDivision(burnedAmount, liquidityIndex));
@@ -60,8 +64,10 @@ export function handleATokenBurn(event: Burn): void {
 export function handleATokenInitialized(event: Initialized): void {
   // This function handles when an AToken is initialized in a new lending pool.
   // This function serves to get the reward token for a given market, as the incentives controller is received in the parametes
-
-  const market = loadMarket();
+  const aTokenAddr = event.address;
+  const aToken = AToken.bind(aTokenAddr);
+  const marketAddr = aToken.POOL();
+  const market = loadMarket(marketAddr.toHexString());
   const incentivesControllerAddr = event.params.incentivesController;
   if (incentivesControllerAddr.toHexString() != zeroAddr) {
     // Instantiate IncentivesController to get access to contract read methods
