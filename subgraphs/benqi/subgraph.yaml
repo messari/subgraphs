@@ -35,11 +35,11 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event:  ActionPaused(address,string,bool)
-          handler: handleActionPaused
+          handler: MarketPaused1
         - event: DistributedBorrowerReward(indexed uint8,indexed address,indexed address,uint256,uint256)
-          handler: handleDistributedReward
+          handler: DistributedBorrowerReward
         - event: DistributedSupplierReward(indexed uint8,indexed address,indexed address,uint256,uint256)
-          handler: handleDistributedReward
+          handler: DistributedSupplierReward
       file: ./src/comptroller.ts
   - kind: ethereum
     name: BenqiTokenqiAVAX
@@ -74,17 +74,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiBTC
@@ -119,17 +119,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiETH
@@ -164,17 +164,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiUSDT
@@ -209,17 +209,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiLINK
@@ -254,17 +254,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiUSDC
@@ -299,17 +299,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiDAI
@@ -344,17 +344,17 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
   - kind: ethereum
     name: BenqiTokenqiQI
@@ -389,15 +389,15 @@ dataSources:
           file: ./abis/Comptroller.json
       eventHandlers:
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
+          handler: accrueInterest
         - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
+          handler: borrowTransactions
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
+          handler: liquidTransactions
         - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: DepositTransactions
         - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
+          handler: withDrawTransactions
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
+          handler: repayTransactions
       file: ./src/token.ts
