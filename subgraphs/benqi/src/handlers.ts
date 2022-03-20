@@ -95,13 +95,13 @@ export function handleborrowTransactions(
   defineUser(transactionTo, timestamp, blockNumber, protocolInterface)
 
 
-  financialsDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
-  financialsDailySnapshotEntity.totalVolumeUSD.minus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalValueLockedUSD = financialsDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalVolumeUSD = financialsDailySnapshotEntity.totalVolumeUSD.minus(amount.toBigDecimal())
   financialsDailySnapshotEntity.save()
-  market.totalValueLockedUSD.minus(amount.toBigDecimal())
-  market.totalVolumeUSD.minus(amount.toBigDecimal())
+  market.totalValueLockedUSD = market.totalValueLockedUSD.minus(amount.toBigDecimal())
+  market.totalVolumeUSD = market.totalVolumeUSD.minus(amount.toBigDecimal())
   market.save()
-  marketDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
+  marketDailySnapshotEntity.totalValueLockedUSD = marketDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
   marketDailySnapshotEntity.save()
   entity.hash = transactionHash.toString()
   entity.logIndex = logIndex.toI32()
@@ -112,11 +112,11 @@ export function handleborrowTransactions(
   entity.blockNumber = blockNumber
   entity.timestamp = timestamp
 
-  entity.market = market.getString(market.id)
+  entity.market = market.id
 
   let token = defineToken(qiTokenAddress)
 
-  entity.asset = token.getString(token.id)
+  entity.asset = token.id
   entity.amount = convertBINumToDesiredDecimals(amount, 18)
 
   entity.amountUSD = convertBINumToDesiredDecimals(amount, 18).times(priceWithDecimal)
@@ -150,13 +150,13 @@ export function handlerepayTransactions(
   defineUser(transactionTo, timestamp, blockNumber, protocolInterface)
   defineUser(transactionFrom, timestamp, blockNumber, protocolInterface)
 
-  financialsDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
-  financialsDailySnapshotEntity.totalVolumeUSD.plus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalValueLockedUSD = financialsDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalVolumeUSD = financialsDailySnapshotEntity.totalVolumeUSD.plus(amount.toBigDecimal())
   financialsDailySnapshotEntity.save()
-  market.totalVolumeUSD.plus(amount.toBigDecimal())
-  market.totalValueLockedUSD.plus(amount.toBigDecimal())
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amount.toBigDecimal())
+  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(amount.toBigDecimal())
   market.save()
-  marketDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
+  marketDailySnapshotEntity.totalValueLockedUSD = marketDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
   marketDailySnapshotEntity.save()
   
   entity.hash = transactionHash.toString()
@@ -169,7 +169,7 @@ export function handlerepayTransactions(
   entity.timestamp = timestamp
 
 
-  entity.market = market.getString(market.id)
+  entity.market = market.id
 
   let token = defineToken(qiTokenAddress)
   entity.asset = token.id
@@ -205,18 +205,18 @@ export function handleWithDrawTransactions(
   }
   defineUser(transactionTo, timestamp, blockNumber, protocolInterface)
 
-  financialsDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
-  financialsDailySnapshotEntity.totalVolumeUSD.minus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalValueLockedUSD = financialsDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalVolumeUSD = financialsDailySnapshotEntity.totalVolumeUSD.minus(amount.toBigDecimal())
   financialsDailySnapshotEntity.save()
-  market.totalVolumeUSD.minus(amount.toBigDecimal())
-  market.totalValueLockedUSD.minus(amount.toBigDecimal())
+  market.totalVolumeUSD = market.totalVolumeUSD.minus(amount.toBigDecimal())
+  market.totalValueLockedUSD = market.totalValueLockedUSD.minus(amount.toBigDecimal())
   market.save()
-  marketDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
+  marketDailySnapshotEntity.totalValueLockedUSD = marketDailySnapshotEntity.totalValueLockedUSD.minus(amount.toBigDecimal())
   marketDailySnapshotEntity.save()
 
   entity.hash = transactionHash.toString()
   entity.logIndex = logIndex.toI32()
-  entity.protocol = protocolInterface.getString(protocolInterface.id)
+  entity.protocol = protocolInterface.id
   entity.to = transactionTo.toString()
   entity.blockNumber = blockNumber
   entity.timestamp = timestamp
@@ -258,13 +258,13 @@ export function handleDepositTransactions(
   }
   defineUser(transactionTo, timestamp, blockNumber, protocolInterface)
 
-  financialsDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
-  financialsDailySnapshotEntity.totalVolumeUSD.plus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalValueLockedUSD = financialsDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalVolumeUSD = financialsDailySnapshotEntity.totalVolumeUSD.plus(amount.toBigDecimal())
   financialsDailySnapshotEntity.save()
-  market.totalVolumeUSD.plus(amount.toBigDecimal())
-  market.totalValueLockedUSD.plus(amount.toBigDecimal())
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amount.toBigDecimal())
+  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(amount.toBigDecimal())
   market.save()
-  marketDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
+  marketDailySnapshotEntity.totalValueLockedUSD = marketDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
   marketDailySnapshotEntity.save()
 
   entity.hash = transactionHash.toString()
@@ -317,17 +317,17 @@ export function handleLiquidTransaction(
   defineUser(transactionTo, timestamp, blockNumber, protocolInterface)
   defineUser(transactionFrom, timestamp, blockNumber, protocolInterface)
 
-  financialsDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
-  financialsDailySnapshotEntity.totalVolumeUSD.plus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalValueLockedUSD = financialsDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
+  financialsDailySnapshotEntity.totalVolumeUSD = financialsDailySnapshotEntity.totalVolumeUSD.plus(amount.toBigDecimal())
   financialsDailySnapshotEntity.save()
-  market.totalVolumeUSD.plus(amount.toBigDecimal())
-  market.totalValueLockedUSD.plus(amount.toBigDecimal())
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amount.toBigDecimal())
+  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(amount.toBigDecimal())
   market.save()
-  marketDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
+  marketDailySnapshotEntity.totalValueLockedUSD = marketDailySnapshotEntity.totalValueLockedUSD.plus(amount.toBigDecimal())
   marketDailySnapshotEntity.save()
   entity.hash = transactionHash.toString()
   entity.logIndex = logIndex.toI32()
-  entity.protocol = protocolInterface.getString(protocolInterface.id)
+  entity.protocol = protocolInterface.id
   entity.to = transactionTo.toString()
   entity.from = transactionFrom.toString()
   entity.blockNumber = blockNumber
@@ -355,7 +355,7 @@ export function handleDistributedReward(
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress,timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   let MarketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress,timestamp,blockNumber,market, comptrollerAddress)
-  MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(convertBINumToDesiredDecimals(rewardAmount, 18))
+  MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType] = MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(convertBINumToDesiredDecimals(rewardAmount, 18))
   let comptrollerContract = Comptroller.bind(comptrollerAddress)
   if(comptrollerContract.try_getAllMarkets().reverted) {
     
@@ -368,7 +368,7 @@ export function handleDistributedReward(
         let token = defineToken(addressOfMarket)
         if (token.symbol == "qiQI") {
           priceWithDecimal = getPriceOfUnderlying(addressOfMarket, comptrollerAddress)
-          MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
+          MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType] = MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
         } 
       }
     } else if(tokenType == 1) {
@@ -377,7 +377,7 @@ export function handleDistributedReward(
         let token = defineToken(addressOfMarket)
         if (token.symbol == "qiAVAX") {
           priceWithDecimal = getPriceOfUnderlying(addressOfMarket, comptrollerAddress)
-          MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
+          MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType] = MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
         }
       }
   
@@ -467,7 +467,7 @@ function defineFinancialsDailySnapshotEntity(
     FinancialsDailySnapshotEntity = new FinancialsDailySnapshot(daysFromStart.toString())
     FinancialsDailySnapshotEntity.timestamp = timestamp
     FinancialsDailySnapshotEntity.blockNumber = blockNumber
-    FinancialsDailySnapshotEntity.protocol = protocolInterface.getString(protocolInterface.id)
+    FinancialsDailySnapshotEntity.protocol = protocolInterface.id
   }
 
   FinancialsDailySnapshotEntity.save()
@@ -502,7 +502,7 @@ function getPriceOfUnderlying(qiTokenAddress: Address, comptrollerAddress: Addre
     return priceWithDecimal
   } else {
     let oracleAddress = comptrollerContract.oracle()
-    let oracleContract = Oracle.bind(Address.fromString(oracleAddress.toString()))
+    let oracleContract = Oracle.bind(oracleAddress)
     let priceWithoutDecimal = oracleContract.getUnderlyingPrice(qiTokenAddress)
     if (qiTokenContract.try_symbol().reverted) {
       return priceWithDecimal
@@ -649,7 +649,7 @@ function defineMarket(
     } else {
       market.name = qiTokenContract.name()
     }
-    market.protocol = protocolInterface.getString(protocolInterface.id)
+    market.protocol = protocolInterface.id
     market.createdTimestamp = timestamp
     market.createdBlockNumber = blockNumber
     market.rewardTokens = defineRewardToken(qiTokenAddress, comptrollerAddress).map<string>((t) => t.id)
@@ -681,7 +681,7 @@ function defineMarket(
   market.isActive = false
 
   let outputToken = defineToken(qiTokenAddress)
-  market.outputToken = outputToken.getString(outputToken.id)
+  market.outputToken = outputToken.id
 
   if (qiTokenContract.try_totalSupply().reverted) {
     market.outputTokenSupply = bigDecimal.fromString("0")
@@ -751,9 +751,9 @@ function updateInputTokensSupply(
     for (let index = 0; index < numberOfMarkets; index++) {
       let tokenIndex = market.inputTokens.indexOf(marketAddresses[index].toString())
       let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
-      let inputContract = BenqiTokenqi.bind(Address.fromString(marketAddresses[index].toString()))
+      let inputContract = BenqiTokenqi.bind(marketAddresses[index])
       marketDailySnapshotEntity.inputTokenBalances[tokenIndex] = convertBINumToDesiredDecimals(inputContract.totalSupply(), 18)
-      let priceWithDecimal = getPriceOfUnderlying(Address.fromString(marketAddresses[index].toString()), comptrollerAddress)
+      let priceWithDecimal = getPriceOfUnderlying(marketAddresses[index], comptrollerAddress)
       marketDailySnapshotEntity.inputTokenPricesUSD[tokenIndex] = priceWithDecimal
       marketDailySnapshotEntity.save()
     }
