@@ -408,57 +408,62 @@ type Swap implements Event @entity {
 #Added Entities 
 
 # An account is a unique Ethereum address
-type Account @entity {
+type _Account @entity {
   " Address of the account "
   id: ID!
 }
 
-type DailyActiveAccount @entity {
+type _DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }
 
-type Transaction @entity {
+type _Transaction @entity {
   id: ID! # txn hash
   blockNumber: BigInt!
   timestamp: BigInt!
-  # This is not the reverse of Mint.transaction; it is only used to
-  # track incomplete mints (similar for burns and swaps)
-  mints: [Mint!]
-  burns: [Burn!]
+  " This is not the reverse of Mint.transaction; it is only used to track incomplete mints (similar for burns and swaps) "
+  mints: [_Mint!] 
+  burns: [_Burn!]
 }
 
-type Mint @entity {
-  # transaction hash + "-" + index in mints Transaction array
+type _Mint @entity {
+  " transaction hash + '-' + index in mints Transaction array "
   id: ID!
  
-  # populated from the primary Transfer event
+  " populated from the primary Transfer event "
   to: Bytes!
   from: Bytes
   liquidity: BigDecimal!
 }
 
-type Burn @entity {
-  # transaction hash + "-" + index in mints Transaction array
+type _Burn @entity {
+  " transaction hash + '-' + index in mints Transaction array "
   id: ID!
 
-  # populated from the primary Transfer event
+  " populated from the primary Transfer event "
   liquidity: BigDecimal!
 
-  # populated from the Burn event
+  " populated from the Burn event "
   sender: Bytes
   to: Bytes
  
-  # mark uncomplete in ETH case
+  " mark uncomplete in ETH case "
   needsComplete: Boolean!
 }
 
-# stores for USD calculations
-type Bundle @entity {
+"  Used to keep track of the price of Ether/TVL in USD "
+type _PricesUSD @entity {
   id: ID!
-  ethPrice: BigDecimal! # price of ETH usd
+  " price of ETH usd/TVL "
+  valueUSD: BigDecimal! 
 }
 
-
-
-
+type _TokenTracker @entity { 
+  " Token Address "
+  id: ID!
+  " pools token is in that are white listed for USD pricing "
+  whitelistPools: [Pool!]!
+  " derived price in ETH "
+  derivedETH: BigDecimal!
+}

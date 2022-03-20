@@ -1,16 +1,52 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
+import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
 
-export const PROTOCOL_ID = "1337"
 
-export const NETWORK_ETHEREUM = "ETHEREUM"
+////////////////////////
+///// Schema Enums /////
+////////////////////////
 
-export const PROTOCOL_TYPE_DEX_AMM = "DEX_AMM"
-export const PROTOCOL_TYPE_LENDING = "LENDING"
-export const PROTOCOL_TYPE_YIELD = "YIELD"
+export namespace Network {
+  export const AVALANCHE = "AVALANCHE"
+  export const AURORA = "AURORA"
+  export const BSC = "BSC"
+  export const CELO = "CELO"
+  export const CRONOS = "CRONOS"
+  export const ETHEREUM = "ETHEREUM"
+  export const FANTOM = "FANTOM"
+  export const HARMONY = "HARMONY"
+  export const MOONBEAM = "MOONBEAM"
+  export const MOONRIVER = "MOONRIVER"
+  export const OPTIMISM = "OPTIMISM"
+  export const POLYGON = "POLYGON"
+  export const XDAI = "XDAI"
+}
 
-export const MANAGEMENT_FEE = "MANAGEMENT_FEE"
-export const PERFORMANCE_FEE = "PERFORMANCE_FEE"
+export namespace ProtocolType {
+  export const EXCHANGE = "EXCHANGE"
+  export const LENDING = "LENDING"
+  export const YIELD = "YIELD"
+  export const BRIDGE = "BRIDGE"
+  export const GENERIC = "GENERIC"
+}
+
+export namespace VaultFeeType {
+  export const MANAGEMENT_FEE = "MANAGEMENT_FEE"
+  export const PERFORMANCE_FEE = "PERFORMANCE_FEE"
+  export const DEPOSIT_FEE = "DEPOSIT_FEE"
+  export const WITHDRAWLAL_FEE = "WITHDRAWLAL_FEE"
+}
+
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT"
+  export const BORROW = "BORROW"
+}
+
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+
+export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+export const USDC_WETH_PAIR = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' // created 10008355
+export const DAI_WETH_PAIR = '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11' // created block 10042267
+export const USDT_WETH_PAIR = '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // created block 10093341
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
@@ -22,6 +58,9 @@ export let BIGINT_MAX = BigInt.fromString(
 );
 export let BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export let BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
+
+export let INT_ZERO = 0 as i32
+export let INT_ONE = 1 as i32
 
 export let MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export let DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));

@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { BigInt, BigDecimal, store } from '@graphprotocol/graph-ts'
+import { BigInt, BigDecimal, store, log } from '@graphprotocol/graph-ts'
 import {
   Deposit,
   Withdraw, 
@@ -7,10 +7,11 @@ import {
   LiquidityPool,
   DexAmmProtocol,
   Token,
-  Transaction, 
-  Mint as MintEvent, 
-  Burn as BurnEvent,
-  Bundle
+  _Transaction, 
+  _Mint as MintEvent, 
+  _Burn as BurnEvent,
+  _PricesUSD,
+  _TokenTracker
 } from './../generated/schema'
 
 import { Mint, Burn, Swap, Transfer, Sync } from '../generated/templates/Pair/Pair'
@@ -39,13 +40,14 @@ function isCompleteMint(mintId: string): boolean {
 export function handleTransfer(event: Transfer): void {
 
   // get pair and load contract
-  let pool = LiquidityPool.load(event.address.toHexString())
+  let pool = LiquidityPool.load(event.address.toHex())
 
   if (pool == null) {
+    log.debug('pool was null', [])
     return
   }
 
-  let transactionHash = event.transaction.hash.toHexString()
+  let transactionHash = event.transaction.hash.toHex()
 
   // user stats
   let from = event.params.from
@@ -55,30 +57,22 @@ export function handleTransfer(event: Transfer): void {
   let value = convertTokenToDecimal(event.params.value, BigInt.fromI32(DEFAULT_DECIMALS))
 
   // ignore initial transfers for first adds
-  if (to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BigInt.fromI32(1000))) {
+  if (to.toHex() == ZERO_ADDRESS && event.params.value.equals(BigInt.fromI32(1000))) {
     return
   }
 
   // get or create transaction
-  let transaction = Transaction.load(transactionHash)
+  let transaction = _Transaction.load(transactionHash)
   if (transaction == null) {
-    transaction = new Transaction(transactionHash)
+    transaction = new _Transaction(transactionHash)
     transaction.blockNumber = event.block.number
     transaction.timestamp = event.block.timestamp
-    transaction.mints = []
-    transaction.burns = []
   }
 
-  if (transaction.mints == null) {
-    transaction.mints = []
-  }
-  if (transaction.burns == null) {
-    transaction.burns = []
-  }
 
   // mints
   let mints = transaction.mints
-  if (from.toHexString() == ZERO_ADDRESS) {
+  if (from.toHex() == ZERO_ADDRESS) {
     // update total supply
     pool.outputTokenSupply = pool.outputTokenSupply.plus(value)
     pool.save()
@@ -91,7 +85,7 @@ export function handleTransfer(event: Transfer): void {
 
       let mint = new MintEvent(
         event.transaction.hash
-          .toHexString()
+          .toHex()
           .concat('-')
           .concat(BigInt.fromI32(length).toString())
       )
@@ -115,7 +109,7 @@ export function handleTransfer(event: Transfer): void {
 
         //let mint = new MintEvent(
           //event.transaction.hash
-            //.toHexString()
+            //.toHex()
             //.concat('-')
             //.concat(BigInt.fromI32(mints.length).toString())
         //)
@@ -135,12 +129,12 @@ export function handleTransfer(event: Transfer): void {
   }
 
   // case where direct send first on ETH withdrawls
-  if (event.params.to.toHexString() == pool.id) {
+  if (event.params.to.toHex() == pool.id) {
     let burns = transaction.burns
     let length = burns == null ? 0: burns.length
     let burn = new BurnEvent(
       event.transaction.hash
-        .toHexString()
+        .toHex()
         .concat('-')
         .concat(BigInt.fromI32(length).toString())
     )
@@ -151,8 +145,6 @@ export function handleTransfer(event: Transfer): void {
     burn.needsComplete = true
     burn.save()
 
-    // TODO: Consider using .concat() for handling array updates to protect
-    // against unintended side effects for other code paths.
     if (burns == null) transaction.burns = [burn.id]
     else transaction.burns = burns.concat([burn.id])
 
@@ -160,7 +152,7 @@ export function handleTransfer(event: Transfer): void {
   }
 
   // burn
-  if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from.toHexString() == pool.id) {
+  if (event.params.to.toHex() == ZERO_ADDRESS && event.params.from.toHex() == pool.id) {
     pool.outputTokenSupply = pool.outputTokenSupply.minus(value)
     pool.save()
 
@@ -174,7 +166,7 @@ export function handleTransfer(event: Transfer): void {
       } else {
         burn = new BurnEvent(
           event.transaction.hash
-            .toHexString()
+            .toHex()
             .concat('-')
             .concat(BigInt.fromI32(burns.length).toString())
         )
@@ -187,7 +179,7 @@ export function handleTransfer(event: Transfer): void {
     } else {
       burn = new BurnEvent(
         event.transaction.hash
-          .toHexString()
+          .toHex()
           .concat('-')
           .concat(BigInt.fromI32(0).toString())
       )
@@ -202,7 +194,7 @@ export function handleTransfer(event: Transfer): void {
     // if this logical burn included a fee mint, account for this
     if (mints != null && !isCompleteMint(mints[mints.length - 1])) {
       // remove the logical mint
-      store.remove('Mint', mints[mints.length - 1])
+      store.remove('_Mint', mints[mints.length - 1])
       // update the transaction
 
       // TODO: Consider using .slice().pop() to protect against unintended
@@ -240,37 +232,52 @@ export function handleSync(event: Sync): void {
 
   let token0 = Token.load(pool.inputTokens[0])
   let token1 = Token.load(pool.inputTokens[1])
+  let tokenTracker0 = _TokenTracker.load(pool.inputTokens[0])
+  let tokenTracker1 = _TokenTracker.load(pool.inputTokens[1])
 
   if (token0 == null) return
   if (token1 == null) return
+  if (tokenTracker0 == null) return
+  if (tokenTracker1 == null) return
 
-  pool.inputTokenBalances[0] = convertTokenToDecimal(event.params.reserve0, BigInt.fromI32(token0.decimals))
-  pool.inputTokenBalances[1] = convertTokenToDecimal(event.params.reserve1, BigInt.fromI32(token1.decimals))
+  let tokenDecimal0 = convertTokenToDecimal(event.params.reserve0, BigInt.fromI32(token0.decimals))
+  let tokenDecimal1 = convertTokenToDecimal(event.params.reserve1, BigInt.fromI32(token1.decimals))
+
+  pool.inputTokenBalances = [tokenDecimal0, tokenDecimal1]
   
   pool.save()
 
-  // update ETH price now that reserves could have changed
-  let bundle = Bundle.load('1')
-  if (bundle == null) return
-    
-  bundle.ethPrice = getEthPriceInUSD()
+
+  // // update ETH price now that reserves could have changed
+  let ether = _PricesUSD.load('ETH')
+  if (ether == null) return
+  let tvl = _PricesUSD.load('ETH')
+  if (tvl == null) return
+
+  ether.valueUSD = getEthPriceInUSD()
   
-  let token0USD = findEthPerToken(token0).times(bundle.ethPrice)
-  let token1USD = findEthPerToken(token1).times(bundle.ethPrice)
+  tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
+  tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
+  tokenTracker0.save()
+  tokenTracker1.save()
   
-  let newTvl = token0USD.times(pool.inputTokenBalances[0]).plus(token1USD.times(pool.inputTokenBalances[1]))
+
+  tvl.valueUSD = tvl.valueUSD.minus(pool.totalValueLockedUSD)
+  let newTvl = tokenTracker0.derivedETH.times(pool.inputTokenBalances[0]).plus(tokenTracker1.derivedETH.times(pool.inputTokenBalances[1]))
   
   pool.totalValueLockedUSD =  newTvl
   pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(pool.outputTokenSupply)
 
-  bundle.save()
+  tvl.valueUSD = tvl.valueUSD.plus(pool.totalValueLockedUSD)
 
+  ether.save()
+  tvl.save()
   pool.save()
 }
 
 
 export function handleMint(event: Mint): void {
-  let transaction = Transaction.load(event.transaction.hash.toHexString())
+  let transaction = _Transaction.load(event.transaction.hash.toHex())
   if (transaction == null) return
 
   let mints = transaction.mints
@@ -290,19 +297,23 @@ export function handleMint(event: Mint): void {
 
   let token0 = Token.load(pool.inputTokens[0])
   let token1 = Token.load(pool.inputTokens[1])
+  let tokenTracker0 = _TokenTracker.load(pool.inputTokens[0])
+  let tokenTracker1 = _TokenTracker.load(pool.inputTokens[1])
 
   if (token0 == null) return
   if (token1 == null) return
+  if (tokenTracker0 == null) return
+  if (tokenTracker1 == null) return
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(event.params.amount0, BigInt.fromI32(token0.decimals))
   let token1Amount = convertTokenToDecimal(event.params.amount1, BigInt.fromI32(token1.decimals))
 
-  let bundle = Bundle.load('1')
-  if (bundle == null) return
+  let ether = _PricesUSD.load('ETH')
+  if (ether == null) return
 
-  let token0USD = findEthPerToken(token0).times(bundle.ethPrice)
-  let token1USD = findEthPerToken(token1).times(bundle.ethPrice)
+  let token0USD = tokenTracker0.derivedETH.times(ether.valueUSD)
+  let token1USD = tokenTracker1.derivedETH.times(ether.valueUSD)
 
   let deposit = new Deposit(
     event.transaction.hash
@@ -337,7 +348,7 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleBurn(event: Burn): void {
-  let transaction = Transaction.load(event.transaction.hash.toHexString())
+  let transaction = _Transaction.load(event.transaction.hash.toHex())
   if (transaction == null) return
 
   let burns = transaction.burns
@@ -358,19 +369,23 @@ export function handleBurn(event: Burn): void {
 
   let token0 = Token.load(pool.inputTokens[0])
   let token1 = Token.load(pool.inputTokens[1])
+  let tokenTracker0 = _TokenTracker.load(pool.inputTokens[0])
+  let tokenTracker1 = _TokenTracker.load(pool.inputTokens[1])
 
   if (token0 == null) return
   if (token1 == null) return
+  if (tokenTracker0 == null) return
+  if (tokenTracker1 == null) return
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(event.params.amount0, BigInt.fromI32(token0.decimals))
   let token1Amount = convertTokenToDecimal(event.params.amount1, BigInt.fromI32(token1.decimals))
 
-  let bundle = Bundle.load('1')
-  if (bundle == null) return
+  let ether = _PricesUSD.load('ETH')
+  if (ether == null) return
 
-  let token0USD = findEthPerToken(token0).times(bundle.ethPrice)
-  let token1USD = findEthPerToken(token1).times(bundle.ethPrice)
+  let token0USD = tokenTracker0.derivedETH.times(ether.valueUSD)
+  let token1USD = tokenTracker1.derivedETH.times(ether.valueUSD)
 
   let withdrawal = new Withdraw(
     event.transaction.hash
@@ -405,7 +420,7 @@ export function handleBurn(event: Burn): void {
 
 
 export function handleSwap(event: Swap): void {
-  let pool = LiquidityPool.load(event.address.toHexString())
+  let pool = LiquidityPool.load(event.address.toHex())
   if (pool == null) return
 
   let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
@@ -413,8 +428,13 @@ export function handleSwap(event: Swap): void {
 
   let token0 = Token.load(pool.inputTokens[0])
   let token1 = Token.load(pool.inputTokens[1])
+  let tokenTracker0 = _TokenTracker.load(pool.inputTokens[0])
+  let tokenTracker1 = _TokenTracker.load(pool.inputTokens[1])
+  
   if (token0 == null) return
   if (token1 == null) return
+  if (tokenTracker0 == null) return
+  if (tokenTracker1 == null) return
 
 
   let amount0In = convertTokenToDecimal(event.params.amount0In, BigInt.fromI32(token0.decimals))
@@ -427,26 +447,23 @@ export function handleSwap(event: Swap): void {
   let amount1Total = amount1Out.plus(amount1In)
 
   // ETH/USD prices
-  let bundle = Bundle.load('1')
-  if (bundle == null) return
+  let ether = _PricesUSD.load('ETH')
+  if (ether == null) return
 
-  let token0ETHPrice = findEthPerToken(token0)
-  let token1ETHPrice = findEthPerToken(token1)
-
-  let token0USD = token0ETHPrice.times(amount0Total).times(bundle.ethPrice)
-  let token1USD = token1ETHPrice.times(amount1Total).times(bundle.ethPrice)
+  let token0USD = tokenTracker0.derivedETH.times(amount0Total).times(ether.valueUSD)
+  let token1USD = tokenTracker0.derivedETH.times(amount1Total).times(ether.valueUSD)
 
   /// get total amounts of derived USD for tracking
   /// let derivedAmountUSD = token1USD.plus(token0USD).div(BigDecimal.fromString('2'))
 
   // only accounts for volume through white listed tokens
-  let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, token0 as Token, amount1Total, token1 as Token, pool as LiquidityPool)
+  let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, tokenTracker0 as _TokenTracker, amount1Total, tokenTracker1 as _TokenTracker, pool as LiquidityPool)
 
   let trackedAmountETH: BigDecimal
-  if (bundle.ethPrice.equals(BIGDECIMAL_ZERO)) {
+  if (ether.valueUSD.equals(BIGDECIMAL_ZERO)) {
     trackedAmountETH = BIGDECIMAL_ZERO
   } else {
-    trackedAmountETH = trackedAmountUSD.div(bundle.ethPrice)
+    trackedAmountETH = trackedAmountUSD.div(ether.valueUSD)
   }
 
   var feeToken: BigDecimal
@@ -454,16 +471,16 @@ export function handleSwap(event: Swap): void {
 
   if (amount0In != BIGDECIMAL_ZERO) {
     feeToken = amount0In.times(BigDecimal.fromString('0.03'))
-    feeUSD = feeToken.times(token0ETHPrice).times(bundle.ethPrice)
+    feeUSD = feeToken.times(tokenTracker0.derivedETH).times(ether.valueUSD)
   } else {
     feeToken = amount1In.times(BigDecimal.fromString('0.03'))
-    feeUSD = feeToken.times(token1ETHPrice).times(bundle.ethPrice)
+    feeUSD = feeToken.times(tokenTracker1.derivedETH).times(ether.valueUSD)
   }
 
 
   let swap = new SwapEvent(
     event.transaction.hash
-      .toHexString()
+      .toHex()
       .concat('-')
       .concat(event.logIndex.toString())
   )

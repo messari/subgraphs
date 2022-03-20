@@ -3,15 +3,16 @@ import { BigInt, BigDecimal, Address, log } from "@graphprotocol/graph-ts"
 import {
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
-  Account,
-  DailyActiveAccount,
+  _Account,
+  _DailyActiveAccount,
   DexAmmProtocol,
   LiquidityPool,
-  PoolDailySnapshot
+  PoolDailySnapshot,
+  _PricesUSD
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 
-import { BIGDECIMAL_ZERO, PROTOCOL_ID, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS } from "../common/constants"
+import { BIGDECIMAL_ZERO, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS } from "../common/constants"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -23,10 +24,12 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
     let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
     let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+    let tvl = _PricesUSD.load('TVL')
+    if (tvl == null) return
 
     if (!financialMetrics) {
         financialMetrics = new FinancialsDailySnapshot(id.toString());
-        financialMetrics.protocol = PROTOCOL_ID;
+        financialMetrics.protocol = FACTORY_ADDRESS;
 
         financialMetrics.feesUSD = BIGDECIMAL_ZERO
         financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
@@ -34,31 +37,15 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
         financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
         financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
     }
-
-    let protocolTvlUsd = BIGDECIMAL_ZERO
-    const protocol = DexAmmProtocol.load(PROTOCOL_ID)
-    if (protocol) {
-        if (!protocol.pools) {
-        log.error(
-            '[financials] no pool',
-            []
-        );
-    }
-        for (let i = 0; i < protocol.pools.length; i++) {
-            const poolId = protocol.pools[i]
-            const pool = LiquidityPool.load(poolId)
-            if (pool == null) return
-            protocolTvlUsd = protocolTvlUsd.plus(pool.totalValueLockedUSD)
-        }
-     financialMetrics.totalValueLockedUSD = protocolTvlUsd
-    }
   
     // Update the block number and timestamp to that of the last transaction of that day
     financialMetrics.blockNumber = blockNumber;
     financialMetrics.timestamp = timestamp;
+    financialMetrics.totalValueLockedUSD = tvl.valueUSD
 
     financialMetrics.save();
 }
+
 
 
 export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from: Address): void {
@@ -68,7 +55,7 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
 
     if (!usageMetrics) {
         usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-        usageMetrics.protocol = PROTOCOL_ID;
+        usageMetrics.protocol = FACTORY_ADDRESS;
 
         usageMetrics.activeUsers = 0;
         usageMetrics.totalUniqueUsers = 0;
@@ -80,19 +67,19 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
     usageMetrics.timestamp = timestamp;
     usageMetrics.dailyTransactionCount += 1;
 
-    let accountId = from.toHexString()
-    let account = Account.load(accountId)
+    let accountId = from.toHex()
+    let account = _Account.load(accountId)
     if (!account) {
-        account = new Account(accountId);
+        account = new _Account(accountId);
         account.save();
         usageMetrics.totalUniqueUsers += 1;
     } 
 
     // Combine the id and the user address to generate a unique user id for the day
-    let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
-    let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
+    let dailyActiveAccountId = id.toString() + "-" + from.toHex()
+    let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
     if (!dailyActiveAccount) {
-        dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
+        dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
         dailyActiveAccount.save();
         usageMetrics.activeUsers += 1;
     }
@@ -108,7 +95,7 @@ export function updatePoolMetrics(blockNumber: BigInt, timestamp: BigInt, pool: 
   
       if (!poolMetrics) {
         poolMetrics = new PoolDailySnapshot(id.toString());
-        poolMetrics.protocol = PROTOCOL_ID;
+        poolMetrics.protocol = FACTORY_ADDRESS;
         poolMetrics.pool = pool.id;
         poolMetrics.rewardTokenEmissionsAmount = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
         poolMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
@@ -160,4 +147,13 @@ export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: Big
       return tokenAmount.toBigDecimal()
     }
     return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
+}
+
+// return 0 if denominator is 0 in division
+export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
+  if (amount1.equals(BIGDECIMAL_ZERO)) {
+    return BIGDECIMAL_ZERO
+  } else {
+    return amount0.div(amount1)
+  }
 }
