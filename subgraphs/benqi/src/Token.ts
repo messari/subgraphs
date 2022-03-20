@@ -27,7 +27,6 @@ export function borrowTransactions(event: BorrowEvent): void {
     event.block.timestamp,
     event.address,
     event.params.borrowAmount,
-    "0x316aE55EC59e0bEb2121C0e41d4BDef8bF66b32B",
   );
 }
 
@@ -41,7 +40,6 @@ export function repayTransactions(event: RepayBorrowEvent): void {
     event.block.timestamp,
     event.address,
     event.params.repayAmount,
-    "0x316aE55EC59e0bEb2121C0e41d4BDef8bF66b32B",
   );
 }
 
@@ -54,7 +52,6 @@ export function withDrawTransactions(event: RedeemEvent): void {
     event.block.timestamp,
     event.address,
     event.params.redeemAmount,
-    "0x316aE55EC59e0bEb2121C0e41d4BDef8bF66b32B",
   );
 }
 export function DepositTransactions(event: MintEvent): void {
@@ -66,7 +63,6 @@ export function DepositTransactions(event: MintEvent): void {
     event.block.timestamp,
     event.address,
     event.params.mintAmount,
-    "0x316aE55EC59e0bEb2121C0e41d4BDef8bF66b32B",
   );
 }
 
@@ -82,7 +78,6 @@ export function liquidTransactions(event: LiquidateBorrowEvent): void {
     event.transaction.value,
     event.params.seizeTokens,
     event.params.repayAmount,
-    "0x316aE55EC59e0bEb2121C0e41d4BDef8bF66b32B",
   );
 }
 
@@ -92,6 +87,5 @@ export function accrueInterest(event: AccrueInterestEvent): void {
     event.params.interestAccumulated,
     event.block.timestamp,
     event.block.number,
-    "0x316aE55EC59e0bEb2121C0e41d4BDef8bF66b32B",
   )
 }

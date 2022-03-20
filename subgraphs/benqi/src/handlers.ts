@@ -1,8 +1,29 @@
-import { BigInt, Address, Bytes, BigDecimal, bigInt, bigDecimal } from "@graphprotocol/graph-ts"
+import { 
+  BigInt, 
+  Address, 
+  Bytes, 
+  BigDecimal, 
+  bigInt, 
+  bigDecimal 
+} from "@graphprotocol/graph-ts"
 import { BenqiTokenqi } from "../generated/BenqiTokenqiAVAX/BenqiTokenqi"
 import { Comptroller } from "../generated/BenqiTokenqiAVAX/Comptroller"
 import { Oracle } from "../generated/BenqiTokenqiAVAX/Oracle"
-import { User, Token, Market, Borrow, Repay, Deposit, Withdraw, Liquidation, UsageMetricsDailySnapshot, LendingProtocol, FinancialsDailySnapshot, MarketDailySnapshot, RewardToken } from "../generated/schema"
+import { 
+  User, 
+  Token, 
+  Market, 
+  Borrow, 
+  Repay, 
+  Deposit, 
+  Withdraw, 
+  Liquidation, 
+  UsageMetricsDailySnapshot, 
+  LendingProtocol, 
+  FinancialsDailySnapshot, 
+  MarketDailySnapshot, 
+  RewardToken 
+} from "../generated/schema"
 import { convertBINumToDesiredDecimals } from "./utils/converters"
 
 
@@ -11,31 +32,39 @@ export function handleAccrueInterest(
   accrueInterest: BigInt,
   timestamp: BigInt,
   blockNumber: BigInt,
-  comptrollerAddress: String,
 ): void {
   let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
-  let protocolInterface = defineLendingProtocol()
-  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
-  financialsDailySnapshotEntity.supplySideRevenueUSD =
-    bigDecimal.times(
-      bigDecimal.times(
-        bigDecimal.minus(
-          bigDecimal.fromString("1"), convertBINumToDesiredDecimals(qiTokenContract.reserveFactorMantissa(), 18))
-        , convertBINumToDesiredDecimals(accrueInterest, 18))
-      , priceWithDecimal)
-  financialsDailySnapshotEntity.protocolSideRevenueUSD =
-    bigDecimal.times(
-      bigDecimal.times(
-        convertBINumToDesiredDecimals(qiTokenContract.reserveFactorMantissa(), 18)
-        , convertBINumToDesiredDecimals(accrueInterest, 18))
-      , priceWithDecimal)
-  financialsDailySnapshotEntity.feesUSD =
-    bigDecimal.times(
-      bigDecimal.times(
-        convertBINumToDesiredDecimals(qiTokenContract.reserveFactorMantissa(), 18)
-        , convertBINumToDesiredDecimals(accrueInterest, 18))
-      , priceWithDecimal)
+  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber,comptrollerAddress)
+  
+  if (qiTokenContract.try_reserveFactorMantissa().reverted) {
+    financialsDailySnapshotEntity.supplySideRevenueUSD = bigDecimal.fromString("0")
+  } else {
+    financialsDailySnapshotEntity.supplySideRevenueUSD = 
+    (bigDecimal.fromString("1")
+    .minus(convertBINumToDesiredDecimals(qiTokenContract.reserveFactorMantissa(), 18)))
+    .times(convertBINumToDesiredDecimals(accrueInterest, 18))
+    .times(priceWithDecimal)
+  }
+  
+  if (qiTokenContract.try_reserveFactorMantissa().reverted) {
+    financialsDailySnapshotEntity.protocolSideRevenueUSD = bigDecimal.fromString("0")    
+  } else {
+    financialsDailySnapshotEntity.protocolSideRevenueUSD = 
+      convertBINumToDesiredDecimals(qiTokenContract.reserveFactorMantissa(), 18)
+      .times(convertBINumToDesiredDecimals(accrueInterest, 18))
+      .times(priceWithDecimal)
+  }
+
+  if (qiTokenContract.try_reserveFactorMantissa().reverted) {
+    financialsDailySnapshotEntity.feesUSD = bigDecimal.fromString("0")    
+  } else {
+    financialsDailySnapshotEntity.feesUSD = 
+      convertBINumToDesiredDecimals(qiTokenContract.reserveFactorMantissa(), 18)
+      .times(convertBINumToDesiredDecimals(accrueInterest, 18))
+      .times(priceWithDecimal)
+  }
   financialsDailySnapshotEntity.save()
 }
 
@@ -48,16 +77,16 @@ export function handleborrowTransactions(
   timestamp: BigInt,
   qiTokenAddress: Address,
   amount: BigInt,
-  comptrollerAddress: String,
-
 ): void {
-  let protocolInterface = defineLendingProtocol()
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
 
 
   defineUsageMetricsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
-  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
+  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber,comptrollerAddress)
   let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
   let entity = Borrow.load(transactionHash.toString().concat("-").concat(logIndex.toString()))
   if (entity == null) {
@@ -90,7 +119,7 @@ export function handleborrowTransactions(
   entity.asset = token.getString(token.id)
   entity.amount = convertBINumToDesiredDecimals(amount, 18)
 
-  entity.amountUSD = bigDecimal.times(convertBINumToDesiredDecimals(amount, 18), priceWithDecimal)
+  entity.amountUSD = convertBINumToDesiredDecimals(amount, 18).times(priceWithDecimal)
   entity.save()
   updateInputTokensSupply(qiTokenAddress,market,comptrollerAddress,timestamp,blockNumber)
 }
@@ -103,17 +132,16 @@ export function handlerepayTransactions(
   timestamp: BigInt,
   qiTokenAddress: Address,
   amount: BigInt,
-  comptrollerAddress: String,
-
 ): void {
-
-  let protocolInterface = defineLendingProtocol()
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   market.save()
 
   defineUsageMetricsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
-  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
+  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber,comptrollerAddress)
   let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
   let entity = Repay.load(transactionHash.toString().concat("-").concat(logIndex.toString()))
   if (entity == null) {
@@ -134,7 +162,6 @@ export function handlerepayTransactions(
   entity.hash = transactionHash.toString()
   entity.logIndex = logIndex.toI32()
 
-  // protocol done
   entity.protocol = protocolInterface.getString(protocolInterface.id)
   entity.to = transactionTo.toString()
   entity.from = transactionFrom.toString()
@@ -148,7 +175,7 @@ export function handlerepayTransactions(
   entity.asset = token.id
   entity.amount = convertBINumToDesiredDecimals(amount, 18)
 
-  entity.amountUSD = bigDecimal.times(convertBINumToDesiredDecimals(amount, 18), priceWithDecimal)
+  entity.amountUSD = convertBINumToDesiredDecimals(amount, 18).times(priceWithDecimal)
   entity.save()
   updateInputTokensSupply(qiTokenAddress,market,comptrollerAddress,timestamp,blockNumber)
 }
@@ -161,17 +188,16 @@ export function handleWithDrawTransactions(
   timestamp: BigInt,
   qiTokenAddress: Address,
   amount: BigInt,
-  comptrollerAddress: String,
-
 ): void {
-
-  let protocolInterface = defineLendingProtocol()
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   market.save()
 
   defineUsageMetricsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
-  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
+  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber,comptrollerAddress)
   let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
   let entity = Withdraw.load(transactionHash.toString().concat("-").concat(logIndex.toString()))
   if (entity == null) {
@@ -202,7 +228,7 @@ export function handleWithDrawTransactions(
   entity.asset = token.id
   entity.amount = convertBINumToDesiredDecimals(amount, 18)
 
-  entity.amountUSD = bigDecimal.times(convertBINumToDesiredDecimals(amount, 18), priceWithDecimal)
+  entity.amountUSD = convertBINumToDesiredDecimals(amount, 18).times(priceWithDecimal)
   entity.save()
   updateInputTokensSupply(qiTokenAddress,market,comptrollerAddress,timestamp,blockNumber)
 }
@@ -215,16 +241,16 @@ export function handleDepositTransactions(
   timestamp: BigInt,
   qiTokenAddress: Address,
   amount: BigInt,
-  comptrollerAddress: String,
-
 ): void {
-  let protocolInterface = defineLendingProtocol()
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   market.save()
 
   defineUsageMetricsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
-  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
+  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber,comptrollerAddress)
   let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
   let entity = Deposit.load(transactionHash.toString().concat("-").concat(logIndex.toString()))
   if (entity == null) {
@@ -256,7 +282,7 @@ export function handleDepositTransactions(
   entity.asset = token.id
   entity.amount = convertBINumToDesiredDecimals(amount, 18)
 
-  entity.amountUSD = bigDecimal.times(convertBINumToDesiredDecimals(amount, 18), priceWithDecimal)
+  entity.amountUSD = convertBINumToDesiredDecimals(amount, 18).times(priceWithDecimal)
   entity.save()
   updateInputTokensSupply(qiTokenAddress,market,comptrollerAddress,timestamp,blockNumber)
 }
@@ -272,10 +298,11 @@ export function handleLiquidTransaction(
   amount: BigInt,
   seizeTokens: BigInt,
   repayAmount: BigInt,
-  comptrollerAddress: String,
 ): void {
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
-  let protocolInterface = defineLendingProtocol()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   market.save()
 
@@ -284,7 +311,7 @@ export function handleLiquidTransaction(
     entity = new Liquidation(transactionHash.toString().concat("-").concat(logIndex.toString()))
   }
   let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
-  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber, protocolInterface)
+  let financialsDailySnapshotEntity = defineFinancialsDailySnapshotEntity(timestamp, blockNumber,comptrollerAddress)
   market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   market.liquidationPenalty = bigInt.dividedBy(bigInt.minus(seizeTokens, repayAmount), seizeTokens).toBigDecimal()
   defineUser(transactionTo, timestamp, blockNumber, protocolInterface)
@@ -311,7 +338,7 @@ export function handleLiquidTransaction(
   entity.asset = token.id
   entity.amount = convertBINumToDesiredDecimals(amount, 18)
 
-  entity.amountUSD = bigDecimal.times(convertBINumToDesiredDecimals(amount, 18), priceWithDecimal)
+  entity.amountUSD = convertBINumToDesiredDecimals(amount, 18).times(priceWithDecimal)
   entity.save()
   updateInputTokensSupply(qiTokenAddress,market,comptrollerAddress,timestamp,blockNumber)
 }
@@ -319,37 +346,42 @@ export function handleLiquidTransaction(
 export function handleDistributedReward(
   tokenType: number,
   qiTokenAddress: Address,
-  comptrollerAddress: String,
   blockNumber: BigInt,
   timestamp: BigInt,
   rewardAmount: BigInt,
 ): void {
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress,timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   let MarketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress,timestamp,blockNumber,market, comptrollerAddress)
   MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(convertBINumToDesiredDecimals(rewardAmount, 18))
-  let comptrollerContract = Comptroller.bind(Address.fromString(comptrollerAddress.toString()))
-  let marketAddresses = comptrollerContract.getAllMarkets()
-  let numberOfMarkets = marketAddresses.length
-  if (tokenType == 0){
-    for (let index = 0; index < numberOfMarkets; index++) {
-      let addressOfMarket = marketAddresses[index]
-      let token = defineToken(addressOfMarket)
-      if (token.symbol == "qiQI") {
-        priceWithDecimal = getPriceOfUnderlying(addressOfMarket, comptrollerAddress)
-        MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
-      } 
-    }
-  } else if(tokenType == 1) {
-    for (let index = 0; index < numberOfMarkets; index++) {
-      let addressOfMarket = marketAddresses[index]
-      let token = defineToken(addressOfMarket)
-      if (token.symbol == "qiAVAX") {
-        priceWithDecimal = getPriceOfUnderlying(addressOfMarket, comptrollerAddress)
-        MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
+  let comptrollerContract = Comptroller.bind(comptrollerAddress)
+  if(comptrollerContract.try_getAllMarkets().reverted) {
+    
+  } else {
+    let marketAddresses = comptrollerContract.getAllMarkets()
+    let numberOfMarkets = marketAddresses.length
+    if (tokenType == 0){
+      for (let index = 0; index < numberOfMarkets; index++) {
+        let addressOfMarket = marketAddresses[index]
+        let token = defineToken(addressOfMarket)
+        if (token.symbol == "qiQI") {
+          priceWithDecimal = getPriceOfUnderlying(addressOfMarket, comptrollerAddress)
+          MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
+        } 
       }
+    } else if(tokenType == 1) {
+      for (let index = 0; index < numberOfMarkets; index++) {
+        let addressOfMarket = marketAddresses[index]
+        let token = defineToken(addressOfMarket)
+        if (token.symbol == "qiAVAX") {
+          priceWithDecimal = getPriceOfUnderlying(addressOfMarket, comptrollerAddress)
+          MarketDailySnapshotEntity.rewardTokenEmissionsAmount[<i32>tokenType].plus(priceWithDecimal.times(convertBINumToDesiredDecimals(rewardAmount, 18)))
+        }
+      }
+  
     }
-
   }
   MarketDailySnapshotEntity.save()
 }
@@ -358,10 +390,11 @@ export function handleMarketPaused(
   action: String,
   pauseState: boolean,
   qiTokenAddress: Address,
-  comptrollerAddress: String,
   blockNumber: BigInt,
   timestamp: BigInt,
 ): void {
+  let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
+  let comptrollerAddress = qiTokenContract.comptroller()
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
   let market = defineMarket(qiTokenAddress, timestamp, blockNumber, priceWithDecimal, comptrollerAddress)
   if (action = "Borrow") {
@@ -378,9 +411,9 @@ function defineMarketDailySnapshotEntity(
   timestamp: BigInt,
   blockNumber: BigInt,
   market: Market,
-  comptrollerAddress: String,
+  comptrollerAddress: Address,
 ): MarketDailySnapshot {
-  let protocolInterface = defineLendingProtocol()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let daysFromStart = timestamp.toI32() / 24 / 60 / 60
   let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
   let priceWithDecimal = getPriceOfUnderlying(qiTokenAddress, comptrollerAddress)
@@ -395,12 +428,27 @@ function defineMarketDailySnapshotEntity(
     MarketDailySnapshotEntity.rewardTokenEmissionsUSD = [bigDecimal.fromString("0"),bigDecimal.fromString("0")]
   }
 
-  MarketDailySnapshotEntity.outputTokenSupply = convertBINumToDesiredDecimals(qiTokenContract.totalSupply(), 18)
+  if (qiTokenContract.try_totalSupply().reverted){
+    MarketDailySnapshotEntity.outputTokenSupply = bigDecimal.fromString("0")
+  } else {
+    MarketDailySnapshotEntity.outputTokenSupply = convertBINumToDesiredDecimals(qiTokenContract.totalSupply(), 18)
+  }
   MarketDailySnapshotEntity.outputTokenPriceUSD = priceWithDecimal
-  MarketDailySnapshotEntity.depositRate = convertBINumToDesiredDecimals(qiTokenContract.supplyRatePerTimestamp(), 18)
-  MarketDailySnapshotEntity.stableBorrowRate = convertBINumToDesiredDecimals(qiTokenContract.borrowRatePerTimestamp(), 18)
-  MarketDailySnapshotEntity.variableBorrowRate = convertBINumToDesiredDecimals(qiTokenContract.borrowRatePerTimestamp(), 18)
-
+  if (qiTokenContract.try_supplyRatePerTimestamp().reverted){
+    MarketDailySnapshotEntity.depositRate = bigDecimal.fromString("0")
+  } else {
+    MarketDailySnapshotEntity.depositRate = convertBINumToDesiredDecimals(qiTokenContract.supplyRatePerTimestamp(), 18)
+  }
+  if (qiTokenContract.try_borrowRatePerTimestamp().reverted){
+    MarketDailySnapshotEntity.stableBorrowRate = bigDecimal.fromString("0")
+  } else {
+    MarketDailySnapshotEntity.stableBorrowRate = convertBINumToDesiredDecimals(qiTokenContract.borrowRatePerTimestamp(), 18)
+  }
+  if (qiTokenContract.try_borrowRatePerTimestamp().reverted){
+    MarketDailySnapshotEntity.variableBorrowRate = bigDecimal.fromString("0")
+  } else {
+    MarketDailySnapshotEntity.variableBorrowRate = convertBINumToDesiredDecimals(qiTokenContract.borrowRatePerTimestamp(), 18)
+  }
   MarketDailySnapshotEntity.save()
   return MarketDailySnapshotEntity
 }
@@ -410,9 +458,9 @@ function defineMarketDailySnapshotEntity(
 function defineFinancialsDailySnapshotEntity(
   timestamp: BigInt,
   blockNumber: BigInt,
-  protocolInterface: LendingProtocol,
+  comptrollerAddress: Address,
 ): FinancialsDailySnapshot {
-
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let daysFromStart = timestamp.toI32() / 24 / 60 / 60
   let FinancialsDailySnapshotEntity = FinancialsDailySnapshot.load(daysFromStart.toString())
   if (FinancialsDailySnapshotEntity == null) {
@@ -446,20 +494,28 @@ function defineUsageMetricsDailySnapshotEntity(
   return UsageMetricsDailySnapshotEntity
 }
 
-function getPriceOfUnderlying(qiTokenAddress: Address, comptrollerAddress: String): BigDecimal {
+function getPriceOfUnderlying(qiTokenAddress: Address, comptrollerAddress: Address): BigDecimal {
   let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
-  let comptrollerContract = Comptroller.bind(Address.fromString(comptrollerAddress.toString()))
-  let oracleAddress = comptrollerContract.oracle()
-  let oracleContract = Oracle.bind(Address.fromString(oracleAddress.toString()))
-  let priceWithoutDecimal = oracleContract.getUnderlyingPrice(qiTokenAddress)
-  let symbol = qiTokenContract.symbol()
-  let priceWithDecimal: BigDecimal
-  if (symbol == "qiBTC") {
-    priceWithDecimal = convertBINumToDesiredDecimals(priceWithoutDecimal, 28)
+  let comptrollerContract = Comptroller.bind(comptrollerAddress)
+  let priceWithDecimal: BigDecimal = bigDecimal.fromString("0")
+  if (comptrollerContract.try_oracle().reverted) {
+    return priceWithDecimal
   } else {
-    priceWithDecimal = convertBINumToDesiredDecimals(priceWithoutDecimal, 18)
+    let oracleAddress = comptrollerContract.oracle()
+    let oracleContract = Oracle.bind(Address.fromString(oracleAddress.toString()))
+    let priceWithoutDecimal = oracleContract.getUnderlyingPrice(qiTokenAddress)
+    if (qiTokenContract.try_symbol().reverted) {
+      return priceWithDecimal
+    } else {
+      let symbol = qiTokenContract.symbol()
+      if (symbol == "qiBTC") {
+        priceWithDecimal = convertBINumToDesiredDecimals(priceWithoutDecimal, 28)
+      } else {
+        priceWithDecimal = convertBINumToDesiredDecimals(priceWithoutDecimal, 18)
+      }
+      return priceWithDecimal
+    }
   }
-  return priceWithDecimal
 }
 
 function defineToken(qiTokenAddress: Address): Token {
@@ -467,18 +523,30 @@ function defineToken(qiTokenAddress: Address): Token {
   let token = Token.load(qiTokenAddress.toString())
   if (token == null) {
     token = new Token(qiTokenAddress.toString())
-    token.decimals = qiTokenContract.decimals()
-    token.name = qiTokenContract.name()
-    token.symbol = qiTokenContract.symbol()
+    if (qiTokenContract.try_decimals().reverted) {
+      token.decimals = 0
+    } else {
+      token.decimals = qiTokenContract.decimals()
+    }
+    if (qiTokenContract.try_name().reverted) {
+      token.name = ""
+    } else {
+      token.name = qiTokenContract.name()
+    }
+    if (qiTokenContract.try_symbol().reverted) {
+      token.symbol = ""
+    } else {
+      token.symbol = qiTokenContract.symbol()
+    }
   }
   token.save()
   return token
 }
 
-function defineLendingProtocol(): LendingProtocol {
-  let protocolInterface = LendingProtocol.load("0")
+function defineLendingProtocol(comptrollerAddress: Address): LendingProtocol {
+  let protocolInterface = LendingProtocol.load(comptrollerAddress.toString())
   if (protocolInterface == null) {
-    protocolInterface = new LendingProtocol("0")
+    protocolInterface = new LendingProtocol(comptrollerAddress.toString())
   }
 
   protocolInterface.name = "Benqi Finance"
@@ -493,41 +561,69 @@ function defineLendingProtocol(): LendingProtocol {
 
 function defineRewardToken(
   qiTokenAddress: Address,
-  comptrollerAddress: String,
+  comptrollerAddress: Address,
 ): RewardToken[] {
   let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
-  let comptrollerContract = Comptroller.bind(Address.fromString(comptrollerAddress.toString()))
-  let marketAddresses = comptrollerContract.getAllMarkets()
-  let numberOfMarkets = marketAddresses.length
+  let comptrollerContract = Comptroller.bind(comptrollerAddress)
   let rewardTokenList: RewardToken[] = []
-  for (let index = 0; index < numberOfMarkets; index++) {
-    let addressOfMarket = marketAddresses[index]
-    let token = defineToken(addressOfMarket)
-    if (token.symbol == "qiQI") {
-      let rewardToken = RewardToken.load(qiTokenAddress.toString())
-      if (rewardToken == null) {
-        rewardToken = new RewardToken(qiTokenAddress.toString())
-        rewardToken.decimals = qiTokenContract.decimals()
-        rewardToken.name = qiTokenContract.name()
-        rewardToken.symbol = qiTokenContract.symbol()
-        rewardToken.save()
+  if (comptrollerContract.try_getAllMarkets().reverted){
+
+  } else {
+    let marketAddresses = comptrollerContract.getAllMarkets()
+    let numberOfMarkets = marketAddresses.length
+    for (let index = 0; index < numberOfMarkets; index++) {
+      let addressOfMarket = marketAddresses[index]
+      let token = defineToken(addressOfMarket)
+      if (token.symbol == "qiQI") {
+        let rewardToken = RewardToken.load(qiTokenAddress.toString())
+        if (rewardToken == null) {
+          rewardToken = new RewardToken(qiTokenAddress.toString())
+          if (qiTokenContract.try_decimals().reverted) {
+            rewardToken.decimals = 0
+          } else {
+            rewardToken.decimals = qiTokenContract.decimals()
+          }
+          if (qiTokenContract.try_name().reverted) {
+            rewardToken.name = ""
+          } else {
+            rewardToken.name = qiTokenContract.name()
+          }
+          if (qiTokenContract.try_symbol().reverted) {
+            rewardToken.symbol = ""
+          } else {
+            rewardToken.symbol = qiTokenContract.symbol()
+          }
+          rewardToken.save()
+        }
+        rewardTokenList.push(rewardToken)
       }
-      rewardTokenList.push(rewardToken)
     }
-  }
-  for (let index = 0; index < numberOfMarkets; index++) {
-    let addressOfMarket = marketAddresses[index]
-    let token = defineToken(addressOfMarket)
-    if (token.symbol == "qiAVAX ") {
-      let rewardToken = RewardToken.load(qiTokenAddress.toString())
-      if (rewardToken == null) {
-        rewardToken = new RewardToken(qiTokenAddress.toString())
-        rewardToken.decimals = qiTokenContract.decimals()
-        rewardToken.name = qiTokenContract.name()
-        rewardToken.symbol = qiTokenContract.symbol()
-        rewardToken.save()
+    for (let index = 0; index < numberOfMarkets; index++) {
+      let addressOfMarket = marketAddresses[index]
+      let token = defineToken(addressOfMarket)
+      if (token.symbol == "qiAVAX ") {
+        let rewardToken = RewardToken.load(qiTokenAddress.toString())
+        if (rewardToken == null) {
+          rewardToken = new RewardToken(qiTokenAddress.toString())
+          if (qiTokenContract.try_decimals().reverted) {
+            rewardToken.decimals = 0
+          } else {
+            rewardToken.decimals = qiTokenContract.decimals()
+          }
+          if (qiTokenContract.try_name().reverted) {
+            rewardToken.name = ""
+          } else {
+            rewardToken.name = qiTokenContract.name()
+          }
+          if (qiTokenContract.try_symbol().reverted) {
+            rewardToken.symbol = ""
+          } else {
+            rewardToken.symbol = qiTokenContract.symbol()
+          }
+          rewardToken.save()
+        }
+        rewardTokenList.push(rewardToken)
       }
-      rewardTokenList.push(rewardToken)
     }
   }
   return rewardTokenList
@@ -539,48 +635,80 @@ function defineMarket(
   timestamp: BigInt,
   blockNumber: BigInt,
   priceWithDecimal: BigDecimal,
-  comptrollerAddress: String,
+  comptrollerAddress: Address,
 ): Market {
-  let protocolInterface = defineLendingProtocol()
+  let protocolInterface = defineLendingProtocol(comptrollerAddress)
   let qiTokenContract = BenqiTokenqi.bind(qiTokenAddress)
-  let comptrollerContract = Comptroller.bind(Address.fromString(comptrollerAddress.toString()))
+  let comptrollerContract = Comptroller.bind(comptrollerAddress)
 
   let market = Market.load(qiTokenAddress.toString())
   if (market == null) {
     market = new Market(qiTokenAddress.toString())
-    market.name = qiTokenContract.name()
+    if (qiTokenContract.try_name().reverted) {
+      market.name = null
+    } else {
+      market.name = qiTokenContract.name()
+    }
     market.protocol = protocolInterface.getString(protocolInterface.id)
     market.createdTimestamp = timestamp
     market.createdBlockNumber = blockNumber
     market.rewardTokens = defineRewardToken(qiTokenAddress, comptrollerAddress).map<string>((t) => t.id)
   }
 
-  let marketAddresses = comptrollerContract.getAllMarkets()
-  let numberOfMarkets = marketAddresses.length
-  market.inputTokenBalances = []
-  market.inputTokens = []
-  let inputTokens: Token[] = []
-  for (let index = 0; index < numberOfMarkets; index++) {
-    let addressOfMarket = marketAddresses[index]
-    let token = defineToken(addressOfMarket)
-    inputTokens.push(token)
-    let inputTokenContract = BenqiTokenqi.bind(addressOfMarket)
-    let inputTokenBalance = convertBINumToDesiredDecimals(inputTokenContract.totalSupply(), 18)
-    market.inputTokenBalances.push(inputTokenBalance)
+  if (comptrollerContract.try_getAllMarkets().reverted) {
+  } else {
+    let marketAddresses = comptrollerContract.getAllMarkets()
+    let numberOfMarkets = marketAddresses.length
+    market.inputTokenBalances = []
+    market.inputTokens = []
+    let inputTokens: Token[] = []
+    for (let index = 0; index < numberOfMarkets; index++) {
+      let addressOfMarket = marketAddresses[index]
+      let token = defineToken(addressOfMarket)
+      inputTokens.push(token)
+      let inputTokenContract = BenqiTokenqi.bind(addressOfMarket)
+      let inputTokenBalance: BigDecimal = bigDecimal.fromString("0")
+      if(inputTokenContract.try_totalSupply().reverted){
+        
+      } else {
+        inputTokenBalance = convertBINumToDesiredDecimals(inputTokenContract.totalSupply(), 18)
+      }
+      market.inputTokenBalances.push(inputTokenBalance)
+    }
+    market.inputTokens = inputTokens.map<string>((t) => t.id)
   }
-  market.inputTokens = inputTokens.map<string>((t) => t.id)
+
   market.isActive = false
 
   let outputToken = defineToken(qiTokenAddress)
   market.outputToken = outputToken.getString(outputToken.id)
 
-  market.outputTokenSupply = convertBINumToDesiredDecimals(qiTokenContract.totalSupply(), 18)
+  if (qiTokenContract.try_totalSupply().reverted) {
+    market.outputTokenSupply = bigDecimal.fromString("0")
+  } else {
+    market.outputTokenSupply = convertBINumToDesiredDecimals(qiTokenContract.totalSupply(), 18)
+  }
   market.outputTokenPriceUSD = priceWithDecimal
   market.canUseAsCollateral = true
   market.canBorrowFrom = true
-  market.maximumLTV = bigInt.dividedByDecimal(qiTokenContract.totalBorrows(), qiTokenContract.totalSupply().toBigDecimal())
-  market.depositRate = convertBINumToDesiredDecimals(qiTokenContract.supplyRatePerTimestamp(), 18)
-  market.variableBorrowRate = convertBINumToDesiredDecimals(qiTokenContract.borrowRatePerTimestamp(), 18)
+  
+  if (qiTokenContract.try_totalBorrows().reverted || qiTokenContract.try_totalSupply().reverted) {
+    market.maximumLTV = bigDecimal.fromString("0")
+  } else {
+    market.maximumLTV = qiTokenContract.totalBorrows().divDecimal(qiTokenContract.totalSupply().toBigDecimal())
+  }
+
+  if (qiTokenContract.try_supplyRatePerTimestamp().reverted) {
+    market.depositRate = bigDecimal.fromString("0")
+  } else {
+    market.depositRate = convertBINumToDesiredDecimals(qiTokenContract.supplyRatePerTimestamp(), 18)
+  }
+
+  if (qiTokenContract.try_borrowRatePerTimestamp().reverted) {
+    market.variableBorrowRate = bigDecimal.fromString("0")
+  } else {
+    market.variableBorrowRate = convertBINumToDesiredDecimals(qiTokenContract.borrowRatePerTimestamp(), 18)
+  }
   market.liquidationThreshold = new BigDecimal(BigInt.fromI32(0))
   market.stableBorrowRate = new BigDecimal(BigInt.fromI32(0))
 
@@ -610,20 +738,24 @@ function defineUser(
 function updateInputTokensSupply(
   qiTokenAddress: Address,
   market: Market,
-  comptrollerAddress: String,
+  comptrollerAddress: Address,
   timestamp: BigInt,
   blockNumber: BigInt,
 ): void{
-  let comptrollerContract = Comptroller.bind(Address.fromString(comptrollerAddress.toString()))
-  let marketAddresses = comptrollerContract.getAllMarkets()
-  let numberOfMarkets = marketAddresses.length
-  for (let index = 0; index < numberOfMarkets; index++) {
-    let tokenIndex = market.inputTokens.indexOf(marketAddresses[index].toString())
-    let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
-    let inputContract = BenqiTokenqi.bind(Address.fromString(marketAddresses[index].toString()))
-    marketDailySnapshotEntity.inputTokenBalances[tokenIndex] = convertBINumToDesiredDecimals(inputContract.totalSupply(), 18)
-    let priceWithDecimal = getPriceOfUnderlying(Address.fromString(marketAddresses[index].toString()), comptrollerAddress)
-    marketDailySnapshotEntity.inputTokenPricesUSD[tokenIndex] = priceWithDecimal
-    marketDailySnapshotEntity.save()
+  let comptrollerContract = Comptroller.bind(comptrollerAddress)
+  if (comptrollerContract.try_getAllMarkets().reverted) {
+    
+  } else {
+    let marketAddresses = comptrollerContract.getAllMarkets()
+    let numberOfMarkets = marketAddresses.length
+    for (let index = 0; index < numberOfMarkets; index++) {
+      let tokenIndex = market.inputTokens.indexOf(marketAddresses[index].toString())
+      let marketDailySnapshotEntity = defineMarketDailySnapshotEntity(qiTokenAddress, timestamp, blockNumber, market, comptrollerAddress)
+      let inputContract = BenqiTokenqi.bind(Address.fromString(marketAddresses[index].toString()))
+      marketDailySnapshotEntity.inputTokenBalances[tokenIndex] = convertBINumToDesiredDecimals(inputContract.totalSupply(), 18)
+      let priceWithDecimal = getPriceOfUnderlying(Address.fromString(marketAddresses[index].toString()), comptrollerAddress)
+      marketDailySnapshotEntity.inputTokenPricesUSD[tokenIndex] = priceWithDecimal
+      marketDailySnapshotEntity.save()
+    }
   }
 }

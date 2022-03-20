@@ -2,7 +2,7 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Comptroller
     network: avalanche
     source:
@@ -41,7 +41,7 @@ dataSources:
         - event: DistributedSupplierReward(indexed uint8,indexed address,indexed address,uint256,uint256)
           handler: DistributedSupplierReward
       file: ./src/comptroller.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiAVAX
     network: avalanche
     source:
@@ -86,7 +86,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiBTC
     network: avalanche
     source:
@@ -131,7 +131,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiETH
     network: avalanche
     source:
@@ -176,7 +176,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiUSDT
     network: avalanche
     source:
@@ -221,7 +221,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiLINK
     network: avalanche
     source:
@@ -266,7 +266,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiUSDC
     network: avalanche
     source:
@@ -311,7 +311,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiDAI
     network: avalanche
     source:
@@ -356,7 +356,7 @@ dataSources:
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: repayTransactions
       file: ./src/token.ts
-  - kind: ethereum
+  - kind: ethereum/contract
     name: BenqiTokenqiQI
     network: avalanche
     source:
