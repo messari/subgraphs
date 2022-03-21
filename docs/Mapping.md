@@ -12,7 +12,7 @@ There are couple things you can do to significantly improve your indexing speed:
 - Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
 - Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
 
-## Common Issues
+## Common Questions
 
 ### Proxy
 
@@ -21,8 +21,6 @@ Some protocols use proxy contracts for upgradeability. Note that when handling p
 You should navigate to the implementation contract first (Contract -> Read as Proxy -> Address underlined in red) and use the ABI there:
 
 ![Proxy Contract](images/proxy.png "Proxy Contract")
-
-### Price Oracles
 
 ### Snapshots
 
