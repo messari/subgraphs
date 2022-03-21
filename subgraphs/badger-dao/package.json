@@ -1,0 +1,17 @@
+{
+  "name": "badger-dao",
+  "license": "UNLICENSED",
+  "scripts": {
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "codegen": "graph codegen subgraph.yaml",
+    "build": "graph build subgraph.yaml",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.28.0",
+    "@graphprotocol/graph-ts": "0.26.0",
+    "matchstick-as": "^0.4.0"
+  }
+}

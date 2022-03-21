@@ -1,0 +1,15 @@
+{
+  "chain": "mainnet",
+  "tokens": [
+    {
+      "name": "Badger",
+      "address": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
+      "startBlock": 11348423
+    },
+    {
+      "name": "ibBTC",
+      "address": "0xc4E15973E6fF2A35cC804c2CF9D2a1b817a8b40F",
+      "startBlock": 12342123
+    }
+  ]
+}
