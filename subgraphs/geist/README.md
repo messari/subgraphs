@@ -16,7 +16,7 @@ Deployed addresses: [docs.geist.finance/useful-info/deployments-addresses](https
 ## Status: Work in progress
 The subgraph is live on The Graph Hosted Service [here](https://thegraph.com/hosted-service/subgraph/dineshpinto/geist-finance).
 
-## Ste Commands
+## Build Commands
 1. Generate and build subgraph
 
 ```shell
