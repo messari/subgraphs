@@ -34,6 +34,8 @@ You can leverage the Matchstick unit testing framework to better debug/test your
 
 https://github.com/LimeChain/matchstick/blob/main/README.md
 
+Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build. 
+
 ## Debugging
 
 ### Debug Logs
@@ -55,6 +57,18 @@ You also have an option of `Error`, `Warning`, `Info`, `Debug` as the log level.
 You can check the indexing status of your subgraph and surface indexing errors that you may encounter along the way here: https://thegraph.com/docs/en/developer/quick-start/#5-check-your-logs
 
 **Note**: you should use (copy/paste) this endpoint when you use the GraphiQL playground: https://api.thegraph.com/index-node/graphql. If you click into it, it's going to direct you to a different URL which won't work with the GraphiQL playground.
+
+### Running Locally
+
+You can debug your subgraph by running `graph-node` locally. Here are some instructions to set it up:
+
+https://github.com/graphprotocol/graph-node#running-a-local-graph-node
+
+Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/).
+
+### Subgraph Forking
+
+You can avoid re-syncing your subgraph every time by "forking" it from an existing one, which should significantly speed up the iteration time. For more details: https://thegraph.com/docs/en/developer/subgraph-debug-forking/.
 
 ## Known Issues
 
