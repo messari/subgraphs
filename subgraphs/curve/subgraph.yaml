@@ -15,10 +15,7 @@ dataSources:
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings/registry.ts
-      entities: 
-        - DexAmmProtocol
-        - LiquidityPool
-        - Token
+      entities: []
       abis:
         - name: ERC20
           file: ./abis/IERC20.json
@@ -29,11 +26,17 @@ dataSources:
         - name: StableSwap
           file: ./abis/StableSwap.json
       eventHandlers:
-        - event: PoolAdded(indexed address,bytes)
-          handler: handlePoolAdded
         - event: PoolRemoved(indexed address)
           handler: handlePoolRemoved
-
+      callHandlers:
+        - function: add_metapool(address,uint256,address,uint256,string)
+          handler: handleAddMetaPool
+        - function: add_metapool(address,uint256,address,uint256,string,address)
+          handler: handleAddMeta1Pool
+        - function: add_pool(address,uint256,address,bytes32,uint256,uint256,bool,bool,string)
+          handler: handleAddPool
+        - function: add_pool_without_underlying(address,uint256,address,bytes32,uint256,uint256,bool,bool,string)
+          handler: handleAddPoolWithUnderlying
 templates:
   # Main pool contract
   - name: Pool
@@ -52,6 +55,12 @@ templates:
           file: ./abis/StableSwap.json
         - name: Registry
           file: ./abis/Registry.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/CalculationsSushiSwap.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity
@@ -65,6 +74,5 @@ templates:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-
-
+      
   

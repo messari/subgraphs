@@ -23,6 +23,23 @@ enum ProtocolType {
   # Will add more
 }
 
+#######################################
+######## Internal Entities ############
+#######################################
+
+# An account is a unique Ethereum address
+type Account @entity {
+  " Address of the account "
+  id: ID!
+}
+
+type DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: ID!
+}
+
+######################################
+
 type Token @entity {
   " Smart contract address of the market "
   id: ID!
@@ -253,7 +270,7 @@ type DexAmmProtocol implements Protocol @entity {
   ##### DexAmm-Specific #####
 
   " All pools that belong to this protocol "
-  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+  pool: [LiquidityPool!]! @derivedFrom(field: "protocol")
 }
 
 type LiquidityPool @entity {
@@ -304,6 +321,9 @@ type LiquidityPool @entity {
 
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
+
+  "Liquidity Token Address"
+  _lpTokenAddress: Bytes!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 
