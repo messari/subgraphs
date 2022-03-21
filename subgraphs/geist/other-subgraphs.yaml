@@ -1,0 +1,196 @@
+  # --------------------------------------
+  #      ORACLES / PRICE PROVIDERS
+  # --------------------------------------
+  - kind: ethereum/contract
+    name: AaveOracle
+    network: fantom
+    source:
+      address: '0xC466e3FeE82C6bdc2E17f2eaF2c6F1E91AD10FD3'
+      startBlock: 32862727
+      abi: AaveOracle
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ChainlinkAggregator
+        - PriceOracle
+        - PriceOracleAsset
+      abis:
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+      eventHandlers:
+        - event: AssetSourceUpdated(indexed address,indexed address)
+          handler: handleAssetSourceUpdated
+        - event: FallbackOracleUpdated(indexed address)
+          handler: handleFallbackOracleUpdated
+        - event: WethSet(indexed address)
+          handler: handleWethSet
+      file: src/mapping/proxy-price-provider/avalanche.ts
+
+# --------------------------------------
+  #           CONFIGURATIONS
+  # --------------------------------------
+  - kind: ethereum/contract
+    name: LendingPoolAddressesProviderRegistry
+    network: fantom
+    source:
+      address: '0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82'
+      abi: LendingPoolAddressesProviderRegistry
+      startBlock: 32862727
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LendingPoolAddressesProvider
+      abis:
+        - name: LendingPoolAddressesProviderRegistry
+          file: ./abis/LendingPoolAddressesProviderRegistry.json
+      eventHandlers:
+        - event: AddressesProviderRegistered(indexed address)
+          handler: handleAddressesProviderRegistered
+        - event: AddressesProviderUnregistered(indexed address)
+          handler: handleAddressesProviderUnregistered
+      file: src/mapping/address-provider-registry.ts
+
+  # --------------------------------------
+  #
+  # --------------------------------------
+templates:
+  # --------------------------------------
+  #       CONFIGURATIONS
+  # --------------------------------------
+  - kind: ethereum/contract
+    name: LendingPoolAddressesProvider
+    network: fantom
+    source:
+      abi: LendingPoolAddressesProvider
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LendingPoolAddressesProvider
+      abis:
+        - name: LendingPoolAddressesProvider
+          file: ./abis/LendingPoolAddressesProvider.json
+      eventHandlers:
+        - event: ProxyCreated(bytes32,indexed address)
+          handler: handleProxyCreated
+        - event: PriceOracleUpdated(indexed address)
+          handler: handlePriceOracleUpdated
+        - event: LendingRateOracleUpdated(indexed address)
+          handler: handleLendingRateOracleUpdated
+        - event: LendingPoolUpdated(indexed address)
+          handler: handleLendingPoolUpdated
+        - event: LendingPoolConfiguratorUpdated(indexed address)
+          handler: handleLendingPoolConfiguratorUpdated
+        - event: LendingPoolCollateralManagerUpdated(indexed address)
+          handler: handleLendingPoolCollateralManagerUpdated
+        - event: ConfigurationAdminUpdated(indexed address) # past aaveadminupdated todo: change
+          handler: handleConfigurationAdminUpdated
+        - event: EmergencyAdminUpdated(indexed address) #new
+          handler: handleEmergencyAdminUpdated
+        # - event: EthereumAddressUpdated(indexed address) #new
+        #   handler: handleEthereumAddressUpdated
+        # - event: OwnershipTransferred(indexed address,indexed address) #new
+        #   handler: handleOwnershipTransferred
+        - event: AddressSet(bytes32,indexed address,bool) #new
+          handler: handleAddressSet
+      file: src/mapping/lending-pool-address-provider.ts
+
+  - kind: ethereum/contract
+    name: LendingPoolConfigurator
+    network: fantom
+    source:
+      abi: LendingPoolConfigurator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - Reserve
+      abis:
+        - name: LendingPoolConfigurator
+          file: ./abis/LendingPoolConfigurator.json
+      eventHandlers:
+        - event: ReserveInitialized(indexed address,indexed address,address,address,address)
+          handler: handleReserveInitialized
+        - event: BorrowingEnabledOnReserve(indexed address,bool)
+          handler: handleBorrowingEnabledOnReserve
+        - event: BorrowingDisabledOnReserve(indexed address)
+          handler: handleBorrowingDisabledOnReserve
+        - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralConfigurationChanged
+        - event: StableRateEnabledOnReserve(indexed address)
+          handler: handleStableRateEnabledOnReserve
+        - event: StableRateDisabledOnReserve(indexed address)
+          handler: handleStableRateDisabledOnReserve
+        - event: ReserveActivated(indexed address)
+          handler: handleReserveActivated
+        - event: ReserveDeactivated(indexed address)
+          handler: handleReserveDeactivated
+        - event: ReserveFrozen(indexed address)
+          handler: handleReserveFreezed
+        - event: ReserveUnfrozen(indexed address)
+          handler: handleReserveUnfreezed
+        - event: ReserveFactorChanged(indexed address,uint256)
+          handler: handleReserveFactorChanged
+        - event: ReserveDecimalsChanged(indexed address,uint256)
+          handler: handleReserveDecimalsChanged
+        - event: ReserveInterestRateStrategyChanged(indexed address,address)
+          handler: handleReserveInterestRateStrategyChanged
+        - event: ATokenUpgraded(indexed address,indexed address,indexed address)
+          handler: handleATokenUpgraded
+        - event: StableDebtTokenUpgraded(indexed address,indexed address,indexed address)
+          handler: handleStableDebtTokenUpgraded
+        - event: VariableDebtTokenUpgraded(indexed address,indexed address,indexed address)
+          handler: handleVariableDebtTokenUpgraded
+      file: src/mapping/lending-pool-configurator/avalanche.ts
+  - kind: ethereum/contract
+    name: LendingPool
+    network: fantom
+    source:
+      abi: LendingPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - ReserveOperation
+        - InterestRateHistory
+        - Reserve
+        - UserReserve
+        - User
+      abis:
+        - name: LendingPool
+          file: ./abis/LendingPool.json
+      eventHandlers:
+        - event: Deposit(indexed address,address,indexed address,uint256,indexed uint16)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdraw
+        - event: Borrow(indexed address,address,indexed address,uint256,uint256,uint256,indexed uint16)
+          handler: handleBorrow
+        - event: Repay(indexed address,indexed address,indexed address,uint256)
+          handler: handleRepay
+        - event: Swap(indexed address,indexed address,uint256)
+          handler: handleSwap
+        - event: ReserveUsedAsCollateralEnabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralEnabled
+        - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
+          handler: handleReserveUsedAsCollateralDisabled
+        - event: RebalanceStableBorrowRate(indexed address,indexed address)
+          handler: handleRebalanceStableBorrowRate
+        - event: FlashLoan(indexed address,indexed address,indexed address,uint256,uint256,uint16)
+          handler: handleFlashLoan
+        - event: LiquidationCall(indexed address,indexed address,indexed address,uint256,uint256,address,bool)
+          handler: handleLiquidationCall
+        - event: Paused()
+          handler: handlePaused
+        - event: Unpaused()
+          handler: handleUnpaused
+        - event: ReserveDataUpdated(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleReserveDataUpdated
+      file: src/mapping/lending-pool/lending-pool.ts
