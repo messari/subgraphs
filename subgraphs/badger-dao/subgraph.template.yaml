@@ -65,3 +65,28 @@ templates:
         - event: Harvest(uint256,indexed uint256)
           handler: handleReward
       file: ./src/handlers/tokens.ts
+  - kind: ethereum/contract
+    name: AffiliateSettVault
+    network: {{ chain }}
+    source:
+      abi: BadgerAffiliateSett
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - User
+        - LendingProtocol
+        - UsageMetricsDailySnapshot
+        - Market
+      abis:
+        - name: BadgerAffiliateSett
+          file: ./abis/BadgerAffiliateSett.json
+      eventHandlers:
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+      file: ./src/handlers/vault.ts

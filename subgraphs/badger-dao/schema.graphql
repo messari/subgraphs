@@ -50,6 +50,13 @@ type RewardToken @entity {
   type: RewardTokenType
 }
 
+type User @entity {
+  " User public address "
+  id: ID!
+
+  lastDayActive: Int!
+}
+
 #############################
 ##### Protocol Metadata #####
 #############################
