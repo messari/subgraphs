@@ -7,7 +7,7 @@ dataSources:
     network: avalanche
     source:
       address: "0x486Af39519B4Dc9a7fCcd318217352830E8AD9b4"
-      startBlock: 4001232
+      startBlock: 3046286
       abi: Comptroller
     mapping:
       kind: ethereum/events
@@ -46,7 +46,7 @@ dataSources:
     network: avalanche
     source:
       address: "0x5C0401e81Bc07Ca70fAD469b451682c0d747Ef1c"
-      startBlock: 4841344
+      startBlock: 3046672
       abi: BenqiTokenqi
     mapping:
       kind: ethereum/events
