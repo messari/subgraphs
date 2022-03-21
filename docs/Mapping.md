@@ -58,6 +58,18 @@ You can check the indexing status of your subgraph and surface indexing errors t
 
 **Note**: you should use (copy/paste) this endpoint when you use the GraphiQL playground: https://api.thegraph.com/index-node/graphql. If you click into it, it's going to direct you to a different URL which won't work with the GraphiQL playground.
 
+### Running Locally
+
+You can debug your subgraph by running `graph-node` locally. Here are some instructions to set it up:
+
+https://github.com/graphprotocol/graph-node#running-a-local-graph-node
+
+Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/).
+
+### Subgraph Forking
+
+You can avoid re-syncing your subgraph every time by "forking" it from an existing one, which should significantly speed up the iteration time. For more details: https://thegraph.com/docs/en/developer/subgraph-debug-forking/.
+
 ## Known Issues
 
 Here are some known issues with subgraph tooling that you may run into:
