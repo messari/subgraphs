@@ -16,6 +16,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - Token
+        - RewardToken
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -37,10 +38,30 @@ templates:
       language: wasm/assemblyscript
       entities:
         - Token
+        - RewardToken
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+      file: ./src/handlers/tokens.ts
+  - kind: ethereum/contract
+    name: BadgerStrategy
+    network: {{ chain }}
+    source:
+      abi: BadgerStrategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+      abis:
+        - name: BadgerStrategy
+          file: ./abis/BadgerStrategy.json
+      eventHandlers:
+        - event: Harvest(uint256,indexed uint256)
+          handler: handleReward
       file: ./src/handlers/tokens.ts

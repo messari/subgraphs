@@ -1,10 +1,10 @@
 import { assert, test } from 'matchstick-as';
 import { handleTransfer } from '../../src/handlers/tokens';
-import { createTransferEvent, mockTransferFunctions } from './utils';
+import { createTransferEvent, mockErc20Functions } from './utils';
 
 test('testing for badger and iBTC types', () => {
   let transferEvent = createTransferEvent();
-  mockTransferFunctions(transferEvent.address, 'Badger', 'BADGER', 1338);
+  mockErc20Functions(transferEvent.address, 'Badger', 'BADGER', 1338);
   handleTransfer(transferEvent);
 
   const id = transferEvent.address.toHex();

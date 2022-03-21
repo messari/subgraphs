@@ -2,7 +2,7 @@ import { Address, ethereum } from '@graphprotocol/graph-ts';
 import { createMockedFunction, newMockEvent } from 'matchstick-as';
 import { Transfer } from '../../generated/templates/Token/ERC20';
 
-export const mockTransferFunctions = (
+export const mockErc20Functions = (
   address: Address,
   name: string,
   symbol: string,
