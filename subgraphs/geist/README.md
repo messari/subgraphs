@@ -2,11 +2,15 @@
 
 ## Links
 
-Protocol: https://geist.finance/
-Analytics: https://geist.finance/stats/
-Docs: https://docs.geist.finance/
-Smart contracts: https://github.com/geist-finance/geist-protocol
-Deployed addresses: https://docs.geist.finance/useful-info/deployments-addresses
+Protocol: [geist.finance](https://geist.finance/)
+
+Analytics: [geist.finance/stats](https://geist.finance/stats/)
+
+Docs: [docs.geist.finance](https://docs.geist.finance/)
+
+Smart contracts: [github.com/geist-finance/geist-protocol](https://github.com/geist-finance/geist-protocol)
+
+Deployed addresses: [docs.geist.finance/useful-info/deployments-addresses](https://docs.geist.finance/useful-info/deployments-addresses)
 
 
 ## Status: Work in progress
