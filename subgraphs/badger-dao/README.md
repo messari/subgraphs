@@ -35,3 +35,9 @@ yarn run build:<network>
 ```
 yarn run test
 ```
+
+5. Deploy
+```
+graph auth --product hosted-service <access-token>
+graph deploy --product hosted-service <username/subgraph-name>
+```

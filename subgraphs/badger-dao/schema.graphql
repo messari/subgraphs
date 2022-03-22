@@ -50,7 +50,7 @@ type RewardToken @entity {
   type: RewardTokenType
 }
 
-type User @entity {
+type _User @entity {
   " User public address "
   id: ID!
 
@@ -62,7 +62,7 @@ type User @entity {
 #############################
 
 interface Protocol {
-  " UUID "
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
@@ -117,13 +117,13 @@ type FinancialsDailySnapshot @entity {
   " Total volume in USD "
   totalVolumeUSD: BigDecimal!
 
-  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 2.5% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   supplySideRevenueUSD: BigDecimal!
 
-  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.5%). OpenSea 10% sell fee. "
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
   protocolSideRevenueUSD: BigDecimal!
 
-  " Fees paid by the users. e.g. 3.0% of swap fee in Sushiswap "
+  " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
   feesUSD: BigDecimal!
   
   " Block number of this snapshot "
@@ -246,7 +246,7 @@ enum RiskType {
 }
 
 type LendingProtocol implements Protocol @entity {
-  " UUID "
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Aave v2 "
@@ -273,12 +273,12 @@ type LendingProtocol implements Protocol @entity {
   riskType: RiskType
 }
 
-type Market implements Pool @entity {
+type Market @entity {
   " Smart contract address of the market "
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
@@ -359,7 +359,7 @@ type Market implements Pool @entity {
   liquidations: [Liquidation!]! @derivedFrom(field: "market")
 }
 
-type MarketDailySnapshot implements PoolDailySnapshot @entity {
+type MarketDailySnapshot @entity {
   " { Smart contract address of the market }-{ # of days since Unix epoch time } "
   id: ID!
 

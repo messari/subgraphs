@@ -1,7 +1,15 @@
-import { Address, BigDecimal, BigInt, dataSource } from '@graphprotocol/graph-ts';
+import { Address, BigDecimal, dataSource, ethereum } from '@graphprotocol/graph-ts';
 import { LendingProtocol, Market } from '../../generated/schema';
+import {
+  PROTOCOL_ID,
+  PROTOCOL_LENDING_TYPE,
+  PROTOCOL_NAME,
+  PROTOCOL_RISK_TYPE,
+  PROTOCOL_SLUG,
+  PROTOCOL_TYPE,
+} from '../constant';
 
-export function getOrCreateMarket(id: Address, timestamp: BigInt, block: BigInt): Market {
+export function getOrCreateMarket(id: Address, block: ethereum.Block): Market {
   let market = Market.load(id.toHex());
 
   if (market) {
@@ -19,8 +27,8 @@ export function getOrCreateMarket(id: Address, timestamp: BigInt, block: BigInt)
   market.inputTokenBalances = [];
   market.outputTokenSupply = BigDecimal.zero();
   market.outputTokenPriceUSD = BigDecimal.zero();
-  market.createdTimestamp = timestamp;
-  market.createdBlockNumber = block;
+  market.createdTimestamp = block.timestamp;
+  market.createdBlockNumber = block.number;
   market.snapshots = [];
   market.name = '';
   market.isActive = false;
@@ -42,25 +50,26 @@ export function getOrCreateMarket(id: Address, timestamp: BigInt, block: BigInt)
   return market;
 }
 
-export function getOrCreateProtocol(id: Address): LendingProtocol {
-  let protocol = LendingProtocol.load(id.toHex());
+export function getOrCreateProtocol(): LendingProtocol {
+  const id = PROTOCOL_ID.toHex();
+  let protocol = LendingProtocol.load(id);
 
   if (protocol) {
     return protocol;
   }
 
-  protocol = new LendingProtocol(id.toHex());
+  protocol = new LendingProtocol(id);
 
   // TODO: values to verify
-  protocol.name = 'Badger';
-  protocol.slug = 'badger';
+  protocol.name = PROTOCOL_NAME;
+  protocol.slug = PROTOCOL_SLUG;
   protocol.network = dataSource.network().toUpperCase();
-  protocol.type = 'LENDING';
+  protocol.type = PROTOCOL_TYPE;
   protocol.usageMetrics = [];
   protocol.financialMetrics = [];
   protocol.markets = [];
-  protocol.lendingType = 'POOLED';
-  protocol.riskType = 'GLOBAL';
+  protocol.lendingType = PROTOCOL_LENDING_TYPE;
+  protocol.riskType = PROTOCOL_RISK_TYPE;
 
   return protocol;
 }
