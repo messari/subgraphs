@@ -15,9 +15,11 @@ import {
   Failure,
   Transfer,
   Approval
-} from "../types/cAAVE/cToken"
+} from "../types/cCOMP/cToken"
 import { Deposit, Token } from "../types/schema"
 
+// TODO: remove
+let counter = 0
 
   // Note: If a handler doesn't require existing field values, it is faster
   // _not_ to load the entity from the store. Instead, create it fresh with
@@ -53,9 +55,9 @@ export function handleReservesReduced(event: ReservesReduced): void {}
 export function handleFailure(event: Failure): void {}
 
 export function handleTransfer(event: Transfer): void {
-  let deposit = new Deposit((event.transaction.hash.toI32() - event.logIndex.toI32()).toString())
-  deposit.from = event.params.from.toHex()
-
+  let deposit = new Deposit(counter.toString())
+  deposit.from = event.params.from.toHex().toString()
+  counter++
   deposit.save()
 }
 

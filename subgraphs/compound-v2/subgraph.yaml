@@ -3,35 +3,54 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: cAAVE
+    name: cCOMP
     network: mainnet
     source:
-      address: "0xe65cdb6479bac1e22340e4e755fae7e509ecd06c"
+      address: "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4"
       abi: cToken
+      startBlock: 10960099
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
       abis:
-        - name: cAAVE
-          file: ./abis/cAAVE.json
         - name: cToken
           file: ./abis/cToken.json
       eventHandlers:
         # - event: AccrueInterest(uint256,uint256,uint256)
         #   handler: handleAccrueInterest
-        # - event: Mint(address,uint256,uint256)
-        #   handler: handleMint
-        # - event: Redeem(address,uint256,uint256)
-        #   handler: handleRedeem
-        # - event: Borrow(address,uint256,uint256,uint256)
-        #   handler: handleBorrow
-        # - event: RepayBorrow(address,address,uint256,uint256,uint256)
-        #   handler: handleRepayBorrow
-        # - event: LiquidateBorrow(address,address,uint256,address,uint256)
-        #   handler: handleLiquidateBorrow
+
+        # This event equates to a Deposit
+        # event Mint(address minter, uint mintAmount, uint mintTokens);
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+
+        # This event equates to a withdraw
+        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+
+        # This event equates to a Borrow
+        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+
+        # This event equates to a Repay
+        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+
+        # This event equates to a Liquidation
+        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+
         # - event: NewPendingAdmin(address,address)
         #   handler: handleNewPendingAdmin
         # - event: NewAdmin(address,address)
@@ -46,12 +65,8 @@ dataSources:
         #   handler: handleReservesReduced
         # - event: Failure(uint256,uint256,uint256)
         #   handler: handleFailure
-        
-        # trying to use the mint event to fill deposit entity
-
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-
+        # - event: Transfer(indexed address,indexed address,uint256)
+        #   handler: handleTransfer
         # - event: Approval(indexed address,indexed address,uint256)
         #   handler: handleApproval
       file: ./src/mappings/cToken.ts
