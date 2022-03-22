@@ -54,10 +54,11 @@ import {
   PROTOCOL_ID,
   NETWORK_FANTOM,
   PROTOCOL_TYPE_LENDING,
-  DEPOSIT,
-  BORROW,
-  WITHDRAW,
-  REWARD
+  DEPOSIT_INTERACTION,
+  BORROW_INTERACTION,
+  WITHDRAW_INTERACTION,
+  REWARD_INTERACTION,
+  REPAY_INTERACTION
 } from "../common/constants";
 
 import {
@@ -140,19 +141,19 @@ export function handleDeposit(event: Deposit): void {
 
   let tx = event.transaction
   let id = tx.hash.toHexString()
-  let transaction = DepositEntity.load(id)
-  if (transaction == null) {
-    transaction = new DepositEntity(id)
-    transaction.logIndex = tx.index.toI32()
+  let deposit = DepositEntity.load(id)
+  if (deposit == null) {
+    deposit = new DepositEntity(id)
+    deposit.logIndex = tx.index.toI32()
     if (tx.to) {
-      transaction.to = (tx.to as Address).toHexString()
+      deposit.to = (tx.to as Address).toHexString()
     }
-    transaction.from = tx.from.toHexString()
-    transaction.hash = tx.hash.toHexString()
-    transaction.timestamp = getTimestampInMillis(event.block);
-    transaction.blockNumber = event.block.number;
-    transaction.protocol = PROTOCOL_ID
-    transaction.save()
+    deposit.from = tx.from.toHexString()
+    deposit.hash = tx.hash.toHexString()
+    deposit.timestamp = getTimestampInMillis(event.block);
+    deposit.blockNumber = event.block.number;
+    deposit.protocol = PROTOCOL_ID
+    deposit.save()
   }
 
   // Generate data for the UsageMetricsDailySnapshot Entity
@@ -161,12 +162,17 @@ export function handleDeposit(event: Deposit): void {
 
   usageMetrics.save()
 
+  // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
+  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
   // Depositing adds to TVL and volume
   let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
     event.block.timestamp,
     event.params.amount,
     event.params.reserve,
-    DEPOSIT,
+    transactionFee,
+    BigInt.fromI32(0),
+    DEPOSIT_INTERACTION,
   ); 
   financialsDailySnapshot.protocol = PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
@@ -180,19 +186,19 @@ export function handleBorrow(event: Borrow): void {
 
   let tx = event.transaction
   let id = tx.hash.toHexString()
-  let transaction = BorrowEntity.load(id)
-  if (transaction == null) {
-    transaction = new BorrowEntity(id)
-    transaction.logIndex = tx.index.toI32()
+  let borrow = BorrowEntity.load(id)
+  if (!borrow) {
+    borrow = new BorrowEntity(id)
+    borrow.logIndex = tx.index.toI32()
     if (tx.to) {
-      transaction.to = (tx.to as Address).toHexString()
+      borrow.to = (tx.to as Address).toHexString()
     }
-    transaction.from = tx.from.toHexString()
-    transaction.hash = tx.hash.toHexString()
-    transaction.timestamp = getTimestampInMillis(event.block);
-    transaction.blockNumber = event.block.number;
-    transaction.protocol = PROTOCOL_ID
-    transaction.save()
+    borrow.from = tx.from.toHexString()
+    borrow.hash = tx.hash.toHexString()
+    borrow.timestamp = getTimestampInMillis(event.block);
+    borrow.blockNumber = event.block.number;
+    borrow.protocol = PROTOCOL_ID
+    borrow.save()
   }
 
   // Generate data for the UsageMetricsDailySnapshot Entity
@@ -201,13 +207,109 @@ export function handleBorrow(event: Borrow): void {
 
   usageMetrics.save()
 
+  // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
+  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
   // Depositing adds to TVL and volume
   let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
     event.block.timestamp,
     event.params.amount,
     event.params.reserve,
-    BORROW,
+    transactionFee,
+    event.params.borrowRate,
+    BORROW_INTERACTION,
   ); 
+  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.blockNumber = event.block.number;
+
+
+  financialsDailySnapshot.save()
+}
+
+export function handleWithdraw(event: Withdraw): void{
+  log.warning('Withdraw event', [])
+
+  let tx = event.transaction
+  let id = tx.hash.toHexString()
+  let withdraw = WithdrawEntity.load(id)
+  if (!withdraw) {
+    withdraw = new WithdrawEntity(id)
+    withdraw.logIndex = tx.index.toI32()
+    if (tx.to) {
+      withdraw.to = (tx.to as Address).toHexString()
+    }
+    withdraw.from = tx.from.toHexString()
+    withdraw.hash = tx.hash.toHexString()
+    withdraw.timestamp = getTimestampInMillis(event.block);
+    withdraw.blockNumber = event.block.number;
+    withdraw.protocol = PROTOCOL_ID
+    withdraw.save()
+  }
+
+  // Generate data for the UsageMetricsDailySnapshot Entity
+  let usageMetrics: UsageMetricsDailySnapshotEntity = 
+        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+
+  usageMetrics.save()
+
+  // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
+  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
+  // Depositing adds to TVL and volume
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+    event.block.timestamp,
+    event.params.amount,
+    event.params.reserve,
+    transactionFee,
+    BigInt.fromI32(0),
+    WITHDRAW_INTERACTION,
+  );
+  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.blockNumber = event.block.number;
+
+  financialsDailySnapshot.save()
+}
+
+export function handleRepay(event: Repay): void {
+  log.warning('Repay event', [])
+
+  let tx = event.transaction
+  let id = tx.hash.toHexString()
+  let withdraw = RepayEntity.load(id)
+  if (!withdraw) {
+    withdraw = new RepayEntity(id)
+    withdraw.logIndex = tx.index.toI32()
+    if (tx.to) {
+      withdraw.to = (tx.to as Address).toHexString()
+    }
+    withdraw.from = tx.from.toHexString()
+    withdraw.hash = tx.hash.toHexString()
+    withdraw.timestamp = getTimestampInMillis(event.block);
+    withdraw.blockNumber = event.block.number;
+    withdraw.protocol = PROTOCOL_ID
+    withdraw.save()
+  }
+
+  // Generate data for the UsageMetricsDailySnapshot Entity
+  let usageMetrics: UsageMetricsDailySnapshotEntity = 
+        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+
+  usageMetrics.save()
+
+  // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
+  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
+  // Depositing adds to TVL and volume
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+    event.block.timestamp,
+    event.params.amount,
+    event.params.reserve,
+    transactionFee,
+    BigInt.fromI32(0),
+    REPAY_INTERACTION,
+  );
   financialsDailySnapshot.protocol = PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
@@ -418,11 +520,17 @@ export function handleBorrow(event: Borrow): void {
 
 export function handleRewardPaid(event: RewardPaid): void {
   // Rewards do not to TVL, but adds to volume and supply side revenue
+  
+  // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
+  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
   let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
     event.block.timestamp,
     event.params.reward,
     event.params.rewardsToken,
-    REWARD
+    transactionFee,
+    BigInt.fromI32(0),
+    REWARD_INTERACTION
   );
 
   financialsDailySnapshot.blockNumber = event.block.number;

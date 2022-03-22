@@ -81,6 +81,8 @@ dataSources:
           file: ./abis/AaveOracle.json
         - name: SpookySwapGEISTFTM
           file: ./abis/SpookySwapGEISTFTM.json
+        - name: GeistToken
+          file: ./abis/GeistToken.json
       eventHandlers:
         - event: RewardPaid(indexed address,indexed address,uint256)
           handler: handleRewardPaid

@@ -20,7 +20,8 @@ export const DEFAULT_DECIMALS = 18;
 export const SECONDS_PER_DAY = 86400;
 
 // Interaction types for snapshot calculations
-export const DEPOSIT = "DEPOSIT";
-export const WITHDRAW = "DEPOSIT";
-export const BORROW = "DEPOSIT";
-export const REWARD = "DEPOSIT";
+export const DEPOSIT_INTERACTION = "DEPOSIT";
+export const WITHDRAW_INTERACTION = "WITHDRAW";
+export const BORROW_INTERACTION = "BORROW";
+export const REWARD_INTERACTION = "REWARD";
+export const REPAY_INTERACTION = "REPAY";

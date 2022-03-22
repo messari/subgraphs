@@ -18,10 +18,12 @@ import {
 import { 
     ZERO_BD,
     SECONDS_PER_DAY,
-    DEPOSIT,
-    WITHDRAW,
-    BORROW,
-    REWARD
+    DEPOSIT_INTERACTION,
+    WITHDRAW_INTERACTION,
+    BORROW_INTERACTION,
+    REWARD_INTERACTION,
+    REPAY_INTERACTION,
+    PROTOCOL_ID
 } from "../common/constants";
 
 import { 
@@ -65,7 +67,8 @@ import {
 
 import { 
     convertTokenToDecimal,
-    exponentToBigDecimal
+    exponentToBigDecimal,
+    bigIntToPercentage
 } from "../common/utils"
 
 
@@ -152,7 +155,7 @@ export function getUsageMetrics(
     // The protocol is defined in the schema as type Protocol!
     // But doesnt this create a circular dependency?
     // Protocol depends on usageMetrics, and usageMetrics depends on Protocol
-    usageMetrics.protocol = TOKEN_NAME_GEIST;
+    usageMetrics.protocol = PROTOCOL_ID;
     usageMetrics.dailyTransactionCount += 1
     usageMetrics.blockNumber = block_number;
     usageMetrics.timestamp = timestamp;
@@ -160,7 +163,7 @@ export function getUsageMetrics(
     userExists.save();
 
     log.warning(
-        "Adding UsageMetricsDailySnapshot with id {}. activeUsers={}, totalUniqueUsers={}, dailyTransactionCount={}", 
+        "Adding to UsageMetricsDailySnapshot with ID={}. activeUsers={}, totalUniqueUsers={}, dailyTransactionCount={}", 
         [
             usageMetrics.id,
             usageMetrics.activeUsers.toString(),
@@ -174,16 +177,23 @@ export function getUsageMetrics(
 
   export function getTokenAmountUSD(tokenAddress: Address, tokenAmount: BigInt): BigDecimal {
     /* 
-        Get the price of the token from the oracle. 
-        Multiply that with the amount of the token.
-        Convert it to a BigDecimal with the correct number of decimal points.
+        Get the price of the token from the oracle as a BigInt with 18 decimals. 
+        Convert token price to BigDecimal using 18 decimals.
+        Convert token amount to BigDecimal using the contract decimals.
+        Multiply them, then truncate to 2 decimals places to get price in USD.
+
+        eg. for a gETH transaction
+        tokenPrice = 3007540000000000000000
+        tokenAmount = 3361871152102563403
+        tokenAmountUSD = (token_price / 1e18) * (token_amount / 1e18) = 10110.961964794544
+        tokenAmountUSD.truncate(2) = 10110.96
     */
     let tokenPrice = getTokenPrice(tokenAddress);
     let tokenContract = TokenContract.bind(tokenAddress)
-    log.warning("Token address={} has USD price of {}", [tokenAddress.toHexString(), tokenPrice.toString()]);
-    let tokenAmountBD = convertTokenToDecimal(tokenAmount.times(tokenPrice), tokenContract.decimals());
-    let tokenAmountUSD = tokenAmountBD.div(exponentToBigDecimal(BigInt.fromI32(2)));
-    log.warning("Token amount is {} USD", [tokenAmountUSD.toString()]);
+    let tokenAmountBD = convertTokenToDecimal(tokenAmount, tokenContract.decimals());
+    let tokenPriceBD = convertTokenToDecimal(tokenPrice, BigInt.fromI32(18));
+    let tokenAmountUSD = tokenAmountBD.times(tokenPriceBD).truncate(2);
+    log.warning("{} {} (${}) transferred", [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);
     return tokenAmountUSD
   }
 
@@ -191,6 +201,8 @@ export function getUsageMetrics(
       timestamp: BigInt,
       tokenAmount: BigInt,
       tokenAddress: Address,
+      transactionFee: BigInt,
+      rate: BigInt,
       interactionType: string,
   ): FinancialsDailySnapshotEntity {
 
@@ -201,7 +213,7 @@ export function getUsageMetrics(
   
     // Initialize all daily snapshot values
     if (!financialsDailySnapshot) {
-      log.warning("Initializing financialsDailySnapshot", []);
+      log.warning("Initializing financialsDailySnapshot with ID={}", [id.toString()]);
       financialsDailySnapshot =  new FinancialsDailySnapshotEntity(id.toString());
       financialsDailySnapshot.id = id.toString();
       financialsDailySnapshot.totalValueLockedUSD = ZERO_BD;
@@ -211,42 +223,52 @@ export function getUsageMetrics(
       financialsDailySnapshot.feesUSD = ZERO_BD;
     }
 
-    let tokenAmountUSD = getTokenAmountUSD(tokenAddress, tokenAmount)
+    let tokenAmountUSD = getTokenAmountUSD(tokenAddress, tokenAmount);
 
-    if (interactionType == DEPOSIT) {
+    if (interactionType == DEPOSIT_INTERACTION) {
         // Add value locked for operations like depositing
-        financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
     }
-    else if (interactionType == BORROW) {
-        // Add value locked for operations like depositing
-        financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
-        financialsDailySnapshot.protocolSideRevenueUSD.plus(tokenAmountUSD);
+    else if (interactionType == BORROW_INTERACTION) {
+        // Add value locked for operations like borrow (temporary for testing)
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+        let protocolSideRevenueUSD = bigIntToPercentage(rate).times(tokenAmountUSD);
+        financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(protocolSideRevenueUSD);
     }
-    else if (interactionType == WITHDRAW) {
+    else if (interactionType == WITHDRAW_INTERACTION) {
         // Subtract value locked for operations like withdrawing
-        financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
     }
-    else if (interactionType == REWARD) {
+    else if (interactionType == REWARD_INTERACTION) {
         // Add supply revenue for rewards
-        financialsDailySnapshot.supplySideRevenueUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.supplySideRevenueUSD = financialsDailySnapshot.supplySideRevenueUSD.plus(tokenAmountUSD);
+    }
+    else if (interactionType == REPAY_INTERACTION) {
+        // Add supply revenue for rewards
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+    }
+    else {
+        log.error("Invalid interaction type {}", [interactionType])
     }
 
     // Volume is counted for all interactions
-    financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD);
+    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD)
+    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(getTokenAmountUSD(TOKEN_ADDRESS_WFTM, transactionFee))
     financialsDailySnapshot.timestamp = timestamp;
 
     log.warning(
-        "Adding FinancialsDailySnapshot with id {} and interactionType={}. ValueLockedUSD={}, totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
+        "Adding to FinancialsDailySnapshot with ID={}. InteractionType={} (${}). totalValueLockedUSD={}, totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
         [
             financialsDailySnapshot.id, 
             interactionType,
+            tokenAmountUSD.toString(),
             financialsDailySnapshot.totalValueLockedUSD.toString(), 
             financialsDailySnapshot.totalVolumeUSD.toString(), 
             financialsDailySnapshot.supplySideRevenueUSD.toString(),
             financialsDailySnapshot.protocolSideRevenueUSD.toString(),
             financialsDailySnapshot.feesUSD.toString()
         ]
-    );
+    )
 
     return financialsDailySnapshot;
   }
