@@ -23,6 +23,8 @@ import {
     BORROW_INTERACTION,
     REWARD_INTERACTION,
     REPAY_INTERACTION,
+    STAKE_INTERACTION,
+    UNSTAKE_INTERACTION,
     PROTOCOL_ID
 } from "../common/constants";
 
@@ -246,6 +248,12 @@ export function getUsageMetrics(
     else if (interactionType == REPAY_INTERACTION) {
         // Add supply revenue for rewards
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+    }
+    else if (interactionType == STAKE_INTERACTION) {
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+    }
+    else if (interactionType == UNSTAKE_INTERACTION) {
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
     }
     else {
         log.error("Invalid interaction type {}", [interactionType])

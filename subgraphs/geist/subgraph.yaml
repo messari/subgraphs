@@ -86,6 +86,10 @@ dataSources:
       eventHandlers:
         - event: RewardPaid(indexed address,indexed address,uint256)
           handler: handleRewardPaid
+        - event: Staked(indexed address,uint256)
+          handler: handleStakeAdded
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleStakeWithdrawn
       file: ./src/mappings/mapping.ts
 
   # --------------------------------------
