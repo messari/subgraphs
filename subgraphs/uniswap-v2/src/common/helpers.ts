@@ -8,11 +8,11 @@ import {
   DexAmmProtocol,
   LiquidityPool,
   PoolDailySnapshot,
-  _PricesUSD
+  _Bundle
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS, BIGDECIMAL_ONE } from "../common/constants"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -24,7 +24,7 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
   let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-  let tvl = _PricesUSD.load('TVL')
+  let tvl = _Bundle.load('TVL')
   if (tvl == null) return
 
   if (!financialMetrics) {
@@ -41,7 +41,7 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
     // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
   financialMetrics.timestamp = timestamp;
-  financialMetrics.totalValueLockedUSD = tvl.valueUSD
+  financialMetrics.totalValueLockedUSD = tvl.valueDecimal!
 
   financialMetrics.save();
 }
@@ -52,6 +52,8 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
   // Number of days since Unix epoch
     let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
     let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+    let uniqueUsersTotal = _Bundle.load("USERS")
+    if (uniqueUsersTotal == null) return
 
     if (!usageMetrics) {
         usageMetrics = new UsageMetricsDailySnapshot(id.toString());
@@ -61,28 +63,31 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
         usageMetrics.totalUniqueUsers = 0;
         usageMetrics.dailyTransactionCount = 0;
     }
-  
-    // Update the block number and timestamp to that of the last transaction of that day
-    usageMetrics.blockNumber = blockNumber;
-    usageMetrics.timestamp = timestamp;
-    usageMetrics.dailyTransactionCount += 1;
 
     let accountId = from.toHexString()
     let account = _Account.load(accountId)
     if (!account) {
         account = new _Account(accountId);
         account.save();
-        usageMetrics.totalUniqueUsers += 1;
+
+        uniqueUsersTotal.valueInt = uniqueUsersTotal.valueInt + INT_ONE
     } 
 
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
     let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+    
     if (!dailyActiveAccount) {
         dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
         dailyActiveAccount.save();
         usageMetrics.activeUsers += 1;
     }
+
+    // Update the block number and timestamp to that of the last transaction of that day
+    usageMetrics.blockNumber = blockNumber;
+    usageMetrics.timestamp = timestamp;
+    usageMetrics.dailyTransactionCount += 1;
+    usageMetrics.totalUniqueUsers = uniqueUsersTotal.valueInt
 
     usageMetrics.save();
 
@@ -91,10 +96,10 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
 export function updatePoolMetrics(blockNumber: BigInt, timestamp: BigInt, pool: LiquidityPool): void {
     // Number of days since Unix epoch
       let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
-      let poolMetrics = PoolDailySnapshot.load(id.toString());
+      let poolMetrics = PoolDailySnapshot.load(pool.id.concat("-").concat(id.toString()));
   
       if (!poolMetrics) {
-        poolMetrics = new PoolDailySnapshot(id.toString());
+        poolMetrics = new PoolDailySnapshot(pool.id.concat("-").concat(id.toString()));
         poolMetrics.protocol = FACTORY_ADDRESS;
         poolMetrics.pool = pool.id;
         poolMetrics.rewardTokenEmissionsAmount = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
@@ -116,13 +121,14 @@ export function updateVolumeAndFees(timestamp: BigInt, trackedAmountUSD: BigDeci
   // Number of days since Unix epoch
     let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
 
-    let poolMetrics = PoolDailySnapshot.load(id.toString());
+    let poolMetrics = PoolDailySnapshot.load(pool.id.concat("-").concat(id.toString()));
     let financialMetrics = FinancialsDailySnapshot.load(id.toString());
     if (financialMetrics == null) return
     if (poolMetrics == null) return
 
     financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feeUSD)
+    financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(feeUSD)
 
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)

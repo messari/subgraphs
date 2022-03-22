@@ -1,7 +1,7 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { log } from '@graphprotocol/graph-ts'
 import { PairCreated } from './../generated/Factory/Factory'
-import { DexAmmProtocol, LiquidityPool, Token, _PricesUSD, _TokenTracker } from './../generated/schema'
+import { DexAmmProtocol, LiquidityPool, Token, _Bundle, _TokenTracker } from './../generated/schema'
 import { Pair as PairTemplate } from '../generated/templates'
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './common/tokens'
 import { WHITELIST } from './common/Price'
@@ -10,7 +10,8 @@ import {
   BIGDECIMAL_ZERO,
   ProtocolType,
   Network,
-  BIGDECIMAL_ONE
+  BIGDECIMAL_ONE,
+  INT_ZERO
 } from './common/constants'
 
 export function handleNewPair(event: PairCreated): void {
@@ -27,13 +28,19 @@ export function handleNewPair(event: PairCreated): void {
     protocol.type = ProtocolType.EXCHANGE
 
     // create new ether price storage object
-    let ether = new _PricesUSD('ETH')
-    ether.valueUSD = BIGDECIMAL_ZERO
+    let ether = new _Bundle('ETH')
+    ether.valueDecimal = BIGDECIMAL_ZERO
     ether.save()
 
-    let tvl = new _PricesUSD('TVL')
-    tvl.valueUSD = BIGDECIMAL_ZERO
+    // Tracks the total value locked accross all pools 
+    let tvl = new _Bundle('TVL')
+    tvl.valueDecimal = BIGDECIMAL_ZERO
     tvl.save()
+
+    // Tracks the total number of unique users of the protocol 
+    let uniqueUsersTotal = new _Bundle('USERS')
+    uniqueUsersTotal.valueInt = INT_ZERO
+    uniqueUsersTotal.save()
   }  
 
   // create the tokens
@@ -113,8 +120,8 @@ export function handleNewPair(event: PairCreated): void {
     tokenTracker0.whitelistPools = newPools
   }
 
-  let poolDeposits = new _PricesUSD(event.params.pair.toHexString())
-  poolDeposits.valueUSD = BIGDECIMAL_ZERO
+  let poolDeposits = new _Bundle(event.params.pair.toHexString())
+  poolDeposits.valueInt = INT_ZERO
 
   let pool = new LiquidityPool(event.params.pair.toHexString())
 
@@ -140,7 +147,8 @@ export function handleNewPair(event: PairCreated): void {
   token1.save()
   tokenTracker0.save()
   tokenTracker1.save()
-  LPtoken.id
+  LPtoken.save()
   pool.save()
+  poolDeposits.save()
   protocol.save()
 }

@@ -452,11 +452,13 @@ type _Burn @entity {
   needsComplete: Boolean!
 }
 
-"  Used to keep track of the price of Ether/TVL in USD "
-type _PricesUSD @entity {
+"  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
+type _Bundle @entity {
   id: ID!
-  " price of ETH usd/TVL "
-  valueUSD: BigDecimal! 
+  " price of ETH usd/TVL, # of deposits, # of unique users "
+  valueDecimal: BigDecimal
+  valueInt: Int
+
 }
 
 type _TokenTracker @entity { 
