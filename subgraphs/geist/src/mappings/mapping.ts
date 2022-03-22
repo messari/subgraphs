@@ -28,6 +28,9 @@ import {
 
 import {
   Deposit,
+  Borrow,
+  Withdraw,
+  Repay
 } from '../../generated/templates/LendingPool/LendingPool'
 
 import { 
@@ -50,7 +53,11 @@ import {
 import { 
   PROTOCOL_ID,
   NETWORK_FANTOM,
-  PROTOCOL_TYPE_LENDING
+  PROTOCOL_TYPE_LENDING,
+  DEPOSIT,
+  BORROW,
+  WITHDRAW,
+  REWARD
 } from "../common/constants";
 
 import {
@@ -106,6 +113,28 @@ export function handleProxyCreated(event: ProxyCreated): void {
   }
 }
 
+export function handleApproval(event: Approval): void {
+  // Add main token into Token store
+  initializeToken(TOKEN_ADDRESS_GEIST);
+
+  // Use the Reward Token contract to pull all the reward token addresses
+  let rewardTokenContract = MultiFeeDistribution.bind(REWARD_TOKEN_CONTRACT);
+
+  // The loop ends at 256 because we are presuming there will not be more tokens than that
+  // Note that the full loop will never execute in practise as it breaks when it hits a revert
+  for (let i = 0; i < 256; i++) {
+    // Query the reward token from number 
+    let result = rewardTokenContract.try_rewardTokens(BigInt.fromI32(i));
+
+    if (result.reverted) {
+      // Break loop when hitting an invalid value of `i`
+      break;
+    }
+    // Add rewardToken into RewardToken store
+    initializeRewardToken(result.value, "DEPOSIT");
+  }
+}
+
 export function handleDeposit(event: Deposit): void {
   log.warning('Deposit event', [])
 
@@ -137,10 +166,7 @@ export function handleDeposit(event: Deposit): void {
     event.block.timestamp,
     event.params.amount,
     event.params.reserve,
-    true,
-    true,
-    false,
-    false
+    DEPOSIT,
   ); 
   financialsDailySnapshot.protocol = PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
@@ -149,26 +175,44 @@ export function handleDeposit(event: Deposit): void {
   financialsDailySnapshot.save()
 }
 
-export function handleApproval(event: Approval): void {
-  // Add main token into Token store
-  initializeToken(TOKEN_ADDRESS_GEIST);
+export function handleBorrow(event: Borrow): void {
+  log.warning('Borrow event', [])
 
-  // Use the Reward Token contract to pull all the reward token addresses
-  let rewardTokenContract = MultiFeeDistribution.bind(REWARD_TOKEN_CONTRACT);
-
-  // The loop ends at 256 because we are presuming there will not be more tokens than that
-  // Note that the full loop will never execute in practise as it breaks when it hits a revert
-  for (let i = 0; i < 256; i++) {
-    // Query the reward token from number 
-    let result = rewardTokenContract.try_rewardTokens(BigInt.fromI32(i));
-
-    if (result.reverted) {
-      // Break loop when hitting an invalid value of `i`
-      break;
+  let tx = event.transaction
+  let id = tx.hash.toHexString()
+  let transaction = BorrowEntity.load(id)
+  if (transaction == null) {
+    transaction = new BorrowEntity(id)
+    transaction.logIndex = tx.index.toI32()
+    if (tx.to) {
+      transaction.to = (tx.to as Address).toHexString()
     }
-    // Add rewardToken into RewardToken store
-    initializeRewardToken(result.value, "DEPOSIT");
+    transaction.from = tx.from.toHexString()
+    transaction.hash = tx.hash.toHexString()
+    transaction.timestamp = getTimestampInMillis(event.block);
+    transaction.blockNumber = event.block.number;
+    transaction.protocol = PROTOCOL_ID
+    transaction.save()
   }
+
+  // Generate data for the UsageMetricsDailySnapshot Entity
+  let usageMetrics: UsageMetricsDailySnapshotEntity = 
+        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+
+  usageMetrics.save()
+
+  // Depositing adds to TVL and volume
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+    event.block.timestamp,
+    event.params.amount,
+    event.params.reserve,
+    BORROW,
+  ); 
+  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.blockNumber = event.block.number;
+
+  financialsDailySnapshot.save()
 }
 
 // export function handleDepositETH(call: DepositETHCall): void {
@@ -378,10 +422,7 @@ export function handleRewardPaid(event: RewardPaid): void {
     event.block.timestamp,
     event.params.reward,
     event.params.rewardsToken,
-    false,
-    false,
-    true,
-    false
+    REWARD
   );
 
   financialsDailySnapshot.blockNumber = event.block.number;

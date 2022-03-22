@@ -17,7 +17,11 @@ import {
 
 import { 
     ZERO_BD,
-    SECONDS_PER_DAY
+    SECONDS_PER_DAY,
+    DEPOSIT,
+    WITHDRAW,
+    BORROW,
+    REWARD
 } from "../common/constants";
 
 import { 
@@ -52,15 +56,16 @@ import {
 import { 
     AaveOracle,
     OwnershipTransferred
-} from "../../generated/AaveOracle/AaveOracle"
+} from "../../generated/MultiFeeDistribution/AaveOracle"
 
 import { 
     SpookySwapGEISTFTM,
     Transfer
-} from "../../generated/SpookySwapGEISTFTM/SpookySwapGEISTFTM"
+} from "../../generated/MultiFeeDistribution/SpookySwapGEISTFTM"
 
 import { 
-    convertTokenToDecimal 
+    convertTokenToDecimal,
+    exponentToBigDecimal
 } from "../common/utils"
 
 
@@ -168,21 +173,25 @@ export function getUsageMetrics(
   }
 
   export function getTokenAmountUSD(tokenAddress: Address, tokenAmount: BigInt): BigDecimal {
+    /* 
+        Get the price of the token from the oracle. 
+        Multiply that with the amount of the token.
+        Convert it to a BigDecimal with the correct number of decimal points.
+    */
     let tokenPrice = getTokenPrice(tokenAddress);
-    log.warning("Token price is {}", [tokenPrice.toString()]);
-    let tokenAmountUSDBD = convertTokenToDecimal(tokenPrice.times(tokenAmount), new BigInt(2));
-    log.warning("Token price is {} USD", [tokenAmountUSDBD.toString()]);
-    return tokenAmountUSDBD
+    let tokenContract = TokenContract.bind(tokenAddress)
+    log.warning("Token address={} has USD price of {}", [tokenAddress.toHexString(), tokenPrice.toString()]);
+    let tokenAmountBD = convertTokenToDecimal(tokenAmount.times(tokenPrice), tokenContract.decimals());
+    let tokenAmountUSD = tokenAmountBD.div(exponentToBigDecimal(BigInt.fromI32(2)));
+    log.warning("Token amount is {} USD", [tokenAmountUSD.toString()]);
+    return tokenAmountUSD
   }
 
   export function getFinancialSnapshot(
       timestamp: BigInt,
       tokenAmount: BigInt,
       tokenAddress: Address,
-      isValueLocked: bool,
-      isIncreasingValueLocked: bool,
-      isSupplySideRevenue: bool,
-      isProtocolSideRevenue: bool
+      interactionType: string,
   ): FinancialsDailySnapshotEntity {
 
     let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
@@ -192,6 +201,7 @@ export function getUsageMetrics(
   
     // Initialize all daily snapshot values
     if (!financialsDailySnapshot) {
+      log.warning("Initializing financialsDailySnapshot", []);
       financialsDailySnapshot =  new FinancialsDailySnapshotEntity(id.toString());
       financialsDailySnapshot.id = id.toString();
       financialsDailySnapshot.totalValueLockedUSD = ZERO_BD;
@@ -203,29 +213,33 @@ export function getUsageMetrics(
 
     let tokenAmountUSD = getTokenAmountUSD(tokenAddress, tokenAmount)
 
-    // Add value locked for operations like depositing
-    if (isValueLocked && isIncreasingValueLocked) {
+    if (interactionType == DEPOSIT) {
+        // Add value locked for operations like depositing
         financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
     }
-    // Subtract value locked for operations like withdrawing
-    else if (isValueLocked && !isIncreasingValueLocked) {
-        financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
-    }
-    // Add protocol revenue for fees
-    if (isProtocolSideRevenue) {
+    else if (interactionType == BORROW) {
+        // Add value locked for operations like depositing
+        financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
         financialsDailySnapshot.protocolSideRevenueUSD.plus(tokenAmountUSD);
     }
-    // Add supply side revenue for rewards
-    if (isSupplySideRevenue) {
+    else if (interactionType == WITHDRAW) {
+        // Subtract value locked for operations like withdrawing
+        financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
+    }
+    else if (interactionType == REWARD) {
+        // Add supply revenue for rewards
         financialsDailySnapshot.supplySideRevenueUSD.plus(tokenAmountUSD);
     }
+
+    // Volume is counted for all interactions
     financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD);
     financialsDailySnapshot.timestamp = timestamp;
 
     log.warning(
-        "Adding FinancialsDailySnapshot with id {}. totalValueLockedUSD={}, totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
+        "Adding FinancialsDailySnapshot with id {} and interactionType={}. ValueLockedUSD={}, totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
         [
             financialsDailySnapshot.id, 
+            interactionType,
             financialsDailySnapshot.totalValueLockedUSD.toString(), 
             financialsDailySnapshot.totalVolumeUSD.toString(), 
             financialsDailySnapshot.supplySideRevenueUSD.toString(),
@@ -243,8 +257,6 @@ export function getUsageMetrics(
         So map the gTokens to the underlying asset for price
         eg. gUSDC -> USDC, gDAI -> DAI etc.
     */
-
-    log.warning('Getting price for {}', [tokenAddress.toHexString()])
 
     let priceOracle = AaveOracle.bind(PRICE_ORACLE);
 

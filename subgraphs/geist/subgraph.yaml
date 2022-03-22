@@ -149,7 +149,15 @@ templates:
           file: ./abis/AaveOracle.json
         - name: SpookySwapGEISTFTM
           file: ./abis/SpookySwapGEISTFTM.json
+        - name: GeistToken
+          file: ./abis/GeistToken.json
       eventHandlers:
         - event: Deposit(indexed address,address,indexed address,uint256,indexed uint16)
           handler: handleDeposit
+        - event: Borrow(indexed address,address,indexed address,uint256,uint256,uint256,indexed uint16)
+          handler: handleBorrow
+        - event: Repay(indexed address,indexed address,indexed address,uint256)
+          handler: handleRepay
+        - event: Withdraw(indexed address,indexed address,indexed address,uint256)
+          handler: handleWithdraw
       file: src/mappings/mapping.ts

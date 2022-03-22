@@ -13,6 +13,7 @@ import {
 
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
+    /* Get the denominator to convert a token amount to BigDecimal */
     let bd = BigDecimal.fromString('1')
     for (let i = ZERO_BI; i.lt(decimals as BigInt); i = i.plus(ONE_BI)) {
       bd = bd.times(BigDecimal.fromString('10'))
