@@ -2,7 +2,7 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: cCOMP
     network: mainnet
     source:
@@ -69,4 +69,658 @@ dataSources:
         #   handler: handleTransfer
         # - event: Approval(indexed address,indexed address,uint256)
         #   handler: handleApproval
-      file: ./src/mappings/cToken.ts
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cAAVE
+    network: mainnet
+    source:
+      address: "0xe65cdb6479bac1e22340e4e755fae7e509ecd06c"
+      abi: cToken
+      startBlock: 12848198
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        # This event equates to a Deposit
+        # event Mint(address minter, uint mintAmount, uint mintTokens);
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+
+        # This event equates to a withdraw
+        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+
+        # This event equates to a Borrow
+        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+
+        # This event equates to a Repay
+        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+
+        # This event equates to a Liquidation
+        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cBAT
+    network: mainnet
+    source:
+      address: "0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e"
+      abi: cToken
+      startBlock: 7710735
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        # This event equates to a Deposit
+        # event Mint(address minter, uint mintAmount, uint mintTokens);
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+
+        # This event equates to a withdraw
+        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+
+        # This event equates to a Borrow
+        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+
+        # This event equates to a Repay
+        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+
+        # This event equates to a Liquidation
+        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cDAI
+    network: mainnet
+    source:
+      address: "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
+      abi: cToken
+      startBlock: 8983575
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        # This event equates to a Deposit
+        # event Mint(address minter, uint mintAmount, uint mintTokens);
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+
+        # This event equates to a withdraw
+        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+
+        # This event equates to a Borrow
+        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+
+        # This event equates to a Repay
+        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+
+        # This event equates to a Liquidation
+        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cFEI
+    network: mainnet
+    source:
+      address: "0x7713dd9ca933848f6819f38b8352d9a15ea73f67"
+      abi: cToken
+      startBlock: 13227624
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cLINK
+    network: mainnet
+    source:
+      address: "0xface851a4921ce59e912d19329929ce6da6eb0c7"
+      abi: cToken
+      startBlock: 12286030
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cMKR
+    network: mainnet
+    source:
+      address: "0x95b4ef2869ebd94beb4eee400a99824bf5dc325b"
+      abi: cToken
+      startBlock: 12836064
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cREP
+    network: mainnet
+    source:
+      address: "0x158079ee67fce2f58472a96584a73c7ab9ac95c1"
+      abi: cToken
+      startBlock: 7710755
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cSUSHI
+    network: mainnet
+    source:
+      address: "0x4b0181102a0112a2ef11abee5563bb4a3176c9d7"
+      abi: cToken
+      startBlock: 12848166
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cTUSD
+    network: mainnet
+    source:
+      address: "0x12392f67bdf24fae0af363c24ac620a2f67dad86"
+      abi: cToken
+      startBlock: 11008385
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cUNI
+    network: mainnet
+    source:
+      address: "0x35a18000230da775cac24873d00ff85bccded550"
+      abi: cToken
+      startBlock: 10921410
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cUSDC
+    network: mainnet
+    source:
+      address: "0x39aa39c021dfbae8fac545936693ac917d5e7563"
+      abi: cToken
+      startBlock: 7710760
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cUSDP
+    network: mainnet
+    source:
+      address: "0x041171993284df560249b57358f931d9eb7b925d"
+      abi: cToken
+      startBlock: 13258119
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cUSDT
+    network: mainnet
+    source:
+      address: "0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9"
+      abi: cToken
+      startBlock: 9879363
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cWBTC
+    network: mainnet
+    source:
+      address: "0xc11b1268c1a384e55c48c2391d8d480264a3a7f4"
+      abi: cToken
+      startBlock: 8163813
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cWBTC2
+    network: mainnet
+    source:
+      address: "0xccf4429db6322d5c611ee964527d42e5d685dd6a"
+      abi: cToken
+      startBlock: 12038653
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cYFI
+    network: mainnet
+    source:
+      address: "0x80a2ae356fc9ef4305676f7a3e2ed04e12c33946"
+      abi: cToken
+      startBlock: 12848198
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cZRX
+    network: mainnet
+    source:
+      address: "0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407"
+      abi: cToken
+      startBlock: 7710733
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  - kind: ethereum/contract
+    name: cETH
+    network: mainnet
+    source:
+      address: "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5"
+      abi: cEther
+      startBlock: 7710758
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidation
+      abis:
+        - name: cEther
+          file: ./abis/cEther.json
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
+        - event: Borrow(address,uint256,uint256,uint256)
+          handler: handleBorrow
+        - event: RepayBorrow(address,address,uint256,uint256,uint256)
+          handler: handleRepayBorrow
+        - event: LiquidateBorrow(address,address,uint256,address,uint256)
+          handler: handleLiquidateBorrow
+      file: ./src/mappings/mappings.ts
+  
+  # This is the "factory" contracts and controls some stuff in market entity
+  - kind: ethereum/contract
+    name: Comptroller 
+    network: mainnet
+    source:
+      address: "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
+      abi: Comptroller
+      startBlock: 7710671
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - LendingProtocol
+      abis:
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: cToken
+          file: ./abis/cToken.json
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+      eventHandlers:
+        # event MarketEntered(CToken cToken, address account);
+        - event: MarketEntered(address,address)
+          handler: handleMarketEntered
+        # event MarketExited(CToken cToken, address account);
+        - event: MarketExited(address,address)
+          handler: handleMarketExited
+        # event NewPriceOracle(PriceOracle oldPriceOracle, PriceOracle newPriceOracle);
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+      file: ./src/mappings/mappings.ts
