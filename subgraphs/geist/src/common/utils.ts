@@ -12,7 +12,6 @@ import {
 } from "./constants"
 
 
-
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     let bd = BigDecimal.fromString('1')
     for (let i = ZERO_BI; i.lt(decimals as BigInt); i = i.plus(ONE_BI)) {

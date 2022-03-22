@@ -1,10 +1,17 @@
 import { 
-  BigInt, BigDecimal, Address, log 
+  BigInt, 
+  BigDecimal, 
+  Address, 
+  log 
 } from "@graphprotocol/graph-ts"
 
 import { 
-  Approval 
+  Approval,
 } from "../../generated/GeistToken/GeistToken"
+
+import { 
+  MultiFeeDistribution 
+} from "../../generated/GeistToken/MultiFeeDistribution"
 
 import { 
   AddressesProviderRegistered,
@@ -24,18 +31,8 @@ import {
 } from '../../generated/templates/LendingPool/LendingPool'
 
 import { 
-  MultiFeeDistribution,
-  RewardPaid
-} from "../../generated/MultiFeeDistribution/MultiFeeDistribution"
-
-
-
-import { 
-  DepositETHCall, 
-  BorrowETHCall, 
-  RepayETHCall, 
-  WithdrawETHCall 
-} from "../../generated/WETHGateway/WETHGateway"
+  RewardPaid 
+} from '../../generated/MultiFeeDistribution/MultiFeeDistribution'
 
 import { 
   Token as TokenEntity,
@@ -59,7 +56,6 @@ import {
 import {
   TOKEN_ADDRESS_GEIST,
   REWARD_TOKEN_CONTRACT,
-  TOKEN_ADDRESS_gETH,
 } from "../common/addresses"
 
 import { 
@@ -69,7 +65,10 @@ import {
   getFinancialSnapshot
 } from './helpers';
 
-import { getTimestampInMillis } from "../common/utils"
+import { 
+  getTimestampInMillis 
+} from "../common/utils"
+
 
 // Definitions
 // totalValueLockedUSD = staking + deposits
@@ -130,6 +129,7 @@ export function handleDeposit(event: Deposit): void {
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
         getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+
   usageMetrics.save()
 
   // Depositing adds to TVL and volume
@@ -141,11 +141,11 @@ export function handleDeposit(event: Deposit): void {
     true,
     false,
     false
-  );
-
+  ); 
   financialsDailySnapshot.protocol = PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
+
   financialsDailySnapshot.save()
 }
 
@@ -171,221 +171,219 @@ export function handleApproval(event: Approval): void {
   }
 }
 
-export function handleDepositETH(call: DepositETHCall): void {
-  // Extract user metrics from depositing ETH, ignores non-unique addresses
-  // createProtocol();
+// export function handleDepositETH(call: DepositETHCall): void {
+//   // Extract user metrics from depositing ETH, ignores non-unique addresses
+//   // createProtocol();
 
-  // // Generate data for the Deposit and Market Entities
-  // const hash = call.transaction.hash.toHexString();
-  // // This is the transaction index, not the log index
-  // const logIndex = call.transaction.index;
+//   // // Generate data for the Deposit and Market Entities
+//   // const hash = call.transaction.hash.toHexString();
+//   // // This is the transaction index, not the log index
+//   // const logIndex = call.transaction.index;
 
-  // let deposit = new DepositEntity(hash + "-" + logIndex.toHexString());
-  // deposit.hash = hash;
-  // deposit.logIndex = logIndex.toI32();
-  // deposit.protocol = PROTOCOL_ID;
-  // deposit.from = call.from.toHexString();
-  // deposit.amount = new BigDecimal(call.transaction.value);
-  // deposit.timestamp = call.block.timestamp;
-  // deposit.blockNumber = call.block.number;
+//   // let deposit = new DepositEntity(hash + "-" + logIndex.toHexString());
+//   // deposit.hash = hash;
+//   // deposit.logIndex = logIndex.toI32();
+//   // deposit.protocol = PROTOCOL_ID;
+//   // deposit.from = call.from.toHexString();
+//   // deposit.amount = new BigDecimal(call.transaction.value);
+//   // deposit.timestamp = call.block.timestamp;
+//   // deposit.blockNumber = call.block.number;
 
-  // const marketAddress = call.inputs.lendingPool.toHexString();
+//   // const marketAddress = call.inputs.lendingPool.toHexString();
 
-  // deposit.to = marketAddress;
-  // deposit.market = marketAddress;
+//   // deposit.to = marketAddress;
+//   // deposit.market = marketAddress;
 
-  // let market = MarketEntity.load(marketAddress) as MarketEntity;
-  // const token = initializeToken(Address.fromString(market.inputTokens[0]));
+//   // let market = MarketEntity.load(marketAddress) as MarketEntity;
+//   // const token = initializeToken(Address.fromString(market.inputTokens[0]));
 
-  // deposit.asset = token.id;
-  // market.deposits.push(deposit.id)
+//   // deposit.asset = token.id;
+//   // market.deposits.push(deposit.id)
 
-  // deposit.save()
-  // market.save()
+//   // deposit.save()
+//   // market.save()
 
-  // // Generate data for the UsageMetricsDailySnapshot Entity
-  // let usageMetrics: UsageMetricsDailySnapshotEntity = 
-  //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
-  // usageMetrics.save()
+//   // // Generate data for the UsageMetricsDailySnapshot Entity
+//   // let usageMetrics: UsageMetricsDailySnapshotEntity = 
+//   //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
+//   // usageMetrics.save()
 
-  // // Depositing ETH adds to TVL and volume
-  // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-  //   call.block.timestamp,
-  //   call.transaction.value,
-  //   TOKEN_ADDRESS_gETH,
-  //   true,
-  //   true,
-  //   false,
-  //   false
-  // );
+//   // // Depositing ETH adds to TVL and volume
+//   // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+//   //   call.block.timestamp,
+//   //   call.transaction.value,
+//   //   TOKEN_ADDRESS_gETH,
+//   //   true,
+//   //   true,
+//   //   false,
+//   //   false
+//   // );
 
-  // financialsDailySnapshot.protocol = PROTOCOL_ID;
-  // financialsDailySnapshot.timestamp = call.block.timestamp;
-  // financialsDailySnapshot.blockNumber = call.block.number;
-  // financialsDailySnapshot.save()
-}
+//   // financialsDailySnapshot.protocol = PROTOCOL_ID;
+//   // financialsDailySnapshot.timestamp = call.block.timestamp;
+//   // financialsDailySnapshot.blockNumber = call.block.number;
+//   // financialsDailySnapshot.save()
+// }
 
-export function handleBorrowETH(call: BorrowETHCall): void {
-  // createProtocol();
+// export function handleBorrowETH(call: BorrowETHCall): void {
+//   // createProtocol();
 
-  // // Generate data for the Borrow and Market Entities
-  // const hash = call.transaction.hash.toHexString();
-  // const logIndex = call.transaction.index;
+//   // // Generate data for the Borrow and Market Entities
+//   // const hash = call.transaction.hash.toHexString();
+//   // const logIndex = call.transaction.index;
 
-  // let borrow = new BorrowEntity(hash + "-" + logIndex.toHexString());
-  // borrow.hash = hash;
-  // borrow.logIndex = logIndex.toI32();
-  // borrow.protocol = PROTOCOL_ID;
-  // borrow.from = call.from.toHexString();
-  // borrow.to = call.to.toHexString();
-  // borrow.amount = new BigDecimal(call.inputs.amount);
-  // borrow.timestamp = call.block.timestamp;
-  // borrow.blockNumber = call.block.number;
+//   // let borrow = new BorrowEntity(hash + "-" + logIndex.toHexString());
+//   // borrow.hash = hash;
+//   // borrow.logIndex = logIndex.toI32();
+//   // borrow.protocol = PROTOCOL_ID;
+//   // borrow.from = call.from.toHexString();
+//   // borrow.to = call.to.toHexString();
+//   // borrow.amount = new BigDecimal(call.inputs.amount);
+//   // borrow.timestamp = call.block.timestamp;
+//   // borrow.blockNumber = call.block.number;
 
-  // const marketAddress = call.inputs.lendingPool.toHexString();
-  // borrow.market = marketAddress;
+//   // const marketAddress = call.inputs.lendingPool.toHexString();
+//   // borrow.market = marketAddress;
 
-  // let market = MarketEntity.load(marketAddress) as MarketEntity;
-  // const token = initializeToken(Address.fromString(market.inputTokens[0]));
+//   // let market = MarketEntity.load(marketAddress) as MarketEntity;
+//   // const token = initializeToken(Address.fromString(market.inputTokens[0]));
 
-  // borrow.asset = token.id;
-  // market.deposits.push(borrow.id)
+//   // borrow.asset = token.id;
+//   // market.deposits.push(borrow.id)
 
-  // borrow.save()
-  // market.save()
+//   // borrow.save()
+//   // market.save()
 
-  // // Extract user metrics from borrowing ETH, ignores non-unique addresses
-  // let usageMetrics: UsageMetricsDailySnapshotEntity = 
-  //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
-  // usageMetrics.save()
+//   // // Extract user metrics from borrowing ETH, ignores non-unique addresses
+//   // let usageMetrics: UsageMetricsDailySnapshotEntity = 
+//   //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
+//   // usageMetrics.save()
 
-  // // Borrowing ETH does not to TVL, but adds to volume
-  // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-  //   call.block.timestamp,
-  //   call.inputs.amount,
-  //   TOKEN_ADDRESS_gETH,
-  //   false,
-  //   false,
-  //   false,
-  //   false
-  // );
+//   // // Borrowing ETH does not to TVL, but adds to volume
+//   // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+//   //   call.block.timestamp,
+//   //   call.inputs.amount,
+//   //   TOKEN_ADDRESS_gETH,
+//   //   false,
+//   //   false,
+//   //   false,
+//   //   false
+//   // );
 
-  // financialsDailySnapshot.blockNumber = call.block.number;
-  // financialsDailySnapshot.save()
-}
+//   // financialsDailySnapshot.blockNumber = call.block.number;
+//   // financialsDailySnapshot.save()
+// }
 
-export function handleRepayETH(call: RepayETHCall): void {
-  // createProtocol();
+// export function handleRepayETH(call: RepayETHCall): void {
+//   // createProtocol();
 
-  // // Generate data for the Borrow and Market Entities
-  // const hash = call.transaction.hash.toHexString();
-  // const logIndex = call.transaction.index;
+//   // // Generate data for the Borrow and Market Entities
+//   // const hash = call.transaction.hash.toHexString();
+//   // const logIndex = call.transaction.index;
 
-  // let repay = new RepayEntity(hash + "-" + logIndex.toHexString());
-  // repay.hash = hash;
-  // repay.logIndex = logIndex.toI32();
-  // repay.protocol = PROTOCOL_ID;
-  // repay.from = call.from.toHexString();
-  // repay.amount = new BigDecimal(call.inputs.amount);
-  // repay.timestamp = call.block.timestamp;
-  // repay.blockNumber = call.block.number;
+//   // let repay = new RepayEntity(hash + "-" + logIndex.toHexString());
+//   // repay.hash = hash;
+//   // repay.logIndex = logIndex.toI32();
+//   // repay.protocol = PROTOCOL_ID;
+//   // repay.from = call.from.toHexString();
+//   // repay.amount = new BigDecimal(call.inputs.amount);
+//   // repay.timestamp = call.block.timestamp;
+//   // repay.blockNumber = call.block.number;
 
-  // const marketAddress = call.inputs.lendingPool.toHexString();
-  // repay.market = marketAddress;
-  // repay.to = marketAddress;
+//   // const marketAddress = call.inputs.lendingPool.toHexString();
+//   // repay.market = marketAddress;
+//   // repay.to = marketAddress;
 
-  // let market = MarketEntity.load(marketAddress) as MarketEntity;
-  // const token = initializeToken(Address.fromString(market.inputTokens[0]));
+//   // let market = MarketEntity.load(marketAddress) as MarketEntity;
+//   // const token = initializeToken(Address.fromString(market.inputTokens[0]));
 
-  // repay.asset = token.id;
-  // market.deposits.push(repay.id)
+//   // repay.asset = token.id;
+//   // market.deposits.push(repay.id)
 
-  // repay.save()
-  // market.save()
+//   // repay.save()
+//   // market.save()
 
-  // // Extract user metrics from replaying ETH, ignores non-unique addresses
-  // let usageMetrics: UsageMetricsDailySnapshotEntity = 
-  //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
-  // usageMetrics.save()
+//   // // Extract user metrics from replaying ETH, ignores non-unique addresses
+//   // let usageMetrics: UsageMetricsDailySnapshotEntity = 
+//   //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
+//   // usageMetrics.save()
 
-  // // Repaying ETH does not to TVL, but adds to volume
-  // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-  //   call.block.timestamp,
-  //   call.inputs.amount,
-  //   TOKEN_ADDRESS_gETH,
-  //   false,
-  //   false,
-  //   false,
-  //   false
-  // );
+//   // // Repaying ETH does not to TVL, but adds to volume
+//   // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+//   //   call.block.timestamp,
+//   //   call.inputs.amount,
+//   //   TOKEN_ADDRESS_gETH,
+//   //   false,
+//   //   false,
+//   //   false,
+//   //   false
+//   // );
 
-  // financialsDailySnapshot.blockNumber = call.block.number;
-  // financialsDailySnapshot.save()
-}
+//   // financialsDailySnapshot.blockNumber = call.block.number;
+//   // financialsDailySnapshot.save()
+// }
 
-export function handleWithdrawETH(call: WithdrawETHCall): void {
-  // createProtocol();
+// export function handleWithdrawETH(call: WithdrawETHCall): void {
+//   // createProtocol();
 
-  // // Generate data for the Borrow and Market Entities
-  // const hash = call.transaction.hash.toHexString();
-  // const logIndex = call.transaction.index;
+//   // // Generate data for the Borrow and Market Entities
+//   // const hash = call.transaction.hash.toHexString();
+//   // const logIndex = call.transaction.index;
 
-  // let withdraw = new WithdrawEntity(hash + "-" + logIndex.toHexString());
-  // withdraw.hash = hash;
-  // withdraw.logIndex = logIndex.toI32();
-  // withdraw.protocol = PROTOCOL_ID;
-  // withdraw.from = call.from.toHexString();
-  // withdraw.to = call.to.toHexString();
-  // withdraw.amount = new BigDecimal(call.inputs.amount);
-  // withdraw.timestamp = call.block.timestamp;
-  // withdraw.blockNumber = call.block.number;
+//   // let withdraw = new WithdrawEntity(hash + "-" + logIndex.toHexString());
+//   // withdraw.hash = hash;
+//   // withdraw.logIndex = logIndex.toI32();
+//   // withdraw.protocol = PROTOCOL_ID;
+//   // withdraw.from = call.from.toHexString();
+//   // withdraw.to = call.to.toHexString();
+//   // withdraw.amount = new BigDecimal(call.inputs.amount);
+//   // withdraw.timestamp = call.block.timestamp;
+//   // withdraw.blockNumber = call.block.number;
 
-  // const marketAddress = call.inputs.lendingPool.toHexString();
-  // withdraw.market = marketAddress;
+//   // const marketAddress = call.inputs.lendingPool.toHexString();
+//   // withdraw.market = marketAddress;
 
-  // let market = MarketEntity.load(marketAddress) as MarketEntity;
-  // const token = initializeToken(Address.fromString(market.inputTokens[0]));
+//   // let market = MarketEntity.load(marketAddress) as MarketEntity;
+//   // const token = initializeToken(Address.fromString(market.inputTokens[0]));
 
-  // withdraw.asset = token.id;
-  // market.deposits.push(withdraw.id)
+//   // withdraw.asset = token.id;
+//   // market.deposits.push(withdraw.id)
 
-  // withdraw.save()
-  // market.save()
+//   // withdraw.save()
+//   // market.save()
 
-  // // Extract user metrics from withdrawing ETH, ignores non-unique addresses
-  // let usageMetrics: UsageMetricsDailySnapshotEntity = 
-  //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
-  // usageMetrics.save()
+//   // // Extract user metrics from withdrawing ETH, ignores non-unique addresses
+//   // let usageMetrics: UsageMetricsDailySnapshotEntity = 
+//   //       getUsageMetrics(call.block.number, call.block.timestamp, call.from);
+//   // usageMetrics.save()
 
-  // // Borrowing ETH reduces TVL, but adds to volume
-  // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-  //   call.block.timestamp,
-  //   call.inputs.amount,
-  //   TOKEN_ADDRESS_gETH,
-  //   true,
-  //   false,
-  //   false,
-  //   false
-  // );
+//   // // Borrowing ETH reduces TVL, but adds to volume
+//   // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+//   //   call.block.timestamp,
+//   //   call.inputs.amount,
+//   //   TOKEN_ADDRESS_gETH,
+//   //   true,
+//   //   false,
+//   //   false,
+//   //   false
+//   // );
 
-  // financialsDailySnapshot.blockNumber = call.block.number;
-  // financialsDailySnapshot.save()
-}
+//   // financialsDailySnapshot.blockNumber = call.block.number;
+//   // financialsDailySnapshot.save()
+// }
 
 export function handleRewardPaid(event: RewardPaid): void {
-  // createProtocol();
+  // Rewards do not to TVL, but adds to volume and supply side revenue
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+    event.block.timestamp,
+    event.params.reward,
+    event.params.rewardsToken,
+    false,
+    false,
+    true,
+    false
+  );
 
-  // // Rewards do not to TVL, but adds to volume and supply side revenue
-  // let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-  //   event.block.timestamp,
-  //   event.params.reward,
-  //   event.params.rewardsToken,
-  //   false,
-  //   false,
-  //   true,
-  //   false
-  // );
-
-  // financialsDailySnapshot.blockNumber = event.block.number;
-  // financialsDailySnapshot.save();
+  financialsDailySnapshot.blockNumber = event.block.number;
+  financialsDailySnapshot.save();
 }

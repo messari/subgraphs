@@ -20,15 +20,12 @@ import {
     SECONDS_PER_DAY
 } from "../common/constants";
 
-import {
+import { 
     TOKEN_NAME_GEIST, 
     TOKEN_DECIMALS_GEIST, 
     REWARD_TOKEN_NAME, 
     REWARD_TOKEN_DECIMALS, 
     REWARD_TOKEN_SYMBOL,
-} from "../common/addresses"
-
-import { 
     PRICE_ORACLE,
     TOKEN_ADDRESS_GEIST,
     TOKEN_ADDRESS_gFTM,
@@ -52,7 +49,6 @@ import {
     GEIST_FTM_LP_ADDRESS
 } from "../common/addresses"
 
-
 import { 
     AaveOracle,
     OwnershipTransferred
@@ -62,6 +58,10 @@ import {
     SpookySwapGEISTFTM,
     Transfer
 } from "../../generated/SpookySwapGEISTFTM/SpookySwapGEISTFTM"
+
+import { 
+    convertTokenToDecimal 
+} from "../common/utils"
 
 
 export function initializeToken(address: Address): TokenEntity {
@@ -154,12 +154,24 @@ export function getUsageMetrics(
   
     userExists.save();
 
+    log.warning(
+        "Adding UsageMetricsDailySnapshot with id {}. activeUsers={}, totalUniqueUsers={}, dailyTransactionCount={}", 
+        [
+            usageMetrics.id,
+            usageMetrics.activeUsers.toString(),
+            usageMetrics.totalUniqueUsers.toString(),
+            usageMetrics.dailyTransactionCount.toString(),
+        ]
+    );
+
     return usageMetrics;
   }
 
   export function getTokenAmountUSD(tokenAddress: Address, tokenAmount: BigInt): BigDecimal {
     let tokenPrice = getTokenPrice(tokenAddress);
-    let tokenAmountUSDBD = tokenPrice.times(tokenAmount).toBigDecimal();
+    log.warning("Token price is {}", [tokenPrice.toString()]);
+    let tokenAmountUSDBD = convertTokenToDecimal(tokenPrice.times(tokenAmount), new BigInt(2));
+    log.warning("Token price is {} USD", [tokenAmountUSDBD.toString()]);
     return tokenAmountUSDBD
   }
 
@@ -209,6 +221,18 @@ export function getUsageMetrics(
     }
     financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD);
     financialsDailySnapshot.timestamp = timestamp;
+
+    log.warning(
+        "Adding FinancialsDailySnapshot with id {}. totalValueLockedUSD={}, totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
+        [
+            financialsDailySnapshot.id, 
+            financialsDailySnapshot.totalValueLockedUSD.toString(), 
+            financialsDailySnapshot.totalVolumeUSD.toString(), 
+            financialsDailySnapshot.supplySideRevenueUSD.toString(),
+            financialsDailySnapshot.protocolSideRevenueUSD.toString(),
+            financialsDailySnapshot.feesUSD.toString()
+        ]
+    );
 
     return financialsDailySnapshot;
   }
