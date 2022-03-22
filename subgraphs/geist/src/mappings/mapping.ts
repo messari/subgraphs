@@ -140,7 +140,7 @@ export function handleDeposit(event: Deposit): void {
   log.warning('Deposit event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString()
+  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let deposit = DepositEntity.load(id)
   if (deposit == null) {
     deposit = new DepositEntity(id)
@@ -185,7 +185,7 @@ export function handleBorrow(event: Borrow): void {
   log.warning('Borrow event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString()
+  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let borrow = BorrowEntity.load(id)
   if (!borrow) {
     borrow = new BorrowEntity(id)
@@ -216,7 +216,7 @@ export function handleBorrow(event: Borrow): void {
     event.params.amount,
     event.params.reserve,
     transactionFee,
-    event.params.borrowRate,
+    event.params.borrowRateMode,
     BORROW_INTERACTION,
   ); 
   financialsDailySnapshot.protocol = PROTOCOL_ID;
@@ -231,7 +231,7 @@ export function handleWithdraw(event: Withdraw): void{
   log.warning('Withdraw event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString()
+  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let withdraw = WithdrawEntity.load(id)
   if (!withdraw) {
     withdraw = new WithdrawEntity(id)
@@ -276,7 +276,7 @@ export function handleRepay(event: Repay): void {
   log.warning('Repay event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString()
+  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let withdraw = RepayEntity.load(id)
   if (!withdraw) {
     withdraw = new RepayEntity(id)

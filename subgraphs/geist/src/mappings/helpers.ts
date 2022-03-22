@@ -326,6 +326,7 @@ export function getUsageMetrics(
         return priceOracle.getAssetPrice(TOKEN_ADDRESS_WFTM);
     }
     else {
+        log.error("Invalid token address {}, cannot get price from oracle", [tokenAddress.toHexString()])
         return BigInt.fromI32(0);
     }
 }
