@@ -48,13 +48,13 @@ export function handleLendingPoolConfiguratorUpdated(event: LendingPoolConfigura
   startIndexingLendingPoolConfigurator(event.params.newAddress, context);
 }
 
-function startIndexingLendingPool(poolAddress: Address, context: DataSourceContext): void {
+export function startIndexingLendingPool(poolAddress: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool/Market
   // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
   LendingPoolTemplate.createWithContext(poolAddress, context);
 }
 
-function startIndexingLendingPoolConfigurator(configurator: Address, context: DataSourceContext): void {
+export function startIndexingLendingPoolConfigurator(configurator: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool Configurator
   // This indexes for events within the lendingPoolConfigurator.ts mapping script
   LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
@@ -65,14 +65,30 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   // Need to verify that context is accessible from any file importing dataSource? or just scripts for templates directly called to createWithContext
 
   const contract = AddressProviderContract.bind(addrProvider);
-  const lendingPool = contract.getLendingPool();
+  // NEED TO MOCK CONTRACT CALLS
+  // https://thegraph.com/docs/en/developer/matchstick/#calling-a-mapping-function-with-an-event
+  const trylendingPool = contract.try_getLendingPool();
+  let lendingPool = ''
+  if (!trylendingPool.reverted) {
+    lendingPool = trylendingPool.value.toHexString()
+    log.info('init context LP:' + lendingPool, [lendingPool])
+  } else {
+    log.error('FAILED TO GET LENDING POOL', [''])
+  }
   const lendingProtocol = fetchProtocolEntity('aave-v2');
   // Get the Address Provider Contract's Price Oracle
-  const priceOracle = contract.getPriceOracle();
-  log.info('CREATING CONTEXT ' + lendingPool.toHexString()+ priceOracle.toHexString()+ addrProvider.toHexString() , [lendingPool.toHexString(), priceOracle.toHexString(), addrProvider.toHexString()])
+  const tryPriceOracle = contract.try_getPriceOracle();
+  let priceOracle = ''
+  if (!tryPriceOracle.reverted) {
+    priceOracle = tryPriceOracle.value.toHexString()
+    log.info('init context PO: ' + priceOracle, [priceOracle])
+  } else {
+    log.error('FAILED TO GET ORACLE', [''])
+  }
+  log.info('CREATING CONTEXT ' + lendingPool + '----' + priceOracle + '-----' + lendingProtocol.id , [lendingPool, priceOracle, addrProvider.toHexString()])
   const context = new DataSourceContext();
-  context.setString("lendingPool", lendingPool.toHexString());
-  context.setString("priceOracle", priceOracle.toHexString());
+  context.setString("lendingPool", lendingPool);
+  context.setString("priceOracle", priceOracle);
   context.setString("protocolId", lendingProtocol.id);
   return context
 }

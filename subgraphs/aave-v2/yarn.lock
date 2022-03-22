@@ -259,10 +259,17 @@
     "which" "2.0.2"
     "yaml" "1.9.2"
 
-"@graphprotocol/graph-ts@^0.24.1", "@graphprotocol/graph-ts@0.24.1":
+"@graphprotocol/graph-ts@^0.24.1":
   "integrity" "sha512-2vU4m5ZPQIqMlMce/z5vmOtGHRlRmcRhMfemS3NIwxCSxSBGVnX2zb7QBTzzdQKGwsAZdbz6V0okkOtvohELfQ=="
   "resolved" "https://registry.npmjs.org/@graphprotocol/graph-ts/-/graph-ts-0.24.1.tgz"
   "version" "0.24.1"
+  dependencies:
+    "assemblyscript" "0.19.10"
+
+"@graphprotocol/graph-ts@^0.25.0":
+  "integrity" "sha512-/R++19dAtqPhd/Bv3l09ubcc8SWrm+akeyYG4yqkg5fk+b5Bm2Bi4Y+CK8B4l3C9mcc2mzJ7s7YisDMmGclqzw=="
+  "resolved" "https://registry.npmjs.org/@graphprotocol/graph-ts/-/graph-ts-0.25.0.tgz"
+  "version" "0.25.0"
   dependencies:
     "assemblyscript" "0.19.10"
 
@@ -2945,10 +2952,10 @@
   dependencies:
     "multiaddr" "^7.3.0"
 
-"matchstick-as@^0.3.0":
-  "integrity" "sha512-+nxHlchVHzvcJzcNc8WxCV5FpADVqVJwEBuaq3IvZjp29xVoe/RWpodmTvQw+Pk6bRMAPI5grdmTPjR4hGgrcw=="
-  "resolved" "https://registry.npmjs.org/matchstick-as/-/matchstick-as-0.3.0.tgz"
-  "version" "0.3.0"
+"matchstick-as@^0.4.0":
+  "integrity" "sha512-XkWoXQWUg1ms8DaDMkl2M95woGPB89f7aysjwDNst/x+G9FV48dxcAKSwilJ1BVGV3MqU7HfuKGHxegSsuxQxQ=="
+  "resolved" "https://registry.npmjs.org/matchstick-as/-/matchstick-as-0.4.0.tgz"
+  "version" "0.4.0"
   dependencies:
     "@graphprotocol/graph-ts" "^0.24.1"
     "assemblyscript" "^0.19.20"

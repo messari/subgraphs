@@ -26,19 +26,22 @@ import { AToken } from "../../generated/templates/AToken/AToken";
 const weiPerEth = BigInt.fromI64(1000000000000000000);
 export const zeroAddr = "0x0000000000000000000000000000000000000000";
 export const contractAddrWETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
-export const contractAddrUSDC = "0xBcca60bB61934080951369a648Fb03DF4F96263C";
+export const contractAddrUSDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
+export const priceOracle = "0xa50ba011c48153de246e5192c8f9258a2ba79ca9";
 
 export function createMarket(
     event: ethereum.Event,
     id: string,
     inputTokens: Token[],
     outputToken: Token,
-    rewardTokens: Token[]
+    reserveStableRate: BigDecimal,
+    reserveVariableRate: BigDecimal
   ): Market {
     // To prevent mistake double creation, check if a Market entity implementation has already been created with the provided lending pool address/id
-    log.info('MARKET CREATION, ' + id,[id])
+    log.info('MARKET LOAD: ' + id,[])
     let market = Market.load(id);
     if (market === null) {
+        log.info('MARKETCREATION: ' + id, [])
         // If the market entity has not been created yet, create the instance
         // Populate fields with data that has been passed to the function
         // Other data fields are initialized as 0/[]/false
@@ -52,13 +55,12 @@ export function createMarket(
         market.protocol = protocol.name;
         market.inputTokens = inputTokens.map<string>((t) => t.id);
         market.outputToken = outputToken.id;
-        market.rewardTokens = rewardTokens.map<string>((t) => t.id);
+        market.rewardTokens = [];
         market.inputTokenBalances = inputTokenBalances;
         market.outputTokenSupply = getOutputTokenSupply(Address.fromString(outputToken.id));
-        market.outputTokenPriceUSD = getAssetPriceInUSDC(outputToken);
+        market.outputTokenPriceUSD = getAssetPriceInUSDC(inputTokens[0]);
         market.createdBlockNumber = event.block.number;
         market.createdTimestamp = event.block.timestamp;
-        market.snapshots = [];
         market.name = "";
         market.isActive = false;
         market.canBorrowFrom = false;
@@ -67,38 +69,37 @@ export function createMarket(
         market.liquidationPenalty = new BigDecimal(BigInt.fromI32(0));
         market.liquidationThreshold = new BigDecimal(BigInt.fromI32(0));
         market.depositRate = new BigDecimal(BigInt.fromI32(0));
-        market.stableBorrowRate = new BigDecimal(BigInt.fromI32(0));
-        market.variableBorrowRate = new BigDecimal(BigInt.fromI32(0));
+        market.stableBorrowRate = reserveStableRate;
+        market.variableBorrowRate = reserveVariableRate;
         market.totalValueLockedUSD = new BigDecimal(BigInt.fromI32(0));
         market.totalVolumeUSD = new BigDecimal(BigInt.fromI32(0));
-        market.deposits = [];
-        market.withdraws = [];
-        market.borrows = [];
-        market.repays = [];
-        market.liquidations = [];
         market.save();
-        
-        protocol.markets.push(market.id);
-        protocol.save();
+
+        log.info('market save: ' + market.createdBlockNumber.toString(), [market.createdBlockNumber.toString()])
     }
     return market as Market;
   }
 
 export function loadMarket(marketAddr: string): Market {
     //Function to load the lending pool and update the entity properties that should be checked each time the Market instance is called or modified
-    log.info('MarketAddr From Context in utilFunctions.ts' + marketAddr , [marketAddr])
-    const market = Market.load(marketAddr) as Market;
-    let outputTokenAddrStr: string = "";
-    if (market.outputToken) {
-        outputTokenAddrStr = market.outputToken as string;
+    log.info('LOADMARKET() MarketAddr From Context in utilFunctions.ts ' + marketAddr + '-----TEST:'  , [marketAddr])
+    const market = Market.load(marketAddr);
+    if (!market) {
+        log.info('market has NOT been created ' + marketAddr, [marketAddr]);
+    } else {
+        log.info('market has been created ' + marketAddr, [marketAddr])
     }
-    if (outputTokenAddrStr) {
-        const outputTokenAddr = Address.fromString(outputTokenAddrStr);
-        const outputToken = initToken(outputTokenAddr);
-        market.outputTokenSupply = getOutputTokenSupply(outputTokenAddr);
-        market.outputTokenPriceUSD = getAssetPriceInUSDC(outputToken);
-        market.save();
-    }
+    // let outputTokenAddrStr: string = "";
+    // if (market.outputToken) {
+    //     outputTokenAddrStr = market.outputToken as string;
+    // }
+    // if (outputTokenAddrStr) {
+    //     const outputTokenAddr = Address.fromString(outputTokenAddrStr);
+    //     const outputToken = initToken(outputTokenAddr);
+    //     market.outputTokenSupply = getOutputTokenSupply(outputTokenAddr);
+    //     market.outputTokenPriceUSD = getAssetPriceInUSDC(outputToken);
+    //     market.save();
+    // }
     // By default for functions that call this function, update the market output token price in USD
     return market;
 }
@@ -108,7 +109,6 @@ export function getOutputTokenSupply(outputTokenAddr: Address): BigDecimal {
     const outputTokenSupply = new BigDecimal(aTokenInstance.scaledTotalSupply());
     return outputTokenSupply;
 }
-  
 
 export function initToken(assetAddr: Address): Token {
     // In the schema Token and RewardToken entities, the id is said to be " Smart contract address of the market ". 
@@ -161,7 +161,9 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
     // Load or create the Lending Protocol entity implementation
     // Protocol Id is currently 'aave-v2' rather than a UUID. Need to ask what the UUID should be, ie. a hash, just a number, mix of values etc
     let lendingProtocol = LendingProtocol.load(protocolId);
+    log.info('proto id: ' + protocolId, [protocolId])
     if (!lendingProtocol) {
+        log.info('CREATING PROTO ENTITY', [''])
         lendingProtocol = new LendingProtocol(protocolId);
         // Should these values be hardcoded?
         lendingProtocol.name = 'Aave-v2';
@@ -172,9 +174,7 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
         lendingProtocol.lendingType = 'POOLED';
         lendingProtocol.riskType = 'ISOLATED';
         // Initialize empty arrays
-        lendingProtocol.usageMetrics = [];
-        lendingProtocol.financialMetrics = [];
-        lendingProtocol.markets = [];
+        lendingProtocol.save();
     }    
     return lendingProtocol as LendingProtocol;
 }
@@ -205,12 +205,7 @@ export function loadMarketDailySnapshot(
         marketSnapshot = new MarketDailySnapshot(updateId);
         marketSnapshot.market = market.id;
         marketSnapshot.protocol = protocol.id;
-        let marketSnapshots: string[] = [] ;
-        if (market.snapshots) {
-            marketSnapshots = market.snapshots as string[];
-        } 
-        marketSnapshots.push(market.id);
-        market.snapshots = marketSnapshots;
+
         let rewardTokenList: string[] = []
         if (market.rewardTokens) {
             rewardTokenList = market.rewardTokens as string[];
@@ -227,7 +222,6 @@ export function loadMarketDailySnapshot(
             marketSnapshot.rewardTokenEmissionsAmount = [];
             marketSnapshot.rewardTokenEmissionsUSD = [];
         }
-        market.save();
     }
     // Data potentially updated whether the snapshot instance is new or loaded
     // The following fields are pulled from the current Market Entity Implementation's data.
@@ -379,22 +373,37 @@ export function getFinancialsDailySnapshot(event: ethereum.Event): FinancialsDai
 
 export function getPriceOracle(): IPriceOracleGetter {
     // priceOracle is set the address of the price oracle contract of the address provider contract, pulled from context
-    const priceOracle = dataSource.context().getString("priceOracle");
     return IPriceOracleGetter.bind(Address.fromString(priceOracle));
 }
 
 export function getAssetPriceInUSDC(token: Token): BigDecimal {
+    log.info('getAssetPriceInUSDC ' + token.name + '---' + token.id, [''])
     const tokenAddress = Address.fromString(token.id);
     // Get the oracle contract instance
     const oracle = getPriceOracle();
+    log.info('oracle address? in getAssetPriceInUSDC() ' + oracle._address.toHexString(), [''])
     // The Aave protocol oracle contracts only contain a method for getting an asset price in ETH, so USDC price must be fetched to convert asset price from Eth to USDC
     // Get the asset price in Wei and convert it to Eth
-    const assetPriceInEth: BigInt = oracle.getAssetPrice(tokenAddress).div(weiPerEth);
+    let assetPriceInUSDC: BigDecimal | null = null;
+    let tryAssetPriceInEth = oracle.try_getAssetPrice(tokenAddress);
     // Fetch USDC price in Wei and convert it to Eth
-    const priceUSDCInEth: BigInt = oracle.getAssetPrice(Address.fromString(contractAddrUSDC)).div(weiPerEth);
+    let tryPriceUSDCInEth = oracle.try_getAssetPrice(Address.fromString(contractAddrUSDC));
+    if (!tryAssetPriceInEth.reverted && !tryPriceUSDCInEth.reverted) {
+        const assetPriceInEth = tryAssetPriceInEth.value;
+        const priceUSDCInEth = tryPriceUSDCInEth.value;
+        assetPriceInUSDC = new BigDecimal((assetPriceInEth).div(priceUSDCInEth));
+        log.info('Asset price of ' + token.name + '-' + token.id + ' = ' + assetPriceInEth.toString() + ' = ' + priceUSDCInEth.toString(), [token.id])
+
+    } else {
+        log.info('REVERTED: ASSET? ' + tryAssetPriceInEth.reverted.toString() + ' USDC? ' + tryPriceUSDCInEth.reverted.toString(), ['']);
+        
+    }
     // Asset price in Eth/USDC priced in Eth = Asset price in in USDC
-    const assetPriceInUSDC = new BigDecimal((assetPriceInEth).div(priceUSDCInEth));
     // return price per asset in USDC
+    if (!assetPriceInUSDC) {
+        log.info('Could not fetch asset price of ' + token.name + '-' + token.id, [token.id])
+        return new BigDecimal(new BigInt(0));
+    }
     return assetPriceInUSDC;
 }
 
@@ -417,9 +426,11 @@ export function getProtocolIdFromCtx(): string {
 // MATH FUNCTIONS
 
 export function amountInUSD(token: Token, amount: BigDecimal): BigDecimal {
-    // This function takes in a token and the amount of the token and converts the amount of that token in USD
+    // This function takes in a token and the amount of the token and converts the amount of that token into USD
+    log.info('HERE IN amountInUSD', [])
     const priceInUSDC = getAssetPriceInUSDC(token);
     const amountUSD = amount.times(priceInUSDC);
+    log.info('AMOUNT AND PRICE??? ' + priceInUSDC.toString() + '---' + amountUSD.toString(), [])
     return amountUSD;
   }  
 
