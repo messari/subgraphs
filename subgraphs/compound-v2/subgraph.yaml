@@ -1,0 +1,57 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: cAAVE
+    network: mainnet
+    source:
+      address: "0xe65cdb6479bac1e22340e4e755fae7e509ecd06c"
+      abi: cToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+      abis:
+        - name: cAAVE
+          file: ./abis/cAAVE.json
+        - name: cToken
+          file: ./abis/cToken.json
+      eventHandlers:
+        # - event: AccrueInterest(uint256,uint256,uint256)
+        #   handler: handleAccrueInterest
+        # - event: Mint(address,uint256,uint256)
+        #   handler: handleMint
+        # - event: Redeem(address,uint256,uint256)
+        #   handler: handleRedeem
+        # - event: Borrow(address,uint256,uint256,uint256)
+        #   handler: handleBorrow
+        # - event: RepayBorrow(address,address,uint256,uint256,uint256)
+        #   handler: handleRepayBorrow
+        # - event: LiquidateBorrow(address,address,uint256,address,uint256)
+        #   handler: handleLiquidateBorrow
+        # - event: NewPendingAdmin(address,address)
+        #   handler: handleNewPendingAdmin
+        # - event: NewAdmin(address,address)
+        #   handler: handleNewAdmin
+        # - event: NewComptroller(address,address)
+        #   handler: handleNewComptroller
+        # - event: NewMarketInterestRateModel(address,address)
+        #   handler: handleNewMarketInterestRateModel
+        # - event: NewReserveFactor(uint256,uint256)
+        #   handler: handleNewReserveFactor
+        # - event: ReservesReduced(address,uint256,uint256)
+        #   handler: handleReservesReduced
+        # - event: Failure(uint256,uint256,uint256)
+        #   handler: handleFailure
+        
+        # trying to use the mint event to fill deposit entity
+
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+
+        # - event: Approval(indexed address,indexed address,uint256)
+        #   handler: handleApproval
+      file: ./src/mappings/cToken.ts
