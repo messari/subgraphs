@@ -5,7 +5,7 @@
 
 + Each CToken is a different "Market" > need to import all of those
 + Figure out how to spin up locally
-+ 
++ OpenZepplin subgraph resource: https://docs.openzeppelin.com/subgraphs/0.1.x/
 
 
 ## Links
