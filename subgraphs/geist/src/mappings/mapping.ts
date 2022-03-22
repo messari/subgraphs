@@ -140,7 +140,7 @@ export function handleDeposit(event: Deposit): void {
   log.warning('Deposit event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
+  let id = "deposit-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let deposit = DepositEntity.load(id)
   if (deposit == null) {
     deposit = new DepositEntity(id)
@@ -185,7 +185,7 @@ export function handleBorrow(event: Borrow): void {
   log.warning('Borrow event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
+  let id = "borrow-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let borrow = BorrowEntity.load(id)
   if (!borrow) {
     borrow = new BorrowEntity(id)
@@ -231,7 +231,7 @@ export function handleWithdraw(event: Withdraw): void{
   log.warning('Withdraw event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
+  let id = "withdraw-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   let withdraw = WithdrawEntity.load(id)
   if (!withdraw) {
     withdraw = new WithdrawEntity(id)
@@ -276,20 +276,20 @@ export function handleRepay(event: Repay): void {
   log.warning('Repay event', [])
 
   let tx = event.transaction
-  let id = tx.hash.toHexString() + "-" + tx.index.toI32().toString()
-  let withdraw = RepayEntity.load(id)
-  if (!withdraw) {
-    withdraw = new RepayEntity(id)
-    withdraw.logIndex = tx.index.toI32()
+  let id = "repay-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString()
+  let repay = RepayEntity.load(id)
+  if (!repay) {
+    repay = new RepayEntity(id)
+    repay.logIndex = tx.index.toI32()
     if (tx.to) {
-      withdraw.to = (tx.to as Address).toHexString()
+      repay.to = (tx.to as Address).toHexString()
     }
-    withdraw.from = tx.from.toHexString()
-    withdraw.hash = tx.hash.toHexString()
-    withdraw.timestamp = getTimestampInMillis(event.block);
-    withdraw.blockNumber = event.block.number;
-    withdraw.protocol = PROTOCOL_ID
-    withdraw.save()
+    repay.from = tx.from.toHexString()
+    repay.hash = tx.hash.toHexString()
+    repay.timestamp = getTimestampInMillis(event.block);
+    repay.blockNumber = event.block.number;
+    repay.protocol = PROTOCOL_ID
+    repay.save()
   }
 
   // Generate data for the UsageMetricsDailySnapshot Entity
