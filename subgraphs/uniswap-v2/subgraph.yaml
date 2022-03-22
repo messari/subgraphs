@@ -18,11 +18,11 @@ dataSources:
       file: ./src/factory.ts
       entities:
         - Token
-        - RewardToken
         - DexAmmProtocol
         - LiquidityPool
         - Protocol
-        - Bundle
+        - _PricesUSD
+        - _TokenTracker
       abis:
         - name: Factory
           file: ./abis/factory.json
@@ -55,15 +55,16 @@ templates:
         - LiquidityPool
         - DexAmmProtocol
         - Token
-        - Transaction
-        - Mint 
-        - Burn 
-        - Bundle
+        - _Transaction
+        - _Mint 
+        - _Burn 
+        - _PricesUSD
         - UsageMetricsDailySnapshot
         - FinancialsDailySnapshot
-        - Account
-        - DailyActiveAccount
+        - _Account
+        - _DailyActiveAccount
         - PoolDailySnapshot
+        - _TokenTracker
       abis:
         - name: Pair
           file: ./abis/pair.json

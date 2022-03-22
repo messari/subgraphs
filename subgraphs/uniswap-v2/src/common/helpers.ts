@@ -12,7 +12,7 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 
-import { BIGDECIMAL_ZERO, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS } from "../common/constants"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -22,28 +22,28 @@ export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b2
 
 export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
-    let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
-    let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-    let tvl = _PricesUSD.load('TVL')
-    if (tvl == null) return
+  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+  let tvl = _PricesUSD.load('TVL')
+  if (tvl == null) return
 
-    if (!financialMetrics) {
-        financialMetrics = new FinancialsDailySnapshot(id.toString());
-        financialMetrics.protocol = FACTORY_ADDRESS;
+  if (!financialMetrics) {
+      financialMetrics = new FinancialsDailySnapshot(id.toString());
+      financialMetrics.protocol = FACTORY_ADDRESS;
 
-        financialMetrics.feesUSD = BIGDECIMAL_ZERO
-        financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
-        financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
-        financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
-        financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
-    }
+      financialMetrics.feesUSD = BIGDECIMAL_ZERO
+      financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
+      financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
+      financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
+      financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
+  }
   
     // Update the block number and timestamp to that of the last transaction of that day
-    financialMetrics.blockNumber = blockNumber;
-    financialMetrics.timestamp = timestamp;
-    financialMetrics.totalValueLockedUSD = tvl.valueUSD
+  financialMetrics.blockNumber = blockNumber;
+  financialMetrics.timestamp = timestamp;
+  financialMetrics.totalValueLockedUSD = tvl.valueUSD
 
-    financialMetrics.save();
+  financialMetrics.save();
 }
 
 
@@ -67,7 +67,7 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
     usageMetrics.timestamp = timestamp;
     usageMetrics.dailyTransactionCount += 1;
 
-    let accountId = from.toHex()
+    let accountId = from.toHexString()
     let account = _Account.load(accountId)
     if (!account) {
         account = new _Account(accountId);
@@ -76,7 +76,7 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
     } 
 
     // Combine the id and the user address to generate a unique user id for the day
-    let dailyActiveAccountId = id.toString() + "-" + from.toHex()
+    let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
     let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
     if (!dailyActiveAccount) {
         dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
@@ -134,20 +134,21 @@ export function updateVolumeAndFees(timestamp: BigInt, trackedAmountUSD: BigDeci
 }
 
 
-export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
-    let bd = BigDecimal.fromString('1')
-    for (let i = BIGINT_ZERO; i.lt(decimals as BigInt); i = i.plus(BIGINT_ONE)) {
-      bd = bd.times(BigDecimal.fromString('10'))
-    }
-    return bd
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+  let bd = BigDecimal.fromString('1')
+  for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
+    bd = bd.times(BigDecimal.fromString('10'))
+  }
+  return bd
 }
   
-export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: BigInt): BigDecimal {
-    if (exchangeDecimals == BIGINT_ZERO) {
-      return tokenAmount.toBigDecimal()
-    }
-    return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
+export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
+  if (exchangeDecimals == INT_ZERO) {
+    return tokenAmount.toBigDecimal()
+  }
+  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
 }
+
 
 // return 0 if denominator is 0 in division
 export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
