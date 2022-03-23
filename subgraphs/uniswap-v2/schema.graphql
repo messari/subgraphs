@@ -453,10 +453,11 @@ type _Burn @entity {
 }
 
 "  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
-type _Bundle @entity {
+type _HelperStore @entity {
   id: ID!
-  " price of ETH usd/TVL, # of deposits, # of unique users "
+  " price of ETH in USD " 
   valueDecimal: BigDecimal
+  " # of deposits, # of unique users "
   valueInt: Int
 
 }

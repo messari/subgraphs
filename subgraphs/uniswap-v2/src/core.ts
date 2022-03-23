@@ -10,7 +10,7 @@ import {
   _Transaction, 
   _Mint as MintEvent, 
   _Burn as BurnEvent,
-  _Bundle,
+  _HelperStore,
   _TokenTracker
 } from './../generated/schema'
 
@@ -253,9 +253,9 @@ export function handleSync(event: Sync): void {
   pool.save()
 
   // // update ETH price now that reserves could have changed
-  let ether = _Bundle.load('ETH')
+  let ether = _HelperStore.load('ETH')
   if (ether == null) return
-  let tvl = _Bundle.load('TVL')
+  let tvl = _HelperStore.load('TVL')
   if (tvl == null) return
 
   ether.valueDecimal = getEthPriceInUSD()
@@ -317,7 +317,7 @@ export function handleMint(event: Mint): void {
   let token0Amount = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let token1Amount = convertTokenToDecimal(event.params.amount1, token1.decimals)
 
-  let ether = _Bundle.load('ETH')
+  let ether = _HelperStore.load('ETH')
   if (ether == null) return
 
   let token0USD = tokenTracker0.derivedETH.times(ether.valueDecimal!)
@@ -346,7 +346,7 @@ export function handleMint(event: Mint): void {
   mint.from = event.params.sender
 
 
-  let poolDeposits = _Bundle.load(event.address.toHexString())
+  let poolDeposits = _HelperStore.load(event.address.toHexString())
   if (poolDeposits == null) return
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
 
@@ -394,7 +394,7 @@ export function handleBurn(event: Burn): void {
   let token0Amount = convertTokenToDecimal(event.params.amount0, token0.decimals)
   let token1Amount = convertTokenToDecimal(event.params.amount1, token1.decimals)
 
-  let ether = _Bundle.load('ETH')
+  let ether = _HelperStore.load('ETH')
   if (ether == null) return
 
   let token0USD = tokenTracker0.derivedETH.times(ether.valueDecimal!)
@@ -460,7 +460,7 @@ export function handleSwap(event: Swap): void {
   let amount1Total = amount1Out.plus(amount1In)
 
   // ETH/USD prices
-  let ether = _Bundle.load('ETH')
+  let ether = _HelperStore.load('ETH')
   if (ether == null) return
 
   let token0USD = tokenTracker0.derivedETH.times(amount0Total).times(ether.valueDecimal!)

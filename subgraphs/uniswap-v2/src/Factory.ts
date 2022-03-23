@@ -1,7 +1,7 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { log } from '@graphprotocol/graph-ts'
 import { PairCreated } from './../generated/Factory/Factory'
-import { DexAmmProtocol, LiquidityPool, Token, _Bundle, _TokenTracker } from './../generated/schema'
+import { DexAmmProtocol, LiquidityPool, Token, _HelperStore, _TokenTracker } from './../generated/schema'
 import { Pair as PairTemplate } from '../generated/templates'
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './common/tokens'
 import { WHITELIST } from './common/Price'
@@ -28,17 +28,17 @@ export function handleNewPair(event: PairCreated): void {
     protocol.type = ProtocolType.EXCHANGE
 
     // create new ether price storage object
-    let ether = new _Bundle('ETH')
+    let ether = new _HelperStore('ETH')
     ether.valueDecimal = BIGDECIMAL_ZERO
     ether.save()
 
     // Tracks the total value locked accross all pools 
-    let tvl = new _Bundle('TVL')
+    let tvl = new _HelperStore('TVL')
     tvl.valueDecimal = BIGDECIMAL_ZERO
     tvl.save()
 
     // Tracks the total number of unique users of the protocol 
-    let uniqueUsersTotal = new _Bundle('USERS')
+    let uniqueUsersTotal = new _HelperStore('USERS')
     uniqueUsersTotal.valueInt = INT_ZERO
     uniqueUsersTotal.save()
   }  
@@ -120,7 +120,7 @@ export function handleNewPair(event: PairCreated): void {
     tokenTracker0.whitelistPools = newPools
   }
 
-  let poolDeposits = new _Bundle(event.params.pair.toHexString())
+  let poolDeposits = new _HelperStore(event.params.pair.toHexString())
   poolDeposits.valueInt = INT_ZERO
 
   let pool = new LiquidityPool(event.params.pair.toHexString())

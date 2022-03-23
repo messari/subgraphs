@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 import { BigDecimal, Address, BigInt, log } from '@graphprotocol/graph-ts/index'
 import { factoryContract, UNTRACKED_PAIRS, safeDiv } from './helpers'
-import { LiquidityPool, Token, _Bundle, _TokenTracker } from '../../generated/schema'
+import { LiquidityPool, Token, _HelperStore, _TokenTracker } from '../../generated/schema'
 import { ZERO_ADDRESS, BIGDECIMAL_ZERO, BIGDECIMAL_ONE, WETH_ADDRESS, USDC_WETH_PAIR, DAI_WETH_PAIR, USDT_WETH_PAIR, BIGINT_ZERO } from '../common/constants'
 
 function token0PairPrice(pool: LiquidityPool): BigDecimal {
@@ -133,7 +133,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   // need to update this to actually detect best rate based on liquidity distribution
   let largestLiquidityETH = BIGDECIMAL_ZERO
   let priceSoFar = BIGDECIMAL_ZERO
-  let ether = _Bundle.load('ETH')
+  let ether = _HelperStore.load('ETH')
   if (ether == null) return BIGDECIMAL_ZERO
 
   // hardcoded fix for incorrect rates
@@ -190,7 +190,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   pool: LiquidityPool
 ): BigDecimal {
 
-  let ether = _Bundle.load('ETH')
+  let ether = _HelperStore.load('ETH')
   if (ether == null) return BIGDECIMAL_ZERO
   let price0 = tokenTracker0.derivedETH.times(ether.valueDecimal!)
   let price1 = tokenTracker1.derivedETH.times(ether.valueDecimal!)
@@ -199,7 +199,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
     return BIGDECIMAL_ZERO
   }
 
-  let poolDeposits = _Bundle.load(pool.id)
+  let poolDeposits = _HelperStore.load(pool.id)
   if (poolDeposits == null) return BIGDECIMAL_ZERO
 
   // if less than 5 LPs, require high minimum reserve amount amount or return 0

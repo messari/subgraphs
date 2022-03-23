@@ -8,7 +8,7 @@ import {
   DexAmmProtocol,
   LiquidityPool,
   PoolDailySnapshot,
-  _Bundle
+  _HelperStore
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 
@@ -24,7 +24,7 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
   let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-  let tvl = _Bundle.load('TVL')
+  let tvl = _HelperStore.load('TVL')
   if (tvl == null) return
 
   if (!financialMetrics) {
@@ -52,7 +52,7 @@ export function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from:
   // Number of days since Unix epoch
     let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
     let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-    let uniqueUsersTotal = _Bundle.load("USERS")
+    let uniqueUsersTotal = _HelperStore.load("USERS")
     if (uniqueUsersTotal == null) return
 
     if (!usageMetrics) {
