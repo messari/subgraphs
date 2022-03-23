@@ -1,24 +1,26 @@
 // map blockchain data to entities outlined in schema.graphql
 
 import { BigInt } from "@graphprotocol/graph-ts"
+import { DEFAULT_DECIMALS } from "../common/constants"
 import {
-  AccrueInterest,
   Mint,
   Redeem,
   Borrow,
   RepayBorrow,
   LiquidateBorrow,
-  NewPendingAdmin,
-  NewAdmin,
-  NewComptroller,
-  NewMarketInterestRateModel,
-  NewReserveFactor,
-  ReservesReduced,
-  Failure,
-  Transfer,
-  Approval
+  NewComptroller, // comptroller update
 } from "../types/cCOMP/cToken"
-import { Deposit, Token } from "../types/schema"
+
+import { 
+  Token,
+  LendingProtocol,
+  Market,
+  Deposit,
+  Withdraw,
+  Borrow1,
+  Repay,
+  Liquidation
+  } from "../types/schema"
 
 // TODO: remove
 let counter = 0
@@ -30,7 +32,40 @@ let counter = 0
   // unchanged, allowing for partial updates to be applied.
 
 
-export function handleMint(event: Mint): void {}
+export function handleMint(event: Mint): void {
+  let transactionHash = event.transaction.hash.toHexString()
+  let logIndex = event.logIndex
+  let id = transactionHash + '-' + logIndex.toString()
+
+  // create new Deposit
+  let deposit = new Deposit(id)
+
+  // fill in deposit numbers
+  deposit.hash = transactionHash
+  deposit.logIndex = logIndex.toI32()
+  // TODO: check if protocol exists else make protocol in helpers
+  // deposit.protocol =
+  // TODO: is this good practice? Otherwise will need to use transfers instead or use just for to addr
+  // let toAddress = event.transaction.to?.toString() 
+  // if (toAddress !== null)
+  //   deposit.to = toAddress
+  // else
+  //   deposit.to = ""
+
+  deposit.from = event.params.minter.toHexString()
+  deposit.blockNumber = event.block.number
+  deposit.timestamp = event.block.timestamp
+  // TODO check if market exists if not make it
+  // deposit.market =
+  // TODO check if token exists if not make it
+  // deposit.token = 
+  deposit.amount = event.params.mintAmount.toBigDecimal()
+  // TODO get usd price
+  // https://github.com/compound-finance/compound-v2-subgraph/blob/master/src/mappings/markets.ts#L26
+  // https://github.com/compound-finance/compound-v2-subgraph/blob/master/src/mappings/markets.ts#L80
+
+  deposit.save()
+}
 
 export function handleRedeem(event: Redeem): void {}
 
@@ -40,27 +75,12 @@ export function handleRepayBorrow(event: RepayBorrow): void {}
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {}
 
-export function handleNewPendingAdmin(event: NewPendingAdmin): void {}
-
-export function handleNewAdmin(event: NewAdmin): void {}
-
 export function handleNewComptroller(event: NewComptroller): void {}
 
-export function handleNewMarketInterestRateModel(
-  event: NewMarketInterestRateModel
-): void {}
-
-export function handleNewReserveFactor(event: NewReserveFactor): void {}
-
-export function handleReservesReduced(event: ReservesReduced): void {}
-
-export function handleFailure(event: Failure): void {}
-
-export function handleTransfer(event: Transfer): void {
-  let deposit = new Deposit(counter.toString())
-  deposit.from = event.params.from.toHex().toString()
-  counter++
-  deposit.save()
-}
-
-export function handleApproval(event: Approval): void {}
+// export function handleTransfer(event: Transfer): void {
+//   let deposit = new Deposit(counter.toString())
+//   deposit.from = event.params.from.toHex().toString()
+//   counter++
+  
+//   deposit.save()
+// }

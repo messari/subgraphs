@@ -345,7 +345,7 @@ type Market @entity {
 
   withdraws: [Withdraw!]! @derivedFrom(field: "market")
 
-  borrows: [Borrow!]! @derivedFrom(field: "market")
+  borrows: [Borrow1!]! @derivedFrom(field: "market")
 
   repays: [Repay!]! @derivedFrom(field: "market")
 
@@ -512,7 +512,7 @@ type Withdraw implements Event @entity {
   amountUSD: BigDecimal!
 }
 
-type Borrow implements Event @entity {
+type Borrow1 implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 

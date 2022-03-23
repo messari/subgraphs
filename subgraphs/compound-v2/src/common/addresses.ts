@@ -1,6 +1,6 @@
 // store common addresses
 
-import { Address } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts"
 
 // null address
 export const ADDRESS_ZERO = Address.fromString("0x0000000000000000000000000000000000000000")

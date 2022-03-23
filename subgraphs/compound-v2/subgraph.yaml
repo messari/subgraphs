@@ -692,35 +692,35 @@ dataSources:
       file: ./src/mappings/mappings.ts
   
   # This is the "factory" contracts and controls some stuff in market entity
-  - kind: ethereum/contract
-    name: Comptroller 
-    network: mainnet
-    source:
-      address: "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
-      abi: Comptroller
-      startBlock: 7710671
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Market
-        - LendingProtocol
-      abis:
-        - name: Comptroller
-          file: ./abis/Comptroller.json
-        - name: cToken
-          file: ./abis/cToken.json
-        - name: PriceOracle
-          file: ./abis/PriceOracle.json
-      eventHandlers:
-        # event MarketEntered(CToken cToken, address account);
-        - event: MarketEntered(address,address)
-          handler: handleMarketEntered
-        # event MarketExited(CToken cToken, address account);
-        - event: MarketExited(address,address)
-          handler: handleMarketExited
-        # event NewPriceOracle(PriceOracle oldPriceOracle, PriceOracle newPriceOracle);
-        - event: NewPriceOracle(address,address)
-          handler: handleNewPriceOracle
-      file: ./src/mappings/mappings.ts
+  # - kind: ethereum/contract
+  #   name: Comptroller 
+  #   network: mainnet
+  #   source:
+  #     address: "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b"
+  #     abi: Comptroller
+  #     startBlock: 7710671
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Market
+  #       - LendingProtocol
+  #     abis:
+  #       - name: Comptroller
+  #         file: ./abis/Comptroller.json
+  #       - name: cToken
+  #         file: ./abis/cToken.json
+  #       - name: PriceOracle
+  #         file: ./abis/PriceOracle.json
+  #     eventHandlers:
+  #       # event MarketEntered(CToken cToken, address account);
+  #       - event: MarketEntered(address,address)
+  #         handler: handleMarketEntered
+  #       # event MarketExited(CToken cToken, address account);
+  #       - event: MarketExited(address,address)
+  #         handler: handleMarketExited
+  #       # event NewPriceOracle(PriceOracle oldPriceOracle, PriceOracle newPriceOracle);
+  #       # - event: NewPriceOracle(address,address)
+  #       #   handler: handleNewPriceOracle
+  #     file: ./src/mappings/mappings.ts
