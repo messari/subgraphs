@@ -5,7 +5,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "codegen": "graph codegen subgraph.yaml",
-    "build": "graph build subgraph.yaml",
+    "build": "rm -rf build && graph build subgraph.yaml",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
     "test": "graph test"
   },
