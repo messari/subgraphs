@@ -66,7 +66,7 @@ You can debug your subgraph by running `graph-node` locally. Here are some instr
 
 https://github.com/graphprotocol/graph-node#running-a-local-graph-node
 
-Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/).
+Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/) or contact me for one.
 
 ### Subgraph Forking
 
