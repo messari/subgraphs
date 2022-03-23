@@ -64,6 +64,7 @@ interface Protocol {
   slug: String!
   network: Network!
   type: ProtocolType!
+  totalValueLockedUSD: BigDecimal!
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
@@ -226,6 +227,7 @@ type DexAmmProtocol implements Protocol @entity {
   slug: String!
   network: Network!
   type: ProtocolType!
+  totalValueLockedUSD: BigDecimal!
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
   ##### DexAmm-Specific #####

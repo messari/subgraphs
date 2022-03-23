@@ -24,6 +24,7 @@ export function handleNewPair(event: PairCreated): void {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE
 
@@ -31,11 +32,6 @@ export function handleNewPair(event: PairCreated): void {
     let ether = new _HelperStore('ETH')
     ether.valueDecimal = BIGDECIMAL_ZERO
     ether.save()
-
-    // Tracks the total value locked accross all pools 
-    let tvl = new _HelperStore('TVL')
-    tvl.valueDecimal = BIGDECIMAL_ZERO
-    tvl.save()
 
     // Tracks the total number of unique users of the protocol 
     let uniqueUsersTotal = new _HelperStore('USERS')

@@ -12,7 +12,7 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS, BIGDECIMAL_ONE } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, SECONDS_PER_DAY, BIGINT_ZERO, BIGINT_ONE, FACTORY_ADDRESS, BIGDECIMAL_ONE, ProtocolType } from "../common/constants"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -24,8 +24,9 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
   let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-  let tvl = _HelperStore.load('TVL')
-  if (tvl == null) return
+
+  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
+  if (protocol == null) return
 
   if (!financialMetrics) {
       financialMetrics = new FinancialsDailySnapshot(id.toString());
@@ -41,7 +42,7 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
     // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
   financialMetrics.timestamp = timestamp;
-  financialMetrics.totalValueLockedUSD = tvl.valueDecimal!
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD
 
   financialMetrics.save();
 }

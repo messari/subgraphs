@@ -232,6 +232,9 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleSync(event: Sync): void {
+  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
+  if (protocol == null) return
+
   let pool = LiquidityPool.load(event.address.toHexString())
   if (pool == null) return
 
@@ -255,8 +258,6 @@ export function handleSync(event: Sync): void {
   // // update ETH price now that reserves could have changed
   let ether = _HelperStore.load('ETH')
   if (ether == null) return
-  let tvl = _HelperStore.load('TVL')
-  if (tvl == null) return
 
   ether.valueDecimal = getEthPriceInUSD()
 
@@ -266,7 +267,7 @@ export function handleSync(event: Sync): void {
   tokenTracker1.save()
 
   // Subtract the old pool tvl
-  tvl.valueDecimal = tvl.valueDecimal!.minus(pool.totalValueLockedUSD)
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD)
   let newTvl = tokenTracker0.derivedETH.times(pool.inputTokenBalances[0]).times(ether.valueDecimal!).plus(tokenTracker1.derivedETH.times(pool.inputTokenBalances[1]).times(ether.valueDecimal!))
   pool.totalValueLockedUSD =  newTvl
 
@@ -274,12 +275,12 @@ export function handleSync(event: Sync): void {
   else pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(pool.outputTokenSupply)
 
   // Add the new pool tvl
-  tvl.valueDecimal = tvl.valueDecimal!.plus(pool.totalValueLockedUSD)
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
 
   log.warning("Hello3", [])
 
   ether.save()
-  tvl.save()
+  protocol.save()
   pool.save()
 }
 
