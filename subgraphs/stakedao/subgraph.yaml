@@ -23,10 +23,16 @@ dataSources:
           file: ./abis/Ethereum/vault.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
       callHandlers:
         - function: setVault(address,address) 
           handler: handleSetVault
-      file: ./src/mappings/vault.ts
+        - function: setStrategy(address,address) 
+          handler: handleSetStrategy
+        - function: revokeStrategy(address,address) 
+          handler: handleRevokeStrategy
+      file: ./src/mappings/controllerMappings.ts
 
 templates:
   - name: Vault
@@ -53,14 +59,44 @@ templates:
           file: ./abis/Price/CalculationsCurve.json
         - name: CalculationsSushiSwap
           file: ./abis/Price/CalculationsSushiSwap.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit
-
+        - function: depositAll()
+          handler: handleDepositAll
         - function: withdraw(uint256)
           handler: handleWithdraw
-
-        - function: earn()
-          handler: handleEarn
-        - function: harvest(address,uint256)
-          handler: handleHarvest
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+  - name: Strategy
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/strategyMappings.ts
+      entities:
+        - Vault
+        - Deposit
+        - Transaction
+        - Token
+      abis:
+        - name: Vault
+          file: ./abis/Ethereum/vault.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
+        - name: EthereumController
+          file: ./abis/Ethereum/controller.json
+      eventHandlers:
+        - event: Harvested(uint256,uint256)
+          handler: handleHarvested
+      callHandlers:
+        - function: setPerformanceFee(uint256)
+          handler: handleSetPerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleSetWithdrawalFee

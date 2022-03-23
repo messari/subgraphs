@@ -265,6 +265,7 @@ type Vault @entity {
   outputToken: Token
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
+  
   ##### Quantitative Data #####
   totalValueLockedUSD: BigDecimal!
   " Total volume in USD "
@@ -281,9 +282,9 @@ type Vault @entity {
   createdBlockNumber: BigInt!
   " Vault snapshots "
   snapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
+  
   ##### Yield-Specific #####
   name: String
-
   symbol: String
   depositLimit: BigInt!
   fees: [VaultFee!]!
@@ -388,6 +389,9 @@ type Deposit implements Transaction @entity {
   " Amount of token deposited in USD "
   amountUSD: BigDecimal!
 
+  " Shares Minted "
+  sharesMinted: BigDecimal!
+
   ##### Yield-Specific #####
 
   " The vault involving this transaction "
@@ -436,6 +440,13 @@ type Withdraw implements Transaction @entity {
 type _Account @entity {
   " Address of the account "
   id: ID!
+}
+
+type Strategy @entity {
+  " Strategy Address "
+  id: ID!
+  vaultAddress: Bytes!
+  inputToken: Bytes!
 }
 
 type _DailyActiveAccount @entity {
