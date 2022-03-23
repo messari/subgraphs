@@ -52,18 +52,7 @@ import {
   Repay as RepayEntity
 } from "../../generated/schema"
 
-import { 
-  PROTOCOL_ID,
-  NETWORK_FANTOM,
-  PROTOCOL_TYPE_LENDING,
-  DEPOSIT_INTERACTION,
-  BORROW_INTERACTION,
-  WITHDRAW_INTERACTION,
-  REWARD_INTERACTION,
-  REPAY_INTERACTION,
-  STAKE_INTERACTION,
-  UNSTAKE_INTERACTION
-} from "../common/constants";
+import * as constants from "../common/constants"
 
 import {
   TOKEN_ADDRESS_GEIST,
@@ -89,13 +78,13 @@ import {
 // protocolSideRevenueUSD = fees
 
 function createProtocol(): void {
-  let protocol = LendingProtocolEntity.load(PROTOCOL_ID)
+  let protocol = LendingProtocolEntity.load(constants.PROTOCOL_ID)
   if (!protocol) {
-    protocol = new LendingProtocolEntity(PROTOCOL_ID)
+    protocol = new LendingProtocolEntity(constants.PROTOCOL_ID)
     protocol.name = "Geist Finance"
     protocol.slug = "geist-finance"
-    protocol.network = NETWORK_FANTOM
-    protocol.type = PROTOCOL_TYPE_LENDING
+    protocol.network = constants.NETWORK_FANTOM
+    protocol.type = constants.PROTOCOL_TYPE_LENDING
     protocol.save()
   }
 }
@@ -156,7 +145,7 @@ export function handleDeposit(event: Deposit): void {
     deposit.hash = tx.hash.toHexString()
     deposit.timestamp = getTimestampInMillis(event.block);
     deposit.blockNumber = event.block.number;
-    deposit.protocol = PROTOCOL_ID
+    deposit.protocol = constants.PROTOCOL_ID
     deposit.save()
   }
 
@@ -176,9 +165,9 @@ export function handleDeposit(event: Deposit): void {
     event.params.reserve,
     transactionFee,
     BigInt.fromI32(0),
-    DEPOSIT_INTERACTION,
+    constants.DEPOSIT_INTERACTION,
   ); 
-  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
 
@@ -201,7 +190,7 @@ export function handleBorrow(event: Borrow): void {
     borrow.hash = tx.hash.toHexString()
     borrow.timestamp = getTimestampInMillis(event.block);
     borrow.blockNumber = event.block.number;
-    borrow.protocol = PROTOCOL_ID
+    borrow.protocol = constants.PROTOCOL_ID
     borrow.save()
   }
 
@@ -221,9 +210,9 @@ export function handleBorrow(event: Borrow): void {
     event.params.reserve,
     transactionFee,
     event.params.borrowRateMode,
-    BORROW_INTERACTION,
+    constants.BORROW_INTERACTION,
   ); 
-  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
 
@@ -247,7 +236,7 @@ export function handleWithdraw(event: Withdraw): void{
     withdraw.hash = tx.hash.toHexString()
     withdraw.timestamp = getTimestampInMillis(event.block);
     withdraw.blockNumber = event.block.number;
-    withdraw.protocol = PROTOCOL_ID
+    withdraw.protocol = constants.PROTOCOL_ID
     withdraw.save()
   }
 
@@ -267,9 +256,9 @@ export function handleWithdraw(event: Withdraw): void{
     event.params.reserve,
     transactionFee,
     BigInt.fromI32(0),
-    WITHDRAW_INTERACTION,
+    constants.WITHDRAW_INTERACTION,
   );
-  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
 
@@ -292,7 +281,7 @@ export function handleRepay(event: Repay): void {
     repay.hash = tx.hash.toHexString()
     repay.timestamp = getTimestampInMillis(event.block);
     repay.blockNumber = event.block.number;
-    repay.protocol = PROTOCOL_ID
+    repay.protocol = constants.PROTOCOL_ID
     repay.save()
   }
 
@@ -312,9 +301,9 @@ export function handleRepay(event: Repay): void {
     event.params.reserve,
     transactionFee,
     BigInt.fromI32(0),
-    REPAY_INTERACTION,
+    constants.REPAY_INTERACTION,
   );
-  financialsDailySnapshot.protocol = PROTOCOL_ID;
+  financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
 
@@ -333,7 +322,7 @@ export function handleRewardPaid(event: RewardPaid): void {
     event.params.rewardsToken,
     transactionFee,
     BigInt.fromI32(0),
-    REWARD_INTERACTION
+    constants.REWARD_INTERACTION
   );
 
   financialsDailySnapshot.blockNumber = event.block.number;
@@ -350,7 +339,7 @@ export function handleStakeAdded(event: Staked): void {
     TOKEN_ADDRESS_GEIST,
     transactionFee,
     BigInt.fromI32(0),
-    STAKE_INTERACTION
+    constants.STAKE_INTERACTION
   );
 
   financialsDailySnapshot.blockNumber = event.block.number;
@@ -368,7 +357,7 @@ export function handleStakeWithdrawn(event: Withdrawn): void {
     TOKEN_ADDRESS_GEIST,
     transactionFee,
     BigInt.fromI32(0),
-    UNSTAKE_INTERACTION
+    constants.UNSTAKE_INTERACTION
   );
 
   financialsDailySnapshot.blockNumber = event.block.number;

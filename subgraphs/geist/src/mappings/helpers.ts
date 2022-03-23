@@ -16,48 +16,6 @@ import {
 } from "../../generated/schema"
 
 import { 
-    ZERO_BD,
-    SECONDS_PER_DAY,
-    DEPOSIT_INTERACTION,
-    WITHDRAW_INTERACTION,
-    BORROW_INTERACTION,
-    REWARD_INTERACTION,
-    REPAY_INTERACTION,
-    STAKE_INTERACTION,
-    UNSTAKE_INTERACTION,
-    PROTOCOL_ID
-} from "../common/constants";
-
-import { 
-    TOKEN_NAME_GEIST, 
-    TOKEN_DECIMALS_GEIST, 
-    REWARD_TOKEN_NAME, 
-    REWARD_TOKEN_DECIMALS, 
-    REWARD_TOKEN_SYMBOL,
-    PRICE_ORACLE,
-    TOKEN_ADDRESS_GEIST,
-    TOKEN_ADDRESS_gFTM,
-    TOKEN_ADDRESS_gCRV,
-    TOKEN_ADDRESS_gDAI,
-    TOKEN_ADDRESS_gETH,
-    TOKEN_ADDRESS_gMIM,
-    TOKEN_ADDRESS_gLINK,
-    TOKEN_ADDRESS_gUSDC,
-    TOKEN_ADDRESS_gWBTC,
-    TOKEN_ADDRESS_gfUSDT,
-    TOKEN_ADDRESS_DAI,
-    TOKEN_ADDRESS_WFTM,
-    TOKEN_ADDRESS_CRV,
-    TOKEN_ADDRESS_ETH,
-    TOKEN_ADDRESS_MIM,
-    TOKEN_ADDRESS_LINK,
-    TOKEN_ADDRESS_USDC,
-    TOKEN_ADDRESS_BTC,
-    TOKEN_ADDRESS_fUSDT,
-    GEIST_FTM_LP_ADDRESS
-} from "../common/addresses"
-
-import { 
     AaveOracle,
     OwnershipTransferred
 } from "../../generated/MultiFeeDistribution/AaveOracle"
@@ -72,6 +30,9 @@ import {
     exponentToBigDecimal,
     bigIntToPercentage
 } from "../common/utils"
+
+import * as constants from "../common/constants"
+import * as addresses from "../common/addresses"
 
 
 export function initializeToken(address: Address): TokenEntity {
@@ -88,11 +49,11 @@ export function initializeToken(address: Address): TokenEntity {
 
     token.id = address.toHexString();
     token.decimals = tokenContract.try_decimals().reverted ? 
-                     TOKEN_DECIMALS_GEIST: tokenContract.try_decimals().value.toI32();
+                     addresses.TOKEN_DECIMALS_GEIST: tokenContract.try_decimals().value.toI32();
     token.name = tokenContract.try_name().reverted ? 
-                 TOKEN_NAME_GEIST: tokenContract.try_name().value.toString();
+                 addresses.TOKEN_NAME_GEIST: tokenContract.try_name().value.toString();
     token.symbol = tokenContract.try_name().reverted ? 
-                   TOKEN_NAME_GEIST: tokenContract.try_name().value.toString();
+                   addresses.TOKEN_NAME_GEIST: tokenContract.try_name().value.toString();
     token.save();
     return token;
 }
@@ -109,11 +70,11 @@ export function initializeRewardToken(address: Address, rewardType: string): Rew
     let tokenContract = TokenContract.bind(address);
     rewardToken.id = address.toHexString();
     rewardToken.decimals = tokenContract.try_decimals().reverted ? 
-                           REWARD_TOKEN_DECIMALS: tokenContract.try_decimals().value.toI32();
+                           addresses.REWARD_TOKEN_DECIMALS: tokenContract.try_decimals().value.toI32();
     rewardToken.name = tokenContract.try_name().reverted ? 
-                       REWARD_TOKEN_NAME: tokenContract.try_name().value.toString();
+                       addresses.REWARD_TOKEN_NAME: tokenContract.try_name().value.toString();
     rewardToken.symbol = tokenContract.try_symbol().reverted ? 
-                         REWARD_TOKEN_SYMBOL: tokenContract.try_symbol().value.toString();
+                         addresses.REWARD_TOKEN_SYMBOL: tokenContract.try_symbol().value.toString();
     rewardToken.type = rewardType;
     rewardToken.save();
     return rewardToken;
@@ -127,7 +88,7 @@ export function getUsageMetrics(
     // Number of days since Unix epoch
     // Note: This is an unsafe cast to int, this should be handled better, 
     // perhaps some additional rounding logic
-    let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+    let id: i64 = timestamp.toI64() / constants.SECONDS_PER_DAY;
   
     // Check if the id (i.e. the day) exists in the store
     let usageMetrics = UsageMetricsDailySnapshotEntity.load(id.toString());
@@ -157,7 +118,7 @@ export function getUsageMetrics(
     // The protocol is defined in the schema as type Protocol!
     // But doesnt this create a circular dependency?
     // Protocol depends on usageMetrics, and usageMetrics depends on Protocol
-    usageMetrics.protocol = PROTOCOL_ID;
+    usageMetrics.protocol = constants.PROTOCOL_ID;
     usageMetrics.dailyTransactionCount += 1
     usageMetrics.blockNumber = block_number;
     usageMetrics.timestamp = timestamp;
@@ -208,7 +169,7 @@ export function getUsageMetrics(
       interactionType: string,
   ): FinancialsDailySnapshotEntity {
 
-    let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
+    let id: i64 = timestamp.toI64() / constants.SECONDS_PER_DAY;
 
     // Refresh id daily, historical snapshots can be accessed by using the id
     let financialsDailySnapshot = FinancialsDailySnapshotEntity.load(id.toString())
@@ -218,41 +179,41 @@ export function getUsageMetrics(
       log.warning("Initializing financialsDailySnapshot with ID={}", [id.toString()]);
       financialsDailySnapshot =  new FinancialsDailySnapshotEntity(id.toString());
       financialsDailySnapshot.id = id.toString();
-      financialsDailySnapshot.totalValueLockedUSD = ZERO_BD;
-      financialsDailySnapshot.totalVolumeUSD = ZERO_BD;
-      financialsDailySnapshot.supplySideRevenueUSD = ZERO_BD;
-      financialsDailySnapshot.protocolSideRevenueUSD = ZERO_BD;
-      financialsDailySnapshot.feesUSD = ZERO_BD;
+      financialsDailySnapshot.totalValueLockedUSD = constants.ZERO_BD;
+      financialsDailySnapshot.totalVolumeUSD = constants.ZERO_BD;
+      financialsDailySnapshot.supplySideRevenueUSD = constants.ZERO_BD;
+      financialsDailySnapshot.protocolSideRevenueUSD = constants.ZERO_BD;
+      financialsDailySnapshot.feesUSD = constants.ZERO_BD;
     }
 
     let tokenAmountUSD = getTokenAmountUSD(tokenAddress, tokenAmount);
 
-    if (interactionType == DEPOSIT_INTERACTION) {
+    if (interactionType == constants.DEPOSIT_INTERACTION) {
         // Add value locked for operations like depositing
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
     }
-    else if (interactionType == BORROW_INTERACTION) {
+    else if (interactionType == constants.BORROW_INTERACTION) {
         // Add value locked for operations like borrow (temporary for testing)
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
         let protocolSideRevenueUSD = bigIntToPercentage(rate).times(tokenAmountUSD);
         financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(protocolSideRevenueUSD);
     }
-    else if (interactionType == WITHDRAW_INTERACTION) {
+    else if (interactionType == constants.WITHDRAW_INTERACTION) {
         // Subtract value locked for operations like withdrawing
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
     }
-    else if (interactionType == REWARD_INTERACTION) {
+    else if (interactionType == constants.REWARD_INTERACTION) {
         // Add supply revenue for rewards
         financialsDailySnapshot.supplySideRevenueUSD = financialsDailySnapshot.supplySideRevenueUSD.plus(tokenAmountUSD);
     }
-    else if (interactionType == REPAY_INTERACTION) {
+    else if (interactionType == constants.REPAY_INTERACTION) {
         // Add supply revenue for rewards
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
     }
-    else if (interactionType == STAKE_INTERACTION) {
+    else if (interactionType == constants.STAKE_INTERACTION) {
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
     }
-    else if (interactionType == UNSTAKE_INTERACTION) {
+    else if (interactionType == constants.UNSTAKE_INTERACTION) {
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
     }
     else {
@@ -261,7 +222,7 @@ export function getUsageMetrics(
 
     // Volume is counted for all interactions
     financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD)
-    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(getTokenAmountUSD(TOKEN_ADDRESS_WFTM, transactionFee))
+    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(getTokenAmountUSD(addresses.TOKEN_ADDRESS_WFTM, transactionFee))
     financialsDailySnapshot.timestamp = timestamp;
 
     log.warning(
@@ -288,50 +249,55 @@ export function getUsageMetrics(
         eg. gUSDC -> USDC, gDAI -> DAI etc.
     */
 
-    let priceOracle = AaveOracle.bind(PRICE_ORACLE);
+    let priceOracle = AaveOracle.bind(addresses.PRICE_ORACLE);
 
-    if ((tokenAddress == TOKEN_ADDRESS_gfUSDT) || (tokenAddress == TOKEN_ADDRESS_fUSDT)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_fUSDT);
+    if ((tokenAddress == addresses.TOKEN_ADDRESS_gfUSDT) || (tokenAddress == addresses.TOKEN_ADDRESS_fUSDT)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_fUSDT);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gUSDC) || (tokenAddress == TOKEN_ADDRESS_USDC)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_USDC);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gUSDC) || (tokenAddress == addresses.TOKEN_ADDRESS_USDC)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_USDC);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gDAI) || (tokenAddress == TOKEN_ADDRESS_DAI)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_DAI);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gDAI) || (tokenAddress == addresses.TOKEN_ADDRESS_DAI)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_DAI);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gMIM) || (tokenAddress == TOKEN_ADDRESS_MIM)) {    
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_MIM);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gMIM) || (tokenAddress == addresses.TOKEN_ADDRESS_MIM)) {    
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_MIM);
     }
-    else if (tokenAddress == TOKEN_ADDRESS_GEIST) {
+    else if (tokenAddress == addresses.TOKEN_ADDRESS_GEIST) {
         /* 
             For the GEIST token, the price is derived from the
             ratio of FTM-GEIST reserves on Spookyswap multiplied by
             the price of WFTM from the oracle
         */
-        let geistFtmLP = SpookySwapGEISTFTM.bind(GEIST_FTM_LP_ADDRESS);
+        let geistFtmLP = SpookySwapGEISTFTM.bind(addresses.GEIST_FTM_LP_ADDRESS);
 
-        let reserveFTM = geistFtmLP.getReserves().value0;
-        let reserveGEIST = geistFtmLP.getReserves().value1;
+        let reserves = geistFtmLP.try_getReserves();
+        
+        if (reserves.reverted) {
+            log.error("Unable to get reserves for GEIST-FTM", [])
+            return BigInt.fromI32(0)
+        }
+        let reserveFTM = reserves.value.value0
+        let reserveGEIST = reserves.value.value1;
 
         let priceGEISTinFTM = reserveFTM.div(reserveGEIST);
-
-        let priceFTMinUSD = priceOracle.getAssetPrice(TOKEN_ADDRESS_WFTM);        
+        let priceFTMinUSD = priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_WFTM);        
         return priceGEISTinFTM.times(priceFTMinUSD)
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gWBTC) || (tokenAddress == TOKEN_ADDRESS_BTC)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_BTC);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gWBTC) || (tokenAddress == addresses.TOKEN_ADDRESS_BTC)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_BTC);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gLINK) || (tokenAddress == TOKEN_ADDRESS_LINK)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_LINK);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gLINK) || (tokenAddress == addresses.TOKEN_ADDRESS_LINK)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_LINK);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gCRV) || (tokenAddress == TOKEN_ADDRESS_CRV)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_CRV);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gCRV) || (tokenAddress == addresses.TOKEN_ADDRESS_CRV)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_CRV);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gETH) || (tokenAddress == TOKEN_ADDRESS_ETH)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_ETH);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gETH) || (tokenAddress == addresses.TOKEN_ADDRESS_ETH)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_ETH);
     }
-    else if ((tokenAddress == TOKEN_ADDRESS_gFTM) || (tokenAddress == TOKEN_ADDRESS_WFTM)) {
-        return priceOracle.getAssetPrice(TOKEN_ADDRESS_WFTM);
+    else if ((tokenAddress == addresses.TOKEN_ADDRESS_gFTM) || (tokenAddress == addresses.TOKEN_ADDRESS_WFTM)) {
+        return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_WFTM);
     }
     else {
         log.error("Invalid token address {}, cannot get price from oracle", [tokenAddress.toHexString()])
