@@ -1,5 +1,6 @@
 import { Address } from '@graphprotocol/graph-ts';
 import { RewardToken, Token } from '../../generated/schema';
+import { DEFAULT_DECIMALS } from '../constant';
 
 export function getOrCreateToken(id: Address): Token {
   let token = Token.load(id.toHex());
@@ -12,7 +13,7 @@ export function getOrCreateToken(id: Address): Token {
 
   token.name = '';
   token.symbol = '';
-  token.decimals = 18;
+  token.decimals = DEFAULT_DECIMALS;
   token.save();
 
   return token;
@@ -29,7 +30,7 @@ export function getOrCreateReward(id: Address): RewardToken {
 
   token.name = '';
   token.symbol = '';
-  token.decimals = 18;
+  token.decimals = DEFAULT_DECIMALS;
   token.type = 'DEPOSIT';
   token.save();
 

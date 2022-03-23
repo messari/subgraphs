@@ -1,78 +1,98 @@
-import { BigDecimal } from '@graphprotocol/graph-ts';
-import {
-  LendingProtocol,
-  Market,
-  UsageMetricsDailySnapshot,
-} from '../../generated/schema';
-import {
-  Deposit,
-  Withdraw,
-} from '../../generated/templates/AffiliateSettVault/BadgerAffiliateSett';
-import { getOrCreateMarket, getOrCreateProtocol } from '../entities/Market';
+import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
+import { Vault, VaultFee } from '../../generated/schema';
+import { SettVault } from '../../generated/templates';
+import { BadgerController } from '../../generated/templates/SettVault/BadgerController';
+import { BadgerStrategy } from '../../generated/templates/SettVault/BadgerStrategy';
+import { BadgerSett } from '../../generated/VaultRegistry/BadgerSett';
+import { NewVault } from '../../generated/VaultRegistry/VaultRegistry';
+import { DEFAULT_DECIMALS, NULL_ADDRESS } from '../constant';
+import { getOrCreateProtocol } from '../entities/Protocol';
 import { getOrCreateToken } from '../entities/Token';
-import { getOrCreateDeposit, getOrCreateWithdraw } from '../entities/Transaction';
-import { getOrCreateUser, getOrCreateUserSnapshot } from '../entities/User';
-import { getDay } from '../utils/numbers';
-import { updateUsageMetrics } from './common';
+import { getOrCreateVault } from '../entities/Vault';
+import { readValue } from '../utils/contracts';
 
-export function handleDeposit(event: Deposit): void {
-  let user = getOrCreateUser(event.params.account);
-  let protocol = getOrCreateProtocol();
-  let metrics = getOrCreateUserSnapshot(getDay(event.block.timestamp));
-  let market = getOrCreateMarket(event.address, event.block);
-  let token = getOrCreateToken(event.address);
+export function handleNewVault(event: NewVault): void {
+  const address = event.params.vault;
+  let vault = Vault.load(address.toHex());
 
-  updateUsageMetrics(user, protocol, metrics, event.block);
-  updateProtocol(protocol, market, metrics);
+  if (vault === null) {
+    let sett = BadgerSett.bind(address);
+    let name = readValue<string>(sett.try_name(), '');
 
-  let deposit = getOrCreateDeposit(event.transaction.hash, event.logIndex);
-  deposit.protocol = protocol.id;
-  deposit.to = event.address.toHex(); // TODO: need verification
-  deposit.from = user.id;
-  deposit.blockNumber = event.block.number;
-  deposit.timestamp = event.block.timestamp;
-  deposit.market = market.id;
-  deposit.asset = token.id;
-  deposit.amount = event.params.amount.toBigDecimal();
-  deposit.amountUSD = BigDecimal.zero(); // TODO: cal
-  deposit.save();
+    // checking if it is a sett/vault
+    if (name.length > 0) {
+      let tokenAddress = readValue<Address>(sett.try_token(), NULL_ADDRESS);
+      let token = getOrCreateToken(tokenAddress);
+
+      token.name = name;
+      token.symbol = readValue<string>(sett.try_name(), '');
+      token.decimals = readValue<i32>(sett.try_decimals(), DEFAULT_DECIMALS);
+      token.save();
+
+      vault = getOrCreateVault(address, event.block);
+      vault.protocol = getOrCreateProtocol().id;
+      vault.inputTokens = vault.inputTokens.concat([token.id]);
+      vault.outputToken = getOrCreateToken(address).id;
+      vault.depositLimit = readValue<BigInt>(sett.try_max(), BigInt.zero());
+      vault.outputTokenSupply = readValue<BigInt>(
+        sett.try_totalSupply(),
+        BigInt.zero(),
+      ).toBigDecimal();
+      vault.outputTokenPriceUSD = BigDecimal.zero(); // TODO: calc
+      vault.name = name;
+      vault.symbol = token.symbol;
+      vault.fees = getFees(sett, tokenAddress).map<string>(fee => fee.id);
+      vault.save();
+
+      // starting template indexing
+      SettVault.create(address);
+    }
+  }
 }
 
-export function handleWithdraw(event: Withdraw): void {
-  let user = getOrCreateUser(event.params.account);
-  let protocol = getOrCreateProtocol();
-  let metrics = getOrCreateUserSnapshot(getDay(event.block.timestamp));
-  let market = getOrCreateMarket(event.address, event.block);
-  let token = getOrCreateToken(event.address);
+function getFees(sett: BadgerSett, token: Address): VaultFee[] {
+  let fees: VaultFee[] = [];
 
-  updateUsageMetrics(user, protocol, metrics, event.block);
-  updateProtocol(protocol, market, metrics);
-
-  let withdraw = getOrCreateWithdraw(event.transaction.hash, event.logIndex);
-  withdraw.protocol = protocol.id;
-  withdraw.to = event.params.account.toHex();
-  withdraw.from = event.address.toHex();
-  withdraw.blockNumber = event.block.number;
-  withdraw.timestamp = event.block.timestamp;
-  withdraw.market = market.id;
-  withdraw.asset = token.id;
-  withdraw.amount = event.params.amount.toBigDecimal();
-  withdraw.amountUSD = BigDecimal.zero(); // TODO: cal
-  withdraw.save();
-}
-
-function updateProtocol(
-  protocol: LendingProtocol,
-  market: Market,
-  metrics: UsageMetricsDailySnapshot,
-): void {
-  if (protocol.markets.indexOf(market.id) === -1) {
-    protocol.markets.concat([market.id]);
+  let controller = readValue<Address>(sett.try_controller(), NULL_ADDRESS);
+  if (controller.equals(NULL_ADDRESS)) {
+    return [];
   }
 
-  if (protocol.usageMetrics.indexOf(metrics.id) === -1) {
-    protocol.usageMetrics = protocol.usageMetrics.concat([metrics.id]);
+  let controllerContract = BadgerController.bind(controller);
+  let strategy = readValue<Address>(
+    controllerContract.try_strategies(token),
+    NULL_ADDRESS,
+  );
+  if (strategy.equals(NULL_ADDRESS)) {
+    return [];
   }
 
-  protocol.save();
+  let strategyContract = BadgerStrategy.bind(strategy);
+  let withDrawFee = new VaultFee(
+    strategy
+      .toHex()
+      .concat('-')
+      .concat('withdraw'),
+  );
+  withDrawFee.feeType = 'WITHDRAWAL_FEE';
+  withDrawFee.feePercentage = readValue<BigInt>(
+    strategyContract.try_withdrawalFee(),
+    BigInt.zero(),
+  ).toBigDecimal();
+  fees.push(withDrawFee);
+
+  let performanceFee = new VaultFee(
+    strategy
+      .toHex()
+      .concat('-')
+      .concat('performance'),
+  );
+  performanceFee.feeType = 'PERFORMANCE_FEE';
+  performanceFee.feePercentage = readValue<BigInt>(
+    strategyContract.try_performanceFeeGovernance(),
+    BigInt.zero(),
+  ).toBigDecimal();
+  fees.push(performanceFee);
+
+  return fees;
 }

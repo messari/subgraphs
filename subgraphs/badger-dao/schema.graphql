@@ -50,13 +50,6 @@ type RewardToken @entity {
   type: RewardTokenType
 }
 
-type _User @entity {
-  " User public address "
-  id: ID!
-
-  lastDayActive: Int!
-}
-
 #############################
 ##### Protocol Metadata #####
 #############################
@@ -80,9 +73,41 @@ interface Protocol {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
+type YieldAggregator implements Protocol @entity {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: ID!
+
+  " Name of the protocol, including version. e.g. Yearn v3 "
+  name: String!
+
+  " Slug of protocol, including version. e.g. yearn-v3 "
+  slug: String!
+
+  network: Network!
+
+  type: ProtocolType!
+
+  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  ##### Yield-Specific #####
+  
+  " All vaults that belong to this protocol "
+  vaults: [Vault!]! @derivedFrom(field: "protocol")
+}
+
 ###############################
 ##### Protocol Timeseries #####
 ###############################
+
+# User entity to track unique user
+type _User @entity {
+  " User public address "
+  id: ID!
+
+  lastDayActive: Int!
+}
 
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
@@ -113,6 +138,12 @@ type FinancialsDailySnapshot @entity {
   protocol: Protocol!
 
   totalValueLockedUSD: BigDecimal!
+
+  " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
+  protocolTreasuryUSD: BigDecimal
+
+  " Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " Total volume in USD "
   totalVolumeUSD: BigDecimal!
@@ -166,7 +197,7 @@ interface Pool {
 
   totalValueLockedUSD: BigDecimal!
 
-  " Total volume in USD (volume is defined differently according to the protocol category) "
+  " Total volume in USD "
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
@@ -213,7 +244,7 @@ interface PoolDailySnapshot {
   " Total supply of output token "
   outputTokenSupply: BigDecimal!
 
-  " Price per share of output token in USD "
+  " Price per event.params.vault of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
@@ -229,62 +260,39 @@ interface PoolDailySnapshot {
   timestamp: BigInt!
 }
 
-enum LendingType {
-  " Collateralized Debt Position (CDP) protocols have singular isolated positions created by users. We aggregate them to give a single view of a market "
-  CDP
+enum VaultFeeType {
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
+  DEPOSIT_FEE
 
-  " Pooled protocols pool all users assets into a single market "
-  POOLED
+  " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
+  WITHDRAWAL_FEE
+
+  " Fees charged by the protocol during harvest, in percentages of the interest accrued "
+  PERFORMANCE_FEE
+
+  " Fees charged by the protocol on a periodic basis, in percentages of the total principal "
+  MANAGEMENT_FEE
 }
 
-enum RiskType {
-  " Global risk means each users position in a market is combined for one score to determine if they can be liquidated "
-  GLOBAL
-
-  " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
-  ISOLATED
-}
-
-type LendingProtocol implements Protocol @entity {
-  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+type VaultFee @entity {
   id: ID!
 
-  " Name of the protocol, including version. e.g. Aave v2 "
-  name: String!
+  feePercentage: BigDecimal!
 
-  " Slug of protocol, including version. e.g. aave-v2 "
-  slug: String!
-
-  network: Network!
-
-  type: ProtocolType!
-
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
-
-  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
-
-  ##### Lending-Specific #####
-
-  " All markets that belong to this protocol "
-  markets: [Market!]! @derivedFrom(field: "protocol")
-
-  lendingType: LendingType
-
-  riskType: RiskType
+  feeType: VaultFeeType!
 }
 
-type Market @entity {
-  " Smart contract address of the market "
+type Vault @entity {
+  " Smart contract address of the vault "
   id: ID!
 
-  " The protocol this pool belongs to "
-  protocol: LendingProtocol!
+  protocol: YieldAggregator!
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
   # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
   # and inputToken balances are used to calculate returns
-
+  
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
   inputTokens: [Token!]!
 
@@ -298,10 +306,10 @@ type Market @entity {
 
   totalValueLockedUSD: BigDecimal!
 
-  " Total borrow volume in USD (i.e. total loan origination ) "
+  " Total volume in USD "
   totalVolumeUSD: BigDecimal!
 
-  " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
+  " Amount of input tokens in the vault. The ordering should be the same as the vault's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
 
   " Total supply of output token "
@@ -316,66 +324,41 @@ type Market @entity {
   " Creation block number "
   createdBlockNumber: BigInt!
 
-  " Pool snapshots "
-  snapshots: [MarketDailySnapshot!]! @derivedFrom(field: "market")
+  " Vault snapshots "
+  snapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
 
-  ##### Lending-Specific #####
+  ##### Yield-Specific #####
 
-  " Name of market "
   name: String
+  
+  symbol: String
 
-  isActive: Boolean!
+  depositLimit: BigInt!
 
-  canUseAsCollateral: Boolean!
+  fees: [VaultFee!]!
 
-  canBorrowFrom: Boolean!
+  deposits: [Deposit!]! @derivedFrom(field: "vault")
 
-  " Maximum loan-to-value ratio as a percentage value "
-  maximumLTV: BigDecimal!
-
-  " Liquidation threshold as a percentage value "
-  liquidationThreshold: BigDecimal!
-
-  " Liquidation penalty as a percentage value "
-  liquidationPenalty: BigDecimal!
-
-  " Deposit interest rate in percentage "
-  depositRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  stableBorrowRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  variableBorrowRate: BigDecimal!
-
-  deposits: [Deposit!]! @derivedFrom(field: "market")
-
-  withdraws: [Withdraw!]! @derivedFrom(field: "market")
-
-  borrows: [Borrow!]! @derivedFrom(field: "market")
-
-  repays: [Repay!]! @derivedFrom(field: "market")
-
-  liquidations: [Liquidation!]! @derivedFrom(field: "market")
+  withdraws: [Withdraw!]! @derivedFrom(field: "vault")
 }
 
-type MarketDailySnapshot @entity {
-  " { Smart contract address of the market }-{ # of days since Unix epoch time } "
+type VaultDailySnapshot @entity {
+  " { Smart contract address of the vault }-{ # of days since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
   protocol: Protocol!
 
-  " The pool this snapshot belongs to "
-  market: Market!
+  " The vault this snapshot belongs to "
+  vault: Vault!
 
   totalValueLockedUSD: BigDecimal!
 
-  " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  " Total deposit volume in USD "
+  totalVolumeUSD: BigDecimal!
 
-  " Price per share of input token in USD "
-  inputTokenPricesUSD: [BigDecimal!]!
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: BigDecimal!
 
   " Total supply of output token "
   outputTokenSupply: BigDecimal!
@@ -394,17 +377,6 @@ type MarketDailySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " Deposit interest rate in percentage "
-  depositRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  stableBorrowRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  variableBorrowRate: BigDecimal!
 }
 
 ##################################
@@ -466,11 +438,6 @@ type Deposit implements Event @entity {
 
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
   " Token deposited "
   asset: Token!
 
@@ -479,6 +446,11 @@ type Deposit implements Event @entity {
 
   " Amount of token deposited in USD "
   amountUSD: BigDecimal!
+
+  ##### Yield-Specific #####
+
+  " The vault involving this transaction "
+  vault: Vault!
 }
 
 type Withdraw implements Event @entity {
@@ -504,11 +476,6 @@ type Withdraw implements Event @entity {
 
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
   " Token withdrawn "
   asset: Token!
 
@@ -517,121 +484,9 @@ type Withdraw implements Event @entity {
 
   " Amount of token withdrawn in USD "
   amountUSD: BigDecimal!
-}
 
-type Borrow implements Event @entity {
-  " { Transaction hash }-{ Log index } "
-  id: ID!
+  ##### Yield-Specific #####
 
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: Protocol!
-
-  " Address that received tokens "
-  to: String!
-
-  " Market that tokens are borrowed from "
-  from: String!
-
-  blockNumber: BigInt!
-
-  timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
-  " Token borrowed "
-  asset: Token!
-
-  " Amount of token borrowed in native units "
-  amount: BigDecimal!
-
-  " Amount of token borrowed in USD "
-  amountUSD: BigDecimal
-}
-
-type Repay implements Event @entity {
-  " { Transaction hash }-{ Log index } "
-  id: ID!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: Protocol!
-
-  " Market that tokens are repaid to "
-  to: String!
-
-  " Address that sent tokens "
-  from: String!
-
-  blockNumber: BigInt!
-
-  timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
-  " Token repaid "
-  asset: Token!
-
-  " Amount of token repaid in native units "
-  amount: BigDecimal!
-
-  " Amount of token repaid in USD "
-  amountUSD: BigDecimal
-}
-
-type Liquidation implements Event @entity {
-  " { Transaction hash }-{ Log index } "
-  id: ID!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: Protocol!
-
-  " Market that tokens are repaid to "
-  to: String!
-
-  " Address that carried out the liquidation "
-  from: String!
-
-  blockNumber: BigInt!
-
-  timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
-  " Token liquidated "
-  asset: Token!
-
-  " Amount of token liquidated in native units "
-  amount: BigDecimal!
-
-  " Amount of token liquidated in USD "
-  amountUSD: BigDecimal
-
-  " Amount of profit from liquidation in USD "
-  profitUSD: BigDecimal
+  " The vault involving this transaction "
+  vault: Vault!
 }

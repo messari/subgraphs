@@ -1,14 +1,15 @@
 import { BigInt, ethereum } from '@graphprotocol/graph-ts';
 import {
-  LendingProtocol,
   UsageMetricsDailySnapshot,
+  Vault,
+  YieldAggregator,
   _User as User,
 } from '../../generated/schema';
 import { getDay } from '../utils/numbers';
 
 export function updateUsageMetrics(
   user: User,
-  protocol: LendingProtocol,
+  protocol: YieldAggregator,
   metrics: UsageMetricsDailySnapshot,
   block: ethereum.Block,
 ): void {
@@ -40,4 +41,20 @@ export function updateUsageMetrics(
 
   user.save();
   metrics.save();
+}
+
+export function updateProtocol(
+  protocol: YieldAggregator,
+  vault: Vault,
+  metrics: UsageMetricsDailySnapshot,
+): void {
+  if (protocol.vaults.indexOf(vault.id) === -1) {
+    protocol.vaults.concat([vault.id]);
+  }
+
+  if (protocol.usageMetrics.indexOf(metrics.id) === -1) {
+    protocol.usageMetrics = protocol.usageMetrics.concat([metrics.id]);
+  }
+
+  protocol.save();
 }

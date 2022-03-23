@@ -22,7 +22,7 @@ export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
   deposit.from = '';
   deposit.blockNumber = BigInt.zero();
   deposit.timestamp = BigInt.zero();
-  deposit.market = '';
+  deposit.vault = '';
   deposit.asset = '';
   deposit.amount = BigDecimal.zero();
   deposit.amountUSD = BigDecimal.zero();
@@ -52,7 +52,7 @@ export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt): Withdraw {
   withdraw.from = '';
   withdraw.blockNumber = BigInt.zero();
   withdraw.timestamp = BigInt.zero();
-  withdraw.market = '';
+  withdraw.vault = '';
   withdraw.asset = '';
   withdraw.amount = BigDecimal.zero();
   withdraw.amountUSD = BigDecimal.zero();
