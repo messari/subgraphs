@@ -24,6 +24,16 @@ You should navigate to the implementation contract first (Contract -> Read as Pr
 
 ### Price Oracles
 
+### Failed Transactions
+
+Failed transactions are not indexed by `graph-node` and should not invoke any event handlers or call handlers. However, people have reported issues where they've seen failed transactions before (likely because of an inner call reverted). For example: https://discord.com/channels/438038660412342282/548982456414371850/892721444507774996.
+
+If you run into one of these issues, feel free to let me know and I can report it to The Graph's dev team for investigation.
+
+### Nested Calls
+
+Nested calls (e.g. calls from a multi-sig wallet) still invokes call-handlers and event-handlers regardless of how deep the nesting is.
+
 ### Snapshots
 
 If no event occurred throughout the duration of a snapshot, you can skip that snapshot.
@@ -54,11 +64,22 @@ which will show up in the Logs tab of Subgraph Studio:
 
 You also have an option of `Error`, `Warning`, `Info`, `Debug` as the log level. I like to use `Warning` so that I can quickly filter for it. The way to filter for logs of a specific level is to click (uncheck) the log levels circled in red above.
 
+**Note**: there is a known issue where historical logs are only kept for an indeterminate amount of time (usually an hour or so). Which means it's difficult to search for historical logs. The workaround is to run `graph-node` locally and deploy your subgraph locally (see instructions below), this way you have access to all your historical logs in the console.
+
 ### Indexing Status
 
 You can check the indexing status of your subgraph and surface indexing errors that you may encounter along the way here: https://thegraph.com/docs/en/developer/quick-start/#5-check-your-logs
 
 **Note**: you should use (copy/paste) this endpoint when you use the GraphiQL playground: https://api.thegraph.com/index-node/graphql. If you click into it, it's going to direct you to a different URL which won't work with the GraphiQL playground.
+
+#### Subgraph fails to sync without error message
+
+If you're having issues with the subgraph sync failing and no error messages shown in the log, you can access the **Indexing Status** of your subgraph to get more details. See steps are similar to above:
+
+1. Check your graph health here https://graphiql-online.com/. Where it says "Enter the GraphQL endpoint" copy paste this endpoint https://api.thegraph.com/index-node/graphql
+2. After running this, copy the sample query in section 5 of the graph docs here https://thegraph.com/docs/en/developer/quick-start/#5-check-your-logs into the window
+3. Replace the part where it says subgraphs: ["Qm..."]  with your deployment id (you will see this in the studio)
+4. Run the query, you will see if your subgraph had any indexing errors! 
 
 ### Running Locally
 
@@ -80,6 +101,7 @@ Here are some known issues with subgraph tooling that you may run into:
 
 - Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null	wasm` ([Github Issue](https://iboxshare.com/graphprotocol/graph-ts/issues/219))
 - Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
+- Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
 
 ### AssemblyScript Issues
 
