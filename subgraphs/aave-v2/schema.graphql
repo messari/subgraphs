@@ -252,6 +252,11 @@ type LendingProtocol implements Protocol @entity {
 
   type: ProtocolType!
 
+  protocolPriceOracle: String!
+
+  " # of total/cumulative unique users on the protocol level"
+  totalUniqueUsers: Int!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -282,7 +287,7 @@ type Market @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]

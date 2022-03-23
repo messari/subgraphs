@@ -37,7 +37,7 @@ import {
   getAssetPriceInUSDC,
   getProtocolIdFromCtx,
   initToken,
-  loadMarket,
+  initMarket,
   amountInUSD,
   updateFinancials,
   loadMarketDailySnapshot,
@@ -46,27 +46,36 @@ import {
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool/market address with context
-  // Need to verify that context is available here, not just the lendingPoolConfigurator.ts script
   let context = dataSource.context();
   return context.getString("lendingPool");
 }
 
-// This section needs to be updated once I can figure out what defines these metrics and how to check if they should be incremented
-function updateMetrics(event: ethereum.Event): UsageMetricsDailySnapshot {
-  // Update the current date's UsageMetricsDailySnapshot instance
-  const metricsDailySnapshot = updateMetricsDailySnapshot(event);
-  // Needs conditionals for incrementing
-  metricsDailySnapshot.dailyTransactionCount += 1;
-  metricsDailySnapshot.activeUsers += 1;
-  metricsDailySnapshot.totalUniqueUsers += 1;
-  metricsDailySnapshot.save();
-  return metricsDailySnapshot;
+export function getTokenBalanceIndex(market: Market, asset: string): number {
+
+  // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
+  let tokenBalanceIndex = market.inputTokens.indexOf(asset);
+  if (tokenBalanceIndex < 0 || !tokenBalanceIndex) {
+    log.error('Transaction event asset/reserve not in market.inputTokens - ' + asset, []);
+    if (market.inputTokens.length >= 1) {
+      let testIdx = market.inputTokens.indexOf(market.inputTokens[0]);
+      log.info('INDEX CHECK FAILED, INDEX OF TEST market.inputTokens[0] = ' + market.inputTokens[0] + ' asset = ' + asset + " index is " + testIdx.toString(), [])
+      market.inputTokens.forEach((tok, idx) => {
+        log.info('MARKET INPUTTOKEN ' + idx.toString() + ': ' + tok, []);
+      })
+    }
+    tokenBalanceIndex = market.inputTokens.length;
+    initToken(Address.fromString(asset));
+    market.inputTokens.push(asset);
+    market.inputTokenBalances.push(new BigDecimal(new BigInt(0)));
+  }
+  log.info('returning token index' + tokenBalanceIndex.toString(), [])
+  return tokenBalanceIndex;
 }
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // This event handler updates the deposit/borrow rates on a market when the state of a reserve is updated
 
-  const market = loadMarket(event.params.reserve.toHexString()) as Market;
+  const market = initMarket(event.block.number, event.block.timestamp, event.params.reserve.toHexString()) as Market;
   market.depositRate = new BigDecimal(event.params.liquidityRate);
   market.variableBorrowRate = new BigDecimal(event.params.variableBorrowRate);
   market.stableBorrowRate = new BigDecimal(event.params.stableBorrowRate);
@@ -90,7 +99,7 @@ export function handleDeposit(event: Deposit): void {
   // Instantiate the deposit entity with the specified string construction as id
   log.info('DEPOSIT AMT: ' + event.params.amount.toString(), [])
   let deposit = new DepositEntity(hash + "-" + logIdx.toHexString());
-  log.info('Passed the deposit entity creation', [])
+  log.info('Passed the deposit entity creation for ' + event.params.reserve.toHexString(), [])
   deposit.to = marketAddr;
   deposit.market = marketAddr;
   deposit.from = event.transaction.from.toHexString();
@@ -105,29 +114,24 @@ export function handleDeposit(event: Deposit): void {
   log.info('DEPO RES ADDR' + event.params.reserve.toHexString(), [])
 
   const token = initToken(event.params.reserve);
-  const market = loadMarket(marketAddr) as Market;
-  log.info('Market tokenlength...' + market.inputTokens.length.toString(), []);
-  if (market.inputTokens.length >= 1) {
-    market.inputTokens.forEach((tok, idx) => {
-      log.info('TOKEN ' + idx.toString() + ': ' + tok, []);
-    })
+  let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  const tokenBalanceIndex = getTokenBalanceIndex(market, deposit.asset);
+  if (tokenBalanceIndex >= market.inputTokens.length) {
+    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
+    market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   }
-  // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
-  const tokenBalanceIndex = market.inputTokens.indexOf(deposit.asset);
-  log.info('Made here...' + tokenBalanceIndex.toString(), []);
 
-  market.inputTokenBalances[tokenBalanceIndex].plus(deposit.amount);
+  market.inputTokenBalances[<i32>(tokenBalanceIndex)].plus(deposit.amount);
+  log.info('DEPO PASSED INPUT TOKEN INDEXING ' + deposit.asset, [])
   const amountUSD = amountInUSD(token, deposit.amount);
-  log.info('Grabbed from oracle: ' + amountUSD.toString(), []);
   deposit.amountUSD = amountUSD;
-  log.info('DEPOSIT AMT IN USD: ' + deposit.amountUSD.toString(), [])
 
   deposit.save();
   market.totalVolumeUSD.plus(amountUSD);
   market.totalValueLockedUSD.plus(amountUSD);
   market.save();
   loadMarketDailySnapshot(event, market);
-  updateMetrics(event);
+  updateMetricsDailySnapshot(event);
   // Protocol side revenue and fees args need to be set to correct value
   updateFinancials(event, true, amountUSD, amountUSD, amountUSD );
 }
@@ -160,10 +164,14 @@ export function handleWithdraw(event: Withdraw): void {
   withdraw.blockNumber = event.block.number;
   
   const token = initToken(event.params.reserve);
-  const market = loadMarket(marketAddr) as Market;
+  let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
-  const tokenBalanceIndex = market.inputTokens.indexOf(withdraw.asset);
-  market.inputTokenBalances[tokenBalanceIndex].minus(withdraw.amount);
+  const tokenBalanceIndex = getTokenBalanceIndex(market, withdraw.asset);
+  if (tokenBalanceIndex >= market.inputTokens.length) {
+    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
+    market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  }
+  market.inputTokenBalances[<i32>(tokenBalanceIndex)].minus(withdraw.amount);
   const amountUSD = amountInUSD(token, withdraw.amount);
   withdraw.amountUSD = amountUSD;
   log.info('WITHDRAW AMT IN USD: ' + withdraw.amountUSD.toString(), [])
@@ -173,9 +181,10 @@ export function handleWithdraw(event: Withdraw): void {
   market.totalValueLockedUSD.minus(amountUSD);
   market.save();
   loadMarketDailySnapshot(event, market);
-  updateMetrics(event);
+  updateMetricsDailySnapshot(event);
   // Protocol side revenue and fees args need to be set to correct value
-  updateFinancials(event, false, amountUSD, amountUSD, amountUSD );}
+  updateFinancials(event, false, amountUSD, amountUSD, amountUSD );
+}
 
 export function handleBorrow(event: Borrow): void {
   log.info('BORROW' + event.transaction.hash.toHexString(), [])
@@ -184,7 +193,7 @@ export function handleBorrow(event: Borrow): void {
   const hash = event.transaction.hash.toHexString();
   const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
-  log.info('MarketAddr From Context in lendingPool.ts handleBorrow' + marketAddr , [marketAddr])
+  log.info('MarketAddr From Context in lendingPool.ts handleBorrow' + marketAddr , [])
 
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
@@ -202,16 +211,20 @@ export function handleBorrow(event: Borrow): void {
   borrow.save();
   
   const token = initToken(event.params.reserve);
-  const market = loadMarket(marketAddr) as Market;
+  let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
-  const tokenBalanceIndex = market.inputTokens.indexOf(borrow.asset);
-  market.inputTokenBalances[tokenBalanceIndex].minus(borrow.amount);
+  const tokenBalanceIndex = getTokenBalanceIndex(market, borrow.asset);
+  if (tokenBalanceIndex >= market.inputTokens.length) {
+    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
+    market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  }
+  market.inputTokenBalances[<i32>(tokenBalanceIndex)].minus(borrow.amount);
   const amountUSD = amountInUSD(token, borrow.amount);
   market.totalVolumeUSD.plus(amountUSD);
   market.totalValueLockedUSD.minus(amountUSD);
   market.save();
   loadMarketDailySnapshot(event, market);
-  updateMetrics(event);
+  updateMetricsDailySnapshot(event);
   // Protocol side revenue and fees args need to be set to correct value
   updateFinancials(event, false, amountUSD, amountUSD, amountUSD );
 }
@@ -242,16 +255,20 @@ export function handleRepay(event: Repay): void {
   repay.save();
   
   const token = initToken(event.params.reserve);
-  const market = loadMarket(marketAddr) as Market;
+  let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
-  const tokenBalanceIndex = market.inputTokens.indexOf(repay.asset);
-  market.inputTokenBalances[tokenBalanceIndex].plus(repay.amount);
+  const tokenBalanceIndex = getTokenBalanceIndex(market, repay.asset);
+  if (tokenBalanceIndex >= market.inputTokens.length) {
+    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
+    market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  }
+  market.inputTokenBalances[<i32>(tokenBalanceIndex)].plus(repay.amount);
   const amountUSD = amountInUSD(token, repay.amount);
   market.totalVolumeUSD.plus(amountUSD);
   market.totalValueLockedUSD.plus(amountUSD);
   market.save();
   loadMarketDailySnapshot(event, market);
-  updateMetrics(event);
+  updateMetricsDailySnapshot(event);
   // Protocol side revenue and fees args need to be set to correct value
   updateFinancials(event, true, amountUSD, amountUSD, amountUSD );
 }
@@ -282,16 +299,20 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   liquidation.save();
 
   const token = initToken(event.params.collateralAsset);
-  const market = loadMarket(marketAddr) as Market;
+  let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
-  const tokenBalanceIndex = market.inputTokens.indexOf(liquidation.asset);
-  market.inputTokenBalances[tokenBalanceIndex].plus(liquidation.amount);
+  const tokenBalanceIndex = getTokenBalanceIndex(market, liquidation.asset);
+  if (tokenBalanceIndex >= market.inputTokens.length) {
+    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
+    market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  }
+  market.inputTokenBalances[<i32>(tokenBalanceIndex)].plus(liquidation.amount);
   const amountUSD = amountInUSD(token, liquidation.amount);
   market.totalVolumeUSD.plus(amountUSD);
   market.totalValueLockedUSD.plus(amountUSD);
   market.save();
   loadMarketDailySnapshot(event, market);
-  updateMetrics(event);
+  updateMetricsDailySnapshot(event);
   // Protocol side revenue and fees args need to be set to correct value
   updateFinancials(event, true, amountUSD, amountUSD, amountUSD );
 }
@@ -301,7 +322,7 @@ export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollate
   const marketAddr = event.params.reserve.toHexString();
   log.info('MarketAddr From Context in lendingPool.ts handleResColEnabled' + marketAddr , [marketAddr])
 
-  const market = loadMarket(marketAddr) as Market;
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   market.canUseAsCollateral = true;
   market.save();
 }
@@ -310,7 +331,7 @@ export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollat
   // This Event handler disables a reserve/market being used as collateral
   const marketAddr = event.params.reserve.toHexString();
   log.info('MarketAddr From Context in lendingPool.ts handleResColEnabled' + marketAddr , [marketAddr]);
-  const market = loadMarket(marketAddr) as Market;
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   market.canUseAsCollateral = false;
   market.save();
 }

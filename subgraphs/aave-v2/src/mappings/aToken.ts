@@ -19,10 +19,10 @@ import { AaveIncentivesController as IncentivesControllerContract } from "../../
 
 import {
   initToken,
-  loadMarket,
   initRewardToken,
   zeroAddr,
-  rayDivision
+  rayDivision,
+  initMarket
 } from "./utilFunctions";
 
 // Code written to pull a Token entity by its aToken. Leaving code commented here for now in case needed 
@@ -37,13 +37,13 @@ export function handleATokenMint(event: Mint): void {
   // Event handler for AToken mints. This gets triggered upon deposits
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
-  const marketAddr = aToken.POOL();
-  const market = loadMarket(marketAddr.toHexString());
-  const mintedAmount = event.params.value;
-  const liquidityIndex = event.params.index;
-  const scaledMintedAmount = new BigDecimal(rayDivision(mintedAmount, liquidityIndex));
-  const beforeScaledSupply = market.outputTokenSupply;
-  market.outputTokenSupply = beforeScaledSupply.plus(scaledMintedAmount);
+  const tryInputToken = aToken.try_UNDERLYING_ASSET_ADDRESS();
+  let marketAddr = '';
+  if (!tryInputToken.reverted) {
+    marketAddr = tryInputToken.value.toHexString();
+  }
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr);
+  market.outputTokenSupply = new BigDecimal(aToken.totalSupply());
   market.save();
 }
 
@@ -52,12 +52,8 @@ export function handleATokenBurn(event: Burn): void {
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
   const marketAddr = aToken.POOL();
-  const market = loadMarket(marketAddr.toHexString());
-  const burnedAmount = event.params.value;
-  const liquidityIndex = event.params.index;
-  const scaledBurnedAmount = new BigDecimal(rayDivision(burnedAmount, liquidityIndex));
-  const beforeScaledSupply = market.outputTokenSupply;
-  market.outputTokenSupply = beforeScaledSupply.minus(scaledBurnedAmount);
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString());
+  market.outputTokenSupply = new BigDecimal(aToken.totalSupply());
   market.save();
 }
 
@@ -67,7 +63,7 @@ export function handleATokenInitialized(event: Initialized): void {
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
   const marketAddr = aToken.POOL();
-  const market = loadMarket(marketAddr.toHexString());
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString());
   const incentivesControllerAddr = event.params.incentivesController;
   if (incentivesControllerAddr.toHexString() != zeroAddr) {
     // Instantiate IncentivesController to get access to contract read methods

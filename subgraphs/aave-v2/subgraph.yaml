@@ -42,6 +42,8 @@ templates:
       eventHandlers:
         - event: ProxyCreated(bytes32,indexed address)
           handler: handleProxyCreated
+        - event: PriceOracleUpdated(indexed address)
+          handler: handlePriceOracleUpdated
         - event: LendingPoolUpdated(indexed address)
           handler: handleLendingPoolUpdated
         - event: LendingPoolConfiguratorUpdated(indexed address)

@@ -1,4 +1,4 @@
-import { Address, DataSourceContext, log } from "@graphprotocol/graph-ts";
+import { Address, dataSource, DataSourceContext, log } from "@graphprotocol/graph-ts";
 
 import {
   ProxyCreated,
@@ -15,26 +15,34 @@ import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPoolAddressesProvider as LendingPoolAddressesProviderTemplate
 } from "../../generated/templates";
-import { fetchProtocolEntity } from "./utilFunctions";
+import { fetchProtocolEntity, zeroAddr } from "./utilFunctions";
+
+export const priceOracleDefault = "0xa50ba011c48153de246e5192c8f9258a2ba79ca9";
 
 export function handleAddressesProviderRegistered(event: AddressesProviderRegistered): void {
-  let address = event.params.newAddress;
+  const address = event.params.newAddress;
   // start indexing the address provider
   LendingPoolAddressesProviderTemplate.create(address);
 }
 
 export function handleProxyCreated(event: ProxyCreated): void {
   // Event handler for lending pool or configurator contract creation
-  let pool = event.params.id.toString();
-  let address = event.params.newAddress;
-  log.info('pool:,' + pool + '- address: '+ address.toHexString()+ ' in handleProxyCreated', [pool, address.toHexString()])
+  const pool = event.params.id.toString();
+  const address = event.params.newAddress;
+  log.info('pool:,' + pool + '- address: '+ address.toHexString()+ ' in handleProxyCreated', [])
   const context = initiateContext(event.address);
-
   if (pool == "LENDING_POOL") {
     startIndexingLendingPool(address, context);
   } else if (pool == "LENDING_POOL_CONFIGURATOR") {
     startIndexingLendingPoolConfigurator(address, context);
   }
+}
+
+export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
+  log.info('HANDLING PRICE ORACLE UPDATE TO ' + event.params.newAddress.toHexString(), [])
+  const lendingProtocol = fetchProtocolEntity('aave-v2');
+  lendingProtocol.protocolPriceOracle = event.params.newAddress.toHexString();
+  lendingProtocol.save();
 }
 
 export function handleLendingPoolUpdated(event: LendingPoolUpdated): void {
@@ -61,34 +69,36 @@ export function startIndexingLendingPoolConfigurator(configurator: Address, cont
 }
 
 function initiateContext(addrProvider: Address): DataSourceContext {
-  // Add Lending Pool/Market address, price oracle contract address, and protocol id to the context for general accessibility
-  // Need to verify that context is accessible from any file importing dataSource? or just scripts for templates directly called to createWithContext
+  // Add Lending Pool address, price oracle contract address, and protocol id to the context for general accessibility
 
   const contract = AddressProviderContract.bind(addrProvider);
-  // NEED TO MOCK CONTRACT CALLS
-  // https://thegraph.com/docs/en/developer/matchstick/#calling-a-mapping-function-with-an-event
+  log.info('AddrProvContract: ' + addrProvider.toHexString(), []);
+  // Get the lending pool
   const trylendingPool = contract.try_getLendingPool();
   let lendingPool = ''
   if (!trylendingPool.reverted) {
-    lendingPool = trylendingPool.value.toHexString()
-    log.info('init context LP:' + lendingPool, [lendingPool])
+    lendingPool = trylendingPool.value.toHexString();
+    log.info('initiateContext LP:' + lendingPool, []);
   } else {
-    log.error('FAILED TO GET LENDING POOL', [''])
+    log.error('FAILED TO GET LENDING POOL', ['']);
   }
-  const lendingProtocol = fetchProtocolEntity('aave-v2');
   // Get the Address Provider Contract's Price Oracle
   const tryPriceOracle = contract.try_getPriceOracle();
-  let priceOracle = ''
-  if (!tryPriceOracle.reverted) {
-    priceOracle = tryPriceOracle.value.toHexString()
-    log.info('init context PO: ' + priceOracle, [priceOracle])
+  let priceOracle = '';
+  if (!tryPriceOracle.reverted && tryPriceOracle.value.toHexString() !== zeroAddr ) {
+    priceOracle = tryPriceOracle.value.toHexString();
+    log.info('initiateContext priceOracle: ' + priceOracle, []);
   } else {
-    log.error('FAILED TO GET ORACLE', [''])
+    priceOracle = priceOracleDefault;
+    log.error('FAILED TO GET ORACLE - REVERTED TO DEFAULT HARD-CODED AT ' + priceOracle, ['']);
   }
-  log.info('CREATING CONTEXT ' + lendingPool + '----' + priceOracle + '-----' + lendingProtocol.id , [lendingPool, priceOracle, addrProvider.toHexString()])
+  // Initialize the protocol entity
+  const lendingProtocol = fetchProtocolEntity('aave-v2');
+  lendingProtocol.protocolPriceOracle = priceOracle;
+  lendingProtocol.save();
+  log.info('CREATING CONTEXT ' + lendingPool + '----' + priceOracle + '-----' + lendingProtocol.id , []);
   const context = new DataSourceContext();
   context.setString("lendingPool", lendingPool);
-  context.setString("priceOracle", priceOracle);
   context.setString("protocolId", lendingProtocol.id);
-  return context
+  return context;
 }
