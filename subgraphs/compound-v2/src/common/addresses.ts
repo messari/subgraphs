@@ -32,3 +32,26 @@ export const CUSDT_ADDRESS  =   Address.fromString("0xf650c3d88d12db855b8bf7d11b
 export const CWBTC2_ADDRESS =   Address.fromString("0xccf4429db6322d5c611ee964527d42e5d685dd6a")
 export const CYFI_ADDRESS   =   Address.fromString("0x80a2ae356fc9ef4305676f7a3e2ed04e12c33946")
 export const CZRX_ADDRESS   =   Address.fromString("0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407")
+
+// market list
+export const MARKET_LIST = [
+    CAAVE_ADDRESS,
+    CBAT_ADDRESS,
+    CCOMP_ADDRESS,
+    CDAI_ADDRESS,
+    CETH_ADDRESS,
+    CFEI_ADDRESS,
+    CLINK_ADDRESS,
+    CMKR_ADDRESS,
+    CREP_ADDRESS,
+    CSAI_ADDRESS,
+    CSUSHI_ADDRESS,
+    CTUSD_ADDRESS,
+    CUNI_ADDRESS,
+    CUSDC_ADDRESS,
+    CUSDP_ADDRESS,
+    CUSDT_ADDRESS,
+    CWBTC2_ADDRESS,
+    CYFI_ADDRESS,
+    CZRX_ADDRESS
+]
