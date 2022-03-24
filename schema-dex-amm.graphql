@@ -156,7 +156,7 @@ interface Pool {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -267,7 +267,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -375,13 +375,13 @@ type Deposit implements Event @entity {
   inputTokens: [Token!]!
 
   " Output tokens of the transaction. E.g. the UNI-LP token "
-  outputTokens: [Token!]!
+  outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigDecimal!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmounts: [BigDecimal!]!
+  outputTokenAmount: BigDecimal!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
@@ -419,13 +419,13 @@ type Withdraw implements Event @entity {
   inputTokens: [Token!]!
 
   " Output tokens of the transaction. E.g. WETH and USDC from a WETH-USDC pool "
-  outputTokens: [Token!]!
+  outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigDecimal!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmounts: [BigDecimal!]!
+  outputTokenAmount: BigDecimal!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
