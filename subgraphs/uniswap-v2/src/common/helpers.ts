@@ -25,6 +25,7 @@ export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADD
 // rebass tokens, dont count in tracked volume
 export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
 
+// Create a liquidity pool from PairCreated contract call
 export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: Address, token0: Token, token1: Token, LPtoken: Token): void {
   let pool = new LiquidityPool(poolAddress.toHexString())
 
@@ -52,6 +53,7 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   PairTemplate.create(poolAddress)
 }
 
+// These whiteslists are used to track what pools the tokens are a part of. Used in price calculations. 
 export function UpdateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker1: _TokenTracker, poolAddress: Address): void {
     // update white listed pools
     if (WHITELIST.includes(tokenTracker0.id)) {
@@ -69,6 +71,7 @@ export function UpdateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker
     }
 }
 
+// Upate token balances based on reserves emitted from the sync event. 
 export function updateInputTokenBalances(poolAddress: string, reserve0: BigInt, reserve1: BigInt): void {
 
   let pool = getLiquidityPool(poolAddress)
@@ -84,6 +87,7 @@ export function updateInputTokenBalances(poolAddress: string, reserve0: BigInt, 
   pool.save()
 }
 
+// Update tvl an token prices 
 export function updateTvlAndTokenPrices(poolAddress: string): void {
   let pool = getLiquidityPool(poolAddress)
 
@@ -129,6 +133,7 @@ function isCompleteMint(mintId: string): boolean {
   return mint.from !== null // sufficient checks
 }
 
+// Handle data from transfer event for mints. Used to populate deposit entity in the mint event. 
 export function handleTransferMint(event: ethereum.Event, value: BigDecimal, to: Address): void {
   let pool = getLiquidityPool(event.address.toHexString())
   let transaction = getOrCreateTransaction(event)
@@ -177,6 +182,7 @@ export function handleTransferMint(event: ethereum.Event, value: BigDecimal, to:
   }
 }
 
+// Handle the transer of LP tokens to the liquidity pool that minted them and track the data for the burn event. 
 export function handleTransferToPool(event: ethereum.Event, value: BigDecimal, to: Address, from: Address): void {
   let transaction = getOrCreateTransaction(event)
 
@@ -198,6 +204,7 @@ export function handleTransferToPool(event: ethereum.Event, value: BigDecimal, t
   burn.save()
 }
 
+// Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
 export function handleTransferBurn(event: ethereum.Event, value: BigDecimal, to: Address, from: Address): void {
   let pool = getLiquidityPool(event.address.toHexString())
   let transaction = getOrCreateTransaction(event)
@@ -265,6 +272,7 @@ export function handleTransferBurn(event: ethereum.Event, value: BigDecimal, to:
   pool.save()
 }
 
+// Generate the deposit entity and update deposit account for the according pool.
 export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address): void {
   let transaction = getOrCreateTransaction(event)
 
@@ -316,6 +324,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   mint.save()
 }
 
+// Generate the withdraw entity
 export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address, to: Address): void {
   let transaction = getOrCreateTransaction(event)
 
@@ -363,6 +372,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.save()
 }
 
+// Handle swaps data and update entities volumes and fees 
 export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address, sender: Address, amount0In: BigInt, amount1In: BigInt, amount0Out: BigInt, amount1Out: BigInt): void {
 
   let protocol = getOrCreateDex()
@@ -433,13 +443,14 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   updateVolumeAndFees(event, trackedAmountUSD, feeUSD)
 }
 
-
+// Update store that tracks the deposit count per pool
 export function UpdateDepositHelper(poolAddress: Address): void {
   let poolDeposits = _HelperStore.load(poolAddress.toHexString())!
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
   poolDeposits.save()
 }
 
+// convert decimals 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
   let bd = BigDecimal.fromString('1')
   for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
@@ -447,7 +458,8 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   }
   return bd
 }
-  
+
+// convert emitted values to tokens count
 export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
   if (exchangeDecimals == INT_ZERO) {
     return tokenAmount.toBigDecimal()

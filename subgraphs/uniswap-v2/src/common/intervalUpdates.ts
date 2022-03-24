@@ -10,6 +10,7 @@ import { INT_ONE, SECONDS_PER_DAY} from "../common/constants"
 import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot, getOrCreateUsersHelper } from "./getters";
 
 
+// Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
 
     let financialMetrics = getOrCreateFinancials(event);
@@ -23,11 +24,13 @@ export function updateFinancials(event: ethereum.Event): void {
     financialMetrics.save();
 }
   
+// Update UsageMetricsDailySnapshot entity
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
     let usageMetrics = getOrCreateUsageMetricSnapshot(event) 
     let uniqueUsersTotal = getOrCreateUsersHelper()
 
+    // Increment total unique users and unique users per day
     if (createAndIncrementAccount(from) == true){
         uniqueUsersTotal.valueInt += INT_ONE
     }
@@ -45,7 +48,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     usageMetrics.save()
 }
   
-  export function updatePoolMetrics(event: ethereum.Event): void {
+// Update UsagePoolDailySnapshot entity
+export function updatePoolMetrics(event: ethereum.Event): void {
 
     // get or create pool metrics
     let poolMetrics = getOrCreatePoolDailySnapshot(event)
@@ -61,8 +65,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   
     poolMetrics.save();
 }
-  
-  export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, feeUSD: BigDecimal): void {
+
+// Update the volume and accrued fees for all relavant entities 
+export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, feeUSD: BigDecimal): void {
     let pool = getLiquidityPool(event.address.toHexString())
     let poolMetrics = getOrCreatePoolDailySnapshot(event);
     let financialMetrics = getOrCreateFinancials(event);
@@ -79,6 +84,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     pool.save()
 }
 
+// Create Account entity for participating account 
 export function createAndIncrementAccount(accountId: Address): bool {
     let account = _Account.load(accountId.toHexString())
     if (!account) {
@@ -90,6 +96,7 @@ export function createAndIncrementAccount(accountId: Address): bool {
     return false
 }
 
+// Create DailyActiveAccount entity for participating account
 export function createAndIncrementDailyAccount(event: ethereum.Event, accountId: Address): bool {
     // Number of days since Unix epoch
     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
