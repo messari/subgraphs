@@ -12,8 +12,8 @@ export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
 }
 
-export function normalizedUsdcPrice(usdcPrice: BigInt): BigDecimal {
-  return usdcPrice.toBigDecimal().div(constants.USDC_DENOMINATOR)
+export function normalizedUsdcPrice(usdcPrice: BigInt): BigInt {
+  return usdcPrice.div(constants.USDC_DENOMINATOR)
 }
 
 export function getOrCreateToken(address: Address): Token {

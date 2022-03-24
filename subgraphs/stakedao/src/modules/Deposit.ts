@@ -5,13 +5,13 @@ import {
 
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { getPriceOfCurveLpToken, getPriceOfStakedTokens } from "./Price";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function _Deposit(
   vault: VaultStore,
   _depositAmount: BigInt
-): Array<BigDecimal> {
+): BigDecimal {
   let _totalSupply = BigInt.fromString(vault.outputTokenSupply.toString());
   let _balance = BigInt.fromString(vault.inputTokenBalances[0].toString());
 
@@ -20,45 +20,40 @@ export function _Deposit(
     : _depositAmount.times(_totalSupply).div(_balance);
 
   vault.outputTokenSupply = vault.outputTokenSupply.plus(
-    _sharesMinted.toBigDecimal()
+    _sharesMinted
   );
   vault.inputTokenBalances = [
-    vault.inputTokenBalances[0].plus(_depositAmount.toBigDecimal()),
+    vault.inputTokenBalances[0].plus(_depositAmount),
   ];
 
-  let _decimals = BigInt.fromString(
-    constants.DEFAULT_DECIMALS_BIGDECIMAL.toString()
-  );
+  let _decimals = constants.DEFAULT_DECIMALS_BIGINT;
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   const amountUSD = utils.normalizedUsdcPrice(
     getPriceOfCurveLpToken(inputTokenAddress, _depositAmount, _decimals)
   );
 
-  vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD);
+  vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD.toBigDecimal());
   vault.totalValueLockedUSD = utils.normalizedUsdcPrice(
     getPriceOfCurveLpToken(
       inputTokenAddress,
       BigInt.fromString(vault.inputTokenBalances[0].toString()),
       _decimals
     )
-  );
+  ).toBigDecimal();
 
-  vault.outputTokenPriceUSD = utils.normalizedUsdcPrice(
-    getPriceOfStakedTokens(
-      Address.fromString(vault.id),
-      inputTokenAddress,
-      _decimals
-    )
-  );
+  vault.outputTokenPriceUSD = getPriceOfStakedTokens(
+    Address.fromString(vault.id),
+    inputTokenAddress,
+    _decimals
+  ).toBigDecimal();
   vault.save();
 
-  return [_sharesMinted.toBigDecimal(), amountUSD];
+  return amountUSD.toBigDecimal();
 }
 
 export function createDepositTransaction(
   call: ethereum.Call,
   _amount: BigInt,
-  _sharesMinted: BigDecimal,
   _amountUSD: BigDecimal
 ): DepositTransaction {
   let id = "deposit-" + call.transaction.hash.toHexString();
@@ -80,9 +75,8 @@ export function createDepositTransaction(
     if (vault) {
       transaction.asset = vault.inputTokens[0];
     }
-    transaction.amount = _amount.toBigDecimal();
+    transaction.amount = _amount;
     transaction.amountUSD = _amountUSD;
-    transaction.sharesMinted = _sharesMinted;
     transaction.save();
   }
 

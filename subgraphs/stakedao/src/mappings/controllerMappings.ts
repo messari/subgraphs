@@ -27,11 +27,11 @@ export function handleSetVault(call: SetVaultCall): void {
 
   const inputToken = getOrCreateToken(inputTokenAddress);
   vault.inputTokens = [inputToken.id];
-  vault.inputTokenBalances = [constants.BIGDECIMAL_ZERO];
+  vault.inputTokenBalances = [constants.BIGINT_ZERO];
 
   const outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
-  vault.outputTokenSupply = constants.BIGDECIMAL_ZERO;
+  vault.outputTokenSupply = constants.BIGINT_ZERO;
 
   vault.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
   vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
@@ -51,8 +51,8 @@ export function handleSetVault(call: SetVaultCall): void {
   let protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
   if (!protocol) {
     let protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-    protocol.name = "Yearn v1";
-    protocol.slug = "yearn-v1";
+    protocol.name = "Stake DAO";
+    protocol.slug = "stake-dao";
     protocol.network = constants.Network.ETHEREUM;
     protocol.type = constants.ProtocolType.YIELD;
     protocol._vaultIds.push(vaultAddress.toHexString())

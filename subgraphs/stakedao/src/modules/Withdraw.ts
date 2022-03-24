@@ -4,24 +4,22 @@ import {
 } from "../../generated/schema";
 
 import * as utils from "../common/utils";
+import { getPriceOfCurveLpToken } from "./Price";
 import * as constants from "../common/constants";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { getPriceOfCurveLpToken } from "./Price";
 
 export function _Withdraw(
   vault: VaultStore,
   _sharesBurnt: BigInt
-): Array<BigDecimal> {
+): Array<BigInt> {
   let _totalSupply = BigInt.fromString(vault.outputTokenSupply.toString());
   let _balance = BigInt.fromString(vault.inputTokenBalances[0].toString());
 
   let _withdrawAmount = _balance.times(_sharesBurnt).div(_totalSupply);
 
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(
-    _sharesBurnt.toBigDecimal()
-  );
+  vault.outputTokenSupply = vault.outputTokenSupply.minus(_sharesBurnt);
   vault.inputTokenBalances = [
-    vault.inputTokenBalances[0].minus(_withdrawAmount.toBigDecimal()),
+    vault.inputTokenBalances[0].minus(_withdrawAmount),
   ];
 
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
@@ -29,7 +27,7 @@ export function _Withdraw(
     getPriceOfCurveLpToken(
       inputTokenAddress,
       _withdrawAmount,
-      BigInt.fromString(constants.DEFAULT_DECIMALS_BIGDECIMAL.toString())
+      constants.DEFAULT_DECIMALS_BIGINT
     )
   );
 
@@ -37,18 +35,18 @@ export function _Withdraw(
     getPriceOfCurveLpToken(
       inputTokenAddress,
       BigInt.fromString(vault.inputTokenBalances[0].toString()),
-      BigInt.fromString(constants.DEFAULT_DECIMALS_BIGDECIMAL.toString())
+      constants.DEFAULT_DECIMALS_BIGINT
     )
-  );
+  ).toBigDecimal();
 
   vault.save();
 
-  return [_withdrawAmount.toBigDecimal(), amountUSD];
+  return [_withdrawAmount, amountUSD];
 }
 
 export function createWithdrawTransaction(
   call: ethereum.Call,
-  _amount: BigDecimal,
+  _amount: BigInt,
   _amountUSD: BigDecimal
 ): WithdrawTransaction {
   let tx = call.transaction;

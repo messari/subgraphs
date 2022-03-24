@@ -1,7 +1,7 @@
 import {
   VaultFee,
   Vault as VaultStore,
-  Strategy as StrategyStore,
+  _Strategy as StrategyStore,
 } from "../../generated/schema";
 import {
   SetWithdrawalFeeCall,
@@ -31,7 +31,7 @@ export function handleHarvested(event: HarvestedEvent): void {
       .div(BigInt.fromI32(100));
 
     vault!.inputTokenBalances = [
-      vault!.inputTokenBalances[0].plus(wantEarned.toBigDecimal()),
+      vault!.inputTokenBalances[0].plus(wantEarned),
     ];
 
     vault!.save();

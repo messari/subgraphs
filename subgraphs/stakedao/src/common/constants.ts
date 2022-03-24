@@ -38,11 +38,13 @@ export namespace RewardTokenType {
 
 export const ZERO_ADDRESS = "0x0";
 export const SECONDS_PER_DAY = 60 * 60 * 24;
-export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(1500);
 export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
+
+export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+
 export const ETHEREUM_PROTOCOL_ID =
   "0x29D3782825432255041Db2EAfCB7174f5273f08A";
 export const ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS =
@@ -53,14 +55,11 @@ export const ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS =
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
-export const BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-);
-export const DEFAULT_DECIMALS_BIGDECIMAL = BigDecimal.fromString('1000000000000000000');
+export const USDC_DENOMINATOR = BigInt.fromString("1000000");
+export const DEFAULT_DECIMALS_BIGINT = BigInt.fromString('1000000000000000000');
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
-export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
+export const DAYS_PER_YEAR = BigInt.fromI32(365);
+export const MS_PER_DAY = BigInt.fromI32(24 * 60 * 60 * 1000);
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+  BigInt.fromI32(24 * 60 * 60 * 1000)
 );

@@ -7,7 +7,7 @@ import {
   UsageMetricsDailySnapshot,
 } from "../../generated/schema";
 import * as constants from "../common/constants";
-import { BigInt, Address, log } from "@graphprotocol/graph-ts";
+import { BigInt, Address } from "@graphprotocol/graph-ts";
 
 export function updateFinancials(
   blockNumber: BigInt,
