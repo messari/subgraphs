@@ -82,7 +82,7 @@ type YieldAggregator implements Protocol @entity {
   ##### Yield-Specific #####
 
   " All vaults that belong to this protocol "
-  vaults: [Vault!]! @derivedFrom(field: "protocol")
+  _vaultIds: [String!]!
 }
 
 ###############################
@@ -120,10 +120,13 @@ type FinancialsDailySnapshot @entity {
 
   " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
   protocolTreasuryUSD: BigDecimal
+
   " Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
+  
   " Total volume in USD "
   totalVolumeUSD: BigDecimal!
+  
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 2.5% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   supplySideRevenueUSD: BigDecimal!
 

@@ -7,7 +7,7 @@ import {
 } from "../../generated/templates/Vault/Vault";
 
 import { BigInt, log } from "@graphprotocol/graph-ts";
-import { updateUsageMetrics } from "../common/metrics";
+import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
 import { Vault as VaultStore } from "../../generated/schema";
 import { _Deposit, createDepositTransaction } from "../modules/Deposit";
 import { createWithdrawTransaction, _Withdraw } from "../modules/Withdraw";
@@ -23,6 +23,7 @@ export function handleDeposit(call: DepositCall): void {
     createDepositTransaction(call, _depositAmount, values[0], values[1]);
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateFinancials(call.block.number, call.block.timestamp);
 }
 
 export function handleDepositAll(call: DepositAllCall): void {
@@ -50,6 +51,7 @@ export function handleDepositAll(call: DepositAllCall): void {
     createDepositTransaction(call, _depositAmount, values[0], values[1]);
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateFinancials(call.block.number, call.block.timestamp);
 }
 
 export function handleWithdraw(call: WithdrawCall): void {
@@ -63,6 +65,7 @@ export function handleWithdraw(call: WithdrawCall): void {
     createWithdrawTransaction(call, values[0], values[1]);
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  // updateFinancials(call.block.number, call.block.timestamp);
 }
 
 export function handleWithdrawAll(call: WithdrawAllCall): void {
@@ -91,5 +94,6 @@ export function handleWithdrawAll(call: WithdrawAllCall): void {
     );
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateFinancials(call.block.number, call.block.timestamp);
 }
 

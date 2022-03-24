@@ -1,12 +1,12 @@
 import * as constants from "../common/constants";
 import {
-  RevokeStrategyCall,
-  SetStrategyCall,
   SetVaultCall,
+  SetStrategyCall,
+  RevokeStrategyCall,
 } from "../../generated/Controller/EthereumController";
 
 import { getOrCreateToken } from "../common/utils";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, log, store } from "@graphprotocol/graph-ts";
 import { getOrCreateStrategy } from "../modules/Strategy";
 import { Vault as VaultTemplate } from "../../generated/templates";
 import { Vault as VaultStore, YieldAggregator } from "../../generated/schema";
@@ -38,7 +38,7 @@ export function handleSetVault(call: SetVaultCall): void {
 
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;
-
+  
   VaultTemplate.create(vaultAddress);
   vault.save();
 
@@ -49,8 +49,16 @@ export function handleSetVault(call: SetVaultCall): void {
   );
 
   let protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
-  if (protocol) {
-    protocol.vaults.push(vaultAddress.toHexString());
+  if (!protocol) {
+    let protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+    protocol.name = "Yearn v1";
+    protocol.slug = "yearn-v1";
+    protocol.network = constants.Network.ETHEREUM;
+    protocol.type = constants.ProtocolType.YIELD;
+    protocol._vaultIds.push(vaultAddress.toHexString())
+    protocol.save();
+  } else {
+    protocol._vaultIds.push(vaultAddress.toHexString())
     protocol.save();
   }
 
@@ -91,4 +99,11 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   }
 }
 
-export function handleRevokeStrategy(call: RevokeStrategyCall): void {}
+export function handleRevokeStrategy(call: RevokeStrategyCall): void {
+  store.remove('Strategy', call.inputs._strategy.toString())
+
+  log.warning("[RevokeStrategy]\n TxHash: {}, StrategyId: {}", [
+    call.transaction.hash.toHexString(),
+    call.inputs._strategy.toString(),
+  ]);
+}

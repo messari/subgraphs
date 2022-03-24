@@ -1,12 +1,12 @@
 import {
-  Strategy as StrategyStore,
-  Vault as VaultStore,
   VaultFee,
+  Vault as VaultStore,
+  Strategy as StrategyStore,
 } from "../../generated/schema";
 import {
-  Harvested as HarvestedEvent,
-  SetPerformanceFeeCall,
   SetWithdrawalFeeCall,
+  SetPerformanceFeeCall,
+  Harvested as HarvestedEvent,
 } from "../../generated/templates/Strategy/Strategy";
 
 import { BigInt, log } from "@graphprotocol/graph-ts";
@@ -37,8 +37,9 @@ export function handleHarvested(event: HarvestedEvent): void {
     vault!.save();
 
     log.warning(
-      "[handleHarvested]\n TxHash: {}, wantEarned: {}, origionalBalance: {}",
+      "[handleHarvested]\n TxHash: {}, eventAddress: {}, wantEarned: {}, origionalBalance: {}",
       [
+        event.transaction.hash.toHexString(),
         event.address.toHexString(),
         wantEarned.toString(),
         origionalBalance.toString(),
