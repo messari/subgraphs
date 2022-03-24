@@ -91,6 +91,7 @@ export function initializeLendingProtocol(): void {
       protocol.type = constants.PROTOCOL_TYPE_LENDING
       protocol.lendingType = constants.LENDING_TYPE_POOLED
       protocol.riskType = constants.RISK_TYPE_GLOBAL
+      protocol.version = "1.0.0"
       protocol.save()
     }
   }
@@ -177,8 +178,7 @@ export function getUsageMetrics(
 
   export function getFinancialSnapshot(
       timestamp: BigInt,
-      tokenAmount: BigInt,
-      tokenAddress: Address,
+      tokenAmountUSD: BigDecimal,
       transactionFee: BigInt,
       rate: BigInt,
       interactionType: string,
@@ -200,8 +200,6 @@ export function getUsageMetrics(
       financialsDailySnapshot.protocolSideRevenueUSD = constants.ZERO_BD;
       financialsDailySnapshot.feesUSD = constants.ZERO_BD;
     }
-
-    let tokenAmountUSD = getTokenAmountUSD(tokenAddress, tokenAmount);
 
     if (interactionType == constants.DEPOSIT_INTERACTION) {
         // Add value locked for operations like depositing
@@ -292,12 +290,23 @@ export function getUsageMetrics(
             log.error("Unable to get reserves for GEIST-FTM", [])
             return BigInt.fromI32(0)
         }
-        let reserveFTM = reserves.value.value0
+        let reserveFTM = reserves.value.value0;
         let reserveGEIST = reserves.value.value1;
 
         let priceGEISTinFTM = reserveFTM.div(reserveGEIST);
-        let priceFTMinUSD = priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_WFTM);        
-        return priceGEISTinFTM.times(priceFTMinUSD)
+        let priceFTMinUSD = priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_WFTM);
+        let priceGEISTinUSD = priceGEISTinFTM.times(priceFTMinUSD)
+        log.warning(
+            "SpookySwap LP: reserveFTM={}, reserveGEIST={}, priceGEISTinFTM={}, priceFTMinUSD={}, priceGEISTinUSD={}", 
+            [
+                reserveFTM.toString(), 
+                reserveGEIST.toString(),
+                priceGEISTinFTM.toString(),
+                priceFTMinUSD.toString(),
+                priceGEISTinUSD.toString()
+            ]
+        )
+        return priceGEISTinUSD
     }
     else if ((tokenAddress == addresses.TOKEN_ADDRESS_gWBTC) || (tokenAddress == addresses.TOKEN_ADDRESS_BTC)) {
         return priceOracle.getAssetPrice(addresses.TOKEN_ADDRESS_BTC);
