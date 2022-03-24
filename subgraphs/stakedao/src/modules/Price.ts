@@ -3,17 +3,19 @@ import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/templates/Vault/Vault";
 import { CalculationsCurve } from "../../generated/templates/Vault/CalculationsCurve";
 
-export function getPriceOfCurveLpToken(tokenAddress: Address, _amount: BigInt): BigInt {
+export function getPriceOfCurveLpToken(
+  tokenAddress: Address,
+  _amount: BigInt,
+  _decimals: BigInt
+): BigInt {
   const curveContract = CalculationsCurve.bind(
     Address.fromString(constants.ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS)
   );
 
   let tokenPrice = constants.BIGINT_ZERO;
   let try_isLpToken = curveContract.try_isCurveLpToken(tokenAddress);
-  
-  let isLpToken = try_isLpToken.reverted
-    ? false
-    : try_isLpToken.value
+
+  let isLpToken = try_isLpToken.reverted ? false : try_isLpToken.value;
 
   if (isLpToken) {
     let try_tokenPrice = curveContract.try_getCurvePriceUsdc(tokenAddress);
@@ -22,16 +24,20 @@ export function getPriceOfCurveLpToken(tokenAddress: Address, _amount: BigInt): 
       ? constants.BIGINT_ZERO
       : try_tokenPrice.value;
   }
-  return tokenPrice.times(_amount);
+  return tokenPrice.times(_amount.div(_decimals));
 }
 
-export function getVirtualPriceOfCurveLpToken(tokenAddress: Address): BigInt {
+export function getVirtualPriceOfCurveLpToken(
+  tokenAddress: Address,
+  _decimals: BigInt
+): BigInt {
   const curveContract = CalculationsCurve.bind(
     Address.fromString(constants.ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS)
   );
 
   let tokenPrice = constants.BIGINT_ZERO;
-  let isLpToken = curveContract.isCurveLpToken(tokenAddress);
+  let try_isLpToken = curveContract.try_isCurveLpToken(tokenAddress);
+  let isLpToken = try_isLpToken.reverted ? false : try_isLpToken.value;
 
   if (isLpToken) {
     let try_tokenPrice = curveContract.try_getVirtualPrice(tokenAddress);
@@ -40,13 +46,13 @@ export function getVirtualPriceOfCurveLpToken(tokenAddress: Address): BigInt {
       ? constants.BIGINT_ZERO
       : try_tokenPrice.value;
   }
-  return tokenPrice;
+  return tokenPrice.div(_decimals);
 }
 
 export function getPriceOfStakedTokens(
   vaultAddress: Address,
   tokenAddress: Address,
-  _amount: BigInt
+  _decimals: BigInt
 ): BigInt {
   const vaultContract = Vault.bind(vaultAddress);
 
@@ -56,7 +62,7 @@ export function getPriceOfStakedTokens(
     ? constants.BIGINT_ZERO
     : try_pricePerShare.value;
 
-  let virtualPrice = getVirtualPriceOfCurveLpToken(tokenAddress);
+  let virtualPrice = getVirtualPriceOfCurveLpToken(tokenAddress, _decimals);
 
-  return pricePerShare.times(virtualPrice).times(_amount);
+  return pricePerShare.div(_decimals).times(virtualPrice);
 }
