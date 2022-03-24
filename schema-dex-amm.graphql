@@ -47,7 +47,7 @@ type RewardToken @entity {
   symbol: String!
   decimals: Int!
 
-  type: RewardTokenType
+  type: RewardTokenType!
 }
 
 #############################
@@ -63,6 +63,9 @@ interface Protocol {
 
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
+  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
+  version: String!
 
   network: Network!
 
@@ -156,7 +159,7 @@ interface Pool {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -169,10 +172,10 @@ interface Pool {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -207,16 +210,16 @@ type PoolDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -241,6 +244,9 @@ type DexAmmProtocol implements Protocol @entity {
 
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
+  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
+  version: String!
 
   network: Network!
 
@@ -267,7 +273,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -280,10 +286,10 @@ type LiquidityPool @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -375,13 +381,13 @@ type Deposit implements Event @entity {
   inputTokens: [Token!]!
 
   " Output tokens of the transaction. E.g. the UNI-LP token "
-  outputTokens: [Token!]!
+  outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
-  inputTokenAmounts: [BigDecimal!]!
+  inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmounts: [BigDecimal!]!
+  outputTokenAmount: BigInt!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
@@ -419,13 +425,13 @@ type Withdraw implements Event @entity {
   inputTokens: [Token!]!
 
   " Output tokens of the transaction. E.g. WETH and USDC from a WETH-USDC pool "
-  outputTokens: [Token!]!
+  outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
-  inputTokenAmounts: [BigDecimal!]!
+  inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmounts: [BigDecimal!]!
+  outputTokenAmount: BigInt!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!

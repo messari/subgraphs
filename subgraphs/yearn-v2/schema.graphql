@@ -47,7 +47,7 @@ type RewardToken @entity {
   symbol: String!
   decimals: Int!
 
-  type: RewardTokenType
+  type: RewardTokenType!
 }
 
 #############################
@@ -63,6 +63,9 @@ interface Protocol {
 
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
+  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
+  version: String!
 
   network: Network!
 
@@ -82,6 +85,9 @@ type YieldAggregator implements Protocol @entity {
 
   " Slug of protocol, including version. e.g. yearn-v3 "
   slug: String!
+
+  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
+  version: String!
 
   network: Network!
 
@@ -197,10 +203,10 @@ interface Pool {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -235,16 +241,16 @@ interface PoolDailySnapshot {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: BigInt!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -306,10 +312,10 @@ type Vault @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the vault. The ordering should be the same as the vault's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -354,16 +360,16 @@ type VaultDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: BigInt!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -438,7 +444,7 @@ type Deposit implements Event @entity {
   asset: Token!
 
   " Amount of token deposited in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token deposited in USD "
   amountUSD: BigDecimal!
@@ -476,7 +482,7 @@ type Withdraw implements Event @entity {
   asset: Token!
 
   " Amount of token withdrawn in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token withdrawn in USD "
   amountUSD: BigDecimal!
