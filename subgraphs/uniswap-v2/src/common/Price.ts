@@ -1,8 +1,9 @@
 /* eslint-disable prefer-const */
-import { BigDecimal, Address, BigInt, log } from '@graphprotocol/graph-ts/index'
-import { factoryContract, UNTRACKED_PAIRS, safeDiv } from './helpers'
-import { LiquidityPool, Token, _HelperStore, _TokenTracker } from '../../generated/schema'
-import { ZERO_ADDRESS, BIGDECIMAL_ZERO, BIGDECIMAL_ONE, WETH_ADDRESS, USDC_WETH_PAIR, DAI_WETH_PAIR, USDT_WETH_PAIR, BIGINT_ZERO } from '../common/constants'
+import { BigDecimal, Address, log } from '@graphprotocol/graph-ts/index'
+import { UNTRACKED_PAIRS, safeDiv } from './helpers'
+import { getLiquidityPool, getOrCreateEtherHelper, getOrCreateTokenTracker } from './getters'
+import { LiquidityPool, _HelperStore, _TokenTracker } from '../../generated/schema'
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, WETH_ADDRESS, USDC_WETH_PAIR, DAI_WETH_PAIR, USDT_WETH_PAIR, INT_ZERO} from '../common/constants'
 
 function token0PairPrice(pool: LiquidityPool): BigDecimal {
   if (pool.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) return pool.inputTokenBalances[0].div(pool.inputTokenBalances[1])
@@ -42,7 +43,7 @@ export function getEthPriceInUSD(): BigDecimal {
   } else if (usdcPair !== null) {
     return token0PairPrice(usdcPair)
   } else {
-    return BIGDECIMAL_ONE
+    return BIGDECIMAL_ZERO
   }
 }
 
@@ -85,46 +86,10 @@ let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('400000')
 // minimum liquidity for price to get tracked
 let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
 
-/**
- * Search through graph to find derived Eth per token.
- * @todo update to be derived ETH (add stablecoin estimates)
- **/
-// export function findEthPerToken(token: Token): BigDecimal {
-//   if (token.id == WETH_ADDRESS) {
-//     return BIGDECIMAL_ONE
-//   }
-//   // loop through whitelist and check if paired with any
-//   for (let i = 0; i < WHITELIST.length; ++i) {
-//     let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
-//     if (pairAddress.toHexString() != ZERO_ADDRESS) {
-//       let pair = LiquidityPool.load(pairAddress.toHexString())
-//       if (pair == null){
-//         return BIGDECIMAL_ZERO
-//       }
-//       let token1 = Token.load(pair.inputTokens[1])
-//       if (token1 == null){
-//         return BIGDECIMAL_ZERO
-//       }
-//       let token1EthPrice = findEthPerToken(token1)
-//       if (pair.inputTokens[0] == token.id && token1EthPrice.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-//         return token1PairPrice(pair).times(token1EthPrice as BigDecimal) // return token1 per our token * Eth per token 1
-//       }
-//       let token0 = Token.load(pair.inputTokens[0])
-//       if (token0 == null){
-//         return BIGDECIMAL_ZERO
-//       }
-//       let token0EthPrice = findEthPerToken(token0)
-
-//       if (pair.inputTokens[1] == token.id && token0EthPrice.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-//         return token0PairPrice(pair).times(token0EthPrice as BigDecimal) // return token0 per our token * ETH per token 0
-//       }
-//     }
-//   }
-//   return BIGDECIMAL_ZERO // nothing was found return 0
-// }
-
-
 export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
+  if (tokenTracker.whitelistPools.length == INT_ZERO) {
+    return BIGDECIMAL_ZERO
+  }
   if (tokenTracker.id == WETH_ADDRESS) {
     return BIGDECIMAL_ONE
   }
@@ -133,8 +98,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   // need to update this to actually detect best rate based on liquidity distribution
   let largestLiquidityETH = BIGDECIMAL_ZERO
   let priceSoFar = BIGDECIMAL_ZERO
-  let ether = _HelperStore.load('ETH')
-  if (ether == null) return BIGDECIMAL_ZERO
+  let ether = getOrCreateEtherHelper()
 
   // hardcoded fix for incorrect rates
   // if whitelist includes token - get the safe price
@@ -143,13 +107,13 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
       let poolAddress = whiteList[i]
-      let pool = LiquidityPool.load(poolAddress)
-      if (pool == null) return BIGDECIMAL_ZERO
+      let pool = getLiquidityPool(poolAddress)
+
 
       if (pool.outputTokenSupply.gt(BIGDECIMAL_ZERO)) {
         if (pool.inputTokens[0] == tokenTracker.id) {
           // whitelist token is token1
-          let tokenTracker1 = _TokenTracker.load(pool.inputTokens[1])
+          let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
           if (tokenTracker1 == null) return BIGDECIMAL_ZERO
           // get the derived ETH in pool
           let ethLocked = pool.inputTokenBalances[1].times(tokenTracker1.derivedETH)
@@ -160,7 +124,8 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
           }
         }
         if (pool.inputTokens[1] == tokenTracker.id) {
-          let tokenTracker0 = _TokenTracker.load(pool.inputTokens[0])
+          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
+
           if (tokenTracker0 == null) return BIGDECIMAL_ZERO
           // get the derived ETH in pool
           let ethLocked = pool.inputTokenBalances[0].times(tokenTracker0.derivedETH)
@@ -190,8 +155,8 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   pool: LiquidityPool
 ): BigDecimal {
 
-  let ether = _HelperStore.load('ETH')
-  if (ether == null) return BIGDECIMAL_ZERO
+  let ether = getOrCreateEtherHelper()
+
   let price0 = tokenTracker0.derivedETH.times(ether.valueDecimal!)
   let price1 = tokenTracker1.derivedETH.times(ether.valueDecimal!)
   // dont count tracked volume on these pairs - usually rebass tokens

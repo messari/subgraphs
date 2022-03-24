@@ -41,6 +41,12 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW"
 }
 
+export namespace HelperStoreType {
+  export const ETHER = 'ETHER'
+  export const USERS = 'USERS'
+  // Pool addresses are also stored in the HelperStore
+}
+
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
@@ -53,6 +59,7 @@ export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("100000");
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
+export let BIGINT_THOUSAND = BigInt.fromI32(1000)
 export let BIGINT_MAX = BigInt.fromString(
   '115792089237316195423570985008687907853269984665640564039457584007913129639935'
 );
@@ -61,6 +68,7 @@ export let BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 
 export let INT_ZERO = 0 as i32
 export let INT_ONE = 1 as i32
+export let INT_TWO = 2 as i32
 
 export let MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export let DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
@@ -69,6 +77,10 @@ export let MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export let MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
+export let ERROR_NUM = 9999
+
+export let SWAP_FEE = "0.03"
+
 
 ///////
 //////////////

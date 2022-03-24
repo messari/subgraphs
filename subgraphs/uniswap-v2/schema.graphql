@@ -38,6 +38,7 @@ enum RewardTokenType {
   BORROW
 }
 
+"Uniswap does not have reward tokens so these field will always be empty"
 type RewardToken @entity {
   " Smart contract address of the market "
   id: ID!
@@ -149,7 +150,7 @@ interface Pool {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token!
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Uniswap does not have reward tokens so these field will always be empty "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -206,9 +207,10 @@ type PoolDailySnapshot @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  " Total amount of reward token emissions in a day, in token's native amount "
+  " Uniswap does not have reward tokens so these field will always be empty "
   rewardTokenEmissionsAmount: [BigDecimal!]
-  " Total amount of reward token emissions in a day, normalized to USD "
+
+  " Uniswap does not have reward tokens so these field will always be empty "
   rewardTokenEmissionsUSD: [BigDecimal!]
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -243,7 +245,7 @@ type LiquidityPool implements Pool @entity {
   inputTokens: [Token!]!
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token!
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Uniswap does not have reward tokens so these field will always be empty "
   rewardTokens: [RewardToken!]
   ##### Quantitative Data #####
   totalValueLockedUSD: BigDecimal!
@@ -463,7 +465,7 @@ type _HelperStore @entity {
   valueInt: Int
 
 }
-
+" This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
 type _TokenTracker @entity { 
   " Token Address "
   id: ID!

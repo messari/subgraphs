@@ -4,6 +4,7 @@ import { ERC20SymbolBytes } from '../../generated/Factory/ERC20SymbolBytes'
 import { ERC20NameBytes } from '../../generated/Factory/ERC20NameBytes'
 import { StaticTokenDefinition } from './staticTokenDefinition'
 import { Address } from '@graphprotocol/graph-ts'
+import { ERROR_NUM } from '../common/constants'
 
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
@@ -76,7 +77,7 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
       return staticTokenDefinition.decimals as i32
     }
     else {
-      return 9999 as i32
+      return ERROR_NUM as i32
     }
   }
 }
