@@ -1,18 +1,19 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import {
-  UsageMetricsDailySnapshot,
+  FinancialsDailySnapshot,
   Vault,
+  VaultDailySnapshot,
   YieldAggregator,
   _User as User,
 } from '../../generated/schema';
+import { getOrCreateUserSnapshot } from '../entities/Metrics';
+import { getOrCreateProtocol } from '../entities/Protocol';
 import { getDay } from '../utils/numbers';
 
-export function updateUsageMetrics(
-  user: User,
-  protocol: YieldAggregator,
-  metrics: UsageMetricsDailySnapshot,
-  block: ethereum.Block,
-): void {
+export function updateUsageMetrics(user: User, block: ethereum.Block): void {
+  let metrics = getOrCreateUserSnapshot(getDay(block.timestamp));
+  let protocol = getOrCreateProtocol();
+
   // no metrics yet, initialize
   if (metrics.blockNumber.equals(BigInt.zero())) {
     metrics.blockNumber = block.number;
@@ -43,18 +44,61 @@ export function updateUsageMetrics(
   metrics.save();
 }
 
-export function updateProtocol(
-  protocol: YieldAggregator,
+export function updateVault(
   vault: Vault,
-  metrics: UsageMetricsDailySnapshot,
+  inputTokenAddress: Address,
+  inputTokenAmount: BigInt,
 ): void {
-  if (protocol.vaults.indexOf(vault.id) === -1) {
-    protocol.vaults.concat([vault.id]);
+  let index = vault.inputTokens.indexOf(inputTokenAddress.toHex());
+
+  if (index === -1) {
+    vault.inputTokens = vault.inputTokens.concat([inputTokenAddress.toHex()]);
+    vault.inputTokenBalances = vault.inputTokenBalances.concat([inputTokenAmount]);
   }
 
-  if (protocol.usageMetrics.indexOf(metrics.id) === -1) {
-    protocol.usageMetrics = protocol.usageMetrics.concat([metrics.id]);
+  if (index !== -1) {
+    let balances = vault.inputTokenBalances;
+    balances[index] = balances[index].plus(inputTokenAmount);
+
+    vault.inputTokenBalances = balances;
   }
 
-  protocol.save();
+  vault.save();
+}
+
+export function updateFinancialMetrics(
+  metrics: FinancialsDailySnapshot,
+  protocol: YieldAggregator,
+  block: ethereum.Block,
+): void {
+  if (metrics.blockNumber.equals(BigInt.zero())) {
+    metrics.timestamp = block.timestamp;
+    metrics.blockNumber = block.number;
+  }
+
+  metrics.protocol = protocol.id;
+  metrics.save();
+}
+
+export function updateVaultMetrics(
+  metrics: VaultDailySnapshot,
+  inputTokenAmount: BigInt,
+  isDeposit: bool,
+  block: ethereum.Block,
+): void {
+  let currentBalance = metrics.inputTokenBalances;
+
+  if (metrics.blockNumber.equals(BigInt.zero())) {
+    metrics.timestamp = block.timestamp;
+    metrics.blockNumber = block.number;
+  }
+
+  if (isDeposit) {
+    currentBalance = currentBalance.plus(inputTokenAmount);
+  } else {
+    currentBalance = currentBalance.minus(inputTokenAmount);
+  }
+
+  metrics.inputTokenBalances = currentBalance;
+  metrics.save();
 }

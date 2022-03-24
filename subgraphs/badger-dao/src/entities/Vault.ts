@@ -17,17 +17,14 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.totalValueLockedUSD = BigDecimal.zero();
   vault.totalVolumeUSD = BigDecimal.zero();
   vault.inputTokenBalances = [];
-  vault.outputTokenSupply = BigDecimal.zero();
+  vault.outputTokenSupply = BigInt.zero();
   vault.outputTokenPriceUSD = BigDecimal.zero();
   vault.createdTimestamp = block.timestamp;
   vault.createdBlockNumber = block.number;
-  vault.snapshots = [];
   vault.name = '';
   vault.symbol = '';
   vault.depositLimit = BigInt.zero();
   vault.fees = [];
-  vault.deposits = [];
-  vault.withdraws = [];
   vault.save();
 
   return vault;

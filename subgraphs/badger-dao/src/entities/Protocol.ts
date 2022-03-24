@@ -1,6 +1,11 @@
-import { dataSource } from '@graphprotocol/graph-ts';
 import { YieldAggregator } from '../../generated/schema';
-import { PROTOCOL_ID, PROTOCOL_NAME, PROTOCOL_SLUG, PROTOCOL_TYPE } from '../constant';
+import {
+  PROTOCOL_ID,
+  PROTOCOL_NAME,
+  PROTOCOL_NETWORK,
+  PROTOCOL_SLUG,
+  PROTOCOL_TYPE,
+} from '../constant';
 
 export function getOrCreateProtocol(): YieldAggregator {
   const id = PROTOCOL_ID.toHex();
@@ -15,11 +20,9 @@ export function getOrCreateProtocol(): YieldAggregator {
   // TODO: values to verify
   protocol.name = PROTOCOL_NAME;
   protocol.slug = PROTOCOL_SLUG;
-  protocol.network = dataSource.network().toUpperCase();
+  protocol.network = PROTOCOL_NETWORK;
   protocol.type = PROTOCOL_TYPE;
-  protocol.usageMetrics = [];
-  protocol.financialMetrics = [];
-  protocol.vaults = [];
+  protocol.save();
 
   return protocol;
 }
