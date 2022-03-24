@@ -8,6 +8,9 @@ export const ADDRESS_ZERO = Address.fromString("0x000000000000000000000000000000
 // "factory" address (Comptroller.sol)
 export const COMPTROLLER_ADDRESS = Address.fromString("0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b")
 
+// PriceOracle Addresses
+export const PRICE_ORACLE1_ADDRESS = Address.fromString("0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904")
+
 // COMP address
 // TODO: might not be necessary
 export const COMP_ADDRESS = Address.fromString("0xc00e94cb662c3520282e6f5717214004a7f26888")

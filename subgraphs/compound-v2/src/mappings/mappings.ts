@@ -15,6 +15,10 @@ import {
   NewComptroller, // comptroller update
 } from "../types/cCOMP/cToken"
 
+import {
+  NewPriceOracle
+} from "../types/Comptroller/Comptroller"
+
 import { 
   Token,
   LendingProtocol,
@@ -35,7 +39,8 @@ import {
     NETWORK_ETHEREUM,
     PROTOCOL_TYPE_LENDING,
     PROTOCOL_NAME,
-    PROTOCOL_SLUG
+    PROTOCOL_SLUG,
+    PROTOCOL_VERSION
   } from "../common/constants"
 
 // TODO: remove
@@ -72,7 +77,9 @@ export function handleMint(event: Mint): void {
   // create a mapping between cToken to token address
   // deposit.token = 
   event.transaction.input
-  deposit.amount = event.params.mintAmount.toBigDecimal()
+
+  // TODO: change to actual amount not 8000000...00
+  deposit.amount = event.params.mintAmount
   // TODO get usd price
   // https://github.com/compound-finance/compound-v2-subgraph/blob/master/src/mappings/markets.ts#L26
   // https://github.com/compound-finance/compound-v2-subgraph/blob/master/src/mappings/markets.ts#L80
@@ -98,3 +105,22 @@ export function handleNewComptroller(event: NewComptroller): void {}
   
 //   deposit.save()
 // }
+
+export function handleNewPriceOracle(event: NewPriceOracle): void {
+  // create LendingProtocol - first function to be called in Comptroller
+  let lendingProtocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())
+  if (lendingProtocol == null) {
+    lendingProtocol = new LendingProtocol(COMPTROLLER_ADDRESS.toHexString())
+    lendingProtocol.name = PROTOCOL_NAME
+    lendingProtocol.slug = PROTOCOL_SLUG
+    lendingProtocol.version = PROTOCOL_VERSION
+    lendingProtocol.network = NETWORK_ETHEREUM
+    lendingProtocol.type = PROTOCOL_TYPE_LENDING
+
+    // create empty lists that will be populated each day
+    lendingProtocol.usageMetrics = []
+    lendingProtocol.financialMetrics = []
+  }
+  lendingProtocol._priceOracle = event.params.newPriceOracle
+  lendingProtocol.save()
+}

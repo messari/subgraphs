@@ -14,7 +14,9 @@ import {
 
 import { 
     MARKET_LIST,
-    ADDRESS_ZERO
+    ADDRESS_ZERO,
+    COMPTROLLER_ADDRESS,
+    PRICE_ORACLE1_ADDRESS
  } from "../common/addresses"
 import {
     NETWORK_ETHEREUM,
@@ -22,7 +24,7 @@ import {
     PROTOCOL_NAME,
     PROTOCOL_SLUG
 } from "../common/constants"
-import { Address } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal } from "@graphprotocol/graph-ts"
 
 // find market address
 export function findMarketAddress(address: Address | null): Address {
@@ -40,6 +42,8 @@ export function findMarketAddress(address: Address | null): Address {
 // TODO: helper for converting uni time to days
 
 // TODO: create new market
+
+// TODO: update market
 
 // create a LendingProtocol based off params
 export function createLendingProtocol(
@@ -62,4 +66,21 @@ export function createLendingProtocol(
     return lendingProtocol
 }
 
-// TODO: create function to get usd price
+// get price of erc20 tokens (NOT eth)
+function getTokenPrice(
+    blockNumber: i32,
+    eventAddress: Address,
+    assetAddress: Address,
+    assetDecimals: i32
+): BigDecimal {
+    let lendingProtocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())
+    let oracle2Address = lendingProtocol?._priceOracle as Address
+    let underlyingPrice: BigDecimal
+    let oracle1Address = PRICE_ORACLE1_ADDRESS
+
+    /**
+     * Note: The first Price oracle was only used for the first ~100 blocks:
+     *    https://etherscan.io/address/0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904
+     * 
+     */
+}
