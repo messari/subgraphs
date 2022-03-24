@@ -27,3 +27,9 @@ export const REWARD_INTERACTION = "REWARD";
 export const REPAY_INTERACTION = "REPAY";
 export const STAKE_INTERACTION = "STAKE";
 export const UNSTAKE_INTERACTION = "UNSTAKE";
+
+export const LENDING_TYPE_POOLED = "POOLED";
+export const LENDING_TYPE_CDP = "CDP";
+
+export const RISK_TYPE_GLOBAL = "GLOBAL";
+export const RISK_TYPE_ISOLATED = "ISOLATED";

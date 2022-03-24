@@ -63,7 +63,8 @@ import {
   initializeToken, 
   initializeRewardToken,
   getUsageMetrics,
-  getFinancialSnapshot
+  getFinancialSnapshot,
+  initializeLendingProtocol
 } from './helpers';
 
 import { 
@@ -77,20 +78,8 @@ import {
 // supplySideRevenueUSD = rewards paid to depositors
 // protocolSideRevenueUSD = fees
 
-function createProtocol(): void {
-  let protocol = LendingProtocolEntity.load(constants.PROTOCOL_ID)
-  if (!protocol) {
-    protocol = new LendingProtocolEntity(constants.PROTOCOL_ID)
-    protocol.name = "Geist Finance"
-    protocol.slug = "geist-finance"
-    protocol.network = constants.NETWORK_FANTOM
-    protocol.type = constants.PROTOCOL_TYPE_LENDING
-    protocol.save()
-  }
-}
-
 export function handleAddressesProviderRegistered(event: AddressesProviderRegistered): void {
-  createProtocol()
+  initializeLendingProtocol()
 
   let address = event.params.newAddress.toHexString()
   LendingPoolAddressesProvider.create(Address.fromString(address))

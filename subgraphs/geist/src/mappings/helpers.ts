@@ -10,6 +10,7 @@ import { GeistToken as TokenContract } from "../../generated/GeistToken/GeistTok
 import { 
     Token as TokenEntity, 
     RewardToken as RewardTokenEntity, 
+    LendingProtocol as LendingProtocolEntity,
     UsageMetricsDailySnapshot as UsageMetricsDailySnapshotEntity, 
     UniqueUsers as UniqueUsersEntity,
     FinancialsDailySnapshot as FinancialsDailySnapshotEntity,
@@ -80,6 +81,20 @@ export function initializeRewardToken(address: Address, rewardType: string): Rew
     return rewardToken;
 }
 
+export function initializeLendingProtocol(): void {
+    let protocol = LendingProtocolEntity.load(constants.PROTOCOL_ID)
+    if (!protocol) {
+      protocol = new LendingProtocolEntity(constants.PROTOCOL_ID)
+      protocol.name = "Geist Finance"
+      protocol.slug = "geist-finance"
+      protocol.network = constants.NETWORK_FANTOM
+      protocol.type = constants.PROTOCOL_TYPE_LENDING
+      protocol.lendingType = constants.LENDING_TYPE_POOLED
+      protocol.riskType = constants.RISK_TYPE_GLOBAL
+      protocol.save()
+    }
+  }
+  
 export function getUsageMetrics(
     block_number: BigInt, 
     timestamp: BigInt, 
