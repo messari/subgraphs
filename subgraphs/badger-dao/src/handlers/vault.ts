@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
+import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts';
 import { Vault, VaultFee } from '../../generated/schema';
 import { SettVault } from '../../generated/templates';
 import { BadgerController } from '../../generated/templates/SettVault/BadgerController';
@@ -14,6 +14,7 @@ import { readValue } from '../utils/contracts';
 export function handleNewVault(event: NewVault): void {
   const address = event.params.vault;
   let vault = Vault.load(address.toHex());
+  log.debug('[BADGER] handling new vault: {}', [address.toHex()]);
 
   if (vault === null) {
     let sett = BadgerSett.bind(address);
@@ -23,6 +24,11 @@ export function handleNewVault(event: NewVault): void {
     if (name.length > 0) {
       let tokenAddress = readValue<Address>(sett.try_token(), NULL_ADDRESS);
       let token = getOrCreateToken(tokenAddress);
+
+      log.debug('[BADGER] Vault found: {} Input Token: {}', [
+        address.toHex(),
+        tokenAddress.toHex(),
+      ]);
 
       token.name = name;
       token.symbol = readValue<string>(sett.try_name(), '');
@@ -34,15 +40,19 @@ export function handleNewVault(event: NewVault): void {
       vault.inputTokens = vault.inputTokens.concat([token.id]);
       vault.outputToken = getOrCreateToken(address).id;
       vault.depositLimit = readValue<BigInt>(sett.try_max(), BigInt.zero());
-      vault.outputTokenSupply = readValue<BigInt>(
-        sett.try_totalSupply(),
-        BigInt.zero(),
-      ).toBigDecimal();
+      vault.outputTokenSupply = readValue<BigInt>(sett.try_totalSupply(), BigInt.zero());
       vault.outputTokenPriceUSD = BigDecimal.zero(); // TODO: calc
       vault.name = name;
       vault.symbol = token.symbol;
       vault.fees = getFees(sett, tokenAddress).map<string>(fee => fee.id);
       vault.save();
+
+      // adding vault to protocol
+      let protocol = getOrCreateProtocol();
+      if (protocol.vaults.indexOf(address.toHex()) === -1) {
+        protocol.vaults = protocol.vaults.concat([address.toHex()]);
+        protocol.save();
+      }
 
       // starting template indexing
       SettVault.create(address);
@@ -53,11 +63,13 @@ export function handleNewVault(event: NewVault): void {
 function getFees(sett: BadgerSett, token: Address): VaultFee[] {
   let fees: VaultFee[] = [];
 
+  log.debug('[BADGER] getting fees', []);
   let controller = readValue<Address>(sett.try_controller(), NULL_ADDRESS);
   if (controller.equals(NULL_ADDRESS)) {
     return [];
   }
 
+  log.debug('[BADGER] controller found {}', [controller.toHex()]);
   let controllerContract = BadgerController.bind(controller);
   let strategy = readValue<Address>(
     controllerContract.try_strategies(token),
@@ -67,6 +79,7 @@ function getFees(sett: BadgerSett, token: Address): VaultFee[] {
     return [];
   }
 
+  log.debug('[BADGER] strategy found {}', [strategy.toHex()]);
   let strategyContract = BadgerStrategy.bind(strategy);
   let withDrawFee = new VaultFee(
     strategy

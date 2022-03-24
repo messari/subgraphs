@@ -27,11 +27,15 @@ dataSources:
           file: ./abis/VaultRegistry.json
         - name: BadgerSett
           file: ./abis/BadgerSett.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: BadgerController
+          file: ./abis/BadgerController.json
+        - name: BadgerStrategy
+          file: ./abis/BadgerStrategy.json
       eventHandlers:
         - event: NewVault(address,string,address)
           handler: handleNewVault
-        - event: PromoteVault(address,string,address,uint8)
-          handler: handlePromoteVault
       file: ./src/handlers/vault.ts
   {{/registry}}
 

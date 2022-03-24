@@ -41,3 +41,27 @@ yarn run test
 graph auth --product hosted-service <access-token>
 graph deploy --product hosted-service <username/subgraph-name>
 ```
+
+## Pending Things
+
+- financial daily snapshot (entity)
+    - total values locked usd
+    - protocol treasury usd
+    - protocol controlled usd
+    - total volume usd
+    - supply side revenue usd
+    - fees usd
+- vault entity
+    - reward tokens
+    - total volume locked usd
+    - total volume usd
+- vault daily snapshot (entity)
+    - total value locked usd
+    - total volume usd
+    - output token price usd
+    - reward token emissions amount
+    - reward token emission usd
+- deposit
+    - amount usd
+- withdraw
+    - amount usd

@@ -24,7 +24,7 @@ export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
   deposit.timestamp = BigInt.zero();
   deposit.vault = '';
   deposit.asset = '';
-  deposit.amount = BigDecimal.zero();
+  deposit.amount = BigInt.zero();
   deposit.amountUSD = BigDecimal.zero();
   deposit.save();
 
@@ -54,7 +54,7 @@ export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt): Withdraw {
   withdraw.timestamp = BigInt.zero();
   withdraw.vault = '';
   withdraw.asset = '';
-  withdraw.amount = BigDecimal.zero();
+  withdraw.amount = BigInt.zero();
   withdraw.amountUSD = BigDecimal.zero();
   withdraw.save();
 

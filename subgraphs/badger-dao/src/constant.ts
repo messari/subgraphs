@@ -12,6 +12,7 @@ export const PROTOCOL_ID = Address.fromString(
 export const PROTOCOL_NAME = 'Badger DAO';
 export const PROTOCOL_SLUG = 'badger';
 export const PROTOCOL_TYPE = 'YIELD';
+export const PROTOCOL_NETWORK = 'ETHEREUM';
 
 // null address
 export const NULL_ADDRESS = Address.fromString(
