@@ -1,6 +1,6 @@
 import { Address } from "@graphprotocol/graph-ts";
 
-import { ERC20 } from "../../generated/MainRegistry/ERC20";
+import { ERC20 } from "../../generated/Factory/ERC20";
 
 import { Token } from "../../generated/schema";
 import { ZERO_ADDRESS } from "./constant";

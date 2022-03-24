@@ -27,6 +27,11 @@ enum ProtocolType {
 ######## Internal Entities ############
 #######################################
 
+enum PoolType {
+  META
+  PLAIN
+  LEND
+}
 # An account is a unique Ethereum address
 type Account @entity {
   " Address of the account "
@@ -36,6 +41,63 @@ type Account @entity {
 type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
+}
+
+type BasePool @entity {
+  id: ID!
+  address: Bytes!
+}
+
+type Coin @entity {
+  " Equals to: <pool_id>-<coin_index>"
+  id: ID!
+
+  " Coin index "
+  index: Int!
+
+  pool: LiquidityPool!
+
+  token: Token!
+
+  underlying: UnderlyingCoin!
+
+  balance: BigDecimal!
+
+  " Exchange rate between this coin and the associated underlying coin within the pool "
+  rate: BigDecimal
+
+  " Coin Balance in USD"
+  balanceUSD: BigDecimal!
+
+  " All time accrued coin fee"
+  feeBalance: BigDecimal!
+
+  " All time accrued coin fee in USD"
+  feeBalanceUSD: BigDecimal!
+
+  updated: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTransaction: Bytes!
+}
+
+type UnderlyingCoin @entity {
+  " Equals to: <pool_id>-<coin_index>"
+  id: ID!
+
+  " Coin index "
+  index: Int!
+
+  pool: LiquidityPool!
+
+  token: Token!
+
+  coin: Coin!
+
+  balance: BigDecimal!
+
+  updated: BigInt!
+  updatedAtBlock: BigInt!
+  updatedAtTransaction: Bytes!
 }
 
 ######################################
@@ -280,6 +342,28 @@ type LiquidityPool @entity {
   " The protocol this pool belongs to "
   protocol: DexAmmProtocol!
 
+  " Address of registry"
+  _factoryAddress: Bytes!
+
+  " Pool swap Address"
+  _swapAddress: Bytes!
+
+  " Base Pool"
+  _basePool: BasePool!
+
+  " Number of coins composing the pool "
+  _coinCount: BigInt!
+
+  " List of the swappable coins within the pool "
+  _coins: [Coin!] @derivedFrom(field: "pool")
+
+  " Number of underlying coins composing the pool "
+  _underlyingCount: BigInt!
+
+  " List of the swappable underlying coins within the pool "
+  _underlyingCoins: [UnderlyingCoin!] @derivedFrom(field: "pool")
+
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
@@ -324,6 +408,9 @@ type LiquidityPool @entity {
 
   "Liquidity Token Address"
   _lpTokenAddress: Bytes!
+
+  "Pool type (eg META, PLAIN, LENDING)"
+  _poolType: PoolType!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 

@@ -3,13 +3,13 @@ schema:
   file: ./schema.graphql
 dataSources:
 # Main registry contract used to locate pools and query information about them as well as registered coins
-  - name: MainRegistry
+  - name: Factory
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: Registry
-      address: '0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5'
-      startBlock: 12195750
+      abi: Factory
+      address: '0xB9fC157394Af804a3578134A6585C0dc9cc990d4'
+      startBlock: 12903979
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -19,24 +19,27 @@ dataSources:
       abis:
         - name: ERC20
           file: ./abis/IERC20.json
-        - name: PoolInfo
-          file: ./abis/PoolInfo.json
+        - name: Factory
+          file: ./abis/Factory.json
         - name: Registry
           file: ./abis/Registry.json
         - name: StableSwap
           file: ./abis/StableSwap.json
       eventHandlers:
-        - event: PoolRemoved(indexed address)
-          handler: handlePoolRemoved
+        - event: BasePoolAdded(address)
+          handler: handleBasePoolAdded
       callHandlers:
-        - function: add_metapool(address,uint256,address,uint256,string)
-          handler: handleAddMetaPool
-        - function: add_metapool(address,uint256,address,uint256,string,address)
-          handler: handleAddMeta1Pool
-        - function: add_pool(address,uint256,address,bytes32,uint256,uint256,bool,bool,string)
-          handler: handleAddPool
-        - function: add_pool_without_underlying(address,uint256,address,bytes32,uint256,uint256,bool,bool,string)
-          handler: handleAddPoolWithUnderlying
+        - function: deploy_metapool(address,string,string,address,uint256,uint256)
+          handler: handleDeployMetaPool
+        - function: deploy_metapool(address,string,string,address,uint256,uint256,uint256)
+          handler: handleDeployMetaPool1
+        - function: deploy_plain_pool(string,string,address[4],uint256,uint256)
+          handler: handleDeployPlainPool
+        - function: deploy_plain_pool(string,string,address[4],uint256,uint256,uint256)
+          handler: handleDeployPlainPool1
+        - function: deploy_plain_pool(string,string,address[4],uint256,uint256,uint256,uint256)
+          handler: handleDeployPlainPool2
+        
 templates:
   # Main pool contract
   - name: Pool
@@ -57,6 +60,8 @@ templates:
           file: ./abis/Registry.json
         - name: Oracle
           file: ./abis/Oracle.json
+        - name: Factory
+          file: ./abis/Factory.json
         - name: CalculationsCurve
           file: ./abis/CalculationsCurve.json
         - name: CalculationsSushiSwap
