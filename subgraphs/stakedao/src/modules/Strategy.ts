@@ -1,6 +1,6 @@
 import * as constants from "../common/constants";
 import {
-  Strategy,
+  _Strategy,
   Vault as VaultStore,
   VaultFee,
 } from "../../generated/schema";
@@ -47,7 +47,7 @@ export function getOrCreateStrategy(
   }
 
   if (strategyAddress != constants.ZERO_ADDRESS) {
-    const strategy = new Strategy(strategyAddress);
+    const strategy = new _Strategy(strategyAddress);
     const vault = VaultStore.load(vaultAddress.toHexString());
     const strategyContract = StrategyContract.bind(
       Address.fromString(strategyAddress)
