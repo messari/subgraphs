@@ -1,65 +1,77 @@
-import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
 import { Vault, VaultFee } from '../../generated/schema';
 import { SettVault } from '../../generated/templates';
 import { BadgerController } from '../../generated/templates/SettVault/BadgerController';
 import { BadgerStrategy } from '../../generated/templates/SettVault/BadgerStrategy';
 import { BadgerSett } from '../../generated/VaultRegistry/BadgerSett';
 import { NewVault } from '../../generated/VaultRegistry/VaultRegistry';
-import { DEFAULT_DECIMALS, NULL_ADDRESS } from '../constant';
+import { NULL_ADDRESS } from '../constant';
 import { getOrCreateProtocol } from '../entities/Protocol';
 import { getOrCreateToken } from '../entities/Token';
 import { getOrCreateVault } from '../entities/Vault';
 import { readValue } from '../utils/contracts';
+import { getPriceOfStakedTokens } from './price';
+import { createToken } from './tokens';
 
 export function handleNewVault(event: NewVault): void {
-  const address = event.params.vault;
-  let vault = Vault.load(address.toHex());
-  log.debug('[BADGER] handling new vault: {}', [address.toHex()]);
+  initializeVault(event.params.vault, event.block);
 
-  if (vault === null) {
-    let sett = BadgerSett.bind(address);
-    let name = readValue<string>(sett.try_name(), '');
-
-    // checking if it is a sett/vault
-    if (name.length > 0) {
-      let tokenAddress = readValue<Address>(sett.try_token(), NULL_ADDRESS);
-      let token = getOrCreateToken(tokenAddress);
-
-      log.debug('[BADGER] Vault found: {} Input Token: {}', [
-        address.toHex(),
-        tokenAddress.toHex(),
-      ]);
-
-      token.name = name;
-      token.symbol = readValue<string>(sett.try_name(), '');
-      token.decimals = readValue<i32>(sett.try_decimals(), DEFAULT_DECIMALS);
-      token.save();
-
-      vault = getOrCreateVault(address, event.block);
-      vault.protocol = getOrCreateProtocol().id;
-      vault.inputTokens = vault.inputTokens.concat([token.id]);
-      vault.outputToken = getOrCreateToken(address).id;
-      vault.depositLimit = readValue<BigInt>(sett.try_max(), BigInt.zero());
-      vault.outputTokenSupply = readValue<BigInt>(sett.try_totalSupply(), BigInt.zero());
-      vault.outputTokenPriceUSD = BigDecimal.zero(); // TODO: calc
-      vault.name = name;
-      vault.symbol = token.symbol;
-      vault.fees = getFees(sett, tokenAddress).map<string>(fee => fee.id);
-      vault.save();
-
-      // adding vault to protocol
-      let protocol = getOrCreateProtocol();
-      if (protocol.vaults.indexOf(address.toHex()) === -1) {
-        protocol.vaults = protocol.vaults.concat([address.toHex()]);
-        protocol.save();
-      }
-
-      // starting template indexing
-      SettVault.create(address);
-    }
-  }
+  // starting template indexing
+  SettVault.create(event.params.vault);
 }
 
+/**
+ * creates a new vault if it doesnt exists, initializes all the static values
+ * called when a new vault event is emitted or when transfer is called on
+ * transfer event of any sett token
+ */
+export function initializeVault(address: Address, block: ethereum.Block): Vault {
+  let vault = Vault.load(address.toHex());
+
+  // existing vault
+  if (vault) {
+    return vault;
+  }
+
+  vault = getOrCreateVault(address, block);
+  log.debug('[BADGER] handling new vault: {}', [address.toHex()]);
+  let sett = BadgerSett.bind(address);
+  let name = readValue<string>(sett.try_name(), '');
+
+  // checking if it is a sett/vault
+  if (name.length > 0) {
+    let tokenAddress = readValue<Address>(sett.try_token(), NULL_ADDRESS);
+    let token = createToken(tokenAddress);
+
+    log.debug('[BADGER] Vault found: {} Input Token: {}', [
+      address.toHex(),
+      tokenAddress.toHex(),
+    ]);
+
+    vault.protocol = getOrCreateProtocol().id;
+    vault.inputTokens = vault.inputTokens.concat([token.id]);
+    vault.inputTokenBalances = vault.inputTokenBalances.concat([BigInt.zero()]);
+    vault.outputToken = getOrCreateToken(address).id;
+    vault.depositLimit = readValue<BigInt>(sett.try_max(), BigInt.zero());
+    vault.outputTokenSupply = readValue<BigInt>(sett.try_totalSupply(), BigInt.zero());
+    vault.outputTokenPriceUSD = getPriceOfStakedTokens(
+      address,
+      tokenAddress,
+      BigInt.fromI32(token.decimals),
+    ).toBigDecimal();
+    vault.name = name;
+    vault.symbol = token.symbol;
+    vault.fees = getFees(sett, tokenAddress).map<string>(fee => fee.id);
+    vault.save();
+  }
+
+  return vault;
+}
+
+/**
+ * tries to get fees from sett -> controlerr -> strategy
+ * events of fees could be handled : TODO
+ */
 function getFees(sett: BadgerSett, token: Address): VaultFee[] {
   let fees: VaultFee[] = [];
 

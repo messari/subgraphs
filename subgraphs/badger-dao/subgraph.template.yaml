@@ -25,14 +25,16 @@ dataSources:
       abis:
         - name: VaultRegistry
           file: ./abis/VaultRegistry.json
-        - name: BadgerSett
-          file: ./abis/BadgerSett.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: BadgerSett
+          file: ./abis/BadgerSett.json
         - name: BadgerController
           file: ./abis/BadgerController.json
         - name: BadgerStrategy
           file: ./abis/BadgerStrategy.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
       eventHandlers:
         - event: NewVault(address,string,address)
           handler: handleNewVault
@@ -60,8 +62,18 @@ dataSources:
         - UsageMetricsDailySnapshot
         - Vault
       abis:
+        - name: VaultRegistry
+          file: ./abis/VaultRegistry.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: BadgerSett
+          file: ./abis/BadgerSett.json
+        - name: BadgerController
+          file: ./abis/BadgerController.json
+        - name: BadgerStrategy
+          file: ./abis/BadgerStrategy.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleReward
@@ -91,6 +103,14 @@ dataSources:
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: BadgerSett
+          file: ./abis/BadgerSett.json
+        - name: BadgerController
+          file: ./abis/BadgerController.json
+        - name: BadgerStrategy
+          file: ./abis/BadgerStrategy.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
@@ -125,7 +145,9 @@ templates:
           file: ./abis/BadgerController.json
         - name: BadgerStrategy
           file: ./abis/BadgerStrategy.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleSettTransfer
+          handler: handleTransfer
       file: ./src/handlers/tokens.ts
