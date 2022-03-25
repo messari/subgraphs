@@ -1,6 +1,5 @@
 import {
-  Address,
-  BigInt,
+  Address
 } from "@graphprotocol/graph-ts"
   
 // Initialize a Token Definition with the attributes

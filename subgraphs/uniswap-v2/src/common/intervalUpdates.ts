@@ -1,13 +1,15 @@
-import { BigDecimal, Address, log, ethereum } from "@graphprotocol/graph-ts"
+// import { log } from "@graphprotocol/graph-ts"
+import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
 
 import {
   _HelperStore,
   _TokenTracker,
   _Account,
-  _DailyActiveAccount
+  _DailyActiveAccount,
+  UsageMetricsDailySnapshot
 } from "../../generated/schema"
-import { INT_ONE, SECONDS_PER_DAY} from "../common/constants"
-import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot, getOrCreateUsersHelper } from "./getters";
+import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
+import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./getters";
 
 
 // Update FinancialsDailySnapshots entity
@@ -23,30 +25,47 @@ export function updateFinancials(event: ethereum.Event): void {
   
     financialMetrics.save();
 }
-  
-// Update UsageMetricsDailySnapshot entity
+
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
-
-    let usageMetrics = getOrCreateUsageMetricSnapshot(event) 
-    let uniqueUsersTotal = getOrCreateUsersHelper()
-
-    // Increment total unique users and unique users per day
-    if (createAndIncrementAccount(from) == true){
-        uniqueUsersTotal.valueInt += INT_ONE
-    }
-    if (createAndIncrementDailyAccount(event, from) == true){
-        usageMetrics.totalUniqueUsers += INT_ONE
-    }
+    // Number of days since Unix epoch
+    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+    let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+    let totalUniqueUsers = getOrCreateUsersHelper()
   
+    if (!usageMetrics) {
+      usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+      usageMetrics.protocol = FACTORY_ADDRESS
+      usageMetrics.activeUsers = 0;
+      usageMetrics.totalUniqueUsers = 0;
+      usageMetrics.dailyTransactionCount = 0;
+    }
+    
     // Update the block number and timestamp to that of the last transaction of that day
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
     usageMetrics.dailyTransactionCount += 1;
-    usageMetrics.totalUniqueUsers = uniqueUsersTotal.valueInt
-
-      
-    usageMetrics.save()
-}
+  
+    let accountId = from.toHexString()
+    let account = _Account.load(accountId)
+    if (!account) {
+      account = new _Account(accountId);
+      account.save();
+      totalUniqueUsers.valueInt += 1;
+    }
+    usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
+  
+    // Combine the id and the user address to generate a unique user id for the day
+    let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
+    let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+    if (!dailyActiveAccount) {
+      dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+      dailyActiveAccount.save();
+      usageMetrics.activeUsers += 1
+    }
+  
+    totalUniqueUsers.save();
+    usageMetrics.save();
+  }
   
 // Update UsagePoolDailySnapshot entity
 export function updatePoolMetrics(event: ethereum.Event): void {
@@ -82,33 +101,4 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
     poolMetrics.save();
     financialMetrics.save()
     pool.save()
-}
-
-// Create Account entity for participating account 
-export function createAndIncrementAccount(accountId: Address): bool {
-    let account = _Account.load(accountId.toHexString())
-    if (!account) {
-        account = new _Account(accountId.toHexString());
-        account.save();
-
-        return true
-    } 
-    return false
-}
-
-// Create DailyActiveAccount entity for participating account
-export function createAndIncrementDailyAccount(event: ethereum.Event, accountId: Address): bool {
-    // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-
-    // Combine the id and the user address to generate a unique user id for the day
-    let dailyActiveAccountId = id.toString() + "-" + accountId.toHexString()
-    let account = _DailyActiveAccount.load(dailyActiveAccountId)
-    if (!account) {
-        account = new _DailyActiveAccount(accountId.toHexString());
-        account.save();
-        
-        return true
-    } 
-    return false
 }

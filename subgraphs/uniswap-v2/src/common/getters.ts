@@ -1,5 +1,5 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts"
-
+// import { log } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import {
   Token,
   DexAmmProtocol,
@@ -13,16 +13,15 @@ import {
   _Burn,
   UsageMetricsDailySnapshot,
   PoolDailySnapshot,
-  FinancialsDailySnapshot
+  FinancialsDailySnapshot,
+  _LiquidityPoolAmounts
 } from "../../generated/schema"
-
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY } from "../common/constants"
-import { findEthPerToken, getEthPriceInUSD} from "./Price"
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE } from "../common/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
-    if (ether === null) {
+    if (!ether) {
         ether = new _HelperStore(HelperStoreType.ETHER)
         ether.valueDecimal = BIGDECIMAL_ZERO
         ether.save()
@@ -31,71 +30,43 @@ export function getOrCreateEtherHelper(): _HelperStore {
 }
 export function getOrCreateUsersHelper(): _HelperStore {
     let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
-    if (uniqueUsersTotal === null) {
+    if (!uniqueUsersTotal) {
         uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-        uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO
+        uniqueUsersTotal.valueInt = INT_ZERO
         uniqueUsersTotal.save()
     }
     return uniqueUsersTotal
 }
-export function createAndIncrementAccount(accountId: Address): bool {
-    let account = _Account.load(accountId.toHexString())
-    if (!account) {
-        account = new _Account(accountId.toHexString());
-        account.save();
 
-        return true
-    } 
-    return false
-}
-
-export function createAndIncrementDailyAccount(event: ethereum.Event, accountId: Address): bool {
-    // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-
-    // Combine the id and the user address to generate a unique user id for the day
-    let dailyActiveAccountId = id.toString() + "-" + accountId.toHexString()
-    let account = _DailyActiveAccount.load(dailyActiveAccountId)
-    if (!account) {
-        account = new _DailyActiveAccount(accountId.toHexString());
-        account.save();
-        
-        return true
-    } 
-    return false
-}
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
 
-  if (protocol === null) {
+  if (!protocol) {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
+    protocol.version = "1.0.0"
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE
 
     protocol.save()
-
-    // create new ether price storage object
-    let ether = getOrCreateEtherHelper()
-
-    // Tracks the total number of unique users of the protocol 
-    let uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-    uniqueUsersTotal.valueInt = INT_ZERO
-    uniqueUsersTotal.save()
   }  
   return protocol
 }
 
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
-  }
+}
+
+export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
+    return _LiquidityPoolAmounts.load(poolAddress)!
+}
 
 export function getOrCreateToken(tokenAddress: Address): Token {
     let token = Token.load(tokenAddress.toHexString())
     // fetch info if null
-    if (token === null) {
+    if (!token) {
         token = new Token(tokenAddress.toHexString())
         token.symbol = fetchTokenSymbol(tokenAddress)
         token.name = fetchTokenName(tokenAddress)
@@ -108,7 +79,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
     // fetch info if null
-    if (tokenTracker === null) {
+    if (!tokenTracker) {
 
         tokenTracker = new _TokenTracker(tokenAddress.toHexString())
 
@@ -130,7 +101,7 @@ export function getBurn(id: string): _Burn {
 export function getOrCreateTransaction(event: ethereum.Event): _Transaction {
     let transactionHash = event.transaction.hash.toHexString()
     let transaction = _Transaction.load(transactionHash)
-    if (transaction == null) {    
+    if (!transaction) {    
         transaction = new _Transaction(transactionHash)
         transaction.blockNumber = event.block.number
         transaction.timestamp = event.block.timestamp
@@ -142,7 +113,7 @@ export function getOrCreateTransaction(event: ethereum.Event): _Transaction {
 export function createMint(event: ethereum.Event, length: i32): _Mint {
     let id = event.transaction.hash.toHexString().concat('-').concat(BigInt.fromI32(length).toString())
     let mint = _Mint.load(id)
-    if (mint == null) {mint = new _Mint(id)}
+    if (!mint) {mint = new _Mint(id)}
     mint.save()
 
     return mint
@@ -214,4 +185,3 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     }
     return financialMetrics
 }
-

@@ -1,4 +1,4 @@
-import { log } from '@graphprotocol/graph-ts'
+// import { log } from '@graphprotocol/graph-ts'
 import { PairCreated } from './../generated/Factory/Factory'
 import { getOrCreateDex, getOrCreateToken, getOrCreateTokenTracker } from './common/getters'
 import { CreateLiquidityPool, UpdateTokenWhitelists } from './common/helpers'

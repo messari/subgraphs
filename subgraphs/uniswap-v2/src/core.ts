@@ -1,5 +1,4 @@
-/* eslint-disable prefer-const */
-import { log } from '@graphprotocol/graph-ts'
+// import { log } from '@graphprotocol/graph-ts'
 import {
   _Transaction, 
   _HelperStore,
@@ -8,7 +7,6 @@ import {
 
 import { Mint, Burn, Swap, Transfer, Sync } from '../generated/templates/Pair/Pair'
 import {
-  convertTokenToDecimal,
   updateInputTokenBalances,
   updateTvlAndTokenPrices,
   handleTransferMint,
@@ -27,13 +25,11 @@ import {
 
 import {
   BIGINT_THOUSAND,
-  DEFAULT_DECIMALS,
   ZERO_ADDRESS,
 } from './common/constants'
 
 export function handleTransfer(event: Transfer): void {
-  // liquidity token amount being transfered
-  let value = convertTokenToDecimal(event.params.value, DEFAULT_DECIMALS)
+
 
   // ignore initial transfers for first adds
   if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
@@ -42,18 +38,18 @@ export function handleTransfer(event: Transfer): void {
 
   // mints
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
-    handleTransferMint(event, value, event.params.to)  
+    handleTransferMint(event, event.params.value, event.params.to)  
   } 
 
   // Case where direct send first on ETH withdrawls.
   // For burns, mint tokens are first transferred to the pool before transferred for burn.
   if (event.params.to == event.address) {
-    handleTransferToPool(event, value, event.params.to, event.params.from)
+    handleTransferToPool(event, event.params.value, event.params.to, event.params.from)
   }
 
   // burn
   if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from == event.address) {
-    handleTransferBurn(event, value, event.params.to, event.params.from)
+    handleTransferBurn(event, event.params.value, event.params.to, event.params.from)
   }
 }
 
