@@ -24,7 +24,8 @@ import {
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
     USDC_DECIMALS,
-    PROTOCOL_VERSION
+    PROTOCOL_VERSION.
+    PROTOCOL_RISK_TYPE
 } from "../common/constants"
 import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts"
 import { PriceOracle2 } from "../types/Comptroller/PriceOracle2"
@@ -45,16 +46,22 @@ export function createLendingProtocol(): LendingProtocol {
     lendingProtocol.version = PROTOCOL_VERSION
     lendingProtocol.network = NETWORK_ETHEREUM
     lendingProtocol.type = PROTOCOL_TYPE_LENDING
+    lendingProtocol.riskType = PROTOCOL_RISK_TYPE
 
     // create empty lists that will be populated each day
     // No need to set these as empty. just add to them
     // lendingProtocol.usageMetrics = []
     // lendingProtocol.financialMetrics = []
+    // lendingProtocol.markets = []
+
+    
 
     return lendingProtocol
 }
 
 // get usd price of cerc20 tokens (NOT eth)
+// TODO: broken for eth -i think it is decimals
+// TODO: erc20 token decimals messed up i think
 export function getTokenPrice(
     blockNumber: i32,
     eventAddress: Address,
@@ -65,7 +72,7 @@ export function getTokenPrice(
     if (protocol == null) {
         protocol = createLendingProtocol()
     }
-    let oracle2Address = protocol._priceOracle
+    let oracle2Address = changetype<Address>(protocol._priceOracle)
     let underlyingPrice: BigDecimal
     let mantissaFactorBD = exponentToBigDecimal(18)
 
@@ -110,7 +117,7 @@ export function getcETHPrice(blockNumber: i32): BigDecimal {
         protocol = createLendingProtocol()
     }    
     // TODO: fix this: https://discord.com/channels/438038660412342282/438070183794573313/937998440045117440
-    let oracle2Address = protocol._priceOracle
+    let oracle2Address = changetype<Address>(protocol._priceOracle)
     let usdcPrice: BigDecimal
     let mantissaFactorBD = exponentToBigDecimal(18)
 

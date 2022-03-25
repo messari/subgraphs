@@ -16,9 +16,10 @@ export let ONE_BD  = BigDecimal.fromString("1")
 // protocol constants
 export const NETWORK_ETHEREUM      = "ETHEREUM"
 export const PROTOCOL_TYPE_LENDING = "LENDING"
+export const PROTOCOL_RISK_TYPE    = "ISOLATED" // TODO: ensure this is accurate
 export const PROTOCOL_NAME         = "Compound v2"
 export const PROTOCOL_SLUG         = "compound-v2"
-export const PROTOCOL_VERSION      = "1.0.2"
+export const PROTOCOL_VERSION      = "1.0.4"
 
 export const DEFAULT_DECIMALS = 18
 export const COMPOUND_DECIMALS = 8
