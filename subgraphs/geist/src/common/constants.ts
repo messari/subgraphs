@@ -28,8 +28,10 @@ export const REPAY_INTERACTION = "REPAY";
 export const STAKE_INTERACTION = "STAKE";
 export const UNSTAKE_INTERACTION = "UNSTAKE";
 
+// Protocol lending type
 export const LENDING_TYPE_POOLED = "POOLED";
 export const LENDING_TYPE_CDP = "CDP";
 
+// Protocol risk type
 export const RISK_TYPE_GLOBAL = "GLOBAL";
 export const RISK_TYPE_ISOLATED = "ISOLATED";

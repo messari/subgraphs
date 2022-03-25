@@ -17,10 +17,10 @@ export const REWARD_TOKEN_DECIMALS: i32 = 18;
 export const REWARD_TOKEN_NAME: string = "Geist.Finance Protocol Token"; 
 export const REWARD_TOKEN_SYMBOL: string = "GEIST";
 
-// Token contract can be used to get addresses of all reward tokens
+// Token contract used to get addresses of all reward tokens
 export const REWARD_TOKEN_CONTRACT = Address.fromString("0x49c93a95dbcc9A6A4D8f77E59c038ce5020e82f8");
 
-// Additional reward token addresses (not used but kept anyway)
+// gToken addresses
 export const TOKEN_ADDRESS_gDAI = Address.fromString("0x07E6332dD090D287d3489245038daF987955DCFB");
 export const TOKEN_ADDRESS_gETH = Address.fromString("0x25c130B2624CF12A4Ea30143eF50c5D68cEFA22f");
 export const TOKEN_ADDRESS_gFTM = Address.fromString("0x39B3bd37208CBaDE74D0fcBDBb12D606295b430a");
@@ -32,7 +32,7 @@ export const TOKEN_ADDRESS_gMIM = Address.fromString("0xc664Fc7b8487a3E10824Cda7
 export const TOKEN_ADDRESS_gLINK = Address.fromString("0xBeCF29265B0cc8D33fA24446599955C7bcF7F73B");
 
 // Token contracts used to query oracle as proxies for reward tokens
-// This is done as the Oracle does not accept reward token address
+// This is done as the Oracle does not accept gToken address
 export const TOKEN_ADDRESS_DAI = Address.fromString("0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E");
 export const TOKEN_ADDRESS_ETH = Address.fromString("0x74b23882a30290451A17c44f4F05243b6b58C76d");
 export const TOKEN_ADDRESS_WFTM = Address.fromString("0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83");

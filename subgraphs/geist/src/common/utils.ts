@@ -40,4 +40,3 @@ export function getTimestampInMillis(block: ethereum.Block): BigInt {
 export function bigIntToPercentage(n: BigInt): BigDecimal {
     return n.toBigDecimal().div(BigDecimal.fromString("100"))
 }
-  

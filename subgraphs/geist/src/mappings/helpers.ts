@@ -173,10 +173,14 @@ export function getUsageMetrics(
     let tokenPriceBD = convertTokenToDecimal(tokenPrice, BigInt.fromI32(18));
     let tokenAmountUSD = tokenAmountBD.times(tokenPriceBD).truncate(2);
     if (fee) {
-        log.warning("{} {} (${}) fee transferred", [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);    
+        log.warning(
+            "{} {} (${}) fee transferred", 
+            [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);    
     }
     else {
-        log.warning("{} {} (${}) transferred", [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);
+        log.warning(
+            "{} {} (${}) transferred", 
+            [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);
     }
     return tokenAmountUSD
   }
@@ -208,31 +212,39 @@ export function getUsageMetrics(
 
     if (interactionType == constants.DEPOSIT_INTERACTION) {
         // Add value locked for operations like depositing
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(
+            tokenAmountUSD);
     }
     else if (interactionType == constants.BORROW_INTERACTION) {
         // Add value locked for operations like borrow (temporary for testing)
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(
+            tokenAmountUSD);
         let protocolSideRevenueUSD = bigIntToPercentage(rate).times(tokenAmountUSD);
-        financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(protocolSideRevenueUSD);
+        financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(
+            protocolSideRevenueUSD);
     }
     else if (interactionType == constants.WITHDRAW_INTERACTION) {
         // Subtract value locked for operations like withdrawing
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(
+            tokenAmountUSD);
     }
     else if (interactionType == constants.REWARD_INTERACTION) {
         // Add supply revenue for rewards
-        financialsDailySnapshot.supplySideRevenueUSD = financialsDailySnapshot.supplySideRevenueUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.supplySideRevenueUSD = financialsDailySnapshot.supplySideRevenueUSD.plus(
+            tokenAmountUSD);
     }
     else if (interactionType == constants.REPAY_INTERACTION) {
         // Add supply revenue for rewards
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(
+            tokenAmountUSD);
     }
     else if (interactionType == constants.STAKE_INTERACTION) {
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(
+            tokenAmountUSD);
     }
     else if (interactionType == constants.UNSTAKE_INTERACTION) {
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(
+            tokenAmountUSD);
     }
     else {
         log.error("Invalid interaction type {}", [interactionType])
@@ -240,11 +252,13 @@ export function getUsageMetrics(
 
     // Volume is counted for all interactions
     financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD)
-    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(getTokenAmountUSD(addresses.TOKEN_ADDRESS_WFTM, transactionFee, true))
+    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(
+        getTokenAmountUSD(addresses.TOKEN_ADDRESS_WFTM, transactionFee, true))
     financialsDailySnapshot.timestamp = timestamp;
 
     log.warning(
-        "Adding to FinancialsDailySnapshot with ID={}. InteractionType={} (${}). totalValueLockedUSD={}, totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
+        "Adding to FinancialsDailySnapshot with ID={}. InteractionType={} (${}). totalValueLockedUSD={}, " + 
+        "totalVolumeUSD={}, supplySideRevenueUSD={}, protocolSideRevenueUSD={}, feesUSD={}", 
         [
             financialsDailySnapshot.id, 
             interactionType,
