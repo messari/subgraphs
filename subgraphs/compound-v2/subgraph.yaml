@@ -96,6 +96,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         # This event equates to a Deposit
         # event Mint(address minter, uint mintAmount, uint mintTokens);
@@ -142,6 +146,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         # This event equates to a Deposit
         # event Mint(address minter, uint mintAmount, uint mintTokens);
@@ -188,6 +196,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         # This event equates to a Deposit
         # event Mint(address minter, uint mintAmount, uint mintTokens);
@@ -234,6 +246,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -266,6 +282,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -330,6 +350,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -362,6 +386,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -394,6 +422,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -426,6 +458,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -458,6 +494,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -490,6 +530,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -522,6 +566,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -554,6 +602,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -586,6 +638,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -618,6 +674,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -650,6 +710,10 @@ dataSources:
       abis:
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -684,6 +748,10 @@ dataSources:
           file: ./abis/cEther.json
         - name: cToken
           file: ./abis/cToken.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
