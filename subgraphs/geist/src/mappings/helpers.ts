@@ -154,7 +154,7 @@ export function getUsageMetrics(
     return usageMetrics;
   }
 
-  export function getTokenAmountUSD(tokenAddress: Address, tokenAmount: BigInt): BigDecimal {
+  export function getTokenAmountUSD(tokenAddress: Address, tokenAmount: BigInt, fee: bool = false): BigDecimal {
     /* 
         Get the price of the token from the oracle as a BigInt with 18 decimals. 
         Convert token price to BigDecimal using 18 decimals.
@@ -172,7 +172,12 @@ export function getUsageMetrics(
     let tokenAmountBD = convertTokenToDecimal(tokenAmount, tokenContract.decimals());
     let tokenPriceBD = convertTokenToDecimal(tokenPrice, BigInt.fromI32(18));
     let tokenAmountUSD = tokenAmountBD.times(tokenPriceBD).truncate(2);
-    log.warning("{} {} (${}) transferred", [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);
+    if (fee) {
+        log.warning("{} {} (${}) fee transferred", [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);    
+    }
+    else {
+        log.warning("{} {} (${}) transferred", [tokenAmountBD.truncate(2).toString(), tokenContract.symbol(), tokenAmountUSD.toString()]);
+    }
     return tokenAmountUSD
   }
 
@@ -221,7 +226,7 @@ export function getUsageMetrics(
     }
     else if (interactionType == constants.REPAY_INTERACTION) {
         // Add supply revenue for rewards
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(tokenAmountUSD);
     }
     else if (interactionType == constants.STAKE_INTERACTION) {
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(tokenAmountUSD);
@@ -235,7 +240,7 @@ export function getUsageMetrics(
 
     // Volume is counted for all interactions
     financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(tokenAmountUSD)
-    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(getTokenAmountUSD(addresses.TOKEN_ADDRESS_WFTM, transactionFee))
+    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(getTokenAmountUSD(addresses.TOKEN_ADDRESS_WFTM, transactionFee, true))
     financialsDailySnapshot.timestamp = timestamp;
 
     log.warning(
@@ -279,7 +284,7 @@ export function getUsageMetrics(
     else if (tokenAddress == addresses.TOKEN_ADDRESS_GEIST) {
         /* 
             For the GEIST token, the price is derived from the
-            ratio of FTM-GEIST reserves on Spookyswap multiplied by
+            ratio of FTM-GEIST reserves on SpookySwap multiplied by
             the price of WFTM from the oracle
         */
         let geistFtmLP = SpookySwapGEISTFTM.bind(addresses.GEIST_FTM_LP_ADDRESS);
