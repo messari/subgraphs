@@ -33,6 +33,7 @@ export function initMarket(
     blockNumber: BigInt,
     timestamp: BigInt,
     id: string,
+    aTokenInput: Address | null
   ): Market {
     // This function either loads or creates the Market entity from a reserve
     log.info('MARKET LOAD: ' + id,[]);
@@ -48,23 +49,25 @@ export function initMarket(
         // Initialize market fields as zero
         let reserveStableRate = new BigDecimal(BigInt.fromI32(0));
         let reserveVariableRate = new BigDecimal(BigInt.fromI32(0));
-        let aTokenAddr = Address.fromString(zeroAddr);
+        let aTokenAddr = aTokenInput ? aTokenInput : Address.fromString(zeroAddr);
         if (!tryReserve.reverted) {
           // If a valid reserve is returned, add fields from the reserve to the market entity 
-          aTokenAddr = tryReserve.value.aTokenAddress;
+          log.info('ATOKEN POTENTIAL VALS: ' + tryReserve.value.aTokenAddress.toHexString() + ' or ' + (aTokenInput ? aTokenInput : Address.fromString(zeroAddr)).toHexString(), [])
+          aTokenAddr = tryReserve.value.aTokenAddress ? tryReserve.value.aTokenAddress : aTokenAddr;
           reserveStableRate = new BigDecimal(tryReserve.value.currentStableBorrowRate);
           reserveVariableRate = new BigDecimal(tryReserve.value.currentVariableBorrowRate);
         } else {
           log.error('FAILED TO GET RESERVE', [''])
         }
+        log.info('INITIALIZING ATOKEN FROM MARKET ' + aTokenAddr.toHexString(), [])
         const aToken = initToken(aTokenAddr);
         // The input token, which would be the token instantiated from the id/address input
         const inputTokens: Token[] = [token];
         // Populate fields with data that has been passed to the function
         // Other data fields are initialized as 0/[]/false
-        const inputTokenBalances: BigDecimal[] = [];
+        const inputTokenBalances: BigInt[] = [];
         for (let i = 0; i < inputTokens.length; i++) {
-            inputTokenBalances.push(new BigDecimal(new BigInt(0)));
+            inputTokenBalances.push(new BigInt(0));
         }
         const protocolId = getProtocolIdFromCtx();
         const protocol = fetchProtocolEntity(protocolId);
@@ -98,14 +101,14 @@ export function initMarket(
     return market as Market;
   }
 
-export function getOutputTokenSupply(outputTokenAddr: Address): BigDecimal {
+export function getOutputTokenSupply(outputTokenAddr: Address): BigInt {
     const aTokenInstance = AToken.bind(outputTokenAddr);
     const tryTokenSupply = aTokenInstance.try_scaledTotalSupply();
     log.info('OUTPUT TOKEN ' + aTokenInstance._name + ' ' + outputTokenAddr.toHexString(), [] );
-    let outputTokenSupply = new BigDecimal(new BigInt(0));
+    let outputTokenSupply = new BigInt(0);
     if (!tryTokenSupply.reverted) {
         log.info('OUTTOKEN SUPPLY ' + aTokenInstance._name + ' ' + tryTokenSupply.value.toString(), [] );
-        outputTokenSupply = new BigDecimal(tryTokenSupply.value);
+        outputTokenSupply = tryTokenSupply.value;
     } else {
         log.info('OUTPUT TOKEN SUPPLY CALL REVERTED FOR TOKEN ' + aTokenInstance._name + ' ' + aTokenInstance._address.toHexString(), [])
     }
@@ -182,10 +185,11 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
         log.info('CREATING PROTO ENTITY', [''])
         lendingProtocol = new LendingProtocol(protocolId);
         lendingProtocol.totalUniqueUsers = 0;
-        // Should these values be hardcoded?
+        lendingProtocol.version = '0.0.1';
         lendingProtocol.name = 'Aave-v2';
         lendingProtocol.slug = 'aave-v2';
         lendingProtocol.network = 'ETHEREUM';
+        lendingProtocol.totalValueLockedUSD = BigDecimal.fromString("0");
         // Are these options correct?
         lendingProtocol.type = 'LENDING';
         lendingProtocol.lendingType = 'POOLED';
@@ -200,12 +204,14 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
 
 export function getMarketDailySnapshotId(event: ethereum.Event, market: Market): string {
     const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
-    let id = market.id.concat("-").concat(daysSinceEpoch.toString());
+    let id = market.id.concat("-").concat(daysSinceEpoch);
     return id;
 }
 
 // For the lack of closure support, the recommendation is to loop into a global variable
-let rewardEmissionsAmounts: BigDecimal[] = [];
+let rewardEmissionsAmounts: BigInt[] = [];
+let rewardEmissionsAmountsUSD: BigDecimal[] = [];
+
 export function loadMarketDailySnapshot(
     event: ethereum.Event,
     market: Market,
@@ -228,10 +234,11 @@ export function loadMarketDailySnapshot(
             rewardEmissionsAmounts = [];
             rewardTokenList.forEach(() => {
               // For each reward token, create a zero value to initialize the amount of reward emissions for that day
-              rewardEmissionsAmounts.push(new BigDecimal(new BigInt(0)));
+              rewardEmissionsAmounts.push(new BigInt(0));
+              rewardEmissionsAmountsUSD.push(BigDecimal.fromString("0"));
             });
             marketSnapshot.rewardTokenEmissionsAmount = rewardEmissionsAmounts;
-            marketSnapshot.rewardTokenEmissionsUSD = rewardEmissionsAmounts;
+            marketSnapshot.rewardTokenEmissionsUSD = rewardEmissionsAmountsUSD;
         } else {
             marketSnapshot.rewardTokenEmissionsAmount = [];
             marketSnapshot.rewardTokenEmissionsUSD = [];
@@ -242,6 +249,8 @@ export function loadMarketDailySnapshot(
     // As this function is called AFTER a transaction is completed, each snapshot's data will vary from the previous snapshot
     
     // PERHAPS WILL NEED TO CHANGES THIS TO HANDLE MULTIPLE INPUT TOKENS
+    marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
     marketSnapshot.inputTokenBalances = market.inputTokenBalances[0];
     // Either pass in or call getAssetPriceInUSDC() on the input token from here to get input token price in USD
     marketSnapshot.inputTokenPricesUSD = [getAssetPriceInUSDC(initToken(Address.fromString(market.inputTokens[0])))];
@@ -263,19 +272,19 @@ export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsD
       const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
       const protocolId = getProtocolIdFromCtx();
       const protocol = fetchProtocolEntity(protocolId);
-      let metricsDailySnapshot = UsageMetricsDailySnapshot.load(daysSinceEpoch.toString());
+      let metricsDailySnapshot = UsageMetricsDailySnapshot.load(daysSinceEpoch);
       if (!metricsDailySnapshot) {
-          metricsDailySnapshot = new UsageMetricsDailySnapshot(daysSinceEpoch.toString());
+          metricsDailySnapshot = new UsageMetricsDailySnapshot(daysSinceEpoch);
           metricsDailySnapshot.protocol = protocol.id;
           // Initialize zero values
           metricsDailySnapshot.activeUsers = 0;
           // NEED SIMILIAR GET MOST RECENT SNAPSHOT FUNCTION TO GET TOTAL CUMULATIVE USERS
           metricsDailySnapshot.totalUniqueUsers = protocol.totalUniqueUsers;
           metricsDailySnapshot.dailyTransactionCount = 0;
-          // Push the new day's entity implementation to the protocol array
-          protocol.usageMetrics.push(metricsDailySnapshot.id);
+      } else {
+        log.info('LOADED METRIC SNAPSHOT ' + metricsDailySnapshot.id, [])
+
       }
-        
       const userAddr = event.transaction.from;
       let user = UserAddr.load(userAddr.toHexString());
       if (!user) {
@@ -283,8 +292,9 @@ export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsD
           metricsDailySnapshot.totalUniqueUsers += 1;
           protocol.totalUniqueUsers += 1;
       }
-      if (user.mostRecentVisit !== new BigInt(daysSinceEpoch as i32)) {
-          user.mostRecentVisit = new BigInt(daysSinceEpoch as i32);
+      log.info('REACHED METRIC USER ' + user.id, [])
+      if (user.mostRecentVisit !== BigInt.fromString(daysSinceEpoch)) {
+          user.mostRecentVisit = BigInt.fromString(daysSinceEpoch);
           metricsDailySnapshot.activeUsers += 1;
       }
       protocol.save();
@@ -296,21 +306,6 @@ export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsD
       return metricsDailySnapshot as UsageMetricsDailySnapshot;
     }
 
-function getMostRecentFinancialSnapshot(daysSinceEpoch: number): FinancialsDailySnapshot | null {
-    // This function gets the most recent Financial snapshot in order to initialize certain fields that are cummulative
-    let mostRecentSnapshot: FinancialsDailySnapshot | null = null;
-    for (let i = 0; i < 30; ++i) {
-        mostRecentSnapshot = FinancialsDailySnapshot.load((daysSinceEpoch - i).toString()) as FinancialsDailySnapshot;
-        if (mostRecentSnapshot) {
-            break;
-        }
-    }
-    if (!mostRecentSnapshot) {
-        return null;
-    }
-    return mostRecentSnapshot;
-}
-
 export function updateFinancials(
     event: ethereum.Event,
     increaseTVL: bool,
@@ -320,14 +315,15 @@ export function updateFinancials(
     ): FinancialsDailySnapshot {
     // Update the current date's FinancialDailySnapshot instance
     const financialsDailySnapshot = getFinancialsDailySnapshot(event);
+    log.info('SUCCESFULLY INIT FINANCIALS WITH ID: ' + financialsDailySnapshot.id, []);
     if (increaseTVL) {
-      financialsDailySnapshot.totalValueLockedUSD.plus(amount);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(amount);
     } else {
-      financialsDailySnapshot.totalValueLockedUSD.minus(amount);
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(amount);
     }
-    financialsDailySnapshot.totalVolumeUSD.plus(amount);
-    financialsDailySnapshot.protocolSideRevenueUSD.plus(protocolSideRevenueReceived);
-    financialsDailySnapshot.feesUSD.plus(feesReceived);
+    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(amount);
+    financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(protocolSideRevenueReceived);
+    financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(feesReceived);
     financialsDailySnapshot.save();
     return financialsDailySnapshot;
 }
@@ -337,24 +333,15 @@ export function getFinancialsDailySnapshot(event: ethereum.Event): FinancialsDai
     const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
     const protocolId = getProtocolIdFromCtx();
     const protocol = fetchProtocolEntity(protocolId);
-    let financialsDailySnapshot = FinancialsDailySnapshot.load(daysSinceEpoch.toString());
+    let financialsDailySnapshot = FinancialsDailySnapshot.load(daysSinceEpoch);
     if (!financialsDailySnapshot) {
-        financialsDailySnapshot = new FinancialsDailySnapshot(daysSinceEpoch.toString());
+        financialsDailySnapshot = new FinancialsDailySnapshot(daysSinceEpoch);
         financialsDailySnapshot.protocol = protocol.id;
-        financialsDailySnapshot.totalVolumeUSD = new BigDecimal(new BigInt(0));
-        financialsDailySnapshot.supplySideRevenueUSD = new BigDecimal(new BigInt(0));
-        financialsDailySnapshot.protocolSideRevenueUSD = new BigDecimal(new BigInt(0));
-        financialsDailySnapshot.feesUSD = new BigDecimal(new BigInt(0));
-        const recentSnapshot = getMostRecentFinancialSnapshot(daysSinceEpoch);
-        if (!recentSnapshot) {
-            // Initialize zero values
-            financialsDailySnapshot.totalValueLockedUSD = new BigDecimal(new BigInt(0));
-        } else {
-            financialsDailySnapshot.totalValueLockedUSD = recentSnapshot.totalValueLockedUSD;
-        }
-        // Push the new day's entity implementation to the protocol array
-        protocol.financialMetrics.push(financialsDailySnapshot.id);
-        protocol.save();
+        financialsDailySnapshot.totalVolumeUSD = BigDecimal.fromString("0");
+        financialsDailySnapshot.supplySideRevenueUSD = BigDecimal.fromString("0");
+        financialsDailySnapshot.protocolSideRevenueUSD = BigDecimal.fromString("0");
+        financialsDailySnapshot.feesUSD = BigDecimal.fromString("0");
+        financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
     }
     financialsDailySnapshot.blockNumber = event.block.number;
     financialsDailySnapshot.timestamp = event.block.timestamp;
@@ -385,9 +372,7 @@ export function getAssetPriceInUSDC(token: Token): BigDecimal {
     if (!tryAssetPriceInEth.reverted && !tryPriceUSDCInEth.reverted) {
         const assetPriceInEth = tryAssetPriceInEth.value;
         const priceUSDCInEth = tryPriceUSDCInEth.value;
-        assetPriceInUSDC = new BigDecimal((assetPriceInEth).div(priceUSDCInEth));
-        log.info('Asset price of ' + token.name + '-' + token.id + ' = ' + assetPriceInEth.toString() + ' = ' + priceUSDCInEth.toString(), [token.id])
-
+        assetPriceInUSDC = (new BigDecimal(assetPriceInEth).div(new BigDecimal(priceUSDCInEth)));
     } else {
         log.info('REVERTED: ASSET? ' + tryAssetPriceInEth.reverted.toString() + ' USDC? ' + tryPriceUSDCInEth.reverted.toString(), ['']);
     }
@@ -395,7 +380,7 @@ export function getAssetPriceInUSDC(token: Token): BigDecimal {
     // return price per asset in USDC
     if (!assetPriceInUSDC) {
         log.info('Could not fetch asset price of ' + token.name + '-' + token.id, [token.id]);
-        return new BigDecimal(new BigInt(0));
+        return BigDecimal.fromString("0");
     }
     return assetPriceInUSDC;
 }
@@ -422,13 +407,14 @@ export function getOracleAddressFromProtocol(): string {
 
 // MATH FUNCTIONS
 
-export function amountInUSD(token: Token, amount: BigDecimal): BigDecimal {
+export function amountInUSD(token: Token, amount: BigInt): BigDecimal {
     // This function takes in a token and the amount of the token and converts the amount of that token into USD
     log.info('HERE IN amountInUSD', []);
+    const amountInDecimals = exponentToBigDecimal(token.decimals.toString(), amount.toString());
     const priceInUSDC = getAssetPriceInUSDC(token);
-    const amountUSD = amount.times(priceInUSDC);
-    log.info('AMOUNT AND PRICE??? ' + priceInUSDC.toString() + '---' + amountUSD.toString(), []);
-    return amountUSD;
+    const amountUSD = amountInDecimals.times(priceInUSDC);
+    log.info(token.id + ' ' + token.name.toUpperCase() + ' AMOUNT ' + amount.toString() + ' AND PRICE??? ' + priceInUSDC.toString() + '---' + amountUSD.toString(), []);
+    return amountUSD.truncate(2);
 }  
 
 export function rayDivision(a: BigInt, b: BigInt): BigInt {
@@ -446,6 +432,21 @@ export function rayMultiplication(a: BigInt, b: BigInt): BigInt {
   return mult;
 }
 
-export function getDaysSinceEpoch(secondsSinceEpoch: number): number {
-    return (Math.floor(secondsSinceEpoch/86400));
+export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
+    return new BigInt(<i32>Math.floor(secondsSinceEpoch/86400)).toString();
 }
+
+export function exponentToBigDecimal(decimals: string, amount: string): BigDecimal {
+    /* Get the denominator to convert a token amount to BigDecimal */
+    log.info("exponentToBigDecimal " + decimals, [])
+    let amountArr = amount.split(".").join("").split("");
+    let insertIdx = <i32>(amountArr.length - parseInt(decimals))
+    if (insertIdx < 0) {
+      for (insertIdx; insertIdx < 0; insertIdx ++ ) {
+        amountArr.unshift("0");
+      }
+    }
+    log.info('AMOUNT ARR ' + amountArr.toString() + ' INDEX ' + insertIdx.toString(), []);
+    amountArr[insertIdx] = '.' + amountArr[insertIdx];
+    return BigDecimal.fromString(amountArr.join(""))
+  }

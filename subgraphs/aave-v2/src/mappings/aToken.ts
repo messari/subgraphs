@@ -6,14 +6,9 @@ import {
 } from "../../generated/templates/AToken/AToken";
 
 import {
-  Address,
-  BigDecimal
-} from "@graphprotocol/graph-ts";
 
-import {
-  Market,
-  RewardToken
-} from "../../generated/schema";
+  log
+} from "@graphprotocol/graph-ts";
 
 import { AaveIncentivesController as IncentivesControllerContract } from "../../generated/templates/IncentivesController/AaveIncentivesController";
 
@@ -42,8 +37,8 @@ export function handleATokenMint(event: Mint): void {
   if (!tryInputToken.reverted) {
     marketAddr = tryInputToken.value.toHexString();
   }
-  const market = initMarket(event.block.number, event.block.timestamp, marketAddr);
-  market.outputTokenSupply = new BigDecimal(aToken.totalSupply());
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr, event.address);
+  market.outputTokenSupply = aToken.totalSupply();
   market.save();
 }
 
@@ -52,8 +47,8 @@ export function handleATokenBurn(event: Burn): void {
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
   const marketAddr = aToken.POOL();
-  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString());
-  market.outputTokenSupply = new BigDecimal(aToken.totalSupply());
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), event.address);
+  market.outputTokenSupply = aToken.totalSupply();
   market.save();
 }
 
@@ -62,8 +57,9 @@ export function handleATokenInitialized(event: Initialized): void {
   // This function serves to get the reward token for a given market, as the incentives controller is received in the parametes
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
-  const marketAddr = aToken.POOL();
-  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString());
+  log.info('aToken POOL | underlying asset ' + aToken.POOL().toHexString() + ' ... ' + aToken.UNDERLYING_ASSET_ADDRESS().toHexString(), [])
+  const marketAddr = aToken.UNDERLYING_ASSET_ADDRESS();
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), event.address);
   const incentivesControllerAddr = event.params.incentivesController;
   if (incentivesControllerAddr.toHexString() != zeroAddr) {
     // Instantiate IncentivesController to get access to contract read methods

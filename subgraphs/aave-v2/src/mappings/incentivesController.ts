@@ -27,7 +27,9 @@ function getRewardTokenAddr(incentiveContAddr: Address): string {
 }
 
 // declare reward emissions array outside of function to avoid closure issues
-let rewardEmissions: BigDecimal[] = [];
+let rewardEmissions: BigInt[] = [];
+let rewardEmissionsUSD: BigDecimal[] = [];
+
 export function handleRewardsClaimed(event: RewardsClaimed): void {
   // Handle event emitted when reward tokens are claimed
   // event.address is the incentiveController address
@@ -35,20 +37,20 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
   const marketAddr = event.transaction.to as Address;
   if (incentiveContAddr.toHexString() != zeroAddr) {
     const rewardTokenAddr = getRewardTokenAddr(incentiveContAddr);
-    let market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString()) as Market;
+    let market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), null) as Market;
     // If the initRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
     // Therefore the market needs to be pulled again to account for the updated RewardToken field 
     initRewardToken(Address.fromString(rewardTokenAddr), market);
     const tokenInstance = initToken(Address.fromString(rewardTokenAddr));
     const assetPriceInUSDC = getAssetPriceInUSDC(tokenInstance);
-    market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString()) as Market;
+    market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), null) as Market;
 
     // Load/Create the daily market snapshot entity instance
     const marketDailySnapshot = loadMarketDailySnapshot(event, market) as MarketDailySnapshot;
     // Copy current snapshot data into temporary arrays to calculate in to avoid type errors
-    let rewardTokenEmAmount: BigDecimal[] = [];
+    let rewardTokenEmAmount: BigInt[] = [];
     if (marketDailySnapshot.rewardTokenEmissionsAmount) {
-      rewardTokenEmAmount = marketDailySnapshot.rewardTokenEmissionsAmount as BigDecimal[];
+      rewardTokenEmAmount = marketDailySnapshot.rewardTokenEmissionsAmount as BigInt[];
     }
     let rewardTokenEmUSD: BigDecimal[] = [];
     if (marketDailySnapshot.rewardTokenEmissionsUSD) {
@@ -71,11 +73,12 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
         rewardEmissions = [];
         rewardTokensList.forEach(() => {
           // For each reward token, create a zero value to initialize the amount of reward emissions for that day
-          rewardEmissions.push(new BigDecimal(new BigInt(0)));
+          rewardEmissions.push(new BigInt(0));
+          rewardEmissionsUSD.push(BigDecimal.fromString("0"));
         });
         // set both the token emissions amount and amount in USD to arrays of the same length with all indicies as zero values
         rewardTokenEmAmount = rewardEmissions;
-        rewardTokenEmUSD = rewardEmissions;
+        rewardTokenEmUSD = rewardEmissionsUSD;
       }
       for (let i = 0; i < rewardTokensList.length; i++) {
         // Loop through the reward tokens on the market entity instance to compare the addresses to the reward token address
@@ -83,8 +86,8 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
         if (rewardTokenAddr === token) {
           // If the current token iteration is the reward token address which is to be updated-
           // Add the rewardTokenEmissionsAmount of that index by the amount of reward tokens claimed
-          rewardTokenEmAmount[i].plus(new BigDecimal(event.params.amount));
-          rewardTokenEmUSD[i].plus(assetPriceInUSDC.times(new BigDecimal(event.params.amount)));
+          rewardTokenEmAmount[i] = rewardTokenEmAmount[i].plus(event.params.amount);
+          rewardTokenEmUSD[i] = rewardTokenEmUSD[i].plus(assetPriceInUSDC.times(new BigDecimal(event.params.amount)));
         }
       }
     }
@@ -100,7 +103,7 @@ export function handleRewardsAccrued(event: RewardsAccrued): void {
   // event.address is the incentiveController address
   const incentiveContAddr = event.address;
   const marketAddr = event.transaction.to as Address;
-  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString()) as Market;
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), null) as Market;
   const rewardTokenAddr = Address.fromString(getRewardTokenAddr(incentiveContAddr));
   // initRewardToken in case it has not been created as a RewardToken entity yet
   initRewardToken(rewardTokenAddr, market);
@@ -109,6 +112,6 @@ export function handleRewardsAccrued(event: RewardsAccrued): void {
   const rewardTokenInUSD = getAssetPriceInUSDC(token);
   const rewardAccruedInUSD = new BigDecimal(event.params.amount).times(rewardTokenInUSD)
   const financialsDailySnapshot = getFinancialsDailySnapshot(event);
-  financialsDailySnapshot.supplySideRevenueUSD.plus(rewardAccruedInUSD);
+  financialsDailySnapshot.supplySideRevenueUSD = financialsDailySnapshot.supplySideRevenueUSD.plus(rewardAccruedInUSD);
   financialsDailySnapshot.save();
 }
