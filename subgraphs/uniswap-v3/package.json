@@ -1,0 +1,16 @@
+{
+  "name": "uniswap-v3-alt",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ uniswap-v3-alt",
+    "create-local": "graph create --node http://localhost:8020/ uniswap-v3-alt",
+    "remove-local": "graph remove --node http://localhost:8020/ uniswap-v3-alt",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 uniswap-v3-alt"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  }
+}
