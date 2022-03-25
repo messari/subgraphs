@@ -18,10 +18,11 @@ export const NETWORK_ETHEREUM      = "ETHEREUM"
 export const PROTOCOL_TYPE_LENDING = "LENDING"
 export const PROTOCOL_NAME         = "Compound v2"
 export const PROTOCOL_SLUG         = "compound-v2"
-export const PROTOCOL_VERSION      = "1.0.0"
+export const PROTOCOL_VERSION      = "1.0.2"
 
 export const DEFAULT_DECIMALS = 18
 export const COMPOUND_DECIMALS = 8
+export const USDC_DECIMALS = 6
 export const UNIX_DAY = 86400
 
 // TODO: do I need the names/symbols for each token or is that possible from mapping?

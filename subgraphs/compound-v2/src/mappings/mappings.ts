@@ -1,15 +1,18 @@
 // map blockchain data to entities outlined in schema.graphql
 
-import { BigInt } from "@graphprotocol/graph-ts"
-import { DEFAULT_DECIMALS } from "../common/constants"
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
+import { 
+  DEFAULT_DECIMALS,
+  COMPOUND_DECIMALS 
+} from "../common/constants"
 import { 
   createLendingProtocol,
-  findMarketAddress 
+  getTokenPrice
 } from "./helpers"
 import {
   Mint,
   Redeem,
-  Borrow,
+  Borrow as BorrowEvent,
   RepayBorrow,
   LiquidateBorrow,
   NewComptroller, // comptroller update
@@ -25,7 +28,7 @@ import {
   Market,
   Deposit,
   Withdraw,
-  Borrow1,
+  Borrow as BorrowEntity,
   Repay,
   Liquidation
   } from "../types/schema"
@@ -62,35 +65,36 @@ export function handleMint(event: Mint): void {
   let deposit = new Deposit(id)
 
   // get reused vars
-  let marketAddress = findMarketAddress(event.transaction.to).toHexString()
+  let marketAddress = event.transaction.to as Address
+  let blockNumber = event.block.number
 
   // fill in deposit numbers
   deposit.hash = transactionHash
   deposit.logIndex = logIndex.toI32()
   deposit.protocol = COMPTROLLER_ADDRESS.toHexString()
-  deposit.to = marketAddress
+  deposit.to = marketAddress.toHexString()
   deposit.from = event.params.minter.toHexString()
-  deposit.blockNumber = event.block.number
+  deposit.blockNumber = blockNumber
   deposit.timestamp = event.block.timestamp
-  deposit.market = marketAddress
-  // TODO check if token exists if not make it
-  // create a mapping between cToken to token address
-  // deposit.token = 
-  event.transaction.input
+  deposit.market = marketAddress.toHexString()
+  deposit.asset = marketAddress.toHexString() // TODO: it should be the cToken
+  deposit.amount = event.params.mintAmount // TODO: change to actual amount not 8000000...00
 
-  // TODO: change to actual amount not 8000000...00
-  deposit.amount = event.params.mintAmount
-  // TODO get usd price
-  // https://github.com/compound-finance/compound-v2-subgraph/blob/master/src/mappings/markets.ts#L26
-  // https://github.com/compound-finance/compound-v2-subgraph/blob/master/src/mappings/markets.ts#L80
+  // get usdPrice
+  let usdPrice = getTokenPrice(
+    blockNumber.toI32(), 
+    event.address, 
+    marketAddress, 
+    COMPOUND_DECIMALS
+  )
+  deposit.amountUSD = usdPrice
 
-  // TODO add metrics for snapshots (maybe put this in handleTransfer to minimize calls)
   deposit.save()
 }
 
 export function handleRedeem(event: Redeem): void {}
 
-export function handleBorrow(event: Borrow): void {}
+export function handleBorrow(event: BorrowEvent): void {}
 
 export function handleRepayBorrow(event: RepayBorrow): void {}
 
@@ -99,7 +103,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {}
 export function handleNewComptroller(event: NewComptroller): void {}
 
 // export function handleTransfer(event: Transfer): void {
-//   let deposit = new Deposit(counter.toString())
+//   let deposit = new Deposit()
 //   deposit.from = event.params.from.toHex().toString()
 //   counter++
   
@@ -110,16 +114,7 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   // create LendingProtocol - first function to be called in Comptroller
   let lendingProtocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())
   if (lendingProtocol == null) {
-    lendingProtocol = new LendingProtocol(COMPTROLLER_ADDRESS.toHexString())
-    lendingProtocol.name = PROTOCOL_NAME
-    lendingProtocol.slug = PROTOCOL_SLUG
-    lendingProtocol.version = PROTOCOL_VERSION
-    lendingProtocol.network = NETWORK_ETHEREUM
-    lendingProtocol.type = PROTOCOL_TYPE_LENDING
-
-    // create empty lists that will be populated each day
-    lendingProtocol.usageMetrics = []
-    lendingProtocol.financialMetrics = []
+    lendingProtocol = createLendingProtocol()
   }
   lendingProtocol._priceOracle = event.params.newPriceOracle
   lendingProtocol.save()

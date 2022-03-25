@@ -5,6 +5,9 @@ import { Address } from "@graphprotocol/graph-ts"
 // null address
 export const ADDRESS_ZERO = Address.fromString("0x0000000000000000000000000000000000000000")
 
+// USDC address
+export const USDC_ADDRESS = Address.fromString("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48")
+
 // "factory" address (Comptroller.sol)
 export const COMPTROLLER_ADDRESS = Address.fromString("0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b")
 
