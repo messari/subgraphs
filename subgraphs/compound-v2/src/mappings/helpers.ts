@@ -3,40 +3,34 @@
 import { 
     Token,
     LendingProtocol,
-    Market,
-    Deposit,
-    Withdraw,
-    Repay,
-    Liquidation,
-    
+    Market
 } from "../types/schema"
 
 import { 
-    MARKET_LIST,
-    ADDRESS_ZERO,
     COMPTROLLER_ADDRESS,
     PRICE_ORACLE1_ADDRESS,
-    USDC_ADDRESS
+    USDC_ADDRESS,
+    MARKETS
  } from "../common/addresses"
+
 import {
     NETWORK_ETHEREUM,
     PROTOCOL_TYPE_LENDING,
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
     USDC_DECIMALS,
-    PROTOCOL_VERSION.
-    PROTOCOL_RISK_TYPE
+    PROTOCOL_VERSION,
+    PROTOCOL_RISK_TYPE,
+    COMPOUND_DECIMALS,
+    ZERO_BD,
+    ZERO_BI
 } from "../common/constants"
-import { Address, BigDecimal, Bytes } from "@graphprotocol/graph-ts"
+
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 import { PriceOracle2 } from "../types/Comptroller/PriceOracle2"
 import { PriceOracle1 } from "../types/Comptroller/PriceOracle1"
-import { Comptroller } from "../types/Comptroller/Comptroller"
 
 // TODO: helper for converting uni time to days
-
-// TODO: create new market
-
-// TODO: update market
 
 // create a LendingProtocol based off params
 export function createLendingProtocol(): LendingProtocol {
@@ -57,6 +51,58 @@ export function createLendingProtocol(): LendingProtocol {
     
 
     return lendingProtocol
+}
+
+// creates a new lending market and returns it
+export function createMarket(marketAddress: string): Market {
+    let market = new Market(marketAddress)
+    let marketMapping = MARKETS[marketAddress]
+
+    // create Tokens for asset token and cToken/cEther
+    createMarketTokens(marketAddress)
+
+    // populate market vars
+    market.protocol = COMPTROLLER_ADDRESS.toHexString()
+    market.inputTokens = [marketMapping.underlyingAddress.toHexString()]
+    market.outputToken = marketAddress
+    market.totalValueLockedUSD = ZERO_BD
+    market.totalVolumeUSD = ZERO_BD
+    market.inputTokenBalances = [ZERO_BI]
+    market.outputTokenSupply = ZERO_BI
+    market.outputTokenPriceUSD = ZERO_BD
+    market.createdTimestamp = BigInt.fromI32(marketMapping.timestamp)
+    market.createdBlockNumber = BigInt.fromI32(marketMapping.block)
+    market.name = marketMapping.underlyingName
+    market.isActive = true
+    market.canUseAsCollateral = false // will change to true when used as collateral in a liquidation
+    market.canBorrowFrom = false // will update when used in Borrow
+    market.maximumLTV = ZERO_BD
+    market.liquidationThreshold = ZERO_BD
+    market.liquidationPenalty = ZERO_BD
+    market.depositRate = ZERO_BD
+    market.stableBorrowRate = ZERO_BD
+    market.variableBorrowRate = ZERO_BD
+
+    return market
+}
+
+// creates both tokens for a market pool token/cToken
+export function createMarketTokens(marketAddress: string): void {
+    let marketMapping = MARKETS[marketAddress]
+
+    // create underlying Token
+    let underlyingToken = new Token(marketMapping.underlyingAddress.toHexString())
+    underlyingToken.name = marketMapping.underlyingName
+    underlyingToken.symbol = marketMapping.underlyingSymbol
+    underlyingToken.decimals = marketMapping.underlyingDecimals
+    underlyingToken.save()
+
+    // create pool token (ie, cToken)
+    let cToken = new Token(marketAddress)
+    cToken.name = marketMapping.name
+    cToken.symbol = marketMapping.symbol
+    cToken.decimals = COMPOUND_DECIMALS
+    cToken.save()
 }
 
 // get usd price of cerc20 tokens (NOT eth)

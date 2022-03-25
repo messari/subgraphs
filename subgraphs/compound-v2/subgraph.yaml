@@ -29,52 +29,16 @@ dataSources:
         - name: PriceOracle2
           file: ./abis/PriceOracle2.json
       eventHandlers:
-        # - event: AccrueInterest(uint256,uint256,uint256)
-        #   handler: handleAccrueInterest
-
-        # This event equates to a Deposit
-        # event Mint(address minter, uint mintAmount, uint mintTokens);
         - event: Mint(address,uint256,uint256)
           handler: handleMint
-
-        # This event equates to a withdraw
-        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
         - event: Redeem(address,uint256,uint256)
           handler: handleRedeem
-
-        # This event equates to a Borrow
-        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
         - event: Borrow(address,uint256,uint256,uint256)
           handler: handleBorrow
-
-        # This event equates to a Repay
-        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: handleRepayBorrow
-
-        # This event equates to a Liquidation
-        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
-
-        # - event: NewPendingAdmin(address,address)
-        #   handler: handleNewPendingAdmin
-        # - event: NewAdmin(address,address)
-        #   handler: handleNewAdmin
-        # - event: NewComptroller(address,address)
-        #   handler: handleNewComptroller
-        # - event: NewMarketInterestRateModel(address,address)
-        #   handler: handleNewMarketInterestRateModel
-        # - event: NewReserveFactor(uint256,uint256)
-        #   handler: handleNewReserveFactor
-        # - event: ReservesReduced(address,uint256,uint256)
-        #   handler: handleReservesReduced
-        # - event: Failure(uint256,uint256,uint256)
-        #   handler: handleFailure
-        # - event: Transfer(indexed address,indexed address,uint256)
-        #   handler: handleTransfer
-        # - event: Approval(indexed address,indexed address,uint256)
-        #   handler: handleApproval
       file: ./src/mappings/mappings.ts
   - kind: ethereum/contract
     name: cAAVE
@@ -101,28 +65,14 @@ dataSources:
         - name: PriceOracle2
           file: ./abis/PriceOracle2.json
       eventHandlers:
-        # This event equates to a Deposit
-        # event Mint(address minter, uint mintAmount, uint mintTokens);
         - event: Mint(address,uint256,uint256)
           handler: handleMint
-
-        # This event equates to a withdraw
-        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
         - event: Redeem(address,uint256,uint256)
           handler: handleRedeem
-
-        # This event equates to a Borrow
-        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
         - event: Borrow(address,uint256,uint256,uint256)
           handler: handleBorrow
-
-        # This event equates to a Repay
-        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: handleRepayBorrow
-
-        # This event equates to a Liquidation
-        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
       file: ./src/mappings/mappings.ts
@@ -151,28 +101,14 @@ dataSources:
         - name: PriceOracle2
           file: ./abis/PriceOracle2.json
       eventHandlers:
-        # This event equates to a Deposit
-        # event Mint(address minter, uint mintAmount, uint mintTokens);
         - event: Mint(address,uint256,uint256)
           handler: handleMint
-
-        # This event equates to a withdraw
-        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
         - event: Redeem(address,uint256,uint256)
           handler: handleRedeem
-
-        # This event equates to a Borrow
-        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
         - event: Borrow(address,uint256,uint256,uint256)
           handler: handleBorrow
-
-        # This event equates to a Repay
-        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: handleRepayBorrow
-
-        # This event equates to a Liquidation
-        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
       file: ./src/mappings/mappings.ts
@@ -201,28 +137,14 @@ dataSources:
         - name: PriceOracle2
           file: ./abis/PriceOracle2.json
       eventHandlers:
-        # This event equates to a Deposit
-        # event Mint(address minter, uint mintAmount, uint mintTokens);
         - event: Mint(address,uint256,uint256)
           handler: handleMint
-
-        # This event equates to a withdraw
-        # event Redeem(address redeemer, uint redeemAmount, uint redeemTokens);
         - event: Redeem(address,uint256,uint256)
           handler: handleRedeem
-
-        # This event equates to a Borrow
-        # event Borrow(address borrower, uint borrowAmount, uint accountBorrows, uint totalBorrows);
         - event: Borrow(address,uint256,uint256,uint256)
           handler: handleBorrow
-
-        # This event equates to a Repay
-        # event RepayBorrow(address payer, address borrower, uint repayAmount, uint accountBorrows, uint totalBorrows);
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
           handler: handleRepayBorrow
-
-        # This event equates to a Liquidation
-        # event LiquidateBorrow(address liquidator, address borrower, uint repayAmount, address cTokenCollateral, uint seizeTokens);
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
       file: ./src/mappings/mappings.ts
@@ -764,8 +686,7 @@ dataSources:
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
       file: ./src/mappings/mappings.ts
-  
-  # This is the "factory" contracts and controls some stuff in market entity
+# This is the "factory" contract
   - kind: ethereum/contract
     name: Comptroller 
     network: mainnet
@@ -783,18 +704,7 @@ dataSources:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
-        - name: PriceOracle1
-          file: ./abis/PriceOracle1.json
-        - name: PriceOracle2
-          file: ./abis/PriceOracle2.json
       eventHandlers:
-        # event MarketEntered(CToken cToken, address account);
-        # - event: MarketEntered(address,address)
-        #   handler: handleMarketEntered
-        # event MarketExited(CToken cToken, address account);
-        # - event: MarketExited(address,address)
-        #   handler: handleMarketExited
-        # event NewPriceOracle(PriceOracle oldPriceOracle, PriceOracle newPriceOracle);
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
       file: ./src/mappings/mappings.ts

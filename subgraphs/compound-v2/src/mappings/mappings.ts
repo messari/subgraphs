@@ -1,21 +1,21 @@
 // map blockchain data to entities outlined in schema.graphql
 
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 import { 
-  DEFAULT_DECIMALS,
   COMPOUND_DECIMALS 
 } from "../common/constants"
+
 import { 
   createLendingProtocol,
-  getTokenPrice
+  getTokenPrice,
+  createMarket
 } from "./helpers"
+
 import {
   Mint,
   Redeem,
   Borrow as BorrowEvent,
   RepayBorrow,
   LiquidateBorrow,
-  NewComptroller, // comptroller update
 } from "../types/cCOMP/cToken"
 
 import {
@@ -23,7 +23,6 @@ import {
 } from "../types/Comptroller/Comptroller"
 
 import { 
-  Token,
   LendingProtocol,
   Market,
   Deposit,
@@ -31,25 +30,13 @@ import {
   Borrow as BorrowEntity,
   Repay,
   Liquidation,
-  Borrow
   } from "../types/schema"
 
   import {
     COMPTROLLER_ADDRESS,
-    ADDRESS_ZERO
+    MARKETS
   } from "../common/addresses"
 
-  import {
-    NETWORK_ETHEREUM,
-    PROTOCOL_TYPE_LENDING,
-    PROTOCOL_NAME,
-    PROTOCOL_SLUG,
-    PROTOCOL_VERSION
-  } from "../common/constants"
-import { get } from "https"
-
-// TODO: remove
-let counter = 0
 
   // Note: If a handler doesn't require existing field values, it is faster
   // _not_ to load the entity from the store. Instead, create it fresh with
@@ -60,11 +47,17 @@ let counter = 0
 
 export function handleMint(event: Mint): void {
   // get reused vars
-  let marketAddress = event.transaction.to as Address
+  let marketAddress = event.transaction.to!
   let blockNumber = event.block.number
   let transactionHash = event.transaction.hash.toHexString()
   let logIndex = event.logIndex
   let id = transactionHash + '-' + logIndex.toString()
+  let market = Market.load(marketAddress.toHexString())
+
+  // create Market if not already (also creates market Tokens)
+  if (market == null) {
+    market = createMarket(marketAddress.toHexString())
+  }
 
   // create new Deposit
   let deposit = new Deposit(id)
@@ -78,7 +71,7 @@ export function handleMint(event: Mint): void {
   deposit.blockNumber = blockNumber
   deposit.timestamp = event.block.timestamp
   deposit.market = marketAddress.toHexString()
-  deposit.asset = marketAddress.toHexString() // TODO: it should be the cToken
+  deposit.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
   deposit.amount = event.params.mintAmount // TODO: change to actual amount not 8000000...00
 
   // get usdPrice
@@ -91,6 +84,8 @@ export function handleMint(event: Mint): void {
   deposit.amountUSD = usdPrice
 
   deposit.save()
+
+  market.save()
 }
 
 export function handleRedeem(event: Redeem): void {
@@ -100,6 +95,14 @@ export function handleRedeem(event: Redeem): void {
   let transactionHash = event.transaction.hash.toHexString()
   let logIndex = event.logIndex
   let id = transactionHash + '-' + logIndex.toString()
+  let market = Market.load(marketAddress.toHexString())
+
+  // create Market if not already (also creates market Tokens)
+  
+  if (market == null) {
+    market = createMarket(marketAddress.toHexString())
+  }
+  
 
   // creates Withdraw entity
   let withdraw = new Withdraw(id)
@@ -113,7 +116,7 @@ export function handleRedeem(event: Redeem): void {
   withdraw.blockNumber = blockNumber
   withdraw.timestamp = event.block.timestamp
   withdraw.market = marketAddress.toHexString()
-  withdraw.asset = marketAddress.toHexString()
+  withdraw.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
   withdraw.amount = event.params.redeemAmount
 
   // get usd amount
@@ -127,6 +130,7 @@ export function handleRedeem(event: Redeem): void {
 
   withdraw.save()
 
+  market.save()
 }
 
 export function handleBorrow(event: BorrowEvent): void {
@@ -136,6 +140,12 @@ export function handleBorrow(event: BorrowEvent): void {
   let transactionHash = event.transaction.hash.toHexString()
   let logIndex = event.logIndex
   let id = transactionHash + '-' + logIndex.toString()
+  let market = Market.load(marketAddress.toHexString())
+
+  // create Market if not already (also creates market Tokens)
+  if (market == null) {
+    market = createMarket(marketAddress.toHexString())
+  }
 
   // creates Borrow entity
   let borrow = new BorrowEntity(id)
@@ -149,7 +159,7 @@ export function handleBorrow(event: BorrowEvent): void {
   borrow.blockNumber = blockNumber
   borrow.timestamp = event.block.timestamp
   borrow.market = marketAddress.toHexString()
-  borrow.asset = marketAddress.toHexString()
+  borrow.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
   borrow.amount = event.params.borrowAmount
 
   // get usdPrice
@@ -162,6 +172,11 @@ export function handleBorrow(event: BorrowEvent): void {
   borrow.amountUSD = usdPrice
 
   borrow.save()
+
+  // update Market canBorrowFrom marketAddress
+  market.canBorrowFrom = true
+
+  market.save()
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
@@ -171,6 +186,12 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let transactionHash = event.transaction.hash.toHexString()
   let logIndex = event.logIndex
   let id = transactionHash + '-' + logIndex.toString()
+  let market = Market.load(marketAddress.toHexString())
+
+  // create Market if not already (also creates market Tokens)
+  if (market == null) {
+    market = createMarket(marketAddress.toHexString())
+  }
 
   // create Repay entity
   let repay = new Repay(id)
@@ -184,7 +205,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   repay.blockNumber = blockNumber
   repay.timestamp = event.block.timestamp
   repay.market = marketAddress.toHexString()
-  repay.asset = marketAddress.toHexString()
+  repay.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
   repay.amount = event.params.repayAmount
 
   // get usdPrice
@@ -198,6 +219,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
   repay.save()
 
+  market.save()
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
@@ -207,7 +229,13 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let transactionHash = event.transaction.hash.toHexString()
   let logIndex = event.logIndex
   let id = transactionHash + '-' + logIndex.toString()
+  let market = Market.load(marketAddress.toHexString())
 
+  // create Market if not already (also creates market Tokens)
+  if (market == null) {
+    market = createMarket(marketAddress.toHexString())
+  }
+  
   // create liquidation entity
   let liquidation = new Liquidation(id)
 
@@ -220,7 +248,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   liquidation.blockNumber = blockNumber
   liquidation.timestamp = event.block.timestamp
   liquidation.market = marketAddress.toHexString()
-  liquidation.asset = marketAddress.toHexString()
+  liquidation.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
   liquidation.amount = event.params.repayAmount
 
   // get usdPrice
@@ -234,17 +262,19 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
   liquidation.save()
 
+  market.save()
+
+  // update canUseAsCollateral in Market
+  let collateralToken = event.params.cTokenCollateral.toHexString()
+  let collateralMarket = new Market(collateralToken)
+
+  if (collateralMarket == null) {
+    collateralMarket = createMarket(collateralToken)
+  }
+
+  collateralMarket.canUseAsCollateral = true
+  collateralMarket.save()
 }
-
-export function handleNewComptroller(event: NewComptroller): void {}
-
-// export function handleTransfer(event: Transfer): void {
-//   let deposit = new Deposit()
-//   deposit.from = event.params.from.toHex().toString()
-//   counter++
-  
-//   deposit.save()
-// }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   // create LendingProtocol - first function to be called in Comptroller
