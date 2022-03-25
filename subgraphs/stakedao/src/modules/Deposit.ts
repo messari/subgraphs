@@ -1,19 +1,20 @@
 import {
   Vault as VaultStore,
   Deposit as DepositTransaction,
+  Token,
 } from "../../generated/schema";
 
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { getPriceOfCurveLpToken, getPriceOfStakedTokens } from "./Price";
+import { getUsdPriceOfToken, getPriceOfStakedTokens } from "./Price";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function _Deposit(
   vault: VaultStore,
   _depositAmount: BigInt
 ): BigDecimal {
-  let _totalSupply = BigInt.fromString(vault.outputTokenSupply.toString());
-  let _balance = BigInt.fromString(vault.inputTokenBalances[0].toString());
+  let _totalSupply = vault.outputTokenSupply;
+  let _balance = vault.inputTokenBalances[0];
 
   let _sharesMinted = _totalSupply.isZero()
     ? _depositAmount
@@ -25,16 +26,18 @@ export function _Deposit(
   vault.inputTokenBalances = [
     vault.inputTokenBalances[0].plus(_depositAmount),
   ];
-
-  let _decimals = constants.DEFAULT_DECIMALS_BIGINT;
+  
+  let inputToken = Token.load(vault.inputTokens[0])
+  let _decimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8)
+  
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   const amountUSD = utils.normalizedUsdcPrice(
-    getPriceOfCurveLpToken(inputTokenAddress, _depositAmount, _decimals)
+    getUsdPriceOfToken(inputTokenAddress, _depositAmount, _decimals)
   );
 
   vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD.toBigDecimal());
   vault.totalValueLockedUSD = utils.normalizedUsdcPrice(
-    getPriceOfCurveLpToken(
+    getUsdPriceOfToken(
       inputTokenAddress,
       BigInt.fromString(vault.inputTokenBalances[0].toString()),
       _decimals

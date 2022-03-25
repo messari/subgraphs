@@ -28,6 +28,7 @@ export function updateFinancials(
     financialMetrics.supplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.protocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
   }
+
   const protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
   if (protocol) {
     let protocolTvlUsd = constants.BIGDECIMAL_ZERO;
@@ -49,6 +50,7 @@ export function updateFinancials(
     financialMetrics.totalValueLockedUSD = protocolTvlUsd;
   }
 
+  
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
   financialMetrics.timestamp = timestamp;

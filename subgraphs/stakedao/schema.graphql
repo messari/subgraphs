@@ -302,7 +302,7 @@ type Vault @entity {
   outputToken: Token
 
   " Aditional tokens that are given as reward for position in a protocol "
-  rewardTokens: [RewardToken!]
+  rewardTokens: [RewardToken!]!
 
   ##### Quantitative Data #####
 
@@ -316,6 +316,9 @@ type Vault @entity {
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
+
+  " Total amount of reward token emissions "
+  totalRewardTokenEmissions: BigInt!  
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!

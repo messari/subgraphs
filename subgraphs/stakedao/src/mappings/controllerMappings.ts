@@ -36,6 +36,8 @@ export function handleSetVault(call: SetVaultCall): void {
   vault.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
   vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
+  vault.totalRewardTokenEmissions = constants.BIGINT_ZERO;
+
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;
   
@@ -100,7 +102,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
 }
 
 export function handleRevokeStrategy(call: RevokeStrategyCall): void {
-  store.remove('Strategy', call.inputs._strategy.toString())
+  store.remove('_Strategy', call.inputs._strategy.toString())
 
   log.warning("[RevokeStrategy]\n TxHash: {}, StrategyId: {}", [
     call.transaction.hash.toHexString(),

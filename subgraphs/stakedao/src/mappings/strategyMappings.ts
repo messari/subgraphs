@@ -1,3 +1,4 @@
+import * as constants from "../common/constants";
 import {
   VaultFee,
   Vault as VaultStore,
@@ -21,10 +22,17 @@ export function handleHarvested(event: HarvestedEvent): void {
     const vault = VaultStore.load(vaultAddress.toHexString());
 
     // load performance fee and get the fees percentage
-    const vaultFee = VaultFee.load(vault!.fees[1]);
-    let performanceFee = BigInt.fromString(vaultFee!.feePercentage.toString());
+    let performanceFee = constants.DEFAULT_PERFORMANCE_FEE;
 
-    let origionalBalance = vault!.inputTokenBalances[0];
+    for (let i = 0; i < vault!.fees.length; i++) {
+      const vaultFee = VaultFee.load(vault!.fees[i])
+
+      if (vaultFee!.feeType == constants.VaultFeeType.PERFORMANCE_FEE) {
+        performanceFee = BigInt.fromString(vaultFee!.feePercentage.toString());
+      }
+    }
+
+    let originalBalance = vault!.inputTokenBalances[0];
 
     let wantEarned = event.params.wantEarned
       .times(BigInt.fromI32(100).minus(performanceFee))
@@ -37,12 +45,12 @@ export function handleHarvested(event: HarvestedEvent): void {
     vault!.save();
 
     log.warning(
-      "[handleHarvested]\n TxHash: {}, eventAddress: {}, wantEarned: {}, origionalBalance: {}",
+      "[handleHarvested]\n TxHash: {}, eventAddress: {}, wantEarned: {}, originalBalance: {}",
       [
         event.transaction.hash.toHexString(),
         event.address.toHexString(),
         wantEarned.toString(),
-        origionalBalance.toString(),
+        originalBalance.toString(),
       ]
     );
   }

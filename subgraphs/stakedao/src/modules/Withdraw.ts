@@ -1,10 +1,11 @@
 import {
+  Token,
   Vault as VaultStore,
   Withdraw as WithdrawTransaction,
 } from "../../generated/schema";
 
 import * as utils from "../common/utils";
-import { getPriceOfCurveLpToken } from "./Price";
+import { getUsdPriceOfToken } from "./Price";
 import * as constants from "../common/constants";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
@@ -21,21 +22,24 @@ export function _Withdraw(
   vault.inputTokenBalances = [
     vault.inputTokenBalances[0].minus(_withdrawAmount),
   ];
-
+  
+  let inputToken = Token.load(vault.inputTokens[0])
+  let _decimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8)
+  
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   const amountUSD = utils.normalizedUsdcPrice(
-    getPriceOfCurveLpToken(
+    getUsdPriceOfToken(
       inputTokenAddress,
       _withdrawAmount,
-      constants.DEFAULT_DECIMALS_BIGINT
+      _decimals
     )
   );
 
   vault.totalValueLockedUSD = utils.normalizedUsdcPrice(
-    getPriceOfCurveLpToken(
+    getUsdPriceOfToken(
       inputTokenAddress,
       BigInt.fromString(vault.inputTokenBalances[0].toString()),
-      constants.DEFAULT_DECIMALS_BIGINT
+      _decimals
     )
   ).toBigDecimal();
 

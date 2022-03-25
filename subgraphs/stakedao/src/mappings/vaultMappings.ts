@@ -1,15 +1,17 @@
 import {
-  Vault as VaultContract,
   DepositCall,
   WithdrawCall,
+  SetGaugeCall,
   DepositAllCall,
   WithdrawAllCall,
+  Vault as VaultContract,
 } from "../../generated/templates/Vault/Vault";
 
 import { BigInt, log } from "@graphprotocol/graph-ts";
 import { Vault as VaultStore } from "../../generated/schema";
-import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
+import { Gauge as GaugeTemplate } from "../../generated/templates";
 import { _Deposit, createDepositTransaction } from "../modules/Deposit";
+import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
 import { createWithdrawTransaction, _Withdraw } from "../modules/Withdraw";
 
 export function handleDeposit(call: DepositCall): void {
@@ -94,4 +96,9 @@ export function handleWithdrawAll(call: WithdrawAllCall): void {
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
+}
+
+export function handleSetGauge(call: SetGaugeCall): void {
+  const gaugeAddress = call.inputs._gauge;
+  GaugeTemplate.create(gaugeAddress)
 }

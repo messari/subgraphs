@@ -15,16 +15,16 @@ export function createFeeType(
   try_feePercentage: ethereum.CallResult<BigInt>,
   defaultFeePercentage: BigInt
 ): void {
-  const Fees = new VaultFee(feeId);
+  const fees = new VaultFee(feeId);
 
   let feePercentage = try_feePercentage.reverted
     ? defaultFeePercentage
     : try_feePercentage.value;
 
-  Fees.feeType = feeType;
-  Fees.feePercentage = (feePercentage.div(BigInt.fromI32(100))).toBigDecimal();
+  fees.feeType = feeType;
+  fees.feePercentage = (feePercentage.div(BigInt.fromI32(100))).toBigDecimal();
 
-  Fees.save();
+  fees.save();
 }
 
 export function getOrCreateStrategy(

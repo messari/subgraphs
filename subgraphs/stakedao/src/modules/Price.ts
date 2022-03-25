@@ -1,9 +1,10 @@
 import * as constants from "../common/constants";
-import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/templates/Vault/Vault";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { CalculationsSushi } from "../../generated/templates/Vault/CalculationsSushi";
 import { CalculationsCurve } from "../../generated/templates/Vault/CalculationsCurve";
 
-export function getPriceOfCurveLpToken(
+export function getUsdPriceOfToken(
   tokenAddress: Address,
   _amount: BigInt,
   _decimals: BigInt
@@ -23,6 +24,16 @@ export function getPriceOfCurveLpToken(
     tokenPrice = try_tokenPrice.reverted
       ? constants.BIGINT_ZERO
       : try_tokenPrice.value;
+  } else {
+    const sushiContract = CalculationsSushi.bind(
+      Address.fromString(constants.ETH_MAINNET_CALCULATIONS_SUSHI_ADDRESS)
+    );
+
+    let try_getPriceUsdc = sushiContract.try_getPriceUsdc(tokenAddress);
+
+    tokenPrice = try_getPriceUsdc.reverted
+      ? constants.BIGINT_ZERO
+      : try_getPriceUsdc.value;
   }
   return tokenPrice.times(_amount.div(_decimals));
 }
