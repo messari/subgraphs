@@ -1,0 +1,60 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Manager
+    network: mainnet
+    source:
+      address: "0xA86e412109f77c45a3BC1c5870b880492Fb86A14"
+      startBlock: 12912471
+      abi: Manager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NewVault
+      abis:
+        - name: Manager
+          file: ./abis/Manager.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+      eventHandlers:
+        - event: PoolRegistered(address)
+          handler: handleNewVault
+      file: ./src/mappings/managerMappings.ts
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vaultMappings.ts
+      entities:
+        - Vault
+        - Deposit
+        - Transaction
+        - Token
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/CalculationsSushiSwap.json 
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,address)
+          handler: handleDepositWithRecipient
+        - function: withdraw(uint256)
+          handler: handleWithdraw
