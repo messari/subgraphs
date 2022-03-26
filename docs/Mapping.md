@@ -105,5 +105,6 @@ Here are some known issues with subgraph tooling that you may run into:
 
 ### AssemblyScript Issues
 
+- When updating an entity array, you cannot use `array.push()` on the entity's field directly. Instead, you need to create a copy of that array. See [details](https://thegraph.com/docs/en/developer/assemblyscript-api/#updating-existing-entities).
 - Initialize array using `let a = new Array<T>()` instead of `let a = []`. See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3174s).
 - Scope is not inherited into closures (can't use variables declared outside of a closure). See [details](https://www.youtube.com/watch?v=1-8AW-lVfrA&t=3243s).
