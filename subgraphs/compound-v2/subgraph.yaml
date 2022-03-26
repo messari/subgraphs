@@ -704,6 +704,10 @@ dataSources:
       abis:
         - name: Comptroller
           file: ./abis/Comptroller.json
+        - name: PriceOracle1
+          file: ./abis/PriceOracle1.json
+        - name: PriceOracle2
+          file: ./abis/PriceOracle2.json
       eventHandlers:
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle

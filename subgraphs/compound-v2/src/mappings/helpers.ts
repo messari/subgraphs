@@ -3,19 +3,24 @@
 import { 
     Token,
     LendingProtocol,
-    Market
+    Market,
+    RewardToken
 } from "../types/schema"
 
 import { 
     COMPTROLLER_ADDRESS,
     PRICE_ORACLE1_ADDRESS,
     USDC_ADDRESS,
-    MARKETS
+    MARKETS,
+    MarketMapping,
+    CTOKEN_LIST,
+    ADDRESS_ZERO,
+    CCOMP_ADDRESS,
+    COMP_ADDRESS
  } from "../common/addresses"
 
 import {
     NETWORK_ETHEREUM,
-    PROTOCOL_TYPE_LENDING,
     PROTOCOL_NAME,
     PROTOCOL_SLUG,
     USDC_DECIMALS,
@@ -23,7 +28,10 @@ import {
     PROTOCOL_RISK_TYPE,
     COMPOUND_DECIMALS,
     ZERO_BD,
-    ZERO_BI
+    ZERO_BI,
+    REWARD_TOKEN_TYPE,
+    PROTOCOL_TYPE,
+    LENDING_TYPE
 } from "../common/constants"
 
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
@@ -32,6 +40,25 @@ import { PriceOracle1 } from "../types/Comptroller/PriceOracle1"
 
 // TODO: helper for converting uni time to days
 
+// grab Market from MARKETS by cToken
+export function getMarketMapping(cToken: string): MarketMapping {
+    for (let index = 0; index < CTOKEN_LIST.length; index++) {
+        if (CTOKEN_LIST[index].toHexString() == cToken) {
+            return MARKETS[index]
+        }
+    }
+    return new MarketMapping(
+        "Error in getMarketMapping()",
+        "",
+        ADDRESS_ZERO,
+        "Error in getMarketMapping()",
+        "",
+        -1,
+        -1,
+        -1
+    )
+}
+
 // create a LendingProtocol based off params
 export function createLendingProtocol(): LendingProtocol {
     let lendingProtocol = new LendingProtocol(COMPTROLLER_ADDRESS.toHexString())
@@ -39,7 +66,8 @@ export function createLendingProtocol(): LendingProtocol {
     lendingProtocol.slug = PROTOCOL_SLUG
     lendingProtocol.version = PROTOCOL_VERSION
     lendingProtocol.network = NETWORK_ETHEREUM
-    lendingProtocol.type = PROTOCOL_TYPE_LENDING
+    lendingProtocol.type = PROTOCOL_TYPE
+    lendingProtocol.lendingType = LENDING_TYPE
     lendingProtocol.riskType = PROTOCOL_RISK_TYPE
 
     // create empty lists that will be populated each day
@@ -48,30 +76,37 @@ export function createLendingProtocol(): LendingProtocol {
     // lendingProtocol.financialMetrics = []
     // lendingProtocol.markets = []
 
-    
-
     return lendingProtocol
 }
 
 // creates a new lending market and returns it
 export function createMarket(marketAddress: string): Market {
     let market = new Market(marketAddress)
-    let marketMapping = MARKETS[marketAddress]
+    let marketMapping = getMarketMapping(marketAddress)
 
     // create Tokens for asset token and cToken/cEther
-    createMarketTokens(marketAddress)
+    if (Token.load(marketAddress) == null) {
+        createMarketTokens(marketAddress)
+    }
+    
+    // create reward token if non existant
+    if (RewardToken.load(COMP_ADDRESS.toHexString()) == null) {
+        createMarketTokens(CCOMP_ADDRESS.toHexString())
+    }
+
 
     // populate market vars
     market.protocol = COMPTROLLER_ADDRESS.toHexString()
     market.inputTokens = [marketMapping.underlyingAddress.toHexString()]
     market.outputToken = marketAddress
+    market.rewardTokens = [COMP_ADDRESS.toHexString()]
     market.totalValueLockedUSD = ZERO_BD
     market.totalVolumeUSD = ZERO_BD
     market.inputTokenBalances = [ZERO_BI]
     market.outputTokenSupply = ZERO_BI
     market.outputTokenPriceUSD = ZERO_BD
-    market.createdTimestamp = BigInt.fromI32(marketMapping.timestamp)
-    market.createdBlockNumber = BigInt.fromI32(marketMapping.block)
+    market.createdTimestamp = BigInt.fromI32(marketMapping.timestamp as i32)
+    market.createdBlockNumber = BigInt.fromI32(marketMapping.block as i32)
     market.name = marketMapping.underlyingName
     market.isActive = true
     market.canUseAsCollateral = false // will change to true when used as collateral in a liquidation
@@ -88,14 +123,24 @@ export function createMarket(marketAddress: string): Market {
 
 // creates both tokens for a market pool token/cToken
 export function createMarketTokens(marketAddress: string): void {
-    let marketMapping = MARKETS[marketAddress]
+    let marketMapping = getMarketMapping(marketAddress)
 
     // create underlying Token
-    let underlyingToken = new Token(marketMapping.underlyingAddress.toHexString())
-    underlyingToken.name = marketMapping.underlyingName
-    underlyingToken.symbol = marketMapping.underlyingSymbol
-    underlyingToken.decimals = marketMapping.underlyingDecimals
-    underlyingToken.save()
+    if (marketAddress == CCOMP_ADDRESS.toHexString()) {
+        // create RewardToken out of COMP
+        let rewardToken = new RewardToken(marketMapping.underlyingAddress.toHexString())
+        rewardToken.name = marketMapping.underlyingName
+        rewardToken.symbol = marketMapping.underlyingSymbol
+        rewardToken.decimals = marketMapping.underlyingDecimals as i32
+        rewardToken.type = REWARD_TOKEN_TYPE
+        rewardToken.save()
+    } else {
+        let underlyingToken = new Token(marketMapping.underlyingAddress.toHexString())
+        underlyingToken.name = marketMapping.underlyingName
+        underlyingToken.symbol = marketMapping.underlyingSymbol
+        underlyingToken.decimals = marketMapping.underlyingDecimals as i32
+        underlyingToken.save()
+    }
 
     // create pool token (ie, cToken)
     let cToken = new Token(marketAddress)

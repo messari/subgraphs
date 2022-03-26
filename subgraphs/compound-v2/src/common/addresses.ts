@@ -2,22 +2,6 @@
 
 import { Address } from "@graphprotocol/graph-ts"
 
-// market mapping interfaces
-export interface MarketData {
-    name: string,
-    symbol: string,
-    underlyingAddress: Address,
-    underlyingName: string,
-    underlyingSymbol: string,
-    underlyingDecimals: number
-    timestamp: number,
-    block: number
-}
-
-interface MarketMapping {
-    [market: string]: MarketData
-}
-
 // null address
 export const ADDRESS_ZERO = Address.fromString("0x0000000000000000000000000000000000000000")
 
@@ -69,205 +53,263 @@ export const WBTC_ADDRESS  =   Address.fromString("0x2260FAC5E5542a773Aa44fBCfeD
 export const YFI_ADDRESS   =   Address.fromString("0x0bc529c00C6401aEF6D220BE8C6Ea1667F6Ad93e")
 export const ZRX_ADDRESS   =   Address.fromString("0xE41d2489571d322189246DaFA5ebDe1F4699F498")
 
+// cparallel cToken list - MUST be parallel with MARKETS
+export const CTOKEN_LIST = [
+    CAAVE_ADDRESS,
+    CBAT_ADDRESS,
+    CCOMP_ADDRESS,
+    CDAI_ADDRESS,
+    CETH_ADDRESS,
+    CFEI_ADDRESS,
+    CLINK_ADDRESS,
+    CMKR_ADDRESS,
+    CREP_ADDRESS,
+    CSAI_ADDRESS,
+    CSUSHI_ADDRESS,
+    CTUSD_ADDRESS,
+    CUNI_ADDRESS,
+    CUSDC_ADDRESS,
+    CUSDP_ADDRESS,
+    CUSDT_ADDRESS,
+    CWBTC_ADDRESS,
+    CWBTC2_ADDRESS,
+    CYFI_ADDRESS,
+    CZRX_ADDRESS
+]
+
+// market mappings
+export class MarketMapping {
+    name: string
+    symbol: string
+    underlyingAddress: Address
+    underlyingName: string
+    underlyingSymbol: string
+    underlyingDecimals: number
+    timestamp: number
+    block: number
+
+    constructor(
+        name: string,
+        symbol: string,
+        underlyingAddress: Address,
+        underlyingName: string,
+        underlyingSymbol: string,
+        underlyingDecimals: number,
+        timestamp: number,
+        block: number
+    ) {
+        this.name = name
+        this.symbol = symbol
+        this.underlyingAddress = underlyingAddress
+        this.underlyingName = underlyingName
+        this.underlyingSymbol = underlyingSymbol
+        this.underlyingDecimals = underlyingDecimals
+        this.timestamp = timestamp
+        this.block = block
+    }
+}
+
 // create/populate MARKETS
-export const MARKETS:MarketMapping = {}
-MARKETS[CAAVE_ADDRESS.toHexString()] = {
-    name: "Compound Aave",
-    symbol: "cAAVE",
-    underlyingAddress: AAVE_ADDRESS,
-    underlyingName: "Aave",
-    underlyingSymbol: "AAVE",
-    underlyingDecimals: 18,
-    timestamp: 1626578345,
-    block: 12848198
-}
-MARKETS[CBAT_ADDRESS.toHexString()] = {
-    name: "Compound Basic Attention Token",
-    symbol: "cBAT",
-    underlyingAddress: BAT_ADDRESS,
-    underlyingName: "Basic Attention Token",
-    underlyingSymbol: "BAT",
-    underlyingDecimals: 18,
-    timestamp: 1557192085,
-    block: 7710735
-}
-MARKETS[CCOMP_ADDRESS.toHexString()] = {
-    name: "Compound Collateral",
-    symbol: "cCOMP",
-    underlyingAddress: COMP_ADDRESS,
-    underlyingName: "Compound",
-    underlyingSymbol: "COMP",
-    underlyingDecimals: 18,
-    timestamp: 1601419265,
-    block: 10960099
-}
-MARKETS[CDAI_ADDRESS.toHexString()] = {
-    name: "Compound Dai",
-    symbol: "cDAI",
-    underlyingAddress: DAI_ADDRESS,
-    underlyingName: "Dai",
-    underlyingSymbol: "DAI",
-    underlyingDecimals: 18,
-    timestamp: 1574471013,
-    block: 8983575
-}
-MARKETS[CETH_ADDRESS.toHexString()] = {
-    name: "Compound Ether",
-    symbol: "cETH",
-    underlyingAddress: ADDRESS_ZERO,
-    underlyingName: "Ether",
-    underlyingSymbol: "ETH",
-    underlyingDecimals: 18,
-    timestamp: 1557192318,
-    block: 7710758
-}
-MARKETS[CFEI_ADDRESS.toHexString()] = {
-    name: "Compound Fei USD",
-    symbol: "cFEI",
-    underlyingAddress: FEI_ADDRESS,
-    underlyingName: "Fei USD",
-    underlyingSymbol: "FEI",
-    underlyingDecimals: 18,
-    timestamp: 1631672795,
-    block: 13227624
-}
-MARKETS[CLINK_ADDRESS.toHexString()] = {
-    name: "Compound Chainlink",
-    symbol: "cLINK",
-    underlyingAddress: LINK_ADDRESS,
-    underlyingName: "Chainlink",
-    underlyingSymbol: "LINK",
-    underlyingDecimals: 18,
-    timestamp: 1619041102,
-    block: 12286030
-}
-MARKETS[CMKR_ADDRESS.toHexString()] = {
-    name: "Compound Maker",
-    symbol: "cMKR",
-    underlyingAddress: MKR_ADDRESS,
-    underlyingName: "Maker",
-    underlyingSymbol: "MKR",
-    underlyingDecimals: 18,
-    timestamp: 1626413417,
-    block: 12836064
-}
-MARKETS[CREP_ADDRESS.toHexString()] = {
-    name: "Compound Augur",
-    symbol: "cREP",
-    underlyingAddress: REP_ADDRESS,
-    underlyingName: "Augur",
-    underlyingSymbol: "REP",
-    underlyingDecimals: 18,
-    timestamp: 1557192288,
-    block: 7710755
-}
-MARKETS[CSAI_ADDRESS.toHexString()] = {
-    name: "Compound Dai",
-    symbol: "cDAI",
-    underlyingAddress: SAI_ADDRESS,
-    underlyingName: "Single Collateral Dai",
-    underlyingSymbol: "SAI",
-    underlyingDecimals: 18,
-    timestamp: 1557192252,
-    block: 7710752 
-}
-MARKETS[CSUSHI_ADDRESS.toHexString()] = {
-    name: "Compound Sushi Token",
-    symbol: "cSUSHI",
-    underlyingAddress: SUSHI_ADDRESS,
-    underlyingName: "Sushi Token",
-    underlyingSymbol: "SUSHI",
-    underlyingDecimals: 18,
-    timestamp: 1626577979,
-    block: 12848166
-}
-MARKETS[CTUSD_ADDRESS.toHexString()] = {
-    name: "Compound TrueUSD",
-    symbol: "cTUSD",
-    underlyingAddress: TUSD_ADDRESS,
-    underlyingName: "TrueUSD",
-    underlyingSymbol: "TUSD",
-    underlyingDecimals: 18,
-    timestamp: 1602071129,
-    block: 11008385
-}
-MARKETS[CUNI_ADDRESS.toHexString()] = {
-    name: "Compound Uniswap",
-    symbol: "cUNI",
-    underlyingAddress: UNI_ADDRESS,
-    underlyingName: "Uniswap",
-    underlyingSymbol: "UNI",
-    underlyingDecimals: 18,
-    timestamp: 1600898747,
-    block: 10921410
-}
-MARKETS[CUSDC_ADDRESS.toHexString()] = {
-    name: "Compound USD Coin",
-    symbol: "cUSDC",
-    underlyingAddress: USDC_ADDRESS,
-    underlyingName: "",
-    underlyingSymbol: "",
-    underlyingDecimals: 6,
-    timestamp: 1557192331,
-    block: 7710760
-}
-MARKETS[CUSDP_ADDRESS.toHexString()] = {
-    name: "Compound Pax Dollar",
-    symbol: "cUSDP",
-    underlyingAddress: USDP_ADDRESS,
-    underlyingName: "Pax Dollar",
-    underlyingSymbol: "USDP",
-    underlyingDecimals: 18,
-    timestamp: 1632080577,
-    block: 13258119
-}
-MARKETS[CUSDT_ADDRESS.toHexString()] = {
-    name: "Compound USDT",
-    symbol: "cUSDT",
-    underlyingAddress: USDT_ADDRESS,
-    underlyingName: "Tether",
-    underlyingSymbol: "USDT",
-    underlyingDecimals: 6,
-    timestamp: 1586985186,
-    block: 9879363
-}
-MARKETS[CWBTC_ADDRESS.toHexString()] = { // Legacy version of WBTC
-    name: "Compound Wrapped BTC",
-    symbol: "cWBTC",
-    underlyingAddress: WBTC_ADDRESS,
-    underlyingName: "Wrapped BTC",
-    underlyingSymbol: "WBTC",
-    underlyingDecimals: 8,
-    timestamp: 1563306457,
-    block: 8163813
-}
-MARKETS[CWBTC2_ADDRESS.toHexString()] = { // Newest WBTC market
-    name: "Compound Wrapped BTC",
-    symbol: "cWBTC",
-    underlyingAddress: WBTC_ADDRESS,
-    underlyingName: "Wrapped BTC",
-    underlyingSymbol: "WBTC",
-    underlyingDecimals: 8,
-    timestamp: 1615751087,
-    block: 12038653
-}
-MARKETS[CYFI_ADDRESS.toHexString()] = {
-    name: "Compound yearn.finance",
-    symbol: "cYFI",
-    underlyingAddress: YFI_ADDRESS,
-    underlyingName: "yearn.finance",
-    underlyingSymbol: "YFI",
-    underlyingDecimals: 18,
-    timestamp: 1626578345,
-    block: 12848198
-}
-MARKETS[CZRX_ADDRESS.toHexString()] = {
-    name: "Compound 0x",
-    symbol: "cZRX",
-    underlyingAddress: ZRX_ADDRESS,
-    underlyingName: "0x",
-    underlyingSymbol: "ZRX",
-    underlyingDecimals: 18,
-    timestamp: 1557192054,
-    block: 7710733
-}
+export let MARKETS: MarketMapping[] = [
+    new MarketMapping(
+        "Compound Aave",
+        "cAAVE",
+        AAVE_ADDRESS,
+        "Aave",
+        "AAVE",
+        18,
+        1626578345,
+        12848198
+    ),
+    new MarketMapping(
+        "Compound Basic Attention Token",
+        "cBAT",
+        BAT_ADDRESS,
+        "Basic Attention Token",
+        "BAT",
+        18,
+        1557192085,
+        7710735
+    ),
+    new MarketMapping(
+        "Compound Collateral",
+        "cCOMP",
+        COMP_ADDRESS,
+        "Compound",
+        "COMP",
+        18,
+        1601419265,
+        10960099
+    ),
+    new MarketMapping(
+        "Compound Dai",
+        "cDAI",
+        DAI_ADDRESS,
+        "Dai",
+        "DAI",
+        18,
+        1574471013,
+        8983575
+    ),
+    new MarketMapping(
+        "Compound Ether",
+        "cETH",
+        ADDRESS_ZERO,
+        "Ether",
+        "ETH",
+        18,
+        1557192318,
+        7710758
+    ),
+    new MarketMapping(
+        "Compound Fei USD",
+        "cFEI",
+        FEI_ADDRESS,
+        "Fei USD",
+        "FEI",
+        18,
+        1631672795,
+        13227624
+    ),
+    new MarketMapping(
+        "Compound Chainlink",
+        "cLINK",
+        LINK_ADDRESS,
+        "Chainlink",
+        "LINK",
+        18,
+        1619041102,
+        12286030
+    ),
+    new MarketMapping(
+        "Compound Maker",
+        "cMKR",
+        MKR_ADDRESS,
+        "Maker",
+        "MKR",
+        18,
+        1626413417,
+        12836064
+    ),
+    new MarketMapping(
+        "Compound Augur",
+        "cREP",
+        REP_ADDRESS,
+        "Augur",
+        "REP",
+        18,
+        1557192288,
+        7710755
+    ),
+    new MarketMapping(
+        "Compound Dai",
+        "cDAI",
+        SAI_ADDRESS,
+        "Single Collateral Dai",
+        "SAI",
+        18,
+        1557192252,
+        7710752 
+    ),
+    new MarketMapping(
+        "Compound Sushi Token",
+        "cSUSHI",
+        SUSHI_ADDRESS,
+        "Sushi Token",
+        "SUSHI",
+        18,
+        1626577979,
+        12848166
+    ),
+    new MarketMapping(
+        "Compound TrueUSD",
+        "cTUSD",
+        TUSD_ADDRESS,
+        "TrueUSD",
+        "TUSD",
+        18,
+        1602071129,
+        11008385
+    ),
+    new MarketMapping(
+        "Compound Uniswap",
+        "cUNI",
+        UNI_ADDRESS,
+        "Uniswap",
+        "UNI",
+        18,
+        1600898747,
+        10921410
+    ),
+    new MarketMapping(
+        "Compound USD Coin",
+        "cUSDC",
+        USDC_ADDRESS,
+        "",
+        "",
+        6,
+        1557192331,
+        7710760
+    ),
+    new MarketMapping(
+        "Compound Pax Dollar",
+        "cUSDP",
+        USDP_ADDRESS,
+        "Pax Dollar",
+        "USDP",
+        18,
+        1632080577,
+        13258119
+    ),
+    new MarketMapping(
+        "Compound USDT",
+        "cUSDT",
+        USDT_ADDRESS,
+        "Tether",
+        "USDT",
+        6,
+        1586985186,
+        9879363
+    ),
+    new MarketMapping( // Legacy version of WBTC
+        "Compound Wrapped BTC",
+        "cWBTC",
+        WBTC_ADDRESS,
+        "Wrapped BTC",
+        "WBTC",
+        8,
+        1563306457,
+        8163813
+    ),
+    new MarketMapping( // Newest WBTC market
+        "Compound Wrapped BTC",
+        "cWBTC",
+        WBTC_ADDRESS,
+        "Wrapped BTC",
+        "WBTC",
+        8,
+        1615751087,
+        12038653
+    ),
+    new MarketMapping(
+        "Compound yearn.finance",
+        "cYFI",
+        YFI_ADDRESS,
+        "yearn.finance",
+        "YFI",
+        18,
+        1626578345,
+        12848198
+    ),
+    new MarketMapping(
+        "Compound 0x",
+        "cZRX",
+        ZRX_ADDRESS,
+        "0x",
+        "ZRX",
+        18,
+        1557192054,
+        7710733
+    ),
+
+]

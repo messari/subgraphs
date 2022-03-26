@@ -7,7 +7,8 @@ import {
 import { 
   createLendingProtocol,
   getTokenPrice,
-  createMarket
+  createMarket,
+  getMarketMapping
 } from "./helpers"
 
 import {
@@ -15,7 +16,7 @@ import {
   Redeem,
   Borrow as BorrowEvent,
   RepayBorrow,
-  LiquidateBorrow,
+  LiquidateBorrow
 } from "../types/cCOMP/cToken"
 
 import {
@@ -33,16 +34,8 @@ import {
   } from "../types/schema"
 
   import {
-    COMPTROLLER_ADDRESS,
-    MARKETS
+    COMPTROLLER_ADDRESS
   } from "../common/addresses"
-
-
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
 
 
 export function handleMint(event: Mint): void {
@@ -71,7 +64,7 @@ export function handleMint(event: Mint): void {
   deposit.blockNumber = blockNumber
   deposit.timestamp = event.block.timestamp
   deposit.market = marketAddress.toHexString()
-  deposit.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
+  deposit.asset = getMarketMapping(marketAddress.toHexString()).underlyingAddress.toHexString()
   deposit.amount = event.params.mintAmount // TODO: change to actual amount not 8000000...00
 
   // get usdPrice
@@ -116,7 +109,7 @@ export function handleRedeem(event: Redeem): void {
   withdraw.blockNumber = blockNumber
   withdraw.timestamp = event.block.timestamp
   withdraw.market = marketAddress.toHexString()
-  withdraw.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
+  withdraw.asset = getMarketMapping(marketAddress.toHexString()).underlyingAddress.toHexString()
   withdraw.amount = event.params.redeemAmount
 
   // get usd amount
@@ -159,7 +152,7 @@ export function handleBorrow(event: BorrowEvent): void {
   borrow.blockNumber = blockNumber
   borrow.timestamp = event.block.timestamp
   borrow.market = marketAddress.toHexString()
-  borrow.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
+  borrow.asset = getMarketMapping(marketAddress.toHexString()).underlyingAddress.toHexString()
   borrow.amount = event.params.borrowAmount
 
   // get usdPrice
@@ -205,7 +198,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   repay.blockNumber = blockNumber
   repay.timestamp = event.block.timestamp
   repay.market = marketAddress.toHexString()
-  repay.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
+  repay.asset = getMarketMapping(marketAddress.toHexString()).underlyingAddress.toHexString()
   repay.amount = event.params.repayAmount
 
   // get usdPrice
@@ -223,8 +216,9 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+  // TODO: verify market, to, from is accurate (changed)
   // reused vars
-  let marketAddress = event.transaction.to!
+  let marketAddress = event.params.cTokenCollateral
   let blockNumber = event.block.number
   let transactionHash = event.transaction.hash.toHexString()
   let logIndex = event.logIndex
@@ -248,7 +242,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   liquidation.blockNumber = blockNumber
   liquidation.timestamp = event.block.timestamp
   liquidation.market = marketAddress.toHexString()
-  liquidation.asset = MARKETS[marketAddress.toHexString()].underlyingAddress.toHexString()
+  liquidation.asset = getMarketMapping(marketAddress.toHexString()).underlyingAddress.toHexString()
   liquidation.amount = event.params.repayAmount
 
   // get usdPrice
@@ -259,6 +253,9 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     COMPOUND_DECIMALS
   )
   liquidation.amountUSD = usdPrice
+
+  // TODO: calculate profit
+  // liquidation.profitUSD = TODO
 
   liquidation.save()
 
