@@ -5,7 +5,7 @@
 - Decide which protocol you want to build a subgraph for
 - Fork this repository
 - Add a folder under `subgraphs` with the name of the protocol you want to work on
-- Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`
+- Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`. Note `schema-common.graphql` is used for schema design and reference, and should never be used for implementation
 - Build the subgraph within that folder
 - Submit a pull request to this repo after you are done
 
