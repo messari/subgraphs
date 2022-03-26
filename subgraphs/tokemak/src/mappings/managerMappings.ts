@@ -46,6 +46,7 @@ function createRewardTokens(): void{
     token.decimals = rewardToken.decimals;
     token.symbol = rewardToken.symbol;
     token.name = rewardToken.name;
+    token.type = RewardTokenType.DEPOSIT;
     token.save();
   }
 }
@@ -78,6 +79,7 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     vault.createdTimestamp = event.block.timestamp
 
     const rewardToken = getOrCreateToken(Address.fromString(TOKE_ADDRESS))
+
     vault.rewardTokens = [rewardToken.id]
 
     const managementFeeId = "management-fee-" + vault.id
