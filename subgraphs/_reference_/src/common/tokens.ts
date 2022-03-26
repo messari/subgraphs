@@ -5,14 +5,17 @@ import { ERC20NameBytes } from '../../generated/UniswapV2Factory/ERC20NameBytes'
 import { Address } from '@graphprotocol/graph-ts'
 
 export const INVALID_TOKEN_DECIMALS = 9999
+export const UNKNOWN_TOKEN_VALUE = 'unknown'
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
   let contract = ERC20.bind(tokenAddress)
   let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress)
 
   // try types string and bytes32 for symbol
-  let symbolValue = 'unknown'
+  let symbolValue = UNKNOWN_TOKEN_VALUE
   let symbolResult = contract.try_symbol()
+  
+  // non-standard ERC20 implementation
   if (symbolResult.reverted) {
     let symbolResultBytes = contractSymbolBytes.try_symbol()
     if (!symbolResultBytes.reverted) {
@@ -39,8 +42,10 @@ export function fetchTokenName(tokenAddress: Address): string {
   let contractNameBytes = ERC20NameBytes.bind(tokenAddress)
 
   // try types string and bytes32 for name
-  let nameValue = 'unknown'
+  let nameValue = UNKNOWN_TOKEN_VALUE
   let nameResult = contract.try_name()
+
+  // non-standard ERC20 implementation
   if (nameResult.reverted) {
     let nameResultBytes = contractNameBytes.try_name()
     if (!nameResultBytes.reverted) {
