@@ -7,10 +7,9 @@ import {
   Deploy_plain_pool2Call,
 } from "../../generated/Factory/Factory";
 
-import { Pool as PoolDataSource } from "../../generated/templates";
-import {} from "../utils/common";
+import { PoolLPToken as PoolDataSource } from "../../generated/templates";
 import {
-  CreatePool,
+  CreatePoolFromFactory,
   getOrCreateBasePool,
 } from "../helpers/pool";
 import { PoolType } from "../utils/constant";
@@ -34,7 +33,7 @@ export function handleDeployMetaPool(call: Deploy_metapoolCall): void {
   let poolAddress = call.outputs.value0;
 
   // Create a new pool
-  CreatePool(call, poolAddress, name, symbol, PoolType.META);
+  CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.META);
 
   PoolDataSource.create(poolAddress);
 }
@@ -49,7 +48,7 @@ export function handleDeployMetaPool1(call: Deploy_metapool1Call): void {
   let poolAddress = call.outputs.value0;
 
   // Create a new pool
-  CreatePool(call, poolAddress, name, symbol, PoolType.META);
+  CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.META);
 
   PoolDataSource.create(poolAddress);
 }
@@ -63,7 +62,7 @@ export function handleDeployPlainPool(call: Deploy_plain_poolCall): void {
   let poolAddress = call.outputs.value0;
 
   // Create a new pool
-  CreatePool(call, poolAddress, name, symbol, PoolType.PLAIN);
+  CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.PLAIN);
 
   PoolDataSource.create(poolAddress);
 }
@@ -78,7 +77,7 @@ export function handleDeployPlainPool1(call: Deploy_plain_pool1Call): void {
   let poolAddress = call.outputs.value0;
 
   // Create a new pool
-  CreatePool(call, poolAddress, name, symbol, PoolType.PLAIN);
+  CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.PLAIN);
 
   PoolDataSource.create(poolAddress);
 }
@@ -93,7 +92,8 @@ export function handleDeployPlainPool2(call: Deploy_plain_pool2Call): void {
   let poolAddress = call.outputs.value0;
 
   // Create a new pool
-  CreatePool(call, poolAddress, name, symbol, PoolType.PLAIN);
+  CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.PLAIN);
 
   PoolDataSource.create(poolAddress);
 }
+

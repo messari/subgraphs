@@ -12,7 +12,7 @@ import {
   ProtocolType,
   toDecimal,
 } from "./constant";
-import { normalizedUsdcPrice, usdcPricePerToken } from "./pricing";
+import { getOrCreateToken } from "./tokens";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
   let id = Address.fromString(FACTORY_ADDRESS).toHexString();
@@ -22,6 +22,7 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.name = "curve finance";
     protocol.slug = "curve-finance";
     protocol.network = Network.ETHEREUM;
+    protocol.version = "1.0.0";
     protocol.type = ProtocolType.EXCHANGE;
 
     protocol.save();
@@ -31,19 +32,20 @@ export function getOrCreateProtocol(): DexAmmProtocol {
   return protocol as DexAmmProtocol;
 }
 
-export function getOutTokenPriceUSD(pool: LiquidityPool): BigDecimal {
-  return normalizedUsdcPrice(
-    usdcPricePerToken(Address.fromBytes(pool._lpTokenAddress))
-  );
-}
+// export function getOutTokenPriceUSD(pool: LiquidityPool): BigDecimal {
+//   return normalizedUsdcPrice(
+//     usdcPricePerToken(Address.fromBytes(pool._lpTokenAddress))
+//   );
+// }
 
 export function getTVLUSD(pool: LiquidityPool): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
   for (let i = 0; i < pool._coinCount.toI32(); ++i) {
     let coin = Coin.load(pool.id.concat("-").concat(i.toString()));
     if (coin !== null) {
+      let token = getOrCreateToken(Address.fromString(coin.token))
       // @TODO: Get the USD Value of the coin.balance first
-      totalValueLockedUSD.plus(coin.balance);
+      totalValueLockedUSD.plus(toDecimal(coin.balance, token.decimals));
     }
   }
   return totalValueLockedUSD;
@@ -66,57 +68,55 @@ export function getCurrentTokenSupply(
   return currentTokenSupply;
 }
 
-export function addToPoolBalances(
-  pool: LiquidityPool,
-  token_amount: BigInt[],
-  fees: BigInt[]
-): BigDecimal[] {
-  let newPoolBalances: BigDecimal[] = [];
-  for (let i = 0; i < pool._coinCount.toI32(); ++i) {
-    let coin = Coin.load(pool.id.concat("-").concat(i.toString()));
-    if (coin !== null) {
-      if (
-        pool._coinCount.toI32() == token_amount.length &&
-        pool._coinCount.toI32() == fees.length
-      ) {
-        coin.balance = coin.balance.plus(
-          toDecimal(token_amount[i], DEFAULT_DECIMALS)
-        );
-        coin.feeBalance = coin.feeBalance.plus(
-          toDecimal(fees[i], FEE_DECIMALS)
-        );
-        // @TODO: change this!!!!
-        coin.feeBalanceUSD = coin.feeBalance
-        coin.save();
-        newPoolBalances.push(coin.balance);
-      }
-    }
-  }
-  pool.inputTokenBalances = newPoolBalances.map<BigDecimal>((pb) => pb);
-  return pool.inputTokenBalances;
-}
+// export function addToPoolBalances(
+//   pool: LiquidityPool,
+//   token_amount: BigInt[],
+//   fees: BigInt[]
+// ): BigInt[] {
+//   let newPoolBalances: BigInt[] = [];
+//   for (let i = 0; i < pool._coinCount.toI32(); ++i) {
+//     let coin = Coin.load(pool.id.concat("-").concat(i.toString()));
+//     if (coin !== null) {
+//       if (
+//         pool._coinCount.toI32() == token_amount.length &&
+//         pool._coinCount.toI32() == fees.length
+//       ) {
+//         coin.balance = coin.balance.plus(
+//           token_amount[i],
+//         );
+//         coin.feeBalance = coin.feeBalance.plus(
+//           fees[i]
+//         );
+//         // @TODO: change this!!!!
+//         // coin.feeBalanceUSD = toDecimal(coin.feeBalance, DEFAULT_DECIMALS);
+//         coin.save();
+//         newPoolBalances.push(coin.balance);
+//       }
+//     }
+//   }
+//   pool.inputTokenBalances = newPoolBalances.map<BigInt>((pb) => pb);
+//   return pool.inputTokenBalances;
+// }
 
-export function minusFromPoolBalances(
-  pool: LiquidityPool,
-  token_amount: BigInt[],
-  fees: BigInt[]
-): BigDecimal[] {
-  let newPoolBalances: BigDecimal[] = [];
-  for (let i = 0; i < pool._coinCount.toI32(); ++i) {
-    let coin = Coin.load(pool.id.concat("-").concat(i.toString()));
-    if (coin !== null) {
-        coin.balance = coin.balance.minus(
-          toDecimal(token_amount[i], DEFAULT_DECIMALS)
-        );
-        coin.feeBalance = coin.feeBalance.plus(
-          toDecimal(fees[i], FEE_DECIMALS)
-        );
-        // @TODO: change this!!!!
-        coin.feeBalanceUSD = coin.feeBalance
-        coin.save();
-        newPoolBalances.push(coin.balance);
-    }
-  }
-  pool.inputTokenBalances = newPoolBalances.map<BigDecimal>((pb) => pb);
-  return pool.inputTokenBalances;
-}
+// export function minusFromPoolBalances(
+//   pool: LiquidityPool,
+//   token_amount: BigInt[],
+//   fees: BigInt[]
+// ): BigInt[] {
+//   let newPoolBalances: BigInt[] = [];
+//   for (let i = 0; i < pool._coinCount.toI32(); ++i) {
+//     let coin = Coin.load(pool.id.concat("-").concat(i.toString()));
+//     if (coin !== null) {
+//       coin.balance = coin.balance.minus(
+//         token_amount[i]
+//       );
+//       coin.feeBalance = coin.feeBalance.plus(fees[i]);
+//       // @TODO: change this!!!!
+//       // coin.feeBalanceUSD = toDecimal(coin.feeBalance, DEFAULT_DECIMALS);
+//       coin.save();
+//       newPoolBalances.push(coin.balance);
+//     }
+//   }
+//   pool.inputTokenBalances = newPoolBalances.map<BigInt>((pb) => pb);
+//   return pool.inputTokenBalances;
+// }

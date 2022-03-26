@@ -12,10 +12,10 @@ export function createSwap(
   protocol: DexAmmProtocol,
   tokenIn: Token,
   amountIn: BigDecimal,
-  amountInUSD: BigDecimal,
+  // amountInUSD: BigDecimal,
   tokenOut: Token,
   amountOut: BigDecimal,
-  amountOutUSD: BigDecimal,
+  // amountOutUSD: BigDecimal,
   buyer: Address
 ): void {
   let swap_id = event.transaction.hash
@@ -34,12 +34,14 @@ export function createSwap(
     swap.timestamp = event.block.timestamp;
     swap.tokenIn = tokenIn.id;
     swap.amountIn = amountIn;
-    swap.amountInUSD = amountInUSD;
+    // swap.amountInUSD = amountInUSD;
     swap.tokenOut = tokenOut.id;
     swap.amountOut = amountOut;
-    swap.amountOutUSD = amountOutUSD;
+    // swap.amountOutUSD = amountOutUSD;
     swap.pool = pool.id;
 
     swap.save();
   }
 }
+
+

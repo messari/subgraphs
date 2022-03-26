@@ -1,4 +1,4 @@
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, PoolDailySnapshot } from "../../generated/schema";
 import { getOrCreateProtocol } from "../utils/common";
 import { SECONDS_PER_DAY } from "../utils/constant";
@@ -21,18 +21,22 @@ export function createPoolDailySnapshot(
     poolDailySnapshot = new PoolDailySnapshot(id);
     poolDailySnapshot.protocol = protocol.id;
     poolDailySnapshot.pool = pool.id;
-    poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
-    poolDailySnapshot.totalVolumeUSD = pool.totalVolumeUSD;
+    // poolDailySnapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+    // poolDailySnapshot.totalVolumeUSD = pool.totalVolumeUSD;
     poolDailySnapshot.inputTokenBalances = pool.inputTokenBalances.map<
-      BigDecimal
-    >((it) => it);
+      BigInt
+    >(it => it);
     poolDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
-    poolDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+    // poolDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
     poolDailySnapshot.rewardTokenEmissionsAmount = [];
-    poolDailySnapshot.rewardTokenEmissionsUSD = [];
+    // poolDailySnapshot.rewardTokenEmissionsUSD = [];
     poolDailySnapshot.blockNumber = blockNumber;
     poolDailySnapshot.timestamp = timestamp;
 
     poolDailySnapshot.save();
   }
 }
+
+
+
+

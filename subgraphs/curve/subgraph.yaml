@@ -23,8 +23,8 @@ dataSources:
           file: ./abis/Factory.json
         - name: Registry
           file: ./abis/Registry.json
-        - name: StableSwap
-          file: ./abis/StableSwap.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
       eventHandlers:
         - event: BasePoolAdded(address)
           handler: handleBasePoolAdded
@@ -39,34 +39,758 @@ dataSources:
           handler: handleDeployPlainPool1
         - function: deploy_plain_pool(string,string,address[4],uint256,uint256,uint256,uint256)
           handler: handleDeployPlainPool2
-        
-templates:
-  # Main pool contract
-  - name: Pool
-    kind: ethereum/contract
+
+  - kind: ethereum/contract
+    name: TriPool
     network: mainnet
     source:
-      abi: StableSwap
-    mapping: &pool_mapping
+      address: "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"
+      startBlock: 10809473
+      abi: StableSwapPlain3
+    mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mappings/pool.ts
-      entities: [ ]
+      entities: []
       abis:
-        - name: StableSwap
-          file: ./abis/StableSwap.json
-        - name: Registry
-          file: ./abis/Registry.json
-        - name: Oracle
-          file: ./abis/Oracle.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
         - name: Factory
           file: ./abis/Factory.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
+        - name: Registry
+          file: ./abis/Registry.json
       eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: AaveLendingPool
+    network: mainnet
+    source:
+      address: "0xDeBF20617708857ebe4F679508E7b7863a8A8EeE"
+      startBlock: 11497105
+      abi: StableSwapLending3
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: YLendingPool
+    network: mainnet
+    source:
+      address: "0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51"
+      startBlock: 9476468
+      abi: StableSwapLending4_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: StableSwapLending4_v1
+          file: ./abis/StableSwapLending4_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[4],uint256[4],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: sUSDLendingPool
+    network: mainnet
+    source:
+      address: "0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"
+      startBlock: 9906598
+      abi: StableSwapLending4_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: StableSwapLending4_v1
+          file: ./abis/StableSwapLending4_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[4],uint256[4],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: BUSDLendingPool
+    network: mainnet
+    source:
+      address: "0x79a8c46dea5ada233abaffd40f3a0a2b1e5a4f27"
+      startBlock: 9567295
+      abi: StableSwapLending4_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: StableSwapLending4_v1
+          file: ./abis/StableSwapLending4_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[4],uint256[4],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: PaxLendingPool
+    network: mainnet
+    source:
+      address: "0x06364f10b501e868329afbc005b3492902d6c763"
+      startBlock: 10041041
+      abi: StableSwapLending4_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: StableSwapLending4_v1
+          file: ./abis/StableSwapLending4_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[4],uint256[4],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[4],uint256[4],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: CompoundLendingPool
+    network: mainnet
+    source:
+      address: "0xa2b47e3d5c44877cca798226b7b8118f9bfb7a56"
+      startBlock: 9554040
+      abi: StableSwapLending2_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: IronBankPool
+    network: mainnet
+    source:
+      address: "0x2dded6da1bf5dbdf597c45fcfaa3194e53ecfeaf"
+      startBlock: 11831119
+      abi: StableSwapLending3
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: HUSDPool
+    network: mainnet
+    source:
+      address: "0x3ef6a01a0f81d6046290f3e2a8c5b843e738e604"
+      startBlock: 11010070
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: USDKPool
+    network: mainnet
+    source:
+      address: "0x3e01dd8a5e1fb3481f0f589056b428fc308af0fb"
+      startBlock: 11010305
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: MUSDPool
+    network: mainnet
+    source:
+      address: "0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6"
+      startBlock: 11011940
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: USDPPool
+    network: mainnet
+    source:
+      address: "0x42d7025938bec20b69cbae5a77421082407f053a"
+      startBlock: 11921924
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: DUSDPool
+    network: mainnet
+    source:
+      address: "0x8038c01a0390a8c547446a0b2c18fc9aefecc10c"
+      startBlock: 11187276
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: RSVPool
+    network: mainnet
+    source:
+      address: "0xc18cc39da8b11da8c3541c598ee022258f9744da"
+      startBlock: 11037531
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: USTPool
+    network: mainnet
+    source:
+      address: "0x890f4e345b1daed0367a877a1612f86a1f86985f"
+      startBlock: 11466568
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: GUSDPool
+    network: mainnet
+    source:
+      address: "0x4f062658eaaf2c1ccf8c8e36d6824cdf41167956"
+      startBlock: 11005604
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: USDNPool
+    network: mainnet
+    source:
+      address: "0x0f9cb53ebe405d49a0bbdbd291a65ff571bc83e1"
+      startBlock: 11010514
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: EURSPool
+    network: mainnet
+    source:
+      address: "0x0ce6a5ff5217e38315f87032cf90686c96627caa"
+      startBlock: 11466871
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: RenPool
+    network: mainnet
+    source:
+      address: "0x93054188d876f558f4a66b2ef1d97d16edf0895b"
+      startBlock: 10151385
+      abi: StableSwapLending2_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity
         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
@@ -75,9 +799,872 @@ templates:
           handler: handleRemoveLiquidityImbalance
         - event: RemoveLiquidityOne(indexed address,uint256,uint256)
           handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: HBTCPool
+    network: mainnet
+    source:
+      address: "0x4ca9b3063ec5866a4b82e437059d2c43d1be596f"
+      startBlock: 10732328
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: SBTCPool
+    network: mainnet
+    source:
+      address: "0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714"
+      startBlock: 10276641
+      abi: StableSwapPlain3_v1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3_v1
+          file: ./abis/StableSwapPlain3_v1.json
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: OBTCPool
+    network: mainnet
+    source:
+      address: "0xd81da8d904b52208541bade1bd6595d8a251f8dd"
+      startBlock: 11459238
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
-          handler: handleTokenExchangeUnderlying
-      
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: BBTCPool
+    network: mainnet
+    source:
+      address: "0x071c661b4deefb59e2a3ddb20db036821eee8f4b"
+      startBlock: 11455022
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: PBTCPool
+    network: mainnet
+    source:
+      address: "0x7f55dde206dbad629c080068923b36fe9d6bdbef"
+      startBlock: 11421596
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: TBTCPool
+    network: mainnet
+    source:
+      address: "0xc25099792e9349c7dd09759744ea681c7de2cb66"
+      startBlock: 11095928
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: LUSDPool
+    network: mainnet
+    source:
+      address: "0xed279fdd11ca84beef15af5d39bb4d4bee23f0ca"
+      startBlock: 12184843
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: FRAXPool
+    network: mainnet
+    source:
+      address: "0xd632f22692fac7611d2aa1c0d552930d43caed3b"
+      startBlock: 11968730
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: BUSDv2Pool
+    network: mainnet
+    source:
+      address: "0x4807862aa8b2bf68830e4c8dc86d0e9a998e085a"
+      startBlock: 12237709
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: ALUSDPool
+    network: mainnet
+    source:
+      address: "0x43b4fdfd4ff969587185cdb6f0bd875c5fc83f8c"
+      startBlock: 11955333
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: SAAVEPool
+    network: mainnet
+    source:
+      address: "0xeb16ae0052ed37f479f7fe63849198df1765a733"
+      startBlock: 11772500
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: SETHPool
+    network: mainnet
+    source:
+      address: "0xc5424b857f758e906013f3555dad202e4bdb4567"
+      startBlock: 11491884
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: STETHPool
+    network: mainnet
+    source:
+      address: "0xdc24316b9ae028f1497c275eb9192a3ea0f67022"
+      startBlock: 11592551
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: ANKRETHPool
+    network: mainnet
+    source:
+      address: "0xa96a65c051bf88b4095ee1f2451c2a9d43f53ae2"
+      startBlock: 11774139
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: RETHPool
+    network: mainnet
+    source:
+      address: "0xf9440930043eb3997fc70e1339dbb11f341de7a8"
+      startBlock: 12463576
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: LINKPool
+    network: mainnet
+    source:
+      address: "0xf178c0b5bb7e7abf4e12a4838c7b7c5ba2c623c0"
+      startBlock: 11875215
+      abi: StableSwapPlain2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain2
+          file: ./abis/StableSwapPlain2.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: LINKUSDPool
+    network: mainnet
+    source:
+      address: "0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171"
+      startBlock: 11011556
+      abi: StableSwapLending2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: TRICRYPTOPool
+    network: mainnet
+    source:
+      address: "0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5"
+      startBlock: 12521538
+      abi: StableSwapTriCrypto
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapTriCrypto
+          file: ./abis/StableSwapTriCrypto.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: Registry
+          file: ./abis/Registry.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchangeTriCrypto
+        - event: AddLiquidity(indexed address,uint256[3],uint256,uint256)
+          handler: handleAddLiquidityTriCrypto
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256)
+          handler: handleRemoveLiquidityTriCrypto
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOneTriCryptoCall
+      file: ./src/mappings/pool.ts
+
+  - kind: ethereum/contract
+    name: TRICRYPTO_2_Pool
+    network: mainnet
+    source:
+      address: "0xd51a44d3fae010294c616388b506acda1bfaae46"
+      startBlock: 12821148
+      abi: StableSwapTriCrypto
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapTriCrypto
+          file: ./abis/StableSwapTriCrypto.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: Factory
+          file: ./abis/Factory.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchangeTriCrypto
+        - event: AddLiquidity(indexed address,uint256[3],uint256,uint256)
+          handler: handleAddLiquidityTriCrypto
+        - event: RemoveLiquidity(indexed address,uint256[3],uint256)
+          handler: handleRemoveLiquidityTriCrypto
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOneTriCryptoCall
+      file: ./src/mappings/pool.ts
+
+templates:
+  - kind: ethereum/contract
+    name: PoolLPToken
+    network: mainnet
+    source:
+      abi: ERC20
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: StableSwapLending2_v1
+          file: ./abis/StableSwapLending2_v1.json
+        - name: StableSwapLending4_v1
+          file: ./abis/StableSwapLending4_v1.json
+        - name: StableSwapPlain3
+          file: ./abis/StableSwapPlain3.json
+        - name: StableSwapLending3
+          file: ./abis/StableSwapLending3.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mappings/pool.ts
+        
+# templates:
+#   - name: StableSwapLending2
+#     kind: ethereum/contract
+#     network: mainnet
+#     source:
+#       abi: StableSwapLending2
+#     mapping:
+#       kind: ethereum/events
+#       apiVersion: 0.0.5
+#       language: wasm/assemblyscript
+#       file: ./src/mappings/pool.ts
+#       entities: [ ]
+#       abis:
+#         - name: StableSwapLending2
+#           file: ./abis/StableSwapLending2.json
+#         - name: Registry
+#           file: ./abis/Registry.json
+#         - name: Factory
+#           file: ./abis/Factory.json
+#         - name: ERC20
+#           file: ./abis/IERC20.json
+#         - name: Oracle
+#           file: ./abis/Oracle.json
+#       - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+#           handler: handleTokenExchange
+#         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+#           handler: handleTokenExchange
+#         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+#           handler: handleAddLiquidity
+#         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+#           handler: handleRemoveLiquidity
+#         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+#           handler: handleRemoveLiquidityImbalance
+#         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+#           handler: handleRemoveLiquidityOne
+#       callHandlers:
+#         - function: remove_liquidity_one_coin(uint256,int128,uint256)
+#           handler: handleRemoveLiquidityOneCall
+
   

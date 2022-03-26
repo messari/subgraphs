@@ -61,19 +61,19 @@ type Coin @entity {
 
   underlying: UnderlyingCoin!
 
-  balance: BigDecimal!
+  balance: BigInt!
 
   " Exchange rate between this coin and the associated underlying coin within the pool "
   rate: BigDecimal
 
-  " Coin Balance in USD"
-  balanceUSD: BigDecimal!
+  # " Coin Balance in USD"
+  # balanceUSD: BigDecimal!
 
   " All time accrued coin fee"
-  feeBalance: BigDecimal!
+  feeBalance: BigInt!
 
-  " All time accrued coin fee in USD"
-  feeBalanceUSD: BigDecimal!
+  # " All time accrued coin fee in USD"
+  # feeBalanceUSD: BigDecimal!
 
   updated: BigInt!
   updatedAtBlock: BigInt!
@@ -93,11 +93,23 @@ type UnderlyingCoin @entity {
 
   coin: Coin!
 
-  balance: BigDecimal!
+  balance: BigInt!
 
   updated: BigInt!
   updatedAtBlock: BigInt!
   updatedAtTransaction: Bytes!
+}
+
+type RemoveLiqudityOneEvent @entity {
+  id: ID! # {transactionHash}{poolAddress}
+  pool: Pool!
+  provider: Bytes!
+  tokenAmount: BigInt
+  dy: BigInt
+  i: Int
+  eventApplied: Boolean!
+  callApplied: Boolean!
+  logIndex: BigInt
 }
 
 ######################################
@@ -143,6 +155,8 @@ interface Protocol {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
+  version: String!
+
   network: Network!
 
   type: ProtocolType!
@@ -186,23 +200,23 @@ type FinancialsDailySnapshot @entity {
 
   totalValueLockedUSD: BigDecimal!
 
-  " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
-  protocolTreasuryUSD: BigDecimal
+  # " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
+  # protocolTreasuryUSD: BigDecimal
 
-  " Only relevant for protocols with PCV. "
-  protocolControlledValueUSD: BigDecimal
+  # " Only relevant for protocols with PCV. "
+  # protocolControlledValueUSD: BigDecimal
 
-  " Total volume in USD "
-  totalVolumeUSD: BigDecimal!
+  # " Total volume in USD "
+  # totalVolumeUSD: BigDecimal!
 
-  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
-  supplySideRevenueUSD: BigDecimal!
+  # " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  # supplySideRevenueUSD: BigDecimal!
 
-  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
-  protocolSideRevenueUSD: BigDecimal!
+  # " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  # protocolSideRevenueUSD: BigDecimal!
 
-  " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
-  feesUSD: BigDecimal!
+  # " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
+  # feesUSD: BigDecimal!
   
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -242,10 +256,10 @@ interface Pool {
 
   ##### Quantitative Data #####
 
-  totalValueLockedUSD: BigDecimal!
+  # totalValueLockedUSD: BigDecimal!
 
-  " Total volume in USD (volume is defined differently according to the protocol category) "
-  totalVolumeUSD: BigDecimal!
+  # " Total volume in USD (volume is defined differently according to the protocol category) "
+  # totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
@@ -253,8 +267,8 @@ interface Pool {
   " Total supply of output token "
   outputTokenSupply: BigDecimal!
 
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  # " Price per share of output token in USD "
+  # outputTokenPriceUSD: BigDecimal!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -280,25 +294,25 @@ type PoolDailySnapshot @entity {
   " The pool this snapshot belongs to "
   pool: LiquidityPool!
 
-  totalValueLockedUSD: BigDecimal!
+  # totalValueLockedUSD: BigDecimal!
 
-  " Total volume in USD "
-  totalVolumeUSD: BigDecimal!
+  # " Total volume in USD "
+  # totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigDecimal!
 
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  # " Price per share of output token in USD "
+  # outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigDecimal!]
 
-  " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
+  # " Total amount of reward token emissions in a day, normalized to USD "
+  # rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -322,6 +336,8 @@ type DexAmmProtocol implements Protocol @entity {
   slug: String!
 
   network: Network!
+
+  version: String!
 
   type: ProtocolType!
 
@@ -375,19 +391,19 @@ type LiquidityPool @entity {
 
   ##### Quantitative Data #####
 
-  totalValueLockedUSD: BigDecimal!
+  # totalValueLockedUSD: BigDecimal!
 
-  " Total swap volume in USD "
-  totalVolumeUSD: BigDecimal!
+  # " Total swap volume in USD "
+  # totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigDecimal!
 
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  # " Price per share of output token in USD "
+  # outputTokenPriceUSD: BigDecimal!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -490,8 +506,8 @@ type Deposit implements Event @entity {
   " Amount of output tokens in the token's native unit "
   outputTokenAmounts: [BigDecimal!]!
 
-  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
-  amountUSD: BigDecimal!
+  # " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
+  # amountUSD: BigDecimal!
 
   ##### DexAmm-Specific #####
 
@@ -534,8 +550,8 @@ type Withdraw implements Event @entity {
   " Amount of output tokens in the token's native unit "
   outputTokenAmounts: [BigDecimal!]!
 
-  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
-  amountUSD: BigDecimal!
+  # " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
+  # amountUSD: BigDecimal!
 
   ##### DexAmm-Specific #####
 
@@ -572,8 +588,8 @@ type Swap implements Event @entity {
   " Amount of token deposited into pool in native units "
   amountIn: BigDecimal!
 
-  " Amount of token deposited into pool in USD "
-  amountInUSD: BigDecimal!
+  # " Amount of token deposited into pool in USD "
+  # amountInUSD: BigDecimal!
 
   " Token withdrawn from pool "
   tokenOut: Token!
@@ -581,8 +597,8 @@ type Swap implements Event @entity {
   " Amount of token withdrawn from pool in native units "
   amountOut: BigDecimal!
 
-  " Amount of token withdrawn from pool in USD "
-  amountOutUSD: BigDecimal!
+  # " Amount of token withdrawn from pool in USD "
+  # amountOutUSD: BigDecimal!
 
   ##### DexAmm-Specific #####
 

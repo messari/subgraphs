@@ -10,7 +10,6 @@ import {
   DEFAULT_DECIMALS,
   toDecimal,
 } from "../utils/constant";
-import { normalizedUsdcPrice, usdcPrice } from "../utils/pricing";
 import { getOrCreateToken } from "../utils/tokens";
 
 export function createDeposit(
@@ -37,6 +36,7 @@ export function createDeposit(
     deposit.timestamp = event.block.timestamp;
     deposit.inputTokens = pool.inputTokens;
 
+    
     // Output Token and Output Token Amount
     let outputTokens: Token[] = [];
     outputTokens.push(
@@ -48,31 +48,35 @@ export function createDeposit(
     deposit.outputTokenAmounts = outputTokenAmounts.map<BigDecimal>((tm) => tm);
 
     // Input Token and Input Token Amount
-    let tokenAmount = token_amount.map<BigInt>((ta) => ta);
-
-    let amountUSD = BIGDECIMAL_ZERO;
-    for (let i = 0; i < pool._coinCount.toI32(); ++i) {
-  
-        let inputToken = getOrCreateToken(
-          Address.fromString(deposit.inputTokens[i])
-        );
-        let inputTokenAmounts = tokenAmount[i];
-
-        // Get the price of 1 input token in usd
-        // and multiple with the input token amount
-        let inputTokenUSD = normalizedUsdcPrice(
-          usdcPrice(inputToken, inputTokenAmounts)
-        );
-        // Add the price of the total input to amountUSD
-        amountUSD = amountUSD.plus(inputTokenUSD);
-      
+    let tokenAmount: BigInt[] = []
+    for(let i = 0; i < pool._coinCount.toI32(); ++i) {
+      tokenAmount.push(token_amount[i])
     }
+
+    // let amountUSD = BIGDECIMAL_ZERO;
+    // for (let i = 0; i < pool._coinCount.toI32(); ++i) {
+  
+    //     let inputToken = getOrCreateToken(
+    //       Address.fromString(deposit.inputTokens[i])
+    //     );
+    //     let inputTokenAmounts = tokenAmount[i];
+
+    //     // Get the price of 1 input token in usd
+    //     // and multiple with the input token amount
+    //     let inputTokenUSD = normalizedUsdcPrice(
+    //       usdcPrice(inputToken, inputTokenAmounts)
+    //     );
+    //     // Add the price of the total input to amountUSD
+    //     amountUSD = amountUSD.plus(inputTokenUSD);
+      
+    // }
     deposit.inputTokenAmounts = tokenAmount.map<BigDecimal>((ta) =>
       toDecimal(ta, DEFAULT_DECIMALS)
     );
-    deposit.amountUSD = amountUSD;
+    // deposit.amountUSD = amountUSD;
     deposit.pool = pool.id;
 
     deposit.save();
   }
 }
+

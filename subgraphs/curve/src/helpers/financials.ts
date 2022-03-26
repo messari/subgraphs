@@ -34,11 +34,11 @@ export function updateFinancials(
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = protocol.id;
 
-    financialMetrics.feesUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    // financialMetrics.feesUSD = BIGDECIMAL_ZERO;
+    // financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
+    // financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    // financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
+    // financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.blockNumber = blockNumber;
     financialMetrics.timestamp = timestamp;
@@ -49,19 +49,19 @@ export function updateFinancials(
   for (let i = 0; i < pool._coinCount.toI32(); ++i) {
     let coin = Coin.load(pool.id.concat("-").concat(i.toString()));
     if (coin !== null) {
-      totalFee = totalFee.plus(coin.feeBalanceUSD);
+      // totalFee = totalFee.plus(coin.feeBalanceUSD);
     }
   }
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(totalFee);
+  // financialMetrics.feesUSD = financialMetrics.feesUSD.plus(totalFee);
 
   let getFee = registryContract.try_get_fees(Address.fromString(pool.id));
   let fee: BigInt[] = getFee.reverted ? [] : getFee.value;
   let adminFee = toDecimal(fee[1], FEE_DECIMALS);
   let protocolFee = BIGDECIMAL_ONE.minus(adminFee);
-  financialMetrics.supplySideRevenueUSD = totalFee.times(adminFee);
-  financialMetrics.protocolSideRevenueUSD = totalFee.times(protocolFee);
-  financialMetrics.totalVolumeUSD = pool.totalVolumeUSD;
-  financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  // financialMetrics.supplySideRevenueUSD = totalFee.times(adminFee);
+  // financialMetrics.protocolSideRevenueUSD = totalFee.times(protocolFee);
+  // financialMetrics.totalVolumeUSD = pool.totalVolumeUSD;
+  // financialMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
 
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
@@ -69,3 +69,4 @@ export function updateFinancials(
 
   financialMetrics.save();
 }
+
