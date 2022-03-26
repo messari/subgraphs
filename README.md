@@ -20,7 +20,7 @@
   - For example, usually it's easier to start writing mappings for transactions and usage metrics
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio
-- Document in the README how important metrics are calculated (TVL, fees, revenue). Feel free to reach out to me if anything isn't clear
+- For specific metrics (esp. financial metrics), please refer to our [methodology](https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/). Feel free to comment in the spreadsheet if anything is unclear or incorrect.
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
