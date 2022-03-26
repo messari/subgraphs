@@ -21,8 +21,8 @@ import {
   VaultFeeType,
   TOKE_ADDRESS,
   RewardTokenType,
+  BIGINT_ZERO,
 } from "../common/constants"
-import { bigIntToPercentage } from "../common/utils"
 
 function createProtocol(): void {
   let protocol = YieldAggregator.load(PROTOCOL_ID)
@@ -68,10 +68,10 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     vault.symbol = vaultContract.symbol()
     const inputToken = getOrCreateToken(vaultContract.underlyer())
     vault.inputTokens = [inputToken.id]
-    vault.inputTokenBalances = [BIGDECIMAL_ZERO]
+    vault.inputTokenBalances = [BIGINT_ZERO]
     const outputToken = getOrCreateToken(Address.fromString(vault.id))
     vault.outputToken = outputToken.id
-    vault.outputTokenSupply = BIGDECIMAL_ZERO
+    vault.outputTokenSupply = BIGINT_ZERO
     vault.totalVolumeUSD = BIGDECIMAL_ZERO
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO
     vault.createdBlockNumber = event.block.number

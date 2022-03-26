@@ -11,8 +11,8 @@ import {
   Deposit as DepositTransaction,
   Withdraw as WithdrawTransaction,
   UsageMetricsDailySnapshot,
-  Account,
-  DailyActiveAccount,
+  _Account,
+  _DailyActiveAccount,
   FinancialsDailySnapshot,
   YieldAggregator,
 } from "../../generated/schema"
@@ -55,15 +55,14 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
   const token = getOrCreateToken(Address.fromString(vault.inputTokens[0]))
   const amountUSD = normalizedUsdcPrice(usdcPrice(token, depositAmount))
   vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD)
+  const tvl = vault.inputTokenBalances[0].plus(depositAmount)
+  vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl))
 
-  const depositUsd = normalizedUsdcPrice(usdcPrice(token, depositAmount))
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositUsd)
-
-  vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount.toBigDecimal())]
-  vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted.toBigDecimal())
+  vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount)]
+  vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted)
   vault.save();
 
-  getOrCreateDepositTransactionFromCall(call, depositAmount.toBigDecimal(), amountUSD, 'vault.deposit()')
+  getOrCreateDepositTransactionFromCall(call, depositAmount, amountUSD, 'vault.deposit()')
 }
 
 
@@ -88,19 +87,18 @@ export function handleWithdraw(call: WithdrawCall): void {
 function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt, sharesBurnt: BigInt): void {
   const token = getOrCreateToken(Address.fromString(vault.inputTokens[0]))
   let amountUSD = normalizedUsdcPrice(usdcPrice(token, withdrawAmount))
-
-  const withdrawUsd = normalizedUsdcPrice(usdcPrice(token, withdrawAmount))
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(withdrawUsd)
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt.toBigDecimal());
-  vault.inputTokenBalances = [vault.inputTokenBalances[0].minus(withdrawAmount.toBigDecimal())];
+  const tvl = vault.inputTokenBalances[0].minus(withdrawAmount)
+  vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl))
+  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  vault.inputTokenBalances = [tvl];
   vault.save();
 
-  getOrCreateWithdrawTransactionFromCall(call, withdrawAmount.toBigDecimal(), amountUSD, 'vault.withdraw()')
+  getOrCreateWithdrawTransactionFromCall(call, withdrawAmount, amountUSD, 'vault.withdraw()')
 }
 
 export function getOrCreateDepositTransactionFromCall(
   call: ethereum.Call,
-  amount: BigDecimal,
+  amount: BigInt,
   amountUSD: BigDecimal,
   action: string
 ): DepositTransaction {
@@ -136,7 +134,7 @@ export function getOrCreateDepositTransactionFromCall(
 
 export function getOrCreateWithdrawTransactionFromCall(
   call: ethereum.Call,
-  amount: BigDecimal,
+  amount: BigInt,
   amountUSD: BigDecimal,
   action: string
 ): WithdrawTransaction {
@@ -232,18 +230,18 @@ function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from: Addres
   usageMetrics.dailyTransactionCount += 1;
 
   let accountId = from.toHexString()
-  let account = Account.load(accountId)
+  let account = _Account.load(accountId)
   if (!account) {
-    account = new Account(accountId);
+    account = new _Account(accountId);
     account.save();
     usageMetrics.totalUniqueUsers += 1;
   }
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
-  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
     usageMetrics.activeUsers += 1;
   }
