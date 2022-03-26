@@ -12,7 +12,7 @@ import {
   VaultFee,
   RewardToken
 } from "../../generated/schema"
-import { getOrCreateToken } from "../common/tokens"
+import { getOrCreateRewardToken, getOrCreateToken } from "../common/tokens"
 import {
   BIGDECIMAL_ZERO,
   PROTOCOL_ID,
@@ -38,17 +38,7 @@ function createProtocol(): void {
 }
 function createRewardTokens(): void{
   const address = Address.fromString(TOKE_ADDRESS)
-  const rewardToken = getOrCreateToken(address)
-  let id = address.toHexString();
-  let token = RewardToken.load(id);
-  if(!token){
-    token = new RewardToken(rewardToken.id);
-    token.decimals = rewardToken.decimals;
-    token.symbol = rewardToken.symbol;
-    token.name = rewardToken.name;
-    token.type = RewardTokenType.DEPOSIT;
-    token.save();
-  }
+  getOrCreateRewardToken(address)
 }
 export function handleNewVault(event: PoolRegistered): void {
   createProtocol()
@@ -78,7 +68,7 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     vault.createdBlockNumber = event.block.number
     vault.createdTimestamp = event.block.timestamp
 
-    const rewardToken = getOrCreateToken(Address.fromString(TOKE_ADDRESS))
+    const rewardToken = getOrCreateRewardToken(Address.fromString(TOKE_ADDRESS))
 
     vault.rewardTokens = [rewardToken.id]
 

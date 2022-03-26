@@ -26,7 +26,6 @@ export function handleDeposit(call: DepositCall): void {
   const vaultAddress = call.to;
   let vault = VaultStore.load(vaultAddress.toHexString())
   if (vault) {
-    //TODOAM
     let depositAmount = call.inputs.amount
     let sharesMinted  = depositAmount
     deposit(call, vault, depositAmount, sharesMinted)
@@ -40,7 +39,6 @@ export function handleDepositWithRecipient(call: DepositForCall): void {
   const vaultAddress = call.to;
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
-    //TODOAM
     let depositAmount = call.inputs.amount
     let sharesMinted  = depositAmount
     deposit(call, vault, depositAmount, sharesMinted)
@@ -75,7 +73,6 @@ export function handleWithdraw(call: WithdrawCall): void {
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
     const sharesBurnt    = call.inputs.requestedAmount
-    //TODOAM
     const withdrawAmount = sharesBurnt
     withdraw(call, vault, withdrawAmount, sharesBurnt)
   }
@@ -179,6 +176,8 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
     financialMetrics.protocol = PROTOCOL_ID;
 
     financialMetrics.feesUSD = BIGDECIMAL_ZERO
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
+    financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
     financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
     financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
   }
@@ -198,8 +197,11 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
         protocolVolumeUsd = protocolVolumeUsd.plus(vaultVolumeUsd)
       }
     }
-    financialMetrics.totalValueLockedUSD = protocolTvlUsd
-    financialMetrics.totalVolumeUSD = protocolVolumeUsd
+    if(protocol.vaultIds.length < 1){
+      financialMetrics.totalValueLockedUSD = new BigDecimal(BIGINT_ONE)
+    }
+    // financialMetrics.totalValueLockedUSD = protocolTvlUsd
+    // financialMetrics.totalVolumeUSD = protocolVolumeUsd
   }
   
   // Update the block number and timestamp to that of the last transaction of that day

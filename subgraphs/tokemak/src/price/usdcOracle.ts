@@ -12,22 +12,13 @@ import {
   ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS,
   ETH_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
   ETH_MAINNET_NETWORK,
-  FTM_MAINNET_NETWORK,
   ETH_MAINNET_USDC_ORACLE_ADDRESS,
-  FTM_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
-  FTM_MAINNET_USDC_ORACLE_ADDRESS,
-  FTM_MAINNET_CALCULATIONS_SPOOKY_SWAP_ADDRESS,
-  ARB_MAINNET_NETWORK,
-  ARB_MAINNET_USDC_ORACLE_ADDRESS,
-  ARB_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
   USDC_DENOMINATOR,
 } from '../common/constants';
 
 function getSushiSwapCalculationsAddress(network: string): Address {
   let map = new Map<string, string>();
   map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
-  map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
-  map.set(ARB_MAINNET_NETWORK, ARB_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
   let address = changetype<Address>(Address.fromHexString(map.get(network)));
   log.info('Getting SushiSwap Calculations address {} in {}.', [
     address.toHexString(),
@@ -39,8 +30,6 @@ function getSushiSwapCalculationsAddress(network: string): Address {
 function getOracleCalculatorAddress(network: string): Address {
   let map = new Map<string, string>();
   map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_USDC_ORACLE_ADDRESS);
-  map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_USDC_ORACLE_ADDRESS);
-  map.set(ARB_MAINNET_NETWORK, ARB_MAINNET_USDC_ORACLE_ADDRESS);
   let address = changetype<Address>(Address.fromHexString(map.get(network)));
   log.info('Getting Oracle Calculations address {} in {}.', [
     address.toHexString(),
@@ -52,8 +41,6 @@ function getOracleCalculatorAddress(network: string): Address {
 function getCurveCalculationsAddress(network: string): Address {
   let map = new Map<string, string>();
   map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS);
-  // Note: Curve is not present in Fantom, so we use Spooky Swap.
-  map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_CALCULATIONS_SPOOKY_SWAP_ADDRESS);
   let address = changetype<Address>(Address.fromHexString(map.get(network)));
   log.info('Getting Curve Calculations address {} in {}.', [
     address.toHexString(),
