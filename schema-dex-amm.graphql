@@ -47,7 +47,7 @@ type RewardToken @entity {
   symbol: String!
   decimals: Int!
 
-  type: RewardTokenType
+  type: RewardTokenType!
 }
 
 #############################
@@ -63,6 +63,9 @@ interface Protocol {
 
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
+  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
+  version: String!
 
   network: Network!
 
@@ -81,7 +84,7 @@ type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " # of unique daily active users "
   activeUsers: Int!
@@ -103,7 +106,7 @@ type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   totalValueLockedUSD: BigDecimal!
 
@@ -145,7 +148,7 @@ interface Pool {
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
@@ -156,7 +159,7 @@ interface Pool {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -169,10 +172,10 @@ interface Pool {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -196,10 +199,10 @@ type PoolDailySnapshot @entity {
   id: ID!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " The pool this snapshot belongs to "
-  pool: Pool!
+  pool: LiquidityPool!
 
   totalValueLockedUSD: BigDecimal!
 
@@ -207,16 +210,16 @@ type PoolDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -242,6 +245,9 @@ type DexAmmProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
+  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
+  version: String!
+
   network: Network!
 
   type: ProtocolType!
@@ -256,18 +262,18 @@ type DexAmmProtocol implements Protocol @entity {
   pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
-type LiquidityPool implements Pool @entity {
+type LiquidityPool @entity {
   " Smart contract address of the pool "
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -280,10 +286,10 @@ type LiquidityPool implements Pool @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -335,7 +341,7 @@ interface Event {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
@@ -359,7 +365,7 @@ type Deposit implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Market that tokens are deposited into "
   to: String!
@@ -375,13 +381,13 @@ type Deposit implements Event @entity {
   inputTokens: [Token!]!
 
   " Output tokens of the transaction. E.g. the UNI-LP token "
-  outputTokens: [Token!]!
+  outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
-  inputTokenAmounts: [BigDecimal!]!
+  inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmounts: [BigDecimal!]!
+  outputTokenAmount: BigInt!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
@@ -403,7 +409,7 @@ type Withdraw implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
@@ -419,13 +425,13 @@ type Withdraw implements Event @entity {
   inputTokens: [Token!]!
 
   " Output tokens of the transaction. E.g. WETH and USDC from a WETH-USDC pool "
-  outputTokens: [Token!]!
+  outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
-  inputTokenAmounts: [BigDecimal!]!
+  inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmounts: [BigDecimal!]!
+  outputTokenAmount: BigInt!
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
@@ -447,7 +453,7 @@ type Swap implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!

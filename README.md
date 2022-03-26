@@ -20,12 +20,39 @@
   - For example, usually it's easier to start writing mappings for transactions and usage metrics
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio
+- For specific metrics (esp. financial metrics), please refer to our [methodology](https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/). Feel free to comment in the spreadsheet if anything is unclear or incorrect.
+- Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
+  - Project's official analytics dashboard
+  - [DeFi Llama](https://defillama.com/) (for TVL)
+  - [Dune Analytics](https://dune.xyz/)
+  - [TokenTerminal](https://www.tokenterminal.com/terminal)
 
 ## Resources
 
-- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
-- Get familiar with Uniswap: [https://uniswap.org/faq](https://uniswap.org/faq)
-- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
-- Creating a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
-- Deploying a subgraph to The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
+### Introductory
 
+- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
+- Query subgraphs using GraphQL: https://thegraph.com/docs/en/developer/graphql-api/
+- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
+- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
+- Creating a subgraph: https://thegraph.com/docs/en/developer/create-subgraph-hosted/
+- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
+
+### Intermediate
+
+- [AssemblyScript API](https://thegraph.com/docs/en/developer/assemblyscript-api/)
+- [Unit Test Using Matchstick](https://thegraph.com/docs/en/developer/matchstick/)
+- [Building a Subgraph for Sushiswap](https://docs.simplefi.finance/subgraph-development-documentation/sushiswap-subgraph-development)
+- [Building a Subgraph for Loopring](https://www.youtube.com/watch?v=SNmzhwlQqgU)
+  - Using templates (dynamic data sources)
+  - Indexing proxies
+
+### Advanced
+
+- Building ambitious subgraphs (Part I): https://www.youtube.com/watch?v=4V2o5YJooOM
+  - Schema design
+  - Error handling
+  - Interface and union types
+- Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
+  - Performance tips and tricks (for both mappings and queries)
+- [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
