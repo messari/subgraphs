@@ -18,6 +18,6 @@ Smart contracts: https://github.com/compound-finance/compound-protocol
 
 Deployed addresses: https://compound.finance/docs#networks
 
-Existing subgraphs: https://github.com/compound-finance/compound-v2-subgraph
+Existing subgraphs: https://github.com/graphprotocol/compound-v2-subgraph
 
 Subgraph in the studio: 
