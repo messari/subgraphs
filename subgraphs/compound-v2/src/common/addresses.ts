@@ -3,7 +3,7 @@
 import { Address } from "@graphprotocol/graph-ts"
 
 // null address
-export const ADDRESS_ZERO = Address.fromString("0x0000000000000000000000000000000000000000")
+export const NULL_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000")
 
 // "factory" address (Comptroller.sol)
 export const COMPTROLLER_ADDRESS = Address.fromString("0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b")
@@ -14,7 +14,7 @@ export const PRICE_ORACLE1_ADDRESS = Address.fromString("0x02557a5E05DeFeFFD4cAe
 // cToken addresses
 export const CAAVE_ADDRESS  =   Address.fromString("0xe65cdb6479bac1e22340e4e755fae7e509ecd06c")
 export const CBAT_ADDRESS   =   Address.fromString("0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e")
-export const CCOMP_ADDRESS  =   Address.fromString("0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4")
+export const CCOMP_ADDRESS  =   Address.fromString("0xc00e94cb662c3520282e6f5717214004a7f26888")
 export const CDAI_ADDRESS   =   Address.fromString("0x5d3a536e4d6dbd6114cc1ead35777bab948e3643")
 export const CETH_ADDRESS   =   Address.fromString("0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5")
 export const CFEI_ADDRESS   =   Address.fromString("0x7713dd9ca933848f6819f38b8352d9a15ea73f67")

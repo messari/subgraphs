@@ -4,6 +4,7 @@ import {
     BigInt, 
     BigDecimal, 
 } from "@graphprotocol/graph-ts"
+import exp = require("constants")
 
 // BigInt 0 and 1
 export let ZERO_BI = BigInt.fromI32(0)
@@ -22,6 +23,14 @@ export const PROTOCOL_NAME         = "Compound v2"
 export const PROTOCOL_SLUG         = "compound-v2"
 export const REWARD_TOKEN_TYPE     = "DEPOSIT" // TODO: check - seems like both
 export const PROTOCOL_VERSION      = "1.1.3"
+
+// ETH token constants
+export const ETH_DECIMALS = 18
+export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH"
+// Uses ZERO address
+
+
 
 export const COMPOUND_DECIMALS = 8
 export const USDC_DECIMALS = 6

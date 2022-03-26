@@ -14,9 +14,10 @@ import {
     MARKETS,
     MarketMapping,
     CTOKEN_LIST,
-    ADDRESS_ZERO,
+    NULL_ADDRESS,
     CCOMP_ADDRESS,
-    COMP_ADDRESS
+    COMP_ADDRESS,
+    CETH_ADDRESS
  } from "../common/addresses"
 
 import {
@@ -31,12 +32,17 @@ import {
     ZERO_BI,
     REWARD_TOKEN_TYPE,
     PROTOCOL_TYPE,
-    LENDING_TYPE
+    LENDING_TYPE,
+    ETH_NAME,
+    ETH_SYMBOL,
+    ETH_DECIMALS
 } from "../common/constants"
 
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 import { PriceOracle2 } from "../types/Comptroller/PriceOracle2"
 import { PriceOracle1 } from "../types/Comptroller/PriceOracle1"
+import { CToken } from "../types/Comptroller/cToken"
+import { ERC20 } from "../types/Comptroller/ERC20"
 
 // TODO: helper for converting uni time to days
 
@@ -60,8 +66,8 @@ export function getMarketMapping(cToken: string): MarketMapping {
 }
 
 // create a LendingProtocol based off params
-export function createLendingProtocol(): LendingProtocol {
-    let lendingProtocol = new LendingProtocol(COMPTROLLER_ADDRESS.toHexString())
+export function createLendingProtocol(address: string): LendingProtocol {
+    let lendingProtocol = new LendingProtocol(address)
     lendingProtocol.name = PROTOCOL_NAME
     lendingProtocol.slug = PROTOCOL_SLUG
     lendingProtocol.version = PROTOCOL_VERSION
@@ -80,37 +86,55 @@ export function createLendingProtocol(): LendingProtocol {
 }
 
 // creates a new lending market and returns it
-export function createMarket(marketAddress: string): Market {
+export function createMarket(
+    marketAddress: string, 
+    protocol: string,
+    blockNumber: BigInt,
+    timestamp: BigInt
+): Market {
     let market = new Market(marketAddress)
-    let marketMapping = getMarketMapping(marketAddress)
+    let cTokenContract = CToken.bind(Address.fromString(marketAddress))
+    let underlyingAddress = cTokenContract.underlying().toHexString()
 
-    // create Tokens for asset token and cToken/cEther
-    if (Token.load(marketAddress) == null) {
-        createMarketTokens(marketAddress)
-    }
-    
-    // create reward token if non existant
-    if (RewardToken.load(COMP_ADDRESS.toHexString()) == null) {
-        createMarketTokens(CCOMP_ADDRESS.toHexString())
-    }
-
+    // create cToken/erc20 Tokens
+    createMarketTokens(
+        marketAddress, 
+        underlyingAddress,
+        cTokenContract
+    )
 
     // populate market vars
-    market.protocol = COMPTROLLER_ADDRESS.toHexString()
-    market.inputTokens = [marketMapping.underlyingAddress.toHexString()]
+    market.protocol = protocol
+
+    // add tokens
+    let inputTokens = new Array<string>()
+    inputTokens.push(underlyingAddress)
+    market.inputTokens = inputTokens
     market.outputToken = marketAddress
-    market.rewardTokens = [COMP_ADDRESS.toHexString()]
+    let rewardTokens = new Array<string>()
+    rewardTokens.push(COMP_ADDRESS.toHexString())
+    market.rewardTokens = rewardTokens
+
+    // populate quantitative data
     market.totalValueLockedUSD = ZERO_BD
     market.totalVolumeUSD = ZERO_BD
-    market.inputTokenBalances = [ZERO_BI]
+    let inputTokenBalances = new Array<BigInt>()
+    inputTokenBalances.push(ZERO_BI)
+    market.inputTokenBalances = inputTokenBalances
     market.outputTokenSupply = ZERO_BI
     market.outputTokenPriceUSD = ZERO_BD
-    market.createdTimestamp = BigInt.fromI32(marketMapping.timestamp as i32)
-    market.createdBlockNumber = BigInt.fromI32(marketMapping.block as i32)
-    market.name = marketMapping.underlyingName
+    market.createdTimestamp = timestamp
+    market.createdBlockNumber = blockNumber
+    
+    // lending-specific data
+    let inputToken = Token.load(underlyingAddress)
+    market.name = inputToken!.name
     market.isActive = true
-    market.canUseAsCollateral = false // will change to true when used as collateral in a liquidation
-    market.canBorrowFrom = false // will update when used in Borrow
+    market.canUseAsCollateral = false // until Collateral is taken out
+    market.canBorrowFrom = false // until Borrowed from
+    
+    // calculations data
+    // TODO: figure out and do calcs
     market.maximumLTV = ZERO_BD
     market.liquidationThreshold = ZERO_BD
     market.liquidationPenalty = ZERO_BD
@@ -122,31 +146,50 @@ export function createMarket(marketAddress: string): Market {
 }
 
 // creates both tokens for a market pool token/cToken
-export function createMarketTokens(marketAddress: string): void {
-    let marketMapping = getMarketMapping(marketAddress)
-
-    // create underlying Token
+export function createMarketTokens(
+    marketAddress: string,
+    underlyingAddress: string,
+    cTokenContract: CToken
+): void {
+    
+    // create underlying token
     if (marketAddress == CCOMP_ADDRESS.toHexString()) {
-        // create RewardToken out of COMP
-        let rewardToken = new RewardToken(marketMapping.underlyingAddress.toHexString())
-        rewardToken.name = marketMapping.underlyingName
-        rewardToken.symbol = marketMapping.underlyingSymbol
-        rewardToken.decimals = marketMapping.underlyingDecimals as i32
+        // create RewardToken COMP
+        let compToken = ERC20.bind(Address.fromString(underlyingAddress))
+
+        let rewardToken = new RewardToken(underlyingAddress)
+        rewardToken.name =  compToken.name()
+        rewardToken.symbol = compToken.symbol()
+        rewardToken.decimals = compToken.decimals()
         rewardToken.type = REWARD_TOKEN_TYPE
         rewardToken.save()
+
+    } else if (marketAddress == CETH_ADDRESS.toHexString()) {
+        // ETH has a unique makeup
+        
+        let ethToken = new Token(NULL_ADDRESS.toHexString())
+        ethToken.name = ETH_NAME
+        ethToken.symbol = ETH_SYMBOL
+        ethToken.decimals = ETH_DECIMALS
+        ethToken.save()
+
     } else {
-        let underlyingToken = new Token(marketMapping.underlyingAddress.toHexString())
-        underlyingToken.name = marketMapping.underlyingName
-        underlyingToken.symbol = marketMapping.underlyingSymbol
-        underlyingToken.decimals = marketMapping.underlyingDecimals as i32
-        underlyingToken.save()
+        // create ERC20 Token normally
+        let erc20 = ERC20.bind(Address.fromString(underlyingAddress))
+        let token = new Token(underlyingAddress)
+
+        token.name = erc20.name()
+        token.symbol = erc20.symbol()
+        token.decimals = erc20.decimals()
+        token.save()
+
     }
 
     // create pool token (ie, cToken)
     let cToken = new Token(marketAddress)
-    cToken.name = marketMapping.name
-    cToken.symbol = marketMapping.symbol
-    cToken.decimals = COMPOUND_DECIMALS
+    cToken.name = cTokenContract.name()
+    cToken.symbol = cTokenContract.symbol()
+    cToken.decimals = cTokenContract.decimals()
     cToken.save()
 }
 

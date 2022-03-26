@@ -1,7 +1,7 @@
 // map blockchain data to entities outlined in schema.graphql
 
 import { 
-  COMPOUND_DECIMALS 
+  COMPOUND_DECIMALS, LENDING_TYPE, NETWORK_ETHEREUM, PROTOCOL_NAME, PROTOCOL_RISK_TYPE, PROTOCOL_SLUG, PROTOCOL_TYPE, PROTOCOL_VERSION 
 } from "../common/constants"
 
 import { 
@@ -20,6 +20,7 @@ import {
 } from "../types/cCOMP/cToken"
 
 import {
+  MarketListed,
   NewPriceOracle
 } from "../types/Comptroller/Comptroller"
 
@@ -36,6 +37,7 @@ import {
   import {
     COMPTROLLER_ADDRESS
   } from "../common/addresses"
+import { CToken } from "../types/templates"
 
 
 export function handleMint(event: Mint): void {
@@ -46,11 +48,6 @@ export function handleMint(event: Mint): void {
   let logIndex = event.logIndex
   let id = transactionHash + '-' + logIndex.toString()
   let market = Market.load(marketAddress.toHexString())
-
-  // create Market if not already (also creates market Tokens)
-  if (market == null) {
-    market = createMarket(marketAddress.toHexString())
-  }
 
   // create new Deposit
   let deposit = new Deposit(id)
@@ -273,12 +270,36 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   collateralMarket.save()
 }
 
+export function handleMarketListed(event: MarketListed): void {
+  // a new market/cToken pair is added to the protocol
+  // create a new CToken data source template
+  CToken.create(event.params.cToken)
+
+  // create new market now that the data source is instantiated
+  let market = createMarket(
+    event.params.cToken.toHexString(), 
+    event.address.toHexString(),
+    event.block.number,
+    event.block.timestamp
+  )
+  market.save()
+}
+
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   // create LendingProtocol - first function to be called in Comptroller
-  let lendingProtocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())
+  let lendingProtocol = LendingProtocol.load(event.address.toHexString()) // TODO: check this id
+  
   if (lendingProtocol == null) {
-    lendingProtocol = createLendingProtocol()
+    lendingProtocol = new LendingProtocol(event.address.toHexString())
+    lendingProtocol.name = PROTOCOL_NAME
+    lendingProtocol.slug = PROTOCOL_SLUG
+    lendingProtocol.version = PROTOCOL_VERSION
+    lendingProtocol.network = NETWORK_ETHEREUM
+    lendingProtocol.type = PROTOCOL_TYPE
+    lendingProtocol.lendingType = LENDING_TYPE
+    lendingProtocol.riskType = PROTOCOL_RISK_TYPE
   }
+
   lendingProtocol._priceOracle = event.params.newPriceOracle
   lendingProtocol.save()
 }

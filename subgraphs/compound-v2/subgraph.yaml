@@ -21,7 +21,8 @@ dataSources:
         - Market
         - Token
       abis:
-        - name: Comptroller
+        # TODO: check later if any './abis/...' are unnecessary
+        - name: Comptroller # TODO: where did graphprotocol get this abi (not the same as etherscan or truffle compile)
           file: ./abis/Comptroller.json
         - name: CToken
           file: ./abis/CToken.json
@@ -44,8 +45,8 @@ dataSources:
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
           handler: handleNewLiquidationIncentive
-        - event: NewMaxAssets(uint256,uint256)
-          handler: handleNewMaxAssets
+        # - event: NewMaxAssets(uint256,uint256)
+        #   handler: handleNewMaxAssets
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
 templates:
