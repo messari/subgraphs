@@ -28,6 +28,33 @@ dataSources:
         - event: NewExperimentalVault(indexed address,indexed address,address,string)
           handler: handleNewExperimentalVault
       file: ./src/mappings/registryMappings.ts
+  - kind: ethereum/contract
+    name: RegistryV2
+    network: mainnet
+    source:
+      address: "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804"
+      startBlock: 12045550
+      abi: Registry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Transaction
+      abis:
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+        - name: Vault
+          file: ./abis/Vault.json
+      eventHandlers:
+        - event: NewVault(indexed address,indexed uint256,address,string)
+          handler: handleNewVault
+        - event: NewExperimentalVault(indexed address,indexed address,address,string)
+          handler: handleNewExperimentalVault
+      file: ./src/mappings/registryMappings.ts
 templates:
   - name: Vault
     kind: ethereum/contract
@@ -58,10 +85,32 @@ templates:
           handler: handleDepositEvent
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawEvent
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
         - event: UpdatePerformanceFee(uint256)
           handler: handleUpdatePerformanceFee
         - event: UpdateManagementFee(uint256)
           handler: handleUpdateManagementFee
+
+        # V1: StrategyAdded(strategy,debtLimit,rateLimit,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
+          handler: handleStrategyAddedV1
+        # V2: StrategyAdded(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleStrategyAddedV2
+
+        # Reward address is the treasury address (for accruing protocol revenue)
+        - event: UpdateRewards(address)
+          handler: handleUpdateRewards
+
+        # We have two handlers to process the StrategyReported event due to incompatibility in both event structure.
+        # The "old" one is for vault versions 0.3.0 and 0.3.1.
+        # The "new" one is for vault versions 0.3.2 and higher.
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReportedOld
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReportedNew
+
         # - event: UpdateDepositLimit(uint256)
         #   handler: handleUpdateDepositLimit
       callHandlers:
