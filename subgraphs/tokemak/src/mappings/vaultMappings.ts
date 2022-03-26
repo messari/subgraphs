@@ -197,11 +197,9 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
         protocolVolumeUsd = protocolVolumeUsd.plus(vaultVolumeUsd)
       }
     }
-    if(protocol.vaultIds.length < 1){
-      financialMetrics.totalValueLockedUSD = new BigDecimal(BIGINT_ONE)
-    }
-    // financialMetrics.totalValueLockedUSD = protocolTvlUsd
-    // financialMetrics.totalVolumeUSD = protocolVolumeUsd
+    
+    financialMetrics.totalValueLockedUSD = protocolTvlUsd
+    financialMetrics.totalVolumeUSD = protocolVolumeUsd
   }
   
   // Update the block number and timestamp to that of the last transaction of that day
