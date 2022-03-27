@@ -12,14 +12,14 @@
 ## Build
 
 - Initialize subgraph (Subgraph Studio):
-    ```
-    graph init --product subgraph-studio
+  ```
+  graph init --product subgraph-studio
   --from-contract <CONTRACT_ADDRESS> [--network <ETHEREUM_NETWORK>] [--abi <FILE>] <SUBGRAPH_SLUG> [<DIRECTORY>]
-    ```
+  ```
 - Initialize subgraph (Hosted Service):
-    ```
-    graph init --product hosted-service --from-contract <CONTRACT_ADDRESS> <GITHUB_USER>/<SUBGRAPH_NAME>[<DIRECTORY>]
-    ```
+  ```
+  graph init --product hosted-service --from-contract <CONTRACT_ADDRESS> <GITHUB_USER>/<SUBGRAPH_NAME>[<DIRECTORY>]
+  ```
 - Generate code from manifest and schema: `graph codegen`
 - Build subgraph: `graph build`
 

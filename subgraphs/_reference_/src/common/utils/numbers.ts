@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -9,7 +9,7 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
-  let sum = BigDecimal.fromString('0');
+  let sum = BigDecimal.fromString("0");
   for (let i = 0; i < prices.length; i++) {
     sum = sum.plus(prices[i]);
   }
@@ -24,7 +24,7 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 
   let mid = Math.ceil(sorted.length / 2) as i32;
   if (sorted.length % 2 == 0) {
-    return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString('2'));
+    return sorted[mid].plus(sorted[mid - 1]).div(BigDecimal.fromString("2"));
   }
 
   return sorted[mid - 1];

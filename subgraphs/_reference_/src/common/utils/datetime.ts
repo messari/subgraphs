@@ -1,4 +1,4 @@
-import { BigInt } from '@graphprotocol/graph-ts';
+import { BigInt } from "@graphprotocol/graph-ts";
 
 export let minute = BigInt.fromI32(60);
 export let hour = BigInt.fromI32(3600);
