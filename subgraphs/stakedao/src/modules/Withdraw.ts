@@ -8,72 +8,98 @@ import * as utils from "../common/utils";
 import { getUsdPriceOfToken } from "./Price";
 import * as constants from "../common/constants";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  WithdrawAllCall,
+  WithdrawCall,
+} from "../../generated/templates/Vault/Vault";
 
 export function _Withdraw(
+  call: ethereum.Call,
   vault: VaultStore,
   _sharesBurnt: BigInt
-): Array<BigInt> {
+): void {
+  let id = "withdraw-" + call.transaction.hash.toHexString();
+
+  let transaction = WithdrawTransaction.load(id);
+  if (transaction) {
+    return;
+  }
+
+  transaction = createWithdrawTransaction(id, call);
+
   let _totalSupply = BigInt.fromString(vault.outputTokenSupply.toString());
   let _balance = BigInt.fromString(vault.inputTokenBalances[0].toString());
 
+  // calculate withdraw amount as per the withdraw function in vault 
+  // contract address
   let _withdrawAmount = _balance.times(_sharesBurnt).div(_totalSupply);
 
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(_sharesBurnt);
+  let inputToken = Token.load(vault.inputTokens[0]);
+  let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
+  let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
+  let inputTokenPrice = getUsdPriceOfToken(inputTokenAddress);
+
+  vault.totalValueLockedUSD = inputTokenPrice
+    .times(vault.inputTokenBalances[0])
+    .div(inputTokenDecimals)
+    .toBigDecimal();
+  // vault.totalVolumeUSD remains same
+
   vault.inputTokenBalances = [
     vault.inputTokenBalances[0].minus(_withdrawAmount),
   ];
-  
-  let inputToken = Token.load(vault.inputTokens[0])
-  let _decimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8)
-  
-  let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
-  const amountUSD = utils.normalizedUsdcPrice(
-    getUsdPriceOfToken(
-      inputTokenAddress,
-      _withdrawAmount,
-      _decimals
-    )
+  vault.outputTokenSupply = vault.outputTokenSupply.minus(_sharesBurnt);
+
+  // Update Financial Metrics FeesUSD
+  let financialMetricsId: i64 =
+    call.block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const financialMetrics = utils.getOrCreateFinancialSnapshots(
+    financialMetricsId.toString()
   );
 
-  vault.totalValueLockedUSD = utils.normalizedUsdcPrice(
-    getUsdPriceOfToken(
-      inputTokenAddress,
-      BigInt.fromString(vault.inputTokenBalances[0].toString()),
-      _decimals
-    )
-  ).toBigDecimal();
+  let feesPercentage = utils.getFeePercentage(
+    vault.id,
+    constants.VaultFeeType.WITHDRAWAL_FEE
+  );
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(
+    inputTokenPrice
+      .times(_withdrawAmount)
+      .times(
+        BigInt.fromString(
+          feesPercentage.times(BigDecimal.fromString("10")).toString()
+        )
+      )
+      .div(constants.BIGINT_HUNDRED.times(BigInt.fromI32(10)))
+      .div(inputTokenDecimals)
+      .toBigDecimal()
+  );
 
+  // update deposit transaction
+  transaction.asset = vault.inputTokens[0];
+  transaction.amount = _withdrawAmount;
+  transaction.amountUSD = inputTokenPrice
+    .times(_withdrawAmount)
+    .div(inputTokenDecimals)
+    .toBigDecimal();
+
+  financialMetrics.save();
+  transaction.save();
   vault.save();
-
-  return [_withdrawAmount, amountUSD];
 }
 
 export function createWithdrawTransaction(
-  call: ethereum.Call,
-  _amount: BigInt,
-  _amountUSD: BigDecimal
+  id: string,
+  call: ethereum.Call
 ): WithdrawTransaction {
-  let tx = call.transaction;
-  let id = "withdraw-" + tx.hash.toHexString();
-  let transaction = WithdrawTransaction.load(id);
-  if (transaction == null) {
-    transaction = new WithdrawTransaction(id);
-    transaction.logIndex = tx.index.toI32();
-    transaction.to = call.to.toHexString();
-    transaction.from = tx.from.toHexString();
-    transaction.hash = tx.hash.toHexString();
-    transaction.timestamp = utils.getTimestampInMillis(call.block);
-    transaction.blockNumber = call.block.number;
-    transaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
-    transaction.vault = call.to.toHexString();
+  let transaction = new WithdrawTransaction(id);
+  transaction.logIndex = call.transaction.index.toI32();
+  transaction.to = call.to.toHexString();
+  transaction.from = call.transaction.from.toHexString();
+  transaction.hash = call.transaction.hash.toHexString();
+  transaction.timestamp = utils.getTimestampInMillis(call.block);
+  transaction.blockNumber = call.block.number;
+  transaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+  transaction.vault = call.to.toHexString();
 
-    const vault = VaultStore.load(call.to.toHexString());
-    if (vault) {
-      transaction.asset = vault.inputTokens[0];
-    }
-    transaction.amount = _amount;
-    transaction.amountUSD = _amountUSD;
-    transaction.save();
-  }
   return transaction;
 }

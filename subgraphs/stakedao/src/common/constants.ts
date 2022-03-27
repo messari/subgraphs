@@ -44,6 +44,8 @@ export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGINT_HUNDRED = BigInt.fromI32(100)
+export const BIGDECIMAL_HUNDRED = BigDecimal.fromString('100')
 
 export const ETHEREUM_PROTOCOL_ID =
   "0x29D3782825432255041Db2EAfCB7174f5273f08A";
@@ -51,7 +53,6 @@ export const ETH_MAINNET_CALCULATIONS_SUSHI_ADDRESS =
   "0x8263e161A855B644f582d9C164C66aABEe53f927";
 export const ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS =
   "0x25BF7b72815476Dd515044F9650Bf79bAd0Df655";
-
 
 // Yearn registry contract
 export const DEFAULT_DECIMALS = 18;

@@ -7,12 +7,12 @@ import {
   Vault as VaultContract,
 } from "../../generated/templates/Vault/Vault";
 
+import { _Deposit,  } from "../modules/Deposit";
+import { _Withdraw } from "../modules/Withdraw";
 import { BigInt, log } from "@graphprotocol/graph-ts";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Gauge as GaugeTemplate } from "../../generated/templates";
-import { _Deposit, createDepositTransaction } from "../modules/Deposit";
 import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
-import { createWithdrawTransaction, _Withdraw } from "../modules/Withdraw";
 
 export function handleDeposit(call: DepositCall): void {
   const vaultAddress = call.to.toHexString();
@@ -21,8 +21,7 @@ export function handleDeposit(call: DepositCall): void {
   if (vault) {
     let _depositAmount = call.inputs._amount;
 
-    let amountUSD = _Deposit(vault, _depositAmount);
-    createDepositTransaction(call, _depositAmount, amountUSD);
+    _Deposit(call, vault, _depositAmount);
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
@@ -39,7 +38,8 @@ export function handleDepositAll(call: DepositAllCall): void {
     );
     let new_Balance = vaultContract.balance();
     let _depositAmount = new_Balance.minus(prev_Balance);
-    let amountUSD = _Deposit(vault, _depositAmount);
+    
+    _Deposit(call, vault, _depositAmount);
 
     log.warning(
       "[handleDepositAll] TxHash: {}, prev_Balance: {}, _depositAmount: {}",
@@ -49,7 +49,6 @@ export function handleDepositAll(call: DepositAllCall): void {
         _depositAmount.toString(),
       ]
     );
-    createDepositTransaction(call, _depositAmount, amountUSD);
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
@@ -62,8 +61,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   if (vault) {
     let _sharesBurnt = call.inputs._shares;
 
-    let values = _Withdraw(vault, _sharesBurnt);
-    createWithdrawTransaction(call, values[0], values[1].toBigDecimal());
+    _Withdraw(call, vault, _sharesBurnt);
   }
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
@@ -81,16 +79,15 @@ export function handleWithdrawAll(call: WithdrawAllCall): void {
     );
 
     let _sharesBurnt = prev_TotalSupply.minus(new_TotalSupply);
-    let values = _Withdraw(vault, _sharesBurnt);
-    createWithdrawTransaction(call, values[0], values[1].toBigDecimal());
+    
+    _Withdraw(call, vault, _sharesBurnt);
 
     log.warning(
-      "[handleWithdrawAll] TxHash: {}, prev_TotalSupply: {}, _sharesBurnt: {}, _withdrawAmount: {}",
+      "[handleWithdrawAll] TxHash: {}, prev_TotalSupply: {}, _sharesBurnt: {}",
       [
         call.transaction.hash.toHexString(),
         prev_TotalSupply.toString(),
         _sharesBurnt.toString(),
-        values[0].toString(),
       ]
     );
   }

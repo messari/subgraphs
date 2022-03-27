@@ -3,37 +3,21 @@ import {
   YieldAggregator,
   _DailyActiveAccount,
   Vault as VaultStore,
-  FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
 } from "../../generated/schema";
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { BigInt, Address } from "@graphprotocol/graph-ts";
 
-export function updateFinancials(
-  blockNumber: BigInt,
-  timestamp: BigInt,
-): void {
+export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   // Number of days since Unix epoch
   let id: i64 = timestamp.toI64() / constants.SECONDS_PER_DAY;
-  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-
-  if (!financialMetrics) {
-    financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
-
-    financialMetrics.feesUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.protocolTreasuryUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.supplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.protocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
-  }
+  const financialMetrics = utils.getOrCreateFinancialSnapshots(id.toString());
 
   const protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
   if (protocol) {
     let protocolTvlUsd = constants.BIGDECIMAL_ZERO;
     let protocolTotalVolumeUSD = constants.BIGDECIMAL_ZERO;
-    
 
     for (let i = 0; i < protocol._vaultIds.length; i++) {
       const vaultId = protocol._vaultIds[i];
@@ -50,7 +34,6 @@ export function updateFinancials(
     financialMetrics.totalValueLockedUSD = protocolTvlUsd;
   }
 
-  
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = blockNumber;
   financialMetrics.timestamp = timestamp;
@@ -99,4 +82,30 @@ export function updateUsageMetrics(
   }
 
   usageMetrics.save();
+}
+
+export function updateVaultSnapshots(
+  vaultAddress: string,
+  blockNumber: BigInt,
+  timestamp: BigInt
+): void {
+  // Number of days since Unix epoch
+  let id: i64 = timestamp.toI64() / constants.SECONDS_PER_DAY;
+
+  const vault = VaultStore.load(vaultAddress);
+  const vaultSnapshots = utils.getOrCreateVaultSnapshots(id.toString());
+
+  // TODO: vaultSnapshots.vault
+  vaultSnapshots.totalValueLockedUSD = vault!.totalValueLockedUSD;
+  vaultSnapshots.totalVolumeUSD = vault!.totalVolumeUSD;
+  vaultSnapshots.inputTokenBalances = vault!.inputTokenBalances;
+  vaultSnapshots.outputTokenSupply = vault!.outputTokenSupply;
+  vaultSnapshots.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
+  vaultSnapshots.rewardTokenEmissionsAmount = vault!.rewardTokenEmissionsAmount;
+  vaultSnapshots.rewardTokenEmissionsUSD = vault!.rewardTokenEmissionsUSD;
+
+  vaultSnapshots.blockNumber = blockNumber;
+  vaultSnapshots.timestamp = timestamp;
+
+  vaultSnapshots.save();
 }

@@ -2,12 +2,14 @@ import {
   RewardPaid,
   AddRewardCall,
   Gauge as GaugeContract,
+  RewardAdded,
 } from "../../generated/templates/Gauge/Gauge";
 
 import * as constants from "../common/constants";
+import { getUsdPriceOfToken } from "../modules/Price";
 import { getOrCreateRewardToken } from "../common/utils";
-import { Vault as VaultStore } from "../../generated/schema";
-import { ethereum, BigInt, Address, log } from "@graphprotocol/graph-ts";
+import { RewardToken, Vault as VaultStore } from "../../generated/schema";
+import { ethereum, BigInt, Address, log, BigDecimal } from "@graphprotocol/graph-ts";
 
 export function handleRewardPaid(event: RewardPaid): void {
   const gaugeAddress = event.address;
@@ -21,7 +23,27 @@ export function handleRewardPaid(event: RewardPaid): void {
 
   const vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
-    vault.totalRewardTokenEmissions = event.params.reward;
+
+    let rewardTokenDecimals: BigInt, rewardTokenPrice: BigInt;
+    let rewardTokenEmissionsAmount: Array<BigInt> = []
+    let rewardTokenEmissionsUSD: Array<BigDecimal> = []
+
+    for (let i = 0; i < vault._rewardTokensIds.length; i++) {
+      
+      let rewardToken = RewardToken.load(vault._rewardTokensIds[i])
+      rewardTokenPrice = getUsdPriceOfToken(Address.fromString(vault._rewardTokensIds[i]));
+      rewardTokenDecimals = BigInt.fromI32(10).pow(rewardToken!.decimals as u8);
+      
+      rewardTokenEmissionsAmount.push(event.params.reward);
+      rewardTokenEmissionsUSD.push(
+        rewardTokenPrice
+          .times(event.params.reward)
+          .div(rewardTokenDecimals)
+          .toBigDecimal()
+      );
+    }
+    vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
 
     vault.save();
   }
@@ -50,6 +72,7 @@ export function handleAddReward(call: AddRewardCall): void {
       rewardTokensIds.push(rewardToken.id);
     }
     vault.rewardTokens = rewardTokensIds;
+    vault._rewardTokensIds = rewardTokensIds;
     vault.save();
 
     log.warning(
@@ -62,3 +85,6 @@ export function handleAddReward(call: AddRewardCall): void {
     );
   }
 }
+
+
+export function handleRewardAdded(event: RewardAdded): void {}

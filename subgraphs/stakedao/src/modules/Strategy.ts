@@ -4,7 +4,7 @@ import {
   Vault as VaultStore,
   VaultFee,
 } from "../../generated/schema";
-import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
 import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
@@ -22,7 +22,9 @@ export function createFeeType(
     : try_feePercentage.value;
 
   fees.feeType = feeType;
-  fees.feePercentage = (feePercentage.div(BigInt.fromI32(100))).toBigDecimal();
+  fees.feePercentage = feePercentage
+    .toBigDecimal()
+    .div(BigDecimal.fromString("100"));
 
   fees.save();
 }

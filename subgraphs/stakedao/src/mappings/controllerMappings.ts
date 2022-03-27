@@ -36,7 +36,8 @@ export function handleSetVault(call: SetVaultCall): void {
   vault.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
   vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
-  vault.totalRewardTokenEmissions = constants.BIGINT_ZERO;
+  vault.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
+  vault.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;

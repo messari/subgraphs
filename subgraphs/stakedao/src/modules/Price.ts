@@ -6,8 +6,6 @@ import { CalculationsCurve } from "../../generated/templates/Vault/CalculationsC
 
 export function getUsdPriceOfToken(
   tokenAddress: Address,
-  _amount: BigInt,
-  _decimals: BigInt
 ): BigInt {
   const curveContract = CalculationsCurve.bind(
     Address.fromString(constants.ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS)
@@ -35,7 +33,7 @@ export function getUsdPriceOfToken(
       ? constants.BIGINT_ZERO
       : try_getPriceUsdc.value;
   }
-  return tokenPrice.times(_amount.div(_decimals));
+  return tokenPrice.div(constants.USDC_DENOMINATOR);
 }
 
 export function getVirtualPriceOfCurveLpToken(

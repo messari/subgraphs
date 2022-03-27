@@ -195,6 +195,7 @@ interface Pool {
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
 
+  
   ##### Quantitative Data #####
 
   totalValueLockedUSD: BigDecimal!
@@ -304,6 +305,8 @@ type Vault @entity {
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]!
 
+  _rewardTokensIds: [String!]!
+
   ##### Quantitative Data #####
 
   totalValueLockedUSD: BigDecimal!
@@ -317,8 +320,11 @@ type Vault @entity {
   " Total supply of output token "
   outputTokenSupply: BigInt!
 
-  " Total amount of reward token emissions "
-  totalRewardTokenEmissions: BigInt!  
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -363,7 +369,7 @@ type VaultDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigInt!
+  inputTokenBalances: [BigInt!]
 
   " Total supply of output token "
   outputTokenSupply: BigInt!

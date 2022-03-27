@@ -1,7 +1,14 @@
-import { RewardToken, Token } from "../../generated/schema";
 import * as constants from "../common/constants";
 import { DEFAULT_DECIMALS } from "../common/constants";
-import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts";
+import {
+  Token,
+  RewardToken,
+  Vault as VaultStore,
+  VaultFee,
+  VaultDailySnapshot,
+  FinancialsDailySnapshot,
+} from "../../generated/schema";
+import { BigInt, ethereum, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 
 export function getTimeInMillis(time: BigInt): BigInt {
@@ -10,10 +17,6 @@ export function getTimeInMillis(time: BigInt): BigInt {
 
 export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
-}
-
-export function normalizedUsdcPrice(usdcPrice: BigInt): BigInt {
-  return usdcPrice.div(constants.USDC_DENOMINATOR)
 }
 
 export function getOrCreateToken(address: Address): Token {
@@ -57,4 +60,62 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     rewardToken.save();
   }
   return rewardToken as RewardToken;
+}
+
+export function getFeePercentage(
+  vaultAddress: string,
+  feeType: string
+): BigDecimal {
+  let feesPercentage: BigDecimal = BigDecimal.fromString("0");
+  const vault = VaultStore.load(vaultAddress);
+
+  for (let i = 0; i < vault!.fees.length; i++) {
+    const vaultFee = VaultFee.load(vault!.fees[i]);
+
+    if (vaultFee!.feeType == feeType) {
+      feesPercentage = vaultFee!.feePercentage;
+    }
+  }
+
+  return feesPercentage;
+}
+
+export function getOrCreateFinancialSnapshots(
+  financialSnapshotId: string
+): FinancialsDailySnapshot {
+  let financialMetrics = FinancialsDailySnapshot.load(financialSnapshotId);
+
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(financialSnapshotId);
+    financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
+
+    financialMetrics.feesUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.supplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+    financialMetrics.protocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  }
+
+  return financialMetrics;
+}
+
+export function getOrCreateVaultSnapshots(
+  vaultSnapshotsId: string
+): VaultDailySnapshot {
+  let vaultSnapshots = VaultDailySnapshot.load(vaultSnapshotsId);
+
+  if (!vaultSnapshots) {
+    vaultSnapshots = new VaultDailySnapshot(vaultSnapshotsId);
+    vaultSnapshots.protocol = constants.ETHEREUM_PROTOCOL_ID;
+
+    vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.inputTokenBalances = [constants.BIGINT_ZERO];
+    vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
+    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
+    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
+  }
+
+  return vaultSnapshots;
 }

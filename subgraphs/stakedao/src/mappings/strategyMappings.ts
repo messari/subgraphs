@@ -3,6 +3,7 @@ import {
   VaultFee,
   Vault as VaultStore,
   _Strategy as StrategyStore,
+  Token,
 } from "../../generated/schema";
 import {
   SetWithdrawalFeeCall,
@@ -10,8 +11,9 @@ import {
   Harvested as HarvestedEvent,
 } from "../../generated/templates/Strategy/Strategy";
 
-import { BigInt, log } from "@graphprotocol/graph-ts";
-
+import * as utils from "../common/utils";
+import { getUsdPriceOfToken } from "../modules/Price";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 export function handleHarvested(event: HarvestedEvent): void {
   const strategyAddress = event.address;
@@ -21,25 +23,57 @@ export function handleHarvested(event: HarvestedEvent): void {
     const vaultAddress = strategy.vaultAddress;
     const vault = VaultStore.load(vaultAddress.toHexString());
 
+    let financialMetricsId: i64 =
+      event.block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+    const financialMetrics = utils.getOrCreateFinancialSnapshots(
+      financialMetricsId.toString()
+    );
+
     // load performance fee and get the fees percentage
-    let performanceFee = constants.DEFAULT_PERFORMANCE_FEE;
-
-    for (let i = 0; i < vault!.fees.length; i++) {
-      const vaultFee = VaultFee.load(vault!.fees[i])
-
-      if (vaultFee!.feeType == constants.VaultFeeType.PERFORMANCE_FEE) {
-        performanceFee = BigInt.fromString(vaultFee!.feePercentage.toString());
-      }
-    }
+    let performanceFee = utils.getFeePercentage(
+      vaultAddress.toHexString(),
+      constants.VaultFeeType.PERFORMANCE_FEE
+    );
 
     let originalBalance = vault!.inputTokenBalances[0];
 
     let wantEarned = event.params.wantEarned
-      .times(BigInt.fromI32(100).minus(performanceFee))
-      .div(BigInt.fromI32(100));
+      .times(
+        constants.BIGINT_HUNDRED.minus(
+          BigInt.fromString(performanceFee.toString())
+        )
+      )
+      .div(constants.BIGINT_HUNDRED);
+
+    let protocolEarnings = event.params.wantEarned
+      .toBigDecimal()
+      .times(performanceFee)
+      .div(constants.BIGDECIMAL_HUNDRED);
+
+    let protocolSideRevenueUSD = protocolEarnings.plus(
+      financialMetrics.feesUSD
+    );
+
+    let inputToken = Token.load(vault!.inputTokens[0]);
+    let inputTokenAddress = Address.fromString(vault!.inputTokens[0]);
+    let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
+    let inputTokenPrice = getUsdPriceOfToken(inputTokenAddress);
+
+    financialMetrics.supplySideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
+      inputTokenPrice
+        .times(wantEarned)
+        .div(inputTokenDecimals)
+        .toBigDecimal()
+    );
+
+    financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
+      protocolSideRevenueUSD
+    );
 
     vault!.inputTokenBalances = [
-      vault!.inputTokenBalances[0].plus(wantEarned),
+      vault!.inputTokenBalances[0].plus(
+        BigInt.fromString(wantEarned.toString())
+      ),
     ];
 
     vault!.save();
@@ -70,15 +104,12 @@ export function handleSetPerformanceFee(call: SetPerformanceFeeCall): void {
       .div(BigInt.fromI32(100))
       .toBigDecimal();
 
-    performanceFee!.save()
-    
-    log.warning(
-      "[setPerformanceFee]\n TxHash: {}, newPerformanceFee: {}",
-      [
-        call.transaction.hash.toHexString(),
-        call.inputs._performanceFee.toString(),
-      ]
-    );
+    performanceFee!.save();
+
+    log.warning("[setPerformanceFee]\n TxHash: {}, newPerformanceFee: {}", [
+      call.transaction.hash.toHexString(),
+      call.inputs._performanceFee.toString(),
+    ]);
   }
 }
 
@@ -96,14 +127,11 @@ export function handleSetWithdrawalFee(call: SetWithdrawalFeeCall): void {
       .div(BigInt.fromI32(100))
       .toBigDecimal();
 
-    withdrawalFee!.save()
+    withdrawalFee!.save();
 
-    log.warning(
-      "[setWithdrawalFee]\n TxHash: {}, newPerformanceFee: {}",
-      [
-        call.transaction.hash.toHexString(),
-        call.inputs._withdrawalFee.toString(),
-      ]
-    );
+    log.warning("[setWithdrawalFee]\n TxHash: {}, newPerformanceFee: {}", [
+      call.transaction.hash.toHexString(),
+      call.inputs._withdrawalFee.toString(),
+    ]);
   }
 }
