@@ -154,7 +154,7 @@ export let MARKETS: MarketMapping[] = [
     new MarketMapping(
         "Compound Ether",
         "cETH",
-        ADDRESS_ZERO,
+        NULL_ADDRESS,
         "Ether",
         "ETH",
         18,

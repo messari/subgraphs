@@ -11,9 +11,6 @@ import {
     COMPTROLLER_ADDRESS,
     PRICE_ORACLE1_ADDRESS,
     USDC_ADDRESS,
-    MARKETS,
-    MarketMapping,
-    CTOKEN_LIST,
     NULL_ADDRESS,
     CCOMP_ADDRESS,
     COMP_ADDRESS,
@@ -21,69 +18,24 @@ import {
  } from "../common/addresses"
 
 import {
-    NETWORK_ETHEREUM,
-    PROTOCOL_NAME,
-    PROTOCOL_SLUG,
     USDC_DECIMALS,
-    PROTOCOL_VERSION,
-    PROTOCOL_RISK_TYPE,
-    COMPOUND_DECIMALS,
     ZERO_BD,
     ZERO_BI,
     REWARD_TOKEN_TYPE,
-    PROTOCOL_TYPE,
-    LENDING_TYPE,
     ETH_NAME,
     ETH_SYMBOL,
     ETH_DECIMALS
 } from "../common/constants"
 
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts"
 import { PriceOracle2 } from "../types/Comptroller/PriceOracle2"
 import { PriceOracle1 } from "../types/Comptroller/PriceOracle1"
 import { CToken } from "../types/Comptroller/cToken"
 import { ERC20 } from "../types/Comptroller/ERC20"
+import { ERC20SymbolBytes } from "../types/Comptroller/ERC20SymbolBytes"
+import { ERC20NameBytes } from "../types/Comptroller/ERC20NameBytes"
 
-// TODO: helper for converting uni time to days
-
-// grab Market from MARKETS by cToken
-export function getMarketMapping(cToken: string): MarketMapping {
-    for (let index = 0; index < CTOKEN_LIST.length; index++) {
-        if (CTOKEN_LIST[index].toHexString() == cToken) {
-            return MARKETS[index]
-        }
-    }
-    return new MarketMapping(
-        "Error in getMarketMapping()",
-        "",
-        ADDRESS_ZERO,
-        "Error in getMarketMapping()",
-        "",
-        -1,
-        -1,
-        -1
-    )
-}
-
-// create a LendingProtocol based off params
-export function createLendingProtocol(address: string): LendingProtocol {
-    let lendingProtocol = new LendingProtocol(address)
-    lendingProtocol.name = PROTOCOL_NAME
-    lendingProtocol.slug = PROTOCOL_SLUG
-    lendingProtocol.version = PROTOCOL_VERSION
-    lendingProtocol.network = NETWORK_ETHEREUM
-    lendingProtocol.type = PROTOCOL_TYPE
-    lendingProtocol.lendingType = LENDING_TYPE
-    lendingProtocol.riskType = PROTOCOL_RISK_TYPE
-
-    // create empty lists that will be populated each day
-    // No need to set these as empty. just add to them
-    // lendingProtocol.usageMetrics = []
-    // lendingProtocol.financialMetrics = []
-    // lendingProtocol.markets = []
-
-    return lendingProtocol
-}
+// TODO: helper for converting uni time to day
 
 // creates a new lending market and returns it
 export function createMarket(
@@ -94,7 +46,14 @@ export function createMarket(
 ): Market {
     let market = new Market(marketAddress)
     let cTokenContract = CToken.bind(Address.fromString(marketAddress))
-    let underlyingAddress = cTokenContract.underlying().toHexString()
+    let underlyingAddress: string
+    let underlying = cTokenContract.try_underlying()
+    if (underlying.reverted) {
+        underlyingAddress = NULL_ADDRESS.toHexString()
+    } else {
+        underlyingAddress = underlying.value.toHexString()
+    }
+    
 
     // create cToken/erc20 Tokens
     createMarketTokens(
@@ -155,18 +114,15 @@ export function createMarketTokens(
     // create underlying token
     if (marketAddress == CCOMP_ADDRESS.toHexString()) {
         // create RewardToken COMP
-        let compToken = ERC20.bind(Address.fromString(underlyingAddress))
-
         let rewardToken = new RewardToken(underlyingAddress)
-        rewardToken.name =  compToken.name()
-        rewardToken.symbol = compToken.symbol()
-        rewardToken.decimals = compToken.decimals()
+        rewardToken.name =  getAssetName(Address.fromString(underlyingAddress))
+        rewardToken.symbol = getAssetSymbol(Address.fromString(underlyingAddress))
+        rewardToken.decimals = getAssetDecimals(Address.fromString(underlyingAddress))
         rewardToken.type = REWARD_TOKEN_TYPE
         rewardToken.save()
 
     } else if (marketAddress == CETH_ADDRESS.toHexString()) {
         // ETH has a unique makeup
-        
         let ethToken = new Token(NULL_ADDRESS.toHexString())
         ethToken.name = ETH_NAME
         ethToken.symbol = ETH_SYMBOL
@@ -175,12 +131,11 @@ export function createMarketTokens(
 
     } else {
         // create ERC20 Token normally
-        let erc20 = ERC20.bind(Address.fromString(underlyingAddress))
         let token = new Token(underlyingAddress)
 
-        token.name = erc20.name()
-        token.symbol = erc20.symbol()
-        token.decimals = erc20.decimals()
+        token.name = getAssetName(Address.fromString(underlyingAddress))
+        token.symbol = getAssetSymbol(Address.fromString(underlyingAddress))
+        token.decimals = getAssetDecimals(Address.fromString(underlyingAddress))
         token.save()
 
     }
@@ -202,10 +157,7 @@ export function getTokenPrice(
     marketAddress: Address,
     assetDecimals: i32
 ): BigDecimal {
-    let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())
-    if (protocol == null) {
-        protocol = createLendingProtocol()
-    }
+    let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())!
     let oracle2Address = changetype<Address>(protocol._priceOracle)
     let underlyingPrice: BigDecimal
     let mantissaFactorBD = exponentToBigDecimal(18)
@@ -246,10 +198,7 @@ export function getTokenPrice(
 // TODO: combine function above into one
 // get usdc price of cETH
 export function getcETHPrice(blockNumber: i32): BigDecimal {
-    let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())
-    if (protocol == null) {
-        protocol = createLendingProtocol()
-    }    
+    let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())!  
     // TODO: fix this: https://discord.com/channels/438038660412342282/438070183794573313/937998440045117440
     let oracle2Address = changetype<Address>(protocol._priceOracle)
     let usdcPrice: BigDecimal
@@ -284,3 +233,52 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
     }
     return bigDecimal
   }
+
+
+
+  // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
+  export function getAssetName(address: Address): string {
+    let contract = ERC20.bind(address);
+    let nameCall = contract.try_name();
+    if (!nameCall.reverted) {
+      return nameCall.value;
+    }
+  
+    let bytesContract = ERC20NameBytes.bind(address);
+    let nameBytesCall = bytesContract.try_name();
+    if (!nameBytesCall.reverted) {
+      return nameBytesCall.value.toString();
+    }
+  
+    log.error('name() call (string or bytes) reverted for {}', [address.toHex()]);
+    return 'UNKNOWN';
+  }
+  
+  export function getAssetSymbol(address: Address): string {
+    let contract = ERC20.bind(address);
+    let symbolCall = contract.try_symbol();
+    if (!symbolCall.reverted) {
+      return symbolCall.value;
+    }
+  
+    let bytesContract = ERC20SymbolBytes.bind(address);
+    let symbolBytesCall = bytesContract.try_symbol();
+    if (!symbolBytesCall.reverted) {
+      return symbolBytesCall.value.toString();
+    }
+  
+    log.error('symbol() call (string or bytes) reverted for {}', [address.toHex()]);
+    return 'UNKNOWN';
+  }
+  
+  export function getAssetDecimals(address: Address): i32 {
+    let contract = ERC20.bind(address);
+    let decimalsCall = contract.try_decimals();
+    if (!decimalsCall.reverted) {
+      return decimalsCall.value;
+    }
+  
+    log.error('decimals() call reverted for {}', [address.toHex()]);
+    return -1;
+  }
+  
