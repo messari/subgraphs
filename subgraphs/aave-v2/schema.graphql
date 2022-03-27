@@ -448,6 +448,9 @@ interface Event {
   " Address that sent tokens "
   from: String!
 
+  " The number of days since Unix epoch time, used to signify which financial/metric dailySnapshots this transaction is recorded in "
+  snapshotId: String!
+
   blockNumber: BigInt!
 
   timestamp: BigInt!
@@ -471,6 +474,9 @@ type Deposit implements Event @entity {
 
   " Address that deposited tokens "
   from: String!
+
+  " The number of days since Unix epoch time, used to signify which financial/metric dailySnapshots this transaction is recorded in "
+  snapshotId: String!
 
   blockNumber: BigInt!
 
@@ -510,6 +516,9 @@ type Withdraw implements Event @entity {
   " Market that tokens are withdrawn from "
   from: String!
 
+  " The number of days since Unix epoch time, used to signify which financial/metric dailySnapshots this transaction is recorded in "
+  snapshotId: String!
+
   blockNumber: BigInt!
 
   timestamp: BigInt!
@@ -547,6 +556,9 @@ type Borrow implements Event @entity {
 
   " Market that tokens are borrowed from "
   from: String!
+
+  " The number of days since Unix epoch time, used to signify which financial/metric dailySnapshots this transaction is recorded in "
+  snapshotId: String!
 
   blockNumber: BigInt!
 
@@ -586,6 +598,9 @@ type Repay implements Event @entity {
   " Address that sent tokens "
   from: String!
 
+  " The number of days since Unix epoch time, used to signify which financial/metric dailySnapshots this transaction is recorded in "
+  snapshotId: String!
+
   blockNumber: BigInt!
 
   timestamp: BigInt!
@@ -623,6 +638,9 @@ type Liquidation implements Event @entity {
 
   " Address that carried out the liquidation "
   from: String!
+
+  " The number of days since Unix epoch time, used to signify which financial/metric dailySnapshots this transaction is recorded in "
+  snapshotId: String!
 
   blockNumber: BigInt!
 

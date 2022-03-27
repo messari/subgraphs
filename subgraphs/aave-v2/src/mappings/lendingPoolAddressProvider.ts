@@ -15,7 +15,7 @@ import {
   LendingPoolConfigurator as LendingPoolConfiguratorTemplate,
   LendingPoolAddressesProvider as LendingPoolAddressesProviderTemplate
 } from "../../generated/templates";
-import { fetchProtocolEntity, zeroAddr } from "./utilFunctions";
+import { fetchProtocolEntity } from "./utilFunctions";
 
 export const priceOracleDefault = "0xa50ba011c48153de246e5192c8f9258a2ba79ca9";
 
@@ -85,7 +85,7 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   // Get the Address Provider Contract's Price Oracle
   const tryPriceOracle = contract.try_getPriceOracle();
   let priceOracle = '';
-  if (!tryPriceOracle.reverted && tryPriceOracle.value.toHexString() !== zeroAddr ) {
+  if (!tryPriceOracle.reverted && tryPriceOracle.value !== Address.zero() ) {
     priceOracle = tryPriceOracle.value.toHexString();
     log.info('initiateContext priceOracle: ' + priceOracle, []);
   } else {

@@ -19,48 +19,26 @@ import {
 } from "../../generated/schema";
 
 import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPriceOracleGetter";
-  
 import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
 import { AToken } from "../../generated/templates/AToken/AToken";
 import { LendingPool } from "../../generated/templates/LendingPool/LendingPool";
 
 const weiPerEth = BigInt.fromI64(1000000000000000000);
 export const zeroAddr = "0x0000000000000000000000000000000000000000";
-export const contractAddrWETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 export const contractAddrUSDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 
 export function initMarket(
-    blockNumber: BigInt,
-    timestamp: BigInt,
+    event: ethereum.Event,
     id: string,
-    aTokenInput: Address | null
   ): Market {
     // This function either loads or creates the Market entity from a reserve
     log.info('MARKET LOAD: ' + id,[]);
     const token = initToken(Address.fromString(id)) as Token;
     let market = Market.load(id);
     if (market === null) {
-        log.info('MARKET CREATION FROM RESERVE ' + id, [])
         // Get the lending pool to get the rerve data for this Market entity
         const lendingPool = getLendingPoolFromCtx();
         const lendingPoolContract = LendingPool.bind(Address.fromString(lendingPool));
-        const tryReserve = lendingPoolContract.try_getReserveData(Address.fromString(id));
-
-        // Initialize market fields as zero
-        let reserveStableRate = new BigDecimal(BigInt.fromI32(0));
-        let reserveVariableRate = new BigDecimal(BigInt.fromI32(0));
-        let aTokenAddr = aTokenInput ? aTokenInput : Address.fromString(zeroAddr);
-        if (!tryReserve.reverted) {
-          // If a valid reserve is returned, add fields from the reserve to the market entity 
-          log.info('ATOKEN POTENTIAL VALS: ' + tryReserve.value.aTokenAddress.toHexString() + ' or ' + (aTokenInput ? aTokenInput : Address.fromString(zeroAddr)).toHexString(), [])
-          aTokenAddr = tryReserve.value.aTokenAddress ? tryReserve.value.aTokenAddress : aTokenAddr;
-          reserveStableRate = new BigDecimal(tryReserve.value.currentStableBorrowRate);
-          reserveVariableRate = new BigDecimal(tryReserve.value.currentVariableBorrowRate);
-        } else {
-          log.error('FAILED TO GET RESERVE', [''])
-        }
-        log.info('INITIALIZING ATOKEN FROM MARKET ' + aTokenAddr.toHexString(), [])
-        const aToken = initToken(aTokenAddr);
         // The input token, which would be the token instantiated from the id/address input
         const inputTokens: Token[] = [token];
         // Populate fields with data that has been passed to the function
@@ -71,27 +49,38 @@ export function initMarket(
         }
         const protocolId = getProtocolIdFromCtx();
         const protocol = fetchProtocolEntity(protocolId);
+        // Initialize market fields as zero
         market = new Market(id);
+        market.stableBorrowRate = BigDecimal.fromString("0");
+        market.variableBorrowRate = BigDecimal.fromString("0");
+        const tryReserve = lendingPoolContract.try_getReserveData(Address.fromString(id));
+        if (!tryReserve.reverted) {
+          // If a valid reserve is returned, add fields from the reserve to the market entity 
+          log.info(token.name + ' TRY RESERVE ATOKEN RETURNED FROM GETRESERVEDATA ' + tryReserve.value.aTokenAddress.toHexString() + ' EQUAL ADDR.ZERO? ' + (tryReserve.value.aTokenAddress === Address.zero()).toString(), [])
+          market.outputToken = tryReserve.value.aTokenAddress.toHexString();
+          market.stableBorrowRate = new BigDecimal(tryReserve.value.currentStableBorrowRate);
+          market.variableBorrowRate = new BigDecimal(tryReserve.value.currentVariableBorrowRate);
+        } else {
+          log.error('FAILED TO GET RESERVE', [''])
+        }
+        log.info('INITIALIZING ATOKEN FROM MARKET ' + market.outputToken, [])
+        initToken(Address.fromString(market.outputToken));
         market.protocol = protocol.name;
         market.inputTokens = inputTokens.map<string>((t) => t.id);
-        market.outputToken = aToken.id;
         market.rewardTokens = [];
         market.inputTokenBalances = inputTokenBalances;
-        market.createdBlockNumber = blockNumber;
-        market.createdTimestamp = timestamp;
+        market.createdBlockNumber = event.block.number;
+        market.createdTimestamp = event.block.timestamp;
         market.name = token.name;
         market.isActive = false;
         market.canBorrowFrom = false;
         market.canUseAsCollateral = false;
-        market.maximumLTV = new BigDecimal(BigInt.fromI32(0));
-        market.liquidationPenalty = new BigDecimal(BigInt.fromI32(0));
-        market.liquidationThreshold = new BigDecimal(BigInt.fromI32(0));
-        market.depositRate = new BigDecimal(BigInt.fromI32(0));
-        market.stableBorrowRate = reserveStableRate;
-        market.variableBorrowRate = reserveVariableRate;
-        market.totalValueLockedUSD = new BigDecimal(BigInt.fromI32(0));
-        market.totalVolumeUSD = new BigDecimal(BigInt.fromI32(0));
-        
+        market.maximumLTV = BigDecimal.fromString("0");
+        market.liquidationPenalty = BigDecimal.fromString("0");
+        market.liquidationThreshold = BigDecimal.fromString("0");
+        market.depositRate = BigDecimal.fromString("0");
+        market.totalValueLockedUSD = BigDecimal.fromString("0");
+        market.totalVolumeUSD = BigDecimal.fromString("0");
     }
     // Update outputToken data each time the market is loaded
     market.outputTokenSupply = getOutputTokenSupply(Address.fromString(market.outputToken));
@@ -99,18 +88,18 @@ export function initMarket(
     market.save();
     log.info('market save: ' + market.createdBlockNumber.toString(), [])
     return market as Market;
-  }
+}
 
 export function getOutputTokenSupply(outputTokenAddr: Address): BigInt {
     const aTokenInstance = AToken.bind(outputTokenAddr);
-    const tryTokenSupply = aTokenInstance.try_scaledTotalSupply();
-    log.info('OUTPUT TOKEN ' + aTokenInstance._name + ' ' + outputTokenAddr.toHexString(), [] );
+    const tryTokenSupply = aTokenInstance.try_totalSupply();
+    log.info('OUTPUT TOKEN ' + outputTokenAddr.toHexString(), [] );
     let outputTokenSupply = new BigInt(0);
     if (!tryTokenSupply.reverted) {
-        log.info('OUTTOKEN SUPPLY ' + aTokenInstance._name + ' ' + tryTokenSupply.value.toString(), [] );
+        log.info('OUTTOKEN SUPPLY ' + tryTokenSupply.value.toString(), [] );
         outputTokenSupply = tryTokenSupply.value;
     } else {
-        log.info('OUTPUT TOKEN SUPPLY CALL REVERTED FOR TOKEN ' + aTokenInstance._name + ' ' + aTokenInstance._address.toHexString(), [])
+        log.info('OUTPUT TOKEN SUPPLY CALL REVERTED FOR TOKEN ' + outputTokenAddr.toHexString(), [])
     }
     return outputTokenSupply;
 }
@@ -211,7 +200,6 @@ export function getMarketDailySnapshotId(event: ethereum.Event, market: Market):
 // For the lack of closure support, the recommendation is to loop into a global variable
 let rewardEmissionsAmounts: BigInt[] = [];
 let rewardEmissionsAmountsUSD: BigDecimal[] = [];
-
 export function loadMarketDailySnapshot(
     event: ethereum.Event,
     market: Market,
@@ -261,7 +249,6 @@ export function loadMarketDailySnapshot(
     marketSnapshot.depositRate = market.depositRate;
     marketSnapshot.stableBorrowRate = market.stableBorrowRate;
     marketSnapshot.variableBorrowRate = market.variableBorrowRate;
-    marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
     marketSnapshot.save();
 
     return marketSnapshot as MarketDailySnapshot;
@@ -283,17 +270,17 @@ export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsD
           metricsDailySnapshot.dailyTransactionCount = 0;
       } else {
         log.info('LOADED METRIC SNAPSHOT ' + metricsDailySnapshot.id, [])
-
       }
       const userAddr = event.transaction.from;
       let user = UserAddr.load(userAddr.toHexString());
+      let userCreated = false;
       if (!user) {
           user = new UserAddr(userAddr.toHexString());
           metricsDailySnapshot.totalUniqueUsers += 1;
           protocol.totalUniqueUsers += 1;
+          userCreated = true;
       }
-      log.info('REACHED METRIC USER ' + user.id, [])
-      if (user.mostRecentVisit !== BigInt.fromString(daysSinceEpoch)) {
+      if (user.mostRecentVisit.notEqual(BigInt.fromString(daysSinceEpoch)) || userCreated) {
           user.mostRecentVisit = BigInt.fromString(daysSinceEpoch);
           metricsDailySnapshot.activeUsers += 1;
       }
@@ -308,19 +295,15 @@ export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsD
 
 export function updateFinancials(
     event: ethereum.Event,
-    increaseTVL: bool,
     amount: BigDecimal,
     protocolSideRevenueReceived: BigDecimal,
     feesReceived: BigDecimal
     ): FinancialsDailySnapshot {
     // Update the current date's FinancialDailySnapshot instance
     const financialsDailySnapshot = getFinancialsDailySnapshot(event);
-    log.info('SUCCESFULLY INIT FINANCIALS WITH ID: ' + financialsDailySnapshot.id, []);
-    if (increaseTVL) {
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.plus(amount);
-    } else {
-        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(amount);
-    }
+    const protocol = fetchProtocolEntity(financialsDailySnapshot.protocol);
+    financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    log.info('FINANCIAL SNAPSHOT ' + financialsDailySnapshot.id + ' TRANSACTION ' + event.transaction.hash.toHexString() + ' adding amount: ' + amount.toString(), [] )
     financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(amount);
     financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(protocolSideRevenueReceived);
     financialsDailySnapshot.feesUSD = financialsDailySnapshot.feesUSD.plus(feesReceived);
@@ -358,14 +341,13 @@ export function getPriceOracle(): IPriceOracleGetter {
 }
 
 export function getAssetPriceInUSDC(token: Token): BigDecimal {
-    log.info('getAssetPriceInUSDC ' + token.name + '---' + token.id, [''])
+    log.info('getAssetPriceInUSDC ' + token.name + '---' + token.id, []);
     const tokenAddress = Address.fromString(token.id);
     // Get the oracle contract instance
     const oracle = getPriceOracle();
-    log.info('oracle address? in getAssetPriceInUSDC() ' + oracle._address.toHexString(), [''])
     // The Aave protocol oracle contracts only contain a method for getting an asset price in ETH, so USDC price must be fetched to convert asset price from Eth to USDC
     // Get the asset price in Wei and convert it to Eth
-    let assetPriceInUSDC: BigDecimal | null = null;
+    let assetPriceInUSDC: BigDecimal = BigDecimal.fromString("0");
     let tryAssetPriceInEth = oracle.try_getAssetPrice(tokenAddress);
     // Fetch USDC price in Wei and convert it to Eth
     let tryPriceUSDCInEth = oracle.try_getAssetPrice(Address.fromString(contractAddrUSDC));
@@ -374,14 +356,10 @@ export function getAssetPriceInUSDC(token: Token): BigDecimal {
         const priceUSDCInEth = tryPriceUSDCInEth.value;
         assetPriceInUSDC = (new BigDecimal(assetPriceInEth).div(new BigDecimal(priceUSDCInEth)));
     } else {
-        log.info('REVERTED: ASSET? ' + tryAssetPriceInEth.reverted.toString() + ' USDC? ' + tryPriceUSDCInEth.reverted.toString(), ['']);
+        log.info('REVERTED GETTING USDC PRICE: ASSET? ' + token.name, []);
     }
     // Asset price in Eth/USDC priced in Eth = Asset price in in USDC
     // return price per asset in USDC
-    if (!assetPriceInUSDC) {
-        log.info('Could not fetch asset price of ' + token.name + '-' + token.id, [token.id]);
-        return BigDecimal.fromString("0");
-    }
     return assetPriceInUSDC;
 }
 
@@ -409,7 +387,6 @@ export function getOracleAddressFromProtocol(): string {
 
 export function amountInUSD(token: Token, amount: BigInt): BigDecimal {
     // This function takes in a token and the amount of the token and converts the amount of that token into USD
-    log.info('HERE IN amountInUSD', []);
     const amountInDecimals = exponentToBigDecimal(token.decimals.toString(), amount.toString());
     const priceInUSDC = getAssetPriceInUSDC(token);
     const amountUSD = amountInDecimals.times(priceInUSDC);
@@ -433,20 +410,18 @@ export function rayMultiplication(a: BigInt, b: BigInt): BigInt {
 }
 
 export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
-    return new BigInt(<i32>Math.floor(secondsSinceEpoch/86400)).toString();
+    return (<i32>Math.floor(secondsSinceEpoch/86400)).toString();
 }
 
 export function exponentToBigDecimal(decimals: string, amount: string): BigDecimal {
-    /* Get the denominator to convert a token amount to BigDecimal */
-    log.info("exponentToBigDecimal " + decimals, [])
+    // Convert a token amount with decimals
     let amountArr = amount.split(".").join("").split("");
-    let insertIdx = <i32>(amountArr.length - parseInt(decimals))
+    let insertIdx = <i32>(amountArr.length - parseInt(decimals));
     if (insertIdx < 0) {
       for (insertIdx; insertIdx < 0; insertIdx ++ ) {
         amountArr.unshift("0");
       }
     }
-    log.info('AMOUNT ARR ' + amountArr.toString() + ' INDEX ' + insertIdx.toString(), []);
     amountArr[insertIdx] = '.' + amountArr[insertIdx];
     return BigDecimal.fromString(amountArr.join(""))
   }

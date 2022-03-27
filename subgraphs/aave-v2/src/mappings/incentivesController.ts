@@ -11,7 +11,6 @@ import { Market, MarketDailySnapshot, RewardToken } from "../../generated/schema
 import {
   initRewardToken,
   loadMarketDailySnapshot,
-  zeroAddr,
   initMarket,
   getFinancialsDailySnapshot,
   getAssetPriceInUSDC,
@@ -35,15 +34,15 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
   // event.address is the incentiveController address
   const incentiveContAddr = event.address;
   const marketAddr = event.transaction.to as Address;
-  if (incentiveContAddr.toHexString() != zeroAddr) {
+  if (incentiveContAddr != Address.zero()) {
     const rewardTokenAddr = getRewardTokenAddr(incentiveContAddr);
-    let market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), null) as Market;
+    let market = initMarket(event, marketAddr.toHexString()) as Market;
     // If the initRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
     // Therefore the market needs to be pulled again to account for the updated RewardToken field 
     initRewardToken(Address.fromString(rewardTokenAddr), market);
     const tokenInstance = initToken(Address.fromString(rewardTokenAddr));
     const assetPriceInUSDC = getAssetPriceInUSDC(tokenInstance);
-    market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), null) as Market;
+    market = initMarket(event, marketAddr.toHexString()) as Market;
 
     // Load/Create the daily market snapshot entity instance
     const marketDailySnapshot = loadMarketDailySnapshot(event, market) as MarketDailySnapshot;
@@ -103,7 +102,7 @@ export function handleRewardsAccrued(event: RewardsAccrued): void {
   // event.address is the incentiveController address
   const incentiveContAddr = event.address;
   const marketAddr = event.transaction.to as Address;
-  const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString(), null) as Market;
+  const market = initMarket(event, marketAddr.toHexString()) as Market;
   const rewardTokenAddr = Address.fromString(getRewardTokenAddr(incentiveContAddr));
   // initRewardToken in case it has not been created as a RewardToken entity yet
   initRewardToken(rewardTokenAddr, market);
