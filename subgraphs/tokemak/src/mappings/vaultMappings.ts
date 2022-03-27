@@ -4,7 +4,7 @@ import {
   Vault as VaultContract,
   DepositCall, DepositForCall,
   WithdrawCall
-} from "../../generated/Registry/Vault"
+} from "../../generated/Manager/Vault"
 
 import {
   Vault as VaultStore,
@@ -16,7 +16,7 @@ import {
   FinancialsDailySnapshot,
   YieldAggregator,
 } from "../../generated/schema"
-import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ONE, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, PROTOCOL_ID, SECONDS_PER_DAY, VaultFeeType } from "../common/constants"
+import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ONE, BIGINT_ZERO, ETH_MAINNET_MANAGER_ADDRESS, PROTOCOL_ID, SECONDS_PER_DAY, VaultFeeType } from "../common/constants"
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils"
 import { getOrCreateToken } from "../common/tokens"
 import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle"
@@ -196,6 +196,7 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
         protocolTvlUsd = protocolTvlUsd.plus(vaultTvlUsd);
         protocolVolumeUsd = protocolVolumeUsd.plus(vaultVolumeUsd)
       }
+      
     }
     
     financialMetrics.totalValueLockedUSD = protocolTvlUsd

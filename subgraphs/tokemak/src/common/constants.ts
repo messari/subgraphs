@@ -40,7 +40,7 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW"
 }
 
-// Yearn registry contract
+// Tokemak manager contract
 export const PROTOCOL_ID = "0xA86e412109f77c45a3BC1c5870b880492Fb86A14"
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
@@ -68,7 +68,7 @@ export let MS_PER_YEAR = DAYS_PER_YEAR.times(
 
 ////////////
 
-export const ETH_MAINNET_REGISTRY_ADDRESS = "0xA86e412109f77c45a3BC1c5870b880492Fb86A14"
+export const ETH_MAINNET_MANAGER_ADDRESS = "0xA86e412109f77c45a3BC1c5870b880492Fb86A14"
 
 export const TOKE_ADDRESS = "0x2e9d63788249371f1DFC918a52f8d799F4a38C94"
 

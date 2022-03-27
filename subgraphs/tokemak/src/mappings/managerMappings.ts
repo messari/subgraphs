@@ -32,20 +32,21 @@ function createProtocol(): void {
     protocol.slug = "tokemak"
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.YIELD
-    protocol.vaultIds = []
+    protocol.vaultIds = new Array<string>()
     protocol.save()
   }
 }
+
 function createRewardTokens(): void{
   const address = Address.fromString(TOKE_ADDRESS)
   getOrCreateRewardToken(address)
 }
+
 export function handlePoolRegistered(event: PoolRegistered): void {
   createProtocol()
   createRewardTokens()
   getOrCreateVault(event.params.pool, event)
 }
-
 
 function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultStore {
   // Note that the NewVault event are also emitted when endorseVault and newRelease
@@ -75,25 +76,23 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     const managementFeeId = "management-fee-" + vault.id
     let managementFee = new VaultFee(managementFeeId)
     managementFee.feeType = VaultFeeType.MANAGEMENT_FEE
-    //TODOAM
-    managementFee.feePercentage =BIGDECIMAL_ZERO
-    // managementFee.feePercentage = 0
+    managementFee.feePercentage = BIGDECIMAL_ZERO
     managementFee.save()
 
     const performanceFeeId = "performance-fee-" + vault.id
     let performanceFee = new VaultFee(performanceFeeId)
     performanceFee.feeType = VaultFeeType.PERFORMANCE_FEE
-    //TODOAM
-    performanceFee.feePercentage =BIGDECIMAL_ZERO
-    // performanceFee.feePercentage = 0
+    performanceFee.feePercentage = BIGDECIMAL_ZERO
     performanceFee.save()
 
-    vault.fees = [managementFeeId, performanceFeeId]
+    vault.fees = []
     vault.save()
 
     let protocol = YieldAggregator.load(PROTOCOL_ID)
     if (protocol) {
-      protocol.vaultIds.push(vault.id)
+      let vaultIds = protocol.vaultIds;
+      vaultIds.push(vault.id)
+      protocol.vaultIds = vaultIds;
       protocol.save()
     }
   

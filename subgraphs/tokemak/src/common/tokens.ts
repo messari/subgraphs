@@ -1,7 +1,7 @@
 import { BigInt, Address, BigDecimal, log } from "@graphprotocol/graph-ts"
 import {
   ERC20 as ERC20Contract,
-} from "../../generated/Registry/ERC20"
+} from "../../generated/Manager/ERC20"
 import {
   RewardToken,
   Token,
@@ -27,6 +27,7 @@ export function getOrCreateToken(address: Address): Token {
   }
   return token as Token;
 }
+
 export function getOrCreateRewardToken(address: Address): RewardToken {
   let id = address.toHexString();
   let token = RewardToken.load(id);
