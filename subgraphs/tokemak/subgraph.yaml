@@ -24,7 +24,7 @@ dataSources:
           file: ./abis/ERC20Detailed.json
       eventHandlers:
         - event: PoolRegistered(address)
-          handler: handleNewVault
+          handler: handlePoolRegistered
       file: ./src/mappings/managerMappings.ts
 templates:
   - name: Vault
@@ -54,7 +54,7 @@ templates:
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit
-        - function: deposit(uint256,address)
+        - function: depositFor(uint256,address)
           handler: handleDepositWithRecipient
         - function: withdraw(uint256)
           handler: handleWithdraw

@@ -40,7 +40,7 @@ function createRewardTokens(): void{
   const address = Address.fromString(TOKE_ADDRESS)
   getOrCreateRewardToken(address)
 }
-export function handleNewVault(event: PoolRegistered): void {
+export function handlePoolRegistered(event: PoolRegistered): void {
   createProtocol()
   createRewardTokens()
   getOrCreateVault(event.params.pool, event)

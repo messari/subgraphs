@@ -72,9 +72,9 @@ export function handleWithdraw(call: WithdrawCall): void {
   const vaultAddress = call.to;
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
-    const sharesBurnt    = call.inputs.requestedAmount
-    const withdrawAmount = sharesBurnt
-    withdraw(call, vault, withdrawAmount, sharesBurnt)
+    const requestedAmount = call.inputs.requestedAmount
+    const withdrawAmount = requestedAmount
+    withdraw(call, vault, withdrawAmount, requestedAmount)
   }
   updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
@@ -193,7 +193,7 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
       if(vault){
         const vaultTvlUsd = vault.totalValueLockedUSD;
         const vaultVolumeUsd = vault.totalVolumeUSD;
-        protocolTvlUsd = protocolTvlUsd.plus(vaultTvlUsd );
+        protocolTvlUsd = protocolTvlUsd.plus(vaultTvlUsd);
         protocolVolumeUsd = protocolVolumeUsd.plus(vaultVolumeUsd)
       }
     }
