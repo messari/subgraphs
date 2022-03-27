@@ -71,6 +71,11 @@ interface Protocol {
 
   type: ProtocolType!
 
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -252,6 +257,11 @@ type DexAmmProtocol implements Protocol @entity {
 
   type: ProtocolType!
 
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -260,6 +270,28 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+}
+
+enum LiquidityPoolFeeType {
+  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
+  TRADING_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  PROTOCOL_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_FEE
+}
+
+type LiquidityPoolFee @entity {
+  id: ID!
+
+  feePercentage: BigDecimal!
+
+  feeType: LiquidityPoolFeeType!
 }
 
 type LiquidityPool @entity {
@@ -310,6 +342,9 @@ type LiquidityPool @entity {
 
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
+
+  " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
+  fees: [LiquidityPoolFee!]!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 

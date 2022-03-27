@@ -71,6 +71,11 @@ interface Protocol {
 
   type: ProtocolType!
 
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -257,6 +262,11 @@ type LendingProtocol implements Protocol @entity {
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
