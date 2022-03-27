@@ -434,38 +434,14 @@ type _DailyActiveAccount @entity {
   id: ID!
 }
 
-type _Transaction @entity {
+" Thia entity is used to track data from the transfer events. Mainly, I want to track the executor of the deposit/withdraw and the liquidity minted/burned "
+type _Transfer @entity {
   id: ID! # txn hash
   blockNumber: BigInt!
   timestamp: BigInt!
-  " This is not the reverse of Mint.transaction; it is only used to track incomplete mints (similar for burns and swaps) "
-  mints: [_Mint!] 
-  burns: [_Burn!]
-}
-
-type _Mint @entity {
-  " transaction hash + '-' + index in mints Transaction array "
-  id: ID!
- 
-  " populated from the primary Transfer event "
-  to: Bytes!
-  from: Bytes
-  liquidity: BigInt!
-}
-
-type _Burn @entity {
-  " transaction hash + '-' + index in mints Transaction array "
-  id: ID!
-
-  " populated from the primary Transfer event "
-  liquidity: BigInt!
-
-  " populated from the Burn event "
-  sender: Bytes
-  to: Bytes
- 
-  " mark uncomplete in ETH case "
-  needsComplete: Boolean!
+  sender: String
+  type: String
+  liquidity: BigInt
 }
 
 "  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "

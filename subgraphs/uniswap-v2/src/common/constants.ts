@@ -47,6 +47,12 @@ export namespace HelperStoreType {
   // Pool addresses are also stored in the HelperStore
 }
 
+export namespace TransferType {
+  export const MINT = 'MINT'
+  export const BURN = 'BURN'
+  // Pool addresses are also stored in the HelperStore
+}
+
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
