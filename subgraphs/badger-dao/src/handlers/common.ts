@@ -1,29 +1,32 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import {
-  FinancialsDailySnapshot,
+  Token,
   Vault,
   VaultDailySnapshot,
   YieldAggregator,
   _User as User,
 } from '../../generated/schema';
-import { getOrCreateUserSnapshot } from '../entities/Metrics';
+import {
+  getOrCreateFinancialsDailySnapshot,
+  getOrCreateUserSnapshot,
+} from '../entities/Metrics';
 import { getOrCreateProtocol } from '../entities/Protocol';
-import { getDay } from '../utils/numbers';
+import { getDay, normalizedUsdcPrice } from '../utils/numbers';
+import { getPriceOfCurveLpToken, getPriceOfStakedTokens } from './price';
 
 export function updateUsageMetrics(user: User, block: ethereum.Block): void {
   let metrics = getOrCreateUserSnapshot(getDay(block.timestamp));
   let protocol = getOrCreateProtocol();
+  let day = getDay(block.timestamp);
+
+  metrics.protocol = protocol.id;
+  metrics.dailyTransactionCount = metrics.dailyTransactionCount + 1;
 
   // no metrics yet, initialize
   if (metrics.blockNumber.equals(BigInt.zero())) {
     metrics.blockNumber = block.number;
     metrics.timestamp = block.timestamp;
   }
-
-  metrics.protocol = protocol.id;
-  metrics.dailyTransactionCount = metrics.dailyTransactionCount + 1;
-
-  let day = getDay(block.timestamp);
 
   // is a new user
   if (user.lastDayActive === 0) {
@@ -46,14 +49,17 @@ export function updateUsageMetrics(user: User, block: ethereum.Block): void {
 
 export function updateVault(
   vault: Vault,
-  inputTokenAddress: Address,
+  token: Token,
   inputTokenAmount: BigInt,
+  tokenPrice: BigInt,
 ): void {
-  let index = vault.inputTokens.indexOf(inputTokenAddress.toHex());
+  let index = vault.inputTokens.indexOf(token.id);
+  let balance = BigInt.zero();
 
   if (index === -1) {
-    vault.inputTokens = vault.inputTokens.concat([inputTokenAddress.toHex()]);
+    vault.inputTokens = vault.inputTokens.concat([token.id]);
     vault.inputTokenBalances = vault.inputTokenBalances.concat([inputTokenAmount]);
+    balance = inputTokenAmount;
   }
 
   if (index !== -1) {
@@ -61,28 +67,59 @@ export function updateVault(
     balances[index] = balances[index].plus(inputTokenAmount);
 
     vault.inputTokenBalances = balances;
+    balance = balances[index];
   }
+
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(
+    getPriceOfStakedTokens(
+      Address.fromString(vault.id),
+      Address.fromString(token.id),
+      BigInt.fromI32(token.decimals),
+    ),
+  ).toBigDecimal();
+  vault.totalVolumeUSD = vault.totalVolumeUSD.plus(tokenPrice.toBigDecimal());
+  vault.totalValueLockedUSD = normalizedUsdcPrice(
+    getPriceOfCurveLpToken(
+      Address.fromString(token.id),
+      balance,
+      BigInt.fromI32(token.decimals),
+    ),
+  ).toBigDecimal();
 
   vault.save();
 }
 
 export function updateFinancialMetrics(
-  metrics: FinancialsDailySnapshot,
   protocol: YieldAggregator,
+  token: Token,
+  tokenPrice: BigInt,
+  inputTokenAmount: BigInt,
   block: ethereum.Block,
 ): void {
+  let metrics = getOrCreateFinancialsDailySnapshot(getDay(block.timestamp));
   if (metrics.blockNumber.equals(BigInt.zero())) {
     metrics.timestamp = block.timestamp;
     metrics.blockNumber = block.number;
   }
 
+  metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(tokenPrice.toBigDecimal());
+  metrics.totalValueLockedUSD = normalizedUsdcPrice(
+    getPriceOfCurveLpToken(
+      Address.fromString(token.id),
+      inputTokenAmount,
+      BigInt.fromI32(token.decimals),
+    ),
+  ).toBigDecimal();
   metrics.protocol = protocol.id;
   metrics.save();
 }
 
 export function updateVaultMetrics(
+  vault: Vault,
+  token: Token,
   metrics: VaultDailySnapshot,
   inputTokenAmount: BigInt,
+  tokenPrice: BigInt,
   isDeposit: bool,
   block: ethereum.Block,
 ): void {
@@ -99,6 +136,21 @@ export function updateVaultMetrics(
     currentBalance = currentBalance.minus(inputTokenAmount);
   }
 
+  metrics.outputTokenPriceUSD = normalizedUsdcPrice(
+    getPriceOfStakedTokens(
+      Address.fromString(vault.id),
+      Address.fromString(token.id),
+      BigInt.fromI32(token.decimals),
+    ),
+  ).toBigDecimal();
+  metrics.totalVolumeUSD = vault.totalVolumeUSD.plus(tokenPrice.toBigDecimal());
+  metrics.totalValueLockedUSD = normalizedUsdcPrice(
+    getPriceOfCurveLpToken(
+      Address.fromString(token.id),
+      currentBalance,
+      BigInt.fromI32(token.decimals),
+    ),
+  ).toBigDecimal();
   metrics.inputTokenBalances = currentBalance;
   metrics.save();
 }
