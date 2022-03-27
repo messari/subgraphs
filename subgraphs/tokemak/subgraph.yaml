@@ -42,6 +42,14 @@ dataSources:
       abis:
         - name: Rewards
           file: ./abis/Rewards.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushiSwap
+          file: ./abis/CalculationsSushiSwap.json 
       eventHandlers:
         - event: Claimed(uint256,address,uint256)
           handler: handleClaim
