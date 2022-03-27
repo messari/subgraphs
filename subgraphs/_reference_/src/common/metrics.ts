@@ -5,7 +5,7 @@ import {
   UsageMetricsDailySnapshot
 } from "../../generated/schema"
 import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import { getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./getters";
+import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -17,6 +17,7 @@ export function updateFinancials(event: ethereum.Event): void {
   // financialMetrics.blockNumber = event.block.number;
   // financialMetrics.timestamp = event.block.timestamp;
   // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD
+  // ...
 
   // financialMetrics.save();
 }
@@ -24,16 +25,7 @@ export function updateFinancials(event: ethereum.Event): void {
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-  let totalUniqueUsers = getOrCreateUsersHelper()
-
-  if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = FACTORY_ADDRESS
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
-  }
+  let usageMetrics = getOrCreateUsageMetricSnapshot(event);
   
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetrics.blockNumber = event.block.number;
@@ -42,12 +34,15 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
   let accountId = from.toHexString()
   let account = _Account.load(accountId)
+  let protocol = getOrCreateDexAmm();
   if (!account) {
     account = new _Account(accountId);
     account.save();
-    totalUniqueUsers.valueInt += 1;
+
+    protocol.totalUniqueUsers += 1;
+    protocol.save();
   }
-  usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
+  usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
@@ -58,7 +53,6 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     usageMetrics.activeUsers += 1
   }
 
-  totalUniqueUsers.save();
   usageMetrics.save();
 }
 
@@ -76,6 +70,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD
   // poolMetrics.blockNumber = event.block.number;
   // poolMetrics.timestamp = event.block.timestamp;
+  // ...
 
   // poolMetrics.save();
 }

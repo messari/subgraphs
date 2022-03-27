@@ -11,17 +11,7 @@ import {
   PoolDailySnapshot,
 } from "../../generated/schema"
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
-import { BIGDECIMAL_ZERO, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE } from "../common/constants"
-
-export function getOrCreateUsersHelper(): _HelperStore {
-    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
-    if (!uniqueUsersTotal) {
-        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-        uniqueUsersTotal.valueInt = INT_ZERO
-        uniqueUsersTotal.save()
-    }
-    return uniqueUsersTotal
-}
+import { BIGDECIMAL_ZERO, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY } from "../common/constants"
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString())
@@ -109,16 +99,10 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.version = "1.0.0"
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE
+    protocol.totalUniqueUsers = 0
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
 
     protocol.save()
   }  
   return protocol
-}
-
-export function getLiquidityPool(poolAddress: string): LiquidityPool {
-  return LiquidityPool.load(poolAddress)!
-}
-
-export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
-  return _LiquidityPoolAmounts.load(poolAddress)!
 }
