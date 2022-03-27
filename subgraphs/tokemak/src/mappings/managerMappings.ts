@@ -24,7 +24,7 @@ import {
   BIGINT_ZERO,
 } from "../common/constants"
 
-function createProtocol(): void {
+export function createProtocol(): YieldAggregator {
   let protocol = YieldAggregator.load(PROTOCOL_ID)
   if (!protocol) {
     protocol = new YieldAggregator(PROTOCOL_ID)
@@ -35,8 +35,8 @@ function createProtocol(): void {
     protocol.vaultIds = new Array<string>()
     protocol.save()
   }
+  return protocol
 }
-
 function createRewardTokens(): void{
   const address = Address.fromString(TOKE_ADDRESS)
   getOrCreateRewardToken(address)

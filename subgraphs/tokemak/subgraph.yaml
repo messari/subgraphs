@@ -26,6 +26,26 @@ dataSources:
         - event: PoolRegistered(address)
           handler: handlePoolRegistered
       file: ./src/mappings/managerMappings.ts
+  - kind: ethereum
+    name: Rewards
+    network: mainnet
+    source:
+      address: "0x79dD22579112d8a5F7347c5ED7E609e60da713C5"
+      startBlock: 12969749
+      abi: Rewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - NewVault
+      abis:
+        - name: Rewards
+          file: ./abis/Rewards.json
+      eventHandlers:
+        - event: Claimed(uint256,address,uint256)
+          handler: handleClaim
+      file: ./src/mappings/rewardMappings.ts
 templates:
   - name: Vault
     kind: ethereum/contract
@@ -51,6 +71,9 @@ templates:
           file: ./abis/CalculationsCurve.json
         - name: CalculationsSushiSwap
           file: ./abis/CalculationsSushiSwap.json 
+      eventHandlers:
+        - event: WithdrawalRequested(address,uint256)
+          handler: handleWithdrawRequest
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit

@@ -3,7 +3,8 @@ import { BigInt, BigDecimal, Address, ethereum, log } from "@graphprotocol/graph
 import {
   Vault as VaultContract,
   DepositCall, DepositForCall,
-  WithdrawCall
+  WithdrawCall,
+  WithdrawalRequested
 } from "../../generated/Manager/Vault"
 
 import {
@@ -20,6 +21,8 @@ import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ONE, BIGINT_ZERO, ETH_MAINNET_MANAG
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils"
 import { getOrCreateToken } from "../common/tokens"
 import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle"
+import { getOrCreateFinancialMetrics } from "../common/financial"
+import { updateUsageMetrics } from "../common/usage"
 
 export function handleDeposit(call: DepositCall): void {
   log.info('[Vault mappings] Handle deposit with amount {}, vault {}', [call.inputs.amount.toString(), call.to.toHexString()])
@@ -63,8 +66,6 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
   getOrCreateDepositTransactionFromCall(call, depositAmount, amountUSD, 'vault.deposit()')
 }
 
-
-
 export function handleWithdraw(call: WithdrawCall): void {
   log.info('[Vault mappings] Handle withdraw with shares. TX hash: {}', [
     call.transaction.hash.toHexString(),
@@ -79,8 +80,13 @@ export function handleWithdraw(call: WithdrawCall): void {
   updateFinancials(call.block.number, call.block.timestamp, call.from)
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from)
 }
+export function handleWithdrawRequest(event: WithdrawalRequested): void {
+  log.info('[Vault mappings] Handle withdraw request with shares. TX hash: {}', [
+    event.transaction.hash.toHexString(),
+  ]);
 
-
+  updateUsageMetrics(event.block.number, event.block.timestamp, event.params.requestor)
+}
 function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt, sharesBurnt: BigInt): void {
   const token = getOrCreateToken(Address.fromString(vault.inputTokens[0]))
   let amountUSD = normalizedUsdcPrice(usdcPrice(token, withdrawAmount))
@@ -167,21 +173,9 @@ export function getOrCreateWithdrawTransactionFromCall(
 
 
 function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address): void {
-  // Number of days since Unix epoch
-  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
-  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
-  if (!financialMetrics) {
-    financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = PROTOCOL_ID;
-
-    financialMetrics.feesUSD = BIGDECIMAL_ZERO
-    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
-    financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
-    financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
-    financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
-  }
-
+  let financialMetrics = getOrCreateFinancialMetrics(timestamp)
+  
   let protocolTvlUsd = BIGDECIMAL_ZERO
   let protocolVolumeUsd = BIGDECIMAL_ZERO
   const protocol = YieldAggregator.load(PROTOCOL_ID)
@@ -208,44 +202,4 @@ function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address)
   financialMetrics.timestamp = timestamp;
 
   financialMetrics.save();
-}
-
-
-function updateUsageMetrics(blockNumber: BigInt, timestamp: BigInt, from: Address): void {
-  // Number of days since Unix epoch
-  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-
-  if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = PROTOCOL_ID;
-
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
-  }
-  
-  // Update the block number and timestamp to that of the last transaction of that day
-  usageMetrics.blockNumber = blockNumber;
-  usageMetrics.timestamp = timestamp;
-  usageMetrics.dailyTransactionCount += 1;
-
-  let accountId = from.toHexString()
-  let account = _Account.load(accountId)
-  if (!account) {
-    account = new _Account(accountId);
-    account.save();
-    usageMetrics.totalUniqueUsers += 1;
-  }
-
-  // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
-  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
-  if (!dailyActiveAccount) {
-    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
-    dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1;
-  }
-
-  usageMetrics.save();
 }
