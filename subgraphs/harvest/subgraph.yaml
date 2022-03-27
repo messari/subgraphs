@@ -1,0 +1,53 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Controller
+    network: mainnet
+    source:
+      address: "0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C"
+      startBlock: 10770087
+      abi: Controller
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Token
+      abis:
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+        - name: Vault
+          file: ./abis/Vault.json
+      callHandlers:
+        - function: addVaultAndStrategy(address,address)
+          handler: handleAddVaultAndStrategy
+      file: ./src/mappings/controller.ts
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/vault.ts
+      entities:
+        - Vault
+        - Oracle
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: withdraw(uint256)
+          handler: handleWithdraw
