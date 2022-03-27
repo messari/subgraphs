@@ -1,0 +1,54 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Manager
+    network: mainnet
+    source:
+      address: "0xe15461b18ee31b7379019dc523231c57d1cbc18c"
+      startBlock: 11390000
+      abi: Manager
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+      abis:
+        - name: Manager
+          file: ./abis/Manager.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Erc20
+          file: ./abis/ERC20Detailed.json
+      eventHandlers:
+        - event: PoolRegistered(address)
+          handler: handlePoolRegistered
+      file: ./src/mappings/manager.ts
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vault.ts
+      entities:
+        - Vault
+        - Oracle
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Oracle
+          file: ./abis/Oracle.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: withdraw(uint256)
+          handler: handleWithdraw

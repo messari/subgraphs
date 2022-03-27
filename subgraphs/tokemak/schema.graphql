@@ -1,38 +1,3 @@
-##### SCHEMA GUIDELINES
-#
-### Usage
-# - This schema is intended to be a "master" document for standardization work. It includes all possible protocol
-#   categories and entities. To implement a specific protocol, you should only include entities that are relevant
-#   to that particular protocol. For example, to implement Aave, you should only include the lending protocol
-#   entities and leave out the rest.
-#
-### Naming Conventions
-# - Enum values should be in all caps
-# - Common types
-#   - hash/address: String
-#   - block height: BigInt
-#   - timestamp: unix timestamp in BigInt
-#   - token amount: All token amounts should be BigDecimal after normalizing according to its decimals
-#   - dollar amount: All USD amounts (including prices) should be BigDecimal
-# - Certain prefixes may be used to indicate a particular type of value.
-#   * total - indicates this is a cumulative value (e.g. totalSharesMinted, totalGrossReturns)
-#   * balance - indicates this is a spot balance (e.g. balanceTokensInvested, balanceTokensIdle)
-#   * delta - indicates this value is the difference between the prior state and the current state (e.g. deltaPricePerShare)
-#   * current - used exclusively in Update entities. Similar to balance, current indicates the state of a field or value at the
-#               time of the update. These values are populated in every update whether they changed or not.
-#   * new - used exclusively in Update entities. Fields with this prefix will only be populated if they have changed since the
-#           last Update. If there has been no change, the value will be null.
-# - Use plurals when referring to Tokens or Shares (e.g. totalShares, balanceTokens)
-#
-### Quantitative Data
-# - There are 3 ways in which quantitative data are stored and fetched:
-#   1. Real-time: you can get real-time data by querying on specific entities. For example, get `totalValueLockedUSD`
-#      from a `Pool`.
-#   2. Point-in-time: you can get point-in-time (including historical) data on specific entities using time-travel queries.
-#   3. Time-series: the best way to get time-series data is by querying snapshots. For example, get `totalValueLockedUSD` from
-#      `PoolDailySnapshot`.
-#
-
 enum Network {
   AVALANCHE
   AURORA
@@ -106,6 +71,30 @@ interface Protocol {
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+}
+
+type YieldAggregator implements Protocol @entity {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: ID!
+
+  " Name of the protocol, including version. e.g. Yearn v3 "
+  name: String!
+
+  " Slug of protocol, including version. e.g. yearn-v3 "
+  slug: String!
+
+  network: Network!
+
+  type: ProtocolType!
+
+  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  ##### Yield-Specific #####
+  
+  " All vaults that belong to this protocol "
+  vaults: [Vault!]! @derivedFrom(field: "protocol")
 }
 
 ###############################
@@ -200,7 +189,7 @@ interface Pool {
 
   totalValueLockedUSD: BigDecimal!
 
-  " Total volume in USD (volume is defined differently according to the protocol category) "
+  " Total volume in USD "
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
@@ -256,6 +245,125 @@ interface PoolDailySnapshot {
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+enum VaultFeeType {
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
+  DEPOSIT_FEE
+
+  " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
+  WITHDRAWAL_FEE
+
+  " Fees charged by the protocol during harvest, in percentages of the interest accrued "
+  PERFORMANCE_FEE
+
+  " Fees charged by the protocol on a periodic basis, in percentages of the total principal "
+  MANAGEMENT_FEE
+}
+
+type VaultFee @entity {
+  id: ID!
+
+  feePercentage: BigDecimal!
+
+  feeType: VaultFeeType!
+}
+
+type Vault @entity {
+  " Smart contract address of the vault "
+  id: ID!
+
+  protocol: YieldAggregator!
+
+  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
+  # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # and inputToken balances are used to calculate returns
+  
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Token that is minted to track ownership of position in protocol "
+  outputToken: Token
+
+  " Aditional tokens that are given as reward for position in a protocol "
+  rewardTokens: [RewardToken!]
+
+  ##### Quantitative Data #####
+
+  totalValueLockedUSD: BigDecimal!
+
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
+  " Amount of input tokens in the vault. The ordering should be the same as the vault's `inputTokens` field. "
+  inputTokenBalances: [BigDecimal!]!
+
+  " Total supply of output token "
+  outputTokenSupply: BigDecimal!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
+  " Vault snapshots "
+  snapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
+
+  ##### Yield-Specific #####
+
+  name: String
+  
+  symbol: String
+
+  depositLimit: BigInt!
+
+  fees: [VaultFee!]!
+
+  deposits: [Deposit!]! @derivedFrom(field: "vault")
+
+  withdraws: [Withdraw!]! @derivedFrom(field: "vault")
+}
+
+type VaultDailySnapshot @entity {
+  " { Smart contract address of the vault }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: Protocol!
+
+  " The vault this snapshot belongs to "
+  vault: Vault!
+
+  totalValueLockedUSD: BigDecimal!
+
+  " Total deposit volume in USD "
+  totalVolumeUSD: BigDecimal!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: BigDecimal!
+
+  " Total supply of output token "
+  outputTokenSupply: BigDecimal!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigDecimal!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+  
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -331,8 +439,10 @@ type Deposit implements Event @entity {
   " Amount of token deposited in USD "
   amountUSD: BigDecimal!
 
-  " The pool involving this transaction "
-  pool: Pool!
+  ##### Yield-Specific #####
+
+  " The vault involving this transaction "
+  vault: Vault!
 }
 
 type Withdraw implements Event @entity {
@@ -367,80 +477,8 @@ type Withdraw implements Event @entity {
   " Amount of token withdrawn in USD "
   amountUSD: BigDecimal!
 
-  " The pool involving this transaction "
-  pool: Pool!
-}
+  ##### Yield-Specific #####
 
-###############################################################################
-################################# Generic #####################################
-###############################################################################
-
-# The GenericProtocol entities are meant to serve as a template for any protocols
-# that don't fall into one of the existing categories. The entities and fields
-# are designed to be as generic as possible so they can cover as many protocols
-# as possible.
-type GenericProtocol implements Protocol @entity {
-  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: ID!
-
-  " Name of the protocol, including version. e.g. Uniswap v3 "
-  name: String!
-
-  " Slug of protocol, including version. e.g. uniswap-v3 "
-  slug: String!
-
-  network: Network!
-
-  type: ProtocolType!
-
-  " All pools that belong to this protocol "
-  pools: [Pool!]! @derivedFrom(field: "protocol")
-
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
-
-  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
-}
-
-type GenericPool implements Pool @entity {
-  " Smart contract address of the pool "
-  id: ID!
-
-  " The protocol this pool belongs to "
-  protocol: Protocol!
-
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
-  inputTokens: [Token!]!
-
-  " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
-
-  " Aditional tokens that are given as reward for position in a protocol "
-  rewardTokens: [RewardToken!]
-
-  ##### Quantitative Data #####
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Total volume in USD "
-  totalVolumeUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
-
-  " Total supply of output token "
-  outputTokenSupply: BigDecimal!
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
-
-  blockNumber: BigInt!
-
-  timestamp: BigInt!
-
-  " Pool snapshots "
-  snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
-
-  deposits: [Deposit!]! @derivedFrom(field: "pool")
-
-  withdraws: [Withdraw!]! @derivedFrom(field: "pool")
+  " The vault involving this transaction "
+  vault: Vault!
 }
