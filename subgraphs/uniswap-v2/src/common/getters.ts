@@ -4,17 +4,15 @@ import {
   Token,
   DexAmmProtocol,
   LiquidityPool,
-  _Account,
-  _DailyActiveAccount,
-  _HelperStore,
-  _TokenTracker,
-  _Transaction,
-  _Mint,
-  _Burn,
   UsageMetricsDailySnapshot,
   PoolDailySnapshot,
   FinancialsDailySnapshot,
-  _LiquidityPoolAmounts
+  _LiquidityPoolAmounts,
+  _Transfer,
+  _Account,
+  _DailyActiveAccount,
+  _HelperStore,
+  _TokenTracker
 } from "../../generated/schema"
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
 import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE } from "../common/constants"
@@ -90,41 +88,16 @@ export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     return tokenTracker
 }
 
-export function getMint(id: string): _Mint {
-    return _Mint.load(id)!
-}
-
-export function getBurn(id: string): _Burn {
-    return _Burn.load(id)!
-}
-
-export function getOrCreateTransaction(event: ethereum.Event): _Transaction {
+export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
     let transactionHash = event.transaction.hash.toHexString()
-    let transaction = _Transaction.load(transactionHash)
-    if (!transaction) {    
-        transaction = new _Transaction(transactionHash)
-        transaction.blockNumber = event.block.number
-        transaction.timestamp = event.block.timestamp
+    let transfer = _Transfer.load(transactionHash)
+    if (!transfer) {    
+        transfer = new _Transfer(transactionHash)
+        transfer.blockNumber = event.block.number
+        transfer.timestamp = event.block.timestamp
     }
-    transaction.save()
-    return transaction
-}
-
-export function createMint(event: ethereum.Event, length: i32): _Mint {
-    let id = event.transaction.hash.toHexString().concat('-').concat(BigInt.fromI32(length).toString())
-    let mint = _Mint.load(id)
-    if (!mint) {mint = new _Mint(id)}
-    mint.save()
-
-    return mint
-}
-
-export function createBurn(event: ethereum.Event, length: i32): _Burn {
-    let id = event.transaction.hash.toHexString().concat('-').concat(BigInt.fromI32(length).toString())
-    let burn = new _Burn(id)
-    burn.save()
-
-    return burn
+    transfer.save()
+    return transfer
 }
 
 export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot{

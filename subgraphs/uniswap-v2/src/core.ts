@@ -1,6 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
 import {
-  _Transaction, 
   _HelperStore,
   _TokenTracker
 } from './../generated/schema'
@@ -10,7 +9,7 @@ import {
   updateInputTokenBalances,
   updateTvlAndTokenPrices,
   handleTransferMint,
-  handleTransferToPool,
+  handleTransferToPoolBurn,
   handleTransferBurn,
   createDeposit,
   createWithdraw,
@@ -40,16 +39,16 @@ export function handleTransfer(event: Transfer): void {
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     handleTransferMint(event, event.params.value, event.params.to)  
   } 
-
   // Case where direct send first on ETH withdrawls.
   // For burns, mint tokens are first transferred to the pool before transferred for burn.
+  // This gets the EOA that made the burn loaded into the _Transfer.
   if (event.params.to == event.address) {
-    handleTransferToPool(event, event.params.value, event.params.to, event.params.from)
+    handleTransferToPoolBurn(event, event.params.value, event.params.from)
   }
 
   // burn
   if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from == event.address) {
-    handleTransferBurn(event, event.params.value, event.params.to, event.params.from)
+    handleTransferBurn(event, event.params.value, event.params.from)
   }
 }
 

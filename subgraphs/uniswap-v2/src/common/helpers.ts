@@ -5,21 +5,21 @@ import {
   _DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
-  _Burn as BurnEvent,
+  _LiquidityPoolAmounts,
   Token,
   DexAmmProtocol,
   LiquidityPool,
   Deposit,
   Withdraw,
   Swap as SwapEvent,
-  _LiquidityPoolAmounts
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, SWAP_FEE, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, SWAP_FEE, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType } from "../common/constants"
 import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./Price"
-import { getLiquidityPool, createBurn, createMint, getMint, getBurn, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker, getOrCreateTransaction, getLiquidityPoolAmounts } from "./getters"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer } from "./getters"
 import { updateVolumeAndFees } from "./intervalUpdates"
+import { Transfer, TransferFromCall } from "../../generated/Factory/ERC20"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -167,158 +167,71 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
   ether.save()
 }
 
-// Checks if the mint has been completed with the Deposit event. 
-function isCompleteMint(mintId: string): boolean {
-  let mint = getMint(mintId)
-  if (mint == null) return false
-  return mint.from !== null // sufficient checks
-}
-
 // Handle data from transfer event for mints. Used to populate deposit entity in the mint event. 
 export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Address): void {
   let pool = getLiquidityPool(event.address.toHexString())
-  let transaction = getOrCreateTransaction(event)
+  let transfer = getOrCreateTransfer(event)
   
   // Tracks supply of minted LP tokens 
   pool.outputTokenSupply = pool.outputTokenSupply.plus(value)
-  pool.save()
-
-  let mints = transaction.mints
 
   // create new mint if no mints so far or if last one is done already
-  if (mints == null || isCompleteMint(mints[mints.length - 1])) {
-    
-    let length = mints == null ? 0: mints.length
+  if (!transfer.type) {
+    transfer.type = TransferType.MINT
 
-    let mint = createMint(event, length)
-
-    mint.to = to
-    mint.liquidity = value
-
-    // update mints in transaction
-    if (mints == null) transaction.mints = [mint.id]
-    else transaction.mints = mints.concat([mint.id])
-
-    // save entities
-    transaction.save()
-    mint.save()
+    // Address that is minted to
+    transfer.sender = to.toHexString()
+    transfer.liquidity = value
   }
 
   // This is done to remove a potential feeto mint --- Not active 
-  else if (!isCompleteMint(mints[mints.length - 1])) {
-    store.remove('Mint', mints[mints.length - 1])
-
-    let mint = createMint(event, mints.length)
-
-    mint.to = to
-    mint.liquidity = value
-  
-    // update mints in transaction
-    mints.pop()
-    transaction.mints = mints.concat([mint.id])
-  
-    // save entities
-    transaction.save()
-    mint.save()
+  else if (transfer.type == TransferType.MINT) {
+    // Updates the liquidity if the previous mint was a fee mint
+    // Address that is minted to
+    transfer.sender = to.toHexString()
+    transfer.liquidity = value
   }
-}
 
-// Handle the transer of LP tokens to the liquidity pool that minted them and track the data for the burn event. 
-export function handleTransferToPool(event: ethereum.Event, value: BigInt, to: Address, from: Address): void {
-  let transaction = getOrCreateTransaction(event)
-
-  let burns = transaction.burns
-  let length = burns == null ? 0: burns.length
-  let burn = createBurn(event, length)
-
-  burn.liquidity = value
-  burn.to = to
-  burn.sender = from
-  burn.needsComplete = true
-
-  // update burns in transaction
-  if (burns == null) transaction.burns = [burn.id]
-  else transaction.burns = burns.concat([burn.id])
-
-  // save entities
-  transaction.save()
-  burn.save()
+  transfer.save()
+  pool.save()
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
-export function handleTransferBurn(event: ethereum.Event, value: BigInt, to: Address, from: Address): void {
+export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt,from: Address): void {
+  let transfer = getOrCreateTransfer(event)
+
+  transfer.type = TransferType.BURN
+  transfer.sender = from.toHexString()
+
+  transfer.save()
+}
+
+
+// Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
+export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: Address): void {
   let pool = getLiquidityPool(event.address.toHexString())
-  let transaction = getOrCreateTransaction(event)
+  let transfer = getOrCreateTransfer(event)
 
   // Tracks supply of minted LP tokens 
   pool.outputTokenSupply = pool.outputTokenSupply.minus(value)
 
-  // this is a new instance of a logical burn
-  let burns = transaction.burns
-  let burn: BurnEvent
-  
-  if (burns != null) {
-    let currentBurn = getBurn(burns[burns.length - 1])
-
-    if (currentBurn != null && currentBurn.needsComplete) {
-      burn = currentBurn as BurnEvent
-    } 
-    
-    else {
-      burn = createBurn(event, burns.length)
-
-      burn.needsComplete = false
-      burn.liquidity = value
-      burn.to = to
-      burn.sender = from
-    }
-  } 
-  
+  // Uses address from the transfer to pool part of the burn. Otherwise create with this transfer event. 
+  if (transfer.type == TransferType.BURN) { 
+    transfer.liquidity = value
+  }
   else {
-    burn = createBurn(event, INT_ZERO)
-    burn.needsComplete = false
-    burn.liquidity = value
-    burn.to = to
-    burn.sender = from
+    transfer.type = TransferType.BURN
+    transfer.sender = from.toHexString()
+    transfer.liquidity = value
   }
 
-  let mints = transaction.mints
-  // if this logical burn included a fee mint, account for this
-  if (mints != null && !isCompleteMint(mints[mints.length - 1])) {
-    // remove the logical mint
-    store.remove('_Mint', mints[mints.length - 1])
-    // update the transaction
-    // TODO: Consider using .slice().pop() to protect against unintended
-    // side effects for other code paths.
-    mints.pop()
-    transaction.mints = mints
-    transaction.save()
-  }
-  burn.save()
-  // if accessing last one, replace it
-  if (burn.needsComplete) {
-    // TODO: Consider using .slice(0, -1).conc at() to protect against
-    // unintended side effects for other code paths.
-
-    if (burns != null) burns[burns.length - 1] = burn.id
-    else burns = [burn.id]
-  }
-  // else add new one
-  else {
-    if (burns == null) transaction.burns = [burn.id]
-    else transaction.burns = burns.concat([burn.id])
-  }
-  transaction.burns = burns
-  transaction.save()
+  transfer.save()
   pool.save()
 }
 
 // Generate the deposit entity and update deposit account for the according pool.
 export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address): void {
-  let transaction = getOrCreateTransaction(event)
-
-  let mints = transaction.mints!
-  let mint = getMint(mints[mints.length - 1])
+  let transfer = getOrCreateTransfer(event)
 
   let pool = getLiquidityPool(event.address.toHexString())
 
@@ -347,30 +260,26 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.hash = event.transaction.hash.toHexString()
   deposit.logIndex = event.logIndex.toI32()
   deposit.protocol = FACTORY_ADDRESS
-  deposit.to = mint.to.toHexString()
-  deposit.from = sender.toHexString()
+  deposit.to = pool.id
+  deposit.from = transfer.sender!
   deposit.blockNumber = event.block.number
   deposit.timestamp = event.block.timestamp
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
   deposit.outputTokens = pool.outputToken
   deposit.inputTokenAmounts = [amount0, amount1]
-  deposit.outputTokenAmount = mint.liquidity
+  deposit.outputTokenAmount = transfer.liquidity!
   deposit.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
-
-  mint.from = sender
 
   UpdateDepositHelper(event.address)
 
+  store.remove('_Transfer', transfer.id)
+
   deposit.save()
-  mint.save()
 }
 
 // Generate the withdraw entity
 export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address, to: Address): void {
-  let transaction = getOrCreateTransaction(event)
-
-  let burns = transaction.burns!
-  let burn = getBurn(burns[burns.length - 1])
+  let transfer = getOrCreateTransfer(event)
 
   let pool = getLiquidityPool(event.address.toHexString())
 
@@ -399,16 +308,17 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.hash = event.transaction.hash.toHexString()
   withdrawal.logIndex = event.logIndex.toI32()
   withdrawal.protocol = FACTORY_ADDRESS
-  withdrawal.to = to.toHexString()
-  withdrawal.from = sender.toHexString()
+  withdrawal.to = transfer.sender!
+  withdrawal.from = pool.id
   withdrawal.blockNumber = event.block.number
   withdrawal.timestamp = event.block.timestamp
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
   withdrawal.outputTokens = pool.outputToken
   withdrawal.inputTokenAmounts = [amount0, amount1]
-  withdrawal.outputTokenAmount = burn.liquidity
+  withdrawal.outputTokenAmount = transfer.liquidity!
   withdrawal.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
 
+  store.remove('_Transfer', transfer.id)
 
   withdrawal.save()
 }
