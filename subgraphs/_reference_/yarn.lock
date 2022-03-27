@@ -1054,6 +1054,7 @@
     "path-is-absolute" "^1.0.0"
 
 "gluegun@https://github.com/edgeandnode/gluegun#v4.3.1-pin-colors-dep":
+  "resolved" "git+ssh://git@github.com/edgeandnode/gluegun.git#b34b9003d7bf556836da41b57ef36eb21570620a"
   "version" "4.3.1"
   dependencies:
     "apisauce" "^1.0.1"
@@ -2217,6 +2218,11 @@
   "integrity" "sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew=="
   "resolved" "https://registry.npmjs.org/prettier/-/prettier-1.19.1.tgz"
   "version" "1.19.1"
+
+"prettier@2.6.1":
+  "integrity" "sha512-8UVbTBYGwN37Bs9LERmxCPjdvPxlEowx2urIL6urHzdb3SDq4B/Z6xLFCblrSnE4iKWcS6ziJ3aOYrc1kz/E2A=="
+  "resolved" "https://registry.npmjs.org/prettier/-/prettier-2.6.1.tgz"
+  "version" "2.6.1"
 
 "process-nextick-args@~2.0.0":
   "integrity" "sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag=="
