@@ -185,6 +185,12 @@ interface Pool {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -325,6 +331,12 @@ type LiquidityPool @entity {
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Creation timestamp "
   createdTimestamp: BigInt!

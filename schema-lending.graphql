@@ -179,6 +179,12 @@ interface Pool {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -209,7 +215,7 @@ interface PoolDailySnapshot {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigInt!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
@@ -319,6 +325,12 @@ type Market @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -381,7 +393,7 @@ type MarketDailySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: BigInt!
+  inputTokenBalances: [BigInt!]!
 
   " Price per share of input token in USD "
   inputTokenPricesUSD: [BigDecimal!]!
