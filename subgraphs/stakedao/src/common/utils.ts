@@ -8,6 +8,7 @@ import {
   VaultDailySnapshot,
   Vault as VaultStore,
   FinancialsDailySnapshot,
+  UsageMetricsDailySnapshot,
 } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
@@ -136,4 +137,24 @@ export function getOrCreateVaultSnapshots(
   }
 
   return vaultSnapshots;
+}
+
+export function getOrCreateUsageMetricSnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+    usageMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
+
+    usageMetrics.activeUsers = 0;
+    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
 }

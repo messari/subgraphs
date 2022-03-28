@@ -66,6 +66,7 @@ export function handleAddReward(call: AddRewardCall): void {
     let rewardTokenAddress: Address;
     let try_rewardTokens: ethereum.CallResult<Address>;
 
+    // Assuming that their are a maximum of 10 rewardTokens in the whole supgraph.
     for (let i = 0; i <= 10; i++) {
       try_rewardTokens = gaugeContract.try_rewardTokens(BigInt.fromI32(i));
 

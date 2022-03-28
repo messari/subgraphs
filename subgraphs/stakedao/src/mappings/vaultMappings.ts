@@ -23,7 +23,7 @@ export function handleDeposit(call: DepositCall): void {
 
     _Deposit(call, vault, _depositAmount);
   }
-  updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateUsageMetrics(call.block, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
 }
 
@@ -50,7 +50,7 @@ export function handleDepositAll(call: DepositAllCall): void {
       ]
     );
   }
-  updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateUsageMetrics(call.block, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
 }
 
@@ -63,7 +63,7 @@ export function handleWithdraw(call: WithdrawCall): void {
 
     _Withdraw(call, vault, _sharesBurnt);
   }
-  updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateUsageMetrics(call.block, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
 }
 
@@ -91,7 +91,7 @@ export function handleWithdrawAll(call: WithdrawAllCall): void {
       ]
     );
   }
-  updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+  updateUsageMetrics(call.block, call.from);
   updateFinancials(call.block.number, call.block.timestamp);
 }
 
