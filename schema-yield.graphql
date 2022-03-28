@@ -71,6 +71,11 @@ interface Protocol {
 
   type: ProtocolType!
 
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -92,6 +97,11 @@ type YieldAggregator implements Protocol @entity {
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -207,6 +217,12 @@ interface Pool {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -237,7 +253,7 @@ interface PoolDailySnapshot {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigInt!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
@@ -316,6 +332,12 @@ type Vault @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -356,7 +378,7 @@ type VaultDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigInt!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
