@@ -14,24 +14,23 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
   // try types string and bytes32 for symbol
   let symbolValue = UNKNOWN_TOKEN_VALUE;
   let symbolResult = contract.try_symbol();
+  if (!symbolResult.reverted) {
+    return symbolResult.value;
+  }
 
   // non-standard ERC20 implementation
-  if (symbolResult.reverted) {
-    let symbolResultBytes = contractSymbolBytes.try_symbol();
-    if (!symbolResultBytes.reverted) {
-      // for broken pairs that have no symbol function exposed
-      if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
-        symbolValue = symbolResultBytes.value.toString();
-      } else {
-        // try with the static definition
-        let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
-        if (staticTokenDefinition != null) {
-          symbolValue = staticTokenDefinition.symbol;
-        }
+  let symbolResultBytes = contractSymbolBytes.try_symbol();
+  if (!symbolResultBytes.reverted) {
+    // for broken pairs that have no symbol function exposed
+    if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
+      symbolValue = symbolResultBytes.value.toString();
+    } else {
+      // try with the static definition
+      let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
+      if (staticTokenDefinition != null) {
+        symbolValue = staticTokenDefinition.symbol;
       }
     }
-  } else {
-    symbolValue = symbolResult.value;
   }
 
   return symbolValue;
@@ -44,24 +43,23 @@ export function fetchTokenName(tokenAddress: Address): string {
   // try types string and bytes32 for name
   let nameValue = UNKNOWN_TOKEN_VALUE;
   let nameResult = contract.try_name();
+  if (!nameResult.reverted) {
+    return nameResult.value;
+  }
 
   // non-standard ERC20 implementation
-  if (nameResult.reverted) {
-    let nameResultBytes = contractNameBytes.try_name();
-    if (!nameResultBytes.reverted) {
-      // for broken exchanges that have no name function exposed
-      if (!isNullEthValue(nameResultBytes.value.toHexString())) {
-        nameValue = nameResultBytes.value.toString();
-      } else {
-        // try with the static definition
-        let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
-        if (staticTokenDefinition != null) {
-          nameValue = staticTokenDefinition.name;
-        }
+  let nameResultBytes = contractNameBytes.try_name();
+  if (!nameResultBytes.reverted) {
+    // for broken exchanges that have no name function exposed
+    if (!isNullEthValue(nameResultBytes.value.toHexString())) {
+      nameValue = nameResultBytes.value.toString();
+    } else {
+      // try with the static definition
+      let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
+      if (staticTokenDefinition != null) {
+        nameValue = staticTokenDefinition.name;
       }
     }
-  } else {
-    nameValue = nameResult.value;
   }
 
   return nameValue;
@@ -69,19 +67,20 @@ export function fetchTokenName(tokenAddress: Address): string {
 
 export function fetchTokenDecimals(tokenAddress: Address): i32 {
   let contract = ERC20.bind(tokenAddress);
+
   // try types uint8 for decimals
   let decimalResult = contract.try_decimals();
   if (!decimalResult.reverted) {
     let decimalValue = decimalResult.value;
     return decimalValue as i32;
+  }
+
+  // try with the static definition
+  let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
+  if (staticTokenDefinition != null) {
+    return staticTokenDefinition.decimals as i32;
   } else {
-    // try with the static definition
-    let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress);
-    if (staticTokenDefinition != null) {
-      return staticTokenDefinition.decimals as i32;
-    } else {
-      return INVALID_TOKEN_DECIMALS as i32;
-    }
+    return INVALID_TOKEN_DECIMALS as i32;
   }
 }
 
