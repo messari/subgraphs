@@ -6,10 +6,16 @@ import {
   Vault as VaultContract,
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
+  Transfer as TransferEvent,
   DepositCall, Deposit1Call, Deposit2Call,
   WithdrawCall, Withdraw1Call, Withdraw2Call,
   UpdateManagementFee as UpdateManagementFeeEvent,
   UpdatePerformanceFee as UpdatePerformanceFeeEvent,
+  UpdateRewards as UpdateRewardsEvent,
+  StrategyAdded as StrategyAddedV1Event,
+  StrategyAdded1 as StrategyAddedV2Event,
+  StrategyReported as OldStrategyReportedEvent,
+  StrategyReported1 as NewStrategyReportedEvent,
 } from "../../generated/Registry/Vault"
 import {
   Vault as VaultStore,
@@ -19,13 +25,37 @@ import {
   UsageMetricsDailySnapshot,
   _Account,
   _DailyActiveAccount,
+  _Strategy,
   FinancialsDailySnapshot,
   YieldAggregator,
+  _Treasury,
 } from "../../generated/schema"
-import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, PROTOCOL_ID, SECONDS_PER_DAY, VaultFeeType } from "../common/constants"
+import { BIGDECIMAL_ZERO, BIGINT_MAX, BIGINT_ZERO, ETH_MAINNET_REGISTRY_ADDRESS, PROTOCOL_ID, SECONDS_PER_DAY, VaultFeeType, ZERO_ADDRESS } from "../common/constants"
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils"
 import { getOrCreateToken } from "../common/tokens"
 import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle"
+import * as tokenFeeLibrary from "../tokenFees"
+import { getOrCreateAccount } from "../common/stores"
+
+/* This version of the AddStrategy event was used in vaults from 0.1.0 up to and including 0.3.1 */
+export function handleStrategyAddedV1(event: StrategyAddedV1Event): void {
+  const strategyAddress = event.params.strategy
+  let strategy = new _Strategy(strategyAddress.toHexString())
+  strategy.save()
+}
+
+/* This version of the AddStrategy event is used in vaults 0.3.2 and up */
+export function handleStrategyAddedV2(event: StrategyAddedV2Event): void {
+  const strategyAddress = event.params.strategy
+  let strategy = new _Strategy(strategyAddress.toHexString())
+  strategy.save()
+}
+
+export function handleUpdateRewards(event: UpdateRewardsEvent): void {
+  const rewardsAddress = event.params.rewards
+  let treasury = new _Treasury(rewardsAddress.toHexString())
+  treasury.save()
+}
 
 export function handleDepositEvent(event: DepositEvent): void {
   log.info('[Vault mappings] Handle deposit event', []);
@@ -300,6 +330,161 @@ function calculateAmountDeposited(
     ]
   );
   return amount;
+}
+
+export function handleTransfer(event: TransferEvent): void {
+  log.info('[Vault mappings] Handle transfer: From: {} - To: {}. TX hash: {}', [
+    event.params.sender.toHexString(),
+    event.params.receiver.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
+  if (
+    event.params.sender.toHexString() != ZERO_ADDRESS &&
+    event.params.receiver.toHexString() != ZERO_ADDRESS
+  ) {
+    log.info(
+      '[Vault mappings] Processing transfer: From: {} - To: {}. TX hash: {}',
+      [
+        event.params.sender.toHexString(),
+        event.params.receiver.toHexString(),
+        event.transaction.hash.toHexString(),
+      ]
+    );
+
+    let vaultContract = VaultContract.bind(event.address);
+    let totalAssets = vaultContract.totalAssets();
+    let totalSupply = vaultContract.totalSupply();
+    let sharesAmount = event.params.value;
+    let amount = sharesAmount.times(totalAssets).div(totalSupply);
+    // share  = (amount * totalSupply) / totalAssets
+    // amount = (shares * totalAssets) / totalSupply
+
+    let token = getOrCreateToken(vaultContract.token())
+    let shareToken = getOrCreateToken(event.address)
+    let fromAccount = getOrCreateAccount(event.params.sender);
+    let toAccount = getOrCreateAccount(event.params.receiver);
+    let vault = VaultStore.load(event.address.toHexString());
+    if (vault) {
+      let isFeeToStrategy = tokenFeeLibrary.isFeeToStrategy(
+        vault,
+        toAccount,
+        amount
+      );
+      let isFeeToTreasury = tokenFeeLibrary.isFeeToTreasury(
+        vault,
+        toAccount,
+        amount
+      );
+    }
+  } else {
+    log.info(
+      '[Vault mappings] Not processing transfer: From: {} - To: {}. TX hash: {}',
+      [
+        event.params.sender.toHexString(),
+        event.params.receiver.toHexString(),
+        event.transaction.hash.toHexString(),
+      ]
+    );
+  }
+}
+
+/**
+ * We have two handlers to process the StrategyReported event due to incompatibility in both event structure.
+ * This is for vault versions 0.3.0 and 0.3.1.
+ * If you need 0.3.2 or superior, please see the 'handleStrategyReportedNew' handler.
+ */
+export function handleStrategyReportedOld(event: OldStrategyReportedEvent): void {
+  log.info(
+    '[Vault mappings] Updating price per share (strategy reported): {}',
+    [event.transaction.hash.toHexString()]
+  );
+  let vaultContractAddress = event.address;
+  let vaultContract = VaultContract.bind(vaultContractAddress);
+  strategyReported(
+    event.params.gain,
+    event.params.loss,
+    vaultContract,
+    vaultContractAddress
+  );
+}
+
+/**
+ * We have two handlers to process the StrategyReported event due to incompatibility in both event structure.
+ * This is for vault versions 0.3.2 or superior.
+ *
+ * This version includes the new field `debtPaid` introduced in the Vault version 0.3.2.
+ *
+ * In case a new structure is implemented, please create a new handler.
+ * If you need 0.3.0 or 0.3.1, please see the 'handleStrategyReportedOld' handler.
+ */
+export function handleStrategyReportedNew(event: NewStrategyReportedEvent): void {
+  log.info('[Vault mappings] Handle strategy reported (new)', []);
+  log.info(
+    '[Vault mappings] Updating price per share (strategy reported): {}',
+    [event.transaction.hash.toHexString()]
+  );
+  let vaultContractAddress = event.address;
+  let vaultContract = VaultContract.bind(vaultContractAddress);
+  strategyReported(
+    event.params.gain,
+    event.params.loss,
+    vaultContract,
+    vaultContractAddress
+  );
+}
+
+function strategyReported(
+  gain: BigInt,
+  loss: BigInt,
+  vaultContract: VaultContract,
+  vaultAddress: Address
+): void {
+  log.info('[Vault] Strategy reported for vault {} at TX ', [
+    vaultAddress.toHexString(),
+  ]);
+  let vault = VaultStore.load(vaultAddress.toHexString())
+  if (vault) {
+    let balancePosition = getBalancePosition(vaultContract);
+    let grossReturnsGenerated = gain.minus(loss);
+  
+    // Need to find netReturnsGenerated by subtracting out the fees
+    let feeTokensToTreasury = tokenFeeLibrary.recognizeTreasuryFees(vault);
+    let feeTokensToStrategist = tokenFeeLibrary.recognizeStrategyFees(vault);
+    let pricePerShare = vaultContract.pricePerShare();
+  
+    let feesPaidDuringReport = feeTokensToTreasury.plus(feeTokensToStrategist);
+  
+    let netReturnsGenerated = grossReturnsGenerated.minus(feesPaidDuringReport);
+    vault.inputTokenBalances = [vaultContract.totalAssets().toBigDecimal()]
+    vault.save()
+  }
+}
+
+function getBalancePosition(vaultContract: VaultContract): BigInt {
+  let totalAssets = vaultContract.totalAssets();
+  let tryPricePerShare = vaultContract.try_pricePerShare();
+  let pricePerShare = tryPricePerShare.reverted
+    ? BigInt.fromI32(0)
+    : tryPricePerShare.value;
+  // TODO Debugging Use pricePerShare directly
+  if (tryPricePerShare.reverted) {
+    log.warning('try_pricePerShare FAILED Vault {} - PricePerShare', [
+      vaultContract._address.toHexString(),
+      pricePerShare.toString(),
+    ]);
+  } else {
+    log.warning('try_pricePerShare SUCCESS Vault {} - PricePerShare', [
+      vaultContract._address.toHexString(),
+      pricePerShare.toString(),
+    ]);
+  }
+  // @ts-ignore
+  let decimals = u8(vaultContract.decimals().toI32());
+  return totalAssets.times(pricePerShare).div(BigInt.fromI32(10).pow(decimals));
+}
+
+function getTotalAssets(vaultContract: VaultContract): BigInt {
+  return vaultContract.totalAssets();
 }
 
 function updateFinancials(blockNumber: BigInt, timestamp: BigInt, from: Address): void {
