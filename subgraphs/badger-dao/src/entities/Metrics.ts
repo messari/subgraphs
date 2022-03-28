@@ -69,7 +69,7 @@ export function getOrCreateVaultDailySnapshot(
   snapshot.vault = vault.toHex();
   snapshot.totalValueLockedUSD = BigDecimal.zero();
   snapshot.totalVolumeUSD = BigDecimal.zero();
-  snapshot.inputTokenBalances = BigInt.zero();
+  snapshot.inputTokenBalances = [];
   snapshot.outputTokenSupply = BigInt.zero();
   snapshot.outputTokenPriceUSD = BigDecimal.zero();
   snapshot.rewardTokenEmissionsAmount = [];

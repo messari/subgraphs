@@ -123,7 +123,9 @@ export function updateVaultMetrics(
   isDeposit: bool,
   block: ethereum.Block,
 ): void {
-  let currentBalance = metrics.inputTokenBalances;
+  let index = vault.inputTokens.indexOf(token.id);
+  let balances = metrics.inputTokenBalances;
+  let currentBalance = balances[index];
 
   if (metrics.blockNumber.equals(BigInt.zero())) {
     metrics.timestamp = block.timestamp;
@@ -135,6 +137,9 @@ export function updateVaultMetrics(
   } else {
     currentBalance = currentBalance.minus(inputTokenAmount);
   }
+
+  balances[index] = currentBalance;
+  metrics.inputTokenBalances = balances;
 
   metrics.outputTokenPriceUSD = normalizedUsdcPrice(
     getPriceOfStakedTokens(
@@ -151,6 +156,5 @@ export function updateVaultMetrics(
       BigInt.fromI32(token.decimals),
     ),
   ).toBigDecimal();
-  metrics.inputTokenBalances = currentBalance;
   metrics.save();
 }
