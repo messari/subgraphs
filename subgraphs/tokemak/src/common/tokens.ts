@@ -1,13 +1,8 @@
-import { BigInt, Address, BigDecimal, log } from "@graphprotocol/graph-ts"
-import {
-  ERC20 as ERC20Contract,
-} from "../../generated/Manager/ERC20"
-import {
-  RewardToken,
-  Token,
-} from "../../generated/schema"
+import { BigInt, Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { ERC20 as ERC20Contract } from "../../generated/Manager/ERC20";
+import { RewardToken, Token } from "../../generated/schema";
 
-import { DEFAULT_DECIMALS, RewardTokenType } from '../common/constants';
+import { DEFAULT_DECIMALS, RewardTokenType } from "../common/constants";
 
 export function getOrCreateToken(address: Address): Token {
   let id = address.toHexString();
@@ -21,8 +16,8 @@ export function getOrCreateToken(address: Address): Token {
     let symbol = erc20Contract.try_symbol();
     // TODO: add overrides for name and symbol
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? '' : name.value;
-    token.symbol = symbol.reverted ? '' : symbol.value;
+    token.name = name.reverted ? "" : name.value;
+    token.symbol = symbol.reverted ? "" : symbol.value;
     token.save();
   }
   return token as Token;
@@ -40,8 +35,8 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     let symbol = erc20Contract.try_symbol();
     // TODO: add overrides for name and symbol
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? '' : name.value;
-    token.symbol = symbol.reverted ? '' : symbol.value;
+    token.name = name.reverted ? "" : name.value;
+    token.symbol = symbol.reverted ? "" : symbol.value;
     token.type = RewardTokenType.DEPOSIT;
     token.save();
   }

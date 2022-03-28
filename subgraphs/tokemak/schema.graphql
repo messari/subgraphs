@@ -64,12 +64,20 @@ interface Protocol {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -86,19 +94,27 @@ type YieldAggregator implements Protocol @entity {
   " Slug of protocol, including version. e.g. yearn-v3 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   ##### Yield-Specific #####
-  
+
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
 
@@ -158,7 +174,7 @@ type FinancialsDailySnapshot @entity {
 
   " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
   feesUSD: BigDecimal!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -183,7 +199,7 @@ interface Pool {
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
   # and inputToken balances are used to calculate returns
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
@@ -292,9 +308,9 @@ type Vault @entity {
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
   # and inputToken balances are used to calculate returns
-  
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
   inputTokens: [Token!]!
 
@@ -332,7 +348,7 @@ type Vault @entity {
   ##### Yield-Specific #####
 
   name: String
-  
+
   symbol: String
 
   depositLimit: BigInt!
@@ -373,7 +389,7 @@ type VaultDailySnapshot @entity {
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -523,16 +539,16 @@ type _TokenFee @entity {
   id: ID!
 
   vault: Vault!
-  
+
   " The token which the fees are denominated in. Equivalent to vault.token. "
   token: Token!
-  
+
   " All time fees paid using this token to the treasury. Denominated in the vault's want token. "
   totalTreasuryFees: BigInt!
-  
+
   " All time fees paid using this token to strategists.  Denominated in the vault's want token. "
   totalStrategyFees: BigInt!
-  
+
   " All time fees paid using this token to strategists and the treasury.  Denominated in the vault's want token. "
   totalFees: BigInt!
 
