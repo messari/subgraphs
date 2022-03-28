@@ -28,6 +28,8 @@ function createProtocol(): void {
     protocol = new YieldAggregator(PROTOCOL_ID)
     protocol.name = "Yearn v2"
     protocol.slug = "yearn-v2"
+    protocol.schemaVersion = "1.0.0";
+    protocol.subgraphVersion = "1.0.0";
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.YIELD
     protocol.vaultIds = []

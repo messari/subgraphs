@@ -4,48 +4,49 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Schema Enums /////
 ////////////////////////
 
+// Using Coingecko slugs
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM";
-  export const AVALANCHE = "AVALANCHE";
-  export const AURORA = "AURORA";
-  export const BSC = "BSC";
-  export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
-  export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY";
-  export const MOONBEAM = "MOONBEAM";
-  export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "POLYGON";
-  export const XDAI = "XDAI";
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "binance-smart-chain";
+  export const CELO = "celo";
+  export const CRONOS = "cronos";
+  export const ETHEREUM = "ethereum";
+  export const FANTOM = "fantom";
+  export const HARMONY = "harmony-shard-0";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const OPTIMISM = "optimistic-ethereum";
+  export const POLYGON = "polygon-pos";
+  export const XDAI = "xdai";
 }
 
 export namespace ProtocolType {
-  export const EXCHANGE = "EXCHANGE";
-  export const LENDING = "LENDING";
-  export const YIELD = "YIELD";
-  export const BRIDGE = "BRIDGE";
-  export const GENERIC = "GENERIC";
+  export const EXCHANGE = "exchange";
+  export const LENDING = "lending";
+  export const YIELD = "yield";
+  export const BRIDGE = "bridge";
+  export const GENERIC = "generic";
 }
 
 export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
-  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
-  export const DEPOSIT_FEE = "DEPOSIT_FEE";
-  export const WITHDRAWLAL_FEE = "WITHDRAWLAL_FEE";
+  export const MANAGEMENT_FEE = "management-fee";
+  export const PERFORMANCE_FEE = "performance-fee";
+  export const DEPOSIT_FEE = "deposit-fee";
+  export const WITHDRAWLAL_FEE = "withdrawal-fee";
 }
 
 export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "TRADING_FEE";
-  export const PROTOCOL_FEE = "PROTOCOL_FEE";
-  export const TIERED_FEE = "TIERED_FEE";
-  export const DYNAMIC_FEE = "DYNAMIC_FEE";
+  export const TRADING_FEE = "trading-fee";
+  export const PROTOCOL_FEE = "protocol-fee";
+  export const TIERED_FEE = "tiered-fee";
+  export const DYNAMIC_FEE = "dynamic-fee";
 }
 
 export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
+  export const DEPOSIT = "deposit";
+  export const BORROW = "borrow";
 }
 
 //////////////////////////////
