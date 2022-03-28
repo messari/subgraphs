@@ -16,29 +16,24 @@ export function createLiquidityPool(
   token1: Token,
   LPtoken: Token,
 ): void {
-  // let pool = new LiquidityPool(poolAddress.toHexString())
-  // pool.protocol = protocol.id
-  // pool.inputTokens = [token0.id, token1.id]
-  // pool.outputToken = LPtoken.id
+  // let pool = new LiquidityPool(poolAddress.toHexString());
+  // pool.protocol = protocol.id;
+  // pool.inputTokens = [token0.id, token1.id];
+  // pool.outputToken = LPtoken.id;
   // ...
-  // pool.save()
-  // create the tracked contract based on the template
-  // PairTemplate.create(poolAddress)
+  // pool.save();
+  // // create the tracked contract based on the template
+  // PairTemplate.create(poolAddress);
 }
 
 // Generate the deposit entity and update deposit account for the according pool.
 export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address): void {
-  // let deposit = new Deposit(
-  //   event.transaction.hash
-  //     .toHexString()
-  //     .concat('-')
-  //     .concat(event.logIndex.toString())
-  // )
-  // deposit.hash = event.transaction.hash.toHexString()
-  // deposit.logIndex = event.logIndex.toI32()
-  // deposit.protocol = FACTORY_ADDRESS
-  // ...
-  // deposit.save()
+  // let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  // deposit.hash = event.transaction.hash.toHexString();
+  // deposit.logIndex = event.logIndex.toI32();
+  // deposit.protocol = FACTORY_ADDRESS;
+  // ..
+  // deposit.save();
 }
 
 // Generate the withdraw entity
@@ -49,17 +44,12 @@ export function createWithdraw(
   sender: Address,
   to: Address,
 ): void {
-  // let withdrawal = new Withdraw(
-  //   event.transaction.hash
-  //     .toHexString()
-  //     .concat('-')
-  //     .concat(event.logIndex.toString())
-  // )
-  // withdrawal.hash = event.transaction.hash.toHexString()
-  // withdrawal.logIndex = event.logIndex.toI32()
-  // withdrawal.protocol = FACTORY_ADDRESS
-  // ...
-  // withdrawal.save()
+  // let withdrawal = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  // withdrawal.hash = event.transaction.hash.toHexString();
+  // withdrawal.logIndex = event.logIndex.toI32();
+  // withdrawal.protocol = FACTORY_ADDRESS;
+  // ..
+  // withdrawal.save();
 }
 
 // Handle swaps data and update entities volumes and fees
@@ -72,17 +62,12 @@ export function createSwapHandleVolumeAndFees(
   amount0Out: BigInt,
   amount1Out: BigInt,
 ): void {
-  // let swap = new SwapEvent(
-  //   event.transaction.hash
-  //     .toHexString()
-  //     .concat('-')
-  //     .concat(event.logIndex.toString())
-  // )
-  // update swap event
-  // swap.hash = event.transaction.hash.toHexString()
-  // swap.logIndex = event.logIndex.toI32()
-  // swap.protocol = FACTORY_ADDRESS
-  // ...
-  // swap.save()
-  // updateVolumeAndFees(event, trackedAmountUSD, feeUSD)
+  // let swap = new SwapEvent(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+  // // update swap event
+  // swap.hash = event.transaction.hash.toHexString();
+  // swap.logIndex = event.logIndex.toI32();
+  // swap.protocol = FACTORY_ADDRESS;
+  // ..
+  // swap.save();
+  // updateVolumeAndFees(event, trackedAmountUSD, feeUSD);
 }

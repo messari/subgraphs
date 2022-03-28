@@ -6,11 +6,11 @@ import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetric
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
   // let financialMetrics = getOrCreateFinancials(event);
-  // let protocol = getOrCreateDexAmm()
+  // let protocol = getOrCreateDexAmm();
   // // Update the block number and timestamp to that of the last transaction of that day
   // financialMetrics.blockNumber = event.block.number;
   // financialMetrics.timestamp = event.block.timestamp;
-  // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD
+  // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   // ...
   // financialMetrics.save();
 }
@@ -52,13 +52,13 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 // Update UsagePoolDailySnapshot entity
 export function updatePoolMetrics(event: ethereum.Event): void {
   // get or create pool metrics
-  // let poolMetrics = getOrCreatePoolDailySnapshot(event)
-  // let pool = getLiquidityPool(event.address.toHexString())
+  // let poolMetrics = getOrCreatePoolDailySnapshot(event);
+  // let pool = getLiquidityPool(event.address.toHexString());
   // // Update the block number and timestamp to that of the last transaction of that day
   // poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  // poolMetrics.inputTokenBalances = pool.inputTokenBalances
-  // poolMetrics.outputTokenSupply = pool.outputTokenSupply
-  // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD
+  // poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+  // poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+  // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   // poolMetrics.blockNumber = event.block.number;
   // poolMetrics.timestamp = event.block.timestamp;
   // ...

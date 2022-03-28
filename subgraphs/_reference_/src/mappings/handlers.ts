@@ -9,16 +9,16 @@ import { getOrCreateDexAmm } from "../common/getters";
 // handlers in this file, and create helper functions to handle specific events
 
 export function handleNewPair(event: PairCreated): void {
-  // let protocol = getOrCreateDexAmm()
+  // let protocol = getOrCreateDexAmm();
   // // create the tokens and tokentracker
-  // let token0 = getOrCreateToken(event.params.token0)
-  // let token1 = getOrCreateToken(event.params.token1)
-  // let LPtoken = getOrCreateToken(event.params.pair)
-  // let tokenTracker0 = getOrCreateTokenTracker(event.params.token0)
-  // let tokenTracker1 = getOrCreateTokenTracker(event.params.token1)
-  // tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
-  // tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
-  // createLiquidityPool(event, protocol, event.params.pair, token0, token1, LPtoken)
+  // let token0 = getOrCreateToken(event.params.token0);
+  // let token1 = getOrCreateToken(event.params.token1);
+  // let LPtoken = getOrCreateToken(event.params.pair);
+  // let tokenTracker0 = getOrCreateTokenTracker(event.params.token0);
+  // let tokenTracker1 = getOrCreateTokenTracker(event.params.token1);
+  // tokenTracker0.derivedETH = findEthPerToken(tokenTracker0);
+  // tokenTracker1.derivedETH = findEthPerToken(tokenTracker1);
+  // createLiquidityPool(event, protocol, event.params.pair, token0, token1, LPtoken);
 }
 
 export function handleMint(event: Mint): void {
