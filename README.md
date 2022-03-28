@@ -56,3 +56,35 @@
 - Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
   - Performance tips and tricks (for both mappings and queries)
 - [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
+
+## Development Status
+
+🔨 = In progress.  
+🛠 = Feature complete. Additional testing required.  
+✅ = Production-ready.  
+
+| Feature |  Status |
+| ------- |  :------: |
+| **DEX AMM** |    |
+| Uniswap v2 | 🛠 |
+| Uniswap v3 | 🔨 |
+| Sushiswap | 🔨 |
+| Curve | 🔨 |
+| Balancer v2 | |
+| Bancor v2 | 🔨 |
+| Bancor v3 | |
+| DODO v2 |  |
+| **Lending Protocols** |    |
+| Aave v2 | 🔨  |
+| Compound | 🔨  |
+| Geist | 🔨  |
+| Benqi | 🔨  |
+| **Yield Aggregators** |     |
+| Yearn v2 | 🔨 |
+| Convex Finance | 🔨  |
+| Badger DAO | 🔨 |
+| Stake DAO | 🛠 |
+| Beefy Finance |  |
+| Tokemak | 🛠  |
+| Harvest Finance | 🔨  |
+| Yield Yak |  |
