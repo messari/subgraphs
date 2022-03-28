@@ -15,7 +15,7 @@
 ## Links
 
 - Protocol: https://uniswap.org/
-- Analytics: https://info.uniswap.org/
+- Analytics: https://v2.info.uniswap.org/
 - Docs: https://docs.uniswap.org/protocol/V2/introduction
 - Smart contracts: https://github.com/Uniswap/v2-core
 - Deployed addresses: https://docs.uniswap.org/protocol/V2/reference/smart-contracts/factory
