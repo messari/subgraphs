@@ -1,4 +1,4 @@
-# Subgraph Schema: Lending Protocol
+# Subgraph Schema: DEX AMM
 # Version: 1.0.0
 
 enum Network {
@@ -95,7 +95,7 @@ type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " # of unique daily active users "
   activeUsers: Int!
@@ -117,9 +117,15 @@ type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   totalValueLockedUSD: BigDecimal!
+
+  " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
+  protocolTreasuryUSD: BigDecimal
+
+  " Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " Total volume in USD "
   totalVolumeUSD: BigDecimal!
@@ -132,7 +138,7 @@ type FinancialsDailySnapshot @entity {
 
   " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
   feesUSD: BigDecimal!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -153,18 +159,18 @@ interface Pool {
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
   # and inputToken balances are used to calculate returns
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -205,15 +211,15 @@ interface Pool {
 ##### Pool-Level Timeseries #####
 #################################
 
-interface PoolDailySnapshot {
+type PoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " The pool this snapshot belongs to "
-  pool: Pool!
+  pool: LiquidityPool!
 
   totalValueLockedUSD: BigDecimal!
 
@@ -242,30 +248,18 @@ interface PoolDailySnapshot {
   timestamp: BigInt!
 }
 
-enum LendingType {
-  " Collateralized Debt Position (CDP) protocols have singular isolated positions created by users. We aggregate them to give a single view of a market "
-  CDP
+###############################################################################
+################################# DEX AMM #####################################
+###############################################################################
 
-  " Pooled protocols pool all users assets into a single market "
-  POOLED
-}
-
-enum RiskType {
-  " Global risk means each users position in a market is combined for one score to determine if they can be liquidated "
-  GLOBAL
-
-  " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
-  ISOLATED
-}
-
-type LendingProtocol implements Protocol @entity {
+type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
-  " Name of the protocol, including version. e.g. Aave v2 "
+  " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
 
-  " Slug of protocol, including version. e.g. aave-v2 "
+  " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
@@ -287,33 +281,46 @@ type LendingProtocol implements Protocol @entity {
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
-  ##### Lending-Specific #####
+  ##### DexAmm-Specific #####
 
-  " All markets that belong to this protocol "
-  markets: [Market!]! @derivedFrom(field: "protocol")
-
-  lendingType: LendingType
-
-  riskType: RiskType
+  " All pools that belong to this protocol "
+  pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
-type Market @entity {
-  " Smart contract address of the market "
+enum LiquidityPoolFeeType {
+  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
+  TRADING_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  PROTOCOL_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_FEE
+}
+
+type LiquidityPoolFee @entity {
+  id: ID!
+
+  feePercentage: BigDecimal!
+
+  feeType: LiquidityPoolFeeType!
+}
+
+type LiquidityPool @entity {
+  " Smart contract address of the pool "
   id: ID!
 
   " The protocol this pool belongs to "
-  protocol: LendingProtocol!
+  protocol: DexAmmProtocol!
 
-  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
-  # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
-  # and inputToken balances are used to calculate returns
-
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
@@ -322,10 +329,10 @@ type Market @entity {
 
   totalValueLockedUSD: BigDecimal!
 
-  " Total borrow volume in USD (i.e. total loan origination ) "
+  " Total swap volume in USD "
   totalVolumeUSD: BigDecimal!
 
-  " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
@@ -347,94 +354,24 @@ type Market @entity {
   createdBlockNumber: BigInt!
 
   " Pool snapshots "
-  snapshots: [MarketDailySnapshot!]! @derivedFrom(field: "market")
+  snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
 
-  ##### Lending-Specific #####
+  ##### DexAmm-Specific #####
 
-  " Name of market "
+  " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
 
-  isActive: Boolean!
+  " Symbol of liquidity pool (e.g. 3CRV) "
+  symbol: String
 
-  canUseAsCollateral: Boolean!
+  " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
+  fees: [LiquidityPoolFee!]!
 
-  canBorrowFrom: Boolean!
+  deposits: [Deposit!]! @derivedFrom(field: "pool")
 
-  " Maximum loan-to-value ratio as a percentage value "
-  maximumLTV: BigDecimal!
+  withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 
-  " Liquidation threshold as a percentage value "
-  liquidationThreshold: BigDecimal!
-
-  " Liquidation penalty as a percentage value "
-  liquidationPenalty: BigDecimal!
-
-  " Deposit interest rate in percentage "
-  depositRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  stableBorrowRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  variableBorrowRate: BigDecimal!
-
-  deposits: [Deposit!]! @derivedFrom(field: "market")
-
-  withdraws: [Withdraw!]! @derivedFrom(field: "market")
-
-  borrows: [Borrow!]! @derivedFrom(field: "market")
-
-  repays: [Repay!]! @derivedFrom(field: "market")
-
-  liquidations: [Liquidation!]! @derivedFrom(field: "market")
-}
-
-type MarketDailySnapshot @entity {
-  " { Smart contract address of the market }-{ # of days since Unix epoch time } "
-  id: ID!
-
-  " The protocol this snapshot belongs to "
-  protocol: Protocol!
-
-  " The pool this snapshot belongs to "
-  market: Market!
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Price per share of input token in USD "
-  inputTokenPricesUSD: [BigDecimal!]!
-
-  " Total supply of output token "
-  outputTokenSupply: BigInt!
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
-
-  " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-  
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " Deposit interest rate in percentage "
-  depositRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  stableBorrowRate: BigDecimal!
-
-  " Borrow interest rate in percentage "
-  variableBorrowRate: BigDecimal!
+  swaps: [Swap!]! @derivedFrom(field: "pool")
 }
 
 ##################################
@@ -460,7 +397,7 @@ interface Event {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
@@ -484,7 +421,7 @@ type Deposit implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Market that tokens are deposited into "
   to: String!
@@ -496,19 +433,25 @@ type Deposit implements Event @entity {
 
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Input tokens of the transaction. E.g. WETH and USDC to a WETH-USDC pool "
+  inputTokens: [Token!]!
 
-  " The market this transaction interacted with "
-  market: Market!
+  " Output tokens of the transaction. E.g. the UNI-LP token "
+  outputTokens: Token!
 
-  " Token deposited "
-  asset: Token!
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
 
-  " Amount of token deposited in native units "
-  amount: BigInt!
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt!
 
-  " Amount of token deposited in USD "
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
+
+  ##### DexAmm-Specific #####
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
 }
 
 type Withdraw implements Event @entity {
@@ -522,7 +465,7 @@ type Withdraw implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
@@ -534,22 +477,28 @@ type Withdraw implements Event @entity {
 
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Input tokens of the transaction. E.g. the UNI-LP token "
+  inputTokens: [Token!]!
 
-  " The market this transaction interacted with "
-  market: Market!
+  " Output tokens of the transaction. E.g. WETH and USDC from a WETH-USDC pool "
+  outputTokens: Token!
 
-  " Token withdrawn "
-  asset: Token!
+  " Amount of input tokens in the token's native unit "
+  inputTokenAmounts: [BigInt!]!
 
-  " Amount of token withdrawn in native units "
-  amount: BigInt!
+  " Amount of output tokens in the token's native unit "
+  outputTokenAmount: BigInt!
 
-  " Amount of token withdrawn in USD "
+  " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
+
+  ##### DexAmm-Specific #####
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
 }
 
-type Borrow implements Event @entity {
+type Swap implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -560,108 +509,58 @@ type Borrow implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: DexAmmProtocol!
 
   " Address that received tokens "
   to: String!
 
-  " Market that tokens are borrowed from "
+  " Market that tokens are withdrawn from "
   from: String!
 
   blockNumber: BigInt!
 
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  " Token deposited into pool "
+  tokenIn: Token!
 
-  " The market this transaction interacted with "
-  market: Market!
+  " Amount of token deposited into pool in native units "
+  amountIn: BigInt!
 
-  " Token borrowed "
-  asset: Token!
+  " Amount of token deposited into pool in USD "
+  amountInUSD: BigDecimal!
 
-  " Amount of token borrowed in native units "
-  amount: BigInt!
+  " Token withdrawn from pool "
+  tokenOut: Token!
 
-  " Amount of token borrowed in USD "
-  amountUSD: BigDecimal
+  " Amount of token withdrawn from pool in native units "
+  amountOut: BigInt!
+
+  " Amount of token withdrawn from pool in USD "
+  amountOutUSD: BigDecimal!
+
+  ##### DexAmm-Specific #####
+
+  " The pool involving this transaction "
+  pool: LiquidityPool!
 }
 
-type Repay implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+###########################
+##### Helper Entities #####
+###########################
+
+# Helper entities are additional entities created to help with mapping.
+# They are usually used to store internal states that would simplify
+# the mapping logic. All helper entities should be prefixed with an
+# underscore to differentiate them from the common schema.
+
+# An account is a unique Ethereum address
+type _Account @entity {
+  " Address of the account "
   id: ID!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: Protocol!
-
-  " Market that tokens are repaid to "
-  to: String!
-
-  " Address that sent tokens "
-  from: String!
-
-  blockNumber: BigInt!
-
-  timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
-  " Token repaid "
-  asset: Token!
-
-  " Amount of token repaid in native units "
-  amount: BigInt!
-
-  " Amount of token repaid in USD "
-  amountUSD: BigDecimal
 }
 
-type Liquidation implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+type _DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
-
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
-
-  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
-  logIndex: Int!
-
-  " The protocol this transaction belongs to "
-  protocol: Protocol!
-
-  " Market that tokens are repaid to "
-  to: String!
-
-  " Address that carried out the liquidation "
-  from: String!
-
-  blockNumber: BigInt!
-
-  timestamp: BigInt!
-
-  ##### Lending-Specific #####
-
-  " The market this transaction interacted with "
-  market: Market!
-
-  " Token liquidated "
-  asset: Token!
-
-  " Amount of token liquidated in native units "
-  amount: BigInt!
-
-  " Amount of token liquidated in USD "
-  amountUSD: BigDecimal
-
-  " Amount of profit from liquidation in USD "
-  profitUSD: BigDecimal
 }
