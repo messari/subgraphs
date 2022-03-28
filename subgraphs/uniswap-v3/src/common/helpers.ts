@@ -30,6 +30,7 @@ export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b2
 export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: string, token0: Token, token1: Token, LPtoken: Token): void {
   let pool = new LiquidityPool(poolAddress)
   let poolAmounts = new _LiquidityPoolAmounts(poolAddress)
+  let poolFee = new 
 
   pool.protocol = protocol.id
   pool.inputTokens =  [token0.id, token1.id]
@@ -46,6 +47,7 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
 
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
 
+  poolAmounts.save()
   pool.save()
 }
 
@@ -85,17 +87,21 @@ export function UpdateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker
 export function updatePrices(event: ethereum.Event): void {
   let pool = getLiquidityPool(event.address.toHexString())
 
+
   let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
   let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+
 
   // update ETH price now that prices could have changed
   let ether = getOrCreateEtherHelper()
   ether.valueDecimal = getEthPriceInUSD()
 
+
   // update token prices
   tokenTracker0.derivedETH = findEthPerToken(tokenTracker0 as _TokenTracker)
   tokenTracker1.derivedETH = findEthPerToken(tokenTracker1 as _TokenTracker)
   
+
   tokenTracker0.save()
   tokenTracker1.save()
   ether.save()
@@ -172,7 +178,7 @@ export function createDeposit(event: ethereum.Event, owner: Address, amount0: Bi
   deposit.blockNumber = event.block.number
   deposit.timestamp = event.block.timestamp
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
-  deposit.outputTokens = pool.outputToken!
+  deposit.outputTokens = pool.outputToken
   deposit.inputTokenAmounts = [amount0, amount1]
   deposit.outputTokenAmount = amount
   deposit.amountUSD = amountUSD
@@ -243,12 +249,12 @@ export function createWithdraw(event: ethereum.Event, owner: Address, amount0: B
   withdrawal.hash = event.transaction.hash.toHexString()
   withdrawal.logIndex = event.logIndex.toI32()
   withdrawal.protocol = protocol.id
-  withdrawal.to = pool.id
-  withdrawal.from = owner.toHexString()
+  withdrawal.to = owner.toHexString()
+  withdrawal.from = pool.id
   withdrawal.blockNumber = event.block.number
   withdrawal.timestamp = event.block.timestamp
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
-  withdrawal.outputTokens = pool.outputToken!
+  withdrawal.outputTokens = pool.outputToken
   withdrawal.inputTokenAmounts = [amount0, amount1]
   withdrawal.outputTokenAmount = amount
   withdrawal.amountUSD = amountUSD

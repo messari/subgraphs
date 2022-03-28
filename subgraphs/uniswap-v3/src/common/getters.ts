@@ -43,6 +43,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
+    protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE

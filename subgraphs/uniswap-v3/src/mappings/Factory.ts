@@ -14,13 +14,9 @@ export function handlePoolCreated(event: PoolCreated): void {
   let protocol = getOrCreateDex()
   
   // create the tokens and tokentracker
-  log.warning("Hello1", [])
   let token0 = getOrCreateToken(event.params.token0)
-  log.warning("Hello2", [])
   let token1 = getOrCreateToken(event.params.token1)
-  log.warning("Hello3", [])
   let LPtoken = getOrCreateLPToken(event.params.pool, token0, token1)
-  log.warning("Hello4", [])
 
   let tokenTracker0 = getOrCreateTokenTracker(event.params.token0)
   let tokenTracker1 = getOrCreateTokenTracker(event.params.token1)
