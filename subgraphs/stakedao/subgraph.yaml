@@ -1,0 +1,185 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Controller
+    network: mainnet
+    source:
+      address: "0x29D3782825432255041Db2EAfCB7174f5273f08A"
+      abi: EthereumController
+      startBlock: 11692633
+      # startBlock: 13816851
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: EthereumController
+          file: ./abis/Ethereum/controller.json
+        - name: Vault
+          file: ./abis/Ethereum/vault.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
+        - name: CalculationsCurve
+          file: ./abis/Price/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/Price/CalculationsSushiSwap.json
+      callHandlers:
+        - function: setVault(address,address) 
+          handler: handleSetVault
+        - function: setStrategy(address,address) 
+          handler: handleSetStrategy
+        - function: revokeStrategy(address,address) 
+          handler: handleRevokeStrategy
+      file: ./src/mappings/controllerMappings.ts
+  - kind: ethereum
+    name: NewController
+    network: mainnet
+    source:
+      address: "0x408179Cd13C805Ca4EdED1e3D2718bC7302116AE"
+      abi: EthereumController
+      startBlock: 12722464
+      # startBlock: 13816851
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: EthereumController
+          file: ./abis/Ethereum/controller.json
+        - name: Vault
+          file: ./abis/Ethereum/vault.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
+        - name: CalculationsCurve
+          file: ./abis/Price/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/Price/CalculationsSushiSwap.json
+      callHandlers:
+        - function: setVault(address,address) 
+          handler: handleSetVault
+        - function: setStrategy(address,address) 
+          handler: handleSetStrategy
+        - function: revokeStrategy(address,address) 
+          handler: handleRevokeStrategy
+      file: ./src/mappings/controllerMappings.ts
+
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vaultMappings.ts
+      entities:
+        - Vault
+        - Deposit
+        - Transaction
+        - Token
+      abis:
+        - name: Vault
+          file: ./abis/Ethereum/vault.json
+        - name: CalculationsCurve
+          file: ./abis/Price/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/Price/CalculationsSushiSwap.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
+        - name: Gauge
+          file: ./abis/Ethereum/gauge.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+        - function: setGauge(address)
+          handler: handleSetGauge
+  - name: Strategy
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/strategyMappings.ts
+      entities:
+        - Vault
+        - Deposit
+        - Transaction
+        - Token
+      abis:
+        - name: Vault
+          file: ./abis/Ethereum/vault.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
+        - name: EthereumController
+          file: ./abis/Ethereum/controller.json
+        - name: CalculationsCurve
+          file: ./abis/Price/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/Price/CalculationsSushiSwap.json
+      eventHandlers:
+        - event: Harvested(uint256,uint256)
+          handler: handleHarvested
+      callHandlers:
+        - function: setPerformanceFee(uint256)
+          handler: handleSetPerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleSetWithdrawalFee
+  - name: Gauge
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Gauge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/gaugeMappings.ts
+      entities:
+        - Vault
+        - Token
+      abis:
+        - name: Gauge
+          file: ./abis/Ethereum/gauge.json
+        - name: Vault
+          file: ./abis/Ethereum/vault.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
+        - name: EthereumController
+          file: ./abis/Ethereum/controller.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
+        - name: CalculationsCurve
+          file: ./abis/Price/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/Price/CalculationsSushiSwap.json
+      eventHandlers:
+        - event: RewardPaid(indexed address,indexed address,uint256)
+          handler: handleRewardPaid
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+      callHandlers:
+        - function: addReward(address,address,uint256)
+          handler: handleAddReward
