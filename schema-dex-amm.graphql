@@ -2,8 +2,9 @@
 # Version: 1.0.0
 
 enum Network {
-  AVALANCHE
+  ARBITRUM
   AURORA
+  AVALANCHE
   BSC
   CELO
   CRONOS
