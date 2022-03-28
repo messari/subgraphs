@@ -29,6 +29,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     // Number of days since Unix epoch
     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
     let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+    let protocol = getOrCreateDex()
     let totalUniqueUsers = getOrCreateUsersHelper()
   
     if (!usageMetrics) {
@@ -52,6 +53,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
       totalUniqueUsers.valueInt += 1;
     }
     usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
+    protocol.totalUniqueUsers = totalUniqueUsers.valueInt
   
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
