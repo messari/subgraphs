@@ -1,11 +1,5 @@
-import { YieldAggregator } from '../../generated/schema';
-import {
-  PROTOCOL_ID,
-  PROTOCOL_NAME,
-  PROTOCOL_NETWORK,
-  PROTOCOL_SLUG,
-  PROTOCOL_TYPE,
-} from '../constant';
+import { YieldAggregator } from "../../generated/schema";
+import { PROTOCOL_ID, PROTOCOL_NAME, PROTOCOL_NETWORK, PROTOCOL_SLUG, PROTOCOL_TYPE } from "../constant";
 
 export function getOrCreateProtocol(): YieldAggregator {
   const id = PROTOCOL_ID.toHex();

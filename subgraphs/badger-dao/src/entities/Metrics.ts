@@ -1,9 +1,6 @@
-import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts';
-import {
-  FinancialsDailySnapshot,
-  UsageMetricsDailySnapshot,
-  VaultDailySnapshot,
-} from '../../generated/schema';
+import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { FinancialsDailySnapshot, UsageMetricsDailySnapshot, VaultDailySnapshot } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 
 export function getOrCreateUserSnapshot(day: i32): UsageMetricsDailySnapshot {
   let snapshot = UsageMetricsDailySnapshot.load(day.toString());
@@ -14,7 +11,7 @@ export function getOrCreateUserSnapshot(day: i32): UsageMetricsDailySnapshot {
 
   snapshot = new UsageMetricsDailySnapshot(day.toString());
 
-  snapshot.protocol = '';
+  snapshot.protocol = "";
   snapshot.activeUsers = 0;
   snapshot.totalUniqueUsers = 0;
   snapshot.dailyTransactionCount = 0;
@@ -34,14 +31,14 @@ export function getOrCreateFinancialsDailySnapshot(day: i32): FinancialsDailySna
 
   snapshot = new FinancialsDailySnapshot(day.toString());
 
-  snapshot.protocol = '';
-  snapshot.totalValueLockedUSD = BigDecimal.zero();
-  snapshot.protocolTreasuryUSD = BigDecimal.zero();
-  snapshot.protocolControlledValueUSD = BigDecimal.zero();
-  snapshot.totalVolumeUSD = BigDecimal.zero();
-  snapshot.supplySideRevenueUSD = BigDecimal.zero();
-  snapshot.protocolSideRevenueUSD = BigDecimal.zero();
-  snapshot.feesUSD = BigDecimal.zero();
+  snapshot.protocol = "";
+  snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  snapshot.protocolTreasuryUSD = BIGDECIMAL_ZERO;
+  snapshot.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+  snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
+  snapshot.supplySideRevenueUSD = BIGDECIMAL_ZERO;
+  snapshot.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  snapshot.feesUSD = BIGDECIMAL_ZERO;
   snapshot.blockNumber = BigInt.fromI32(0);
   snapshot.timestamp = BigInt.fromI32(0);
   snapshot.save();
@@ -49,13 +46,10 @@ export function getOrCreateFinancialsDailySnapshot(day: i32): FinancialsDailySna
   return snapshot;
 }
 
-export function getOrCreateVaultDailySnapshot(
-  vault: Address,
-  day: i32,
-): VaultDailySnapshot {
+export function getOrCreateVaultDailySnapshot(vault: Address, day: i32): VaultDailySnapshot {
   const id = vault
     .toHex()
-    .concat('-')
+    .concat("-")
     .concat(day.toString());
   let snapshot = VaultDailySnapshot.load(id);
 
@@ -65,13 +59,13 @@ export function getOrCreateVaultDailySnapshot(
 
   snapshot = new VaultDailySnapshot(id);
 
-  snapshot.protocol = '';
+  snapshot.protocol = "";
   snapshot.vault = vault.toHex();
-  snapshot.totalValueLockedUSD = BigDecimal.zero();
-  snapshot.totalVolumeUSD = BigDecimal.zero();
+  snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
   snapshot.inputTokenBalances = [];
-  snapshot.outputTokenSupply = BigInt.zero();
-  snapshot.outputTokenPriceUSD = BigDecimal.zero();
+  snapshot.outputTokenSupply = BIGINT_ZERO;
+  snapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   snapshot.rewardTokenEmissionsAmount = [];
   snapshot.rewardTokenEmissionsUSD = [];
   snapshot.blockNumber = BigInt.fromI32(0);
