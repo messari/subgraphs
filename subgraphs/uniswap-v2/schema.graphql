@@ -66,24 +66,30 @@ interface Protocol {
   version: String!
   network: Network!
   type: ProtocolType!
-  " Total value locked in the protocol"
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
   totalValueLockedUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
+
 ###############################
 ##### Protocol Timeseries #####
 ###############################
+
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
   protocol: DexAmmProtocol!
 
-  " number of unique daily active users "
+  " # of unique daily active users "
   activeUsers: Int!
 
-  " number of total/cumulative unique users "
+  " # of total/cumulative unique users "
   totalUniqueUsers: Int!
 
   " Total number of transaction occurred in a day. Transactions include all entities that implement the Event interface. "
@@ -171,20 +177,20 @@ interface Pool {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
   " Creation timestamp "
   createdTimestamp: BigInt!
-
   " Creation block number "
   createdBlockNumber: BigInt!
-
   " Pool snapshots "
   snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
 }
-
 #################################
 ##### Pool-Level Timeseries #####
 #################################
-
 type PoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
@@ -211,16 +217,21 @@ type PoolDailySnapshot @entity {
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
+
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Block number of this snapshot "
   blockNumber: BigInt!
+
   " Timestamp of this snapshot "
   timestamp: BigInt!
 }
+
 ###############################################################################
 ################################# DEX AMM #####################################
 ###############################################################################
+
 type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
@@ -233,29 +244,69 @@ type DexAmmProtocol implements Protocol @entity {
   version: String!
   network: Network!
   type: ProtocolType!
-  " Total value locked in the protocol"
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
   totalValueLockedUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
   ##### DexAmm-Specific #####
+
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+  
+  " Storing pool IDs so I can iterate through all pools " 
+  poolIds: [Bytes!]!
 }
+
+enum LiquidityPoolFeeType {
+  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
+  TRADING_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  PROTOCOL_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_FEE
+}
+
+type LiquidityPoolFee @entity {
+  id: ID!
+
+  feePercentage: BigDecimal!
+
+  feeType: LiquidityPoolFeeType!
+}
+
 type LiquidityPool @entity {
   " Smart contract address of the pool "
   id: ID!
+
   " The protocol this pool belongs to "
   protocol: DexAmmProtocol!
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
+
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token!
+
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
+
   ##### Quantitative Data #####
+
   totalValueLockedUSD: BigDecimal!
+
   " Total swap volume in USD "
   totalVolumeUSD: BigDecimal!
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -265,22 +316,25 @@ type LiquidityPool @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
   " Creation timestamp "
   createdTimestamp: BigInt!
-
   " Creation block number "
   createdBlockNumber: BigInt!
-
   " Pool snapshots "
   snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
-
   ##### DexAmm-Specific #####
-
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
 
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
+
+  " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
+  fees: [LiquidityPoolFee!]!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 
@@ -420,6 +474,7 @@ type Swap implements Event @entity {
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
+
 
 #Added Entities 
 

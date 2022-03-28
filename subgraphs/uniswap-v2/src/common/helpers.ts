@@ -9,27 +9,43 @@ import {
   Token,
   DexAmmProtocol,
   LiquidityPool,
+  LiquidityPoolFee,
   Deposit,
   Withdraw,
   Swap as SwapEvent,
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, SWAP_FEE, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE_TO_OFF, BIGDECIMAL_HUNDRED } from "../common/constants"
 import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./Price"
-import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer } from "./getters"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
 import { updateVolumeAndFees } from "./intervalUpdates"
-import { Transfer, TransferFromCall } from "../../generated/Factory/ERC20"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
 // rebass tokens, dont count in tracked volume
 export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
 
+function createPoolFees(poolAddressString: string): string[] {
+  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
+  poolTradingFee.feeType = LiquidityPoolFeeType.TRADING_FEE
+  poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
+
+  let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
+  poolProtocolFee.feeType = LiquidityPoolFeeType.TRADING_FEE
+  poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
+
+  poolTradingFee.save()
+  poolProtocolFee.save()
+
+  return [poolTradingFee.id, poolProtocolFee.id]
+}
+
 // Create a liquidity pool from PairCreated contract call
 export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: Address, token0: Token, token1: Token, LPtoken: Token): void {
-  let pool = new LiquidityPool(poolAddress.toHexString())
-  let poolAmounts = new _LiquidityPoolAmounts(poolAddress.toHexString())
+  let poolAddressString = poolAddress.toHexString()
+  let pool = new LiquidityPool(poolAddressString)
+  let poolAmounts = new _LiquidityPoolAmounts(poolAddressString)
 
   pool.protocol = protocol.id
   pool.inputTokens =  [token0.id, token1.id]
@@ -39,12 +55,14 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO]
   pool.outputTokenSupply = BIGINT_ZERO 
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO
+  pool.fees = createPoolFees(poolAddressString)
   pool.createdTimestamp = event.block.timestamp
   pool.createdBlockNumber = event.block.number
   pool.name = protocol.name + " " + LPtoken.symbol
   pool.symbol = LPtoken.symbol
 
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
+  savePoolId(poolAddress)
 
   pool.save()
   poolAmounts.save()
@@ -323,6 +341,10 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.save()
 }
 
+function percToDec(percentage: BigDecimal): BigDecimal {
+  return percentage.div(BIGDECIMAL_HUNDRED)
+}
+
 // Handle swaps data and update entities volumes and fees 
 export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address, sender: Address, amount0In: BigInt, amount1In: BigInt, amount0Out: BigInt, amount1Out: BigInt): void {
   
@@ -354,16 +376,21 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   // only accounts for volume through white listed tokens
   let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, tokenTracker0 as _TokenTracker, amount1TotalConverted, tokenTracker1 as _TokenTracker, poolAmounts as _LiquidityPoolAmounts)
 
-  var feeToken: BigDecimal
-  var feeUSD: BigDecimal
+  let tradingFee = getLiquidityPoolFee(pool.fees[0])
+  let protocolFee = getLiquidityPoolFee(pool.fees[0])
+  let tradingFeeAmount: BigDecimal
+  let protocolFeeAmount: BigDecimal
 
   if (amount0In != BIGINT_ZERO) {
-    feeToken = amount0TotalConverted.times(BigDecimal.fromString(SWAP_FEE))
-    feeUSD = feeToken.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
+    tradingFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage))
+    protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage))
   } else {
-    feeToken = amount1TotalConverted.times(BigDecimal.fromString(SWAP_FEE))
-    feeUSD = feeToken.times(tokenTracker1.derivedETH).times(ether.valueDecimal!)
+    tradingFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage))
+    protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage))
   }
+
+  let tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
+  let protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
 
   let swap = new SwapEvent(
     event.transaction.hash
@@ -390,7 +417,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
 
   swap.save()
 
-  updateVolumeAndFees(event, trackedAmountUSD, feeUSD)
+  updateVolumeAndFees(event, trackedAmountUSD, tradingFeeAmountUSD, protocolFeeAmountUSD)
 }
 
 // Update store that tracks the deposit count per pool

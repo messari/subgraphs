@@ -1,6 +1,9 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { PairCreated } from './../generated/Factory/Factory'
-import { getOrCreateDex, getOrCreateToken, getOrCreateTokenTracker } from './common/getters'
+import { BigDecimal } from '@graphprotocol/graph-ts'
+import { LiquidityPoolFee } from '../generated/schema'
+import { PairCreated, SetFeeToCall } from './../generated/Factory/Factory'
+import { LiquidityPoolFeeType, ProtocolType, PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, TRADING_FEE_TO_OFF, TRADING_FEE_TO_ON, ZERO_ADDRESS } from './common/constants'
+import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateToken, getOrCreateTokenTracker } from './common/getters'
 import { CreateLiquidityPool, UpdateTokenWhitelists } from './common/helpers'
 import { findEthPerToken } from './common/Price'
 
@@ -22,4 +25,33 @@ export function handleNewPair(event: PairCreated): void {
   UpdateTokenWhitelists(tokenTracker0, tokenTracker1, event.params.pair)
 
   CreateLiquidityPool(event, protocol, event.params.pair, token0, token1, LPtoken)
+}
+
+// The call handler is used to update feeTo as on or off for each pool
+export function handleFeeTo(call: SetFeeToCall): void {
+  let protocol = getOrCreateDex()
+  let poolIds = protocol.poolIds
+  let tradingFeeUpdate: BigDecimal
+  let protocolFeeUpdate: BigDecimal
+  if (call.inputs._feeTo.toHexString() != ZERO_ADDRESS)  {
+    tradingFeeUpdate = TRADING_FEE_TO_ON
+    protocolFeeUpdate = PROTOCOL_FEE_TO_ON
+  } else {
+    tradingFeeUpdate = TRADING_FEE_TO_OFF
+    protocolFeeUpdate = PROTOCOL_FEE_TO_OFF
+  }
+    for (let i = 0; i < poolIds.length; i++) {
+      let pool = getLiquidityPool(poolIds[i].toHexString())
+      let tradingFeeId = pool.fees[0]
+      let protocolFeeId = pool.fees[1]
+
+      let tradingFee = getLiquidityPoolFee(tradingFeeId)
+      tradingFee.feePercentage = tradingFeeUpdate
+
+      let protocolFee = getLiquidityPoolFee(protocolFeeId)
+      protocolFee.feePercentage = protocolFeeUpdate
+
+      tradingFee.save()
+      protocolFee.save()
+  }
 }

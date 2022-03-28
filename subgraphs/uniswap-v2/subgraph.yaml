@@ -20,6 +20,7 @@ dataSources:
         - Token
         - DexAmmProtocol
         - LiquidityPool
+        - LiquidityPoolFee
         - Protocol
         - _PricesUSD
         - _TokenTracker
@@ -35,6 +36,9 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handleNewPair
+      callHandlers:
+        - function: setFeeTo(address)
+          handler: handleFeeTo
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -53,6 +57,7 @@ templates:
         - Withdraw
         - Swap
         - LiquidityPool
+        - LiquidityPoolFee
         - DexAmmProtocol
         - Token
         - _Transaction

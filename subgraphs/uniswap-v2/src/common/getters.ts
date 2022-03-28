@@ -12,7 +12,8 @@ import {
   _Account,
   _DailyActiveAccount,
   _HelperStore,
-  _TokenTracker
+  _TokenTracker,
+  LiquidityPoolFee
 } from "../../generated/schema"
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
 import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE } from "../common/constants"
@@ -53,11 +54,25 @@ export function getOrCreateDex(): DexAmmProtocol {
   return protocol
 }
 
+export function savePoolId(poolAddress: Address): void { 
+    let protocol = getOrCreateDex()
+    protocol.poolIds.push(poolAddress)
+    protocol.save()
+}
+
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
 }
 
 export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
+    return _LiquidityPoolAmounts.load(poolAddress)!
+}
+
+export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
+    return LiquidityPoolFee.load(id)!
+}
+
+export function get(poolAddress: string): _LiquidityPoolAmounts {
     return _LiquidityPoolAmounts.load(poolAddress)!
 }
 
