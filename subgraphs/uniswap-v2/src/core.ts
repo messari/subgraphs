@@ -75,5 +75,5 @@ export function handleSwap(event: Swap): void {
   createSwapHandleVolumeAndFees(event, event.params.to, event.params.sender, event.params.amount0In, event.params.amount1In, event.params.amount0Out, event.params.amount1Out)
   updateFinancials(event)
   updatePoolMetrics(event)
-  updateUsageMetrics(event, event.params.sender)
+  updateUsageMetrics(event, event.transaction.from)
 }
