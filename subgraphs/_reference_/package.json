@@ -2,6 +2,7 @@
   "name": "reference-subgraph",
   "license": "UNLICENSED",
   "scripts": {
+    "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ this-username-is-taken/reference-subgraph",

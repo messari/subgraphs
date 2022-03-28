@@ -1,5 +1,17 @@
 # Uniswap v2 Subgraph
 
+> This is a reference subgraph used to demonstrate some of the common patterns  
+> you should use in your subgraph. It should help you bootstrap your subgraph  
+> quickly, improve the readability and maintainability of your code, and  
+> provide some common functions/modules that you can leverage. Specifically,  
+> here are some guidelines:
+>
+> - Make sure you include this README (but without this section) in the  
+>   subgraph, with links to protocol-related resource and build instruction.
+> - Make sure you run `npm run format` to format your code before committing.
+> - Try to follow the same folder structure inside of `src` for your subgraph.
+> - There is a set of useful functions in `src/common` that you can leverage.
+
 ## Links
 
 - Protocol: https://uniswap.org/
