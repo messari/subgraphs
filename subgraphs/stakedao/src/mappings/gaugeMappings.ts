@@ -137,6 +137,7 @@ export function handleRewardAdded(event: RewardAdded): void {
     .plus(
       rewardTokenPrice
         .times(protocolRevenue.toBigDecimal())
+        .div(rewardTokenDecimals.toBigDecimal())
     )
     .plus(financialMetrics.feesUSD);
 
