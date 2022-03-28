@@ -1,17 +1,17 @@
-import { Address, BigInt, ethereum, log } from '@graphprotocol/graph-ts';
-import { Vault, VaultFee } from '../../generated/schema';
-import { SettVault } from '../../generated/templates';
-import { BadgerController } from '../../generated/templates/SettVault/BadgerController';
-import { BadgerStrategy } from '../../generated/templates/SettVault/BadgerStrategy';
-import { BadgerSett } from '../../generated/VaultRegistry/BadgerSett';
-import { NewVault } from '../../generated/VaultRegistry/VaultRegistry';
-import { NULL_ADDRESS } from '../constant';
-import { getOrCreateProtocol } from '../entities/Protocol';
-import { getOrCreateToken } from '../entities/Token';
-import { getOrCreateVault } from '../entities/Vault';
-import { readValue } from '../utils/contracts';
-import { getPriceOfStakedTokens } from './price';
-import { createToken } from './tokens';
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Vault, VaultFee } from "../../generated/schema";
+import { SettVault } from "../../generated/templates";
+import { BadgerController } from "../../generated/templates/SettVault/BadgerController";
+import { BadgerStrategy } from "../../generated/templates/SettVault/BadgerStrategy";
+import { BadgerSett } from "../../generated/VaultRegistry/BadgerSett";
+import { NewVault } from "../../generated/VaultRegistry/VaultRegistry";
+import { NULL_ADDRESS } from "../constant";
+import { getOrCreateProtocol } from "../entities/Protocol";
+import { getOrCreateToken } from "../entities/Token";
+import { getOrCreateVault } from "../entities/Vault";
+import { readValue } from "../utils/contracts";
+import { getPriceOfStakedTokens } from "./price";
+import { createToken } from "./tokens";
 
 export function handleNewVault(event: NewVault): void {
   initializeVault(event.params.vault, event.block);
@@ -34,19 +34,16 @@ export function initializeVault(address: Address, block: ethereum.Block): Vault 
   }
 
   vault = getOrCreateVault(address, block);
-  log.debug('[BADGER] handling new vault: {}', [address.toHex()]);
+  log.debug("[BADGER] handling new vault: {}", [address.toHex()]);
   let sett = BadgerSett.bind(address);
-  let name = readValue<string>(sett.try_name(), '');
+  let name = readValue<string>(sett.try_name(), "");
 
   // checking if it is a sett/vault
   if (name.length > 0) {
     let tokenAddress = readValue<Address>(sett.try_token(), NULL_ADDRESS);
     let token = createToken(tokenAddress);
 
-    log.debug('[BADGER] Vault found: {} Input Token: {}', [
-      address.toHex(),
-      tokenAddress.toHex(),
-    ]);
+    log.debug("[BADGER] Vault found: {} Input Token: {}", [address.toHex(), tokenAddress.toHex()]);
 
     vault.protocol = getOrCreateProtocol().id;
     vault.inputTokens = vault.inputTokens.concat([token.id]);
@@ -75,44 +72,38 @@ export function initializeVault(address: Address, block: ethereum.Block): Vault 
 function getFees(sett: BadgerSett, token: Address): VaultFee[] {
   let fees: VaultFee[] = [];
 
-  log.debug('[BADGER] getting fees', []);
+  log.debug("[BADGER] getting fees", []);
   let controller = readValue<Address>(sett.try_controller(), NULL_ADDRESS);
   if (controller.equals(NULL_ADDRESS)) {
     return [];
   }
 
-  log.debug('[BADGER] controller found {}', [controller.toHex()]);
+  log.debug("[BADGER] controller found {}", [controller.toHex()]);
   let controllerContract = BadgerController.bind(controller);
-  let strategy = readValue<Address>(
-    controllerContract.try_strategies(token),
-    NULL_ADDRESS,
-  );
+  let strategy = readValue<Address>(controllerContract.try_strategies(token), NULL_ADDRESS);
   if (strategy.equals(NULL_ADDRESS)) {
     return [];
   }
 
-  log.debug('[BADGER] strategy found {}', [strategy.toHex()]);
+  log.debug("[BADGER] strategy found {}", [strategy.toHex()]);
   let strategyContract = BadgerStrategy.bind(strategy);
   let withDrawFee = new VaultFee(
     strategy
       .toHex()
-      .concat('-')
-      .concat('withdraw'),
+      .concat("-")
+      .concat("withdraw"),
   );
-  withDrawFee.feeType = 'WITHDRAWAL_FEE';
-  withDrawFee.feePercentage = readValue<BigInt>(
-    strategyContract.try_withdrawalFee(),
-    BigInt.zero(),
-  ).toBigDecimal();
+  withDrawFee.feeType = "WITHDRAWAL_FEE";
+  withDrawFee.feePercentage = readValue<BigInt>(strategyContract.try_withdrawalFee(), BigInt.zero()).toBigDecimal();
   fees.push(withDrawFee);
 
   let performanceFee = new VaultFee(
     strategy
       .toHex()
-      .concat('-')
-      .concat('performance'),
+      .concat("-")
+      .concat("performance"),
   );
-  performanceFee.feeType = 'PERFORMANCE_FEE';
+  performanceFee.feeType = "PERFORMANCE_FEE";
   performanceFee.feePercentage = readValue<BigInt>(
     strategyContract.try_performanceFeeGovernance(),
     BigInt.zero(),
