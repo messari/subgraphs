@@ -406,7 +406,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   swap.logIndex = event.logIndex.toI32()
   swap.protocol = protocol.id
   swap.to = to.toHexString()
-  swap.from = sender.toHexString()
+  swap.from = event.transaction.from.toHexString()
   swap.blockNumber = event.block.number
   swap.timestamp = event.block.timestamp
   swap.tokenIn = amount0In != BIGINT_ZERO ? token0.id : token1.id
