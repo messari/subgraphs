@@ -21,7 +21,7 @@ export const PROTOCOL_RISK_TYPE    = "ISOLATED" // TODO: ensure this is accurate
 export const PROTOCOL_NAME         = "Compound v2"
 export const PROTOCOL_SLUG         = "compound-v2"
 export const REWARD_TOKEN_TYPE     = "DEPOSIT" // TODO: check - seems like both
-export const PROTOCOL_VERSION      = "1.2.8"
+export const PROTOCOL_VERSION      = "1.2.9"
 
 // ETH token constants
 export const ETH_DECIMALS = 18

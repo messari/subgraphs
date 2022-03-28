@@ -82,11 +82,15 @@ export function createMarket(
     market.inputTokenBalances = inputTokenBalances
     market.outputTokenSupply = ZERO_BI
     market.outputTokenPriceUSD = ZERO_BD
+    market.rewardTokenEmissionsAmount = inputTokenBalances
+    let rewardEmissionsUSD = new Array<BigDecimal>()
+    rewardEmissionsUSD.push(ZERO_BD)
+    market.rewardTokenEmissionsUSD = rewardEmissionsUSD 
     market.createdTimestamp = timestamp
     market.createdBlockNumber = blockNumber
     
     // lending-specific data
-    let inputToken = Token.load(underlyingAddress)
+    let inputToken = Token.load(underlyingAddress) // TODO: make sure this is
     market.name = inputToken!.name
     market.isActive = true
     market.canUseAsCollateral = false // until Collateral is taken out
@@ -112,6 +116,7 @@ export function createMarketTokens(
 ): void {
     
     // create underlying token
+    // TODO: fill in reward token once created on old markets
     if (marketAddress == CCOMP_ADDRESS.toHexString()) {
         // create RewardToken COMP
         let rewardToken = new RewardToken(underlyingAddress)

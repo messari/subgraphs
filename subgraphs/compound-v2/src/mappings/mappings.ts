@@ -8,7 +8,9 @@ import {
   PROTOCOL_RISK_TYPE, 
   PROTOCOL_SLUG, 
   PROTOCOL_TYPE, 
-  PROTOCOL_VERSION 
+  PROTOCOL_VERSION, 
+  ZERO_BD,
+  ZERO_BI
 } from "../common/constants"
 
 import { 
@@ -51,6 +53,7 @@ import {
 import { CToken } from "../types/templates"
 import { AccrueInterest, NewMarketInterestRateModel, NewReserveFactor } from "../types/Comptroller/cToken"
 import { Transfer } from "../types/templates/CToken/CToken"
+import { log } from "@graphprotocol/graph-ts"
 
 
 export function handleMint(event: Mint): void {
@@ -74,8 +77,9 @@ export function handleMint(event: Mint): void {
   deposit.timestamp = event.block.timestamp
   deposit.market = marketAddress.toHexString()
   let market = Market.load(marketAddress.toHexString())
-  if (market == null) {
+  if (market == null) { // TODO: don't create deposit if this is the case
     deposit.asset = NULL_ADDRESS.toHexString()
+    log.error("Market {} does not exist", [marketAddress.toHexString()])
   } else {
     deposit.asset = market.inputTokens[0]
   }
@@ -116,6 +120,7 @@ export function handleRedeem(event: Redeem): void {
   let market = Market.load(marketAddress.toHexString())
   if (market == null) {
     withdraw.asset = NULL_ADDRESS.toHexString()
+    log.error("Market {} does not exist", [marketAddress.toHexString()])
   } else {
     withdraw.asset = market.inputTokens[0]
   }
@@ -153,9 +158,10 @@ export function handleBorrow(event: BorrowEvent): void {
   borrow.blockNumber = blockNumber
   borrow.timestamp = event.block.timestamp
   borrow.market = marketAddress.toHexString()
-  let market = Market.load(marketAddress.toHexString())!
+  let market = Market.load(marketAddress.toHexString())
   if (market == null) {
     borrow.asset = NULL_ADDRESS.toHexString()
+    log.error("Market {} does not exist", [marketAddress.toHexString()])
   } else {
     borrow.asset = market.inputTokens[0]
   }
@@ -173,8 +179,10 @@ export function handleBorrow(event: BorrowEvent): void {
   borrow.save()
 
   // update Market canBorrowFrom marketAddress
-  market.canBorrowFrom = true
-  market.save()
+  if (market != null) {
+    market.canBorrowFrom = true
+    market.save()
+  }
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
@@ -200,6 +208,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let market = Market.load(marketAddress.toHexString())
   if (market == null) {
     repay.asset = NULL_ADDRESS.toHexString()
+    log.error("Market {} does not exist", [marketAddress.toHexString()])
   } else {
     repay.asset = market.inputTokens[0]
   }
@@ -241,6 +250,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let market = Market.load(marketAddress.toHexString())
   if (market == null) {
     liquidation.asset = NULL_ADDRESS.toHexString()
+    log.error("Market {} does not exist", [marketAddress.toHexString()])
   } else {
     liquidation.asset = market.inputTokens[0]
   }  liquidation.amount = event.params.repayAmount
@@ -261,9 +271,11 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
   // update canUseAsCollateral in Market
   let collateralToken = event.params.cTokenCollateral.toHexString()
-  let collateralMarket = Market.load(collateralToken)!
-  collateralMarket.canUseAsCollateral = true
-  collateralMarket.save()
+  let collateralMarket = Market.load(collateralToken)
+  if (collateralMarket != null) {
+    collateralMarket.canUseAsCollateral = true
+    collateralMarket.save()
+  }
 }
 
 export function handleMarketListed(event: MarketListed): void {
@@ -292,6 +304,8 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
     lendingProtocol.version = PROTOCOL_VERSION
     lendingProtocol.network = NETWORK_ETHEREUM
     lendingProtocol.type = PROTOCOL_TYPE
+    lendingProtocol.totalUniqueUsers = 0 as i32
+    lendingProtocol.totalValueLockedUSD = ZERO_BD
     lendingProtocol.lendingType = LENDING_TYPE
     lendingProtocol.riskType = PROTOCOL_RISK_TYPE
   }
