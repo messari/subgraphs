@@ -3,6 +3,11 @@ import { _Account, _DailyActiveAccount, UsageMetricsDailySnapshot } from "../../
 import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
 import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
 
+// These are meant more as boilerplates that'll be filled out depending on the
+// subgraph, and will be different from subgraph to subgraph, hence left
+// partially implemented and commented out.
+// They are common within a subgraph but not common across different subgraphs.
+
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
   // let financialMetrics = getOrCreateFinancials(event);
