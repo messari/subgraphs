@@ -29,11 +29,11 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC"
 }
 
-export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "MANAGEMENT_FEE"
-  export const PERFORMANCE_FEE = "PERFORMANCE_FEE"
-  export const DEPOSIT_FEE = "DEPOSIT_FEE"
-  export const WITHDRAWLAL_FEE = "WITHDRAWLAL_FEE"
+export namespace LiquidityPoolFeeType {
+  export const TRADING_FEE = "TRADING_FEE"
+  export const PROTOCOL_FEE = "PROTOCOL_FEE"
+  export const TIERED_FEE = "TIERED_FEE"
+  export const DYNAMIC_FEE = "DYNAMIC_FEE"
 }
 
 export namespace RewardTokenType {
@@ -66,6 +66,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("100000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000)
 export const BIGINT_MAX = BigInt.fromString(
   '115792089237316195423570985008687907853269984665640564039457584007913129639935'
@@ -78,6 +79,8 @@ export const INT_TWO = 2 as i32
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
+
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
@@ -88,7 +91,11 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 );
 export const ERROR_NUM = 9999
 
-export const SWAP_FEE = "0.03"
+export const TRADING_FEE_TO_OFF = BigDecimal.fromString("3")
+export const TRADING_FEE_TO_ON = BigDecimal.fromString("2.5")
+export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0")
+export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5")
+
 
 
 ///////

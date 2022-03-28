@@ -86,15 +86,16 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 }
 
 // Update the volume and accrued fees for all relavant entities 
-export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, feeUSD: BigDecimal): void {
+export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, tradingFeeAmountUSD: BigDecimal, protocolFeeAmountUSD: BigDecimal): void {
     let pool = getLiquidityPool(event.address.toHexString())
     let poolMetrics = getOrCreatePoolDailySnapshot(event);
     let financialMetrics = getOrCreateFinancials(event);
   
     financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
-    financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feeUSD)
-    financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(feeUSD)
-  
+    financialMetrics.feesUSD = financialMetrics.feesUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD)
+    financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(tradingFeeAmountUSD)
+    financialMetrics.protocolSideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(protocolFeeAmountUSD)
+
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
   
