@@ -11,6 +11,9 @@
 > - Make sure you run `npm run format` to format your code before committing.
 > - Try to follow the same folder structure inside of `src` for your subgraph.
 > - There is a set of useful functions in `src/common` that you can leverage.
+>  
+> Note that since Uniswap v2 is a DEX (AMM), the `schema.graphql` used here  
+> is derived from `schema-dex-amm.graphql` in the repo root.
 
 ## Links
 
@@ -38,5 +41,5 @@
 ## Deploy
 
 - Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
-- Deploy to Hosted Service: `graph deploy --product hosted-service <GITHUB_USER>/<SUBGRAPH_NAME>`
 - Deploy to Subgraph Studio: `graph deploy --studio <SUBGRAPH_NAME>`
+- Deploy to Hosted Service: `graph deploy --product hosted-service <GITHUB_USER>/<SUBGRAPH_NAME>`

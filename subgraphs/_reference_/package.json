@@ -1,6 +1,6 @@
 {
   "name": "reference-subgraph",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
