@@ -132,7 +132,7 @@ type FinancialsDailySnapshot @entity {
 
   " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
   feesUSD: BigDecimal!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -157,7 +157,7 @@ interface Pool {
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
   # and inputToken balances are used to calculate returns
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
@@ -534,4 +534,24 @@ type Swap implements Event @entity {
 
   " The pool involving this transaction "
   pool: LiquidityPool!
+}
+
+###########################
+##### Helper Entities #####
+###########################
+
+# Helper entities are additional entities created to help with mapping.
+# They are usually used to store internal states that would simplify
+# the mapping logic. All helper entities should be prefixed with an
+# underscore to differentiate them from the common schema.
+
+# An account is a unique Ethereum address
+type _Account @entity {
+  " Address of the account "
+  id: ID!
+}
+
+type _DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: ID!
 }

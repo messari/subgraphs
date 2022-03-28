@@ -535,7 +535,7 @@ type Swap implements Event @entity {
   tokenIn: Token!
 
   " Amount of token deposited into pool in native units "
-  amountIn: BigDecimal!
+  amountIn: BigInt!
 
   " Amount of token deposited into pool in USD "
   amountInUSD: BigDecimal!
@@ -544,7 +544,7 @@ type Swap implements Event @entity {
   tokenOut: Token!
 
   " Amount of token withdrawn from pool in native units "
-  amountOut: BigDecimal!
+  amountOut: BigInt!
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
