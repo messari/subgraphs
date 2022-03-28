@@ -6,6 +6,10 @@ import {
     ethereum,
     log
 } from "@graphprotocol/graph-ts";
+
+import {
+    AaveIncentivesController as IncentivesControllerContract,
+} from "../../generated/templates/IncentivesController/AaveIncentivesController";
   
 import {
     Token,
@@ -22,6 +26,7 @@ import { IPriceOracleGetter } from "../../generated/templates/LendingPool/IPrice
 import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
 import { AToken } from "../../generated/templates/AToken/AToken";
 import { LendingPool } from "../../generated/templates/LendingPool/LendingPool";
+import { IncentivesController } from "../../generated/templates";
 
 const weiPerEth = BigInt.fromI64(1000000000000000000);
 export const zeroAddr = "0x0000000000000000000000000000000000000000";
@@ -130,7 +135,7 @@ export function initToken(assetAddr: Address): Token {
 }
 
 // HOW WOULD ONE GET THE TOKEN TYPE(DEPOSIT/BORROW)? SEE aToken.ts
-export function initRewardToken(assetAddr: Address, market: Market): RewardToken {
+export function loadRewardToken(assetAddr: Address, market: Market): RewardToken {
     // See initToken() function above
     let asset = RewardToken.load(assetAddr.toHex());
     if (asset === null) {
@@ -187,6 +192,28 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
         lendingProtocol.save();
     }    
     return lendingProtocol as LendingProtocol;
+}
+
+
+export function getRewardTokenFromIncController(incentiveContAddr: Address, market: Market): string {
+    // Instantiate IncentivesController to get access to contract read methods
+    const contract = IncentivesControllerContract.bind(incentiveContAddr);
+    // Get the contract Reward Token's address
+    const rewardTokenAddr = contract.REWARD_TOKEN().toHexString();
+    loadRewardToken(Address.fromString(rewardTokenAddr), market);
+    return rewardTokenAddr;
+}
+
+export function initIncentivesController(aToken: AToken, market: Market): void {
+    if (!aToken.try_getIncentivesController().reverted) {
+        const incContAddr = aToken.try_getIncentivesController().value;
+        log.info('BURN INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
+        IncentivesController.create(aToken.try_getIncentivesController().value);
+        const rewardTokenAddr = getRewardTokenFromIncController(incContAddr, market);
+        loadRewardToken(Address.fromString(rewardTokenAddr), market);
+      } else {
+        log.info('BURN FAILED TO GET INCENTIVE CONTROLLER ' + aToken._address.toHexString() + ' ' + market.id, [])
+      }
 }
 
 // SNAPSHOT FUNCTIONS

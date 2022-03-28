@@ -15,10 +15,13 @@ import { AaveIncentivesController as IncentivesControllerContract } from "../../
 
 import {
   initToken,
-  initRewardToken,
+  loadRewardToken,
   rayDivision,
-  initMarket
+  initMarket,
+  getRewardTokenFromIncController,
+  initIncentivesController
 } from "./utilFunctions";
+import { IncentivesController } from "../../generated/templates";
 
 // Code written to pull a Token entity by its aToken. Leaving code commented here for now in case needed 
 
@@ -40,6 +43,8 @@ export function handleATokenMint(event: Mint): void {
   }
   const market = initMarket(event, marketAddr);
   market.outputTokenSupply = aToken.totalSupply();
+  log.info('MINT getting incentive controller', [])
+  initIncentivesController(aToken, market);
   market.save();
 }
 
@@ -55,19 +60,22 @@ export function handleATokenBurn(event: Burn): void {
     marketAddr = tryInputToken.value.toHexString();
   }
   const market = initMarket(event, marketAddr);
+  initIncentivesController(aToken, market);
   market.outputTokenSupply = aToken.totalSupply();
   market.save();
 }
 
+
 export function handleATokenInitialized(event: Initialized): void {
   // This function handles when an AToken is initialized in a new lending pool.
   // This function serves to get the reward token for a given market, as the incentives controller is received in the parametes
-  log.info('INIT ATOKEN: ' + event.address.toHexString(), [])
+  log.info('INITIALIZE ATOKEN: ' + event.address.toHexString(), [])
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
   const marketAddr = aToken.UNDERLYING_ASSET_ADDRESS();
   const market = initMarket(event, marketAddr.toHexString());
   log.info('IN ATOKEN.TS aToken POOL | underlying asset ' + aToken.POOL().toHexString() + ' ... ' + aToken.UNDERLYING_ASSET_ADDRESS().toHexString() + ' ATOKEN ADDR ' + aTokenAddr.toString() + ' SAVED MARKET ATOKEN ' + market.outputToken, [])
+
   const incentivesControllerAddr = event.params.incentivesController;
   if (incentivesControllerAddr != Address.zero()) {
     // Instantiate IncentivesController to get access to contract read methods
@@ -77,6 +85,6 @@ export function handleATokenInitialized(event: Initialized): void {
     // Load/Create the Reward Token as an entity
     // SHOULD THE REWARD TOKEN BE CREATED AS A 'Token' ENTITY AS WELL?
     // HOW TO PULL THE REWARD TOKEN 'type'?
-    initRewardToken(rewardTokenAddr, market);
+    loadRewardToken(rewardTokenAddr, market);
   }
 }

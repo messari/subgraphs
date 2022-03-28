@@ -16,9 +16,10 @@ import {
 } from "../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 
 import { Token, Market } from "../../generated/schema";
-import { initToken, initMarket, getOutputTokenSupply } from "./utilFunctions";
+import { initToken, initMarket, getOutputTokenSupply, getRewardTokenFromIncController, loadRewardToken } from "./utilFunctions";
 import { AToken } from "../../generated/templates/AToken/AToken";
 import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
+import { IncentivesController, AToken as ATokenTemplate } from "../../generated/templates";
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -29,13 +30,15 @@ export function getLendingPoolFromCtx(): string {
 export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
   // Attempt to load or create the market implementation
+  ATokenTemplate.create(event.params.aToken);
   const market = initMarket(
     event,
     event.params.asset.toHexString(),
   );
 
+
   // If the initMarket could not successfully set the reserve aToken, check these methods for valid data returned/failure.
-  const currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
+  let currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
   const tryUnderlyingAsset = currentOutputToken.try_UNDERLYING_ASSET_ADDRESS();
   const tryGetIncCont = currentOutputToken.try_getIncentivesController();
   const tryGetTotalSupply = currentOutputToken.try_totalSupply();
@@ -46,8 +49,20 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     market.outputTokenSupply = getOutputTokenSupply(event.params.aToken);
     initToken(Address.fromString(market.outputToken))
     log.info('CHANGED MARKET OUTPUT FROM ' + currentOutputToken._address.toHexString() + " to " + market.outputToken, [])
-    market.save()
+    currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
+    market.save();
   }
+
+  if (!currentOutputToken.try_getIncentivesController().reverted) {
+    const incContAddr = currentOutputToken.try_getIncentivesController().value;
+    log.info('NEW RESERVE INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
+    IncentivesController.create(currentOutputToken.try_getIncentivesController().value);
+    const rewardTokenAddr = getRewardTokenFromIncController(incContAddr, market);
+    loadRewardToken(Address.fromString(rewardTokenAddr), market);
+  } else {
+    log.info('FAILED TO GET INCENTIVE CONTROLLER ' + currentOutputToken._address.toHexString() + ' ' + market.id, [])
+  }
+
   log.info('CREATED? ' + market.id + 'on block# ' + market.createdBlockNumber.toString(), [])
 }
 

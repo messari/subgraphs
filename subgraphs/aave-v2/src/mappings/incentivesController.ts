@@ -1,4 +1,4 @@
-import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 
 import {
   RewardsClaimed,
@@ -9,21 +9,14 @@ import {
 import { Market, MarketDailySnapshot, RewardToken } from "../../generated/schema";
 
 import {
-  initRewardToken,
+  loadRewardToken,
   loadMarketDailySnapshot,
   initMarket,
   getFinancialsDailySnapshot,
   getAssetPriceInUSDC,
+  getRewardTokenFromIncController,
   initToken
 } from "./utilFunctions";
-
-function getRewardTokenAddr(incentiveContAddr: Address): string {
-  // Instantiate IncentivesController to get access to contract read methods
-  const contract = IncentivesControllerContract.bind(incentiveContAddr);
-  // Get the contract Reward Token's address
-  const rewardTokenAddr = contract.REWARD_TOKEN().toHexString();
-  return rewardTokenAddr;
-}
 
 // declare reward emissions array outside of function to avoid closure issues
 let rewardEmissions: BigInt[] = [];
@@ -32,14 +25,15 @@ let rewardEmissionsUSD: BigDecimal[] = [];
 export function handleRewardsClaimed(event: RewardsClaimed): void {
   // Handle event emitted when reward tokens are claimed
   // event.address is the incentiveController address
+  log.info('HANDLE REWARDS CLAIMED', [])
   const incentiveContAddr = event.address;
   const marketAddr = event.transaction.to as Address;
   if (incentiveContAddr != Address.zero()) {
-    const rewardTokenAddr = getRewardTokenAddr(incentiveContAddr);
     let market = initMarket(event, marketAddr.toHexString()) as Market;
-    // If the initRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
+    const rewardTokenAddr = getRewardTokenFromIncController(incentiveContAddr, market);
+    // If the loadRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
     // Therefore the market needs to be pulled again to account for the updated RewardToken field 
-    initRewardToken(Address.fromString(rewardTokenAddr), market);
+    loadRewardToken(Address.fromString(rewardTokenAddr), market);
     const tokenInstance = initToken(Address.fromString(rewardTokenAddr));
     const assetPriceInUSDC = getAssetPriceInUSDC(tokenInstance);
     market = initMarket(event, marketAddr.toHexString()) as Market;
@@ -100,12 +94,13 @@ export function handleRewardsAccrued(event: RewardsAccrued): void {
   // Financial daily snapshot, add the reward token value in USD to the financial supplyside revenue
   // Handle event emitted when reward tokens are accrued from deposits
   // event.address is the incentiveController address
+  log.info("HANDLE REWARDS ACCRUED", [])
   const incentiveContAddr = event.address;
   const marketAddr = event.transaction.to as Address;
   const market = initMarket(event, marketAddr.toHexString()) as Market;
-  const rewardTokenAddr = Address.fromString(getRewardTokenAddr(incentiveContAddr));
-  // initRewardToken in case it has not been created as a RewardToken entity yet
-  initRewardToken(rewardTokenAddr, market);
+  const rewardTokenAddr = Address.fromString(getRewardTokenFromIncController(incentiveContAddr, market));
+  // loadRewardToken in case it has not been created as a RewardToken entity yet
+  loadRewardToken(rewardTokenAddr, market);
   // initToken of the RewardToken to be able to pull the reward token price in USDC
   const token = initToken(rewardTokenAddr);
   const rewardTokenInUSD = getAssetPriceInUSDC(token);
