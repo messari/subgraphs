@@ -1,18 +1,19 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export namespace Network {
+  export const ARBITRUM = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BSC";
+  export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY";
+  export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "POLYGON";
+  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
+  export const POLYGON = "POLYGON_POS";
   export const XDAI = "XDAI";
 }
 
@@ -31,10 +32,18 @@ export namespace VaultFeeType {
   export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
+export namespace LiquidityPoolFeeType {
+  export const TRADING_FEE = "TRADING_FEE";
+  export const PROTOCOL_FEE = "PROTOCOL_FEE";
+  export const TIERED_FEE = "TIERED_FEE";
+  export const DYNAMIC_FEE = "DYNAMIC_FEE";
+}
+
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";
 }
+
 
 export const ZERO_ADDRESS = "0x0";
 export const SECONDS_PER_DAY = 60 * 60 * 24;
