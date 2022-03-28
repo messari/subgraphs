@@ -1,5 +1,5 @@
 import { YieldAggregator } from "../../generated/schema";
-import { PROTOCOL_ID, PROTOCOL_NAME, PROTOCOL_NETWORK, PROTOCOL_SLUG, PROTOCOL_TYPE } from "../constant";
+import { BIGDECIMAL_ZERO, PROTOCOL_ID, PROTOCOL_NAME, PROTOCOL_NETWORK, PROTOCOL_SLUG, PROTOCOL_TYPE } from "../constant";
 
 export function getOrCreateProtocol(): YieldAggregator {
   const id = PROTOCOL_ID.toHex();
@@ -16,6 +16,8 @@ export function getOrCreateProtocol(): YieldAggregator {
   protocol.slug = PROTOCOL_SLUG;
   protocol.network = PROTOCOL_NETWORK;
   protocol.type = PROTOCOL_TYPE;
+  protocol.totalUniqueUsers = 0;
+  protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
   protocol.save();
 
   return protocol;

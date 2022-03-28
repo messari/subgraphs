@@ -45,14 +45,9 @@ graph deploy --product hosted-service <username/subgraph-name>
 ## Pending Things
 
 - financial daily snapshot (entity)
-    - total values locked usd
     - protocol treasury usd
     - protocol controlled usd
-    - total volume usd
     - supply side revenue usd
-    - fees usd
-- vault entity
-    - reward tokens
 - vault daily snapshot (entity)
     - reward token emissions amount
     - reward token emission usd

@@ -20,6 +20,8 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.inputTokenBalances = [];
   vault.outputTokenSupply = BIGINT_ZERO;
   vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  vault.rewardTokenEmissionsAmount = [];
+  vault.rewardTokenEmissionsUSD = [];
   vault.createdTimestamp = block.timestamp;
   vault.createdBlockNumber = block.number;
   vault.name = "";

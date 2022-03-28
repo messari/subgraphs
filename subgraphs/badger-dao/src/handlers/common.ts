@@ -1,5 +1,6 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Token, Vault, VaultDailySnapshot, YieldAggregator, _User as User } from "../../generated/schema";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Token, Vault, VaultDailySnapshot, VaultFee, YieldAggregator, _User as User } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_HUNDRED, VaultFeeType } from "../constant";
 import { getOrCreateFinancialsDailySnapshot, getOrCreateUserSnapshot } from "../entities/Metrics";
 import { getOrCreateProtocol } from "../entities/Protocol";
 import { getDay, normalizedUsdcPrice } from "../utils/numbers";
@@ -25,6 +26,10 @@ export function updateUsageMetrics(user: User, block: ethereum.Block): void {
 
     metrics.totalUniqueUsers = metrics.totalUniqueUsers + 1;
     metrics.activeUsers = metrics.activeUsers + 1;
+
+    // update users on protocol
+    protocol.totalUniqueUsers = protocol.totalUniqueUsers + 1;
+    protocol.save();
   }
 
   // new user of the day
@@ -69,6 +74,7 @@ export function updateVault(vault: Vault, token: Token, inputTokenAmount: BigInt
 
 export function updateFinancialMetrics(
   protocol: YieldAggregator,
+  vault: Vault,
   token: Token,
   tokenPrice: BigInt,
   inputTokenAmount: BigInt,
@@ -80,12 +86,24 @@ export function updateFinancialMetrics(
     metrics.blockNumber = block.number;
   }
 
-  metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(tokenPrice.toBigDecimal());
-  metrics.totalValueLockedUSD = normalizedUsdcPrice(
+  let feePercentage = getFeePercentange(vault, VaultFeeType.WITHDRAWAL_FEE);
+  let feeAmount = tokenPrice
+    .times(BigInt.fromString(feePercentage.toString()))
+    .div(BIGINT_HUNDRED)
+    .toBigDecimal();
+  let valueLockedUSD = normalizedUsdcPrice(
     getPriceOfCurveLpToken(Address.fromString(token.id), inputTokenAmount, BigInt.fromI32(token.decimals)),
   ).toBigDecimal();
+
+  metrics.feesUSD = metrics.feesUSD.plus(feeAmount);
+  metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(tokenPrice.toBigDecimal());
+  metrics.totalValueLockedUSD = valueLockedUSD;
   metrics.protocol = protocol.id;
   metrics.save();
+
+  // updating protocol
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(valueLockedUSD);
+  protocol.save();
 }
 
 export function updateVaultMetrics(
@@ -123,4 +141,18 @@ export function updateVaultMetrics(
     getPriceOfCurveLpToken(Address.fromString(token.id), currentBalance, BigInt.fromI32(token.decimals)),
   ).toBigDecimal();
   metrics.save();
+}
+
+function getFeePercentange(vault: Vault, feeType: string): BigDecimal {
+  let feePercentage = BIGDECIMAL_ZERO;
+
+  for (let i = 0; i < vault.fees.length; i++) {
+    let fee = VaultFee.load(vault.fees[i]);
+
+    if (fee && fee.feeType === feeType) {
+      return fee.feePercentage;
+    }
+  }
+
+  return feePercentage;
 }

@@ -1,11 +1,17 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Vault, VaultFee } from "../../generated/schema";
 import { SettVault } from "../../generated/templates";
-import { BadgerController } from "../../generated/templates/SettVault/BadgerController";
-import { BadgerStrategy } from "../../generated/templates/SettVault/BadgerStrategy";
+import { BadgerController } from "../../generated/VaultRegistry/BadgerController";
 import { BadgerSett } from "../../generated/VaultRegistry/BadgerSett";
+import { BadgerStrategy } from "../../generated/VaultRegistry/BadgerStrategy";
 import { NewVault } from "../../generated/VaultRegistry/VaultRegistry";
-import { NULL_ADDRESS } from "../constant";
+import {
+  BIGDECIMAL_HUNDRED,
+  DEFAULT_PERFORMANCE_FEE,
+  DEFAULT_WITHDRAWAL_FEE,
+  NULL_ADDRESS,
+  VaultFeeType,
+} from "../constant";
 import { getOrCreateProtocol } from "../entities/Protocol";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateVault } from "../entities/Vault";
@@ -21,12 +27,13 @@ export function handleNewVault(event: NewVault): void {
 }
 
 /**
- * creates a new vault if it doesnt exists, initializes all the static values
+ * creates aya new vault if it doesnt exists, initializes all the static values
  * called when a new vault event is emitted or when transfer is called on
  * transfer event of any sett token
  */
 export function initializeVault(address: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(address.toHex());
+  log.debug("[BADGER] found vault: {}", [address.toHex()]);
 
   // existing vault
   if (vault) {
@@ -59,14 +66,17 @@ export function initializeVault(address: Address, block: ethereum.Block): Vault 
     vault.name = name;
     vault.symbol = token.symbol;
     vault.fees = getFees(sett, tokenAddress).map<string>(fee => fee.id);
+    vault.rewardTokens = getRewards(sett);
     vault.save();
+  } else {
+    log.debug("[BADGER] Not a vault: {} ...skipping", [address.toHex()]);
   }
 
   return vault;
 }
 
 /**
- * tries to get fees from sett -> controlerr -> strategy
+ * tries to get fees from sett -> controller -> strategy
  * events of fees could be handled : TODO
  */
 function getFees(sett: BadgerSett, token: Address): VaultFee[] {
@@ -87,28 +97,57 @@ function getFees(sett: BadgerSett, token: Address): VaultFee[] {
 
   log.debug("[BADGER] strategy found {}", [strategy.toHex()]);
   let strategyContract = BadgerStrategy.bind(strategy);
-  let withDrawFee = new VaultFee(
+  let withdrawFee = getVaultFee(
     strategy
       .toHex()
       .concat("-")
       .concat("withdraw"),
+    strategyContract.try_withdrawalFee(),
+    DEFAULT_WITHDRAWAL_FEE,
+    VaultFeeType.WITHDRAWAL_FEE,
   );
-  withDrawFee.feeType = "WITHDRAWAL_FEE";
-  withDrawFee.feePercentage = readValue<BigInt>(strategyContract.try_withdrawalFee(), BigInt.zero()).toBigDecimal();
-  fees.push(withDrawFee);
-
-  let performanceFee = new VaultFee(
+  let performanceFee = getVaultFee(
     strategy
       .toHex()
       .concat("-")
       .concat("performance"),
-  );
-  performanceFee.feeType = "PERFORMANCE_FEE";
-  performanceFee.feePercentage = readValue<BigInt>(
     strategyContract.try_performanceFeeGovernance(),
-    BigInt.zero(),
-  ).toBigDecimal();
+    DEFAULT_PERFORMANCE_FEE,
+    VaultFeeType.PERFORMANCE_FEE,
+  );
+
+  fees.push(withdrawFee);
   fees.push(performanceFee);
 
   return fees;
+}
+
+function getVaultFee(id: string, try_fee: ethereum.CallResult<BigInt>, defFee: BigInt, feeType: string): VaultFee {
+  let vaultFee = new VaultFee(id);
+
+  let feePercentage = readValue<BigInt>(try_fee, defFee)
+    .toBigDecimal()
+    .div(BIGDECIMAL_HUNDRED);
+
+  vaultFee.feePercentage = feePercentage;
+  vaultFee.feeType = feeType;
+  vaultFee.save();
+
+  return vaultFee;
+}
+
+function getRewards(sett: BadgerSett): string[] {
+  let controller = readValue<Address>(sett.try_controller(), NULL_ADDRESS);
+  if (controller.equals(NULL_ADDRESS)) {
+    return [];
+  }
+
+  let controllerContract = BadgerController.bind(controller);
+  let reward = readValue<Address>(controllerContract.try_rewards(), NULL_ADDRESS);
+
+  if (NULL_ADDRESS) {
+    return [];
+  }
+
+  return [reward.toHex()];
 }

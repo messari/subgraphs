@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { RewardToken, Token, VaultDailySnapshot } from "../../generated/schema";
-import { ERC20 } from "../../generated/templates/SettVault/ERC20";
 import { BadgerSett, Transfer } from "../../generated/VaultRegistry/BadgerSett";
+import { ERC20 } from "../../generated/VaultRegistry/ERC20";
 import { DEFAULT_DECIMALS, NULL_ADDRESS } from "../constant";
 import { getOrCreateVaultDailySnapshot } from "../entities/Metrics";
 import { getOrCreateProtocol } from "../entities/Protocol";
@@ -77,7 +77,7 @@ export function handleTransfer(event: Transfer): void {
   // TODO: 3rd condition, normal transfer, mange financial
   updateVault(vault, token, inputTokenAmount, tokenPriceUSD);
   updateVaultMetrics(vault, token, vaultMetrics, inputTokenAmount, tokenPriceUSD, isDeposit, event.block);
-  updateFinancialMetrics(protocol, token, tokenPriceUSD, inputTokenAmount, event.block);
+  updateFinancialMetrics(protocol, vault, token, tokenPriceUSD, inputTokenAmount, event.block);
 }
 
 export function handleReward(event: Transfer): void {

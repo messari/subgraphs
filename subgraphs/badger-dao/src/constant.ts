@@ -2,47 +2,39 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 // Using Coingecko slugs
 export namespace Network {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BSC = "binance-smart-chain";
-  export const CELO = "celo";
-  export const CRONOS = "cronos";
-  export const ETHEREUM = "ethereum";
-  export const FANTOM = "fantom";
-  export const HARMONY = "harmony-shard-0";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const OPTIMISM = "optimistic-ethereum";
-  export const POLYGON = "polygon-pos";
-  export const XDAI = "xdai";
+  export const AVALANCHE = "AVALANCHE";
+  export const AURORA = "AURORA";
+  export const BSC = "BSC";
+  export const CELO = "CELO";
+  export const CRONOS = "CRONOS";
+  export const ETHEREUM = "ETHEREUM";
+  export const FANTOM = "FANTOM";
+  export const HARMONY = "HARMONY";
+  export const MOONBEAM = "MOONBEAM";
+  export const MOONRIVER = "MOONRIVER";
+  export const OPTIMISM = "OPTIMISM";
+  export const POLYGON = "POLYGON";
+  export const XDAI = "XDAI";
 }
 
 export namespace ProtocolType {
-  export const EXCHANGE = "exchange";
-  export const LENDING = "lending";
-  export const YIELD = "yield";
-  export const BRIDGE = "bridge";
-  export const GENERIC = "generic";
+  export const EXCHANGE = "EXCHANGE";
+  export const LENDING = "LENDING";
+  export const YIELD = "YIELD";
+  export const BRIDGE = "BRIDGE";
+  export const GENERIC = "GENERIC";
 }
 
 export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "management-fee";
-  export const PERFORMANCE_FEE = "performance-fee";
-  export const DEPOSIT_FEE = "deposit-fee";
-  export const WITHDRAWLAL_FEE = "withdrawal-fee";
-}
-
-export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "trading-fee";
-  export const PROTOCOL_FEE = "protocol-fee";
-  export const TIERED_FEE = "tiered-fee";
-  export const DYNAMIC_FEE = "dynamic-fee";
+  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
+  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
 export namespace RewardTokenType {
-  export const DEPOSIT = "deposit";
-  export const BORROW = "borrow";
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
 }
 
 // default usdc denominator
@@ -53,7 +45,13 @@ export const DEFAULT_DECIMALS = 18;
 
 // zero values
 export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_HUNDRED = BigInt.fromString("100");
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
+
+// https://docs.badger.com/badger-finance/setts/overview-and-fees#interest-bearing-rewards
+export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(2000);
+export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(10);
 
 // no of seconds of a day
 export const SECONDS_PER_DAY = 84600;
