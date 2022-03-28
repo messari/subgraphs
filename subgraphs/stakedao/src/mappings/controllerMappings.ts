@@ -5,12 +5,12 @@ import {
   RevokeStrategyCall,
 } from "../../generated/Controller/EthereumController";
 
-import { getOrCreateToken } from "../common/utils";
-import { Address, log, store } from "@graphprotocol/graph-ts";
 import { getOrCreateStrategy } from "../modules/Strategy";
+import { Vault as VaultStore } from "../../generated/schema";
+import { Address, log, store } from "@graphprotocol/graph-ts";
 import { Vault as VaultTemplate } from "../../generated/templates";
-import { Vault as VaultStore, YieldAggregator } from "../../generated/schema";
 import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
+import { getOrCreateToken, getOrCreateYieldAggregator } from "../common/utils";
 import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
 
 export function handleSetVault(call: SetVaultCall): void {
@@ -41,7 +41,7 @@ export function handleSetVault(call: SetVaultCall): void {
 
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;
-  
+
   VaultTemplate.create(vaultAddress);
   vault.save();
 
@@ -51,19 +51,9 @@ export function handleSetVault(call: SetVaultCall): void {
     inputTokenAddress
   );
 
-  let protocol = YieldAggregator.load(constants.ETHEREUM_PROTOCOL_ID);
-  if (!protocol) {
-    let protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-    protocol.name = "Stake DAO";
-    protocol.slug = "stake-dao";
-    protocol.network = constants.Network.ETHEREUM;
-    protocol.type = constants.ProtocolType.YIELD;
-    protocol._vaultIds.push(vaultAddress.toHexString())
-    protocol.save();
-  } else {
-    protocol._vaultIds.push(vaultAddress.toHexString())
-    protocol.save();
-  }
+  let protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  protocol._vaultIds.push(vaultAddress.toHexString());
+  protocol.save();
 
   log.warning("[SetVault]\n - TxHash: {}, VaultId: {}, StrategyId: {}", [
     call.transaction.hash.toHexString(),
@@ -103,10 +93,10 @@ export function handleSetStrategy(call: SetStrategyCall): void {
 }
 
 export function handleRevokeStrategy(call: RevokeStrategyCall): void {
-  store.remove('_Strategy', call.inputs._strategy.toString())
+  store.remove("_Strategy", call.inputs._strategy.toHexString());
 
   log.warning("[RevokeStrategy]\n TxHash: {}, StrategyId: {}", [
     call.transaction.hash.toHexString(),
-    call.inputs._strategy.toString(),
+    call.inputs._strategy.toHexString(),
   ]);
 }

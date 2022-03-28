@@ -2,14 +2,16 @@ import * as constants from "../common/constants";
 import { DEFAULT_DECIMALS } from "../common/constants";
 import {
   Token,
-  RewardToken,
-  Vault as VaultStore,
   VaultFee,
+  RewardToken,
+  YieldAggregator,
   VaultDailySnapshot,
+  Vault as VaultStore,
   FinancialsDailySnapshot,
 } from "../../generated/schema";
-import { BigInt, ethereum, Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
+import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
+import { BigInt, ethereum, Address, BigDecimal } from "@graphprotocol/graph-ts";
 
 export function getTimeInMillis(time: BigInt): BigInt {
   return time.times(BigInt.fromI32(1000));
@@ -17,6 +19,22 @@ export function getTimeInMillis(time: BigInt): BigInt {
 
 export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
+}
+
+export function getOrCreateYieldAggregator(id: string): YieldAggregator {
+  let protocol = YieldAggregator.load(id)
+  
+  if (!protocol) {
+    protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+    protocol.name = "Stake DAO";
+    protocol.slug = "stake-dao";
+    protocol.schemaVersion = "1.0.0";
+    protocol.subgraphVersion = "1.0.0"
+    protocol.network = constants.Network.ETHEREUM;
+    protocol.type = constants.ProtocolType.YIELD;
+  }
+
+  return protocol
 }
 
 export function getOrCreateToken(address: Address): Token {

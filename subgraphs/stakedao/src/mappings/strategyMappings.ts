@@ -59,11 +59,10 @@ export function handleHarvested(event: HarvestedEvent): void {
     let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
     let inputTokenPrice = getUsdPriceOfToken(inputTokenAddress);
 
-    financialMetrics.supplySideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
+    financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
       inputTokenPrice
-        .times(wantEarned)
-        .div(inputTokenDecimals)
-        .toBigDecimal()
+        .times(wantEarned.toBigDecimal())
+        .div(inputTokenDecimals.toBigDecimal())
     );
 
     financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
@@ -76,15 +75,18 @@ export function handleHarvested(event: HarvestedEvent): void {
       ),
     ];
 
+    financialMetrics.save();
     vault!.save();
 
     log.warning(
-      "[handleHarvested]\n TxHash: {}, eventAddress: {}, wantEarned: {}, originalBalance: {}",
+      "[handleHarvested]\n TxHash: {}, eventAddress: {}, wantEarned: {}, inputTokenPrice: {}, supplySideRevenueUSD: {}, protocolSideRevenueUSD: {}",
       [
         event.transaction.hash.toHexString(),
         event.address.toHexString(),
         wantEarned.toString(),
-        originalBalance.toString(),
+        inputTokenPrice.toString(),
+        financialMetrics.supplySideRevenueUSD.toString(),
+        financialMetrics.protocolSideRevenueUSD.toString(),
       ]
     );
   }

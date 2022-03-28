@@ -8,7 +8,6 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { getUsdPriceOfToken, getPriceOfStakedTokens } from "./Price";
-import { DepositAllCall, DepositCall } from "../../generated/templates/Vault/Vault";
 
 export function _Deposit(
   call: ethereum.Call,
@@ -41,15 +40,13 @@ export function _Deposit(
   );
   
   vault.totalValueLockedUSD = inputTokenPrice
-    .times(vault.inputTokenBalances[0])
-    .div(inputTokenDecimals)
-    .toBigDecimal();
+    .times(vault.inputTokenBalances[0].toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
 
   vault.totalVolumeUSD = vault.totalVolumeUSD.plus(
     inputTokenPrice
-      .times(_depositAmount)
-      .div(inputTokenDecimals)
-      .toBigDecimal()
+      .times(_depositAmount.toBigDecimal())
+      .div(inputTokenDecimals.toBigDecimal())
   );
   
   vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(_depositAmount)]
@@ -65,9 +62,8 @@ export function _Deposit(
   transaction.asset = vault.inputTokens[0];
   transaction.amount = _depositAmount;
   transaction.amountUSD = inputTokenPrice
-    .times(_depositAmount)
-    .div(inputTokenDecimals)
-    .toBigDecimal();
+    .times(_depositAmount.toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
 
   transaction.save();
   vault.save();

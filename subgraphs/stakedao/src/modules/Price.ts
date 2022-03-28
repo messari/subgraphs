@@ -1,12 +1,12 @@
 import * as constants from "../common/constants";
 import { Vault } from "../../generated/templates/Vault/Vault";
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { CalculationsSushi } from "../../generated/templates/Vault/CalculationsSushi";
 import { CalculationsCurve } from "../../generated/templates/Vault/CalculationsCurve";
 
 export function getUsdPriceOfToken(
   tokenAddress: Address,
-): BigInt {
+): BigDecimal {
   const curveContract = CalculationsCurve.bind(
     Address.fromString(constants.ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS)
   );
@@ -33,7 +33,7 @@ export function getUsdPriceOfToken(
       ? constants.BIGINT_ZERO
       : try_getPriceUsdc.value;
   }
-  return tokenPrice.div(constants.USDC_DENOMINATOR);
+  return tokenPrice.toBigDecimal().div(constants.USDC_DENOMINATOR.toBigDecimal());
 }
 
 export function getVirtualPriceOfCurveLpToken(
