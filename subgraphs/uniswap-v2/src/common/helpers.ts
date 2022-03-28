@@ -32,7 +32,7 @@ function createPoolFees(poolAddressString: string): string[] {
   poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
 
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
-  poolProtocolFee.feeType = LiquidityPoolFeeType.TRADING_FEE
+  poolProtocolFee.feeType = LiquidityPoolFeeType.PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
   poolTradingFee.save()
@@ -377,20 +377,22 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, tokenTracker0 as _TokenTracker, amount1TotalConverted, tokenTracker1 as _TokenTracker, poolAmounts as _LiquidityPoolAmounts)
 
   let tradingFee = getLiquidityPoolFee(pool.fees[0])
-  let protocolFee = getLiquidityPoolFee(pool.fees[0])
-  let tradingFeeAmount: BigDecimal
-  let protocolFeeAmount: BigDecimal
+  let protocolFee = getLiquidityPoolFee(pool.fees[1])
+
+  let tradingFeeAmountUSD: BigDecimal
+  let protocolFeeAmountUSD: BigDecimal
 
   if (amount0In != BIGINT_ZERO) {
-    tradingFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage))
-    protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage))
+    let tradingFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage))
+    let protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage))
+    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
+    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
   } else {
-    tradingFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage))
-    protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage))
+    let tradingFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage))
+    let protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage))
+    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker1.derivedETH).times(ether.valueDecimal!)
+    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker1.derivedETH).times(ether.valueDecimal!)
   }
-
-  let tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
-  let protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
 
   let swap = new SwapEvent(
     event.transaction.hash
