@@ -94,7 +94,7 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
     financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     financialMetrics.feesUSD = financialMetrics.feesUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD)
     financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(tradingFeeAmountUSD)
-    financialMetrics.protocolSideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(protocolFeeAmountUSD)
+    financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(protocolFeeAmountUSD)
 
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
