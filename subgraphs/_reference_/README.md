@@ -12,8 +12,9 @@
 > - Try to follow the same folder structure inside of `src` for your subgraph.
 > - There is a set of useful functions in `src/common` that you can leverage.
 >  
-> Note that since Uniswap v2 is a DEX (AMM), the `schema.graphql` used here  
-> is derived from `schema-dex-amm.graphql` in the repo root.
+> Note: this subgraph is just a reference is not meant to be built and deployed  
+> Note: since Uniswap v2 is a DEX (AMM), the `schema.graphql` used here is  
+> derived from `schema-dex-amm.graphql` in the repo root.
 
 ## Links
 
