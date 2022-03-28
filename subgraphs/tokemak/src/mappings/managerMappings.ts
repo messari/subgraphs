@@ -73,18 +73,6 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
 
     vault.rewardTokens = [rewardToken.id]
 
-    const managementFeeId = "management-fee-" + vault.id
-    let managementFee = new VaultFee(managementFeeId)
-    managementFee.feeType = VaultFeeType.MANAGEMENT_FEE
-    managementFee.feePercentage = BIGDECIMAL_ZERO
-    managementFee.save()
-
-    const performanceFeeId = "performance-fee-" + vault.id
-    let performanceFee = new VaultFee(performanceFeeId)
-    performanceFee.feeType = VaultFeeType.PERFORMANCE_FEE
-    performanceFee.feePercentage = BIGDECIMAL_ZERO
-    performanceFee.save()
-
     vault.fees = []
     vault.save()
 
