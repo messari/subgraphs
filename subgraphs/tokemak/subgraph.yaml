@@ -85,7 +85,7 @@ templates:
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit
-        - function: depositFor(uint256,address)
+        - function: depositFor(address,uint256)
           handler: handleDepositWithRecipient
         - function: withdraw(uint256)
           handler: handleWithdraw
