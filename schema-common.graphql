@@ -1,4 +1,5 @@
 ##### SCHEMA GUIDELINES
+### Version: 1.0.0
 #
 ### Usage
 # - This schema is intended to be a "master" document for standardization work. It includes all possible protocol
@@ -99,8 +100,11 @@ interface Protocol {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
@@ -399,8 +403,11 @@ type DexAmmProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
@@ -586,8 +593,11 @@ type LendingProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. aave-v2 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
@@ -883,8 +893,11 @@ type YieldAggregator implements Protocol @entity {
   " Slug of protocol, including version. e.g. yearn-v3 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
@@ -1048,8 +1061,11 @@ type GenericProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
 
   network: Network!
 
