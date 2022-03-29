@@ -78,6 +78,8 @@ export let MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 
 export const ETH_MAINNET_MANAGER_ADDRESS = "0xA86e412109f77c45a3BC1c5870b880492Fb86A14";
 
 export const TOKE_ADDRESS = "0x2e9d63788249371f1DFC918a52f8d799F4a38C94";
+export const TOKE_NAME = "Tokemak";
+export const TOKE_SYMBOL = "TOKE";
 
 export const ETH_MAINNET_NETWORK = "mainnet";
 

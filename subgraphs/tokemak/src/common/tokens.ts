@@ -2,7 +2,7 @@ import { BigInt, Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Manager/ERC20";
 import { RewardToken, Token } from "../../generated/schema";
 
-import { DEFAULT_DECIMALS, RewardTokenType } from "../common/constants";
+import { DEFAULT_DECIMALS, RewardTokenType, TOKE_ADDRESS, TOKE_NAME, TOKE_SYMBOL } from "../common/constants";
 
 export function getOrCreateToken(address: Address): Token {
   let id = address.toHexString();
@@ -35,11 +35,16 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     let symbol = erc20Contract.try_symbol();
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
 
-    //TOKE is the only reward token
-    token.name = name.reverted ? "Tokemak" : name.value;
-    token.symbol = symbol.reverted ? "TOKE" : symbol.value;
+    token.name = name.reverted ? "" : name.value;
+    token.symbol = symbol.reverted ? "" : symbol.value;
 
     token.type = RewardTokenType.DEPOSIT;
+
+    //Values if TOKE token is not deployed yet
+    if (token.name === "" && address.toString() === TOKE_ADDRESS) {
+      token.name = TOKE_NAME;
+      token.symbol = TOKE_SYMBOL;
+    }
     token.save();
   }
   return token as RewardToken;

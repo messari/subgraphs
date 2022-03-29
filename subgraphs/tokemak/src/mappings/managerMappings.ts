@@ -19,6 +19,7 @@ import { getOrCreateProtocol } from "../common/protocol";
 function createRewardTokens(): void {
   const address = Address.fromString(TOKE_ADDRESS);
   getOrCreateRewardToken(address);
+ 
 }
 
 export function handlePoolRegistered(event: PoolRegistered): void {
@@ -49,7 +50,8 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     vault.createdTimestamp = event.block.timestamp;
 
     const rewardToken = getOrCreateRewardToken(Address.fromString(TOKE_ADDRESS));
-
+   
+    
     vault.rewardTokens = [rewardToken.id];
 
     vault.fees = [];
