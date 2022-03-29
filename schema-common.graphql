@@ -35,8 +35,9 @@
 #
 
 enum Network {
-  AVALANCHE
+  ARBITRUM
   AURORA
+  AVALANCHE
   BSC
   CELO
   CRONOS
