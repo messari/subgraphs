@@ -27,6 +27,7 @@ import {
   PROTOCOL_ID,
   SECONDS_PER_DAY,
   VaultFeeType,
+  ZERO_ADDRESS,
 } from "../common/constants";
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils";
 import { getOrCreateToken } from "../common/tokens";
@@ -75,6 +76,12 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
 
   vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount)];
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+
+  const outputToken = getOrCreateToken(Address.fromString(vault.id));
+  const outputTokenForPrice = token;
+  outputTokenForPrice.decimals = outputToken.decimals;
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(outputTokenForPrice, BIGINT_ONE));
+
   vault.save();
 
   getOrCreateDepositTransactionFromCall(call, depositAmount, amountUSD, "vault.deposit()");
@@ -103,6 +110,11 @@ function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt
   const tvl = vault.inputTokenBalances[0].minus(withdrawAmount);
   vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl));
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  const outputToken = getOrCreateToken(Address.fromString(vault.id));
+  const outputTokenForPrice = token;
+  outputTokenForPrice.decimals = outputToken.decimals;
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(outputTokenForPrice, BIGINT_ONE));
+
   vault.inputTokenBalances = [tvl];
   vault.save();
 
