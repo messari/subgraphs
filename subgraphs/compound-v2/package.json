@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "repository": "https://github.com/messari/subgraphs/blob/master/subgraphs/compound-v2",
   "scripts": {
+    "format": "npx prettier --write .",
     "codegen": "graph codegen --output-dir src/types/",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ compound-v2",

@@ -1,2 +1,1 @@
 // store common calculations
-

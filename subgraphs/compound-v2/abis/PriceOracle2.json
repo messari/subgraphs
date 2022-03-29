@@ -48,21 +48,14 @@
   "ast": {
     "absolutePath": "/C/Users/dmelo/VS-workspace/blockchain-workspace/compound-protocol/contracts/PriceOracle.sol",
     "exportedSymbols": {
-      "PriceOracle": [
-        43884
-      ]
+      "PriceOracle": [43884]
     },
     "id": 43885,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 43872,
-        "literals": [
-          "solidity",
-          "^",
-          "0.5",
-          ".16"
-        ],
+        "literals": ["solidity", "^", "0.5", ".16"],
         "nodeType": "PragmaDirective",
         "src": "0:24:39"
       },
@@ -84,9 +77,7 @@
         "documentation": null,
         "fullyImplemented": false,
         "id": 43884,
-        "linearizedBaseContracts": [
-          43884
-        ],
+        "linearizedBaseContracts": [43884],
         "name": "PriceOracle",
         "nodeType": "ContractDefinition",
         "nodes": [
@@ -226,21 +217,14 @@
   "legacyAST": {
     "absolutePath": "/C/Users/dmelo/VS-workspace/blockchain-workspace/compound-protocol/contracts/PriceOracle.sol",
     "exportedSymbols": {
-      "PriceOracle": [
-        43884
-      ]
+      "PriceOracle": [43884]
     },
     "id": 43885,
     "nodeType": "SourceUnit",
     "nodes": [
       {
         "id": 43872,
-        "literals": [
-          "solidity",
-          "^",
-          "0.5",
-          ".16"
-        ],
+        "literals": ["solidity", "^", "0.5", ".16"],
         "nodeType": "PragmaDirective",
         "src": "0:24:39"
       },
@@ -262,9 +246,7 @@
         "documentation": null,
         "fullyImplemented": false,
         "id": 43884,
-        "linearizedBaseContracts": [
-          43884
-        ],
+        "linearizedBaseContracts": [43884],
         "name": "PriceOracle",
         "nodeType": "ContractDefinition",
         "nodes": [
