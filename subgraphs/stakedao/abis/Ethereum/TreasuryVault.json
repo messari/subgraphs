@@ -1,0 +1,171 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_governanceStaking",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_rewards", "type": "address" },
+      { "internalType": "address", "name": "_treasuryZap", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_from", "type": "address" },
+      { "internalType": "address", "name": "_to", "type": "address" },
+      { "internalType": "uint256", "name": "parts", "type": "uint256" }
+    ],
+    "name": "convert",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_from", "type": "address" },
+      { "internalType": "address", "name": "_to", "type": "address" },
+      { "internalType": "uint256", "name": "parts", "type": "uint256" }
+    ],
+    "name": "getExpectedReturn",
+    "outputs": [
+      { "internalType": "uint256", "name": "expected", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "governance",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "governanceStaking",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "onesplit",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_authorized", "type": "address" }
+    ],
+    "name": "revokeAuthorized",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "rewards",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_authorized", "type": "address" }
+    ],
+    "name": "setAuthorized",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_governance", "type": "address" }
+    ],
+    "name": "setGovernance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_governanceStaking",
+        "type": "address"
+      }
+    ],
+    "name": "setGovernanceStaking",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_onesplit", "type": "address" }
+    ],
+    "name": "setOnesplit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_rewards", "type": "address" }
+    ],
+    "name": "setRewards",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_treasuryZap", "type": "address" }
+    ],
+    "name": "setTreasuryZap",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "token_in", "type": "address" },
+      { "internalType": "address", "name": "token_out", "type": "address" },
+      { "internalType": "uint256", "name": "amount_in", "type": "uint256" }
+    ],
+    "name": "swapViaZap",
+    "outputs": [
+      { "internalType": "uint256", "name": "amount_out", "type": "uint256" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_token", "type": "address" },
+      { "internalType": "uint256", "name": "_amount", "type": "uint256" }
+    ],
+    "name": "toGovernance",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "toGovernanceStaking",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "treasuryZap",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
