@@ -20,7 +20,7 @@
   - For example, usually it's easier to start writing mappings for transactions and usage metrics
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio
-- For specific metrics (esp. financial metrics), please refer to our [methodology](https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/). Feel free to comment in the spreadsheet if anything is unclear or incorrect.
+- Document in the README how important metrics are calculated (TVL, fees, revenue). Feel free to reach out to me if anything isn't clear
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
@@ -63,28 +63,28 @@
 🛠 = Feature complete. Additional testing required.  
 ✅ = Production-ready.  
 
-| Feature |  Status |
-| ------- |  :------: |
-| **DEX AMM** |    |
-| Uniswap v2 | 🛠 |
-| Uniswap v3 | 🔨 |
-| Sushiswap | 🔨 |
-| Curve | 🔨 |
-| Balancer v2 | |
-| Bancor v2 | 🔨 |
-| Bancor v3 | |
-| DODO v2 |  |
+| Feature |  Status | Version |
+| ------- |  :------: | --- |
+| **DEX AMM** |    | |
+| Uniswap v2 | 🛠 | |
+| Uniswap v3 | 🔨 | |
+| Sushiswap | 🔨 | |
+| Curve | 🔨 | |
+| Balancer v2 | | |
+| Bancor v2 | 🔨 | |
+| Bancor v3 | | |
+| DODO v2 |  | |
 | **Lending Protocols** |    |
-| Aave v2 | 🔨  |
-| Compound | 🔨  |
-| Geist | 🔨  |
-| Benqi | 🔨  |
+| Aave v2 | 🔨  | |
+| Compound | 🔨  | |
+| Geist | 🔨  | |
+| Benqi | 🔨  | |
 | **Yield Aggregators** |     |
-| Yearn v2 | 🔨 |
-| Convex Finance | 🔨  |
-| Badger DAO | 🔨 |
-| Stake DAO | 🛠 |
-| Beefy Finance |  |
-| Tokemak | 🛠  |
-| Harvest Finance | 🔨  |
-| Yield Yak |  |
+| Yearn v2 | 🔨 | |
+| Convex Finance | 🔨  | |
+| Badger DAO | 🔨 | |
+| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 |
+| Beefy Finance |  | |
+| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠  | 1.0.0 |
+| Harvest Finance | 🔨  | |
+| Yield Yak |  | |
