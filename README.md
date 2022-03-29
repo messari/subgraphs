@@ -63,28 +63,28 @@
 🛠 = Feature complete. Additional testing required.  
 ✅ = Production-ready.  
 
-| Feature |  Status |
-| ------- |  :------: |
-| **DEX AMM** |    |
-| Uniswap v2 | 🛠 |
-| Uniswap v3 | 🔨 |
-| Sushiswap | 🔨 |
-| Curve | 🔨 |
-| Balancer v2 | |
-| Bancor v2 | 🔨 |
-| Bancor v3 | |
-| DODO v2 |  |
+| Feature |  Status | Version |
+| ------- |  :------: | --- |
+| **DEX AMM** |    | |
+| Uniswap v2 | 🛠 | |
+| Uniswap v3 | 🔨 | |
+| Sushiswap | 🔨 | |
+| Curve | 🔨 | |
+| Balancer v2 | | |
+| Bancor v2 | 🔨 | |
+| Bancor v3 | | |
+| DODO v2 |  | |
 | **Lending Protocols** |    |
-| Aave v2 | 🔨  |
-| Compound | 🔨  |
-| Geist | 🔨  |
-| Benqi | 🔨  |
+| Aave v2 | 🔨  | |
+| Compound | 🔨  | |
+| Geist | 🔨  | |
+| Benqi | 🔨  | |
 | **Yield Aggregators** |     |
-| Yearn v2 | 🔨 |
-| Convex Finance | 🔨  |
-| Badger DAO | 🔨 |
-| Stake DAO | 🛠 |
-| Beefy Finance |  |
-| Tokemak | 🛠  |
-| Harvest Finance | 🔨  |
-| Yield Yak |  |
+| Yearn v2 | 🔨 | |
+| Convex Finance | 🔨  | |
+| Badger DAO | 🔨 | |
+| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 |
+| Beefy Finance |  | |
+| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠  | 1.0.0 |
+| Harvest Finance | 🔨  | |
+| Yield Yak |  | |
