@@ -27,6 +27,8 @@ import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
 import { AToken } from "../../generated/templates/AToken/AToken";
 import { LendingPool } from "../../generated/templates/LendingPool/LendingPool";
 import { IncentivesController } from "../../generated/templates";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, USDC_DECIMALS } from "../common/constants";
+import { bigIntToBigDecimal } from "../common/utils/numbers";
 
 const weiPerEth = BigInt.fromI64(1000000000000000000);
 export const zeroAddr = "0x0000000000000000000000000000000000000000";
@@ -50,14 +52,14 @@ export function initMarket(
         // Other data fields are initialized as 0/[]/false
         const inputTokenBalances: BigInt[] = [];
         for (let i = 0; i < inputTokens.length; i++) {
-            inputTokenBalances.push(new BigInt(0));
+            inputTokenBalances.push(BIGINT_ZERO);
         }
         const protocolId = getProtocolIdFromCtx();
         const protocol = fetchProtocolEntity(protocolId);
         // Initialize market fields as zero
         market = new Market(id);
-        market.stableBorrowRate = BigDecimal.fromString("0");
-        market.variableBorrowRate = BigDecimal.fromString("0");
+        market.stableBorrowRate = BIGDECIMAL_ZERO;
+        market.variableBorrowRate = BIGDECIMAL_ZERO;
         const tryReserve = lendingPoolContract.try_getReserveData(Address.fromString(id));
         if (!tryReserve.reverted) {
           // If a valid reserve is returned, add fields from the reserve to the market entity 
@@ -73,6 +75,8 @@ export function initMarket(
         market.protocol = protocol.name;
         market.inputTokens = inputTokens.map<string>((t) => t.id);
         market.rewardTokens = [];
+        market.rewardTokenEmissionsAmount = [];
+        market.rewardTokenEmissionsUSD = [];
         market.inputTokenBalances = inputTokenBalances;
         market.createdBlockNumber = event.block.number;
         market.createdTimestamp = event.block.timestamp;
@@ -80,12 +84,12 @@ export function initMarket(
         market.isActive = false;
         market.canBorrowFrom = false;
         market.canUseAsCollateral = false;
-        market.maximumLTV = BigDecimal.fromString("0");
-        market.liquidationPenalty = BigDecimal.fromString("0");
-        market.liquidationThreshold = BigDecimal.fromString("0");
-        market.depositRate = BigDecimal.fromString("0");
-        market.totalValueLockedUSD = BigDecimal.fromString("0");
-        market.totalVolumeUSD = BigDecimal.fromString("0");
+        market.maximumLTV = BIGDECIMAL_ZERO;
+        market.liquidationPenalty = BIGDECIMAL_ZERO;
+        market.liquidationThreshold = BIGDECIMAL_ZERO;
+        market.depositRate = BIGDECIMAL_ZERO;
+        market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+        market.totalVolumeUSD = BIGDECIMAL_ZERO;
     }
     // Update outputToken data each time the market is loaded
     market.outputTokenSupply = getOutputTokenSupply(Address.fromString(market.outputToken));
@@ -99,7 +103,7 @@ export function getOutputTokenSupply(outputTokenAddr: Address): BigInt {
     const aTokenInstance = AToken.bind(outputTokenAddr);
     const tryTokenSupply = aTokenInstance.try_totalSupply();
     log.info('OUTPUT TOKEN ' + outputTokenAddr.toHexString(), [] );
-    let outputTokenSupply = new BigInt(0);
+    let outputTokenSupply = BIGINT_ZERO;
     if (!tryTokenSupply.reverted) {
         log.info('OUTTOKEN SUPPLY ' + tryTokenSupply.value.toString(), [] );
         outputTokenSupply = tryTokenSupply.value;
@@ -179,11 +183,12 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
         log.info('CREATING PROTO ENTITY', [''])
         lendingProtocol = new LendingProtocol(protocolId);
         lendingProtocol.totalUniqueUsers = 0;
-        lendingProtocol.version = '0.0.1';
+        lendingProtocol.subgraphVersion = '0.0.1';
+        lendingProtocol.schemaVersion = '0.0.1';
         lendingProtocol.name = 'Aave-v2';
         lendingProtocol.slug = 'aave-v2';
         lendingProtocol.network = 'ETHEREUM';
-        lendingProtocol.totalValueLockedUSD = BigDecimal.fromString("0");
+        lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
         // Are these options correct?
         lendingProtocol.type = 'LENDING';
         lendingProtocol.lendingType = 'POOLED';
@@ -196,6 +201,7 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
 
 
 export function getRewardTokenFromIncController(incentiveContAddr: Address, market: Market): string {
+    log.info('GET REWARD FROM INCENTIVE CONTROLLER ' + incentiveContAddr.toHexString(), [])
     // Instantiate IncentivesController to get access to contract read methods
     const contract = IncentivesControllerContract.bind(incentiveContAddr);
     // Get the contract Reward Token's address
@@ -205,14 +211,15 @@ export function getRewardTokenFromIncController(incentiveContAddr: Address, mark
 }
 
 export function initIncentivesController(aToken: AToken, market: Market): void {
+  log.info('INIT INC CONT MARKET: ' + market.id, [])
     if (!aToken.try_getIncentivesController().reverted) {
         const incContAddr = aToken.try_getIncentivesController().value;
-        log.info('BURN INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
+        log.info('INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
         IncentivesController.create(aToken.try_getIncentivesController().value);
         const rewardTokenAddr = getRewardTokenFromIncController(incContAddr, market);
         loadRewardToken(Address.fromString(rewardTokenAddr), market);
       } else {
-        log.info('BURN FAILED TO GET INCENTIVE CONTROLLER ' + aToken._address.toHexString() + ' ' + market.id, [])
+        log.info('FAILED TO GET INCENTIVE CONTROLLER ' + aToken._address.toHexString() + ' ' + market.id, [])
       }
 }
 
@@ -249,8 +256,8 @@ export function loadMarketDailySnapshot(
             rewardEmissionsAmounts = [];
             rewardTokenList.forEach(() => {
               // For each reward token, create a zero value to initialize the amount of reward emissions for that day
-              rewardEmissionsAmounts.push(new BigInt(0));
-              rewardEmissionsAmountsUSD.push(BigDecimal.fromString("0"));
+              rewardEmissionsAmounts.push(BIGINT_ZERO);
+              rewardEmissionsAmountsUSD.push(BIGDECIMAL_ZERO);
             });
             marketSnapshot.rewardTokenEmissionsAmount = rewardEmissionsAmounts;
             marketSnapshot.rewardTokenEmissionsUSD = rewardEmissionsAmountsUSD;
@@ -266,7 +273,7 @@ export function loadMarketDailySnapshot(
     // PERHAPS WILL NEED TO CHANGES THIS TO HANDLE MULTIPLE INPUT TOKENS
     marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
     marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
-    marketSnapshot.inputTokenBalances = market.inputTokenBalances[0];
+    marketSnapshot.inputTokenBalances = market.inputTokenBalances;
     // Either pass in or call getAssetPriceInUSDC() on the input token from here to get input token price in USD
     marketSnapshot.inputTokenPricesUSD = [getAssetPriceInUSDC(initToken(Address.fromString(market.inputTokens[0])))];
     marketSnapshot.outputTokenSupply = market.outputTokenSupply;
@@ -347,10 +354,10 @@ export function getFinancialsDailySnapshot(event: ethereum.Event): FinancialsDai
     if (!financialsDailySnapshot) {
         financialsDailySnapshot = new FinancialsDailySnapshot(daysSinceEpoch);
         financialsDailySnapshot.protocol = protocol.id;
-        financialsDailySnapshot.totalVolumeUSD = BigDecimal.fromString("0");
-        financialsDailySnapshot.supplySideRevenueUSD = BigDecimal.fromString("0");
-        financialsDailySnapshot.protocolSideRevenueUSD = BigDecimal.fromString("0");
-        financialsDailySnapshot.feesUSD = BigDecimal.fromString("0");
+        financialsDailySnapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
+        financialsDailySnapshot.supplySideRevenueUSD = BIGDECIMAL_ZERO;
+        financialsDailySnapshot.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+        financialsDailySnapshot.feesUSD = BIGDECIMAL_ZERO;
         financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
     }
     financialsDailySnapshot.blockNumber = event.block.number;
@@ -374,7 +381,7 @@ export function getAssetPriceInUSDC(token: Token): BigDecimal {
     const oracle = getPriceOracle();
     // The Aave protocol oracle contracts only contain a method for getting an asset price in ETH, so USDC price must be fetched to convert asset price from Eth to USDC
     // Get the asset price in Wei and convert it to Eth
-    let assetPriceInUSDC: BigDecimal = BigDecimal.fromString("0");
+    let assetPriceInUSDC: BigDecimal = BIGDECIMAL_ZERO;
     let tryAssetPriceInEth = oracle.try_getAssetPrice(tokenAddress);
     // Fetch USDC price in Wei and convert it to Eth
     let tryPriceUSDCInEth = oracle.try_getAssetPrice(Address.fromString(contractAddrUSDC));
@@ -414,7 +421,8 @@ export function getOracleAddressFromProtocol(): string {
 
 export function amountInUSD(token: Token, amount: BigInt): BigDecimal {
     // This function takes in a token and the amount of the token and converts the amount of that token into USD
-    const amountInDecimals = exponentToBigDecimal(token.decimals.toString(), amount.toString());
+    const amountInDecimals = bigIntToBigDecimal(amount, token.decimals);
+    log.info('AMOUNTINUSD AMOUNT IN DECIMALS: ' + amountInDecimals.toString(), [])
     const priceInUSDC = getAssetPriceInUSDC(token);
     const amountUSD = amountInDecimals.times(priceInUSDC);
     log.info(token.id + ' ' + token.name.toUpperCase() + ' AMOUNT ' + amount.toString() + ' AND PRICE??? ' + priceInUSDC.toString() + '---' + amountUSD.toString(), []);

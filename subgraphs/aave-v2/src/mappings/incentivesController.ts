@@ -17,6 +17,7 @@ import {
   getRewardTokenFromIncController,
   initToken
 } from "./utilFunctions";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 
 // declare reward emissions array outside of function to avoid closure issues
 let rewardEmissions: BigInt[] = [];
@@ -28,7 +29,6 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
   log.info('HANDLE REWARDS CLAIMED', [])
   const incentiveContAddr = event.address;
   const marketAddr = event.transaction.to as Address;
-  if (incentiveContAddr != Address.zero()) {
     let market = initMarket(event, marketAddr.toHexString()) as Market;
     const rewardTokenAddr = getRewardTokenFromIncController(incentiveContAddr, market);
     // If the loadRewardToken() call creates a new RewardToken implementation, the Market implementation adds the reward token to its array
@@ -66,8 +66,8 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
         rewardEmissions = [];
         rewardTokensList.forEach(() => {
           // For each reward token, create a zero value to initialize the amount of reward emissions for that day
-          rewardEmissions.push(new BigInt(0));
-          rewardEmissionsUSD.push(BigDecimal.fromString("0"));
+          rewardEmissions.push(BIGINT_ZERO);
+          rewardEmissionsUSD.push(BIGDECIMAL_ZERO);
         });
         // set both the token emissions amount and amount in USD to arrays of the same length with all indicies as zero values
         rewardTokenEmAmount = rewardEmissions;
@@ -75,8 +75,8 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
       }
       for (let i = 0; i < rewardTokensList.length; i++) {
         // Loop through the reward tokens on the market entity instance to compare the addresses to the reward token address
-        const token = rewardTokensList[i];
-        if (rewardTokenAddr === token) {
+        const token = loadRewardToken(Address.fromString(rewardTokensList[i]), market);
+        if (rewardTokenAddr === token.id) {
           // If the current token iteration is the reward token address which is to be updated-
           // Add the rewardTokenEmissionsAmount of that index by the amount of reward tokens claimed
           rewardTokenEmAmount[i] = rewardTokenEmAmount[i].plus(event.params.amount);
@@ -87,7 +87,6 @@ export function handleRewardsClaimed(event: RewardsClaimed): void {
     marketDailySnapshot.rewardTokenEmissionsAmount = rewardTokenEmAmount;
     marketDailySnapshot.rewardTokenEmissionsUSD = rewardTokenEmUSD;
     marketDailySnapshot.save();
-  }
 }
 
 export function handleRewardsAccrued(event: RewardsAccrued): void {

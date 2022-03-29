@@ -20,6 +20,7 @@ import { initToken, initMarket, getOutputTokenSupply, getRewardTokenFromIncContr
 import { AToken } from "../../generated/templates/AToken/AToken";
 import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
 import { IncentivesController, AToken as ATokenTemplate } from "../../generated/templates";
+import { isNullEthValue } from "../common/tokens";
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -35,7 +36,6 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
     event,
     event.params.asset.toHexString(),
   );
-
 
   // If the initMarket could not successfully set the reserve aToken, check these methods for valid data returned/failure.
   let currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
@@ -71,8 +71,11 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleCollateralConfigurationChanged' + marketAddr , [])
   const market = initMarket(event, marketAddr) as Market;
+  const token = initToken(Address.fromString(market.id));
   market.maximumLTV = new BigDecimal(event.params.ltv);
   market.liquidationThreshold = new BigDecimal(event.params.liquidationThreshold);
+  // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on
+  market.liquidationPenalty = new BigDecimal(event.params.liquidationBonus);
   market.save();
 }
 

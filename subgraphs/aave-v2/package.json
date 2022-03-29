@@ -12,9 +12,12 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "^0.25.0"
+    "@graphprotocol/graph-ts": "^0.25.0",
+    "prettier": "@protofire/subgraph-prettier-config"
+
   },
   "devDependencies": {
+    "@protofire/subgraph-prettier-config": "^0.1.1",
     "@typescript-eslint/eslint-plugin": "^5.14.0",
     "@typescript-eslint/parser": "^5.14.0",
     "eslint": "^7.32.0",
