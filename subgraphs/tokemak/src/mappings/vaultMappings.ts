@@ -77,10 +77,7 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
   vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount)];
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
 
-  const outputToken = getOrCreateToken(Address.fromString(vault.id));
-  const outputTokenForPrice = token;
-  outputTokenForPrice.decimals = outputToken.decimals;
-  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(outputTokenForPrice, BIGINT_ONE));
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(token, BIGINT_ONE));
 
   vault.save();
 
@@ -110,10 +107,8 @@ function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt
   const tvl = vault.inputTokenBalances[0].minus(withdrawAmount);
   vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl));
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
-  const outputToken = getOrCreateToken(Address.fromString(vault.id));
-  const outputTokenForPrice = token;
-  outputTokenForPrice.decimals = outputToken.decimals;
-  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(outputTokenForPrice, BIGINT_ONE));
+
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(token, BIGINT_ONE));
 
   vault.inputTokenBalances = [tvl];
   vault.save();

@@ -26,7 +26,7 @@ export function getOrCreateToken(address: Address): Token {
 export function getOrCreateRewardToken(address: Address): RewardToken {
   let id = address.toHexString();
   let token = RewardToken.load(id);
-  if (!token || token.name === "") {
+  if (!token) {
     token = new RewardToken(id);
     let erc20Contract = ERC20Contract.bind(address);
     let decimals = erc20Contract.try_decimals();
@@ -40,7 +40,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 
     token.type = RewardTokenType.DEPOSIT;
 
-    //Values if TOKE token is not deployed yet
+    // Values if TOKE token is not deployed yet
     if (token.name === "" && address.toString() === TOKE_ADDRESS) {
       token.name = TOKE_NAME;
       token.symbol = TOKE_SYMBOL;
