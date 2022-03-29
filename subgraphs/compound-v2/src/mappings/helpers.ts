@@ -1,20 +1,16 @@
 // helper functions for ./mappings.ts
 
-import { Token, LendingProtocol, Market, RewardToken } from "../types/schema";
+import { Token, Market, RewardToken, Deposit, Withdraw, Borrow, Repay, Liquidation } from "../types/schema";
 
 import {
   COMPTROLLER_ADDRESS,
-  PRICE_ORACLE1_ADDRESS,
-  USDC_ADDRESS,
-  NULL_ADDRESS,
+  ZERO_ADDRESS,
   CCOMP_ADDRESS,
   COMP_ADDRESS,
   CETH_ADDRESS,
-  CUSDC_ADDRESS,
-} from "../common/addresses";
+} from "../common/utils/constants";
 
 import {
-  USDC_DECIMALS,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   REWARD_TOKEN_TYPE,
@@ -22,19 +18,228 @@ import {
   ETH_SYMBOL,
   DEFAULT_DECIMALS,
   ETH_ADDRESS,
-  BIGDECIMAL_ONE,
   SAI_ADDRESS,
-} from "../common/constants";
+} from "../common/utils/constants";
 
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { PriceOracle2 } from "../types/Comptroller/PriceOracle2";
-import { PriceOracle1 } from "../types/Comptroller/PriceOracle1";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { CToken } from "../types/Comptroller/cToken";
-import { ERC20 } from "../types/Comptroller/ERC20";
-import { ERC20SymbolBytes } from "../types/Comptroller/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../types/Comptroller/ERC20NameBytes";
+import { getAmountUSD } from "../common/prices/prices";
+import { getAssetDecimals, getAssetName, getAssetSymbol } from "../common/utils/tokens";
 
-// TODO: helper for converting uni time to day
+//////////////////////////////
+//// Transaction Entities ////
+//////////////////////////////
+
+// create a Deposit entity, return false if transaction is null
+// null = market does not exist
+export function createDeposit(event: ethereum.Event, amount: BigInt, sender: Address): bool {
+  // grab and store market
+  let marketAddress = event.transaction.to!;
+  let market = Market.load(marketAddress.toHexString());
+  if (market == null) {
+    log.error("Market {} does not exist", [marketAddress.toHexString()]);
+    return false;
+  }
+
+  // grab local vars
+  let blockNumber = event.block.number;
+  let transactionHash = event.transaction.hash.toHexString();
+  let logIndex = event.logIndex;
+  let id = transactionHash + "-" + logIndex.toString();
+
+  // create new Deposit
+  let deposit = new Deposit(id);
+
+  // fill in deposit vars
+  deposit.hash = transactionHash;
+  deposit.logIndex = logIndex.toI32();
+  deposit.protocol = COMPTROLLER_ADDRESS;
+  deposit.to = marketAddress.toHexString();
+  deposit.from = sender.toHexString();
+  deposit.blockNumber = blockNumber;
+  deposit.timestamp = event.block.timestamp;
+  deposit.market = marketAddress.toHexString();
+  deposit.asset = market.inputTokens[0];
+  deposit.amount = amount;
+  deposit.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+
+  deposit.save();
+  return true;
+}
+
+// creates a withdraw entity, returns false if market does not exist
+export function createWithdraw(event: ethereum.Event, redeemer: Address, amount: BigInt): bool {
+  // grab and store market entity
+  let marketAddress = event.transaction.from;
+  let market = Market.load(marketAddress.toHexString());
+  if (market == null) {
+    log.error("Market {} does not exist", [marketAddress.toHexString()]);
+    return false;
+  }
+
+  // local vars
+  let blockNumber = event.block.number;
+  let transactionHash = event.transaction.hash.toHexString();
+  let logIndex = event.logIndex;
+  let id = transactionHash + "-" + logIndex.toString();
+
+  // creates Withdraw entity
+  let withdraw = new Withdraw(id);
+
+  // fill in withdraw vars
+  withdraw.hash = transactionHash;
+  withdraw.logIndex = logIndex.toI32();
+  withdraw.protocol = COMPTROLLER_ADDRESS;
+  withdraw.to = redeemer.toHexString();
+  withdraw.from = marketAddress.toHexString();
+  withdraw.blockNumber = blockNumber;
+  withdraw.timestamp = event.block.timestamp;
+  withdraw.market = marketAddress.toHexString();
+  withdraw.asset = market.inputTokens[0];
+  withdraw.amount = amount;
+  withdraw.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+
+  withdraw.save();
+  return true;
+}
+
+export function createBorrow(event: ethereum.Event, borrower: Address, amount: BigInt): bool {
+  // grab and store market entity
+  let marketAddress = event.transaction.from;
+  let market = Market.load(marketAddress.toHexString());
+  if (market == null) {
+    log.error("Market {} does not exist", [marketAddress.toHexString()]);
+    return false;
+  }
+  if (!market.canBorrowFrom) {
+    market.canBorrowFrom = true;
+    market.save();
+  }
+
+  // local vars
+  let blockNumber = event.block.number;
+  let transactionHash = event.transaction.hash.toHexString();
+  let logIndex = event.logIndex;
+  let id = transactionHash + "-" + logIndex.toString();
+
+  // creates Borrow entity
+  let borrow = new Borrow(id);
+
+  // fill in borrow vars
+  borrow.hash = transactionHash;
+  borrow.logIndex = logIndex.toI32();
+  borrow.protocol = COMPTROLLER_ADDRESS;
+  borrow.to = borrower.toHexString();
+  borrow.from = marketAddress.toHexString();
+  borrow.blockNumber = blockNumber;
+  borrow.timestamp = event.block.timestamp;
+  borrow.market = marketAddress.toHexString();
+  borrow.asset = market.inputTokens[0];
+  borrow.amount = amount;
+  borrow.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+
+  borrow.save();
+  return true;
+}
+
+// create Repay entity, return false if market does not exist
+export function createRepay(event: ethereum.Event, payer: Address, amount: BigInt): bool {
+  // grab and store market entity
+  let marketAddress = event.transaction.to!;
+  let market = Market.load(marketAddress.toHexString());
+  if (market == null) {
+    log.error("Market {} does not exist", [marketAddress.toHexString()]);
+    return false;
+  }
+
+  // local vars
+  let blockNumber = event.block.number;
+  let transactionHash = event.transaction.hash.toHexString();
+  let logIndex = event.logIndex;
+  let id = transactionHash + "-" + logIndex.toString();
+
+  // create Repay entity
+  let repay = new Repay(id);
+
+  // populate repay vars
+  repay.hash = transactionHash;
+  repay.logIndex = logIndex.toI32();
+  repay.protocol = COMPTROLLER_ADDRESS;
+  repay.to = marketAddress.toHexString();
+  repay.from = payer.toHexString();
+  repay.blockNumber = blockNumber;
+  repay.timestamp = event.block.timestamp;
+  repay.market = marketAddress.toHexString();
+  repay.asset = market.inputTokens[0];
+  repay.amount = amount;
+  repay.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+
+  repay.save();
+  return true;
+}
+
+// create Liquidation entity, return false if any markets are null
+// TODO: ensure this is correct
+export function createLiquidation(
+  event: ethereum.Event,
+  liquidatedToken: Address,
+  liquidator: Address,
+  liquidatedAmount: BigInt,
+  repaidAmount: BigInt,
+): bool {
+  // grab and store market
+  let marketAddress = liquidatedToken;
+  let market = Market.load(marketAddress.toHexString());
+  if (market == null) {
+    log.error("Market {} does not exist", [marketAddress.toHexString()]);
+    return false;
+  }
+  if (!market.canUseAsCollateral) {
+    market.canUseAsCollateral = true;
+    market.save();
+  }
+
+  // local vars
+  let blockNumber = event.block.number;
+  let transactionHash = event.transaction.hash.toHexString();
+  let logIndex = event.logIndex;
+  let id = transactionHash + "-" + logIndex.toString();
+
+  // create liquidation entity
+  let liquidation = new Liquidation(id);
+
+  // populate liquidations vars
+  liquidation.hash = transactionHash;
+  liquidation.logIndex = logIndex.toI32();
+  liquidation.protocol = COMPTROLLER_ADDRESS;
+  liquidation.to = marketAddress.toHexString();
+  liquidation.from = liquidator.toHexString();
+  liquidation.blockNumber = blockNumber;
+  liquidation.timestamp = event.block.timestamp;
+  liquidation.market = marketAddress.toHexString();
+  let assetId = market.outputToken;
+  if (assetId == null) {
+    return false;
+  }
+  liquidation.asset = assetId!;
+  liquidation.amount = liquidatedAmount;
+  liquidation.amountUSD = getAmountUSD(market, liquidatedAmount, blockNumber.toI32(), true);
+
+  // calculate profit = (liquidatedAmountUSD - repaidAmountUSD)
+  let repayMarket = Market.load(event.transaction.to!.toHexString());
+  if (repayMarket == null) {
+    return false;
+  }
+  let costUSD = getAmountUSD(repayMarket, repaidAmount, blockNumber.toI32(), false);
+  liquidation.profitUSD = liquidation.amountUSD!.minus(costUSD);
+
+  liquidation.save();
+  return true;
+}
+
+///////////////////////////////
+//// Market/Token Entities ////
+///////////////////////////////
 
 // creates a new lending market and returns it
 export function createMarket(marketAddress: string, protocol: string, blockNumber: BigInt, timestamp: BigInt): Market {
@@ -43,7 +248,7 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
   let underlyingAddress: string;
   let underlying = cTokenContract.try_underlying();
   if (underlying.reverted) {
-    underlyingAddress = NULL_ADDRESS.toHexString();
+    underlyingAddress = ZERO_ADDRESS;
   } else {
     underlyingAddress = underlying.value.toHexString();
   }
@@ -63,7 +268,7 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
   market.inputTokens = inputTokens;
   market.outputToken = marketAddress;
   let rewardTokens = new Array<string>();
-  rewardTokens.push(COMP_ADDRESS.toHexString());
+  rewardTokens.push(COMP_ADDRESS);
   market.rewardTokens = rewardTokens;
 
   // populate quantitative data
@@ -112,8 +317,8 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
 // creates both tokens for a market pool token/cToken
 export function createMarketTokens(marketAddress: string, underlyingAddress: string, cTokenContract: CToken): void {
   // create underlying token
-  // TODO: fill in reward token once created on old markets
-  if (marketAddress == CCOMP_ADDRESS.toHexString()) {
+  // TODO: fill in reward token once created on old markets?
+  if (marketAddress == CCOMP_ADDRESS) {
     // create RewardToken COMP
     let rewardToken = new RewardToken(underlyingAddress);
     rewardToken.name = getAssetName(Address.fromString(underlyingAddress));
@@ -144,193 +349,4 @@ export function createMarketTokens(marketAddress: string, underlyingAddress: str
   cToken.symbol = cTokenContract.symbol();
   cToken.decimals = cTokenContract.decimals();
   cToken.save();
-}
-
-// returns the usd price of the amount of the underlying asset in market
-export function getAmountUSD(market: Market, amount: BigInt, blockNumber: i32): BigDecimal {
-  let cTokenAddress = market.id;
-  let underlyingToken = Token.load(market.inputTokens[0]);
-  if (underlyingToken == null) {
-    log.error("Couldn't find input token for market {}", [market.id]);
-    return BIGDECIMAL_ZERO;
-  }
-  let underlyingAddress = underlyingToken.id;
-  let underlyingDecimals = underlyingToken.decimals;
-  let tokenPrice: BigDecimal;
-
-  // get usd price of token
-  if (blockNumber > 10678764) {
-    // after block 10678764 ETH price was calculated in USD instead of USDC
-    let ethPriceUSD = getUSDPriceETH(blockNumber);
-
-    if (cTokenAddress == CETH_ADDRESS) {
-      tokenPrice = ethPriceUSD.truncate(underlyingDecimals);
-    } else {
-      let tokenPriceUSD = getTokenPrice(
-        blockNumber,
-        Address.fromString(cTokenAddress),
-        Address.fromString(underlyingAddress),
-        underlyingDecimals,
-      );
-      tokenPrice = tokenPriceUSD.truncate(underlyingDecimals);
-    }
-  } else {
-    let usdPriceinInETH = getUSDCPriceETH(blockNumber);
-
-    if (cTokenAddress == CETH_ADDRESS) {
-      tokenPrice = BIGDECIMAL_ONE.div(usdPriceinInETH).truncate(underlyingDecimals);
-    } else {
-      let tokenPriceETH = getTokenPrice(
-        blockNumber,
-        Address.fromString(cTokenAddress),
-        Address.fromString(underlyingAddress),
-        underlyingDecimals,
-      );
-      let underlyingPrice = tokenPriceETH.truncate(underlyingDecimals);
-      if (cTokenAddress == CUSDC_ADDRESS) {
-        tokenPrice = BIGDECIMAL_ONE;
-      } else {
-        tokenPrice = underlyingPrice.div(usdPriceinInETH).truncate(underlyingDecimals);
-      }
-    }
-  }
-  log.info("Token {} costs ${} at block {}", [underlyingAddress, tokenPrice.toString(), blockNumber.toString()]);
-
-  let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  return tokenPrice.times(decimalAmount);
-}
-
-// get usd price of cerc20 tokens (NOT eth)
-// TODO: still not accurate i think
-export function getTokenPrice(
-  blockNumber: i32,
-  cTokenAddress: Address,
-  underlyingAddress: Address,
-  underlyingDecimals: i32,
-): BigDecimal {
-  let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())!;
-  let oracle2Address = changetype<Address>(protocol._priceOracle);
-  let underlyingPrice: BigDecimal;
-  let mantissaFactorBD = exponentToBigDecimal(18);
-
-  /**
-   * Note: The first Price oracle was only used for the first ~100 blocks:
-   *    https://etherscan.io/address/0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904
-   *
-   * PriceOracle2 is used starting aroun block 7715908 and we need the cToken
-   * address. This returns the value without factoring in decimals and wei.
-   *
-   * So the number is divided by (ethDecimals - tokenDecimals) and again by mantissa
-   * USDC = 10 ^ ((18 - 6) + 18) = 10 ^ 30
-   *
-   */
-  if (blockNumber > 7715908) {
-    // calculate using PriceOracle2
-    let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
-    let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
-    let priceOracle2 = PriceOracle2.bind(oracle2Address);
-    let tryPrice = priceOracle2.try_getUnderlyingPrice(cTokenAddress);
-
-    underlyingPrice = tryPrice.reverted ? BIGDECIMAL_ZERO : tryPrice.value.toBigDecimal().div(bdFactor);
-  } else {
-    /**
-     * Calculate using PriceOracle1
-     *
-     * Note: this returns the value already factoring in token decimals and wei,
-     * therefore we only need to divide by the mantissa, 10^18
-     */
-    let priceOracle1 = PriceOracle1.bind(PRICE_ORACLE1_ADDRESS);
-    underlyingPrice = priceOracle1.getPrice(underlyingAddress).toBigDecimal().div(mantissaFactorBD);
-  }
-
-  return underlyingPrice;
-}
-
-// get usdc price of ETH
-export function getUSDCPriceETH(blockNumber: i32): BigDecimal {
-  let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())!;
-  let oracle2Address = changetype<Address>(protocol._priceOracle);
-  let usdcPrice: BigDecimal;
-  let mantissaFactorBD = exponentToBigDecimal(18);
-
-  // see getTokenPrice() for explanation
-  if (blockNumber > 7715908) {
-    let priceOracle2 = PriceOracle2.bind(oracle2Address);
-    let mantissaDecimalFactorUSDC = 18 - USDC_DECIMALS + 18;
-    let bdFactorUSDC = exponentToBigDecimal(mantissaDecimalFactorUSDC);
-    let tryPrice = priceOracle2.try_getUnderlyingPrice(Address.fromString(CUSDC_ADDRESS));
-
-    usdcPrice = tryPrice.reverted ? BIGDECIMAL_ZERO : tryPrice.value.toBigDecimal().div(bdFactorUSDC);
-  } else {
-    let priceOracle1 = PriceOracle1.bind(PRICE_ORACLE1_ADDRESS);
-    usdcPrice = priceOracle1.getPrice(USDC_ADDRESS).toBigDecimal().div(mantissaFactorBD);
-  }
-  return usdcPrice;
-}
-
-export function getUSDPriceETH(blockNumber: i32): BigDecimal {
-  let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS.toHexString())!;
-  let mantissaFactorBD = exponentToBigDecimal(18);
-  let oracle2Address = changetype<Address>(protocol._priceOracle);
-  let priceOracle2 = PriceOracle2.bind(oracle2Address);
-  let tryPrice = priceOracle2.try_getUnderlyingPrice(Address.fromString(CETH_ADDRESS));
-
-  let ethPriceInUSD = tryPrice.reverted ? BIGDECIMAL_ZERO : tryPrice.value.toBigDecimal().div(mantissaFactorBD);
-
-  return ethPriceInUSD;
-}
-
-// turn exponent into a BigDecimal number
-export function exponentToBigDecimal(decimals: i32): BigDecimal {
-  let bigDecimal = BigDecimal.fromString("1");
-  for (let i = 0; i < decimals; i++) {
-    bigDecimal = bigDecimal.times(BigDecimal.fromString("10"));
-  }
-  return bigDecimal;
-}
-
-// Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
-export function getAssetName(address: Address): string {
-  let contract = ERC20.bind(address);
-  let nameCall = contract.try_name();
-  if (!nameCall.reverted) {
-    return nameCall.value;
-  }
-
-  let bytesContract = ERC20NameBytes.bind(address);
-  let nameBytesCall = bytesContract.try_name();
-  if (!nameBytesCall.reverted) {
-    return nameBytesCall.value.toString();
-  }
-
-  log.error("name() call (string or bytes) reverted for {}", [address.toHex()]);
-  return "UNKNOWN";
-}
-
-export function getAssetSymbol(address: Address): string {
-  let contract = ERC20.bind(address);
-  let symbolCall = contract.try_symbol();
-  if (!symbolCall.reverted) {
-    return symbolCall.value;
-  }
-
-  let bytesContract = ERC20SymbolBytes.bind(address);
-  let symbolBytesCall = bytesContract.try_symbol();
-  if (!symbolBytesCall.reverted) {
-    return symbolBytesCall.value.toString();
-  }
-
-  log.error("symbol() call (string or bytes) reverted for {}", [address.toHex()]);
-  return "UNKNOWN";
-}
-
-export function getAssetDecimals(address: Address): i32 {
-  let contract = ERC20.bind(address);
-  let decimalsCall = contract.try_decimals();
-  if (!decimalsCall.reverted) {
-    return decimalsCall.value;
-  }
-
-  log.error("decimals() call reverted for {}", [address.toHex()]);
-  return -1;
 }

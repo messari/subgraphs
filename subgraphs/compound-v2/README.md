@@ -8,7 +8,6 @@
 
 ### TODO
 
-- Get USD price working
 - calculate and add market calculations (see: https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/edit#gid=686701533)
 - add market/lending protocol dynamic updates
 - figure out how to add daily snapshots each day

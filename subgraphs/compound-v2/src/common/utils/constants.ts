@@ -61,10 +61,10 @@ export const ETH_SYMBOL = "ETH";
 
 export const SAI_ADDRESS = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359";
 export const USDC_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
-export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-export const USDC_WETH_PAIR = "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"; // created 10008355
-export const DAI_WETH_PAIR = "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"; // created block 10042267
-export const USDT_WETH_PAIR = "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"; // created block 10093341
+export const CUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
+export const CETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
+export const COMP_ADDRESS = "0xc00e94cb662c3520282e6f5717214004a7f26888";
+export const CCOMP_ADDRESS = "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -107,6 +107,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 /////////////////////////////
 
 export const COMPTROLLER_ADDRESS = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b";
+export const PRICE_ORACLE1_ADDRESS = "0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904";
 export const NETWORK_ETHEREUM = "ETHEREUM";
 export const PROTOCOL_TYPE = "LENDING";
 export const LENDING_TYPE = "CDP"; // TODO: guess - look more into this to verify
@@ -114,6 +115,6 @@ export const PROTOCOL_RISK_TYPE = "ISOLATED"; // TODO: ensure this is accurate
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
 export const REWARD_TOKEN_TYPE = "DEPOSIT"; // TODO: check - seems like both
-export const SUBGRAPH_VERSION = "1.2.18";
+export const SUBGRAPH_VERSION = "1.3.2";
 export const SCHEMA_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
