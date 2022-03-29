@@ -62,9 +62,14 @@ interface Protocol {
   name: String!
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+    " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
+
   type: ProtocolType!
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
@@ -240,9 +245,14 @@ type DexAmmProtocol implements Protocol @entity {
   name: String!
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
-  " Version of the subgraph implementation, in the format { schema ver }.{ major ver }.{ minor ver }. Start at 1.0.0 "
-  version: String!
+    " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
+
   type: ProtocolType!
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
@@ -257,6 +267,7 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+  
 }
 
 enum LiquidityPoolFeeType {
@@ -458,19 +469,59 @@ type Swap implements Event @entity {
   " Token deposited into pool "
   tokenIn: Token!
   " Amount of token deposited into pool in native units "
-  amountIn: BigDecimal!
+  amountIn: BigInt!
   " Amount of token deposited into pool in USD "
   amountInUSD: BigDecimal!
   " Token withdrawn from pool "
   tokenOut: Token!
   " Amount of token withdrawn from pool in native units "
-  amountOut: BigDecimal!
+  amountOut: BigInt!
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
   ##### DexAmm-Specific #####
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
+
+#Added Entities 
+
+# An account is a unique Ethereum address
+type _Account @entity {
+  " Address of the account "
+  id: ID!
+}
+
+type _DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: ID!
+}
+
+"  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
+type _HelperStore @entity {
+  id: ID!
+  " price of ETH/TVL in USD "
+  valueDecimal: BigDecimal
+  " # of deposits, # of unique users "
+  valueInt: Int
+
+}
+
+type _TokenTracker @entity { 
+  " Token Address "
+  id: ID!
+  " pools token is in that are white listed for USD pricing "
+  whitelistPools: [Pool!]!
+  " derived price in ETH "
+  derivedETH: BigDecimal!
+}
+
+type _LiquidityPoolAmounts @entity {
+  " Smart contract address of the pool "
+  id: ID!
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigDecimal!]!
+}
+
 
 
 

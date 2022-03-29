@@ -12,6 +12,7 @@ import {
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   _LiquidityPoolAmounts,
+  LiquidityPoolFee,
 } from "../../generated/schema"
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
@@ -43,6 +44,8 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
+    protocol.schemaVersion = "1.0.0"
+    protocol.subgraphVersion = "1.0.0"
     protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.network = Network.ETHEREUM
@@ -68,6 +71,11 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
 export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
     return _LiquidityPoolAmounts.load(poolAddress)!
 }
+
+export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
+    return LiquidityPoolFee.load(id)!
+}
+
 
 export function getFeeTier(event: ethereum.Event): _HelperStore {
     return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!

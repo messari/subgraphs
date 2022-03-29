@@ -1,5 +1,5 @@
 import { log } from '@graphprotocol/graph-ts'
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BIGINT_ZERO } from './constants'
+import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO } from './constants'
 import { _HelperStore, _TokenTracker, _LiquidityPoolAmounts } from '../../generated/schema'
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { safeDiv } from '../common/helpers'
@@ -144,12 +144,12 @@ export function getTrackedAmountUSD(
 
   // take double value of the whitelisted token amount
   if (WHITELIST_TOKENS.includes(tokenTracker0.id) && !WHITELIST_TOKENS.includes(tokenTracker1.id)) {
-    return tokenAmount0.times(price0USD).times(BigDecimal.fromString('2'))
+    return tokenAmount0.times(price0USD).times(BIGDECIMAL_TWO)
   }
 
   // take double value of the whitelisted token amount
   if (!WHITELIST_TOKENS.includes(tokenTracker0.id) && WHITELIST_TOKENS.includes(tokenTracker1.id)) {
-    return tokenAmount1.times(price1USD).times(BigDecimal.fromString('2'))
+    return tokenAmount1.times(price1USD).times(BIGDECIMAL_TWO)
   }
 
   // neither token is on white list, tracked amount is 0

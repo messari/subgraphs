@@ -3,7 +3,7 @@ import { PoolCreated } from '../../generated//Factory/Factory'
 import { Address } from '@graphprotocol/graph-ts'
 import { findEthPerToken } from '../common/pricing'
 import { getOrCreateDex, getOrCreateToken, getOrCreateLPToken, getOrCreateTokenTracker } from '../common/getters'
-import { CreateLiquidityPool, updateStoresAndTemplate, UpdateTokenWhitelists } from '../common/helpers'
+import { CreateLiquidityPool, UpdateTokenWhitelists } from '../common/helpers'
 
 export function handlePoolCreated(event: PoolCreated): void {
   // temp fix
@@ -26,7 +26,6 @@ export function handlePoolCreated(event: PoolCreated): void {
 
   UpdateTokenWhitelists(tokenTracker0, tokenTracker1, event.params.pool)
 
-  CreateLiquidityPool(event, protocol, event.params.pool.toHexString(), token0, token1, LPtoken)
-  updateStoresAndTemplate(event.params.pool.toHexString(), event.params.fee) 
+  CreateLiquidityPool(event, protocol, event.params.pool, event.params.fee, token0, token1, LPtoken)
 }
 

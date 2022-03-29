@@ -7,7 +7,7 @@ import {
   _DailyActiveAccount,
   UsageMetricsDailySnapshot
 } from "../../generated/schema"
-import { FACTORY_ADDRESS, SECONDS_PER_DAY} from "../common/constants"
+import { FACTORY_ADDRESS, INT_ONE, INT_ZERO, SECONDS_PER_DAY} from "../common/constants"
 import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./getters";
 
 
@@ -35,9 +35,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     if (!usageMetrics) {
       usageMetrics = new UsageMetricsDailySnapshot(id.toString());
       usageMetrics.protocol = FACTORY_ADDRESS
-      usageMetrics.activeUsers = 0;
-      usageMetrics.totalUniqueUsers = 0;
-      usageMetrics.dailyTransactionCount = 0;
+      usageMetrics.activeUsers = INT_ZERO;
+      usageMetrics.totalUniqueUsers = INT_ZERO;
+      usageMetrics.dailyTransactionCount = INT_ZERO;
     }
     
     // Update the block number and timestamp to that of the last transaction of that day
@@ -50,7 +50,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     if (!account) {
       account = new _Account(accountId);
       account.save();
-      totalUniqueUsers.valueInt += 1;
+      totalUniqueUsers.valueInt += INT_ONE;
     }
     usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
     protocol.totalUniqueUsers = totalUniqueUsers.valueInt
@@ -61,7 +61,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     if (!dailyActiveAccount) {
       dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
       dailyActiveAccount.save();
-      usageMetrics.activeUsers += 1
+      usageMetrics.activeUsers += INT_ONE
     }
   
     totalUniqueUsers.save();
