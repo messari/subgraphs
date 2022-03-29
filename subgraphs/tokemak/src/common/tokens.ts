@@ -26,17 +26,19 @@ export function getOrCreateToken(address: Address): Token {
 export function getOrCreateRewardToken(address: Address): RewardToken {
   let id = address.toHexString();
   let token = RewardToken.load(id);
-  if (!token) {
+  if (!token || token.name === "") {
     token = new RewardToken(id);
     let erc20Contract = ERC20Contract.bind(address);
     let decimals = erc20Contract.try_decimals();
     // Using try_cause some values might be missing
     let name = erc20Contract.try_name();
     let symbol = erc20Contract.try_symbol();
-    // TODO: add overrides for name and symbol
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
+
+    //TOKE is the only reward token
+    token.name = name.reverted ? "Tokemak" : name.value;
+    token.symbol = symbol.reverted ? "TOKE" : symbol.value;
+
     token.type = RewardTokenType.DEPOSIT;
     token.save();
   }
