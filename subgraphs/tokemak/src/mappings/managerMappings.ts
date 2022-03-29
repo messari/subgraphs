@@ -59,7 +59,6 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     vault.createdTimestamp = event.block.timestamp;
 
     const rewardToken = createRewardTokens();
-   
     
     vault.rewardTokens = [rewardToken.id];
 

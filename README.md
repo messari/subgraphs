@@ -5,8 +5,8 @@
 - Decide which protocol you want to build a subgraph for
 - Fork this repository
 - Add a folder under `subgraphs` with the name of the protocol you want to work on
-- Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`
-- Build the subgraph within that folder
+- Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`. Note `schema-common.graphql` is used for schema design and reference, and should never be used for implementation
+- Build the subgraph within that folder. Feel free to use the [reference subgraph](./subgraphs/_reference_/) as a reference.
 - Submit a pull request to this repo after you are done
 
 ## Recommended Development Workflow
@@ -56,3 +56,35 @@
 - Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
   - Performance tips and tricks (for both mappings and queries)
 - [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
+
+## Development Status
+
+🔨 = In progress.  
+🛠 = Feature complete. Additional testing required.  
+✅ = Production-ready.  
+
+| Feature |  Status | Version |
+| ------- |  :------: | --- |
+| **DEX AMM** |    | |
+| Uniswap v2 | 🛠 | |
+| Uniswap v3 | 🔨 | |
+| Sushiswap | 🔨 | |
+| Curve | 🔨 | |
+| Balancer v2 | | |
+| Bancor v2 | 🔨 | |
+| Bancor v3 | | |
+| DODO v2 |  | |
+| **Lending Protocols** |    |
+| Aave v2 | 🔨  | |
+| Compound | 🔨  | |
+| Geist | 🔨  | |
+| Benqi | 🔨  | |
+| **Yield Aggregators** |     |
+| Yearn v2 | 🔨 | |
+| Convex Finance | 🔨  | |
+| Badger DAO | 🔨 | |
+| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 |
+| Beefy Finance |  | |
+| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠  | 1.0.0 |
+| Harvest Finance | 🔨  | |
+| Yield Yak |  | |
