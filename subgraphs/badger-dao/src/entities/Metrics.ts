@@ -1,6 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { FinancialsDailySnapshot, UsageMetricsDailySnapshot, VaultDailySnapshot } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { getOrCreateProtocol } from "./Protocol";
 
 export function getOrCreateUserSnapshot(day: i32): UsageMetricsDailySnapshot {
   let snapshot = UsageMetricsDailySnapshot.load(day.toString());
@@ -31,10 +32,8 @@ export function getOrCreateFinancialsDailySnapshot(day: i32): FinancialsDailySna
 
   snapshot = new FinancialsDailySnapshot(day.toString());
 
-  snapshot.protocol = "";
+  snapshot.protocol = getOrCreateProtocol().id;
   snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  snapshot.protocolTreasuryUSD = BIGDECIMAL_ZERO;
-  snapshot.protocolControlledValueUSD = BIGDECIMAL_ZERO;
   snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
   snapshot.supplySideRevenueUSD = BIGDECIMAL_ZERO;
   snapshot.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
@@ -59,7 +58,7 @@ export function getOrCreateVaultDailySnapshot(vault: Address, day: i32): VaultDa
 
   snapshot = new VaultDailySnapshot(id);
 
-  snapshot.protocol = "";
+  snapshot.protocol = getOrCreateProtocol().id;
   snapshot.vault = vault.toHex();
   snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
   snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;

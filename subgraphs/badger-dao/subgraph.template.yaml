@@ -2,13 +2,13 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
-  {{#registry}}
+  {{#controllers}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
     source:
       address: "{{ address }}"
-      abi: VaultRegistry
+      abi: BadgerController
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
@@ -17,14 +17,17 @@ dataSources:
       entities:
         - Token
         - RewardToken
-        - User
-        - LendingProtocol
-        - VaultDailySnapshot
+        - YieldAggregator
         - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
         - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
       abis:
-        - name: VaultRegistry
-          file: ./abis/VaultRegistry.json
         - name: ERC20
           file: ./abis/ERC20.json
         - name: BadgerSett
@@ -35,19 +38,23 @@ dataSources:
           file: ./abis/BadgerStrategy.json
         - name: CalculationsCurve
           file: ./abis/CalculationsCurve.json
-      eventHandlers:
-        - event: NewVault(address,string,address)
-          handler: handleNewVault
-      file: ./src/handlers/vault.ts
-  {{/registry}}
+        - name: CalculationsSushi
+          file: ./abis/CalculationsSushiSwap.json
+      callHandlers:
+        - function: setVault(address,address) 
+          handler: handleSetVault
+        - function: setStrategy(address,address) 
+          handler: handleSetStrategy
+      file: ./src/handlers/controller.ts
+  {{/controllers}}
 
-  {{#tokens}}
+  {{#rewards}}
   - kind: ethereum/contract
     name: {{ name }}
     network: {{ chain }}
     source:
       address: "{{ address }}"
-      abi: ERC20
+      abi: StakingRewards
       startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
@@ -56,50 +63,16 @@ dataSources:
       entities:
         - Token
         - RewardToken
-        - User
-        - LendingProtocol
-        - VaultDailySnapshot
+        - YieldAggregator
         - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
         - Vault
-      abis:
-        - name: VaultRegistry
-          file: ./abis/VaultRegistry.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: BadgerSett
-          file: ./abis/BadgerSett.json
-        - name: BadgerController
-          file: ./abis/BadgerController.json
-        - name: BadgerStrategy
-          file: ./abis/BadgerStrategy.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleReward
-      file: ./src/handlers/tokens.ts
-  {{/tokens}}
-  
-  {{#setts}}
-  - kind: ethereum/contract
-    name: {{ name }}
-    network: {{ chain }}
-    source:
-      address: "{{ address }}"
-      abi: ERC20
-      startBlock: {{ startBlock }}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Token
-        - RewardToken
-        - User
-        - LendingProtocol
         - VaultDailySnapshot
-        - UsageMetricsDailySnapshot
-        - Vault
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -111,13 +84,19 @@ dataSources:
           file: ./abis/BadgerStrategy.json
         - name: CalculationsCurve
           file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/CalculationsSushiSwap.json
+        - name: StakingRewards
+          file: ./abis/StakingRewards.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/handlers/tokens.ts
-  {{/setts}}
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+      file: ./src/handlers/reward.ts
+  {{/rewards}}
 
-# dynamic sett, created in vault.ts
+# dynamic sett, created in controller.ts
 templates:
   - kind: ethereum/contract
     name: SettVault
@@ -131,11 +110,16 @@ templates:
       entities:
         - Token
         - RewardToken
-        - User
-        - LendingProtocol
-        - VaultDailySnapshot
+        - YieldAggregator
         - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
         - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
       abis:
         - name: ERC20
           file: ./abis/ERC20.json
@@ -147,7 +131,59 @@ templates:
           file: ./abis/BadgerStrategy.json
         - name: CalculationsCurve
           file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/CalculationsSushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/handlers/vault.ts
+  - kind: ethereum/contract
+    name: BadgerStrategy
+    network: {{ chain }}
+    source:
+      abi: BadgerStrategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: BadgerSett
+          file: ./abis/BadgerSett.json
+        - name: BadgerController
+          file: ./abis/BadgerController.json
+        - name: BadgerStrategy
+          file: ./abis/BadgerStrategy.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/CalculationsSushiSwap.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/handlers/tokens.ts
+        - event: Harvest(uint256,indexed uint256)
+          handler: handleHarvested
+      callHandlers:
+        - function: setPerformanceFee(uint256)
+          handler: handleSetPerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleSetWithdrawalFee
+      file: ./src/handlers/strategy.ts 

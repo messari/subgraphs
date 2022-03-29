@@ -1,54 +1,48 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { BadgerSett } from "../../generated/VaultRegistry/BadgerSett";
-import { CalculationsCurve } from "../../generated/VaultRegistry/CalculationsCurve";
-import { CALCULATIONS_CURVE_ADDRESS } from "../constant";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BadgerSett } from "../../generated/badger-wbtc/BadgerSett";
+import { CalculationsCurve } from "../../generated/badger-wbtc/CalculationsCurve";
+import { CalculationsSushi } from "../../generated/badger-wbtc/CalculationsSushi";
+import {
+  BIGINT_ZERO,
+  ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS,
+  ETH_MAINNET_CALCULATIONS_SUSHI_ADDRESS,
+  USDC_DENOMINATOR,
+} from "../constant";
 import { readValue } from "../utils/contracts";
 
-export function getPriceOfCurveLpToken(tokenAddress: Address, amount: BigInt, decimals: BigInt): BigInt {
-  let curveContract = CalculationsCurve.bind(CALCULATIONS_CURVE_ADDRESS);
-  let tokenPrice = BigInt.zero();
+export function getUsdPriceOfToken(tokenAddress: Address): BigDecimal {
+  const curveContract = CalculationsCurve.bind(Address.fromString(ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS));
 
-  let isBaseToken = readValue<bool>(curveContract.try_isBasicToken(tokenAddress), false);
-  if (isBaseToken) {
-    tokenPrice = readValue<BigInt>(curveContract.try_getPriceUsdc(tokenAddress), BigInt.zero());
+  let tokenPrice = BIGINT_ZERO;
+
+  let isLpToken = readValue<bool>(curveContract.try_isCurveLpToken(tokenAddress), false);
+  if (isLpToken) {
+    tokenPrice = readValue<BigInt>(curveContract.try_getCurvePriceUsdc(tokenAddress), BIGINT_ZERO);
+  } else {
+    const sushiContract = CalculationsSushi.bind(Address.fromString(ETH_MAINNET_CALCULATIONS_SUSHI_ADDRESS));
+    tokenPrice = readValue<BigInt>(sushiContract.try_getPriceUsdc(tokenAddress), BIGINT_ZERO);
   }
 
-  log.debug("[BADGER] token price for curve lp base price usd for {} is {}", [
-    tokenAddress.toHex(),
-    tokenPrice.toString(),
-  ]);
-
-  let isCToken = readValue<bool>(curveContract.try_isCurveLpToken(tokenAddress), false);
-  if (isCToken) {
-    tokenPrice = readValue<BigInt>(curveContract.try_getCurvePriceUsdc(tokenAddress), BigInt.zero());
-  }
-
-  log.debug("[BADGER] token price for curve lp curve price usd for {} is {}", [
-    tokenAddress.toHex(),
-    tokenPrice.toString(),
-  ]);
-
-  return tokenPrice.times(amount).div(decimals);
+  return tokenPrice.toBigDecimal().div(USDC_DENOMINATOR.toBigDecimal());
 }
 
 export function getVirtualPriceOfCurveLpToken(tokenAddress: Address, _decimals: BigInt): BigInt {
-  let curveContract = CalculationsCurve.bind(CALCULATIONS_CURVE_ADDRESS);
-  let tokenPrice = BigInt.zero();
+  const curveContract = CalculationsCurve.bind(Address.fromString(ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS));
 
-  let isCToken = readValue<bool>(curveContract.try_isCurveLpToken(tokenAddress), false);
-  if (isCToken) {
-    tokenPrice = readValue<BigInt>(curveContract.try_getVirtualPrice(tokenAddress), BigInt.zero());
+  let tokenPrice = BIGINT_ZERO;
+  let isLpToken = readValue<bool>(curveContract.try_isCurveLpToken(tokenAddress), false);
+
+  if (isLpToken) {
+    tokenPrice = readValue<BigInt>(curveContract.try_getVirtualPrice(tokenAddress), BIGINT_ZERO);
   }
-
-  log.debug("[BADGER] token virtual price for {} is {}", [tokenAddress.toHex(), tokenPrice.toString()]);
 
   return tokenPrice.div(_decimals);
 }
 
 export function getPriceOfStakedTokens(vaultAddress: Address, tokenAddress: Address, _decimals: BigInt): BigInt {
-  let vaultContract = BadgerSett.bind(vaultAddress);
+  const vaultContract = BadgerSett.bind(vaultAddress);
 
-  let pricePerShare = readValue<BigInt>(vaultContract.try_getPricePerFullShare(), BigInt.zero());
+  let pricePerShare = readValue<BigInt>(vaultContract.try_getPricePerFullShare(), BIGINT_ZERO);
   let virtualPrice = getVirtualPriceOfCurveLpToken(tokenAddress, _decimals);
 
   return pricePerShare.div(_decimals).times(virtualPrice);

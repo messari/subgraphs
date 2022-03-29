@@ -117,14 +117,6 @@ type YieldAggregator implements Protocol @entity {
 ##### Protocol Timeseries #####
 ###############################
 
-# User entity to track unique user
-type _User @entity {
-  " User public address "
-  id: ID!
-
-  lastDayActive: Int!
-}
-
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
@@ -517,4 +509,22 @@ type Withdraw implements Event @entity {
 
   " The vault involving this transaction "
   vault: Vault!
+}
+
+## Private entities
+
+# Tracking every strategy of the vault
+type _Strategy @entity {
+  " Strategy Address "
+  id: ID!
+  vaultAddress: Vault!
+  inputToken: Token!
+}
+
+# User entity to track unique user
+type _User @entity {
+  " User public address "
+  id: ID!
+
+  lastDayActive: Int!
 }

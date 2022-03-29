@@ -5,133 +5,53 @@
     "address": "0xfda7eb6f8b7a9e9fcfd348042ae675d1d652454f",
     "startBlock": 13006329
   },
-  "tokens": [
+  "controllers": [
     {
-      "name": "Badger",
-      "address": "0x3472A5A71965499acd81997a54BBA8D852C6E53d",
-      "startBlock": 11348423
+      "name": "native",
+      "address": "0x63cF44B2548e4493Fd099222A1eC79F3344D9682",
+      "startBlock": "11380863"
     },
     {
-      "name": "IBBTC",
-      "address": "0xc4E15973E6fF2A35cC804c2CF9D2a1b817a8b40F",
-      "startBlock": 12342123
+      "name": "harvest",
+      "address": "0x30392694C25fbBE5C026CF846e9b6525A2aC3eC8",
+      "startBlock": "11380864"
     },
     {
-      "name": "Digg",
-      "address": "0x798D1bE841a82a273720CE31c822C61a67a601C3",
-      "startBlock": 11668475
+      "name": "experimental",
+      "address": "0x9b4efA18c0c6b4822225b81D150f3518160f8609",
+      "startBlock": "12376094"
+    },
+    {
+      "name": "mstable",
+      "address": "0xd35ff2C170CC1e44de4EDdC9f2Fc425C16670250",
+      "startBlock": "13353840"
+    },
+    {
+      "name": "bbveCVX-CVX-f",
+      "address": "0x0c41A8613fbeFCC8d6e5dF1020DBb336F875247F",
+      "startBlock": "13495936"
+    },
+    {
+      "name": "ibBTCCrv",
+      "address": "0xe505F7C2FFcce7Ae4b076456BC02A70D8fe8d4d2",
+      "startBlock": "13277206"
+    },
+    {
+      "name": "restitution",
+      "address": "0x3F61344BA56df00dad9bBcA05d98CA2AeC43Ba0B",
+      "startBlock": "13998344"
+    },
+    {
+      "name": "badger-wbtc",
+      "address": "0xa54d8a596B4022CC4436b692C8ea0E342405eB6e",
+      "startBlock": "14412318"
     }
   ],
-  "setts": [
+  "rewards": [
     {
-      "name": "sBTCCRV",
-      "address": "0xd04c48A53c111300aD41190D63681ed3dAd998eC",
-      "startBlock": 11380877
-    },
-    {
-      "name": "renBTCCRV",
-      "address": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
-      "startBlock": 11380872
-    },
-    {
-      "name": "tBTCCRV",
-      "address": "0xb9D076fDe463dbc9f915E5392F807315Bf940334",
-      "startBlock": 11380878
-    },
-    {
-      "name": "UNI-BADGER",
-      "address": "0x235c9e24D3FB2FAFd58a2E49D454Fdcd2DBf7FF1",
-      "startBlock": 11380883
-    },
-    {
-      "name": "hrenBTCCRV",
-      "address": "0xAf5A1DECfa95BAF63E0084a35c62592B774A2A87",
-      "startBlock": 11380939
-    },
-    {
-      "name": "BADGER",
-      "address": "0x19D97D8fA813EE2f51aD4B4e04EA08bAf4DFfC28",
-      "startBlock": 11380871
-    },
-    {
-      "name": "SLP-WBTC",
-      "address": "0x758a43ee2bff8230eeb784879cdcff4828f2544d",
-      "startBlock": 11537600
-    },
-    {
-      "name": "SLP-BADGER",
-      "address": "0x1862A18181346EBd9EdAf800804f89190DeF24a5",
-      "startBlock": 11539529
-    },
-    {
-      "name": "SLP-DIGG",
-      "address": "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6",
-      "startBlock": 11681030
-    },
-    {
-      "name": "UNI-DIGG",
-      "address": "0xC17078FDd324CC473F8175Dc5290fae5f2E84714",
-      "startBlock": 11680833
-    },
-    {
-      "name": "DIGG",
-      "address": "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a",
-      "startBlock": 11680422
-    },
-    {
-      "name": "ibBTC",
-      "address": "0x8a8FFec8f4A0C8c9585Da95D9D97e8Cd6de273DE",
-      "startBlock": 12383984
-    },
-    {
-      "name": "hBTC",
-      "address": "0x8c76970747afd5398e958bdfada4cf0b9fca16c4",
-      "startBlock": 12589485
-    },
-    {
-      "name": "pBTC",
-      "address": "0x55912d0cf83b75c492e761932abc4db4a5cb1b17",
-      "startBlock": 12589485
-    },
-    {
-      "name": "oBTC",
-      "address": "0xf349c0faa80fc1870306ac093f75934078e28991",
-      "startBlock": 12589485
-    },
-    {
-      "name": "bBTC",
-      "address": "0x5dce29e92b1b939f8e8c60dcf15bde82a85be4a9",
-      "startBlock": 12589485
-    },
-    {
-      "name": "zsDIGG",
-      "address": "0x608b6D82eb121F3e5C0baeeD32d81007B916E83C",
-      "startBlock": 12375910
-    },
-    {
-      "name": "tricrypto",
-      "address": "0xbe08ef12e4a553666291e9ffc24fccfd354f2dd2",
-      "startBlock": 12679976
-    },
-    {
-      "name": "renbtc",
-      "address": "0x58CAc1409F1ffbdcBA6a58d54c94CAC3fb4C6F8B",
-      "startBlock": 12870265
-    },
-    {
-      "name": "tricrypto2",
-      "address": "0x27E98fC7d05f54E544d16F58C194C2D7ba71e3B5",
-      "startBlock": 12679976
-    },
-    {
-      "name": "cvx",
-      "address": "0x53C8E199eb2Cb7c01543C137078a038937a68E40",
-      "startBlock": 12678302
-    },
-    {
-      "name": "cvxcrv",
-      "address": "0x2B5455aac8d64C14786c3a29858E43b5945819C0",
-      "startBlock": 12679976
+      "name": "StakingRewards",
+      "address": "0x0c79406977314847A9545B11783635432D7fe019",
+      "startBlock": 11380897
     }
   ]
 }
