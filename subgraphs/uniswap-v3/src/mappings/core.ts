@@ -3,8 +3,10 @@ import {
   Burn as BurnEvent,
   Initialize,
   Mint as MintEvent,
-  Swap as SwapEvent
+  Swap as SwapEvent,
+  SetFeeProtocol
 } from '../../generated/templates/Pool/Pool'
+import { getLiquidityPool, getLiquidityPoolFee } from '../common/getters'
 import {
   updatePrices,
   createDeposit,
@@ -21,6 +23,12 @@ export function handleInitialize(event: Initialize): void {
   log.warning("Hello3", [])
 }
 
+export function handleSetFeeProtocol(event: SetFeeProtocol): void {
+  // let pool = getLiquidityPool(event.address.toString())
+  // let protocolFee = getLiquidityPoolFee(pool.fees[1])
+  // protocolFee.feePercentage = 
+  // event.params.feeProtocol0New
+}
 
 export function handleMint(event: MintEvent): void {
   createDeposit(event, event.params.owner, event.params.amount0, event.params.amount1, event.params.amount)
