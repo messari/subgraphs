@@ -5,6 +5,13 @@
   "license": "MIT",
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.29.0",
-    "@graphprotocol/graph-ts": "^0.26.0"
+    "@graphprotocol/graph-ts": "^0.26.0",
+    "fs-extra": "^10.0.1",
+    "mustache": "^4.2.0",
+    "p-tap": "^3.1.0",
+    "vesper-metadata": "^2.57.0"
+  },
+  "scripts": {
+    "codegen": "graph codegen"
   }
 }

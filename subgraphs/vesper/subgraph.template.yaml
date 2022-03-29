@@ -1,0 +1,46 @@
+specVersion: 0.0.2
+description: Vesper subgraph.
+repository: https://github.com/vesperfi/vesper-subgraph
+schema:
+  file: ./schema.graphql
+dataSources:
+{{#pools}}
+  - kind: ethereum/contract
+    name: 'poolV{{version}}_{{name}}_{{address}}'
+    network: mainnet
+    source:
+      address: '{{address}}'
+      abi: PoolV{{version}}
+      startBlock: {{birthblock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - PoolQuery
+      # This lists all posible abis to be used for each data source
+      abis:
+        - name: PoolV{{version}}
+          file: ./abis/pool-v{{version}}.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
+        - name: Controller
+          file: ./abis/controller.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+      # this is used to calculate withdraw fees
+      eventHandlers:
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawFeeV{{version}}
+      # this is used to calculate interest fees
+        - event: {{interestFeeEvent}}
+          handler: handleInterestFeeV{{version}}
+      # this is used to calculate totalDebt and totalSupply values
+      blockHandlers:
+        - handler: handleBlockV{{version}}
+{{/pools}}
