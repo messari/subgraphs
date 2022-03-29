@@ -55,6 +55,9 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
   market.protocol = protocol;
 
   // add tokens
+  if (marketAddress == CETH_ADDRESS) {
+    underlyingAddress = ETH_ADDRESS;
+  }
   let inputTokens = new Array<string>();
   inputTokens.push(underlyingAddress);
   market.inputTokens = inputTokens;
@@ -169,12 +172,7 @@ export function getAmountUSD(market: Market, amount: BigInt, blockNumber: i32): 
         Address.fromString(underlyingAddress),
         underlyingDecimals,
       );
-
-      if (cTokenAddress == CUSDC_ADDRESS) {
-        tokenPrice = BIGDECIMAL_ONE;
-      } else {
-        tokenPrice = tokenPriceUSD.truncate(underlyingDecimals);
-      }
+      tokenPrice = tokenPriceUSD.truncate(underlyingDecimals);
     }
   } else {
     let usdPriceinInETH = getUSDCPriceETH(blockNumber);
