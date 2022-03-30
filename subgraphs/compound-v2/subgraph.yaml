@@ -53,6 +53,9 @@ dataSources:
         #   handler: handleNewMaxAssets
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
+      callHandlers:
+        - function: claimComp(address[],address[],bool,bool)
+          handler: handleClaimComp
 templates:
   - name: CToken
     kind: ethereum/contract

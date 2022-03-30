@@ -2,8 +2,38 @@
 
 ### TODO
 
-- calculate and add market calculations (see: https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/edit#gid=686701533)
+- Get prices working for cTokens
 - add calculations for daily snapshots
+- Figure out how/where to calculate/update:
+  - protocol.totalValueLockedUSD
+  - market.totalValueLockedUSD
+  - market.totalVolumeUSD
+  - market.inputTokenBalances
+  - market.outputTokenSupply
+  - market.outputTokenPriceUSD (easy once cToken Price Oracle)
+  - market.rewardTokenEmissionsAmount
+  - market.rewardTokenEmissionsUSD
+  - market.maximumLTV
+  - market.liquidationThreshold
+  - market.liquidationPenalty
+  - market.depositRate
+  - market.stableBorrowRate
+  - market.variableBorrowRate
+  - marketDailySnapshot.totalValueLockedUSD
+  - marketDailySnapshot.inputTokenBalances
+  - marketDailySnapshot.inputTokenPricesUSD
+  - marketDailySnapshot.outputTokenSupply
+  - marketDailySnapshot.outputTokenPriceUSD
+  - marketDailySnapshot.rewardTokenEmissionsAmount
+  - marketDailySnapshot.rewardTokenEmissionsUSD
+  - marketDailySnapshot.depositRate
+  - marketDailySnapshot.stableBorrowRate
+  - marketDailySnapshot.variableBorrowRate
+  - financialDailySnapshot.totalValueLockedUSD
+  - financialDailySnapshot.totalVolumeUSD
+  - financialDailySnapshot.supplySideRevenueUSD
+  - financialDailySnapshot.protocolSideRevenueUSD
+  - financialDailySnapshot.feesUSD
 - Test along the way
 - test making sure each var is what we want
 - test along dune tests to ensure accuracy

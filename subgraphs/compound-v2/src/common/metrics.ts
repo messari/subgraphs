@@ -7,14 +7,14 @@ import { SECONDS_PER_DAY } from "./utils/constants";
 
 // updates a given FinancialDailySnapshot Entity
 export function updateFinancials(event: ethereum.Event): void {
-    // let financialMetrics = getOrCreateFinancials(event);
-    // let protocol = getOrCreateDexAmm();
-    // // Update the block number and timestamp to that of the last transaction of that day
-    // financialMetrics.blockNumber = event.block.number;
-    // financialMetrics.timestamp = event.block.timestamp;
-    // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-    // ...
-    // financialMetrics.save();
+  // let financialMetrics = getOrCreateFinancials(event);
+  // let protocol = getOrCreateDexAmm();
+  // // Update the block number and timestamp to that of the last transaction of that day
+  // financialMetrics.blockNumber = event.block.number;
+  // financialMetrics.timestamp = event.block.timestamp;
+  // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  // ...
+  // financialMetrics.save();
 }
 
 // update a given UsageMetricDailySnapshot
@@ -52,19 +52,18 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetrics.save();
 }
 
-// update a given MarketDailySnapshot 
+// update a given MarketDailySnapshot
 export function updateMarketMetrics(event: ethereum.Event): void {
-    // get or create pool metrics
-    // let marketMetrics = getOrCreatePoolDailySnapshot(event);
-    // let pool = getLiquidityPool(event.address.toHexString());
-    // // Update the block number and timestamp to that of the last transaction of that day
-    // marketMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-    // marketMetrics.inputTokenBalances = pool.inputTokenBalances;
-    // marketMetrics.outputTokenSupply = pool.outputTokenSupply;
-    // marketMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    // marketMetrics.blockNumber = event.block.number;
-    // marketMetrics.timestamp = event.block.timestamp;
-    // ...
-    // marketMetrics.save();
+  // get or create pool metrics
+  // let marketMetrics = getOrCreatePoolDailySnapshot(event);
+  // let pool = getLiquidityPool(event.address.toHexString());
+  // // Update the block number and timestamp to that of the last transaction of that day
+  // marketMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  // marketMetrics.inputTokenBalances = pool.inputTokenBalances;
+  // marketMetrics.outputTokenSupply = pool.outputTokenSupply;
+  // marketMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  // marketMetrics.blockNumber = event.block.number;
+  // marketMetrics.timestamp = event.block.timestamp;
+  // ...
+  // marketMetrics.save();
 }
-

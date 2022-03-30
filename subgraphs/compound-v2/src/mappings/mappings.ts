@@ -11,12 +11,15 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   NewPriceOracle,
+  ClaimCompCall,
 } from "../types/Comptroller/Comptroller";
 
 import { CToken } from "../types/templates";
 import { AccrueInterest, NewMarketInterestRateModel, NewReserveFactor } from "../types/Comptroller/cToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
 import { getOrCreateLendingProtcol } from "../common/getters";
+import { Market } from "../types/schema";
+import { exponentToBigDecimal } from "../common/utils/utils";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.minter)) {
@@ -28,19 +31,25 @@ export function handleMint(event: Mint): void {
 
 export function handleRedeem(event: Redeem): void {
   if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount)) {
-    // TODO: more things to update
+    updateUsageMetrics(event, event.params.redeemer);
+    updateFinancials(event);
+    updateMarketMetrics(event);
   }
 }
 
 export function handleBorrow(event: Borrow): void {
   if (createBorrow(event, event.params.borrower, event.params.borrowAmount)) {
-    // TODO: more updates
+    updateUsageMetrics(event, event.params.borrower);
+    updateFinancials(event);
+    updateMarketMetrics(event);
   }
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
   if (createRepay(event, event.params.payer, event.params.repayAmount)) {
-    // TODO: more updates
+    updateUsageMetrics(event, event.params.payer);
+    updateFinancials(event);
+    updateMarketMetrics(event);
   }
 }
 
@@ -54,7 +63,9 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
       event.params.repayAmount,
     )
   ) {
-    // TODO: more updates
+    updateUsageMetrics(event, event.params.liquidator);
+    updateFinancials(event);
+    updateMarketMetrics(event);
   }
 }
 
@@ -75,7 +86,7 @@ export function handleMarketListed(event: MarketListed): void {
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   // create LendingProtocol - first function to be called in Comptroller
-  let lendingProtocol = getOrCreateLendingProtcol()
+  let lendingProtocol = getOrCreateLendingProtcol();
 
   lendingProtocol._priceOracle = event.params.newPriceOracle;
   lendingProtocol.save();
@@ -95,12 +106,19 @@ export function handleMarketExited(event: MarketExited): void {}
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {}
 
-export function handleNewCollateralFactor(event: NewCollateralFactor): void {}
+export function handleNewCollateralFactor(event: NewCollateralFactor): void {
+  // update LTV for a given market
+  let market = Market.load(event.params.cToken.toHexString());
+  if (market == null) {
+    return;
+  }
+  let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(18));
+  market.maximumLTV = newLTV;
+  market.save();
+}
 
 // export function handleNewMaxAssets(event: NewMaxAssets): void {}
 
 export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {}
-function updatePoolMetrics(event: Mint) {
-  throw new Error("Function not implemented.");
-}
 
+export function handleClaimComp(call: ClaimCompCall): void {}

@@ -1,31 +1,21 @@
 // helper functions for ./mappings.ts
 
-import { Token, Market, RewardToken, Deposit, Withdraw, Borrow, Repay, Liquidation } from "../types/schema";
+import { Token, Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
 
-import {
-  COMPTROLLER_ADDRESS,
-  ZERO_ADDRESS,
-  CCOMP_ADDRESS,
-  COMP_ADDRESS,
-  CETH_ADDRESS,
-} from "../common/utils/constants";
+import { COMPTROLLER_ADDRESS, ZERO_ADDRESS, COMP_ADDRESS, CETH_ADDRESS } from "../common/utils/constants";
 
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  REWARD_TOKEN_TYPE,
-  ETH_NAME,
-  ETH_SYMBOL,
-  DEFAULT_DECIMALS,
-  ETH_ADDRESS,
-  SAI_ADDRESS,
-} from "../common/utils/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, ETH_ADDRESS, SAI_ADDRESS } from "../common/utils/constants";
 
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { CToken } from "../types/Comptroller/cToken";
 import { getAmountUSD } from "../common/prices/prices";
-import { getAssetDecimals, getAssetName, getAssetSymbol } from "../common/utils/tokens";
-import { getOrCreateLendingProtcol } from "../common/getters";
+import {
+  getOrCreateCToken,
+  getOrCreateLendingProtcol,
+  getOrCreateRewardToken,
+  getOrCreateToken,
+} from "../common/getters";
+import { exchangecTokenForTokenAmount } from "../common/utils/utils";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -62,16 +52,16 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, sender: Add
   deposit.market = marketAddress.toHexString();
   deposit.asset = market.inputTokens[0];
   deposit.amount = amount;
-  deposit.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+  deposit.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
 
   deposit.save();
 
   // update TVL
   market.totalValueLockedUSD = market.totalValueLockedUSD.plus(deposit.amountUSD);
-  let protocol = getOrCreateLendingProtcol()
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(deposit.amountUSD)
-  market.save()
-  protocol.save()
+  let protocol = getOrCreateLendingProtcol();
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(deposit.amountUSD);
+  market.save();
+  protocol.save();
 
   // TODO: update token balances and supply
 
@@ -108,7 +98,7 @@ export function createWithdraw(event: ethereum.Event, redeemer: Address, amount:
   withdraw.market = marketAddress.toHexString();
   withdraw.asset = market.inputTokens[0];
   withdraw.amount = amount;
-  withdraw.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+  withdraw.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
 
   withdraw.save();
   return true;
@@ -147,7 +137,7 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.market = marketAddress.toHexString();
   borrow.asset = market.inputTokens[0];
   borrow.amount = amount;
-  borrow.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+  borrow.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
 
   borrow.save();
   return true;
@@ -183,15 +173,15 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.market = marketAddress.toHexString();
   repay.asset = market.inputTokens[0];
   repay.amount = amount;
-  repay.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
+  repay.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
 
   repay.save();
   return true;
 }
 
 // create Liquidation entity, return false if any markets are null
-// TODO: USD price calcs broken
-// TODO: price calcs for cTokens broken
+// TODO: verify logic
+// TODO: instead of exchanging cTokens to tokens calculate cToken Price
 export function createLiquidation(
   event: ethereum.Event,
   liquidatedToken: Address,
@@ -200,7 +190,7 @@ export function createLiquidation(
   repaidAmount: BigInt,
 ): bool {
   // grab and store market
-  let marketAddress = liquidatedToken;
+  let marketAddress = event.transaction.to!;
   let market = Market.load(marketAddress.toHexString());
   if (market == null) {
     log.error("Market {} does not exist", [marketAddress.toHexString()]);
@@ -229,20 +219,28 @@ export function createLiquidation(
   liquidation.blockNumber = blockNumber;
   liquidation.timestamp = event.block.timestamp;
   liquidation.market = marketAddress.toHexString();
-  let assetId = market.outputToken;
+
+  // get liquidated underlying address
+  let liquidatedMarket = Market.load(liquidatedToken.toHexString());
+  if (liquidatedMarket == null) {
+    return false;
+  }
+  let assetId = liquidatedMarket.inputTokens[0];
   if (assetId == null) {
     return false;
   }
-  liquidation.asset = assetId!;
-  liquidation.amount = liquidatedAmount;
-  liquidation.amountUSD = getAmountUSD(market, liquidatedAmount, blockNumber.toI32(), true);
+  liquidation.asset = assetId;
+
+  // calculate asset amount from siezeTokens (call exchangecTokenForTokenAmount)
+  let assetAmount = exchangecTokenForTokenAmount(liquidatedAmount, liquidatedToken);
+  if (assetAmount == BIGINT_ZERO) {
+    log.error("Exchange rate failed: returned 0", []);
+  }
+  liquidation.amount = assetAmount;
+  liquidation.amountUSD = getAmountUSD(liquidatedMarket, assetAmount, blockNumber.toI32());
 
   // calculate profit = (liquidatedAmountUSD - repaidAmountUSD)
-  let repayMarket = Market.load(event.transaction.to!.toHexString());
-  if (repayMarket == null) {
-    return false;
-  }
-  let costUSD = getAmountUSD(repayMarket, repaidAmount, blockNumber.toI32(), false);
+  let costUSD = getAmountUSD(market, repaidAmount, blockNumber.toI32());
   liquidation.profitUSD = liquidation.amountUSD!.minus(costUSD);
 
   liquidation.save();
@@ -265,36 +263,48 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
     underlyingAddress = underlying.value.toHexString();
   }
 
-  // create cToken/erc20 Tokens
-  createMarketTokens(marketAddress, underlyingAddress, cTokenContract);
+  // create Tokens
+  let inputToken: Token;
+  let rewardToken: RewardToken | null;
+  if (marketAddress == CETH_ADDRESS) {
+    inputToken = getOrCreateToken(Address.fromString(ETH_ADDRESS));
+    underlyingAddress = ETH_ADDRESS;
+  } else {
+    inputToken = getOrCreateToken(Address.fromString(underlyingAddress));
+  }
+  // COMP was not created until block 9601359
+  if (blockNumber.toI32() > 9601359) {
+    rewardToken = getOrCreateRewardToken(Address.fromString(COMP_ADDRESS));
+  } else {
+    rewardToken = null;
+  }
+
+  let outputToken = getOrCreateCToken(Address.fromString(marketAddress), cTokenContract);
 
   // populate market vars
   market.protocol = protocol;
 
   // add tokens
-  if (marketAddress == CETH_ADDRESS) {
-    underlyingAddress = ETH_ADDRESS;
-  }
   let inputTokens = new Array<string>();
-  inputTokens.push(underlyingAddress);
+  inputTokens.push(inputToken.id);
   market.inputTokens = inputTokens;
-  market.outputToken = marketAddress;
-  let rewardTokens = new Array<string>();
-  rewardTokens.push(COMP_ADDRESS);
-  market.rewardTokens = rewardTokens;
+  market.outputToken = outputToken.id;
+  if (rewardToken != null) {
+    let rewardTokens = new Array<string>();
+    rewardTokens.push(rewardToken.id);
+    market.rewardTokens = rewardTokens;
+  } else {
+    market.rewardTokens = [];
+  }
 
   // populate quantitative data
   market.totalValueLockedUSD = BIGDECIMAL_ZERO;
   market.totalVolumeUSD = BIGDECIMAL_ZERO;
-  let inputTokenBalances = new Array<BigInt>();
-  inputTokenBalances.push(BIGINT_ZERO);
-  market.inputTokenBalances = inputTokenBalances;
+  market.inputTokenBalances = [];
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.rewardTokenEmissionsAmount = inputTokenBalances;
-  let rewardEmissionsUSD = new Array<BigDecimal>();
-  rewardEmissionsUSD.push(BIGDECIMAL_ZERO);
-  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  market.rewardTokenEmissionsAmount = [];
+  market.rewardTokenEmissionsUSD = [];
   market.createdTimestamp = timestamp;
   market.createdBlockNumber = blockNumber;
 
@@ -323,42 +333,4 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
   market.variableBorrowRate = BIGDECIMAL_ZERO;
 
   return market;
-}
-
-// creates both tokens for a market pool token/cToken
-// TODO: maybe make a seperate function in getters
-export function createMarketTokens(marketAddress: string, underlyingAddress: string, cTokenContract: CToken): void {
-  // create underlying token
-  // TODO: fill in reward token once created on old markets?
-  if (marketAddress == CCOMP_ADDRESS) {
-    // create RewardToken COMP
-    let rewardToken = new RewardToken(underlyingAddress);
-    rewardToken.name = getAssetName(Address.fromString(underlyingAddress));
-    rewardToken.symbol = getAssetSymbol(Address.fromString(underlyingAddress));
-    rewardToken.decimals = getAssetDecimals(Address.fromString(underlyingAddress));
-    rewardToken.type = REWARD_TOKEN_TYPE;
-    rewardToken.save();
-  } else if (marketAddress == CETH_ADDRESS) {
-    // ETH has a unique makeup
-    let ethToken = new Token(ETH_ADDRESS);
-    ethToken.name = ETH_NAME;
-    ethToken.symbol = ETH_SYMBOL;
-    ethToken.decimals = DEFAULT_DECIMALS;
-    ethToken.save();
-  } else {
-    // create ERC20 Token normally
-    let token = new Token(underlyingAddress);
-
-    token.name = getAssetName(Address.fromString(underlyingAddress));
-    token.symbol = getAssetSymbol(Address.fromString(underlyingAddress));
-    token.decimals = getAssetDecimals(Address.fromString(underlyingAddress));
-    token.save();
-  }
-
-  // create pool token (ie, cToken)
-  let cToken = new Token(marketAddress);
-  cToken.name = cTokenContract.name();
-  cToken.symbol = cTokenContract.symbol();
-  cToken.decimals = cTokenContract.decimals();
-  cToken.save();
 }

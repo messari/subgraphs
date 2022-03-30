@@ -1,5 +1,7 @@
 // store common calculations
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { CToken } from "../../types/templates/CToken/CToken";
+import { BIGINT_ZERO } from "./constants";
 
 // turn exponent into a BigDecimal number
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
@@ -8,4 +10,12 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
     bigDecimal = bigDecimal.times(BigDecimal.fromString("10"));
   }
   return bigDecimal;
+}
+
+// get the amount in underlying token from cToken
+export function exchangecTokenForTokenAmount(amount: BigInt, marketAddress: Address): BigInt {
+  let cTokenContract = CToken.bind(marketAddress);
+  let tryExchangeRate = cTokenContract.try_exchangeRateCurrent();
+  let exchangedAmount = tryExchangeRate.reverted ? BIGINT_ZERO : amount.div(tryExchangeRate.value);
+  return exchangedAmount;
 }

@@ -9,6 +9,8 @@ import {
   USDC_DECIMALS,
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
+  CUSDT_ADDRESS,
+  CTUSD_ADDRESS,
 } from "../../common/utils/constants";
 
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
@@ -18,21 +20,9 @@ import { exponentToBigDecimal } from "../utils/utils";
 
 // returns the usd price of the amount of the underlying asset in market
 // TODO: hardcode stablecoins: https://compound.finance/docs/prices#architecture
-export function getAmountUSD(
-  market: Market,
-  amount: BigInt,
-  blockNumber: i32,
-  cToken: bool, // if true we want the value of the cToken in the market
-): BigDecimal {
+export function getAmountUSD(market: Market, amount: BigInt, blockNumber: i32): BigDecimal {
   let cTokenAddress = market.id;
-  let getToken: Token | null;
-  if (cToken) {
-    // we want value of cToken of market
-    getToken = Token.load(market.outputToken!);
-  } else {
-    // we want value of underlyingToken of market
-    getToken = Token.load(market.inputTokens[0]);
-  }
+  let getToken = Token.load(market.inputTokens[0]);
   if (getToken == null) {
     log.error("Couldn't find input token for market {}", [market.id]);
     return BIGDECIMAL_ZERO;
@@ -70,7 +60,7 @@ export function getAmountUSD(
         getTokenDecimals,
       );
       let underlyingPrice = tokenPriceETH.truncate(getTokenDecimals);
-      if (cTokenAddress == CUSDC_ADDRESS) {
+      if (cTokenAddress == CUSDC_ADDRESS || cTokenAddress == CUSDT_ADDRESS || cTokenAddress == CTUSD_ADDRESS) {
         tokenPrice = BIGDECIMAL_ONE;
       } else {
         tokenPrice = underlyingPrice.div(usdPriceinInETH).truncate(getTokenDecimals);
@@ -80,14 +70,14 @@ export function getAmountUSD(
   log.info("Token {} costs ${} at block {}", [getTokenAddress, tokenPrice.toString(), blockNumber.toString()]);
 
   // update market outputTokenPrice
-  market.outputTokenPriceUSD = tokenPrice
-  market.save()
+  market.outputTokenPriceUSD = tokenPrice;
+  market.save();
 
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(getTokenDecimals));
   return tokenPrice.times(decimalAmount);
 }
 
-// get usd price of cerc20 tokens (NOT eth)
+// get usd price of underlying tokens (NOT eth)
 // TODO: still not accurate i think
 export function getTokenPrice(
   blockNumber: i32,

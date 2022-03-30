@@ -33,7 +33,7 @@ export namespace ProtocolType {
 
 export namespace LendingType {
   export const CDP = "CDP";
-  export const POOLED = "POOLED"
+  export const POOLED = "POOLED";
 }
 
 export namespace RiskType {
@@ -61,6 +61,8 @@ export const CUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
 export const CETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
 export const COMP_ADDRESS = "0xc00e94cb662c3520282e6f5717214004a7f26888";
 export const CCOMP_ADDRESS = "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4";
+export const CUSDT_ADDRESS = "0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9";
+export const CTUSD_ADDRESS = "0x12392f67bdf24fae0af363c24ac620a2f67dad86";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -111,6 +113,6 @@ export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is acc
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
 export const REWARD_TOKEN_TYPE = RewardTokenType.DEPOSIT; // TODO: check - seems like both
-export const SUBGRAPH_VERSION = "1.3.2";
+export const SUBGRAPH_VERSION = "1.3.4";
 export const SCHEMA_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
