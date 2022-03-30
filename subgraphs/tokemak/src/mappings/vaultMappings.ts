@@ -22,6 +22,7 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_MAX,
   BIGINT_ONE,
+  BIGINT_TEN,
   BIGINT_ZERO,
   ETH_MAINNET_MANAGER_ADDRESS,
   PROTOCOL_ID,
@@ -77,7 +78,7 @@ function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, 
   vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount)];
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
 
-  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(token, BIGINT_ONE));
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(token, BIGINT_TEN.pow(u8(token.decimals))));
 
   vault.save();
 
@@ -108,7 +109,7 @@ function withdraw(call: ethereum.Call, vault: VaultStore, withdrawAmount: BigInt
   vault.totalValueLockedUSD = normalizedUsdcPrice(usdcPrice(token, tvl));
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
 
-  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(token, BIGINT_ONE));
+  vault.outputTokenPriceUSD = normalizedUsdcPrice(usdcPrice(token, BIGINT_TEN.pow(u8(token.decimals))));
 
   vault.inputTokenBalances = [tvl];
   vault.save();
