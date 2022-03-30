@@ -16,44 +16,7 @@ import {
   RemoveDVM
 } from "../generated/DVMFactory/DVMFactory";
 
-import {
-  DODOLpToken,
-  Approval,
-  Burn,
-  Mint,
-  OwnershipTransferPrepared,
-  OwnershipTransferred,
-  Transfer
-} from "../generated/DODOLpToken/DODOLpToken";
-
-import {
-  vDODOToken,
-  Approval,
-  ChangePerReward,
-  DonateDODO,
-  MintVDODO,
-  PreDeposit,
-  OwnershipTransferPrepared,
-  OwnershipTransferred,
-  RedeemVDODO,
-  SetCantransfer,
-  Transfer,
-  UpdateDODOFeeBurnRatio
-} from "../generated/vDODOToken/vDODOToken";
-
-import {
-  DVM,
-  BuyShares,
-  SellShares,
-  DODOSwap,
-  DODOFlashLoan,
-  Transfer,
-  Approval,
-  Mint,
-  Burn
-} from "../generated/templates/DVM/DVM";
-
-import { ERC20, Transfer, Approval } from "../generated/templates/ERC20/ERC20";
+import { ERC20 } from "../generated/templates/ERC20/ERC20";
 
 import {
   DexAmmProtocol,
@@ -146,6 +109,7 @@ export function handleNewDVM(event: NewDVM): void {
 }
 
 export function handleRemoveDVM(event: RemoveDVM): void {
-  let dodo = DexAmmProtocol.load(event.address.toHex());
-  let pool = LiquidityPool.load(event.params.dvm.toHex());
+  // let pool = LiquidityPool.load(event.params.dvm.toHex());
+  //
+  // pool.remove();
 }
