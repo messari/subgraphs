@@ -4,6 +4,7 @@ import { CalculationsCurve as CalculationsCurveContract } from "../../generated/
 import { CalculationsSushiSwap as CalculationsSushiSwapContract } from "../../generated/templates/Vault/CalculationsSushiSwap";
 import { Token } from "../../generated/schema";
 import {
+  BIGINT_TEN,
   BIGINT_ZERO,
   ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS,
   ETH_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
@@ -57,7 +58,7 @@ export function normalizedUsdcPrice(usdcPrice: BigInt): BigDecimal {
 
 export function usdcPrice(token: Token, tokenAmount: BigInt): BigInt {
   let tokenAddress = Address.fromString(token.id);
-  let decimals = BigInt.fromI32(token.decimals);
+  let decimals = BIGINT_TEN.pow(u8(token.decimals));
   let oracleCalculatorPrice = getTokenPriceFromOracle(tokenAddress, tokenAmount);
   if (oracleCalculatorPrice.notEqual(BIGINT_ZERO)) {
     return oracleCalculatorPrice;

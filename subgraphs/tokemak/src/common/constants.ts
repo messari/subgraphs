@@ -56,8 +56,9 @@ export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
-export let BIGINT_THOUSAND = BigInt.fromI32(1000);
+export let BIGINT_TEN = BigInt.fromI32(10);
 export let BIGINT_HUNDRED = BigInt.fromI32(100);
+export let BIGINT_THOUSAND = BigInt.fromI32(1000);
 export let BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
