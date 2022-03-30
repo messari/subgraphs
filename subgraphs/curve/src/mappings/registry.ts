@@ -7,21 +7,24 @@ import {
   Deploy_plain_pool2Call,
 } from "../../generated/Factory/Factory";
 
-import { PoolLPToken as PoolDataSource } from "../../generated/templates";
+import { StableSwapLending2 as Pool } from "../../generated/templates";
 import {
   CreatePoolFromFactory,
   getOrCreateBasePool,
-} from "../helpers/pool";
+} from "../helpers/pools/createPool";
+import { getOrCreateProtocol } from "../utils/common";
 import { PoolType } from "../utils/constant";
 
 // Call handlers
 export function handleBasePoolAdded(event: BasePoolAdded): void {
   let basePoolAddress = event.params.base_pool;
 
+  getOrCreateProtocol()
+
   // Create a new pool
   getOrCreateBasePool(basePoolAddress);
 
-  PoolDataSource.create(basePoolAddress);
+  Pool.create(basePoolAddress);
 }
 export function handleDeployMetaPool(call: Deploy_metapoolCall): void {
   let A = call.inputs._A;
@@ -32,10 +35,12 @@ export function handleDeployMetaPool(call: Deploy_metapoolCall): void {
   let symbol = call.inputs._symbol;
   let poolAddress = call.outputs.value0;
 
+  getOrCreateProtocol()
+
   // Create a new pool
   CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.META);
 
-  PoolDataSource.create(poolAddress);
+  Pool.create(poolAddress);
 }
 
 export function handleDeployMetaPool1(call: Deploy_metapool1Call): void {
@@ -47,10 +52,12 @@ export function handleDeployMetaPool1(call: Deploy_metapool1Call): void {
   let symbol = call.inputs._symbol;
   let poolAddress = call.outputs.value0;
 
+  getOrCreateProtocol()
+
   // Create a new pool
   CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.META);
 
-  PoolDataSource.create(poolAddress);
+  Pool.create(poolAddress);
 }
 
 export function handleDeployPlainPool(call: Deploy_plain_poolCall): void {
@@ -61,10 +68,12 @@ export function handleDeployPlainPool(call: Deploy_plain_poolCall): void {
   let fee = call.inputs._fee;
   let poolAddress = call.outputs.value0;
 
+  getOrCreateProtocol()
+
   // Create a new pool
   CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.PLAIN);
 
-  PoolDataSource.create(poolAddress);
+  Pool.create(poolAddress);
 }
 
 export function handleDeployPlainPool1(call: Deploy_plain_pool1Call): void {
@@ -76,10 +85,12 @@ export function handleDeployPlainPool1(call: Deploy_plain_pool1Call): void {
   let symbol = call.inputs._symbol;
   let poolAddress = call.outputs.value0;
 
+  getOrCreateProtocol()
+
   // Create a new pool
   CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.PLAIN);
 
-  PoolDataSource.create(poolAddress);
+  Pool.create(poolAddress);
 }
 
 export function handleDeployPlainPool2(call: Deploy_plain_pool2Call): void {
@@ -91,9 +102,11 @@ export function handleDeployPlainPool2(call: Deploy_plain_pool2Call): void {
   let symbol = call.inputs._symbol;
   let poolAddress = call.outputs.value0;
 
+  getOrCreateProtocol()
+
   // Create a new pool
   CreatePoolFromFactory(call, poolAddress, name, symbol, PoolType.PLAIN);
 
-  PoolDataSource.create(poolAddress);
+  Pool.create(poolAddress);
 }
 

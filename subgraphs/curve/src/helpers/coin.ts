@@ -2,38 +2,35 @@ import { Address, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 import { Registry } from "../../generated/Factory/Registry";
 import { Coin, LiquidityPool, UnderlyingCoin } from "../../generated/schema";
+import { getOrCreateProtocol } from "../utils/common";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   getOrNull,
+  REGISTRY_ADDRESS,
   toDecimal,
 } from "../utils/constant";
 import { getOrCreateToken } from "../utils/tokens";
 
 export function saveCoin(
   pool: LiquidityPool,
+  coins: Address[],
+  underlyingCoins: Address[],
+  balances: BigInt[],
   timestamp: BigInt,
   blockNumber: BigInt,
   transactionhash: Bytes
 ): void {
-  let factoryContract = Factory.bind(Address.fromBytes(pool._factoryAddress));
-  let registryContract = Registry.bind(Address.fromBytes(pool._swapAddress));
-
-  let coins = getOrNull<Address[]>(
-    factoryContract.try_get_coins(Address.fromBytes(pool._swapAddress))
-  );
-  let underlyingCoins = getOrNull<Address[]>(
-    factoryContract.try_get_underlying_coins(Address.fromBytes(pool._swapAddress))
-  );
+  let protocol = getOrCreateProtocol();
+  let factoryContract = Factory.bind(Address.fromString(protocol.id))
+  let registryContract = Registry.bind(Address.fromString(REGISTRY_ADDRESS));
 
   if (coins) {
     log.info("Success: Coins {} found for pool {}", [coins.toString(), pool.id])
-    let balances = getOrNull<BigInt[]>(
-      factoryContract.try_get_balances(Address.fromBytes(pool._swapAddress))
-    );
+    
     let rates = getOrNull<BigInt[]>(
-      registryContract.try_get_rates(Address.fromBytes(pool._swapAddress))
+      registryContract.try_get_rates(Address.fromString(pool.id))
     );
 
     for (let i = 0, count = pool._coinCount.toI32(); i < count; ++i) {
@@ -47,9 +44,7 @@ export function saveCoin(
         coin.pool = pool.id;
         coin.token = token.id;
         coin.underlying = coin.id;
-        coin.balance = balances
-          ? balances[i]
-          : BIGINT_ZERO;
+        coin.balance = balances[i]
         coin.rate = rates
           ? toDecimal(rates[i], DEFAULT_DECIMALS)
           : BIGDECIMAL_ZERO;
@@ -64,12 +59,12 @@ export function saveCoin(
       log.info("Coin {} found for pool {}", [coins[i].toHexString(), pool.id])
     }
   }
-  log.warning("Error: Coins for pool {} not found", [pool._swapAddress.toHexString()])
+  log.warning("Error: Coins for pool {} not found", [pool.id])
 
   if (underlyingCoins) {
     log.info("Success: Underlying Coins {} found for pool {}", [underlyingCoins.toString(), pool.id])
     let getBalances = factoryContract.try_get_underlying_balances(
-      Address.fromBytes(pool._swapAddress)
+      Address.fromString(pool.id)
     );
     let balances: BigInt[] = getBalances.reverted ? [] : getBalances.value;
 
@@ -94,6 +89,6 @@ export function saveCoin(
       }
     }
   }
-  log.warning("Error: Underlyng Coins for pool {} not found", [pool._swapAddress.toHexString()])
+  log.warning("Error: Underlying Coins for pool {} not found", [pool.id])
 }
 

@@ -1601,70 +1601,43 @@ dataSources:
           handler: handleRemoveLiquidityOneTriCryptoCall
       file: ./src/mappings/pool.ts
 
+        
 templates:
-  - kind: ethereum/contract
-    name: PoolLPToken
+  - name: StableSwapLending2
+    kind: ethereum/contract
     network: mainnet
     source:
-      abi: ERC20
+      abi: StableSwapLending2
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      entities: []
+      file: ./src/mappings/pool.ts
+      entities: [ ]
       abis:
-        - name: StableSwapLending2_v1
-          file: ./abis/StableSwapLending2_v1.json
-        - name: StableSwapLending4_v1
-          file: ./abis/StableSwapLending4_v1.json
-        - name: StableSwapPlain3
-          file: ./abis/StableSwapPlain3.json
-        - name: StableSwapLending3
-          file: ./abis/StableSwapLending3.json
+        - name: StableSwapLending2
+          file: ./abis/StableSwapLending2.json
+        - name: Registry
+          file: ./abis/Registry.json
+        - name: Factory
+          file: ./abis/Factory.json
         - name: ERC20
           file: ./abis/IERC20.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/mappings/pool.ts
-        
-# templates:
-#   - name: StableSwapLending2
-#     kind: ethereum/contract
-#     network: mainnet
-#     source:
-#       abi: StableSwapLending2
-#     mapping:
-#       kind: ethereum/events
-#       apiVersion: 0.0.5
-#       language: wasm/assemblyscript
-#       file: ./src/mappings/pool.ts
-#       entities: [ ]
-#       abis:
-#         - name: StableSwapLending2
-#           file: ./abis/StableSwapLending2.json
-#         - name: Registry
-#           file: ./abis/Registry.json
-#         - name: Factory
-#           file: ./abis/Factory.json
-#         - name: ERC20
-#           file: ./abis/IERC20.json
-#         - name: Oracle
-#           file: ./abis/Oracle.json
-#       - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
-#           handler: handleTokenExchange
-#         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
-#           handler: handleTokenExchange
-#         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
-#           handler: handleAddLiquidity
-#         - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
-#           handler: handleRemoveLiquidity
-#         - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
-#           handler: handleRemoveLiquidityImbalance
-#         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
-#           handler: handleRemoveLiquidityOne
-#       callHandlers:
-#         - function: remove_liquidity_one_coin(uint256,int128,uint256)
-#           handler: handleRemoveLiquidityOneCall
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,int128,uint256)
+          handler: handleRemoveLiquidityOneCall
 
   

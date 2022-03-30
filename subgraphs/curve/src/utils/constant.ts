@@ -1,4 +1,10 @@
-import { ethereum, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
+import {
+  ethereum,
+  BigDecimal,
+  BigInt,
+  TypedMap,
+  Address,
+} from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -51,7 +57,6 @@ export function toDecimal(value: BigInt, decimals: u32): BigDecimal {
   return value.divDecimal(precision);
 }
 
-
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const ETH_TOKEN_ADDRESS = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export const REGISTRY_ADDRESS = "0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5";
@@ -78,6 +83,12 @@ export let MS_PER_YEAR = DAYS_PER_YEAR.times(
 );
 
 ////////////
+
+export class PoolInfo {
+  coins: Address[];
+  underlyingCoins: Address[];
+  balances: BigInt[];
+}
 
 // for some contracts it's not possible to get LP token address or coin count
 // from pool contract, so static mapping is defined here
@@ -182,18 +193,34 @@ export const LINKUSD_LP_TOKEN = "0x6d65b498cb23deaba52db31c93da9bffb340fb8f";
 export const TRICRYPTO_POOL = "0x80466c64868e1ab14a1ddf27a676c3fcbe638fe5";
 export const TRICRYPTO_LP_TOKEN = "0xca3d75ac011bf5ad07a98d02f18225f9bd9a6bdf";
 export const TRICRYPTO_2_POOL = "0xd51a44d3fae010294c616388b506acda1bfaae46";
-export const TRICRYPTO_2_LP_TOKEN = "0xc4ad29ba4b3c580e6d59105fff484999997675ff";
+export const TRICRYPTO_2_LP_TOKEN =
+  "0xc4ad29ba4b3c580e6d59105fff484999997675ff";
 
 export let addressToPool = new TypedMap<string, PoolStaticInfo>();
 addressToPool.set(
   TRIPOOL_POOL,
   new PoolStaticInfo(TRIPOOL_POOL, TRIPOOL_LP_TOKEN, 3, "PLAIN", false, [])
 );
-addressToPool.set(AAVE_POOL, new PoolStaticInfo(AAVE_POOL, AAVE_LP_TOKEN, 3, "LENDING", false, []));
-addressToPool.set(Y_POOL, new PoolStaticInfo(Y_POOL, Y_LP_TOKEN, 4, "LENDING", true, []));
-addressToPool.set(SUSD_POOL, new PoolStaticInfo(SUSD_POOL, SUSD_LP_TOKEN, 4, "LENDING", true, []));
-addressToPool.set(BUSD_POOL, new PoolStaticInfo(BUSD_POOL, BUSD_LP_TOKEN, 4, "LENDING", true, []));
-addressToPool.set(PAX_POOL, new PoolStaticInfo(PAX_POOL, PAX_LP_TOKEN, 4, "LENDING", true, []));
+addressToPool.set(
+  AAVE_POOL,
+  new PoolStaticInfo(AAVE_POOL, AAVE_LP_TOKEN, 3, "LENDING", false, [])
+);
+addressToPool.set(
+  Y_POOL,
+  new PoolStaticInfo(Y_POOL, Y_LP_TOKEN, 4, "LENDING", true, [])
+);
+addressToPool.set(
+  SUSD_POOL,
+  new PoolStaticInfo(SUSD_POOL, SUSD_LP_TOKEN, 4, "LENDING", true, [])
+);
+addressToPool.set(
+  BUSD_POOL,
+  new PoolStaticInfo(BUSD_POOL, BUSD_LP_TOKEN, 4, "LENDING", true, [])
+);
+addressToPool.set(
+  PAX_POOL,
+  new PoolStaticInfo(PAX_POOL, PAX_LP_TOKEN, 4, "LENDING", true, [])
+);
 addressToPool.set(
   COMPOUND_POOL,
   new PoolStaticInfo(COMPOUND_POOL, COMPOUND_LP_TOKEN, 2, "LENDING", true, [])
@@ -202,35 +229,98 @@ addressToPool.set(
   IRONBANK_POOL,
   new PoolStaticInfo(IRONBANK_POOL, IRONBANK_LP_TOKEN, 3, "LENDING", false, [])
 );
-addressToPool.set(HUSD_POOL, new PoolStaticInfo(HUSD_POOL, HUSD_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(USDK_POOL, new PoolStaticInfo(USDK_POOL, USDK_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(MUSD_POOL, new PoolStaticInfo(MUSD_POOL, MUSD_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(USDP_POOL, new PoolStaticInfo(USDP_POOL, USDP_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(DUSD_POOL, new PoolStaticInfo(DUSD_POOL, DUSD_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(RSV_POOL, new PoolStaticInfo(RSV_POOL, RSV_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(UST_POOL, new PoolStaticInfo(UST_POOL, UST_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(GUSD_POOL, new PoolStaticInfo(GUSD_POOL, GUSD_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(USDN_POOL, new PoolStaticInfo(USDN_POOL, USDN_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(EURS_POOL, new PoolStaticInfo(EURS_POOL, EURS_LP_TOKEN, 2, "PLAIN", false, []));
-addressToPool.set(REN_POOL, new PoolStaticInfo(REN_POOL, REN_LP_TOKEN, 2, "PLAIN", true, []));
-addressToPool.set(HBTC_POOL, new PoolStaticInfo(HBTC_POOL, HBTC_LP_TOKEN, 2, "PLAIN", false, []));
-addressToPool.set(SBTC_POOL, new PoolStaticInfo(SBTC_POOL, SBTC_LP_TOKEN, 3, "PLAIN", true, []));
-addressToPool.set(OBTC_POOL, new PoolStaticInfo(OBTC_POOL, OBTC_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(BBTC_POOL, new PoolStaticInfo(BBTC_POOL, BBTC_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(PBTC_POOL, new PoolStaticInfo(PBTC_POOL, PBTC_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(TBTC_POOL, new PoolStaticInfo(TBTC_POOL, TBTC_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(LUSD_POOL, new PoolStaticInfo(LUSD_POOL, LUSD_LP_TOKEN, 2, "META", false, []));
-addressToPool.set(FRAX_POOL, new PoolStaticInfo(FRAX_POOL, FRAX_LP_TOKEN, 2, "META", false, []));
+addressToPool.set(
+  HUSD_POOL,
+  new PoolStaticInfo(HUSD_POOL, HUSD_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  USDK_POOL,
+  new PoolStaticInfo(USDK_POOL, USDK_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  MUSD_POOL,
+  new PoolStaticInfo(MUSD_POOL, MUSD_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  USDP_POOL,
+  new PoolStaticInfo(USDP_POOL, USDP_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  DUSD_POOL,
+  new PoolStaticInfo(DUSD_POOL, DUSD_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  RSV_POOL,
+  new PoolStaticInfo(RSV_POOL, RSV_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  UST_POOL,
+  new PoolStaticInfo(UST_POOL, UST_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  GUSD_POOL,
+  new PoolStaticInfo(GUSD_POOL, GUSD_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  USDN_POOL,
+  new PoolStaticInfo(USDN_POOL, USDN_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  EURS_POOL,
+  new PoolStaticInfo(EURS_POOL, EURS_LP_TOKEN, 2, "PLAIN", false, [])
+);
+addressToPool.set(
+  REN_POOL,
+  new PoolStaticInfo(REN_POOL, REN_LP_TOKEN, 2, "PLAIN", true, [])
+);
+addressToPool.set(
+  HBTC_POOL,
+  new PoolStaticInfo(HBTC_POOL, HBTC_LP_TOKEN, 2, "PLAIN", false, [])
+);
+addressToPool.set(
+  SBTC_POOL,
+  new PoolStaticInfo(SBTC_POOL, SBTC_LP_TOKEN, 3, "PLAIN", true, [])
+);
+addressToPool.set(
+  OBTC_POOL,
+  new PoolStaticInfo(OBTC_POOL, OBTC_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  BBTC_POOL,
+  new PoolStaticInfo(BBTC_POOL, BBTC_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  PBTC_POOL,
+  new PoolStaticInfo(PBTC_POOL, PBTC_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  TBTC_POOL,
+  new PoolStaticInfo(TBTC_POOL, TBTC_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  LUSD_POOL,
+  new PoolStaticInfo(LUSD_POOL, LUSD_LP_TOKEN, 2, "META", false, [])
+);
+addressToPool.set(
+  FRAX_POOL,
+  new PoolStaticInfo(FRAX_POOL, FRAX_LP_TOKEN, 2, "META", false, [])
+);
 addressToPool.set(
   BUSDv2_POOL,
   new PoolStaticInfo(BUSDv2_POOL, BUSDv2_LP_TOKEN, 2, "META", false, [])
 );
-addressToPool.set(ALUSD_POOL, new PoolStaticInfo(ALUSD_POOL, ALUSD_LP_TOKEN, 2, "META", false, []));
+addressToPool.set(
+  ALUSD_POOL,
+  new PoolStaticInfo(ALUSD_POOL, ALUSD_LP_TOKEN, 2, "META", false, [])
+);
 addressToPool.set(
   SAAVE_POOL,
   new PoolStaticInfo(SAAVE_POOL, SAAVE_LP_TOKEN, 2, "LENDING", false, [])
 );
-addressToPool.set(SETH_POOL, new PoolStaticInfo(SETH_POOL, SETH_LP_TOKEN, 2, "PLAIN", false, []));
+addressToPool.set(
+  SETH_POOL,
+  new PoolStaticInfo(SETH_POOL, SETH_LP_TOKEN, 2, "PLAIN", false, [])
+);
 addressToPool.set(
   STETH_POOL,
   new PoolStaticInfo(STETH_POOL, STETH_LP_TOKEN, 2, "PLAIN", false, [])
@@ -239,8 +329,14 @@ addressToPool.set(
   ANKRETH_POOL,
   new PoolStaticInfo(ANKRETH_POOL, ANKRETH_LP_TOKEN, 2, "PLAIN", false, [])
 );
-addressToPool.set(RETH_POOL, new PoolStaticInfo(RETH_POOL, RETH_LP_TOKEN, 2, "PLAIN", false, []));
-addressToPool.set(LINK_POOL, new PoolStaticInfo(LINK_POOL, LINK_LP_TOKEN, 2, "PLAIN", false, []));
+addressToPool.set(
+  RETH_POOL,
+  new PoolStaticInfo(RETH_POOL, RETH_LP_TOKEN, 2, "PLAIN", false, [])
+);
+addressToPool.set(
+  LINK_POOL,
+  new PoolStaticInfo(LINK_POOL, LINK_LP_TOKEN, 2, "PLAIN", false, [])
+);
 addressToPool.set(
   LINKUSD_POOL,
   new PoolStaticInfo(LINKUSD_POOL, LINKUSD_LP_TOKEN, 2, "META", false, [])
@@ -251,7 +347,14 @@ addressToPool.set(
 );
 addressToPool.set(
   TRICRYPTO_2_POOL,
-  new PoolStaticInfo(TRICRYPTO_2_POOL, TRICRYPTO_2_LP_TOKEN, 3, "PLAIN", false, [])
+  new PoolStaticInfo(
+    TRICRYPTO_2_POOL,
+    TRICRYPTO_2_LP_TOKEN,
+    3,
+    "PLAIN",
+    false,
+    []
+  )
 );
 
 export let lpTokenToPool = new TypedMap<string, string>();
