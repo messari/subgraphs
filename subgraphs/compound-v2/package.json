@@ -1,6 +1,6 @@
 {
   "name": "compound",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "version": "1.0.0",
   "repository": "https://github.com/messari/subgraphs/blob/master/subgraphs/compound-v2",
   "scripts": {

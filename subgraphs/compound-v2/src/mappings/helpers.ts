@@ -25,6 +25,7 @@ import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph
 import { CToken } from "../types/Comptroller/cToken";
 import { getAmountUSD } from "../common/prices/prices";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "../common/utils/tokens";
+import { getOrCreateLendingProtcol } from "../common/getters";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -64,6 +65,16 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, sender: Add
   deposit.amountUSD = getAmountUSD(market, amount, blockNumber.toI32(), false);
 
   deposit.save();
+
+  // update TVL
+  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(deposit.amountUSD);
+  let protocol = getOrCreateLendingProtcol()
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(deposit.amountUSD)
+  market.save()
+  protocol.save()
+
+  // TODO: update token balances and supply
+
   return true;
 }
 
@@ -179,7 +190,8 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
 }
 
 // create Liquidation entity, return false if any markets are null
-// TODO: ensure this is correct
+// TODO: USD price calcs broken
+// TODO: price calcs for cTokens broken
 export function createLiquidation(
   event: ethereum.Event,
   liquidatedToken: Address,
@@ -297,7 +309,6 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
       market.name = inputToken.name;
     }
   }
-
   market.isActive = true;
   market.canUseAsCollateral = false; // until Collateral is taken out
   market.canBorrowFrom = false; // until Borrowed from

@@ -1,17 +1,4 @@
 // map blockchain data to entities outlined in schema.graphql
-
-import {
-  LENDING_TYPE,
-  NETWORK_ETHEREUM,
-  PROTOCOL_NAME,
-  PROTOCOL_RISK_TYPE,
-  PROTOCOL_SLUG,
-  PROTOCOL_TYPE,
-  SUBGRAPH_VERSION,
-  SCHEMA_VERSION,
-  BIGDECIMAL_ZERO,
-} from "../common/utils/constants";
-
 import { createBorrow, createDeposit, createLiquidation, createMarket, createRepay, createWithdraw } from "./helpers";
 
 import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow, Transfer } from "../types/templates/cToken/CToken";
@@ -26,13 +13,16 @@ import {
   NewPriceOracle,
 } from "../types/Comptroller/Comptroller";
 
-import { LendingProtocol } from "../types/schema";
 import { CToken } from "../types/templates";
 import { AccrueInterest, NewMarketInterestRateModel, NewReserveFactor } from "../types/Comptroller/cToken";
+import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
+import { getOrCreateLendingProtcol } from "../common/getters";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.minter)) {
-    // TODO: continue to handle usage metrics, financials, and market updates
+    updateUsageMetrics(event, event.params.minter);
+    updateFinancials(event);
+    updateMarketMetrics(event);
   }
 }
 
@@ -85,21 +75,7 @@ export function handleMarketListed(event: MarketListed): void {
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   // create LendingProtocol - first function to be called in Comptroller
-  let lendingProtocol = LendingProtocol.load(event.address.toHexString()); // TODO: check this id
-
-  if (lendingProtocol == null) {
-    lendingProtocol = new LendingProtocol(event.address.toHexString());
-    lendingProtocol.name = PROTOCOL_NAME;
-    lendingProtocol.slug = PROTOCOL_SLUG;
-    lendingProtocol.schemaVersion = SCHEMA_VERSION;
-    lendingProtocol.subgraphVersion = SUBGRAPH_VERSION;
-    lendingProtocol.network = NETWORK_ETHEREUM;
-    lendingProtocol.type = PROTOCOL_TYPE;
-    lendingProtocol.totalUniqueUsers = 0 as i32;
-    lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.lendingType = LENDING_TYPE;
-    lendingProtocol.riskType = PROTOCOL_RISK_TYPE;
-  }
+  let lendingProtocol = getOrCreateLendingProtcol()
 
   lendingProtocol._priceOracle = event.params.newPriceOracle;
   lendingProtocol.save();
@@ -124,3 +100,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {}
 // export function handleNewMaxAssets(event: NewMaxAssets): void {}
 
 export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {}
+function updatePoolMetrics(event: Mint) {
+  throw new Error("Function not implemented.");
+}
+

@@ -78,6 +78,10 @@ export function getAmountUSD(
   }
   log.info("Token {} costs ${} at block {}", [getTokenAddress, tokenPrice.toString(), blockNumber.toString()]);
 
+  // update market outputTokenPrice
+  market.outputTokenPriceUSD = tokenPrice
+  market.save()
+
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(getTokenDecimals));
   return tokenPrice.times(decimalAmount);
 }

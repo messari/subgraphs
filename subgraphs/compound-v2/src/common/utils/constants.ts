@@ -31,18 +31,14 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
-export namespace VaultFeeType {
-  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
-  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
-  export const DEPOSIT_FEE = "DEPOSIT_FEE";
-  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
+export namespace LendingType {
+  export const CDP = "CDP";
+  export const POOLED = "POOLED"
 }
 
-export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "TRADING_FEE";
-  export const PROTOCOL_FEE = "PROTOCOL_FEE";
-  export const TIERED_FEE = "TIERED_FEE";
-  export const DYNAMIC_FEE = "DYNAMIC_FEE";
+export namespace RiskType {
+  export const GLOBAL = "GLOBAL";
+  export const ISOLATED = "ISOLATED";
 }
 
 export namespace RewardTokenType {
@@ -108,13 +104,13 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 
 export const COMPTROLLER_ADDRESS = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b";
 export const PRICE_ORACLE1_ADDRESS = "0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904";
-export const NETWORK_ETHEREUM = "ETHEREUM";
-export const PROTOCOL_TYPE = "LENDING";
-export const LENDING_TYPE = "CDP"; // TODO: guess - look more into this to verify
-export const PROTOCOL_RISK_TYPE = "ISOLATED"; // TODO: ensure this is accurate
+export const NETWORK_ETHEREUM = Network.ETHEREUM;
+export const PROTOCOL_TYPE = ProtocolType.LENDING;
+export const LENDING_TYPE = LendingType.POOLED; // TODO: guess - look more into this to verify
+export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is accurate
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const REWARD_TOKEN_TYPE = "DEPOSIT"; // TODO: check - seems like both
+export const REWARD_TOKEN_TYPE = RewardTokenType.DEPOSIT; // TODO: check - seems like both
 export const SUBGRAPH_VERSION = "1.3.2";
 export const SCHEMA_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
