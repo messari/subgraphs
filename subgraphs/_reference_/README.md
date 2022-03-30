@@ -8,6 +8,9 @@
 >
 > - Make sure you include this README (but without this section) in the  
 >   subgraph, with links to protocol-related resource and build instruction.
+> - Note that after you init the subgraph with `graph init`, it would create
+>   another git repo inside of the existing one. You should remove that with
+>   `rm -rf .git` and not check it in as a submodule.
 > - Make sure you run `npm run format` to format your code before committing.
 > - Try to follow the same folder structure inside of `src` for your subgraph.
 > - There is a set of useful functions in `src/common` that you can leverage.
