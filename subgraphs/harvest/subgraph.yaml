@@ -27,6 +27,35 @@ dataSources:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy
       file: ./src/mappings/controller.ts
+  - kind: ethereum/contract
+    name: MegaFactory
+    network: mainnet
+    source:
+      address: "0xE1EC9151Eb8D9a3451B8F623CE8b62632a6D4f4D"
+      startBlock: 13658254
+      abi: MegaFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Vault
+        - Token
+      abis:
+        - name: MegaFactory
+          file: ./abis/MegaFactory.json
+        - name: ERC20
+          file: ./abis/ERC20Detailed.json
+        - name: Vault
+          file: ./abis/Vault.json
+      callHandlers:
+        - function: createRegularVault(string,address)
+          handler: handleCreateRegularVault
+        - function: createUniV3Vault(string,uint256)
+          handler: handleCreateUniV3Vault
+        - function: createRegularVaultUsingUpgradableStrategy(string,address,address)
+          handler: handleRegularVaultStrategy
+      file: ./src/mappings/megaFactory.ts
 templates:
   - name: Vault
     kind: ethereum/contract

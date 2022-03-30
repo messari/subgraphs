@@ -26,6 +26,8 @@ export namespace ProtocolType {
 
 export const PROTOCOL_ID = '0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C'
 
+export const MEGA_FACTORY_ADDRESS = '0xE1EC9151Eb8D9a3451B8F623CE8b62632a6D4f4D'
+
 export const BIGDECIMAL_ZERO = BigDecimal.fromString('0')
 
 export const DEFAULT_DECIMALS = 18
