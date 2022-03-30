@@ -27,7 +27,11 @@ import {
   LiquidityPool,
   Token,
   RewardToken,
-  PoolDailySnapshot
+  PoolDailySnapshot,
+  LiquidityPoolFee,
+  Deposit,
+  Withdraw,
+  Swap
 } from "../generated/schema";
 
 //In the case of a DVM the pools shares are the base token
@@ -45,6 +49,10 @@ import {
 // );
 export function handleBuyShares(event: BuyShares): void {
   let pool = LiquidityPool.load(event.address.toHex());
+  let lpFee = LiquidityPoolFee.load();
+  let poolDailySS = PoolDailySnapshot.load();
+  let deposit = Deposit.load();
+
   pool.totalValueLockedUSD = ZERO_BD;
   pool.totalVolumeUSD = ZERO_BD;
   pool.inputTokenBalances = [ZERO_BI];
