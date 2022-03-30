@@ -62,6 +62,10 @@ import {
   RewardToken
 } from "../generated/schema";
 
+function getToken(address: Address): ERC20 {
+  return ERC20.bind(address);
+}
+
 export function handleNewDVM(event: NewDVM): void {
   let dodo = DexAmmProtocol.load(event.address.toHex());
   let pool = LiquidityPool.load(event.params.dvm.toHex());
@@ -141,14 +145,7 @@ export function handleNewDVM(event: NewDVM): void {
   pool.save();
 }
 
-export function handleOwnershipTransferPrepared(
-  event: OwnershipTransferPrepared
-): void {}
-
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
-
-export function handleRemoveDVM(event: RemoveDVM): void {}
-
-function getToken(address: Address): ERC20 {
-  return ERC20.bind(address);
+export function handleRemoveDVM(event: RemoveDVM): void {
+  let dodo = DexAmmProtocol.load(event.address.toHex());
+  let pool = LiquidityPool.load(event.params.dvm.toHex());
 }

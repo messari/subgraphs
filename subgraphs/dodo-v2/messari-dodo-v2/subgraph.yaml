@@ -15,8 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDVM
-        - OwnershipTransferPrepared
-        - OwnershipTransferred
         - RemoveDVM
       abis:
         - name: DVMFactory
@@ -24,14 +22,10 @@ dataSources:
       eventHandlers:
         - event: NewDVM(address,address,address,address)
           handler: handleNewDVM
-        - event: OwnershipTransferPrepared(indexed address,indexed address)
-          handler: handleOwnershipTransferPrepared
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: RemoveDVM(address)
           handler: handleRemoveDVM
-      file: ./src/mapping.ts
-      # blank
+      file: ./src/mappingDVMFactory.ts
+  # blank
   - kind: ethereum
     name: DODOLpToken
     network: mainnet
@@ -47,8 +41,6 @@ dataSources:
         - Approval
         - Burn
         - Mint
-        - OwnershipTransferPrepared
-        - OwnershipTransferred
         - Transfer
       abis:
         - name: DODOLpToken
@@ -60,14 +52,10 @@ dataSources:
           handler: handleBurn
         - event: Mint(indexed address,uint256)
           handler: handleMint
-        - event: OwnershipTransferPrepared(indexed address,indexed address)
-          handler: handleOwnershipTransferPrepared
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file:
-        ./src/mapping.ts
+        ./src/mappingDODOLp.ts
         #  blank
   - kind: ethereum
     name: vDODOToken
@@ -86,8 +74,6 @@ dataSources:
         - DonateDODO
         - MintVDODO
         - PreDeposit
-        - OwnershipTransferPrepared
-        - OwnershipTransferred
         - RedeemVDODO
         - SetCantransfer
         - Transfer
@@ -106,10 +92,6 @@ dataSources:
           handler: handleMintVDODO
         - event: PreDeposit(uint256)
           handler: handlePreDeposit
-        - event: OwnershipTransferPrepared(indexed address,indexed address)
-          handler: handleOwnershipTransferPrepared
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: RedeemVDODO(address,uint256,uint256,uint256)
           handler: handleRedeemVDODO
         - event: SetCantransfer(bool)
@@ -118,7 +100,7 @@ dataSources:
           handler: handleTransfer
         - event: UpdateDODOFeeBurnRatio(uint256)
           handler: handleUpdateDODOFeeBurnRatio
-      file: ./src/mapping.ts
+      file: ./src/mappingVDODO.ts
     # blank
 templates:
   - name: DVM
@@ -134,11 +116,6 @@ templates:
         - BuyShares
         - SellShares
         - DODOSwap
-        - DODOFlashLoan
-        - Transfer
-        - Approval
-        - Mint
-        - Burn
       abis:
         - name: DVM
           file: ./abis/DVM.json
@@ -149,17 +126,7 @@ templates:
           handler: handleSellShares
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
-        - event: DODOFlashLoan(address,address,uint256,uint256)
-          handler: handleDODOFlashLoan
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: Mint(indexed address,uint256)
-          handler: handleMint
-        - event: Burn(indexed address,uint256)
-          handler: handleBurn
-      file: ./src/mapping.ts
+      file: ./src/mappingDVM.ts
   - name: ERC20
     kind: ethereum/contract
     network: mainnet
@@ -180,4 +147,4 @@ templates:
           handler: handleTransfer
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
-      file: ./src/mapping.ts
+      file: ./src/mappingERC20.ts
