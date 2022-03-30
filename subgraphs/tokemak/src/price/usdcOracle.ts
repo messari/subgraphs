@@ -58,7 +58,7 @@ export function normalizedUsdcPrice(usdcPrice: BigInt): BigDecimal {
 
 export function usdcPrice(token: Token, tokenAmount: BigInt): BigInt {
   let tokenAddress = Address.fromString(token.id);
-  let decimals = BIGINT_TEN.pow(u8(token.decimals))
+  let decimals = BIGINT_TEN.pow(u8(token.decimals));
   let oracleCalculatorPrice = getTokenPriceFromOracle(tokenAddress, tokenAmount);
   if (oracleCalculatorPrice.notEqual(BIGINT_ZERO)) {
     return oracleCalculatorPrice;

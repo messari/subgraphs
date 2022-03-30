@@ -21,14 +21,14 @@ import { getOrCreateProtocol } from "../common/protocol";
 function createRewardTokens(): RewardToken {
   const address = Address.fromString(TOKE_ADDRESS);
   const rewardToken = getOrCreateRewardToken(address);
-  
+
   // Values if TOKE token is not deployed yet
-  if(rewardToken.name === ""){
-    rewardToken.name = TOKE_NAME
-    rewardToken.symbol = TOKE_SYMBOL
-    rewardToken.save()
+  if (rewardToken.name === "") {
+    rewardToken.name = TOKE_NAME;
+    rewardToken.symbol = TOKE_SYMBOL;
+    rewardToken.save();
   }
-  return rewardToken
+  return rewardToken;
 }
 
 export function handlePoolRegistered(event: PoolRegistered): void {
@@ -59,7 +59,7 @@ function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultSt
     vault.createdTimestamp = event.block.timestamp;
 
     const rewardToken = createRewardTokens();
-    
+
     vault.rewardTokens = [rewardToken.id];
 
     vault.fees = [];
