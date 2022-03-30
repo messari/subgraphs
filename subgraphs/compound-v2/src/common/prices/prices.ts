@@ -17,6 +17,7 @@ import { PriceOracle1 } from "../../types/Comptroller/PriceOracle1";
 import { exponentToBigDecimal } from "../utils/utils";
 
 // returns the usd price of the amount of the underlying asset in market
+// TODO: hardcode stablecoins: https://compound.finance/docs/prices#architecture
 export function getAmountUSD(
   market: Market,
   amount: BigInt,

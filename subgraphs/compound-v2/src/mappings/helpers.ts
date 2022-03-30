@@ -326,6 +326,7 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
 }
 
 // creates both tokens for a market pool token/cToken
+// TODO: maybe make a seperate function in getters
 export function createMarketTokens(marketAddress: string, underlyingAddress: string, cTokenContract: CToken): void {
   // create underlying token
   // TODO: fill in reward token once created on old markets?
