@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
 import { BIGINT_HUNDRED, VaultFeeType } from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
@@ -14,7 +14,7 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt): voi
   let totalSupply = vault.outputTokenSupply;
   let balance = vault.inputTokenBalances[0];
 
-  let amount = balance.times(shares).div(totalSupply);
+  let amount = totalSupply.isZero() ? shares : balance.times(shares).div(totalSupply);
 
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   let inputToken = getOrCreateToken(inputTokenAddress);

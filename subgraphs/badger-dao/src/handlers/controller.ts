@@ -44,7 +44,7 @@ export function handleSetVault(call: SetVaultCall): void {
 
   const strategyAddress = getOrCreateStrategy(controllerAddress, vaultAddress, inputTokenAddress);
 
-  log.info("[BADGER] vault found : vault {}, strategy {}", [vaultAddress.toHex(), strategyAddress.toHex()]);
+  log.warning("[BADGER] vault found : vault {}, strategy {}", [vaultAddress.toHex(), strategyAddress.toHex()]);
 }
 
 export function handleSetStrategy(call: SetStrategyCall): void {
@@ -60,5 +60,5 @@ export function handleSetStrategy(call: SetStrategyCall): void {
     getOrCreateStrategy(controllerAddress, vaultAddress, inputTokenAddress, newStrategyAddress);
   }
 
-  log.info("[BADGER] new strategy found : vault {}, strategy {}", [vaultAddress.toHex(), newStrategyAddress.toHex()]);
+  log.warning("[BADGER] new strategy found : vault {}, strategy {}", [vaultAddress.toHex(), newStrategyAddress.toHex()]);
 }

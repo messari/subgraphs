@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
   BadgerSett,
   DepositAllCall,
@@ -25,6 +25,8 @@ export function handleDeposit(call: DepositCall): void {
   let amount = call.inputs._amount;
   let user = getOrCreateUser(call.from);
 
+  log.warning("[BADGER] handleDeposit - amount {}, vault {}", [amount.toString(), vaultAddress]);
+
   deposit(call, vault, amount);
   updateUsageMetrics(user, call.block);
   updateVaultMetrics(vault, call.block);
@@ -46,6 +48,12 @@ export function handleDepositAll(call: DepositAllCall): void {
   let amount = newBalance.minus(prevBalance);
   let user = getOrCreateUser(call.from);
 
+  log.warning("[BADGER] handleDeposit - prevBalance {}, amount {}, vault {}", [
+    prevBalance.toString(),
+    amount.toString(),
+    vaultAddress,
+  ]);
+
   deposit(call, vault, amount);
   updateUsageMetrics(user, call.block);
   updateVaultMetrics(vault, call.block);
@@ -62,6 +70,8 @@ export function handleWithdraw(call: WithdrawCall): void {
 
   let shares = call.inputs._shares;
   let user = getOrCreateUser(call.from);
+
+  log.warning("[BADGER] handleWithdraw - shares {}, vault {}", [shares.toString(), vaultAddress]);
 
   withdraw(call, vault, shares);
   updateUsageMetrics(user, call.block);
@@ -83,6 +93,12 @@ export function handleWithdrawAll(call: WithdrawAllCall): void {
 
   let shares = prevSupply.minus(newSupply);
   let user = getOrCreateUser(call.from);
+
+  log.warning("[BADGER] handleWithdrawAll - newSuppply {}, shares {}, vault {}", [
+    newSupply.toString(),
+    shares.toString(),
+    vaultAddress,
+  ]);
 
   withdraw(call, vault, shares);
   updateUsageMetrics(user, call.block);

@@ -61,7 +61,7 @@ export function handleSetPerformanceFee(call: SetPerformanceFeeGovernanceCall): 
     performanceFee!.feePercentage = call.inputs._performanceFeeGovernance.div(BIGINT_HUNDRED).toBigDecimal();
     performanceFee!.save();
 
-    log.info("[BADGER] performance fee : vault {}, fee {}", [
+    log.warning("[BADGER] performance fee : vault {}, fee {}", [
       vaultAddress,
       call.inputs._performanceFeeGovernance.toString(),
     ]);
@@ -80,6 +80,6 @@ export function handleSetWithdrawalFee(call: SetWithdrawalFeeCall): void {
     withdrawFee!.feePercentage = call.inputs._withdrawalFee.div(BIGINT_HUNDRED).toBigDecimal();
     withdrawFee!.save();
 
-    log.info("[BADGER] withdrawal fee : vault {}, fee {}", [vaultAddress, call.inputs._withdrawalFee.toString()]);
+    log.warning("[BADGER] withdrawal fee : vault {}, fee {}", [vaultAddress, call.inputs._withdrawalFee.toString()]);
   }
 }

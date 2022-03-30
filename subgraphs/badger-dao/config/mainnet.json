@@ -9,42 +9,42 @@
     {
       "name": "native",
       "address": "0x63cF44B2548e4493Fd099222A1eC79F3344D9682",
-      "startBlock": "11380863"
+      "startBlock": 11380863
     },
     {
       "name": "harvest",
       "address": "0x30392694C25fbBE5C026CF846e9b6525A2aC3eC8",
-      "startBlock": "11380864"
+      "startBlock": 11380864
     },
     {
       "name": "experimental",
       "address": "0x9b4efA18c0c6b4822225b81D150f3518160f8609",
-      "startBlock": "12376094"
+      "startBlock": 12376094
     },
     {
       "name": "mstable",
       "address": "0xd35ff2C170CC1e44de4EDdC9f2Fc425C16670250",
-      "startBlock": "13353840"
+      "startBlock": 13353840
     },
     {
       "name": "bbveCVX-CVX-f",
       "address": "0x0c41A8613fbeFCC8d6e5dF1020DBb336F875247F",
-      "startBlock": "13495936"
+      "startBlock": 13495936
     },
     {
       "name": "ibBTCCrv",
       "address": "0xe505F7C2FFcce7Ae4b076456BC02A70D8fe8d4d2",
-      "startBlock": "13277206"
+      "startBlock": 13277206
     },
     {
       "name": "restitution",
       "address": "0x3F61344BA56df00dad9bBcA05d98CA2AeC43Ba0B",
-      "startBlock": "13998344"
+      "startBlock": 13998344
     },
     {
       "name": "badger-wbtc",
       "address": "0xa54d8a596B4022CC4436b692C8ea0E342405eB6e",
-      "startBlock": "14412318"
+      "startBlock": 14412318
     }
   ],
   "rewards": [

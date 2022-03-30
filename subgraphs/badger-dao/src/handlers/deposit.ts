@@ -1,8 +1,8 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
-import { getPriceOfStakedTokens, getUsdPriceOfToken } from "./price";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
+import { getPriceOfStakedTokens, getUsdPriceOfToken } from "./price";
 
 export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt): void {
   let deposit = getOrCreateDeposit(call.transaction.hash, call.transaction.index);
