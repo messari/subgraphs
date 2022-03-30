@@ -6,14 +6,9 @@ const _ = require("lodash");
 const genFunc = () => {
   console.info("Config generation started");
   const context = {
-    controllers: [],
+    controllers: _.filter(controllers, { chainId: 1 }).map(e => ({name: e.name, address: e.address})),
+    tokens: _.filter(tokens, { chainId: 1 }).map(e => ({name: e.symbol, address: e.address})),
   };
-
-  controllers.forEach((e) => {
-    if (e.chainId === 1) {
-      context.controllers.push({ name: e.name, address: e.address });
-    }
-  });
 
   console.log(context);
   readFile("./subgraph.template.yaml", "utf8")
