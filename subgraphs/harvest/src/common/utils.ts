@@ -29,8 +29,8 @@ export function createProtocol(): void {
     let protocol = YieldAggregator.load(PROTOCOL_ID)
     if (!protocol) {
         protocol = new YieldAggregator(PROTOCOL_ID)
-        protocol.name = "Tokemak"
-        protocol.slug = "tokemak"
+        protocol.name = "harvest"
+        protocol.slug = "harvest"
         protocol.network = Network.ETHEREUM
         protocol.type = ProtocolType.YIELD
         protocol.vaults = []
