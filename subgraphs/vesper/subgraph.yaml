@@ -84,3 +84,87 @@ dataSources:
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
+  - kind: ethereum/contract
+    name: 'VSP'
+    network: mainnet
+    source:
+      address: '0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421'
+      abi: Erc20Token
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: PoolV2
+          file: ./abis/pool-v2.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
+        - name: Controller
+          file: ./abis/controller.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+      eventHandlers:
+        - event:  Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event:  Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+  - kind: ethereum/contract
+    name: 'VUSD'
+    network: mainnet
+    source:
+      address: '0x677ddbd918637E5F2c79e164D402454dE7dA8619'
+      abi: Erc20Token
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: PoolV2
+          file: ./abis/pool-v2.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
+        - name: Controller
+          file: ./abis/controller.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+      eventHandlers:
+        - event:  Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event:  Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
