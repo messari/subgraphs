@@ -4,34 +4,25 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-{{#controllers}}
+{{#pools}}
   - kind: ethereum/contract
-    name: '{{name}}'
+    name: 'poolV{{version}}_{{name}}_{{address}}'
     network: mainnet
     source:
       address: '{{address}}'
-      abi: Controller
+      abi: PoolV{{version}}
+      startBlock: {{birthblock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       file: ./src/mappings.ts
       entities:
-        - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
-        - Deposit
-        - Withdraw
+        - PoolQuery
+      # This lists all posible abis to be used for each data source
       abis:
-        - name: PoolV2
-          file: ./abis/pool-v2.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV{{version}}
+          file: ./abis/pool-v{{version}}.json
         - name: AddressList
           file: ./abis/address-list.json
         - name: StrategyV2
@@ -42,7 +33,14 @@ dataSources:
           file: ./abis/uniswap.json
         - name: Erc20Token
           file: ./abis/erc-20.json
+      # this is used to calculate withdraw fees
       eventHandlers:
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-{{/controllers}}
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawFeeV{{version}}
+      # this is used to calculate interest fees
+        - event: {{interestFeeEvent}}
+          handler: handleInterestFeeV{{version}}
+      # this is used to calculate totalDebt and totalSupply values
+      blockHandlers:
+        - handler: handleBlockV{{version}}
+{{/pools}}

@@ -7,11 +7,16 @@
     "@graphprotocol/graph-cli": "^0.29.0",
     "@graphprotocol/graph-ts": "^0.26.0",
     "fs-extra": "^10.0.1",
+    "lodash": "^4.17.21",
     "mustache": "^4.2.0",
-    "p-tap": "^3.1.0",
     "vesper-metadata": "^2.57.0"
   },
   "scripts": {
-    "codegen": "graph codegen"
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ vesper_finance",
+    "create-local": "graph create --node http://localhost:8020/ vesper_finance",
+    "remove-local": "graph remove --node http://localhost:8020/ vesper_finance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 vesper_finance"
   }
 }
