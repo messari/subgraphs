@@ -434,10 +434,10 @@ type Deposit implements Event @entity {
 
   timestamp: BigInt!
 
-  " Input tokens of the transaction. E.g. WETH and USDC to a WETH-USDC pool "
+  " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output tokens of the transaction. E.g. the UNI-LP token "
+  " Output tokens of the pool. E.g. the UNI-LP token "
   outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
@@ -478,10 +478,10 @@ type Withdraw implements Event @entity {
 
   timestamp: BigInt!
 
-  " Input tokens of the transaction. E.g. the UNI-LP token "
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output tokens of the transaction. E.g. WETH and USDC from a WETH-USDC pool "
+  " Output tokens of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
   outputTokens: Token!
 
   " Amount of input tokens in the token's native unit "
