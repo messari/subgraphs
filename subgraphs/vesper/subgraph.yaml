@@ -27,20 +27,8 @@ dataSources:
         - Deposit
         - Withdraw
       abis:
-        - name: PoolV2
-          file: ./abis/pool-v2.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
-        - name: AddressList
-          file: ./abis/address-list.json
-        - name: StrategyV2
-          file: ./abis/strategy-v2.json
         - name: Controller
           file: ./abis/controller.json
-        - name: PriceRouter
-          file: ./abis/uniswap.json
-        - name: Erc20Token
-          file: ./abis/erc-20.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
@@ -67,20 +55,8 @@ dataSources:
         - Deposit
         - Withdraw
       abis:
-        - name: PoolV2
-          file: ./abis/pool-v2.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
-        - name: AddressList
-          file: ./abis/address-list.json
-        - name: StrategyV2
-          file: ./abis/strategy-v2.json
         - name: Controller
           file: ./abis/controller.json
-        - name: PriceRouter
-          file: ./abis/uniswap.json
-        - name: Erc20Token
-          file: ./abis/erc-20.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
@@ -107,18 +83,6 @@ dataSources:
         - Deposit
         - Withdraw
       abis:
-        - name: PoolV2
-          file: ./abis/pool-v2.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
-        - name: AddressList
-          file: ./abis/address-list.json
-        - name: StrategyV2
-          file: ./abis/strategy-v2.json
-        - name: Controller
-          file: ./abis/controller.json
-        - name: PriceRouter
-          file: ./abis/uniswap.json
         - name: Erc20Token
           file: ./abis/erc-20.json
       eventHandlers:
@@ -149,18 +113,6 @@ dataSources:
         - Deposit
         - Withdraw
       abis:
-        - name: PoolV2
-          file: ./abis/pool-v2.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
-        - name: AddressList
-          file: ./abis/address-list.json
-        - name: StrategyV2
-          file: ./abis/strategy-v2.json
-        - name: Controller
-          file: ./abis/controller.json
-        - name: PriceRouter
-          file: ./abis/uniswap.json
         - name: Erc20Token
           file: ./abis/erc-20.json
       eventHandlers:
