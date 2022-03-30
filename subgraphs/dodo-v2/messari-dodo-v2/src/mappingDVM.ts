@@ -9,39 +9,6 @@ import {
 } from "./utils/constants";
 
 import {
-  DVMFactory,
-  NewDVM,
-  OwnershipTransferPrepared,
-  OwnershipTransferred,
-  RemoveDVM
-} from "../generated/DVMFactory/DVMFactory";
-
-import {
-  DODOLpToken,
-  Approval,
-  Burn,
-  Mint,
-  OwnershipTransferPrepared,
-  OwnershipTransferred,
-  Transfer
-} from "../generated/DODOLpToken/DODOLpToken";
-
-import {
-  vDODOToken,
-  Approval,
-  ChangePerReward,
-  DonateDODO,
-  MintVDODO,
-  PreDeposit,
-  OwnershipTransferPrepared,
-  OwnershipTransferred,
-  RedeemVDODO,
-  SetCantransfer,
-  Transfer,
-  UpdateDODOFeeBurnRatio
-} from "../generated/vDODOToken/vDODOToken";
-
-import {
   DVM,
   BuyShares,
   SellShares,
@@ -51,18 +18,39 @@ import {
   Approval,
   Mint,
   Burn
-} from "../generated/templates/DVM/DVM";
+} from "../generated/DVM/DVM";
 
-import { ERC20, Transfer, Approval } from "../generated/templates/ERC20/ERC20";
+import { ERC20 } from "../generated/ERC20/ERC20";
 
 import {
   DexAmmProtocol,
   LiquidityPool,
   Token,
-  RewardToken
+  RewardToken,
+  PoolDailySnapshot
 } from "../generated/schema";
 
-export function handleBuyShares(event: BuyShares): void {}
+//In the case of a DVM the pools shares are the base token
+
+// event BuyShares(address to, uint256 increaseShares, uint256 totalShares);
+//
+// event SellShares(address payer, address to, uint256 decreaseShares, uint256 totalShares);
+// event DODOSwap(
+//     address fromToken,
+//     address toToken,
+//     uint256 fromAmount,
+//     uint256 toAmount,
+//     address trader,
+//     address receiver
+// );
+export function handleBuyShares(event: BuyShares): void {
+  let pool = LiquidityPool.load(event.address.toHex());
+  pool.totalValueLockedUSD = ZERO_BD;
+  pool.totalVolumeUSD = ZERO_BD;
+  pool.inputTokenBalances = [ZERO_BI];
+  pool.outputTokenSupply = ZERO_BI;
+  pool.outputTokenPriceUSD = ZERO_BD;
+}
 
 export function handleSellShares(event: SellShares): void {}
 

@@ -16,7 +16,7 @@ import {
   RemoveDVM
 } from "../generated/DVMFactory/DVMFactory";
 
-import { ERC20 } from "../generated/templates/ERC20/ERC20";
+import { ERC20 } from "../generated/ERC20/ERC20";
 
 import {
   DexAmmProtocol,
@@ -109,7 +109,5 @@ export function handleNewDVM(event: NewDVM): void {
 }
 
 export function handleRemoveDVM(event: RemoveDVM): void {
-  // let pool = LiquidityPool.load(event.params.dvm.toHex());
-  //
-  // pool.remove();
+  // LiquidityPool.remove(event.params.dvm.toHex());
 }

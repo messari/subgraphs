@@ -8,7 +8,7 @@ dataSources:
     source:
       address: "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C"
       abi: DVMFactory
-      startBlock: 14112689
+      startBlock: 14190000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -19,6 +19,8 @@ dataSources:
       abis:
         - name: DVMFactory
           file: ./abis/DVMFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: NewDVM(address,address,address,address)
           handler: handleNewDVM
@@ -32,7 +34,7 @@ dataSources:
     source:
       address: "0x43Dfc4159D86F3A37A5A4B3D4580b888ad7d4DDd"
       abi: DODOLpToken
-      startBlock: 14112689
+      startBlock: 14190000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -63,7 +65,7 @@ dataSources:
     source:
       address: "0xc4436fBAE6eBa5d95bf7d53Ae515F8A707Bd402A"
       abi: vDODOToken
-      startBlock: 14112689
+      startBlock: 14190000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -102,12 +104,34 @@ dataSources:
           handler: handleUpdateDODOFeeBurnRatio
       file: ./src/mappingVDODO.ts
     # blank
-templates:
+  # - name: ERC20
+  #   kind: ethereum/contract
+  #   network: mainnet
+  #   source:
+  #     abi: ERC20
+  #     startBlock: 14190000
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.5
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Transfer
+  #       - Approval
+  #     abis:
+  #       - name: ERC20
+  #         file: ./abis/ERC20.json
+  #     eventHandlers:
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #       - event: Approval(indexed address,indexed address,uint256)
+  #         handler: handleApproval
+  #     file: ./src/mappingERC20.ts
   - name: DVM
     kind: ethereum/contract
     network: mainnet
     source:
       abi: DVM
+      startBlock: 14190000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -127,24 +151,3 @@ templates:
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
       file: ./src/mappingDVM.ts
-  - name: ERC20
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: ERC20
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Transfer
-        - Approval
-      abis:
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-      file: ./src/mappingDVMFactory.ts
