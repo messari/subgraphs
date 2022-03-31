@@ -14,7 +14,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mappings.ts
+      file: ./src/handlers/controller.ts
       entities:
         - Token
         - RewardToken
@@ -42,7 +42,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mappings.ts
+      file: ./src/handlers/controller.ts
       entities:
         - Token
         - RewardToken
@@ -70,7 +70,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mappings.ts
+      file: ./src/handlers/token.ts
       entities:
         - Token
         - RewardToken
@@ -100,7 +100,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
-      file: ./src/mappings.ts
+      file: ./src/handlers/token.ts
       entities:
         - Token
         - RewardToken
