@@ -6,20 +6,22 @@ import {
   Withdraw,
 } from "../../generated/poolV3_vUNI/PoolV3";
 
-function processDeposit(event: Deposit | Transfer): void {
-    const vaultAddress = event.address.toHexString();
-    let vault = Vault.load(vaultAddress);
-
-    if (!vault) {
-        vault = new Vault(vaultAddress);
-    }
-    log.debug("[deposit params] {}", JSON.stringify(event.params));
-};
-
 export function handleDepositV3(event: Deposit): void {
-    processDeposit(event);
+  const vaultAddress = event.address.toHexString();
+  let vault = Vault.load(vaultAddress);
+
+  if (!vault) {
+    vault = new Vault(vaultAddress);
+  }
+  log.debug("[deposit params] Amount : {}", [event.params.amount.toString()]);
 }
 export function handleTransferV3(event: Transfer): void {
-    processDeposit(event);
+  const vaultAddress = event.address.toHexString();
+  let vault = Vault.load(vaultAddress);
+
+  if (!vault) {
+    vault = new Vault(vaultAddress);
+  }
+  log.debug("[deposit params] Amount : {}", [event.params.value.toString()]);
 }
 export function handleWithdrawV3(event: Withdraw): void {}
