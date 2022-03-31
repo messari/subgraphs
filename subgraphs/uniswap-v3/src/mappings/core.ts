@@ -1,4 +1,4 @@
-import { log } from '@graphprotocol/graph-ts'
+// import { log } from '@graphprotocol/graph-ts'
 import {
   Burn as BurnEvent,
   Initialize,
@@ -6,7 +6,7 @@ import {
   Swap as SwapEvent,
   SetFeeProtocol
 } from '../../generated/templates/Pool/Pool'
-import { getLiquidityPool, getLiquidityPoolFee } from '../common/getters'
+// import { getLiquidityPool, getLiquidityPoolFee } from '../common/getters'
 import {
   updatePrices,
   createDeposit,
@@ -16,11 +16,8 @@ import {
 import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/intervalUpdates'
 
 export function handleInitialize(event: Initialize): void {
-  log.warning("Hello1", [])
   updatePrices(event)
-  log.warning("Hello2", [])
   updatePoolMetrics(event)
-  log.warning("Hello3", [])
 }
 
 export function handleSetFeeProtocol(event: SetFeeProtocol): void {

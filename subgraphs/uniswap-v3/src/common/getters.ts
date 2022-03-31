@@ -15,7 +15,6 @@ import {
   LiquidityPoolFee,
 } from "../../generated/schema"
 
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
 import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "../common/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
@@ -81,33 +80,6 @@ export function getFeeTier(event: ethereum.Event): _HelperStore {
     return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!
 }
 
-export function getOrCreateToken(tokenAddress: Address): Token {
-    let token = Token.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (token === null) {
-        token = new Token(tokenAddress.toHexString())
-        token.symbol = fetchTokenSymbol(tokenAddress)
-        token.name = fetchTokenName(tokenAddress)
-        token.decimals = fetchTokenDecimals(tokenAddress)
-        token.save()
-    }
-    return token
-}
-
-export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
-    let token = Token.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (token === null) {
-        token = new Token(tokenAddress.toHexString())
-        token.symbol = token0.name + '/' + token1.name
-        token.name = token0.name + '/' + token1.name + " LP"
-        token.decimals = DEFAULT_DECIMALS
-        token.save()
-    }
-    return token
-}
-
-
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
     // fetch info if null
@@ -121,7 +93,6 @@ export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
 
     return tokenTracker
 }
-
 
 export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot{
     // Number of days since Unix epoch
