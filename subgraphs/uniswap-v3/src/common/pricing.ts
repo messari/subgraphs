@@ -1,4 +1,4 @@
-import { log } from '@graphprotocol/graph-ts'
+// import { log } from '@graphprotocol/graph-ts'
 import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO } from './constants'
 import { _HelperStore, _TokenTracker, _LiquidityPoolAmounts } from '../../generated/schema'
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
