@@ -6,6 +6,7 @@ import {
   DepositForCall,
   WithdrawCall,
   WithdrawalRequested,
+  Withdraw1Call,
 } from "../../generated/Manager/Vault";
 
 import {
@@ -28,6 +29,7 @@ import {
   PROTOCOL_ID,
   SECONDS_PER_DAY,
   VaultFeeType,
+  WETH_VAULT,
   ZERO_ADDRESS,
 } from "../common/constants";
 import { bigIntToPercentage, getTimestampInMillis } from "../common/utils";
@@ -69,6 +71,9 @@ export function handleDepositWithRecipient(call: DepositForCall): void {
 }
 
 function deposit(call: ethereum.Call, vault: VaultStore, depositAmount: BigInt, sharesMinted: BigInt): void {
+  if (call.transaction.value > BIGINT_ZERO && WETH_VAULT.toLowerCase() === vault.id.toLowerCase()) {
+    depositAmount = call.transaction.value;
+  }
   const token = getOrCreateToken(Address.fromString(vault.inputTokens[0]));
   const amountUSD = normalizedUsdcPrice(usdcPrice(token, depositAmount));
   vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD);
@@ -97,6 +102,20 @@ export function handleWithdraw(call: WithdrawCall): void {
   updateFinancials(call.block.number, call.block.timestamp, call.from);
   updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
 }
+
+export function handleWithdrawEthPool(call: Withdraw1Call): void {
+  log.info("[Vault mappings] Handle withdraw with shares. TX hash: {}", [call.transaction.hash.toHexString()]);
+  const vaultAddress = call.to;
+  let vault = VaultStore.load(vaultAddress.toHexString());
+  if (vault) {
+    const requestedAmount = call.inputs.requestedAmount;
+    const withdrawAmount = requestedAmount;
+    withdraw(call, vault, withdrawAmount, requestedAmount);
+  }
+  updateFinancials(call.block.number, call.block.timestamp, call.from);
+  updateUsageMetrics(call.block.number, call.block.timestamp, call.from);
+}
+
 export function handleWithdrawRequest(event: WithdrawalRequested): void {
   log.info("[Vault mappings] Handle withdraw request with shares. TX hash: {}", [event.transaction.hash.toHexString()]);
 

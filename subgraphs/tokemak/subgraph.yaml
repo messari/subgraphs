@@ -110,3 +110,5 @@ templates:
           handler: handleDepositWithRecipient
         - function: withdraw(uint256)
           handler: handleWithdraw
+        - function: withdraw(uint256,bool)
+          handler: handleWithdrawEthPool
