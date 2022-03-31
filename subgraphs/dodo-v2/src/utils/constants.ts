@@ -18,38 +18,38 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 );
 
 export namespace Network {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BSC = "binance-smart-chain";
-  export const CELO = "celo";
-  export const CRONOS = "cronos";
-  export const ETHEREUM = "ethereum";
-  export const FANTOM = "fantom";
-  export const HARMONY = "harmony-shard-0";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const OPTIMISM = "optimistic-ethereum";
-  export const POLYGON = "polygon-pos";
-  export const XDAI = "xdai";
+  export const ARBITRUM = "ARBITRUM";
+  export const AVALANCHE = "AVALANCHE";
+  export const AURORA = "AURORA";
+  export const BSC = "BSC";
+  export const CELO = "CELO";
+  export const CRONOS = "CRONOS";
+  export const ETHEREUM = "ETHEREUM";
+  export const FANTOM = "FANTOM";
+  export const HARMONY = "HARMONY";
+  export const MOONBEAM = "MOONBEAM";
+  export const MOONRIVER = "MOONRIVER";
+  export const OPTIMISM = "OPTIMISM";
+  export const POLYGON = "POLYGON";
+  export const XDAI = "XDAI";
 }
 
 export namespace ProtocolType {
-  export const EXCHANGE = "exchange";
-  export const LENDING = "lending";
-  export const YIELD = "yield";
-  export const BRIDGE = "bridge";
-  export const GENERIC = "generic";
+  export const EXCHANGE = "EXCHANGE";
+  export const LENDING = "LENDING";
+  export const YIELD = "YIELD";
+  export const BRIDGE = "BRIDGE";
+  export const GENERIC = "GENERIC";
 }
 
 export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "trading-fee";
-  export const PROTOCOL_FEE = "protocol-fee";
-  export const TIERED_FEE = "tiered-fee";
-  export const DYNAMIC_FEE = "dynamic-fee";
+  export const TRADING_FEE = "TRADING_FEE";
+  export const PROTOCOL_FEE = "PROTOCOL_FEE";
+  export const TIERED_FEE = "PROTOCOL_FEE";
+  export const DYNAMIC_FEE = "PROTOCOL_FEE";
 }
 
 export namespace RewardTokenType {
-  export const DEPOSIT = "deposit";
-  export const BORROW = "borrow";
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
 }

@@ -28,82 +28,82 @@ dataSources:
           handler: handleRemoveDVM
       file: ./src/mappingDVMFactory.ts
   # blank
-  - kind: ethereum
-    name: DODOLpToken
-    network: mainnet
-    source:
-      address: "0x43Dfc4159D86F3A37A5A4B3D4580b888ad7d4DDd"
-      abi: DODOLpToken
-      startBlock: 14480000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-        - Burn
-        - Mint
-        - Transfer
-      abis:
-        - name: DODOLpToken
-          file: ./abis/DODOLpToken.json
-      eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: Burn(indexed address,uint256)
-          handler: handleBurn
-        - event: Mint(indexed address,uint256)
-          handler: handleMint
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file:
-        ./src/mappingDODOLp.ts
-        #  blank
-  - kind: ethereum
-    name: vDODOToken
-    network: mainnet
-    source:
-      address: "0xc4436fBAE6eBa5d95bf7d53Ae515F8A707Bd402A"
-      abi: vDODOToken
-      startBlock: 14480000
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-        - ChangePerReward
-        - DonateDODO
-        - MintVDODO
-        - PreDeposit
-        - RedeemVDODO
-        - SetCantransfer
-        - Transfer
-        - UpdateDODOFeeBurnRatio
-      abis:
-        - name: vDODOToken
-          file: ./abis/vDODOToken.json
-      eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: ChangePerReward(uint256)
-          handler: handleChangePerReward
-        - event: DonateDODO(address,uint256)
-          handler: handleDonateDODO
-        - event: MintVDODO(address,address,uint256)
-          handler: handleMintVDODO
-        - event: PreDeposit(uint256)
-          handler: handlePreDeposit
-        - event: RedeemVDODO(address,uint256,uint256,uint256)
-          handler: handleRedeemVDODO
-        - event: SetCantransfer(bool)
-          handler: handleSetCantransfer
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdateDODOFeeBurnRatio(uint256)
-          handler: handleUpdateDODOFeeBurnRatio
-      file: ./src/mappingVDODO.ts
-    # blank
+  # - kind: ethereum
+  #   name: DODOLpToken
+  #   network: mainnet
+  #   source:
+  #     address: "0x43Dfc4159D86F3A37A5A4B3D4580b888ad7d4DDd"
+  #     abi: DODOLpToken
+  #     startBlock: 14480000
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.5
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Approval
+  #       - Burn
+  #       - Mint
+  #       - Transfer
+  #     abis:
+  #       - name: DODOLpToken
+  #         file: ./abis/DODOLpToken.json
+  #     eventHandlers:
+  #       - event: Approval(indexed address,indexed address,uint256)
+  #         handler: handleApproval
+  #       - event: Burn(indexed address,uint256)
+  #         handler: handleBurn
+  #       - event: Mint(indexed address,uint256)
+  #         handler: handleMint
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #     file:
+  #       ./src/mappingDODOLp.ts
+  #       #  blank
+  # - kind: ethereum
+  #   name: vDODOToken
+  #   network: mainnet
+  #   source:
+  #     address: "0xc4436fBAE6eBa5d95bf7d53Ae515F8A707Bd402A"
+  #     abi: vDODOToken
+  #     startBlock: 14480000
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.5
+  #     language: wasm/assemblyscript
+  #     entities:
+  #       - Approval
+  #       - ChangePerReward
+  #       - DonateDODO
+  #       - MintVDODO
+  #       - PreDeposit
+  #       - RedeemVDODO
+  #       - SetCantransfer
+  #       - Transfer
+  #       - UpdateDODOFeeBurnRatio
+  #     abis:
+  #       - name: vDODOToken
+  #         file: ./abis/vDODOToken.json
+  #     eventHandlers:
+  #       - event: Approval(indexed address,indexed address,uint256)
+  #         handler: handleApproval
+  #       - event: ChangePerReward(uint256)
+  #         handler: handleChangePerReward
+  #       - event: DonateDODO(address,uint256)
+  #         handler: handleDonateDODO
+  #       - event: MintVDODO(address,address,uint256)
+  #         handler: handleMintVDODO
+  #       - event: PreDeposit(uint256)
+  #         handler: handlePreDeposit
+  #       - event: RedeemVDODO(address,uint256,uint256,uint256)
+  #         handler: handleRedeemVDODO
+  #       - event: SetCantransfer(bool)
+  #         handler: handleSetCantransfer
+  #       - event: Transfer(indexed address,indexed address,uint256)
+  #         handler: handleTransfer
+  #       - event: UpdateDODOFeeBurnRatio(uint256)
+  #         handler: handleUpdateDODOFeeBurnRatio
+  #     file: ./src/mappingVDODO.ts
+  # blank
   # - name: ERC20
   #   kind: ethereum/contract
   #   network: mainnet

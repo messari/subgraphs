@@ -41,24 +41,24 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-// export function getOrCreateDexAmm(): DexAmmProtocol {
-//   let protocol = DexAmmProtocol.load(FACTORY_ADDRESS);
-//
-//   if (!protocol) {
-//     protocol = new DexAmmProtocol(FACTORY_ADDRESS);
-//     protocol.name = "Uniswap v2";
-//     protocol.slug = "uniswap-v2";
-//     protocol.schemaVersion = "1.0.0";
-//     protocol.subgraphVersion = "1.0.0";
-//     protocol.network = Network.ETHEREUM;
-//     protocol.type = ProtocolType.EXCHANGE;
-//     protocol.totalUniqueUsers = 0;
-//     protocol.totalValueLockedUSD = ZERO_BD;
-//
-//     protocol.save();
-//   }
-//   return protocol;
-// }
+export function getOrCreateDexAmm(address: Address): DexAmmProtocol {
+  let protocol = DexAmmProtocol.load(address.toHex());
+
+  if (!protocol) {
+    protocol = new DexAmmProtocol(address.toHex());
+    protocol.name = "DODO V2";
+    protocol.slug = "messari-dodo";
+    protocol.schemaVersion = "1.0.0";
+    protocol.subgraphVersion = "1.0.0";
+    protocol.network = Network.ETHEREUM;
+    protocol.type = ProtocolType.EXCHANGE;
+    protocol.totalUniqueUsers = 0;
+    protocol.totalValueLockedUSD = ZERO_BD;
+
+    protocol.save();
+  }
+  return protocol;
+}
 // export function getOrCreateUsageMetricSnapshot(
 //   event: ethereum.Event
 // ): UsageMetricsDailySnapshot {

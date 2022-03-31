@@ -11,7 +11,11 @@ import {
   RewardTokenType
 } from "./utils/constants";
 
-import { getOrCreateToken, getOrCreateRewardToken } from "./utils/getters";
+import {
+  getOrCreateToken,
+  getOrCreateRewardToken,
+  getOrCreateDexAmm
+} from "./utils/getters";
 
 import {
   DVMFactory,
@@ -31,24 +35,12 @@ import {
 } from "../generated/schema";
 
 export function handleNewDVM(event: NewDVM): void {
-  let dodo = DexAmmProtocol.load(event.address.toHex());
+  let dodo = getOrCreateDexAmm(event.address);
   let pool = LiquidityPool.load(event.params.dvm.toHex());
   let it = getOrCreateToken(event.params.baseToken);
   let ot = getOrCreateToken(event.params.quoteToken);
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
-
-  if (!dodo) {
-    dodo = new DexAmmProtocol(event.address.toHex());
-    dodo.name = "DODO V2";
-    dodo.slug = "messari-dodo";
-    dodo.schemaVersion = "schema-dex-amm";
-    dodo.subgraphVersion = "0.0.2";
-    dodo.network = "ETHEREUM";
-    dodo.type = "EXCHANGE";
-    dodo.totalUniqueUsers = 0;
-    dodo.totalValueLockedUSD = ZERO_BD;
-  }
 
   if (!pool) {
     pool = new LiquidityPool(event.params.dvm.toHex());
@@ -66,8 +58,6 @@ export function handleNewDVM(event: NewDVM): void {
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
   }
-
-  dodo.save();
   pool.save();
 }
 
