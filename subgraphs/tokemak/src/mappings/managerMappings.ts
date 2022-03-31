@@ -92,6 +92,7 @@ function createVault(vaultAddress: Address, timestamp: BigInt, blocknumber: BigI
   VaultTemplate.create(vaultAddress);
   return vault;
 }
+
 function getOrCreateVault(vaultAddress: Address, event: ethereum.Event): VaultStore {
   // Note that the NewVault event are also emitted when endorseVault and newRelease
   // are called. So we only create it when necessary.
