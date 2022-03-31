@@ -66,6 +66,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   
     totalUniqueUsers.save();
     usageMetrics.save();
+    protocol.save()
   }
   
 // Update UsagePoolDailySnapshot entity
