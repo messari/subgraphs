@@ -16,7 +16,7 @@ const genFunc = () => {
     })),
     pools: _.filter(pools, (e) => {
       return (
-        e.chainId === 1 && e.stage === "prod" && e.version === 3
+        e.chainId === 1 && e.stage === "prod" && e.version > 2 && e.version < 4 // When next abi version arrives increment
       );
     }).map((e) => ({
       name: e.name,

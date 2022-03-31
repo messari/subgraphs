@@ -94,10 +94,14 @@ dataSources:
         - name: PoolV{{version}}
           file: ./abis/pool-v{{version}}.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV{{version}}
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV{{version}}
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV{{version}}
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV{{version}}
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV{{version}}
       blockHandlers:
         - handler: handleBlockV{{version}}
 {{/pools}}
