@@ -15,10 +15,6 @@ import {
   updateProtocolFees
 } from '../common/helpers'
 import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/intervalUpdates'
-import { Pool, SetFeeProtocol__Params } from '../../generated/Factory/Pool'
-import { getLiquidityPool, getLiquidityPoolFee } from '../common/getters'
-import { BigDecimal } from '@graphprotocol/graph-ts'
-import { BIGDECIMAL_ONE } from '../common/constants'
 
 export function handleInitialize(event: Initialize): void {
   updatePrices(event)

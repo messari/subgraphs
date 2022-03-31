@@ -378,6 +378,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
 
   swap.save()
   pool.save()
+  protocol.save()
   poolAmounts.save()
   ether.save()
 }
