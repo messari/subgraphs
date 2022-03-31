@@ -193,7 +193,7 @@ export function createDeposit(event: ethereum.Event, owner: Address, amount0: Bi
   deposit.logIndex = event.logIndex.toI32()
   deposit.protocol = protocol.id
   deposit.to = pool.id
-  deposit.from = owner.toHexString()
+  deposit.from = event.transaction.from.toHexString()
   deposit.blockNumber = event.block.number
   deposit.timestamp = event.block.timestamp
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
@@ -268,7 +268,7 @@ export function createWithdraw(event: ethereum.Event, owner: Address, amount0: B
   withdrawal.hash = event.transaction.hash.toHexString()
   withdrawal.logIndex = event.logIndex.toI32()
   withdrawal.protocol = protocol.id
-  withdrawal.to = owner.toHexString()
+  withdrawal.to = event.transaction.from.toHexString()
   withdrawal.from = pool.id
   withdrawal.blockNumber = event.block.number
   withdrawal.timestamp = event.block.timestamp
