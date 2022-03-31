@@ -1,0 +1,26 @@
+{
+  "name": "balancer-v2-subgraph",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write ../balancer-v2",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ dOrgTech/balancer-v2",
+    "create-local": "graph create --node http://localhost:8020/ dOrgTech/balancer-v2",
+    "remove-local": "graph remove --node http://localhost:8020/ dOrgTech/balancer-v2",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dOrgTech/balancer-v2"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.26.0",
+    "@graphprotocol/graph-ts": "0.25.0"
+  },
+  "devDependencies": {
+    "prettier": "2.6.1",
+    "husky": "7.0.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run format"
+    }
+  }
+}
