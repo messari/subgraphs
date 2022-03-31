@@ -252,26 +252,31 @@ export function createLiquidation(
 ///////////////////////////////
 
 // creates a new lending market and returns it
-export function createMarket(marketAddress: string, protocol: string, blockNumber: BigInt, timestamp: BigInt): Market {
+export function createMarket(marketAddress: string, blockNumber: BigInt, timestamp: BigInt): Market {
   let market = new Market(marketAddress);
   let cTokenContract = CToken.bind(Address.fromString(marketAddress));
   let underlyingAddress: string;
   let underlying = cTokenContract.try_underlying();
-  if (underlying.reverted) {
+  if (marketAddress == CETH_ADDRESS) {
+    underlyingAddress = ETH_ADDRESS;
+  } else if (underlying.reverted) {
     underlyingAddress = ZERO_ADDRESS;
   } else {
     underlyingAddress = underlying.value.toHexString();
   }
 
+  // add market id to protocol
+  let protocol = getOrCreateLendingProtcol();
+  let marketIds = protocol._marketIds;
+  marketIds.push(marketAddress);
+  protocol._marketIds = marketIds;
+  protocol.save();
+
   // create Tokens
-  let inputToken: Token;
+  let inputToken = getOrCreateToken(underlyingAddress);
   let rewardToken: RewardToken | null;
-  if (marketAddress == CETH_ADDRESS) {
-    inputToken = getOrCreateToken(Address.fromString(ETH_ADDRESS));
-    underlyingAddress = ETH_ADDRESS;
-  } else {
-    inputToken = getOrCreateToken(Address.fromString(underlyingAddress));
-  }
+  let outputToken = getOrCreateCToken(Address.fromString(marketAddress), cTokenContract);
+
   // COMP was not created until block 9601359
   if (blockNumber.toI32() > 9601359) {
     rewardToken = getOrCreateRewardToken(Address.fromString(COMP_ADDRESS));
@@ -279,10 +284,8 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
     rewardToken = null;
   }
 
-  let outputToken = getOrCreateCToken(Address.fromString(marketAddress), cTokenContract);
-
   // populate market vars
-  market.protocol = protocol;
+  market.protocol = COMPTROLLER_ADDRESS;
 
   // add tokens
   let inputTokens = new Array<string>();
@@ -312,14 +315,9 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
   if (underlyingAddress == SAI_ADDRESS) {
     market.name = "Dai Stablecoin v1.0 (DAI)";
   } else {
-    let inputToken = Token.load(underlyingAddress);
-    if (inputToken == null) {
-      market.name = "Unknown Name";
-    } else {
-      market.name = inputToken.name;
-    }
+    market.name = inputToken.name;
   }
-  market.isActive = true;
+  market.isActive = true; // event MarketListed() makes a market active
   market.canUseAsCollateral = false; // until Collateral is taken out
   market.canBorrowFrom = false; // until Borrowed from
 
@@ -327,10 +325,16 @@ export function createMarket(marketAddress: string, protocol: string, blockNumbe
   // TODO: figure out and do calcs
   market.maximumLTV = BIGDECIMAL_ZERO;
   market.liquidationThreshold = BIGDECIMAL_ZERO;
-  market.liquidationPenalty = BIGDECIMAL_ZERO;
   market.depositRate = BIGDECIMAL_ZERO;
   market.stableBorrowRate = BIGDECIMAL_ZERO;
   market.variableBorrowRate = BIGDECIMAL_ZERO;
+
+  // add liquidation penalty if the protocol has it
+  if (protocol._liquidationPenalty != BIGDECIMAL_ZERO) {
+    market.liquidationPenalty = protocol._liquidationPenalty;
+  } else {
+    market.liquidationPenalty = BIGDECIMAL_ZERO;
+  }
 
   return market;
 }

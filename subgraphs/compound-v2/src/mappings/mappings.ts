@@ -20,6 +20,8 @@ import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../co
 import { getOrCreateLendingProtcol } from "../common/getters";
 import { Market } from "../types/schema";
 import { exponentToBigDecimal } from "../common/utils/utils";
+import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ONE } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.minter)) {
@@ -75,12 +77,7 @@ export function handleMarketListed(event: MarketListed): void {
   CToken.create(event.params.cToken);
 
   // create new market now that the data source is instantiated
-  let market = createMarket(
-    event.params.cToken.toHexString(),
-    event.address.toHexString(),
-    event.block.number,
-    event.block.timestamp,
-  );
+  let market = createMarket(event.params.cToken.toHexString(), event.block.number, event.block.timestamp);
   market.save();
 }
 
@@ -107,18 +104,35 @@ export function handleMarketExited(event: MarketExited): void {}
 export function handleNewCloseFactor(event: NewCloseFactor): void {}
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  // update LTV for a given market
   let market = Market.load(event.params.cToken.toHexString());
   if (market == null) {
     return;
   }
-  let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(18));
+  let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(16));
   market.maximumLTV = newLTV;
+  // collateral factor is the borrowing capacity. The liquidity a borrower has is the collateral factor
+  // ex: if collateral factor = 75% and the user has 100 USD (normalized) they can borrow $75
+  //     if that ratio rises above 75% they are at risk of liquidation
+  market.liquidationThreshold = newLTV;
   market.save();
 }
 
 // export function handleNewMaxAssets(event: NewMaxAssets): void {}
 
-export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {}
+export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
+  let protocol = getOrCreateLendingProtcol();
+  let liquidationPenalty = event.params.newLiquidationIncentiveMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(16))
+    .minus(BIGDECIMAL_ONE);
+  protocol._liquidationPenalty = liquidationPenalty;
+
+  // set liquidation penalty for each market
+  for (let i = 0; i < protocol._marketIds.length; i++) {
+    let market = Market.load(protocol._marketIds[i]);
+    market!.liquidationPenalty = liquidationPenalty;
+    market!.save();
+  }
+}
 
 export function handleClaimComp(call: ClaimCompCall): void {}

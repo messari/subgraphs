@@ -292,12 +292,18 @@ type LendingProtocol implements Protocol @entity {
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
 
+  " Store the ids of each market "
+  _marketIds: [String!]!
+
   lendingType: LendingType
 
   riskType: RiskType
 
   " Price Oracle used to calculate asset price in USD "
   _priceOracle: Bytes
+
+  " Liquidation penalty (the same for every market) "
+  _liquidationPenalty: BigDecimal!
 }
 
 type Market @entity {

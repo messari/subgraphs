@@ -51,6 +51,8 @@ Deployed addresses: https://compound.finance/docs#networks
 
 Existing subgraphs: https://github.com/graphprotocol/compound-v2-subgraph
 
+Explanation of lending metrics: https://docs.aave.com/risk/asset-risk/risk-parameters
+
 Subgraph in the studio:
 
 Dune Dashboard for Testing: https://dune.xyz/messari/Messari:-Compound-Macro-Financial-Statements
