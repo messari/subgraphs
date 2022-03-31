@@ -5,8 +5,13 @@ import {
   ZERO_BI,
   ONE_BI,
   ZERO_BD,
-  ADDRESS_ZERO
+  ADDRESS_ZERO,
+  Network,
+  ProtocolType,
+  RewardTokenType
 } from "./utils/constants";
+
+import { getOrCreateToken, getOrCreateRewardToken } from "./utils/getters";
 
 import {
   DVMFactory,
@@ -25,55 +30,13 @@ import {
   RewardToken
 } from "../generated/schema";
 
-function getToken(address: Address): ERC20 {
-  return ERC20.bind(address);
-}
-
 export function handleNewDVM(event: NewDVM): void {
   let dodo = DexAmmProtocol.load(event.address.toHex());
   let pool = LiquidityPool.load(event.params.dvm.toHex());
-  let it = Token.load(event.params.baseToken.toHex());
-  let ot = Token.load(event.params.quoteToken.toHex());
-  let dodoLp = RewardToken.load(DODOLpToken_ADDRESS);
-  let vdodo = RewardToken.load(vDODOToken_ADDRESS);
-
-  if (!dodoLp) {
-    dodoLp = new RewardToken(DODOLpToken_ADDRESS);
-    let tokenC = getToken(Address.fromString(DODOLpToken_ADDRESS));
-    dodoLp.name = tokenC.name();
-    dodoLp.symbol = tokenC.symbol();
-    dodoLp.decimals = tokenC.decimals();
-    dodoLp.type = "DEPOSIT";
-    dodoLp.save();
-  }
-
-  if (!vdodo) {
-    vdodo = new RewardToken(vDODOToken_ADDRESS);
-    let tokenC = getToken(Address.fromString(vDODOToken_ADDRESS));
-    vdodo.name = tokenC.name();
-    vdodo.symbol = tokenC.symbol();
-    vdodo.decimals = tokenC.decimals();
-    vdodo.type = "DEPOSIT";
-    vdodo.save();
-  }
-
-  if (!it) {
-    it = new Token(event.params.baseToken.toHex());
-    let tokenC = getToken(event.params.baseToken);
-    it.name = tokenC.name();
-    it.symbol = tokenC.symbol();
-    it.decimals = tokenC.decimals();
-  }
-  it.save();
-
-  if (!ot) {
-    ot = new Token(event.params.quoteToken.toHex());
-    let tokenC = getToken(event.params.baseToken);
-    ot.name = tokenC.name();
-    ot.symbol = tokenC.symbol();
-    ot.decimals = tokenC.decimals();
-  }
-  ot.save();
+  let it = getOrCreateToken(event.params.baseToken);
+  let ot = getOrCreateToken(event.params.quoteToken);
+  let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
+  let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
 
   if (!dodo) {
     dodo = new DexAmmProtocol(event.address.toHex());

@@ -3,7 +3,9 @@
 ## Links
 
 - Protocol: https://dodoex.io/
-- Docs: https://docs.dodoex.io/english/
+- Docs:
+  https://docs.dodoex.io/english/
+  https://dodoex.github.io/docs/docs/contractUseGuide
 - Smart contracts: https://github.com/DODOEX/contractV2
 - Deployed addresses: https://docs.dodoex.io/english/developers/contracts-address
 - Official subgraph: https://github.com/DODOEX/dodoex_v2_subgraph
