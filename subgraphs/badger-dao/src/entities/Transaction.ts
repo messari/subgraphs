@@ -3,8 +3,8 @@ import { Deposit, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 
 export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
-  const id: string = hash
-    .toHex()
+  const id: string = "deposit-"
+    .concat(hash.toHex())
     .concat("-")
     .concat(logIndex.toHex());
 
@@ -33,8 +33,8 @@ export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
 }
 
 export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt): Withdraw {
-  const id: string = hash
-    .toHex()
+  const id: string = "withdraw-"
+    .concat(hash.toHex())
     .concat("-")
     .concat(logIndex.toHex());
 
