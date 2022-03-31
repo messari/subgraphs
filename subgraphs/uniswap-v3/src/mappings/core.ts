@@ -11,9 +11,14 @@ import {
   updatePrices,
   createDeposit,
   createWithdraw,
-  createSwapHandleVolumeAndFees
+  createSwapHandleVolumeAndFees,
+  updateProtocolFees
 } from '../common/helpers'
 import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/intervalUpdates'
+import { Pool, SetFeeProtocol__Params } from '../../generated/Factory/Pool'
+import { getLiquidityPool, getLiquidityPoolFee } from '../common/getters'
+import { BigDecimal } from '@graphprotocol/graph-ts'
+import { BIGDECIMAL_ONE } from '../common/constants'
 
 export function handleInitialize(event: Initialize): void {
   updatePrices(event)
@@ -21,21 +26,18 @@ export function handleInitialize(event: Initialize): void {
 }
 
 export function handleSetFeeProtocol(event: SetFeeProtocol): void {
-  // let pool = getLiquidityPool(event.address.toString())
-  // let protocolFee = getLiquidityPoolFee(pool.fees[1])
-  // protocolFee.feePercentage = 
-  // event.params.feeProtocol0New
+  updateProtocolFees(event)
 }
 
 export function handleMint(event: MintEvent): void {
-  createDeposit(event, event.params.owner, event.params.amount0, event.params.amount1, event.params.amount)
+  createDeposit(event, event.params.amount0, event.params.amount1, event.params.amount)
   updateUsageMetrics(event, event.params.sender)
   updateFinancials(event)
   updatePoolMetrics(event)
 }
 
 export function handleBurn(event: BurnEvent): void {
-  createWithdraw(event, event.params.owner, event.params.amount0, event.params.amount1, event.params.amount)
+  createWithdraw(event, event.params.amount0, event.params.amount1, event.params.amount)
   updateUsageMetrics(event, event.transaction.from)
   updateFinancials(event)
   updatePoolMetrics(event)
