@@ -147,10 +147,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -180,10 +184,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -213,10 +221,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -246,10 +258,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -279,10 +295,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -312,10 +332,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -345,10 +369,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -378,10 +406,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -411,10 +443,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -444,10 +480,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -477,10 +517,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -510,10 +554,14 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -543,9 +591,13 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApprovalV3
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
       blockHandlers:
         - handler: handleBlockV3
