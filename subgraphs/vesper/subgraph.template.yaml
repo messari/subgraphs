@@ -94,8 +94,6 @@ dataSources:
         - name: PoolV{{version}}
           file: ./abis/pool-v{{version}}.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV{{version}}
         - event: Deposit(indexed address,uint256,uint256)
           handler: handleDepositV{{version}}
         - event: Transfer(indexed address,indexed address,uint256)
