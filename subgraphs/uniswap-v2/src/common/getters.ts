@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
+import { Address, ethereum } from "@graphprotocol/graph-ts"
 import {
   Token,
   DexAmmProtocol,
@@ -15,8 +15,7 @@ import {
   _TokenTracker,
   LiquidityPoolFee
 } from "../../generated/schema"
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE } from "../common/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE, DEFAULT_DECIMALS } from "../common/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
@@ -77,15 +76,27 @@ export function get(poolAddress: string): _LiquidityPoolAmounts {
     return _LiquidityPoolAmounts.load(poolAddress)!
 }
 
-export function getOrCreateToken(tokenAddress: Address): Token {
+// export function getOrCreateToken(tokenAddress: Address): Token {
+//     let token = Token.load(tokenAddress.toHexString())
+//     // fetch info if null
+//     if (!token) {
+//         token = new Token(tokenAddress.toHexString())
+//         token.symbol = fetchTokenSymbol(tokenAddress)
+//         token.name = fetchTokenName(tokenAddress)
+//         token.decimals = fetchTokenDecimals(tokenAddress)
+
+//     }
+//     return token
+// }
+
+export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
     let token = Token.load(tokenAddress.toHexString())
     // fetch info if null
-    if (!token) {
+    if (token === null) {
         token = new Token(tokenAddress.toHexString())
-        token.symbol = fetchTokenSymbol(tokenAddress)
-        token.name = fetchTokenName(tokenAddress)
-        token.decimals = fetchTokenDecimals(tokenAddress)
-        token.save()
+        token.symbol = token0.name + '/' + token1.name
+        token.name = token0.name + '/' + token1.name + " LP"
+        token.decimals = DEFAULT_DECIMALS
     }
     return token
 }

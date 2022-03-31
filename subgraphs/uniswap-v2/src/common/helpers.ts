@@ -18,8 +18,9 @@ import { Factory as FactoryContract } from '../../generated/templates/Pair/Facto
 import { Pair as PairTemplate } from '../../generated/templates'
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE_TO_OFF, BIGDECIMAL_HUNDRED } from "../common/constants"
 import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./Price"
-import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
 import { updateVolumeAndFees } from "./intervalUpdates"
+import { getOrCreateToken } from "./tokens"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -406,7 +407,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   swap.logIndex = event.logIndex.toI32()
   swap.protocol = protocol.id
   swap.to = to.toHexString()
-  swap.from = event.transaction.from.toHexString()
+  swap.from = sender.toHexString()
   swap.blockNumber = event.block.number
   swap.timestamp = event.block.timestamp
   swap.tokenIn = amount0In != BIGINT_ZERO ? token0.id : token1.id
