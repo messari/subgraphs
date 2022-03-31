@@ -48,16 +48,16 @@ import {
 //     address receiver
 // );
 export function handleBuyShares(event: BuyShares): void {
-  let pool = LiquidityPool.load(event.address.toHex());
-  let lpFee = LiquidityPoolFee.load();
-  let poolDailySS = PoolDailySnapshot.load();
-  let deposit = Deposit.load();
-
-  pool.totalValueLockedUSD = ZERO_BD;
-  pool.totalVolumeUSD = ZERO_BD;
-  pool.inputTokenBalances = [ZERO_BI];
-  pool.outputTokenSupply = ZERO_BI;
-  pool.outputTokenPriceUSD = ZERO_BD;
+  // let pool = LiquidityPool.load(event.address.toHex());
+  // let lpFee = LiquidityPoolFee.load();
+  // let poolDailySS = PoolDailySnapshot.load();
+  // let deposit = Deposit.load();
+  //
+  // pool.totalValueLockedUSD = ZERO_BD;
+  // pool.totalVolumeUSD = ZERO_BD;
+  // pool.inputTokenBalances = [ZERO_BI];
+  // pool.outputTokenSupply = ZERO_BI;
+  // pool.outputTokenPriceUSD = ZERO_BD;
 }
 
 export function handleSellShares(event: SellShares): void {}
