@@ -66,3 +66,38 @@ dataSources:
         - event:  Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
 {{/tokens}}
+{{#pools}}
+  - kind: ethereum/contract
+    name: 'poolV{{version}}_{{name}}'
+    network: mainnet
+    source:
+      address: '{{address}}'
+      abi: PoolV{{version}}
+      startBlock: {{birthblock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+      abis:
+        - name: PoolV{{version}}
+          file: ./abis/pool-v{{version}}.json
+      eventHandlers:
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV{{version}}
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV{{version}}
+      blockHandlers:
+        - handler: handleBlockV{{version}}
+{{/pools}}
