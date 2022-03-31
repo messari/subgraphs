@@ -56,6 +56,7 @@ export function registerCurrentVaults(event: ethereum.Event): void {
     getOrCreateVault(Address.fromString(CURRENT_VAULTS[i]), event);
   }
 }
+
 function createVault(vaultAddress: Address, timestamp: BigInt, blocknumber: BigInt): VaultStore {
   const vault = new VaultStore(vaultAddress.toHexString());
   const vaultContract = VaultContract.bind(Address.fromString(vault.id));
