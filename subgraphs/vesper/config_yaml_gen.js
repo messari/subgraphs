@@ -26,7 +26,7 @@ const genFunc = () => {
     })),
   };
 
-  console.log(context);
+  console.info('Template context :', context);
   readFile("./subgraph.template.yaml", "utf8")
     .then((templateFile) =>
       writeFile("./subgraph.yaml", Mustache.render(templateFile, context))

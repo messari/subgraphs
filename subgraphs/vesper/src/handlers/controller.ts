@@ -1,5 +1,4 @@
 import { Deposit } from "../../generated/schema";
-import { OwnershipTransferred as OTC } from "../../generated/controller/Controller";
-import { OwnershipTransferred as OTCM } from "../../generated/collateralManager/Controller";
+import { OwnershipTransferred } from "../../generated/controller/Controller";
 
-export function handleOwnershipTransferred(event: OTC | OTCM) {}
+export function handleOwnershipTransferred(event: OwnershipTransferred) {}

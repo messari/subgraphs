@@ -1,13 +1,6 @@
 import { Token, RewardToken } from "../../generated/schema";
-import {
-  Approval as ApprovalVSP,
-  Transfer as TransferVSP,
-} from "../../generated/VSP/Erc20Token";
-import {
-  Approval as ApprovalVUSP,
-  Transfer as TransferVUSP,
-} from "../../generated/VUSD/Erc20Token";
+import { Approval, Transfer } from "../../generated/VSP/Erc20Token";
 
-export function handleApproval(event: ApprovalVSP | ApprovalVUSP) {}
+export function handleApproval(event: Approval) {}
 
-export function handleTransfer(event: TransferVSP | TransferVUSP) {}
+export function handleTransfer(event: Transfer) {}
