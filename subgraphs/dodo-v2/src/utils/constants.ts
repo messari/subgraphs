@@ -3,6 +3,7 @@ import { BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts";
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 export const DODOLpToken_ADDRESS = "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd";
 export const vDODOToken_ADDRESS = "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a";
+export const DVMFactory_ADDRESS = "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C";
 
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);

@@ -13,11 +13,7 @@ import {
   BuyShares,
   SellShares,
   DODOSwap,
-  DODOFlashLoan,
-  Transfer,
-  Approval,
-  Mint,
-  Burn
+  DODOFlashLoan
 } from "../generated/DVM/DVM";
 
 import { ERC20 } from "../generated/ERC20/ERC20";
@@ -34,7 +30,22 @@ import {
   Swap
 } from "../generated/schema";
 
-//In the case of a DVM the pools shares are the base token
+import {
+  getOrCreateToken,
+  getOrCreateRewardToken,
+  getOrCreateDexAmm,
+  getOrCreateUsageMetricSnapshot,
+  getOrCreateFinancials,
+  getOrCreatePoolDailySnapshot
+} from "./utils/getters";
+
+import {
+  updateFinancials,
+  updateUsageMetrics,
+  updatePoolMetrics
+} from "./utils/metrics";
+
+//In the case of a DVM the pools shares are the lp token ?
 
 // event BuyShares(address to, uint256 increaseShares, uint256 totalShares);
 //
@@ -48,18 +59,19 @@ import {
 //     address receiver
 // );
 export function handleBuyShares(event: BuyShares): void {
-  // let pool = LiquidityPool.load(event.address.toHex());
-  // let lpFee = LiquidityPoolFee.load();
-  // let poolDailySS = PoolDailySnapshot.load();
-  // let deposit = Deposit.load();
-  //
-  // pool.totalValueLockedUSD = ZERO_BD;
-  // pool.totalVolumeUSD = ZERO_BD;
-  // pool.inputTokenBalances = [ZERO_BI];
-  // pool.outputTokenSupply = ZERO_BI;
-  // pool.outputTokenPriceUSD = ZERO_BD;
+  updateUsageMetrics(event, event.params.to);
+  updateFinancials(event);
+  updatePoolMetrics(event);
 }
 
-export function handleSellShares(event: SellShares): void {}
+export function handleSellShares(event: SellShares): void {
+  updateUsageMetrics(event, event.params.payer);
+  updateFinancials(event);
+  updatePoolMetrics(event);
+}
 
-export function handleDODOSwap(event: DODOSwap): void {}
+export function handleDODOSwap(event: DODOSwap): void {
+  updateUsageMetrics(event, event.params.trader);
+  updateFinancials(event);
+  updatePoolMetrics(event);
+}

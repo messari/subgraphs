@@ -12,7 +12,14 @@ import {
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 
-import { ZERO_BD, Network, ProtocolType, RewardTokenType } from "./constants";
+import {
+  ZERO_BD,
+  Network,
+  ProtocolType,
+  RewardTokenType,
+  SECONDS_PER_DAY,
+  DVMFactory_ADDRESS
+} from "./constants";
 
 export function getOrCreateRewardToken(rewardToken: Address): RewardToken {
   let token = RewardToken.load(rewardToken.toHexString());
@@ -41,11 +48,15 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateDexAmm(address: Address): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(address.toHex());
+export function getOrCreateDexAmm(): DexAmmProtocol {
+  let protocol = DexAmmProtocol.load(
+    Address.fromString(DVMFactory_ADDRESS).toHex()
+  );
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(address.toHex());
+    protocol = new DexAmmProtocol(
+      Address.fromString(DVMFactory_ADDRESS).toHex()
+    );
     protocol.name = "DODO V2";
     protocol.slug = "messari-dodo";
     protocol.schemaVersion = "1.0.0";
@@ -59,71 +70,72 @@ export function getOrCreateDexAmm(address: Address): DexAmmProtocol {
   }
   return protocol;
 }
-// export function getOrCreateUsageMetricSnapshot(
-//   event: ethereum.Event
-// ): UsageMetricsDailySnapshot {
-//   // Number of days since Unix epoch
-//   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-//
-//   // Create unique id for the day
-//   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-//
-//   if (!usageMetrics) {
-//     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-//     usageMetrics.protocol = FACTORY_ADDRESS;
-//
-//     usageMetrics.activeUsers = 0;
-//     usageMetrics.totalUniqueUsers = 0;
-//     usageMetrics.dailyTransactionCount = 0;
-//     usageMetrics.save();
-//   }
-//
-//   return usageMetrics;
-// }
-//
-// export function getOrCreatePoolDailySnapshot(
-//   event: ethereum.Event
-// ): PoolDailySnapshot {
-//   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-//   let poolAddress = event.address.toHexString();
-//   let poolMetrics = PoolDailySnapshot.load(
-//     poolAddress.concat("-").concat(id.toString())
-//   );
-//
-//   if (!poolMetrics) {
-//     poolMetrics = new PoolDailySnapshot(
-//       poolAddress.concat("-").concat(id.toString())
-//     );
-//     poolMetrics.protocol = FACTORY_ADDRESS;
-//     poolMetrics.pool = poolAddress;
-//     poolMetrics.rewardTokenEmissionsAmount = [];
-//     poolMetrics.rewardTokenEmissionsUSD = [];
-//
-//     poolMetrics.save();
-//   }
-//
-//   return poolMetrics;
-// }
-//
-// export function getOrCreateFinancials(
-//   event: ethereum.Event
-// ): FinancialsDailySnapshot {
-//   // Number of days since Unix epoch
-//   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-//
-//   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-//
-//   if (!financialMetrics) {
-//     financialMetrics = new FinancialsDailySnapshot(id.toString());
-//     financialMetrics.protocol = FACTORY_ADDRESS;
-//
-//     financialMetrics.feesUSD = BIGDECIMAL_ZERO;
-//     financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
-//     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-//     financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-//     financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-//
-//     financialMetrics.save();
-//   }
-//   return financialMetrics;
-// }
+
+export function getOrCreateUsageMetricSnapshot(
+  event: ethereum.Event
+): UsageMetricsDailySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+    usageMetrics.protocol = DVMFactory_ADDRESS;
+
+    usageMetrics.activeUsers = 0;
+    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
+}
+
+export function getOrCreateFinancials(
+  event: ethereum.Event
+): FinancialsDailySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(id.toString());
+    financialMetrics.protocol = DVMFactory_ADDRESS;
+
+    financialMetrics.feesUSD = ZERO_BD;
+    financialMetrics.totalVolumeUSD = ZERO_BD;
+    financialMetrics.totalValueLockedUSD = ZERO_BD;
+    financialMetrics.supplySideRevenueUSD = ZERO_BD;
+    financialMetrics.protocolSideRevenueUSD = ZERO_BD;
+
+    financialMetrics.save();
+  }
+  return financialMetrics;
+}
+
+export function getOrCreatePoolDailySnapshot(
+  event: ethereum.Event
+): PoolDailySnapshot {
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let poolAddress = event.address.toHexString();
+  let poolMetrics = PoolDailySnapshot.load(
+    poolAddress.concat("-").concat(id.toString())
+  );
+
+  if (!poolMetrics) {
+    poolMetrics = new PoolDailySnapshot(
+      poolAddress.concat("-").concat(id.toString())
+    );
+    poolMetrics.protocol = DVMFactory_ADDRESS;
+    poolMetrics.pool = poolAddress;
+    poolMetrics.rewardTokenEmissionsAmount = [];
+    poolMetrics.rewardTokenEmissionsUSD = [];
+
+    poolMetrics.save();
+  }
+
+  return poolMetrics;
+}

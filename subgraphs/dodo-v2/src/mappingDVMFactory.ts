@@ -14,7 +14,10 @@ import {
 import {
   getOrCreateToken,
   getOrCreateRewardToken,
-  getOrCreateDexAmm
+  getOrCreateDexAmm,
+  getOrCreateUsageMetricSnapshot,
+  getOrCreateFinancials,
+  getOrCreatePoolDailySnapshot
 } from "./utils/getters";
 
 import {
@@ -35,12 +38,15 @@ import {
 } from "../generated/schema";
 
 export function handleNewDVM(event: NewDVM): void {
-  let dodo = getOrCreateDexAmm(event.address);
+  let dodo = getOrCreateDexAmm();
   let pool = LiquidityPool.load(event.params.dvm.toHex());
   let it = getOrCreateToken(event.params.baseToken);
   let ot = getOrCreateToken(event.params.quoteToken);
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
+  getOrCreateUsageMetricSnapshot(event);
+  getOrCreateFinancials(event);
+  getOrCreatePoolDailySnapshot(event);
 
   if (!pool) {
     pool = new LiquidityPool(event.params.dvm.toHex());
