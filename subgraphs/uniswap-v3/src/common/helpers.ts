@@ -1,5 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigInt, BigDecimal, Address, log, ethereum } from "@graphprotocol/graph-ts"
+import { Pool } from "../../generated/Factory/Pool"
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -128,7 +129,7 @@ function incrementDepositHelper(poolAddress: string): void {
   poolDeposits.save()
 }
 
-export function createDeposit(event: ethereum.Event, owner: Address, amount0: BigInt, amount1: BigInt, amount: BigInt): void {
+export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, amount: BigInt): void {
   let ether = getOrCreateEtherHelper()
 
   let poolAddress = event.address.toHexString()
@@ -210,7 +211,7 @@ export function createDeposit(event: ethereum.Event, owner: Address, amount0: Bi
   protocol.save()
 }
 
-export function createWithdraw(event: ethereum.Event, owner: Address, amount0: BigInt, amount1: BigInt, amount: BigInt): void {
+export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt, amount: BigInt): void {
   let ether = getOrCreateEtherHelper()
 
   let poolAddress = event.address.toHexString()
@@ -411,6 +412,28 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
   poolMetrics.save();
   financialMetrics.save()
   pool.save()
+}
+
+export function updateProtocolFees(event: ethereum.Event): void {
+  let poolContract = Pool.bind(event.address)
+  let pool = getLiquidityPool(event.address.toString())
+
+  let tradingFee = getLiquidityPoolFee(pool.fees[0])
+  let protocolFee = getLiquidityPoolFee(pool.fees[1])
+
+  // Get the total proportion of swap value collected as a fee
+  let totalPoolFee = tradingFee.feePercentage.plus(protocolFee.feePercentage)
+
+  // Value5 is the feeProtocol variabe in the slot0 struct of the pool contract 
+  let feeProtocol = poolContract.slot0().value5
+  let protocolFeeProportion = BIGDECIMAL_ONE.div(BigDecimal.fromString(feeProtocol.toString()))
+
+  // Update protocol and trading fees for this pool
+  tradingFee.feePercentage = totalPoolFee.times(BIGDECIMAL_ONE.minus(protocolFeeProportion))
+  protocolFee.feePercentage = totalPoolFee.times(protocolFeeProportion)
+
+  tradingFee.save()
+  protocolFee.save()
 }
 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
