@@ -3,7 +3,6 @@ import {
     BigInt,
     BigDecimal,
     log,
-    dataSource
 } from '@graphprotocol/graph-ts'
 
 import { GeistToken as TokenContract } from "../../generated/GeistToken/GeistToken"
@@ -34,9 +33,9 @@ import {
 
 import { 
     convertBigIntToBigDecimal,
-    exponentToBigDecimal,
     bigIntToPercentage,
-    getDaysSinceUnixEpoch
+    getDaysSinceUnixEpoch,
+    getDataFromContext
 } from "../common/utils"
 
 import * as constants from "../common/constants"
@@ -88,10 +87,10 @@ export function initializeRewardToken(address: Address, rewardType: string): Rew
     return rewardToken;
 }
 
-export function initializeLendingProtocol(): LendingProtocolEntity {
-    let protocol = LendingProtocolEntity.load(constants.PROTOCOL_ID)
+export function initializeLendingProtocol(id: string): LendingProtocolEntity {
+    let protocol = LendingProtocolEntity.load(id)
     if (!protocol) {
-      protocol = new LendingProtocolEntity(constants.PROTOCOL_ID)
+      protocol = new LendingProtocolEntity(id)
       protocol.name = "Geist Finance"
       protocol.slug = "geist-finance"
       protocol.network = constants.NETWORK_FANTOM
@@ -374,7 +373,7 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
     let market = MarketEntity.load(id) as MarketEntity;
 
     if (!market) {
-        let lendingPool = getLendingPoolFromContext();
+        let lendingPool = getDataFromContext("lendingPool");
         let lendingPoolContract = LendingPool.bind(Address.fromString(lendingPool));
         let token = initializeToken(Address.fromString(id));
         let inputTokens: TokenEntity[] = [token]; 
@@ -382,7 +381,8 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(constants.ZERO_BI);
         };
-        let protocol = initializeLendingProtocol();
+        let protocolId = getDataFromContext("protocolId");
+        let protocol = initializeLendingProtocol(protocolId);
 
         let market = new MarketEntity(id);
         market.protocol = protocol.name;
@@ -409,14 +409,23 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
         market.depositRate = constants.ZERO_BD;
 
         let reserves = lendingPoolContract.try_getReserveData(Address.fromString(id));
+        log.warning(
+            "Reserves are currentStableBorrowRate={}, currentVariableBorrowRate={}", 
+            [
+                reserves.value.currentStableBorrowRate.toString(), 
+                reserves.value.currentVariableBorrowRate.toString()
+            ]
+        );
         if (reserves.reverted) {
             log.error("Unable to set market stableBorrowRate and variableBorrowRate, setting to zero", []);
             market.stableBorrowRate = constants.ZERO_BD;
             market.variableBorrowRate = constants.ZERO_BD;
         }
         else {
-            market.stableBorrowRate = convertBigIntToBigDecimal(reserves.value.currentStableBorrowRate, BigInt.fromI32(18));
-            market.variableBorrowRate = convertBigIntToBigDecimal(reserves.value.currentVariableBorrowRate, BigInt.fromI32(18));
+            market.stableBorrowRate = convertBigIntToBigDecimal(
+                reserves.value.currentStableBorrowRate, BigInt.fromI32(18));
+            market.variableBorrowRate = convertBigIntToBigDecimal(
+                reserves.value.currentVariableBorrowRate, BigInt.fromI32(18));
             log.warning(
                 "Market stableBorrowRate={}, variableBorrowRate={}", 
                 [
@@ -430,10 +439,4 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
     market.save();
 
     return market;
-}
-
-export function getLendingPoolFromContext(): string {
-    // Get the lending pool/market address with context
-    let context = dataSource.context();
-    return context.getString("lendingPool");
 }
