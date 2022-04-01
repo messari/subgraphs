@@ -93,9 +93,15 @@ dataSources:
       abis:
         - name: PoolV{{version}}
           file: ./abis/pool-v{{version}}.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV2
+          file: ./abis/strategy-v{{version}}.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV{{version}}
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV{{version}}
         - event: Withdraw(indexed address,uint256,uint256)
