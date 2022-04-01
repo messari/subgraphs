@@ -32,7 +32,11 @@ import {
   Deposit,
   Borrow,
   Withdraw,
-  Repay
+  Repay,
+  LiquidationCall,
+  ReserveDataUpdated,
+  ReserveUsedAsCollateralEnabled,
+  ReserveUsedAsCollateralDisabled
 } from '../../generated/templates/LendingPool/LendingPool'
 
 import { 
@@ -49,7 +53,8 @@ import {
   Deposit as DepositEntity,
   Withdraw as WithdrawEntity,
   Borrow as BorrowEntity,
-  Repay as RepayEntity
+  Repay as RepayEntity,
+  Liquidation as LiquidationEntity
 } from "../../generated/schema"
 
 import * as constants from "../common/constants"
@@ -69,7 +74,8 @@ import {
 } from './helpers';
 
 import { 
-  getTimestampInMillis 
+  getTimestampInMillis,
+  getDaysSinceUnixEpoch
 } from "../common/utils"
 
 
@@ -371,4 +377,61 @@ export function handleStakeWithdrawn(event: Withdrawn): void {
   financialsDailySnapshot.save();
 }
 
+export function handleLiquidationCall(event: LiquidationCall): void {
+  let tx = event.transaction;
+  let id = "liquidation-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString();
+  let marketAddress = event.params.collateralAsset.toHexString();
 
+  let asset = initializeToken(event.params.collateralAsset);
+  let tokenAmountUSD = getTokenAmountUSD(event.params.collateralAsset, event.params.liquidatedCollateralAmount);
+  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
+  let liquidation = LiquidationEntity.load(id);
+  if (!liquidation) {
+    liquidation = new LiquidationEntity(id)
+    liquidation.logIndex = tx.index.toI32()
+    liquidation.to = marketAddress;
+    liquidation.from = event.params.liquidator.toHexString();
+    liquidation.hash = tx.hash.toHexString();
+    liquidation.logIndex = tx.index.toI32();
+    liquidation.asset = asset.id;
+    liquidation.protocol = constants.PROTOCOL_ID;
+    liquidation.timestamp = getTimestampInMillis(event.block);
+    liquidation.blockNumber = event.block.number;
+    liquidation.amount = event.params.liquidatedCollateralAmount;
+    liquidation.amountUSD = tokenAmountUSD;
+    liquidation.save();
+  };
+
+  // Generate data for the UsageMetricsDailySnapshot Entity
+  let usageMetrics: UsageMetricsDailySnapshotEntity = 
+        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+  usageMetrics.save();
+
+  // Liqudidation removes TVL and adds to volume
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+    event.block.timestamp,
+    tokenAmountUSD,
+    transactionFee,
+    BigInt.fromI32(0),
+    constants.REPAY_INTERACTION,
+  );
+  financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.blockNumber = event.block.number;
+
+  financialsDailySnapshot.save()
+
+}
+
+export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
+
+}
+
+export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
+
+}
+
+export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollateralDisabled): void {
+
+}

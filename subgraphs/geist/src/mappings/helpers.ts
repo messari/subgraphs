@@ -29,7 +29,8 @@ import {
 import { 
     convertTokenToDecimal,
     exponentToBigDecimal,
-    bigIntToPercentage
+    bigIntToPercentage,
+    getDaysSinceUnixEpoch
 } from "../common/utils"
 
 import * as constants from "../common/constants"
@@ -104,7 +105,7 @@ export function getUsageMetrics(
     // Number of days since Unix epoch
     // Note: This is an unsafe cast to int, this should be handled better, 
     // perhaps some additional rounding logic
-    let id: i64 = timestamp.toI64() / constants.SECONDS_PER_DAY;
+    let id: i64 = getDaysSinceUnixEpoch(timestamp);
   
     // Check if the id (i.e. the day) exists in the store
     let usageMetrics = UsageMetricsDailySnapshotEntity.load(id.toString());
@@ -193,7 +194,7 @@ export function getUsageMetrics(
       interactionType: string,
   ): FinancialsDailySnapshotEntity {
 
-    let id: i64 = timestamp.toI64() / constants.SECONDS_PER_DAY;
+    let id: i64 = getDaysSinceUnixEpoch(timestamp);
 
     // Refresh id daily, historical snapshots can be accessed by using the id
     let financialsDailySnapshot = FinancialsDailySnapshotEntity.load(id.toString())
@@ -243,6 +244,10 @@ export function getUsageMetrics(
             tokenAmountUSD);
     }
     else if (interactionType == constants.UNSTAKE_INTERACTION) {
+        financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(
+            tokenAmountUSD);
+    }
+    else if (interactionType == constants.LIQUIDATION_INTERACTION) {
         financialsDailySnapshot.totalValueLockedUSD = financialsDailySnapshot.totalValueLockedUSD.minus(
             tokenAmountUSD);
     }
