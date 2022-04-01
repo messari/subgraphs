@@ -3,7 +3,8 @@ import {
     BigDecimal, 
     Address,
     ethereum,
-    log
+    log,
+    dataSource
 } from "@graphprotocol/graph-ts";
 
 import * as constants from "../common/constants"
@@ -57,3 +58,9 @@ export function convertWadToRay(num: BigInt): BigInt {
     let result = num.times(BigInt.fromI32(10).pow(9));
     return result;
   }
+
+export function getDataFromContext(data: string): string {
+    /* Get data using the context, eg. data="lendingPool", "protocolId" etc. */
+    let context = dataSource.context();
+    return context.getString(data);
+}
