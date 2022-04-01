@@ -1,6 +1,6 @@
 import * as constants from "../common/constants";
 import { Vault } from "../../generated/templates/Vault/Vault";
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CalculationsSushi } from "../../generated/templates/Vault/CalculationsSushi";
 import { CalculationsCurve } from "../../generated/templates/Vault/CalculationsCurve";
 
