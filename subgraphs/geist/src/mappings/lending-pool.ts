@@ -47,10 +47,11 @@ import {
 import { 
   getOrInitializeToken, 
   getOrInitializeRewardToken,
-  getOrInitializeUsageMetrics,
-  getOrInitializeFinancialSnapshot,
+  updateOrInitializeUsageMetrics,
+  updateOrInitializeFinancialSnapshot,
   getTokenAmountUSD,
-  getOrInitializeMarket
+  getOrInitializeMarket,
+  getLendingProtocol
 } from './helpers';
 
 import { 
@@ -93,7 +94,7 @@ export function handleDeposit(event: Deposit): void {
   let id = "deposit-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString()
   
   let deposit = DepositEntity.load(id)
-  if (deposit == null) {
+  if (!deposit) {
     deposit = new DepositEntity(id)
     deposit.logIndex = tx.index.toI32()
     if (tx.to) {
@@ -112,23 +113,37 @@ export function handleDeposit(event: Deposit): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
-
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
   usageMetrics.save()
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
     BigInt.fromI32(0),
     constants.DEPOSIT_INTERACTION,
-  ); 
+  );
   financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.blockNumber = event.block.number;
+  financialsDailySnapshot.save();
 
-  financialsDailySnapshot.save()
+  // Get the protocol data into scope
+  let protocol = getLendingProtocol(constants.PROTOCOL_ID);
+
+  // Create a market and add deposited token value to it
+  let market = getOrInitializeMarket(asset.id, protocol.name, event.block.number, event.block.timestamp);
+  let inputTokenIndex = market.inputTokens.indexOf(asset.id);
+  market.inputTokenBalances[inputTokenIndex] = market.inputTokenBalances[inputTokenIndex].plus(deposit.amount);
+  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(tokenAmountUSD);
+  market.deposits.push(deposit.id);
+  market.save();
+
+  // Update protocol metrics
+  protocol.financialMetrics.push(financialsDailySnapshot.id);
+  protocol.usageMetrics.push(usageMetrics.id);
+  protocol.save()
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -161,12 +176,12 @@ export function handleBorrow(event: Borrow): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -208,7 +223,7 @@ export function handleWithdraw(event: Withdraw): void{
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
@@ -216,7 +231,7 @@ export function handleWithdraw(event: Withdraw): void{
   let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -258,7 +273,7 @@ export function handleRepay(event: Repay): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
@@ -266,7 +281,7 @@ export function handleRepay(event: Repay): void {
   let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -308,11 +323,11 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
   usageMetrics.save();
 
   // Liqudidation removes TVL and adds to volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -328,8 +343,10 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   let id = event.params.reserve.toHexString();
+  let protocol = getLendingProtocol(constants.PROTOCOL_ID);
 
-  let market: MarketEntity = getOrInitializeMarket(id, event.block.number, event.block.timestamp);
+
+  let market: MarketEntity = getOrInitializeMarket(id, protocol.name, event.block.number, event.block.timestamp);
 
   market.depositRate = convertBigIntToBigDecimal(convertRayToWad(event.params.liquidityRate));
   market.variableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.variableBorrowRate));
@@ -350,9 +367,11 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
 export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
   let id = event.params.reserve.toHexString();
-  let market: MarketEntity = getOrInitializeMarket(id, event.block.number, event.block.timestamp);
-  market.canUseAsCollateral = true;
+  let protocol = getLendingProtocol(constants.PROTOCOL_ID);
 
+  let market: MarketEntity = getOrInitializeMarket(id, protocol.name, event.block.number, event.block.timestamp);
+
+  market.canUseAsCollateral = true;
   market.save();
 
   log.warning(
@@ -366,9 +385,11 @@ export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollate
 
 export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollateralDisabled): void {
   let id = event.params.reserve.toHexString();
-  let market: MarketEntity = getOrInitializeMarket(id, event.block.number, event.block.timestamp);
-  market.canUseAsCollateral = false;
+  let protocol = getLendingProtocol(constants.PROTOCOL_ID);
 
+  let market: MarketEntity = getOrInitializeMarket(id, protocol.name, event.block.number, event.block.timestamp);
+  
+  market.canUseAsCollateral = false;
   market.save();
 
   log.warning(

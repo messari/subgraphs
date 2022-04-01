@@ -23,7 +23,7 @@ import {
 } from "../../generated/schema"
 
 import { 
-    getOrInitializeFinancialSnapshot,
+    updateOrInitializeFinancialSnapshot,
     getTokenAmountUSD,
 } from './helpers';
 
@@ -42,7 +42,7 @@ export function handleRewardPaid(event: RewardPaid): void {
     // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
   
-    let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+    let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
       event.block.timestamp,
       tokenAmountUSD,
       transactionFee,
@@ -59,7 +59,7 @@ export function handleStakeAdded(event: Staked): void {
     let tokenAmountUSD = getTokenAmountUSD(TOKEN_ADDRESS_GEIST, event.params.amount);
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
-    let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+    let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
         event.block.timestamp,
         tokenAmountUSD,
         transactionFee,
@@ -76,7 +76,7 @@ export function handleStakeWithdrawn(event: Withdrawn): void {
     let tokenAmountUSD = getTokenAmountUSD(TOKEN_ADDRESS_GEIST, event.params.amount);
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
-    let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
+    let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
         event.block.timestamp,
         tokenAmountUSD,
         transactionFee,

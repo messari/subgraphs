@@ -99,12 +99,11 @@ export function getLendingProtocol(id: string): LendingProtocolEntity {
       protocol.lendingType = constants.LENDING_TYPE_POOLED
       protocol.riskType = constants.RISK_TYPE_GLOBAL
       protocol.version = "1.0.0"
-      protocol.save()
     }
     return protocol
   }
   
-export function getOrInitializeUsageMetrics(
+export function updateOrInitializeUsageMetrics(
     block_number: BigInt, 
     timestamp: BigInt, 
     from: Address
@@ -193,7 +192,7 @@ export function getOrInitializeUsageMetrics(
     return tokenAmountUSD
   }
 
-  export function getOrInitializeFinancialSnapshot(
+  export function updateOrInitializeFinancialSnapshot(
       timestamp: BigInt,
       tokenAmountUSD: BigDecimal,
       transactionFee: BigInt,
@@ -368,7 +367,8 @@ export function handleTransfer(event: Transfer): void {
     // Placeholder
 }
 
-export function getOrInitializeMarket(id: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
+export function getOrInitializeMarket(
+    id: string, protocolName: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
     /* Create a new Market and initialize its arguments */
     let market = MarketEntity.load(id);
 
@@ -389,9 +389,8 @@ export function getOrInitializeMarket(id: string, blockNumber: BigInt, timestamp
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(constants.ZERO_BI);
         };
-        let protocol = getLendingProtocol(constants.PROTOCOL_ID);
 
-        market.protocol = protocol.name;
+        market.protocol = protocolName;
         market.inputTokens = inputTokens;
         market.outputToken = constants.ZERO_ADDRESS.toHexString();
         market.rewardTokens = rewardTokens;
