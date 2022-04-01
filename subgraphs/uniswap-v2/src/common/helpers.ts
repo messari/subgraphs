@@ -297,7 +297,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 }
 
 // Generate the withdraw entity
-export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address, to: Address): void {
+export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
   let transfer = getOrCreateTransfer(event)
 
   let pool = getLiquidityPool(event.address.toHexString())
