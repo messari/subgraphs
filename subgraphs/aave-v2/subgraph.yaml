@@ -73,6 +73,10 @@ templates:
       abis:
         - name: AToken
           file: ./abis/AToken.json
+        - name: VariableDebtToken
+          file: ./abis/VariableDebtToken.json
+        - name: StableDebtToken
+          file: ./abis/StableDebtToken.json
         - name: LendingPool
           file: ./abis/LendingPool.json
         - name: IERC20
@@ -97,7 +101,6 @@ templates:
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
       file: ./src/mappings/lendingPool.ts
-
   - kind: ethereum/contract
     name: LendingPoolConfigurator
     network: mainnet
@@ -140,6 +143,8 @@ templates:
           handler: handleReserveActivated
         - event: ReserveDeactivated(indexed address)
           handler: handleReserveDeactivated  
+        - event: ReserveFactorChanged(indexed address,uint256)
+          handler: handleReserveFactorChanged
       file: ./src/mappings/lendingPoolConfigurator.ts
   - kind: ethereum/contract
     name: AToken

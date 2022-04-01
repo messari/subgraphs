@@ -4,6 +4,7 @@ import { LendingProtocol } from '../generated/schema';
 import { handleProxyCreated } from './createMockEvents'
 import { getLendingPoolFromCtx, getProtocolIdFromCtx } from '../src/mappings/utilFunctions';
 import { mockProxyCreatedEvent } from './createMockEvents';
+import { BIGDECIMAL_ZERO } from '../src/common/constants';
 
 
   test('Test lending pool/protocol init', () => {
@@ -15,7 +16,7 @@ import { mockProxyCreatedEvent } from './createMockEvents';
 
     handleProxyCreated(mockEvent)
 
-    assert.fieldEquals("LendingProtocol", 'aave-v2', "network", "ETHEREUM")
+    assert.fieldEquals("LendingProtocol", 'aave-v2', "totalFeesUSD", BIGDECIMAL_ZERO.toString())
 
     logStore()
 

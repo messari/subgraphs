@@ -12,15 +12,26 @@ import {
   BorrowingEnabledOnReserve,
   BorrowingDisabledOnReserve,
   ReserveActivated,
-  ReserveDeactivated
+  ReserveDeactivated,
+  ReserveFactorChanged
 } from "../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 
 import { Token, Market } from "../../generated/schema";
-import { initToken, initMarket, getOutputTokenSupply, getRewardTokenFromIncController, loadRewardToken } from "./utilFunctions";
+import {
+  initToken,
+  initMarket,
+  getOutputTokenSupply,
+  getRewardTokenFromIncController,
+  loadRewardToken,
+  getAssetPriceInUSDC,
+  rayToWad
+} from "./utilFunctions";
+
 import { AToken } from "../../generated/templates/AToken/AToken";
-import { IERC20 } from "../../generated/templates/LendingPool/IERC20";
-import { IncentivesController, AToken as ATokenTemplate } from "../../generated/templates";
-import { isNullEthValue } from "../common/tokens";
+import {
+  IncentivesController,
+  AToken as ATokenTemplate
+} from "../../generated/templates";
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -31,46 +42,44 @@ export function getLendingPoolFromCtx(): string {
 export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
   // Attempt to load or create the market implementation
+
   ATokenTemplate.create(event.params.aToken);
   const market = initMarket(
-    event,
+    event.block.number,
+    event.block.timestamp,
     event.params.asset.toHexString(),
   );
 
-  // If the initMarket could not successfully set the reserve aToken, check these methods for valid data returned/failure.
-  let currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
-  const tryUnderlyingAsset = currentOutputToken.try_UNDERLYING_ASSET_ADDRESS();
-  const tryGetIncCont = currentOutputToken.try_getIncentivesController();
-  const tryGetTotalSupply = currentOutputToken.try_totalSupply();
+  // Set the aToken contract from the param aToken
+  const aToken = initToken(event.params.aToken);
+  market.outputToken = event.params.aToken.toHexString();
+  market.outputTokenSupply = getOutputTokenSupply(event.params.aToken);
+  market.outputTokenPriceUSD = getAssetPriceInUSDC(aToken);
 
-  if (tryUnderlyingAsset.reverted || tryGetIncCont.reverted || tryGetTotalSupply.reverted) {
-    // If any of the methods revert, pull the aToken contract from the param aToken
-    market.outputToken = event.params.aToken.toHexString();
-    market.outputTokenSupply = getOutputTokenSupply(event.params.aToken);
-    initToken(Address.fromString(market.outputToken))
-    log.info('CHANGED MARKET OUTPUT FROM ' + currentOutputToken._address.toHexString() + " to " + market.outputToken, [])
-    currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
-    market.save();
-  }
-
+  // Set the s/vToken addresses from params
+  market.sToken = event.params.stableDebtToken.toHexString();
+  market.vToken = event.params.variableDebtToken.toHexString();
+  
+  // !!! IS THIS NEEDED? MOST RESERVES INIT BEFORE INCENTIVE CONTROLLERS EXISTED
+  // Attempt to get the incentive controller
+  const currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
   if (!currentOutputToken.try_getIncentivesController().reverted) {
     const incContAddr = currentOutputToken.try_getIncentivesController().value;
     log.info('NEW RESERVE INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
     IncentivesController.create(currentOutputToken.try_getIncentivesController().value);
-    const rewardTokenAddr = getRewardTokenFromIncController(incContAddr, market);
-    loadRewardToken(Address.fromString(rewardTokenAddr), market);
+    const rewardToken = getRewardTokenFromIncController(incContAddr, market);
+    loadRewardToken(Address.fromString(rewardToken.id), market);
   } else {
     log.info('FAILED TO GET INCENTIVE CONTROLLER ' + currentOutputToken._address.toHexString() + ' ' + market.id, [])
   }
-
-  log.info('CREATED? ' + market.id + 'on block# ' + market.createdBlockNumber.toString(), [])
+  market.save();
 }
 
 export function handleCollateralConfigurationChanged(event: CollateralConfigurationChanged): void {
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed 
   const marketAddr = event.params.asset.toHexString();
-  log.info('MarketAddr in lendingPoolConfigurator.ts handleCollateralConfigurationChanged' + marketAddr , [])
-  const market = initMarket(event, marketAddr) as Market;
+  log.info('MarketAddr in lendingPoolConfigurator.ts handleCollateralConfigurationChanged' + marketAddr, [])
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const token = initToken(Address.fromString(market.id));
   market.maximumLTV = new BigDecimal(event.params.ltv);
   market.liquidationThreshold = new BigDecimal(event.params.liquidationThreshold);
@@ -82,8 +91,8 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
 export function handleBorrowingEnabledOnReserve(event: BorrowingEnabledOnReserve): void {
   // Upon enabling borrowing on this market, set market.canBorrowFrom to true
   const marketAddr = event.params.asset.toHexString();
-  log.info('MarketAddr in lendingPoolConfigurator.ts handleBorrowingEnabledReserve' + marketAddr , []);
-  const market = initMarket(event, marketAddr) as Market;
+  log.info('MarketAddr in lendingPoolConfigurator.ts handleBorrowingEnabledReserve' + marketAddr, []);
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   market.canBorrowFrom = true;
   market.save();
 }
@@ -91,8 +100,8 @@ export function handleBorrowingEnabledOnReserve(event: BorrowingEnabledOnReserve
 export function handleBorrowingDisabledOnReserve(event: BorrowingDisabledOnReserve): void {
   // Upon disabling borrowing on this market, set market.canBorrowFrom to false
   const marketAddr = event.params.asset.toHexString();
-  log.info('MarketAddr in lendingPoolConfigurator.ts handleBorrowingDisabledOnReserve' + marketAddr , []);
-  const market = initMarket(event, marketAddr) as Market;
+  log.info('MarketAddr in lendingPoolConfigurator.ts handleBorrowingDisabledOnReserve' + marketAddr, []);
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   market.canBorrowFrom = false;
   market.save();
 }
@@ -100,8 +109,8 @@ export function handleBorrowingDisabledOnReserve(event: BorrowingDisabledOnReser
 export function handleReserveActivated(event: ReserveActivated): void {
   // Upon activating this lending pool, set market.isActive to true
   const marketAddr = event.params.asset.toHexString();
-  log.info('MarketAddr in lendingPoolConfigurator.ts handleReserveActivated' + marketAddr , []);
-  const market = initMarket(event, marketAddr) as Market;
+  log.info('MarketAddr in lendingPoolConfigurator.ts handleReserveActivated' + marketAddr, []);
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   market.isActive = true;
   market.save();
 }
@@ -109,8 +118,20 @@ export function handleReserveActivated(event: ReserveActivated): void {
 export function handleReserveDeactivated(event: ReserveDeactivated): void {
   // Upon deactivating this lending pool, set market.isActive to false
   const marketAddr = event.params.asset.toHexString();
-  log.info('MarketAddr in lendingPoolConfigurator.ts handleReserveDeactivated' + marketAddr , []);
-  const market = initMarket(event, marketAddr) as Market;
+  log.info('MarketAddr in lendingPoolConfigurator.ts handleReserveDeactivated' + marketAddr, []);
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   market.isActive = false;
+  market.save();
+}
+
+export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
+  // Handle the reserve factor change event
+  const marketAddr = event.params.asset.toHexString();
+  log.info('RESERVE FACTOR MarketAddr in lendingPoolConfigurator.ts handleReserveFactorChanged ' + marketAddr + ' ' + event.params.factor.toString(), []);
+  const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  
+  // !!! THIS SHOULD PROBABLY ALLOW FOR FRACTIONS OF A PERCENT, CURRENTLY ROUNDS TO TWO DIGIT PERCENTAGES
+  // Set the reserve factor as a percentage (ie saved as 20 for 20%)
+  market.reserveFactor = (event.params.factor).div(BigInt.fromI32(100));
   market.save();
 }

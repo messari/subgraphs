@@ -80,6 +80,9 @@ interface Protocol {
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
 
+  " Total fees in USD of all markets on the protocol "
+  totalFeesUSD: BigDecimal!
+
   totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -284,7 +287,16 @@ type LendingProtocol implements Protocol @entity {
   " Number of total/cumulative unique users "
   totalUniqueUsers: Int!
 
+  " Total fees in USD of all markets on the lending protocol "
+  totalFeesUSD: BigDecimal!
+
   totalValueLockedUSD: BigDecimal!
+
+  " The portion of the revenue allocated to the protocol "
+  protocolSideRevenueUSD : BigDecimal!
+
+  " The portion of the revenue allocated to the suppliers (depositors) "
+  supplySideRevenueUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -320,13 +332,35 @@ type Market @entity {
 
   " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
+  
+  " The variable debt token address correlated to the reserve asset "
+  vToken: String!
+
+  " The stable debt token address correlated to the reserve asset "
+  sToken: String!
 
   ##### Quantitative Data #####
 
+  " The reserve factor as a percentage "
+  reserveFactor: BigInt!
+
+  " The total fees to be collected on the market denominated in USD "
+  totalFeesUSD: BigDecimal!
+
+  " The total value locked in deposits on this market measured in tokens "
+  totalValueLocked: BigInt!
+
+  " The total value locked in deposits on this market measured in USD "
   totalValueLockedUSD: BigDecimal!
 
   " Total borrow volume in USD (i.e. total loan origination ) "
   totalVolumeUSD: BigDecimal!
+
+  " Total amount of tokens locked up in stable rate borrows "
+  totalStableValueLocked: BigInt!
+
+  " Total amount of tokens locked up in variable rate borrows "
+  totalVariableValueLocked: BigInt!
 
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -362,6 +396,12 @@ type Market @entity {
   canUseAsCollateral: Boolean!
 
   canBorrowFrom: Boolean!
+
+  " The portion of the revenue from this market allocated to the protocol "
+  protocolSideRevenueUSD : BigDecimal!
+
+  " The portion of the revenue from this market allocated to the suppliers (depositors) "
+  supplySideRevenueUSD: BigDecimal!
 
   " Maximum loan-to-value ratio as a percentage value "
   maximumLTV: BigDecimal!
