@@ -22,6 +22,11 @@ export const PROTOCOL_TYPE_LENDING = "LENDING";
 export const DEFAULT_DECIMALS = 18;
 export const SECONDS_PER_DAY = 86400;
 
+// Types of reward tokens
+export const REWARD_TYPE_DEPOSIT = "DEPOSIT";
+export const REWARD_TYPE_BORROW = "BORROW";
+
+
 // Interaction types for snapshot calculations
 export const DEPOSIT_INTERACTION = "DEPOSIT";
 export const WITHDRAW_INTERACTION = "WITHDRAW";

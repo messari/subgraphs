@@ -69,14 +69,12 @@ import {
   initializeRewardToken,
   getUsageMetrics,
   getFinancialSnapshot,
-  initializeLendingProtocol,
   getTokenAmountUSD,
   initializeMarket
 } from './helpers';
 
 import { 
   getTimestampInMillis,
-  getDaysSinceUnixEpoch,
   convertBigIntToBigDecimal,
   convertRayToWad
 } from "../common/utils"
@@ -89,8 +87,6 @@ import {
 // protocolSideRevenueUSD = fees
 
 export function handleAddressesProviderRegistered(event: AddressesProviderRegistered): void {
-  initializeLendingProtocol()
-
   let address = event.params.newAddress.toHexString()
   LendingPoolAddressesProvider.create(Address.fromString(address))
 }
@@ -124,7 +120,7 @@ export function handleApproval(event: Approval): void {
       break;
     }
     // Add rewardToken into RewardToken store
-    initializeRewardToken(result.value, "DEPOSIT");
+    initializeRewardToken(result.value, constants.REWARD_TYPE_DEPOSIT);
   }
 }
 
@@ -429,15 +425,16 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   let id = event.params.reserve.toHexString();
-  const market = initializeMarket(id, event.block.number, event.block.timestamp);
+  let market: MarketEntity = initializeMarket(id, event.block.number, event.block.timestamp);
 
   market.depositRate = convertBigIntToBigDecimal(convertRayToWad(event.params.liquidityRate));
   market.variableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.variableBorrowRate));
   market.stableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.stableBorrowRate));
 
   log.warning(
-    "Reserve data updated, depositRate={}, variableBorrowRate={}, stableBorrowRate={}", 
+    "Reserve data updated for Market ID={}, depositRate={}, variableBorrowRate={}, stableBorrowRate={}", 
     [
+      id,
       market.depositRate.toString(),
       market.variableBorrowRate.toString(),
       market.stableBorrowRate.toString() 
@@ -448,14 +445,32 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
 export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
   let id = event.params.reserve.toHexString();
-  let market = initializeMarket(id, event.block.number, event.block.timestamp);
+  let market: MarketEntity = initializeMarket(id, event.block.number, event.block.timestamp);
   market.canUseAsCollateral = true;
+
+  log.warning(
+    "Reserve used as collateral updated for Market ID={}, canUseAsCollateral={}", 
+    [
+      id,
+      market.canUseAsCollateral.toString()
+    ]
+  )
+
   market.save();
 }
 
 export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollateralDisabled): void {
   let id = event.params.reserve.toHexString();
-  let market = initializeMarket(id, event.block.number, event.block.timestamp);
+  let market: MarketEntity = initializeMarket(id, event.block.number, event.block.timestamp);
   market.canUseAsCollateral = false;
+
+  log.warning(
+    "Reserve used as collateral updated for Market ID={}, canUseAsCollateral={}", 
+    [
+      id,
+      market.canUseAsCollateral.toString()
+    ]
+  )
+
   market.save();
 }

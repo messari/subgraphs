@@ -35,7 +35,8 @@ import {
     convertBigIntToBigDecimal,
     bigIntToPercentage,
     getDaysSinceUnixEpoch,
-    getDataFromContext
+    getDataFromContext,
+    convertRayToWad
 } from "../common/utils"
 
 import * as constants from "../common/constants"
@@ -369,14 +370,23 @@ export function handleTransfer(event: Transfer): void {
 
 export function initializeMarket(id: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
     /* Create a new Market and initialize its arguments */
-    log.warning("Initializing market with id={}", [id]);
-    let market = MarketEntity.load(id) as MarketEntity;
+    //log.warning("Initializing market with id={}", [id]);
+    let market = MarketEntity.load(id);
 
     if (!market) {
+        market = new MarketEntity(id);
+
         let lendingPool = getDataFromContext("lendingPool");
         let lendingPoolContract = LendingPool.bind(Address.fromString(lendingPool));
         let token = initializeToken(Address.fromString(id));
-        let inputTokens: TokenEntity[] = [token]; 
+        let inputTokens: TokenEntity[] = [token];
+
+        let rewardToken = initializeRewardToken(Address.fromString(id), constants.REWARD_TYPE_DEPOSIT);
+        let rewardTokens: RewardTokenEntity[] = [rewardToken];
+
+        let rewardTokenEmissionsAmount: BigInt[] = [];
+        let rewardTokenEmissionsUSD: BigDecimal[] = [];
+        
         let inputTokenBalances: BigInt[] = [];
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(constants.ZERO_BI);
@@ -384,16 +394,15 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
         let protocolId = getDataFromContext("protocolId");
         let protocol = initializeLendingProtocol(protocolId);
 
-        let market = new MarketEntity(id);
         market.protocol = protocol.name;
-        market.inputTokens = inputTokens.map<string>((tokens) => tokens.id);
+        market.inputTokens = inputTokens.map<string>((t) => t.id);
         market.outputToken = constants.ZERO_ADDRESS.toHexString();
-        market.rewardTokens = [];
+        market.rewardTokens = rewardTokens.map<string>((t) => t.id);
         market.totalValueLockedUSD = constants.ZERO_BD;
         market.totalVolumeUSD = constants.ZERO_BD;
         market.inputTokenBalances = inputTokenBalances;
-        market.rewardTokenEmissionsAmount = [];
-        market.rewardTokenEmissionsUSD = [];
+        market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+        market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
         market.createdTimestamp = timestamp;
         market.createdBlockNumber = blockNumber;
         market.outputTokenSupply = constants.ZERO_BI;
@@ -407,36 +416,21 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
         market.liquidationThreshold = constants.ZERO_BD;
         market.liquidationPenalty = constants.ZERO_BD;
         market.depositRate = constants.ZERO_BD;
+        market.stableBorrowRate = constants.ZERO_BD;
+        market.variableBorrowRate = constants.ZERO_BD;
 
         let reserves = lendingPoolContract.try_getReserveData(Address.fromString(id));
-        log.warning(
-            "Reserves are currentStableBorrowRate={}, currentVariableBorrowRate={}", 
-            [
-                reserves.value.currentStableBorrowRate.toString(), 
-                reserves.value.currentVariableBorrowRate.toString()
-            ]
-        );
         if (reserves.reverted) {
             log.error("Unable to set market stableBorrowRate and variableBorrowRate, setting to zero", []);
             market.stableBorrowRate = constants.ZERO_BD;
             market.variableBorrowRate = constants.ZERO_BD;
         }
         else {
-            market.stableBorrowRate = convertBigIntToBigDecimal(
-                reserves.value.currentStableBorrowRate, BigInt.fromI32(18));
-            market.variableBorrowRate = convertBigIntToBigDecimal(
-                reserves.value.currentVariableBorrowRate, BigInt.fromI32(18));
-            log.warning(
-                "Market stableBorrowRate={}, variableBorrowRate={}", 
-                [
-                    market.stableBorrowRate.toString(), 
-                    market.variableBorrowRate.toString()
-                ]
-            );
-        };
-    };
+            market.stableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(reserves.value.currentStableBorrowRate));
+            market.variableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(reserves.value.currentVariableBorrowRate));
+        }
+    }
 
     market.save();
-
     return market;
 }
