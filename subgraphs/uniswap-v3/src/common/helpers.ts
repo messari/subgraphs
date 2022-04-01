@@ -18,7 +18,7 @@ import {
 import { Pool as PoolTemplate } from '../../generated/templates'
 import { Factory as FactoryContract } from '../../generated/templates/Pool/Factory'
 
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, DEFAULT_DECIMALS, BIGDECIMAL_TWO, BIGDECIMAL_MILLION, BIGINT_ZERO, LiquidityPoolFeeType, BIGDECIMAL_TEN_THOUSAND, PROTOCOL_FEE_TO_OFF, BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGDECIMAL_TEN } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, DEFAULT_DECIMALS, BIGDECIMAL_TWO, BIGDECIMAL_MILLION, BIGINT_ZERO, LiquidityPoolFeeType, BIGDECIMAL_TEN_THOUSAND, PROTOCOL_FEE_TO_OFF, BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGDECIMAL_TEN, BIGINT_ONE } from "../common/constants"
 import { getLiquidityPool, getLiquidityPoolAmounts, getLiquidityPoolFee, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateTokenTracker } from "./getters"
 import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, WHITELIST_TOKENS } from "./pricing"
 import { getOrCreateToken } from "./tokens"
@@ -129,7 +129,7 @@ function incrementDepositHelper(poolAddress: string): void {
   poolDeposits.save()
 }
 
-export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, amount: BigInt): void {
+export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
   let ether = getOrCreateEtherHelper()
 
   let poolAddress = event.address.toHexString()
@@ -158,15 +158,9 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   // Pools liquidity tracks the currently active liquidity given pools current tick.
   // We only want to update it on mint if the new position includes the current tick.
 
-  log.warning("BefPool0 " + pool.inputTokenBalances[0].toString(), [])
-
   pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount0), pool.inputTokenBalances[1].plus(amount1)]
   poolAmounts.inputTokenBalances = [poolAmounts.inputTokenBalances[0].plus(amount0Converted), poolAmounts.inputTokenBalances[1].plus(amount1Converted)]
 
-  log.warning("Amount0 " + amount0.toString(), [])
-  log.warning("Amount1 " + amount1.toString(), [])
-  log.warning("Pool0 " + pool.inputTokenBalances[0].toString(), [])
-  log.warning("Pool1 " + pool.inputTokenBalances[1].toString(), [])
 
   
   let totalValueLockedETH = poolAmounts.inputTokenBalances[0]
@@ -174,7 +168,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
     .plus(poolAmounts.inputTokenBalances[1].times(tokenTracker1.derivedETH))
   pool.totalValueLockedUSD = totalValueLockedETH.times(ether.valueDecimal!)
 
-  pool.outputTokenSupply = pool.outputTokenSupply.plus(amount)
+  pool.outputTokenSupply = pool.outputTokenSupply.plus(BIGINT_ONE)
   let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply, DEFAULT_DECIMALS)
 
   if (pool.outputTokenSupply == BIGINT_ZERO) pool.outputTokenPriceUSD = BIGDECIMAL_ZERO
@@ -200,7 +194,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
   deposit.outputTokens = pool.outputToken
   deposit.inputTokenAmounts = [amount0, amount1]
-  deposit.outputTokenAmount = amount
+  deposit.outputTokenAmount = BIGINT_ONE
   deposit.amountUSD = amountUSD
 
   incrementDepositHelper(poolAddress)
@@ -211,7 +205,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   protocol.save()
 }
 
-export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt, amount: BigInt): void {
+export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
   let ether = getOrCreateEtherHelper()
 
   let poolAddress = event.address.toHexString()
@@ -240,15 +234,17 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   // Pools liquidity tracks the currently active liquidity given pools current tick.
   // We only want to update it on mint if the new position includes the current tick.
 
-  pool.inputTokenBalances = [pool.inputTokenBalances[0].plus(amount0), pool.inputTokenBalances[1].plus(amount1)]
-  poolAmounts.inputTokenBalances = [poolAmounts.inputTokenBalances[0].plus(amount0Converted), poolAmounts.inputTokenBalances[1].plus(amount1Converted)]
+  log.warning("BefPool0 " + amount0Converted.toString(), [])
+  log.warning("BefPool1 " + amount1Converted.toString(), [])
+  pool.inputTokenBalances = [pool.inputTokenBalances[0].minus(amount0), pool.inputTokenBalances[1].minus(amount1)]
+  poolAmounts.inputTokenBalances = [poolAmounts.inputTokenBalances[0].minus(amount0Converted), poolAmounts.inputTokenBalances[1].minus(amount1Converted)]
 
   let totalValueLockedETH = poolAmounts.inputTokenBalances[0]
     .times(tokenTracker0.derivedETH)
     .plus(poolAmounts.inputTokenBalances[1].times(tokenTracker1.derivedETH))
   pool.totalValueLockedUSD = totalValueLockedETH.times(ether.valueDecimal!)
 
-  pool.outputTokenSupply = pool.outputTokenSupply.plus(amount)
+  pool.outputTokenSupply = pool.outputTokenSupply.minus(BIGINT_ONE)
 
   //// This needs to be updated. Default Decimals not correct 
   let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply, DEFAULT_DECIMALS)
@@ -276,7 +272,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
   withdrawal.outputTokens = pool.outputToken
   withdrawal.inputTokenAmounts = [amount0, amount1]
-  withdrawal.outputTokenAmount = amount
+  withdrawal.outputTokenAmount = BIGINT_ONE
   withdrawal.amountUSD = amountUSD
 
   withdrawal.save()
