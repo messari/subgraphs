@@ -7,11 +7,11 @@ import {
 
 import { 
   Approval,
-} from "../../generated/GeistToken/GeistToken"
+} from "../../generated/templates/LendingPool/GeistToken"
 
 import { 
   MultiFeeDistribution,
-} from "../../generated/GeistToken/MultiFeeDistribution"
+} from "../../generated/templates/MultiFeeDistribution/MultiFeeDistribution"
 
 import {
   Deposit,

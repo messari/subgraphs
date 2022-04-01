@@ -4,9 +4,6 @@ repository: https://github.com/dineshpinto/geist-finance-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
-  # --------------------------------------
-  #           CONFIGURATIONS
-  # --------------------------------------
   - kind: ethereum/contract
     name: LendingPoolAddressesProviderRegistry
     network: fantom

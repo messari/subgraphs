@@ -8,12 +8,9 @@ import {
 import { 
     MultiFeeDistribution,
     Staked,
-    Withdrawn
-} from "../../generated/GeistToken/MultiFeeDistribution"
-
-import { 
-    RewardPaid 
-} from '../../generated/MultiFeeDistribution/MultiFeeDistribution'
+    Withdrawn,
+    RewardPaid
+} from "../../generated/templates/MultiFeeDistribution/MultiFeeDistribution"
 
 import { 
     Token as TokenEntity,
@@ -25,6 +22,7 @@ import {
 import { 
     updateOrInitializeFinancialSnapshot,
     getTokenAmountUSD,
+    updateOrInitializeUsageMetrics
 } from './helpers';
 
 import * as constants from "../common/constants"
@@ -39,6 +37,11 @@ export function handleRewardPaid(event: RewardPaid): void {
     // Rewards do not to TVL, but adds to volume and supply side revenue
     let tokenAmountUSD = getTokenAmountUSD(event.params.rewardsToken, event.params.reward);
   
+  // Generate data for the UsageMetricsDailySnapshot Entity
+  let usageMetrics: UsageMetricsDailySnapshotEntity = 
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+  usageMetrics.save()
+
     // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
   
@@ -59,6 +62,11 @@ export function handleStakeAdded(event: Staked): void {
     let tokenAmountUSD = getTokenAmountUSD(TOKEN_ADDRESS_GEIST, event.params.amount);
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
+    // Generate data for the UsageMetricsDailySnapshot Entity
+    let usageMetrics: UsageMetricsDailySnapshotEntity = 
+            updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+    usageMetrics.save()
+
     let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
         event.block.timestamp,
         tokenAmountUSD,
@@ -75,6 +83,12 @@ export function handleStakeWithdrawn(event: Withdrawn): void {
     /* Unstaking is treated equivalent to withdrawing for the purposes of the snapshots */
     let tokenAmountUSD = getTokenAmountUSD(TOKEN_ADDRESS_GEIST, event.params.amount);
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
+
+    // Generate data for the UsageMetricsDailySnapshot Entity
+    let usageMetrics: UsageMetricsDailySnapshotEntity = 
+        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+    usageMetrics.save()
+
 
     let financialsDailySnapshot: FinancialsDailySnapshotEntity = updateOrInitializeFinancialSnapshot(
         event.block.timestamp,

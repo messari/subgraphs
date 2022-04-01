@@ -5,7 +5,13 @@ import {
     log,
 } from '@graphprotocol/graph-ts'
 
-import { GeistToken as TokenContract } from "../../generated/GeistToken/GeistToken"
+import { 
+    GeistToken as TokenContract,
+  } from "../../generated/templates/LendingPool/GeistToken"
+
+import {
+    LendingPool
+} from "../../generated/templates/LendingPool/LendingPool"
 
 import { 
     Market as MarketEntity,
@@ -18,24 +24,19 @@ import {
 } from "../../generated/schema"
 
 import { 
-    LendingPool
-} from "../../generated/templates/LendingPool/LendingPool"
-
-import { 
     AaveOracle,
     OwnershipTransferred
-} from "../../generated/MultiFeeDistribution/AaveOracle"
+} from "../../generated/templates/MultiFeeDistribution/AaveOracle"
 
 import { 
     SpookySwapGEISTFTM,
     Transfer
-} from "../../generated/MultiFeeDistribution/SpookySwapGEISTFTM"
+} from "../../generated/templates/MultiFeeDistribution/SpookySwapGEISTFTM"
 
 import { 
     convertBigIntToBigDecimal,
     bigIntToPercentage,
     getDaysSinceUnixEpoch,
-    getDataFromContext,
     convertRayToWad
 } from "../common/utils"
 
