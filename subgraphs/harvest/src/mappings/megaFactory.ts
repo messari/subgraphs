@@ -7,7 +7,7 @@ import { Vault as VaultTemplate} from '../../generated/templates'
 import { PROTOCOL_ID, BIGDECIMAL_ZERO, MEGA_FACTORY_ADDRESS } from '../common/constants'
 import { createProtocol, getOrCreateToken } from '../common/utils'
 
-function createVault(vaultAddress: Address, blockNumber: BigInt, timestamp: BigInt) {
+function createVault(vaultAddress: Address, blockNumber: BigInt, timestamp: BigInt): void {
     createProtocol()
     
     let vault = VaultStore.load(vaultAddress.toHex())
@@ -49,17 +49,17 @@ function getVaultId(vaultId: string): Address {
     return completedDeployments.value2
 }
 
-export function handleCreateRegularVault(call: CreateRegularVaultCall) {
+export function handleCreateRegularVault(call: CreateRegularVaultCall): void {
     const vaultId = getVaultId(call.inputs.id)
     createVault(vaultId, call.block.number, call.block.timestamp)
 }
 
-export function handleCreateUniV3Vault(call: CreateUniV3VaultCall) {
+export function handleCreateUniV3Vault(call: CreateUniV3VaultCall): void {
     const vaultId = getVaultId(call.inputs.id)
     createVault(vaultId, call.block.number, call.block.timestamp)
 }
 
-export function handleCreateRegularVaultStrategy(call: CreateRegularVaultUsingUpgradableStrategyCall) {
+export function handleCreateRegularVaultStrategy(call: CreateRegularVaultUsingUpgradableStrategyCall): void {
     const vaultId = getVaultId(call.inputs.id)
     createVault(vaultId, call.block.number, call.block.timestamp)
 }

@@ -6,7 +6,7 @@ import { Vault as VaultTemplate} from '../../generated/templates'
 import { BIGDECIMAL_ZERO, PROTOCOL_ID } from '../common/constants'
 import { createProtocol, getOrCreateToken } from '../common/utils'
 
-export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall) {
+export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
     createProtocol()
     
     let vaultAddress = call.inputs._vault

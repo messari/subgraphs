@@ -75,6 +75,10 @@ templates:
           file: ./abis/Vault.json
         - name: Oracle
           file: ./abis/Oracle.json
+        - name: CalculationsCurve
+          file: ./abis/CalculationsCurve.json
+        - name: CalculationsSushi
+          file: ./abis/CalculationsSushiSwap.json
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit
