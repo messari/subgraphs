@@ -26,14 +26,14 @@ export function handleSetFeeProtocol(event: SetFeeProtocol): void {
 }
 
 export function handleMint(event: MintEvent): void {
-  createDeposit(event, event.params.amount0, event.params.amount1, event.params.amount)
+  createDeposit(event, event.params.amount0, event.params.amount1)
   updateUsageMetrics(event, event.params.sender)
   updateFinancials(event)
   updatePoolMetrics(event)
 }
 
 export function handleBurn(event: BurnEvent): void {
-  createWithdraw(event, event.params.amount0, event.params.amount1, event.params.amount)
+  createWithdraw(event, event.params.amount0, event.params.amount1)
   updateUsageMetrics(event, event.transaction.from)
   updateFinancials(event)
   updatePoolMetrics(event)
