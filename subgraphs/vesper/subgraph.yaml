@@ -147,10 +147,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -184,10 +180,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -221,10 +213,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -258,10 +246,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -295,10 +279,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -332,10 +312,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -369,10 +345,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -406,10 +378,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -443,10 +411,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -480,10 +444,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -517,10 +477,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -554,10 +510,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -591,10 +543,6 @@ dataSources:
         - name: PoolV3
           file: ./abis/pool-v3.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApprovalV3
-        - event: Deposit(indexed address,uint256,uint256)
-          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
