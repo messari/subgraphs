@@ -2,12 +2,14 @@ import {
     Address,
     BigInt,
     BigDecimal,
-    log
+    log,
+    dataSource
 } from '@graphprotocol/graph-ts'
 
 import { GeistToken as TokenContract } from "../../generated/GeistToken/GeistToken"
 
 import { 
+    Market as MarketEntity,
     Token as TokenEntity, 
     RewardToken as RewardTokenEntity, 
     LendingProtocol as LendingProtocolEntity,
@@ -15,6 +17,10 @@ import {
     UniqueUsers as UniqueUsersEntity,
     FinancialsDailySnapshot as FinancialsDailySnapshotEntity,
 } from "../../generated/schema"
+
+import { 
+    LendingPool
+} from "../../generated/templates/LendingPool/LendingPool"
 
 import { 
     AaveOracle,
@@ -82,7 +88,7 @@ export function initializeRewardToken(address: Address, rewardType: string): Rew
     return rewardToken;
 }
 
-export function initializeLendingProtocol(): void {
+export function initializeLendingProtocol(): LendingProtocolEntity {
     let protocol = LendingProtocolEntity.load(constants.PROTOCOL_ID)
     if (!protocol) {
       protocol = new LendingProtocolEntity(constants.PROTOCOL_ID)
@@ -95,6 +101,7 @@ export function initializeLendingProtocol(): void {
       protocol.version = "1.0.0"
       protocol.save()
     }
+    return protocol
   }
   
 export function getUsageMetrics(
@@ -359,4 +366,72 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
 
 export function handleTransfer(event: Transfer): void {
     // Placeholder
+}
+
+export function initializeMarket(id: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
+    log.warning("Initializing market with id={}", [id]);
+    let market = MarketEntity.load(id);
+
+    if (!market) {
+        let lendingPool = getLendingPoolFromContext();
+        let lendingPoolContract = LendingPool.bind(Address.fromString(lendingPool));
+        let token = initializeToken(Address.fromString(id));
+        let inputTokens: TokenEntity[] = [token]; 
+        let inputTokenBalances: BigInt[] = [];
+        for (let i = 0; i < inputTokens.length; i++) {
+            inputTokenBalances.push(constants.ZERO_BI);
+        }
+        let protocol = initializeLendingProtocol();
+
+        let market = new MarketEntity(id);
+        market.protocol = protocol.name;
+        market.inputTokens = inputTokens.map<string>((t) => t.id);
+        market.outputToken = constants.ZERO_ADDRESS.toHexString();
+        market.rewardTokens = [];
+        market.totalValueLockedUSD = constants.ZERO_BD;
+        market.totalVolumeUSD = constants.ZERO_BD;
+        market.inputTokenBalances = inputTokenBalances;
+        market.rewardTokenEmissionsAmount = [];
+        market.rewardTokenEmissionsUSD = [];
+        market.createdTimestamp = timestamp;
+        market.createdBlockNumber = blockNumber;
+
+        market.name = token.name;
+        market.isActive = false;
+        market.canUseAsCollateral = false;
+        market.canBorrowFrom = false;
+        market.maximumLTV = constants.ZERO_BD;
+        market.liquidationThreshold = constants.ZERO_BD;
+        market.liquidationPenalty = constants.ZERO_BD;
+        market.depositRate = constants.ZERO_BD;
+
+        let reserves = lendingPoolContract.try_getReserveData(Address.fromString(id));
+        if (reserves.reverted) {
+            log.error("Unable to set market stableBorrowRate and variableBorrowRate, setting to zero", []);
+            market.stableBorrowRate = constants.ZERO_BD;
+            market.variableBorrowRate = constants.ZERO_BD;
+        }
+        else {
+            market.stableBorrowRate = convertTokenToDecimal(reserves.value.currentStableBorrowRate, BigInt.fromI32(18));
+            market.variableBorrowRate = convertTokenToDecimal(reserves.value.currentVariableBorrowRate, BigInt.fromI32(18));
+            log.warning(
+                "Market stableBorrowRate={}, variableBorrowRate={}", 
+                [
+                    market.stableBorrowRate.toString(), 
+                    market.variableBorrowRate.toString()
+                ]
+            );
+        }
+    }
+
+    market.outputTokenSupply = constants.ZERO_BI;
+    market.outputTokenPriceUSD = constants.ZERO_BD;
+    market.save();
+    return market
+}
+
+export function getLendingPoolFromContext(): string {
+    // Get the lending pool/market address with context
+    let context = dataSource.context();
+    return context.getString("lendingPool");
 }

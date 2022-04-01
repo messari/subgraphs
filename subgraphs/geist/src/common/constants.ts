@@ -1,6 +1,7 @@
 import { 
     BigInt, 
-    BigDecimal, 
+    BigDecimal,
+    Address,
 } from "@graphprotocol/graph-ts";
 
 // BigInt 0 and 1
@@ -10,6 +11,8 @@ export let ONE_BI = BigInt.fromI32(1);
 // BigDecimal 0 and 1
 export let ZERO_BD = BigDecimal.fromString("0");
 export let ONE_BD = BigDecimal.fromString("1");
+
+export let ZERO_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000")
 
 // Set Protocol ID to the registry address
 export const PROTOCOL_ID = "0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82";
