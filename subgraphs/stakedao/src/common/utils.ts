@@ -24,7 +24,7 @@ export function getTimestampInMillis(block: ethereum.Block): BigInt {
 
 export function getOrCreateYieldAggregator(id: string): YieldAggregator {
   let protocol = YieldAggregator.load(id)
-  
+
   if (!protocol) {
     protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
     protocol.name = "Stake DAO";
@@ -51,7 +51,7 @@ export function getOrCreateToken(address: Address): Token {
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
     token.decimals = decimals.reverted
-      ? DEFAULT_DECIMALS
+      ? DEFAULT_DECIMALS.toI32()
       : decimals.value.toI32();
 
     token.save();
@@ -72,7 +72,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     rewardToken.name = name.reverted ? "" : name.value;
     rewardToken.symbol = symbol.reverted ? "" : symbol.value;
     rewardToken.decimals = decimals.reverted
-      ? DEFAULT_DECIMALS
+      ? DEFAULT_DECIMALS.toI32()
       : decimals.value.toI32();
 
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
@@ -157,4 +157,9 @@ export function getOrCreateUsageMetricSnapshot(block: ethereum.Block): UsageMetr
   }
 
   return usageMetrics;
+}
+
+
+export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
+  return callResult.reverted ? defaultValue : callResult.value;
 }
