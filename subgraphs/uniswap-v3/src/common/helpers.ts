@@ -234,8 +234,6 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   // Pools liquidity tracks the currently active liquidity given pools current tick.
   // We only want to update it on mint if the new position includes the current tick.
 
-  log.warning("BefPool0 " + amount0Converted.toString(), [])
-  log.warning("BefPool1 " + amount1Converted.toString(), [])
   pool.inputTokenBalances = [pool.inputTokenBalances[0].minus(amount0), pool.inputTokenBalances[1].minus(amount1)]
   poolAmounts.inputTokenBalances = [poolAmounts.inputTokenBalances[0].minus(amount0Converted), poolAmounts.inputTokenBalances[1].minus(amount1Converted)]
 
