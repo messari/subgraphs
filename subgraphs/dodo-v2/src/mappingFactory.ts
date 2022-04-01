@@ -42,15 +42,12 @@ import {
 import { LiquidityPool } from "../generated/schema";
 
 export function handleNewDVM(event: NewDVM): void {
-  let dodo = getOrCreateDexAmm(event.address);
+  let dodo = getOrCreateDexAmm(event.params.dvm);
   let pool = LiquidityPool.load(event.params.dvm.toHex());
   let it = getOrCreateToken(event.params.baseToken);
   let ot = getOrCreateToken(event.params.quoteToken);
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
-  getOrCreateUsageMetricSnapshot(event);
-  getOrCreateFinancials(event);
-  getOrCreatePoolDailySnapshot(event);
 
   if (!pool) {
     pool = new LiquidityPool(event.params.dvm.toHex());
@@ -72,15 +69,12 @@ export function handleNewDVM(event: NewDVM): void {
 }
 
 export function handleNewCP(event: NewCP): void {
-  let dodo = getOrCreateDexAmm(event.address);
+  let dodo = getOrCreateDexAmm(event.params.cp);
   let pool = LiquidityPool.load(event.params.cp.toHex());
   let it = getOrCreateToken(event.params.baseToken);
   let ot = getOrCreateToken(event.params.quoteToken);
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
-  getOrCreateUsageMetricSnapshot(event);
-  getOrCreateFinancials(event);
-  getOrCreatePoolDailySnapshot(event);
 
   if (!pool) {
     pool = new LiquidityPool(event.params.cp.toHex());
@@ -102,15 +96,12 @@ export function handleNewCP(event: NewCP): void {
 }
 
 export function handleNewDPP(event: NewDPP): void {
-  let dodo = getOrCreateDexAmm(event.address);
+  let dodo = getOrCreateDexAmm(event.params.dpp);
   let pool = LiquidityPool.load(event.params.dpp.toHex());
   let it = getOrCreateToken(event.params.baseToken);
   let ot = getOrCreateToken(event.params.quoteToken);
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
-  getOrCreateUsageMetricSnapshot(event);
-  getOrCreateFinancials(event);
-  getOrCreatePoolDailySnapshot(event);
 
   if (!pool) {
     pool = new LiquidityPool(event.params.dpp.toHex());
@@ -132,15 +123,12 @@ export function handleNewDPP(event: NewDPP): void {
 }
 
 export function handleNewDSP(event: NewDSP): void {
-  let dodo = getOrCreateDexAmm(event.address);
+  let dodo = getOrCreateDexAmm(event.params.DSP);
   let pool = LiquidityPool.load(event.params.DSP.toHex());
   let it = getOrCreateToken(event.params.baseToken);
   let ot = getOrCreateToken(event.params.quoteToken);
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
-  getOrCreateUsageMetricSnapshot(event);
-  getOrCreateFinancials(event);
-  getOrCreatePoolDailySnapshot(event);
 
   if (!pool) {
     pool = new LiquidityPool(event.params.DSP.toHex());

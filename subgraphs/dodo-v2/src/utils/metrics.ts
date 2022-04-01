@@ -48,7 +48,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
   let accountId = from.toHexString();
   let account = _Account.load(accountId);
-  let protocol = getOrCreateDexAmm(Address.fromString(DVMFactory_ADDRESS));
+  let protocol = getOrCreateDexAmm(event.address);
   if (!account) {
     account = new _Account(accountId);
     account.save();

@@ -54,10 +54,11 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 }
 
 export function getOrCreateDexAmm(factoryAddress: Address): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(factoryAddress.toHex());
+  let proto = getProtocolFromPool(factoryAddress);
+  let protocol = DexAmmProtocol.load(proto);
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(factoryAddress.toHex());
+    protocol = new DexAmmProtocol(proto);
     protocol.name = "DODO V2";
     protocol.slug = "messari-dodo";
     protocol.schemaVersion = "1.0.0";

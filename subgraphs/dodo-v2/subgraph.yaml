@@ -21,6 +21,8 @@ dataSources:
           file: ./abis/DVMFactory.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
       eventHandlers:
         - event: NewDVM(address,address,address,address)
           handler: handleNewDVM
@@ -66,6 +68,8 @@ dataSources:
       abis:
         - name: DPPFactory
           file: ./abis/DPPFactory.json
+        - name: DVM
+          file: ./abis/DVM.json
       eventHandlers:
         - event: NewDPP(address,address,address,address)
           handler: handleNewDPP
@@ -90,6 +94,8 @@ dataSources:
       abis:
         - name: DSPFactory
           file: ./abis/DSPFactory.json
+        - name: DVM
+          file: ./abis/DVM.json
       eventHandlers:
         - event: NewDSP(address,address,address,address)
           handler: handleNewDSP
@@ -140,6 +146,8 @@ dataSources:
       abis:
         - name: CP
           file: ./abis/CP.json
+        - name: DVM
+          file: ./abis/DVM.json
       eventHandlers:
         - event: Bid(address,uint256,uint256)
           handler: handleBid
@@ -165,6 +173,8 @@ dataSources:
       abis:
         - name: DPP
           file: ./abis/DPP.json
+        - name: DVM
+          file: ./abis/DVM.json
       eventHandlers:
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
@@ -189,6 +199,8 @@ dataSources:
       abis:
         - name: DSP
           file: ./abis/DSP.json
+        - name: DVM
+          file: ./abis/DVM.json
       eventHandlers:
         - event: BuyShares(address,uint256,uint256)
           handler: handleBuyShares
