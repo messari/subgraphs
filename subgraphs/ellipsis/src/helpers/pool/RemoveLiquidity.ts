@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../../generated/Factory/ERC20";
 import { Factory } from "../../../generated/Factory/Factory";
 import { getCoinCount, getCoins, getOrCreateProtocol } from "../../utils/common";
@@ -10,12 +10,15 @@ import { createWithdraw } from "../withdraw";
 import { getOrCreatePoolFromFactory } from "./createPool";
 
 export function removeLiquidity(
-    event: ethereum.Event,
     poolAddress: Address,
     token_supply: BigInt,
     token_amounts: BigInt[],
     provider: Address,
-    fees: BigInt[]
+    fees: BigInt[],
+    timestamp: BigInt,
+    blockNumber: BigInt,
+    logIndex: BigInt,
+    transactionHash: Bytes
   ): void {
     // create pool
     let protocol = getOrCreateProtocol();
@@ -26,13 +29,14 @@ export function removeLiquidity(
     // Get lp_token
     let getLpToken = factory.try_get_lp_token(poolAddress)
     let lpToken: Address = getLpToken.reverted ? Address.fromString(ZERO_ADDRESS) : getLpToken.value
-    let pool = getOrCreatePoolFromFactory(event, coins, BIGINT_ZERO, lpToken, poolAddress)
+    let pool = getOrCreatePoolFromFactory(coins, BIGINT_ZERO, lpToken, poolAddress, timestamp, blockNumber)
     // update input token balances
     let coinCount = getCoinCount(poolAddress)
+    let inputTokenBalances: BigInt[] = []
     for(let i = 0; i < coinCount.toI32(); ++i) {
-        pool.inputTokenBalances[i] = pool.inputTokenBalances[i].minus(token_amounts[i])
+        inputTokenBalances.push(pool.inputTokenBalances[i].minus(token_amounts[i]))
     }
-
+    pool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb)
     // Update outputTokenSupply
     let oldOutputTokenSupply = pool.outputTokenSupply
     pool.outputTokenSupply = token_supply
@@ -49,15 +53,15 @@ export function removeLiquidity(
 
   
     // Update Withdraw
-    createWithdraw(event, pool, protocol, outputTokenAmount, token_amounts, provider);
+    createWithdraw(pool, protocol, outputTokenAmount, token_amounts, provider, transactionHash, logIndex, blockNumber, timestamp);
   
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(event, pool);
+    createPoolDailySnapshot(poolAddress, blockNumber, timestamp, pool);
   
     // Take FinancialsDailySnapshot
-    getOrCreateFinancials(event, protocol);
+    getOrCreateFinancials(protocol, timestamp, blockNumber);
   
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(event, provider, protocol);
+    updateUsageMetrics(provider, protocol, timestamp, blockNumber);
   }
   

@@ -26,12 +26,14 @@ export function addLiquidity(
     // Get lp_token
     let getLpToken = factory.try_get_lp_token(poolAddress)
     let lpToken: Address = getLpToken.reverted ? Address.fromString(ZERO_ADDRESS) : getLpToken.value
-    let pool = getOrCreatePoolFromFactory(event, coins, BIGINT_ZERO, lpToken, poolAddress)
+    let pool = getOrCreatePoolFromFactory(coins, BIGINT_ZERO, lpToken, poolAddress, event.block.timestamp, event.block.number)
     // update input token balances
     let coinCount = getCoinCount(poolAddress)
+    let inputTokenBalances: BigInt[] = []
     for(let i = 0; i < coinCount.toI32(); ++i) {
-        pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(token_amounts[i])
+        inputTokenBalances.push(pool.inputTokenBalances[i].plus(token_amounts[i]))
     }
+    pool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb)
     // Update outputTokenSupply
     let oldOutputTokenSupply = pool.outputTokenSupply
     pool.outputTokenSupply = token_supply
@@ -49,11 +51,11 @@ export function addLiquidity(
     createDeposit(event, pool, protocol, outputTokenAmount, token_amounts, provider);
   
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(event, pool);
+    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
   
     // Take FinancialsDailySnapshot
-    getOrCreateFinancials(event, protocol);
+    getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
   
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(event, provider, protocol);
+    updateUsageMetrics(provider, protocol, event.block.timestamp, event.block.number);
   }

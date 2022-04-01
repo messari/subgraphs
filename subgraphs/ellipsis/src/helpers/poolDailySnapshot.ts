@@ -1,17 +1,17 @@
-import { ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, PoolDailySnapshot } from "../../generated/schema";
 import { getOrCreateProtocol } from "../utils/common";
 import { SECONDS_PER_DAY } from "../utils/constant";
 
 export function createPoolDailySnapshot(
-  event: ethereum.Event,
+  poolAddress: Address,
+  blockNumber: BigInt,
+  timestamp: BigInt,
   pool: LiquidityPool
 ): void {
   // Number of days since Unix epoch
-  let timestamp = event.block.timestamp;
-  let blockNumber = event.block.number;
   let day: i64 = timestamp.toI64() / SECONDS_PER_DAY;
-  let id = event.address
+  let id = poolAddress
     .toHexString()
     .concat("-")
     .concat(day.toString());

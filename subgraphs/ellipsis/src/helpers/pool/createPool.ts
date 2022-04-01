@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../../../generated/Factory/Factory"
 import { StableSwap } from "../../../generated/Factory/StableSwap"
 import { BasePool, LiquidityPool } from "../../../generated/schema";
@@ -22,11 +22,12 @@ export function getOrCreateBasePool(basePoolAddress: Address): BasePool {
   }
 
 export function getOrCreatePoolFromFactory(
-    event: ethereum.Event,
     coins: Address[],
     fee: BigInt,
     lp_token: Address,
     pool: Address,
+    timestamp: BigInt, 
+    blockNumber: BigInt
 ): LiquidityPool {
     let id = pool.toHexString()
     // Check if pool already exist
@@ -40,20 +41,27 @@ export function getOrCreatePoolFromFactory(
         let factory = Factory.bind(Address.fromString(FACTORY_ADDRESS))
         let getCoinCount = factory.try_get_n_coins(pool)
         let coinCount: BigInt = getCoinCount.reverted ? BIGINT_ZERO : getCoinCount.value
+        log.info("Coin length: {}", [coins.length.toString()])
+        log.info("Coin count: {}", [coinCount.toI32().toString()])
+        let inputTokens: string[] = []
+        let inputTokenBalances: BigInt[] = []
         for(let i = 0; i < coinCount.toI32(); ++i) {
-            liquidityPool.inputTokens[i] = getOrCreateToken(coins[i]).id
+            inputTokens.push(getOrCreateToken(coins[i]).id)
+            inputTokenBalances.push(BIGINT_ZERO)
         }
+        liquidityPool.inputTokens = inputTokens.map<string>(t => t)
+        liquidityPool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb)
         liquidityPool.outputToken = getOrCreateToken(lp_token).id
+        log.info("Output Token: {}", [liquidityPool.outputToken.toString()])
         liquidityPool.rewardTokens = []
         liquidityPool.totalValueLockedUSD = BIGDECIMAL_ZERO
         liquidityPool.totalVolumeUSD = BIGDECIMAL_ZERO
-        liquidityPool.inputTokenBalances = []
         liquidityPool.outputTokenSupply = BIGINT_ZERO
         liquidityPool.outputTokenPriceUSD = BIGDECIMAL_ZERO
         liquidityPool.rewardTokenEmissionsAmount = []
         liquidityPool.rewardTokenEmissionsUSD = []
-        liquidityPool.createdTimestamp = event.block.timestamp
-        liquidityPool.createdBlockNumber = event.block.number
+        liquidityPool.createdTimestamp = timestamp
+        liquidityPool.createdBlockNumber = blockNumber
         liquidityPool.name = null
         liquidityPool.symbol = null
         liquidityPool._basePool = null

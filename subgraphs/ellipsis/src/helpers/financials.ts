@@ -9,11 +9,10 @@ import {
 } from "../utils/constant";
 
 export function getOrCreateFinancials(
-  event: ethereum.Event,
-  protocol: DexAmmProtocol
+  protocol: DexAmmProtocol,
+  timestamp: BigInt,
+  blockNumber: BigInt
 ): FinancialsDailySnapshot {
-  let timestamp = event.block.timestamp;
-  let blockNumber = event.block.number;
 
   // Number of days since Unix epoch
   let id = timestamp.toI64() / SECONDS_PER_DAY;

@@ -26,15 +26,17 @@ export function tokenExchange(
     // Get lp_token
     let getLpToken = factory.try_get_lp_token(poolAddress)
     let lpToken: Address = getLpToken.reverted ? Address.fromString(ZERO_ADDRESS) : getLpToken.value
-    let pool = getOrCreatePoolFromFactory(event, coins, BIGINT_ZERO, lpToken, poolAddress)
+    let pool = getOrCreatePoolFromFactory(coins, BIGINT_ZERO, lpToken, poolAddress, event.block.timestamp, event.block.number)
   
     // update pool entity with new token balances
     let getInputTokenBalances = factory.try_get_balances(poolAddress)
     let inputBalances: BigInt[] = getInputTokenBalances.reverted ? [] : getInputTokenBalances.value
     let coinCount = getCoinCount(poolAddress)
+    let inputTokenBalances: BigInt[] = []
     for(let i = 0; i < coinCount.toI32(); ++i) {
-        pool.inputTokenBalances[i] = inputBalances[i]
+        inputTokenBalances.push(inputBalances[i])
     }
+    pool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb)
     pool.save()
   
     createSwap(
@@ -51,11 +53,11 @@ export function tokenExchange(
     );
   
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(event, pool);
+    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
   
     // Take FinancialsDailySnapshot
-    getOrCreateFinancials(event, protocol);
+    getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
   
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(event, buyer, protocol);
+    updateUsageMetrics(buyer, protocol, event.block.timestamp, event.block.number);
   }

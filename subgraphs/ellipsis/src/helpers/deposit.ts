@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   DexAmmProtocol,
@@ -7,11 +7,8 @@ import {
 } from "../../generated/schema";
 import { getCoinCount } from "../utils/common";
 import {
-  BIGDECIMAL_ZERO,
-  DEFAULT_DECIMALS,
-  toDecimal,
+  BIGDECIMAL_ZERO
 } from "../utils/constant";
-import { getOrCreateToken } from "../utils/token";
 
 export function createDeposit(
   event: ethereum.Event,
@@ -46,10 +43,11 @@ export function createDeposit(
 
     // Input Token and Input Token Amount
     let coinCount = getCoinCount(Address.fromString(pool.id))
+    let inputTokenAmounts: BigInt[] = []
     for(let i = 0; i < coinCount.toI32(); ++i) {
-        deposit.inputTokenAmounts[i] = token_amount[i]
+        inputTokenAmounts.push(token_amount[i])
     }
-    
+    deposit.inputTokenAmounts = inputTokenAmounts.map<BigInt>(ta => ta)
     deposit.amountUSD = BIGDECIMAL_ZERO;
     deposit.pool = pool.id;
 

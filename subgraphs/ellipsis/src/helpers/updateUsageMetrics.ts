@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   DailyActiveAccount,
@@ -8,13 +8,12 @@ import {
 import { SECONDS_PER_DAY } from "../utils/constant";
 
 export function updateUsageMetrics(
-  event: ethereum.Event,
   provider: Address,
-  protocol: DexAmmProtocol
+  protocol: DexAmmProtocol,
+  timestamp: BigInt,
+  blockNumber: BigInt
 ): void {
   // Number of days since Unix epoch
-  let timestamp = event.block.timestamp;
-  let blockNumber = event.block.number;
   let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
 
@@ -36,12 +35,14 @@ export function updateUsageMetrics(
   usageMetrics.timestamp = timestamp;
   usageMetrics.dailyTransactionCount += 1;
 
+
   let accountId = provider.toHexString();
   let account = Account.load(accountId);
   if (!account) {
     account = new Account(accountId);
     account.save();
     usageMetrics.totalUniqueUsers += 1;
+    protocol.totalUniqueUsers += 1;
   }
 
   // Combine the id and the user address to generate a unique user id for the day

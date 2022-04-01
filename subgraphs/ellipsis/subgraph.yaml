@@ -155,4 +155,7 @@ templates:
           handler: handleRemoveLiquidityOne
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
+      callHandlers:
+        - function: remove_liquidity_one_coin(uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOneCall
       file: ./src/mappings/pool.ts
