@@ -70,12 +70,15 @@ import {
   getUsageMetrics,
   getFinancialSnapshot,
   initializeLendingProtocol,
-  getTokenAmountUSD
+  getTokenAmountUSD,
+  initializeMarket
 } from './helpers';
 
 import { 
   getTimestampInMillis,
-  getDaysSinceUnixEpoch
+  getDaysSinceUnixEpoch,
+  convertBigIntToBigDecimal,
+  convertRayToWad
 } from "../common/utils"
 
 
@@ -425,13 +428,34 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 }
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
+  let id = event.params.reserve.toHexString();
+  const market = initializeMarket(id, event.block.number, event.block.timestamp);
 
+  market.depositRate = convertBigIntToBigDecimal(convertRayToWad(event.params.liquidityRate));
+  market.variableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.variableBorrowRate));
+  market.stableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.stableBorrowRate));
+
+  log.warning(
+    "Reserve data updated, depositRate={}, variableBorrowRate={}, stableBorrowRate={}", 
+    [
+      market.depositRate.toString(),
+      market.variableBorrowRate.toString(),
+      market.stableBorrowRate.toString() 
+    ]
+  );
+  market.save();
 }
 
 export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
-
+  let id = event.params.reserve.toHexString();
+  let market = initializeMarket(id, event.block.number, event.block.timestamp);
+  market.canUseAsCollateral = true;
+  market.save();
 }
 
 export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollateralDisabled): void {
-
+  let id = event.params.reserve.toHexString();
+  let market = initializeMarket(id, event.block.number, event.block.timestamp);
+  market.canUseAsCollateral = false;
+  market.save();
 }

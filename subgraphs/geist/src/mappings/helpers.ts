@@ -33,7 +33,7 @@ import {
 } from "../../generated/MultiFeeDistribution/SpookySwapGEISTFTM"
 
 import { 
-    convertTokenToDecimal,
+    convertBigIntToBigDecimal,
     exponentToBigDecimal,
     bigIntToPercentage,
     getDaysSinceUnixEpoch
@@ -177,8 +177,8 @@ export function getUsageMetrics(
     */
     let tokenPrice = getTokenPrice(tokenAddress);
     let tokenContract = TokenContract.bind(tokenAddress)
-    let tokenAmountBD = convertTokenToDecimal(tokenAmount, tokenContract.decimals());
-    let tokenPriceBD = convertTokenToDecimal(tokenPrice, BigInt.fromI32(18));
+    let tokenAmountBD = convertBigIntToBigDecimal(tokenAmount, tokenContract.decimals());
+    let tokenPriceBD = convertBigIntToBigDecimal(tokenPrice, BigInt.fromI32(18));
     let tokenAmountUSD = tokenAmountBD.times(tokenPriceBD).truncate(2);
     if (fee) {
         log.warning(
@@ -369,8 +369,9 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function initializeMarket(id: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
+    /* Create a new Market and initialize its arguments */
     log.warning("Initializing market with id={}", [id]);
-    let market = MarketEntity.load(id);
+    let market = MarketEntity.load(id) as MarketEntity;
 
     if (!market) {
         let lendingPool = getLendingPoolFromContext();
@@ -380,12 +381,12 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
         let inputTokenBalances: BigInt[] = [];
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(constants.ZERO_BI);
-        }
+        };
         let protocol = initializeLendingProtocol();
 
         let market = new MarketEntity(id);
         market.protocol = protocol.name;
-        market.inputTokens = inputTokens.map<string>((t) => t.id);
+        market.inputTokens = inputTokens.map<string>((tokens) => tokens.id);
         market.outputToken = constants.ZERO_ADDRESS.toHexString();
         market.rewardTokens = [];
         market.totalValueLockedUSD = constants.ZERO_BD;
@@ -395,6 +396,8 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
         market.rewardTokenEmissionsUSD = [];
         market.createdTimestamp = timestamp;
         market.createdBlockNumber = blockNumber;
+        market.outputTokenSupply = constants.ZERO_BI;
+        market.outputTokenPriceUSD = constants.ZERO_BD;
 
         market.name = token.name;
         market.isActive = false;
@@ -412,8 +415,8 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
             market.variableBorrowRate = constants.ZERO_BD;
         }
         else {
-            market.stableBorrowRate = convertTokenToDecimal(reserves.value.currentStableBorrowRate, BigInt.fromI32(18));
-            market.variableBorrowRate = convertTokenToDecimal(reserves.value.currentVariableBorrowRate, BigInt.fromI32(18));
+            market.stableBorrowRate = convertBigIntToBigDecimal(reserves.value.currentStableBorrowRate, BigInt.fromI32(18));
+            market.variableBorrowRate = convertBigIntToBigDecimal(reserves.value.currentVariableBorrowRate, BigInt.fromI32(18));
             log.warning(
                 "Market stableBorrowRate={}, variableBorrowRate={}", 
                 [
@@ -421,13 +424,12 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
                     market.variableBorrowRate.toString()
                 ]
             );
-        }
-    }
+        };
+    };
 
-    market.outputTokenSupply = constants.ZERO_BI;
-    market.outputTokenPriceUSD = constants.ZERO_BD;
     market.save();
-    return market
+
+    return market;
 }
 
 export function getLendingPoolFromContext(): string {
