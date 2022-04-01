@@ -11,22 +11,7 @@ import {
 
 import { 
   MultiFeeDistribution,
-  Staked,
-  Withdrawn
 } from "../../generated/GeistToken/MultiFeeDistribution"
-
-import { 
-  AddressesProviderRegistered,
-} from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry"
-
-import {
-  LendingPool,
-  LendingPoolAddressesProvider
-} from '../../generated/templates'
-
-import { 
-  ProxyCreated,
-} from "../../generated/templates/LendingPoolAddressesProvider/LendingPoolAddressesProvider"
 
 import {
   Deposit,
@@ -39,13 +24,8 @@ import {
   ReserveUsedAsCollateralDisabled
 } from '../../generated/templates/LendingPool/LendingPool'
 
-import { 
-  RewardPaid 
-} from '../../generated/MultiFeeDistribution/MultiFeeDistribution'
 
 import { 
-  Token as TokenEntity,
-  RewardToken as RewardTokenEntity,
   UsageMetricsDailySnapshot as UsageMetricsDailySnapshotEntity,
   FinancialsDailySnapshot as FinancialsDailySnapshotEntity,
   LendingProtocol as LendingProtocolEntity,
@@ -65,12 +45,12 @@ import {
 } from "../common/addresses"
 
 import { 
-  initializeToken, 
-  initializeRewardToken,
-  getUsageMetrics,
-  getFinancialSnapshot,
+  getOrInitializeToken, 
+  getOrInitializeRewardToken,
+  getOrInitializeUsageMetrics,
+  getOrInitializeFinancialSnapshot,
   getTokenAmountUSD,
-  initializeMarket
+  getOrInitializeMarket
 } from './helpers';
 
 import { 
@@ -80,31 +60,9 @@ import {
 } from "../common/utils"
 
 
-// Definitions
-// totalValueLockedUSD = staking + deposits
-// totalVolumeUSD = deposit + staking + repay + withdraw
-// supplySideRevenueUSD = rewards paid to depositors
-// protocolSideRevenueUSD = fees
-
-export function handleAddressesProviderRegistered(event: AddressesProviderRegistered): void {
-  let address = event.params.newAddress.toHexString()
-  LendingPoolAddressesProvider.create(Address.fromString(address))
-}
-
-export function handleProxyCreated(event: ProxyCreated): void {
-  log.warning('Proxy created', [])
-
-  let newProxyAddress = event.params.newAddress
-  let contactId = event.params.id.toString()
-
-  if (contactId == 'LENDING_POOL') {
-    LendingPool.create(newProxyAddress)
-  }
-}
-
 export function handleApproval(event: Approval): void {
   // Add main token into Token store
-  initializeToken(TOKEN_ADDRESS_GEIST);
+  getOrInitializeToken(TOKEN_ADDRESS_GEIST);
 
   // Use the Reward Token contract to pull all the reward token addresses
   let rewardTokenContract = MultiFeeDistribution.bind(REWARD_TOKEN_CONTRACT);
@@ -120,14 +78,14 @@ export function handleApproval(event: Approval): void {
       break;
     }
     // Add rewardToken into RewardToken store
-    initializeRewardToken(result.value, constants.REWARD_TYPE_DEPOSIT);
+    getOrInitializeRewardToken(result.value, constants.REWARD_TYPE_DEPOSIT);
   }
 }
 
 export function handleDeposit(event: Deposit): void {
   log.warning('Deposit event', [])
 
-  let asset = initializeToken(event.params.reserve);
+  let asset = getOrInitializeToken(event.params.reserve);
   let tokenAmountUSD = getTokenAmountUSD(event.params.reserve, event.params.amount);
   // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
   let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
@@ -154,12 +112,12 @@ export function handleDeposit(event: Deposit): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -176,7 +134,7 @@ export function handleDeposit(event: Deposit): void {
 export function handleBorrow(event: Borrow): void {
   log.warning('Borrow event', [])
 
-  let asset = initializeToken(event.params.reserve);
+  let asset = getOrInitializeToken(event.params.reserve);
   let tokenAmountUSD = getTokenAmountUSD(event.params.reserve, event.params.amount);
   let tx = event.transaction
   let id = "borrow-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString()
@@ -203,12 +161,12 @@ export function handleBorrow(event: Borrow): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -225,7 +183,7 @@ export function handleBorrow(event: Borrow): void {
 export function handleWithdraw(event: Withdraw): void{
   log.warning('Withdraw event', [])
 
-  let asset = initializeToken(event.params.reserve);
+  let asset = getOrInitializeToken(event.params.reserve);
   let tokenAmountUSD = getTokenAmountUSD(event.params.reserve, event.params.amount);
 
   let tx = event.transaction
@@ -250,7 +208,7 @@ export function handleWithdraw(event: Withdraw): void{
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
@@ -258,7 +216,7 @@ export function handleWithdraw(event: Withdraw): void{
   let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -275,7 +233,7 @@ export function handleWithdraw(event: Withdraw): void{
 export function handleRepay(event: Repay): void {
   log.warning('Repay event', [])
 
-  let asset = initializeToken(event.params.reserve);
+  let asset = getOrInitializeToken(event.params.reserve);
   let tokenAmountUSD = getTokenAmountUSD(event.params.reserve, event.params.amount);
 
   let tx = event.transaction
@@ -300,7 +258,7 @@ export function handleRepay(event: Repay): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
 
   usageMetrics.save()
 
@@ -308,7 +266,7 @@ export function handleRepay(event: Repay): void {
   let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
   // Depositing adds to TVL and volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -322,66 +280,12 @@ export function handleRepay(event: Repay): void {
   financialsDailySnapshot.save()
 }
 
-export function handleRewardPaid(event: RewardPaid): void {
-  // Rewards do not to TVL, but adds to volume and supply side revenue
-  let tokenAmountUSD = getTokenAmountUSD(event.params.rewardsToken, event.params.reward);
-
-  // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
-  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
-
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-    event.block.timestamp,
-    tokenAmountUSD,
-    transactionFee,
-    BigInt.fromI32(0),
-    constants.REWARD_INTERACTION
-  );
-
-  financialsDailySnapshot.blockNumber = event.block.number;
-  financialsDailySnapshot.save();
-}
-
-export function handleStakeAdded(event: Staked): void {
-  /* Staking is treated equivalent to depositing for the purposes of the snapshots */
-  let tokenAmountUSD = getTokenAmountUSD(TOKEN_ADDRESS_GEIST, event.params.amount);
-  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
-
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-    event.block.timestamp,
-    tokenAmountUSD,
-    transactionFee,
-    BigInt.fromI32(0),
-    constants.STAKE_INTERACTION
-  );
-
-  financialsDailySnapshot.blockNumber = event.block.number;
-  financialsDailySnapshot.save();
-}
-
-
-export function handleStakeWithdrawn(event: Withdrawn): void {
-  /* Unstaking is treated equivalent to withdrawing for the purposes of the snapshots */
-  let tokenAmountUSD = getTokenAmountUSD(TOKEN_ADDRESS_GEIST, event.params.amount);
-  let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
-
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
-    event.block.timestamp,
-    tokenAmountUSD,
-    transactionFee,
-    BigInt.fromI32(0),
-    constants.UNSTAKE_INTERACTION
-  );
-
-  financialsDailySnapshot.blockNumber = event.block.number;
-  financialsDailySnapshot.save();
-}
-
 export function handleLiquidationCall(event: LiquidationCall): void {
   let tx = event.transaction;
   let id = "liquidation-" + tx.hash.toHexString() + "-" + tx.index.toI32().toString();
   let marketAddress = event.params.collateralAsset.toHexString();
 
-  let asset = initializeToken(event.params.collateralAsset);
+  let asset = getOrInitializeToken(event.params.collateralAsset);
   let tokenAmountUSD = getTokenAmountUSD(event.params.collateralAsset, event.params.liquidatedCollateralAmount);
   let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
 
@@ -404,11 +308,11 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 
   // Generate data for the UsageMetricsDailySnapshot Entity
   let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        getUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+        getOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
   usageMetrics.save();
 
   // Liqudidation removes TVL and adds to volume
-  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getFinancialSnapshot(
+  let financialsDailySnapshot: FinancialsDailySnapshotEntity = getOrInitializeFinancialSnapshot(
     event.block.timestamp,
     tokenAmountUSD,
     transactionFee,
@@ -420,16 +324,18 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   financialsDailySnapshot.blockNumber = event.block.number;
 
   financialsDailySnapshot.save()
-
 }
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   let id = event.params.reserve.toHexString();
-  let market: MarketEntity = initializeMarket(id, event.block.number, event.block.timestamp);
+
+  let market: MarketEntity = getOrInitializeMarket(id, event.block.number, event.block.timestamp);
 
   market.depositRate = convertBigIntToBigDecimal(convertRayToWad(event.params.liquidityRate));
   market.variableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.variableBorrowRate));
   market.stableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(event.params.stableBorrowRate));
+
+  market.save();
 
   log.warning(
     "Reserve data updated for Market ID={}, depositRate={}, variableBorrowRate={}, stableBorrowRate={}", 
@@ -440,13 +346,14 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       market.stableBorrowRate.toString() 
     ]
   );
-  market.save();
 }
 
 export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollateralEnabled): void {
   let id = event.params.reserve.toHexString();
-  let market: MarketEntity = initializeMarket(id, event.block.number, event.block.timestamp);
+  let market: MarketEntity = getOrInitializeMarket(id, event.block.number, event.block.timestamp);
   market.canUseAsCollateral = true;
+
+  market.save();
 
   log.warning(
     "Reserve used as collateral updated for Market ID={}, canUseAsCollateral={}", 
@@ -455,14 +362,14 @@ export function handleReserveUsedAsCollateralEnabled(event: ReserveUsedAsCollate
       market.canUseAsCollateral.toString()
     ]
   )
-
-  market.save();
 }
 
 export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollateralDisabled): void {
   let id = event.params.reserve.toHexString();
-  let market: MarketEntity = initializeMarket(id, event.block.number, event.block.timestamp);
+  let market: MarketEntity = getOrInitializeMarket(id, event.block.number, event.block.timestamp);
   market.canUseAsCollateral = false;
+
+  market.save();
 
   log.warning(
     "Reserve used as collateral updated for Market ID={}, canUseAsCollateral={}", 
@@ -471,6 +378,4 @@ export function handleReserveUsedAsCollateralDisabled(event: ReserveUsedAsCollat
       market.canUseAsCollateral.toString()
     ]
   )
-
-  market.save();
 }

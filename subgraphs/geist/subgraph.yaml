@@ -5,94 +5,6 @@ schema:
   file: ./schema.graphql
 dataSources:
   # --------------------------------------
-  #      Token
-  # --------------------------------------
-  - kind: ethereum/contract
-    name: GeistToken
-    network: fantom 
-    source:
-      address: "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d"
-      startBlock: 18400515
-      abi: GeistToken
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Protocol
-        - Token
-        - RewardToken
-      abis:
-        - name: GeistToken
-          file: ./abis/GeistToken.json
-        - name: MultiFeeDistribution
-          file: ./abis/MultiFeeDistribution.json
-      eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-      file: ./src/mappings/mapping.ts
-  # --------------------------------------
-  #      Borrowing/Lending
-  # --------------------------------------     
-  # - kind: ethereum/contract
-  #   name: WETHGateway
-  #   network: fantom
-  #   source:
-  #     address: "0x47102245FEa0F8D35a6b28E54505e9FfD83d0704"
-  #     startBlock: 33000000
-  #     abi: WETHGateway
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.6
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - UniqueUsers
-  #       - UsageMetricsDailySnapshot
-  #     abis:
-  #       - name: WETHGateway
-  #         file: ./abis/WETHGateway.json
-  #     callHandlers:
-  #       - function: depositETH(address,address,uint16)
-  #         handler: handleDepositETH
-  #       - function: withdrawETH(address,uint256,address)
-  #         handler: handleWithdrawETH
-  #       - function: repayETH(address,uint256,uint256,address)
-  #         handler: handleRepayETH
-  #       - function: borrowETH(address,uint256,uint256,uint16)
-  #         handler: handleBorrowETH
-  #     file: ./src/mappings/mapping.ts
-  - kind: ethereum/contract
-    name: MultiFeeDistribution
-    network: fantom
-    source:
-      address: "0x49c93a95dbcc9A6A4D8f77E59c038ce5020e82f8"
-      startBlock: 18400515
-      abi: MultiFeeDistribution
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - FinancialsDailySnapshot
-      abis:
-        - name: MultiFeeDistribution
-          file: ./abis/MultiFeeDistribution.json
-        - name: AaveOracle
-          file: ./abis/AaveOracle.json
-        - name: SpookySwapGEISTFTM
-          file: ./abis/SpookySwapGEISTFTM.json
-        - name: GeistToken
-          file: ./abis/GeistToken.json
-      eventHandlers:
-        - event: RewardPaid(indexed address,indexed address,uint256)
-          handler: handleRewardPaid
-        - event: Staked(indexed address,uint256)
-          handler: handleStakeAdded
-        - event: Withdrawn(indexed address,uint256)
-          handler: handleStakeWithdrawn
-      file: ./src/mappings/mapping.ts
-
-  # --------------------------------------
   #           CONFIGURATIONS
   # --------------------------------------
   - kind: ethereum/contract
@@ -107,7 +19,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - LendingPoolAddressesProvider
+        - AddressesProviderRegistered
       abis:
         - name: LendingPoolAddressesProviderRegistry
           file: ./abis/LendingPoolAddressesProviderRegistry.json
@@ -116,7 +28,7 @@ dataSources:
           handler: handleAddressesProviderRegistered
         - event: AddressesProviderUnregistered(indexed address)
           handler: handleAddressesProviderUnregistered
-      file: src/mappings/mapping.ts
+      file: src/mappings/address-provider-registry.ts
 
 templates:
   - kind: ethereum/contract
@@ -136,7 +48,13 @@ templates:
       eventHandlers:
         - event: ProxyCreated(bytes32,indexed address)
           handler: handleProxyCreated
-      file: src/mappings/mapping.ts
+        - event: PriceOracleUpdated(indexed address)
+          handler: handlePriceOracleUpdated
+        - event: LendingPoolUpdated(indexed address)
+          handler: handleLendingPoolUpdated
+        - event: LendingPoolConfiguratorUpdated(indexed address)
+          handler: handleLendingPoolConfiguratorUpdated
+      file: src/mappings/address-provider-registry.ts
   - kind: ethereum/contract
     name: LendingPool
     network: fantom
@@ -147,7 +65,14 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Reserve
+        - Block
+        - Account
+        - Token
+        - Market
+        - Transaction
+        - Transfer
+        - Position
+        - PositionSnapshot
       abis:
         - name: LendingPool
           file: ./abis/LendingPool.json
@@ -174,4 +99,62 @@ templates:
           handler: handleReserveUsedAsCollateralEnabled
         - event: ReserveUsedAsCollateralDisabled(indexed address,indexed address)
           handler: handleReserveUsedAsCollateralDisabled
-      file: src/mappings/mapping.ts
+      file: src/mappings/lending-pool.ts
+  - kind: ethereum/contract
+    name: LendingPoolConfigurator
+    network: fantom
+    source:
+      abi: LendingPoolConfigurator
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Block
+        - Account
+        - Token
+        - Market
+        - Transaction
+        - Transfer
+        - Position
+        - PositionSnapshot
+      abis:
+        - name: LendingPoolConfigurator
+          file: ./abis/LendingPoolConfigurator.json
+        - name: LendingPool
+          file: ./abis/LendingPool.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+        - name: SpookySwapGEISTFTM
+          file: ./abis/SpookySwapGEISTFTM.json
+        - name: GeistToken
+          file: ./abis/GeistToken.json
+      file: src/mappings/address-provider-registry.ts
+  - kind: ethereum/contract
+    name: MultiFeeDistribution
+    network: fantom
+    source:
+      abi: MultiFeeDistribution
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - FinancialsDailySnapshot
+      abis:
+        - name: MultiFeeDistribution
+          file: ./abis/MultiFeeDistribution.json
+        - name: AaveOracle
+          file: ./abis/AaveOracle.json
+        - name: SpookySwapGEISTFTM
+          file: ./abis/SpookySwapGEISTFTM.json
+        - name: GeistToken
+          file: ./abis/GeistToken.json
+      eventHandlers:
+        - event: RewardPaid(indexed address,indexed address,uint256)
+          handler: handleRewardPaid
+        - event: Staked(indexed address,uint256)
+          handler: handleStakeAdded
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleStakeWithdrawn
+      file: ./src/mappings/fee-distribution.ts

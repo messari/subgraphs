@@ -43,7 +43,7 @@ import * as constants from "../common/constants"
 import * as addresses from "../common/addresses"
 
 
-export function initializeToken(address: Address): TokenEntity {
+export function getOrInitializeToken(address: Address): TokenEntity {
     let token = TokenEntity.load(address.toHexString());
 
     if (token) {
@@ -66,7 +66,7 @@ export function initializeToken(address: Address): TokenEntity {
     return token;
 }
 
-export function initializeRewardToken(address: Address, rewardType: string): RewardTokenEntity {
+export function getOrInitializeRewardToken(address: Address, rewardType: string): RewardTokenEntity {
     let rewardToken = RewardTokenEntity.load(address.toHexString());
        
     if (rewardToken) {
@@ -88,7 +88,7 @@ export function initializeRewardToken(address: Address, rewardType: string): Rew
     return rewardToken;
 }
 
-export function initializeLendingProtocol(id: string): LendingProtocolEntity {
+export function getLendingProtocol(id: string): LendingProtocolEntity {
     let protocol = LendingProtocolEntity.load(id)
     if (!protocol) {
       protocol = new LendingProtocolEntity(id)
@@ -104,7 +104,7 @@ export function initializeLendingProtocol(id: string): LendingProtocolEntity {
     return protocol
   }
   
-export function getUsageMetrics(
+export function getOrInitializeUsageMetrics(
     block_number: BigInt, 
     timestamp: BigInt, 
     from: Address
@@ -193,7 +193,7 @@ export function getUsageMetrics(
     return tokenAmountUSD
   }
 
-  export function getFinancialSnapshot(
+  export function getOrInitializeFinancialSnapshot(
       timestamp: BigInt,
       tokenAmountUSD: BigDecimal,
       transactionFee: BigInt,
@@ -368,36 +368,33 @@ export function handleTransfer(event: Transfer): void {
     // Placeholder
 }
 
-export function initializeMarket(id: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
+export function getOrInitializeMarket(id: string, blockNumber: BigInt, timestamp: BigInt): MarketEntity {
     /* Create a new Market and initialize its arguments */
-    //log.warning("Initializing market with id={}", [id]);
     let market = MarketEntity.load(id);
 
     if (!market) {
         market = new MarketEntity(id);
 
-        let lendingPool = getDataFromContext("lendingPool");
-        let lendingPoolContract = LendingPool.bind(Address.fromString(lendingPool));
-        let token = initializeToken(Address.fromString(id));
-        let inputTokens: TokenEntity[] = [token];
+        let lendingPoolContract = LendingPool.bind(Address.fromString(id));
+        let token = getOrInitializeToken(Address.fromString(id));
+        let inputTokens: string[] = [token.id];
 
-        let rewardToken = initializeRewardToken(Address.fromString(id), constants.REWARD_TYPE_DEPOSIT);
-        let rewardTokens: RewardTokenEntity[] = [rewardToken];
+        let rewardToken = getOrInitializeRewardToken(Address.fromString(id), constants.REWARD_TYPE_DEPOSIT);
+        let rewardTokens: string[] = [rewardToken.id];
 
         let rewardTokenEmissionsAmount: BigInt[] = [];
         let rewardTokenEmissionsUSD: BigDecimal[] = [];
-        
+
         let inputTokenBalances: BigInt[] = [];
         for (let i = 0; i < inputTokens.length; i++) {
             inputTokenBalances.push(constants.ZERO_BI);
         };
-        let protocolId = getDataFromContext("protocolId");
-        let protocol = initializeLendingProtocol(protocolId);
+        let protocol = getLendingProtocol(constants.PROTOCOL_ID);
 
         market.protocol = protocol.name;
-        market.inputTokens = inputTokens.map<string>((t) => t.id);
+        market.inputTokens = inputTokens;
         market.outputToken = constants.ZERO_ADDRESS.toHexString();
-        market.rewardTokens = rewardTokens.map<string>((t) => t.id);
+        market.rewardTokens = rewardTokens;
         market.totalValueLockedUSD = constants.ZERO_BD;
         market.totalVolumeUSD = constants.ZERO_BD;
         market.inputTokenBalances = inputTokenBalances;
@@ -426,9 +423,28 @@ export function initializeMarket(id: string, blockNumber: BigInt, timestamp: Big
             market.variableBorrowRate = constants.ZERO_BD;
         }
         else {
-            market.stableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(reserves.value.currentStableBorrowRate));
-            market.variableBorrowRate = convertBigIntToBigDecimal(convertRayToWad(reserves.value.currentVariableBorrowRate));
+            market.stableBorrowRate = convertBigIntToBigDecimal(
+                convertRayToWad(reserves.value.currentStableBorrowRate));
+            market.variableBorrowRate = convertBigIntToBigDecimal(
+                convertRayToWad(reserves.value.currentVariableBorrowRate));
         }
+
+        log.warning(
+            "Created MarketEntity with ID={}. protocol={}, totalValueLockedUSD={}, totalVolumeUSD={}, \
+            inputTokenBalances={}, outputTokenSupply={}, canUseAsCollateral={}, canBorrowFrom={}, maximumLTV={}", 
+            [
+                id,
+                market.protocol,
+                market.totalValueLockedUSD.toString(),
+                market.totalVolumeUSD.toString(),
+                market.inputTokenBalances.toString(),
+                market.outputTokenSupply.toString(),
+                market.canUseAsCollateral.toString(),
+                market.canBorrowFrom.toString(),
+                market.maximumLTV.toString(),
+
+            ]
+        )
     }
 
     market.save();

@@ -61,6 +61,7 @@ export function convertWadToRay(num: BigInt): BigInt {
 
 export function getDataFromContext(data: string): string {
     /* Get data using the context, eg. data="lendingPool", "protocolId" etc. */
+    log.warning("Getting data={} from context", [data]);
     let context = dataSource.context();
     return context.getString(data);
 }
