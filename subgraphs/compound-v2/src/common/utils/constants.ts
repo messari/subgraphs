@@ -113,6 +113,6 @@ export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is acc
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
 export const REWARD_TOKEN_TYPE = RewardTokenType.DEPOSIT; // TODO: check - seems like both
-export const SUBGRAPH_VERSION = "1.3.8";
+export const SUBGRAPH_VERSION = "1.3.12";
 export const SCHEMA_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;

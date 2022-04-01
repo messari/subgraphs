@@ -53,8 +53,6 @@ dataSources:
         #   handler: handleNewMaxAssets
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
-        - event: MarketListed(address)
-          handler: handleMarketListed
       callHandlers:
         - function: claimComp(address[],address[],bool,bool)
           handler: handleClaimComp

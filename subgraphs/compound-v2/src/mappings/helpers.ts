@@ -23,7 +23,7 @@ import { exchangecTokenForTokenAmount } from "../common/utils/utils";
 
 // create a Deposit entity, return false if transaction is null
 // null = market does not exist
-export function createDeposit(event: ethereum.Event, amount: BigInt, sender: Address): bool {
+export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens: BigInt, sender: Address): bool {
   // grab and store market
   let marketAddress = event.transaction.to!;
   let market = Market.load(marketAddress.toHexString());
@@ -56,12 +56,18 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, sender: Add
 
   deposit.save();
 
+  // update cToken supply
+  market.outputTokenSupply = market.outputTokenSupply.plus(mintTokens);
+
+  // update inputTokensBalance
+  let inputBalance = market.inputTokenBalances;
+  inputBalance = [inputBalance[0].plus(amount)];
+  market.inputTokenBalances = inputBalance;
+
   // update TVL
-  market.totalValueLockedUSD = market.totalValueLockedUSD.plus(deposit.amountUSD);
-  let protocol = getOrCreateLendingProtcol();
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(deposit.amountUSD);
-  market.save();
-  protocol.save();
+  market.totalValueLockedUSD = getAmountUSD(market, inputBalance[0], blockNumber.toI32());
+
+  // TODO: update protocol TVL
 
   // TODO: update token balances and supply
 
@@ -99,8 +105,16 @@ export function createWithdraw(event: ethereum.Event, redeemer: Address, amount:
   withdraw.asset = market.inputTokens[0];
   withdraw.amount = amount;
   withdraw.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
-
   withdraw.save();
+
+  // TODO: can make this faster by saving token price and multiplying by that
+  // even better if we pass it to other functions that need it
+  // update TVL
+  let inputBalance = market.inputTokenBalances;
+  inputBalance = [inputBalance[0].minus(amount)];
+  market.inputTokenBalances = inputBalance;
+  market.totalValueLockedUSD = getAmountUSD(market, inputBalance[0], blockNumber.toI32());
+
   return true;
 }
 
@@ -138,8 +152,11 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.asset = market.inputTokens[0];
   borrow.amount = amount;
   borrow.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
-
   borrow.save();
+
+  // update borrow volume
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(borrow.amountUSD);
+
   return true;
 }
 
@@ -233,15 +250,16 @@ export function createLiquidation(
 
   // calculate asset amount from siezeTokens (call exchangecTokenForTokenAmount)
   let assetAmount = exchangecTokenForTokenAmount(liquidatedAmount, liquidatedToken);
-  if (assetAmount == BIGINT_ZERO) {
+  if (assetAmount == BIGDECIMAL_ZERO) {
     log.error("Exchange rate failed: returned 0", []);
   }
-  liquidation.amount = assetAmount;
-  liquidation.amountUSD = getAmountUSD(liquidatedMarket, assetAmount, blockNumber.toI32());
+  // liquidation.amount = assetAmount;
+  log.info("asset amount check: {}", [assetAmount.toString()]);
+  // liquidation.amountUSD = getAmountUSD(liquidatedMarket, assetAmount, blockNumber.toI32());
 
   // calculate profit = (liquidatedAmountUSD - repaidAmountUSD)
-  let costUSD = getAmountUSD(market, repaidAmount, blockNumber.toI32());
-  liquidation.profitUSD = liquidation.amountUSD!.minus(costUSD);
+  // let costUSD = getAmountUSD(market, repaidAmount, blockNumber.toI32());
+  // liquidation.profitUSD = liquidation.amountUSD!.minus(costUSD);
 
   liquidation.save();
   return true;

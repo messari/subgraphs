@@ -337,6 +337,9 @@ type Market @entity {
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
+  " Price per share of nput token price in USD "
+  _inputTokenPrice: BigDecimal!
+
   " Total supply of output token "
   outputTokenSupply: BigInt!
 

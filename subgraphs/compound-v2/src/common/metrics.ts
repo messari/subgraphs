@@ -5,6 +5,10 @@ import { _Account, _DailyActiveAccount } from "../types/schema";
 import { getOrCreateLendingProtcol, getOrCreateUsageMetricSnapshot } from "./getters";
 import { SECONDS_PER_DAY } from "./utils/constants";
 
+///////////////////////////
+//// Snapshot Entities ////
+///////////////////////////
+
 // updates a given FinancialDailySnapshot Entity
 export function updateFinancials(event: ethereum.Event): void {
   // let financialMetrics = getOrCreateFinancials(event);
@@ -67,3 +71,9 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   // ...
   // marketMetrics.save();
 }
+
+////////////////////////
+//// Other Entities ////
+////////////////////////
+
+// export function up

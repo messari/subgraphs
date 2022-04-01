@@ -2,20 +2,13 @@
 
 ### TODO
 
-- Get prices working for cTokens
+- Get prices working for cTokens - might need to do a conversion to get cToken price
 - add calculations for daily snapshots
 - Figure out how/where to calculate/update:
   - protocol.totalValueLockedUSD
-  - market.totalValueLockedUSD
-  - market.totalVolumeUSD
-  - market.inputTokenBalances
-  - market.outputTokenSupply
-  - market.outputTokenPriceUSD (easy once cToken Price Oracle)
+  - market.outputTokenPriceUSD (take exchange rate and divide underlying token price)
   - market.rewardTokenEmissionsAmount
   - market.rewardTokenEmissionsUSD
-  - market.maximumLTV
-  - market.liquidationThreshold
-  - market.liquidationPenalty
   - market.depositRate
   - market.stableBorrowRate
   - market.variableBorrowRate
