@@ -18,8 +18,13 @@ import {
   ProtocolType,
   RewardTokenType,
   SECONDS_PER_DAY,
-  DVMFactory_ADDRESS
+  DVMFactory_ADDRESS,
+  CPFactory_ADDRESS,
+  DPPFactory_ADDRESS,
+  DSPFactory_ADDRESS
 } from "./constants";
+
+import { DVM } from "../../generated/DVM/DVM";
 
 export function getOrCreateRewardToken(rewardToken: Address): RewardToken {
   let token = RewardToken.load(rewardToken.toHexString());
@@ -48,15 +53,11 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateDexAmm(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(
-    Address.fromString(DVMFactory_ADDRESS).toHex()
-  );
+export function getOrCreateDexAmm(factoryAddress: Address): DexAmmProtocol {
+  let protocol = DexAmmProtocol.load(factoryAddress.toHex());
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(
-      Address.fromString(DVMFactory_ADDRESS).toHex()
-    );
+    protocol = new DexAmmProtocol(factoryAddress.toHex());
     protocol.name = "DODO V2";
     protocol.slug = "messari-dodo";
     protocol.schemaVersion = "1.0.0";
@@ -82,7 +83,7 @@ export function getOrCreateUsageMetricSnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = DVMFactory_ADDRESS;
+    usageMetrics.protocol = getProtocolFromPool(event.address);
 
     usageMetrics.activeUsers = 0;
     usageMetrics.totalUniqueUsers = 0;
@@ -103,7 +104,7 @@ export function getOrCreateFinancials(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = DVMFactory_ADDRESS;
+    financialMetrics.protocol = getProtocolFromPool(event.address);
 
     financialMetrics.feesUSD = ZERO_BD;
     financialMetrics.totalVolumeUSD = ZERO_BD;
@@ -129,7 +130,8 @@ export function getOrCreatePoolDailySnapshot(
     poolMetrics = new PoolDailySnapshot(
       poolAddress.concat("-").concat(id.toString())
     );
-    poolMetrics.protocol = DVMFactory_ADDRESS;
+
+    poolMetrics.protocol = getProtocolFromPool(event.address);
     poolMetrics.pool = poolAddress;
     poolMetrics.rewardTokenEmissionsAmount = [];
     poolMetrics.rewardTokenEmissionsUSD = [];
@@ -138,4 +140,20 @@ export function getOrCreatePoolDailySnapshot(
   }
 
   return poolMetrics;
+}
+
+function getProtocolFromPool(poolAddress: Address): string {
+  let pool = DVM.bind(poolAddress);
+  let version = pool.version();
+  let factoryAdd = "";
+  if (version == "DVM 1.0.2") {
+    factoryAdd = DVMFactory_ADDRESS;
+  } else if (version == "CP 1.0.0") {
+    factoryAdd = CPFactory_ADDRESS;
+  } else if (version == "DPP 1.0.0") {
+    factoryAdd = DPPFactory_ADDRESS;
+  } else if (version == "DSP 1.0.1") {
+    factoryAdd = DSPFactory_ADDRESS;
+  }
+  return factoryAdd;
 }

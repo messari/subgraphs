@@ -8,13 +8,7 @@ import {
   ADDRESS_ZERO
 } from "./utils/constants";
 
-import {
-  DVM,
-  BuyShares,
-  SellShares,
-  DODOSwap,
-  DODOFlashLoan
-} from "../generated/DVM/DVM";
+import { DPP, DODOSwap, LpFeeRateChange } from "../generated/DPP/DPP";
 
 import {
   DexAmmProtocol,
@@ -34,20 +28,14 @@ import {
   updatePoolMetrics
 } from "./utils/metrics";
 
-export function handleBuyShares(event: BuyShares): void {
-  updateUsageMetrics(event, event.params.to);
-  updateFinancials(event);
-  updatePoolMetrics(event);
-}
-
-export function handleSellShares(event: SellShares): void {
-  updateUsageMetrics(event, event.params.payer);
-  updateFinancials(event);
-  updatePoolMetrics(event);
-}
-
 export function handleDODOSwap(event: DODOSwap): void {
-  updateUsageMetrics(event, event.params.trader);
+  updateUsageMetrics(event, event.params.receiver);
+  updateFinancials(event);
+  updatePoolMetrics(event);
+}
+
+export function handleLpFeeRateChange(event: LpFeeRateChange): void {
+  //  updateUsageMetrics(event, event.params.payer);
   updateFinancials(event);
   updatePoolMetrics(event);
 }

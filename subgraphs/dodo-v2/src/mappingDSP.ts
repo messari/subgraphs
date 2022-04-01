@@ -8,13 +8,7 @@ import {
   ADDRESS_ZERO
 } from "./utils/constants";
 
-import {
-  DVM,
-  BuyShares,
-  SellShares,
-  DODOSwap,
-  DODOFlashLoan
-} from "../generated/DVM/DVM";
+import { DSP, BuyShares, SellShares, DODOSwap } from "../generated/DSP/DSP";
 
 import {
   DexAmmProtocol,

@@ -1,7 +1,23 @@
 import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
-import { DVMFactory_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
+import {
+  _Account,
+  _DailyActiveAccount,
+  UsageMetricsDailySnapshot
+} from "../../generated/schema";
+
+import {
+  DVMFactory_ADDRESS,
+  CPFactory_ADDRESS,
+  DPPFactory_ADDRESS,
+  DSPFactory_ADDRESS,
+  SECONDS_PER_DAY
+} from "./constants";
+
+import {
+  getOrCreateDexAmm,
+  getOrCreatePoolDailySnapshot,
+  getOrCreateUsageMetricSnapshot
+} from "./getters";
 
 // These are meant more as boilerplates that'll be filled out depending on the
 // subgraph, and will be different from subgraph to subgraph, hence left
@@ -32,7 +48,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
   let accountId = from.toHexString();
   let account = _Account.load(accountId);
-  let protocol = getOrCreateDexAmm();
+  let protocol = getOrCreateDexAmm(Address.fromString(DVMFactory_ADDRESS));
   if (!account) {
     account = new _Account(accountId);
     account.save();

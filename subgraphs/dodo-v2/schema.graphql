@@ -175,7 +175,7 @@ type LiquidityPoolFee @entity {
   feeType: LiquidityPoolFeeType!
 }
 
-type LiquidityPool @entity {
+type LiquidityPool implements Pool @entity {
   id: ID!
   protocol: DexAmmProtocol!
   inputTokens: [Token!]!

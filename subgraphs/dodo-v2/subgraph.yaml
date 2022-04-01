@@ -26,106 +26,77 @@ dataSources:
           handler: handleNewDVM
         - event: RemoveDVM(address)
           handler: handleRemoveDVM
-      file: ./src/mappingDVMFactory.ts
+      file: ./src/mappingFactory.ts
+      # blank
+  - kind: ethereum
+    name: CrowdPoolingFactory
+    network: mainnet
+    source:
+      address: "0xE8C9A78725D0451FA19878D5f8A3dC0D55FECF25"
+      abi: CrowdPoolingFactory
+      startBlock: 14480000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewCP
+      abis:
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+      eventHandlers:
+        - event: NewCP(address,address,address,address)
+          handler: handleNewCP
+      file: ./src/mappingFactory.ts
+      # blank
+  - kind: ethereum
+    name: DPPFactory
+    network: mainnet
+    source:
+      address: "0x5336edE8F971339F6c0e304c66ba16F1296A2Fbe"
+      abi: DPPFactory
+      startBlock: 14480000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewDPP
+        - RemoveDPP
+      abis:
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+      eventHandlers:
+        - event: NewDPP(address,address,address,address)
+          handler: handleNewDPP
+        - event: RemoveDPP(address)
+          handler: handleRemoveDPP
+      file: ./src/mappingFactory.ts
   # blank
-  # - kind: ethereum
-  #   name: DODOLpToken
-  #   network: mainnet
-  #   source:
-  #     address: "0x43Dfc4159D86F3A37A5A4B3D4580b888ad7d4DDd"
-  #     abi: DODOLpToken
-  #     startBlock: 14480000
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.5
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - Approval
-  #       - Burn
-  #       - Mint
-  #       - Transfer
-  #     abis:
-  #       - name: DODOLpToken
-  #         file: ./abis/DODOLpToken.json
-  #     eventHandlers:
-  #       - event: Approval(indexed address,indexed address,uint256)
-  #         handler: handleApproval
-  #       - event: Burn(indexed address,uint256)
-  #         handler: handleBurn
-  #       - event: Mint(indexed address,uint256)
-  #         handler: handleMint
-  #       - event: Transfer(indexed address,indexed address,uint256)
-  #         handler: handleTransfer
-  #     file:
-  #       ./src/mappingDODOLp.ts
-  #       #  blank
-  # - kind: ethereum
-  #   name: vDODOToken
-  #   network: mainnet
-  #   source:
-  #     address: "0xc4436fBAE6eBa5d95bf7d53Ae515F8A707Bd402A"
-  #     abi: vDODOToken
-  #     startBlock: 14480000
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.5
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - Approval
-  #       - ChangePerReward
-  #       - DonateDODO
-  #       - MintVDODO
-  #       - PreDeposit
-  #       - RedeemVDODO
-  #       - SetCantransfer
-  #       - Transfer
-  #       - UpdateDODOFeeBurnRatio
-  #     abis:
-  #       - name: vDODOToken
-  #         file: ./abis/vDODOToken.json
-  #     eventHandlers:
-  #       - event: Approval(indexed address,indexed address,uint256)
-  #         handler: handleApproval
-  #       - event: ChangePerReward(uint256)
-  #         handler: handleChangePerReward
-  #       - event: DonateDODO(address,uint256)
-  #         handler: handleDonateDODO
-  #       - event: MintVDODO(address,address,uint256)
-  #         handler: handleMintVDODO
-  #       - event: PreDeposit(uint256)
-  #         handler: handlePreDeposit
-  #       - event: RedeemVDODO(address,uint256,uint256,uint256)
-  #         handler: handleRedeemVDODO
-  #       - event: SetCantransfer(bool)
-  #         handler: handleSetCantransfer
-  #       - event: Transfer(indexed address,indexed address,uint256)
-  #         handler: handleTransfer
-  #       - event: UpdateDODOFeeBurnRatio(uint256)
-  #         handler: handleUpdateDODOFeeBurnRatio
-  #     file: ./src/mappingVDODO.ts
+  - kind: ethereum
+    name: DSPFactory
+    network: mainnet
+    source:
+      address: "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
+      abi: DSPFactory
+      startBlock: 14480000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewDSP
+        - RemoveDSP
+      abis:
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+      eventHandlers:
+        - event: NewDSP(address,address,address,address)
+          handler: handleNewDSP
+        - event: RemoveDSP(address)
+          handler: handleRemoveDSP
+      file: ./src/mappingFactory.ts
   # blank
-  # - name: ERC20
-  #   kind: ethereum/contract
-  #   network: mainnet
-  #   source:
-  #     abi: ERC20
-  #     startBlock: 14190000
-  #   mapping:
-  #     kind: ethereum/events
-  #     apiVersion: 0.0.5
-  #     language: wasm/assemblyscript
-  #     entities:
-  #       - Transfer
-  #       - Approval
-  #     abis:
-  #       - name: ERC20
-  #         file: ./abis/ERC20.json
-  #     eventHandlers:
-  #       - event: Transfer(indexed address,indexed address,uint256)
-  #         handler: handleTransfer
-  #       - event: Approval(indexed address,indexed address,uint256)
-  #         handler: handleApproval
-  #     file: ./src/mappingERC20.ts
   - name: DVM
     kind: ethereum/contract
     network: mainnet
@@ -151,3 +122,78 @@ dataSources:
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
       file: ./src/mappingDVM.ts
+  # blank
+  - name: CP
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: CP
+      startBlock: 14480000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+        - Cancel
+        - Settle
+      abis:
+        - name: CP
+          file: ./abis/CP.json
+      eventHandlers:
+        - event: Bid(address,uint256,uint256)
+          handler: handleBid
+        - event: Cancel(address,uint256)
+          handler: handleCancel
+        - event: Settle()
+          handler: handleSettle
+      file: ./src/mappingCP.ts
+  # blank
+  - name: DPP
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: DPP
+      startBlock: 14480000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DODOSwap
+        - LpFeeRateChange
+      abis:
+        - name: DPP
+          file: ./abis/DPP.json
+      eventHandlers:
+        - event: DODOSwap(address,address,uint256,uint256,address,address)
+          handler: handleDODOSwap
+        - event: LpFeeRateChange(uint256)
+          handler: handleLpFeeRateChange
+      file: ./src/mappingDPP.ts
+  # # blank
+  - name: DSP
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: DSP
+      startBlock: 14480000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BuyShares
+        - SellShares
+        - DODOSwap
+      abis:
+        - name: DSP
+          file: ./abis/DSP.json
+      eventHandlers:
+        - event: BuyShares(address,uint256,uint256)
+          handler: handleBuyShares
+        - event: SellShares(address,address,uint256,uint256)
+          handler: handleSellShares
+        - event: DODOSwap(address,address,uint256,uint256,address,address)
+          handler: handleDODOSwap
+      file: ./src/mappingDSP.ts
