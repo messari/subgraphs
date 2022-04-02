@@ -44,3 +44,16 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
   }
   return token as RewardToken;
 }
+
+export function createRewardTokens(): RewardToken {
+  const address = Address.fromString(TOKE_ADDRESS);
+  const rewardToken = getOrCreateRewardToken(address);
+
+  // Values if TOKE token is not deployed yet
+  if (rewardToken.name === "") {
+    rewardToken.name = TOKE_NAME;
+    rewardToken.symbol = TOKE_SYMBOL;
+    rewardToken.save();
+  }
+  return rewardToken;
+}
