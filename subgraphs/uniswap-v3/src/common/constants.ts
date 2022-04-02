@@ -89,7 +89,6 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 
-export const ERROR_NUM = 9999
 export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0")
 
 ///////

@@ -346,6 +346,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
   /**
    * Things afffected by new USD rates
    */
+   // Get the total value locked in USD
   let totalValueLockedETH = poolAmounts.inputTokenBalances[0]
     .times(tokenTracker0.derivedETH)
     .plus(poolAmounts.inputTokenBalances[1].times(tokenTracker1.derivedETH))
