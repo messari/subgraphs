@@ -12,7 +12,7 @@ export function getOrCreateUserSnapshot(day: i32): UsageMetricsDailySnapshot {
 
   snapshot = new UsageMetricsDailySnapshot(day.toString());
 
-  snapshot.protocol = "";
+  snapshot.protocol = getOrCreateProtocol().id;
   snapshot.activeUsers = 0;
   snapshot.totalUniqueUsers = 0;
   snapshot.dailyTransactionCount = 0;
