@@ -1,4 +1,4 @@
-/* eslint-disable prefer-const */
+// import { log } from '@graphprotocol/graph-ts'
 import { ERC20 } from '../../generated/Factory/ERC20'
 import { Address } from '@graphprotocol/graph-ts'
 import { DEFAULT_DECIMALS } from '../common/constants'
