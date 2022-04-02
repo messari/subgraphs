@@ -31,15 +31,11 @@ export function handleSetVault(call: SetVaultCall): void {
 
   const outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
-  vault.outputTokenSupply = BIGINT_ZERO;
-
-  vault.totalVolumeUSD = BIGDECIMAL_ZERO;
-  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
 
   vault.rewardTokenEmissionsAmount = [BIGINT_ZERO];
   vault.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
-
   vault.save();
+
   SettVault.create(vaultAddress);
 
   const strategyAddress = getOrCreateStrategy(controllerAddress, vaultAddress, inputTokenAddress);
@@ -60,5 +56,8 @@ export function handleSetStrategy(call: SetStrategyCall): void {
     getOrCreateStrategy(controllerAddress, vaultAddress, inputTokenAddress, newStrategyAddress);
   }
 
-  log.warning("[BADGER] new strategy found : vault {}, strategy {}", [vaultAddress.toHex(), newStrategyAddress.toHex()]);
+  log.warning("[BADGER] new strategy found : vault {}, strategy {}", [
+    vaultAddress.toHex(),
+    newStrategyAddress.toHex(),
+  ]);
 }

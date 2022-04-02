@@ -1,10 +1,5 @@
 {
   "chain": "mainnet",
-  "registry": {
-    "name": "VaultRegistry",
-    "address": "0xfda7eb6f8b7a9e9fcfd348042ae675d1d652454f",
-    "startBlock": 13006329
-  },
   "controllers": [
     {
       "name": "native",

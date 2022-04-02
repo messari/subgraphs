@@ -48,11 +48,17 @@ export function handleDepositAll(call: DepositAllCall): void {
   let amount = newBalance.minus(prevBalance);
   let user = getOrCreateUser(call.from);
 
-  log.warning("[BADGER] handleDeposit - prevBalance {}, amount {}, vault {}", [
+  log.warning("[BADGER] handleDepositAll - prevBalance {}, currBalance {}, amount {}, vault {}", [
     prevBalance.toString(),
+    newBalance.toString(),
     amount.toString(),
     vaultAddress,
   ]);
+
+  if (amount <= BIGINT_ZERO) {
+    log.warning("[BADGER] skipping handleDepositAll", []);
+    return;
+  }
 
   deposit(call, vault, amount);
   updateUsageMetrics(user, call.block);
@@ -89,16 +95,22 @@ export function handleWithdrawAll(call: WithdrawAllCall): void {
   }
 
   let newSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
-  let prevSupply = vault.outputTokenSupply;
+  let prevSupply = BigInt.fromString(vault.outputTokenSupply.toString());
 
   let shares = prevSupply.minus(newSupply);
   let user = getOrCreateUser(call.from);
 
-  log.warning("[BADGER] handleWithdrawAll - newSuppply {}, shares {}, vault {}", [
+  log.warning("[BADGER] handleWithdrawAll - newSuppply {}, prevSupply {}, shares {}, vault {}", [
     newSupply.toString(),
+    prevSupply.toString(),
     shares.toString(),
     vaultAddress,
   ]);
+
+  if (shares <= BIGINT_ZERO) {
+    log.warning("[BADGER] skipping handleWithdrawAll", []);
+    return;
+  }
 
   withdraw(call, vault, shares);
   updateUsageMetrics(user, call.block);
