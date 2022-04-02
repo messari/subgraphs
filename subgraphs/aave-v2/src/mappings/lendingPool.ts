@@ -1,8 +1,6 @@
 import {
   BigInt,
-  BigDecimal,
   Address,
-  ethereum,
   dataSource,
   log
 } from "@graphprotocol/graph-ts";
@@ -19,36 +17,29 @@ import {
 } from "../../generated/templates/LendingPool/LendingPool";
 
 import {
-  IPriceOracleGetter
-} from "../../generated/templates/LendingPool/IPriceOracleGetter";
-
-import {
   Deposit as DepositEntity,
   Withdraw as WithdrawEntity,
   Borrow as BorrowEntity,
   Repay as RepayEntity,
   Liquidation as LiquidationEntity,
-  Market,
-  Token
+  Market
 } from '../../generated/schema';
 
 import {
   fetchProtocolEntity,
-  getAssetPriceInUSDC,
   getProtocolIdFromCtx,
   initToken,
   initMarket,
   amountInUSD,
   updateFinancials,
-  loadMarketDailySnapshot,
+  getMarketDailySnapshot,
   updateMetricsDailySnapshot,
-  exponentToBigDecimal,
   getDaysSinceEpoch,
   updateTVL,
   calculateRevenues,
   rayToWad
 } from "./utilFunctions";
-import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_TWO, BIGINT_ZERO } from "../common/constants";
+import { BIGINT_ZERO } from "../common/constants";
 import { bigIntToBigDecimal } from "../common/utils/numbers";
 
 export function getLendingPoolFromCtx(): string {
@@ -66,6 +57,7 @@ export function getTokenBalanceIndex(market: Market, asset: string): number {
     initToken(Address.fromString(asset));
     market.inputTokens.push(asset);
     market.inputTokenBalances.push(BIGINT_ZERO);
+    market.save();
   }
   log.info('returning token index' + tokenBalanceIndex.toString(), []);
   return <i32>tokenBalanceIndex;
@@ -108,7 +100,7 @@ export function handleDeposit(event: Deposit): void {
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
   // Instantiate the deposit entity with the specified string construction as id
-  log.info('DEPOSIT AMT: ' + event.params.amount.toString(), [])
+  log.info('DEPOSIT AMT: ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   let deposit = new DepositEntity(hash + "-" + logIdx.toHexString());
   deposit.to = marketAddr;
   deposit.market = marketAddr;
@@ -142,7 +134,7 @@ export function handleDeposit(event: Deposit): void {
   market.save();
 
   // Update snapshots
-  loadMarketDailySnapshot(event, market);
+  getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   updateFinancials(event);
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
@@ -152,6 +144,7 @@ export function handleDeposit(event: Deposit): void {
 
 export function handleWithdraw(event: Withdraw): void {
   // Withdraw event from a lending pool to a user triggers this handler
+  log.info('WITH AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   const hash = event.transaction.hash.toHexString();
   const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
@@ -190,7 +183,7 @@ export function handleWithdraw(event: Withdraw): void {
   updateTVL(token, market, protocol, withdraw.amount, true);
   market.save();
   // Update snapshots
-  loadMarketDailySnapshot(event, market);
+  getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   updateFinancials(event);
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
@@ -201,7 +194,7 @@ export function handleWithdraw(event: Withdraw): void {
 export function handleBorrow(event: Borrow): void {
   // Borrow event from a lending pool to a user triggers this handler
   // Stable: 1, Variable: 2
-  log.info('BORROW - MODE: ' + event.params.borrowRateMode.toString(), [])
+  log.info('BORROW - MODE: ' + event.params.borrowRateMode.toString() + ' amt ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   // Depending on borrow mode, add to stable/variable tvl and trigger total fee calculation
   const hash = event.transaction.hash.toHexString();
   const logIdx = event.logIndex;
@@ -244,7 +237,7 @@ export function handleBorrow(event: Borrow): void {
 
   market.save();
   // Update snapshots
-  loadMarketDailySnapshot(event, market);
+  getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   const financial = updateFinancials(event);
   // Add the borrow amount in USD to total volume on the daily financial snapshot ("total loan origination")
@@ -257,6 +250,7 @@ export function handleBorrow(event: Borrow): void {
 
 export function handleRepay(event: Repay): void {
   // Repay event from a user who is paying back into a pool that they borrowed from
+  log.info('REPAY AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   const hash = event.transaction.hash.toHexString();
   const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
@@ -296,7 +290,7 @@ export function handleRepay(event: Repay): void {
   market.save();
 
   // Update snapshots
-  loadMarketDailySnapshot(event, market);
+  getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   updateFinancials(event);
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
@@ -342,7 +336,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   // Update total value locked on the market level
   updateTVL(token, market, protocol, liquidation.amount, false);
   // Update snapshots
-  loadMarketDailySnapshot(event, market);
+  getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   updateFinancials(event);
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot

@@ -71,7 +71,6 @@ export function startIndexingLendingPoolConfigurator(configurator: Address, cont
 
 function initiateContext(addrProvider: Address): DataSourceContext {
   // Add Lending Pool address, price oracle contract address, and protocol id to the context for general accessibility
-
   const contract = AddressProviderContract.bind(addrProvider);
   log.info('AddrProvContract: ' + addrProvider.toHexString(), []);
   // Get the lending pool
@@ -80,24 +79,22 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   if (!trylendingPool.reverted) {
     lendingPool = trylendingPool.value.toHexString();
     log.info('initiateContext LP:' + lendingPool, []);
-  } else {
-    log.error('FAILED TO GET LENDING POOL', ['']);
   }
-  // Get the Address Provider Contract's Price Oracle
-  const tryPriceOracle = contract.try_getPriceOracle();
-  let priceOracle = '';
-  if (!tryPriceOracle.reverted && tryPriceOracle.value !== Address.zero()) {
-    priceOracle = tryPriceOracle.value.toHexString();
-    log.info('initiateContext priceOracle: ' + priceOracle, []);
-  } else {
-    priceOracle = priceOracleDefault;
-    log.error('FAILED TO GET ORACLE - REVERTED TO DEFAULT HARD-CODED AT ' + priceOracle, ['']);
-  }
+
   // Initialize the protocol entity
   const lendingProtocol = fetchProtocolEntity(protocolAddress);
-  lendingProtocol.protocolPriceOracle = priceOracle;
+  // Get the Address Provider Contract's Price Oracle
+  const tryPriceOracle = contract.try_getPriceOracle();
+  if (!tryPriceOracle.reverted) {
+    lendingProtocol.protocolPriceOracle = tryPriceOracle.value.toHexString();
+    log.info('initiateContext priceOracle: ' + lendingProtocol.protocolPriceOracle, []);
+  } else {
+    lendingProtocol.protocolPriceOracle = priceOracleDefault;
+    log.error('FAILED TO GET ORACLE - REVERTED TO DEFAULT HARD-CODED AT ' + lendingProtocol.protocolPriceOracle, ['']);
+  }
   lendingProtocol.save();
-  log.info('CREATING CONTEXT ' + lendingPool + '----' + priceOracle + '-----' + lendingProtocol.id, []);
+
+  log.info('CREATING CONTEXT ' + lendingPool + '-----' + lendingProtocol.id, []);
   const context = new DataSourceContext();
   context.setString("lendingPool", lendingPool);
   context.setString("protocolId", lendingProtocol.id);

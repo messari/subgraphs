@@ -1,4 +1,4 @@
-import { Address, ByteArray, Bytes, DataSourceContext, ethereum, log } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ByteArray, Bytes, DataSourceContext, ethereum, log } from "@graphprotocol/graph-ts"
 import { LendingPoolAddressesProvider, ProxyCreated } from "../generated/templates/LendingPoolAddressesProvider/LendingPoolAddressesProvider"
 import { createMockedFunction, newMockEvent } from "matchstick-as"
 import { startIndexingLendingPool, startIndexingLendingPoolConfigurator } from "../src/mappings/lendingPoolAddressProvider"
@@ -18,14 +18,20 @@ export function mockProxyCreatedEvent(): ProxyCreated {
     mockEvent.parameters
   )
   newProxyCreatedEvent.parameters = new Array()
-  const idParamStr: string = ("LENDING_POOL_CONFIGURATOR")
-  const idParamBytes: Bytes = Bytes.fromUTF8(idParamStr)
 
-  let idParam = new ethereum.EventParam('id', ethereum.Value.fromBytes(idParamBytes));
-  let addressParam = new ethereum.EventParam('address', ethereum.Value.fromAddress(Address.fromString("0x311bb771e4f8952e6da169b425e7e92d6ac45756")))
 
-  newProxyCreatedEvent.parameters.push(idParam)
-  newProxyCreatedEvent.parameters.push(addressParam)
+
+  let asset = new ethereum.EventParam('asset', ethereum.Value.fromAddress(Address.fromString("0x311bb771e4f8952e6da169b425e7e92d6ac45756")))
+  let outputParam = new ethereum.EventParam('aToken', ethereum.Value.fromString('0x311bb771e4f8952e6da169b425e7e92d6ac45756'))
+  let otSupply = new ethereum.EventParam('outputTokenSupply', ethereum.Value.fromUnsignedBigInt(BigInt.fromString("1000000")))
+  let vToken = new ethereum.EventParam('variableDebtToken', ethereum.Value.fromAddress(Address.fromString("0x311bb771e4f8952e6da169b425e7e92d6ac45756")))
+  let sToken = new ethereum.EventParam('stableDebtToken', ethereum.Value.fromAddress(Address.fromString("0x311bb771e4f8952e6da169b425e7e92d6ac45756")))
+
+  newProxyCreatedEvent.parameters.push(sToken)
+  newProxyCreatedEvent.parameters.push(vToken)
+  newProxyCreatedEvent.parameters.push(otSupply)
+  newProxyCreatedEvent.parameters.push(outputParam)
+  newProxyCreatedEvent.parameters.push(asset)
 
   return newProxyCreatedEvent
 }

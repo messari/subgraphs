@@ -372,10 +372,10 @@ type Market @entity {
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]!
 
   " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
+  rewardTokenEmissionsUSD: [BigDecimal!]!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -460,10 +460,10 @@ type MarketDailySnapshot @entity {
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]!
 
   " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
+  rewardTokenEmissionsUSD: [BigDecimal!]!
   
   " Block number of this snapshot "
   blockNumber: BigInt!

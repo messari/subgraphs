@@ -1,7 +1,6 @@
 import {
   Address,
   BigDecimal,
-  BigInt,
   dataSource,
   log
 } from "@graphprotocol/graph-ts";
@@ -21,17 +20,13 @@ import {
   initToken,
   initMarket,
   getOutputTokenSupply,
-  getRewardTokenFromIncController,
-  loadRewardToken,
   getAssetPriceInUSDC,
-  rayToWad
+  rayToWad,
+  initIncentivesController
 } from "./utilFunctions";
 
 import { AToken } from "../../generated/templates/AToken/AToken";
-import {
-  IncentivesController,
-  AToken as ATokenTemplate
-} from "../../generated/templates";
+import { AToken as ATokenTemplate } from "../../generated/templates";
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -51,27 +46,18 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   );
 
   // Set the aToken contract from the param aToken
-  const aToken = initToken(event.params.aToken);
+  initToken(event.params.aToken);
   market.outputToken = event.params.aToken.toHexString();
   market.outputTokenSupply = getOutputTokenSupply(event.params.aToken);
-  market.outputTokenPriceUSD = getAssetPriceInUSDC(aToken);
-
+  market.outputTokenPriceUSD = getAssetPriceInUSDC(event.params.aToken);
+  log.info('RES INIT OUTPUT TOKEN PRICE ' + market.outputTokenPriceUSD.toString(), [])
   // Set the s/vToken addresses from params
   market.sToken = event.params.stableDebtToken.toHexString();
   market.vToken = event.params.variableDebtToken.toHexString();
   
-  // !!! IS THIS NEEDED? MOST RESERVES INIT BEFORE INCENTIVE CONTROLLERS EXISTED
   // Attempt to get the incentive controller
   const currentOutputToken = AToken.bind(Address.fromString(market.outputToken));
-  if (!currentOutputToken.try_getIncentivesController().reverted) {
-    const incContAddr = currentOutputToken.try_getIncentivesController().value;
-    log.info('NEW RESERVE INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
-    IncentivesController.create(currentOutputToken.try_getIncentivesController().value);
-    const rewardToken = getRewardTokenFromIncController(incContAddr, market);
-    loadRewardToken(Address.fromString(rewardToken.id), market);
-  } else {
-    log.info('FAILED TO GET INCENTIVE CONTROLLER ' + currentOutputToken._address.toHexString() + ' ' + market.id, [])
-  }
+  initIncentivesController(currentOutputToken, market);
   market.save();
 }
 
@@ -80,7 +66,6 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleCollateralConfigurationChanged' + marketAddr, [])
   const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
-  const token = initToken(Address.fromString(market.id));
   market.maximumLTV = new BigDecimal(event.params.ltv);
   market.liquidationThreshold = new BigDecimal(event.params.liquidationThreshold);
   // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on
@@ -129,9 +114,7 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   const marketAddr = event.params.asset.toHexString();
   log.info('RESERVE FACTOR MarketAddr in lendingPoolConfigurator.ts handleReserveFactorChanged ' + marketAddr + ' ' + event.params.factor.toString(), []);
   const market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
-  
-  // !!! THIS SHOULD PROBABLY ALLOW FOR FRACTIONS OF A PERCENT, CURRENTLY ROUNDS TO TWO DIGIT PERCENTAGES
-  // Set the reserve factor as a percentage (ie saved as 20 for 20%)
-  market.reserveFactor = (event.params.factor).div(BigInt.fromI32(100));
+  // Set the reserve factor as an integer * 100 of a percent (ie 2500 represents 25% of the reserve)
+  market.reserveFactor = event.params.factor;
   market.save();
 }
