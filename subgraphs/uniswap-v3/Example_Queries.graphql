@@ -1,0 +1,27 @@
+https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-alt
+
+query Asset_pools($id:ID = "0x00000000000045166c45af0fc6e4cf31d9e14b9a",
+$date: Int = 1622505600) {
+  token(id: $id) {
+    id
+    whitelistPools{
+      id
+    }
+    tokenDayData(where: {date:$date}){
+      volume
+      date
+    } 
+  }
+}
+
+query Block_query($number: Int = 14322986){
+  swaps(block:{number: $number}){
+    id
+    token0{
+      name
+    }
+    token1{
+      name
+    }
+  }
+}

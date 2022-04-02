@@ -1,0 +1,121 @@
+# Subgraph Schema: Generic
+# Version: 1.0.0
+
+enum Network {
+  ARBITRUM
+  AURORA
+  AVALANCHE
+  BSC
+  CELO
+  CRONOS
+  ETHEREUM
+  FANTOM
+  HARMONY
+  MOONBEAM
+  MOONRIVER
+  OPTIMISM
+  POLYGON
+  XDAI
+}
+
+enum ProtocolType {
+  EXCHANGE
+  LENDING
+  YIELD
+  BRIDGE
+  GENERIC
+  # Will add more
+}
+
+#############################
+##### Protocol Metadata #####
+#############################
+
+type Protocol @entity {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: ID!
+
+  " Name of the protocol, including version. e.g. Uniswap v3 "
+  name: String!
+
+  " Slug of protocol, including version. e.g. uniswap-v3 "
+  slug: String!
+
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
+  network: Network!
+
+  type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
+
+  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+}
+
+###############################
+##### Protocol Timeseries #####
+###############################
+
+type UsageMetricsDailySnapshot @entity {
+  " ID is # of days since Unix epoch time "
+  id: ID!
+
+  protocol: Protocol!
+
+  " # of unique daily active users "
+  activeUsers: Int!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  " Total number of transaction occurred in a day. Transactions include all entities that implement the Event interface. "
+  dailyTransactionCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type FinancialsDailySnapshot @entity {
+  " ID is # of days since Unix epoch time "
+  id: ID!
+
+  protocol: Protocol!
+
+  totalValueLockedUSD: BigDecimal!
+
+  " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
+  protocolTreasuryUSD: BigDecimal
+
+  " Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  supplySideRevenueUSD: BigDecimal!
+
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  protocolSideRevenueUSD: BigDecimal!
+
+  " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
+  feesUSD: BigDecimal!
+  
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
