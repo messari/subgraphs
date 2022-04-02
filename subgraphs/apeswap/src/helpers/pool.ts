@@ -73,3 +73,11 @@ export function getOrCreatePool(
 
   return pool as LiquidityPool;
 }
+
+export function updatePool(pool: LiquidityPool): void {
+    let inputTokenBalances: BigInt[] = []
+    inputTokenBalances.push(pool._reserve0) 
+    inputTokenBalances.push(pool._reserve1) 
+    pool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb)
+    pool.save()
+}

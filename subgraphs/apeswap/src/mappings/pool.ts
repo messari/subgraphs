@@ -9,6 +9,7 @@ import {
 } from "../../generated/templates/Pool/Pair";
 import { getOrCreateDeposit } from "../helpers/deposit";
 import { getOrCreateFinancials } from "../helpers/financials";
+import { updatePool } from "../helpers/pool";
 import { createPoolDailySnapshot } from "../helpers/poolDailySnapshot";
 import { getOrCreateSwap } from "../helpers/swap";
 import { updateUsageMetrics } from "../helpers/updateUsageMetrics";
@@ -33,7 +34,6 @@ export function handleTransfer(event: Transfer): void {
   let from = event.params.from;
   let to = event.params.to;
   let amount = event.params.value;
-  let transactionHash = event.transaction.hash.toHexString();
   let id = event.address.toHexString();
   let fromHex = from.toHexString();
   let toHex = to.toHexString();
@@ -49,7 +49,6 @@ export function handleTransfer(event: Transfer): void {
     if (fromHex == ZERO_ADDRESS) {
       if (toHex == ZERO_ADDRESS) {
         pool.outputTokenSupply = pool.outputTokenSupply.plus(amount);
-        pool.save();
       }
 
       let deposit = getOrCreateDeposit(event, pool);
@@ -57,7 +56,9 @@ export function handleTransfer(event: Transfer): void {
       deposit.to = to.toHexString();
       deposit.outputTokenAmount = amount;
       deposit.save();
-      // Add Liquidity
+
+      // Update pool
+      updatePool(pool)
     }
 
     if (fromHex !== ZERO_ADDRESS && toHex == pool.id) {
@@ -66,7 +67,8 @@ export function handleTransfer(event: Transfer): void {
       withdraw.to = to.toHexString();
       withdraw.outputTokenAmount = amount;
       withdraw.save();
-      // remove liquidity
+      
+      updatePool(pool)
     }
 
     if (fromHex == pool.id && toHex == ZERO_ADDRESS) {
@@ -77,12 +79,11 @@ export function handleTransfer(event: Transfer): void {
       withdraw.to = to.toHexString();
       withdraw.outputTokenAmount = amount;
       withdraw.save();
-      // Remove liquidity
+
+      // Update pool
+      updatePool(pool)
     }
 
-    if (fromHex !== ZERO_ADDRESS && fromHex !== pool.id && toHex !== pool.id) {
-      // Do nothing
-    }
   }
 }
 
@@ -122,6 +123,9 @@ export function handleMint(event: Mint): void {
     deposit.amountUSD = toDecimal(amountTotalUSD, DEFAULT_DECIMALS);
 
     deposit.save();
+
+    // Update pool
+    updatePool(pool)
 
     // Take a PoolDailySnapshot
     createPoolDailySnapshot(
@@ -188,6 +192,9 @@ export function handleBurn(event: Burn): void {
     withdraw.amountUSD = toDecimal(amountTotalUSD, DEFAULT_DECIMALS);
 
     withdraw.save();
+
+    // Update pool
+    updatePool(pool)
 
     // Take a PoolDailySnapshot
     createPoolDailySnapshot(
@@ -371,8 +378,6 @@ export function handleSync(event: Sync): void {
 
     pool._reserve0 = reserve0;
     pool._reserve1 = reserve1;
-    pool.inputTokenBalances[0] = reserve0;
-    pool.inputTokenBalances[1] = reserve1;
 
     if (pool._reserve1.notEqual(BIGINT_ZERO))
       pool._token0Price = pool._reserve0.div(pool._reserve1);
@@ -424,7 +429,8 @@ export function handleSync(event: Sync): void {
     );
 
     // use tracked amounts globally
-    protocol.totalValueLockedUSD = pool.totalValueLockedUSD;
+    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.plus(trackedLiquidityBNB)
+    protocol.totalValueLockedUSD = toDecimal(protocol._totalValueLockedBNB.times(bundle.bnbPrice), DEFAULT_DECIMALS);
 
     // now correctly set liquidity amounts for each token
     token0.totalLiquidity = token0.totalLiquidity.plus(pool._reserve0);
