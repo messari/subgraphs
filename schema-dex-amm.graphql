@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.0
+# Version: 1.0.1
 
 enum Network {
   ARBITRUM
@@ -437,8 +437,8 @@ type Deposit implements Event @entity {
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output tokens of the pool. E.g. the UNI-LP token "
-  outputTokens: Token!
+  " Output token of the pool. E.g. the UNI-LP token "
+  outputToken: Token!
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
@@ -481,8 +481,8 @@ type Withdraw implements Event @entity {
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output tokens of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
-  outputTokens: Token!
+  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
+  outputToken: Token!
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
