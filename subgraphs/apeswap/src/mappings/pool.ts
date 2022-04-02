@@ -249,7 +249,8 @@ export function handleSwap(event: SwapEvent): void {
       amount0Total,
       token0,
       amount1Total,
-      token1
+      token1,
+      pool
     );
 
     let trackedAmountBNB: BigInt;
