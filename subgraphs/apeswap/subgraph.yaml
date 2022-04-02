@@ -1,0 +1,99 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Factory
+    network: bsc
+    source:
+      address: "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6"
+      abi: Factory
+      startBlock: 5030273	
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/factory.ts
+
+  - kind: ethereum/contract
+    name: BUSD_WBNB_PAIR
+    network: bsc
+    source:
+      address: '0x58f876857a02d6762e0101bb5c46a8c1ed44dc16'
+      abi: BUSD_WBNB_PAIR
+      startBlock: 5030273
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/busdWbnb.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: BUSD_WBNB_PAIR
+          file: ./abis/BUSD_WBNB_PAIR.json
+      eventHandlers:
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+  - kind: ethereum/contract
+    name: USDT_WBNB_PAIR
+    network: bsc
+    source:
+      address: '0x16b9a82891338f9ba80e2d6970fdda79d1eb0dae'
+      abi: USDT_WBNB_PAIR
+      startBlock: 5030273
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/usdtWbnb.ts
+      entities: []
+      abis:
+        - name: ERC20
+          file: ./abis/IERC20.json
+        - name: USDT_WBNB_PAIR
+          file: ./abis/USDT_WBNB_PAIR.json
+      eventHandlers:
+        - event: Sync(uint112,uint112)
+          handler: handleSync
+
+templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: bsc
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: []
+      abis:
+        - name: Pair
+          file: ./abis/Pair.json
+        - name: Factory
+          file: ./abis/Factory.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
