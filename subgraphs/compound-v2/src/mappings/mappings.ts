@@ -1,5 +1,5 @@
 // map blockchain data to entities outlined in schema.graphql
-import { createBorrow, createDeposit, createLiquidation, createMarket, createRepay, createWithdraw } from "./helpers";
+import { createBorrow, createDeposit, createLiquidation, createRepay, createWithdraw } from "./helpers";
 
 import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow, Transfer } from "../types/templates/cToken/CToken";
 
@@ -17,15 +17,17 @@ import {
 import { CToken } from "../types/templates";
 import { AccrueInterest, NewMarketInterestRateModel, NewReserveFactor } from "../types/Comptroller/cToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
-import { getOrCreateLendingProtcol } from "../common/getters";
+import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { Market } from "../types/schema";
 import { exponentToBigDecimal } from "../common/utils/utils";
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
+  log.info("MINT handled", []);
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
     updateUsageMetrics(event, event.params.minter);
-    updateFinancials(event);
+    updateFinancials(event, BIGINT_ZERO);
     updateMarketMetrics(event);
   }
 }
@@ -33,7 +35,7 @@ export function handleMint(event: Mint): void {
 export function handleRedeem(event: Redeem): void {
   if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount)) {
     updateUsageMetrics(event, event.params.redeemer);
-    updateFinancials(event);
+    updateFinancials(event, BIGINT_ZERO);
     updateMarketMetrics(event);
   }
 }
@@ -41,7 +43,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: Borrow): void {
   if (createBorrow(event, event.params.borrower, event.params.borrowAmount)) {
     updateUsageMetrics(event, event.params.borrower);
-    updateFinancials(event);
+    updateFinancials(event, event.params.borrowAmount);
     updateMarketMetrics(event);
   }
 }
@@ -49,7 +51,7 @@ export function handleBorrow(event: Borrow): void {
 export function handleRepayBorrow(event: RepayBorrow): void {
   if (createRepay(event, event.params.payer, event.params.repayAmount)) {
     updateUsageMetrics(event, event.params.payer);
-    updateFinancials(event);
+    updateFinancials(event, BIGINT_ZERO);
     updateMarketMetrics(event);
   }
 }
@@ -65,19 +67,15 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     )
   ) {
     updateUsageMetrics(event, event.params.liquidator);
-    updateFinancials(event);
+    updateFinancials(event, BIGINT_ZERO);
     updateMarketMetrics(event);
   }
 }
 
 export function handleMarketListed(event: MarketListed): void {
-  // a new market/cToken pair is added to the protocol
-  // create a new CToken data source template
-  CToken.create(event.params.cToken);
-
   // create new market now that the data source is instantiated
-  let market = createMarket(event.params.cToken.toHexString(), event.block.number, event.block.timestamp);
-  market.save();
+  CToken.create(event.params.cToken);
+  let market = getOrCreateMarket(event, event.params.cToken);
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -103,10 +101,7 @@ export function handleMarketExited(event: MarketExited): void {}
 export function handleNewCloseFactor(event: NewCloseFactor): void {}
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  let market = Market.load(event.params.cToken.toHexString());
-  if (market == null) {
-    return;
-  }
+  let market = getOrCreateMarket(event, event.params.cToken);
   let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(16));
   market.maximumLTV = newLTV;
   // collateral factor is the borrowing capacity. The liquidity a borrower has is the collateral factor
@@ -128,9 +123,9 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
 
   // set liquidation penalty for each market
   for (let i = 0; i < protocol._marketIds.length; i++) {
-    let market = Market.load(protocol._marketIds[i]);
-    market!.liquidationPenalty = liquidationPenalty;
-    market!.save();
+    let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
+    market.liquidationPenalty = liquidationPenalty;
+    market.save();
   }
 }
 

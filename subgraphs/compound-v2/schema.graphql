@@ -283,6 +283,9 @@ type LendingProtocol implements Protocol @entity {
 
   totalValueLockedUSD: BigDecimal!
 
+  " Total volume borrowed in USD "
+  _totalVolumeUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -339,6 +342,9 @@ type Market @entity {
 
   " Price per share of nput token price in USD "
   _inputTokenPrice: BigDecimal!
+
+  " Exchange rate from cToken to erc20 token "
+  _exchangeRate: BigDecimal!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!

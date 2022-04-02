@@ -1,8 +1,8 @@
 // update snapshots and metrics
 
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../types/schema";
-import { getOrCreateLendingProtcol, getOrCreateUsageMetricSnapshot } from "./getters";
+import { getOrCreateFinancials, getOrCreateLendingProtcol, getOrCreateUsageMetricSnapshot } from "./getters";
 import { SECONDS_PER_DAY } from "./utils/constants";
 
 ///////////////////////////
@@ -10,7 +10,21 @@ import { SECONDS_PER_DAY } from "./utils/constants";
 ///////////////////////////
 
 // updates a given FinancialDailySnapshot Entity
-export function updateFinancials(event: ethereum.Event): void {
+export function updateFinancials(event: ethereum.Event, borrowedAmount: BigInt): void {
+  // number of days since unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let financialMetrics = getOrCreateFinancials(event);
+  let protocol = getOrCreateLendingProtcol();
+
+  // update the block number and timestamp
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
+  // keep track of TVL at each day
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  // keep track of volume in a given day
+  // financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeU
+  // financialMetrics.supplySideRevenueUSD =
+
   // let financialMetrics = getOrCreateFinancials(event);
   // let protocol = getOrCreateDexAmm();
   // // Update the block number and timestamp to that of the last transaction of that day

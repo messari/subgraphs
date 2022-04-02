@@ -1,7 +1,8 @@
 // store common calculations
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, Token } from "../../types/schema";
 import { CToken } from "../../types/templates/CToken/CToken";
+import { getOrCreateMarket, getOrCreateToken } from "../getters";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, COMPOUND_DECIMALS } from "./constants";
 
 // turn exponent into a BigDecimal number
@@ -14,19 +15,13 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 }
 
 // get the amount in underlying token from cToken
-export function exchangecTokenForTokenAmount(amount: BigInt, marketAddress: Address): BigDecimal {
-  let market = Market.load(marketAddress.toString());
-  if (market == null) {
-    return BIGDECIMAL_ZERO;
-  }
-  let underlyingToken = Token.load(market.inputTokens[0]);
-  if (underlyingToken == null) {
-    return BIGDECIMAL_ZERO;
-  }
+export function getExchangeRate(marketAddress: Address, event: ethereum.Event): BigInt {
+  let market = getOrCreateMarket(event, marketAddress);
+  let underlyingToken = getOrCreateToken(market.inputTokens[0]);
   let underlyingDecimals = underlyingToken.decimals;
-  let cTokenContract = CToken.bind(marketAddress);
   let mantissaFactor = 18;
   let mantissaFactorBD = exponentToBigDecimal(mantissaFactor);
+  let cTokenContract = CToken.bind(marketAddress);
 
   /*
    * Exchange rate explained:
@@ -39,23 +34,11 @@ export function exchangecTokenForTokenAmount(amount: BigInt, marketAddress: Addr
    *    - must multiply by cTokenDecimals, so 10^COMPOUND_DECIMALS
    *    - must divide by mantissaFactorBD, so 10^18
    */
-  let exchangeRate = cTokenContract
-    .exchangeRateStored()
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingDecimals))
-    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-    .div(mantissaFactorBD)
-    .truncate(mantissaFactor);
-
-  let underlyingAmount = exchangeRate.times(
-    amount.toBigDecimal().div(BigDecimal.fromString(COMPOUND_DECIMALS.toString())),
-  );
-
-  log.info("exchangeRate: {} amount: {} == underlyingAmount: {}", [
-    exchangeRate.toString(),
-    amount.toString(),
-    underlyingAmount.toString(),
-  ]);
-
-  return underlyingAmount;
+  let exchangeRate = cTokenContract.exchangeRateStored();
+  // .toBigDecimal()
+  // .div(exponentToBigDecimal(underlyingDecimals))
+  // .times(exponentToBigDecimal(COMPOUND_DECIMALS))
+  // .div(mantissaFactorBD)
+  // .truncate(mantissaFactor);
+  return exchangeRate;
 }

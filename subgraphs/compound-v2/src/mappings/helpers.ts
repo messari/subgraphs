@@ -2,20 +2,27 @@
 
 import { Token, Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
 
-import { COMPTROLLER_ADDRESS, ZERO_ADDRESS, COMP_ADDRESS, CETH_ADDRESS } from "../common/utils/constants";
+import {
+  COMPTROLLER_ADDRESS,
+  ZERO_ADDRESS,
+  COMP_ADDRESS,
+  CETH_ADDRESS,
+  COMPOUND_DECIMALS,
+} from "../common/utils/constants";
 
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, ETH_ADDRESS, SAI_ADDRESS } from "../common/utils/constants";
 
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { CToken } from "../types/Comptroller/cToken";
-import { getAmountUSD } from "../common/prices/prices";
+import { getUSDPriceOfToken } from "../common/prices/prices";
 import {
   getOrCreateCToken,
   getOrCreateLendingProtcol,
+  getOrCreateMarket,
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
-import { exchangecTokenForTokenAmount } from "../common/utils/utils";
+import { exponentToBigDecimal, getExchangeRate } from "../common/utils/utils";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -24,13 +31,8 @@ import { exchangecTokenForTokenAmount } from "../common/utils/utils";
 // create a Deposit entity, return false if transaction is null
 // null = market does not exist
 export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens: BigInt, sender: Address): bool {
-  // grab and store market
-  let marketAddress = event.transaction.to!;
-  let market = Market.load(marketAddress.toHexString());
-  if (market == null) {
-    log.error("Market {} does not exist", [marketAddress.toHexString()]);
-    return false;
-  }
+  let marketAddress = event.address;
+  let market = getOrCreateMarket(event, marketAddress);
 
   // grab local vars
   let blockNumber = event.block.number;
@@ -52,9 +54,26 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   deposit.market = marketAddress.toHexString();
   deposit.asset = market.inputTokens[0];
   deposit.amount = amount;
-  deposit.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
 
-  deposit.save();
+  // get/update prices for market
+  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
+  let mantissaFactor = 18;
+  let mantissaFactorBD = exponentToBigDecimal(mantissaFactor);
+  let exchangeRate = getExchangeRate(marketAddress, event);
+  market._exchangeRate = exchangeRate
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingDecimals))
+    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
+    .div(mantissaFactorBD)
+    .truncate(mantissaFactor);
+  market._inputTokenPrice = getUSDPriceOfToken(market, event.block.number.toI32());
+  let outputTokenPrice = market._exchangeRate.div(market._inputTokenPrice);
+  market.outputTokenPriceUSD = outputTokenPrice;
+
+  deposit.amountUSD = market._inputTokenPrice.times(decimalAmount);
+  let mintedCTokens = amount.div(exchangeRate);
+  market.outputTokenSupply = market.outputTokenSupply.plus(mintedCTokens);
 
   // update cToken supply
   market.outputTokenSupply = market.outputTokenSupply.plus(mintTokens);
@@ -65,24 +84,23 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   market.inputTokenBalances = inputBalance;
 
   // update TVL
-  market.totalValueLockedUSD = getAmountUSD(market, inputBalance[0], blockNumber.toI32());
+  let inputDecimalAmount = inputBalance[0].toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
+  market.totalValueLockedUSD = market._inputTokenPrice.times(inputDecimalAmount);
 
   // TODO: update protocol TVL
 
   // TODO: update token balances and supply
 
+  market.save();
+  deposit.save();
   return true;
 }
 
 // creates a withdraw entity, returns false if market does not exist
 export function createWithdraw(event: ethereum.Event, redeemer: Address, amount: BigInt): bool {
   // grab and store market entity
-  let marketAddress = event.transaction.from;
-  let market = Market.load(marketAddress.toHexString());
-  if (market == null) {
-    log.error("Market {} does not exist", [marketAddress.toHexString()]);
-    return false;
-  }
+  let marketAddress = event.address;
+  let market = getOrCreateMarket(event, marketAddress);
 
   // local vars
   let blockNumber = event.block.number;
@@ -104,7 +122,7 @@ export function createWithdraw(event: ethereum.Event, redeemer: Address, amount:
   withdraw.market = marketAddress.toHexString();
   withdraw.asset = market.inputTokens[0];
   withdraw.amount = amount;
-  withdraw.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
+  // withdraw.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
   withdraw.save();
 
   // TODO: can make this faster by saving token price and multiplying by that
@@ -113,19 +131,16 @@ export function createWithdraw(event: ethereum.Event, redeemer: Address, amount:
   let inputBalance = market.inputTokenBalances;
   inputBalance = [inputBalance[0].minus(amount)];
   market.inputTokenBalances = inputBalance;
-  market.totalValueLockedUSD = getAmountUSD(market, inputBalance[0], blockNumber.toI32());
+  // market.totalValueLockedUSD = getAmountUSD(market, inputBalance[0], blockNumber.toI32());
+  // market._exchangeRate = getExchangeRate(marketAddress, event)
 
   return true;
 }
 
 export function createBorrow(event: ethereum.Event, borrower: Address, amount: BigInt): bool {
   // grab and store market entity
-  let marketAddress = event.transaction.from;
-  let market = Market.load(marketAddress.toHexString());
-  if (market == null) {
-    log.error("Market {} does not exist", [marketAddress.toHexString()]);
-    return false;
-  }
+  let marketAddress = event.address;
+  let market = getOrCreateMarket(event, marketAddress);
   if (!market.canBorrowFrom) {
     market.canBorrowFrom = true;
     market.save();
@@ -151,11 +166,11 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.market = marketAddress.toHexString();
   borrow.asset = market.inputTokens[0];
   borrow.amount = amount;
-  borrow.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
+  // borrow.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
   borrow.save();
 
   // update borrow volume
-  market.totalVolumeUSD = market.totalVolumeUSD.plus(borrow.amountUSD);
+  // market.totalVolumeUSD = market.totalVolumeUSD.plus(borrow.amountUSD);
 
   return true;
 }
@@ -163,12 +178,8 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
 // create Repay entity, return false if market does not exist
 export function createRepay(event: ethereum.Event, payer: Address, amount: BigInt): bool {
   // grab and store market entity
-  let marketAddress = event.transaction.to!;
-  let market = Market.load(marketAddress.toHexString());
-  if (market == null) {
-    log.error("Market {} does not exist", [marketAddress.toHexString()]);
-    return false;
-  }
+  let marketAddress = event.address;
+  let market = getOrCreateMarket(event, marketAddress);
 
   // local vars
   let blockNumber = event.block.number;
@@ -190,7 +201,7 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.market = marketAddress.toHexString();
   repay.asset = market.inputTokens[0];
   repay.amount = amount;
-  repay.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
+  // repay.amountUSD = getAmountUSD(market, amount, blockNumber.toI32());
 
   repay.save();
   return true;
@@ -207,12 +218,8 @@ export function createLiquidation(
   repaidAmount: BigInt,
 ): bool {
   // grab and store market
-  let marketAddress = event.transaction.to!;
-  let market = Market.load(marketAddress.toHexString());
-  if (market == null) {
-    log.error("Market {} does not exist", [marketAddress.toHexString()]);
-    return false;
-  }
+  let marketAddress = event.address;
+  let market = getOrCreateMarket(event, marketAddress);
   if (!market.canUseAsCollateral) {
     market.canUseAsCollateral = true;
     market.save();
@@ -238,10 +245,7 @@ export function createLiquidation(
   liquidation.market = marketAddress.toHexString();
 
   // get liquidated underlying address
-  let liquidatedMarket = Market.load(liquidatedToken.toHexString());
-  if (liquidatedMarket == null) {
-    return false;
-  }
+  let liquidatedMarket = getOrCreateMarket(event, liquidatedToken);
   let assetId = liquidatedMarket.inputTokens[0];
   if (assetId == null) {
     return false;
@@ -249,12 +253,12 @@ export function createLiquidation(
   liquidation.asset = assetId;
 
   // calculate asset amount from siezeTokens (call exchangecTokenForTokenAmount)
-  let assetAmount = exchangecTokenForTokenAmount(liquidatedAmount, liquidatedToken);
-  if (assetAmount == BIGDECIMAL_ZERO) {
-    log.error("Exchange rate failed: returned 0", []);
-  }
+  // let assetAmount = exchangecTokenForTokenAmount(liquidatedAmount, liquidatedToken, event);
+  // if (assetAmount == BIGDECIMAL_ZERO) {
+  //   log.error("Exchange rate failed: returned 0", []);
+  // }
   // liquidation.amount = assetAmount;
-  log.info("asset amount check: {}", [assetAmount.toString()]);
+  // log.info("asset amount check: {}", [assetAmount.toString()]);
   // liquidation.amountUSD = getAmountUSD(liquidatedMarket, assetAmount, blockNumber.toI32());
 
   // calculate profit = (liquidatedAmountUSD - repaidAmountUSD)
@@ -263,96 +267,4 @@ export function createLiquidation(
 
   liquidation.save();
   return true;
-}
-
-///////////////////////////////
-//// Market/Token Entities ////
-///////////////////////////////
-
-// creates a new lending market and returns it
-export function createMarket(marketAddress: string, blockNumber: BigInt, timestamp: BigInt): Market {
-  let market = new Market(marketAddress);
-  let cTokenContract = CToken.bind(Address.fromString(marketAddress));
-  let underlyingAddress: string;
-  let underlying = cTokenContract.try_underlying();
-  if (marketAddress == CETH_ADDRESS) {
-    underlyingAddress = ETH_ADDRESS;
-  } else if (underlying.reverted) {
-    underlyingAddress = ZERO_ADDRESS;
-  } else {
-    underlyingAddress = underlying.value.toHexString();
-  }
-
-  // add market id to protocol
-  let protocol = getOrCreateLendingProtcol();
-  let marketIds = protocol._marketIds;
-  marketIds.push(marketAddress);
-  protocol._marketIds = marketIds;
-  protocol.save();
-
-  // create Tokens
-  let inputToken = getOrCreateToken(underlyingAddress);
-  let rewardToken: RewardToken | null;
-  let outputToken = getOrCreateCToken(Address.fromString(marketAddress), cTokenContract);
-
-  // COMP was not created until block 9601359
-  if (blockNumber.toI32() > 9601359) {
-    rewardToken = getOrCreateRewardToken(Address.fromString(COMP_ADDRESS));
-  } else {
-    rewardToken = null;
-  }
-
-  // populate market vars
-  market.protocol = COMPTROLLER_ADDRESS;
-
-  // add tokens
-  let inputTokens = new Array<string>();
-  inputTokens.push(inputToken.id);
-  market.inputTokens = inputTokens;
-  market.outputToken = outputToken.id;
-  if (rewardToken != null) {
-    let rewardTokens = new Array<string>();
-    rewardTokens.push(rewardToken.id);
-    market.rewardTokens = rewardTokens;
-  } else {
-    market.rewardTokens = [];
-  }
-
-  // populate quantitative data
-  market.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  market.totalVolumeUSD = BIGDECIMAL_ZERO;
-  market.inputTokenBalances = [];
-  market.outputTokenSupply = BIGINT_ZERO;
-  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.rewardTokenEmissionsAmount = [];
-  market.rewardTokenEmissionsUSD = [];
-  market.createdTimestamp = timestamp;
-  market.createdBlockNumber = blockNumber;
-
-  // lending-specific data
-  if (underlyingAddress == SAI_ADDRESS) {
-    market.name = "Dai Stablecoin v1.0 (DAI)";
-  } else {
-    market.name = inputToken.name;
-  }
-  market.isActive = true; // event MarketListed() makes a market active
-  market.canUseAsCollateral = false; // until Collateral is taken out
-  market.canBorrowFrom = false; // until Borrowed from
-
-  // calculations data
-  // TODO: figure out and do calcs
-  market.maximumLTV = BIGDECIMAL_ZERO;
-  market.liquidationThreshold = BIGDECIMAL_ZERO;
-  market.depositRate = BIGDECIMAL_ZERO;
-  market.stableBorrowRate = BIGDECIMAL_ZERO;
-  market.variableBorrowRate = BIGDECIMAL_ZERO;
-
-  // add liquidation penalty if the protocol has it
-  if (protocol._liquidationPenalty != BIGDECIMAL_ZERO) {
-    market.liquidationPenalty = protocol._liquidationPenalty;
-  } else {
-    market.liquidationPenalty = BIGDECIMAL_ZERO;
-  }
-
-  return market;
 }

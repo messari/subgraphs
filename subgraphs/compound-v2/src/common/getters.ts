@@ -1,9 +1,10 @@
 // get or create snapshots and metrics
 
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
+  Market,
   MarketDailySnapshot,
   RewardToken,
   Token,
@@ -13,7 +14,9 @@ import { CToken } from "../types/Comptroller/cToken";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  CETH_ADDRESS,
   COMPTROLLER_ADDRESS,
+  COMP_ADDRESS,
   DEFAULT_DECIMALS,
   ETH_ADDRESS,
   ETH_NAME,
@@ -24,12 +27,19 @@ import {
   PROTOCOL_RISK_TYPE,
   PROTOCOL_SLUG,
   PROTOCOL_TYPE,
-  REWARD_TOKEN_TYPE,
+  RewardTokenType,
+  SAI_ADDRESS,
   SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SUBGRAPH_VERSION,
+  ZERO_ADDRESS,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
+import { MarketEntered } from "../types/Comptroller/Comptroller";
+
+///////////////////
+//// Snapshots ////
+///////////////////
 
 export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
@@ -129,6 +139,98 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
   return protocol;
 }
 
+export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address): Market {
+  let market = Market.load(marketAddress.toHexString());
+
+  if (!market) {
+    market = new Market(marketAddress.toHexString());
+    let cTokenContract = CToken.bind(marketAddress);
+    let underlyingAddress: string;
+    let underlying = cTokenContract.try_underlying();
+    if (marketAddress.toHexString().toLowerCase() == CETH_ADDRESS) {
+      underlyingAddress = ETH_ADDRESS;
+    } else if (underlying.reverted) {
+      underlyingAddress = ZERO_ADDRESS;
+    } else {
+      underlyingAddress = underlying.value.toHexString();
+    }
+
+    // add market id to protocol
+    let protocol = getOrCreateLendingProtcol();
+    let marketIds = protocol._marketIds;
+    marketIds.push(marketAddress.toHexString());
+    protocol._marketIds = marketIds;
+    protocol.save();
+    market.protocol = protocol.id;
+
+    // create/add Tokens
+    let inputToken = getOrCreateToken(underlyingAddress);
+    let outputToken = getOrCreateCToken(marketAddress, cTokenContract);
+    let rewardTokenDeposit: RewardToken | null = null;
+    let rewardTokenBorrow: RewardToken | null = null;
+    // COMP was not created until block 9601359
+    if (event.block.number.toI32() > 9601359) {
+      rewardTokenDeposit = getOrCreateRewardToken(
+        marketAddress.toHexString(),
+        Address.fromString(COMP_ADDRESS),
+        RewardTokenType.DEPOSIT,
+      );
+      rewardTokenBorrow = getOrCreateRewardToken(
+        marketAddress.toHexString(),
+        Address.fromString(COMP_ADDRESS),
+        RewardTokenType.BORROW,
+      );
+      let rewardTokenArr = new Array<string>();
+      rewardTokenArr.push(rewardTokenDeposit.id);
+      rewardTokenArr.push(rewardTokenBorrow.id);
+      market.rewardTokens = rewardTokenArr;
+    }
+    let inputTokens = new Array<string>();
+    inputTokens.push(inputToken.id);
+    market.inputTokens = inputTokens;
+    market.outputToken = outputToken.id;
+
+    // populate quantitative data
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.totalVolumeUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalances = [];
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.rewardTokenEmissionsAmount = [];
+    market.rewardTokenEmissionsUSD = [];
+    market.createdTimestamp = event.block.timestamp;
+    market.createdBlockNumber = event.block.number;
+
+    // lending-specific data
+    if (underlyingAddress == SAI_ADDRESS) {
+      market.name = "Dai Stablecoin v1.0 (DAI)";
+    } else {
+      market.name = inputToken.name;
+    }
+    market.isActive = true; // event MarketListed() makes a market active
+    market.canUseAsCollateral = false; // until Collateral is taken out
+    market.canBorrowFrom = false; // until Borrowed from
+
+    // calculations data
+    market.maximumLTV = BIGDECIMAL_ZERO;
+    market.liquidationThreshold = BIGDECIMAL_ZERO;
+    market.depositRate = BIGDECIMAL_ZERO;
+    market.stableBorrowRate = BIGDECIMAL_ZERO;
+    market.variableBorrowRate = BIGDECIMAL_ZERO;
+
+    // add liquidation penalty if the protocol has it
+    if (protocol._liquidationPenalty != BIGDECIMAL_ZERO) {
+      market.liquidationPenalty = protocol._liquidationPenalty;
+    } else {
+      market.liquidationPenalty = BIGDECIMAL_ZERO;
+    }
+
+    market.save();
+  }
+
+  return market;
+}
+
 export function getOrCreateCToken(tokenAddress: Address, cTokenContract: CToken): Token {
   let cToken = Token.load(tokenAddress.toHexString());
 
@@ -163,14 +265,15 @@ export function getOrCreateToken(tokenAddress: string): Token {
   return token;
 }
 
-export function getOrCreateRewardToken(tokenAddress: Address): RewardToken {
-  let rewardToken = RewardToken.load(tokenAddress.toHexString());
+export function getOrCreateRewardToken(marketAddress: string, tokenAddress: Address, type: string): RewardToken {
+  let id = type + "-" + marketAddress;
+  let rewardToken = RewardToken.load(id);
   if (rewardToken == null) {
-    rewardToken = new RewardToken(tokenAddress.toHexString());
+    rewardToken = new RewardToken(id);
     rewardToken.name = getAssetName(tokenAddress);
     rewardToken.symbol = getAssetSymbol(tokenAddress);
     rewardToken.decimals = getAssetDecimals(tokenAddress);
-    rewardToken.type = REWARD_TOKEN_TYPE;
+    rewardToken.type = type;
     rewardToken.save();
   }
   return rewardToken;
