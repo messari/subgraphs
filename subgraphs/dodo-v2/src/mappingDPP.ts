@@ -31,11 +31,11 @@ import {
 export function handleDODOSwap(event: DODOSwap): void {
   updateUsageMetrics(event, event.params.receiver);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  // updatePoolMetrics(event);
 }
 
 export function handleLpFeeRateChange(event: LpFeeRateChange): void {
   //  updateUsageMetrics(event, event.params.payer);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  // updatePoolMetrics(event);
 }

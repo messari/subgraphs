@@ -14,17 +14,43 @@ import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 
 import {
   ZERO_BD,
+  ZERO_BI,
   Network,
   ProtocolType,
   RewardTokenType,
   SECONDS_PER_DAY,
+  DODOLpToken_ADDRESS,
+  vDODOToken_ADDRESS,
   DVMFactory_ADDRESS,
   CPFactory_ADDRESS,
   DPPFactory_ADDRESS,
   DSPFactory_ADDRESS
 } from "./constants";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
+import { ERC20 } from "../../generated/ERC20/ERC20";
+
+import { DVMFactory } from "../../generated/DVMFactory/DVMFactory";
+import { CrowdPoolingFactory } from "../../generated/CrowdPoolingFactory/CrowdPoolingFactory";
+import { DSPFactory } from "../../generated/DSPFactory/DSPFactory";
+import { DPPFactory } from "../../generated/DPPFactory/DPPFactory";
 import { DVM } from "../../generated/DVM/DVM";
+import { CP } from "../../generated/CP/CP";
+import { DPP } from "../../generated/DPP/DPP";
+import { DSP } from "../../generated/DSP/DSP";
+
+let STABLE_COINS: string[] = [
+  "0x6b175474e89094c44da98b954eedeac495271d0f", // dai
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // usdc
+  "0xdac17f958d2ee523a2206206994597c13d831ec7" // usdt
+];
+
+let FACTORIES: string[] = [
+  DVMFactory_ADDRESS,
+  CPFactory_ADDRESS,
+  DPPFactory_ADDRESS,
+  DSPFactory_ADDRESS
+];
 
 export function getOrCreateRewardToken(rewardToken: Address): RewardToken {
   let token = RewardToken.load(rewardToken.toHexString());
@@ -71,6 +97,41 @@ export function getOrCreateDexAmm(factoryAddress: Address): DexAmmProtocol {
     protocol.save();
   }
   return protocol;
+}
+
+export function getOrCreatePool(
+  poolAddress: Address,
+  baseAdd: Address,
+  quoteAdd: Address,
+  timestamp: BigInt,
+  blockNumber: BigInt
+): LiquidityPool {
+  let dodo = getOrCreateDexAmm(poolAddress);
+  let pool = LiquidityPool.load(poolAddress.toHex());
+  let it = getOrCreateToken(baseAdd);
+  let ot = getOrCreateToken(quoteAdd);
+  let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
+  let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
+  let lpToken = getOrCreateToken(poolAddress);
+
+  if (!pool) {
+    pool = new LiquidityPool(poolAddress.toHex());
+    pool.protocol = dodo.id;
+    pool.inputTokens = [it.id, ot.id];
+    pool.outputToken = lpToken.id;
+    pool.rewardTokens = [dodoLp.id, vdodo.id];
+    pool.totalValueLockedUSD = ZERO_BD;
+    pool.totalVolumeUSD = ZERO_BD;
+    pool.inputTokenBalances = [ZERO_BI];
+    pool.outputTokenSupply = ZERO_BI;
+    pool.outputTokenPriceUSD = ZERO_BD;
+    pool.rewardTokenEmissionsAmount = [ZERO_BI];
+    pool.rewardTokenEmissionsUSD = [ZERO_BD];
+    pool.createdTimestamp = timestamp;
+    pool.createdBlockNumber = blockNumber;
+    pool.save();
+  }
+  return pool;
 }
 
 export function getOrCreateUsageMetricSnapshot(
@@ -157,4 +218,67 @@ function getProtocolFromPool(poolAddress: Address): string {
     factoryAdd = DSPFactory_ADDRESS;
   }
   return factoryAdd;
+}
+
+export function getTokenAmountPriceAv(
+  trader: Address,
+  tokenAddress: Address,
+  amount: BigInt
+): BigDecimal {
+  let dvmFactory = DVMFactory.bind(Address.fromString(DVMFactory_ADDRESS));
+  let cpFactory = DVMFactory.bind(Address.fromString(CPFactory_ADDRESS));
+  let dppFactory = DVMFactory.bind(Address.fromString(DPPFactory_ADDRESS));
+  let dspFactory = DVMFactory.bind(Address.fromString(DSPFactory_ADDRESS));
+
+  let total = 0;
+
+  for (let i = 0; i <= 3; i++) {
+    let add = STABLE_COINS[i];
+    let dvmPoolAdd = dvmFactory.getDODOPool(
+      Address.fromString(add),
+      tokenAddress
+    );
+    let cpPoolAdd = cpFactory.getDODOPool(
+      Address.fromString(add),
+      tokenAddress
+    );
+    let dppPoolAdd = dppFactory.getDODOPool(
+      Address.fromString(add),
+      tokenAddress
+    );
+    let dspPoolAdd = dspFactory.getDODOPool(
+      Address.fromString(add),
+      tokenAddress
+    );
+
+    let dvm = DVM.bind(dvmPoolAdd[0]);
+    let vaultReserveDVM = dvm.querySellQuote(trader, amount);
+    let vaultTotal = vaultReserveDVM[0] + vaultReserveDVM[1];
+
+    // let cp = CP.bind(cpPoolAdd[0]);
+    // let dpp = DPP.bind(dppPoolAdd[0]);
+    // let dsp = DSP.bind(dspPoolAdd[0]);
+
+    // let vaultReserveCP = cp.querySellQuote(trader, amount);
+    // vaultTotal = vaultTotal + vaultReserveCP[0] + vaultReserveCP[1];
+    // let vaultReserveDPP = dpp.querySellQuote(trader, amount);
+    // vaultTotal = vaultTotal + vaultReserveDPP[0] + vaultReserveDPP[1];
+    // let vaultReserveDSP = dsp.querySellQuote(trader, amount);
+    // vaultTotal = vaultTotal + vaultReserveDSP[0] + vaultReserveDSP[1];
+    //
+    // total = safeDiv(vaultTotal, 4);
+  }
+
+  return safeDiv(
+    BigDecimal.fromString(total.toString()),
+    BigDecimal.fromString("3")
+  );
+}
+
+export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
+  if (amount1.equals(ZERO_BD)) {
+    return ZERO_BD;
+  } else {
+    return amount0.div(amount1);
+  }
 }

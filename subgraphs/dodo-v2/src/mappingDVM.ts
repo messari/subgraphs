@@ -28,20 +28,38 @@ import {
   updatePoolMetrics
 } from "./utils/metrics";
 
+// event BuyShares(address to, uint256 increaseShares, uint256 totalShares);
+//
+// event SellShares(address payer, address to, uint256 decreaseShares, uint256 totalShares);
+// event DODOSwap(
+//     address fromToken,
+//     address toToken,
+//     uint256 fromAmount,
+//     uint256 toAmount,
+//     address trader,
+//     address receiver
+// );
+
 export function handleBuyShares(event: BuyShares): void {
   updateUsageMetrics(event, event.params.to);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  // updatePoolMetrics(event);
 }
 
 export function handleSellShares(event: SellShares): void {
   updateUsageMetrics(event, event.params.payer);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  // updatePoolMetrics(event);
 }
 
 export function handleDODOSwap(event: DODOSwap): void {
   updateUsageMetrics(event, event.params.trader);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  updatePoolMetrics(
+    event,
+    event.address,
+    [event.params.fromToken, event.params.toToken],
+    event.params.trader,
+    [event.params.fromAmount, event.params.toAmount]
+  );
 }

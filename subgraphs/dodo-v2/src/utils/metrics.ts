@@ -1,8 +1,9 @@
-import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 import {
   _Account,
   _DailyActiveAccount,
-  UsageMetricsDailySnapshot
+  UsageMetricsDailySnapshot,
+  LiquidityPool
 } from "../../generated/schema";
 
 import {
@@ -10,30 +11,37 @@ import {
   CPFactory_ADDRESS,
   DPPFactory_ADDRESS,
   DSPFactory_ADDRESS,
-  SECONDS_PER_DAY
+  SECONDS_PER_DAY,
+  ADDRESS_ZERO,
+  ONE_BI
 } from "./constants";
 
 import {
   getOrCreateDexAmm,
   getOrCreatePoolDailySnapshot,
-  getOrCreateUsageMetricSnapshot
+  getOrCreateUsageMetricSnapshot,
+  getOrCreateFinancials,
+  getOrCreatePool,
+  getTokenAmountPriceAv
 } from "./getters";
-
-// These are meant more as boilerplates that'll be filled out depending on the
-// subgraph, and will be different from subgraph to subgraph, hence left
-// partially implemented and commented out.
-// They are common within a subgraph but not common across different subgraphs.
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
-  // let financialMetrics = getOrCreateFinancials(event);
-  // let protocol = getOrCreateDexAmm();
-  // // Update the block number and timestamp to that of the last transaction of that day
-  // financialMetrics.blockNumber = event.block.number;
-  // financialMetrics.timestamp = event.block.timestamp;
-  // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  // ...
-  // financialMetrics.save();
+  let financialMetrics = getOrCreateFinancials(event);
+  let protocol = getOrCreateDexAmm(event.address);
+
+  // financialMetrics.totalValueLockedUSD = usdPriceOfToken;
+  // financialMetrics.protocolTreasuryUSD = protocol.protocolTreasuryUSD;
+  // financialMetrics.protocolControlledValueUSD =
+  //   protocol.protocolControlledValueUSD;
+  // financialMetrics.totalVolumeUSD = protocol.totalVolumeUSD;
+  // financialMetrics.supplySideRevenueUSD = protocol.supplySideRevenueUSD;
+  // financialMetrics.protocolSideRevenueUSD = protocol.protocolSideRevenueUSD;
+  // financialMetrics.feesUSD = protocol.feesUSD;
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
+
+  financialMetrics.save();
 }
 
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
@@ -71,17 +79,40 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 }
 
 // Update UsagePoolDailySnapshot entity
-export function updatePoolMetrics(event: ethereum.Event): void {
-  // get or create pool metrics
-  // let poolMetrics = getOrCreatePoolDailySnapshot(event);
-  // let pool = getLiquidityPool(event.address.toHexString());
-  // // Update the block number and timestamp to that of the last transaction of that day
-  // poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+export function updatePoolMetrics(
+  event: ethereum.Event,
+  poolAdd: Address,
+  tokenAdds: Address[],
+  trader: Address,
+  amount: BigInt[]
+): void {
+  let poolMetrics = getOrCreatePoolDailySnapshot(event);
+  let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
+
+  let totalUSDval = 0;
+
+  for (let i = 0; i <= 2; i++) {
+    let usdValueOfTransaction = getTokenAmountPriceAv(
+      tokenAdds[i],
+      trader,
+      amount[i]
+    );
+    // totalUSDval = totalUSDval + usdValueOfTransaction;
+  }
+
+  let protocol = getOrCreateDexAmm(event.address);
+  poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
   // poolMetrics.inputTokenBalances = pool.inputTokenBalances;
   // poolMetrics.outputTokenSupply = pool.outputTokenSupply;
   // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  // poolMetrics.blockNumber = event.block.number;
-  // poolMetrics.timestamp = event.block.timestamp;
-  // ...
-  // poolMetrics.save();
+  // poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+  // poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+  poolMetrics.blockNumber = event.block.number;
+  poolMetrics.timestamp = event.block.timestamp;
+
+  poolMetrics.save();
+  pool.save();
 }
+
+function getTokenPriceUSD(tokenAddress: Address): BigDecimal {}

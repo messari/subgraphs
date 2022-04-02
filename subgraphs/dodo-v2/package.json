@@ -10,7 +10,9 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 messari-dodo"
   },
   "dependencies": {
+    "@coingecko/cg-api-ts": "^0.0.51",
     "@graphprotocol/graph-cli": "0.29.0",
-    "@graphprotocol/graph-ts": "0.26.0"
+    "@graphprotocol/graph-ts": "0.26.0",
+    "coingecko-api-v3": "^0.0.13"
   }
 }

@@ -31,17 +31,17 @@ import {
 export function handleBid(event: Bid): void {
   //updateUsageMetrics(event, event.params.to);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  // updatePoolMetrics(event);
 }
 
 export function handleCancel(event: Cancel): void {
   //  updateUsageMetrics(event, event.params.payer);
-  updateFinancials(event);
-  updatePoolMetrics(event);
+  // updateFinancials(event);
+  // updatePoolMetrics(event);
 }
 
 export function handleSettle(event: Settle): void {
   //  updateUsageMetrics(event, event.params.trader);
   updateFinancials(event);
-  updatePoolMetrics(event);
+  // updatePoolMetrics(event);
 }
