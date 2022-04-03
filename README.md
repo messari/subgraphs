@@ -11,7 +11,7 @@
 
 ## Recommended Development Workflow
 
-- Start with understanding the protocol and how it works
+- Start with understanding the protocol. An easy start could be interacting with the protocol UI on testnets, check transaction details on Etherscan and pay attention to key events that are emitted
 - Go over the smart contracts. Identify the ones that we need to pull data from
   - Usually each protocol has a factory contract that's responsible for tracking other contracts (e.g. Uniswap's Factory contract, Aave's Lending Pool Registry, Yearn's Registry)
   - Also a pool/vault contract that's responsible for pool level bookkeeping and transactions (e.g. Uniswap's Pair contract, Yearn's Vault contract, Aave's Lending Pool contract)
