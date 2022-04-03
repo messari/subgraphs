@@ -32,7 +32,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
     let totalUniqueUsers = getOrCreateUsersHelper()
     let protocol = getOrCreateDex()
-  
+
     if (!usageMetrics) {
       usageMetrics = new UsageMetricsDailySnapshot(id.toString());
       usageMetrics.protocol = FACTORY_ADDRESS
@@ -55,7 +55,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     }
     usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
     protocol.totalUniqueUsers = totalUniqueUsers.valueInt;
-  
+
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
     let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
