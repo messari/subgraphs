@@ -298,7 +298,7 @@ type LendingProtocol implements Protocol @entity {
   riskType: RiskType
 }
 
-type Market @entity {
+type Market implements Pool @entity {
   " Smart contract address of the market "
   id: ID!
 

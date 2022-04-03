@@ -306,7 +306,7 @@ type VaultFee @entity {
   feeType: VaultFeeType!
 }
 
-type Vault @entity {
+type Vault implements Pool @entity {
   " Smart contract address of the vault "
   id: ID!
 

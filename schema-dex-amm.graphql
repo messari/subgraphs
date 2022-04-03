@@ -310,7 +310,7 @@ type LiquidityPoolFee @entity {
   feeType: LiquidityPoolFeeType!
 }
 
-type LiquidityPool @entity {
+type LiquidityPool implements Pool @entity {
   " Smart contract address of the pool "
   id: ID!
 
