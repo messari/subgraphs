@@ -518,6 +518,7 @@ type _TokenTracker @entity {
   derivedETH: BigDecimal!
 }
 
+" This entity is used to store token amounts prior to decimal conversion to be used in price calculation "
 type _LiquidityPoolAmounts @entity {
   " Smart contract address of the pool "
   id: ID!
