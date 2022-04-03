@@ -539,55 +539,6 @@ type Swap implements Event @entity {
 
 ############ Internal Use ############
 ######################################
-type PancakeswapToken @entity {
-  # token address
-  id: ID!
-
-  # mirrored from the smart contract
-  symbol: String!
-  name: String!
-  decimals: Int!
-
-  # used for other stats like marketcap
-  totalSupply: BigInt!
-
-  # token specific volume
-  tradeVolume: BigInt!
-  tradeVolumeUSD: BigInt!
-  untrackedVolumeUSD: BigInt!
-  # transactions across all pairs
-  txCount: BigInt!
-
-}
-
-type PancakeswapPair @entity {
-  # pair address
-  id: ID!
-
-  # mirrored from the smart contract
-  token0: Token!
-  token1: Token!
-  reserve0: BigInt!
-  reserve1: BigInt!
-  totalSupply: BigInt!
-
-  # Price in terms of the asset pair
-  token0Price: BigInt!
-  token1Price: BigInt!
-
-  # lifetime volume stats
-  volumeToken0: BigInt!
-  volumeToken1: BigInt!
-  volumeUSD: BigInt!
-  txCount: BigInt!
-  untrackedVolumeUSD: BigInt!
-
-  # creation stats
-  createdAtTimestamp: BigInt!
-  createdAtBlockNumber: BigInt!
-
-}
-
 # stores for USD calculations
 type Bundle @entity {
   id: ID!

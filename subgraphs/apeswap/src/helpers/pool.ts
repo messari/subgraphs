@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Bundle, LiquidityPool, Token } from "../../generated/schema";
-import { getOrCreateProtocol } from "../utils/common";
+import { getOrCreateProtocol, getOrCreateProtocolFee, getOrcreateTradingFees } from "../utils/common";
 import { BIGINT_ZERO, DEFAULT_DECIMALS, toDecimal } from "../utils/constant";
 import { findBnbPerToken } from "../utils/pricing";
 import { getOrCreateToken } from "../utils/token";
@@ -65,7 +65,9 @@ export function getOrCreatePool(
     pool.createdBlockNumber = event.block.number;
     pool.name = outputToken.name;
     pool.symbol = outputToken.symbol;
-    pool.fees = [];
+    let tradingFee = getOrcreateTradingFees(poolAddress).id
+    let protocolFee = getOrCreateProtocolFee(poolAddress).id
+    pool.fees = [tradingFee, protocolFee];
 
     pool.save();
     return pool as LiquidityPool;

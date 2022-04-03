@@ -1,8 +1,9 @@
-import { Address } from "@graphprotocol/graph-ts";
-import { DexAmmProtocol } from "../../generated/schema";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { DexAmmProtocol, LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   FACTORY_ADDRESS,
+  LiquidityPoolFeeType,
   Network,
   ProtocolType,
 } from "./constant";
@@ -26,4 +27,33 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     return protocol as DexAmmProtocol;
   }
   return protocol as DexAmmProtocol;
+}
+
+export function getOrcreateTradingFees(poolAddress: Address): LiquidityPoolFee {
+  let id = poolAddress.toHexString().concat("- tradingFee")
+  let tradingFee = LiquidityPoolFee.load(id)
+  if(tradingFee == null) {
+    tradingFee = new LiquidityPoolFee(id)
+    tradingFee.feeType = LiquidityPoolFeeType.TRADING_FEE
+    tradingFee.feePercentage = BigDecimal.fromString("0.003")
+    tradingFee.save()
+
+    return tradingFee as LiquidityPoolFee 
+  }
+  return tradingFee as LiquidityPoolFee
+
+}
+
+export function getOrCreateProtocolFee(poolAddress: Address): LiquidityPoolFee {
+  let id = poolAddress.toHexString().concat("- protocolFee")
+  let protocolFee = LiquidityPoolFee.load(id)
+  if(protocolFee == null) {
+    protocolFee = new LiquidityPoolFee(id)
+    protocolFee.feeType = LiquidityPoolFeeType.PROTOCOL_FEE
+    protocolFee.feePercentage = BigDecimal.fromString("0")
+    protocolFee.save()
+
+    return protocolFee as LiquidityPoolFee
+  }
+  return protocolFee as LiquidityPoolFee
 }
