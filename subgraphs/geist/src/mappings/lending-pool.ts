@@ -24,7 +24,6 @@ import {
   ReserveUsedAsCollateralDisabled
 } from '../../generated/templates/LendingPool/LendingPool'
 
-
 import { 
   UsageMetricsDailySnapshot as UsageMetricsDailySnapshotEntity,
   FinancialsDailySnapshot as FinancialsDailySnapshotEntity,
@@ -36,8 +35,6 @@ import {
   Repay as RepayEntity,
   Liquidation as LiquidationEntity
 } from "../../generated/schema"
-
-import * as constants from "../common/constants"
 
 import {
   TOKEN_ADDRESS_GEIST,
@@ -59,6 +56,8 @@ import {
   convertBigIntToBigDecimal,
   convertRayToWad
 } from "../common/utils"
+
+import * as constants from "../common/constants"
 
 
 export function handleApproval(event: Approval): void {
@@ -137,12 +136,12 @@ export function handleDeposit(event: Deposit): void {
   let inputTokenIndex = market.inputTokens.indexOf(asset.id);
   market.inputTokenBalances[inputTokenIndex] = market.inputTokenBalances[inputTokenIndex].plus(deposit.amount);
   market.totalValueLockedUSD = market.totalValueLockedUSD.plus(tokenAmountUSD);
-  market.deposits.push(deposit.id);
+  // market.deposits.push(deposit.id);
   market.save();
 
   // Update protocol metrics
-  protocol.financialMetrics.push(financialsDailySnapshot.id);
-  protocol.usageMetrics.push(usageMetrics.id);
+  // protocol.financialMetrics.push(financialsDailySnapshot.id);
+  // protocol.usageMetrics.push(usageMetrics.id);
   protocol.save()
 }
 

@@ -6,14 +6,6 @@ import {
 } from '@graphprotocol/graph-ts'
 
 import { 
-    GeistToken as TokenContract,
-  } from "../../generated/templates/LendingPool/GeistToken"
-
-import {
-    LendingPool
-} from "../../generated/templates/LendingPool/LendingPool"
-
-import { 
     Market as MarketEntity,
     Token as TokenEntity, 
     RewardToken as RewardTokenEntity, 
@@ -21,7 +13,16 @@ import {
     UsageMetricsDailySnapshot as UsageMetricsDailySnapshotEntity, 
     UniqueUsers as UniqueUsersEntity,
     FinancialsDailySnapshot as FinancialsDailySnapshotEntity,
+    MarketDailySnapshot as MarketDailySnapshotEntity,
 } from "../../generated/schema"
+
+import { 
+    GeistToken as TokenContract,
+  } from "../../generated/templates/LendingPool/GeistToken"
+
+import {
+    LendingPool
+} from "../../generated/templates/LendingPool/LendingPool"
 
 import { 
     AaveOracle,
@@ -67,7 +68,7 @@ export function getOrInitializeToken(address: Address): TokenEntity {
     return token;
 }
 
-export function getOrInitializeRewardToken(address: Address, rewardType: string): RewardTokenEntity {
+export function getOrInitializeRewardToken(address: Address, rewardType: string = "DEPOSIT"): RewardTokenEntity {
     let rewardToken = RewardTokenEntity.load(address.toHexString());
        
     if (rewardToken) {
@@ -211,11 +212,13 @@ export function updateOrInitializeUsageMetrics(
       log.warning("Initializing financialsDailySnapshot with ID={}", [id.toString()]);
       financialsDailySnapshot =  new FinancialsDailySnapshotEntity(id.toString());
       financialsDailySnapshot.id = id.toString();
-      financialsDailySnapshot.totalValueLockedUSD = constants.ZERO_BD;
       financialsDailySnapshot.totalVolumeUSD = constants.ZERO_BD;
+      financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
       financialsDailySnapshot.supplySideRevenueUSD = constants.ZERO_BD;
       financialsDailySnapshot.protocolSideRevenueUSD = constants.ZERO_BD;
       financialsDailySnapshot.feesUSD = constants.ZERO_BD;
+      financialsDailySnapshot.blockNumber = constants.ZERO_BI;
+      financialsDailySnapshot.timestamp = constants.ZERO_BI;
     }
 
     if (interactionType == constants.DEPOSIT_INTERACTION) {
@@ -413,12 +416,10 @@ export function getOrInitializeMarket(
         market.liquidationThreshold = constants.ZERO_BD;
         market.liquidationPenalty = constants.ZERO_BD;
         market.depositRate = constants.ZERO_BD;
-        market.stableBorrowRate = constants.ZERO_BD;
-        market.variableBorrowRate = constants.ZERO_BD;
 
         let reserves = lendingPoolContract.try_getReserveData(Address.fromString(id));
         if (reserves.reverted) {
-            log.error("Unable to set market stableBorrowRate and variableBorrowRate, setting to zero", []);
+            log.error("Unable to set market stableBorrowRate and variableBorrowRate for id={}, setting to zero", [id]);
             market.stableBorrowRate = constants.ZERO_BD;
             market.variableBorrowRate = constants.ZERO_BD;
         }
@@ -447,6 +448,71 @@ export function getOrInitializeMarket(
         )
     }
 
-    market.save();
     return market;
 }
+
+export function updateOrInitializeMarketDailySnapshot(market: MarketEntity, blockNumber: BigInt, timestamp: BigInt): MarketDailySnapshotEntity {
+    // Create a snapshot of market data throughout the day. One snapshot per market per day.
+    // Attempt to load Snapshot entity implementation based on days since epoch in id. 
+    // Snapshot is created at the start of a new day and updated after transactions change certain market data.
+    let id = market.id + "-" + getDaysSinceUnixEpoch(timestamp).toString();
+
+    let marketDailySnapshot = MarketDailySnapshotEntity.load(id);
+
+    if (!marketDailySnapshot) {
+        marketDailySnapshot = new MarketDailySnapshotEntity(id);
+
+        let rewardTokenEmissionsAmount: BigInt[] = [];
+        let rewardTokenEmissionsUSD: BigDecimal[] = [];
+        let rewardTokensList: string[] = [];
+
+        marketDailySnapshot.protocol = getLendingProtocol(constants.PROTOCOL_ID).id;
+        marketDailySnapshot.market = market.id;
+        marketDailySnapshot.totalValueLockedUSD = constants.ZERO_BD;
+        marketDailySnapshot.inputTokenBalances = [];
+
+        marketDailySnapshot.inputTokenPricesUSD = [];
+        marketDailySnapshot.outputTokenSupply = constants.ZERO_BI;
+        marketDailySnapshot.outputTokenPriceUSD = constants.ZERO_BD;
+
+        marketDailySnapshot.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+        marketDailySnapshot.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+
+
+        if (market.rewardTokens) {
+            rewardTokensList = market.rewardTokens as string[];
+
+            for (var i = 0; i < rewardTokensList.length; i++) {
+                rewardTokenEmissionsAmount.push(constants.ZERO_BI);
+                rewardTokenEmissionsUSD.push(constants.ZERO_BD);
+            }
+        }
+        marketDailySnapshot.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+        marketDailySnapshot.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+
+        marketDailySnapshot.blockNumber = constants.ZERO_BI;
+        marketDailySnapshot.timestamp = constants.ZERO_BI;
+        
+        marketDailySnapshot.depositRate = constants.ZERO_BD;
+        marketDailySnapshot.stableBorrowRate = constants.ZERO_BD;
+        marketDailySnapshot.variableBorrowRate = constants.ZERO_BD;
+    }
+
+    marketDailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketDailySnapshot.inputTokenBalances = market.inputTokenBalances;
+    marketDailySnapshot.inputTokenPricesUSD = [getTokenAmountUSD(Address.fromString(market.inputTokens[0]), constants.ONE_BI)];
+    marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
+    marketDailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+
+    marketDailySnapshot.blockNumber = blockNumber;
+    marketDailySnapshot.timestamp = timestamp;
+
+    marketDailySnapshot.depositRate = market.depositRate;
+    marketDailySnapshot.stableBorrowRate = market.stableBorrowRate;
+    marketDailySnapshot.variableBorrowRate = market.variableBorrowRate;
+
+    marketDailySnapshot.save();
+  
+    return marketDailySnapshot;
+  }
+  

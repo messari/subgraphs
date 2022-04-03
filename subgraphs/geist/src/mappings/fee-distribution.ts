@@ -22,7 +22,11 @@ import {
 import { 
     updateOrInitializeFinancialSnapshot,
     getTokenAmountUSD,
-    updateOrInitializeUsageMetrics
+    updateOrInitializeUsageMetrics,
+    updateOrInitializeMarketDailySnapshot,
+    getOrInitializeMarket,
+    getLendingProtocol,
+    getOrInitializeRewardToken
 } from './helpers';
 
 import * as constants from "../common/constants"
@@ -37,10 +41,10 @@ export function handleRewardPaid(event: RewardPaid): void {
     // Rewards do not to TVL, but adds to volume and supply side revenue
     let tokenAmountUSD = getTokenAmountUSD(event.params.rewardsToken, event.params.reward);
   
-  // Generate data for the UsageMetricsDailySnapshot Entity
-  let usageMetrics: UsageMetricsDailySnapshotEntity = 
-        updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
-  usageMetrics.save()
+    // Generate data for the UsageMetricsDailySnapshot Entity
+    let usageMetrics: UsageMetricsDailySnapshotEntity = 
+            updateOrInitializeUsageMetrics(event.block.number, event.block.timestamp, event.transaction.from);
+    usageMetrics.save()
 
     // This should use the gasUsed, not the gasLimit. But that is not available per transaction...
     let transactionFee = event.transaction.gasLimit.times(event.transaction.gasPrice)
@@ -53,8 +57,37 @@ export function handleRewardPaid(event: RewardPaid): void {
       constants.REWARD_INTERACTION
     );
   
+    financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
+    financialsDailySnapshot.timestamp = event.block.timestamp;
     financialsDailySnapshot.blockNumber = event.block.number;
     financialsDailySnapshot.save();
+
+    let rewardToken = getOrInitializeRewardToken(event.params.rewardsToken);
+    let protocol = getLendingProtocol(constants.PROTOCOL_ID);
+    let market = getOrInitializeMarket(event.address.toHexString(), protocol.name, event.block.number, event.block.timestamp);
+    market.save();
+    
+    let marketDailySnapshot = updateOrInitializeMarketDailySnapshot(market, event.block.number, event.block.timestamp);
+
+    let rewardTokenEmissionsAmount: BigInt[] = [];
+    let rewardTokenEmissionsUSD: BigDecimal[] = [];
+    let rewardTokensList: string[] = [];
+
+    if (market.rewardTokens) {
+        rewardTokensList = market.rewardTokens as string[];
+
+        for (var i = 0; i < rewardTokensList.length; i++) {
+            const token = getOrInitializeRewardToken(Address.fromString(rewardTokensList[i]));
+            if (rewardToken.id == token.id) {
+                rewardTokenEmissionsAmount[i] = rewardTokenEmissionsAmount[i].plus(event.params.reward);
+                rewardTokenEmissionsUSD[i] = rewardTokenEmissionsUSD[i].plus(tokenAmountUSD);
+            }
+        }
+    }
+
+    marketDailySnapshot.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    marketDailySnapshot.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+    marketDailySnapshot.save();
   }
   
 export function handleStakeAdded(event: Staked): void {
@@ -75,6 +108,8 @@ export function handleStakeAdded(event: Staked): void {
         constants.STAKE_INTERACTION
     );
 
+    financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
+    financialsDailySnapshot.timestamp = event.block.timestamp;
     financialsDailySnapshot.blockNumber = event.block.number;
     financialsDailySnapshot.save();
 }
@@ -98,6 +133,9 @@ export function handleStakeWithdrawn(event: Withdrawn): void {
         constants.UNSTAKE_INTERACTION
     );
 
+    financialsDailySnapshot.protocol = constants.PROTOCOL_ID;
+    financialsDailySnapshot.timestamp = event.block.timestamp;
     financialsDailySnapshot.blockNumber = event.block.number;
     financialsDailySnapshot.save();
 }
+

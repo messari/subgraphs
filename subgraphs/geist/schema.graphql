@@ -382,13 +382,13 @@ type MarketDailySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: [BigInt!]!
 
   " Price per share of input token in USD "
   inputTokenPricesUSD: [BigDecimal!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
