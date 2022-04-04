@@ -6,7 +6,6 @@ import {
   Swap as SwapEvent,
   SetFeeProtocol
 } from '../../generated/templates/Pool/Pool'
-// import { getLiquidityPool, getLiquidityPoolFee } from '../common/getters'
 import {
   updatePrices,
   createDeposit,

@@ -1,7 +1,7 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { ERC20 } from '../../generated/Factory/ERC20'
 import { Address } from '@graphprotocol/graph-ts'
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ZERO } from '../common/constants'
+import { DEFAULT_DECIMALS, INT_ZERO } from '../common/constants'
 import { Token } from '../../generated/schema'
 
 export function getOrCreateToken(address: Address): Token {
@@ -32,7 +32,7 @@ export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1:
       token.symbol = token0.name + '/' + token1.name
       token.name = token0.name + '/' + token1.name + " LP"
       token.decimals = INT_ZERO
+      token.save()
   }
-  token.save()
   return token
 }

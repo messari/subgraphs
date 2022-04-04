@@ -22,6 +22,7 @@ dataSources:
         - Protocol
         - _PricesUSD
         - _TokenTracker
+        - _LiquidityPoolAmounts
       abis:
         - name: Factory
           file: ./abis/factory.json
@@ -56,13 +57,14 @@ templates:
         - LiquidityPool
         - DexAmmProtocol
         - Token
-        - _PricesUSD
         - UsageMetricsDailySnapshot
         - FinancialsDailySnapshot
+        - PoolDailySnapshot
+        - _PricesUSD
         - _Account
         - _DailyActiveAccount
-        - PoolDailySnapshot
         - _TokenTracker
+        - _LiquidityPoolAmounts
       abis:
         - name: Pool
           file: ./abis/pool.json
