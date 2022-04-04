@@ -93,4 +93,6 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const VAULT = "0xA6DB4B0963C37Bc959CbC0a874B5bDDf2250f26F"; // Mainnet
+export const VAULT_ADDRESSES = {
+  [Network.ETHEREUM]: "0xA6DB4B0963C37Bc959CbC0a874B5bDDf2250f26F"
+}

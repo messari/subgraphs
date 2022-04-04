@@ -310,49 +310,29 @@ type LiquidityPoolFee @entity {
 }
 
 type LiquidityPool @entity {
-  " Smart contract address of the pool "
   id: ID!
-
-  " The protocol this pool belongs to "
   protocol: DexAmmProtocol!
-
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
-
-  " Token that is minted to track ownership of position in protocol "
   outputToken: Token!
-
-  " Aditional tokens that are given as reward for position in a protocol "
   rewardTokens: [RewardToken!]
 
-  ##### Quantitative Data #####
-
   totalValueLockedUSD: BigDecimal!
-
   " Total swap volume in USD "
   totalVolumeUSD: BigDecimal!
-
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
-
   " Total supply of output token "
   outputTokenSupply: BigInt!
-
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
-
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
-
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
   " Creation timestamp "
   createdTimestamp: BigInt!
-
   " Creation block number "
   createdBlockNumber: BigInt!
-
   " Pool snapshots "
   snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
 
@@ -360,17 +340,12 @@ type LiquidityPool @entity {
 
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
-
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
-
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
-
   deposits: [Deposit!]! @derivedFrom(field: "pool")
-
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
-
   swaps: [Swap!]! @derivedFrom(field: "pool")
 }
 

@@ -1,11 +1,12 @@
-import {
-  createPool
-} from "./helpers";
-import { PoolCreated } from "../../generated/WeightedPoolFactory/WeightedPoolFactory"
+import {PoolRegistered, TokensRegistered} from "../../generated/Vault/Vault";
+import {getOrCreatePool, getOrCreateToken} from "../common/getters";
 
-// To improve readability and consistency, it is recommended that you put all
-// handlers in this file, and create helper functions to handle specific events
+export function handlePoolRegister(event: PoolRegistered): void {
+  getOrCreatePool(event.params.poolId.toString(), event.params.poolAddress)
+}
 
-export function handleNewPool(pool: PoolCreated): void {
-  createPool(pool);
+export function handleTokensRegister(event: TokensRegistered): void {
+  let pool = getOrCreatePool(event.params.poolId.toString())
+  pool.inputTokens = event.params.tokens.map(t => (getOrCreateToken(t)).id)
+  pool.save()
 }
