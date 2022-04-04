@@ -1,6 +1,6 @@
 // get or create snapshots and metrics
 
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
@@ -73,12 +73,19 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
     marketMetrics.protocol = COMPTROLLER_ADDRESS;
     marketMetrics.market = marketAddress;
     marketMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    marketMetrics.inputTokenBalances = [];
-    marketMetrics.inputTokenPricesUSD = [];
+    let inputBalances = new Array<BigInt>();
+    inputBalances.push(BIGINT_ZERO);
+    marketMetrics.inputTokenBalances = inputBalances;
+    let inputPrices = new Array<BigDecimal>();
+    marketMetrics.inputTokenPricesUSD = inputPrices;
     marketMetrics.outputTokenSupply = BIGINT_ZERO;
     marketMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    marketMetrics.rewardTokenEmissionsAmount = [];
-    marketMetrics.rewardTokenEmissionsUSD = [];
+    let emissionsAmount = new Array<BigInt>();
+    emissionsAmount.push(BIGINT_ZERO);
+    marketMetrics.rewardTokenEmissionsAmount = emissionsAmount;
+    let emissionsUSD = new Array<BigDecimal>();
+    emissionsUSD.push(BIGDECIMAL_ZERO);
+    marketMetrics.rewardTokenEmissionsUSD = emissionsUSD;
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.depositRate = BIGDECIMAL_ZERO;
@@ -193,11 +200,19 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     // populate quantitative data
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.totalVolumeUSD = BIGDECIMAL_ZERO;
-    market.inputTokenBalances = [];
+    let inputTokenBalances = new Array<BigInt>();
+    inputTokenBalances.push(BIGINT_ZERO);
+    market.inputTokenBalances = inputTokenBalances;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    market.rewardTokenEmissionsAmount = [];
-    market.rewardTokenEmissionsUSD = [];
+    let emissionsAmount = new Array<BigInt>();
+    emissionsAmount.push(BIGINT_ZERO);
+    emissionsAmount.push(BIGINT_ZERO);
+    market.rewardTokenEmissionsAmount = emissionsAmount;
+    let emissionsUSD = new Array<BigDecimal>();
+    emissionsUSD.push(BIGDECIMAL_ZERO);
+    emissionsUSD.push(BIGDECIMAL_ZERO);
+    market.rewardTokenEmissionsUSD = emissionsUSD;
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
 

@@ -24,7 +24,6 @@ import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { BIGINT_ZERO } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
-  log.info("MINT handled", []);
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
     updateUsageMetrics(event, event.params.minter);
     updateFinancials(event, BIGINT_ZERO);

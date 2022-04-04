@@ -99,6 +99,7 @@ export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -112,6 +113,6 @@ export const LENDING_TYPE = LendingType.POOLED; // TODO: guess - look more into 
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is accurate
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.3.17";
+export const SUBGRAPH_VERSION = "1.3.25";
 export const SCHEMA_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
