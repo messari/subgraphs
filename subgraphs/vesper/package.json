@@ -12,8 +12,10 @@
     "vesper-metadata": "^2.57.0"
   },
   "scripts": {
+    "confgen": "node config_yaml_gen.js",
     "codegen": "graph codegen",
     "build": "graph build",
+    "allbuild": "yarn confgen && yarn codegen && yarn build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ vesper_finance",
     "create-local": "graph create --node http://localhost:8020/ vesper_finance",
     "remove-local": "graph remove --node http://localhost:8020/ vesper_finance",
