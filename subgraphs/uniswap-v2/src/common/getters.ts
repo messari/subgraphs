@@ -1,7 +1,6 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, ethereum } from "@graphprotocol/graph-ts"
 import {
-  Token,
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
@@ -15,7 +14,7 @@ import {
   _TokenTracker,
   LiquidityPoolFee
 } from "../../generated/schema"
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE, DEFAULT_DECIMALS } from "../common/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY} from "../common/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
@@ -89,17 +88,6 @@ export function get(poolAddress: string): _LiquidityPoolAmounts {
 //     return token
 // }
 
-export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
-    let token = Token.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (token === null) {
-        token = new Token(tokenAddress.toHexString())
-        token.symbol = token0.name + '/' + token1.name
-        token.name = token0.name + '/' + token1.name + " LP"
-        token.decimals = DEFAULT_DECIMALS
-    }
-    return token
-}
 
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())

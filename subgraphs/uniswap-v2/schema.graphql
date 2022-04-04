@@ -75,7 +75,6 @@ interface Protocol {
   network: Network!
 
   type: ProtocolType!
-
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
 
@@ -259,7 +258,6 @@ type DexAmmProtocol implements Protocol @entity {
   network: Network!
 
   type: ProtocolType!
-
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
 
