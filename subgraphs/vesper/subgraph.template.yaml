@@ -95,7 +95,7 @@ dataSources:
           file: ./abis/pool-v{{version}}.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV2
+        - name: StrategyV{{version}}
           file: ./abis/strategy-v{{version}}.json
         - name: PriceRouter
           file: ./abis/uniswap.json

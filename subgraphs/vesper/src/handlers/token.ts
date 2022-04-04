@@ -1,5 +1,5 @@
-import { Token, RewardToken } from "../../generated/schema";
-import { Approval, Transfer } from "../../generated/VSP/Erc20Token";
+import { Token, RewardToken } from "@gen/schema";
+import { Approval, Transfer } from "@gen/VSP/Erc20Token";
 
 export function handleApproval(event: Approval): void {}
 
