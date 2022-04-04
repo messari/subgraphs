@@ -136,6 +136,7 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
     protocol.type = PROTOCOL_TYPE;
     protocol.totalUniqueUsers = 0 as i32;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol._totalVolumeUSD = BIGDECIMAL_ZERO;
     protocol.lendingType = LENDING_TYPE;
     protocol.riskType = PROTOCOL_RISK_TYPE;
     protocol._marketIds = [];
@@ -232,6 +233,9 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.depositRate = BIGDECIMAL_ZERO;
     market.stableBorrowRate = BIGDECIMAL_ZERO;
     market.variableBorrowRate = BIGDECIMAL_ZERO;
+    market._reserveFactor = BIGDECIMAL_ZERO;
+    market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     // add liquidation penalty if the protocol has it
     if (protocol._liquidationPenalty != BIGDECIMAL_ZERO) {

@@ -183,11 +183,15 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
 
   // update borrow volume (ie, market.totalVolumeUSD)
   market.totalVolumeUSD = market.totalVolumeUSD.plus(borrow.amountUSD!);
+  // update total volume on protocol level
+  let protocol = getOrCreateLendingProtcol();
+  protocol._totalVolumeUSD = protocol._totalVolumeUSD.plus(borrow.amountUSD!);
 
   updateMarketRates(market);
 
   borrow.save();
   market.save();
+  protocol.save();
   return true;
 }
 
@@ -299,7 +303,7 @@ export function createLiquidation(
   liquidatedMarket.outputTokenPriceUSD = liquidatedMarket._exchangeRate.times(liquidatedMarket._inputTokenPrice);
 
   // calc amount/amountUSD/profitUSD
-  liquidation.amount = liquidatedAmount.times(liquidatedExchangeRate);
+  liquidation.amount = liquidatedAmount.times(liquidatedExchangeRate).div(BigInt.fromI32(10).pow(DEFAULT_DECIMALS as u8));
   liquidation.amountUSD = liquidation.amount
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingDecimals))
@@ -342,6 +346,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     market.save();
   }
   protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.save();
 }
 
 // export function updateMarketPrices(): Market { }
@@ -374,6 +379,13 @@ export function updateMarketRates(market: Market): void {
     .truncate(DEFAULT_DECIMALS);
   market.stableBorrowRate = borrowRate;
   market.variableBorrowRate = borrowRate;
+
+  // get reserve factor
+  let reserceFactor = contract.try_reserveFactorMantissa();
+  market._reserveFactor = reserceFactor.reverted ? BIGDECIMAL_ZERO : 
+    reserceFactor.value
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
 
   market.save();
 }

@@ -2,7 +2,7 @@
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../types/schema";
-import { getOrCreateFinancials, getOrCreateLendingProtcol, getOrCreateUsageMetricSnapshot } from "./getters";
+import { getOrCreateFinancials, getOrCreateLendingProtcol, getOrCreateMarket, getOrCreateMarketDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
 import { SECONDS_PER_DAY } from "./utils/constants";
 
 ///////////////////////////
@@ -19,20 +19,15 @@ export function updateFinancials(event: ethereum.Event, borrowedAmount: BigInt):
   // update the block number and timestamp
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
-  // keep track of TVL at each day
-  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  // keep track of volume in a given day
-  // financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeU
-  // financialMetrics.supplySideRevenueUSD =
 
-  // let financialMetrics = getOrCreateFinancials(event);
-  // let protocol = getOrCreateDexAmm();
-  // // Update the block number and timestamp to that of the last transaction of that day
-  // financialMetrics.blockNumber = event.block.number;
-  // financialMetrics.timestamp = event.block.timestamp;
-  // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  // ...
-  // financialMetrics.save();
+  // update value/volume vars
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialMetrics.totalVolumeUSD = protocol._totalVolumeUSD;
+
+  // TODO: update fee/revenue vars
+
+
+  financialMetrics.save();
 }
 
 // update a given UsageMetricDailySnapshot
@@ -72,18 +67,32 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
 // update a given MarketDailySnapshot
 export function updateMarketMetrics(event: ethereum.Event): void {
-  // get or create pool metrics
-  // let marketMetrics = getOrCreatePoolDailySnapshot(event);
-  // let pool = getLiquidityPool(event.address.toHexString());
-  // // Update the block number and timestamp to that of the last transaction of that day
-  // marketMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  // marketMetrics.inputTokenBalances = pool.inputTokenBalances;
-  // marketMetrics.outputTokenSupply = pool.outputTokenSupply;
-  // marketMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  // marketMetrics.blockNumber = event.block.number;
-  // marketMetrics.timestamp = event.block.timestamp;
-  // ...
-  // marketMetrics.save();
+    // Number of days since Unix epoch
+    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+    let marketMetrics = getOrCreateMarketDailySnapshot(event);
+    let market = getOrCreateMarket(event, event.address);
+
+    // update to latest block/timestamp
+    marketMetrics.blockNumber = event.block.number;
+    marketMetrics.timestamp = event.block.timestamp;
+
+    // update other vars
+    marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketMetrics.inputTokenBalances = market.inputTokenBalances;
+    let inputTokenPrices = marketMetrics.inputTokenPricesUSD;
+    inputTokenPrices[0] = market._inputTokenPrice;
+    marketMetrics.inputTokenPricesUSD = inputTokenPrices;
+    marketMetrics.outputTokenSupply = market.outputTokenSupply;
+    marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
+    // marketMetrics.rewardTokenEmissionsAmount = ;
+    // marketMetrics.rewardTokenEmissionsUSD = ;
+
+    // lending-specific vars 
+    marketMetrics.depositRate = market.depositRate;
+    marketMetrics.stableBorrowRate = market.stableBorrowRate;
+    marketMetrics.variableBorrowRate = market.variableBorrowRate;
+    
+    marketMetrics.save();
 }
 
 ////////////////////////
