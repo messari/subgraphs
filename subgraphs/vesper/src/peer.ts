@@ -1,10 +1,10 @@
 import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts';
-import { Vault as  Pool } from '@gen/schema';
-import { PoolV3 } from '@gen/poolV3_vaUSDC/PoolV3';
-import { Controller } from '@gen/controller/Controller';
-import { StrategyV3 } from '@gen/poolV3_vaUSDC/StrategyV3';
-import { PriceRouter } from '@gen/poolV3_vaUSDC/PriceRouter';
-import { Erc20Token } from '@gen/VSP/Erc20Token';
+import { Vault as  Pool } from '../../generated/schema';
+import { PoolV3 } from '../../generated/poolV3_vaUSDC/PoolV3';
+import { Controller } from '../../generated/controller/Controller';
+import { StrategyV3 } from '../../generated/poolV3_vaUSDC/StrategyV3';
+import { PriceRouter } from '../../generated/poolV3_vaUSDC/PriceRouter';
+import { Erc20Token } from '../../generated/VSP/Erc20Token';
 
 // This is using Sushiswap address for Ethereum Mainnet.
 let RouterAddress = Address.fromString(
