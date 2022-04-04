@@ -117,7 +117,7 @@ type YieldAggregator implements Protocol @entity {
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   ##### Yield-Specific #####
-  
+
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
 }
@@ -173,7 +173,7 @@ type FinancialsDailySnapshot @entity {
 
   " Fees paid by the users. e.g. 0.30% of swap fee in Sushiswap "
   feesUSD: BigDecimal!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -198,7 +198,7 @@ interface Pool {
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
   # and inputToken balances are used to calculate returns
 
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
@@ -313,9 +313,9 @@ type Vault @entity {
 
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
   # and inputToken balances are used to calculate returns
-  
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
   inputTokens: [Token!]!
 
@@ -359,7 +359,7 @@ type Vault @entity {
   ##### Yield-Specific #####
 
   name: String
-  
+
   symbol: String
 
   depositLimit: BigInt!
@@ -400,7 +400,7 @@ type VaultDailySnapshot @entity {
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -518,4 +518,41 @@ type Withdraw implements Event @entity {
 
   " The vault involving this transaction "
   vault: Vault!
+}
+
+type _Pool @entity {
+  "Address of the pool."
+  id: ID!
+  "Name of the pool."
+  poolName: String!
+  "Version of the pool (2 or 3)."
+  poolVersion: Int!
+  "Symbol of the shares token."
+  poolToken: String!
+  "Number of decimals of poolToken."
+  poolTokenDecimals: Int!
+  "Symbol of the token used as collateral in the pool."
+  collateralToken: String!
+  "Number of decimals of collateralToken."
+  collateralTokenDecimals: Int!
+  "Amount of assets deposited in the pool. Measured in pool tokens (shares)."
+  totalSupply: BigInt!
+  "totalSupply measured in Usd."
+  totalSupplyUsd: BigDecimal!
+  "Amount the assets invested from the pool. Measured in the collateral token."
+  totalDebt: BigInt!
+  "totalDebt measured in Usd."
+  totalDebtUsd: BigDecimal!
+  "For Withdraws, it is 95% of the `withdrawFee`. For interest yield, it is the 95% of the interest fee. Measured in the underlying collateral asset."
+  protocolRevenue: BigDecimal!
+  "protocolRevenue measured in Usd."
+  protocolRevenueUsd: BigDecimal!
+  "For Withdraws, it is 5% of the `withdrawFee`. For interest yield, it is the 5% of the interest fee. Measured in the underlying collateral asset."
+  supplySideRevenue: BigDecimal!
+  "supplySideRevenue measured in Usd."
+  supplySideRevenueUsd: BigDecimal!
+  "protocolRevenue + supplySideRevenue."
+  totalRevenue: BigDecimal!
+  "totalRevenue measured in Usd."
+  totalRevenueUsd: BigDecimal!
 }

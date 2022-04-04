@@ -26,6 +26,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: Controller
           file: ./abis/controller.json
@@ -54,6 +55,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: Controller
           file: ./abis/controller.json
@@ -82,6 +84,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: Erc20Token
           file: ./abis/erc-20.json
@@ -112,6 +115,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: Erc20Token
           file: ./abis/erc-20.json
@@ -143,6 +147,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -156,9 +161,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -184,6 +189,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -197,9 +203,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -225,6 +231,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -238,9 +245,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -266,6 +273,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -279,9 +287,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -307,6 +315,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -320,9 +329,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -348,6 +357,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -361,9 +371,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -389,6 +399,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -402,9 +413,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -430,6 +441,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -443,9 +455,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -471,6 +483,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -484,9 +497,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -512,6 +525,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -525,9 +539,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -553,6 +567,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -566,9 +581,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -594,6 +609,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -607,9 +623,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
@@ -635,6 +651,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
@@ -648,8 +665,8 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV3
+          handler: handleInterestFeeV3
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawFeeV3
       blockHandlers:
         - handler: handleBlockV3

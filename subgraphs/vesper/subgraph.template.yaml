@@ -27,6 +27,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: Controller
           file: ./abis/controller.json
@@ -57,6 +58,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: Erc20Token
           file: ./abis/erc-20.json
@@ -90,6 +92,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - _Pool
       abis:
         - name: PoolV{{version}}
           file: ./abis/pool-v{{version}}.json
@@ -103,9 +106,9 @@ dataSources:
           file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransferV{{version}}
+          handler: handleInterestFeeV{{version}}
         - event: Withdraw(indexed address,uint256,uint256)
-          handler: handleWithdrawV{{version}}
+          handler: handleWithdrawFeeV{{version}}
       blockHandlers:
         - handler: handleBlockV{{version}}
 {{/pools}}
