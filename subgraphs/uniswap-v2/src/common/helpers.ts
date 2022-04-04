@@ -284,7 +284,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.blockNumber = event.block.number
   deposit.timestamp = event.block.timestamp
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
-  deposit.outputTokens = pool.outputToken
+  deposit.outputToken = pool.outputToken
   deposit.inputTokenAmounts = [amount0, amount1]
   deposit.outputTokenAmount = transfer.liquidity!
   deposit.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
@@ -332,7 +332,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.blockNumber = event.block.number
   withdrawal.timestamp = event.block.timestamp
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
-  withdrawal.outputTokens = pool.outputToken
+  withdrawal.outputToken = pool.outputToken
   withdrawal.inputTokenAmounts = [amount0, amount1]
   withdrawal.outputTokenAmount = transfer.liquidity!
   withdrawal.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
