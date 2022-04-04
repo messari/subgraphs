@@ -32,6 +32,7 @@ export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1:
       token.symbol = token0.name + '/' + token1.name
       token.name = token0.name + '/' + token1.name + " LP"
       token.decimals = DEFAULT_DECIMALS
+      token.save()
   }
   return token
 }
