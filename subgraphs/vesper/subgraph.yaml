@@ -146,6 +146,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -179,6 +187,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -212,6 +228,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -245,6 +269,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -278,6 +310,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -311,6 +351,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -344,6 +392,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -377,6 +433,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -410,6 +474,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -443,6 +515,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -476,6 +556,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -509,6 +597,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
@@ -542,6 +638,14 @@ dataSources:
       abis:
         - name: PoolV3
           file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3

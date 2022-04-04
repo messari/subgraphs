@@ -1,11 +1,10 @@
 import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts';
-import { Pool } from '../types/schema';
-import { PoolV2 } from '../types/PoolV2';
-import { PoolV3 } from '../types/PoolV3';
-import { Controller } from '../types/Controller';
-import { StrategyV2 } from '../types/StrategyV2';
-import { PriceRouter } from '../types/PriceRouter';
-import { Erc20Token } from '../types/Erc20Token';
+import { Vault as  Pool } from '@gen/schema';
+import { PoolV3 } from '@gen/poolV3_vaUSDC/PoolV3';
+import { Controller } from '@gen/controller/Controller';
+import { StrategyV3 } from '@gen/poolV3_vaUSDC/StrategyV3';
+import { PriceRouter } from '@gen/poolV3_vaUSDC/PriceRouter';
+import { Erc20Token } from '@gen/VSP/Erc20Token';
 
 // This is using Sushiswap address for Ethereum Mainnet.
 let RouterAddress = Address.fromString(
@@ -85,9 +84,9 @@ export function getStrategyAddress(poolAddress: Address): Address {
   return controller.strategy(poolAddress);
 }
 
-export function getStrategy(poolAddress: Address): StrategyV2 {
+export function getStrategy(poolAddress: Address): StrategyV3 {
   let strategyAddress = getStrategyAddress(poolAddress);
-  return StrategyV2.bind(strategyAddress);
+  return StrategyV3.bind(strategyAddress);
 }
 
 // using this implementation because .includes() fails in comparison
@@ -108,24 +107,6 @@ export function hasStrategy(addresses: Address[], toFound: Address): bool {
   return false;
 }
 
-export function getShareToTokenRateV2(pool: PoolV2): BigDecimal | null {
-  // There is an error in V2 pools (not happening in V3 pools) in which from time to time
-  // using pricePerShare breaks with a "SafeMath: subtraction overflow".
-  // This does not happen in V3 pools.
-  // if this error happens, return null instead.
-  let pricePerShareCall = pool.try_getPricePerShare();
-  if (pricePerShareCall.reverted) {
-    log.info('Could not obtain pricePerShare for poolV2={}.', [
-      pool._address.toHexString(),
-    ]);
-    return null;
-  }
-  return pool
-    .getPricePerShare()
-    .toBigDecimal()
-    .div(getDecimalDivisor(pool.decimals()));
-}
-
 export function getShareToTokenRateV3(pool: PoolV3): BigDecimal {
   return pool
     .pricePerShare()
@@ -133,14 +114,14 @@ export function getShareToTokenRateV3(pool: PoolV3): BigDecimal {
     .div(getDecimalDivisor(pool.decimals()));
 }
 
-export function getPoolV2(address: string): Pool {
+export function getPoolV3(address: string): Pool {
   let pool = Pool.load(address);
   if (pool != null) {
     log.info('Returning Pool query for address {}', [address]);
     return pool as Pool;
   }
-  log.info('Creating new instance of poolV2 for address {}', [address]);
-  let poolV2 = PoolV2.bind(Address.fromString(address));
+  log.info('Creating new instance of poolV3 for address {}', [address]);
+  let poolV3 = PoolV3.bind(Address.fromString(address));
   let newPool = new Pool(address);
   let zeroString = BigDecimal.fromString('0');
   newPool.totalDebt = BigInt.fromString('0');
@@ -153,11 +134,11 @@ export function getPoolV2(address: string): Pool {
   newPool.protocolRevenueUsd = zeroString;
   newPool.supplySideRevenue = zeroString;
   newPool.supplySideRevenueUsd = zeroString;
-  newPool.poolName = poolV2.name();
-  newPool.poolToken = poolV2.symbol();
-  newPool.poolTokenDecimals = poolV2.decimals();
+  newPool.poolName = poolV3.name();
+  newPool.poolToken = poolV3.symbol();
+  newPool.poolTokenDecimals = poolV3.decimals();
   newPool.poolVersion = 2;
-  let token = Erc20Token.bind(poolV2.token());
+  let token = Erc20Token.bind(poolV3.token());
   newPool.collateralToken = token.symbol();
   newPool.collateralTokenDecimals = token.decimals();
   return newPool;
