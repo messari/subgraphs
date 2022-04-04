@@ -12,7 +12,7 @@ import {
   _DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
-  _LiquidityPoolAmounts,
+  _LiquidityPoolAmount,
   LiquidityPoolFee
 } from "../../generated/schema"
 import { Pool as PoolTemplate } from '../../generated/templates'
@@ -35,7 +35,7 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   let pool = new LiquidityPool(poolAddressString)
 
   // This entity stores the actual token amount after decimal adjustment
-  let poolAmounts = new _LiquidityPoolAmounts(poolAddressString)
+  let poolAmounts = new _LiquidityPoolAmount(poolAddressString)
 
   pool.protocol = protocol.id
   pool.inputTokens =  [token0.id, token1.id]

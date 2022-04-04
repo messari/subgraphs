@@ -1,6 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO } from './constants'
-import { _HelperStore, _TokenTracker, _LiquidityPoolAmounts } from '../../generated/schema'
+import { _HelperStore, _TokenTracker, _LiquidityPoolAmount } from '../../generated/schema'
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { safeDiv } from '../common/helpers'
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './getters'
@@ -46,18 +46,18 @@ let STABLE_COINS: string[] = [
 let MINIMUM_ETH_LOCKED = BigDecimal.fromString('52')
 
 
-function token0PairPrice(poolAmounts: _LiquidityPoolAmounts): BigDecimal {
+function token0PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
   if (poolAmounts.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) return poolAmounts.inputTokenBalances[0].div(poolAmounts.inputTokenBalances[1])
   else return BIGDECIMAL_ZERO
 }
-function token1PairPrice(poolAmounts: _LiquidityPoolAmounts): BigDecimal {
+function token1PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
   if (poolAmounts.inputTokenBalances[0].notEqual(BIGDECIMAL_ZERO)) return poolAmounts.inputTokenBalances[1].div(poolAmounts.inputTokenBalances[0])
   else return BIGDECIMAL_ZERO
 }
 
 export function getEthPriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
-  let usdcPool = _LiquidityPoolAmounts.load(USDC_WETH_03_POOL) // dai is token0
+  let usdcPool = _LiquidityPoolAmount.load(USDC_WETH_03_POOL) // dai is token0
   if (usdcPool !== null) {
     return token0PairPrice(usdcPool)
   } else {

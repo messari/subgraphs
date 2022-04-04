@@ -505,7 +505,7 @@ type _DailyActiveAccount @entity {
   id: ID!
 }
 
-type _LiquidityPoolAmounts @entity {
+type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "
   id: ID!
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
@@ -517,7 +517,7 @@ type _HelperStore @entity {
   id: ID!
   " price of ETH/TVL in USD "
   valueDecimal: BigDecimal
-  " # of deposits, # of unique users "
+  " number of deposits, # of unique users "
   valueInt: Int
 
 }

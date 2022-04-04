@@ -10,7 +10,7 @@ import {
   PoolDailySnapshot,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
-  _LiquidityPoolAmounts,
+  _LiquidityPoolAmount,
   LiquidityPoolFee,
 } from "../../generated/schema"
 
@@ -66,8 +66,8 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
 }
 
-export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
-    return _LiquidityPoolAmounts.load(poolAddress)!
+export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmount {
+    return _LiquidityPoolAmount.load(poolAddress)!
 }
 
 export function getLiquidityPoolFee(id: string): LiquidityPoolFee {

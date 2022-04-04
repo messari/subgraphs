@@ -22,7 +22,7 @@ dataSources:
         - Protocol
         - _PricesUSD
         - _TokenTracker
-        - _LiquidityPoolAmounts
+        - _LiquidityPoolAmount
       abis:
         - name: Factory
           file: ./abis/factory.json
@@ -64,7 +64,7 @@ templates:
         - _Account
         - _DailyActiveAccount
         - _TokenTracker
-        - _LiquidityPoolAmounts
+        - _LiquidityPoolAmount
       abis:
         - name: Pool
           file: ./abis/pool.json
