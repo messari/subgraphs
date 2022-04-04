@@ -337,6 +337,9 @@ type Market @entity {
   " Total borrow volume in USD (i.e. total loan origination ) "
   totalVolumeUSD: BigDecimal!
 
+  " Outstanding borrow token amount in native asset "
+  _outstandingBorrowAmount: BigInt!
+
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
