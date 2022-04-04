@@ -520,7 +520,7 @@ type Withdraw implements Event @entity {
   vault: Vault!
 }
 
-type _Pool @entity {
+type VesperPool @entity {
   "Address of the pool."
   id: ID!
   "Name of the pool."

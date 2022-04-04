@@ -1,5 +1,5 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { _Pool as Pool } from "../generated/schema";
+import { VesperPool } from "../generated/schema";
 import { PoolV3 } from "../generated/poolV3_vaUSDC/PoolV3";
 import { Controller } from "../generated/controller/Controller";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
@@ -117,17 +117,17 @@ export function getShareToTokenRateV3(pool: PoolV3): BigDecimal {
     .div(getDecimalDivisor(pool.decimals()));
 }
 
-export function getPoolV3(address: string): Pool {
-  let pool = Pool.load(address);
+export function getPoolV3(address: string): VesperPool {
+  let pool = VesperPool.load(address);
   if (pool != null) {
-    log.info("Returning Pool query for address {}", [address]);
+    log.info("Returning VesperPool query for address {}", [address]);
     // Casting required because here we know poolsQuery is not null, but the AssemblyScript compiler
     // is not picking it up
-    return pool as Pool;
+    return pool as VesperPool;
   }
   log.info("Creating new instance of poolV3 for address {}", [address]);
   let poolV3 = PoolV3.bind(Address.fromString(address));
-  let newPool = new Pool(address);
+  let newPool = new VesperPool(address);
   let zeroString = BigDecimal.fromString("0");
   newPool.totalDebt = BigInt.fromString("0");
   newPool.totalDebtUsd = zeroString;
