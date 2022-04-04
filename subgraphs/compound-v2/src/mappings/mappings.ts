@@ -1,27 +1,22 @@
 // map blockchain data to entities outlined in schema.graphql
 import { createBorrow, createDeposit, createLiquidation, createRepay, createWithdraw } from "./helpers";
 
-import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow, Transfer } from "../types/templates/cToken/CToken";
+import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../types/templates/cToken/CToken";
 
 import {
-  MarketEntered,
-  MarketExited,
   MarketListed,
-  NewCloseFactor,
   NewCollateralFactor,
   NewLiquidationIncentive,
   NewPriceOracle,
-  ClaimCompCall,
 } from "../types/Comptroller/Comptroller";
 
 import { CToken } from "../types/templates";
-import { AccrueInterest, NewMarketInterestRateModel, NewReserveFactor } from "../types/Comptroller/cToken";
+import { NewReserveFactor } from "../types/Comptroller/cToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
-import { Market } from "../types/schema";
 import { exponentToBigDecimal } from "../common/utils/utils";
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
-import { BIGINT_ZERO } from "../common/utils/constants";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO, DEFAULT_DECIMALS } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
@@ -85,19 +80,15 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   lendingProtocol.save();
 }
 
-export function handleTransfer(event: Transfer): void {}
+export function handleNewReserveFactor(event: NewReserveFactor): void {
+  let market = getOrCreateMarket(event, event.address);
 
-export function handleAccrueInterest(event: AccrueInterest): void {}
-
-export function handleNewReserveFactor(event: NewReserveFactor): void {}
-
-export function handleNewMarketInterestRateModel(event: NewMarketInterestRateModel): void {}
-
-export function handleMarketEntered(event: MarketEntered): void {}
-
-export function handleMarketExited(event: MarketExited): void {}
-
-export function handleNewCloseFactor(event: NewCloseFactor): void {}
+  // get reserve factor
+  market._reserveFactor = event.params.newReserveFactorMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  market.save();
+}
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   let market = getOrCreateMarket(event, event.params.cToken);
@@ -109,8 +100,6 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   market.liquidationThreshold = newLTV;
   market.save();
 }
-
-// export function handleNewMaxAssets(event: NewMaxAssets): void {}
 
 export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
   let protocol = getOrCreateLendingProtcol();
@@ -127,5 +116,3 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
     market.save();
   }
 }
-
-export function handleClaimComp(call: ClaimCompCall): void {}

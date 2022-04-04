@@ -13,7 +13,7 @@ import {
   CTUSD_ADDRESS,
 } from "../../common/utils/constants";
 
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { PriceOracle2 } from "../../types/Comptroller/PriceOracle2";
 import { PriceOracle1 } from "../../types/Comptroller/PriceOracle1";
 import { exponentToBigDecimal } from "../utils/utils";
@@ -69,20 +69,6 @@ export function getUSDPriceOfToken(market: Market, blockNumber: i32): BigDecimal
   log.info("Token {} costs ${} at block {}", [getTokenAddress, tokenPrice.toString(), blockNumber.toString()]);
   return tokenPrice;
 }
-
-// // returns the usd price of the amount of the underlying asset in market
-// export function getAmountUSD(market: Market, amount: BigInt, blockNumber: i32): BigDecimal {
-//   let getToken = Token.load(market.inputTokens[0]);
-//   if (getToken == null) {
-//     log.error("Couldn't find input token for market {}", [market.id]);
-//     return BIGDECIMAL_ZERO;
-//   }
-//   let getTokenDecimals = getToken.decimals;
-//   let tokenPrice = getUSDPrice(market, blockNumber);
-
-//   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(getTokenDecimals));
-//   return tokenPrice.times(decimalAmount);
-// }
 
 /////////////////
 //// Helpers ////

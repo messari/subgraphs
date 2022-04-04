@@ -1,9 +1,6 @@
 // store common calculations
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Market, Token } from "../../types/schema";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CToken } from "../../types/templates/CToken/CToken";
-import { getOrCreateMarket, getOrCreateToken } from "../getters";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, COMPOUND_DECIMALS } from "./constants";
 
 // turn exponent into a BigDecimal number
 export function exponentToBigDecimal(decimals: i32): BigDecimal {
@@ -16,11 +13,6 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 
 // get the amount in underlying token from cToken
 export function getExchangeRate(marketAddress: Address, event: ethereum.Event): BigInt {
-  let market = getOrCreateMarket(event, marketAddress);
-  let underlyingToken = getOrCreateToken(market.inputTokens[0]);
-  let underlyingDecimals = underlyingToken.decimals;
-  let mantissaFactor = 18;
-  let mantissaFactorBD = exponentToBigDecimal(mantissaFactor);
   let cTokenContract = CToken.bind(marketAddress);
 
   /*
@@ -35,10 +27,6 @@ export function getExchangeRate(marketAddress: Address, event: ethereum.Event): 
    *    - must divide by mantissaFactorBD, so 10^18
    */
   let exchangeRate = cTokenContract.exchangeRateStored();
-  // .toBigDecimal()
-  // .div(exponentToBigDecimal(underlyingDecimals))
-  // .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-  // .div(mantissaFactorBD)
-  // .truncate(mantissaFactor);
+
   return exchangeRate;
 }

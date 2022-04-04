@@ -35,7 +35,6 @@ import {
   ZERO_ADDRESS,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { MarketEntered } from "../types/Comptroller/Comptroller";
 
 ///////////////////
 //// Snapshots ////
@@ -174,16 +173,14 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     // create/add Tokens
     let inputToken = getOrCreateToken(underlyingAddress);
     let outputToken = getOrCreateCToken(marketAddress, cTokenContract);
-    let rewardTokenDeposit: RewardToken | null = null;
-    let rewardTokenBorrow: RewardToken | null = null;
     // COMP was not created until block 9601359
     if (event.block.number.toI32() > 9601359) {
-      rewardTokenDeposit = getOrCreateRewardToken(
+      let rewardTokenDeposit = getOrCreateRewardToken(
         marketAddress.toHexString(),
         Address.fromString(COMP_ADDRESS),
         RewardTokenType.DEPOSIT,
       );
-      rewardTokenBorrow = getOrCreateRewardToken(
+      let rewardTokenBorrow = getOrCreateRewardToken(
         marketAddress.toHexString(),
         Address.fromString(COMP_ADDRESS),
         RewardTokenType.BORROW,
@@ -236,6 +233,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market._reserveFactor = BIGDECIMAL_ZERO;
     market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
     market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market._outstandingBorrowAmount = BIGINT_ZERO;
 
     // add liquidation penalty if the protocol has it
     if (protocol._liquidationPenalty != BIGDECIMAL_ZERO) {

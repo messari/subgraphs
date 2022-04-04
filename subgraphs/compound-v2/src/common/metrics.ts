@@ -2,8 +2,16 @@
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../types/schema";
-import { getOrCreateFinancials, getOrCreateLendingProtcol, getOrCreateMarket, getOrCreateMarketDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
-import { SECONDS_PER_DAY } from "./utils/constants";
+import {
+  getOrCreateFinancials,
+  getOrCreateLendingProtcol,
+  getOrCreateMarket,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateToken,
+  getOrCreateUsageMetricSnapshot,
+} from "./getters";
+import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, SECONDS_PER_DAY } from "./utils/constants";
+import { exponentToBigDecimal } from "./utils/utils";
 
 ///////////////////////////
 //// Snapshot Entities ////
@@ -24,8 +32,28 @@ export function updateFinancials(event: ethereum.Event, borrowedAmount: BigInt):
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.totalVolumeUSD = protocol._totalVolumeUSD;
 
-  // TODO: update fee/revenue vars
-
+  // calculate supply-side revenue and protocol-side revenue
+  let supplySideRevenue = BIGDECIMAL_ZERO;
+  let protocolSideRevenue = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIds.length; i++) {
+    let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
+    let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+    let outstandingBorrowUSD = market._outstandingBorrowAmount
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingDecimals))
+      .times(market._inputTokenPrice);
+    supplySideRevenue = outstandingBorrowUSD
+      .times(market.variableBorrowRate)
+      .times(BIGDECIMAL_ONE.minus(market._reserveFactor))
+      .plus(supplySideRevenue);
+    protocolSideRevenue = outstandingBorrowUSD
+      .times(market.variableBorrowRate)
+      .times(market._reserveFactor)
+      .plus(protocolSideRevenue);
+  }
+  financialMetrics.supplySideRevenueUSD = supplySideRevenue;
+  financialMetrics.protocolSideRevenueUSD = protocolSideRevenue;
+  financialMetrics.feesUSD = BIGDECIMAL_ZERO; // TODO: could be protocol-side revenue
 
   financialMetrics.save();
 }
@@ -67,36 +95,30 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
 // update a given MarketDailySnapshot
 export function updateMarketMetrics(event: ethereum.Event): void {
-    // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-    let marketMetrics = getOrCreateMarketDailySnapshot(event);
-    let market = getOrCreateMarket(event, event.address);
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let marketMetrics = getOrCreateMarketDailySnapshot(event);
+  let market = getOrCreateMarket(event, event.address);
 
-    // update to latest block/timestamp
-    marketMetrics.blockNumber = event.block.number;
-    marketMetrics.timestamp = event.block.timestamp;
+  // update to latest block/timestamp
+  marketMetrics.blockNumber = event.block.number;
+  marketMetrics.timestamp = event.block.timestamp;
 
-    // update other vars
-    marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
-    marketMetrics.inputTokenBalances = market.inputTokenBalances;
-    let inputTokenPrices = marketMetrics.inputTokenPricesUSD;
-    inputTokenPrices[0] = market._inputTokenPrice;
-    marketMetrics.inputTokenPricesUSD = inputTokenPrices;
-    marketMetrics.outputTokenSupply = market.outputTokenSupply;
-    marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
-    // marketMetrics.rewardTokenEmissionsAmount = ;
-    // marketMetrics.rewardTokenEmissionsUSD = ;
+  // update other vars
+  marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.inputTokenBalances = market.inputTokenBalances;
+  let inputTokenPrices = marketMetrics.inputTokenPricesUSD;
+  inputTokenPrices[0] = market._inputTokenPrice;
+  marketMetrics.inputTokenPricesUSD = inputTokenPrices;
+  marketMetrics.outputTokenSupply = market.outputTokenSupply;
+  marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
 
-    // lending-specific vars 
-    marketMetrics.depositRate = market.depositRate;
-    marketMetrics.stableBorrowRate = market.stableBorrowRate;
-    marketMetrics.variableBorrowRate = market.variableBorrowRate;
-    
-    marketMetrics.save();
+  // lending-specific vars
+  marketMetrics.depositRate = market.depositRate;
+  marketMetrics.stableBorrowRate = market.stableBorrowRate;
+  marketMetrics.variableBorrowRate = market.variableBorrowRate;
+
+  marketMetrics.save();
 }
-
-////////////////////////
-//// Other Entities ////
-////////////////////////
-
-// export function up

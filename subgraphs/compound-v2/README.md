@@ -2,19 +2,11 @@
 
 ### TODO
 
-- add calculations for daily snapshots
-- Figure out how/where to calculate/update:
-  - market.rewardTokenEmissionsAmount
-  - market.rewardTokenEmissionsUSD
-  - marketDailySnapshot.rewardTokenEmissionsAmount
-  - marketDailySnapshot.rewardTokenEmissionsUSD
-  - financialDailySnapshot.supplySideRevenueUSD
-  - financialDailySnapshot.protocolSideRevenueUSD
-  - financialDailySnapshot.feesUSD
-- Test along the way
+- Need fees? COMP price before cCOMP made?
 - test making sure each var is what we want
 - test along dune tests to ensure accuracy
 - Refactor code - make sure all standards are followed
+- Document how important metrics are calculated - TVL/supply/borrow/revenues/rewards
 
 ## Links
 

@@ -113,6 +113,6 @@ export const LENDING_TYPE = LendingType.POOLED; // TODO: guess - look more into 
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is accurate
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.3.25";
+export const SUBGRAPH_VERSION = "1.4.0";
 export const SCHEMA_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;

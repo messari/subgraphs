@@ -1,30 +1,30 @@
 // helper functions for ./mappings.ts
 
-import { Token, Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
+import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
 
 import {
   COMPTROLLER_ADDRESS,
-  ZERO_ADDRESS,
   COMP_ADDRESS,
-  CETH_ADDRESS,
   COMPOUND_DECIMALS,
   DEFAULT_DECIMALS,
   BLOCKS_PER_YEAR,
+  RewardTokenType,
+  CCOMP_ADDRESS,
 } from "../common/utils/constants";
 
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, ETH_ADDRESS, SAI_ADDRESS } from "../common/utils/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/utils/constants";
 
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { CToken } from "../types/Comptroller/cToken";
 import { getUSDPriceOfToken } from "../common/prices/prices";
 import {
-  getOrCreateCToken,
   getOrCreateLendingProtcol,
   getOrCreateMarket,
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
 import { exponentToBigDecimal, getExchangeRate } from "../common/utils/utils";
+import { Comptroller } from "../types/Comptroller/Comptroller";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -84,6 +84,7 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   deposit.save();
   updateProtocolTVL(event); // also updates market TVL
   updateMarketRates(market);
+  updateRewards(event, market);
   return true;
 }
 
@@ -165,6 +166,7 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.market = marketAddress.toHexString();
   borrow.asset = market.inputTokens[0];
   borrow.amount = amount;
+  market._outstandingBorrowAmount = market._outstandingBorrowAmount.plus(amount);
 
   // update market vars and calc amountUSD
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
@@ -221,6 +223,7 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.market = marketAddress.toHexString();
   repay.asset = market.inputTokens[0];
   repay.amount = amount;
+  market._outstandingBorrowAmount = market._outstandingBorrowAmount.minus(amount);
 
   // update market vars and calc amountUSD
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
@@ -303,7 +306,9 @@ export function createLiquidation(
   liquidatedMarket.outputTokenPriceUSD = liquidatedMarket._exchangeRate.times(liquidatedMarket._inputTokenPrice);
 
   // calc amount/amountUSD/profitUSD
-  liquidation.amount = liquidatedAmount.times(liquidatedExchangeRate).div(BigInt.fromI32(10).pow(DEFAULT_DECIMALS as u8));
+  liquidation.amount = liquidatedAmount
+    .times(liquidatedExchangeRate)
+    .div(BigInt.fromI32(10).pow(DEFAULT_DECIMALS as u8));
   liquidation.amountUSD = liquidation.amount
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingDecimals))
@@ -349,7 +354,59 @@ export function updateProtocolTVL(event: ethereum.Event): void {
   protocol.save();
 }
 
-// export function updateMarketPrices(): Market { }
+export function updateRewards(event: ethereum.Event, market: Market): void {
+  // COMP was not created until block 9601359
+  if (event.block.number.toI32() > 9601359) {
+    let rewardTokenBorrow: RewardToken | null = null;
+    let rewardTokenDeposit: RewardToken | null = null;
+    // check if market has COMP reward tokens
+    if (market.rewardTokens == null) {
+      rewardTokenDeposit = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.DEPOSIT);
+      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
+      let rewardTokenArr = new Array<string>();
+      rewardTokenArr.push(rewardTokenDeposit.id);
+      rewardTokenArr.push(rewardTokenBorrow.id);
+      market.rewardTokens = rewardTokenArr;
+    }
+
+    // get COMP distribution/block
+    if (rewardTokenBorrow == null) {
+      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
+    }
+    let rewardDecimals = rewardTokenBorrow.decimals;
+    let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
+    let tryDistribution = troller.try_compSpeeds(event.address);
+
+    // get comp speed per day - this is the distribution amount for supplying and borrowing
+    let compPerDay = tryDistribution.reverted
+      ? BIGINT_ZERO
+      : tryDistribution.value
+          .times(BigInt.fromI32(4)) // 4 blocks/min
+          .times(BigInt.fromI32(60)) // 60 mins/hr
+          .times(BigInt.fromI32(24)); // 24 hrs/day
+    let compPriceUSD = BIGDECIMAL_ZERO;
+
+    // cCOMP was made at this block height 10960099
+    if (event.block.number.toI32() > 10960099) {
+      let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
+      compPriceUSD = getUSDPriceOfToken(compMarket, event.block.number.toI32());
+    } // TODO: how to get COMP price before block 10960099
+
+    let compPerDayUSD = compPerDay.toBigDecimal().div(exponentToBigDecimal(rewardDecimals)).times(compPriceUSD);
+
+    let compAmountArr = new Array<BigInt>();
+    compAmountArr.push(compPerDay);
+    compAmountArr.push(compPerDay);
+    market.rewardTokenEmissionsAmount = compAmountArr;
+
+    let compAmountUSDArr = new Array<BigDecimal>();
+    compAmountUSDArr.push(compPerDayUSD);
+    compAmountUSDArr.push(compPerDayUSD);
+    market.rewardTokenEmissionsUSD = compAmountUSDArr;
+
+    market.save();
+  }
+}
 
 export function updateMarketRates(market: Market): void {
   // This fails on only the first call to cZRX. It is unclear why, but otherwise it works.
@@ -379,13 +436,6 @@ export function updateMarketRates(market: Market): void {
     .truncate(DEFAULT_DECIMALS);
   market.stableBorrowRate = borrowRate;
   market.variableBorrowRate = borrowRate;
-
-  // get reserve factor
-  let reserceFactor = contract.try_reserveFactorMantissa();
-  market._reserveFactor = reserceFactor.reverted ? BIGDECIMAL_ZERO : 
-    reserceFactor.value
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
 
   market.save();
 }

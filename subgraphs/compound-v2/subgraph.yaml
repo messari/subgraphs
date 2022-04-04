@@ -37,25 +37,15 @@ dataSources:
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
+        # event MarketListed(CToken cToken);
         - event: MarketListed(address)
           handler: handleMarketListed
-        - event: MarketEntered(address,address)
-          handler: handleMarketEntered
-        - event: MarketExited(address,address)
-          handler: handleMarketExited
-        - event: NewCloseFactor(uint256,uint256)
-          handler: handleNewCloseFactor
         - event: NewCollateralFactor(address,uint256,uint256)
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
           handler: handleNewLiquidationIncentive
-        # - event: NewMaxAssets(uint256,uint256)
-        #   handler: handleNewMaxAssets
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
-      callHandlers:
-        - function: claimComp(address[],address[],bool,bool)
-          handler: handleClaimComp
 templates:
   - name: CToken
     kind: ethereum/contract
@@ -91,11 +81,5 @@ templates:
           handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
-        - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: NewMarketInterestRateModel(address,address)
-          handler: handleNewMarketInterestRateModel
