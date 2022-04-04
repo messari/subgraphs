@@ -16,12 +16,12 @@ import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../co
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { BIGINT_ZERO, DEFAULT_DECIMALS } from "../common/utils/constants";
+import { DEFAULT_DECIMALS } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
     updateUsageMetrics(event, event.params.minter);
-    updateFinancials(event, BIGINT_ZERO);
+    updateFinancials(event);
     updateMarketMetrics(event);
   }
 }
@@ -29,7 +29,7 @@ export function handleMint(event: Mint): void {
 export function handleRedeem(event: Redeem): void {
   if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount)) {
     updateUsageMetrics(event, event.params.redeemer);
-    updateFinancials(event, BIGINT_ZERO);
+    updateFinancials(event);
     updateMarketMetrics(event);
   }
 }
@@ -37,7 +37,7 @@ export function handleRedeem(event: Redeem): void {
 export function handleBorrow(event: Borrow): void {
   if (createBorrow(event, event.params.borrower, event.params.borrowAmount)) {
     updateUsageMetrics(event, event.params.borrower);
-    updateFinancials(event, event.params.borrowAmount);
+    updateFinancials(event);
     updateMarketMetrics(event);
   }
 }
@@ -45,7 +45,7 @@ export function handleBorrow(event: Borrow): void {
 export function handleRepayBorrow(event: RepayBorrow): void {
   if (createRepay(event, event.params.payer, event.params.repayAmount)) {
     updateUsageMetrics(event, event.params.payer);
-    updateFinancials(event, BIGINT_ZERO);
+    updateFinancials(event);
     updateMarketMetrics(event);
   }
 }
@@ -61,7 +61,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
     )
   ) {
     updateUsageMetrics(event, event.params.liquidator);
-    updateFinancials(event, BIGINT_ZERO);
+    updateFinancials(event);
     updateMarketMetrics(event);
   }
 }

@@ -18,7 +18,7 @@ import { exponentToBigDecimal } from "./utils/utils";
 ///////////////////////////
 
 // updates a given FinancialDailySnapshot Entity
-export function updateFinancials(event: ethereum.Event, borrowedAmount: BigInt): void {
+export function updateFinancials(event: ethereum.Event): void {
   // number of days since unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = getOrCreateFinancials(event);
