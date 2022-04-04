@@ -13,7 +13,7 @@ import {
   Withdraw,
 } from "../../generated/poolV3_vaUSDC/PoolV3";
 import { Erc20Token } from "../../generated/VSP/Erc20Token";
-import { _Pool as Pool } from "../../generated/schema";
+import { VesperPool } from "../../generated/schema";
 import {
   toUsd,
   hasStrategy,
@@ -79,7 +79,7 @@ function calculateRevenue(
   );
 }
 
-function saveRevenue(pool: Pool, revenue: Revenue): void {
+function saveRevenue(pool: VesperPool, revenue: Revenue): void {
   pool.protocolRevenue = pool.protocolRevenue.plus(revenue.protocolRevenue);
   pool.protocolRevenueUsd = pool.protocolRevenueUsd.plus(
     revenue.protocolRevenueUsd
@@ -102,7 +102,7 @@ function saveRevenue(pool: Pool, revenue: Revenue): void {
 function handleTotalSupply(
   blockNumber: BigInt,
   totalSupplyCall: ethereum.CallResult<BigInt>,
-  pool: Pool,
+  pool: VesperPool,
   tokenAddress: Address,
   shareToTokenRate: BigDecimal
 ): void {
@@ -168,7 +168,7 @@ export function handleBlockV3(block: ethereum.Block): void {
 // withdrawing is not whitelisted - in that case it is 0
 // vVSP does not have withdraw fees either
 function handleWithdrawFee(
-  pool: Pool,
+  pool: VesperPool,
   event: Withdraw,
   feeWhiteList: Address,
   withdrawFee: BigDecimal,
@@ -186,7 +186,7 @@ function handleWithdrawFee(
     [poolAddressHex, withdrawerAddressHex, txHash]
   );
   if (poolAddressHex === VVSPAddressHex) {
-    log.info("Tx {}, Pool is vVSP, which has no fees.", [txHash]);
+    log.info("Tx {}, VesperPool is vVSP, which has no fees.", [txHash]);
     return;
   }
 
