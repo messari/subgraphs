@@ -81,5 +81,3 @@ There are situations where you may want to have additional entities in your sche
 In general, feel free to add extra entities that tracks the internal state of the subgraph as you see fit. Make sure you prefix these entities with an underscore (e.g. `_User`) to differentiate it from entities in the common schema.
 
 Make sure these changes are **strictly** additive. If you need to **modify** existing entities, please let me know and we can go through it together.
-
-When adding entities, make sure you document them with comments in your schema. User-facing comments should be done in double quotes and developer-facing comments should be done with hash tags.

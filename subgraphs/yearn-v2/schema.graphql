@@ -26,6 +26,17 @@ enum ProtocolType {
   # Will add more
 }
 
+# An account is a unique Ethereum address
+type _Account @entity {
+  " Address of the account "
+  id: ID!
+}
+
+type _DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: ID!
+}
+
 type Token @entity {
   " Smart contract address of the market "
   id: ID!
@@ -516,54 +527,4 @@ type Withdraw implements Event @entity {
 
   " The vault involving this transaction "
   vault: Vault!
-}
-
-###################################
-##### Yearn Specific Entities #####
-###################################
-
-# An account is a unique Ethereum address
-type _Account @entity {
-  " Address of the account "
-  id: ID!
-}
-
-type _DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
-  id: ID!
-}
-
-type _Strategy @entity {
-  " Strategy address "
-  id: ID!
-}
-
-type _Treasury @entity {
-  " Treasury address "
-  id: ID!
-}
-
-type _TokenFee @entity {
-  " Token address "
-  id: ID!
-
-  vault: Vault!
-  
-  " The token which the fees are denominated in. Equivalent to vault.token. "
-  token: Token!
-  
-  " All time fees paid using this token to the treasury. Denominated in the vault's want token. "
-  totalTreasuryFees: BigInt!
-  
-  " All time fees paid using this token to strategists.  Denominated in the vault's want token. "
-  totalStrategyFees: BigInt!
-  
-  " All time fees paid using this token to strategists and the treasury.  Denominated in the vault's want token. "
-  totalFees: BigInt!
-
-  " Internal field used by VaultUpdate. The amount of treasury fees paid using this token that has yet to be recognized by the subgraph's accounting logic. "
-  unrecognizedTreasuryFees: BigInt!
-
-  " Internal field used by VaultUpdate. The amount of strategist fees paid using this token that has yet to be recognized by the subgraph's accounting logic. "
-  unrecognizedStrategyFees: BigInt!
 }
