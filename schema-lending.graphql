@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 1.0.0
+# Version: 1.0.1
 
 enum Network {
   ARBITRUM
@@ -121,6 +121,12 @@ type FinancialsDailySnapshot @entity {
   protocol: Protocol!
 
   totalValueLockedUSD: BigDecimal!
+
+  " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
+  protocolTreasuryUSD: BigDecimal
+
+  " Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
   " Total volume in USD "
   totalVolumeUSD: BigDecimal!
