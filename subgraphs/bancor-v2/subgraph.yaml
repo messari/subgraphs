@@ -1,0 +1,86 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: BancorNetwork
+    network: mainnet
+    source:
+      address: "0x2F9EC37d6CcFFf1caB21733BdaDEdE11c823cCB0"
+      abi: BancorNetwork
+      # 10285676
+      startBlock: 11451219
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - Swap
+      abis:
+        - name: BancorNetwork
+          file: ./abis/BancorNetwork.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: Conversion(indexed address,indexed address,indexed address,uint256,uint256,address)
+          handler: handleConversion
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: ConverterRegistry
+    network: mainnet
+    source:
+      address: "0xC0205e203F423Bcd8B2a4d6f8C8A154b0Aa60F19"
+      abi: ConverterRegistry
+      startBlock: 11451219
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+      abis:
+        - name: ConverterRegistry
+          file: ./abis/ConverterRegistry.json
+        - name: StandardPoolConverter
+          file: ./abis/StandardPoolConverter.json
+        - name: DSToken
+          file: ./abis/DSToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: LiquidityPoolAdded(indexed address)
+          handler: handleLiquidityPoolAdded
+      file: ./src/mapping.ts
+templates:
+  - kind: ethereum
+    name: StandardPoolConverter
+    network: mainnet
+    source:
+      abi: StandardPoolConverter
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - Withdraw
+      abis:
+        - name: StandardPoolConverter
+          file: ./abis/StandardPoolConverter.json
+      eventHandlers:
+        # - event: Activation(indexed uint16,indexed address,indexed bool)
+        #   handler: handleActivation
+        # - event: Conversion(indexed address,indexed address,indexed address,uint256,uint256,int256)
+        #   handler: handleConversion
+        - event: ConversionFeeUpdate(uint32,uint32)
+          handler: handleConversionFeeUpdate
+        - event: LiquidityAdded(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleLiquidityAdded
+        - event: LiquidityRemoved(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleLiquidityRemoved
+        # - event: OwnerUpdate(indexed address,indexed address)
+        #   handler: handleOwnerUpdate
+        # - event: TokenRateUpdate(indexed address,indexed address,uint256,uint256)
+        #   handler: handleTokenRateUpdate
+      file: ./src/mapping.ts
