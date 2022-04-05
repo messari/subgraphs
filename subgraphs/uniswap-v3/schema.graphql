@@ -479,25 +479,17 @@ type Swap implements Event @entity {
   tokenIn: Token!
   " Amount of token deposited into pool in native units "
   amountIn: BigInt!
-
-  amountInFull: BigDecimal!
   " Amount of token deposited into pool in USD "
   amountInUSD: BigDecimal!
   " Token withdrawn from pool "
   tokenOut: Token!
   " Amount of token withdrawn from pool in native units "
   amountOut: BigInt!
-  amountOutFull: BigDecimal!
-
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
   ##### DexAmm-Specific #####
   " The pool involving this transaction "
   pool: LiquidityPool!
-
-  ether: BigDecimal!
-  tracker0: BigDecimal!
-  tracker1: BigDecimal!
 }
 
 #Added Entities 
@@ -525,7 +517,7 @@ type _HelperStore @entity {
   id: ID!
   " price of ETH/TVL in USD "
   valueDecimal: BigDecimal
-  " number of deposits, # of unique users "
+  " # of deposits, # of unique users "
   valueInt: Int
 
 }

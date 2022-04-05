@@ -172,13 +172,6 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   // Increment for NFT minted representing the position
   pool.outputTokenSupply = pool.outputTokenSupply.plus(BIGINT_ONE)
 
-  // let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply, DEFAULT_DECIMALS)
-
-  // if (pool.outputTokenSupply == BIGINT_ZERO) pool.outputTokenPriceUSD = BIGDECIMAL_ZERO
-  // else pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply)
-
-  // reset aggregates with new amounts
-
   // Add pool value back to protocol total value locked 
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
 
@@ -251,12 +244,6 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
 
   // Increment for NFT minted representing the position
   pool.outputTokenSupply = pool.outputTokenSupply.minus(BIGINT_ONE)
-
-  // //// This needs to be updated. Default Decimals not correct 
-  // let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply, DEFAULT_DECIMALS)
-
-  // if (pool.outputTokenSupply == BIGINT_ZERO) pool.outputTokenPriceUSD = BIGDECIMAL_ZERO
-  // else pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(outputTokenSupply)
 
   // reset aggregates with new amounts
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
@@ -372,16 +359,11 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
   swap.timestamp = event.block.timestamp
   swap.tokenIn = amount0 > BIGINT_ZERO ? token0.id : token1.id
   swap.amountIn = amount0 > BIGINT_ZERO ? amount0 : amount1
-  swap.amountInFull = amount0 > BIGINT_ZERO ? amount0Converted : amount1Converted
   swap.amountInUSD = amount0 > BIGINT_ZERO ? amount0USD : amount1USD
   swap.tokenOut = amount1 > BIGINT_ZERO ? token0.id : token1.id
   swap.amountOut = amount1 > BIGINT_ZERO ? amount0 : amount1
-  swap.amountOutFull = amount1 > BIGINT_ZERO ? amount0Converted : amount1Converted
   swap.amountOutUSD = amount1 > BIGINT_ZERO ? amount0USD : amount1USD
   swap.pool = pool.id
-  swap.ether = ether.valueDecimal!
-  swap.tracker0 = tokenTracker0.derivedETH
-  swap.tracker1 = tokenTracker1.derivedETH
 
   let FeesUSD = calculateFee(pool, trackedAmountUSD)
   updateVolumeAndFees(event, trackedAmountUSD, FeesUSD[0], FeesUSD[1])

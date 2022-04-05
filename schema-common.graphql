@@ -1,4 +1,5 @@
 ##### SCHEMA GUIDELINES
+### Version: 1.0.1
 #
 ### Usage
 # - This schema is intended to be a "master" document for standardization work. It includes all possible protocol
@@ -12,7 +13,7 @@
 #   - hash/address: String
 #   - block height: BigInt
 #   - timestamp: unix timestamp in BigInt
-#   - token amount: All token amounts should be BigDecimal after normalizing according to its decimals
+#   - token amount: All token amounts should be BigInt to preserve precision (i.e. in wei)
 #   - dollar amount: All USD amounts (including prices) should be BigDecimal
 # - Certain prefixes may be used to indicate a particular type of value.
 #   * total - indicates this is a cumulative value (e.g. totalSharesMinted, totalGrossReturns)
@@ -34,8 +35,9 @@
 #
 
 enum Network {
-  AVALANCHE
+  ARBITRUM
   AURORA
+  AVALANCHE
   BSC
   CELO
   CRONOS
@@ -82,7 +84,7 @@ type RewardToken @entity {
   symbol: String!
   decimals: Int!
 
-  type: RewardTokenType
+  type: RewardTokenType!
 }
 
 #############################
@@ -99,9 +101,20 @@ interface Protocol {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -204,13 +217,19 @@ interface Pool {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -242,16 +261,16 @@ interface PoolDailySnapshot {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: BigInt!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -326,7 +345,7 @@ type Deposit implements Event @entity {
   asset: Token!
 
   " Amount of token deposited in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token deposited in USD "
   amountUSD: BigDecimal!
@@ -362,7 +381,7 @@ type Withdraw implements Event @entity {
   asset: Token!
 
   " Amount of token withdrawn in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token withdrawn in USD "
   amountUSD: BigDecimal!
@@ -385,9 +404,20 @@ type DexAmmProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -397,6 +427,28 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+}
+
+enum LiquidityPoolFeeType {
+  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
+  FIXED_TRADING_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_TRADING_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_TRADING_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  PROTOCOL_FEE
+}
+
+type LiquidityPoolFee @entity {
+  id: ID!
+
+  feePercentage: BigDecimal!
+
+  feeType: LiquidityPoolFeeType!
 }
 
 type LiquidityPool implements Pool @entity {
@@ -423,13 +475,19 @@ type LiquidityPool implements Pool @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -447,6 +505,9 @@ type LiquidityPool implements Pool @entity {
 
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
+
+  " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
+  fees: [LiquidityPoolFee!]!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 
@@ -482,7 +543,7 @@ type Swap implements Event @entity {
   tokenIn: Token!
 
   " Amount of token deposited into pool in native units "
-  amountIn: BigDecimal!
+  amountIn: BigInt!
 
   " Amount of token deposited into pool in USD "
   amountInUSD: BigDecimal!
@@ -491,7 +552,7 @@ type Swap implements Event @entity {
   tokenOut: Token!
 
   " Amount of token withdrawn from pool in native units "
-  amountOut: BigDecimal!
+  amountOut: BigInt!
 
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
@@ -533,9 +594,20 @@ type LendingProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. aave-v2 "
   slug: String!
 
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -580,13 +652,19 @@ type Market implements Pool @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -650,19 +728,19 @@ type MarketDailySnapshot implements PoolDailySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: [BigInt!]!
 
   " Price per share of input token in USD "
   inputTokenPricesUSD: [BigDecimal!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -717,7 +795,7 @@ type Borrow implements Event @entity {
   asset: Token!
 
   " Amount of token borrowed in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token borrowed in USD "
   amountUSD: BigDecimal
@@ -755,7 +833,7 @@ type Repay implements Event @entity {
   asset: Token!
 
   " Amount of token repaid in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token repaid in USD "
   amountUSD: BigDecimal
@@ -793,7 +871,7 @@ type Liquidation implements Event @entity {
   asset: Token!
 
   " Amount of token liquidated in native units "
-  amount: BigDecimal!
+  amount: BigInt!
 
   " Amount of token liquidated in USD "
   amountUSD: BigDecimal
@@ -816,9 +894,20 @@ type YieldAggregator implements Protocol @entity {
   " Slug of protocol, including version. e.g. yearn-v3 "
   slug: String!
 
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
 
   type: ProtocolType!
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -880,13 +969,19 @@ type Vault implements Pool @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the vault. The ordering should be the same as the vault's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -928,16 +1023,16 @@ type VaultDailySnapshot implements PoolDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: BigDecimal!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigDecimal!]
+  rewardTokenEmissionsAmount: [BigInt!]
 
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -967,12 +1062,23 @@ type GenericProtocol implements Protocol @entity {
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
 
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  schemaVersion: String!
+
+  " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
+  subgraphVersion: String!
+
   network: Network!
 
   type: ProtocolType!
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
+
+  " # of total/cumulative unique users "
+  totalUniqueUsers: Int!
+
+  totalValueLockedUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -1003,13 +1109,19 @@ type GenericPool implements Pool @entity {
   totalVolumeUSD: BigDecimal!
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigDecimal!]!
+  inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigDecimal!
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   blockNumber: BigInt!
 
