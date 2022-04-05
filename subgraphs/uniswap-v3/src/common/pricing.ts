@@ -43,7 +43,7 @@ let STABLE_COINS: string[] = [
   '0x4dd28568d05f09b02220b09c2cb307bfd837cb95'
 ]
 
-let MINIMUM_ETH_LOCKED = BigDecimal.fromString('52')
+let MINIMUM_ETH_LOCKED = BigDecimal.fromString('60')
 
 
 function token0PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
@@ -105,7 +105,7 @@ export function getEthPriceInUSD(): BigDecimal {
           }
         }
         if (pool.inputTokens[1] == tokenTracker.id) {
-          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[0].times(tokenTracker0.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {

@@ -337,6 +337,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
 
   // update USD pricing
   ether.valueDecimal = getEthPriceInUSD()
+  ether.save()
   
   tokenTracker0.derivedETH = findEthPerToken(tokenTracker0 as _TokenTracker)
   tokenTracker1.derivedETH = findEthPerToken(tokenTracker1 as _TokenTracker)
@@ -371,18 +372,22 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
   swap.timestamp = event.block.timestamp
   swap.tokenIn = amount0 > BIGINT_ZERO ? token0.id : token1.id
   swap.amountIn = amount0 > BIGINT_ZERO ? amount0 : amount1
+  swap.amountInFull = amount0 > BIGINT_ZERO ? amount0Converted : amount1Converted
   swap.amountInUSD = amount0 > BIGINT_ZERO ? amount0USD : amount1USD
   swap.tokenOut = amount1 > BIGINT_ZERO ? token0.id : token1.id
   swap.amountOut = amount1 > BIGINT_ZERO ? amount0 : amount1
+  swap.amountOutFull = amount1 > BIGINT_ZERO ? amount0Converted : amount1Converted
   swap.amountOutUSD = amount1 > BIGINT_ZERO ? amount0USD : amount1USD
   swap.pool = pool.id
+  swap.ether = ether.valueDecimal!
+  swap.tracker0 = tokenTracker0.derivedETH
+  swap.tracker1 = tokenTracker1.derivedETH
 
   let FeesUSD = calculateFee(pool, trackedAmountUSD)
   updateVolumeAndFees(event, trackedAmountUSD, FeesUSD[0], FeesUSD[1])
 
   swap.save()
   pool.save()
-  ether.save()
   protocol.save()
   poolAmounts.save()
   tokenTracker0.save()
