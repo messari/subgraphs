@@ -164,7 +164,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
           }
         }
         if (pool.inputTokens[1] == tokenTracker.id) {
-          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[0].times(tokenTracker0.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
