@@ -1,0 +1,20 @@
+{
+  "name": "sushiswap",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ meditativeape/sushiswap",
+    "create-local": "graph create --node http://localhost:8020/ meditativeape/sushiswap",
+    "remove-local": "graph remove --node http://localhost:8020/ meditativeape/sushiswap",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 meditativeape/sushiswap",
+    "format": "npx prettier --write ."
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  },
+  "devDependencies": {
+    "prettier": "2.6.1"
+  }
+}
