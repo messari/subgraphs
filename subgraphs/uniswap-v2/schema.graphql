@@ -1,9 +1,10 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.0
+# Version: 1.0.1
 
 enum Network {
-  AVALANCHE
+  ARBITRUM
   AURORA
+  AVALANCHE
   BSC
   CELO
   CRONOS
@@ -65,8 +66,7 @@ interface Protocol {
   name: String!
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
-
-    " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
   " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
@@ -249,7 +249,7 @@ type DexAmmProtocol implements Protocol @entity {
   name: String!
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
-    " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
+  " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
   " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
@@ -271,7 +271,7 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [Pool!]! @derivedFrom(field: "protocol")
-  
+    
   " Storing pool IDs so I can iterate through all pools " 
   poolIds: [Bytes!]!
 }
@@ -404,8 +404,8 @@ type Deposit implements Event @entity {
   timestamp: BigInt!
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
-  " Output tokens of the pool. E.g. the UNI-LP token "
-  outputTokens: Token!
+  " Output token of the pool. E.g. the UNI-LP token "
+  outputToken: Token!
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
@@ -438,14 +438,18 @@ type Withdraw implements Event @entity {
   from: String!
   blockNumber: BigInt!
   timestamp: BigInt!
-  " Input tokens of the pool. E.g. WETH and USDC from a WETH-USDC pool "
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
-  " Output tokens of the pool. E.g. the UNI-LP token "
-  outputTokens: Token!
+
+  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
+  outputToken: Token!
+
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
+
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt!
+
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
 
@@ -488,7 +492,6 @@ type Swap implements Event @entity {
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-
 
 #Added Entities 
 

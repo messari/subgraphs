@@ -1,11 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal } from '@graphprotocol/graph-ts'
-import { LiquidityPoolFee } from '../generated/schema'
 import { PairCreated, SetFeeToCall } from './../generated/Factory/Factory'
-import { LiquidityPoolFeeType, ProtocolType, PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, TRADING_FEE_TO_OFF, TRADING_FEE_TO_ON, ZERO_ADDRESS } from './common/constants'
-import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateToken, getOrCreateTokenTracker } from './common/getters'
+import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, TRADING_FEE_TO_OFF, TRADING_FEE_TO_ON, ZERO_ADDRESS } from './common/constants'
+import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateLPToken, getOrCreateTokenTracker } from './common/getters'
 import { CreateLiquidityPool, UpdateTokenWhitelists } from './common/helpers'
 import { findEthPerToken } from './common/Price'
+import { getOrCreateToken } from './common/tokens'
 
 export function handleNewPair(event: PairCreated): void {
 
@@ -14,7 +14,7 @@ export function handleNewPair(event: PairCreated): void {
   // create the tokens and tokentracker
   let token0 = getOrCreateToken(event.params.token0)
   let token1 = getOrCreateToken(event.params.token1)
-  let LPtoken = getOrCreateToken(event.params.pair)
+  let LPtoken = getOrCreateLPToken(event.params.pair, token0, token1)
 
   let tokenTracker0 = getOrCreateTokenTracker(event.params.token0)
   let tokenTracker1 = getOrCreateTokenTracker(event.params.token1)
@@ -25,6 +25,9 @@ export function handleNewPair(event: PairCreated): void {
   UpdateTokenWhitelists(tokenTracker0, tokenTracker1, event.params.pair)
 
   CreateLiquidityPool(event, protocol, event.params.pair, token0, token1, LPtoken)
+
+  token0.save()
+  token1.save()
 }
 
 // The call handler is used to update feeTo as on or off for each pool

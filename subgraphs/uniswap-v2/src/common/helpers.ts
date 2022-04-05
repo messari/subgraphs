@@ -18,8 +18,9 @@ import { Factory as FactoryContract } from '../../generated/templates/Pair/Facto
 import { Pair as PairTemplate } from '../../generated/templates'
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE_TO_OFF, BIGDECIMAL_HUNDRED } from "../common/constants"
 import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./Price"
-import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
 import { updateVolumeAndFees } from "./intervalUpdates"
+import { getOrCreateToken } from "./tokens"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -283,7 +284,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.blockNumber = event.block.number
   deposit.timestamp = event.block.timestamp
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
-  deposit.outputTokens = pool.outputToken
+  deposit.outputToken = pool.outputToken
   deposit.inputTokenAmounts = [amount0, amount1]
   deposit.outputTokenAmount = transfer.liquidity!
   deposit.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
@@ -296,7 +297,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 }
 
 // Generate the withdraw entity
-export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address, to: Address): void {
+export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
   let transfer = getOrCreateTransfer(event)
 
   let pool = getLiquidityPool(event.address.toHexString())
@@ -331,7 +332,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.blockNumber = event.block.number
   withdrawal.timestamp = event.block.timestamp
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]]
-  withdrawal.outputTokens = pool.outputToken
+  withdrawal.outputToken = pool.outputToken
   withdrawal.inputTokenAmounts = [amount0, amount1]
   withdrawal.outputTokenAmount = transfer.liquidity!
   withdrawal.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
@@ -406,7 +407,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   swap.logIndex = event.logIndex.toI32()
   swap.protocol = protocol.id
   swap.to = to.toHexString()
-  swap.from = event.transaction.from.toHexString()
+  swap.from = sender.toHexString()
   swap.blockNumber = event.block.number
   swap.timestamp = event.block.timestamp
   swap.tokenIn = amount0In != BIGINT_ZERO ? token0.id : token1.id
