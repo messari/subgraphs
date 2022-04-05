@@ -60,13 +60,10 @@ export function initMarket(
     const lendingPool = getLendingPoolFromCtx();
     const lendingPoolContract = LendingPool.bind(Address.fromString(lendingPool));
     // The input token, which would be the token instantiated from the id/address input
-    const inputTokens: Token[] = [token];
+    const inputTokens = [token.id];
     // Populate fields with data that has been passed to the function
     // Other data fields are initialized as 0/[]/false
-    const inputTokenBalances: BigInt[] = [];
-    for (let i = 0; i < inputTokens.length; i++) {
-      inputTokenBalances.push(BIGINT_ZERO);
-    }
+    const inputTokenBalances = [BIGINT_ZERO];
     const protocolId = getProtocolIdFromCtx();
     const protocol = fetchProtocolEntity(protocolId);
     // Initialize market fields as zero
@@ -81,7 +78,7 @@ export function initMarket(
     market.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.reserveFactor = BIGINT_ZERO;
     market.outputToken = ZERO_ADDRESS;
-    market.inputTokens = inputTokens.map<string>((t) => t.id);
+    market.inputTokens = inputTokens;
     market.inputTokenBalances = inputTokenBalances;
     market.sToken = ZERO_ADDRESS;
     market.vToken = ZERO_ADDRESS;
@@ -114,7 +111,6 @@ export function initMarket(
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.save();
-  log.info('market save: ' + market.createdBlockNumber.toString(), [])
   return market as Market;
 }
 
@@ -157,7 +153,7 @@ export function initToken(assetAddr: Address): Token {
 }
 
 // HOW WOULD ONE GET THE TOKEN TYPE(DEPOSIT/BORROW)? SEE aToken.ts
-export function loadRewardToken(assetAddr: Address, market: Market): RewardToken {
+export function loadRewardToken(assetAddr: Address, market: Market, type: string): RewardToken {
   // See initToken() function above
   let asset = RewardToken.load(assetAddr.toHex());
   if (asset === null) {
@@ -175,16 +171,24 @@ export function loadRewardToken(assetAddr: Address, market: Market): RewardToken
     if (!tryDecimals.reverted) {
       asset.decimals = tryDecimals.value;
     }
-    asset.type = "DEPOSIT"
+    asset.type = type;
     asset.save();
   }
+
   // Add the reward token to the market
   let rewardTokens = market.rewardTokens;
-  const rewardEmissionsAmounts = market.rewardTokenEmissionsAmount || [];
-  const rewardEmissionsUSD = market.rewardTokenEmissionsUSD || [];
   if (rewardTokens === null) {
-    rewardTokens = [asset.id]
-  } else if (!rewardTokens.includes(asset.id)) {
+    rewardTokens = [asset.id];
+  }
+  let rewardEmissionsAmounts = market.rewardTokenEmissionsAmount;
+  if (rewardEmissionsAmounts === null) {
+    rewardEmissionsAmounts = [BIGINT_ZERO];
+  }
+  let rewardEmissionsUSD = market.rewardTokenEmissionsUSD;
+  if (rewardEmissionsUSD === null) {
+    rewardEmissionsUSD = [BIGDECIMAL_ZERO];
+  }
+  if (!rewardTokens.includes(asset.id)) {
     rewardTokens.push(asset.id);
     rewardEmissionsAmounts.push(BIGINT_ZERO);
     rewardEmissionsUSD.push(BIGDECIMAL_ZERO);
@@ -206,8 +210,8 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
   if (!lendingProtocol) {
     lendingProtocol = new LendingProtocol(protocolId);
     lendingProtocol.totalUniqueUsers = 0;
-    lendingProtocol.subgraphVersion = '0.0.1';
-    lendingProtocol.schemaVersion = '0.0.1';
+    lendingProtocol.subgraphVersion = '1.0.0';
+    lendingProtocol.schemaVersion = '1.0.0';
     lendingProtocol.name = 'Aave-v2';
     lendingProtocol.slug = 'aave-v2';
     lendingProtocol.network = 'ETHEREUM';
@@ -216,28 +220,30 @@ export function fetchProtocolEntity(protocolId: string): LendingProtocol {
     lendingProtocol.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.protocolPriceOracle = ZERO_ADDRESS;
-    // !!! Are these options correct?
     lendingProtocol.type = 'LENDING';
     lendingProtocol.lendingType = 'POOLED';
     lendingProtocol.riskType = 'ISOLATED';
-    // Initialize empty arrays
     lendingProtocol.save();
   }
   return lendingProtocol as LendingProtocol;
 }
 
 
-export function getRewardTokenFromIncController(incentiveContAddr: Address, market: Market): RewardToken {
+export function getRewardTokensFromIncController(incentiveContAddr: Address, market: Market): RewardToken[] | null {
   log.info('GET REWARD FROM INCENTIVE CONTROLLER ' + incentiveContAddr.toHexString(), [])
   // Instantiate IncentivesController to get access to contract read methods
   const contract = IncentivesControllerContract.bind(incentiveContAddr);
   // Get the contract Reward Token's address
+  const rewardTokens: RewardToken[] = [];
   if (!contract.try_REWARD_TOKEN().reverted) {
-    log.info('REWARD TOKEN ON MARKET ' + market.id + ' is ' + contract.try_REWARD_TOKEN().value.toHexString(), [])
-    return loadRewardToken(contract.try_REWARD_TOKEN().value, market);
+    const rewardTokenAddr = contract.try_REWARD_TOKEN().value;
+    log.info('REWARD TOKEN ON MARKET ' + market.id + ' is ' + rewardTokenAddr.toHexString(), []);
+    rewardTokens.push(loadRewardToken(rewardTokenAddr, market, "BORROW"));
+    rewardTokens.push(loadRewardToken(rewardTokenAddr, market, "DEPOSIT"));
+    return rewardTokens;
   } else {
     log.info('MARKET ' + market.id + ' REVERTED REWARD TOKEN', []);
-    return loadRewardToken(Address.fromString(ZERO_ADDRESS), market);
+    return null;
   }
 }
 
@@ -248,7 +254,7 @@ export function initIncentivesController(aToken: AToken, market: Market): void {
     const incContAddr = aToken.try_getIncentivesController().value;
     log.info('INCENTIVE CONTROLLER ' + incContAddr.toHexString(), [])
     IncentivesController.create(aToken.try_getIncentivesController().value);
-    getRewardTokenFromIncController(incContAddr, market);
+    getRewardTokensFromIncController(incContAddr, market);
   } else {
     log.info('FAILED TO GET INCENTIVE CONTROLLER ' + aToken._address.toHexString() + ' ' + market.id, [])
   }
@@ -308,8 +314,6 @@ export function getMarketDailySnapshot(
   marketSnapshot.inputTokenPricesUSD = getTokenPricesList(market.inputTokens);
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
   marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-  marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.depositRate = market.depositRate;
@@ -348,8 +352,10 @@ export function updateMetricsDailySnapshot(event: ethereum.Event): UsageMetricsD
     protocol.totalUniqueUsers += 1;
     userCreated = true;
   }
-  if (user.mostRecentVisit.notEqual(BigInt.fromString(daysSinceEpoch)) || userCreated) {
-    user.mostRecentVisit = BigInt.fromString(daysSinceEpoch);
+
+  const intDaysFromEpoch = BigInt.fromString(daysSinceEpoch);
+  if (user.mostRecentVisit.notEqual(intDaysFromEpoch) || userCreated) {
+    user.mostRecentVisit = intDaysFromEpoch;
     metricsDailySnapshot.activeUsers += 1;
   }
   protocol.save();
@@ -396,7 +402,6 @@ export function getPriceOracle(): IPriceOracleGetter {
 
 export function getAssetPriceInUSDC(tokenAddress: Address): BigDecimal {
   log.info('getAssetPriceInUSDC ' + tokenAddress.toHexString(), []);
-  // Get the oracle contract instance
   const oracle = getPriceOracle();
   // The Aave protocol oracle contracts only contain a method for getting an asset price in ETH, so USDC price must be fetched to convert asset price from Eth to USDC
   // Get the asset price in Wei and convert it to Eth
@@ -488,15 +493,15 @@ export function updateTVL(token: Token, market: Market, protocol: LendingProtoco
   // Subtracting the most recently added TVL of the market ensures that the correct 
   // proportion of this market is deducted before adding the new market TVL to the protocol
   // Otherwise, the difference in asset USD/ETH price  since saving would deduct the incorrect proportion from the protocol TVL
+  log.info(market.id + ' market.totalValueLocked = ' + market.totalValueLocked.toString() + ' newMarketTVL = ' + newMarketTVL.toString() + ' amountInTokens = ' + amountInTokens.toString() + ' toSub ' + toSubtract.toString(), []);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD);
+  market.totalValueLocked = newMarketTVL;
   market.totalValueLockedUSD = amountInUSD(token, newMarketTVL);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
   protocol.save();
   market.save();
 }
 
-// !!!NEED TO CHECK WHICH CALL IS PASSING A NEGATIVE AMOUNT AND WHY
-// THIS IS COMING FROM A CALL ON THIS PAGE, A TVL IS COMING OUT NEGATIVE
 export function amountInUSD(token: Token, amount: BigInt): BigDecimal {
   // This function takes in a token and the amount of the token and converts the amount of that token into USD
   const amountInDecimals = bigIntToBigDecimal(amount, token.decimals);
@@ -516,9 +521,13 @@ export function getTokenPricesList(tokens: string[]): BigDecimal[] {
     const currentTokenAddr = Address.fromString(tokensList[i]);
     const currentTokenPriceUSDC = getAssetPriceInUSDC(currentTokenAddr);
     tokenPrices.push(currentTokenPriceUSDC);
-    log.info('TOKENS LIST ' + i.toString() + ' USD: ' + currentTokenPriceUSDC.toString(), [])
+    log.info('TOKENS LIST ' + i.toString() + ' USD: ' + currentTokenPriceUSDC.toString(), []);
   }
-  return tokenPrices
+  return tokenPrices;
+}
+
+export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
+  return (<i32>Math.floor(secondsSinceEpoch / 86400)).toString();
 }
 
 // Ray is 27 decimal Wad is 18 decimal
@@ -531,8 +540,4 @@ export function rayToWad(a: BigInt): BigInt {
 export function wadToRay(a: BigInt): BigInt {
   let result = a.times(BigInt.fromI32(10).pow(9));
   return result;
-}
-
-export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
-  return (<i32>Math.floor(secondsSinceEpoch / 86400)).toString();
 }

@@ -79,11 +79,12 @@ export function setTokenBalanceArray(newBal: BigInt, tokenBalanceIndex: number, 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // This event handler updates the deposit/borrow rates on a market when the state of a reserve is updated
   const market = initMarket(event.block.number, event.block.timestamp, event.params.reserve.toHexString()) as Market;
+  const token = initToken(Address.fromString(market.id));
   // The rates provided in params are in ray format (27 dec). Convert to decimal format
   market.depositRate = bigIntToBigDecimal(rayToWad(event.params.liquidityRate));
   market.variableBorrowRate = bigIntToBigDecimal(rayToWad(event.params.variableBorrowRate));
   market.stableBorrowRate = bigIntToBigDecimal(rayToWad(event.params.stableBorrowRate));
-  log.info('RESERVE DATA UPDATED ' + market.depositRate.toString() + ' ' + market.variableBorrowRate.toString() + ' ' + event.params.variableBorrowRate.toString() + ' ' + market.stableBorrowRate.toString() + ' ' + event.params.stableBorrowRate.toString(), [])
+  log.info('RESERVE DATA UPDATED DEC: ' + token.decimals.toString() + ' ' + market.depositRate.toString() + ' ' + market.variableBorrowRate.toString() + ' ' + event.params.variableBorrowRate.toString() + ' ' + market.stableBorrowRate.toString() + ' ' + event.params.stableBorrowRate.toString(), [])
   market.save()
 }
 
@@ -95,28 +96,26 @@ export function handleDeposit(event: Deposit): void {
   log.info('DEPO' + event.transaction.hash.toHexString(), []);
   // Deposit event to a lending pool triggers this handler
   const hash = event.transaction.hash.toHexString();
-  const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
+  // Initialize the reserve token
+  const token = initToken(event.params.reserve);
+  const amountUSD = amountInUSD(token, event.params.amount);
   // Instantiate the deposit entity with the specified string construction as id
   log.info('DEPOSIT AMT: ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
-  let deposit = new DepositEntity(hash + "-" + logIdx.toHexString());
+  let deposit = new DepositEntity(hash + "-" + event.logIndex.toHexString());
   deposit.to = marketAddr;
   deposit.market = marketAddr;
   deposit.from = event.transaction.from.toHexString();
   deposit.hash = hash;
-  deposit.logIndex = logIdx.toI32();
+  deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
   deposit.timestamp = event.block.timestamp;
   deposit.blockNumber = event.block.number;
   // The reserve param is the asset contract address
   deposit.asset = event.params.reserve.toHexString();
   deposit.amount = event.params.amount;
-
-  // Initialize the reserve token
-  const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token, deposit.amount);
   deposit.amountUSD = amountUSD;
 
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
@@ -129,6 +128,7 @@ export function handleDeposit(event: Deposit): void {
   const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
   const newBal = balanceAtIdx.plus(deposit.amount);
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
+
   // Update total value locked on the market level
   updateTVL(token, market, protocol, deposit.amount, false);
   market.save();
@@ -146,11 +146,12 @@ export function handleWithdraw(event: Withdraw): void {
   // Withdraw event from a lending pool to a user triggers this handler
   log.info('WITH AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   const hash = event.transaction.hash.toHexString();
-  const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
-  let withdraw = new WithdrawEntity(hash + "-" + logIdx.toHexString());
+  const token = initToken(event.params.reserve);
+  const amountUSD = amountInUSD(token, event.params.amount);
+  let withdraw = new WithdrawEntity(hash + "-" + event.logIndex.toHexString());
   // The tokens are sent to the address listed as the "to" param field of the event
   // NOT "to" property of event.transaction which marketAddr is set to
 
@@ -158,15 +159,12 @@ export function handleWithdraw(event: Withdraw): void {
   withdraw.market = marketAddr;
   withdraw.from = marketAddr;
   withdraw.hash = hash;
-  withdraw.logIndex = logIdx.toI32();
+  withdraw.logIndex = event.logIndex.toI32();
   withdraw.asset = event.params.reserve.toHexString();
   withdraw.protocol = protocol.id || protocolId;
   withdraw.timestamp = event.block.timestamp;
   withdraw.blockNumber = event.block.number;
   withdraw.amount = event.params.amount;
-
-  const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token, withdraw.amount);
   withdraw.amountUSD = amountUSD;
 
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
@@ -179,6 +177,7 @@ export function handleWithdraw(event: Withdraw): void {
   const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
   const newBal = balanceAtIdx.minus(withdraw.amount);
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
+
   // Update total value locked on the market level
   updateTVL(token, market, protocol, withdraw.amount, true);
   market.save();
@@ -197,30 +196,26 @@ export function handleBorrow(event: Borrow): void {
   log.info('BORROW - MODE: ' + event.params.borrowRateMode.toString() + ' amt ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   // Depending on borrow mode, add to stable/variable tvl and trigger total fee calculation
   const hash = event.transaction.hash.toHexString();
-  const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
-
-  let borrow = new BorrowEntity(hash + "-" + logIdx.toHexString());
+  const token = initToken(event.params.reserve);
+  const amountUSD = amountInUSD(token, event.params.amount);
+  let borrow = new BorrowEntity(hash + "-" + event.logIndex.toHexString());
   borrow.to = event.transaction.from.toHexString();
   borrow.market = marketAddr;
   borrow.from = marketAddr;
   borrow.hash = hash;
-  borrow.logIndex = logIdx.toI32();
+  borrow.logIndex = event.logIndex.toI32();
   borrow.asset = event.params.reserve.toHexString();
   borrow.protocol = protocol.id || protocolId;
   borrow.timestamp = event.block.timestamp;
   borrow.blockNumber = event.block.number;
   borrow.amount = event.params.amount;
-
-  const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token, borrow.amount);
   borrow.amountUSD = amountUSD;
 
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   // Add the borrow amount in USD to total volume on the market ("total loan origination")
-  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
   const tokenBalanceIndex = getTokenBalanceIndex(market, borrow.asset);
   if (tokenBalanceIndex >= market.inputTokens.length) {
@@ -230,12 +225,14 @@ export function handleBorrow(event: Borrow): void {
   const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
   const newBal = balanceAtIdx.minus(borrow.amount);
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
+  
   // Update total value locked on the market level
   updateTVL(token, market, protocol, borrow.amount, true);
   // Calculate the revenues and fees as a result of the borrow
   calculateRevenues(market, token);
-
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
+
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
@@ -252,25 +249,22 @@ export function handleRepay(event: Repay): void {
   // Repay event from a user who is paying back into a pool that they borrowed from
   log.info('REPAY AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   const hash = event.transaction.hash.toHexString();
-  const logIdx = event.logIndex;
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
-  let repay = new RepayEntity(hash + "-" + logIdx.toHexString());
+  const token = initToken(event.params.reserve);
+  const amountUSD = amountInUSD(token, event.params.amount);
+  let repay = new RepayEntity(hash + "-" + event.logIndex.toHexString());
   repay.to = marketAddr;
   repay.market = marketAddr;
-  // The user parameter holds the address of the user sending the repayment/transaction into the pool
   repay.from = event.transaction.from.toHexString();
   repay.hash = hash;
-  repay.logIndex = logIdx.toI32();
+  repay.logIndex = event.logIndex.toI32();
   repay.asset = event.params.reserve.toHexString();
   repay.protocol = protocol.id || protocolId;
   repay.timestamp = event.block.timestamp;
   repay.blockNumber = event.block.number;
   repay.amount = event.params.amount;
-
-  const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token, repay.amount);
   repay.amountUSD = amountUSD;
   
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
@@ -283,10 +277,10 @@ export function handleRepay(event: Repay): void {
   const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
   const newBal = balanceAtIdx.plus(repay.amount);
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
+
   // Update total value locked on the market level
   updateTVL(token, market, protocol, repay.amount, false);
   calculateRevenues(market, token);
-
   market.save();
 
   // Update snapshots
@@ -301,26 +295,24 @@ export function handleRepay(event: Repay): void {
 export function handleLiquidationCall(event: LiquidationCall): void {
   // Liquidation event where a users collateral assets are sold to reduce the ratio to borrowed assets
   const hash = event.transaction.hash.toHexString();
-  const logIdx = event.logIndex;
   const marketAddr = event.params.collateralAsset.toHexString();
-
+  
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
-  let liquidation = new LiquidationEntity(hash + "-" + logIdx.toHexString());
+  const token = initToken(event.params.collateralAsset);
+  const amountUSD = amountInUSD(token, event.params.liquidatedCollateralAmount);
+  let liquidation = new LiquidationEntity(hash + "-" + event.logIndex.toHexString());
   // Liquidation.to is set to the market address
   liquidation.to = marketAddr;
   liquidation.market = marketAddr;
   liquidation.from = event.params.liquidator.toHexString();
   liquidation.hash = hash;
-  liquidation.logIndex = logIdx.toI32();
+  liquidation.logIndex = event.logIndex.toI32();
   liquidation.asset = event.params.collateralAsset.toHexString();
   liquidation.protocol = protocol.id || protocolId;
   liquidation.timestamp = event.block.timestamp;
   liquidation.blockNumber = event.block.number;
   liquidation.amount = event.params.liquidatedCollateralAmount;
-
-  const token = initToken(event.params.collateralAsset);
-  const amountUSD = amountInUSD(token, liquidation.amount);
   liquidation.amountUSD = amountUSD;
 
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
@@ -333,8 +325,10 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
   const newBal = balanceAtIdx.plus(liquidation.amount);
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
+
   // Update total value locked on the market level
   updateTVL(token, market, protocol, liquidation.amount, false);
+  calculateRevenues(market, token);
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);

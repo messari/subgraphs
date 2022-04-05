@@ -5,11 +5,11 @@ import {
   AToken
 } from "../../generated/templates/AToken/AToken";
 
-import { log } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
 
 import {
   initMarket,
-  getRewardTokenFromIncController,
+  getRewardTokensFromIncController,
   initIncentivesController,
   getMarketDailySnapshot,
   getMarketDailyId
@@ -84,6 +84,6 @@ export function handleATokenInitialized(event: Initialized): void {
   const marketAddr = aToken.UNDERLYING_ASSET_ADDRESS(); 
   const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString());
   const incentivesControllerAddr = event.params.incentivesController;
-  getRewardTokenFromIncController(incentivesControllerAddr, market);
+  getRewardTokensFromIncController(incentivesControllerAddr, market);
   getMarketDailySnapshot(event, market);
 }

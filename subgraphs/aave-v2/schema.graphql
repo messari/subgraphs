@@ -368,7 +368,7 @@ type Market @entity {
   " Total supply of output token "
   outputTokenSupply: BigInt!
 
-  " Price per share of output token in USD "
+  " Price per share of output token in USD. NOTE: Most aToken/output token prices cannot be fetched with the oracle. In this case, the oracle fetches the price of the underlying input token "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "
@@ -456,7 +456,7 @@ type MarketDailySnapshot @entity {
   " Total supply of output token "
   outputTokenSupply: BigInt!
 
-  " Price per share of output token in USD "
+  " Price per share of output token in USD NOTE: Most aToken/output token prices cannot be fetched with the oracle. In this case, the oracle fetches the price of the underlying input token "
   outputTokenPriceUSD: BigDecimal!
 
   " Total amount of reward token emissions in a day, in token's native amount "

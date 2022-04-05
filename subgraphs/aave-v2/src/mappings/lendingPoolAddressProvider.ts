@@ -1,4 +1,8 @@
-import { Address, dataSource, DataSourceContext, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  DataSourceContext,
+  log
+} from "@graphprotocol/graph-ts";
 
 import {
   ProxyCreated,

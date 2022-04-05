@@ -203,4 +203,6 @@ templates:
       eventHandlers:
         - event: RewardsAccrued(indexed address,uint256)
           handler: handleRewardsAccrued
+        - event: RewardsClaimed(indexed address,indexed address,indexed address,uint256)
+          handler: handleRewardsClaimed
       file: src/mappings/incentivesController.ts

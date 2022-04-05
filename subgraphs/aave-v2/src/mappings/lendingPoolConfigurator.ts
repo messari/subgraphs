@@ -21,12 +21,12 @@ import {
   initMarket,
   getOutputTokenSupply,
   getAssetPriceInUSDC,
-  rayToWad,
   initIncentivesController
 } from "./utilFunctions";
 
 import { AToken } from "../../generated/templates/AToken/AToken";
 import { AToken as ATokenTemplate } from "../../generated/templates";
+import { BIGDECIMAL_ZERO } from "../common/constants";
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -50,7 +50,10 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   market.outputToken = event.params.aToken.toHexString();
   market.outputTokenSupply = getOutputTokenSupply(event.params.aToken);
   market.outputTokenPriceUSD = getAssetPriceInUSDC(event.params.aToken);
-  log.info('RES INIT OUTPUT TOKEN PRICE ' + market.outputTokenPriceUSD.toString(), [])
+  // If the oracle returns 0 as the aToken price, default to the price of the underlying token
+  if (market.outputTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
+    market.outputTokenPriceUSD = getAssetPriceInUSDC(Address.fromString(market.id));
+  }
   // Set the s/vToken addresses from params
   market.sToken = event.params.stableDebtToken.toHexString();
   market.vToken = event.params.variableDebtToken.toHexString();
