@@ -40,8 +40,8 @@ export function getOrCreateDex(): DexAmmProtocol {
 
   if (protocol === null) {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
-    protocol.name = "Uniswap v2"
-    protocol.slug = "uniswap-v2"
+    protocol.name = "Uniswap v3"
+    protocol.slug = "uniswap-v3"
     protocol.schemaVersion = "1.0.1"
     protocol.subgraphVersion = "1.0.0"
     protocol.totalUniqueUsers = INT_ZERO
