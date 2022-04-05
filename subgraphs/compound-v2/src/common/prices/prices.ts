@@ -1,5 +1,3 @@
-import { Token, LendingProtocol, Market } from "../../types/schema";
-
 import {
   COMPTROLLER_ADDRESS,
   PRICE_ORACLE1_ADDRESS,
@@ -12,7 +10,7 @@ import {
   CUSDT_ADDRESS,
   CTUSD_ADDRESS,
 } from "../../common/utils/constants";
-
+import { Token, LendingProtocol, Market } from "../../types/schema";
 import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { PriceOracle2 } from "../../types/Comptroller/PriceOracle2";
 import { PriceOracle1 } from "../../types/Comptroller/PriceOracle1";
@@ -66,7 +64,6 @@ export function getUSDPriceOfToken(market: Market, blockNumber: i32): BigDecimal
       }
     }
   }
-  log.info("Token {} costs ${} at block {}", [getTokenAddress, tokenPrice.toString(), blockNumber.toString()]);
   return tokenPrice;
 }
 

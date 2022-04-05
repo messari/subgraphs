@@ -1,7 +1,4 @@
 // update snapshots and metrics
-
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount } from "../types/schema";
 import {
   getOrCreateFinancials,
   getOrCreateLendingProtcol,
@@ -10,6 +7,8 @@ import {
   getOrCreateToken,
   getOrCreateUsageMetricSnapshot,
 } from "./getters";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { _Account, _DailyActiveAccount } from "../types/schema";
 import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, SECONDS_PER_DAY } from "./utils/constants";
 import { exponentToBigDecimal } from "./utils/utils";
 
@@ -35,6 +34,7 @@ export function updateFinancials(event: ethereum.Event): void {
   // calculate supply-side revenue and protocol-side revenue
   let supplySideRevenue = BIGDECIMAL_ZERO;
   let protocolSideRevenue = BIGDECIMAL_ZERO;
+  let feesUSD = BIGDECIMAL_ZERO; // aka Total revenue = market outstanding borrows * market borrow rate
   for (let i = 0; i < protocol._marketIds.length; i++) {
     let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
     let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
@@ -50,10 +50,13 @@ export function updateFinancials(event: ethereum.Event): void {
       .times(market.variableBorrowRate)
       .times(market._reserveFactor)
       .plus(protocolSideRevenue);
+    feesUSD = outstandingBorrowUSD.times(market.variableBorrowRate).plus(feesUSD);
   }
   financialMetrics.supplySideRevenueUSD = supplySideRevenue;
   financialMetrics.protocolSideRevenueUSD = protocolSideRevenue;
-  financialMetrics.feesUSD = BIGDECIMAL_ZERO; // TODO: could be protocol-side revenue
+
+  // calculate fees = totalRevenue
+  financialMetrics.feesUSD = feesUSD;
 
   financialMetrics.save();
 }

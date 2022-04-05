@@ -1,6 +1,4 @@
 // get or create snapshots and metrics
-
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   FinancialsDailySnapshot,
   LendingProtocol,
@@ -10,7 +8,6 @@ import {
   Token,
   UsageMetricsDailySnapshot,
 } from "../types/schema";
-import { CToken } from "../types/Comptroller/cToken";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
@@ -35,6 +32,8 @@ import {
   ZERO_ADDRESS,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
+import { CToken } from "../types/Comptroller/cToken";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 ///////////////////
 //// Snapshots ////

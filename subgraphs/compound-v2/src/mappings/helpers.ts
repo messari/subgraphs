@@ -1,7 +1,4 @@
 // helper functions for ./mappings.ts
-
-import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
-
 import {
   COMPTROLLER_ADDRESS,
   COMP_ADDRESS,
@@ -11,20 +8,20 @@ import {
   RewardTokenType,
   CCOMP_ADDRESS,
 } from "../common/utils/constants";
-
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/utils/constants";
-
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { CToken } from "../types/Comptroller/cToken";
-import { getUSDPriceOfToken } from "../common/prices/prices";
 import {
   getOrCreateLendingProtcol,
   getOrCreateMarket,
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
+import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/utils/constants";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { CToken } from "../types/Comptroller/cToken";
+import { getUSDPriceOfToken } from "../common/prices/prices";
 import { exponentToBigDecimal, getExchangeRate } from "../common/utils/utils";
 import { Comptroller } from "../types/Comptroller/Comptroller";
+import { PriceOracle2 } from "../types/Comptroller/PriceOracle2";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -130,10 +127,10 @@ export function createWithdraw(event: ethereum.Event, redeemer: Address, amount:
   market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
   withdraw.amountUSD = market._inputTokenPrice.times(decimalAmount);
 
-  updateMarketRates(market);
-
   withdraw.save();
   market.save();
+  updateMarketRates(market);
+  updateRewards(event, market);
   return true;
 }
 
@@ -189,11 +186,11 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   let protocol = getOrCreateLendingProtcol();
   protocol._totalVolumeUSD = protocol._totalVolumeUSD.plus(borrow.amountUSD!);
 
-  updateMarketRates(market);
-
   borrow.save();
   market.save();
   protocol.save();
+  updateMarketRates(market);
+  updateRewards(event, market);
   return true;
 }
 
@@ -240,10 +237,10 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
   repay.amountUSD = market._inputTokenPrice.times(decimalAmount);
 
-  updateMarketRates(market);
-
   market.save();
   repay.save();
+  updateMarketRates(market);
+  updateRewards(event, market);
   return true;
 }
 
@@ -323,12 +320,12 @@ export function createLiquidation(
     .times(market._inputTokenPrice);
   liquidation.profitUSD = liquidation.amountUSD!.minus(costUSD);
 
-  updateMarketRates(market);
-  updateMarketRates(liquidatedMarket);
-
   liquidatedMarket.save();
   market.save();
   liquidation.save();
+  updateMarketRates(market);
+  updateMarketRates(liquidatedMarket);
+  updateRewards(event, market);
   return true;
 }
 
@@ -390,7 +387,13 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
     if (event.block.number.toI32() > 10960099) {
       let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
       compPriceUSD = getUSDPriceOfToken(compMarket, event.block.number.toI32());
-    } // TODO: how to get COMP price before block 10960099
+    } else {
+      // try to get COMP price using assetPrices() and prices[] mapping in SimplePriceOracle.sol
+      let protocol = getOrCreateLendingProtcol();
+      let oracleAddress = changetype<Address>(protocol._priceOracle);
+      let oracle = PriceOracle2.bind(oracleAddress);
+      compPriceUSD = oracle.assetPrices(Address.fromString(COMP_ADDRESS)).toBigDecimal().div(exponentToBigDecimal(6)); // price returned with 6 decimals of precision per docs
+    }
 
     let compPerDayUSD = compPerDay.toBigDecimal().div(exponentToBigDecimal(rewardDecimals)).times(compPriceUSD);
 
@@ -415,7 +418,6 @@ export function updateMarketRates(market: Market): void {
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
   let supplyRatePerBlock = contract.try_supplyRatePerBlock();
   if (supplyRatePerBlock.reverted) {
-    log.info("***CALL FAILED*** : cERC20 supplyRatePerBlock() reverted", []);
     market.depositRate = BIGDECIMAL_ZERO;
   } else {
     market.depositRate = supplyRatePerBlock.value

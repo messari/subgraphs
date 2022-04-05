@@ -51,10 +51,13 @@ export namespace RewardTokenType {
 //////////////////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 
+export const COMPTROLLER_ADDRESS = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b";
+export const PRICE_ORACLE1_ADDRESS = "0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904";
 export const SAI_ADDRESS = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359";
 export const USDC_ADDRESS = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48";
 export const CUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
@@ -105,14 +108,12 @@ export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const COMPTROLLER_ADDRESS = "0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b";
-export const PRICE_ORACLE1_ADDRESS = "0x02557a5E05DeFeFFD4cAe6D83eA3d173B272c904";
 export const NETWORK_ETHEREUM = Network.ETHEREUM;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const LENDING_TYPE = LendingType.POOLED; // TODO: guess - look more into this to verify
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is accurate
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.0";
-export const SCHEMA_VERSION = "1.0.0";
+export const SUBGRAPH_VERSION = "1.4.2";
+export const SCHEMA_VERSION = "1.0.1";
 export const COMPOUND_DECIMALS = 8;
