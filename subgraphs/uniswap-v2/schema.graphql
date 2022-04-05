@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.1
+# Version: 1.0.2
 
 enum Network {
   ARBITRUM
@@ -278,16 +278,16 @@ type DexAmmProtocol implements Protocol @entity {
 
 enum LiquidityPoolFeeType {
   " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
-  TRADING_FEE
+  FIXED_TRADING_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_TRADING_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_TRADING_FEE
 
   " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
   PROTOCOL_FEE
-
-  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
-  TIERED_FEE
-
-  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
-  DYNAMIC_FEE
 }
 
 type LiquidityPoolFee @entity {

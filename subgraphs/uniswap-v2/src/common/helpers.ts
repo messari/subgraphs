@@ -29,7 +29,7 @@ export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b2
 
 function createPoolFees(poolAddressString: string): string[] {
   let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
-  poolTradingFee.feeType = LiquidityPoolFeeType.TRADING_FEE
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
   poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
 
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
