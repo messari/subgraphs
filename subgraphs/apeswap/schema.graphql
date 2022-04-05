@@ -38,20 +38,20 @@ type Token @entity {
 
   ###### internal use ########
   # used for other stats like marketcap
-  totalSupply: BigInt!
+  totalSupply: BigDecimal!
 
   # token specific volume
-  tradeVolume: BigInt!
-  tradeVolumeUSD: BigInt!
-  untrackedVolumeUSD: BigInt!
+  tradeVolume: BigDecimal!
+  tradeVolumeUSD: BigDecimal!
+  untrackedVolumeUSD: BigDecimal!
   # transactions across all pairs
   txCount: BigInt!
 
   # liquidity across all pairs
-  totalLiquidity: BigInt!
+  totalLiquidity: BigDecimal!
 
   # derived prices
-  derivedBNB: BigInt!
+  derivedBNB: BigDecimal!
 }
 
 enum RewardTokenType {
@@ -96,7 +96,7 @@ interface Protocol {
   " # of total/cumulative unique users "
   totalUniqueUsers: Int!
 
-  _totalValueLockedBNB: BigInt!
+  _totalValueLockedBNB: BigDecimal!
 
   totalValueLockedUSD: BigDecimal!
 
@@ -284,7 +284,7 @@ type DexAmmProtocol implements Protocol @entity {
 
   totalValueLockedUSD: BigDecimal!
 
-  _totalValueLockedBNB: BigInt!
+  _totalValueLockedBNB: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -371,21 +371,21 @@ type LiquidityPool @entity {
   # mirrored from the smart contract
   _token0: Token!
   _token1: Token!
-  _reserve0: BigInt!
-  _reserve1: BigInt!
+  _reserve0: BigDecimal!
+  _reserve1: BigDecimal!
 
   # derived liquidity
-  _reserveBNB: BigInt!
+  _reserveBNB: BigDecimal!
   # Price in terms of the asset pair
-  _token0Price: BigInt!
-  _token1Price: BigInt!
-  _trackedReserveBNB: BigInt!
+  _token0Price: BigDecimal!
+  _token1Price: BigDecimal!
+  _trackedReserveBNB: BigDecimal!
 
   # lifetime volume stats
-  _volumeToken0: BigInt!
-  _volumeToken1: BigInt!
+  _volumeToken0: BigDecimal!
+  _volumeToken1: BigDecimal!
   _txCount: BigInt!
-  _untrackedVolumeUSD: BigInt!
+  _untrackedVolumeUSD: BigDecimal!
 
 
   # Fields used to help derived relationship
@@ -542,7 +542,7 @@ type Swap implements Event @entity {
 # stores for USD calculations
 type Bundle @entity {
   id: ID!
-  bnbPrice: BigInt! # price of BNB usd
+  bnbPrice: BigDecimal! # price of BNB usd
 }
 
 # An account is a unique Ethereum address

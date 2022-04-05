@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: bsc
+    network: {{network}}
     source:
-      address: '0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6'
+      address: '{{address}}'
       abi: Factory
-      startBlock: 4855900	
+      startBlock: {{startBlock}}	
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -27,7 +27,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: bsc
+    network: {{network}}
     source:
       abi: Pair
     mapping:

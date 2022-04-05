@@ -1,4 +1,5 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { ERC20 } from "../../generated/Factory/ERC20";
 import { Bundle, LiquidityPool, Token } from "../../generated/schema";
 import {
   Burn,
@@ -14,23 +15,28 @@ import { createPoolDailySnapshot } from "../helpers/poolDailySnapshot";
 import { getOrCreateSwap } from "../helpers/swap";
 import { updateUsageMetrics } from "../helpers/updateUsageMetrics";
 import { getOrCreateWithdraw } from "../helpers/withdraw";
-import { getOrCreateProtocol } from "../utils/common";
 import {
+  getOrCreateProtocol,
+  getOrCreateProtocolFee,
+  getOrcreateTradingFees,
+} from "../utils/common";
+import {
+  BIGDECIMAL_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
-  DEFAULT_DECIMALS,
+  toBigInt,
   toDecimal,
   ZERO_ADDRESS,
 } from "../utils/constant";
 import {
+  baseTokenPriceInUSD,
   findBnbPerToken,
-  getBnbPriceInUSD,
   getTrackedLiquidityUSD,
   getTrackedVolumeUSD,
 } from "../utils/pricing";
-import { getOrCreateToken } from "../utils/token";
 
 export function handleTransfer(event: Transfer): void {
+  log.info("Transfer mapping on pool {}", [event.address.toHexString()]);
   let from = event.params.from;
   let to = event.params.to;
   let amount = event.params.value;
@@ -38,9 +44,9 @@ export function handleTransfer(event: Transfer): void {
   let fromHex = from.toHexString();
   let toHex = to.toHexString();
   // ignore initial transfers for first adds
-  if (toHex == ZERO_ADDRESS && amount.equals(BigInt.fromI32(1000))) {
-    return;
-  }
+  //   if (toHex == ZERO_ADDRESS && amount.equals(BigInt.fromI32(1000))) {
+  //     return;
+  //   }
 
   // get pool
   let pool = LiquidityPool.load(id);
@@ -58,7 +64,7 @@ export function handleTransfer(event: Transfer): void {
       deposit.save();
 
       // Update pool
-      updatePool(pool)
+      updatePool(pool);
     }
 
     if (fromHex !== ZERO_ADDRESS && toHex == pool.id) {
@@ -67,8 +73,8 @@ export function handleTransfer(event: Transfer): void {
       withdraw.to = to.toHexString();
       withdraw.outputTokenAmount = amount;
       withdraw.save();
-      
-      updatePool(pool)
+
+      updatePool(pool);
     }
 
     if (fromHex == pool.id && toHex == ZERO_ADDRESS) {
@@ -81,15 +87,13 @@ export function handleTransfer(event: Transfer): void {
       withdraw.save();
 
       // Update pool
-      updatePool(pool)
+      updatePool(pool);
     }
-
   }
 }
 
 export function handleMint(event: Mint): void {
-  let amount0 = event.params.amount0;
-  let amount1 = event.params.amount1;
+  log.info("Mint mapping on pool {}", [event.address.toHexString()]);
   let id = event.address.toHexString();
   let protocol = getOrCreateProtocol();
 
@@ -97,6 +101,9 @@ export function handleMint(event: Mint): void {
   if (pool !== null) {
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
+
+    let amount0 = toDecimal(event.params.amount0, token0.decimals);
+    let amount1 = toDecimal(event.params.amount1, token1.decimals);
 
     // update txn counts
     token0.txCount = token0.txCount.plus(BIGINT_ONE);
@@ -118,14 +125,14 @@ export function handleMint(event: Mint): void {
     let deposit = getOrCreateDeposit(event, pool);
     deposit.from = event.params.sender.toHexString();
     deposit.to = pool.id;
-    deposit.inputTokenAmounts[0] = amount0;
-    deposit.inputTokenAmounts[1] = amount1;
-    deposit.amountUSD = toDecimal(amountTotalUSD, DEFAULT_DECIMALS);
+    deposit.inputTokenAmounts[0] = toBigInt(amount0, token0.decimals);
+    deposit.inputTokenAmounts[1] = toBigInt(amount1, token1.decimals);
+    deposit.amountUSD = amountTotalUSD;
 
     deposit.save();
 
     // Update pool
-    updatePool(pool)
+    updatePool(pool);
 
     // Take a PoolDailySnapshot
     createPoolDailySnapshot(
@@ -157,8 +164,7 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleBurn(event: Burn): void {
-  let amount0 = event.params.amount0;
-  let amount1 = event.params.amount1;
+  log.info("Burn mapping on pool {}", [event.address.toHexString()]);
   let to = event.params.to;
   let id = event.address.toHexString();
   let protocol = getOrCreateProtocol();
@@ -168,6 +174,8 @@ export function handleBurn(event: Burn): void {
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
 
+    let amount0 = toDecimal(event.params.amount0, token0.decimals);
+    let amount1 = toDecimal(event.params.amount1, token1.decimals);
     // update txn counts
     token0.txCount = token0.txCount.plus(BIGINT_ONE);
     token1.txCount = token1.txCount.plus(BIGINT_ONE);
@@ -187,14 +195,14 @@ export function handleBurn(event: Burn): void {
     let withdraw = getOrCreateWithdraw(event, pool);
     withdraw.to = to.toHexString();
     withdraw.from = event.params.sender.toHexString();
-    withdraw.inputTokenAmounts[0] = amount0;
-    withdraw.inputTokenAmounts[1] = amount1;
-    withdraw.amountUSD = toDecimal(amountTotalUSD, DEFAULT_DECIMALS);
+    withdraw.inputTokenAmounts[0] = toBigInt(amount0, token0.decimals);
+    withdraw.inputTokenAmounts[1] = toBigInt(amount1, token1.decimals);
+    withdraw.amountUSD = amountTotalUSD;
 
     withdraw.save();
 
     // Update pool
-    updatePool(pool)
+    updatePool(pool);
 
     // Take a PoolDailySnapshot
     createPoolDailySnapshot(
@@ -226,17 +234,18 @@ export function handleBurn(event: Burn): void {
 }
 
 export function handleSwap(event: SwapEvent): void {
+  log.info("Swap mapping on pool {}", [event.address.toHexString()]);
   let pool = LiquidityPool.load(event.address.toHexString());
-  let amount0In = event.params.amount0In;
-  let amount0Out = event.params.amount0Out;
-  let amount1In = event.params.amount1In;
-  let amount1Out = event.params.amount1Out;
   let protocol = getOrCreateProtocol();
 
   if (pool !== null) {
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
 
+    let amount0In = toDecimal(event.params.amount0In, token0.decimals);
+    let amount0Out = toDecimal(event.params.amount0Out, token0.decimals);
+    let amount1In = toDecimal(event.params.amount1In, token1.decimals);
+    let amount1Out = toDecimal(event.params.amount1Out, token1.decimals);
     // totals for volume updates
     let amount0Total = amount0Out.plus(amount0In);
     let amount1Total = amount1Out.plus(amount1In);
@@ -248,7 +257,7 @@ export function handleSwap(event: SwapEvent): void {
     let derivedAmountBNB = token1.derivedBNB
       .times(amount1Total)
       .plus(token0.derivedBNB.times(amount0Total))
-      .div(BigInt.fromString("2"));
+      .div(BigDecimal.fromString("2"));
     let derivedAmountUSD = derivedAmountBNB.times(bundle.bnbPrice);
 
     // Only accounts for volume through white listed tokens
@@ -256,13 +265,12 @@ export function handleSwap(event: SwapEvent): void {
       amount0Total,
       token0,
       amount1Total,
-      token1,
-      pool
+      token1
     );
 
-    let trackedAmountBNB: BigInt;
-    if (bundle.bnbPrice.equals(BIGINT_ZERO)) {
-      trackedAmountBNB = BIGINT_ZERO;
+    let trackedAmountBNB: BigDecimal;
+    if (bundle.bnbPrice.equals(BIGDECIMAL_ZERO)) {
+      trackedAmountBNB = BIGDECIMAL_ZERO;
     } else {
       trackedAmountBNB = trackedAmountUSD.div(bundle.bnbPrice);
     }
@@ -286,9 +294,7 @@ export function handleSwap(event: SwapEvent): void {
     token1.txCount = token1.txCount.plus(BIGINT_ONE);
 
     // update pair volume data, use tracked amount if we have it as its probably more accurate
-    pool.totalVolumeUSD = pool.totalVolumeUSD.plus(
-      toDecimal(trackedAmountUSD, DEFAULT_DECIMALS)
-    );
+    pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD);
     pool._volumeToken0 = pool._volumeToken0.plus(amount0Total);
     pool._volumeToken1 = pool._volumeToken1.plus(amount1Total);
     pool._untrackedVolumeUSD = pool._untrackedVolumeUSD.plus(derivedAmountUSD);
@@ -304,18 +310,12 @@ export function handleSwap(event: SwapEvent): void {
     swap.to = event.params.to.toHexString();
     swap.tokenIn = token0.id;
     swap.tokenOut = token1.id;
-    swap.amountIn = amount0Total;
+    swap.amountIn = toBigInt(amount0Total, token0.decimals);
     let amountInBNB = token0.derivedBNB.times(amount0Total);
-    swap.amountInUSD = toDecimal(
-      amountInBNB.times(bundle.bnbPrice),
-      DEFAULT_DECIMALS
-    );
-    swap.amountOut = amount1Total;
+    swap.amountInUSD = amountInBNB.times(bundle.bnbPrice);
+    swap.amountOut = toBigInt(amount1Total, token0.decimals);
     let amountOutBNB = token1.derivedBNB.times(amount1Total);
-    swap.amountOutUSD = toDecimal(
-      amountOutBNB.times(bundle.bnbPrice),
-      DEFAULT_DECIMALS
-    );
+    swap.amountOutUSD = amountOutBNB.times(bundle.bnbPrice);
 
     swap.save();
 
@@ -333,16 +333,27 @@ export function handleSwap(event: SwapEvent): void {
       event.block.timestamp,
       event.block.number
     );
+    let tradingFee = getOrcreateTradingFees(event.address);
+    let protocolFee = getOrCreateProtocolFee(event.address);
+
+    let tradingFeeAmountUSD: BigDecimal;
+    let protocolFeeAmountUSD: BigDecimal;
+
+    let tradingFeeAmount = amount0Total.times(tradingFee.feePercentage);
+    let protocolFeeAmount = amount0Total.times(protocolFee.feePercentage);
+    tradingFeeAmountUSD = tradingFeeAmount
+      .times(token0.derivedBNB)
+      .times(bundle.bnbPrice);
+    protocolFeeAmountUSD = protocolFeeAmount
+      .times(token0.derivedBNB)
+      .times(bundle.bnbPrice);
+
     financials.totalValueLockedUSD = pool.totalValueLockedUSD;
     financials.totalVolumeUSD = pool.totalVolumeUSD;
-    financials.feesUSD = toDecimal(
-      trackedAmountUSD.times(BigInt.fromI32(30/1000)),
-      DEFAULT_DECIMALS
+    financials.feesUSD = financials.feesUSD.plus(
+      trackedAmountUSD.times(tradingFee.feePercentage)
     );
-    financials.supplySideRevenueUSD = toDecimal(
-      trackedAmountUSD.times(BigInt.fromI32(30/1000)),
-      DEFAULT_DECIMALS
-    );
+    financials.supplySideRevenueUSD = financials.feesUSD;
 
     financials.save();
 
@@ -357,6 +368,7 @@ export function handleSwap(event: SwapEvent): void {
 }
 
 export function handleSync(event: Sync): void {
+  log.info("Sync mapping on pool {}", [event.address.toHexString()]);
   let reserve0 = event.params.reserve0;
   let reserve1 = event.params.reserve1;
   let id = event.address.toHexString();
@@ -364,8 +376,8 @@ export function handleSync(event: Sync): void {
   let pool = LiquidityPool.load(id);
   let protocol = getOrCreateProtocol();
 
-  if (pool !== null) {
-    // reset factory liquidity by subtracting onluy tarcked liquidity
+  if (pool !== null && reserve0 !== BIGINT_ZERO && reserve1 !== BIGINT_ZERO) {
+    // reset factory liquidity by subtracting only tracked liquidity
     protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.minus(
       pool._trackedReserveBNB
     );
@@ -376,29 +388,22 @@ export function handleSync(event: Sync): void {
     token0.totalLiquidity = token0.totalLiquidity.minus(pool._reserve0);
     token1.totalLiquidity = token1.totalLiquidity.minus(pool._reserve1);
 
-    pool._reserve0 = reserve0;
-    pool._reserve1 = reserve1;
+    pool._reserve0 = toDecimal(reserve0, token0.decimals);
+    pool._reserve1 = toDecimal(reserve1, token1.decimals);
 
-    if (pool._reserve1.notEqual(BIGINT_ZERO))
+    if (pool._reserve1.notEqual(BIGDECIMAL_ZERO))
       pool._token0Price = pool._reserve0.div(pool._reserve1);
-    else pool._token0Price = BIGINT_ZERO;
-    if (pool._reserve0.notEqual(BIGINT_ZERO))
+    else pool._token0Price = BIGDECIMAL_ZERO;
+    if (pool._reserve0.notEqual(BIGDECIMAL_ZERO))
       pool._token1Price = pool._reserve1.div(pool._reserve0);
-    else pool._token1Price = BIGINT_ZERO;
+    else pool._token1Price = BIGDECIMAL_ZERO;
 
     pool.save();
 
     // update BNB price now that reserves could have changed
     let bundle = Bundle.load("1")!;
-    bundle.bnbPrice = getBnbPriceInUSD();
+    bundle.bnbPrice = baseTokenPriceInUSD();
     bundle.save();
-
-    let outputToken = getOrCreateToken(Address.fromString(pool.outputToken));
-    let outputTokenPriceBNB = findBnbPerToken(outputToken);
-    pool.outputTokenPriceUSD = toDecimal(
-      outputTokenPriceBNB.times(bundle.bnbPrice),
-      DEFAULT_DECIMALS
-    );
 
     token0.derivedBNB = findBnbPerToken(token0 as Token);
     token1.derivedBNB = findBnbPerToken(token1 as Token);
@@ -406,16 +411,22 @@ export function handleSync(event: Sync): void {
     token1.save();
 
     // get tracked liquidity - will be 0 if neither is in whitelist
-    let trackedLiquidityBNB: BigInt;
-    if (bundle.bnbPrice.notEqual(BIGINT_ZERO)) {
-      trackedLiquidityBNB = getTrackedLiquidityUSD(
+    let trackedLiquidityBNB: BigDecimal;
+    if (bundle.bnbPrice.notEqual(BIGDECIMAL_ZERO)) {
+      let TrackedLiquidityUSD = getTrackedLiquidityUSD(
         pool._reserve0,
         token0 as Token,
         pool._reserve1,
         token1 as Token
-      ).div(bundle.bnbPrice);
+      );
+      log.info("Tracked liquidity for pool {} is {} at BNB Price {}", [
+        TrackedLiquidityUSD.toString(),
+        event.address.toHexString(),
+        bundle.bnbPrice.toString(),
+      ]);
+      trackedLiquidityBNB = TrackedLiquidityUSD.div(bundle.bnbPrice);
     } else {
-      trackedLiquidityBNB = BIGINT_ZERO;
+      trackedLiquidityBNB = BIGDECIMAL_ZERO;
     }
 
     // use derived amounts within pair
@@ -423,14 +434,30 @@ export function handleSync(event: Sync): void {
     pool._reserveBNB = pool._reserve0
       .times(token0.derivedBNB)
       .plus(pool._reserve1.times(token1.derivedBNB));
-    pool.totalValueLockedUSD = toDecimal(
-      pool._reserveBNB.times(bundle.bnbPrice),
-      DEFAULT_DECIMALS
-    );
+
+    pool.totalValueLockedUSD = pool._reserveBNB.times(bundle.bnbPrice);
+
+    let poolContract = ERC20.bind(event.address);
+    let getTotalSupply = poolContract.try_totalSupply();
+    if (!getTotalSupply.reverted) {
+      pool.outputTokenSupply = getTotalSupply.value;
+      log.info("TVLUSD for pool {} is {} and outputTokenSupply is {}", [
+        event.address.toHexString(),
+        pool.totalValueLockedUSD.toString(),
+        pool.outputTokenSupply.toString(),
+      ]);
+      pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(
+        toDecimal(pool.outputTokenSupply)
+      );
+    }
 
     // use tracked amounts globally
-    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.plus(trackedLiquidityBNB)
-    protocol.totalValueLockedUSD = toDecimal(protocol._totalValueLockedBNB.times(bundle.bnbPrice), DEFAULT_DECIMALS);
+    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.plus(
+      trackedLiquidityBNB
+    );
+    protocol.totalValueLockedUSD = protocol._totalValueLockedBNB.times(
+      bundle.bnbPrice
+    );
 
     // now correctly set liquidity amounts for each token
     token0.totalLiquidity = token0.totalLiquidity.plus(pool._reserve0);

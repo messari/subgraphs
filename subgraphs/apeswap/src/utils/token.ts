@@ -1,7 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { Token } from "../../generated/schema";
-import { BIGINT_ZERO, ZERO_ADDRESS } from "./constant";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, toDecimal, ZERO_ADDRESS } from "./constant";
 
 export function getOrCreateToken(address: Address): Token {
   // Check if token already exist
@@ -26,14 +26,14 @@ export function getOrCreateToken(address: Address): Token {
     }
     let tryTotalSupply = tokenInstance.try_totalSupply();
     if (!tryTotalSupply.reverted) {
-      token.totalSupply = tryTotalSupply.value;
+      token.totalSupply = toDecimal(tryTotalSupply.value, token.decimals);
     }
-    token.tradeVolume = BIGINT_ZERO;
-    token.tradeVolumeUSD = BIGINT_ZERO;
-    token.untrackedVolumeUSD = BIGINT_ZERO;
+    token.tradeVolume = BIGDECIMAL_ZERO;
+    token.tradeVolumeUSD = BIGDECIMAL_ZERO;
+    token.untrackedVolumeUSD = BIGDECIMAL_ZERO;
     token.txCount = BIGINT_ZERO;
-    token.totalLiquidity = BIGINT_ZERO;
-    token.derivedBNB = BIGINT_ZERO;
+    token.totalLiquidity = BIGDECIMAL_ZERO;
+    token.derivedBNB = BIGDECIMAL_ZERO;
 
     token.save();
     return token as Token;

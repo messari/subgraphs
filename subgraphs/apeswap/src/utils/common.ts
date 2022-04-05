@@ -6,6 +6,7 @@ import {
   LiquidityPoolFeeType,
   Network,
   ProtocolType,
+  toPercentage,
 } from "./constant";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
@@ -35,7 +36,7 @@ export function getOrcreateTradingFees(poolAddress: Address): LiquidityPoolFee {
   if(tradingFee == null) {
     tradingFee = new LiquidityPoolFee(id)
     tradingFee.feeType = LiquidityPoolFeeType.TRADING_FEE
-    tradingFee.feePercentage = BigDecimal.fromString("0.003")
+    tradingFee.feePercentage = toPercentage(BigDecimal.fromString("0.3"))
     tradingFee.save()
 
     return tradingFee as LiquidityPoolFee 
@@ -50,7 +51,7 @@ export function getOrCreateProtocolFee(poolAddress: Address): LiquidityPoolFee {
   if(protocolFee == null) {
     protocolFee = new LiquidityPoolFee(id)
     protocolFee.feeType = LiquidityPoolFeeType.PROTOCOL_FEE
-    protocolFee.feePercentage = BigDecimal.fromString("0")
+    protocolFee.feePercentage = toPercentage(BigDecimal.fromString("0"))
     protocolFee.save()
 
     return protocolFee as LiquidityPoolFee

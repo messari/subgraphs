@@ -1,7 +1,12 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { ERC20 } from "../../generated/Factory/ERC20";
 import { Bundle, LiquidityPool, Token } from "../../generated/schema";
-import { getOrCreateProtocol, getOrCreateProtocolFee, getOrcreateTradingFees } from "../utils/common";
-import { BIGINT_ZERO, DEFAULT_DECIMALS, toDecimal } from "../utils/constant";
+import {
+  getOrCreateProtocol,
+  getOrCreateProtocolFee,
+  getOrcreateTradingFees,
+} from "../utils/common";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, normalizedUsdPrice, toBigInt } from "../utils/constant";
 import { findBnbPerToken } from "../utils/pricing";
 import { getOrCreateToken } from "../utils/token";
 
@@ -21,16 +26,16 @@ export function getOrCreatePool(
 
     // Internal fields
     pool._token0 = token0.id;
-    pool._reserve0 = BIGINT_ZERO;
+    pool._reserve0 = BIGDECIMAL_ZERO;
     pool._token1 = token1.id;
-    pool._reserve1 = BIGINT_ZERO;
-    pool._reserveBNB = BIGINT_ZERO;
-    pool._token0Price = BIGINT_ZERO;
-    pool._token1Price = BIGINT_ZERO;
-    pool._volumeToken0 = BIGINT_ZERO;
-    pool._volumeToken1 = BIGINT_ZERO;
-    pool._trackedReserveBNB = BIGINT_ZERO;
-    pool._untrackedVolumeUSD = BIGINT_ZERO;
+    pool._reserve1 = BIGDECIMAL_ZERO;
+    pool._reserveBNB = BIGDECIMAL_ZERO;
+    pool._token0Price = BIGDECIMAL_ZERO;
+    pool._token1Price = BIGDECIMAL_ZERO;
+    pool._volumeToken0 = BIGDECIMAL_ZERO;
+    pool._volumeToken1 = BIGDECIMAL_ZERO;
+    pool._trackedReserveBNB = BIGDECIMAL_ZERO;
+    pool._untrackedVolumeUSD = BIGDECIMAL_ZERO;
     pool._txCount = BIGINT_ZERO;
     // Input tokens
     let inputTokens: Token[] = [];
@@ -42,8 +47,8 @@ export function getOrCreatePool(
     let outputToken = getOrCreateToken(poolAddress);
     pool.outputToken = outputToken.id;
     pool.rewardTokens = [];
-    pool.totalValueLockedUSD = toDecimal(BIGINT_ZERO, DEFAULT_DECIMALS);
-    pool.totalVolumeUSD = toDecimal(BIGINT_ZERO, DEFAULT_DECIMALS);
+    pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    pool.totalVolumeUSD = BIGDECIMAL_ZERO
     let inputTokenbalances: BigInt[] = [];
     for (let i = 0; i < inputTokens.length; i++) {
       inputTokenbalances.push(BIGINT_ZERO);
@@ -51,22 +56,23 @@ export function getOrCreatePool(
     pool.inputTokenBalances = inputTokenbalances.map<BigInt>(
       (tokenBalance) => tokenBalance
     );
+    let poolContract = ERC20.bind(event.address)
+    let getTotalSupply = poolContract.try_totalSupply()
+    if(!getTotalSupply.reverted) {
+    }
     pool.outputTokenSupply = BIGINT_ZERO;
     // OutputToken Price
     let bundle = Bundle.load("1")!;
     let outputTokenPriceBNB = findBnbPerToken(outputToken);
-    pool.outputTokenPriceUSD = toDecimal(
-      outputTokenPriceBNB.times(bundle.bnbPrice),
-      DEFAULT_DECIMALS
-    );
+    pool.outputTokenPriceUSD = outputTokenPriceBNB.times(bundle.bnbPrice)
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
     pool.name = outputToken.name;
     pool.symbol = outputToken.symbol;
-    let tradingFee = getOrcreateTradingFees(poolAddress).id
-    let protocolFee = getOrCreateProtocolFee(poolAddress).id
+    let tradingFee = getOrcreateTradingFees(poolAddress).id;
+    let protocolFee = getOrCreateProtocolFee(poolAddress).id;
     pool.fees = [tradingFee, protocolFee];
 
     pool.save();
@@ -77,9 +83,9 @@ export function getOrCreatePool(
 }
 
 export function updatePool(pool: LiquidityPool): void {
-    let inputTokenBalances: BigInt[] = []
-    inputTokenBalances.push(pool._reserve0) 
-    inputTokenBalances.push(pool._reserve1) 
-    pool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb)
-    pool.save()
+  let inputTokenBalances: BigInt[] = [];
+  inputTokenBalances.push(toBigInt(pool._reserve0));
+  inputTokenBalances.push(toBigInt(pool._reserve1));
+  pool.inputTokenBalances = inputTokenBalances.map<BigInt>((tb) => tb);
+  pool.save();
 }
