@@ -27,7 +27,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
-        - _Pool
+        - VesperPool
       abis:
         - name: Controller
           file: ./abis/controller.json
@@ -58,7 +58,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
-        - _Pool
+        - VesperPool
       abis:
         - name: Erc20Token
           file: ./abis/erc-20.json
@@ -92,7 +92,7 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
-        - _Pool
+        - VesperPool
       abis:
         - name: PoolV{{version}}
           file: ./abis/pool-v{{version}}.json
