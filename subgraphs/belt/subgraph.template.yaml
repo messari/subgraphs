@@ -9,6 +9,7 @@ dataSources:
     source:
       address: "{{ address }}"
       abi: Vault
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

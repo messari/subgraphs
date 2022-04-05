@@ -28,19 +28,17 @@ export function createStrategy(strategyAddress: Address, vaultAddress: Address, 
     let numer = readValue<BigInt>(strategyContract.try_withdrawFeeNumer(), BIGINT_ZERO);
     let denom = readValue<BigInt>(strategyContract.try_withdrawFeeDenom(), BIGINT_ZERO);
 
-    if (denom.equals(BIGINT_ZERO)) {
-      return;
+    if (denom.notEqual(BIGINT_ZERO)) {
+      let feePercentage = numer.div(denom);
+      let feeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
+        .concat(strategyAddress.toHex())
+        .concat("-")
+        .concat(vaultAddress.toHex());
+      createFeeType(feeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
+
+      vault!.fees = [feeId];
+      vault!.save();
     }
-
-    let feePercentage = numer.div(denom);
-    let feeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
-      .concat(strategyAddress.toHex())
-      .concat("-")
-      .concat(vaultAddress.toHex());
-    createFeeType(feeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
-
-    vault!.fees = [feeId];
-    vault!.save();
 
     StrategyTemplate.create(strategyAddress);
   }

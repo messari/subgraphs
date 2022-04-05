@@ -47,6 +47,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   deposit.to = vault.id;
   deposit.asset = vault.inputTokens[0];
   deposit.amount = event.params.depositAmount;
+  deposit.amountUSD = amountUSD;
   deposit.vault = vault.id;
   deposit.save();
 }

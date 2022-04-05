@@ -61,6 +61,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   withdraw.from = event.transaction.from.toHex();
   withdraw.to = vault.id;
   withdraw.asset = vault.inputTokens[0];
+  withdraw.amount = event.params.withdrawAmount;
   withdraw.amountUSD = amountUSD;
   withdraw.vault = vault.id;
   withdraw.save();
