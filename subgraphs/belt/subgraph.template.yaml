@@ -15,7 +15,18 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - custom
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
       abis:
         - name: Vault
           file: ./abis/Vault.json
@@ -44,7 +55,18 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - custom
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
       abis:
         - name: Vault
           file: ./abis/Vault.json
