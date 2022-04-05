@@ -6,16 +6,25 @@ import {
 } from "../../generated/schema"
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
-import { BIGDECIMAL_ZERO, Network, INT_ZERO, VAULT_ADDRESSES, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "../common/constants"
+import {
+    BIGDECIMAL_ZERO,
+    Network,
+    INT_ZERO,
+    VAULT_ADDRESS,
+    ProtocolType,
+    SECONDS_PER_DAY,
+    DEFAULT_DECIMALS,
+    BIGINT_ZERO
+} from "../common/constants"
 
 export function getOrCreateDex(): DexAmmProtocol {
-    let protocol = DexAmmProtocol.load(VAULT_ADDRESSES[Network.ETHEREUM])
+    let protocol = DexAmmProtocol.load(VAULT_ADDRESS)
 
     if (protocol === null) {
-        protocol = new DexAmmProtocol(VAULT_ADDRESSES[Network.ETHEREUM])
+        protocol = new DexAmmProtocol(VAULT_ADDRESS)
         protocol.name = "Balancer V2"
-        protocol.schemaVersion = "1.0.0"
-        protocol.subgraphVersion = "1.0.0"
+        protocol.schemaVersion = "0.0.2"
+        protocol.subgraphVersion = "0.0.2"
         protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
         protocol.network = Network.ETHEREUM
         protocol.type = ProtocolType.EXCHANGE
@@ -38,17 +47,18 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     return token
 }
 
-export function getOrCreatePool(id: string, address?: Address): LiquidityPool {
-    let pool = LiquidityPool.load(id)
-
-    if (pool === null) {
-        pool = new LiquidityPool(id)
-        pool.outputToken = address!.toHexString()
-
-
-        pool.save()
-    }
-
-    return pool
+export function createPool(id: string, address: Address, blockInfo: ethereum.Block): void {
+    let pool = new LiquidityPool(id)
+    let outputToken = getOrCreateToken(address)
+    pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    pool.totalVolumeUSD = BIGDECIMAL_ZERO;
+    pool.inputTokenBalances = [BIGINT_ZERO];
+    pool.outputTokenSupply = BIGINT_ZERO;
+    pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
+    pool.createdBlockNumber = blockInfo.number
+    pool.createdTimestamp = blockInfo.timestamp
+    pool.outputToken = outputToken.id
+    pool.save()
 }
-

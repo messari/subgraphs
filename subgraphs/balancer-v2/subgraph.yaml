@@ -1,4 +1,4 @@
-specVersion: 1.0.0
+specVersion: 0.0.2
 description: Balancer v2 subgraph for Messari
 repository: https://github.com/messari/subgraphs
 schema:
