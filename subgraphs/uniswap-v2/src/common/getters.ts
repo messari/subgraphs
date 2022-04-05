@@ -43,7 +43,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
     protocol.schemaVersion = "1.0.1"
-    protocol.subgraphVersion = "1.0.0"
+    protocol.subgraphVersion = "1.0.1"
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE
@@ -74,20 +74,6 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
 export function get(poolAddress: string): _LiquidityPoolAmounts {
     return _LiquidityPoolAmounts.load(poolAddress)!
 }
-
-// export function getOrCreateToken(tokenAddress: Address): Token {
-//     let token = Token.load(tokenAddress.toHexString())
-//     // fetch info if null
-//     if (!token) {
-//         token = new Token(tokenAddress.toHexString())
-//         token.symbol = fetchTokenSymbol(tokenAddress)
-//         token.name = fetchTokenName(tokenAddress)
-//         token.decimals = fetchTokenDecimals(tokenAddress)
-
-//     }
-//     return token
-// }
-
 
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
