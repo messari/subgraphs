@@ -241,7 +241,7 @@ function handleWithdrawFee(
 }
 
 // See handleWithdrawFee for explanation.
-export function handleWithdrawFeeV3(event: Withdraw): void {
+export function handleWithdrawV3(event: Withdraw): void {
   let poolAddress = dataSource.address();
   let poolV3 = PoolV3.bind(poolAddress);
   handleWithdrawFee(
@@ -261,10 +261,10 @@ export function handleWithdrawFeeV3(event: Withdraw): void {
 // This handler hooks on transferring of the fees for V3 Pools
 // Strategies of the pool transfer the fees to the pool as an amount of shares
 // this is done through minting of the shares, hence the Transfer event is emitted.
-export function handleInterestFeeV3(event: Transfer): void {
+export function handleTransferV3(event: Transfer): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
-  log.info("Entered handleInterestFeeV3 in tx={}, pool={}", [
+  log.info("Entered handleTransferV3 in tx={}, pool={}", [
     event.transaction.hash.toHex(),
     poolAddressHex,
   ]);
