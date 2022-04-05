@@ -1,6 +1,8 @@
 # Schema Definition
 
-## Protocol ID
+## ID
+
+### Protocol ID
 
 You can use the factory contract address for a protocol as the protocol ID. Here are some examples:
 
@@ -8,6 +10,10 @@ You can use the factory contract address for a protocol as the protocol ID. Here
 - Aave v2's Registry: 0x52D306e36E3B6B02c153d0266ff0f85d18BCD413
 - Yearn v2's Registry: 0xe15461b18ee31b7379019dc523231c57d1cbc18c
 - Curve's Address Provider: 0x0000000022d53366457f9d5e68ec105046fc4383
+
+### Entity ID
+
+Entity IDs are usually defined by either an address, a transaction hash, a log index, or some combination of these. IDs are unique per entity type but can be the same in different entities. For example, a `Protocol` entity and a `Withdraw` entity can have the same ID. Note that entity types that derive from the same interface cannot have the same IDs. For example, a `Withdraw` entity and a `Deposit` entity cannot have the same ID since they both implement the `Event` interface. In this case, we prefix the ID by `withdraw-` or `deposit-` in order to make them unique.
 
 ## Transaction vs. Event
 

@@ -26,6 +26,10 @@ You should navigate to the implementation contract first (Contract -> Read as Pr
 
 See [docs/Oracles.md](./Oracles.md)
 
+### Functions with Multiple Return Values
+
+Some functions in a smart contract can have multiple return values. You can bind the contract and make the function call as usual. However, the return values are embedded in `retval.value0` and `retval.value1` etc.
+
 ### Failed Transactions
 
 Failed transactions are not indexed by `graph-node` and should not invoke any event handlers or call handlers. However, people have reported issues where they've seen failed transactions before (likely because of an inner call reverted). For example: https://discord.com/channels/438038660412342282/548982456414371850/892721444507774996.
