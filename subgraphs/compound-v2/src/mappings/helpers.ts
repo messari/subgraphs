@@ -293,7 +293,7 @@ export function createLiquidation(
   liquidation.asset = assetId;
 
   // update liquidatedMarket vars
-  let underlyingDecimals = getOrCreateToken(liquidatedToken.toHexString()).decimals;
+  let underlyingDecimals = getOrCreateToken(liquidation.asset).decimals;
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
   let liquidatedExchangeRate = getExchangeRate(Address.fromString(liquidatedMarket.id), event);
   liquidatedMarket._exchangeRate = liquidatedExchangeRate

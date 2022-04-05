@@ -2,7 +2,8 @@
 
 ### TODO
 
-- Need fees? COMP price before cCOMP made?
+- Add interest borrowers pay for fees
+- COMP price before cCOMP made?
 - test making sure each var is what we want
 - test along dune tests to ensure accuracy
 - Refactor code - make sure all standards are followed
