@@ -21,8 +21,7 @@ dataSources:
         - Market
         - Token
       abis:
-        # TODO: check later if any './abis/...' are unnecessary
-        - name: Comptroller # TODO: where did graphprotocol get this abi (not the same as etherscan or truffle compile)
+        - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CToken
           file: ./abis/CToken.json
@@ -37,7 +36,6 @@ dataSources:
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
-        # event MarketListed(CToken cToken);
         - event: MarketListed(address)
           handler: handleMarketListed
         - event: NewCollateralFactor(address,uint256,uint256)
@@ -60,7 +58,9 @@ templates:
       entities:
         - Event
         - Market
-        # TODO: add more as I go
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - MarketDailySnapshot
       abis:
         - name: CToken
           file: ./abis/CToken.json
