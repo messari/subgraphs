@@ -173,8 +173,6 @@ templates:
           handler: handleATokenBurn
         - event: Mint(indexed address,uint256,uint256)
           handler: handleATokenMint
-        - event: Initialized(indexed address,indexed address,address,address,uint8,string,string,bytes)
-          handler: handleATokenInitialized
       file: src/mappings/aToken.ts
   - kind: ethereum/contract
     name: IncentivesController
