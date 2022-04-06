@@ -35,13 +35,6 @@ export namespace VaultFeeType {
   export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
-export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "TRADING_FEE";
-  export const PROTOCOL_FEE = "PROTOCOL_FEE";
-  export const TIERED_FEE = "TIERED_FEE";
-  export const DYNAMIC_FEE = "DYNAMIC_FEE";
-}
-
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";
