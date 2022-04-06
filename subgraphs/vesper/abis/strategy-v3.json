@@ -2,7 +2,8 @@
   {
     "inputs": [
       { "internalType": "address", "name": "_pool", "type": "address" },
-      { "internalType": "address", "name": "_swapManager", "type": "address" }
+      { "internalType": "address", "name": "_swapManager", "type": "address" },
+      { "internalType": "uint256", "name": "_fusePoolId", "type": "uint256" }
     ],
     "stateMutability": "nonpayable",
     "type": "constructor"
@@ -11,19 +12,25 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "newFusePoolId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
         "internalType": "address",
-        "name": "_previousProvider",
+        "name": "oldCToken",
         "type": "address"
       },
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "address",
-        "name": "_newProvider",
+        "name": "newCToken",
         "type": "address"
       }
     ],
-    "name": "UpdatedAddressesProvider",
+    "name": "FusePoolChanged",
     "type": "event"
   },
   {
@@ -49,6 +56,37 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldPeriod",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newPeriod",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldRouterIdx",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newRouterIdx",
+        "type": "uint256"
+      }
+    ],
+    "name": "UpdatedOracleConfig",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
         "indexed": true,
         "internalType": "address",
         "name": "previousSwapManager",
@@ -65,11 +103,23 @@
     "type": "event"
   },
   {
-    "inputs": [],
-    "name": "AAVE",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldSwapSlippage",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newSwapSlippage",
+        "type": "uint256"
+      }
+    ],
+    "name": "UpdatedSwapSlippage",
+    "type": "event"
   },
   {
     "inputs": [],
@@ -82,45 +132,6 @@
     "inputs": [],
     "name": "VERSION",
     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "aaveAddressesProvider",
-    "outputs": [
-      {
-        "internalType": "contract AaveLendingPoolAddressesProvider",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "aaveLendingPool",
-    "outputs": [
-      {
-        "internalType": "contract AaveLendingPool",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "aaveProtocolDataProvider",
-    "outputs": [
-      {
-        "internalType": "contract AaveProtocolDataProvider",
-        "name": "",
-        "type": "address"
-      }
-    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -142,47 +153,9 @@
   },
   {
     "inputs": [],
-    "name": "canStartCooldown",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "canUnstake",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "collateralToken",
     "outputs": [
       { "internalType": "contract IERC20", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
-    "name": "convertFrom18",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "pure",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "cooldownData",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "_cooldownStart",
-        "type": "uint256"
-      },
-      { "internalType": "uint256", "name": "_cooldownEnd", "type": "uint256" },
-      { "internalType": "uint256", "name": "_unstakeEnd", "type": "uint256" }
     ],
     "stateMutability": "view",
     "type": "function"
@@ -196,6 +169,19 @@
   },
   {
     "inputs": [],
+    "name": "fusePoolId",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_addressListFactory",
+        "type": "address"
+      }
+    ],
     "name": "init",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -226,6 +212,29 @@
     "name": "migrate",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_newPoolId", "type": "uint256" }
+    ],
+    "name": "migrateFusePool",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oraclePeriod",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oracleRouterIdx",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -260,18 +269,9 @@
   },
   {
     "inputs": [],
-    "name": "startCooldown",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "name": "setupOracles",
+    "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stkAAVE",
-    "outputs": [
-      { "internalType": "contract StakedAave", "name": "", "type": "address" }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -280,6 +280,13 @@
     "outputs": [
       { "internalType": "contract ISwapManager", "name": "", "type": "address" }
     ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapSlippage",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -302,27 +309,18 @@
   {
     "inputs": [],
     "name": "totalValue",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "_totalValue", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "unstakeAave",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_newAddressesProvider",
-        "type": "address"
-      }
+    "name": "totalValueCurrent",
+    "outputs": [
+      { "internalType": "uint256", "name": "_totalValue", "type": "uint256" }
     ],
-    "name": "updateAddressesProvider",
-    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -337,9 +335,32 @@
   },
   {
     "inputs": [
+      { "internalType": "uint256", "name": "_newPeriod", "type": "uint256" },
+      { "internalType": "uint256", "name": "_newRouterIdx", "type": "uint256" }
+    ],
+    "name": "updateOracleConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
       { "internalType": "address", "name": "_swapManager", "type": "address" }
     ],
     "name": "updateSwapManager",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_newSwapSlippage",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateSwapSlippage",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
