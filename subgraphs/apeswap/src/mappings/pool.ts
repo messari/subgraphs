@@ -32,9 +32,6 @@ export function handleTransfer(event: Transfer): void {
   if (pool !== null) {
     // Update pool outputToken Supply
     if (fromHex == ZERO_ADDRESS) {
-      if (toHex == ZERO_ADDRESS) {
-        pool.outputTokenSupply = pool.outputTokenSupply.plus(amount);
-      }
 
       let deposit = getOrCreateDeposit(event, pool);
       deposit.from = from.toHexString();
@@ -57,8 +54,6 @@ export function handleTransfer(event: Transfer): void {
     }
 
     if (fromHex == pool.id && toHex == ZERO_ADDRESS) {
-      pool.outputTokenSupply = pool.outputTokenSupply.minus(amount);
-      pool.save();
       let withdraw = getOrCreateWithdraw(event, pool);
       withdraw.from = from.toHexString();
       withdraw.to = to.toHexString();
