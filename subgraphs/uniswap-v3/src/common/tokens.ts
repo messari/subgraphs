@@ -1,87 +1,38 @@
-import { log } from '@graphprotocol/graph-ts'
+// import { log } from '@graphprotocol/graph-ts'
 import { ERC20 } from '../../generated/Factory/ERC20'
-import { ERC20SymbolBytes } from '../../generated/Factory/ERC20SymbolBytes'
-import { ERC20NameBytes } from '../../generated/Factory/ERC20NameBytes'
-import { StaticTokenDefinition } from './staticTokenDefinition'
 import { Address } from '@graphprotocol/graph-ts'
-import { INT_ZERO } from './constants'
+import { DEFAULT_DECIMALS, INT_ZERO } from '../common/constants'
+import { Token } from '../../generated/schema'
 
-export function fetchTokenSymbol(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress)
-  let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress)
-
-  // try types string and bytes32 for symbol
-  let symbolValue = 'unknown'
-  let symbolResult = contract.try_symbol()
-  if (symbolResult.reverted) {
-    let symbolResultBytes = contractSymbolBytes.try_symbol()
-    if (!symbolResultBytes.reverted) {
-      // for broken pairs that have no symbol function exposed
-      if (!isNullEthValue(symbolResultBytes.value.toHexString())) {
-        symbolValue = symbolResultBytes.value.toString()
-      } else {
-        // try with the static definition
-        let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress)
-        if(staticTokenDefinition != null) {
-          symbolValue = staticTokenDefinition.symbol
-        }
-      }
-    }
-  } else {
-    symbolValue = symbolResult.value
+export function getOrCreateToken(address: Address): Token {
+  let id = address.toHexString();
+  let token = Token.load(id);
+  if (!token) {
+    token = new Token(id);
+    let erc20Contract = ERC20.bind(address);
+    let decimals = erc20Contract.try_decimals();
+    // Using try_cause some values might be missing
+    let name = erc20Contract.try_name();
+    let symbol = erc20Contract.try_symbol();
+    // TODO: add overrides for name and symbol
+    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
+    token.name = name.reverted ? '' : name.value;
+    token.symbol = symbol.reverted ? '' : symbol.value;
+    token.save();
   }
-
-  return symbolValue
+  return token as Token;
 }
 
-export function fetchTokenName(tokenAddress: Address): string {
-  let contract = ERC20.bind(tokenAddress)
-  let contractNameBytes = ERC20NameBytes.bind(tokenAddress)
-
-  // try types string and bytes32 for name
-  let nameValue = 'unknown'
-  let nameResult = contract.try_name()
-  if (nameResult.reverted) {
-    let nameResultBytes = contractNameBytes.try_name()
-    if (!nameResultBytes.reverted) {
-      // for broken exchanges that have no name function exposed
-      if (!isNullEthValue(nameResultBytes.value.toHexString())) {
-        nameValue = nameResultBytes.value.toString()
-      } else {
-        // try with the static definition
-        let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress)
-        if(staticTokenDefinition != null) {
-          nameValue = staticTokenDefinition.name
-        }
-      }
-    }
-  } else {
-    nameValue = nameResult.value
+export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
+  let id = tokenAddress.toHexString();
+  let token = Token.load(id)
+  // fetch info if null
+  if (token === null) {
+      token = new Token(tokenAddress.toHexString())
+      token.symbol = token0.name + '/' + token1.name
+      token.name = token0.name + '/' + token1.name + " LP"
+      token.decimals = INT_ZERO
+      token.save()
   }
-
-  return nameValue
-}
-
-
-export function fetchTokenDecimals(tokenAddress: Address): i32 {
-  let contract = ERC20.bind(tokenAddress)
-  // try types uint8 for decimals
-  let decimalValue = INT_ZERO
-  let decimalResult = contract.try_decimals()
-  if (!decimalResult.reverted) {
-    decimalValue = decimalResult.value
-  } else {
-    // try with the static definition
-    let staticTokenDefinition = StaticTokenDefinition.fromAddress(tokenAddress)
-    if(staticTokenDefinition != null) {
-      return staticTokenDefinition.decimals
-    } else {
-        log.warning("Could not find decimal for " + tokenAddress.toHexString(), [])
-    }
-  }
-  return decimalValue
-}
-
-export function isNullEthValue(value: string): boolean {
-  return value == '0x0000000000000000000000000000000000000000000000000000000000000001'
+  return token
 }

@@ -1,7 +1,6 @@
-import { log } from '@graphprotocol/graph-ts'
+// import { log } from '@graphprotocol/graph-ts'
 import { Address, ethereum } from "@graphprotocol/graph-ts"
 import {
-  Token,
   DexAmmProtocol,
   LiquidityPool,
   _Account,
@@ -11,10 +10,10 @@ import {
   PoolDailySnapshot,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
-  _LiquidityPoolAmounts,
+  _LiquidityPoolAmount,
+  LiquidityPoolFee,
 } from "../../generated/schema"
 
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
 import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "../common/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
@@ -41,8 +40,11 @@ export function getOrCreateDex(): DexAmmProtocol {
 
   if (protocol === null) {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
-    protocol.name = "Uniswap v2"
-    protocol.slug = "uniswap-v2"
+    protocol.name = "Uniswap v3"
+    protocol.slug = "uniswap-v3"
+    protocol.schemaVersion = "1.0.1"
+    protocol.subgraphVersion = "1.0.0"
+    protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE
@@ -64,40 +66,18 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
 }
 
-export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
-    return _LiquidityPoolAmounts.load(poolAddress)!
+export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmount {
+    return _LiquidityPoolAmount.load(poolAddress)!
 }
+
+export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
+    return LiquidityPoolFee.load(id)!
+}
+
 
 export function getFeeTier(event: ethereum.Event): _HelperStore {
     return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!
 }
-
-export function getOrCreateToken(tokenAddress: Address): Token {
-    let token = Token.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (token === null) {
-        token = new Token(tokenAddress.toHexString())
-        token.symbol = fetchTokenSymbol(tokenAddress)
-        token.name = fetchTokenName(tokenAddress)
-        token.decimals = fetchTokenDecimals(tokenAddress)
-        token.save()
-    }
-    return token
-}
-
-export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
-    let token = Token.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (token === null) {
-        token = new Token(tokenAddress.toHexString())
-        token.symbol = token0.name + '/' + token1.name
-        token.name = token0.name + '/' + token1.name + " LP"
-        token.decimals = DEFAULT_DECIMALS
-        token.save()
-    }
-    return token
-}
-
 
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
@@ -112,7 +92,6 @@ export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
 
     return tokenTracker
 }
-
 
 export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot{
     // Number of days since Unix epoch

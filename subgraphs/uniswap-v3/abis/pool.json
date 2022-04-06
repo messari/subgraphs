@@ -33,7 +33,6 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
         "name": "amount0",
         "type": "uint256"
       },
