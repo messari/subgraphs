@@ -1,8 +1,10 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Deposit as DepositEvent } from "../../generated/beltBTC/Vault";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Deposit as DepositEvent, Vault as VaultContract } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
+import { BIGINT_ZERO } from "../constant";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
+import { readValue } from "../utils/contracts";
 import { getUSDPriceOfOutputToken, getUSDPriceOfToken } from "./price";
 
 export function deposit(event: DepositEvent, vault: Vault): void {
@@ -13,16 +15,20 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   let depositAmount = event.params.depositAmount;
   let sharesMinted = event.params.sharesMinted;
 
+  let vaultContract = VaultContract.bind(Address.fromString(vault.id));
+  let inputTokenBalance = readValue<BigInt>(vaultContract.try_calcPoolValueInToken(), BIGINT_ZERO);
+
+  log.warning("[belt] deposit - inputTokenBalance {}", [inputTokenBalance.toString()]);
+
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   let inputToken = getOrCreateToken(inputTokenAddress);
   let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken.decimals as u8);
   let inputTokenPrice = getUSDPriceOfToken(inputToken);
-  let inputTokenBalance = vault.inputTokenBalances[0];
 
   let amountUSD = inputTokenPrice.times(depositAmount.toBigDecimal()).div(inputTokenDecimals.toBigDecimal());
 
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
-  vault.inputTokenBalances = [inputTokenBalance.plus(depositAmount)];
+  vault.inputTokenBalances = [inputTokenBalance];
   vault.totalValueLockedUSD = inputTokenPrice
     .times(inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal());
