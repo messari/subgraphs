@@ -33,7 +33,7 @@ function createPoolFees(poolAddressString: string): string[] {
   poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
 
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
-  poolProtocolFee.feeType = LiquidityPoolFeeType.PROTOCOL_FEE
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
   poolTradingFee.save()
