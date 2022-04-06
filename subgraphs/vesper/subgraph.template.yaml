@@ -4,70 +4,6 @@ repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-{{#controllers}}
-  - kind: ethereum/contract
-    name: '{{name}}'
-    network: mainnet
-    source:
-      address: '{{address}}'
-      abi: Controller
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      file: ./src/handlers/controller.ts
-      entities:
-        - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
-        - Deposit
-        - Withdraw
-        - VesperPool
-      abis:
-        - name: Controller
-          file: ./abis/controller.json
-      eventHandlers:
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-{{/controllers}}
-{{#tokens}}
-  - kind: ethereum/contract
-    name: '{{name}}'
-    network: mainnet
-    source:
-      address: '{{address}}'
-      abi: Erc20Token
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      file: ./src/handlers/token.ts
-      entities:
-        - Token
-        - RewardToken
-        - YieldAggregator
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - VaultFee
-        - Vault
-        - VaultDailySnapshot
-        - Deposit
-        - Withdraw
-        - VesperPool
-      abis:
-        - name: Erc20Token
-          file: ./abis/erc-20.json
-      eventHandlers:
-        - event:  Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event:  Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-{{/tokens}}
 {{#pools}}
   - kind: ethereum/contract
     name: 'poolV{{version}}_{{name}}'
@@ -94,6 +30,10 @@ dataSources:
         - Withdraw
         - VesperPool
       abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
         - name: PoolV{{version}}
           file: ./abis/pool-v{{version}}.json
         - name: AddressList
