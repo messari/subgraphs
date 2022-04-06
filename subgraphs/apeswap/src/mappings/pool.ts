@@ -1,6 +1,7 @@
 import { BigDecimal, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { Bundle, LiquidityPool, Token } from "../../generated/schema";
+import { Pool } from "../../generated/templates";
 import { Burn, Mint, Swap as SwapEvent, Sync, Transfer } from "../../generated/templates/Pool/Pair";
 import { getOrCreateDeposit } from "../helpers/deposit";
 import { getOrCreateFinancials } from "../helpers/financials";
@@ -17,6 +18,7 @@ import {
 } from "../utils/common";
 import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, toBigInt, toDecimal, ZERO_ADDRESS } from "../utils/constant";
 import { baseTokenPriceInUSD, findBnbPerToken, getTrackedLiquidityUSD, getTrackedVolumeUSD } from "../utils/pricing";
+import { getOrCreateToken } from "../utils/token";
 
 export function handleTransfer(event: Transfer): void {
   log.info("Transfer mapping on pool {}", [event.address.toHexString()]);
@@ -348,6 +350,7 @@ export function handleSync(event: Sync): void {
 
     pool.totalValueLockedUSD = pool._reserveBNB.times(bundle.bnbPrice);
 
+    // Update pool OutputTokenSupply
     let poolContract = ERC20.bind(event.address);
     let getTotalSupply = poolContract.try_totalSupply();
     if (!getTotalSupply.reverted) {
@@ -355,8 +358,13 @@ export function handleSync(event: Sync): void {
       log.info("TVLUSD for pool {} is {} and outputTokenSupply is {}", [
         event.address.toHexString(),
         pool.totalValueLockedUSD.toString(),
-        pool.outputTokenSupply.toString(),
+        pool.outputTokenSupply.toString()
       ]);
+      // Update token totalSupply
+      let lpToken = getOrCreateToken(event.address)
+      lpToken.totalSupply = toDecimal(getTotalSupply.value)
+      lpToken.save()
+      
       pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(toDecimal(pool.outputTokenSupply));
     }
 
