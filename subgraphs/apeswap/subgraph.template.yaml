@@ -24,6 +24,32 @@ dataSources:
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
 
+  - kind: ethereum
+    name: Yield
+    network: {{network}}
+    source:
+      address: '{{yield_address}}'
+      abi: {{abi}}
+      startBlock: {{yield_startBlock}}	
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: {{abi}}
+          file: ./abis/{{abi}}.json
+        - name: ERC20
+          file: ./abis/IERC20.json
+      eventHandlers:
+        - event: Deposit({{deposit_params}})
+          handler: {{depositHandler}}
+        - event: Withdraw({{withdraw_params}})
+          handler: {{withdrawHandler}}
+        - event: EmergencyWithdraw({{emergency_withdraw_params}})
+          handler: {{emergencyWithdrawHandler}}
+      file: ./src/mappings/yield.ts
+
 templates:
   - kind: ethereum/contract
     name: Pool

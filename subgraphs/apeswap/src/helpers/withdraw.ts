@@ -1,18 +1,9 @@
-import {
-  BigInt,
-  ethereum,
-} from "@graphprotocol/graph-ts";
-import {
-  LiquidityPool,
-  Withdraw,
-} from "../../generated/schema";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { LiquidityPool, Withdraw } from "../../generated/schema";
 import { getOrCreateProtocol } from "../utils/common";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, ZERO_ADDRESS } from "../utils/constant";
 
-export function getOrCreateWithdraw(
-  event: ethereum.Event,
-  pool: LiquidityPool
-): Withdraw {
+export function getOrCreateWithdraw(event: ethereum.Event, pool: LiquidityPool): Withdraw {
   let transactionHash = event.transaction.hash;
   let logIndex = event.logIndex;
   let blockNumber = event.block.number;
@@ -43,7 +34,7 @@ export function getOrCreateWithdraw(
     for (let i = 0; i < pool.inputTokens.length; ++i) {
       inputTokenAmounts.push(BIGINT_ZERO);
     }
-    withdraw.inputTokenAmounts = inputTokenAmounts.map<BigInt>((ta) => ta);
+    withdraw.inputTokenAmounts = inputTokenAmounts.map<BigInt>(ta => ta);
     withdraw.amountUSD = BIGDECIMAL_ZERO;
     withdraw.pool = pool.id;
 

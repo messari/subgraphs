@@ -1,7 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
-import { Token } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, toDecimal, ZERO_ADDRESS } from "./constant";
+import { RewardToken, Token } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, RewardTokenType, toDecimal, ZERO_ADDRESS } from "./constant";
 
 export function getOrCreateToken(address: Address): Token {
   // Check if token already exist
@@ -41,3 +41,19 @@ export function getOrCreateToken(address: Address): Token {
   return token as Token;
 }
 
+export function getOrCreateRewardToken(address: Address): RewardToken {
+  let rewardToken = RewardToken.load(address.toHexString())
+  if(rewardToken == null) {
+    let token = getOrCreateToken(address)
+    rewardToken = new RewardToken(address.toHexString())
+    rewardToken.name = token.name
+    rewardToken.symbol = token.symbol
+    rewardToken.decimals = token.decimals
+    rewardToken.type = RewardTokenType.DEPOSIT
+
+    rewardToken.save()
+
+    return rewardToken as RewardToken
+  }
+  return rewardToken as RewardToken
+}

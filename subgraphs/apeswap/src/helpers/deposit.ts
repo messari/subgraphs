@@ -1,15 +1,9 @@
 import { BigInt, ethereum } from "@graphprotocol/graph-ts";
-import {
-  Deposit,
-  LiquidityPool,
-} from "../../generated/schema";
+import { Deposit, LiquidityPool } from "../../generated/schema";
 import { getOrCreateProtocol } from "../utils/common";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, ZERO_ADDRESS } from "../utils/constant";
 
-export function getOrCreateDeposit(
-  event: ethereum.Event,
-  pool: LiquidityPool
-): Deposit {
+export function getOrCreateDeposit(event: ethereum.Event, pool: LiquidityPool): Deposit {
   let deposit_id = event.transaction.hash
     .toHexString()
     .concat("-")
@@ -34,7 +28,7 @@ export function getOrCreateDeposit(
     for (let i = 0; i < pool.inputTokens.length; ++i) {
       inputTokenAmounts.push(BIGINT_ZERO);
     }
-    deposit.inputTokenAmounts = inputTokenAmounts.map<BigInt>((ta) => ta);
+    deposit.inputTokenAmounts = inputTokenAmounts.map<BigInt>(ta => ta);
     deposit.amountUSD = BIGDECIMAL_ZERO;
     deposit.pool = pool.id;
 

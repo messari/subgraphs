@@ -1,20 +1,16 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { Bundle, LiquidityPool, Token } from "../../generated/schema";
-import {
-  getOrCreateProtocol,
-  getOrCreateProtocolFee,
-  getOrcreateTradingFees,
-} from "../utils/common";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, normalizedUsdPrice, toBigInt } from "../utils/constant";
+import { getOrCreateProtocol, getOrCreateProtocolFeeShare, getOrcreateTradingFees } from "../utils/common";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, toBigInt, toDecimal } from "../utils/constant";
 import { findBnbPerToken } from "../utils/pricing";
-import { getOrCreateToken } from "../utils/token";
+import { getOrCreateRewardToken, getOrCreateToken } from "../utils/token";
 
 export function getOrCreatePool(
   event: ethereum.Event,
   poolAddress: Address,
   token0: Token,
-  token1: Token
+  token1: Token,
 ): LiquidityPool {
   let id = poolAddress.toHexString();
   let protocol = getOrCreateProtocol();
@@ -41,30 +37,28 @@ export function getOrCreatePool(
     let inputTokens: Token[] = [];
     inputTokens.push(token0);
     inputTokens.push(token1);
-    pool.inputTokens = inputTokens.map<string>((token) => token.id);
+    pool.inputTokens = inputTokens.map<string>(token => token.id);
 
     // Output Tokens
     let outputToken = getOrCreateToken(poolAddress);
     pool.outputToken = outputToken.id;
     pool.rewardTokens = [];
     pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    pool.totalVolumeUSD = BIGDECIMAL_ZERO
+    pool.totalVolumeUSD = BIGDECIMAL_ZERO;
     let inputTokenbalances: BigInt[] = [];
     for (let i = 0; i < inputTokens.length; i++) {
       inputTokenbalances.push(BIGINT_ZERO);
     }
-    pool.inputTokenBalances = inputTokenbalances.map<BigInt>(
-      (tokenBalance) => tokenBalance
-    );
-    let poolContract = ERC20.bind(event.address)
-    let getTotalSupply = poolContract.try_totalSupply()
-    if(!getTotalSupply.reverted) {
+    pool.inputTokenBalances = inputTokenbalances.map<BigInt>(tokenBalance => tokenBalance);
+    let poolContract = ERC20.bind(event.address);
+    let getTotalSupply = poolContract.try_totalSupply();
+    if (!getTotalSupply.reverted) {
     }
     pool.outputTokenSupply = BIGINT_ZERO;
     // OutputToken Price
     let bundle = Bundle.load("1")!;
     let outputTokenPriceBNB = findBnbPerToken(outputToken);
-    pool.outputTokenPriceUSD = outputTokenPriceBNB.times(bundle.bnbPrice)
+    pool.outputTokenPriceUSD = outputTokenPriceBNB.times(bundle.bnbPrice);
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
     pool.createdTimestamp = event.block.timestamp;
@@ -72,8 +66,9 @@ export function getOrCreatePool(
     pool.name = outputToken.name;
     pool.symbol = outputToken.symbol;
     let tradingFee = getOrcreateTradingFees(poolAddress).id;
-    let protocolFee = getOrCreateProtocolFee(poolAddress).id;
-    pool.fees = [tradingFee, protocolFee];
+    let protocolFee = getOrCreateProtocolFeeShare(poolAddress).id;
+    let SupplierFee = getOrCreateProtocolFeeShare(poolAddress).id;
+    pool.fees = [tradingFee, protocolFee, SupplierFee];
 
     pool.save();
     return pool as LiquidityPool;
@@ -86,6 +81,20 @@ export function updatePool(pool: LiquidityPool): void {
   let inputTokenBalances: BigInt[] = [];
   inputTokenBalances.push(toBigInt(pool._reserve0));
   inputTokenBalances.push(toBigInt(pool._reserve1));
-  pool.inputTokenBalances = inputTokenBalances.map<BigInt>((tb) => tb);
+  pool.inputTokenBalances = inputTokenBalances.map<BigInt>(tb => tb);
   pool.save();
+}
+
+export function updateLpWithReward(lpTokenAddress: Address, bananaAddress: Address, accumulatedBanana: BigInt): void {
+  let pool = LiquidityPool.load(lpTokenAddress.toHexString());
+  if (pool !== null) {
+    let bundle = Bundle.load("1")!;
+    let bananaToken = getOrCreateToken(bananaAddress);
+    pool.rewardTokens = [getOrCreateRewardToken(bananaAddress).id];
+    pool.rewardTokenEmissionsAmount = [accumulatedBanana];
+    let rewardTokenEmissionsBNB = findBnbPerToken(bananaToken).times(toDecimal(accumulatedBanana));
+    pool.rewardTokenEmissionsUSD = [rewardTokenEmissionsBNB.times(bundle.bnbPrice)];
+
+    pool.save();
+  }
 }

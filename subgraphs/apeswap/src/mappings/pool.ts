@@ -1,13 +1,7 @@
-import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { Bundle, LiquidityPool, Token } from "../../generated/schema";
-import {
-  Burn,
-  Mint,
-  Swap as SwapEvent,
-  Sync,
-  Transfer,
-} from "../../generated/templates/Pool/Pair";
+import { Burn, Mint, Swap as SwapEvent, Sync, Transfer } from "../../generated/templates/Pool/Pair";
 import { getOrCreateDeposit } from "../helpers/deposit";
 import { getOrCreateFinancials } from "../helpers/financials";
 import { updatePool } from "../helpers/pool";
@@ -17,23 +11,12 @@ import { updateUsageMetrics } from "../helpers/updateUsageMetrics";
 import { getOrCreateWithdraw } from "../helpers/withdraw";
 import {
   getOrCreateProtocol,
-  getOrCreateProtocolFee,
+  getOrCreateProtocolFeeShare,
+  getOrCreateSupplierFeeShare,
   getOrcreateTradingFees,
 } from "../utils/common";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ONE,
-  BIGINT_ZERO,
-  toBigInt,
-  toDecimal,
-  ZERO_ADDRESS,
-} from "../utils/constant";
-import {
-  baseTokenPriceInUSD,
-  findBnbPerToken,
-  getTrackedLiquidityUSD,
-  getTrackedVolumeUSD,
-} from "../utils/pricing";
+import { BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, toBigInt, toDecimal, ZERO_ADDRESS } from "../utils/constant";
+import { baseTokenPriceInUSD, findBnbPerToken, getTrackedLiquidityUSD, getTrackedVolumeUSD } from "../utils/pricing";
 
 export function handleTransfer(event: Transfer): void {
   log.info("Transfer mapping on pool {}", [event.address.toHexString()]);
@@ -43,10 +26,6 @@ export function handleTransfer(event: Transfer): void {
   let id = event.address.toHexString();
   let fromHex = from.toHexString();
   let toHex = to.toHexString();
-  // ignore initial transfers for first adds
-  //   if (toHex == ZERO_ADDRESS && amount.equals(BigInt.fromI32(1000))) {
-  //     return;
-  //   }
 
   // get pool
   let pool = LiquidityPool.load(id);
@@ -135,31 +114,17 @@ export function handleMint(event: Mint): void {
     updatePool(pool);
 
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(
-      event.address,
-      event.block.number,
-      event.block.timestamp,
-      pool
-    );
+    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
 
     // Take FinancialsDailySnapshot
-    let financials = getOrCreateFinancials(
-      protocol,
-      event.block.timestamp,
-      event.block.number
-    );
+    let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
     financials.totalValueLockedUSD = pool.totalValueLockedUSD;
     financials.totalVolumeUSD = pool.totalVolumeUSD;
 
     financials.save();
 
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(
-      event.params.sender,
-      protocol,
-      event.block.timestamp,
-      event.block.number
-    );
+    updateUsageMetrics(event.params.sender, protocol, event.block.timestamp, event.block.number);
   }
 }
 
@@ -205,31 +170,17 @@ export function handleBurn(event: Burn): void {
     updatePool(pool);
 
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(
-      event.address,
-      event.block.number,
-      event.block.timestamp,
-      pool
-    );
+    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
 
     // Take FinancialsDailySnapshot
-    let financials = getOrCreateFinancials(
-      protocol,
-      event.block.timestamp,
-      event.block.number
-    );
+    let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
     financials.totalValueLockedUSD = pool.totalValueLockedUSD;
     financials.totalVolumeUSD = pool.totalVolumeUSD;
 
     financials.save();
 
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(
-      event.params.sender,
-      protocol,
-      event.block.timestamp,
-      event.block.number
-    );
+    updateUsageMetrics(event.params.sender, protocol, event.block.timestamp, event.block.number);
   }
 }
 
@@ -261,12 +212,7 @@ export function handleSwap(event: SwapEvent): void {
     let derivedAmountUSD = derivedAmountBNB.times(bundle.bnbPrice);
 
     // Only accounts for volume through white listed tokens
-    let trackedAmountUSD = getTrackedVolumeUSD(
-      amount0Total,
-      token0,
-      amount1Total,
-      token1
-    );
+    let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, token0, amount1Total, token1);
 
     let trackedAmountBNB: BigDecimal;
     if (bundle.bnbPrice.equals(BIGDECIMAL_ZERO)) {
@@ -278,16 +224,12 @@ export function handleSwap(event: SwapEvent): void {
     // update token0 global volume and token liquidity stats
     token0.tradeVolume = token0.tradeVolume.plus(amount0In.plus(amount0Out));
     token0.tradeVolumeUSD = token0.tradeVolumeUSD.plus(trackedAmountUSD);
-    token0.untrackedVolumeUSD = token0.untrackedVolumeUSD.plus(
-      derivedAmountUSD
-    );
+    token0.untrackedVolumeUSD = token0.untrackedVolumeUSD.plus(derivedAmountUSD);
 
     // update token1 global volume and token liquidity stats
     token1.tradeVolume = token1.tradeVolume.plus(amount1In.plus(amount1Out));
     token1.tradeVolumeUSD = token1.tradeVolumeUSD.plus(trackedAmountUSD);
-    token1.untrackedVolumeUSD = token1.untrackedVolumeUSD.plus(
-      derivedAmountUSD
-    );
+    token1.untrackedVolumeUSD = token1.untrackedVolumeUSD.plus(derivedAmountUSD);
 
     // update txn counts
     token0.txCount = token0.txCount.plus(BIGINT_ONE);
@@ -320,50 +262,30 @@ export function handleSwap(event: SwapEvent): void {
     swap.save();
 
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(
-      event.address,
-      event.block.number,
-      event.block.timestamp,
-      pool
-    );
+    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
 
     // Take FinancialsDailySnapshot
-    let financials = getOrCreateFinancials(
-      protocol,
-      event.block.timestamp,
-      event.block.number
-    );
+    let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
     let tradingFee = getOrcreateTradingFees(event.address);
-    let protocolFee = getOrCreateProtocolFee(event.address);
-
-    let tradingFeeAmountUSD: BigDecimal;
-    let protocolFeeAmountUSD: BigDecimal;
+    let protocolFee = getOrCreateProtocolFeeShare(event.address);
+    let supplierFee = getOrCreateSupplierFeeShare(event.address);
 
     let tradingFeeAmount = amount0Total.times(tradingFee.feePercentage);
-    let protocolFeeAmount = amount0Total.times(protocolFee.feePercentage);
-    tradingFeeAmountUSD = tradingFeeAmount
-      .times(token0.derivedBNB)
-      .times(bundle.bnbPrice);
-    protocolFeeAmountUSD = protocolFeeAmount
-      .times(token0.derivedBNB)
-      .times(bundle.bnbPrice);
+
+    let tradingFeeAmountUSD: BigDecimal = tradingFeeAmount.times(token0.derivedBNB).times(bundle.bnbPrice);
+    let protocolFeeAmountUSD: BigDecimal = tradingFeeAmountUSD.times(protocolFee.feePercentage);
+    let supplierFeeAmountUSD = tradingFeeAmountUSD.times(supplierFee.feePercentage);
 
     financials.totalValueLockedUSD = pool.totalValueLockedUSD;
     financials.totalVolumeUSD = pool.totalVolumeUSD;
-    financials.feesUSD = financials.feesUSD.plus(
-      trackedAmountUSD.times(tradingFee.feePercentage)
-    );
-    financials.supplySideRevenueUSD = financials.feesUSD;
+    financials.feesUSD = financials.feesUSD.plus(tradingFeeAmountUSD);
+    financials.supplySideRevenueUSD = financials.supplySideRevenueUSD.plus(supplierFeeAmountUSD);
+    financials.protocolSideRevenueUSD = financials.protocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
     financials.save();
 
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(
-      event.params.sender,
-      protocol,
-      event.block.timestamp,
-      event.block.number
-    );
+    updateUsageMetrics(event.params.sender, protocol, event.block.timestamp, event.block.number);
   }
 }
 
@@ -378,9 +300,7 @@ export function handleSync(event: Sync): void {
 
   if (pool !== null && reserve0 !== BIGINT_ZERO && reserve1 !== BIGINT_ZERO) {
     // reset factory liquidity by subtracting only tracked liquidity
-    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.minus(
-      pool._trackedReserveBNB
-    );
+    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.minus(pool._trackedReserveBNB);
 
     // reset token total liquidity amounts
     let token0 = Token.load(pool._token0)!;
@@ -391,11 +311,9 @@ export function handleSync(event: Sync): void {
     pool._reserve0 = toDecimal(reserve0, token0.decimals);
     pool._reserve1 = toDecimal(reserve1, token1.decimals);
 
-    if (pool._reserve1.notEqual(BIGDECIMAL_ZERO))
-      pool._token0Price = pool._reserve0.div(pool._reserve1);
+    if (pool._reserve1.notEqual(BIGDECIMAL_ZERO)) pool._token0Price = pool._reserve0.div(pool._reserve1);
     else pool._token0Price = BIGDECIMAL_ZERO;
-    if (pool._reserve0.notEqual(BIGDECIMAL_ZERO))
-      pool._token1Price = pool._reserve1.div(pool._reserve0);
+    if (pool._reserve0.notEqual(BIGDECIMAL_ZERO)) pool._token1Price = pool._reserve1.div(pool._reserve0);
     else pool._token1Price = BIGDECIMAL_ZERO;
 
     pool.save();
@@ -417,7 +335,7 @@ export function handleSync(event: Sync): void {
         pool._reserve0,
         token0 as Token,
         pool._reserve1,
-        token1 as Token
+        token1 as Token,
       );
       log.info("Tracked liquidity for pool {} is {} at BNB Price {}", [
         TrackedLiquidityUSD.toString(),
@@ -431,9 +349,7 @@ export function handleSync(event: Sync): void {
 
     // use derived amounts within pair
     pool._trackedReserveBNB = trackedLiquidityBNB;
-    pool._reserveBNB = pool._reserve0
-      .times(token0.derivedBNB)
-      .plus(pool._reserve1.times(token1.derivedBNB));
+    pool._reserveBNB = pool._reserve0.times(token0.derivedBNB).plus(pool._reserve1.times(token1.derivedBNB));
 
     pool.totalValueLockedUSD = pool._reserveBNB.times(bundle.bnbPrice);
 
@@ -446,18 +362,12 @@ export function handleSync(event: Sync): void {
         pool.totalValueLockedUSD.toString(),
         pool.outputTokenSupply.toString(),
       ]);
-      pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(
-        toDecimal(pool.outputTokenSupply)
-      );
+      pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(toDecimal(pool.outputTokenSupply));
     }
 
     // use tracked amounts globally
-    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.plus(
-      trackedLiquidityBNB
-    );
-    protocol.totalValueLockedUSD = protocol._totalValueLockedBNB.times(
-      bundle.bnbPrice
-    );
+    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.plus(trackedLiquidityBNB);
+    protocol.totalValueLockedUSD = protocol._totalValueLockedBNB.times(bundle.bnbPrice);
 
     // now correctly set liquidity amounts for each token
     token0.totalLiquidity = token0.totalLiquidity.plus(pool._reserve0);

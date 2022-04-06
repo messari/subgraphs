@@ -1,17 +1,12 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  DailyActiveAccount,
-  DexAmmProtocol,
-  UsageMetricsDailySnapshot,
-} from "../../generated/schema";
+import { Account, DailyActiveAccount, DexAmmProtocol, UsageMetricsDailySnapshot } from "../../generated/schema";
 import { SECONDS_PER_DAY } from "../utils/constant";
 
 export function updateUsageMetrics(
   provider: Address,
   protocol: DexAmmProtocol,
   timestamp: BigInt,
-  blockNumber: BigInt
+  blockNumber: BigInt,
 ): void {
   // Number of days since Unix epoch
   let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
@@ -42,6 +37,7 @@ export function updateUsageMetrics(
     account.save();
     usageMetrics.totalUniqueUsers += 1;
     protocol.totalUniqueUsers += 1;
+    protocol.save()
   }
 
   // Combine the id and the user address to generate a unique user id for the day

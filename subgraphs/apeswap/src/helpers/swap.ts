@@ -1,19 +1,9 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import {
-  LiquidityPool,
-  Swap,
-} from "../../generated/schema";
+import { ethereum } from "@graphprotocol/graph-ts";
+import { LiquidityPool, Swap } from "../../generated/schema";
 import { getOrCreateProtocol } from "../utils/common";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  ZERO_ADDRESS,
-} from "../utils/constant";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, ZERO_ADDRESS } from "../utils/constant";
 
-export function getOrCreateSwap(
-  event: ethereum.Event,
-  pool: LiquidityPool
-): Swap {
+export function getOrCreateSwap(event: ethereum.Event, pool: LiquidityPool): Swap {
   let swap_id = event.transaction.hash
     .toHexString()
     .concat("-")

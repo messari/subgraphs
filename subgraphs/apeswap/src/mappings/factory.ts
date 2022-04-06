@@ -2,7 +2,7 @@ import { PairCreated } from "../../generated/Factory/Factory";
 import { Bundle } from "../../generated/schema";
 import { Pool } from "../../generated/templates";
 import { getOrCreatePool } from "../helpers/pool";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../utils/constant";
+import { BIGDECIMAL_ZERO } from "../utils/constant";
 import { getOrCreateToken } from "../utils/token";
 
 export function handlePairCreated(event: PairCreated): void {

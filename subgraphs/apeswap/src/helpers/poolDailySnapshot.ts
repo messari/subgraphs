@@ -7,7 +7,7 @@ export function createPoolDailySnapshot(
   poolAddress: Address,
   blockNumber: BigInt,
   timestamp: BigInt,
-  pool: LiquidityPool
+  pool: LiquidityPool,
 ): void {
   // Number of days since Unix epoch
   let day: i64 = timestamp.toI64() / SECONDS_PER_DAY;
@@ -26,8 +26,7 @@ export function createPoolDailySnapshot(
     poolDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
     poolDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
     poolDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    poolDailySnapshot.rewardTokenEmissionsAmount =
-      pool.rewardTokenEmissionsAmount;
+    poolDailySnapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
     poolDailySnapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
     poolDailySnapshot.blockNumber = blockNumber;
     poolDailySnapshot.timestamp = timestamp;

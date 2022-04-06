@@ -1,14 +1,11 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import {
-  DexAmmProtocol,
-  FinancialsDailySnapshot,
-} from "../../generated/schema";
+import { DexAmmProtocol, FinancialsDailySnapshot } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, SECONDS_PER_DAY } from "../utils/constant";
 
 export function getOrCreateFinancials(
   protocol: DexAmmProtocol,
   timestamp: BigInt,
-  blockNumber: BigInt
+  blockNumber: BigInt,
 ): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   let id = timestamp.toI64() / SECONDS_PER_DAY;
