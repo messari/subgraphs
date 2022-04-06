@@ -12,7 +12,7 @@ import {
   Transfer,
   Withdraw,
 } from "../../generated/poolV3_vaUSDC/PoolV3";
-import { Erc20Token } from "../../generated/VSP/Erc20Token";
+import { Erc20Token } from "../../generated/poolV3_vaUSDC/Erc20Token";
 import { VesperPool } from "../../generated/schema";
 import {
   toUsd,
