@@ -83,11 +83,9 @@ export function createVault(vaultAddress: Address, inputTokenAddress: Address, b
   vault.symbol = readValue<string>(vaultContract.try_symbol(), "");
   vault.protocol = protocol.id;
 
-  if (inputTokenAddress.notEqual(Address.zero())) {
-    let inputToken = getOrCreateToken(inputTokenAddress);
-    vault.inputTokens = [inputToken.id];
-    vault.inputTokenBalances = [BIGINT_ZERO];
-  }
+  let inputToken = getOrCreateToken(inputTokenAddress);
+  vault.inputTokens = [inputToken.id];
+  vault.inputTokenBalances = [BIGINT_ZERO];
 
   let outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
