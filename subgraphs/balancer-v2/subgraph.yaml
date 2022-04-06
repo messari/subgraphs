@@ -27,10 +27,12 @@ dataSources:
           file: ./abis/ERC20.json
         - name: WeightedPool
           file: ./abis/WeightedPool.json
-        - name: StablePool
-          file: ./abis/StablePool.json
+        - name: ConvergentCurvePool
+          file: ./abis/ConvergentCurvePool.json
       eventHandlers:
         - event: PoolRegistered(indexed bytes32,indexed address,uint8)
           handler: handlePoolRegister
         - event: TokensRegistered(indexed bytes32,address[],address[])
           handler: handleTokensRegister
+        - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
+          handler: handlePoolBalanceChanged
