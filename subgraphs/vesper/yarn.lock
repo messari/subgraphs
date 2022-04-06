@@ -3286,10 +3286,10 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vesper-metadata@^2.57.0:
-  version "2.57.0"
-  resolved "https://registry.yarnpkg.com/vesper-metadata/-/vesper-metadata-2.57.0.tgz#59beeb19c4c3c97eb05eb011fd06c9bf00a8b376"
-  integrity sha512-azW6g+XctcGD1knuewJyHJJzQbWPrqhdA36Y3N0togh6hFaaaPlmH84VI3TODqZIxqH13BXZvKf3JfanLRPY0Q==
+vesper-metadata@^2.60.0:
+  version "2.60.0"
+  resolved "https://registry.yarnpkg.com/vesper-metadata/-/vesper-metadata-2.60.0.tgz#ae97b8fafae6489d181931fde340e0c87d1a9514"
+  integrity sha512-/mE4eySt5+BU5K86t19h+aJeM3PixvQRSD/IxfRFN6t3MDIqs/6bBFKke35sr5UhU3NWh/vuMmiZL+Uz2Crm3g==
 
 wcwidth@^1.0.1:
   version "1.0.1"

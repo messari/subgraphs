@@ -9,7 +9,7 @@
     "fs-extra": "^10.0.1",
     "lodash": "^4.17.21",
     "mustache": "^4.2.0",
-    "vesper-metadata": "^2.57.0"
+    "vesper-metadata": "^2.60.0"
   },
   "scripts": {
     "confgen": "node config_yaml_gen.js",
