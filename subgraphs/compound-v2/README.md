@@ -1,14 +1,12 @@
 # Compound Subgraph
 
-
 ## Calculations
 
 - Total Value Locked (TVL) = Pool Deposits
-- Fees = Total Revenue = (Market Outstanding Borrows * Market Borrow Rate)
+- Fees = Total Revenue = (Market Outstanding Borrows \* Market Borrow Rate)
 - Protocol-side Revenue = (Market Outstanding Borrows _ Market Borrow Rate) _ (Market Reserve Factor)
 - Supply-side Revenue = (Market Outstanding Borrows _ Market Borrow Rate) _ (1 - Market Reserve Factor)
-- Reward Emissions for Supply and Borrow = (COMP Per Block * 4 * 60 * 24) * (COMP Price)
-
+- Reward Emissions for Supply and Borrow = (COMP Per Block _ 4 _ 60 _ 24) _ (COMP Price)
 
 ## Links
 

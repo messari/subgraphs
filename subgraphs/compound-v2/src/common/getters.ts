@@ -9,6 +9,7 @@ import {
   UsageMetricsDailySnapshot,
 } from "../types/schema";
 import {
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   CETH_ADDRESS,
@@ -35,6 +36,7 @@ import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
 import { CToken } from "../types/Comptroller/cToken";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
+import { Comptroller } from "../types/Comptroller/Comptroller";
 
 ///////////////////
 //// Snapshots ////
@@ -139,7 +141,13 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
     protocol.lendingType = LENDING_TYPE;
     protocol.riskType = PROTOCOL_RISK_TYPE;
     protocol._marketIds = [];
-    protocol._liquidationPenalty = BIGDECIMAL_ZERO;
+
+    // get initial liquidation penalty
+    let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
+    let tryLiquidationPenalty = troller.try_liquidationIncentiveMantissa();
+    protocol._liquidationPenalty = tryLiquidationPenalty.reverted
+      ? BIGDECIMAL_ZERO
+      : tryLiquidationPenalty.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)).minus(BIGDECIMAL_ONE);
 
     protocol.save();
   }
@@ -237,13 +245,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
     market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market._outstandingBorrowAmount = BIGINT_ZERO;
-
-    // add liquidation penalty if the protocol has it
-    if (protocol._liquidationPenalty != BIGDECIMAL_ZERO) {
-      market.liquidationPenalty = protocol._liquidationPenalty;
-    } else {
-      market.liquidationPenalty = BIGDECIMAL_ZERO;
-    }
+    market.liquidationPenalty = protocol._liquidationPenalty;
 
     market.save();
   }

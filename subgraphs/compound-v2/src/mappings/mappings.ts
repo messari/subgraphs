@@ -13,7 +13,7 @@ import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../co
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { DEFAULT_DECIMALS } from "../common/utils/constants";
+import { BIGDECIMAL_ONE, DEFAULT_DECIMALS } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
@@ -102,8 +102,8 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
   let protocol = getOrCreateLendingProtcol();
   let liquidationPenalty = event.params.newLiquidationIncentiveMantissa
     .toBigDecimal()
-    .div(exponentToBigDecimal(16))
-    .minus(BigDecimal.fromString("100"));
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+    .minus(BIGDECIMAL_ONE);
   protocol._liquidationPenalty = liquidationPenalty;
 
   // set liquidation penalty for each market
