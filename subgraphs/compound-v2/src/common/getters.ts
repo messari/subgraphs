@@ -34,6 +34,7 @@ import {
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
 import { CToken } from "../types/Comptroller/cToken";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { exponentToBigDecimal } from "./utils/utils";
 
 ///////////////////
 //// Snapshots ////
@@ -229,7 +230,10 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.depositRate = BIGDECIMAL_ZERO;
     market.stableBorrowRate = BIGDECIMAL_ZERO;
     market.variableBorrowRate = BIGDECIMAL_ZERO;
-    market._reserveFactor = BIGDECIMAL_ZERO;
+    let tryReserveFactor = cTokenContract.try_reserveFactorMantissa();
+    market._reserveFactor = tryReserveFactor.reverted
+      ? BIGDECIMAL_ZERO
+      : tryReserveFactor.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
     market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
     market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market._outstandingBorrowAmount = BIGINT_ZERO;
