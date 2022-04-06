@@ -105,7 +105,7 @@ Here are some known issues with subgraph tooling that you may run into:
 
 ### Subgraph Issues
 
-- Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null	wasm` ([Github Issue](https://iboxshare.com/graphprotocol/graph-ts/issues/219))
+- Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null	wasm` ([Github Issue](https://github.com/graphprotocol/graph-ts/issues/219))
 - Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
 - Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
 
