@@ -373,6 +373,9 @@ type Market @entity {
   " Creation block number "
   createdBlockNumber: BigInt!
 
+  " Most recent block height seen "
+  _blockNumber: BigInt!
+
   " Pool snapshots "
   snapshots: [MarketDailySnapshot!]! @derivedFrom(field: "market")
 

@@ -54,19 +54,15 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   deposit.asset = market.inputTokens[0];
   deposit.amount = amount;
 
-  // get/update prices for market
+  // get/update prices/rates/rewards for market
+  if (market._blockNumber < event.block.number) {
+    updateMarketPrices(market, event);
+    updateMarketRates(market);
+    updateRewards(event, market);
+    market._blockNumber = event.block.number;
+  }
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
-  let exchangeRate = getExchangeRate(marketAddress, event);
-  market._exchangeRate = exchangeRate
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingDecimals))
-    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-    .div(mantissaFactorBD)
-    .truncate(DEFAULT_DECIMALS);
-  market._inputTokenPrice = getUSDPriceOfToken(market, event.block.number.toI32());
-  market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
   deposit.amountUSD = market._inputTokenPrice.times(decimalAmount);
 
   // update cToken supply
@@ -80,8 +76,6 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   market.save();
   deposit.save();
   updateProtocolTVL(event); // also updates market TVL
-  updateMarketRates(market);
-  updateRewards(event, market);
   return true;
 }
 
@@ -112,25 +106,19 @@ export function createWithdraw(event: ethereum.Event, redeemer: Address, amount:
   withdraw.asset = market.inputTokens[0];
   withdraw.amount = amount;
 
-  // update market vars and calc amountUSD
+  // get/update prices/rates/rewards for market
+  if (market._blockNumber < event.block.number) {
+    updateMarketPrices(market, event);
+    updateMarketRates(market);
+    updateRewards(event, market);
+    market._blockNumber = event.block.number;
+  }
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
-  let exchangeRate = getExchangeRate(marketAddress, event);
-  market._exchangeRate = exchangeRate
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingDecimals))
-    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-    .div(mantissaFactorBD)
-    .truncate(DEFAULT_DECIMALS);
-  market._inputTokenPrice = getUSDPriceOfToken(market, blockNumber.toI32());
-  market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
   withdraw.amountUSD = market._inputTokenPrice.times(decimalAmount);
 
   withdraw.save();
   market.save();
-  updateMarketRates(market);
-  updateRewards(event, market);
   return true;
 }
 
@@ -165,19 +153,15 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.amount = amount;
   market._outstandingBorrowAmount = market._outstandingBorrowAmount.plus(amount);
 
-  // update market vars and calc amountUSD
+  // get/update prices/rates/rewards for market
+  if (market._blockNumber < event.block.number) {
+    updateMarketPrices(market, event);
+    updateMarketRates(market);
+    updateRewards(event, market);
+    market._blockNumber = event.block.number;
+  }
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
-  let exchangeRate = getExchangeRate(marketAddress, event);
-  market._exchangeRate = exchangeRate
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingDecimals))
-    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-    .div(mantissaFactorBD)
-    .truncate(DEFAULT_DECIMALS);
-  market._inputTokenPrice = getUSDPriceOfToken(market, blockNumber.toI32());
-  market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
   borrow.amountUSD = market._inputTokenPrice.times(decimalAmount);
 
   // update borrow volume (ie, market.totalVolumeUSD)
@@ -189,8 +173,6 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.save();
   market.save();
   protocol.save();
-  updateMarketRates(market);
-  updateRewards(event, market);
   return true;
 }
 
@@ -222,31 +204,23 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.amount = amount;
   market._outstandingBorrowAmount = market._outstandingBorrowAmount.minus(amount);
 
-  // update market vars and calc amountUSD
+  // get/update prices/rates/rewards for market
+  if (market._blockNumber < event.block.number) {
+    updateMarketPrices(market, event);
+    updateMarketRates(market);
+    updateRewards(event, market);
+    market._blockNumber = event.block.number;
+  }
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
-  let exchangeRate = getExchangeRate(marketAddress, event);
-  market._exchangeRate = exchangeRate
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingDecimals))
-    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-    .div(mantissaFactorBD)
-    .truncate(DEFAULT_DECIMALS);
-  market._inputTokenPrice = getUSDPriceOfToken(market, blockNumber.toI32());
-  market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
   repay.amountUSD = market._inputTokenPrice.times(decimalAmount);
 
   market.save();
   repay.save();
-  updateMarketRates(market);
-  updateRewards(event, market);
   return true;
 }
 
 // create Liquidation entity, return false if any markets are null
-// TODO: verify logic
-// TODO: instead of exchanging cTokens to tokens calculate cToken Price
 export function createLiquidation(
   event: ethereum.Event,
   liquidatedToken: Address,
@@ -289,18 +263,21 @@ export function createLiquidation(
   }
   liquidation.asset = assetId;
 
-  // update liquidatedMarket vars
+  // get/update prices/rates/rewards for market and liquidatedMarket
+  if (market._blockNumber < event.block.number) {
+    updateMarketPrices(market, event);
+    updateMarketRates(market);
+    updateRewards(event, market);
+    market._blockNumber = event.block.number;
+  }
+  if (liquidatedMarket._blockNumber < event.block.number) {
+    updateMarketPrices(liquidatedMarket, event);
+    updateMarketRates(liquidatedMarket);
+    updateRewards(event, liquidatedMarket);
+    liquidatedMarket._blockNumber = event.block.number;
+  }
   let underlyingDecimals = getOrCreateToken(liquidation.asset).decimals;
-  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
   let liquidatedExchangeRate = getExchangeRate(Address.fromString(liquidatedMarket.id), event);
-  liquidatedMarket._exchangeRate = liquidatedExchangeRate
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingDecimals))
-    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
-    .div(mantissaFactorBD)
-    .truncate(DEFAULT_DECIMALS);
-  liquidatedMarket._inputTokenPrice = getUSDPriceOfToken(liquidatedMarket, blockNumber.toI32());
-  liquidatedMarket.outputTokenPriceUSD = liquidatedMarket._exchangeRate.times(liquidatedMarket._inputTokenPrice);
 
   // calc amount/amountUSD/profitUSD
   liquidation.amount = liquidatedAmount
@@ -323,15 +300,28 @@ export function createLiquidation(
   liquidatedMarket.save();
   market.save();
   liquidation.save();
-  updateMarketRates(market);
-  updateMarketRates(liquidatedMarket);
-  updateRewards(event, market);
   return true;
 }
 
 /////////////////////////
 //// Updates Helpers ////
 /////////////////////////
+
+export function updateMarketPrices(market: Market, event: ethereum.Event): void {
+  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
+  let exchangeRate = getExchangeRate(Address.fromString(market.id), event);
+  market._exchangeRate = exchangeRate
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingDecimals))
+    .times(exponentToBigDecimal(COMPOUND_DECIMALS))
+    .div(mantissaFactorBD)
+    .truncate(DEFAULT_DECIMALS);
+  market._inputTokenPrice = getUSDPriceOfToken(market, event.block.number.toI32());
+  market.outputTokenPriceUSD = market._exchangeRate.times(market._inputTokenPrice);
+
+  market.save();
+}
 
 export function updateProtocolTVL(event: ethereum.Event): void {
   let protocol = getOrCreateLendingProtcol();

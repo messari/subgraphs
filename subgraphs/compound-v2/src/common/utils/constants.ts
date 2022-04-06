@@ -110,10 +110,10 @@ export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 
 export const NETWORK_ETHEREUM = Network.ETHEREUM;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
-export const LENDING_TYPE = LendingType.POOLED; // TODO: guess - look more into this to verify
-export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED; // TODO: ensure this is accurate
+export const LENDING_TYPE = LendingType.POOLED;
+export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.2";
+export const SUBGRAPH_VERSION = "1.4.3";
 export const SCHEMA_VERSION = "1.0.1";
 export const COMPOUND_DECIMALS = 8;
