@@ -26,7 +26,7 @@ export function getOrCreateWithdraw(event: ethereum.Event, pool: LiquidityPool):
     withdraw.inputTokens = pool.inputTokens;
 
     // Output Token && Input Token Amount. Note that the input token is the LPToken in this case
-    withdraw.outputTokens = pool.outputToken;
+    withdraw.outputToken = pool.outputToken;
     withdraw.outputTokenAmount = BIGINT_ZERO;
 
     // Input Token && Output Token Amount

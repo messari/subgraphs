@@ -20,7 +20,7 @@ export function getOrCreateDeposit(event: ethereum.Event, pool: LiquidityPool): 
     deposit.blockNumber = event.block.number;
     deposit.timestamp = event.block.timestamp;
     deposit.inputTokens = pool.inputTokens;
-    deposit.outputTokens = pool.outputToken;
+    deposit.outputToken = pool.outputToken;
     deposit.outputTokenAmount = BIGINT_ZERO;
 
     // Input Token and Input Token Amount
