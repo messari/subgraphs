@@ -99,7 +99,7 @@ export class AddressByNetwork {
   public arbitrum: string;
 }
 
-let network = dataSource.network() as "mainnet" | "polygon" | "arbitrum";
+let network = dataSource.network();
 
 let vaultAddressByNetwork: AddressByNetwork = {
   mainnet: '0xBA12222222228d8Ba445958a75a0704d566BF2C8',
@@ -155,8 +155,13 @@ let daiAddressByNetwork: AddressByNetwork = {
   arbitrum: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
 };
 
-function forNetwork(addressByNetwork: AddressByNetwork, network: "mainnet" | "polygon" | "arbitrum"): Address {
-  return Address.fromString(addressByNetwork[network])
+function forNetwork(addressByNetwork: AddressByNetwork, network: string): Address {
+  if (network === "polygon") {
+    return Address.fromString(addressByNetwork.polygon)
+  } else if (network === "arbitrum") {
+    return Address.fromString(addressByNetwork.arbitrum)
+  }
+  return Address.fromString(addressByNetwork.mainnet)
 }
 
 export let VAULT_ADDRESS = forNetwork(vaultAddressByNetwork, network);

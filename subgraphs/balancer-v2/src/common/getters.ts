@@ -2,7 +2,7 @@ import {Address, BigInt, ethereum} from "@graphprotocol/graph-ts"
 import {
     Token,
     DexAmmProtocol,
-    LiquidityPool, LiquidityPoolFee,
+    LiquidityPool, LiquidityPoolFee, FinancialsDailySnapshot, UsageMetricsDailySnapshot,
 } from "../../generated/schema"
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
@@ -87,4 +87,49 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
     pool.createdTimestamp = blockInfo.timestamp
     pool.outputToken = outputToken.id
     pool.save()
+}
+
+export function getOrCreateFinancials(
+    event: ethereum.Event
+): FinancialsDailySnapshot {
+    // Number of days since Unix epoch
+    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+    let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+
+    if (!financialMetrics) {
+        financialMetrics = new FinancialsDailySnapshot(id.toString());
+        financialMetrics.protocol = getOrCreateDex().id;
+
+        financialMetrics.feesUSD = BIGDECIMAL_ZERO;
+        financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
+        financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+        financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
+        financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
+        financialMetrics.save();
+    }
+    return financialMetrics;
+}
+
+export function getOrCreateUsageMetricSnapshot(
+    event: ethereum.Event
+): UsageMetricsDailySnapshot {
+    // Number of days since Unix epoch
+    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+    // Create unique id for the day
+    let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+
+    if (!usageMetrics) {
+        usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+        usageMetrics.protocol = getOrCreateDex().id;
+
+        usageMetrics.activeUsers = 0;
+        usageMetrics.totalUniqueUsers = 0;
+        usageMetrics.dailyTransactionCount = 0;
+        usageMetrics.save();
+    }
+
+    return usageMetrics;
 }
