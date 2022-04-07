@@ -29,19 +29,19 @@ import {
 } from "./utils/metrics";
 
 export function handleBuyShares(event: BuyShares): void {
-  updateUsageMetrics(event, event.params.to);
-  updateFinancials(event);
+  // updateUsageMetrics(event, event.params.to);
+  // updateFinancials(event);
   // updatePoolMetrics(event);
 }
 
 export function handleSellShares(event: SellShares): void {
-  updateUsageMetrics(event, event.params.payer);
-  updateFinancials(event);
+  // updateUsageMetrics(event, event.params.payer);
+  // updateFinancials(event);
   // updatePoolMetrics(event);
 }
 
 export function handleDODOSwap(event: DODOSwap): void {
-  updateUsageMetrics(event, event.params.trader);
-  updateFinancials(event);
+  // updateUsageMetrics(event, event.params.trader);
+  // updateFinancials(event);
   // updatePoolMetrics(event);
 }

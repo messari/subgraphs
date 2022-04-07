@@ -1,5 +1,7 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { bigIntToBigDecimal, calculateAverage } from "./numbers";
+
 import {
   Token,
   DexAmmProtocol,
@@ -206,7 +208,15 @@ export function getOrCreatePoolDailySnapshot(
 
 function getProtocolFromPool(poolAddress: Address): string {
   let pool = DVM.bind(poolAddress);
-  let version = pool.version();
+  let callResult = pool.try_version();
+  let version = "";
+
+  if (callResult.reverted) {
+    log.info("pool get version reverted", []);
+  } else {
+    version = callResult.value;
+  }
+
   let factoryAdd = "";
   if (version == "DVM 1.0.2") {
     factoryAdd = DVMFactory_ADDRESS;
@@ -226,53 +236,95 @@ export function getTokenAmountPriceAv(
   amount: BigInt
 ): BigDecimal {
   let dvmFactory = DVMFactory.bind(Address.fromString(DVMFactory_ADDRESS));
-  let cpFactory = DVMFactory.bind(Address.fromString(CPFactory_ADDRESS));
-  let dppFactory = DVMFactory.bind(Address.fromString(DPPFactory_ADDRESS));
-  let dspFactory = DVMFactory.bind(Address.fromString(DSPFactory_ADDRESS));
+  // let cpFactory = DVMFactory.bind(Address.fromString(CPFactory_ADDRESS));
+  // let dppFactory = DVMFactory.bind(Address.fromString(DPPFactory_ADDRESS));
+  // let dspFactory = DVMFactory.bind(Address.fromString(DSPFactory_ADDRESS));
+  //
+  let total = [BigDecimal.fromString("0")];
 
-  let total = 0;
-
-  for (let i = 0; i <= 3; i++) {
+  for (let i = 0; i <= 2; i++) {
     let add = STABLE_COINS[i];
-    let dvmPoolAdd = dvmFactory.getDODOPool(
-      Address.fromString(add),
-      tokenAddress
-    );
-    let cpPoolAdd = cpFactory.getDODOPool(
-      Address.fromString(add),
-      tokenAddress
-    );
-    let dppPoolAdd = dppFactory.getDODOPool(
-      Address.fromString(add),
-      tokenAddress
-    );
-    let dspPoolAdd = dspFactory.getDODOPool(
+    //   ////////////////
+    let callResult1 = dvmFactory.try_getDODOPool(
       Address.fromString(add),
       tokenAddress
     );
 
-    let dvm = DVM.bind(dvmPoolAdd[0]);
-    let vaultReserveDVM = dvm.querySellQuote(trader, amount);
-    let vaultTotal = vaultReserveDVM[0] + vaultReserveDVM[1];
+    let dvmPoolAdd: Address[] = [];
+    if (callResult1.reverted) {
+      log.info("DVM getDODOPool reverted", []);
+      return ZERO_BD;
+    } else {
+      dvmPoolAdd = callResult1.value;
+    }
+    //   // ////////////////
+    //   // let callResult2 = cpFactory.try_getDODOPool(
+    //   //   Address.fromString(add),
+    //   //   tokenAddress
+    //   // );
+    //   // if (callResult2.reverted) {
+    //   //   log.info("CrowdPool getDODOPool reverted", []);
+    //   //   return ZERO_BD;
+    //   // } else {
+    //   //   cpPoolAdd = callResult2.value;
+    //   // }
+    //   // ////////////////
+    //   // let callResult3 = dppFactory.try_getDODOPool(
+    //   //   Address.fromString(add),
+    //   //   tokenAddress
+    //   // );
+    //   // if (callResult3.reverted) {
+    //   //   log.info("DPP getDODOPool reverted", []);
+    //   //   return ZERO_BD;
+    //   // } else {
+    //   //   dppPoolAdd = callResult3.value;
+    //   // }
+    //   // ////////////////
+    //   // let callResult4 = dspFactory.try_getDODOPool(
+    //   //   Address.fromString(add),
+    //   //   tokenAddress
+    //   // );
+    //   // if (callResult4.reverted) {
+    //   //   log.info("DSP getDODOPool reverted", []);
+    //   //   return ZERO_BD;
+    //   // } else {
+    //   //   let dspPoolAdd = callResult4.value;
+    //   // }
+    //   //   ////////////////
+    let padd = dvmPoolAdd[0];
 
-    // let cp = CP.bind(cpPoolAdd[0]);
-    // let dpp = DPP.bind(dppPoolAdd[0]);
-    // let dsp = DSP.bind(dspPoolAdd[0]);
-
-    // let vaultReserveCP = cp.querySellQuote(trader, amount);
-    // vaultTotal = vaultTotal + vaultReserveCP[0] + vaultReserveCP[1];
-    // let vaultReserveDPP = dpp.querySellQuote(trader, amount);
-    // vaultTotal = vaultTotal + vaultReserveDPP[0] + vaultReserveDPP[1];
-    // let vaultReserveDSP = dsp.querySellQuote(trader, amount);
-    // vaultTotal = vaultTotal + vaultReserveDSP[0] + vaultReserveDSP[1];
-    //
-    // total = safeDiv(vaultTotal, 4);
+    log.info("DVM POOL ADDRESS SET AS: {}", [padd.toString()]);
+    let dvm = DVM.bind(padd);
+    //  let callResult5 = dvm.try_querySellQuote(trader, amount);
+    // let vaultTotal = [ZERO_BD];
+    // if (callResult5.reverted) {
+    //   log.info("DVM QuerySellQuote reverted", []);
+    //   return ZERO_BD;
+    // } else {
+    //   let num = bigIntToBigDecimal(
+    //     callResult5.value.value0 + callResult5.value.value1
+    //   );
+    //   vaultTotal.push(num);
+    // }
+    //   //
+    //   //   // let cp = CP.bind(cpPoolAdd[0]);
+    //   //   // let vaultReserveCP = cp.querySellQuote(trader, amount);
+    //   //   // vaultTotal = vaultTotal + vaultReserveCP.value0 + vaultReserveCP.value1;
+    //   //
+    //   //   // let dpp = DPP.bind(dppPoolAdd[0]);
+    //   //   // let vaultReserveDPP = dpp.querySellQuote(trader, amount);
+    //   //   // vaultTotal = vaultTotal + vaultReserveDPP.value0 + vaultReserveDPP.value1;
+    //   //   //
+    //   //   // let dsp = DSP.bind(dspPoolAdd[0]);
+    //   //   // let vaultReserveDSP = dsp.querySellQuote(trader, amount);
+    //   //   // vaultTotal = vaultTotal + vaultReserveDSP.value0 + vaultReserveDSP.value1;
+    //   //
+    //   total.push(calculateAverage(vaultTotal));
+    // }
+    // //
+    // return calculateAverage(total);
   }
-
-  return safeDiv(
-    BigDecimal.fromString(total.toString()),
-    BigDecimal.fromString("3")
-  );
+  return ZERO_BD;
 }
 
 export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {

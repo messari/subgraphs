@@ -30,7 +30,7 @@ import {
 
 export function handleBid(event: Bid): void {
   //updateUsageMetrics(event, event.params.to);
-  updateFinancials(event);
+  // updateFinancials(event);
   // updatePoolMetrics(event);
 }
 
@@ -42,6 +42,6 @@ export function handleCancel(event: Cancel): void {
 
 export function handleSettle(event: Settle): void {
   //  updateUsageMetrics(event, event.params.trader);
-  updateFinancials(event);
+  // updateFinancials(event);
   // updatePoolMetrics(event);
 }

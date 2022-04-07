@@ -233,7 +233,7 @@ type Deposit implements Event @entity {
   blockNumber: BigInt!
   timestamp: BigInt!
   inputTokens: [Token!]!
-  outputTokens: Token!
+  outputToken: Token!
   inputTokenAmounts: [BigInt!]!
   outputTokenAmount: BigInt!
   amountUSD: BigDecimal!
@@ -251,7 +251,7 @@ type Withdraw implements Event @entity {
   blockNumber: BigInt!
   timestamp: BigInt!
   inputTokens: [Token!]!
-  outputTokens: Token!
+  outputToken: Token!
   inputTokenAmounts: [BigInt!]!
   outputTokenAmount: BigInt!
   amountUSD: BigDecimal!

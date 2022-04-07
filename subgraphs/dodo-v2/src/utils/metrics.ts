@@ -91,7 +91,7 @@ export function updatePoolMetrics(
 
   let totalUSDval = 0;
 
-  for (let i = 0; i <= 2; i++) {
+  for (let i = 0; i <= 1; i++) {
     let usdValueOfTransaction = getTokenAmountPriceAv(
       tokenAdds[i],
       trader,
@@ -100,7 +100,7 @@ export function updatePoolMetrics(
     // totalUSDval = totalUSDval + usdValueOfTransaction;
   }
 
-  let protocol = getOrCreateDexAmm(event.address);
+  // let protocol = getOrCreateDexAmm(event.address);
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
   // poolMetrics.inputTokenBalances = pool.inputTokenBalances;
