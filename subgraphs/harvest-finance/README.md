@@ -1,33 +1,38 @@
-# Aave v2 Subgraph
+# Harvest Finance Subgraph
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools: 
+Sum across all Vaults: 
 
-`Pool Deposit TVL`
+`Vault TVL`
 
 ### Total Revenue USD
 
-Sum across all Pools:
+Sum across all Vaults:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+`Harvested Yield`
 
-Note: This currently excludes Flash Loans
+Note: This does not currently include investments https://harvest-finance.gitbook.io/harvest-finance/general-info/what-do-we-do/420-69-programm
+
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Market Oustanding Borrow Amount * Market Borrow Rate) * (Pool Reserve Factor)`
+`Harvested Yield * Protocol Share`
+
+Note that the Protocol Share varies on the Network. 
+
+e.g. As of 04/07/22, the Protocol Share on Ethereum is 30% and 8% on BNB Chain
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Market Outstanding Borrows * Market Borrow Rate) * (1 - Pool Reserve Factor)`
+`Harvested Yield * (1 - Protocol Share)`
 
 ### Total Unique Users
 
@@ -35,13 +40,7 @@ Count of  Unique Addresses which have interacted with the protocol via any trans
 
 `Deposits`
 
-`Withdrawals`
-
-`Borrows`
-
-`Liquidations`
-
-`Repayments`
+`Withdraws`
 
 ###  Reward Token Emissions Amount
 
@@ -49,4 +48,4 @@ To be added
 
 ###  Protocol Controlled Value
 
-Not applicable to Aave
+To be added

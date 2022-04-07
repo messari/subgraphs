@@ -1,4 +1,4 @@
-# Compound v2 Subgraph
+# Benqi Subgraph
 
 ## Calculation Methodology v0.0.1
 
@@ -54,10 +54,13 @@ To be added
 
 ###  Protocol Controlled Value
 
-Not applicable to Compound v2
+Not applicable to Benqi v2
 
-### Existing Subgraph for Reference
+## References and Useful Links
 
-https://thegraph.com/hosted-service/subgraph/graphprotocol/compound-v2
-https://github.com/graphprotocol/compound-V2-subgraph
+Existing subgraph
+https://github.com/token-terminal/tt-subgraphs/tree/main/benqi
 
+### Fork Information
+
+Note that Benqi is a fork of Compound

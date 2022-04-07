@@ -1,33 +1,34 @@
-# Aave v2 Subgraph
+# Maple Finance Subgraph
+
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools: 
 
-`Pool Deposit TVL`
+`Current Loans + Total Cash`
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
-
-Note: This currently excludes Flash Loans
+`Interest Earned across all loans + Establishment Fees on the Loan Amount for new loans originated`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Market Oustanding Borrow Amount * Market Borrow Rate) * (Pool Reserve Factor)`
+`Establishment Fees on the Loan Amount for new loans originated`
+
+Note that Establishment Fees is split between Protocol and Delegate 50/50 but full Establishment Fees to be included Protocol-side Revenue
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Market Outstanding Borrows * Market Borrow Rate) * (1 - Pool Reserve Factor)`
+`Interest Earned across all loans`
 
 ### Total Unique Users
 
@@ -35,13 +36,13 @@ Count of  Unique Addresses which have interacted with the protocol via any trans
 
 `Deposits`
 
-`Withdrawals`
+`Withdraws`
 
 `Borrows`
 
-`Liquidations`
+`Repays`
 
-`Repayments`
+`Liquidations`
 
 ###  Reward Token Emissions Amount
 
@@ -49,4 +50,4 @@ To be added
 
 ###  Protocol Controlled Value
 
-Not applicable to Aave
+To be added

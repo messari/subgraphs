@@ -1,33 +1,40 @@
-# Aave v2 Subgraph
+# Lending Protocol Subgraph
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools: 
+Sum across all Pools:
 
-`Pool Deposit TVL`
+`Insert Calculation`
+
+<Add notes to consider if any - delete if none>
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+`Insert Calculation`
 
-Note: This currently excludes Flash Loans
+<Add notes to consider if any - delete if none>
+
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Market Oustanding Borrow Amount * Market Borrow Rate) * (Pool Reserve Factor)`
+`Insert Calculation`
+
+<Add notes to consider if any - delete if none>
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Market Outstanding Borrows * Market Borrow Rate) * (1 - Pool Reserve Factor)`
+`Insert Calculation`
+
+<Add notes to consider if any - delete if none>
 
 ### Total Unique Users
 
@@ -39,9 +46,9 @@ Count of  Unique Addresses which have interacted with the protocol via any trans
 
 `Borrows`
 
-`Liquidations`
+`Repays`
 
-`Repayments`
+`Liquidations`
 
 ###  Reward Token Emissions Amount
 
@@ -49,4 +56,4 @@ To be added
 
 ###  Protocol Controlled Value
 
-Not applicable to Aave
+To be added
