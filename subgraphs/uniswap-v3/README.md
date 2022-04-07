@@ -1,6 +1,6 @@
 # Uniswap v3 Subgraph
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
@@ -21,9 +21,9 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Pool Swap Trading Volume * Protocol Pool Fee Tier)`
+`(Pool Swap Trading Volume * Pool Fee Tier * Protocol Fee)`
 
-Note that the Protocol Swap Fee for Uniswap is currently 0% but could be changed via Governance (04/07/22)
+Note that the Protocol Fee for Uniswap is currently 0% but could be changed via Governance (04/07/22)
 
 https://uniswap.org/blog/uniswap-v3
 
@@ -32,7 +32,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Swap Trading Volume * SupplySide Pool Fee Tier)`
+`(Pool Swap Trading Volume * Pool Fee Tier * (1 - Protocol Fee))`
 
 Note that Pool Fee Tiers vary by pool and more tiers could be added by Governance (04/07/22)
 
