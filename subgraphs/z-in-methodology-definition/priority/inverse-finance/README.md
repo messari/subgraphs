@@ -1,9 +1,9 @@
-# DEX Protocol Subgraph
+# Inverse Finance Yield Protocol Subgraph
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools:
+Sum across all Vaults:
 
 `Insert Calculation`
 
@@ -11,7 +11,7 @@ Sum across all Pools:
 
 ### Total Revenue USD
 
-Sum across all Pools:
+Sum across all Vaults:
 
 `Insert Calculation`
 
@@ -21,7 +21,7 @@ Sum across all Pools:
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
-Sum across all Pools:
+Sum across all Vaults:
 
 `Insert Calculation`
 
@@ -30,7 +30,7 @@ Sum across all Pools:
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
-Sum across all Pools
+Sum across all Vaults
 
 `Insert Calculation`
 
@@ -39,8 +39,6 @@ Sum across all Pools
 ### Total Unique Users
 
 Count of  Unique Addresses which have interacted with the protocol via any transaction
-
-`Swaps`
 
 `Deposits`
 

@@ -23,11 +23,9 @@ Sum across all Pools:
 
 Note that different fees are applied:
 
-Passive Vaults: Performance Fee +  Withdrawal fee
-
-Option Vaults: Performance Fee + Withdrawal Fee 
-
-(Fees can vary between vaults - standard is 15% performance, 0.5% withdrawal)
+- Passive Vaults: Performance Fee +  Withdrawal fee
+- Option Vaults: Performance Fee + Withdrawal Fee 
+- (Fees can vary between vaults - standard is 15% performance, 0.5% withdrawal)
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side

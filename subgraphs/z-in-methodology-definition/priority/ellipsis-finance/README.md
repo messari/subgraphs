@@ -1,9 +1,9 @@
-# Yield Protocol Subgraph
+# Ellipsis Finance (DEX) Subgraph
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Vaults:
+Sum across all Pools:
 
 `Insert Calculation`
 
@@ -11,7 +11,7 @@ Sum across all Vaults:
 
 ### Total Revenue USD
 
-Sum across all Vaults:
+Sum across all Pools:
 
 `Insert Calculation`
 
@@ -21,7 +21,7 @@ Sum across all Vaults:
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
-Sum across all Vaults:
+Sum across all Pools:
 
 `Insert Calculation`
 
@@ -30,7 +30,7 @@ Sum across all Vaults:
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
-Sum across all Vaults
+Sum across all Pools
 
 `Insert Calculation`
 
@@ -40,15 +40,11 @@ Sum across all Vaults
 
 Count of  Unique Addresses which have interacted with the protocol via any transaction
 
+`Swaps`
+
 `Deposits`
 
-`Withdrawals`
-
-`Borrows`
-
-`Repays`
-
-`Liquidations`
+`Withdraws`
 
 ###  Reward Token Emissions Amount
 
