@@ -1,4 +1,4 @@
-# Subgraph Schema: Generic
+# Subgraph Schema: Metrics
 # Version: 1.0.0
 
 enum Network {
