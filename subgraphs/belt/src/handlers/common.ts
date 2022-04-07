@@ -12,7 +12,7 @@ import { getDay } from "../utils/numbers";
 import { getUSDPriceOfToken } from "./price";
 
 export function updateUsageMetrics(user: User, block: ethereum.Block): void {
-  let metrics = getOrCreateUserSnapshot(getDay(block.timestamp));
+  let metrics = getOrCreateUserSnapshot(block);
   let protocol = getOrCreateProtocol();
   let day = getDay(block.timestamp);
 
@@ -49,7 +49,7 @@ export function updateUsageMetrics(user: User, block: ethereum.Block): void {
 }
 
 export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, block: ethereum.Block): void {
-  let metrics = getOrCreateFinancialsDailySnapshot(getDay(block.timestamp));
+  let metrics = getOrCreateFinancialsDailySnapshot(block);
   if (metrics.blockNumber.equals(BigInt.zero())) {
     metrics.timestamp = block.timestamp;
     metrics.blockNumber = block.number;
@@ -69,14 +69,16 @@ export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, b
 
 export function updateProtocolMetrics(amountUSD: BigDecimal, isDeposit: boolean): void {
   let protocol = getOrCreateProtocol();
+
   protocol.totalValueLockedUSD = isDeposit
     ? protocol.totalValueLockedUSD.plus(amountUSD)
     : protocol.totalValueLockedUSD.minus(amountUSD);
+
   protocol.save();
 }
 
 export function updateVaultMetrics(vault: Vault, block: ethereum.Block): void {
-  let metrics = getOrCreateVaultDailySnapshot(Address.fromString(vault.id), getDay(block.timestamp));
+  let metrics = getOrCreateVaultDailySnapshot(Address.fromString(vault.id), block);
 
   metrics.vault = vault.id;
   metrics.totalValueLockedUSD = vault.totalValueLockedUSD;

@@ -1,29 +1,32 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { FinancialsDailySnapshot, UsageMetricsDailySnapshot, VaultDailySnapshot } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { getDay } from "../utils/numbers";
 import { getOrCreateProtocol } from "./Protocol";
 
-export function getOrCreateUserSnapshot(day: i32): UsageMetricsDailySnapshot {
-  let snapshot = UsageMetricsDailySnapshot.load(day.toString());
+export function getOrCreateUserSnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
+  let day = getDay(block.timestamp).toString();
+  let snapshot = UsageMetricsDailySnapshot.load(day);
 
   if (snapshot) {
     return snapshot;
   }
 
-  snapshot = new UsageMetricsDailySnapshot(day.toString());
+  snapshot = new UsageMetricsDailySnapshot(day);
 
-  snapshot.protocol = "";
+  snapshot.protocol = getOrCreateProtocol().id;
   snapshot.activeUsers = 0;
   snapshot.totalUniqueUsers = 0;
   snapshot.dailyTransactionCount = 0;
-  snapshot.blockNumber = BIGINT_ZERO;
-  snapshot.timestamp = BIGINT_ZERO;
+  snapshot.blockNumber = block.number;
+  snapshot.timestamp = block.timestamp;
   snapshot.save();
 
   return snapshot;
 }
 
-export function getOrCreateFinancialsDailySnapshot(day: i32): FinancialsDailySnapshot {
+export function getOrCreateFinancialsDailySnapshot(block: ethereum.Block): FinancialsDailySnapshot {
+  let day = getDay(block.timestamp).toString();
   let snapshot = FinancialsDailySnapshot.load(day.toString());
 
   if (snapshot) {
@@ -38,14 +41,15 @@ export function getOrCreateFinancialsDailySnapshot(day: i32): FinancialsDailySna
   snapshot.supplySideRevenueUSD = BIGDECIMAL_ZERO;
   snapshot.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
   snapshot.feesUSD = BIGDECIMAL_ZERO;
-  snapshot.blockNumber = BIGINT_ZERO;
-  snapshot.timestamp = BIGINT_ZERO;
+  snapshot.blockNumber = block.number;
+  snapshot.timestamp = block.timestamp;
   snapshot.save();
 
   return snapshot;
 }
 
-export function getOrCreateVaultDailySnapshot(vault: Address, day: i32): VaultDailySnapshot {
+export function getOrCreateVaultDailySnapshot(vault: Address, block: ethereum.Block): VaultDailySnapshot {
+  let day = getDay(block.timestamp).toString();
   const id = vault
     .toHex()
     .concat("-")
@@ -67,8 +71,8 @@ export function getOrCreateVaultDailySnapshot(vault: Address, day: i32): VaultDa
   snapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   snapshot.rewardTokenEmissionsAmount = [];
   snapshot.rewardTokenEmissionsUSD = [];
-  snapshot.blockNumber = BIGINT_ZERO;
-  snapshot.timestamp = BIGINT_ZERO;
+  snapshot.blockNumber = block.number;
+  snapshot.timestamp = block.timestamp;
   snapshot.save();
 
   return snapshot;

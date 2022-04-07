@@ -1,6 +1,7 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { getOrCreateProtocol } from "./Protocol";
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -11,7 +12,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
 
   vault = new Vault(id.toHex());
 
-  vault.protocol = "";
+  vault.protocol = getOrCreateProtocol().id;
   vault.inputTokens = [];
   vault.outputToken = "";
   vault.rewardTokens = [];

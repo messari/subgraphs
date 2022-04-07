@@ -19,7 +19,7 @@ export function createStrategy(vault: Vault, strategyAddress: Address, tokenAddr
   const strategyContract = Strategy.bind(strategyAddress);
 
   let strategy = new _Strategy(strategyAddress.toHex());
-  strategy.vaultAddress = vault!.id;
+  strategy.vaultAddress = vault.id;
   strategy.inputToken = tokenAddress.toHex();
   strategy.save();
 

@@ -7,22 +7,19 @@ import { getFeePercentage } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
 import { readValue } from "../utils/contracts";
-import { getDay } from "../utils/numbers";
 import { updateProtocolMetrics } from "./common";
 import { getUSDPriceOfOutputToken, getUSDPriceOfToken } from "./price";
 
 export function deposit(event: DepositEvent, vault: Vault): void {
   let hash = event.transaction.hash;
   let index = event.transaction.index;
-  let deposit = getOrCreateDeposit(hash, index);
+  let deposit = getOrCreateDeposit(hash, index, event.block);
 
   let depositAmount = event.params.depositAmount;
   let sharesMinted = event.params.sharesMinted;
 
   let vaultContract = VaultContract.bind(Address.fromString(vault.id));
   let inputTokenBalance = readValue<BigInt>(vaultContract.try_calcPoolValueInToken(), BIGINT_ZERO);
-
-  log.warning("[belt] deposit - inputTokenBalance {}", [inputTokenBalance.toString()]);
 
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   let inputToken = getOrCreateToken(inputTokenAddress);
@@ -41,10 +38,12 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   vault.outputTokenPriceUSD = getUSDPriceOfOutputToken(vault, inputToken);
   vault.save();
 
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(getDay(event.block.timestamp));
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
   let feePercentage = getFeePercentage(vault, VaultFeeType.DEPOSIT_FEE);
 
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED)));
+  let fees = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(fees);
+  financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(fees);
   financialMetrics.save();
 
   // updating deposit entity

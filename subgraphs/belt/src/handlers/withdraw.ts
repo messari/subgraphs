@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract, Withdraw as WithdrawEvent } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, VaultFeeType } from "../constant";
@@ -7,22 +7,19 @@ import { getFeePercentage } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
 import { readValue } from "../utils/contracts";
-import { getDay } from "../utils/numbers";
 import { updateProtocolMetrics } from "./common";
 import { getUSDPriceOfToken } from "./price";
 
 export function withdraw(event: WithdrawEvent, vault: Vault): void {
   let hash = event.transaction.hash;
   let index = event.transaction.index;
-  let withdraw = getOrCreateWithdraw(hash, index);
+  let withdraw = getOrCreateWithdraw(hash, index, event.block);
 
   let sharesBurnt = event.params.sharesBurnt;
   let withdrawAmount = event.params.withdrawAmount;
 
   let vaultContract = VaultContract.bind(Address.fromString(vault.id));
   let inputTokenBalance = readValue<BigInt>(vaultContract.try_calcPoolValueInToken(), BIGINT_ZERO);
-
-  log.warning("[belt] withdraw - inputTokenBalance {}", [inputTokenBalance.toString()]);
 
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   let inputToken = getOrCreateToken(inputTokenAddress);
@@ -39,10 +36,12 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
 
   vault.save();
 
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(getDay(event.block.timestamp));
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
   let feePercentage = getFeePercentage(vault, VaultFeeType.WITHDRAWAL_FEE);
+  let feesUSD = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
 
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED)));
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feesUSD);
+  financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(feesUSD);
   financialMetrics.save();
 
   // updating withdraw entity

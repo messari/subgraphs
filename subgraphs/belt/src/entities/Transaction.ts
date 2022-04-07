@@ -1,8 +1,9 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { Deposit, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { getOrCreateProtocol } from "./Protocol";
 
-export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
+export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt, block: ethereum.Block): Deposit {
   const id: string = "deposit-"
     .concat(hash.toHex())
     .concat("-")
@@ -18,11 +19,11 @@ export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
 
   deposit.hash = hash.toHex();
   deposit.logIndex = logIndex.toI32();
-  deposit.protocol = "";
+  deposit.protocol = getOrCreateProtocol().id;
   deposit.to = "";
   deposit.from = "";
-  deposit.blockNumber = BIGINT_ZERO;
-  deposit.timestamp = BIGINT_ZERO;
+  deposit.blockNumber = block.number;
+  deposit.timestamp = block.timestamp;
   deposit.vault = "";
   deposit.asset = "";
   deposit.amount = BIGINT_ZERO;
@@ -32,7 +33,7 @@ export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt): Deposit {
   return deposit;
 }
 
-export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt): Withdraw {
+export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt, block: ethereum.Block): Withdraw {
   const id: string = "withdraw-"
     .concat(hash.toHex())
     .concat("-")
@@ -48,11 +49,11 @@ export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt): Withdraw {
 
   withdraw.hash = hash.toHex();
   withdraw.logIndex = logIndex.toI32();
-  withdraw.protocol = "";
+  withdraw.protocol = getOrCreateProtocol().id;
   withdraw.to = "";
   withdraw.from = "";
-  withdraw.blockNumber = BIGINT_ZERO;
-  withdraw.timestamp = BIGINT_ZERO;
+  withdraw.blockNumber = block.number;
+  withdraw.timestamp = block.timestamp;
   withdraw.vault = "";
   withdraw.asset = "";
   withdraw.amount = BIGINT_ZERO;
