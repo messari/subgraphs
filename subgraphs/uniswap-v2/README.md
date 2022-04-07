@@ -21,7 +21,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Swap Trading Volume * Total Swap Fee * Protocol Swap Fee)`
+`(Swap Trading Volume * Total Swap Fee * Protocol Share) or (Swap Trading Volume * Protocol Swap Fee)`
 
 Note that the Protocol Swap Fee for Uniswap_v2 is currently 0% and can be changed via Governance (04/07/22)
 
@@ -30,7 +30,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Swap Trading Volume * Total Swap Fee * (1- Protocol Swap Fee))`
+`(Swap Trading Volume * Total Swap Fee * (1- Protocol Share)) or (Swap Trading Volume * LP Swap Fee)`
 
 ### Total Unique Users
 
