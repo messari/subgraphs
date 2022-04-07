@@ -1,5 +1,5 @@
 # Balancer v1 Subgraph
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
@@ -19,6 +19,8 @@ Portion of the Total Revenue allocated to the Protocol
 Sum across all Pools:
 
 `Pool Swap Volume * Protocol Pool Swap Fee`
+
+Note: 04/07/22 - The ProtocolPool Swap Fee is 0
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
