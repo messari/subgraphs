@@ -144,112 +144,6 @@ type FinancialsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-###############################
-##### Pool-Level Metadata #####
-###############################
-
-# A pool can be:
-# - A liquidity pool in the case of a DEX AMM
-# - A market in the case of a lending protocol
-# - A vault in the case of a yield aggregator
-interface Pool {
-  " Smart contract address of the pool "
-  id: ID!
-
-  " The protocol this pool belongs to "
-  protocol: DexAmmProtocol!
-
-  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
-  # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
-  # and inputToken balances are used to calculate returns
-
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
-  inputTokens: [Token!]!
-
-  " Token that is minted to track ownership of position in protocol "
-  outputToken: Token!
-
-  " Aditional tokens that are given as reward for position in a protocol "
-  rewardTokens: [RewardToken!]
-
-  ##### Quantitative Data #####
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Total volume in USD (volume is defined differently according to the protocol category) "
-  totalVolumeUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Total supply of output token "
-  outputTokenSupply: BigInt!
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
-
-  " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Creation timestamp "
-  createdTimestamp: BigInt!
-
-  " Creation block number "
-  createdBlockNumber: BigInt!
-
-  " Pool snapshots "
-  snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
-}
-
-#################################
-##### Pool-Level Timeseries #####
-#################################
-
-type PoolDailySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-  id: ID!
-
-  " The protocol this snapshot belongs to "
-  protocol: DexAmmProtocol!
-
-  " The pool this snapshot belongs to "
-  pool: LiquidityPool!
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Total volume in USD "
-  totalVolumeUSD: BigDecimal!
-
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Total supply of output token "
-  outputTokenSupply: BigInt!
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
-
-  " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-}
-
-###############################################################################
-################################# DEX AMM #####################################
-###############################################################################
-
 type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
@@ -309,6 +203,10 @@ type LiquidityPoolFee @entity {
 
   feeType: LiquidityPoolFeeType!
 }
+
+###############################
+##### Pool-Level Metadata #####
+###############################
 
 type LiquidityPool @entity {
   " Smart contract address of the pool "
@@ -373,6 +271,47 @@ type LiquidityPool @entity {
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 
   swaps: [Swap!]! @derivedFrom(field: "pool")
+}
+
+#################################
+##### Pool-Level Timeseries #####
+#################################
+
+type PoolDailySnapshot @entity {
+  " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: DexAmmProtocol!
+
+  " The pool this snapshot belongs to "
+  pool: LiquidityPool!
+
+  totalValueLockedUSD: BigDecimal!
+
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigInt!]!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Total amount of reward token emissions in a day, in token's native amount "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Total amount of reward token emissions in a day, normalized to USD "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 ##################################
