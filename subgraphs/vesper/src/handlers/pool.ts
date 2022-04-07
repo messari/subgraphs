@@ -21,10 +21,7 @@ import {
   getDecimalDivisor,
   getPoolV3,
 } from "../peer";
-import {
-  ZERO_ADDRESS,
-  VVSP_ADDRESS_HEX,
-} from "../constant";
+import { ZERO_ADDRESS, VVSP_ADDRESS_HEX } from "../constant";
 
 import { getOrCreateYieldAggregator } from "../orm";
 
@@ -164,8 +161,10 @@ export function handleBlockV3(block: ethereum.Block): void {
     pool.totalDebt.toString(),
   ]);
 
-  aggregator.totalValueLockedUSD.plus(pool.totalDebtUsd);
-  
+  aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD.plus(
+    pool.totalDebtUsd
+  );
+
   aggregator.save();
   pool.save();
 }
