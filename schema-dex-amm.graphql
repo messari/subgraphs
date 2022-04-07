@@ -74,6 +74,9 @@ interface Protocol {
   " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
   subgraphVersion: String!
 
+  " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
+  methodologyVersion: String!
+
   network: Network!
 
   type: ProtocolType!
@@ -159,6 +162,9 @@ type DexAmmProtocol implements Protocol @entity {
 
   " Version of the subgraph implementation, in SemVer format (e.g. 1.0.0) "
   subgraphVersion: String!
+
+  " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
+  methodologyVersion: String!
 
   network: Network!
 
