@@ -1,4 +1,4 @@
-# Inverse Finance Lending Protocol Subgraph
+# Liquity Lending Protocol Subgraph
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
