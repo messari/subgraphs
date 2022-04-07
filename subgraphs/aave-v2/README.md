@@ -2,13 +2,13 @@
 
 ## Calculation Methodology v1.0.0
 
-### Total Value Locked (TVL)
+### Total Value Locked (TVL) USD
 
 Sum across all Pools: 
 
 `Pool Deposit TVL`
 
-### Total Revenue (Amount)
+### Total Revenue USD
 
 Sum across all Pools:
 
@@ -16,44 +16,38 @@ Sum across all Pools:
 
 Note: This currently excludes Flash Loans
 
-### Protocol-Side Revenue (Amount)
+### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
 `(Market Oustanding Borrow Amount * Market Borrow Rate) * (Pool Reserve Factor)`
 
-### Supply-Side Revenue (Amount)
+### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
 `(Market Outstanding Borrows * Market Borrow Rate) * (1 - Pool Reserve Factor)`
 
-### Total Revenue %
-% Revenue from Assets Generated from Usage
+### Total Unique Users
 
-`Pool borrow rate`
+Count of  Unique Addresses which have interacted with the protocol via any transaction
 
-This is pool-dependent and varies based on utilization.
+`Deposits`
 
-Note: This currently excludes Flash Loans
+`Withdrawals`
 
+`Borrows`
 
-### Protocol-Side Revenue %
+`Liquidations`
 
-`Pool borrow rate * Pool Reserve Factor`
+`Repayments`
 
-This is pool-dependent and varies based on utilization.
+###  Reward Token Emissions Amount
 
-Note: This currently excludes Flash Loans
+To be added
 
+###  Protocol Controlled Value
 
-### Total Revenue %
-% Revenue from Assets Generated from Usage
-
-`Pool borrow rate * (1 - Pool Reserve Factor)`
-
-This is pool-dependent and varies based on utilization.
-
-Note: This currently excludes Flash Loans
+Not applicable to Aave
