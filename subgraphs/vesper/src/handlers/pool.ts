@@ -26,6 +26,8 @@ import {
   VVSP_ADDRESS_HEX,
 } from "../constant";
 
+import { getOrCreateYieldAggregator } from "../orm";
+
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
 // we need to do so with the restrictions of AssemblyScript
 // * no union types allowed (so we can't reuse a function here)
@@ -129,7 +131,9 @@ function handleTotalSupply(
 export function handleBlockV3(block: ethereum.Block): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
+  const aggregator = getOrCreateYieldAggregator();
   log.info("Entered handleBlockV3 for address {}", [poolAddressHex]);
+
   let pool = getPoolV3(poolAddressHex);
   let poolV3 = PoolV3.bind(poolAddress);
   log.info("Calculating values for pool {}", [poolAddressHex]);
@@ -159,6 +163,10 @@ export function handleBlockV3(block: ethereum.Block): void {
     poolAddressHex,
     pool.totalDebt.toString(),
   ]);
+
+  aggregator.totalValueLockedUSD.plus(pool.totalDebtUsd);
+  
+  aggregator.save();
   pool.save();
 }
 
