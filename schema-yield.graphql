@@ -157,9 +157,6 @@ type FinancialsDailySnapshot @entity {
 
   totalValueLockedUSD: BigDecimal!
 
-  " Protocol treasury should be composed of non-productive protocol assets. This may be an insurance fund, operational budget, or any other assets not directly generating revenue "
-  protocolTreasuryUSD: BigDecimal
-
   " Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
 
