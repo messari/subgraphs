@@ -7,6 +7,7 @@ import { readValue } from "../utils/contracts";
 
 export function getUSDPriceOfToken(token: Token): BigDecimal {
   let tokenAddress = Address.fromString(token.id);
+  let tokenDecimals = BigInt.fromI32(10).pow(token.decimals as u8);
   let chainlinkAddress = Address.fromString(BSC_CHAINLINK_PRICE_ADDRESS);
 
   const chainlink = Chainlink.bind(chainlinkAddress);
@@ -17,7 +18,7 @@ export function getUSDPriceOfToken(token: Token): BigDecimal {
   }
 
   let value = result.value.value0;
-  return value.toBigDecimal().div(BigDecimal.fromString(token.decimals.toString()));
+  return value.toBigDecimal().div(tokenDecimals.toBigDecimal());
 }
 
 export function getUSDPriceOfOutputToken(vault: Vault, inputToken: Token): BigDecimal {

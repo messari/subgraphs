@@ -1,7 +1,8 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Strategy } from "../../generated/beltBTC/Strategy";
+import { Vault as VaultContract } from "../../generated/beltBTC/Vault";
 import { Vault, VaultFee, _Strategy } from "../../generated/schema";
-import { BIGINT_ZERO, VaultFeeType } from "../constant";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 
@@ -27,12 +28,36 @@ export function createStrategy(strategyAddress: Address, vaultAddress: Address, 
   let denom = readValue<BigInt>(strategyContract.try_withdrawFeeDenom(), BIGINT_ZERO);
 
   let feePercentage = denom.isZero() ? BIGINT_ZERO : numer.div(denom);
-  let feeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
+  let withdrawFeeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
     .concat(strategyAddress.toHex())
     .concat("-")
     .concat(vaultAddress.toHex());
-  createFeeType(feeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
+  createFeeType(withdrawFeeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
 
-  vault!.fees = [feeId];
+  let vaultContract = VaultContract.bind(vaultAddress);
+  numer = readValue<BigInt>(vaultContract.try_entranceFeeNumer(), BIGINT_ZERO);
+  denom = readValue<BigInt>(vaultContract.try_entranceFeeDenom(), BIGINT_ZERO);
+
+  feePercentage = denom.isZero() ? BIGINT_ZERO : numer.div(denom);
+  let depositFeeId = enumToPrefix(VaultFeeType.DEPOSIT_FEE)
+    .concat(strategyAddress.toHex())
+    .concat("-")
+    .concat(vaultAddress.toHex());
+  createFeeType(withdrawFeeId, VaultFeeType.DEPOSIT_FEE, feePercentage);
+
+  vault!.fees = [withdrawFeeId, depositFeeId];
   vault!.save();
+}
+
+export function getFeePercentage(vault: Vault, feeType: string): BigDecimal {
+  for (let i = 0; i < vault.fees.length; i++) {
+    let fee = vault.fees[i];
+    let vaultFee = VaultFee.load(fee);
+
+    if (vaultFee && vaultFee.feeType === feeType) {
+      return vaultFee.feePercentage;
+    }
+  }
+
+  return BIGDECIMAL_ZERO;
 }

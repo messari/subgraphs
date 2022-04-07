@@ -1,6 +1,6 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Vault, VaultFee, _User as User } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Vault, _User as User } from "../../generated/schema";
+import { BIGINT_ZERO } from "../constant";
 import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreateUserSnapshot,
@@ -60,17 +60,12 @@ export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, b
   let inputToken = getOrCreateToken(inputTokenAddress);
   let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken.decimals as u8);
   let inputTokenPrice = getUSDPriceOfToken(inputToken);
+  let inputTokenAmountNormalized = inputTokenAmount.toBigDecimal().div(inputTokenDecimals.toBigDecimal());
 
-  metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(
-    inputTokenPrice.times(inputTokenAmount.toBigDecimal()).div(inputTokenDecimals.toBigDecimal()),
-  );
-  metrics.totalValueLockedUSD = metrics.totalValueLockedUSD.plus(
-    inputTokenPrice.times(vault.inputTokenBalances[0].toBigDecimal()).div(inputTokenDecimals.toBigDecimal()),
-  );
+  metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(inputTokenPrice.times(inputTokenAmountNormalized));
+  metrics.totalValueLockedUSD = vault.totalValueLockedUSD;
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    inputTokenPrice.times(vault.inputTokenBalances[0].toBigDecimal()).div(inputTokenDecimals.toBigDecimal()),
-  );
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(inputTokenPrice.times(inputTokenAmountNormalized));
 
   metrics.save();
   protocol.save();
@@ -80,8 +75,8 @@ export function updateVaultMetrics(vault: Vault, block: ethereum.Block): void {
   let metrics = getOrCreateVaultDailySnapshot(Address.fromString(vault.id), getDay(block.timestamp));
 
   metrics.vault = vault.id;
-  metrics.totalValueLockedUSD = metrics.totalValueLockedUSD.plus(vault.totalValueLockedUSD);
-  metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(vault.totalVolumeUSD);
+  metrics.totalValueLockedUSD = vault.totalValueLockedUSD;
+  metrics.totalVolumeUSD = vault.totalVolumeUSD;
   metrics.inputTokenBalances = vault.inputTokenBalances;
   metrics.outputTokenSupply = vault.outputTokenSupply;
   metrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
@@ -94,18 +89,4 @@ export function updateVaultMetrics(vault: Vault, block: ethereum.Block): void {
   }
 
   metrics.save();
-}
-
-export function getFeePercentange(vault: Vault, feeType: string): BigDecimal {
-  let feePercentage = BIGDECIMAL_ZERO;
-
-  for (let i = 0; i < vault.fees.length; i++) {
-    let fee = VaultFee.load(vault.fees[i]);
-
-    if (fee && fee.feeType === feeType) {
-      return fee.feePercentage;
-    }
-  }
-
-  return feePercentage;
 }
