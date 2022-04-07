@@ -1,13 +1,14 @@
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Deposit as DepositEvent, Vault as VaultContract } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
-import { BIGINT_ZERO, VaultFeeType } from "../constant";
+import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getFeePercentage } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
 import { readValue } from "../utils/contracts";
 import { getDay } from "../utils/numbers";
+import { updateProtocolMetrics } from "./common";
 import { getUSDPriceOfOutputToken, getUSDPriceOfToken } from "./price";
 
 export function deposit(event: DepositEvent, vault: Vault): void {
@@ -43,7 +44,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   let financialMetrics = getOrCreateFinancialsDailySnapshot(getDay(event.block.timestamp));
   let feePercentage = getFeePercentage(vault, VaultFeeType.DEPOSIT_FEE);
 
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(amountUSD.times(feePercentage));
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED)));
   financialMetrics.save();
 
   // updating deposit entity
@@ -54,4 +55,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   deposit.amountUSD = amountUSD;
   deposit.vault = vault.id;
   deposit.save();
+
+  // updating protocol amount locked
+  updateProtocolMetrics(amountUSD, true);
 }

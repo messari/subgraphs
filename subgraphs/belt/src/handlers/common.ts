@@ -1,4 +1,4 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault, _User as User } from "../../generated/schema";
 import { BIGINT_ZERO } from "../constant";
 import {
@@ -49,7 +49,6 @@ export function updateUsageMetrics(user: User, block: ethereum.Block): void {
 }
 
 export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, block: ethereum.Block): void {
-  let protocol = getOrCreateProtocol();
   let metrics = getOrCreateFinancialsDailySnapshot(getDay(block.timestamp));
   if (metrics.blockNumber.equals(BigInt.zero())) {
     metrics.timestamp = block.timestamp;
@@ -65,9 +64,14 @@ export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, b
   metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(inputTokenPrice.times(inputTokenAmountNormalized));
   metrics.totalValueLockedUSD = vault.totalValueLockedUSD;
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(inputTokenPrice.times(inputTokenAmountNormalized));
-
   metrics.save();
+}
+
+export function updateProtocolMetrics(amountUSD: BigDecimal, isDeposit: boolean): void {
+  let protocol = getOrCreateProtocol();
+  protocol.totalValueLockedUSD = isDeposit
+    ? protocol.totalValueLockedUSD.plus(amountUSD)
+    : protocol.totalValueLockedUSD.minus(amountUSD);
   protocol.save();
 }
 

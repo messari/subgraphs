@@ -24,7 +24,7 @@ export function handleDeposit(event: Deposit): void {
 
   let strategy = _Strategy.load(strategyAddress.toHex());
   if (strategy == null) {
-    createStrategy(strategyAddress, vaultAddress, tokenAddress);
+    createStrategy(vault, strategyAddress, tokenAddress);
   }
 
   let amount = event.params.depositAmount;
@@ -55,7 +55,7 @@ export function handleWithdraw(event: Withdraw): void {
 
   let strategy = _Strategy.load(strategyAddress.toHex());
   if (strategy == null) {
-    createStrategy(strategyAddress, vaultAddress, tokenAddress);
+    createStrategy(vault, strategyAddress, tokenAddress);
   }
 
   let amount = event.params.withdrawAmount;

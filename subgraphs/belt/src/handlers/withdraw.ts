@@ -1,13 +1,14 @@
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract, Withdraw as WithdrawEvent } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
-import { BIGINT_ZERO, VaultFeeType } from "../constant";
+import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getFeePercentage } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
 import { readValue } from "../utils/contracts";
 import { getDay } from "../utils/numbers";
+import { updateProtocolMetrics } from "./common";
 import { getUSDPriceOfToken } from "./price";
 
 export function withdraw(event: WithdrawEvent, vault: Vault): void {
@@ -41,7 +42,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   let financialMetrics = getOrCreateFinancialsDailySnapshot(getDay(event.block.timestamp));
   let feePercentage = getFeePercentage(vault, VaultFeeType.WITHDRAWAL_FEE);
 
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(amountUSD.times(feePercentage));
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED)));
   financialMetrics.save();
 
   // updating withdraw entity
@@ -52,4 +53,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   withdraw.amountUSD = amountUSD;
   withdraw.vault = vault.id;
   withdraw.save();
+
+  // updating protocol locked usd
+  updateProtocolMetrics(amountUSD, false);
 }
