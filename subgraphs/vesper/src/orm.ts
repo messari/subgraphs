@@ -1,23 +1,120 @@
-import { YieldAggregator } from "../generated/schema";
+import {
+  YieldAggregator,
+  Vault,
+  Token,
+  RewardToken,
+  VaultFee,
+} from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX } from "./constant";
-import { Network, ProtocolType } from "../../_reference_/src/common/constants";
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BigDecimal, Address, BigInt } from "@graphprotocol/graph-ts";
+import { PoolV3 } from "../generated/poolV3_vaUSDC/PoolV3";
+import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
+import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
+import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
-  let obj = YieldAggregator.load(CONTROLLER_ADDRESS_HEX);
+  let yAggr = YieldAggregator.load(CONTROLLER_ADDRESS_HEX);
 
-  if (!obj) {
-    obj = new YieldAggregator(CONTROLLER_ADDRESS_HEX);
-    obj.name = "Vesper Finance V3";
-    obj.slug = "vesper-finance-v3";
-    obj.schemaVersion = "1.0.0";
-    obj.subgraphVersion = "1.0.0";
-    obj.network = "ETHEREUM";
-    obj.type = "YIELD";
-    obj.totalUniqueUsers = 0;
-    obj.totalValueLockedUSD = BigDecimal.zero();
-    obj.save();
+  if (!yAggr) {
+    yAggr = new YieldAggregator(CONTROLLER_ADDRESS_HEX);
+    yAggr.name = "Vesper Finance V3";
+    yAggr.slug = "vesper-finance-v3";
+    yAggr.schemaVersion = "1.0.0";
+    yAggr.subgraphVersion = "1.0.0";
+    yAggr.network = "ETHEREUM";
+    yAggr.type = "YIELD";
+    yAggr.totalUniqueUsers = 0;
+    yAggr.totalValueLockedUSD = BigDecimal.zero();
+    yAggr.save();
   }
 
-  return obj;
+  return yAggr;
+}
+
+export function getOrCreateToken(address: Address): Token {
+  let token = Token.load(address.toHexString());
+
+  if (!token) {
+    const erc20Token = Erc20Token.bind(address);
+    token = new Token(address.toHexString());
+    token.name = erc20Token.name();
+    token.symbol = erc20Token.symbol();
+    token.decimals = erc20Token.decimals();
+    token.save();
+  }
+
+  return token;
+}
+export function getOrCreateRewardToken(address: Address): RewardToken {
+  let token = RewardToken.load(address.toHexString());
+
+  if (!token) {
+    const erc20Token = Erc20Token.bind(address);
+    token = new RewardToken(address.toHexString());
+    token.type = "DEPOSIT";
+    token.name = erc20Token.name();
+    token.symbol = erc20Token.symbol();
+    token.decimals = erc20Token.decimals();
+    token.save();
+  }
+
+  return token;
+}
+
+export function getOrCreateVaultFee(address: Address): VaultFee {
+  let fee = VaultFee.load(address.toHexString());
+
+  if (!fee) {
+    const poolv3 = PoolV3.bind(address);
+    fee = new VaultFee(address.toHexString());
+    fee.feePercentage = poolv3.withdrawFee().toBigDecimal();
+    fee.feeType = "WITHDRAWAL_FEE";
+    fee.save();
+  }
+
+  return fee;
+}
+
+export function getOrCreateVault(address: Address): Vault {
+  let vault = Vault.load(address.toHexString());
+
+  if (!vault) {
+    const yAggr = getOrCreateYieldAggregator();
+    const fee = getOrCreateVaultFee(address);
+    const poolv3 = PoolV3.bind(address);
+    const strategyAddresses = poolv3.getStrategies();
+    const reward = PoolRewards.bind(poolv3.poolRewards());
+    const rewardToken = getOrCreateRewardToken(reward.rewardToken());
+    const inputTokens: string[] = [];
+    const inputTokenBalances: BigInt[] = [];
+
+    vault = new Vault(address.toHexString());
+    vault.totalValueLockedUSD = BigDecimal.zero();
+    vault.totalVolumeUSD = BigDecimal.zero();
+    vault.outputTokenSupply = BigInt.zero();
+    vault.outputTokenPriceUSD = BigDecimal.zero();
+    vault.createdTimestamp = BigInt.zero();
+    vault.createdBlockNumber = BigInt.zero();
+    vault.protocol = yAggr.id;
+    vault.name = poolv3.name();
+    vault.symbol = poolv3.symbol();
+    vault.depositLimit = BigInt.zero();
+    vault.fees = [fee.id];
+    vault.rewardTokens = [rewardToken.id];
+
+    for (let i = 0, k = strategyAddresses.length; i < k; ++i) {
+      const st = StrategyV3.bind(strategyAddresses[i]);
+      const inputToken = getOrCreateToken(st.collateralToken());
+
+      inputTokens.push(inputToken.id);
+      inputTokenBalances.push(BigInt.zero());
+    }
+
+    vault.inputTokens = inputTokens;
+    vault.inputTokenBalances = inputTokenBalances;
+
+    vault.save();
+  }
+
+  return vault;
 }

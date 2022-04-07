@@ -23,7 +23,7 @@ import {
 } from "../peer";
 import { ZERO_ADDRESS, VVSP_ADDRESS_HEX } from "../constant";
 
-import { getOrCreateYieldAggregator } from "../orm";
+import { getOrCreateYieldAggregator, getOrCreateVault } from "../orm";
 
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
 // we need to do so with the restrictions of AssemblyScript
@@ -128,6 +128,7 @@ function handleTotalSupply(
 export function handleBlockV3(block: ethereum.Block): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
+  const vault = getOrCreateVault(poolAddress);
   const aggregator = getOrCreateYieldAggregator();
   log.info("Entered handleBlockV3 for address {}", [poolAddressHex]);
 
