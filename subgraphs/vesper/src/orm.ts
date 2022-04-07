@@ -84,9 +84,10 @@ export function getOrCreateVault(address: Address): Vault {
     const poolv3 = PoolV3.bind(address);
     const strategyAddresses = poolv3.getStrategies();
     const reward = PoolRewards.bind(poolv3.poolRewards());
-    const rewardToken = getOrCreateRewardToken(reward.rewardToken());
+    const rewardTokenAddresses = reward.getRewardTokens();
     const inputTokens: string[] = [];
     const inputTokenBalances: BigInt[] = [];
+    const rewardTokens: string[] = [];
 
     vault = new Vault(address.toHexString());
     vault.totalValueLockedUSD = BigDecimal.zero();
@@ -100,7 +101,6 @@ export function getOrCreateVault(address: Address): Vault {
     vault.symbol = poolv3.symbol();
     vault.depositLimit = BigInt.zero();
     vault.fees = [fee.id];
-    vault.rewardTokens = [rewardToken.id];
 
     for (let i = 0, k = strategyAddresses.length; i < k; ++i) {
       const st = StrategyV3.bind(strategyAddresses[i]);
@@ -110,8 +110,15 @@ export function getOrCreateVault(address: Address): Vault {
       inputTokenBalances.push(BigInt.zero());
     }
 
+    for (let i = 0, k = rewardTokenAddresses.length; i < k; ++i) {
+      const rt = getOrCreateRewardToken(rewardTokenAddresses[i]);
+      
+      rewardTokens.push(rt.id);
+    }
+
     vault.inputTokens = inputTokens;
     vault.inputTokenBalances = inputTokenBalances;
+    vault.rewardTokens = rewardTokens;
 
     vault.save();
   }
