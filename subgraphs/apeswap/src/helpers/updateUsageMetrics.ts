@@ -41,7 +41,7 @@ export function updateUsageMetrics(
   }
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + provider.toHexString();
+  let dailyActiveAccountId = id.toString().concat("-").concat(provider.toHexString());
   let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);

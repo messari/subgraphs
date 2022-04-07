@@ -17,7 +17,7 @@ export namespace Network {
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "POLYGON";
+  export const POLYGON = "MATIC";
   export const XDAI = "XDAI";
 }
 
@@ -35,15 +35,16 @@ export namespace RewardTokenType {
 }
 
 export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "TRADING_FEE";
-  export const PROTOCOL_FEE = "PROTOCOL_FEE";
-  export const TIERED_FEE = "TIERED_FEE";
-  export const DYNAMIC_FEE = "DYNAMIC_FEE";
+  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
+  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
+  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
+  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 // export const FACTORY_ADDRESS = "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6";
-export const FACTORY_ADDRESS = dataSource.network() == "bsc" ? BSC.FACTORY_ADDRESS : POLYGON.FACTORY_ADDRESS;
+export const FACTORY_ADDRESS = dataSource.network() == Network.BSC.toLowerCase() ? BSC.FACTORY_ADDRESS : POLYGON.FACTORY_ADDRESS;
 export let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
 
 export const DEFAULT_DECIMALS: i32 = 18;
@@ -51,6 +52,11 @@ export const USDC_DECIMALS: i32 = 6;
 export const USD_DENOMINATOR = BigInt.fromI32(10 ** 18).toBigDecimal();
 export const FEE_DENOMINATOR = BigInt.fromI32(10 ** 10);
 export const FEE_DECIMALS = 10;
+export const TRADING_FEE = toPercentage(BigDecimal.fromString("0.2"));
+export const BSC_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.05"));
+export const POLYGON_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.15"));
+export const BSC_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.15"))
+export const POLYGON_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.05"));
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_MAX = BigInt.fromString(

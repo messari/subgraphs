@@ -1,15 +1,16 @@
-import { Address, BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
-import { Bundle, LiquidityPool, Token } from "../../generated/schema";
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BSC, factoryContract, POLYGON, ZERO_ADDRESS } from "./constant";
+import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
+import { HelperStore, LiquidityPool, Token } from "../../generated/schema";
+import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BSC, factoryContract, Network, POLYGON, ZERO_ADDRESS } from "./constant";
 import { getOrCreateToken } from "./token";
 
-const WBNB_ADDRESS = dataSource.network() == "bsc" ? BSC.WBNB_ADDRESS : POLYGON.WMATIC_ADDRESS;
+// Address of the wrapped native token(eg WBNB for bsc and WMATIC for polygon)
+const WRAPPED_NATIVE_TOKEN_ADDRESS = dataSource.network() == Network.BSC.toLowerCase() ? BSC.WBNB_ADDRESS : POLYGON.WMATIC_ADDRESS;
 
 export function baseTokenPriceInUSD(): BigDecimal {
   log.info("Network: {}", [dataSource.network()]);
-  if (dataSource.network() == "bsc") {
+  if (dataSource.network() == Network.BSC.toLowerCase()) {
     return bnbPriceInUSD();
-  } else if (dataSource.network() == "matic") {
+  } else if (dataSource.network() == Network.POLYGON.toLowerCase()) {
     return wmaticPriceInUSD();
   } else {
     return BIGDECIMAL_ZERO;
@@ -102,7 +103,7 @@ function wmaticPriceInUSD(): BigDecimal {
 }
 
 // token where amounts should contribute to tracked volume and liquidity
-let WHITELIST: string[] = dataSource.network() == "bsc" ? BSC.WHITELIST : POLYGON.WHITELIST;
+let WHITELIST: string[] = dataSource.network() == Network.BSC.toLowerCase() ? BSC.WHITELIST : POLYGON.WHITELIST;
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
 // let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigInt.fromI32(10000);
@@ -111,7 +112,7 @@ let WHITELIST: string[] = dataSource.network() == "bsc" ? BSC.WHITELIST : POLYGO
 // let MINIMUM_LIQUIDITY_THRESHOLD_BNB = BigDecimal.fromString('1');
 
 export function findBnbPerToken(token: Token): BigDecimal {
-  if (token.id == Address.fromString(WBNB_ADDRESS).toHexString()) {
+  if (token.id == Address.fromString(WRAPPED_NATIVE_TOKEN_ADDRESS).toHexString()) {
     return BIGDECIMAL_ONE;
   }
   // loop through whitelist and check if paired with any
@@ -122,11 +123,11 @@ export function findBnbPerToken(token: Token): BigDecimal {
       if (pool !== null) {
         if (pool._token0 == token.id) {
           let token1 = getOrCreateToken(Address.fromString(pool._token1));
-          return pool._token1Price.times(token1.derivedBNB as BigDecimal); // return token1 per our token * BNB per token 1
+          return pool._token1Price.times(token1._derivedBNB as BigDecimal); // return token1 per our token * BNB per token 1
         }
         if (pool._token1 == token.id) {
           let token0 = getOrCreateToken(Address.fromString(pool._token0));
-          return pool._token0Price.times(token0.derivedBNB as BigDecimal); // return token0 per our token * BNB per token 0
+          return pool._token0Price.times(token0._derivedBNB as BigDecimal); // return token0 per our token * BNB per token 0
         }
       }
     }
@@ -146,9 +147,9 @@ export function getTrackedVolumeUSD(
   tokenAmount1: BigDecimal,
   token1: Token,
 ): BigDecimal {
-  let bundle = Bundle.load("1")!;
-  let price0 = token0.derivedBNB.times(bundle.bnbPrice);
-  let price1 = token1.derivedBNB.times(bundle.bnbPrice);
+  let helperStore = HelperStore.load("1")!;
+  let price0 = token0._derivedBNB.times(helperStore._value);
+  let price1 = token1._derivedBNB.times(helperStore._value);
 
   // both are whitelist tokens, take average of both amounts
   if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
@@ -184,10 +185,10 @@ export function getTrackedLiquidityUSD(
   tokenAmount1: BigDecimal,
   token1: Token,
 ): BigDecimal {
-  let bundle = Bundle.load("1");
-  if (bundle !== null) {
-    let price0 = token0.derivedBNB.times(bundle.bnbPrice);
-    let price1 = token1.derivedBNB.times(bundle.bnbPrice);
+  let helperStore = HelperStore.load("1");
+  if (helperStore !== null) {
+    let price0 = token0._derivedBNB.times(helperStore._value);
+    let price1 = token1._derivedBNB.times(helperStore._value);
 
     // both are whitelist tokens, take average of both amounts
     if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {

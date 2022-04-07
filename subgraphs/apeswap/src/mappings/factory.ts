@@ -1,5 +1,5 @@
 import { PairCreated } from "../../generated/Factory/Factory";
-import { Bundle } from "../../generated/schema";
+import { HelperStore } from "../../generated/schema";
 import { Pool } from "../../generated/templates";
 import { getOrCreatePool } from "../helpers/pool";
 import { BIGDECIMAL_ZERO } from "../utils/constant";
@@ -11,11 +11,11 @@ export function handlePairCreated(event: PairCreated): void {
   let token1Address = event.params.token1;
 
   // create new bundle, if it doesn't already exist
-  let bundle = Bundle.load("1");
-  if (bundle == null) {
-    let bundle = new Bundle("1");
-    bundle.bnbPrice = BIGDECIMAL_ZERO;
-    bundle.save();
+  let helperStore = HelperStore.load("1");
+  if (helperStore == null) {
+    let helperStore = new HelperStore("1");
+    helperStore._value = BIGDECIMAL_ZERO;
+    helperStore.save();
   }
 
   // Create Tokens

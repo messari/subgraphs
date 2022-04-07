@@ -24,16 +24,7 @@ export function getOrCreateToken(address: Address): Token {
     if (!tryDecimals.reverted) {
       token.decimals = tryDecimals.value;
     }
-    let tryTotalSupply = tokenInstance.try_totalSupply();
-    if (!tryTotalSupply.reverted) {
-      token.totalSupply = toDecimal(tryTotalSupply.value, token.decimals);
-    }
-    token.tradeVolume = BIGDECIMAL_ZERO;
-    token.tradeVolumeUSD = BIGDECIMAL_ZERO;
-    token.untrackedVolumeUSD = BIGDECIMAL_ZERO;
-    token.txCount = BIGINT_ZERO;
-    token.totalLiquidity = BIGDECIMAL_ZERO;
-    token.derivedBNB = BIGDECIMAL_ZERO;
+    token._derivedBNB = BIGDECIMAL_ZERO;
 
     token.save();
     return token as Token;
@@ -42,18 +33,18 @@ export function getOrCreateToken(address: Address): Token {
 }
 
 export function getOrCreateRewardToken(address: Address): RewardToken {
-  let rewardToken = RewardToken.load(address.toHexString())
-  if(rewardToken == null) {
-    let token = getOrCreateToken(address)
-    rewardToken = new RewardToken(address.toHexString())
-    rewardToken.name = token.name
-    rewardToken.symbol = token.symbol
-    rewardToken.decimals = token.decimals
-    rewardToken.type = RewardTokenType.DEPOSIT
+  let rewardToken = RewardToken.load(address.toHexString());
+  if (rewardToken == null) {
+    let token = getOrCreateToken(address);
+    rewardToken = new RewardToken(address.toHexString());
+    rewardToken.name = token.name;
+    rewardToken.symbol = token.symbol;
+    rewardToken.decimals = token.decimals;
+    rewardToken.type = RewardTokenType.DEPOSIT;
 
-    rewardToken.save()
+    rewardToken.save();
 
-    return rewardToken as RewardToken
+    return rewardToken as RewardToken;
   }
-  return rewardToken as RewardToken
+  return rewardToken as RewardToken;
 }
