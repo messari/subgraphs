@@ -1,6 +1,6 @@
 # Uniswap v2 Subgraph
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
@@ -14,25 +14,23 @@ Sum across all Pools:
 
 `(Swap Trading Volume * Total Swap Fee)`
 
-Note that the Total Swap Fee for Uniswap is currently 0.3% but could be changed via Governance (04/07/22)
+Note that the Total Swap Fee for Uniswap_v2 is currently 0.3% and cannot be changed via Governance (04/07/22)
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Swap Trading Volume * Protocol Swap Fee)`
+`(Swap Trading Volume * Total Swap Fee * Protocol Swap Fee)`
 
-Note that the Protocol Swap Fee for Uniswap is currently 0% but could be changed via Governance (04/07/22)
+Note that the Protocol Swap Fee for Uniswap_v2 is currently 0% and can be changed via Governance (04/07/22)
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Swap Trading Volume * SupplySide Swap Fee)`
-
-Note that the SupplySide Swap Fee for Uniswap is currently 0.3% but could be changed via Governance (04/07/22)
+`(Swap Trading Volume * Total Swap Fee * (1- Protocol Swap Fee))`
 
 ### Total Unique Users
 
