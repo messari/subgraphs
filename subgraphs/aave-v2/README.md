@@ -20,14 +20,14 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Market Oustanding Borrow Amount * Market Borrow Rate) * (Pool Reserve Factor)`
+`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Market Outstanding Borrows * Market Borrow Rate) * (1 - Pool Reserve Factor)`
+`(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
 
 ### Total Unique Users
 
@@ -50,3 +50,9 @@ To be added
 ###  Protocol Controlled Value
 
 Not applicable to Aave
+
+## Useful links and references
+
+Existing Subgraph - https://thegraph.com/hosted-service/subgraph/aave/protocol-v2
+
+https://docs.aave.com/risk/asset-risk/risk-parameters#reserve-factor
