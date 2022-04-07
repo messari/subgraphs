@@ -49,3 +49,13 @@ To be added
 ###  Protocol Controlled Value
 
 To be added
+
+## Useful Links
+
+Existing Subgraph
+
+https://thegraph.com/hosted-service/subgraph/harvestfi/harvest-finance	
+
+https://github.com/harvestfi/thegraph	
+
+Documentation - https://harvest-finance.gitbook.io/harvest-finance/thegraph/harvest-finance-subgraph

@@ -49,3 +49,9 @@ To be added
 ###  Protocol Controlled Value
 
 To be added
+
+## Useful Links
+
+Documentation - https://docs.balancer.fi/
+
+Existing Subgraph - https://thegraph.com/hosted-service/subgraph/balancer-labs/balancer-v2
