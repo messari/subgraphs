@@ -1,6 +1,6 @@
 # Curve Subgraph
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
@@ -14,6 +14,7 @@ Sum across all Pools:
 
 `(Swap Trading Volume * Pool Swap Fee)`
 
+Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
@@ -22,15 +23,16 @@ Sum across all Pools:
 
 `(Swap Trading Volume * Pool Swap Fee * Pool Admin Fee)`
 
+Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Swap Trading Volume * Pool Swap Fee * Pool Admin Fee)`
+`(Swap Trading Volume * Pool Swap Fee * (1 - Pool Admin Fee))`
 
- ^ NOTE: Review this. Should not be same as Protocol-side
+Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
 
 ### Total Unique Users
 
