@@ -12,8 +12,8 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     obj.slug = "vesper-finance-v3";
     obj.schemaVersion = "1.0.0";
     obj.subgraphVersion = "1.0.0";
-    obj.network = Network.ETHEREUM;
-    obj.type = ProtocolType.YIELD;
+    obj.network = "ETHEREUM";
+    obj.type = "YIELD";
     obj.totalUniqueUsers = 0;
     obj.totalValueLockedUSD = BigDecimal.zero();
     obj.save();
