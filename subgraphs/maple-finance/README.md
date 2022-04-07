@@ -1,12 +1,12 @@
 # Maple Finance Subgraph
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.1.0
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools: 
 
-`Current Borrow Loans + Remaining Cash Available to Borrow as Loan`
+`Current Borrow Loans + Remaining Cash Available to Borrow as Loan + Value of MPL/USDC BPT Deposited`
 
 ### Total Revenue USD
 
