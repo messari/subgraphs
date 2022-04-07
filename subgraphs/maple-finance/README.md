@@ -12,7 +12,7 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`Interest Earned across all loans + Establishment Fees on the Loan Amount for new loans originated`
+`Interest Earned across all loans + Establishment Fees on the Loan Amount for new loans originated + MPL/USDC BPT Deposits`
 
 Note: Establish fee is taken on NEW LOANS. e.g. if you borrow $500k, repay the $500k and take out another $1m, you pay fees across the $1.5m
 
