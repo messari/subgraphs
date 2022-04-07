@@ -1,4 +1,4 @@
-# Uniswap v2 Subgraph
+# Curve Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -12,25 +12,27 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`(Swap Trading Volume * Total Swap Fee)`
+`(Swap Trading Volume * Pool Swap Fee)`
 
-Note that the Total Swap Fee for Uniswap_v2 is currently 0.3% and cannot be changed via Governance (04/07/22)
+Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Swap Trading Volume * Total Swap Fee * Protocol Swap Fee)`
+`(Swap Trading Volume * Pool Swap Fee * Pool Admin Fee)`
 
-Note that the Protocol Swap Fee for Uniswap_v2 is currently 0% and can be changed via Governance (04/07/22)
+Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Swap Trading Volume * Total Swap Fee * (1- Protocol Swap Fee))`
+`(Swap Trading Volume * Pool Swap Fee * (1 - Pool Admin Fee))`
+
+Note: The Pool Swap Fee + Pool Admin Fees can be dynamically updated from pool-to-pool
 
 ### Total Unique Users
 
@@ -53,9 +55,4 @@ To be added
 ## References and Useful Links
 
 Other existing subgraph
-https://thegraph.com/hosted-service/subgraph/uniswap/uniswap-v2
-
-
-## Smart Contracts Interactions
-
-![Uniswap v2](../../docs/images/protocols/uniswap-v2.png "Uniswap v2")
+https://thegraph.com/hosted-service/subgraph/curvefi/curve

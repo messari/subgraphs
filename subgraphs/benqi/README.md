@@ -1,4 +1,5 @@
-# Aave v2 Subgraph
+# Benqi Subgraph
+
 ## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
@@ -11,9 +12,9 @@ Sum across all Pools:
 
 Sum across all Pools:
 
-`(Pool Variable Borrow Amount * Variable Pool Borrow Rate) + (Pool Stable Borrow Amount * Stable Pool Borrow Rate)`
+`(Pool Borrow Amount * Pool Borrow Rate)`
 
-Note: This currently excludes Flash Loans
+Note: This currently excludes Liquidations
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
@@ -22,12 +23,16 @@ Sum across all Pools:
 
 `(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
 
+Note: This currently excludes Liquidations
+
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
 `(Pool Outstanding Borrow Amount * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+
+Note: This currently excludes Liquidations
 
 ### Total Unique Users
 
@@ -49,10 +54,13 @@ To be added
 
 ###  Protocol Controlled Value
 
-Not applicable to Aave
+Not applicable to Benqi v2
 
-## Useful links and references
+## References and Useful Links
 
-Existing Subgraph - https://thegraph.com/hosted-service/subgraph/aave/protocol-v2
+Existing subgraph
+https://github.com/token-terminal/tt-subgraphs/tree/main/benqi
 
-https://docs.aave.com/risk/asset-risk/risk-parameters#reserve-factor
+### Fork Information
+
+Note that Benqi is a fork of Compound
