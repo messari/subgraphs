@@ -1,18 +1,20 @@
 # Maple Finance Subgraph
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools: 
 
-`Current Loans + Total Cash`
+`Current Borrow Loans + Remaining Cash Available to Borrow as Loan`
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
 `Interest Earned across all loans + Establishment Fees on the Loan Amount for new loans originated`
+
+Note: Establish fee is taken on NEW LOANS. e.g. if you borrow $500k, repay the $500k and take out another $1m, you pay fees across the $1.5m
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
