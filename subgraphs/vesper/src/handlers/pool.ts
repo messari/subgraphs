@@ -21,11 +21,10 @@ import {
   getDecimalDivisor,
   getPoolV3,
 } from "../peer";
-
-const VVSPAddressHex = "0xbA4cFE5741b357FA371b506e5db0774aBFeCf8Fc";
-const ZeroAddressHex = "0x0000000000000000000000000000000000000000";
-let VVSPAddress = Address.fromHexString(VVSPAddressHex);
-let ZeroAddress = Address.fromHexString(ZeroAddressHex);
+import {
+  ZERO_ADDRESS,
+  VVSP_ADDRESS_HEX,
+} from "../constant";
 
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
 // we need to do so with the restrictions of AssemblyScript
@@ -185,7 +184,7 @@ function handleWithdrawFee(
     "Entered handleWithdrawFee for pool {}, withdraw made by {} in tx {}",
     [poolAddressHex, withdrawerAddressHex, txHash]
   );
-  if (poolAddressHex === VVSPAddressHex) {
+  if (poolAddressHex === VVSP_ADDRESS_HEX) {
     log.info("Tx {}, VesperPool is vVSP, which has no fees.", [txHash]);
     return;
   }
@@ -196,7 +195,7 @@ function handleWithdrawFee(
     poolAddressHex,
     feeWhiteListAddressHex,
   ]);
-  if (feeWhiteList != ZeroAddress) {
+  if (feeWhiteList != ZERO_ADDRESS) {
     let addressList = AddressList.bind(feeWhiteList);
     if (addressList.contains(withdrawerAddress)) {
       log.info("Address {} is whitelisted in pool {}, withdraw is fee-less", [
@@ -270,7 +269,7 @@ export function handleTransferV3(event: Transfer): void {
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.from != ZeroAddress ||
+    event.params.from != ZERO_ADDRESS ||
     !hasStrategy(poolV3.getStrategies(), event.params.to)
   ) {
     let toHex = event.params.to.toHexString();

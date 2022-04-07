@@ -5,35 +5,27 @@ import { Controller } from "../generated/poolV3_vaUSDC/Controller";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { PriceRouter } from "../generated/poolV3_vaUSDC/PriceRouter";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
-
-// This is using Sushiswap address for Ethereum Mainnet.
-let RouterAddress = Address.fromString(
-  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
-);
-let UsdcAddress = Address.fromString(
-  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-);
-
-let WEthAddress = Address.fromString(
-  "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-);
-
-const ControllerAddress = "0xa4F1671d3Aee73C05b552d57f2d16d3cfcBd0217";
+import {
+  ROUTER_ADDRESS,
+  USDC_ADDRESS,
+  WETH_ADDRESS,
+  CONTROLLER_ADDRESS_HEX,
+} from "./constant";
 
 export function getDecimalDivisor(decimals: i32): BigDecimal {
   return BigDecimal.fromString("1".concat("0".repeat(decimals)));
 }
 
 function getUsdPriceRate(decimals: i32, address: Address): BigDecimal | null {
-  let priceRouter = PriceRouter.bind(RouterAddress);
+  let priceRouter = PriceRouter.bind(ROUTER_ADDRESS);
   // Interpolation with ``not supported by AssemblyScript
   let oneUnit = BigInt.fromString("1".concat("0".repeat(decimals)));
   // the second parameter returns the rate
   let paths: Address[] = [address];
-  if (address != WEthAddress) {
-    paths.push(WEthAddress);
+  if (address != WETH_ADDRESS) {
+    paths.push(WETH_ADDRESS);
   }
-  paths.push(UsdcAddress);
+  paths.push(USDC_ADDRESS);
   log.info("Trying to retrieve USDC rate for address {} with decimals={}.", [
     address.toHexString(),
     decimals.toString(),
@@ -59,7 +51,7 @@ export function toUsd(
   tokenAddress: Address
 ): BigDecimal {
   // if we are converting from Usdc, it's the same destiniy token, so we return the same value
-  if (tokenAddress == UsdcAddress) {
+  if (tokenAddress == USDC_ADDRESS) {
     return amountIn;
   }
   // if the amount to convert is 0, then
@@ -83,7 +75,7 @@ export function toUsd(
 }
 
 export function getStrategyAddress(poolAddress: Address): Address {
-  let controller = Controller.bind(Address.fromString(ControllerAddress));
+  let controller = Controller.bind(Address.fromString(CONTROLLER_ADDRESS_HEX));
   return controller.strategy(poolAddress);
 }
 
