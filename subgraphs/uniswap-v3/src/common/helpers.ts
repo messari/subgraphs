@@ -72,12 +72,12 @@ function convertFeeToPercent(fee: i64): BigDecimal {
 function createPoolFees(poolAddressString: string, fee: i64): string[] {
   // Trading Fee
   let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
-  poolTradingFee.feeType = LiquidityPoolFeeType.TRADING_FEE
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
   poolTradingFee.feePercentage = convertFeeToPercent(fee)
 
   // Protocol Fee
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
-  poolProtocolFee.feeType = LiquidityPoolFeeType.PROTOCOL_FEE
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
   poolTradingFee.save()
