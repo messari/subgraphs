@@ -1,41 +1,38 @@
 # Sushiswap Subgraph
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools:
 
-`Insert Calculation`
+`Liquidity Pool TVL`
 
-<Add notes to consider if any - delete if none>
+Note: This ignores staked Sushi
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
-`Insert Calculation`
+`(Swap Trading Volume * Total Swap Fee)`
 
-<Add notes to consider if any - delete if none>
-
+Note that the Total Swap Fee for SushiSwap is currently 0.3% and cannot be changed via Governance (04/07/22)
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`Insert Calculation`
+`(Swap Trading Volume * Total Swap Fee * Protocol Share) or (Swap Trading Volume * Protocol Swap Fee)`
 
-<Add notes to consider if any - delete if none>
+Protocol Share is 1/6th of Total Fee (0.3%) i.e. Protocol Swap Fee is 0.05%, 
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`(Swap Trading Volume * Total Swap Fee * (1- Protocol Share)) or (Swap Trading Volume * LP Swap Fee)`
 
 ### Total Unique Users
 
