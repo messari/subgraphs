@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.2
+# Version: 1.0.3
 
 enum Network {
   AVALANCHE
@@ -298,7 +298,10 @@ enum LiquidityPoolFeeType {
   DYNAMIC_TRADING_FEE
 
   " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
-  PROTOCOL_FEE
+  FIXED_PROTOCOL_FEE
+
+  " Some protocols use dynamic protocol fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_PROTOCOL_FEE
 }
 
 type LiquidityPoolFee @entity {
