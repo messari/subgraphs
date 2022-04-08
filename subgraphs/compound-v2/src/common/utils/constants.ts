@@ -114,6 +114,6 @@ export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.8";
+export const SUBGRAPH_VERSION = "1.4.9";
 export const SCHEMA_VERSION = "1.0.1";
 export const COMPOUND_DECIMALS = 8;

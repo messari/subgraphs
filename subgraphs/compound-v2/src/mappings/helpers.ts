@@ -319,16 +319,15 @@ export function createLiquidation(
 export function updatePrevBlockRevenues(market: Market): void {
   // update revenues for prev block
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let borrowRatePerBlock = market.variableBorrowRate.div(BLOCKS_PER_YEAR);
   let outstandingBorrowUSD = market._outstandingBorrowAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingDecimals))
     .times(market._inputTokenPrice);
   market._supplySideRevenueUSDPerBlock = outstandingBorrowUSD
-    .times(market.variableBorrowRate)
+    .times(borrowRatePerBlock)
     .times(BIGDECIMAL_ONE.minus(market._reserveFactor));
-  market._protocolSideRevenueUSDPerBlock = outstandingBorrowUSD
-    .times(market.variableBorrowRate)
-    .times(market._reserveFactor);
+  market._protocolSideRevenueUSDPerBlock = outstandingBorrowUSD.times(borrowRatePerBlock).times(market._reserveFactor);
   market._totalRevenueUSDPerBlock = outstandingBorrowUSD.times(market.variableBorrowRate);
 
   market.save();
