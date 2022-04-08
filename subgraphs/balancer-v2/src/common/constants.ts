@@ -18,7 +18,7 @@ export namespace Network {
   export const MOONBEAM = "moonbeam";
   export const MOONRIVER = "moonriver";
   export const OPTIMISM = "optimistic-ethereum";
-  export const POLYGON = "polygon-pos";
+  export const POLYGON = "POLYGON_POS";
   export const XDAI = "xdai";
 }
 

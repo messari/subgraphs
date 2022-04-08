@@ -1,0 +1,40 @@
+specVersion: 0.0.2
+description: Balancer v2 subgraph for Messari
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Vault
+    network: matic
+    source:
+      address: '0xBA12222222228d8Ba445958a75a0704d566BF2C8'
+      abi: Vault
+      startBlock: 15832990
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - AmmProtocol
+        - Token
+        - LiquidityPool
+      abis:
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: WeightedPool
+          file: ./abis/WeightedPool.json
+        - name: ConvergentCurvePool
+          file: ./abis/ConvergentCurvePool.json
+      eventHandlers:
+        - event: PoolRegistered(indexed bytes32,indexed address,uint8)
+          handler: handlePoolRegister
+        - event: TokensRegistered(indexed bytes32,address[],address[])
+          handler: handleTokensRegister
+        - event: PoolBalanceChanged(indexed bytes32,indexed address,address[],int256[],uint256[])
+          handler: handlePoolBalanceChanged
+        - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
+          handler: handleSwap

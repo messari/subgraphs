@@ -1,4 +1,4 @@
-import {Address, BigInt, ethereum} from "@graphprotocol/graph-ts"
+import {Address, BigInt, dataSource, ethereum} from "@graphprotocol/graph-ts"
 import {
     Token,
     DexAmmProtocol,
@@ -21,6 +21,13 @@ import {ConvergentCurvePool} from "../../generated/Vault/ConvergentCurvePool";
 
 export function getOrCreateDex(): DexAmmProtocol {
     let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString())
+    let network = dataSource.network()
+    if (network === "polygon") {
+        network = Network.POLYGON
+    } else {
+        network = Network.ETHEREUM
+    }
+
 
     if (protocol === null) {
         protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString())
@@ -28,7 +35,7 @@ export function getOrCreateDex(): DexAmmProtocol {
         protocol.schemaVersion = "0.0.2"
         protocol.subgraphVersion = "0.0.2"
         protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
-        protocol.network = Network.ETHEREUM
+        protocol.network = network
         protocol.type = ProtocolType.EXCHANGE
 
         protocol.save()
