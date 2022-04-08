@@ -61,19 +61,43 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
   return token;
 }
 
-export function getOrCreateVaultFee(address: Address): VaultFee {
-  const id = `WITHDRAWAL_FEE_${address.toHexString()}`;
+export function updateVaultFee(vault: Vault): void {
+  const id = `WITHDRAWAL_FEE_${vault.id}`;
+  const vaultAddress = Address.fromString(vault.id);
+  const poolv3 = PoolV3.bind(vaultAddress);
   let fee = VaultFee.load(id);
 
-  if (!fee) {
-    const poolv3 = PoolV3.bind(address);
+  if (fee) {
+    fee.feePercentage = poolv3.withdrawFee().toBigDecimal();
+  } else {
     fee = new VaultFee(id);
     fee.feePercentage = poolv3.withdrawFee().toBigDecimal();
     fee.feeType = "WITHDRAWAL_FEE";
-    fee.save();
   }
 
-  return fee;
+  vault.fees = [fee.id];
+  fee.save();
+  vault.save();
+}
+
+export function updateVaultTokens(vault: Vault): void {
+  const vaultAddress = Address.fromString(vault.id);
+  const poolv3 = PoolV3.bind(vaultAddress);
+  const strategyAddresses = poolv3.getStrategies();
+  const inputTokens: string[] = [];
+  const inputTokenBalances: BigInt[] = [];
+
+  for (let i = 0, k = strategyAddresses.length; i < k; ++i) {
+    const st = StrategyV3.bind(strategyAddresses[i]);
+    const inputToken = getOrCreateToken(st.collateralToken());
+    inputTokens.push(inputToken.id);
+    inputTokenBalances.push(BigInt.zero());
+  }
+
+  vault.inputTokens = inputTokens;
+  vault.inputTokenBalances = inputTokenBalances;
+
+  vault.save();
 }
 
 export function getOrCreateVault(address: Address): Vault {
@@ -81,13 +105,9 @@ export function getOrCreateVault(address: Address): Vault {
 
   if (!vault) {
     const yAggr = getOrCreateYieldAggregator();
-    const fee = getOrCreateVaultFee(address);
     const poolv3 = PoolV3.bind(address);
-    const strategyAddresses = poolv3.getStrategies();
     const reward = PoolRewards.bind(poolv3.poolRewards());
     // const rewardTokenAddresses = reward.getRewardTokens();
-    const inputTokens: string[] = [];
-    const inputTokenBalances: BigInt[] = [];
     const rewardTokens: string[] = [];
 
     vault = new Vault(address.toHexString());
@@ -101,16 +121,6 @@ export function getOrCreateVault(address: Address): Vault {
     vault.name = poolv3.name();
     vault.symbol = poolv3.symbol();
     vault.depositLimit = BigInt.zero();
-    vault.fees = [fee.id];
-
-    for (let i = 0, k = strategyAddresses.length; i < k; ++i) {
-      const st = StrategyV3.bind(strategyAddresses[i]);
-      const inputToken = getOrCreateToken(st.collateralToken());
-      inputTokens.push(inputToken.id);
-      inputTokenBalances.push(BigInt.zero());
-
-      log.info("Strategy Processed: {}", [strategyAddresses[i].toHexString()]);
-    }
 
     // for (let i = 0, k = rewardTokenAddresses.length; i < k; ++i) {
     //   const rt = getOrCreateRewardToken(rewardTokenAddresses[i]);
@@ -118,12 +128,13 @@ export function getOrCreateVault(address: Address): Vault {
     //   rewardTokens.push(rt.id);
     // }
 
-    vault.inputTokens = inputTokens;
-    vault.inputTokenBalances = inputTokenBalances;
     // vault.rewardTokens = rewardTokens;
 
     vault.save();
   }
+
+  updateVaultFee(vault);
+  updateVaultTokens(vault);
 
   return vault;
 }
