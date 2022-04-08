@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
+import { BigDecimal, BigInt, dataSource } from '@graphprotocol/graph-ts';
 
 ////////////////////////
 ///// Schema Enums /////
@@ -96,3 +96,10 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0")
 ///////
 
 export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
+
+let network: string
+if (dataSource.network() == "mainnet") network = Network.ETHEREUM 
+else if (dataSource.network() == "optimism") network = Network.OPTIMISM
+else network = Network.OPTIMISM
+
+export const deployedNetwork = network
