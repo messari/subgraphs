@@ -25,19 +25,22 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.totalVolumeUSD = protocol._totalVolumeUSD;
 
   if (event.block.number > financialMetrics.blockNumber) {
+    // get block difference to catch any blocks that have no transactions (unlikely, but needs to be accounted)
+    let blockDiff = event.block.number.minus(financialMetrics.blockNumber).toBigDecimal();
+
     // only add to revenues if the financialMetrics has not seen this block number
     for (let i = 0; i < protocol._marketIds.length; i++) {
       let market = getOrCreateMarket(event, event.address);
 
       financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-        market._supplySideRevenueUSDPerBlock,
+        market._supplySideRevenueUSDPerBlock.times(blockDiff),
       );
       financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
-        market._protocolSideRevenueUSDPerBlock,
+        market._protocolSideRevenueUSDPerBlock.times(blockDiff),
       );
 
       // fees are just the totalRevenue (to be changed: https://github.com/messari/subgraphs/pull/47)
-      financialMetrics.feesUSD = financialMetrics.feesUSD.plus(market._totalRevenueUSDPerBlock);
+      financialMetrics.feesUSD = financialMetrics.feesUSD.plus(market._totalRevenueUSDPerBlock.times(blockDiff));
     }
   }
 

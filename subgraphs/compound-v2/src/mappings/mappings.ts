@@ -80,6 +80,10 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   let market = getOrCreateMarket(event, event.address);
 
+  // update financials in case the reserve is updated and no other compound transactions happen in that block
+  // intended for capturing accurate revenues
+  updateFinancials(event);
+
   // get reserve factor
   market._reserveFactor = event.params.newReserveFactorMantissa
     .toBigDecimal()
