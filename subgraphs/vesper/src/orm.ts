@@ -6,7 +6,7 @@ import {
   VaultFee,
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX } from "./constant";
-import { BigDecimal, Address, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { PoolV3 } from "../generated/poolV3_vaUSDC/PoolV3";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
@@ -62,11 +62,12 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 }
 
 export function getOrCreateVaultFee(address: Address): VaultFee {
-  let fee = VaultFee.load(address.toHexString());
+  const id = `WITHDRAWAL_FEE_${address.toHexString()}`;
+  let fee = VaultFee.load(id);
 
   if (!fee) {
     const poolv3 = PoolV3.bind(address);
-    fee = new VaultFee(address.toHexString());
+    fee = new VaultFee(id);
     fee.feePercentage = poolv3.withdrawFee().toBigDecimal();
     fee.feeType = "WITHDRAWAL_FEE";
     fee.save();
@@ -105,9 +106,10 @@ export function getOrCreateVault(address: Address): Vault {
     for (let i = 0, k = strategyAddresses.length; i < k; ++i) {
       const st = StrategyV3.bind(strategyAddresses[i]);
       const inputToken = getOrCreateToken(st.collateralToken());
-
       inputTokens.push(inputToken.id);
       inputTokenBalances.push(BigInt.zero());
+
+      log.info("Strategy Processed: {}", [strategyAddresses[i].toHexString()]);
     }
 
     // for (let i = 0, k = rewardTokenAddresses.length; i < k; ++i) {
