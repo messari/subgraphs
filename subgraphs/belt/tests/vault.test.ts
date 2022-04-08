@@ -11,20 +11,24 @@ import {
   mockVaultFeeFunction,
   mockVaultInputBalance,
   mockVaultSharePrice,
+  mockVaultSupply,
 } from "./mocks/vault";
 
 let decimals = BigInt.fromString("10").pow(18);
 let numerator = BigInt.fromString("100");
 let denominator = BigInt.fromString("1000");
 let inputTokenBalance = BigInt.fromString("620").times(decimals);
+let outputTokenBalance = BigInt.fromString("620").times(decimals);
 let price = BigInt.fromString("43500").times(decimals);
 let ratio = BigInt.fromString("1").times(decimals);
 
 mockERC20Functions(c.INPUT_TOKEN_ADDRESS, "BTC", "18");
 mockERC20Functions(c.VAULT_ADDRESS, "beltBTC", "18");
 mockStrategyFunctions(c.STRATEGY_ADDRESS_1, numerator, denominator); // 10% withdrawal fee
+mockStrategyFunctions(c.STRATEGY_ADDRESS_2, numerator, denominator); // 10% withdrawal fee
 mockVaultFeeFunction(c.VAULT_ADDRESS, numerator, denominator); // 10% entrance fee
 mockVaultInputBalance(c.VAULT_ADDRESS, inputTokenBalance); // input token balance
+mockVaultSupply(c.VAULT_ADDRESS, outputTokenBalance); // output token balances
 mockChainlinkPriceFunction(c.CHAINLINK, c.INPUT_TOKEN_ADDRESS, price); // setting to 43.5K
 mockVaultSharePrice(c.VAULT_ADDRESS, ratio); /// setting ratio t0 1
 
@@ -72,7 +76,7 @@ test("vault deposit event", () => {
       .toString(),
   );
   assert.fieldEquals("Vault", c.VAULT_ADDRESS, "inputTokenBalances", `[${inputTokenBalance}]`);
-  assert.fieldEquals("Vault", c.VAULT_ADDRESS, "outputTokenSupply", sharesMinted.toString());
+  assert.fieldEquals("Vault", c.VAULT_ADDRESS, "outputTokenSupply", outputTokenBalance.toString());
   assert.fieldEquals(
     "Vault",
     c.VAULT_ADDRESS,
@@ -154,7 +158,6 @@ test("vault withdraw event", () => {
   handleDeposit(depositEvent);
 
   // after deposit increase
-  assert.fieldEquals("Vault", c.VAULT_ADDRESS, "outputTokenSupply", sharesMinted.toString());
   assert.fieldEquals(
     "YieldAggregator",
     c.PROTOCOL_ID,
@@ -177,7 +180,6 @@ test("vault withdraw event", () => {
   handleWithdraw(withdrawalEvent);
 
   // after withdraw decrease
-  assert.fieldEquals("Vault", c.VAULT_ADDRESS, "outputTokenSupply", "0");
   assert.fieldEquals("YieldAggregator", c.PROTOCOL_ID, "totalValueLockedUSD", "0");
 
   // validating deposit
@@ -201,4 +203,46 @@ test("vault withdraw event", () => {
       .toString(),
   );
   assert.fieldEquals("Withdraw", withdrawId, "vault", c.VAULT_ADDRESS);
+});
+
+test("fees entity", () => {
+  clearStore();
+
+  let depositAmount = BigInt.fromString("1000").times(decimals);
+  let sharesMinted = BigInt.fromString("100").times(decimals);
+
+  handleDeposit(
+    createDepositEvent(c.VAULT_ADDRESS, c.STRATEGY_ADDRESS_1, c.INPUT_TOKEN_ADDRESS, depositAmount, sharesMinted),
+  );
+
+  handleDeposit(
+    createDepositEvent(c.VAULT_ADDRESS, c.STRATEGY_ADDRESS_2, c.INPUT_TOKEN_ADDRESS, depositAmount, sharesMinted),
+  );
+
+  let withdrawFeeId = "withdrawal-fee-"
+    .concat(c.STRATEGY_ADDRESS_1)
+    .concat("-")
+    .concat(c.VAULT_ADDRESS);
+
+  let withdrawFeeId2 = "withdrawal-fee-"
+    .concat(c.STRATEGY_ADDRESS_2)
+    .concat("-")
+    .concat(c.VAULT_ADDRESS);
+
+  let depositFeeId = "deposit-fee-"
+    .concat(c.STRATEGY_ADDRESS_1)
+    .concat("-")
+    .concat(c.VAULT_ADDRESS);
+
+  let depositFeeId2 = "deposit-fee-"
+    .concat(c.STRATEGY_ADDRESS_2)
+    .concat("-")
+    .concat(c.VAULT_ADDRESS);
+
+  assert.fieldEquals(
+    "Vault",
+    c.VAULT_ADDRESS,
+    "fees",
+    `[${withdrawFeeId}, ${depositFeeId}, ${withdrawFeeId2}, ${depositFeeId2}]`,
+  );
 });

@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Deposit as DepositEvent, Vault as VaultContract } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, VaultFeeType } from "../constant";
@@ -28,7 +28,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
 
   let amountUSD = inputTokenPrice.times(depositAmount.toBigDecimal().div(inputTokenDecimals.toBigDecimal()));
 
-  vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+  vault.outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
   vault.inputTokenBalances = [inputTokenBalance];
   vault.totalValueLockedUSD = inputTokenPrice.times(
     inputTokenBalance.toBigDecimal().div(inputTokenDecimals.toBigDecimal()),
@@ -39,7 +39,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   vault.save();
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
-  let feePercentage = getFeePercentage(vault, VaultFeeType.DEPOSIT_FEE);
+  let feePercentage = getFeePercentage(vault, event.params.strategyAddress.toHex(), VaultFeeType.DEPOSIT_FEE);
 
   let fees = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
   financialMetrics.feesUSD = financialMetrics.feesUSD.plus(fees);

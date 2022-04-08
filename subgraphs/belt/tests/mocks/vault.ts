@@ -96,6 +96,14 @@ export function mockVaultInputBalance(address: string, inputTokenBalance: BigInt
   ).returns([ethereum.Value.fromUnsignedBigInt(inputTokenBalance)]);
 }
 
+export function mockVaultSupply(address: string, outputTokenBalance: BigInt): void {
+  createMockedFunction(
+    Address.fromString(address),
+    "totalSupply",
+    "totalSupply():(uint256)",
+  ).returns([ethereum.Value.fromUnsignedBigInt(outputTokenBalance)]);
+}
+
 export function mockVaultSharePrice(address: string, ratio: BigInt): void {
   createMockedFunction(
     Address.fromString(address),

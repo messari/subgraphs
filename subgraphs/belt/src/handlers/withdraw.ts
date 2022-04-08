@@ -28,7 +28,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
 
   let amountUSD = inputTokenPrice.times(withdrawAmount.toBigDecimal().div(inputTokenDecimals.toBigDecimal()));
 
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  vault.outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
   vault.inputTokenBalances = [inputTokenBalance];
   vault.totalValueLockedUSD = inputTokenPrice.times(
     inputTokenBalance.toBigDecimal().div(inputTokenDecimals.toBigDecimal()),
@@ -37,7 +37,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   vault.save();
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
-  let feePercentage = getFeePercentage(vault, VaultFeeType.WITHDRAWAL_FEE);
+  let feePercentage = getFeePercentage(vault, event.params.strategyAddress.toHex(), VaultFeeType.WITHDRAWAL_FEE);
   let feesUSD = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
 
   financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feesUSD);

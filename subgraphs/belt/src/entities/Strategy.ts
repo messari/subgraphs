@@ -33,7 +33,7 @@ export function createStrategy(vault: Vault, strategyAddress: Address, tokenAddr
         .times(BIGDECIMAL_HUNDRED)
         .div(denom.toBigDecimal());
   let withdrawFeeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
-    .concat(strategyAddress.toHex())
+    .concat(strategy.id)
     .concat("-")
     .concat(vault.id);
   createFeeType(withdrawFeeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
@@ -49,23 +49,25 @@ export function createStrategy(vault: Vault, strategyAddress: Address, tokenAddr
         .times(BIGDECIMAL_HUNDRED)
         .div(denom.toBigDecimal());
   let depositFeeId = enumToPrefix(VaultFeeType.DEPOSIT_FEE)
-    .concat(strategyAddress.toHex())
+    .concat(strategy.id)
     .concat("-")
     .concat(vault.id);
   createFeeType(depositFeeId, VaultFeeType.DEPOSIT_FEE, feePercentage);
 
-  vault.fees = [withdrawFeeId, depositFeeId];
+  let fees = vault.fees;
+  vault.fees = fees.concat([withdrawFeeId, depositFeeId]);
   vault.save();
 }
 
-export function getFeePercentage(vault: Vault, feeType: string): BigDecimal {
-  for (let i = 0; i < vault.fees.length; i++) {
-    let fee = vault.fees[i];
-    let vaultFee = VaultFee.load(fee);
+export function getFeePercentage(vault: Vault, strategyAddress: string, feeType: string): BigDecimal {
+  let feeId = enumToPrefix(feeType)
+    .concat(strategyAddress.toLowerCase())
+    .concat("-")
+    .concat(vault.id);
 
-    if (vaultFee && vaultFee.feeType === feeType) {
-      return vaultFee.feePercentage;
-    }
+  let vaultFee = VaultFee.load(feeId);
+  if (vaultFee) {
+    return vaultFee.feePercentage;
   }
 
   return BIGDECIMAL_ZERO;
