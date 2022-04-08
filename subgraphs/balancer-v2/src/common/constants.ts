@@ -125,12 +125,6 @@ let wbtcAddressByNetwork: AddressByNetwork = {
   arbitrum: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f',
 };
 
-let usdAddressByNetwork: AddressByNetwork = {
-  mainnet: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
-  polygon: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
-  arbitrum: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
-};
-
 let usdcAddressByNetwork: AddressByNetwork = {
   mainnet: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
   polygon: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174',
@@ -168,7 +162,6 @@ export let VAULT_ADDRESS = forNetwork(vaultAddressByNetwork, network);
 export let WETH: Address = forNetwork(wethAddressByNetwork, network);
 export let WMATIC: Address = forNetwork(wMaticAddressByNetwork, network);
 export let WBTC: Address = forNetwork(wbtcAddressByNetwork, network);
-export let USD: Address = forNetwork(usdAddressByNetwork, network);
 export let USDC: Address = forNetwork(usdcAddressByNetwork, network);
 export let USDT: Address = forNetwork(usdtAddressByNetwork, network);
 export let BAL: Address = forNetwork(balAddressByNetwork, network);

@@ -539,3 +539,10 @@ type _DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }
+
+type _TokenPrice @entity {
+  " Token Address "
+  id: ID!
+  lastUsdPrice: BigDecimal!
+  block: BigInt!
+}

@@ -1,7 +1,8 @@
-import {Address, ethereum} from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, ethereum} from "@graphprotocol/graph-ts";
 import {getOrCreateDex, getOrCreateFinancials, getOrCreateUsageMetricSnapshot} from "./getters";
 import {SECONDS_PER_DAY} from "./constants";
-import {_Account, _DailyActiveAccount} from "../../generated/schema";
+import {_Account, _DailyActiveAccount, _TokenPrice, LiquidityPool} from "../../generated/schema";
+import {valueInUSD} from "./pricing";
 
 export function updateFinancials(event: ethereum.Event): void {
     let financialMetrics = getOrCreateFinancials(event)
@@ -43,4 +44,27 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     }
 
     usageMetrics.save();
+}
+
+export function updatePoolMetrics(id: string): void {
+    let pool = LiquidityPool.load(id)
+    if (!pool) return
+    let totalValueLocked = BigDecimal.zero()
+    let tokenWithoutPrice = false
+    for (let i = 0; i<pool.inputTokens.length; i++) {
+        let token = _TokenPrice.load(pool.inputTokens[i])
+        if (!token) {
+            tokenWithoutPrice = true
+            break
+        }
+
+        totalValueLocked.plus(valueInUSD(
+            pool.inputTokenBalances[i].toBigDecimal(),
+            Address.fromString(token.id)
+        ))
+    }
+
+    if (tokenWithoutPrice) return
+    pool.totalValueLockedUSD = totalValueLocked
+    pool.save()
 }
