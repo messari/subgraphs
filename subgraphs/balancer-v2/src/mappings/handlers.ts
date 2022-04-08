@@ -48,24 +48,13 @@ export function handleSwap(event: Swap): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString())
   if (pool == null) return
 
-  let tokenInIndex: u32 = -1;
-  let tokenOutIndex: u32 = -1;
-
   for (let i=0; i<pool.inputTokens.length; i++) {
     if (event.params.tokenIn.toHexString() === pool.inputTokens[i]) {
-      tokenInIndex = i
+      pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(event.params.amountIn)
     }
 
-    if (event.params.tokenIn.toHexString() === pool.inputTokens[i]) {
-      tokenOutIndex = i
+    if (event.params.tokenOut.toHexString() === pool.inputTokens[i]) {
+      pool.inputTokenBalances[i] = pool.inputTokenBalances[i].minus(event.params.amountOut)
     }
   }
-
-  if (tokenInIndex < 0) return
-  if (tokenOutIndex < 0) return
-
-  pool.inputTokenBalances[tokenInIndex] = pool.inputTokenBalances[tokenInIndex].plus(event.params.amountIn)
-  pool.inputTokenBalances[tokenOutIndex] = pool.inputTokenBalances[tokenOutIndex].minus(event.params.amountIn)
-
-  pool.save()
 }
