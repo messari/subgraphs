@@ -12,7 +12,7 @@ import { NewReserveFactor } from "../types/Comptroller/cToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { BIGDECIMAL_ONE, DEFAULT_DECIMALS } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
@@ -66,7 +66,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 export function handleMarketListed(event: MarketListed): void {
   // create new market now that the data source is instantiated
   CToken.create(event.params.cToken);
-  let market = getOrCreateMarket(event, event.params.cToken);
+  getOrCreateMarket(event, event.params.cToken);
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {

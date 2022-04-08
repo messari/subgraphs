@@ -7,6 +7,9 @@ import {
   BLOCKS_PER_YEAR,
   RewardTokenType,
   CCOMP_ADDRESS,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  BIGDECIMAL_ONE,
 } from "../common/utils/constants";
 import {
   getOrCreateLendingProtcol,
@@ -15,7 +18,6 @@ import {
   getOrCreateToken,
 } from "../common/getters";
 import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/utils/constants";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CToken } from "../types/Comptroller/cToken";
 import { getUSDPriceOfToken } from "../common/prices/prices";
@@ -56,6 +58,7 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
 
   // get/update prices/rates/rewards for market
   if (market._blockNumber < event.block.number) {
+    updatePrevBlockRevenues(market);
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
@@ -151,15 +154,16 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.market = marketAddress.toHexString();
   borrow.asset = market.inputTokens[0];
   borrow.amount = amount;
-  market._outstandingBorrowAmount = market._outstandingBorrowAmount.plus(amount);
 
   // get/update prices/rates/rewards for market
   if (market._blockNumber < event.block.number) {
+    updatePrevBlockRevenues(market);
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
     market._blockNumber = event.block.number;
   }
+  market._outstandingBorrowAmount = market._outstandingBorrowAmount.plus(amount); // must be after revenue updates
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
   borrow.amountUSD = market._inputTokenPrice.times(decimalAmount);
@@ -202,15 +206,16 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.market = marketAddress.toHexString();
   repay.asset = market.inputTokens[0];
   repay.amount = amount;
-  market._outstandingBorrowAmount = market._outstandingBorrowAmount.minus(amount);
 
   // get/update prices/rates/rewards for market
   if (market._blockNumber < event.block.number) {
+    updatePrevBlockRevenues(market);
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
     market._blockNumber = event.block.number;
   }
+  market._outstandingBorrowAmount = market._outstandingBorrowAmount.minus(amount); // must be after revenue updates
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
   repay.amountUSD = market._inputTokenPrice.times(decimalAmount);
@@ -265,12 +270,14 @@ export function createLiquidation(
 
   // get/update prices/rates/rewards for market and liquidatedMarket
   if (market._blockNumber < event.block.number) {
+    updatePrevBlockRevenues(market);
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
     market._blockNumber = event.block.number;
   }
   if (liquidatedMarket._blockNumber < event.block.number) {
+    updatePrevBlockRevenues(liquidatedMarket);
     updateMarketPrices(liquidatedMarket, event);
     updateMarketRates(liquidatedMarket);
     updateRewards(event, liquidatedMarket);
@@ -306,6 +313,26 @@ export function createLiquidation(
 /////////////////////////
 //// Updates Helpers ////
 /////////////////////////
+
+// must happen before any other fields are updated for the new block
+// b/c we want to capture all of the revenue from the previous block
+export function updatePrevBlockRevenues(market: Market): void {
+  // update revenues for prev block
+  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let outstandingBorrowUSD = market._outstandingBorrowAmount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingDecimals))
+    .times(market._inputTokenPrice);
+  market._supplySideRevenueUSDPerBlock = outstandingBorrowUSD
+    .times(market.variableBorrowRate)
+    .times(BIGDECIMAL_ONE.minus(market._reserveFactor));
+  market._protocolSideRevenueUSDPerBlock = outstandingBorrowUSD
+    .times(market.variableBorrowRate)
+    .times(market._reserveFactor);
+  market._totalRevenueUSDPerBlock = outstandingBorrowUSD.times(market.variableBorrowRate);
+
+  market.save();
+}
 
 export function updateMarketPrices(market: Market, event: ethereum.Event): void {
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;

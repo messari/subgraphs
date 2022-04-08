@@ -4,13 +4,11 @@ import {
   getOrCreateLendingProtcol,
   getOrCreateMarket,
   getOrCreateMarketDailySnapshot,
-  getOrCreateToken,
   getOrCreateUsageMetricSnapshot,
 } from "./getters";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../types/schema";
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, SECONDS_PER_DAY } from "./utils/constants";
-import { exponentToBigDecimal } from "./utils/utils";
+import { SECONDS_PER_DAY } from "./utils/constants";
 
 ///////////////////////////
 //// Snapshot Entities ////
@@ -19,44 +17,33 @@ import { exponentToBigDecimal } from "./utils/utils";
 // updates a given FinancialDailySnapshot Entity
 export function updateFinancials(event: ethereum.Event): void {
   // number of days since unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let financialMetrics = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtcol();
-
-  // update the block number and timestamp
-  financialMetrics.blockNumber = event.block.number;
-  financialMetrics.timestamp = event.block.timestamp;
 
   // update value/volume vars
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.totalVolumeUSD = protocol._totalVolumeUSD;
 
-  // calculate supply-side revenue and protocol-side revenue
-  let supplySideRevenue = BIGDECIMAL_ZERO;
-  let protocolSideRevenue = BIGDECIMAL_ZERO;
-  let feesUSD = BIGDECIMAL_ZERO; // aka Total revenue = market outstanding borrows * market borrow rate
-  for (let i = 0; i < protocol._marketIds.length; i++) {
-    let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
-    let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
-    let outstandingBorrowUSD = market._outstandingBorrowAmount
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingDecimals))
-      .times(market._inputTokenPrice);
-    supplySideRevenue = outstandingBorrowUSD
-      .times(market.variableBorrowRate)
-      .times(BIGDECIMAL_ONE.minus(market._reserveFactor))
-      .plus(supplySideRevenue);
-    protocolSideRevenue = outstandingBorrowUSD
-      .times(market.variableBorrowRate)
-      .times(market._reserveFactor)
-      .plus(protocolSideRevenue);
-    feesUSD = outstandingBorrowUSD.times(market.variableBorrowRate).plus(feesUSD);
-  }
-  financialMetrics.supplySideRevenueUSD = supplySideRevenue;
-  financialMetrics.protocolSideRevenueUSD = protocolSideRevenue;
+  if (event.block.number > financialMetrics.blockNumber) {
+    // only add to revenues if the financialMetrics has not seen this block number
+    for (let i = 0; i < protocol._marketIds.length; i++) {
+      let market = getOrCreateMarket(event, event.address);
 
-  // calculate fees = totalRevenue
-  financialMetrics.feesUSD = feesUSD;
+      financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
+        market._supplySideRevenueUSDPerBlock,
+      );
+      financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
+        market._protocolSideRevenueUSDPerBlock,
+      );
+
+      // fees are just the totalRevenue (to be changed: https://github.com/messari/subgraphs/pull/47)
+      financialMetrics.feesUSD = financialMetrics.feesUSD.plus(market._totalRevenueUSDPerBlock);
+    }
+  }
+
+  // update the block number and timestamp
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
 
   financialMetrics.save();
 }
@@ -99,7 +86,6 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 // update a given MarketDailySnapshot
 export function updateMarketMetrics(event: ethereum.Event): void {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = getOrCreateMarketDailySnapshot(event);
   let market = getOrCreateMarket(event, event.address);
 

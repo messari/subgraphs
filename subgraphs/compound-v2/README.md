@@ -4,7 +4,7 @@
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools: 
+Sum across all Pools:
 
 `Pool Deposit TVL`
 
@@ -27,6 +27,7 @@ Sum across all Pools:
 Note: This currently excludes Liquidations
 
 ### Supply-Side Revenue USD
+
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
@@ -49,7 +50,7 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Repayments`
 
-###  Reward Token Emissions Amount
+### Reward Token Emissions Amount
 
 Amount of reward tokens (COMP) distributed each day.
 
@@ -57,7 +58,7 @@ Following calculation gives the COMP distributed (in COMP) to suppliers OR borro
 
 `COMP per block * 4 * 60 * 24`
 
-###  Protocol Controlled Value
+### Protocol Controlled Value
 
 Not applicable to Compound v2
 

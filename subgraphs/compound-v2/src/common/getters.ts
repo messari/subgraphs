@@ -242,8 +242,9 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market._reserveFactor = tryReserveFactor.reverted
       ? BIGDECIMAL_ZERO
       : tryReserveFactor.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
-    market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market._supplySideRevenueUSDPerBlock = BIGDECIMAL_ZERO;
+    market._protocolSideRevenueUSDPerBlock = BIGDECIMAL_ZERO;
+    market._totalRevenueUSDPerBlock = BIGDECIMAL_ZERO;
     market._outstandingBorrowAmount = BIGINT_ZERO;
     market.liquidationPenalty = protocol._liquidationPenalty;
 
