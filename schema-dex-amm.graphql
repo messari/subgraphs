@@ -1,9 +1,10 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.0
+# Version: 1.0.3
 
 enum Network {
-  AVALANCHE
+  ARBITRUM
   AURORA
+  AVALANCHE
   BSC
   CELO
   CRONOS
@@ -289,16 +290,19 @@ type DexAmmProtocol implements Protocol @entity {
 
 enum LiquidityPoolFeeType {
   " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
-  TRADING_FEE
-
-  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
-  PROTOCOL_FEE
+  FIXED_TRADING_FEE
 
   " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
-  TIERED_FEE
+  TIERED_TRADING_FEE
 
   " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
-  DYNAMIC_FEE
+  DYNAMIC_TRADING_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  FIXED_PROTOCOL_FEE
+
+  " Some protocols use dynamic protocol fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_PROTOCOL_FEE
 }
 
 type LiquidityPoolFee @entity {
@@ -433,11 +437,11 @@ type Deposit implements Event @entity {
 
   timestamp: BigInt!
 
-  " Input tokens of the transaction. E.g. WETH and USDC to a WETH-USDC pool "
+  " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output tokens of the transaction. E.g. the UNI-LP token "
-  outputTokens: Token!
+  " Output token of the pool. E.g. the UNI-LP token "
+  outputToken: Token!
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
@@ -477,11 +481,11 @@ type Withdraw implements Event @entity {
 
   timestamp: BigInt!
 
-  " Input tokens of the transaction. E.g. the UNI-LP token "
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
-  " Output tokens of the transaction. E.g. WETH and USDC from a WETH-USDC pool "
-  outputTokens: Token!
+  " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
+  outputToken: Token!
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
