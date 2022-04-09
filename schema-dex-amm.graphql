@@ -490,3 +490,16 @@ type Swap implements Event @entity {
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
+
+# An account is a unique Ethereum address
+# Helps to accumulate total unique users
+type Account @entity {
+  " Address of the account "
+  id: ID!
+}
+
+# Helper entity for calculating daily active users
+type DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: ID!
+}

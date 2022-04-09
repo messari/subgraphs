@@ -558,12 +558,14 @@ type Swap implements Event @entity {
 # underscore to differentiate them from the common schema.
 
 # An account is a unique Ethereum address
-type _Account @entity {
+# Helps to accumulate total unique users
+type Account @entity {
   " Address of the account "
   id: ID!
 }
 
-type _DailyActiveAccount @entity {
+# Helper entity for calculating daily active users
+type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }
