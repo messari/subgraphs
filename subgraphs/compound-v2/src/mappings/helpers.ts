@@ -337,7 +337,7 @@ export function updateMarketPrices(market: Market, event: ethereum.Event): void 
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
   let exchangeRate = getExchangeRate(Address.fromString(market.id));
-  
+
   /*
    * Exchange rate explained:
    * In Practice:
