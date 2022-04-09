@@ -112,7 +112,8 @@ export function initMarket (
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   // There is no need to execute the below code until block 12251569 when incentive controller was deployed
-  if (blockNumber.gt(new BigInt(12251569))) {
+  if (blockNumber.gt(BigInt.fromString("12251569"))) {
+    log.info('ENTERED PASSED BLOCK NUMBER FILTER ' + blockNumber.toString() + ' ' + (new BigInt(12251569)).toString(), [])
     let rewardTokens = market.rewardTokens;
     if (rewardTokens === null) rewardTokens = [];
     if (rewardTokens.length === 0) {
