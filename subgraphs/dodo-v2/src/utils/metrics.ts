@@ -1,4 +1,11 @@
-import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  Address,
+  ethereum,
+  BigInt,
+  log
+} from "@graphprotocol/graph-ts";
+
 import {
   _Account,
   _DailyActiveAccount,
@@ -13,7 +20,9 @@ import {
   DSPFactory_ADDRESS,
   SECONDS_PER_DAY,
   ADDRESS_ZERO,
-  ONE_BI
+  ZERO_BD,
+  ONE_BI,
+  STABLE_COINS
 } from "./constants";
 
 import {
@@ -22,8 +31,15 @@ import {
   getOrCreateUsageMetricSnapshot,
   getOrCreateFinancials,
   getOrCreatePool,
-  getTokenAmountPriceAv
+  getUSDprice,
+  setUSDprice
 } from "./getters";
+
+import { ERC20 } from "../../generated/ERC20/ERC20";
+import { DVM } from "../../generated/DVM/DVM";
+import { CP } from "../../generated/CP/CP";
+import { DPP } from "../../generated/DPP/DPP";
+import { DSP } from "../../generated/DSP/DSP";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -89,23 +105,58 @@ export function updatePoolMetrics(
   let poolMetrics = getOrCreatePoolDailySnapshot(event);
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
 
-  let totalUSDval = 0;
+  let protocol = getOrCreateDexAmm(event.address);
 
-  for (let i = 0; i <= 1; i++) {
-    let usdValueOfTransaction = getTokenAmountPriceAv(
-      tokenAdds[i],
-      trader,
-      amount[i]
-    );
-    // totalUSDval = totalUSDval + usdValueOfTransaction;
+  // let token1 = ERC20.bind(tokenAdds[0]);
+  // let token2 = ERC20.bind(tokenAdds[1]);
+  // let lpToken = ERC20.bind(pool.outputToken);
+  //
+  // let poolInstance = DVM.bind(poolAdd);
+  //
+  // let tokenBal1 = token1.try_balanceOf(poolAdd);
+  // let tokenBal2 = token2.try_balanceOf(poolAdd);
+  // let lpSupply = poolInstance.totalSupply();
+  //
+  // let tokenPoolBals: BigInt[] = [tokenBal1, tokenBal2];
+  //
+  // let totalUSDvalTransaction = ZERO_BD;
+  let totalUSDvalPool = ZERO_BD;
+
+  log.info("this is the transaction hash: {} ", [
+    event.transaction.hash.toHexString()
+  ]);
+  //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
+  //If either tokens are call the setUSDprice function to set a price for the other token
+  if (
+    tokenAdds[0] == Address.fromString(STABLE_COINS[0]) ||
+    tokenAdds[0] == Address.fromString(STABLE_COINS[1]) ||
+    tokenAdds[0] == Address.fromString(STABLE_COINS[2])
+  ) {
+    setUSDprice(tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
   }
 
-  // let protocol = getOrCreateDexAmm(event.address);
-  poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
-  // poolMetrics.inputTokenBalances = pool.inputTokenBalances;
-  // poolMetrics.outputTokenSupply = pool.outputTokenSupply;
-  // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  if (
+    tokenAdds[1] == Address.fromString(STABLE_COINS[0]) ||
+    tokenAdds[1] == Address.fromString(STABLE_COINS[1]) ||
+    tokenAdds[1] == Address.fromString(STABLE_COINS[2])
+  ) {
+    setUSDprice(tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
+  }
+
+  for (let i = 0; i < tokenAdds.length; i++) {
+    let usdValueOfTransaction = getUSDprice(tokenAdds[i], trader, amount[i]);
+    log.info("this is the USD value returned: {} ", [
+      usdValueOfTransaction.toString()
+    ]);
+  }
+
+  // let lpTokenUSD = getTokenAmountPriceAv(poolAdd, trader, 1000000000000000000);
+
+  //poolMetrics.totalValueLockedUSD = totalUSDvalPool;
+  // // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
+  // poolMetrics.inputTokenBalances = tokenPoolBals;
+  // poolMetrics.outputTokenSupply = lpSupply;
+  // poolMetrics.outputTokenPriceUSD = lpTokenUSD;
   // poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   // poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetrics.blockNumber = event.block.number;

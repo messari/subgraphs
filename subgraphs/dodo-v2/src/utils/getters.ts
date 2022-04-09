@@ -4,6 +4,7 @@ import { bigIntToBigDecimal, calculateAverage } from "./numbers";
 
 import {
   Token,
+  _TokenPrice,
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
@@ -17,6 +18,7 @@ import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   ZERO_BD,
   ZERO_BI,
+  ONE_BI,
   Network,
   ProtocolType,
   RewardTokenType,
@@ -26,8 +28,10 @@ import {
   DVMFactory_ADDRESS,
   CPFactory_ADDRESS,
   DPPFactory_ADDRESS,
-  DSPFactory_ADDRESS
+  DSPFactory_ADDRESS,
+  STABLE_COINS
 } from "./constants";
+
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
 import { ERC20 } from "../../generated/ERC20/ERC20";
@@ -40,12 +44,6 @@ import { DVM } from "../../generated/DVM/DVM";
 import { CP } from "../../generated/CP/CP";
 import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
-
-let STABLE_COINS: string[] = [
-  "0x6b175474e89094c44da98b954eedeac495271d0f", // dai
-  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // usdc
-  "0xdac17f958d2ee523a2206206994597c13d831ec7" // usdt
-];
 
 let FACTORIES: string[] = [
   DVMFactory_ADDRESS,
@@ -230,107 +228,91 @@ function getProtocolFromPool(poolAddress: Address): string {
   return factoryAdd;
 }
 
-export function getTokenAmountPriceAv(
-  trader: Address,
-  tokenAddress: Address,
-  amount: BigInt
-): BigDecimal {
-  let dvmFactory = DVMFactory.bind(Address.fromString(DVMFactory_ADDRESS));
-  // let cpFactory = DVMFactory.bind(Address.fromString(CPFactory_ADDRESS));
-  // let dppFactory = DVMFactory.bind(Address.fromString(DPPFactory_ADDRESS));
-  // let dspFactory = DVMFactory.bind(Address.fromString(DSPFactory_ADDRESS));
-  //
-  let total = [BigDecimal.fromString("0")];
-
-  for (let i = 0; i <= 2; i++) {
-    let add = STABLE_COINS[i];
-    //   ////////////////
-    let callResult1 = dvmFactory.try_getDODOPool(
-      Address.fromString(add),
-      tokenAddress
-    );
-
-    let dvmPoolAdd: Address[] = [];
-    if (callResult1.reverted) {
-      log.info("DVM getDODOPool reverted", []);
-      return ZERO_BD;
-    } else {
-      dvmPoolAdd = callResult1.value;
-    }
-    //   // ////////////////
-    //   // let callResult2 = cpFactory.try_getDODOPool(
-    //   //   Address.fromString(add),
-    //   //   tokenAddress
-    //   // );
-    //   // if (callResult2.reverted) {
-    //   //   log.info("CrowdPool getDODOPool reverted", []);
-    //   //   return ZERO_BD;
-    //   // } else {
-    //   //   cpPoolAdd = callResult2.value;
-    //   // }
-    //   // ////////////////
-    //   // let callResult3 = dppFactory.try_getDODOPool(
-    //   //   Address.fromString(add),
-    //   //   tokenAddress
-    //   // );
-    //   // if (callResult3.reverted) {
-    //   //   log.info("DPP getDODOPool reverted", []);
-    //   //   return ZERO_BD;
-    //   // } else {
-    //   //   dppPoolAdd = callResult3.value;
-    //   // }
-    //   // ////////////////
-    //   // let callResult4 = dspFactory.try_getDODOPool(
-    //   //   Address.fromString(add),
-    //   //   tokenAddress
-    //   // );
-    //   // if (callResult4.reverted) {
-    //   //   log.info("DSP getDODOPool reverted", []);
-    //   //   return ZERO_BD;
-    //   // } else {
-    //   //   let dspPoolAdd = callResult4.value;
-    //   // }
-    //   //   ////////////////
-    let padd = dvmPoolAdd[0];
-
-    log.info("DVM POOL ADDRESS SET AS: {}", [padd.toString()]);
-    let dvm = DVM.bind(padd);
-    //  let callResult5 = dvm.try_querySellQuote(trader, amount);
-    // let vaultTotal = [ZERO_BD];
-    // if (callResult5.reverted) {
-    //   log.info("DVM QuerySellQuote reverted", []);
-    //   return ZERO_BD;
-    // } else {
-    //   let num = bigIntToBigDecimal(
-    //     callResult5.value.value0 + callResult5.value.value1
-    //   );
-    //   vaultTotal.push(num);
-    // }
-    //   //
-    //   //   // let cp = CP.bind(cpPoolAdd[0]);
-    //   //   // let vaultReserveCP = cp.querySellQuote(trader, amount);
-    //   //   // vaultTotal = vaultTotal + vaultReserveCP.value0 + vaultReserveCP.value1;
-    //   //
-    //   //   // let dpp = DPP.bind(dppPoolAdd[0]);
-    //   //   // let vaultReserveDPP = dpp.querySellQuote(trader, amount);
-    //   //   // vaultTotal = vaultTotal + vaultReserveDPP.value0 + vaultReserveDPP.value1;
-    //   //   //
-    //   //   // let dsp = DSP.bind(dspPoolAdd[0]);
-    //   //   // let vaultReserveDSP = dsp.querySellQuote(trader, amount);
-    //   //   // vaultTotal = vaultTotal + vaultReserveDSP.value0 + vaultReserveDSP.value1;
-    //   //
-    //   total.push(calculateAverage(vaultTotal));
-    // }
-    // //
-    // return calculateAverage(total);
-  }
-  return ZERO_BD;
-}
-
 export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
   if (amount1.equals(ZERO_BD)) {
     return ZERO_BD;
   } else {
     return amount0.div(amount1);
   }
+}
+
+// USD Pricing Functions
+
+export function getUSDprice(
+  trader: Address,
+  tokenAddress: Address,
+  amount: BigInt
+): BigDecimal {
+  let totals: BigDecimal[] = [];
+
+  let sc1 = STABLE_COINS[0];
+  let sc2 = STABLE_COINS[1];
+  let sc3 = STABLE_COINS[2];
+
+  for (let i = 0; i <= STABLE_COINS.length; i++) {
+    log.info("address of token whos price is being checked: {} ", [
+      tokenAddress.toHexString()
+    ]);
+    // let scAdd = STABLE_COINS[i];
+    log.info("Stablecoin being used: {} ", [sc1]);
+    // let tokenPrice = _TokenPrice.load(
+    //   tokenAddress.toHexString() + STABLE_COINS[i]
+    // );
+    // if (!tokenPrice) {
+    //   tokenPrice = new _TokenPrice(tokenAddress.toHex() + STABLE_COINS[i]);
+    //   let token = getOrCreateToken(tokenAddress);
+    //   tokenPrice.token = token.id;
+    // }
+    // if (tokenPrice.currentUSDprice != ZERO_BD) {
+    //   totals = totals.push(tokenPrice.currentUSDprice);
+    // }
+  }
+  //
+  // if (totals === []) {
+  //   return ZERO_BD;
+  // }
+
+  // let total = totals[0];
+  //
+  // if (totals.length > 0) {
+  //   for (let i = 1; i <= totals.length; i++) {
+  //     total = total + totals[i];
+  //   }
+  // }
+
+  // if (total == ZERO_BD) {
+  return ZERO_BD;
+  // }
+  //
+  // let price = safeDiv(total, bigIntToBigDecimal(BigInt.fromI32(totals.length)));
+  //
+  // return price;
+}
+
+export function setUSDprice(
+  tokenAdd: Address,
+  amount: BigInt,
+  stableCoin: Address,
+  scAmount: BigInt
+): void {
+  let pricePerToken = safeDiv(
+    bigIntToBigDecimal(amount),
+    bigIntToBigDecimal(scAmount)
+  );
+
+  let tokenPrice = _TokenPrice.load(
+    tokenAdd.toHexString() + stableCoin.toHexString()
+  );
+
+  if (!tokenPrice) {
+    tokenPrice = new _TokenPrice(
+      tokenAdd.toHexString() + stableCoin.toHexString()
+    );
+    log.info("ID of _TokenPrice being created setPrice: {} ", [
+      tokenAdd.toHexString() + stableCoin.toHexString()
+    ]);
+    let token = getOrCreateToken(tokenAdd);
+    tokenPrice.token = token.id;
+  }
+  tokenPrice.currentUSDprice = pricePerToken;
 }

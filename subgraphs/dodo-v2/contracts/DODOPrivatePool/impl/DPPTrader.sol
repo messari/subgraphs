@@ -53,7 +53,7 @@ contract DPPTrader is DPPVault {
 
         _transferQuoteOut(to, receiveQuoteAmount);
         _transferQuoteOut(_MAINTAINER_, mtFee);
-        
+
         // update TARGET
         if (_RState_ != uint32(newRState)) {
             require(newBaseTarget <= uint112(-1),"OVERFLOW");
@@ -192,7 +192,7 @@ contract DPPTrader is DPPVault {
         }
 
         _sync();
-        
+
         emit DODOFlashLoan(msg.sender, assetTo, baseAmount, quoteAmount);
     }
 

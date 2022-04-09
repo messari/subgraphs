@@ -7,6 +7,18 @@ export const DVMFactory_ADDRESS = "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C";
 export const CPFactory_ADDRESS = "0xE8C9A78725D0451FA19878D5f8A3dC0D55FECF25";
 export const DPPFactory_ADDRESS = "0x5336edE8F971339F6c0e304c66ba16F1296A2Fbe";
 export const DSPFactory_ADDRESS = "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4";
+/**
+ * usd pricing
+ */
+export const WRAPPED_BASE_COIN = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+//pricing supported stable coins
+export const STABLE_ONE_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7"; //usdt
+export const STABLE_TWO_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; //usdc
+//stable coins pairs
+export const STABLE_COIN_PAIR_ONE =
+  "0xc9f93163c99695c6526b799ebca2207fdf7d61ad"; //[USDT_USDC_PAIR]
+//base currency pair
+export const BASE_COIN_PAIR = "0x75c23271661d9d143dcb617222bc4bec783eff34"; //[WETH_USDC_PAIR]
 
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);
@@ -57,3 +69,9 @@ export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";
 }
+
+export const STABLE_COINS: string[] = [
+  "0x6b175474e89094c44da98b954eedeac495271d0f", // dai
+  "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // usdc
+  "0xdac17f958d2ee523a2206206994597c13d831ec7" // usdt
+];
