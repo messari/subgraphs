@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract, Withdraw as WithdrawEvent } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, VaultFeeType } from "../constant";
@@ -37,11 +37,22 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   vault.save();
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
-  let feePercentage = getFeePercentage(vault, event.params.strategyAddress.toHex(), VaultFeeType.WITHDRAWAL_FEE);
-  let feesUSD = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
 
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feesUSD);
-  financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(feesUSD);
+  let strategyAddress = event.params.strategyAddress.toHex();
+  let withdrawFeePercentage = getFeePercentage(vault, strategyAddress, VaultFeeType.WITHDRAWAL_FEE);
+  let depositFeePercentage = getFeePercentage(vault, strategyAddress, VaultFeeType.DEPOSIT_FEE);
+
+  let withdrawFeesUSD = amountUSD.times(withdrawFeePercentage.div(BIGDECIMAL_HUNDRED));
+  let depositFeesUSD = amountUSD.times(depositFeePercentage.div(BIGDECIMAL_HUNDRED));
+
+  // only adding withdraw fee as deposit fee is accounted for
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(withdrawFeesUSD);
+  financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(withdrawFeesUSD);
+
+  // total revenue - (sum of all fees)
+  financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
+    amountUSD.minus(withdrawFeesUSD.plus(depositFeesUSD)),
+  );
   financialMetrics.save();
 
   // updating withdraw entity

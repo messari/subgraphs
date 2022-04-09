@@ -1,6 +1,7 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { assert, clearStore, test } from "matchstick-as";
 import { handleDeposit, handleWithdraw } from "../src/handlers/vault";
+import { getDay } from "../src/utils/numbers";
 import * as c from "./constants";
 import { mockChainlinkPriceFunction } from "./mocks/chainlink";
 import { mockStrategyFunctions } from "./mocks/strategy";
@@ -245,4 +246,41 @@ test("fees entity", () => {
     "fees",
     `[${withdrawFeeId}, ${depositFeeId}, ${withdrawFeeId2}, ${depositFeeId2}]`,
   );
+});
+
+test("financial metrics", () => {
+  clearStore();
+
+  let withdrawAmount = BigInt.fromString("1000").times(decimals);
+  let sharesMinted = BigInt.fromString("100").times(decimals);
+
+  let withdrawEvent = createWithdrawEvent(
+    c.VAULT_ADDRESS,
+    c.STRATEGY_ADDRESS_1,
+    c.INPUT_TOKEN_ADDRESS,
+    withdrawAmount,
+    sharesMinted,
+  );
+
+  handleWithdraw(withdrawEvent);
+
+  let day = getDay(withdrawEvent.block.timestamp).toString();
+  let amountUSD = withdrawAmount
+    .toBigDecimal()
+    .div(decimals.toBigDecimal())
+    .times(price.toBigDecimal().div(decimals.toBigDecimal()));
+
+  // 10% of the amount
+  let feesUSD = numerator
+    .toBigDecimal()
+    .div(denominator.toBigDecimal())
+    .times(amountUSD);
+
+  // for deposit and withdraw
+  let protocolSideRevenueUSD = feesUSD;
+  let supplySideRevenueUSD = amountUSD.minus(BigDecimal.fromString("2").times(feesUSD));
+
+  assert.fieldEquals("FinancialsDailySnapshot", day, "protocolSideRevenueUSD", protocolSideRevenueUSD.toString());
+  assert.fieldEquals("FinancialsDailySnapshot", day, "feesUSD", protocolSideRevenueUSD.toString());
+  assert.fieldEquals("FinancialsDailySnapshot", day, "supplySideRevenueUSD", supplySideRevenueUSD.toString());
 });

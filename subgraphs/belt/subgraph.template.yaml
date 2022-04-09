@@ -34,6 +34,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: Chainlink
           file: ./abis/Chainlink.json
+        - name: ChainlinkBNB
+          file: ./abis/ChainlinkBNB.json
         - name: Strategy
           file: ./abis/Strategy.json
       eventHandlers:

@@ -67,3 +67,7 @@ export const NULL_ADDRESS = Address.fromString("0x000000000000000000000000000000
 
 // chainlink's token price contract
 export const BSC_CHAINLINK_PRICE_ADDRESS = "0x0377954c16c5c47322F3BA09E6c32eF25b62E57B";
+export const BSC_BNB_CHAINLINK_PRICE_ADDRESS = "0xe4DE571bCe6c099D9152a09231FA3c65F1A564B5"; // after 8M block
+
+// WBNB token address
+export const WRAPPED_BNB = Address.fromString("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
