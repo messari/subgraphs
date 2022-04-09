@@ -284,7 +284,7 @@ export function createLiquidation(
     liquidatedMarket._blockNumber = event.block.number;
   }
   let underlyingDecimals = getOrCreateToken(liquidation.asset).decimals;
-  let liquidatedExchangeRate = getExchangeRate(Address.fromString(liquidatedMarket.id), event);
+  let liquidatedExchangeRate = getExchangeRate(Address.fromString(liquidatedMarket.id));
 
   // calc amount/amountUSD/profitUSD
   liquidation.amount = liquidatedAmount
@@ -328,7 +328,7 @@ export function updatePrevBlockRevenues(market: Market): void {
     .times(borrowRatePerBlock)
     .times(BIGDECIMAL_ONE.minus(market._reserveFactor));
   market._protocolSideRevenueUSDPerBlock = outstandingBorrowUSD.times(borrowRatePerBlock).times(market._reserveFactor);
-  market._totalRevenueUSDPerBlock = outstandingBorrowUSD.times(market.variableBorrowRate);
+  market._totalRevenueUSDPerBlock = outstandingBorrowUSD.times(borrowRatePerBlock);
 
   market.save();
 }
@@ -336,7 +336,19 @@ export function updatePrevBlockRevenues(market: Market): void {
 export function updateMarketPrices(market: Market, event: ethereum.Event): void {
   let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
-  let exchangeRate = getExchangeRate(Address.fromString(market.id), event);
+  let exchangeRate = getExchangeRate(Address.fromString(market.id));
+  
+  /*
+   * Exchange rate explained:
+   * In Practice:
+   *    - if you call cDAI on etherscan you get (2.0 * 10^26)
+   *    - if you call cUSDC on etherscan you get (2.0 * 10^14)
+   *    - the real value is ~0.02 so cDAI is off by 10^28, and cUSDC 10^16
+   * How to accomadate this:
+   *    - must divide by tokenDecimals, so 10^underlyingDecimals (use exponenttoBigDecimal())
+   *    - must multiply by cTokenDecimals, so 10^COMPOUND_DECIMALS
+   *    - must divide by mantissaFactorBD, so 10^18
+   */
   market._exchangeRate = exchangeRate
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingDecimals))

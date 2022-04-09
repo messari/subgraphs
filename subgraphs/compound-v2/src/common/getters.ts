@@ -86,6 +86,7 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
     marketMetrics.rewardTokenEmissionsAmount = emissionsAmount;
     let emissionsUSD = new Array<BigDecimal>();
     emissionsUSD.push(BIGDECIMAL_ZERO);
+    emissionsUSD.push(BIGDECIMAL_ZERO);
     marketMetrics.rewardTokenEmissionsUSD = emissionsUSD;
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
