@@ -1,29 +1,89 @@
-import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
-import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
+import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import {
+  _Account,
+  _DailyActiveAccount,
+  UsageMetricsDailySnapshot,
+  Deposit,
+  Withdraw,
+  Swap,
+} from "../../generated/schema";
+import { SECONDS_PER_DAY } from "./constants";
+import {
+  getLiquidityPool,
+  getOrCreateDexAmm,
+  getOrCreateFinancialsDailySnapshot,
+  getOrCreatePoolDailySnapshot,
+  getOrCreateUsageMetricsDailySnapshot,
+} from "./getters";
 
-// These are meant more as boilerplates that'll be filled out depending on the
-// subgraph, and will be different from subgraph to subgraph, hence left
-// partially implemented and commented out.
-// They are common within a subgraph but not common across different subgraphs.
+export function updateLiquidityPoolFromDeposit(deposit: Deposit): void {
+  let pool = getLiquidityPool(deposit.to);
 
-// Update FinancialsDailySnapshots entity
-export function updateFinancials(event: ethereum.Event): void {
-  // let financialMetrics = getOrCreateFinancials(event);
-  // let protocol = getOrCreateDexAmm();
-  // // Update the block number and timestamp to that of the last transaction of that day
-  // financialMetrics.blockNumber = event.block.number;
-  // financialMetrics.timestamp = event.block.timestamp;
-  // financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  // ...
-  // financialMetrics.save();
+  pool.inputTokenBalances = [
+    pool.inputTokenBalances[0].plus(deposit.inputTokenAmounts[0]),
+    pool.inputTokenBalances[1].plus(deposit.inputTokenAmounts[1]),
+  ];
+  pool.outputTokenSupply = pool.outputTokenSupply.plus(deposit.outputTokenAmount);
+
+  pool.save();
 }
 
-export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
+export function updateLiquidityPoolFromWithdraw(withdraw: Withdraw): void {
+  let pool = getLiquidityPool(withdraw.from);
+
+  pool.inputTokenBalances = [
+    pool.inputTokenBalances[0].minus(withdraw.inputTokenAmounts[0]),
+    pool.inputTokenBalances[1].minus(withdraw.inputTokenAmounts[1]),
+  ];
+  pool.outputTokenSupply = pool.outputTokenSupply.minus(withdraw.outputTokenAmount);
+
+  pool.save();
+}
+
+export function updateLiquidityPoolFromSwap(swap: Swap): void {
+  let pool = getLiquidityPool(swap.from);
+
+  if (swap.tokenIn == pool.inputTokens[0]) {
+    pool.inputTokenBalances = [
+      pool.inputTokenBalances[0].plus(swap.amountIn),
+      pool.inputTokenBalances[1].minus(swap.amountOut),
+    ];
+  } else {
+    pool.inputTokenBalances = [
+      pool.inputTokenBalances[0].minus(swap.amountOut),
+      pool.inputTokenBalances[1].plus(swap.amountIn),
+    ];
+  }
+
+  pool.save();
+}
+
+export function updateLiquidityPoolFromSync(poolAddress: string, reserve0: BigInt, reserve1: BigInt): void {
+  let pool = getLiquidityPool(poolAddress);
+
+  pool.inputTokenBalances = [reserve0, reserve1];
+
+  pool.save();
+}
+
+// Update FinancialsDailySnapshot entity
+export function updateFinancialsDailySnapshot(event: ethereum.Event): void {
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  let protocol = getOrCreateDexAmm();
+
+  // Update the block number and timestamp to that of the last transaction of that day
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  // TODO: implement the rest
+
+  financialMetrics.save();
+}
+
+export function updateUsageMetricsDailySnapshot(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = getOrCreateUsageMetricSnapshot(event);
+  let usageMetrics = getOrCreateUsageMetricsDailySnapshot(event);
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetrics.blockNumber = event.block.number;
@@ -55,17 +115,18 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 }
 
 // Update UsagePoolDailySnapshot entity
-export function updatePoolMetrics(event: ethereum.Event): void {
-  // get or create pool metrics
-  // let poolMetrics = getOrCreatePoolDailySnapshot(event);
-  // let pool = getLiquidityPool(event.address.toHexString());
-  // // Update the block number and timestamp to that of the last transaction of that day
-  // poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
-  // poolMetrics.inputTokenBalances = pool.inputTokenBalances;
-  // poolMetrics.outputTokenSupply = pool.outputTokenSupply;
-  // poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  // poolMetrics.blockNumber = event.block.number;
-  // poolMetrics.timestamp = event.block.timestamp;
-  // ...
-  // poolMetrics.save();
+export function updatePoolDailySnapshot(event: ethereum.Event): void {
+  let poolMetrics = getOrCreatePoolDailySnapshot(event);
+  let pool = getLiquidityPool(event.address.toHexString());
+
+  // Update the block number and timestamp to that of the last transaction of that day
+  poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+  poolMetrics.outputTokenSupply = pool.outputTokenSupply;
+  poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  poolMetrics.blockNumber = event.block.number;
+  poolMetrics.timestamp = event.block.timestamp;
+  // TODO: implement the rest
+
+  poolMetrics.save();
 }

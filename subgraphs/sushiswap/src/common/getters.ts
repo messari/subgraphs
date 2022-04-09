@@ -3,14 +3,22 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   _Account,
   _DailyActiveAccount,
+  _Transfer,
   Token,
   DexAmmProtocol,
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
   PoolDailySnapshot,
+  LiquidityPool,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
-import { BIGDECIMAL_ZERO, Network, ProtocolType, SUSHISWAP_V2_FACTORY, SECONDS_PER_DAY } from "../common/constants";
+import {
+  BIGDECIMAL_ZERO,
+  Network,
+  ProtocolType,
+  SUSHISWAP_V2_FACTORY_ADDRESS,
+  SECONDS_PER_DAY,
+} from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -25,7 +33,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -34,7 +42,7 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = SUSHISWAP_V2_FACTORY;
+    usageMetrics.protocol = SUSHISWAP_V2_FACTORY_ADDRESS;
 
     usageMetrics.activeUsers = 0;
     usageMetrics.totalUniqueUsers = 0;
@@ -52,7 +60,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
 
   if (!poolMetrics) {
     poolMetrics = new PoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
-    poolMetrics.protocol = SUSHISWAP_V2_FACTORY;
+    poolMetrics.protocol = SUSHISWAP_V2_FACTORY_ADDRESS;
     poolMetrics.pool = poolAddress;
     poolMetrics.rewardTokenEmissionsAmount = [];
     poolMetrics.rewardTokenEmissionsUSD = [];
@@ -63,7 +71,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
   return poolMetrics;
 }
 
-export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
+export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -71,7 +79,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = SUSHISWAP_V2_FACTORY;
+    financialMetrics.protocol = SUSHISWAP_V2_FACTORY_ADDRESS;
 
     financialMetrics.feesUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
@@ -84,18 +92,22 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
   return financialMetrics;
 }
 
+export function getLiquidityPool(poolAddress: string): LiquidityPool {
+  return LiquidityPool.load(poolAddress)!;
+}
+
 ///////////////////////////
 ///// DexAmm Specific /////
 ///////////////////////////
 
 export function getOrCreateDexAmm(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(SUSHISWAP_V2_FACTORY);
+  let protocol = DexAmmProtocol.load(SUSHISWAP_V2_FACTORY_ADDRESS);
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(SUSHISWAP_V2_FACTORY);
+    protocol = new DexAmmProtocol(SUSHISWAP_V2_FACTORY_ADDRESS);
     protocol.name = "SushiSwap v2";
     protocol.slug = "sushiswap-v2";
-    protocol.schemaVersion = "1.0.0";
+    protocol.schemaVersion = "1.0.2";
     protocol.subgraphVersion = "1.0.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.EXCHANGE;
@@ -105,4 +117,8 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.save();
   }
   return protocol;
+}
+
+export function getTransfer(txnHash: string): _Transfer {
+  return _Transfer.load(txnHash)!;
 }
