@@ -75,6 +75,17 @@ Here are some more detailed guidelines:
 
 Since the methodology for calculating financial metrics are protocol-independent, they are defined per-protocol in the `README.md` file of the protocol's subgraph folder.
 
+That being said, here are some general definitions for certain fields:
+
+- **Total Revenue**: All new money entering the protocol from operations. This is fees from dexs. and total yield generated in yield aggregators.
+- **Supply Side Revenue**: portion of Total Rev paid to depositors. this is total yield generated less protocol fees in yield ags. This is fees directed to LPs in DEXes.
+- **Protocol Revenue**: portion of total revenue directed to protocol and its operations. Includes strategiest revenue and other operational funds. so this includes all protocol fees such as protocols' DEX fee portion, yield aggregator's performance fees etc.
+
+In the future, we may also consider more detailed financial metrics. But these are not needed for now:
+
+- **Operational Earnings**: Protocol Revenue after paying for operational expenses. Operational expenses would include strategiest fees in yield ag. Also includes consultant fees such as Gauntlet, GFX Labs contracts with the protocol (second part obv very manual but we should figure out how to leverage our intel prowess here for a metric no one else can put together at scale).
+- **Adj Operational Earnings**: Operational Earnings minus token emissions (in USD). This should represent net capital into the protocol before income redistribution, accounts for incentivized revenue.
+
 ## Internal Entities
 
 There are situations where you may want to have additional entities in your schema. For example:

@@ -7,7 +7,7 @@
 - Add a folder under `subgraphs` with the name of the protocol you want to work on
 - Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`. Note `schema-common.graphql` is used for schema design and reference, and should never be used for implementation
 - Build the subgraph within that folder. Feel free to use the [reference subgraph](./subgraphs/_reference_/) as a reference.
-- Submit a pull request to this repo after you are done
+- Submit a PR (pull request) to this repo after you are done. Make sure you submit your PR as a draft if it's a work-in-progress.
 
 ## Recommended Development Workflow
 
@@ -20,7 +20,7 @@
   - For example, usually it's easier to start writing mappings for transactions and usage metrics
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio
-- Refer to the [methodology](https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/edit#gid=686701533) for metrics calculation (e.g. revenue, fees, TVL). Feel free to reach out to me if anything isn't clear
+- For metrics calculation (e.g. revenue, fees, TVL), please refer to the `README.md` in the protocol's subgraph folder for methodology. There is also a broader explanation of how different fields are defined in the schema in `docs/Schema.md`. Feel free to reach out to me if anything isn't clear
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
