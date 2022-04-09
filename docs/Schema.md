@@ -50,11 +50,13 @@ There are broadly two kinds of yields in DeFi:
 
 ### Reward Tokens
 
-There is a `RewardToken` entity in our schemas. This represents the extra token incentive associated with a particular protocol/pool (i.e. emission token), and is not the token associated with the base yield (i.e. LP token). Similarly, fields like `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD` also refer to the rewards that come from token incentives.
+There is a `RewardToken` entity in our schemas. This represents the extra token incentive associated with a particular protocol/pool (i.e. emission token), usually during a protocol's liquidity mining program, and is not the token associated with the base yield (i.e. LP token). Similarly, fields like `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD` also refer to the rewards that come from token incentives.
 
 Not all protocols have token rewards. For example, Uniswap doesn't have any token reward. For protocols that do, usually not all pools have token rewards. For example, for Sushiswap, only pools in the Onsen program have token rewards.
 
 It's also common for a single pool to have multiple reward tokens. For example, Sushiswap's MasterChef v2 allows for multiple `Rewarders`. Some Curve pools also have both CRV as a reward and also the pool token (e.g. FXS for FRAX, SNX for sUSD) as another reward.
+
+There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTokenEmissionsAmount`. In particular, you can calculate a theoretical emission amount based on the underlying emission equation, or you can calculate the realized amount based on harvests. It's recommended to use the theoretical amount as it's more accurate and consistent. When calculating these in a snapshot, you should calculate them as the per-block amount of the current block normalized to the during of that snapshot (e.g. normalize the per-block amount to the daily amount for a daily snapshot). The reasoning for that is when we show this data on the front-end, it'll be converted to an APR, which will drive user decision (e.g. decide where they want to invest their money in the future), so the data should be forward-looking.
 
 ## Usage Metrics
 
@@ -71,11 +73,7 @@ Here are some more detailed guidelines:
 
 ## Financial Metrics
 
-### Protocol Revenue
-
-### Supply-Side Revenue
-
-### Fees
+Since the methodology for calculating financial metrics are protocol-independent, they are defined per-protocol in the `README.md` file of the protocol's subgraph folder.
 
 ## Internal Entities
 
