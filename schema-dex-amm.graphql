@@ -225,7 +225,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token!
+  outputToken: Token
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -241,10 +241,10 @@ type LiquidityPool @entity {
   inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigInt!
+  outputTokenSupply: BigInt
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  outputTokenPriceUSD: BigDecimal
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -302,10 +302,10 @@ type PoolDailySnapshot @entity {
   inputTokenBalances: [BigInt!]!
 
   " Total supply of output token "
-  outputTokenSupply: BigInt!
+  outputTokenSupply: BigInt
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  outputTokenPriceUSD: BigDecimal
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -383,13 +383,13 @@ type Deposit implements Event @entity {
   inputTokens: [Token!]!
 
   " Output token of the pool. E.g. the UNI-LP token "
-  outputToken: Token!
+  outputToken: Token
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmount: BigInt!
+  outputTokenAmount: BigInt
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
@@ -427,13 +427,13 @@ type Withdraw implements Event @entity {
   inputTokens: [Token!]!
 
   " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
-  outputToken: Token!
+  outputToken: Token
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmount: BigInt!
+  outputTokenAmount: BigInt
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
