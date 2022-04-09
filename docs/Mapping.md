@@ -8,7 +8,7 @@ This document contains some information about issues you may run into, or tips a
 
 There are couple things you can do to significantly improve your indexing speed:
 
-- Set a startblock (Use the deployment block of the contracts).
+- Set a startblock (Use the deployment block of the contracts, [startblock app](https://startblock.vercel.app) may help).
 - Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
 - Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
 
