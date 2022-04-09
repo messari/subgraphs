@@ -1,16 +1,26 @@
 import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
-import { HelperStore, LiquidityPool, Token } from "../../generated/schema";
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BSC, factoryContract, Network, POLYGON, ZERO_ADDRESS } from "./constant";
+import { _HelperStore, LiquidityPool, Token } from "../../generated/schema";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  BSC,
+  factoryContract,
+  Network,
+  POLYGON,
+  POLYGON_NETWORK,
+  ZERO_ADDRESS,
+} from "./constant";
 import { getOrCreateToken } from "./token";
 
 // Address of the wrapped native token(eg WBNB for bsc and WMATIC for polygon)
-const WRAPPED_NATIVE_TOKEN_ADDRESS = dataSource.network() == Network.BSC.toLowerCase() ? BSC.WBNB_ADDRESS : POLYGON.WMATIC_ADDRESS;
+const WRAPPED_NATIVE_TOKEN_ADDRESS =
+  dataSource.network() == Network.BSC.toLowerCase() ? BSC.WBNB_ADDRESS : POLYGON.WMATIC_ADDRESS;
 
 export function baseTokenPriceInUSD(): BigDecimal {
   log.info("Network: {}", [dataSource.network()]);
   if (dataSource.network() == Network.BSC.toLowerCase()) {
     return bnbPriceInUSD();
-  } else if (dataSource.network() == Network.POLYGON.toLowerCase()) {
+  } else if (dataSource.network() == POLYGON_NETWORK) {
     return wmaticPriceInUSD();
   } else {
     return BIGDECIMAL_ZERO;
@@ -111,7 +121,8 @@ let WHITELIST: string[] = dataSource.network() == Network.BSC.toLowerCase() ? BS
 // minimum liquidity for price to get tracked
 // let MINIMUM_LIQUIDITY_THRESHOLD_BNB = BigDecimal.fromString('1');
 
-export function findBnbPerToken(token: Token): BigDecimal {
+// For BSC Network, this gives the Native token equivalent of the token argument
+export function findNativeTokenPricePerToken(token: Token): BigDecimal {
   if (token.id == Address.fromString(WRAPPED_NATIVE_TOKEN_ADDRESS).toHexString()) {
     return BIGDECIMAL_ONE;
   }
@@ -123,11 +134,11 @@ export function findBnbPerToken(token: Token): BigDecimal {
       if (pool !== null) {
         if (pool._token0 == token.id) {
           let token1 = getOrCreateToken(Address.fromString(pool._token1));
-          return pool._token1Price.times(token1._derivedBNB as BigDecimal); // return token1 per our token * BNB per token 1
+          return pool._token1Price.times(token1._derivedNativeToken as BigDecimal); // return token1 per our token * BNB per token 1
         }
         if (pool._token1 == token.id) {
           let token0 = getOrCreateToken(Address.fromString(pool._token0));
-          return pool._token0Price.times(token0._derivedBNB as BigDecimal); // return token0 per our token * BNB per token 0
+          return pool._token0Price.times(token0._derivedNativeToken as BigDecimal); // return token0 per our token * BNB per token 0
         }
       }
     }
@@ -147,9 +158,9 @@ export function getTrackedVolumeUSD(
   tokenAmount1: BigDecimal,
   token1: Token,
 ): BigDecimal {
-  let helperStore = HelperStore.load("1")!;
-  let price0 = token0._derivedBNB.times(helperStore._value);
-  let price1 = token1._derivedBNB.times(helperStore._value);
+  let helperStore = _HelperStore.load("1")!;
+  let price0 = token0._derivedNativeToken.times(helperStore._value);
+  let price1 = token1._derivedNativeToken.times(helperStore._value);
 
   // both are whitelist tokens, take average of both amounts
   if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
@@ -185,10 +196,10 @@ export function getTrackedLiquidityUSD(
   tokenAmount1: BigDecimal,
   token1: Token,
 ): BigDecimal {
-  let helperStore = HelperStore.load("1");
+  let helperStore = _HelperStore.load("1");
   if (helperStore !== null) {
-    let price0 = token0._derivedBNB.times(helperStore._value);
-    let price1 = token1._derivedBNB.times(helperStore._value);
+    let price0 = token0._derivedNativeToken.times(helperStore._value);
+    let price1 = token1._derivedNativeToken.times(helperStore._value);
 
     // both are whitelist tokens, take average of both amounts
     if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {

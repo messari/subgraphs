@@ -1,9 +1,15 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
-import { HelperStore, LiquidityPool, Token } from "../../generated/schema";
-import { getOrCreateProtocol, getOrCreateProtocolFeeShare, getOrCreateTradingFees } from "../utils/common";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, toBigInt, toDecimal } from "../utils/constant";
-import { findBnbPerToken } from "../utils/pricing";
+import { _HelperStore, LiquidityPool, Token } from "../../generated/schema";
+import {
+  getOrCreateProtocol,
+  getOrCreateProtocolFeeShare,
+  getOrCreateSupplyFeeShare,
+  getOrCreateTradingFees,
+  getOrCreateTransfer,
+} from "../utils/common";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, toBigInt, toDecimal, TransferType } from "../utils/constant";
+import { findNativeTokenPricePerToken } from "../utils/pricing";
 import { getOrCreateRewardToken, getOrCreateToken } from "../utils/token";
 
 export function getOrCreatePool(
@@ -25,14 +31,12 @@ export function getOrCreatePool(
     pool._reserve0 = BIGDECIMAL_ZERO;
     pool._token1 = token1.id;
     pool._reserve1 = BIGDECIMAL_ZERO;
-    pool._reserveBNB = BIGDECIMAL_ZERO;
+    pool._nativeTokenReserve = BIGDECIMAL_ZERO;
     pool._token0Price = BIGDECIMAL_ZERO;
     pool._token1Price = BIGDECIMAL_ZERO;
     pool._volumeToken0 = BIGDECIMAL_ZERO;
     pool._volumeToken1 = BIGDECIMAL_ZERO;
-    pool._trackedReserveBNB = BIGDECIMAL_ZERO;
-    pool._untrackedVolumeUSD = BIGDECIMAL_ZERO;
-    pool._txCount = BIGINT_ZERO;
+    pool._trackedNativeTokenReserve = BIGDECIMAL_ZERO;
     // Input tokens
     let inputTokens: Token[] = [];
     inputTokens.push(token0);
@@ -56,8 +60,8 @@ export function getOrCreatePool(
     }
     pool.outputTokenSupply = BIGINT_ZERO;
     // OutputToken Price
-    let helperStore = HelperStore.load("1")!;
-    let outputTokenPriceBNB = findBnbPerToken(outputToken);
+    let helperStore = _HelperStore.load("1")!;
+    let outputTokenPriceBNB = findNativeTokenPricePerToken(outputToken);
     pool.outputTokenPriceUSD = outputTokenPriceBNB.times(helperStore._value);
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
@@ -67,7 +71,7 @@ export function getOrCreatePool(
     pool.symbol = outputToken.symbol;
     let tradingFee = getOrCreateTradingFees(poolAddress).id;
     let protocolFee = getOrCreateProtocolFeeShare(poolAddress).id;
-    let supplySideFee = getOrCreateProtocolFeeShare(poolAddress).id;
+    let supplySideFee = getOrCreateSupplyFeeShare(poolAddress).id;
     pool.fees = [tradingFee, protocolFee, supplySideFee];
 
     pool.save();
@@ -88,13 +92,74 @@ export function updatePool(pool: LiquidityPool): void {
 export function updateLpWithReward(lpTokenAddress: Address, bananaAddress: Address, accumulatedBanana: BigInt): void {
   let pool = LiquidityPool.load(lpTokenAddress.toHexString());
   if (pool !== null) {
-    let helperStore = HelperStore.load("1")!;
+    let helperStore = _HelperStore.load("1")!;
     let bananaToken = getOrCreateToken(bananaAddress);
     pool.rewardTokens = [getOrCreateRewardToken(bananaAddress).id];
     pool.rewardTokenEmissionsAmount = [accumulatedBanana];
-    let rewardTokenEmissionsBNB = findBnbPerToken(bananaToken).times(toDecimal(accumulatedBanana));
+    let rewardTokenEmissionsBNB = findNativeTokenPricePerToken(bananaToken).times(toDecimal(accumulatedBanana));
     pool.rewardTokenEmissionsUSD = [rewardTokenEmissionsBNB.times(helperStore._value)];
 
+    pool.save();
+  }
+}
+
+// Handle data from transfer event for mints. Used to populate deposit entity in the mint event.
+export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Address): void {
+  let pool = LiquidityPool.load(event.address.toHexString());
+  if (pool !== null) {
+    let transfer = getOrCreateTransfer(event);
+
+    // create new mint if no mints so far or if last one is done already
+    if (!transfer._type) {
+      transfer._type = TransferType.MINT;
+
+      // Address that is minted to
+      transfer._sender = to.toHexString();
+      transfer._liquidity = value;
+    }
+
+    // This is done to remove a potential feeto mint --- Not active
+    else if (transfer._type == TransferType.MINT) {
+      // Updates the liquidity if the previous mint was a fee mint
+      // Address that is minted to
+      transfer._sender = to.toHexString();
+      transfer._liquidity = value;
+    }
+
+    transfer.save();
+    pool.save();
+  }
+}
+
+// Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
+export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt, from: Address): void {
+  let transfer = getOrCreateTransfer(event);
+
+  transfer._type = TransferType.BURN;
+  transfer._sender = from.toHexString();
+
+  transfer.save();
+}
+
+// Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
+export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: Address): void {
+  let pool = LiquidityPool.load(event.address.toHexString());
+  if (pool !== null) {
+    let transfer = getOrCreateTransfer(event);
+
+    // Tracks supply of minted LP tokens
+    pool.outputTokenSupply = pool.outputTokenSupply.minus(value);
+
+    // Uses address from the transfer to pool part of the burn. Otherwise create with this transfer event.
+    if (transfer._type == TransferType.BURN) {
+      transfer._liquidity = value;
+    } else {
+      transfer._type = TransferType.BURN;
+      transfer._sender = from.toHexString();
+      transfer._liquidity = value;
+    }
+
+    transfer.save();
     pool.save();
   }
 }

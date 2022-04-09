@@ -1,5 +1,5 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Account, DailyActiveAccount, DexAmmProtocol, UsageMetricsDailySnapshot } from "../../generated/schema";
+import { _Account, _DailyActiveAccount, DexAmmProtocol, UsageMetricsDailySnapshot } from "../../generated/schema";
 import { SECONDS_PER_DAY } from "../utils/constant";
 
 export function updateUsageMetrics(
@@ -31,20 +31,23 @@ export function updateUsageMetrics(
   usageMetrics.dailyTransactionCount += 1;
 
   let accountId = provider.toHexString();
-  let account = Account.load(accountId);
+  let account = _Account.load(accountId);
   if (!account) {
-    account = new Account(accountId);
+    account = new _Account(accountId);
     account.save();
     usageMetrics.totalUniqueUsers += 1;
     protocol.totalUniqueUsers += 1;
-    protocol.save()
+    protocol.save();
   }
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString().concat("-").concat(provider.toHexString());
-  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccountId = id
+    .toString()
+    .concat("-")
+    .concat(provider.toHexString());
+  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
     usageMetrics.activeUsers += 1;
   }

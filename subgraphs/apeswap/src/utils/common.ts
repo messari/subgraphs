@@ -1,5 +1,5 @@
-import { Address, dataSource } from "@graphprotocol/graph-ts";
-import { DexAmmProtocol, LiquidityPoolFee } from "../../generated/schema";
+import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { DexAmmProtocol, LiquidityPoolFee, _Transfer } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BSC_PROTOCOL_FEE,
@@ -7,6 +7,7 @@ import {
   FACTORY_ADDRESS,
   LiquidityPoolFeeType,
   Network,
+  POLYGON_NETWORK,
   POLYGON_PROTOCOL_FEE,
   POLYGON_SUPPLY_FEE,
   ProtocolType,
@@ -20,7 +21,11 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(id);
     protocol.name = "apeswap finance";
     protocol.slug = "apeswap-finance";
-    protocol.network = Network.BSC;
+    if (dataSource.network() == Network.BSC.toLowerCase()) {
+      protocol.network = Network.BSC;
+    } else if (dataSource.network() == POLYGON_NETWORK) {
+      protocol.network = Network.POLYGON;
+    }
     protocol.schemaVersion = "1.0.0";
     protocol.subgraphVersion = "1.0.0";
     protocol.type = ProtocolType.EXCHANGE;
@@ -56,7 +61,7 @@ export function getOrCreateProtocolFeeShare(poolAddress: Address): LiquidityPool
     protocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
     if (dataSource.network() == Network.BSC.toLowerCase()) {
       protocolFee.feePercentage = BSC_PROTOCOL_FEE;
-    } else if (dataSource.network() == Network.POLYGON.toLowerCase()) {
+    } else if (dataSource.network() == POLYGON_NETWORK) {
       protocolFee.feePercentage = POLYGON_PROTOCOL_FEE;
     }
     protocolFee.save();
@@ -74,7 +79,7 @@ export function getOrCreateSupplyFeeShare(poolAddress: Address): LiquidityPoolFe
     supplyFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
     if (dataSource.network() == Network.BSC.toLowerCase()) {
       supplyFee.feePercentage = BSC_SUPPLY_FEE;
-    } else if (dataSource.network() == Network.POLYGON.toLowerCase()) {
+    } else if (dataSource.network() == POLYGON_NETWORK) {
       supplyFee.feePercentage = POLYGON_SUPPLY_FEE;
     }
     supplyFee.save();
@@ -82,4 +87,16 @@ export function getOrCreateSupplyFeeShare(poolAddress: Address): LiquidityPoolFe
     return supplyFee as LiquidityPoolFee;
   }
   return supplyFee as LiquidityPoolFee;
+}
+
+export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
+  let transactionHash = event.transaction.hash.toHexString();
+  let transfer = _Transfer.load(transactionHash);
+  if (!transfer) {
+    transfer = new _Transfer(transactionHash);
+    transfer._blockNumber = event.block.number;
+    transfer._timestamp = event.block.timestamp;
+  }
+  transfer.save();
+  return transfer;
 }

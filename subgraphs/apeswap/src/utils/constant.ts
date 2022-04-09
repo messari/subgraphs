@@ -17,7 +17,7 @@ export namespace Network {
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "MATIC";
+  export const POLYGON = "POLYGON";
   export const XDAI = "XDAI";
 }
 
@@ -42,6 +42,12 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
+export namespace TransferType {
+  export const MINT = 'MINT'
+  export const BURN = 'BURN'
+  // Pool addresses are also stored in the HelperStore
+}
+
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 // export const FACTORY_ADDRESS = "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6";
 export const FACTORY_ADDRESS = dataSource.network() == Network.BSC.toLowerCase() ? BSC.FACTORY_ADDRESS : POLYGON.FACTORY_ADDRESS;
@@ -57,6 +63,7 @@ export const BSC_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.05"));
 export const POLYGON_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.15"));
 export const BSC_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.15"))
 export const POLYGON_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.05"));
+export const POLYGON_NETWORK = "matic"
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_MAX = BigInt.fromString(

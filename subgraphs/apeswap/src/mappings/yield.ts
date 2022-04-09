@@ -1,8 +1,7 @@
 import {
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
-  EmergencyWithdraw,
-  Yield,
+  EmergencyWithdraw
 } from "../../generated/Yield/Yield";
 import {
   Deposit as DepositEventV2,

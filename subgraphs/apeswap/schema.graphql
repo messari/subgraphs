@@ -40,8 +40,8 @@ type Token @entity {
 
   ###### internal use ########
 
-  # derived prices
-  _derivedBNB: BigDecimal!
+  # derived prices. This is thesame as derivedBNB in bsc network or derivedMATIC in polygon network
+  _derivedNativeToken: BigDecimal!
 }
 
 enum RewardTokenType {
@@ -391,23 +391,19 @@ type LiquidityPool @entity {
   _reserve1: BigDecimal!
 
   " derived liquidity"
-  _reserveBNB: BigDecimal!
+  _nativeTokenReserve: BigDecimal!
 
   " Price in terms of the asset pair"
   _token0Price: BigDecimal!
 
   _token1Price: BigDecimal!
 
-  _trackedReserveBNB: BigDecimal!
+  _trackedNativeTokenReserve: BigDecimal!
 
   " lifetime volume stats"
   _volumeToken0: BigDecimal!
 
   _volumeToken1: BigDecimal!
-
-  _txCount: BigInt!
-
-  _untrackedVolumeUSD: BigDecimal!
 
 
   " Fields used to help derived relationship"
@@ -599,7 +595,7 @@ type Swap implements Event @entity {
 # stores for USD calculations
 
 "  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
-type HelperStore @entity {
+type _HelperStore @entity {
   id: ID!
 
   " price of BNB/MATIC in USD " 
@@ -608,12 +604,22 @@ type HelperStore @entity {
 }
 
 # An account is a unique Ethereum address
-type Account @entity {
+type _Account @entity {
   " Address of the account "
   id: ID!
 }
 
-type DailyActiveAccount @entity {
+type _DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
+}
+
+" This entity is used to track data from the transfer events. Mainly, I want to track the executor of the deposit/withdraw and the liquidity minted/burned "
+type _Transfer @entity {
+  id: ID! # txn hash
+  _blockNumber: BigInt!
+  _timestamp: BigInt!
+  _sender: String
+  _type: String
+  _liquidity: BigInt
 }

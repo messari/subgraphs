@@ -1,7 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { RewardToken, Token } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, RewardTokenType, toDecimal, ZERO_ADDRESS } from "./constant";
+import { BIGDECIMAL_ZERO, RewardTokenType, ZERO_ADDRESS } from "./constant";
 
 export function getOrCreateToken(address: Address): Token {
   // Check if token already exist
@@ -24,7 +24,7 @@ export function getOrCreateToken(address: Address): Token {
     if (!tryDecimals.reverted) {
       token.decimals = tryDecimals.value;
     }
-    token._derivedBNB = BIGDECIMAL_ZERO;
+    token._derivedNativeToken = BIGDECIMAL_ZERO;
 
     token.save();
     return token as Token;
