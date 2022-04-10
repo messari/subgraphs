@@ -44,6 +44,8 @@ dataSources:
           file: ./abis/uniswap.json
         - name: PoolRewards
           file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV{{version}}

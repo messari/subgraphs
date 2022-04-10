@@ -11,6 +11,7 @@ import { PoolV3 } from "../generated/poolV3_vaUSDC/PoolV3";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
+import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   let yAggr = YieldAggregator.load(CONTROLLER_ADDRESS_HEX);
@@ -100,15 +101,46 @@ export function updateVaultTokens(vault: Vault): void {
   vault.save();
 }
 
+export function updateVaultRewardTokens(vault: Vault): void {
+  const vaultAddress = Address.fromString(vault.id);
+  const poolv3 = PoolV3.bind(vaultAddress);
+  const rewardAddress = poolv3.poolRewards();
+
+  if (rewardAddress) {
+    const reward = PoolRewards.bind(rewardAddress);
+    const tryResponse = reward.try_getRewardTokens();
+    const ids: string[] = [];
+    let tokenAddresses: Address[] = [];
+
+    if (tryResponse.reverted) {
+      const rewardOld = PoolRewardsOld.bind(rewardAddress);
+      const tmp = rewardOld.try_rewardToken();
+
+      if (!tmp.reverted) {
+        tokenAddresses = [tmp.value];
+      }
+    } else {
+      tokenAddresses = tryResponse.value;
+    }
+
+    for (let i = 0, k = tokenAddresses.length; i < k; ++i) {
+      const rt = getOrCreateRewardToken(tokenAddresses[i]);
+      ids.push(rt.id);
+    }
+
+    if (ids.length) {
+      vault.rewardTokens = ids;
+      vault.save();
+    }
+  }
+}
+
 export function getOrCreateVault(address: Address): Vault {
   let vault = Vault.load(address.toHexString());
 
   if (!vault) {
     const yAggr = getOrCreateYieldAggregator();
     const poolv3 = PoolV3.bind(address);
-    const reward = PoolRewards.bind(poolv3.poolRewards());
-    // const rewardTokenAddresses = reward.getRewardTokens();
-    const rewardTokens: string[] = [];
 
     vault = new Vault(address.toHexString());
     vault.totalValueLockedUSD = BigDecimal.zero();
@@ -122,19 +154,12 @@ export function getOrCreateVault(address: Address): Vault {
     vault.symbol = poolv3.symbol();
     vault.depositLimit = BigInt.zero();
 
-    // for (let i = 0, k = rewardTokenAddresses.length; i < k; ++i) {
-    //   const rt = getOrCreateRewardToken(rewardTokenAddresses[i]);
-
-    //   rewardTokens.push(rt.id);
-    // }
-
-    // vault.rewardTokens = rewardTokens;
-
     vault.save();
   }
 
   updateVaultFee(vault);
   updateVaultTokens(vault);
+  updateVaultRewardTokens(vault);
 
   return vault;
 }
