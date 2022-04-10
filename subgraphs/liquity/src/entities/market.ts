@@ -6,6 +6,7 @@ import {
   ACTIVE_POOL_CREATED_TIMESTAMP,
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  LIQUIDATION_FEE,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
 } from "../utils/constants";
@@ -30,7 +31,7 @@ export function getOrCreateMarket(): Market {
     market.canBorrowFrom = true;
     market.maximumLTV = MAXIMUM_LTV;
     market.liquidationThreshold = MAXIMUM_LTV;
-    market.liquidationPenalty = BIGDECIMAL_ZERO;
+    market.liquidationPenalty = LIQUIDATION_FEE;
     market.depositRate = BIGDECIMAL_ZERO;
     market.stableBorrowRate = BIGDECIMAL_ZERO;
     market.variableBorrowRate = BIGDECIMAL_ZERO;

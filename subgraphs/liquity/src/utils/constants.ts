@@ -131,3 +131,5 @@ export const LUSD_ADDRESS = "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0";
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 
 export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO);
+
+export const LIQUIDATION_FEE = BigDecimal.fromString("0.0005");
