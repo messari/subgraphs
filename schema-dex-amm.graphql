@@ -28,7 +28,7 @@ enum ProtocolType {
 }
 
 type Token @entity {
-  " Smart contract address of the market "
+  " Smart contract address of the token "
   id: ID!
 
   " Mirrored from the smart contract "
@@ -43,7 +43,7 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity {
-  " Smart contract address of the market "
+  " Smart contract address of the reward token "
   id: ID!
 
   " Mirrored from the smart contract "
@@ -345,10 +345,10 @@ interface Event {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received tokens "
+  " Address that received the tokens "
   to: String!
 
-  " Address that sent tokens "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -369,10 +369,10 @@ type Deposit implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Market that tokens are deposited into "
+  " Address that received the tokens "
   to: String!
 
-  " Address that deposited tokens "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -413,10 +413,10 @@ type Withdraw implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received tokens "
+  " Address that received the tokens "
   to: String!
 
-  " Market that tokens are withdrawn from "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -457,10 +457,10 @@ type Swap implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received tokens "
+  " Address that received the tokens "
   to: String!
 
-  " Market that tokens are withdrawn from "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!

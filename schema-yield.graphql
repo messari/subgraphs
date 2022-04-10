@@ -28,7 +28,7 @@ enum ProtocolType {
 }
 
 type Token @entity {
-  " Smart contract address of the market "
+  " Smart contract address of the token "
   id: ID!
 
   " Mirrored from the smart contract "
@@ -43,7 +43,7 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity {
-  " Smart contract address of the market "
+  " Smart contract address of the reward token "
   id: ID!
 
   " Mirrored from the smart contract "
