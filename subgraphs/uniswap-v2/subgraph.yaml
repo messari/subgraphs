@@ -23,6 +23,7 @@ dataSources:
         - Protocol
         - _PricesUSD
         - _TokenTracker
+        - _WindowTracker
       abis:
         - name: Factory
           file: ./abis/factory.json

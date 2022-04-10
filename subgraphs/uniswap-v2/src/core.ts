@@ -27,6 +27,11 @@ import {
   ZERO_ADDRESS,
 } from './common/constants'
 
+
+import {
+  updateMovingAverageBlocksPerDay
+} from './common/blockSpeed'
+
 export function handleTransfer(event: Transfer): void {
 
 
@@ -62,6 +67,7 @@ export function handleMint(event: Mint): void {
   updateUsageMetrics(event, event.params.sender)
   updateFinancials(event)
   updatePoolMetrics(event)
+  updateMovingAverageBlocksPerDay(event.block.timestamp, event.block.number)
 }
 
 export function handleBurn(event: Burn): void {
@@ -69,6 +75,8 @@ export function handleBurn(event: Burn): void {
   updateUsageMetrics(event, event.transaction.from)
   updateFinancials(event)
   updatePoolMetrics(event)
+  updateMovingAverageBlocksPerDay(event.block.timestamp, event.block.number)
+
 }
 
 export function handleSwap(event: Swap): void {
@@ -76,4 +84,5 @@ export function handleSwap(event: Swap): void {
   updateFinancials(event)
   updatePoolMetrics(event)
   updateUsageMetrics(event, event.transaction.from)
+  updateMovingAverageBlocksPerDay(event.block.timestamp, event.block.number)
 }

@@ -2,10 +2,10 @@
 import { BigDecimal } from '@graphprotocol/graph-ts'
 import { PairCreated, SetFeeToCall } from './../generated/Factory/Factory'
 import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, TRADING_FEE_TO_OFF, TRADING_FEE_TO_ON, ZERO_ADDRESS } from './common/constants'
-import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateLPToken, getOrCreateTokenTracker } from './common/getters'
+import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from './common/getters'
 import { CreateLiquidityPool, UpdateTokenWhitelists } from './common/helpers'
 import { findEthPerToken } from './common/Price'
-import { getOrCreateToken } from './common/tokens'
+import { getOrCreateToken, getOrCreateLPToken } from './common/tokens'
 
 export function handleNewPair(event: PairCreated): void {
 
