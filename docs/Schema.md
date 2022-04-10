@@ -1,5 +1,24 @@
 # Schema Definition
 
+## Versioning
+
+Every subgraph has a embedded versioning system in the `Protocol` entity/interface. We use 3 separate fields to version different aspects of the subgraphs for different stakeholders.
+
+### Schema Version
+
+There are two use cases for `schemaVersion`:
+
+1. For us to keep track if a subgraph is implemented to the latest version of the schema. Generally as we update the schema there is going to be a lag between the shared schema upgrade (in the root dir) and specific protocol's schema upgrade. This can be used to track if a protocol has upgraded to the latest schema
+2. For the consumer to know when there is a breaking change in the schema, which will cause a breaking change in their code.
+
+### Subgraph Version
+
+The field `subgraphVersion` this is mainly used for the specific subgraph developer to keep track the implementation. For example, if there is a major refactor, we should bump this version, but this has nothing to do with the schema and will no impact on downstream consumers. There may also be repository-wide implementation upgrades. For example, we might need to reimplement everything in Rust somewhere down the road (for substream upgrades), they it'll be a major upgrade on the implementation (major version bump) but again, no impact on schema or downstream consumer.
+
+### Methodology Version
+
+The field `methodologyVersion` is mainly used for data consumers to track how we calculate our metrics, and to which version of the code/subgraph that methodology corresponds to. For example, if Yahoo Finance uses our data and wants to know when we changed the definition of TVL, this is the best way to diff against that. With a single version, you can't immediately tell if the methodology has been changed
+
 ## ID
 
 ### Protocol ID
