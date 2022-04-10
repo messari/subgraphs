@@ -41,13 +41,9 @@ dataSources:
           file: ./abis/{{abi}}.json
         - name: ERC20
           file: ./abis/IERC20.json
-      eventHandlers:
-        - event: Deposit({{deposit_params}})
-          handler: {{depositHandler}}
-        - event: Withdraw({{withdraw_params}})
-          handler: {{withdrawHandler}}
-        - event: EmergencyWithdraw({{emergency_withdraw_params}})
-          handler: {{emergencyWithdrawHandler}}
+      callHandlers:
+        - function: updatePool(uint256)
+          handler: handleUpdatePool
       file: ./src/mappings/yield.ts
 
 templates:

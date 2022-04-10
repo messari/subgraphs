@@ -4,12 +4,5 @@
     "startBlock": 15298801,
     "yield_address": "0x54aff400858Dcac39797a81894D9920f16972D1D",
     "abi": "YieldV2",
-    "yield_startBlock": 19880385,
-    "deposit_params": "indexed address,indexed uint256,uint256,indexed address",
-    "withdraw_params": "indexed address,indexed uint256,uint256,indexed address",
-    "emergency_withdraw_params": "indexed address,indexed uint256,uint256,indexed address",
-    "harvest_event": "Harvest(indexed address,indexed uint256,uint256)",
-    "depositHandler": "handleDepositV2",
-    "withdrawHandler": "handleWithdrawV2",
-    "emergencyWithdrawHandler": "handleEmergencyWithdrawV2"
+    "yield_startBlock": 19880385
 }

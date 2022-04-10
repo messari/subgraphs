@@ -64,6 +64,7 @@ export const POLYGON_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.15"));
 export const BSC_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.15"))
 export const POLYGON_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.05"));
 export const POLYGON_NETWORK = "matic"
+export const BSC_SECONDS_PER_BLOCK = BigInt.fromI32(5)
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_MAX = BigInt.fromString(

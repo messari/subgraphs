@@ -41,13 +41,9 @@ dataSources:
           file: ./abis/YieldV2.json
         - name: ERC20
           file: ./abis/IERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositV2
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawV2
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawV2
+      callHandlers:
+        - function: updatePool(uint256)
+          handler: handleUpdatePool
       file: ./src/mappings/yield.ts
 
 templates:

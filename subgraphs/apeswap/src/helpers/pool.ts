@@ -89,14 +89,14 @@ export function updatePool(pool: LiquidityPool): void {
   pool.save();
 }
 
-export function updateLpWithReward(lpTokenAddress: Address, bananaAddress: Address, accumulatedBanana: BigInt): void {
+export function updateLpWithReward(lpTokenAddress: Address, bananaAddress: Address, bananaRewardPerDay: BigInt): void {
   let pool = LiquidityPool.load(lpTokenAddress.toHexString());
   if (pool !== null) {
     let helperStore = _HelperStore.load("1")!;
     let bananaToken = getOrCreateToken(bananaAddress);
     pool.rewardTokens = [getOrCreateRewardToken(bananaAddress).id];
-    pool.rewardTokenEmissionsAmount = [accumulatedBanana];
-    let rewardTokenEmissionsBNB = findNativeTokenPricePerToken(bananaToken).times(toDecimal(accumulatedBanana));
+    pool.rewardTokenEmissionsAmount = [bananaRewardPerDay];
+    let rewardTokenEmissionsBNB = findNativeTokenPricePerToken(bananaToken).times(toDecimal(bananaRewardPerDay));
     pool.rewardTokenEmissionsUSD = [rewardTokenEmissionsBNB.times(helperStore._value)];
 
     pool.save();
