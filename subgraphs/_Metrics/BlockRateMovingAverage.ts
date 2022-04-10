@@ -20,12 +20,14 @@
 //   timestamp: Int!
 // }
 
-import { BigDecimal, BigInt, store, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, ethereum, store, log } from "@graphprotocol/graph-ts";
 import { _Block, _BlockTracker } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
 
-export const SECONDS_PER_DAY = 86400
-export const SECONDS_PER_DAY_BD = BigDecimal.fromString(SECONDS_PER_DAY.toString())
+// Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
+// 86400 = 1 Day
+export const RATE_IN_SECONDS = 86400
+export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString())
 
 // WINDOW_SIZE_SECONDS and BLOCK_STORAGE_INTERVALS can be modified. These are just recommended values - 'somewhat' arbitrary. 
 
@@ -41,16 +43,16 @@ export const BLOCK_STORAGE_INTERVAL = 5 as i32
 
 // Paramaters: [event.block.timestamp, event.block.number]
 // Call this function in event handlers frequently enough so that it updates on most blocks 
-export function updateMovingAverageBlocksPerDay(currentTimestamp: BigInt, currentBlockNumber: BigInt): void {
+export function updateMovingAverageBlockRateForecast(event: ethereum): void {
 
     let blockTracker = getOrCreateWindowTracker()
     let blocks: string[]
     blocks = blockTracker.blocks
 
     // Create entity for the current block
-    let currentTimestampI32 = currentTimestamp.toI32()
-    let currentBlockNumberI32 = currentBlockNumber.toI32()
-    let currentBlock = getOrCreateBlock(currentTimestampI32, currentBlockNumberI32)
+    let currentTimestamp = event.block.timestamp.toI32()
+    let currentBlockNumber = event.block.number.toI32()
+    let currentBlock = getOrCreateBlock(currentTimestamp, currentBlockNumber)
 
     if (blocks.length == INT_ZERO) {
         blocks.push(currentBlock.id)
@@ -66,7 +68,7 @@ export function updateMovingAverageBlocksPerDay(currentTimestamp: BigInt, curren
     // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
     // Used to save memory and efficiency on array resizing.
     let recentSavedBlock = _Block.load(blocks[blocks.length - INT_ONE])
-    if (currentBlockNumberI32 - recentSavedBlock!.blockNumber > BLOCK_STORAGE_INTERVAL) {
+    if (currentBlockNumber - recentSavedBlock!.blockNumber > BLOCK_STORAGE_INTERVAL) {
         blocks.push(currentBlock.id)
         currentBlock.save()
     }
@@ -79,7 +81,7 @@ export function updateMovingAverageBlocksPerDay(currentTimestamp: BigInt, curren
     }
 
     // The timestamp at the start of the window (default 24 hours in seconds).
-    let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS
+    let startTimestamp = currentTimestamp - WINDOW_SIZE_SECONDS
 
     // Make sure you still have 2 blocks to calculate rate (This shouldn't really happen past the beginning).
     while(blocks.length > INT_TWO) {
@@ -106,7 +108,7 @@ export function updateMovingAverageBlocksPerDay(currentTimestamp: BigInt, curren
     let blockSpeed = (WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount)).times(windowBlocksCount)
 
     // block speed converted to 24 hour period.
-    let blockSpeedPerDay = (SECONDS_PER_DAY_BD.div(WINDOW_SIZE_SECONDS_BD)).times(blockSpeed)
+    let blockSpeedPerDay = (RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD)).times(blockSpeed)
 
     // Update BlockTracker with new values.
     blockTracker.blocks = blocks
