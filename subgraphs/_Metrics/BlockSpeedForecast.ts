@@ -20,7 +20,7 @@
 //   timestamp: Int!
 // }
 
-import { BigDecimal, ethereum, store, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, ethereum, store } from "@graphprotocol/graph-ts";
 import { _Block, _BlockTracker } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
 
@@ -43,7 +43,7 @@ export const BLOCK_STORAGE_INTERVAL = 5 as i32
 
 // Paramaters: [event.block.timestamp, event.block.number]
 // Call this function in event handlers frequently enough so that it updates on most blocks 
-export function updateMovingAverageBlockRateForecast(event: ethereum): void {
+export function updateMovingAverageBlockSpeedForecast(event: ethereum): void {
 
     let blockTracker = getOrCreateWindowTracker()
     let blocks: string[]
