@@ -45,7 +45,7 @@ export const BLOCK_STORAGE_INTERVAL = 5 as i32
 // Call this function in event handlers frequently enough so that it updates on most blocks 
 export function updateMovingAverageBlockSpeedForecast(event: ethereum): void {
 
-    let blockTracker = getOrCreateWindowTracker()
+    let blockTracker = getOrCreateBlockTracker()
     let blocks: string[]
     blocks = blockTracker.blocks
 
@@ -126,7 +126,7 @@ export function getOrCreateBlock(timestamp: i32, blockNumber: i32): _Block {
     return block
 }
 
-export function getOrCreateWindowTracker(): _BlockTracker {
+export function getOrCreateBlockTracker(): _BlockTracker {
     let blockTracker = _BlockTracker.load("BlockTracker")
 
     if (!blockTracker) {
