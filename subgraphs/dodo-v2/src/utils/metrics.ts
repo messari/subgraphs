@@ -170,10 +170,10 @@ export function updatePoolMetrics(
   );
 
   poolMetrics.totalValueLockedUSD = usdValofPool;
-  // // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
-  // poolMetrics.inputTokenBalances = tokenPoolBals;
+  // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
+  poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
   poolMetrics.outputTokenSupply = lpSupply.value;
-  // poolMetrics.outputTokenPriceUSD = lpTokenUSD;
+  poolMetrics.outputTokenPriceUSD = lpTokenUSD;
   // poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   // poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetrics.blockNumber = event.block.number;
