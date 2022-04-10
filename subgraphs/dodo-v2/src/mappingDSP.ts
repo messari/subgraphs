@@ -29,19 +29,35 @@ import {
 } from "./utils/metrics";
 
 export function handleBuyShares(event: BuyShares): void {
-  // updateUsageMetrics(event, event.params.to);
-  // updateFinancials(event);
+  updateUsageMetrics(event, event.params.to);
+  updateFinancials(event);
   // updatePoolMetrics(event);
 }
 
 export function handleSellShares(event: SellShares): void {
-  // updateUsageMetrics(event, event.params.payer);
-  // updateFinancials(event);
+  updateUsageMetrics(event, event.params.payer);
+  updateFinancials(event);
   // updatePoolMetrics(event);
 }
 
+//
+// event DODOSwap(
+//     address fromToken,
+//     address toToken,
+//     uint256 fromAmount,
+//     uint256 toAmount,
+//     address trader,
+//     address receiver
+// );
+
 export function handleDODOSwap(event: DODOSwap): void {
-  // updateUsageMetrics(event, event.params.trader);
-  // updateFinancials(event);
-  // updatePoolMetrics(event);
+  updateUsageMetrics(event, event.params.trader);
+  updateFinancials(event);
+  updatePoolMetrics(
+    event,
+    event.address,
+    [event.params.fromToken, event.params.toToken],
+    event.params.trader,
+    [event.params.fromAmount, event.params.toAmount]
+  );
 }

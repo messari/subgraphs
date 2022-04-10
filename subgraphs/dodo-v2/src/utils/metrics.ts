@@ -107,19 +107,29 @@ export function updatePoolMetrics(
 
   let protocol = getOrCreateDexAmm(event.address);
 
-  // let token1 = ERC20.bind(tokenAdds[0]);
-  // let token2 = ERC20.bind(tokenAdds[1]);
-  // let lpToken = ERC20.bind(pool.outputToken);
-  //
-  // let poolInstance = DVM.bind(poolAdd);
-  //
-  // let tokenBal1 = token1.try_balanceOf(poolAdd);
-  // let tokenBal2 = token2.try_balanceOf(poolAdd);
-  // let lpSupply = poolInstance.totalSupply();
-  //
-  // let tokenPoolBals: BigInt[] = [tokenBal1, tokenBal2];
-  //
-  // let totalUSDvalTransaction = ZERO_BD;
+  let token1 = ERC20.bind(tokenAdds[0]);
+  let token2 = ERC20.bind(tokenAdds[1]);
+  let lpToken = ERC20.bind(Address.fromString(pool.outputToken));
+
+  let poolInstance = DVM.bind(poolAdd);
+
+  let tokenBal1 = token1.try_balanceOf(poolAdd);
+  if (tokenBal1.reverted) {
+    return;
+  }
+
+  let tokenBal2 = token2.try_balanceOf(poolAdd);
+  if (tokenBal2.reverted) {
+    return;
+  }
+
+  let lpSupply = poolInstance.try_totalSupply();
+  if (lpSupply.reverted) {
+    return;
+  }
+
+  let totalUSDvalTransaction = ZERO_BD;
+
   let totalUSDvalPool = ZERO_BD;
 
   log.info("this is the transaction hash: {} ", [
@@ -150,12 +160,19 @@ export function updatePoolMetrics(
     ]);
   }
 
-  // let lpTokenUSD = getTokenAmountPriceAv(poolAdd, trader, 1000000000000000000);
+  let usdValueOfToken1 = getUSDprice(tokenAdds[0], trader, tokenBal1.value);
+  let usdValueOfToken2 = getUSDprice(tokenAdds[1], trader, tokenBal2.value);
+  let usdValofPool = usdValueOfToken1 + usdValueOfToken2;
+  let lpTokenUSD = getUSDprice(
+    Address.fromString(pool.outputToken),
+    trader,
+    BigInt.fromString("1000000000000000000")
+  );
 
-  //poolMetrics.totalValueLockedUSD = totalUSDvalPool;
+  poolMetrics.totalValueLockedUSD = usdValofPool;
   // // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
   // poolMetrics.inputTokenBalances = tokenPoolBals;
-  // poolMetrics.outputTokenSupply = lpSupply;
+  poolMetrics.outputTokenSupply = lpSupply.value;
   // poolMetrics.outputTokenPriceUSD = lpTokenUSD;
   // poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   // poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
@@ -165,5 +182,3 @@ export function updatePoolMetrics(
   poolMetrics.save();
   pool.save();
 }
-
-function getTokenPriceUSD(tokenAddress: Address): BigDecimal {}

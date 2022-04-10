@@ -243,50 +243,52 @@ export function getUSDprice(
   tokenAddress: Address,
   amount: BigInt
 ): BigDecimal {
-  let totals: BigDecimal[] = [];
+  let total = ZERO_BD;
 
   let sc1 = STABLE_COINS[0];
   let sc2 = STABLE_COINS[1];
   let sc3 = STABLE_COINS[2];
 
-  for (let i = 0; i <= STABLE_COINS.length; i++) {
-    log.info("address of token whos price is being checked: {} ", [
-      tokenAddress.toHexString()
-    ]);
-    // let scAdd = STABLE_COINS[i];
-    log.info("Stablecoin being used: {} ", [sc1]);
-    // let tokenPrice = _TokenPrice.load(
-    //   tokenAddress.toHexString() + STABLE_COINS[i]
-    // );
-    // if (!tokenPrice) {
-    //   tokenPrice = new _TokenPrice(tokenAddress.toHex() + STABLE_COINS[i]);
-    //   let token = getOrCreateToken(tokenAddress);
-    //   tokenPrice.token = token.id;
-    // }
-    // if (tokenPrice.currentUSDprice != ZERO_BD) {
-    //   totals = totals.push(tokenPrice.currentUSDprice);
-    // }
+  log.info("address of token whos price is being checked: {} ", [
+    tokenAddress.toHexString()
+  ]);
+  // let scAdd = STABLE_COINS[i];
+  // for whatever reason trying to access the stablecoins array
+  // from within a for loop causes a weird nondescript array error
+  log.info("Stablecoin being used: {} ", [sc1]);
+  let tokenPrice1 = _TokenPrice.load(tokenAddress.toHexString() + sc1);
+  if (!tokenPrice1) {
+    tokenPrice1 = new _TokenPrice(tokenAddress.toHex() + sc1);
+    let token = getOrCreateToken(tokenAddress);
+    tokenPrice1.token = token.id;
   }
-  //
-  // if (totals === []) {
-  //   return ZERO_BD;
-  // }
 
-  // let total = totals[0];
-  //
-  // if (totals.length > 0) {
-  //   for (let i = 1; i <= totals.length; i++) {
-  //     total = total + totals[i];
-  //   }
-  // }
+  total = tokenPrice1.currentUSDprice;
 
-  // if (total == ZERO_BD) {
-  return ZERO_BD;
-  // }
-  //
-  // let price = safeDiv(total, bigIntToBigDecimal(BigInt.fromI32(totals.length)));
-  //
-  // return price;
+  log.info("Stablecoin being used: {} ", [sc2]);
+  let tokenPrice2 = _TokenPrice.load(tokenAddress.toHexString() + sc2);
+  if (!tokenPrice2) {
+    tokenPrice2 = new _TokenPrice(tokenAddress.toHex() + sc2);
+    let token = getOrCreateToken(tokenAddress);
+    tokenPrice2.token = token.id;
+  }
+  total = total + tokenPrice2.currentUSDprice;
+
+  log.info("Stablecoin being used: {} ", [sc3]);
+  let tokenPrice3 = _TokenPrice.load(tokenAddress.toHexString() + sc3);
+  if (!tokenPrice3) {
+    tokenPrice3 = new _TokenPrice(tokenAddress.toHex() + sc3);
+    let token = getOrCreateToken(tokenAddress);
+    tokenPrice3.token = token.id;
+  }
+  total = total + tokenPrice3.currentUSDprice;
+
+  if (total == ZERO_BD) {
+    return ZERO_BD;
+  }
+  let price = safeDiv(total, BigDecimal.fromString("3"));
+
+  return price;
 }
 
 export function setUSDprice(
@@ -315,4 +317,6 @@ export function setUSDprice(
     tokenPrice.token = token.id;
   }
   tokenPrice.currentUSDprice = pricePerToken;
+
+  tokenPrice.save();
 }

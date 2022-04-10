@@ -29,9 +29,15 @@ import {
 } from "./utils/metrics";
 
 export function handleDODOSwap(event: DODOSwap): void {
-  // updateUsageMetrics(event, event.params.receiver);
-  // updateFinancials(event);
-  // updatePoolMetrics(event);
+  updateUsageMetrics(event, event.params.trader);
+  updateFinancials(event);
+  updatePoolMetrics(
+    event,
+    event.address,
+    [event.params.fromToken, event.params.toToken],
+    event.params.trader,
+    [event.params.fromAmount, event.params.toAmount]
+  );
 }
 
 export function handleLpFeeRateChange(event: LpFeeRateChange): void {
