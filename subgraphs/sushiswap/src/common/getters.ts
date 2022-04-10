@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   _Account,
   _DailyActiveAccount,
@@ -10,6 +10,7 @@ import {
   FinancialsDailySnapshot,
   PoolDailySnapshot,
   LiquidityPool,
+  LiquidityPoolFee,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -113,8 +114,18 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalUniqueUsers = 0;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-
     protocol.save();
+
+    // TODO: clean up
+    let tradingFee = new LiquidityPoolFee("sushiswap-v2-trading-fee");
+    tradingFee.feePercentage = BigDecimal.fromString("0.0025");
+    tradingFee.feeType = "FIXED_TRADING_FEE";
+    tradingFee.save();
+
+    let protocolFee = new LiquidityPoolFee("sushiswap-v2-protocol-fee");
+    protocolFee.feePercentage = BigDecimal.fromString("0.0005");
+    protocolFee.feeType = "PROTOCOL_FEE";
+    protocolFee.save();
   }
   return protocol;
 }

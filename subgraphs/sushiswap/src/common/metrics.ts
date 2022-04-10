@@ -17,7 +17,7 @@ import {
 } from "./getters";
 
 export function updateLiquidityPoolFromDeposit(deposit: Deposit): void {
-  let pool = getLiquidityPool(deposit.to);
+  let pool = getLiquidityPool(deposit.pool);
 
   pool.inputTokenBalances = [
     pool.inputTokenBalances[0].plus(deposit.inputTokenAmounts[0]),
@@ -29,7 +29,7 @@ export function updateLiquidityPoolFromDeposit(deposit: Deposit): void {
 }
 
 export function updateLiquidityPoolFromWithdraw(withdraw: Withdraw): void {
-  let pool = getLiquidityPool(withdraw.from);
+  let pool = getLiquidityPool(withdraw.pool);
 
   pool.inputTokenBalances = [
     pool.inputTokenBalances[0].minus(withdraw.inputTokenAmounts[0]),
@@ -41,7 +41,7 @@ export function updateLiquidityPoolFromWithdraw(withdraw: Withdraw): void {
 }
 
 export function updateLiquidityPoolFromSwap(swap: Swap): void {
-  let pool = getLiquidityPool(swap.from);
+  let pool = getLiquidityPool(swap.pool);
 
   if (swap.tokenIn == pool.inputTokens[0]) {
     pool.inputTokenBalances = [

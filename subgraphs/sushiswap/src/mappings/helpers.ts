@@ -7,10 +7,10 @@ import {
   _Transfer,
   Withdraw,
   Swap as SwapEntity,
+  LiquidityPoolFee,
 } from "../../generated/schema";
-import { Transfer } from "../../generated/SushiV2Factory/ERC20";
 import { SushiV2Pair as PairTemplate } from "../../generated/templates";
-import { Burn, Mint, Swap } from "../../generated/templates/SushiV2Pair/Pair";
+import { Burn, Mint, Swap, Transfer } from "../../generated/templates/SushiV2Pair/Pair";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, SUSHISWAP_V2_FACTORY_ADDRESS, TransferType } from "../common/constants";
 import { getOrCreateToken, getLiquidityPool, getTransfer } from "../common/getters";
 
@@ -37,6 +37,7 @@ export function createLiquidityPool(
   pool.createdBlockNumber = event.block.number;
   pool.name = token0.symbol + "-" + token1.symbol;
   pool.symbol = token0.symbol + "-" + token1.symbol;
+  pool.fees = ["sushiswap-v2-trading-fee", "sushiswap-v2-protocol-fee"];
 
   pool.save();
 
@@ -71,14 +72,14 @@ export function createDeposit(event: Mint): Deposit {
   deposit.hash = txnHash;
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = SUSHISWAP_V2_FACTORY_ADDRESS;
-  deposit.to = pool.id;
+  deposit.to = transfer.to;
   deposit.from = event.params.sender.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [event.params.amount0, event.params.amount1];
-  deposit.outputTokenAmount = transfer.liquidity!;
+  deposit.outputTokenAmount = transfer.liquidity;
   deposit.amountUSD = BIGDECIMAL_ZERO; // TODO: calculate this
   deposit.pool = pool.id;
 
@@ -98,14 +99,14 @@ export function createWithdraw(event: Burn): Withdraw {
   withdrawal.hash = txnHash;
   withdrawal.logIndex = event.logIndex.toI32();
   withdrawal.protocol = SUSHISWAP_V2_FACTORY_ADDRESS;
-  withdrawal.to = pool.id;
+  withdrawal.to = event.params.to.toHexString();
   withdrawal.from = event.params.sender.toHexString();
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
   withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [event.params.amount0, event.params.amount1];
-  withdrawal.outputTokenAmount = transfer.liquidity!;
+  withdrawal.outputTokenAmount = transfer.liquidity;
   withdrawal.amountUSD = BIGDECIMAL_ZERO; // TODO: calculate this
   withdrawal.pool = pool.id;
 
@@ -123,7 +124,7 @@ export function createSwap(event: Swap): SwapEntity {
   swap.hash = txnHash;
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = SUSHISWAP_V2_FACTORY_ADDRESS;
-  swap.to = pool.id;
+  swap.to = event.params.to.toHexString();
   swap.from = event.params.sender.toHexString();
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;

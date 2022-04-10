@@ -48,12 +48,15 @@ templates:
         - Swap
         - Deposit
         - Withdraw
+        - LiquidityPoolFee
         - LiquidityPool
         - DexAmmProtocol
         - UsageMetricsDailySnapshot
         - FinancialsDailySnapshot
+        - PoolDailySnapshot
         - _Account
         - _DailyActiveAccount
+        - _Transfer
       abis:
         - name: Factory
           file: ./abis/SushiV2Factory.json
@@ -68,3 +71,5 @@ templates:
           handler: handleMint
         - event: Burn(indexed address,uint256,uint256,indexed address)
           handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
