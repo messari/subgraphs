@@ -43,7 +43,7 @@ dataSources:
           file: ./abis/IERC20.json
       callHandlers:
         - function: updatePool(uint256)
-          handler: handleUpdatePool
+          handler: {{yield_handler}}
       file: ./src/mappings/yield.ts
 
 templates:

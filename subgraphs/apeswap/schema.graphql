@@ -623,3 +623,15 @@ type _Transfer @entity {
   _type: String
   _liquidity: BigInt
 }
+
+type _BlockTracker @entity {
+  id: ID! 
+  _blocks: [_Block!]!
+  _blocksPerSecond: BigDecimal!
+}
+
+type _Block @entity {
+  id: ID!
+  _blockNumber: Int!
+  _timestamp: Int!
+}

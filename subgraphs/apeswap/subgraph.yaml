@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: matic
+    network: bsc
     source:
-      address: '0xCf083Be4164828f00cAE704EC15a36D711491284'
+      address: '0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6'
       abi: Factory
-      startBlock: 15298801	
+      startBlock: 4855900	
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -26,19 +26,19 @@ dataSources:
 
   - kind: ethereum
     name: Yield
-    network: matic
+    network: bsc
     source:
-      address: '0x54aff400858Dcac39797a81894D9920f16972D1D'
-      abi: YieldV2
-      startBlock: 19880385	
+      address: '0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9'
+      abi: Yield
+      startBlock: 14803526	
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: YieldV2
-          file: ./abis/YieldV2.json
+        - name: Yield
+          file: ./abis/Yield.json
         - name: ERC20
           file: ./abis/IERC20.json
       callHandlers:
@@ -49,7 +49,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: matic
+    network: bsc
     source:
       abi: Pair
     mapping:

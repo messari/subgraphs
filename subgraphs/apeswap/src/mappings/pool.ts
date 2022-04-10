@@ -9,6 +9,7 @@ import { createPoolDailySnapshot } from "../helpers/poolDailySnapshot";
 import { getOrCreateSwap } from "../helpers/swap";
 import { updateUsageMetrics } from "../helpers/updateUsageMetrics";
 import { getOrCreateWithdraw } from "../helpers/withdraw";
+import { updateMovingAverageBlocksPerSecond } from "../utils/blockPerSec";
 import {
   getOrCreateProtocol,
   getOrCreateProtocolFeeShare,
@@ -343,5 +344,8 @@ export function handleSync(event: Sync): void {
     protocol.save();
     token0.save();
     token1.save();
+
+    // Test block per day
+    updateMovingAverageBlocksPerSecond(event.block.timestamp, event.block.number)
   }
 }

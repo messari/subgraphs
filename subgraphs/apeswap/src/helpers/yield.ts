@@ -1,7 +1,8 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Yield } from "../../generated/Yield/Yield";
 import { YieldV2 } from "../../generated/Yield/YieldV2";
-import { BIGINT_ZERO, BSC_SECONDS_PER_BLOCK, SECONDS_PER_DAY, ZERO_ADDRESS } from "../utils/constant";
+import { updateMovingAverageBlocksPerSecond } from "../utils/blockPerSec";
+import { BIGINT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, toBigInt, ZERO_ADDRESS } from "../utils/constant";
 import { updateLpWithReward } from "./pool";
 
 export function handleRewardV2(call: ethereum.Call, pid: BigInt): void {
@@ -79,9 +80,10 @@ export function handleReward(call: ethereum.Call, pid: BigInt): void {
   // Calculate Reward(BANANA) Emission per Block
   let bananaReward = multiplier.times(bananaPerBlock).times(poolAllocPoint).div(totalAllocPoint)
   
-  // @TODO: Calculate Reward(BANANA) emission per day
+  // Calculate Reward(BANANA) emission per day
   // A block is estimated to be produced approximately every 5secs
-  let bananaRewardPerSecond = bananaReward.div(BSC_SECONDS_PER_BLOCK)
+  // let bananaRewardPerSecond = bananaReward.div(toBigInt(updateMovingAverageBlocksPerSecond(call.block.timestamp, call.block.number)))
+  let bananaRewardPerSecond = bananaReward.div(BIGINT_ONE)
   let bananaRewardPerDay = bananaRewardPerSecond.times(BigInt.fromI32(SECONDS_PER_DAY))
 
   updateLpWithReward(lpTokenAddress, bananaAddress, bananaRewardPerDay);

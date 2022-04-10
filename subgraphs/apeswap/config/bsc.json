@@ -4,5 +4,6 @@
     "startBlock": 4855900,
     "yield_address": "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9",
     "abi": "Yield",
-    "yield_startBlock": 14803526
+    "yield_startBlock": 14803526,
+    "yield_handler": "handleUpdatePool"
 }
