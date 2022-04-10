@@ -5,7 +5,7 @@ import {Address, BigDecimal, BigInt} from "@graphprotocol/graph-ts";
 import {BIGINT_ZERO} from "../common/constants";
 import {updateFinancials, updatePoolMetrics, updateUsageMetrics} from "../common/metrics";
 import {WeightedPool} from "../../generated/Vault/WeightedPool";
-import {calculatePrice, calculateTokenValueInUsd, isPricingAsset, isUSDStable} from "../common/pricing";
+import {calculatePrice, calculateTokenValueInUsd, isPricingAsset, isUSDStable, TokenInfo} from "../common/pricing";
 import {scaleDown} from "../common/tokens";
 
 export function handlePoolRegister(event: PoolRegistered): void {
@@ -86,16 +86,14 @@ export function handleSwap(event: Swap): void {
       weightTokenOut
   );
 
-  if (tokenInfo.token) {
-    let token = _TokenPrice.load(tokenInfo.token.toHexString())
+  if (tokenInfo) {
+    let token = _TokenPrice.load(tokenInfo.address.toHexString())
     if (token == null) {
       token = new _TokenPrice(event.params.tokenOut.toHexString())
     }
     token.block = event.block.number
     token.lastUsdPrice = tokenInfo.price
   }
-
-
 
   updatePoolMetrics(event.params.poolId.toHexString())
   updateUsageMetrics(event, event.transaction.from)

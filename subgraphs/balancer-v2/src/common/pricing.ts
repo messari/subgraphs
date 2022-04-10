@@ -55,6 +55,10 @@ export function isPricingAsset(asset: Address): boolean {
     return false;
 }
 
+export class TokenInfo {
+    constructor(public address: Address, public price: BigDecimal) {}
+}
+
 export function calculatePrice(
     tokenA: Address,
     tokenB: Address,
@@ -62,25 +66,14 @@ export function calculatePrice(
     amountB: BigDecimal,
     weightA: BigDecimal | null,
     weightB: BigDecimal | null
-): {
-    price: BigDecimal,
-    token: Address | null
-} {
+): TokenInfo | null {
     // If both tokens are stable the price is one
-    if (isUSDStable(tokenB) && isUSDStable(tokenA)) return {
-        price: BIGDECIMAL_ONE,
-        token: null
-    }
+    if (isUSDStable(tokenB) && isUSDStable(tokenA)) return null
 
     // If one of both tokens is stable we can calculate how much the other token is worth in usd terms
-    if (isUSDStable(tokenB)) return {
-        price: calculateTokenValueInUsd(amountA, amountB, weightA, weightB),
-        token: tokenA
-    }
-    if (isUSDStable(tokenA)) return {
-        price: calculateTokenValueInUsd(amountB, amountA, weightB, weightA),
-        token: tokenB
-    }
+    if (isUSDStable(tokenB)) return new TokenInfo(tokenA, calculateTokenValueInUsd(amountA, amountB, weightA, weightB))
+
+    if (isUSDStable(tokenA)) return new TokenInfo(tokenB, calculateTokenValueInUsd(amountB, amountA, weightB, weightA))
 
     /**
      * Base assets are known tokens that we can make sure they have a pool with a stable token
@@ -89,38 +82,20 @@ export function calculatePrice(
      */
 
     // If both are base assets let's not re calculate price
-    if (isBaseAsset(tokenA) && isBaseAsset(tokenB)) return {
-        price: BIGDECIMAL_ZERO,
-        token: null
-    }
+    if (isBaseAsset(tokenA) && isBaseAsset(tokenB)) return null
 
     if (isBaseAsset(tokenA)) {
         let token = _TokenPrice.load(tokenA.toHexString())
-        if (token == null) return {
-            price: BIGDECIMAL_ZERO,
-            token: null
-        }
+        if (token == null) return null
         let stableAmountB = amountB.times(token.lastUsdPrice)
-        return {
-            price: calculateTokenValueInUsd(amountA, stableAmountB,null, null),
-            token: tokenB
-        }
+        return new TokenInfo(tokenB, calculateTokenValueInUsd(amountA, stableAmountB,null, null))
     }
 
     if (isBaseAsset(tokenB)) {
         let token = _TokenPrice.load(tokenB.toHexString())
-        if (token == null) return {
-            price: BIGDECIMAL_ZERO,
-            token: null
-        }
+        if (token == null) return null
         let stableAmountA = amountA.times(token.lastUsdPrice)
-        return {
-            price: calculateTokenValueInUsd(amountB, stableAmountA, null, null),
-            token: tokenA
-        }
+        return new TokenInfo(tokenA, calculateTokenValueInUsd(amountB, stableAmountA, null, null))
     }
-    return {
-        price: BIGDECIMAL_ZERO,
-        token: null
-    }
+    return null
 }
