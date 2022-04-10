@@ -543,6 +543,7 @@ type _DailyActiveAccount @entity {
 type _TokenPrice @entity {
   " Token Address "
   id: ID!
+  pricingAsset: ID!
   lastUsdPrice: BigDecimal!
   block: BigInt!
 }

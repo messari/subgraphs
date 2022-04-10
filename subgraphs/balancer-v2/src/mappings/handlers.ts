@@ -5,7 +5,8 @@ import {Address, BigDecimal, BigInt} from "@graphprotocol/graph-ts";
 import {BIGINT_ZERO} from "../common/constants";
 import {updateFinancials, updatePoolMetrics, updateUsageMetrics} from "../common/metrics";
 import {WeightedPool} from "../../generated/Vault/WeightedPool";
-import {calculateTokenValueInUsd, isUSDStable} from "../common/pricing";
+import {calculatePrice, calculateTokenValueInUsd, isPricingAsset, isUSDStable} from "../common/pricing";
+import {scaleDown} from "../common/tokens";
 
 export function handlePoolRegister(event: PoolRegistered): void {
   createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block)
@@ -48,10 +49,10 @@ export function handleSwap(event: Swap): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString())
   if (pool == null) return
 
-  let tokenInIndex: u32 = 0
-  let tokenOutIndex: u32 = 0
+  let tokenInIndex: i32 = 0
+  let tokenOutIndex: i32 = 0
 
-  for (let i=0; i<pool.inputTokens.length; i++) {
+  for (let i:i32 = 0; i<pool.inputTokens.length; i++) {
     if (event.params.tokenIn.toHexString() === pool.inputTokens[i]) {
       pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(event.params.amountIn)
       tokenInIndex = i
@@ -66,55 +67,35 @@ export function handleSwap(event: Swap): void {
   let weightPool = WeightedPool.bind(Address.fromString(pool.outputToken))
   let getWeightCall = weightPool.try_getNormalizedWeights()
   let hasWeights = !getWeightCall.reverted
-  let price: BigDecimal;
+  let weightTokenOut: BigDecimal | null = null
+  let weightTokenIn: BigDecimal | null = null
+  if (hasWeights) {
+    weightTokenOut = getWeightCall.value[tokenOutIndex].toBigDecimal()
+    weightTokenIn = getWeightCall.value[tokenInIndex].toBigDecimal()
+  }
 
-  if (isUSDStable(event.params.tokenIn)) {
-    if (hasWeights) {
-      price = calculateTokenValueInUsd(
-          event.params.amountOut,
-          event.params.amountIn,
-          getWeightCall.value[tokenOutIndex],
-          getWeightCall.value[tokenInIndex]
-      )
-    } else {
-      price = calculateTokenValueInUsd(
-          event.params.amountOut,
-          event.params.amountIn,
-          null,
-          null
-      )
-    }
-    let token = _TokenPrice.load(event.params.tokenOut.toHexString())
+  let tokenAmountIn = scaleDown(event.params.tokenIn, event.params.amountIn)
+  let tokenAmountOut = scaleDown(event.params.tokenOut, event.params.amountOut)
+
+  const tokenInfo = calculatePrice(
+      event.params.tokenIn,
+      event.params.tokenOut,
+      tokenAmountIn,
+      tokenAmountOut,
+      weightTokenIn,
+      weightTokenOut
+  );
+
+  if (tokenInfo.token) {
+    let token = _TokenPrice.load(tokenInfo.token.toHexString())
     if (token == null) {
       token = new _TokenPrice(event.params.tokenOut.toHexString())
     }
     token.block = event.block.number
-    token.lastUsdPrice = price;
+    token.lastUsdPrice = tokenInfo.price
   }
 
-  if (isUSDStable(event.params.tokenOut)) {
-    if (hasWeights) {
-      price = calculateTokenValueInUsd(
-          event.params.amountIn,
-          event.params.amountOut,
-          getWeightCall.value[tokenInIndex],
-          getWeightCall.value[tokenOutIndex]
-      )
-    } else {
-      price = calculateTokenValueInUsd(
-          event.params.amountIn,
-          event.params.amountOut,
-          null,
-          null
-      )
-    }
-    let token = _TokenPrice.load(event.params.tokenIn.toHexString())
-    if (token == null) {
-      token = new _TokenPrice(event.params.tokenIn.toHexString())
-    }
-    token.block = event.block.number
-    token.lastUsdPrice = price;
-  }
+
 
   updatePoolMetrics(event.params.poolId.toHexString())
   updateUsageMetrics(event, event.transaction.from)

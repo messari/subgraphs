@@ -1,5 +1,5 @@
 import { ERC20 } from "../../generated/Vault/ERC20";
-import { Address } from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, BigInt} from "@graphprotocol/graph-ts";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
     let contract = ERC20.bind(tokenAddress);
@@ -23,7 +23,12 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
     let contract = ERC20.bind(tokenAddress);
     let decimals = contract.try_decimals()
     if (decimals.reverted) {
-        return 0
+        return 18
     }
     return decimals.value;
+}
+
+export function scaleDown(token: Address, amount: BigInt): BigDecimal {
+    let decimals = fetchTokenDecimals(token)
+    return amount.divDecimal(BigInt.fromI32(10).pow(u8(decimals)).toBigDecimal());
 }
