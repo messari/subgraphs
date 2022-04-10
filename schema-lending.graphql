@@ -86,6 +86,9 @@ interface Protocol {
 
   totalValueLockedUSD: BigDecimal!
 
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -130,6 +133,12 @@ type FinancialsDailySnapshot @entity {
 
   " Total volume in USD "
   totalVolumeUSD: BigDecimal!
+
+  " Current balance of all deposited assets (not historical cumulative), in USD "
+  totalDepsoitUSD: BigDecimal!
+
+  " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
+  totalBorrowUSD: BigDecimal!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   supplySideRevenueUSD: BigDecimal!
@@ -190,6 +199,15 @@ type LendingProtocol implements Protocol @entity {
   totalUniqueUsers: Int!
 
   totalValueLockedUSD: BigDecimal!
+
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
+  " Current balance of all deposited assets (not historical cumulative), in USD "
+  totalDepsoitUSD: BigDecimal!
+
+  " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
+  totalBorrowUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
@@ -323,9 +341,6 @@ type MarketDailySnapshot @entity {
 
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
-
-  " Price per share of input token in USD "
-  inputTokenPricesUSD: [BigDecimal!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!

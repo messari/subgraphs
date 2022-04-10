@@ -86,6 +86,9 @@ interface Protocol {
 
   totalValueLockedUSD: BigDecimal!
 
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -118,6 +121,9 @@ type YieldAggregator implements Protocol @entity {
   totalUniqueUsers: Int!
 
   totalValueLockedUSD: BigDecimal!
+
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
 
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 

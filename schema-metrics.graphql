@@ -59,6 +59,9 @@ type Protocol @entity {
 
   totalValueLockedUSD: BigDecimal!
 
+  " Total volume in USD "
+  totalVolumeUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
