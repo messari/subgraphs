@@ -267,28 +267,31 @@ type Market @entity {
   " Name of market "
   name: String
 
+  " Is this market active or is it frozen "
   isActive: Boolean!
 
+  " Can you use the output token as collateral "
   canUseAsCollateral: Boolean!
 
+  " Can you borrow from this market "
   canBorrowFrom: Boolean!
 
-  " Maximum loan-to-value ratio as a percentage value "
+  " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
-  " Liquidation threshold as a percentage value "
+  " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
   liquidationThreshold: BigDecimal!
 
-  " Liquidation penalty as a percentage value "
+  " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
-  " Deposit interest rate in percentage "
+  " Deposit interest rate in APY percentage "
   depositRate: BigDecimal!
 
-  " Borrow interest rate in percentage "
+  " Borrow interest rate in APY percentage "
   stableBorrowRate: BigDecimal!
 
-  " Borrow interest rate in percentage "
+  " Borrow interest rate in APY percentage "
   variableBorrowRate: BigDecimal!
 
   deposits: [Deposit!]! @derivedFrom(field: "market")
@@ -344,13 +347,13 @@ type MarketDailySnapshot @entity {
 
   ##### Lending-Specific #####
 
-  " Deposit interest rate in percentage "
+  " Deposit interest rate in APY percentage "
   depositRate: BigDecimal!
 
-  " Borrow interest rate in percentage "
+  " Borrow interest rate in APY percentage "
   stableBorrowRate: BigDecimal!
 
-  " Borrow interest rate in percentage "
+  " Borrow interest rate in APY percentage "
   variableBorrowRate: BigDecimal!
 }
 
