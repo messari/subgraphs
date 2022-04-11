@@ -28,9 +28,9 @@ dataSources:
     name: MasterChef
     network: {{network}}
     source:
-      address: '{{yieldAddress}}'
+      address: '{{masterChefAddress}}'
       abi: {{abi}}
-      startBlock: {{yieldStartBlock}}	
+      startBlock: {{masterChefStartBlock}}	
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
