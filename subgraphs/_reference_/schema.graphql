@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.3
+# Version: 1.1.0
 
 enum Network {
   AVALANCHE
@@ -27,7 +27,7 @@ enum ProtocolType {
 }
 
 type Token @entity {
-  " Smart contract address of the market "
+  " Smart contract address of the token "
   id: ID!
 
   " Mirrored from the smart contract "
@@ -42,7 +42,7 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity {
-  " Smart contract address of the market "
+  " Smart contract address of the reward token "
   id: ID!
 
   " Mirrored from the smart contract "
@@ -172,7 +172,7 @@ interface Pool {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token!
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -287,6 +287,10 @@ type DexAmmProtocol implements Protocol @entity {
   pools: [Pool!]! @derivedFrom(field: "protocol")
 }
 
+# Note that trading fee is the fee paid *by* the users, whereas LP fee and
+# protocol fee are fees paid *to* the corresponding parties.
+# Most of the time, trading fee = liquidity provider fee + protocol fee,
+# but not always. Thus we explicitly specify all different fee types.
 enum LiquidityPoolFeeType {
   " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
   FIXED_TRADING_FEE
@@ -296,6 +300,12 @@ enum LiquidityPoolFeeType {
 
   " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_TRADING_FEE
+
+  " Fixed fee that's paid to the LP, as a percentage of the traded amount. e.g. 0.25% for Sushiswap, 0.02% for Curve v1. "
+  FIXED_LP_FEE
+
+  " Some protocols use dynamic LP fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_LP_FEE
 
   " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
   FIXED_PROTOCOL_FEE
@@ -325,7 +335,7 @@ type LiquidityPool @entity {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token!
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -402,10 +412,10 @@ interface Event {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received tokens "
+  " Address that received the tokens "
   to: String!
 
-  " Address that sent tokens "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -426,10 +436,10 @@ type Deposit implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Market that tokens are deposited into "
+  " Address that received the tokens "
   to: String!
 
-  " Address that deposited tokens "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -470,10 +480,10 @@ type Withdraw implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received tokens "
+  " Address that received the tokens "
   to: String!
 
-  " Market that tokens are withdrawn from "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -514,10 +524,10 @@ type Swap implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
 
-  " Address that received tokens "
+  " Address that received the tokens "
   to: String!
 
-  " Market that tokens are withdrawn from "
+  " Address that sent the tokens "
   from: String!
 
   blockNumber: BigInt!
@@ -558,12 +568,14 @@ type Swap implements Event @entity {
 # underscore to differentiate them from the common schema.
 
 # An account is a unique Ethereum address
-type _Account @entity {
+# Helps to accumulate total unique users
+type Account @entity {
   " Address of the account "
   id: ID!
 }
 
-type _DailyActiveAccount @entity {
+# Helper entity for calculating daily active users
+type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }
