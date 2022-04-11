@@ -98,6 +98,8 @@ export function initMarket (
     market.totalFeesUSD = BIGDECIMAL_ZERO;
     market.totalValueLocked = BIGINT_ZERO;
     market.totalVolumeUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     const tryReserve = lendingPoolContract.try_getReserveData(Address.fromString(id));
     if (!tryReserve.reverted) {
       // If a valid reserve is returned, add fields from the reserve to the market entity
@@ -107,13 +109,14 @@ export function initMarket (
     } else {
       log.error('FAILED TO GET RESERVE', []);
     }
+  } else {
+    // If the market is not being created (and presumably the correct handlers have already added the outputToken after event that creates the market)
+    // Update outputToken data each time the market is loaded
+    market.outputTokenSupply = getOutputTokenSupply(Address.fromString(market.outputToken));
   }
-  // Update outputToken data each time the market is loaded
-  market.outputTokenSupply = BIGINT_ZERO;
-  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   // There is no need to execute the below code until block 12251569 when incentive controller was deployed
   if (blockNumber.gt(BigInt.fromString("12251569"))) {
-    log.info('ENTERED PASSED BLOCK NUMBER FILTER ' + blockNumber.toString() + ' ' + (new BigInt(12251569)).toString(), [])
+    log.info('ENTERED PASSED BLOCK NUMBER FILTER ' + blockNumber.toString(), [])
     let rewardTokens = market.rewardTokens;
     if (rewardTokens === null) rewardTokens = [];
     if (rewardTokens.length === 0) {
@@ -329,7 +332,7 @@ export function getMarketDailySnapshot (
   // As this function is called AFTER a transaction is completed, each snapshot's data will vary from the previous snapshot
 
   const token = initToken(Address.fromString(market.id));
-  marketSnapshot.totalValueLockedUSD = amountInUSD(token.id, token.decimals, market.totalValueLocked);
+  marketSnapshot.totalValueLockedUSD = amountInUSD(token.id, token.decimals, market.totalValueLocked, market);
   marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
   marketSnapshot.inputTokenBalances = market.inputTokenBalances;
   marketSnapshot.inputTokenPricesUSD = getTokenPricesList(market.inputTokens);
@@ -442,11 +445,13 @@ export function getAssetPriceInUSDC (tokenAddress: Address): BigDecimal {
   return assetPriceInUSDC;
 }
 
-export function amountInUSD (asset: string, decimals: number, amount: BigInt): BigDecimal {
+export function amountInUSD (asset: string, decimals: number, amount: BigInt, market: Market): BigDecimal {
   // This function takes in a token and the amount of the token and converts the amount of that token into USD
   const amountInDecimals = bigIntToBigDecimal(amount, <i32>decimals);
   const priceInUSDC = getAssetPriceInUSDC(Address.fromString(asset));
   const amountUSD = amountInDecimals.times(priceInUSDC);
+  market.outputTokenPriceUSD = priceInUSDC.truncate(3);
+  market.save();
   log.info(asset + ' TOKEN AMOUNT ' + amount.toString() + ' TIMES PRICE IN USD ' + priceInUSDC.toString() + ' === ' + amountUSD.toString(), []);
   return amountUSD.truncate(3);
 }
@@ -460,7 +465,7 @@ export function getTokenPricesList (tokens: string[]): BigDecimal[] {
   for (let i = 0; i < tokensList.length; i++) {
     const currentTokenAddr = Address.fromString(tokensList[i]);
     const currentTokenPriceUSDC = getAssetPriceInUSDC(currentTokenAddr);
-    tokenPrices.push(currentTokenPriceUSDC);
+    tokenPrices.push(currentTokenPriceUSDC.truncate(3));
     log.info('TOKENS LIST ' + i.toString() + ' USD: ' + currentTokenPriceUSDC.toString(), []);
   }
   return tokenPrices;
@@ -474,8 +479,8 @@ export function getCurrentRewardEmissionsUSD (market: Market): BigDecimal[] {
   // The DEPOSIT reward token is used as the default. Both the deposit and borrow reward token decimals are the same
   const rewardToken = loadRewardToken(rewardTokenAddr, market, "DEPOSIT");
   // In the reward emissions arrays index 0 is for the deposit reward, index 1 for the borrow reward
-  rewardEmissionsUSD[0] = amountInUSD(rewardTokenAddr.toHexString(), rewardToken.decimals, market.rewardTokenEmissionsAmount[0]);
-  rewardEmissionsUSD[1] = amountInUSD(rewardTokenAddr.toHexString(), rewardToken.decimals, market.rewardTokenEmissionsAmount[1]);
+  rewardEmissionsUSD[0] = amountInUSD(rewardTokenAddr.toHexString(), rewardToken.decimals, market.rewardTokenEmissionsAmount[0], market);
+  rewardEmissionsUSD[1] = amountInUSD(rewardTokenAddr.toHexString(), rewardToken.decimals, market.rewardTokenEmissionsAmount[1], market);
   return rewardEmissionsUSD;
 }
 
@@ -521,10 +526,10 @@ export function calculateRevenues (market: Market, token: Token): void {
   const protoMinusMarketSupplyRevenue = protocol.supplySideRevenueUSD.minus(market.supplySideRevenueUSD);
   const protoMinusMarketFees = protocol.totalFeesUSD.minus(market.totalFeesUSD);
   // Multiply total Variable value Locked in USD by market.variableBorrowRate
-  const varAmountUSD = amountInUSD(token.id, token.decimals, market.totalVariableValueLocked);
+  const varAmountUSD = amountInUSD(token.id, token.decimals, market.totalVariableValueLocked, market);
   const varFees = varAmountUSD.times(market.variableBorrowRate);
   // Multiply total Stable value Locked in USD by market.variableStableRate
-  const staAmountUSD = amountInUSD(token.id, token.decimals, market.totalStableValueLocked);
+  const staAmountUSD = amountInUSD(token.id, token.decimals, market.totalStableValueLocked, market);
   const staFees = staAmountUSD.times(market.stableBorrowRate);
 
   // Add these values together, save to market and add protocol total
@@ -554,7 +559,7 @@ export function updateTVL (token: Token, market: Market, protocol: LendingProtoc
   log.info(market.id + ' market.totalValueLocked = ' + market.totalValueLocked.toString() + ' newMarketTVL = ' + newMarketTVL.toString() + ' amountInTokens = ' + amountInTokens.toString() + ' toSub ' + toSubtract.toString(), []);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD);
   market.totalValueLocked = newMarketTVL;
-  market.totalValueLockedUSD = amountInUSD(token.id, token.decimals, newMarketTVL);
+  market.totalValueLockedUSD = amountInUSD(token.id, token.decimals, newMarketTVL, market);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
   protocol.save();
   market.save();

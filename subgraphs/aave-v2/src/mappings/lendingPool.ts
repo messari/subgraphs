@@ -103,7 +103,6 @@ export function handleDeposit (event: Deposit): void {
   const protocol = fetchProtocolEntity(protocolId);
   // Initialize the reserve token
   const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount);
   // Instantiate the deposit entity with the specified string construction as id
   log.info('DEPOSIT AMT: ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
   const deposit = new DepositEntity(hash + '-' + event.logIndex.toHexString());
@@ -118,9 +117,10 @@ export function handleDeposit (event: Deposit): void {
   // The reserve param is the asset contract address
   deposit.asset = event.params.reserve.toHexString();
   deposit.amount = event.params.amount;
-  deposit.amountUSD = amountUSD;
-
+  
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
+  deposit.amountUSD = amountUSD;
   // Get the index of the balance to be changed
   const tokenBalanceIndex = getTokenBalanceIndex(market, deposit.asset);
   if (tokenBalanceIndex >= market.inputTokens.length) {
@@ -152,11 +152,10 @@ export function handleWithdraw (event: Withdraw): void {
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
   const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount);
   const withdraw = new WithdrawEntity(hash + '-' + event.logIndex.toHexString());
   // The tokens are sent to the address listed as the 'to' param field of the event
   // NOT 'to' property of event.transaction which marketAddr is set to
-
+  
   withdraw.to = event.transaction.from.toHexString();
   withdraw.market = marketAddr;
   withdraw.from = marketAddr;
@@ -167,9 +166,10 @@ export function handleWithdraw (event: Withdraw): void {
   withdraw.timestamp = event.block.timestamp;
   withdraw.blockNumber = event.block.number;
   withdraw.amount = event.params.amount;
-  withdraw.amountUSD = amountUSD;
-
+  
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
+  withdraw.amountUSD = amountUSD;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
   const tokenBalanceIndex = getTokenBalanceIndex(market, withdraw.asset);
   if (tokenBalanceIndex >= market.inputTokens.length) {
@@ -202,7 +202,6 @@ export function handleBorrow (event: Borrow): void {
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
   const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount);
   const borrow = new BorrowEntity(hash + '-' + event.logIndex.toHexString());
   borrow.to = event.transaction.from.toHexString();
   borrow.market = marketAddr;
@@ -214,9 +213,10 @@ export function handleBorrow (event: Borrow): void {
   borrow.timestamp = event.block.timestamp;
   borrow.blockNumber = event.block.number;
   borrow.amount = event.params.amount;
-  borrow.amountUSD = amountUSD;
-
+  
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
+  borrow.amountUSD = amountUSD;
   // Add the borrow amount in USD to total volume on the market ('total loan origination')
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
   const tokenBalanceIndex = getTokenBalanceIndex(market, borrow.asset);
@@ -255,7 +255,6 @@ export function handleRepay (event: Repay): void {
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
   const token = initToken(event.params.reserve);
-  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount);
   const repay = new RepayEntity(hash + '-' + event.logIndex.toHexString());
   repay.to = marketAddr;
   repay.market = marketAddr;
@@ -267,9 +266,10 @@ export function handleRepay (event: Repay): void {
   repay.timestamp = event.block.timestamp;
   repay.blockNumber = event.block.number;
   repay.amount = event.params.amount;
-  repay.amountUSD = amountUSD;
-
+  
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
+  repay.amountUSD = amountUSD;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
   const tokenBalanceIndex = getTokenBalanceIndex(market, repay.asset);
   if (tokenBalanceIndex >= market.inputTokens.length) {
@@ -301,7 +301,6 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
   const token = initToken(event.params.collateralAsset);
-  const amountUSD = amountInUSD(token.id, token.decimals, event.params.liquidatedCollateralAmount);
   const liquidation = new LiquidationEntity(hash + '-' + event.logIndex.toHexString());
   // Liquidation.to is set to the market address
   liquidation.to = marketAddr;
@@ -314,9 +313,10 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   liquidation.timestamp = event.block.timestamp;
   liquidation.blockNumber = event.block.number;
   liquidation.amount = event.params.liquidatedCollateralAmount;
-  liquidation.amountUSD = amountUSD;
-
+  
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
+  const amountUSD = amountInUSD(token.id, token.decimals, event.params.liquidatedCollateralAmount, market);
+  liquidation.amountUSD = amountUSD;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
   const tokenBalanceIndex = getTokenBalanceIndex(market, liquidation.asset);
   if (tokenBalanceIndex >= market.inputTokens.length) {
