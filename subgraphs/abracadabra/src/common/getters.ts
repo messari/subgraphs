@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Token, UsageMetricsDailySnapshot, FinancialsDailySnapshot, MarketDailySnapshot, LendingProtocol, Market, _TokenPricesUsd, _LiquidationCache } from "../../generated/schema";
 import { LogRepay } from "../../generated/templates/cauldron/cauldron"
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -11,7 +11,8 @@ import {
   SECONDS_PER_DAY,
   BENTOBOX_ADDRESS,
   LendingType,
-  BIGINT_ONE
+  BIGINT_ONE,
+  BIGINT_ZERO
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {

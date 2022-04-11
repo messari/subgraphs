@@ -4,10 +4,10 @@ import { LogAddCollateral, LogBorrow, LogRemoveCollateral, LogRepay, cauldron, L
 import { Deposit, Borrow, Repay, _Account, Liquidation, _LiquidationCache, _TokenPricesUsd } from '../generated/schema'
 import { BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers"
-import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getOrCreateFinancials, getCachedLiquidation } from "./common/getters"
+import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getCachedLiquidation } from "./common/getters"
 import { cauldron as CauldronDataSource } from "../generated/templates"
 import { fetchMimPriceUSD, getOrCreateTokenPriceEntity, updateTokenPrice } from "./common/prices/prices"
-import { updateUsageMetrics, updateProtocolStats, updateMarketStats, updateMarketMetrics, updateFinancials } from "./common/metrics"
+import { updateUsageMetrics, updateTVL, updateMarketStats, updateMarketMetrics, updateFinancials } from "./common/metrics"
 import { createMarket, createCachedLiquidation } from "./common/setters";
 
 
@@ -43,7 +43,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   depositEvent.save()
 
   updateMarketStats(market.id,"DEPOSIT",collateralToken.id,event.params.share,event)
-  updateProtocolStats(amountUSD,"DEPOSIT")
+  updateTVL(event)
   updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event,event.params.from,event.params.to)
 }
@@ -73,7 +73,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   withdrawalEvent.save()
 
   updateMarketStats(market.id,"WITHDRAW",collateralToken.id,event.params.share,event)
-  updateProtocolStats(amountUSD,"WITHDRAW")
+  updateTVL(event)
   updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event,event.params.from,event.params.to)
 }
@@ -98,14 +98,21 @@ export function handleLogBorrow(event: LogBorrow): void {
   borrowEvent.save()
 
   updateMarketStats(market.id,"BORROW",MIM,event.params.amount,event)
-  updateProtocolStats(amountUSD,"BORROW")
+  updateTVL(event)
   updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event,event.params.from,event.params.to)
 }
 
+// Liquidation steps
+// 1) Handled in two event logs, one after the other:
+//        a) logRemoveCollateral
+//        b) logRepay (logIndex of a+1 ) 
+//
+
+
 export function handleLiquidation(event: LogRepay): void {
   // Retrieve cached liquidation that holds amount of collateral to help calculate profit usd (obtained from log remove collateral with from != to)
-  let cachedLiquidation = getCachedLiquidation(event)
+  let cachedLiquidation = getCachedLiquidation(event) // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
   let liquidationEvent = new Liquidation(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString() + "_Liquidation")
   let market = getMarket(event.address.toHexString())
   let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]))
@@ -126,7 +133,7 @@ export function handleLiquidation(event: LogRepay): void {
   liquidationEvent.asset = collateralToken.id
   liquidationEvent.amount = collateralAmount
   liquidationEvent.amountUSD = collateralAmountUSD
-  liquidationEvent.profitUSD = collateralAmountUSD.times(tokenPriceUSD).minus(mimAmountUSD)
+  liquidationEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD)
   liquidationEvent.save()
 }
 
@@ -153,21 +160,22 @@ export function handleLogRepay(event: LogRepay): void {
   repayEvent.save()
 
   updateMarketStats(market.id,"REPAY",MIM,event.params.part,event) // smart contract code subs event.params.part from totalBorrow
-  updateProtocolStats(amountUSD,"REPAY")
+  updateTVL(event)
   updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event,event.params.from,event.params.to)
 }
 
-export function handleLogWithdrawFees(event: LogWithdrawFees): void {
-  //let mimPriceUSD = fetchMimPriceUSD(event)
-  //let feesUSD = bigIntToBigDecimal(event.params.feesEarnedFraction,18).times(mimPriceUSD)
-  //updateFinancials(event,feesUSD)
-}
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
   let market = getMarket(event.address.toHexString())
   let token = getOrCreateToken(Address.fromString(market.inputTokens[0]))
   let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(event.params.rate,token.decimals))
+  let inputTokenBalances = market.inputTokenBalances
+  let inputTokenBalance = inputTokenBalances.pop()
+  let tvlUSD = bigIntToBigDecimal(inputTokenBalance,token.decimals).times(priceUSD)
+  market.totalValueLockedUSD = tvlUSD
+  market.save()
+  updateTVL(event)
   updateTokenPrice(token.id,priceUSD,event)
 }
 

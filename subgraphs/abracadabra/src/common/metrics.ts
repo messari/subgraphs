@@ -1,6 +1,6 @@
 import { BigDecimal, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../../generated/schema";
-import { SECONDS_PER_DAY, MIM } from "./constants";
+import { SECONDS_PER_DAY, MIM, BIGDECIMAL_ZERO } from "./constants";
 import { getOrCreateMarketDailySnapshot, getOrCreateUsageMetricSnapshot, getOrCreateFinancials, getOrCreateLendingProtocol, getMarket, getOrCreateToken } from "./getters";
 import { fetchMimPriceUSD, getOrCreateTokenPriceEntity } from "./prices/prices"
 import { bigIntToBigDecimal } from "./utils/numbers"
@@ -13,13 +13,13 @@ const ABRA_PROTOCOL_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(25),2)
 export function updateFinancials(event: ethereum.Event,feesUSD:BigDecimal): void {
   // totalVolumeUSD is handled in updateMarketStats
   // feesUSD is handled in handleLogWithdrawFees
+  // totalValueLockedUSD is handled in updateTVL()
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let treasuryBalanceUSD = getTreasuryBalance()
   // // Update the block number and timestamp to that of the last transaction of that day
   financialsDailySnapshots.blockNumber = event.block.number;
   financialsDailySnapshots.timestamp = event.block.timestamp;
-  financialsDailySnapshots.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsDailySnapshots.feesUSD = financialsDailySnapshots.feesUSD.plus(feesUSD) // feesUSD comes from logAccrue which is accounted in MIM
   financialsDailySnapshots.supplySideRevenueUSD = financialsDailySnapshots.supplySideRevenueUSD.plus(feesUSD.times(ABRA_USER_REVENUE_SHARE))
   financialsDailySnapshots.protocolSideRevenueUSD = financialsDailySnapshots.protocolSideRevenueUSD.plus(feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE))
@@ -104,15 +104,20 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 }
 
 
-export function updateProtocolStats(amountUSD: BigDecimal, eventType: string): void {
+export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
   let LendingProtocol = getOrCreateLendingProtocol()
-  if (eventType == "DEPOSIT"){
-    LendingProtocol.totalValueLockedUSD = LendingProtocol.totalValueLockedUSD.plus(amountUSD)
-  } else if (eventType == "WITHDRAW"){
-    LendingProtocol.totalValueLockedUSD = LendingProtocol.totalValueLockedUSD.minus(amountUSD)
+  let financialsDailySnapshots = getOrCreateFinancials(event)
+  let marketIdList = LendingProtocol.marketIdList
+  let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO
+  for (let i: i32 = 0; i < marketIdList.length; i++) { 
+    let marketAddress = marketIdList[i]
+    protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD)
   }
-  LendingProtocol.save()
+  LendingProtocol.totalValueLockedUSD = protocolTotalValueLockedUSD
+  financialsDailySnapshots.totalValueLockedUSD = protocolTotalValueLockedUSD;
+  LendingProtocol.save();
+  financialsDailySnapshots.save();
 }
 
 export function updateMarketStats(marketId: string, eventType: string, asset:string, amount: BigInt, event: ethereum.Event): void {
@@ -123,17 +128,19 @@ export function updateMarketStats(marketId: string, eventType: string, asset:str
   if (eventType == "DEPOSIT"){
     let inputTokenBalances = market.inputTokenBalances
     let inputTokenBalance = inputTokenBalances.pop()
+    let tvlUSD = bigIntToBigDecimal(inputTokenBalance,token_decimals).times(priceUSD)
     inputTokenBalance = inputTokenBalance.plus(amount)
     inputTokenBalances.push(inputTokenBalance)
     market.inputTokenBalances = inputTokenBalances
-    market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance,token_decimals).times(priceUSD)
+    market.totalValueLockedUSD = tvlUSD
   } else if (eventType == "WITHDRAW"){
     let inputTokenBalances = market.inputTokenBalances
     let inputTokenBalance = inputTokenBalances.pop()
+    let tvlUSD = bigIntToBigDecimal(inputTokenBalance,token_decimals).times(priceUSD)
     inputTokenBalance = inputTokenBalance.minus(amount)
     inputTokenBalances.push(inputTokenBalance)
     market.inputTokenBalances = inputTokenBalances
-    market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance,token_decimals).times(priceUSD)
+    market.totalValueLockedUSD = tvlUSD
   } else if (eventType == "BORROW"){
     market.outputTokenSupply = market.outputTokenSupply.plus(amount)
     market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount,token_decimals).times(priceUSD))

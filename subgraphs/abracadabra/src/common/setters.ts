@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { Market, _LiquidationCache } from "../../generated/schema"
 import { cauldron } from "../../generated/templates/cauldron/cauldron"
 import { getOrCreateLendingProtocol, getOrCreateToken } from "./getters"
@@ -6,14 +6,21 @@ import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGINT_ZERO, SECONDS_PER_YEAR, MIM } f
 import { bigIntToBigDecimal } from "./utils/numbers"
 import { LogRemoveCollateral } from '../../generated/templates/cauldron/cauldron'
 
+export function updateProtocolMarketList(marketAddress:string): void{
+  let protocol = getOrCreateLendingProtocol()
+  let marketIdList = protocol.marketIdList
+  marketIdList.push(marketAddress)
+  protocol.marketIdList = marketIdList
+  protocol.save()
+}
 
 export function createMarket(marketAddress: string, blockNumber:BigInt, blockTimestamp:BigInt): void {
     let MarketEntity = new Market(marketAddress)
     let MarketContract = cauldron.bind(Address.fromString(marketAddress))
     let collateralCall = MarketContract.try_collateral()
     if (!collateralCall.reverted){
-      MarketEntity.protocol = getOrCreateLendingProtocol().id
       let inputToken = getOrCreateToken(collateralCall.value)
+      MarketEntity.protocol = getOrCreateLendingProtocol().id
       MarketEntity.inputTokens = [inputToken.id]
       MarketEntity.outputToken = MIM
       MarketEntity.totalValueLockedUSD = BIGDECIMAL_ZERO
@@ -28,6 +35,7 @@ export function createMarket(marketAddress: string, blockNumber:BigInt, blockTim
       MarketEntity.isActive = true
       MarketEntity.canUseAsCollateral = true
       MarketEntity.canBorrowFrom = true
+      
       if (marketAddress.toLowerCase() == "0x551a7cff4de931f32893c928bbc3d25bf1fc5147".toLowerCase()){
         MarketEntity.maximumLTV = bigIntToBigDecimal(BigInt.fromI32(90000),5)
         MarketEntity.liquidationPenalty = bigIntToBigDecimal(BigInt.fromI32(103000),5).minus(BIGDECIMAL_ONE)
@@ -73,6 +81,7 @@ export function createMarket(marketAddress: string, blockNumber:BigInt, blockTim
       MarketEntity.variableBorrowRate = BIGDECIMAL_ZERO // ???
     }
     MarketEntity.save()
+    updateProtocolMarketList(marketAddress)
   }
 
 

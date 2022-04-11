@@ -121,8 +121,6 @@ templates:
           handler: handleLogBorrow
         - event: LogRepay(indexed address,indexed address,uint256,uint256)
           handler: handleLogRepay
-        - event: LogWithdrawFees(indexed address,uint256)
-          handler: handleLogWithdrawFees
         - event: LogExchangeRate(uint256)
           handler: handleLogExchangeRate
         - event: LogAccrue(uint128)

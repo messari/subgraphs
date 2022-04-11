@@ -294,6 +294,8 @@ type LendingProtocol implements Protocol @entity {
 
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
+  marketIdList: [String!]!
+
   ##### Lending-Specific #####
 
   " All markets that belong to this protocol "
