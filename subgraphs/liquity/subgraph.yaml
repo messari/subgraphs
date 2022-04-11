@@ -21,7 +21,8 @@ dataSources:
         - Market
         - Token
         - UsageMetricsDailySnapshot
-        - _DailyActiveAccount
+        - DailyActiveAccount
+        - Account
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
@@ -53,8 +54,9 @@ dataSources:
         - Repay
         - Market
         - Token
-        - _DailyActiveAccount
+        - DailyActiveAccount
         - UsageMetricsDailySnapshot
+        - Account
       abis:
         - name: BorrowerOperations
           file: ./abis/BorrowerOperations.json
@@ -127,8 +129,9 @@ dataSources:
         - LendingProtocol
         - Market
         - Token
-        - _DailyActiveAccount
+        - DailyActiveAccount
         - UsageMetricsDailySnapshot
+        - Account
       abis:
         - name: CollSurplusPool
           file: ./abis/CollSurplusPool.json

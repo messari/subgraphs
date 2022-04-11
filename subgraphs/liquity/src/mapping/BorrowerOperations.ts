@@ -13,12 +13,22 @@ import { getCurrentETHPrice } from "../entities/price";
 import { addUSDFees } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
+/**
+ * Emitted when LUSD is borrowed from trove and a dynamic fee (0.5-5%) is charged (added to debt)
+ *
+ * @param event LUSDBorrowingFeePaid event
+ */
 export function handleLUSDBorrowingFeePaid(event: LUSDBorrowingFeePaid): void {
   const feeAmountLUSD = event.params._LUSDFee;
   const feeAmountUSD = bigIntToBigDecimal(feeAmountLUSD);
   addUSDFees(event, feeAmountUSD);
 }
 
+/**
+ * Emitted when a trove was updated because of a BorrowerOperation (open/close/adjust)
+ *
+ * @param event TroveUpdated event
+ */
 export function handleTroveUpdated(event: TroveUpdated): void {
   const borrower = event.params._borrower;
   const newCollateral = event.params._coll;

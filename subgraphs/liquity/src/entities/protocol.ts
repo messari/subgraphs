@@ -3,7 +3,8 @@ import {
   FinancialsDailySnapshot,
   LendingProtocol,
   UsageMetricsDailySnapshot,
-  _DailyActiveAccount,
+  DailyActiveAccount,
+  Account,
 } from "../../generated/schema";
 import {
   LendingType,
@@ -20,8 +21,9 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
     protocol = new LendingProtocol(TROVE_MANAGER);
     protocol.name = "Liquity";
     protocol.slug = "liquity";
-    protocol.schemaVersion = "1.0.0";
+    protocol.schemaVersion = "1.1.0";
     protocol.subgraphVersion = "1.0.0";
+    protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -31,15 +33,17 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
   return protocol;
 }
 
-export function getOrCreateUsageMetricSnapshot(
+export function getOrCreateUsageMetricsSnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   const id = `${event.block.timestamp.toI64() / SECONDS_PER_DAY}`;
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
   if (!usageMetrics) {
+    const protocol = getOrCreateLiquityProtocol();
     usageMetrics = new UsageMetricsDailySnapshot(id);
-    usageMetrics.protocol = getOrCreateLiquityProtocol().id;
+    usageMetrics.protocol = protocol.id;
+    usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
@@ -67,19 +71,29 @@ export function incrementProtocolUniqueUsers(): void {
   protocol.save();
 }
 
+// Keep track of daily transaction count and daily/total unique users
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch
-  const id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  const usageMetrics = getOrCreateUsageMetricSnapshot(event);
-  const protocol = getOrCreateLiquityProtocol();
+  const days = `${event.block.timestamp.toI64() / SECONDS_PER_DAY}`;
+  const usageMetrics = getOrCreateUsageMetricsSnapshot(event);
   usageMetrics.dailyTransactionCount += 1;
-  usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
+
+  let accountId = from.toHexString();
+  let account = Account.load(accountId);
+  if (!account) {
+    account = new Account(accountId);
+    account.save();
+    const protocol = getOrCreateLiquityProtocol();
+    protocol.totalUniqueUsers += 1;
+    protocol.save();
+    usageMetrics.totalUniqueUsers += 1;
+  }
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = `${id.toString()}-${from.toHexString()}`;
-  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccountId = `${days.toString()}-${accountId}`;
+  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
     usageMetrics.activeUsers += 1;
   }
@@ -91,7 +105,8 @@ export function addUSDFees(
   feeAmountUSD: BigDecimal
 ): void {
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
-  financialsSnapshot.feesUSD = financialsSnapshot.feesUSD.plus(feeAmountUSD);
+  financialsSnapshot.totalRevenueUSD =
+    financialsSnapshot.totalRevenueUSD.plus(feeAmountUSD);
   financialsSnapshot.supplySideRevenueUSD =
     financialsSnapshot.supplySideRevenueUSD.plus(feeAmountUSD);
   financialsSnapshot.save();
@@ -101,6 +116,9 @@ export function addUSDVolume(
   event: ethereum.Event,
   volumeUSD: BigDecimal
 ): void {
+  const protocol = getOrCreateLiquityProtocol();
+  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(volumeUSD);
+  protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
   financialsSnapshot.totalVolumeUSD =
     financialsSnapshot.totalVolumeUSD.plus(volumeUSD);
@@ -113,8 +131,22 @@ export function updateUSDLocked(
 ): void {
   const protocol = getOrCreateLiquityProtocol();
   protocol.totalValueLockedUSD = lockedUSD;
+  protocol.totalDepositUSD = lockedUSD;
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
   financialsSnapshot.totalValueLockedUSD = lockedUSD;
+  financialsSnapshot.totalDepositUSD = lockedUSD;
+  financialsSnapshot.save();
+}
+
+export function updateUSDBorrowed(
+  event: ethereum.Event,
+  borrowedUSD: BigDecimal
+): void {
+  const protocol = getOrCreateLiquityProtocol();
+  protocol.totalBorrowUSD = borrowedUSD;
+  protocol.save();
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
+  financialsSnapshot.totalBorrowUSD = borrowedUSD;
   financialsSnapshot.save();
 }

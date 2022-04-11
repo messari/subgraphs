@@ -22,6 +22,11 @@ enum TroveManagerOperation {
   redeemCollateral,
 }
 
+/**
+ * Emitted at end of batch liquidation flow, containing aggregate data from all liquidations
+ *
+ * @param event Liquidation event
+ */
 export function handleLiquidation(event: Liquidation): void {
   // Total amount of ETH from all (n) troves liquidated in current transaction
   const amountLiquidatedETH = event.params._liquidatedColl;
@@ -38,10 +43,13 @@ export function handleLiquidation(event: Liquidation): void {
     profitUSD,
     event.transaction.from
   );
-  // Ensures the liquidator is counted in total unique users, in case they have not opened a trove
-  getOrCreateTrove(event.transaction.from);
 }
 
+/**
+ * Emitted when a trove was updated because of a TroveManagerOperation operation
+ *
+ * @param event TroveUpdated event
+ */
 export function handleTroveUpdated(event: TroveUpdated): void {
   const trove = getOrCreateTrove(event.params._borrower);
   const operation = event.params._operation as TroveManagerOperation;
@@ -98,6 +106,4 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
     withdrawAmountUSD,
     event.transaction.from
   );
-  // Ensures the redeemer is counted in total unique users, in case they have not opened a trove
-  getOrCreateTrove(event.transaction.from);
 }

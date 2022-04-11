@@ -11,7 +11,11 @@ import {
   SECONDS_PER_DAY,
 } from "../utils/constants";
 import { getCurrentETHPrice } from "./price";
-import { getOrCreateLiquityProtocol, updateUSDLocked } from "./protocol";
+import {
+  getOrCreateLiquityProtocol,
+  updateUSDBorrowed,
+  updateUSDLocked,
+} from "./protocol";
 import { getETHToken, getLUSDToken } from "./token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
@@ -50,8 +54,11 @@ export function createMarketSnapshot(
   marketSnapshot.protocol = market.protocol;
   marketSnapshot.market = market.id;
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
+  marketSnapshot.totalDepositUSD = market.totalDepositUSD;
+  marketSnapshot.totalBorrowUSD = market.totalBorrowUSD;
   marketSnapshot.inputTokenBalances = market.inputTokenBalances;
-  marketSnapshot.inputTokenPricesUSD = [getCurrentETHPrice()];
+  marketSnapshot.inputTokenPricesUSD = market.inputTokenPricesUSD;
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
   marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
 
@@ -67,9 +74,11 @@ export function setMarketLUSDDebt(
   const debtUSD = bigIntToBigDecimal(debtLUSD);
   const market = getOrCreateMarket();
   market.totalVolumeUSD = debtUSD;
+  market.totalBorrowUSD = debtUSD;
   market.outputTokenSupply = debtLUSD;
   market.save();
   createMarketSnapshot(event, market);
+  updateUSDBorrowed(event, debtUSD);
 }
 
 export function setMarketETHBalance(
@@ -79,7 +88,9 @@ export function setMarketETHBalance(
   const balanceUSD = bigIntToBigDecimal(balanceETH).times(getCurrentETHPrice());
   const market = getOrCreateMarket();
   market.totalValueLockedUSD = balanceUSD;
+  market.totalDepositUSD = balanceUSD;
   market.inputTokenBalances = [balanceETH];
+  market.inputTokenPricesUSD = [getCurrentETHPrice()];
   market.save();
   createMarketSnapshot(event, market);
   updateUSDLocked(event, balanceUSD);

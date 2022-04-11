@@ -5,7 +5,15 @@ import { getOrCreateTrove } from "../entities/trove";
 import { BIGINT_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
-// Withdraw event is created immediately upon collateral addition because ETH price is not updated during collateral withdraw flow
+/**
+ * Whenever a borrower's trove is closed by a non-owner address because of either:
+ *   1. Redemption
+ *   2. Liquidation in recovery mode with collateral ratio > 110%
+ * the remaining collateral is sent to CollSurplusPool to be claimed (withdrawn) by the owner.
+ * Because ETH price is not updated during the actual withdrawal, the Withdraw event is instead created upon collateral deposit
+ *
+ * @param event CollBalanceUpdated event
+ */
 export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
   const borrower = event.params._account;
   const collateralSurplusETH = event.params._newBalance;
