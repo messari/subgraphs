@@ -506,14 +506,20 @@ type Withdraw implements Event @entity {
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
+
   " Address that received tokens "
   to: String!
+
   " Market that tokens are withdrawn from "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+  
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
@@ -580,12 +586,14 @@ type Swap implements Event @entity {
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
+
 ############ Internal Use ############
 ######################################
 # stores for USD calculations
 "  Used to keep track of the price of Native Token in USD "
 type _HelperStore @entity {
   id: ID!
+
   " price of Native Token in USD " 
   _value: BigDecimal!
   
@@ -613,6 +621,6 @@ type _Transfer @entity {
   _sender: String
 
   _type: String
-  
+
   _liquidity: BigInt
 }
