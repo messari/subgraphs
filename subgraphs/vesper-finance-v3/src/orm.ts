@@ -9,7 +9,7 @@ import {
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { PoolV3, Transfer } from "../generated/poolV3_vaUSDC/PoolV3";
+import { PoolV3, Transfer, Withdraw as WithdrawEvent } from "../generated/poolV3_vaUSDC/PoolV3";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
@@ -163,6 +163,33 @@ export function getOrCreateDeposit(event: Transfer, vaultAddress: Address): Depo
   }
 
   return deposit;
+}
+
+export function getOrCreateWithdraw(event: WithdrawEvent, vaultAddress: Address): Withdraw {
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
+  let withdraw = Withdraw.load(id);
+
+  if (!withdraw) {
+    const yAggr = getOrCreateYieldAggregator();
+    const poolv3 = PoolV3.bind(vaultAddress);
+
+    withdraw = new Withdraw(id);
+    withdraw.vault = vaultAddress.toHexString();
+    withdraw.hash = event.transaction.hash.toHexString();
+    withdraw.logIndex = event.logIndex.toI32();
+    withdraw.protocol = yAggr.id;
+    withdraw.to = event.params.owner.toHexString();
+    withdraw.from = vaultAddress.toHexString();
+    withdraw.blockNumber = event.block.number;
+    withdraw.timestamp = event.block.timestamp;
+    withdraw.asset = getOrCreateToken(poolv3.token()).id;
+    withdraw.amount = event.transaction.value;
+    withdraw.amountUSD = BigDecimal.zero();
+
+    withdraw.save();
+  }
+
+  return withdraw;
 }
 
 export function getOrCreateVault(
