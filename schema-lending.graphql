@@ -135,7 +135,7 @@ type FinancialsDailySnapshot @entity {
   totalVolumeUSD: BigDecimal!
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
-  totalDepsoitUSD: BigDecimal!
+  totalDepositUSD: BigDecimal!
 
   " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
   totalBorrowUSD: BigDecimal!
@@ -204,7 +204,7 @@ type LendingProtocol implements Protocol @entity {
   totalVolumeUSD: BigDecimal!
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
-  totalDepsoitUSD: BigDecimal!
+  totalDepositUSD: BigDecimal!
 
   " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
   totalBorrowUSD: BigDecimal!
