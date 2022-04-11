@@ -5,6 +5,7 @@ import { BigDecimal, BigInt, dataSource } from '@graphprotocol/graph-ts';
 ////////////////////////
 
 export namespace Network {
+  export const ARBITRUM = "ARBITRUM"
   export const AVALANCHE = "AVALANCHE"
   export const AURORA = "AURORA"
   export const BSC = "BSC"
@@ -103,6 +104,6 @@ export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
 let network: string
 if (dataSource.network() == "mainnet") network = Network.ETHEREUM 
 else if (dataSource.network() == "optimism") network = Network.OPTIMISM
-else network = Network.OPTIMISM
+else network = Network.ARBITRUM
 
-export const deployedNetwork = network
+export const DEPLOYED_NETWORK = network

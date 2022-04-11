@@ -8,8 +8,6 @@ import {
   Deposit,
   Withdraw,
   Swap,
-  Account,
-  DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
   _LiquidityPoolAmount,
@@ -20,7 +18,7 @@ import { Factory as FactoryContract } from '../../generated/templates/Pool/Facto
 
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGDECIMAL_TWO, BIGINT_ZERO, LiquidityPoolFeeType, BIGDECIMAL_TEN_THOUSAND, PROTOCOL_FEE_TO_OFF, BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGDECIMAL_TEN, BIGINT_ONE } from "./utils/constants"
 import { getLiquidityPool, getLiquidityPoolAmounts, getLiquidityPoolFee, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateTokenTracker } from "./getters"
-import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, WHITELIST_TOKENS } from "./utils/pricing"
+import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, WHITELIST_TOKENS } from "./utils/price"
 import { getOrCreateToken } from "./utils/tokens"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))

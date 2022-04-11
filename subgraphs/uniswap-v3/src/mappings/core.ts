@@ -13,7 +13,7 @@ import {
   createSwapHandleVolumeAndFees,
   updateProtocolFees
 } from '../common/helpers'
-import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/intervalUpdates'
+import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/metrics/metrics'
 
 export function handleInitialize(event: Initialize): void {
   updatePrices(event)

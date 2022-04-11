@@ -12,7 +12,7 @@ import {
   LiquidityPoolFee,
 } from "../../generated/schema"
 
-import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, deployedNetwork } from "./utils/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEPLOYED_NETWORK } from "./utils/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
@@ -45,8 +45,8 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.methodologyVersion = "1.0.1"
     protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
-    protocol.totalVolumeUSD
-    protocol.network = deployedNetwork
+    protocol.totalVolumeUSD = BIGDECIMAL_ZERO
+    protocol.network = DEPLOYED_NETWORK
     protocol.type = ProtocolType.EXCHANGE
 
     protocol.save()
