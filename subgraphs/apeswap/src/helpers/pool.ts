@@ -61,8 +61,8 @@ export function getOrCreatePool(
     pool.outputTokenSupply = BIGINT_ZERO;
     // OutputToken Price
     let helperStore = _HelperStore.load("1")!;
-    let outputTokenPriceBNB = findNativeTokenPricePerToken(outputToken);
-    pool.outputTokenPriceUSD = outputTokenPriceBNB.times(helperStore._value);
+    let outputTokenPriceInNativeToken = findNativeTokenPricePerToken(outputToken);
+    pool.outputTokenPriceUSD = outputTokenPriceInNativeToken.times(helperStore._value);
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
     pool.createdTimestamp = event.block.timestamp;
@@ -89,15 +89,21 @@ export function updatePool(pool: LiquidityPool): void {
   pool.save();
 }
 
-export function updateLpWithReward(lpTokenAddress: Address, bananaAddress: Address, bananaRewardPerDay: BigInt): void {
+export function updateLpWithReward(
+  lpTokenAddress: Address,
+  rewardTokenAddress: Address,
+  rewardEmissionPerPerDay: BigInt,
+): void {
   let pool = LiquidityPool.load(lpTokenAddress.toHexString());
   if (pool !== null) {
     let helperStore = _HelperStore.load("1")!;
-    let bananaToken = getOrCreateToken(bananaAddress);
-    pool.rewardTokens = [getOrCreateRewardToken(bananaAddress).id];
-    pool.rewardTokenEmissionsAmount = [bananaRewardPerDay];
-    let rewardTokenEmissionsBNB = findNativeTokenPricePerToken(bananaToken).times(toDecimal(bananaRewardPerDay));
-    pool.rewardTokenEmissionsUSD = [rewardTokenEmissionsBNB.times(helperStore._value)];
+    let rewardToken = getOrCreateToken(rewardTokenAddress);
+    pool.rewardTokens = [getOrCreateRewardToken(rewardTokenAddress).id];
+    pool.rewardTokenEmissionsAmount = [rewardEmissionPerPerDay];
+    let rewardTokenEmissionsInNativeToken = findNativeTokenPricePerToken(rewardToken).times(
+      toDecimal(rewardEmissionPerPerDay),
+    );
+    pool.rewardTokenEmissionsUSD = [rewardTokenEmissionsInNativeToken.times(helperStore._value)];
 
     pool.save();
   }

@@ -1,28 +1,27 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Yield } from "../../generated/Yield/Yield";
-import { YieldV2 } from "../../generated/Yield/YieldV2";
-import { updateMovingAverageBlocksPerSecond } from "../utils/blockPerSec";
-import { BIGINT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, toBigInt, ZERO_ADDRESS } from "../utils/constant";
+import { MasterChef } from "../../generated/Yield/MasterChef";
+import { MasterChefV2 } from "../../generated/Yield/MasterChefV2";
+import { BIGINT_ZERO, BSC_SECONDS_PER_BLOCK, SECONDS_PER_DAY, ZERO_ADDRESS } from "../utils/constant";
 import { updateLpWithReward } from "./pool";
 
-export function handleRewardV2(call: ethereum.Call, pid: BigInt): void {
+export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
   let lpTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
-  let bananaAddress: Address = Address.fromString(ZERO_ADDRESS);
-  let bananaPerSecond: BigInt = BIGINT_ZERO
-  let totalAllocPoint: BigInt = BIGINT_ZERO
-  let poolAllocPoint: BigInt = BIGINT_ZERO
-  let lastRewardTime: BigInt = BIGINT_ZERO
+  let rewardTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
+  let rewardTokenPerSecond: BigInt = BIGINT_ZERO;
+  let totalAllocPoint: BigInt = BIGINT_ZERO;
+  let poolAllocPoint: BigInt = BIGINT_ZERO;
+  let lastRewardTime: BigInt = BIGINT_ZERO;
 
-  let poolContract = YieldV2.bind(call.transaction.from);
+  let poolContract = MasterChefV2.bind(event.address);
   let getlpAddress = poolContract.try_lpToken(pid);
   if (!getlpAddress.reverted) {
     lpTokenAddress = getlpAddress.value;
   }
-  let getBananaPerSecond = poolContract.try_bananaPerSecond();
-  if (!getBananaPerSecond.reverted) {
-    bananaPerSecond = getBananaPerSecond.value;
+  let getRewardTokenPerSecond = poolContract.try_bananaPerSecond();
+  if (!getRewardTokenPerSecond.reverted) {
+    rewardTokenPerSecond = getRewardTokenPerSecond.value;
   }
-  
+
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
   if (!getTotalAllocPoint.reverted) {
     totalAllocPoint = getTotalAllocPoint.value;
@@ -31,33 +30,35 @@ export function handleRewardV2(call: ethereum.Call, pid: BigInt): void {
   if (!getPoolInfo.reverted) {
     let poolInfo = getPoolInfo.value;
     poolAllocPoint = poolInfo.value2;
-    lastRewardTime = poolInfo.value1
+    lastRewardTime = poolInfo.value1;
   }
 
-  let getBanana = poolContract.try_BANANA();
-  if (!getBanana.reverted) bananaAddress = getBanana.value;
+  let getRewardToken = poolContract.try_BANANA();
+  if (!getRewardToken.reverted) rewardTokenAddress = getRewardToken.value;
 
-  // Calculate Reward(BANANA) Emission per sec
-  let time = call.block.timestamp.minus(lastRewardTime)
-  let bananaReward = time.times(bananaPerSecond).times(poolAllocPoint).div(totalAllocPoint)
+  // Calculate Reward Emission per sec
+  let time = event.block.timestamp.minus(lastRewardTime);
+  let rewardEmissionPerSec = time
+    .times(rewardTokenPerSecond)
+    .times(poolAllocPoint)
+    .div(totalAllocPoint);
 
-  // Reward(BANANA) Emission Per Day
-  let bananaRewardPerDay = bananaReward.times(BigInt.fromI32(SECONDS_PER_DAY))
+  // Reward Emission Per Day
+  let rewardEmissionPerDay = rewardEmissionPerSec.times(BigInt.fromI32(SECONDS_PER_DAY));
 
-  updateLpWithReward(lpTokenAddress, bananaAddress, bananaRewardPerDay);
+  updateLpWithReward(lpTokenAddress, rewardTokenAddress, rewardEmissionPerDay);
 }
 
-export function handleReward(call: ethereum.Call, pid: BigInt): void {
+export function handleReward(event: ethereum.Event, pid: BigInt): void {
   let lpTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
-  let bananaAddress: Address = Address.fromString(ZERO_ADDRESS);
-  let totalAllocPoint: BigInt = BIGINT_ZERO
-  let poolAllocPoint: BigInt = BIGINT_ZERO
-  let lastRewardTime: BigInt = BIGINT_ZERO
-  let lastRewardBlock: BigInt = BIGINT_ZERO
-  let bananaPerBlock: BigInt = BIGINT_ZERO
-  let multiplier: BigInt = BIGINT_ZERO
+  let rewardTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
+  let totalAllocPoint: BigInt = BIGINT_ZERO;
+  let poolAllocPoint: BigInt = BIGINT_ZERO;
+  let lastRewardBlock: BigInt = BIGINT_ZERO;
+  let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
+  let multiplier: BigInt = BIGINT_ZERO;
 
-  let poolContract = Yield.bind(call.transaction.from);
+  let poolContract = MasterChef.bind(event.address);
   let getPoolInfo = poolContract.try_getPoolInfo(pid);
   if (!getPoolInfo.reverted) {
     let poolInfo = getPoolInfo.value;
@@ -65,26 +66,29 @@ export function handleReward(call: ethereum.Call, pid: BigInt): void {
     poolAllocPoint = poolInfo.value1;
     lastRewardBlock = poolInfo.value2;
   }
-  let getBanana = poolContract.try_cake();
-  if (!getBanana.reverted) bananaAddress = getBanana.value;
+  let getRewardToken = poolContract.try_cake();
+  if (!getRewardToken.reverted) rewardTokenAddress = getRewardToken.value;
 
-  let getCakePerBlock = poolContract.try_cakePerBlock();
-  if (!getCakePerBlock.reverted) bananaPerBlock = getCakePerBlock.value;
+  let getRewardTokenPerBlock = poolContract.try_cakePerBlock();
+  if (!getRewardTokenPerBlock.reverted) rewardTokenPerBlock = getRewardTokenPerBlock.value;
 
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, call.block.number)
-  if(!getMultiplier.reverted) multiplier = getMultiplier.value
-  
-  let getTotalAllocPoint = poolContract.try_totalAllocPoint()
-  if(!getTotalAllocPoint.reverted) totalAllocPoint = getTotalAllocPoint.value
-  
-  // Calculate Reward(BANANA) Emission per Block
-  let bananaReward = multiplier.times(bananaPerBlock).times(poolAllocPoint).div(totalAllocPoint)
-  
-  // Calculate Reward(BANANA) emission per day
+  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
+  if (!getMultiplier.reverted) multiplier = getMultiplier.value;
+
+  let getTotalAllocPoint = poolContract.try_totalAllocPoint();
+  if (!getTotalAllocPoint.reverted) totalAllocPoint = getTotalAllocPoint.value;
+
+  // Calculate Reward Emission per Block
+  let rewardToken = multiplier
+    .times(rewardTokenPerBlock)
+    .times(poolAllocPoint)
+    .div(totalAllocPoint);
+
+  // Calculate Reward emission per day
   // A block is estimated to be produced approximately every 5secs
-  // let bananaRewardPerSecond = bananaReward.div(toBigInt(updateMovingAverageBlocksPerSecond(call.block.timestamp, call.block.number)))
-  let bananaRewardPerSecond = bananaReward.div(BIGINT_ONE)
-  let bananaRewardPerDay = bananaRewardPerSecond.times(BigInt.fromI32(SECONDS_PER_DAY))
+  let rewardTokenPerSecond = rewardToken.div(BSC_SECONDS_PER_BLOCK);
 
-  updateLpWithReward(lpTokenAddress, bananaAddress, bananaRewardPerDay);
+  let rewardTokenPerDay = rewardTokenPerSecond.times(BigInt.fromI32(SECONDS_PER_DAY));
+
+  updateLpWithReward(lpTokenAddress, rewardTokenAddress, rewardTokenPerDay);
 }

@@ -49,12 +49,10 @@ export namespace TransferType {
 }
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-// export const FACTORY_ADDRESS = "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6";
 export const FACTORY_ADDRESS = dataSource.network() == Network.BSC.toLowerCase() ? BSC.FACTORY_ADDRESS : POLYGON.FACTORY_ADDRESS;
 export let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
 
 export const DEFAULT_DECIMALS: i32 = 18;
-export const USDC_DECIMALS: i32 = 6;
 export const USD_DENOMINATOR = BigInt.fromI32(10 ** 18).toBigDecimal();
 export const FEE_DENOMINATOR = BigInt.fromI32(10 ** 10);
 export const FEE_DECIMALS = 10;

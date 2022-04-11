@@ -1,18 +1,38 @@
 import {
-  UpdatePoolCall
+  Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw
 } from "../../generated/Yield/Yield";
 import {
-  UpdatePoolCall as UpdatePoolCallV2
+  Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2
 } from "../../generated/Yield/YieldV2";
 import { handleReward, handleRewardV2 } from "../helpers/yield";
 
-export function handleUpdatePool(call: UpdatePoolCall): void {
-  let pid = call.inputs._pid;
-  handleReward(call, pid);
+export function handleDeposit(event: DepositEvent): void {
+  let pid = event.params.pid;
+  handleReward(event, pid);
 }
 
-export function handleUpdatePoolV2(call: UpdatePoolCallV2): void {
-  let pid = call.inputs.pid;
-  handleRewardV2(call, pid);
+export function handleDepositV2(event: DepositEventV2): void {
+  let pid = event.params.pid;
+  handleRewardV2(event, pid);
+}
+
+export function handleWithraw(event: WithdrawEvent): void {
+  let pid = event.params.pid;
+  handleReward(event, pid);
+}
+
+export function handleWithrawV2(event: WithdrawEventV2): void {
+  let pid = event.params.pid;
+  handleRewardV2(event, pid);
+}
+
+export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
+  let pid = event.params.pid;
+  handleReward(event, pid);
+}
+
+export function handleEmergencyWithdrawV2(event: EmergencyWithdrawV2): void {
+  let pid = event.params.pid;
+  handleRewardV2(event, pid);
 }
 

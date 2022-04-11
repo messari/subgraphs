@@ -12,22 +12,23 @@ import {
 } from "./constant";
 import { getOrCreateToken } from "./token";
 
-// Address of the wrapped native token(eg WBNB for bsc and WMATIC for polygon)
+// Address of the wrapped Native Token
 const WRAPPED_NATIVE_TOKEN_ADDRESS =
   dataSource.network() == Network.BSC.toLowerCase() ? BSC.WBNB_ADDRESS : POLYGON.WMATIC_ADDRESS;
 
 export function baseTokenPriceInUSD(): BigDecimal {
   log.info("Network: {}", [dataSource.network()]);
   if (dataSource.network() == Network.BSC.toLowerCase()) {
-    return bnbPriceInUSD();
+    return NativeToken1PriceInUSD();
   } else if (dataSource.network() == POLYGON_NETWORK) {
-    return wmaticPriceInUSD();
+    return NativeToken2PriceInUSD();
   } else {
     return BIGDECIMAL_ZERO;
   }
 }
 
-function bnbPriceInUSD(): BigDecimal {
+// Native token price in USD in the first network(in this case bsc newtwork)
+function NativeToken1PriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
   let usdtPair = LiquidityPool.load(
     Address.fromString(BSC.USDT_WBNB_PAIR).toHexString(), // usdt is token0
@@ -40,11 +41,11 @@ function bnbPriceInUSD(): BigDecimal {
   ); // dai is token1
 
   if (busdPair !== null && usdtPair !== null && daiPair !== null) {
-    let totalLiquidityBNB = daiPair._reserve1.plus(busdPair._reserve0).plus(usdtPair._reserve1);
-    if (totalLiquidityBNB.notEqual(BIGDECIMAL_ZERO)) {
-      let daiWeight = daiPair._reserve1.div(totalLiquidityBNB);
-      let busdWeight = busdPair._reserve0.div(totalLiquidityBNB);
-      let usdtWeight = usdtPair._reserve1.div(totalLiquidityBNB);
+    let totalLiquidityInNativeToken = daiPair._reserve1.plus(busdPair._reserve0).plus(usdtPair._reserve1);
+    if (totalLiquidityInNativeToken.notEqual(BIGDECIMAL_ZERO)) {
+      let daiWeight = daiPair._reserve1.div(totalLiquidityInNativeToken);
+      let busdWeight = busdPair._reserve0.div(totalLiquidityInNativeToken);
+      let usdtWeight = usdtPair._reserve1.div(totalLiquidityInNativeToken);
       return daiPair._token0Price
         .times(daiWeight)
         .plus(busdPair._token1Price.times(busdWeight))
@@ -53,10 +54,10 @@ function bnbPriceInUSD(): BigDecimal {
     return BIGDECIMAL_ZERO;
     // busd and usdt have been created
   } else if (busdPair !== null && usdtPair !== null) {
-    let totalLiquidityBNB = busdPair._reserve0.plus(usdtPair._reserve1);
-    if (totalLiquidityBNB.notEqual(BIGDECIMAL_ZERO)) {
-      let busdWeight = busdPair._reserve0.div(totalLiquidityBNB);
-      let usdtWeight = usdtPair._reserve1.div(totalLiquidityBNB);
+    let totalLiquidityInNativeToken = busdPair._reserve0.plus(usdtPair._reserve1);
+    if (totalLiquidityInNativeToken.notEqual(BIGDECIMAL_ZERO)) {
+      let busdWeight = busdPair._reserve0.div(totalLiquidityInNativeToken);
+      let usdtWeight = usdtPair._reserve1.div(totalLiquidityInNativeToken);
       return busdPair._token1Price.times(busdWeight).plus(usdtPair._token0Price.times(usdtWeight));
       // usdt is the only pair so far
     }
@@ -69,7 +70,9 @@ function bnbPriceInUSD(): BigDecimal {
     return BIGDECIMAL_ZERO;
   }
 }
-function wmaticPriceInUSD(): BigDecimal {
+
+// Native token price in USD in the second network(in this case polygon newtwork)
+function NativeToken2PriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
   let usdtPair = LiquidityPool.load(
     Address.fromString(POLYGON.WMATIC_USDT_PAIR).toHexString(), // usdt is token1
@@ -82,11 +85,11 @@ function wmaticPriceInUSD(): BigDecimal {
   ); // dai is token1
 
   if (usdcPair !== null && usdtPair !== null && daiPair !== null) {
-    let totalLiquidityBNB = daiPair._reserve0.plus(usdcPair._reserve0).plus(usdtPair._reserve0);
-    if (totalLiquidityBNB.notEqual(BIGDECIMAL_ZERO)) {
-      let daiWeight = daiPair._reserve0.div(totalLiquidityBNB);
-      let usdcWeight = usdcPair._reserve0.div(totalLiquidityBNB);
-      let usdtWeight = usdtPair._reserve0.div(totalLiquidityBNB);
+    let totalLiquidityInNativeToken = daiPair._reserve0.plus(usdcPair._reserve0).plus(usdtPair._reserve0);
+    if (totalLiquidityInNativeToken.notEqual(BIGDECIMAL_ZERO)) {
+      let daiWeight = daiPair._reserve0.div(totalLiquidityInNativeToken);
+      let usdcWeight = usdcPair._reserve0.div(totalLiquidityInNativeToken);
+      let usdtWeight = usdtPair._reserve0.div(totalLiquidityInNativeToken);
       return daiPair._token1Price
         .times(daiWeight)
         .plus(usdcPair._token1Price.times(usdcWeight))
@@ -95,10 +98,10 @@ function wmaticPriceInUSD(): BigDecimal {
     return BIGDECIMAL_ZERO;
     // busd and usdt have been created
   } else if (usdcPair !== null && usdtPair !== null) {
-    let totalLiquidityBNB = usdcPair._reserve0.plus(usdtPair._reserve0);
-    if (totalLiquidityBNB.notEqual(BIGDECIMAL_ZERO)) {
-      let usdcWeight = usdcPair._reserve0.div(totalLiquidityBNB);
-      let usdtWeight = usdtPair._reserve0.div(totalLiquidityBNB);
+    let totalLiquidityInNativeToken = usdcPair._reserve0.plus(usdtPair._reserve0);
+    if (totalLiquidityInNativeToken.notEqual(BIGDECIMAL_ZERO)) {
+      let usdcWeight = usdcPair._reserve0.div(totalLiquidityInNativeToken);
+      let usdtWeight = usdtPair._reserve0.div(totalLiquidityInNativeToken);
       return usdcPair._token1Price.times(usdcWeight).plus(usdtPair._token1Price.times(usdtWeight));
       // usdt is the only pair so far
     }
@@ -114,12 +117,6 @@ function wmaticPriceInUSD(): BigDecimal {
 
 // token where amounts should contribute to tracked volume and liquidity
 let WHITELIST: string[] = dataSource.network() == Network.BSC.toLowerCase() ? BSC.WHITELIST : POLYGON.WHITELIST;
-
-// minimum liquidity required to count towards tracked volume for pairs with small # of Lps
-// let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigInt.fromI32(10000);
-
-// minimum liquidity for price to get tracked
-// let MINIMUM_LIQUIDITY_THRESHOLD_BNB = BigDecimal.fromString('1');
 
 // For BSC Network, this gives the Native token equivalent of the token argument
 export function findNativeTokenPricePerToken(token: Token): BigDecimal {

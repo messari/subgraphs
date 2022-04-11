@@ -9,7 +9,6 @@ import { createPoolDailySnapshot } from "../helpers/poolDailySnapshot";
 import { getOrCreateSwap } from "../helpers/swap";
 import { updateUsageMetrics } from "../helpers/updateUsageMetrics";
 import { getOrCreateWithdraw } from "../helpers/withdraw";
-import { updateMovingAverageBlocksPerSecond } from "../utils/blockPerSec";
 import {
   getOrCreateProtocol,
   getOrCreateProtocolFeeShare,
@@ -89,7 +88,7 @@ export function handleMint(event: Mint): void {
     deposit.from = transfer._sender!;
     deposit.to = pool.id;
     deposit.inputTokenAmounts = [toBigInt(amount0, token0.decimals), toBigInt(amount1, token1.decimals)];
-    deposit.outputTokenAmount = transfer._liquidity!
+    deposit.outputTokenAmount = transfer._liquidity!;
     deposit.amountUSD = amountTotalUSD;
 
     store.remove("_Transfer", transfer.id);
@@ -143,7 +142,7 @@ export function handleBurn(event: Burn): void {
       withdraw.from = pool.id;
       withdraw.to = transfer._sender!;
       withdraw.inputTokenAmounts = [toBigInt(amount0, token0.decimals), toBigInt(amount1, token1.decimals)];
-      withdraw.outputTokenAmount = transfer._liquidity!
+      withdraw.outputTokenAmount = transfer._liquidity!;
       withdraw.amountUSD = amountTotalUSD;
 
       store.remove("_Transfer", transfer.id);
@@ -269,7 +268,7 @@ export function handleSync(event: Sync): void {
 
   if (pool !== null && reserve0 !== BIGINT_ZERO && reserve1 !== BIGINT_ZERO) {
     // reset factory liquidity by subtracting only tracked liquidity
-    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.minus(pool._trackedNativeTokenReserve);
+    protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.minus(pool._trackedNativeTokenReserve);
 
     // reset token total liquidity amounts
     let token0 = Token.load(pool._token0)!;
@@ -296,7 +295,7 @@ export function handleSync(event: Sync): void {
     token1.save();
 
     // get tracked liquidity - will be 0 if neither is in whitelist
-    let trackedLiquidityBNB: BigDecimal;
+    let trackedLiquidityInNativeToken: BigDecimal;
     if (helperStore._value.notEqual(BIGDECIMAL_ZERO)) {
       let TrackedLiquidityUSD = getTrackedLiquidityUSD(
         pool._reserve0,
@@ -309,13 +308,13 @@ export function handleSync(event: Sync): void {
         event.address.toHexString(),
         helperStore._value.toString(),
       ]);
-      trackedLiquidityBNB = TrackedLiquidityUSD.div(helperStore._value);
+      trackedLiquidityInNativeToken = TrackedLiquidityUSD.div(helperStore._value);
     } else {
-      trackedLiquidityBNB = BIGDECIMAL_ZERO;
+      trackedLiquidityInNativeToken = BIGDECIMAL_ZERO;
     }
 
     // use derived amounts within pair
-    pool._trackedNativeTokenReserve = trackedLiquidityBNB;
+    pool._trackedNativeTokenReserve = trackedLiquidityInNativeToken;
     pool._nativeTokenReserve = pool._reserve0
       .times(token0._derivedNativeToken)
       .plus(pool._reserve1.times(token1._derivedNativeToken));
@@ -336,16 +335,13 @@ export function handleSync(event: Sync): void {
     }
 
     // use tracked amounts globally
-    protocol._totalValueLockedBNB = protocol._totalValueLockedBNB.plus(trackedLiquidityBNB);
-    protocol.totalValueLockedUSD = protocol._totalValueLockedBNB.times(helperStore._value);
+    protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.plus(trackedLiquidityInNativeToken);
+    protocol.totalValueLockedUSD = protocol._totalValueLockedInNativeToken.times(helperStore._value);
 
     // save entities
     pool.save();
     protocol.save();
     token0.save();
     token1.save();
-
-    // Test block per day
-    updateMovingAverageBlocksPerSecond(event.block.timestamp, event.block.number)
   }
 }

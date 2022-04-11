@@ -11,7 +11,7 @@ import {
   POLYGON_PROTOCOL_FEE,
   POLYGON_SUPPLY_FEE,
   ProtocolType,
-  TRADING_FEE,
+  TRADING_FEE
 } from "./constant";
 
 export function getOrCreateProtocol(): DexAmmProtocol {

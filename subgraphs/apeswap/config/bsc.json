@@ -3,7 +3,12 @@
     "address": "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6",
     "startBlock": 4855900,
     "yield_address": "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9",
-    "abi": "Yield",
+    "abi": "MasterChef",
     "yield_startBlock": 14803526,
-    "yield_handler": "handleUpdatePool"
+    "deposit_params": "indexed address,indexed uint256,uint256",
+    "withdraw_params": "indexed address,indexed uint256,uint256",
+    "emergency_withdraw_params": "indexed address,indexed uint256,uint256",
+    "depositHandler": "handleDeposit",
+    "withdrawHandler": "handleWithdraw",
+    "emergencyWithdrawHandler": "handleEmergencyWithdraw"
 }
