@@ -6,23 +6,12 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Schema entities necessary for getting moving average block speed
-
-// type _BlockTracker @entity {
-//     id: ID! 
-//     blocks: [_Block!]!
-//     blocksPerDay: BigDecimal!
-// }
-
-// type _Block @entity {
-//   id: ID!
-//   blockNumber: Int!
-//   timestamp: Int!
-// }
-
-import { BigDecimal, ethereum, store } from "@graphprotocol/graph-ts";
-import { _Block, _BlockTracker } from "../../generated/schema";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { BIGDECIMAL_ZERO, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
+
+export let blocks: i32[][] = []
+export let blockSpeed: BigDecimal = BIGDECIMAL_ZERO
+export let windowStartIndex: i32 = INT_ZERO
 
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
 // 86400 = 1 Day
@@ -38,105 +27,81 @@ export const WINDOW_SIZE_SECONDS = 86400
 export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString())
 
 // The storage interval tells you to only store blocks that are space by at least this amount. 
-// Increasing this value will mean less blocks stored and less frequently computes blocksPerDay.
+// Increasing this value will mean less blocks stored and less frequently computes blocksSpeed.
 export const BLOCK_STORAGE_INTERVAL = 5 as i32
 
-// Paramaters: [event.block.timestamp, event.block.number]
-// Call this function in event handlers frequently enough so that it updates on most blocks 
-export function updateMovingAverageBlockSpeedForecast(event: ethereum): void {
+export const BLOCK_TRACKER = "BlockTracker"
 
-    let blockTracker = getOrCreateBlockTracker()
-    let blocks: string[]
-    blocks = blockTracker.blocks
+// Call this function in event handlers frequently enough so that it updates on most blocks 
+/** 
+* @param {BigInt} currentTimestamp    - Timestamp for current event
+* @param {BigInt} currentBlockNumber  - Block nunmber of current event
+* @returns {BigDecimal}               - Returns estimated blocks for specified rate
+*/
+export function updateMovingAverageBlockSpeedForecast(currentTimestamp: BigInt, currentBlockNumber: BigInt): BigDecimal {
 
     // Create entity for the current block
-    let currentTimestamp = event.block.timestamp.toI32()
-    let currentBlockNumber = event.block.number.toI32()
-    let currentBlock = getOrCreateBlock(currentTimestamp, currentBlockNumber)
+    let currentTimestampI32 = currentTimestamp.toI32()
+    let currentBlockNumberI32 = currentBlockNumber.toI32()
 
     if (blocks.length == INT_ZERO) {
-        blocks.push(currentBlock.id)
-        blockTracker.blocks = blocks
-
-        blockTracker.save()
-        currentBlock.save()
+        blocks.push([currentTimestampI32, currentBlockNumberI32])
+        windowStartIndex = INT_ZERO
 
         // return because there is only 1 reference point.
-        return
+        return BIGDECIMAL_ZERO
     }
 
     // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
     // Used to save memory and efficiency on array resizing.
-    let recentSavedBlock = _Block.load(blocks[blocks.length - INT_ONE])
-    if (currentBlockNumber - recentSavedBlock!.blockNumber > BLOCK_STORAGE_INTERVAL) {
-        blocks.push(currentBlock.id)
-        currentBlock.save()
+    let recentSavedBlock = blocks[blocks.length - INT_ONE]
+    if (currentBlockNumberI32 - recentSavedBlock[INT_ONE] <= BLOCK_STORAGE_INTERVAL) {
+        return blockSpeed
     }
 
-    else return
-
-    // Return 0 incase there is only one element.
-    if (blocks.length < INT_TWO) {
-        return
-    }
+    blocks.push([currentTimestampI32, currentBlockNumberI32])
 
     // The timestamp at the start of the window (default 24 hours in seconds).
-    let startTimestamp = currentTimestamp - WINDOW_SIZE_SECONDS
+    let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS
 
     // Make sure you still have 2 blocks to calculate rate (This shouldn't really happen past the beginning).
     while(blocks.length > INT_TWO) {
-        let oldestPushedBlock = _Block.load(blocks[INT_ZERO])
-
-        // Remove items from array and storage that were greater than 24 Hours ago.
-        if (oldestPushedBlock!.timestamp < startTimestamp) {
-            store.remove('_Block', oldestPushedBlock!.id)
-            blocks.shift()
+        // Shift the start of the window if the current timestamp moves out of desired rate window
+        if (blocks[windowStartIndex][INT_ZERO] < startTimestamp) {
+            windowStartIndex = windowStartIndex + INT_ONE
         }
         else break
     }
 
+    // Remove blocks out of window from the front of the array if they become far enough out of window
+    let secondsOutOfWindow = blocks[windowStartIndex][windowStartIndex] - blocks[INT_ZERO][INT_ZERO]
+    if (secondsOutOfWindow > RATE_IN_SECONDS/INT_TWO) {
+        let newBlocks = blocks.slice(windowStartIndex, blocks.length)
+
+        // Make sure the new blocks array still has at least 2 blocks for calculation
+        if (newBlocks.length >= INT_TWO) {
+            blocks = blocks.slice(windowStartIndex, blocks.length)
+            windowStartIndex = INT_ZERO
+        }
+    }
+
     // Get the oldest block in the the array.
-    let startBlock = _Block.load(blocks[INT_ZERO])
+    let startBlock = blocks[windowStartIndex]
 
     // Wideness of the window in seconds.
-    let windowSecondsCount = BigDecimal.fromString((currentBlock.timestamp - startBlock!.timestamp).toString())
+    let windowSecondsCount = BigDecimal.fromString((currentTimestampI32 - startBlock[INT_ZERO]).toString())
 
     // Wideness of the window in blocks.
-    let windowBlocksCount = BigDecimal.fromString((currentBlock.blockNumber - startBlock!.blockNumber).toString())
+    let windowBlocksCount = BigDecimal.fromString((currentBlockNumberI32 - startBlock[INT_ONE]).toString())
 
     // Estimate block speed for the window in seconds.
-    let blockSpeed = (WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount)).times(windowBlocksCount)
+    let unnormalizedBlockSpeed = (WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount)).times(windowBlocksCount)
 
-    // block speed converted to 24 hour period.
-    let blockSpeedPerDay = (RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD)).times(blockSpeed)
-
+    // block speed converted to specified rate.
+    let normalizedBlockSpeed = (RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD)).times(unnormalizedBlockSpeed)
+    
     // Update BlockTracker with new values.
-    blockTracker.blocks = blocks
-    blockTracker.blocksPerDay = blockSpeedPerDay
-    blockTracker.save()    
-}
-
-export function getOrCreateBlock(timestamp: i32, blockNumber: i32): _Block {
-    let block = _Block.load(blockNumber.toString()) 
-    if (!block) {
-        block = new _Block(blockNumber.toString())
-        block.blockNumber = blockNumber
-        block.timestamp = timestamp
-    }
-    return block
-}
-
-export function getOrCreateBlockTracker(): _BlockTracker {
-    let blockTracker = _BlockTracker.load("BlockTracker")
-
-    if (!blockTracker) {
-        blockTracker = new _BlockTracker("BlockTracker")
-
-        blockTracker.blocks = []
-        blockTracker.blocksPerDay = BIGDECIMAL_ZERO
-
-        blockTracker.save()
-    }
-
-    return blockTracker
+    blockSpeed = normalizedBlockSpeed
+    
+    return blockSpeed
 }
