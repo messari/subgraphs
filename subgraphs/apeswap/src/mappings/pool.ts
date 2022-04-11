@@ -80,7 +80,7 @@ export function handleMint(event: Mint): void {
     let amount0 = toDecimal(event.params.amount0, token0.decimals);
     let amount1 = toDecimal(event.params.amount1, token1.decimals);
 
-    // get new amounts of USD and BNB for tracking
+    // get new amounts of USD and Native Token for tracking
     let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
     let amountTotalUSD = token1._derivedNativeToken
       .times(amount1)
@@ -135,7 +135,7 @@ export function handleBurn(event: Burn): void {
       let amount0 = toDecimal(event.params.amount0, token0.decimals);
       let amount1 = toDecimal(event.params.amount1, token1.decimals);
 
-      // get new amounts of USD and BNB for tracking
+      // get new amounts of USD and Native Token for tracking
       let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
       let amountTotalUSD = token1._derivedNativeToken
         .times(amount1)
@@ -260,7 +260,7 @@ export function handleSync(event: Sync): void {
     protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.minus(
       pool._trackedNativeTokenReserve,
     );
-    
+
     // reset token total liquidity amounts
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
@@ -275,7 +275,7 @@ export function handleSync(event: Sync): void {
 
     pool.save();
 
-    // update BNB price now that reserves could have changed
+    // update Native Token price now that reserves could have changed
     let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
     helperStore._value = baseTokenPriceInUSD();
     helperStore.save();
