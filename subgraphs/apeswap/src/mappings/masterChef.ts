@@ -1,10 +1,10 @@
 import {
   Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw
-} from "../../generated/Yield/Yield";
+} from "../../generated/MasterChef/MasterChef";
 import {
   Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2
-} from "../../generated/Yield/YieldV2";
-import { handleReward, handleRewardV2 } from "../helpers/yield";
+} from "../../generated/MasterChef/MasterChefV2";
+import { handleReward, handleRewardV2 } from "../helpers/masterChef";
 
 export function handleDeposit(event: DepositEvent): void {
   let pid = event.params.pid;

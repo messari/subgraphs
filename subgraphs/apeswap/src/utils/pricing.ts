@@ -5,9 +5,11 @@ import {
   BIGDECIMAL_ZERO,
   BSC,
   factoryContract,
+  HELPER_STORE_ID,
   Network,
   POLYGON,
   POLYGON_NETWORK,
+  STRING_TWO,
   ZERO_ADDRESS,
 } from "./constant";
 import { getOrCreateToken } from "./token";
@@ -16,6 +18,7 @@ import { getOrCreateToken } from "./token";
 const WRAPPED_NATIVE_TOKEN_ADDRESS =
   dataSource.network() == Network.BSC.toLowerCase() ? BSC.WBNB_ADDRESS : POLYGON.WMATIC_ADDRESS;
 
+// @returns Native Token Price base on the current network
 export function baseTokenPriceInUSD(): BigDecimal {
   log.info("Network: {}", [dataSource.network()]);
   if (dataSource.network() == Network.BSC.toLowerCase()) {
@@ -27,7 +30,7 @@ export function baseTokenPriceInUSD(): BigDecimal {
   }
 }
 
-// Native token price in USD in the first network(in this case bsc newtwork)
+// @returns Native token price in USD in the first network(in this case bsc newtwork)
 function NativeToken1PriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
   let usdtPair = LiquidityPool.load(
@@ -71,7 +74,7 @@ function NativeToken1PriceInUSD(): BigDecimal {
   }
 }
 
-// Native token price in USD in the second network(in this case polygon newtwork)
+// @returns Native token price in USD in the second network(in this case polygon newtwork)
 function NativeToken2PriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
   let usdtPair = LiquidityPool.load(
@@ -155,7 +158,7 @@ export function getTrackedVolumeUSD(
   tokenAmount1: BigDecimal,
   token1: Token,
 ): BigDecimal {
-  let helperStore = _HelperStore.load("1")!;
+  let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
   let price0 = token0._derivedNativeToken.times(helperStore._value);
   let price1 = token1._derivedNativeToken.times(helperStore._value);
 
@@ -164,7 +167,7 @@ export function getTrackedVolumeUSD(
     return tokenAmount0
       .times(price0)
       .plus(tokenAmount1.times(price1))
-      .div(BigDecimal.fromString("2"));
+      .div(BigDecimal.fromString(STRING_TWO));
   }
 
   // take full value of the whitelisted token amount
@@ -193,7 +196,7 @@ export function getTrackedLiquidityUSD(
   tokenAmount1: BigDecimal,
   token1: Token,
 ): BigDecimal {
-  let helperStore = _HelperStore.load("1");
+  let helperStore = _HelperStore.load(HELPER_STORE_ID);
   if (helperStore !== null) {
     let price0 = token0._derivedNativeToken.times(helperStore._value);
     let price1 = token1._derivedNativeToken.times(helperStore._value);
@@ -205,12 +208,12 @@ export function getTrackedLiquidityUSD(
 
     // take double value of the whitelisted token amount
     if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
-      return tokenAmount0.times(price0).times(BigDecimal.fromString("2"));
+      return tokenAmount0.times(price0).times(BigDecimal.fromString(STRING_TWO));
     }
 
     // take double value of the whitelisted token amount
     if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
-      return tokenAmount1.times(price1).times(BigDecimal.fromString("2"));
+      return tokenAmount1.times(price1).times(BigDecimal.fromString(STRING_TWO));
     }
 
     // neither token is on white list, tracked volume is 0

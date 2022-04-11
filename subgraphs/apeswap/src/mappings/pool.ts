@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, log, store } from "@graphprotocol/graph-ts";
+import { BigDecimal, log, store } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { _HelperStore, LiquidityPool, Token, _Transfer } from "../../generated/schema";
 import { Burn, Mint, Swap as SwapEvent, Sync, Transfer } from "../../generated/templates/Pool/Pair";
@@ -16,7 +16,15 @@ import {
   getOrCreateTradingFees,
   getOrCreateTransfer,
 } from "../utils/common";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, toBigInt, toDecimal, ZERO_ADDRESS } from "../utils/constant";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_THOUSAND,
+  BIGINT_ZERO,
+  HELPER_STORE_ID,
+  toBigInt,
+  toDecimal,
+  ZERO_ADDRESS,
+} from "../utils/constant";
 import {
   baseTokenPriceInUSD,
   findNativeTokenPricePerToken,
@@ -36,7 +44,7 @@ export function handleTransfer(event: Transfer): void {
   let pool = LiquidityPool.load(id);
   if (pool !== null) {
     // ignore initial transfers for first adds
-    if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BigInt.fromI32(1000))) {
+    if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
       return;
     }
 
@@ -73,7 +81,7 @@ export function handleMint(event: Mint): void {
     let amount1 = toDecimal(event.params.amount1, token1.decimals);
 
     // get new amounts of USD and BNB for tracking
-    let helperStore = _HelperStore.load("1")!;
+    let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
     let amountTotalUSD = token1._derivedNativeToken
       .times(amount1)
       .plus(token0._derivedNativeToken.times(amount0))
@@ -124,12 +132,11 @@ export function handleBurn(event: Burn): void {
     if (transfer !== null) {
       let token0 = Token.load(pool._token0)!;
       let token1 = Token.load(pool._token1)!;
-
       let amount0 = toDecimal(event.params.amount0, token0.decimals);
       let amount1 = toDecimal(event.params.amount1, token1.decimals);
 
       // get new amounts of USD and BNB for tracking
-      let helperStore = _HelperStore.load("1")!;
+      let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
       let amountTotalUSD = token1._derivedNativeToken
         .times(amount1)
         .plus(token0._derivedNativeToken.times(amount0))
@@ -159,7 +166,6 @@ export function handleBurn(event: Burn): void {
       let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
       financials.totalValueLockedUSD = pool.totalValueLockedUSD;
       financials.totalVolumeUSD = pool.totalVolumeUSD;
-
       financials.save();
 
       // Take UsageMetricsDailySnapshot
@@ -176,34 +182,20 @@ export function handleSwap(event: SwapEvent): void {
   if (pool !== null) {
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
-
     let amount0In = toDecimal(event.params.amount0In, token0.decimals);
     let amount0Out = toDecimal(event.params.amount0Out, token0.decimals);
     let amount1In = toDecimal(event.params.amount1In, token1.decimals);
     let amount1Out = toDecimal(event.params.amount1Out, token1.decimals);
+
     // totals for volume updates
     let amount0Total = amount0Out.plus(amount0In);
     let amount1Total = amount1Out.plus(amount1In);
 
-    // BNB/USD prices
-    let helperStore = _HelperStore.load("1")!;
-
-    // get total amounts of derived USD and BNB for tracking
-    let derivedAmountBNB = token1._derivedNativeToken
-      .times(amount1Total)
-      .plus(token0._derivedNativeToken.times(amount0Total))
-      .div(BigDecimal.fromString("2"));
-    let derivedAmountUSD = derivedAmountBNB.times(helperStore._value);
+    // USD price of Native Token
+    let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
 
     // Only accounts for volume through white listed tokens
     let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, token0, amount1Total, token1);
-
-    let trackedAmountBNB: BigDecimal;
-    if (helperStore._value.equals(BIGDECIMAL_ZERO)) {
-      trackedAmountBNB = BIGDECIMAL_ZERO;
-    } else {
-      trackedAmountBNB = trackedAmountUSD.div(helperStore._value);
-    }
 
     // update pair volume data, use tracked amount if we have it as its probably more accurate
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD);
@@ -221,12 +213,11 @@ export function handleSwap(event: SwapEvent): void {
     swap.tokenIn = token0.id;
     swap.tokenOut = token1.id;
     swap.amountIn = toBigInt(amount0Total, token0.decimals);
-    let amountInBNB = token0._derivedNativeToken.times(amount0Total);
-    swap.amountInUSD = amountInBNB.times(helperStore._value);
+    let amountInNativeToken = token0._derivedNativeToken.times(amount0Total);
+    swap.amountInUSD = amountInNativeToken.times(helperStore._value);
     swap.amountOut = toBigInt(amount1Total, token0.decimals);
-    let amountOutBNB = token1._derivedNativeToken.times(amount1Total);
-    swap.amountOutUSD = amountOutBNB.times(helperStore._value);
-
+    let amountOutInNativeToken = token1._derivedNativeToken.times(amount1Total);
+    swap.amountOutUSD = amountOutInNativeToken.times(helperStore._value);
     swap.save();
 
     // Take a PoolDailySnapshot
@@ -249,7 +240,6 @@ export function handleSwap(event: SwapEvent): void {
     financials.feesUSD = financials.feesUSD.plus(tradingFeeAmountUSD);
     financials.supplySideRevenueUSD = financials.supplySideRevenueUSD.plus(supplyFeeAmountUSD);
     financials.protocolSideRevenueUSD = financials.protocolSideRevenueUSD.plus(protocolFeeAmountUSD);
-
     financials.save();
 
     // Take UsageMetricsDailySnapshot
@@ -263,13 +253,14 @@ export function handleSync(event: Sync): void {
   let reserve1 = event.params.reserve1;
   let id = event.address.toHexString();
 
-  let pool = LiquidityPool.load(id);
   let protocol = getOrCreateProtocol();
-
+  let pool = LiquidityPool.load(id);
   if (pool !== null && reserve0 !== BIGINT_ZERO && reserve1 !== BIGINT_ZERO) {
     // reset factory liquidity by subtracting only tracked liquidity
-    protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.minus(pool._trackedNativeTokenReserve);
-
+    protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.minus(
+      pool._trackedNativeTokenReserve,
+    );
+    
     // reset token total liquidity amounts
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
@@ -285,7 +276,7 @@ export function handleSync(event: Sync): void {
     pool.save();
 
     // update BNB price now that reserves could have changed
-    let helperStore = _HelperStore.load("1")!;
+    let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
     helperStore._value = baseTokenPriceInUSD();
     helperStore.save();
 
@@ -303,7 +294,7 @@ export function handleSync(event: Sync): void {
         pool._reserve1,
         token1 as Token,
       );
-      log.info("Tracked liquidity for pool {} is {} at BNB Price {}", [
+      log.info("Tracked liquidity for pool {} is {} at Native Token Price {}", [
         TrackedLiquidityUSD.toString(),
         event.address.toHexString(),
         helperStore._value.toString(),
@@ -335,7 +326,9 @@ export function handleSync(event: Sync): void {
     }
 
     // use tracked amounts globally
-    protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.plus(trackedLiquidityInNativeToken);
+    protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.plus(
+      trackedLiquidityInNativeToken,
+    );
     protocol.totalValueLockedUSD = protocol._totalValueLockedInNativeToken.times(helperStore._value);
 
     // save entities

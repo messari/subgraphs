@@ -26,7 +26,6 @@ export function getOrCreateSwap(event: ethereum.Event, pool: LiquidityPool): Swa
     swap.amountOut = BIGINT_ZERO;
     swap.amountOutUSD = BIGDECIMAL_ZERO;
     swap.pool = pool.id;
-
     swap.save();
 
     return swap as Swap;

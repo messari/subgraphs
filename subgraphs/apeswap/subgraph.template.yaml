@@ -25,12 +25,12 @@ dataSources:
       file: ./src/mappings/factory.ts
 
   - kind: ethereum
-    name: Yield
+    name: MasterChef
     network: {{network}}
     source:
-      address: '{{yield_address}}'
+      address: '{{yieldAddress}}'
       abi: {{abi}}
-      startBlock: {{yield_startBlock}}	
+      startBlock: {{yieldStartBlock}}	
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -42,13 +42,13 @@ dataSources:
         - name: ERC20
           file: ./abis/IERC20.json
       eventHandlers:
-        - event: Deposit({{deposit_params}})
+        - event: Deposit({{depositParams}})
           handler: {{depositHandler}}
-        - event: Withdraw({{withdraw_params}})
+        - event: Withdraw({{withdrawParams}})
           handler: {{withdrawHandler}}
-        - event: EmergencyWithdraw({{emergency_withdraw_params}})
+        - event: EmergencyWithdraw({{emergencyWithdrawParams}})
           handler: {{emergencyWithdrawHandler}}
-      file: ./src/mappings/yield.ts
+      file: ./src/mappings/masterChef.ts
 
 templates:
   - kind: ethereum/contract

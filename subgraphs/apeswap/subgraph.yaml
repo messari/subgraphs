@@ -25,7 +25,7 @@ dataSources:
       file: ./src/mappings/factory.ts
 
   - kind: ethereum
-    name: Yield
+    name: MasterChef
     network: matic
     source:
       address: '0x54aff400858Dcac39797a81894D9920f16972D1D'
@@ -48,7 +48,7 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/yield.ts
+      file: ./src/mappings/masterChef.ts
 
 templates:
   - kind: ethereum/contract

@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount, DexAmmProtocol, UsageMetricsDailySnapshot } from "../../generated/schema";
-import { SECONDS_PER_DAY } from "../utils/constant";
+import { INT_ONE, INT_ZERO, SECONDS_PER_DAY } from "../utils/constant";
 
 export function updateUsageMetrics(
   provider: Address,
@@ -15,31 +15,27 @@ export function updateUsageMetrics(
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = protocol.id;
-
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.activeUsers = INT_ZERO;
+    usageMetrics.totalUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.blockNumber = blockNumber;
     usageMetrics.timestamp = timestamp;
-
     usageMetrics.save();
   }
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetrics.blockNumber = blockNumber;
   usageMetrics.timestamp = timestamp;
-  usageMetrics.dailyTransactionCount += 1;
-
+  usageMetrics.dailyTransactionCount += INT_ONE;
   let accountId = provider.toHexString();
   let account = _Account.load(accountId);
   if (!account) {
     account = new _Account(accountId);
     account.save();
-    usageMetrics.totalUniqueUsers += 1;
-    protocol.totalUniqueUsers += 1;
+    usageMetrics.totalUniqueUsers += INT_ONE;
+    protocol.totalUniqueUsers += INT_ONE;
     protocol.save();
   }
-
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id
     .toString()
@@ -49,8 +45,7 @@ export function updateUsageMetrics(
   if (!dailyActiveAccount) {
     dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1;
+    usageMetrics.activeUsers += INT_ONE;
   }
-
   usageMetrics.save();
 }

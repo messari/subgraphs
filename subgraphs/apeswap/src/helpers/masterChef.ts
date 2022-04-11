@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { MasterChef } from "../../generated/Yield/MasterChef";
-import { MasterChefV2 } from "../../generated/Yield/MasterChefV2";
+import { MasterChef } from "../../generated/MasterChef/MasterChef";
+import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
 import { BIGINT_ZERO, BSC_SECONDS_PER_BLOCK, SECONDS_PER_DAY, ZERO_ADDRESS } from "../utils/constant";
 import { updateLpWithReward } from "./pool";
 
@@ -87,8 +87,6 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
   // Calculate Reward emission per day
   // A block is estimated to be produced approximately every 5secs
   let rewardTokenPerSecond = rewardToken.div(BSC_SECONDS_PER_BLOCK);
-
   let rewardTokenPerDay = rewardTokenPerSecond.times(BigInt.fromI32(SECONDS_PER_DAY));
-
   updateLpWithReward(lpTokenAddress, rewardTokenAddress, rewardTokenPerDay);
 }

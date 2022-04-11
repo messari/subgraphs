@@ -10,7 +10,6 @@ export function getOrCreateToken(address: Address): Token {
   // If token doesn't exist, create a new token
   if (token == null && address !== Address.fromString(ZERO_ADDRESS)) {
     token = new Token(address.toHexString());
-
     let tokenInstance = ERC20.bind(address);
     let tryName = tokenInstance.try_name();
     if (!tryName.reverted) {
@@ -25,8 +24,8 @@ export function getOrCreateToken(address: Address): Token {
       token.decimals = tryDecimals.value;
     }
     token._derivedNativeToken = BIGDECIMAL_ZERO;
-
     token.save();
+
     return token as Token;
   }
   return token as Token;
@@ -41,7 +40,6 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     rewardToken.symbol = token.symbol;
     rewardToken.decimals = token.decimals;
     rewardToken.type = RewardTokenType.DEPOSIT;
-
     rewardToken.save();
 
     return rewardToken as RewardToken;

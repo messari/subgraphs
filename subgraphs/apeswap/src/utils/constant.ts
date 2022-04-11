@@ -43,41 +43,46 @@ export namespace LiquidityPoolFeeType {
 }
 
 export namespace TransferType {
-  export const MINT = 'MINT'
-  export const BURN = 'BURN'
+  export const MINT = "MINT";
+  export const BURN = "BURN";
   // Pool addresses are also stored in the HelperStore
 }
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const FACTORY_ADDRESS = dataSource.network() == Network.BSC.toLowerCase() ? BSC.FACTORY_ADDRESS : POLYGON.FACTORY_ADDRESS;
+export const FACTORY_ADDRESS =
+  dataSource.network() == Network.BSC.toLowerCase() ? BSC.FACTORY_ADDRESS : POLYGON.FACTORY_ADDRESS;
 export let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
 
 export const DEFAULT_DECIMALS: i32 = 18;
 export const USD_DENOMINATOR = BigInt.fromI32(10 ** 18).toBigDecimal();
 export const FEE_DENOMINATOR = BigInt.fromI32(10 ** 10);
-export const FEE_DECIMALS = 10;
 export const TRADING_FEE = toPercentage(BigDecimal.fromString("0.2"));
 export const BSC_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.05"));
 export const POLYGON_PROTOCOL_FEE = toPercentage(BigDecimal.fromString("0.15"));
-export const BSC_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.15"))
+export const BSC_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.15"));
 export const POLYGON_SUPPLY_FEE = toPercentage(BigDecimal.fromString("0.05"));
-export const POLYGON_NETWORK = "matic"
-export const BSC_SECONDS_PER_BLOCK = BigInt.fromI32(5)
+export const HELPER_STORE_ID = "1";
+export const POLYGON_NETWORK = "matic";
+export const FEE_DECIMALS = 10;
+export const BSC_SECONDS_PER_BLOCK = BigInt.fromI32(5);
 export const INT_ZERO: i32 = 0;
 export const INT_ONE: i32 = 1;
 export const INT_TWO: i32 = 2;
-export let BIGINT_ZERO = BigInt.fromI32(0);
-export let BIGINT_ONE = BigInt.fromI32(1);
-export let BIGINT_MAX = BigInt.fromString(
-  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
-);
-export let BIGDECIMAL_ZERO = BigDecimal.fromString("0");
-export let BIGDECIMAL_ONE = BigDecimal.fromString("1");
-export let MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
-export let DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
+export const INT_FIVE: i32 = 5;
+export const INT_TEN: i32 = 10;
+export const INT_THOUSAND: i32 = 1000;
+export const STRING_ZERO = "0";
+export const STRING_ONE = "1";
+export const STRING_TWO = "2";
+export const STRING_TEN = "10";
+export const STRING_HUNDRED = "100";
+export let BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
+export let BIGINT_ONE = BigInt.fromI32(INT_ONE);
+export let BIGINT_THOUSAND = BigInt.fromI32(INT_THOUSAND);
+export let BIGDECIMAL_ZERO = BigDecimal.fromString(STRING_ZERO);
+export let BIGDECIMAL_ONE = BigDecimal.fromString(STRING_ONE);
+export let BIGDECIMAL_TWO = BigDecimal.fromString(STRING_TWO);
 export const SECONDS_PER_DAY = 60 * 60 * 24;
-export let MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export let MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
 export function toDecimal(value: BigInt, decimals: i32 = DEFAULT_DECIMALS): BigDecimal {
   let decimal = BigInt.fromI32(decimals);
@@ -88,25 +93,25 @@ export function toDecimal(value: BigInt, decimals: i32 = DEFAULT_DECIMALS): BigD
 }
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
-  let bd = BigDecimal.fromString("1");
+  let bd = BigDecimal.fromString(STRING_ONE);
   for (let i = BIGINT_ZERO; i.lt(decimals as BigInt); i = i.plus(BIGINT_ONE)) {
-    bd = bd.times(BigDecimal.fromString("10"));
+    bd = bd.times(BigDecimal.fromString(STRING_TEN));
   }
   return bd;
 }
 
 // Converters
 export function toBigInt(value: BigDecimal, decimals: i32 = DEFAULT_DECIMALS): BigInt {
-  return value.times(getPrecision(decimals).toBigDecimal()).truncate(0).digits;
+  return value.times(getPrecision(decimals).toBigDecimal()).truncate(INT_ZERO).digits;
 }
 
 // Helpers
 export function getPrecision(decimals: i32 = DEFAULT_DECIMALS): BigInt {
-  return BigInt.fromI32(10).pow((<u8>decimals) as u8);
+  return BigInt.fromI32(INT_TEN).pow((<u8>decimals) as u8);
 }
 
 export function toPercentage(n: BigDecimal): BigDecimal {
-  return n.div(BigDecimal.fromString("100"));
+  return n.div(BigDecimal.fromString(STRING_HUNDRED));
 }
 
 export namespace BSC {

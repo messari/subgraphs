@@ -5,6 +5,7 @@ import {
   BSC_PROTOCOL_FEE,
   BSC_SUPPLY_FEE,
   FACTORY_ADDRESS,
+  INT_ZERO,
   LiquidityPoolFeeType,
   Network,
   POLYGON_NETWORK,
@@ -29,9 +30,8 @@ export function getOrCreateProtocol(): DexAmmProtocol {
     protocol.schemaVersion = "1.0.0";
     protocol.subgraphVersion = "1.0.0";
     protocol.type = ProtocolType.EXCHANGE;
-    protocol.totalUniqueUsers = 0;
+    protocol.totalUniqueUsers = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-
     protocol.save();
 
     return protocol as DexAmmProtocol;

@@ -30,7 +30,6 @@ export function createPoolDailySnapshot(
     poolDailySnapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
     poolDailySnapshot.blockNumber = blockNumber;
     poolDailySnapshot.timestamp = timestamp;
-
     poolDailySnapshot.save();
   }
 }
