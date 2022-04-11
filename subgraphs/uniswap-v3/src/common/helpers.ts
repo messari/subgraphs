@@ -8,8 +8,8 @@ import {
   Deposit,
   Withdraw,
   Swap,
-  _Account,
-  _DailyActiveAccount,
+  Account,
+  DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
   _LiquidityPoolAmount,
@@ -18,10 +18,10 @@ import {
 import { Pool as PoolTemplate } from '../../generated/templates'
 import { Factory as FactoryContract } from '../../generated/templates/Pool/Factory'
 
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGDECIMAL_TWO, BIGINT_ZERO, LiquidityPoolFeeType, BIGDECIMAL_TEN_THOUSAND, PROTOCOL_FEE_TO_OFF, BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGDECIMAL_TEN, BIGINT_ONE } from "../common/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGDECIMAL_TWO, BIGINT_ZERO, LiquidityPoolFeeType, BIGDECIMAL_TEN_THOUSAND, PROTOCOL_FEE_TO_OFF, BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGDECIMAL_TEN, BIGINT_ONE } from "./utils/constants"
 import { getLiquidityPool, getLiquidityPoolAmounts, getLiquidityPoolFee, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateTokenTracker } from "./getters"
-import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, WHITELIST_TOKENS } from "./pricing"
-import { getOrCreateToken } from "./tokens"
+import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, WHITELIST_TOKENS } from "./utils/pricing"
+import { getOrCreateToken } from "./utils/tokens"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -70,20 +70,26 @@ function convertFeeToPercent(fee: i64): BigDecimal {
 }
 
 function createPoolFees(poolAddressString: string, fee: i64): string[] {
-  // Trading Fee
-  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
-  poolTradingFee.feeType = LiquidityPoolFeeType.TRADING_FEE
-  poolTradingFee.feePercentage = convertFeeToPercent(fee)
+  // LP Fee
+  let poolLpFee = new LiquidityPoolFee('lp-fee-'+poolAddressString)
+  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE
+  poolLpFee.feePercentage = convertFeeToPercent(fee)
 
   // Protocol Fee
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
-  poolProtocolFee.feeType = LiquidityPoolFeeType.PROTOCOL_FEE
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
-  poolTradingFee.save()
-  poolProtocolFee.save()
+  // Trading Fee
+  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
+  poolTradingFee.feePercentage = convertFeeToPercent(fee)
 
-  return [poolTradingFee.id, poolProtocolFee.id]
+  poolLpFee.save()
+  poolProtocolFee.save()
+  poolTradingFee.save()
+
+  return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id]
 }
 
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations. 
@@ -170,7 +176,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   pool.totalValueLockedUSD = totalValueLockedETH.times(ether.valueDecimal!)
 
   // Increment for NFT minted representing the position
-  pool.outputTokenSupply = pool.outputTokenSupply.plus(BIGINT_ONE)
+  pool.outputTokenSupply = pool.outputTokenSupply!.plus(BIGINT_ONE)
 
   // Add pool value back to protocol total value locked 
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
@@ -243,7 +249,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   pool.totalValueLockedUSD = totalValueLockedETH.times(ether.valueDecimal!)
 
   // Increment for NFT minted representing the position
-  pool.outputTokenSupply = pool.outputTokenSupply.minus(BIGINT_ONE)
+  pool.outputTokenSupply = pool.outputTokenSupply!.minus(BIGINT_ONE)
 
   // reset aggregates with new amounts
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
@@ -396,7 +402,7 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
   let financialMetrics = getOrCreateFinancials(event);
 
   financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(tradingFeeUSD).plus(protocolFeeUSD)
+  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(tradingFeeUSD).plus(protocolFeeUSD)
   financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(tradingFeeUSD)
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(protocolFeeUSD)
 

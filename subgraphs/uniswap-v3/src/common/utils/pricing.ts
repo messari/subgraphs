@@ -1,9 +1,9 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO } from './constants'
-import { _HelperStore, _TokenTracker, _LiquidityPoolAmount } from '../../generated/schema'
+import { _HelperStore, _TokenTracker, _LiquidityPoolAmount } from '../../../generated/schema'
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
-import { safeDiv } from '../common/helpers'
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './getters'
+import { safeDiv } from '../helpers'
+import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from '../getters'
 
 const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 const USDC_WETH_03_POOL = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8'
@@ -92,7 +92,7 @@ export function getEthPriceInUSD(): BigDecimal {
       let poolAmounts = getLiquidityPoolAmounts(poolAddress)
       let pool = getLiquidityPool(poolAddress)
 
-      if (pool.outputTokenSupply.gt(BIGINT_ZERO)) {
+      if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         if (pool.inputTokens[0] == tokenTracker.id) {
           // whitelist token is token1
           let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))

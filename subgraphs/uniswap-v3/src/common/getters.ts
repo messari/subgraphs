@@ -3,8 +3,6 @@ import { Address, ethereum } from "@graphprotocol/graph-ts"
 import {
   DexAmmProtocol,
   LiquidityPool,
-  _Account,
-  _DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
   PoolDailySnapshot,
@@ -14,7 +12,7 @@ import {
   LiquidityPoolFee,
 } from "../../generated/schema"
 
-import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, deployedNetwork } from "../common/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, deployedNetwork } from "./utils/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
@@ -42,10 +40,12 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v3"
     protocol.slug = "uniswap-v3"
-    protocol.schemaVersion = "1.0.1"
-    protocol.subgraphVersion = "1.0.0"
+    protocol.schemaVersion = "1.1.0"
+    protocol.subgraphVersion = "1.0.1"
+    protocol.methodologyVersion = "1.0.1"
     protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
+    protocol.totalVolumeUSD
     protocol.network = deployedNetwork
     protocol.type = ProtocolType.EXCHANGE
 
@@ -141,7 +141,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
         financialMetrics = new FinancialsDailySnapshot(id.toString());
         financialMetrics.protocol = FACTORY_ADDRESS;
   
-        financialMetrics.feesUSD = BIGDECIMAL_ZERO
+        financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO
         financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
         financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
         financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO

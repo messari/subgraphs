@@ -3,12 +3,12 @@ import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
 import {
   _HelperStore,
   _TokenTracker,
-  _Account,
-  _DailyActiveAccount,
+  Account,
+  DailyActiveAccount,
   UsageMetricsDailySnapshot
-} from "../../generated/schema"
-import { FACTORY_ADDRESS, INT_ONE, INT_ZERO, SECONDS_PER_DAY} from "../common/constants"
-import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./getters";
+} from "../../../generated/schema"
+import { FACTORY_ADDRESS, INT_ONE, INT_ZERO, SECONDS_PER_DAY} from "../utils/constants"
+import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./../getters";
 
 
 // Update FinancialsDailySnapshots entity
@@ -46,9 +46,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     usageMetrics.dailyTransactionCount += 1;
   
     let accountId = from.toHexString()
-    let account = _Account.load(accountId)
+    let account = Account.load(accountId)
     if (!account) {
-      account = new _Account(accountId);
+      account = new Account(accountId);
       account.save();
       totalUniqueUsers.valueInt += INT_ONE;
     }
@@ -57,9 +57,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
-    let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+    let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
     if (!dailyActiveAccount) {
-      dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+      dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
       dailyActiveAccount.save();
       usageMetrics.activeUsers += INT_ONE
     }
@@ -91,25 +91,28 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, feeUSD: BigDecimal): void {
     let pool = getLiquidityPool(event.address.toHexString())
     let poolMetrics = getOrCreatePoolDailySnapshot(event);
+    let protocol = getOrCreateDex()
     let financialMetrics = getOrCreateFinancials(event);
   
     financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
-    financialMetrics.feesUSD = financialMetrics.feesUSD.plus(feeUSD)
+    financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(feeUSD)
     financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(feeUSD)
   
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
+    protocol.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
   
-    poolMetrics.save();
     financialMetrics.save()
+    poolMetrics.save();
+    protocol.save()
     pool.save()
 }
 
 // Create Account entity for participating account 
 export function createAndIncrementAccount(accountId: Address): bool {
-    let account = _Account.load(accountId.toHexString())
+    let account = Account.load(accountId.toHexString())
     if (!account) {
-        account = new _Account(accountId.toHexString());
+        account = new Account(accountId.toHexString());
         account.save();
 
         return true
@@ -124,9 +127,9 @@ export function createAndIncrementDailyAccount(event: ethereum.Event, accountId:
 
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + accountId.toHexString()
-    let account = _DailyActiveAccount.load(dailyActiveAccountId)
+    let account = DailyActiveAccount.load(dailyActiveAccountId)
     if (!account) {
-        account = new _DailyActiveAccount(accountId.toHexString());
+        account = new DailyActiveAccount(accountId.toHexString());
         account.save();
         
         return true
