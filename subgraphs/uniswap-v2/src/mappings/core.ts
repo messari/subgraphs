@@ -2,9 +2,9 @@
 import {
   _HelperStore,
   _TokenTracker
-} from './../generated/schema'
+} from '../../generated/schema'
 
-import { Mint, Burn, Swap, Transfer, Sync } from '../generated/templates/Pair/Pair'
+import { Mint, Burn, Swap, Transfer, Sync } from '../../generated/templates/Pair/Pair'
 import {
   updateInputTokenBalances,
   updateTvlAndTokenPrices,
@@ -14,16 +14,18 @@ import {
   createDeposit,
   createWithdraw,
   createSwapHandleVolumeAndFees
-} from './common/helpers'
+} from '../common/helpers'
+
+import {
+  updateFinancials,
+  updateUsageMetrics,
+  updatePoolMetrics,
+} from '../common/metrics/metrics'
 
 import {
   BIGINT_THOUSAND,
   ZERO_ADDRESS,
-} from './common/utils/constants'
-
-import {
-  updateFinancials, updatePoolMetrics, updateUsageMetrics
-} from './common/metrics/metrics'
+} from '../common/utils/constants'
 
 export function handleTransfer(event: Transfer): void {
 
