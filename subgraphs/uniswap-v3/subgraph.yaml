@@ -1,6 +1,5 @@
 specVersion: 0.0.2
-description: Uniswap is a decentralized protocol for automated token exchange on Ethereum.
-repository: https://github.com/Uniswap/uniswap-v3-subgraph
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
@@ -23,6 +22,7 @@ dataSources:
         - Protocol
         - _PricesUSD
         - _TokenTracker
+        - _LiquidityPoolAmount
       abis:
         - name: Factory
           file: ./abis/factory.json
@@ -57,13 +57,14 @@ templates:
         - LiquidityPool
         - DexAmmProtocol
         - Token
-        - _PricesUSD
         - UsageMetricsDailySnapshot
         - FinancialsDailySnapshot
+        - PoolDailySnapshot
+        - _PricesUSD
         - _Account
         - _DailyActiveAccount
-        - PoolDailySnapshot
         - _TokenTracker
+        - _LiquidityPoolAmount
       abis:
         - name: Pool
           file: ./abis/pool.json
@@ -74,6 +75,8 @@ templates:
       eventHandlers:
         - event: Initialize(uint160,int24)
           handler: handleInitialize
+        - event: SetFeeProtocol(uint8,uint8,uint8,uint8)
+          handler: handleSetFeeProtocol
         - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
           handler: handleSwap
         - event: Mint(address,indexed address,indexed int24,indexed int24,uint128,uint256,uint256)

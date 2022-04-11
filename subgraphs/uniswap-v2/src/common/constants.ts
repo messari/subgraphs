@@ -30,10 +30,11 @@ export namespace ProtocolType {
 }
 
 export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "TRADING_FEE"
-  export const PROTOCOL_FEE = "PROTOCOL_FEE"
-  export const TIERED_FEE = "TIERED_FEE"
-  export const DYNAMIC_FEE = "DYNAMIC_FEE"
+  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
+  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
+  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
+  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
 export namespace RewardTokenType {
@@ -62,7 +63,7 @@ export const USDT_WETH_PAIR = '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // cr
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("100000");
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
@@ -89,7 +90,6 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
-export const ERROR_NUM = 9999
 
 export const TRADING_FEE_TO_OFF = BigDecimal.fromString("3")
 export const TRADING_FEE_TO_ON = BigDecimal.fromString("2.5")
