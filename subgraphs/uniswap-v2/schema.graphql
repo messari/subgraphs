@@ -480,3 +480,16 @@ type _LiquidityPoolAmounts @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
 }
+
+type _BlockTracker @entity {
+    id: ID! 
+    blocks: [_Block!]!
+    windowStartIndex: Int!
+    blocksPerDay: BigDecimal!
+}
+
+type _Block @entity {
+  id: ID!
+  blockNumber: Int!
+  timestamp: Int!
+}
