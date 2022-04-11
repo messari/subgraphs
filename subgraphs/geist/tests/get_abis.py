@@ -15,7 +15,8 @@ deployment_addresses = {
     "WETHGateway": "0x47102245FEa0F8D35a6b28E54505e9FfD83d0704",
     "MultiFeeDistribution": "0x49c93a95dbcc9A6A4D8f77E59c038ce5020e82f8",
     "TimeLock": "0x7FB9a7cBc6689C1C79e37BF8f852adA44b10EfFC",
-    "SpookySwapGEISTFTM": "0x668AE94D0870230AC007a01B471D02b2c94DDcB9"
+    "SpookySwapGEISTFTM": "0x668AE94D0870230AC007a01B471D02b2c94DDcB9",
+    "LendingPoolConfiguratorProxy": "0x7a0d50E55ffcBF3E2313BB4460E86dBBF8e8c25B",
 }
 
 if __name__ == "__main__":
@@ -27,9 +28,13 @@ if __name__ == "__main__":
         url = f"https://api.ftmscan.com/api?module=contract&action=getabi&address={address}&format=raw"
         data = requests.get(url=url).json()
 
+        print(f"Fetching {name}...")
+
         # Write ABIs to file, make it look pretty too
         with open(f'../abis/{name}.json', 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         
+        print(f"Saved {name} to '../abis/{name}.json'")
+
         # Delay to prevent getting rate limited
         time.sleep(5)
