@@ -5,7 +5,7 @@ import {Address, BigDecimal, BigInt} from "@graphprotocol/graph-ts";
 import {BIGINT_ZERO} from "../common/constants";
 import {updateFinancials, updatePoolMetrics, updateUsageMetrics} from "../common/metrics";
 import {WeightedPool} from "../../generated/Vault/WeightedPool";
-import {calculatePrice, calculateTokenValueInUsd, isPricingAsset, isUSDStable, TokenInfo} from "../common/pricing";
+import {calculatePrice} from "../common/pricing";
 import {scaleDown} from "../common/tokens";
 
 export function handlePoolRegister(event: PoolRegistered): void {
@@ -63,6 +63,7 @@ export function handleSwap(event: Swap): void {
       tokenOutIndex = i
     }
   }
+  pool.save()
 
   let weightPool = WeightedPool.bind(Address.fromString(pool.outputToken))
   let getWeightCall = weightPool.try_getNormalizedWeights()
@@ -70,8 +71,8 @@ export function handleSwap(event: Swap): void {
   let weightTokenOut: BigDecimal | null = null
   let weightTokenIn: BigDecimal | null = null
   if (hasWeights) {
-    weightTokenOut = getWeightCall.value[tokenOutIndex].toBigDecimal()
-    weightTokenIn = getWeightCall.value[tokenInIndex].toBigDecimal()
+    weightTokenOut = getWeightCall.value[tokenOutIndex].divDecimal(BigInt.fromI32(10).pow(u8(18)).toBigDecimal());
+    weightTokenIn = getWeightCall.value[tokenInIndex].divDecimal(BigInt.fromI32(10).pow(u8(18)).toBigDecimal());
   }
 
   let tokenAmountIn = scaleDown(event.params.tokenIn, event.params.amountIn)
@@ -89,10 +90,11 @@ export function handleSwap(event: Swap): void {
   if (tokenInfo) {
     let token = _TokenPrice.load(tokenInfo.address.toHexString())
     if (token == null) {
-      token = new _TokenPrice(event.params.tokenOut.toHexString())
+      token = new _TokenPrice(tokenInfo.address.toHexString())
     }
     token.block = event.block.number
     token.lastUsdPrice = tokenInfo.price
+    token.save()
   }
 
   updatePoolMetrics(event.params.poolId.toHexString())

@@ -16,13 +16,11 @@ export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
         usdValue = value;
     } else {
         // convert to USD
-        for (let i: i32 = 0; i < USD_STABLE_ASSETS.length; i++) {
-            let pricingAssetInUSD = _TokenPrice.load(asset.toHexString());
-            if (pricingAssetInUSD != null) {
-                usdValue = value.times(pricingAssetInUSD.lastUsdPrice);
-                break;
-            }
+        let pricingAssetInUSD = _TokenPrice.load(asset.toHexString());
+        if (pricingAssetInUSD != null) {
+            usdValue = value.times(pricingAssetInUSD.lastUsdPrice);
         }
+
     }
 
     return usdValue;
@@ -88,14 +86,14 @@ export function calculatePrice(
         let token = _TokenPrice.load(tokenA.toHexString())
         if (token == null) return null
         let stableAmountB = amountB.times(token.lastUsdPrice)
-        return new TokenInfo(tokenB, calculateTokenValueInUsd(amountA, stableAmountB,null, null))
+        return new TokenInfo(tokenB, calculateTokenValueInUsd(amountA, stableAmountB, weightA, weightB))
     }
 
     if (isBaseAsset(tokenB)) {
         let token = _TokenPrice.load(tokenB.toHexString())
         if (token == null) return null
         let stableAmountA = amountA.times(token.lastUsdPrice)
-        return new TokenInfo(tokenA, calculateTokenValueInUsd(amountB, stableAmountA, null, null))
+        return new TokenInfo(tokenA, calculateTokenValueInUsd(amountB, stableAmountA, weightB, weightA))
     }
     return null
 }

@@ -2,7 +2,8 @@ import {Address, BigDecimal, ethereum} from "@graphprotocol/graph-ts";
 import {getOrCreateDex, getOrCreateFinancials, getOrCreateUsageMetricSnapshot} from "./getters";
 import {SECONDS_PER_DAY} from "./constants";
 import {_Account, _DailyActiveAccount, _TokenPrice, LiquidityPool} from "../../generated/schema";
-import {valueInUSD} from "./pricing";
+import {isUSDStable, valueInUSD} from "./pricing";
+import {scaleDown} from "./tokens";
 
 export function updateFinancials(event: ethereum.Event): void {
     let financialMetrics = getOrCreateFinancials(event)
@@ -52,16 +53,28 @@ export function updatePoolMetrics(id: string): void {
     let totalValueLocked = BigDecimal.zero()
     let tokenWithoutPrice = false
     for (let i = 0; i<pool.inputTokens.length; i++) {
-        let token = _TokenPrice.load(pool.inputTokens[i])
-        if (!token) {
+        let currentToken = Address.fromString(pool.inputTokens[i])
+        let currentTokenBalance = scaleDown(
+            Address.fromString(pool.inputTokens[i]),
+            pool.inputTokenBalances[i]
+        )
+        let token: _TokenPrice | null = null
+        if (isUSDStable(currentToken)) {
+            totalValueLocked.plus(currentTokenBalance)
+            continue
+        }
+
+        token = _TokenPrice.load(currentToken.toHexString())
+        if (token == null) {
             tokenWithoutPrice = true
             break
         }
 
-        totalValueLocked.plus(valueInUSD(
-            pool.inputTokenBalances[i].toBigDecimal(),
+        let currentTokenValueInUsd = valueInUSD(
+            currentTokenBalance,
             Address.fromString(token.id)
-        ))
+        )
+        totalValueLocked.plus(currentTokenValueInUsd)
     }
 
     if (tokenWithoutPrice) return
