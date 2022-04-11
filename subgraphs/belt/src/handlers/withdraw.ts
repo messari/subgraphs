@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract, Withdraw as WithdrawEvent } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGINT_ZERO, VaultFeeType } from "../constant";
@@ -6,6 +6,7 @@ import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getFeePercentage } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
+import { updateVaultFees } from "../entities/Vault";
 import { readValue } from "../utils/contracts";
 import { updateProtocolMetrics } from "./common";
 import { getUSDPriceOfToken } from "./price";
@@ -36,6 +37,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
 
   vault.save();
 
+  updateVaultFees(vault, event.params.strategyAddress);
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
 
   let strategyAddress = event.params.strategyAddress.toHex();

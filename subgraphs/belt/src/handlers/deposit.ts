@@ -6,6 +6,7 @@ import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getFeePercentage } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
+import { updateVaultFees } from "../entities/Vault";
 import { readValue } from "../utils/contracts";
 import { updateProtocolMetrics } from "./common";
 import { getUSDPriceOfOutputToken, getUSDPriceOfToken } from "./price";
@@ -38,6 +39,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   vault.outputTokenPriceUSD = getUSDPriceOfOutputToken(vault, inputToken);
   vault.save();
 
+  updateVaultFees(vault, event.params.strategyAddress);
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event.block);
   let feePercentage = getFeePercentage(vault, event.params.strategyAddress.toHex(), VaultFeeType.DEPOSIT_FEE);
 

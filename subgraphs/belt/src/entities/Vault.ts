@@ -1,7 +1,12 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Strategy } from "../../generated/beltBTC/Strategy";
+import { Vault as VaultContract } from "../../generated/beltBTC/Vault";
 import { Vault } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, VaultFeeType } from "../constant";
+import { readValue } from "../utils/contracts";
+import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
+import { createFeeType } from "./Strategy";
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -32,4 +37,55 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.save();
 
   return vault;
+}
+
+export function updateVaultFees(vault: Vault, strategyAddress: Address): void {
+  const strategyContract = Strategy.bind(strategyAddress);
+  let numer = readValue<BigInt>(strategyContract.try_withdrawFeeNumer(), BIGINT_ZERO);
+  let denom = readValue<BigInt>(strategyContract.try_withdrawFeeDenom(), BIGINT_ZERO);
+
+  let feePercentage = denom.isZero()
+    ? BIGDECIMAL_ZERO
+    : numer
+        .toBigDecimal()
+        .times(BIGDECIMAL_HUNDRED)
+        .div(denom.toBigDecimal());
+
+  let withdrawFeeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
+    .concat(strategyAddress.toHex().toLowerCase())
+    .concat("-")
+    .concat(vault.id);
+  createFeeType(withdrawFeeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
+
+  let vaultContract = VaultContract.bind(Address.fromString(vault.id));
+  numer = readValue<BigInt>(vaultContract.try_entranceFeeNumer(), BIGINT_ZERO);
+  denom = readValue<BigInt>(vaultContract.try_entranceFeeDenom(), BIGINT_ZERO);
+
+  feePercentage = denom.isZero()
+    ? BIGDECIMAL_ZERO
+    : numer
+        .toBigDecimal()
+        .times(BIGDECIMAL_HUNDRED)
+        .div(denom.toBigDecimal());
+
+  let depositFeeId = enumToPrefix(VaultFeeType.DEPOSIT_FEE)
+    .concat(strategyAddress.toHex().toLowerCase())
+    .concat("-")
+    .concat(vault.id);
+  createFeeType(depositFeeId, VaultFeeType.DEPOSIT_FEE, feePercentage);
+
+  let fees = vault.fees;
+  let withdrawFeeIndex = fees.indexOf(withdrawFeeId);
+  let depositFeeIndex = fees.indexOf(depositFeeId);
+
+  if (withdrawFeeIndex !== -1) {
+    fees[withdrawFeeIndex] = withdrawFeeId;
+  }
+
+  if (depositFeeIndex !== -1) {
+    fees[depositFeeIndex] = depositFeeId;
+  }
+
+  vault.fees = fees;
+  vault.save();
 }
