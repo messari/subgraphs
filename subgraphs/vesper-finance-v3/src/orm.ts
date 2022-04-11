@@ -5,7 +5,7 @@ import {
   RewardToken,
   VaultFee,
   Deposit,
-  Withdraw
+  Withdraw,
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
@@ -65,7 +65,8 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 }
 
 export function updateVaultFee(vault: Vault): void {
-  const id = `WITHDRAWAL_FEE_${vault.id}`;
+  // const id = `WITHDRAWAL_FEE_${vault.id}`;
+  const id = vault.id;
   const vaultAddress = Address.fromString(vault.id);
   const poolv3 = PoolV3.bind(vaultAddress);
   let fee = VaultFee.load(id);
@@ -137,7 +138,10 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
-export function getOrCreateVault(address: Address): Vault {
+export function getOrCreateVault(
+  address: Address,
+  updateOp: boolean = true
+): Vault {
   let vault = Vault.load(address.toHexString());
 
   if (!vault) {
@@ -159,9 +163,11 @@ export function getOrCreateVault(address: Address): Vault {
     vault.save();
   }
 
-  updateVaultFee(vault);
-  updateVaultTokens(vault);
-  updateVaultRewardTokens(vault);
+  if (updateOp) {
+    updateVaultFee(vault);
+    updateVaultTokens(vault);
+    updateVaultRewardTokens(vault);
+  }
 
   return vault;
 }
