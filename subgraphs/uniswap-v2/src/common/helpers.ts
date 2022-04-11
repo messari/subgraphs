@@ -16,9 +16,9 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE_TO_OFF, BIGDECIMAL_HUNDRED } from "../common/utils/constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "../common/utils/constants"
 import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./utils/price"
-import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee } from "./getters"
 import { getOrCreateToken } from "./utils/tokens"
 import { updateVolumeAndFees } from "./metrics/metrics"
 
@@ -28,18 +28,24 @@ export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADD
 export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
 
 function createPoolFees(poolAddressString: string): string[] {
-  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
-  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
-  poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
+  let poolLpFee = new LiquidityPoolFee('lp-fee-'+poolAddressString)
+  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE
+  poolLpFee.feePercentage = LP_FEE_TO_OFF
 
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
-  poolTradingFee.save()
-  poolProtocolFee.save()
+  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
+  poolTradingFee.feePercentage = TRADING_FEE
 
-  return [poolTradingFee.id, poolProtocolFee.id]
+  poolLpFee.save()
+  poolProtocolFee.save()
+  poolTradingFee.save()
+
+
+  return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id]
 }
 
 // Create a liquidity pool from PairCreated contract call
@@ -224,7 +230,6 @@ export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt,fr
 
   transfer.save()
 }
-
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
 export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: Address): void {
@@ -428,6 +433,12 @@ function UpdateDepositHelper(poolAddress: Address): void {
   let poolDeposits = _HelperStore.load(poolAddress.toHexString())!
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
   poolDeposits.save()
+}
+
+export function savePoolId(poolAddress: Address): void { 
+  let protocol = getOrCreateDex()
+  protocol._poolIds.push(poolAddress)
+  protocol.save()
 }
 
 // convert decimals 

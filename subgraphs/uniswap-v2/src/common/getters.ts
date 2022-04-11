@@ -54,12 +54,6 @@ export function getOrCreateDex(): DexAmmProtocol {
   return protocol
 }
 
-export function savePoolId(poolAddress: Address): void { 
-    let protocol = getOrCreateDex()
-    protocol.poolIds.push(poolAddress)
-    protocol.save()
-}
-
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
 }
