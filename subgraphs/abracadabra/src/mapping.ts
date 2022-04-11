@@ -1,0 +1,178 @@
+import { Address } from "@graphprotocol/graph-ts"
+import { DegenBox, LogDeploy } from "../generated/DegenBox/DegenBox"
+import { LogAddCollateral, LogBorrow, LogRemoveCollateral, LogRepay, cauldron, LogExchangeRate, LogWithdrawFees, LogAccrue } from '../generated/templates/cauldron/cauldron'
+import { Deposit, Borrow, Repay, _Account, Liquidation, _LiquidationCache, _TokenPricesUsd } from '../generated/schema'
+import { BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
+import { bigIntToBigDecimal } from "./common/utils/numbers"
+import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getOrCreateFinancials, getCachedLiquidation } from "./common/getters"
+import { cauldron as CauldronDataSource } from "../generated/templates"
+import { fetchMimPriceUSD, getOrCreateTokenPriceEntity, updateTokenPrice } from "./common/prices/prices"
+import { updateUsageMetrics, updateProtocolStats, updateMarketStats, updateMarketMetrics, updateFinancials } from "./common/metrics"
+import { createMarket, createCachedLiquidation } from "./common/setters";
+
+
+export function handleLogDeploy(event: LogDeploy): void {
+  const account = event.transaction.from.toHex().toLowerCase()
+  if (ABRA_ACCOUNTS.indexOf(account) > -1) {
+    createMarket(event.params.cloneAddress.toHexString(),event.block.number,event.block.timestamp)
+    CauldronDataSource.create(event.params.cloneAddress)
+  }
+}
+
+export function handleLogAddCollateral(event: LogAddCollateral): void {
+  let depositEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString())
+  let market = getMarket(event.address.toHexString())
+  let cauldronContract = cauldron.bind(event.address)
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]))
+  let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD
+  let amountUSD = bigIntToBigDecimal(event.params.share,collateralToken.decimals).times(tokenPriceUSD)
+
+  depositEvent.hash = event.transaction.hash.toHexString()
+  depositEvent.logIndex = event.transactionLogIndex.toI32()
+  depositEvent.protocol = getOrCreateLendingProtocol().id
+  depositEvent.to = event.params.to.toHexString()
+  depositEvent.from = event.params.from.toHexString()
+  depositEvent.blockNumber = event.block.number
+  depositEvent.timestamp = event.block.timestamp
+  depositEvent.market = market.id
+  depositEvent.asset = collateralToken.id
+  // Amount needs to be calculated differently as bentobox deals shares and amounts in a different way.
+  // usage of toAmount function converts shares to actrual amount based on collateral
+  depositEvent.amount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(Address.fromString(collateralToken.id), event.params.share, false)
+  depositEvent.amountUSD = amountUSD
+  depositEvent.save()
+
+  updateMarketStats(market.id,"DEPOSIT",collateralToken.id,event.params.share,event)
+  updateProtocolStats(amountUSD,"DEPOSIT")
+  updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateUsageMetrics(event,event.params.from,event.params.to)
+}
+
+export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
+  if (event.params.from.toHexString() != event.params.to.toHexString()){
+    createCachedLiquidation(event)
+  }
+  let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString())
+  let market = getMarket(event.address.toHexString())
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]))
+  let cauldronContract = cauldron.bind(event.address)
+  let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD
+  let amountUSD = bigIntToBigDecimal(event.params.share,collateralToken.decimals).times(tokenPriceUSD)
+
+  withdrawalEvent.hash = event.transaction.hash.toHexString()
+  withdrawalEvent.logIndex = event.transactionLogIndex.toI32()
+  withdrawalEvent.protocol = getOrCreateLendingProtocol().id
+  withdrawalEvent.to = event.params.to.toHexString()
+  withdrawalEvent.from = event.params.from.toHexString()
+  withdrawalEvent.blockNumber = event.block.number
+  withdrawalEvent.timestamp = event.block.timestamp
+  withdrawalEvent.market = market.id
+  withdrawalEvent.asset = collateralToken.id
+  withdrawalEvent.amount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(Address.fromString(collateralToken.id), event.params.share, false)
+  withdrawalEvent.amountUSD = amountUSD
+  withdrawalEvent.save()
+
+  updateMarketStats(market.id,"WITHDRAW",collateralToken.id,event.params.share,event)
+  updateProtocolStats(amountUSD,"WITHDRAW")
+  updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateUsageMetrics(event,event.params.from,event.params.to)
+}
+
+export function handleLogBorrow(event: LogBorrow): void {
+  let borrowEvent = new Borrow(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString())
+  let market = getMarket(event.address.toHexString())
+  let mimPriceUSD = fetchMimPriceUSD(event)
+  let amountUSD = bigIntToBigDecimal(event.params.amount,18).times(mimPriceUSD)
+
+  borrowEvent.hash = event.transaction.hash.toHexString()
+  borrowEvent.logIndex = event.transactionLogIndex.toI32()
+  borrowEvent.protocol = getOrCreateLendingProtocol().id
+  borrowEvent.to = event.params.to.toHexString()
+  borrowEvent.from = event.params.from.toHexString()
+  borrowEvent.blockNumber = event.block.number
+  borrowEvent.timestamp = event.block.timestamp
+  borrowEvent.market = market.id
+  borrowEvent.asset = getOrCreateToken(Address.fromString(MIM)).id
+  borrowEvent.amount = event.params.amount
+  borrowEvent.amountUSD = amountUSD
+  borrowEvent.save()
+
+  updateMarketStats(market.id,"BORROW",MIM,event.params.amount,event)
+  updateProtocolStats(amountUSD,"BORROW")
+  updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateUsageMetrics(event,event.params.from,event.params.to)
+}
+
+export function handleLiquidation(event: LogRepay): void {
+  // Retrieve cached liquidation that holds amount of collateral to help calculate profit usd (obtained from log remove collateral with from != to)
+  let cachedLiquidation = getCachedLiquidation(event)
+  let liquidationEvent = new Liquidation(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString() + "_Liquidation")
+  let market = getMarket(event.address.toHexString())
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]))
+  let cauldronContract = cauldron.bind(event.address)
+  let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD
+  let collateralAmount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(Address.fromString(collateralToken.id), cachedLiquidation.amountCollateral, false)
+  let collateralAmountUSD = bigIntToBigDecimal(collateralAmount,collateralToken.decimals).times(tokenPriceUSD)
+  let mimAmountUSD = bigIntToBigDecimal(event.params.amount,18).times(fetchMimPriceUSD(event))
+
+  liquidationEvent.hash = event.transaction.hash.toHexString()
+  liquidationEvent.logIndex = event.transactionLogIndex.toI32()
+  liquidationEvent.protocol = getOrCreateLendingProtocol().id
+  liquidationEvent.to = event.params.to.toHexString()
+  liquidationEvent.from = event.params.from.toHexString()
+  liquidationEvent.blockNumber = event.block.number
+  liquidationEvent.timestamp = event.block.timestamp
+  liquidationEvent.market = market.id
+  liquidationEvent.asset = collateralToken.id
+  liquidationEvent.amount = collateralAmount
+  liquidationEvent.amountUSD = collateralAmountUSD
+  liquidationEvent.profitUSD = collateralAmountUSD.times(tokenPriceUSD).minus(mimAmountUSD)
+  liquidationEvent.save()
+}
+
+export function handleLogRepay(event: LogRepay): void {
+  if (event.params.from.toHexString() != event.params.to.toHexString()){
+    handleLiquidation(event)
+  }
+  let repayEvent = new Repay(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString())
+  let market = getMarket(event.address.toHexString())
+  let mimPriceUSD = fetchMimPriceUSD(event)
+  let amountUSD = bigIntToBigDecimal(event.params.amount,18).times(mimPriceUSD)
+
+  repayEvent.hash = event.transaction.hash.toHexString()
+  repayEvent.logIndex = event.transactionLogIndex.toI32()
+  repayEvent.protocol = getOrCreateLendingProtocol().id
+  repayEvent.to = event.params.to.toHexString()
+  repayEvent.from = event.params.from.toHexString()
+  repayEvent.blockNumber = event.block.number
+  repayEvent.timestamp = event.block.timestamp
+  repayEvent.market = market.id
+  repayEvent.asset = getOrCreateToken(Address.fromString(MIM)).id
+  repayEvent.amount = event.params.amount
+  repayEvent.amountUSD = amountUSD
+  repayEvent.save()
+
+  updateMarketStats(market.id,"REPAY",MIM,event.params.part,event) // smart contract code subs event.params.part from totalBorrow
+  updateProtocolStats(amountUSD,"REPAY")
+  updateMarketMetrics(event) // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
+  updateUsageMetrics(event,event.params.from,event.params.to)
+}
+
+export function handleLogWithdrawFees(event: LogWithdrawFees): void {
+  //let mimPriceUSD = fetchMimPriceUSD(event)
+  //let feesUSD = bigIntToBigDecimal(event.params.feesEarnedFraction,18).times(mimPriceUSD)
+  //updateFinancials(event,feesUSD)
+}
+
+export function handleLogExchangeRate(event: LogExchangeRate): void {
+  let market = getMarket(event.address.toHexString())
+  let token = getOrCreateToken(Address.fromString(market.inputTokens[0]))
+  let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(event.params.rate,token.decimals))
+  updateTokenPrice(token.id,priceUSD,event)
+}
+
+export function handleLogAccrue(event: LogAccrue): void {
+  let mimPriceUSD = fetchMimPriceUSD(event)
+  let feesUSD = bigIntToBigDecimal(event.params.accruedAmount,18).times(mimPriceUSD)
+  updateFinancials(event,feesUSD)
+}
