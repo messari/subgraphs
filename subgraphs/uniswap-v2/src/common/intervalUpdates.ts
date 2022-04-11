@@ -31,6 +31,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
     let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
     let totalUniqueUsers = getOrCreateUsersHelper()
+    let protocol = getOrCreateDex()
   
     if (!usageMetrics) {
       usageMetrics = new UsageMetricsDailySnapshot(id.toString());
@@ -53,6 +54,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
       totalUniqueUsers.valueInt += 1;
     }
     usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
+    protocol.totalUniqueUsers = totalUniqueUsers.valueInt;
   
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
@@ -65,6 +67,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   
     totalUniqueUsers.save();
     usageMetrics.save();
+    protocol.save()
   }
   
 // Update UsagePoolDailySnapshot entity

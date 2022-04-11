@@ -1,6 +1,9 @@
 generated/
 build/
 
+# alternate placement for generated files
+types/
+
 ############################
 ##### Default Template #####
 ############################
