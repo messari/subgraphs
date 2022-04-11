@@ -26,7 +26,40 @@ const genFunc = () => {
     })),
   };
 
-  console.info('Template context :', context);
+  context.pools = [
+    {
+      name: "vaUSDC",
+      address: "0xa8b607Aa09B6A2E306F93e74c282Fb13f6A80452",
+      version: 3,
+      birthblock: 13729330,
+    },
+    {
+      name: "vaETH",
+      address: "0xd1C117319B3595fbc39b471AB1fd485629eb05F2",
+      version: 3,
+      birthblock: 13044797,
+    },
+    {
+      name: "vaDAI",
+      address: "0x0538C8bAc84E95A9dF8aC10Aad17DbE81b9E36ee",
+      version: 3,
+      birthblock: 12782830,
+    },
+    {
+      name: "vUSDT",
+      address: "0xBA680a906d8f624a5F11fba54D3C672f09F26e47",
+      version: 3,
+      birthblock: 12725974,
+    },
+    {
+      name: "vUNI",
+      address: "0xfF43C327410F960261057ba1DA787eD78B42c257",
+      version: 3,
+      birthblock: 12725830,
+    },
+  ];
+
+  console.info("Template context :", context);
   readFile("./subgraph.template.yaml", "utf8")
     .then((templateFile) =>
       writeFile("./subgraph.yaml", Mustache.render(templateFile, context))

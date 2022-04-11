@@ -4,6 +4,8 @@ import {
   Token,
   RewardToken,
   VaultFee,
+  Deposit,
+  Withdraw
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
