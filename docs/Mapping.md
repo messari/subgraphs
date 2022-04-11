@@ -52,6 +52,13 @@ You can leverage the Matchstick unit testing framework to better debug/test your
 
 https://github.com/LimeChain/matchstick/blob/main/README.md
 
+They have a YouTube series where they walkthrough the framework: https://www.youtube.com/watch?v=cB7o2n-QrnU
+
+Couple more tutorial videos:
+
+https://www.youtube.com/watch?v=T-orbT4gRiA
+https://www.youtube.com/watch?v=EFTHDIxOjVY
+
 Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build. 
 
 ## Debugging
