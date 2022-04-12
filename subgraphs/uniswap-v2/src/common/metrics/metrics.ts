@@ -102,7 +102,7 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
 
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
-    pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
+    protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(trackedAmountUSD)
   
     financialMetrics.save()
     poolMetrics.save();
