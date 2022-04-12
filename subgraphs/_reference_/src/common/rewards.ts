@@ -53,8 +53,12 @@ export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString
 export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString())
 
 // BUFFER_SIZE determined the size of the array
-// Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
-export const BUFFER_SIZE = ((RATE_IN_SECONDS as f64) / (TIMESTAMP_STORAGE_INTERVAL as f64)) as i32
+// Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval - round up to even number
+let BUFFER_SIZE_TEMP = ((RATE_IN_SECONDS as f64) / (TIMESTAMP_STORAGE_INTERVAL as f64)) as i32
+if (BUFFER_SIZE_TEMP % INT_ZERO == INT_ONE) BUFFER_SIZE_TEMP += INT_ONE
+
+export const BUFFER_SIZE = BUFFER_SIZE_TEMP
+
 export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER"
 
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough 
@@ -120,6 +124,7 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
         // Shift the start of the window if the current timestamp moves out of desired rate window
         if (windowIndexBlockTimestamp < startTimestamp) {
             circularBuffer.windowStartIndex = circularBuffer.windowStartIndex + INT_TWO
+            if (circularBuffer.windowStartIndex >= circularBuffer.bufferSize) circularBuffer.windowStartIndex = INT_ZERO
         }
         else break
     }
