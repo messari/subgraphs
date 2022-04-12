@@ -43,6 +43,8 @@ dataSources:
           handler: handleNewLiquidationIncentive
         - event: NewPriceOracle(address,address)
           handler: handleNewPriceOracle
+        - event: ActionPaused(address,string,bool)
+          handler: handleActionPaused
 templates:
   - name: CToken
     kind: ethereum/contract

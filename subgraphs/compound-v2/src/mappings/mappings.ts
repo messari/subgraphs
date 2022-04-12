@@ -1,5 +1,6 @@
 // map blockchain data to entities outlined in schema.graphql
 import {
+  ActionPaused1,
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
@@ -24,7 +25,7 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleRedeem(event: Redeem): void {
-  if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount)) {
+  if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount, event.params.redeemTokens)) {
     updateUsageMetrics(event, event.params.redeemer);
     updateFinancials(event);
     updateMarketMetrics(event);
@@ -116,4 +117,10 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
     market.liquidationPenalty = liquidationPenalty;
     market.save();
   }
+}
+
+export function handleActionPaused(event: ActionPaused1): void {
+  let market = getOrCreateMarket(event, event.params.cToken);
+  market.isActive = event.params.pauseState;
+  market.save();
 }

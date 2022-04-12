@@ -19,7 +19,9 @@ import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
+  INITIAL_EXCHANGE_RATE,
   LENDING_TYPE,
+  METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
   PROTOCOL_NAME,
   PROTOCOL_RISK_TYPE,
@@ -110,9 +112,11 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = COMPTROLLER_ADDRESS;
     financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalDepositUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalBorrowUSD = BIGDECIMAL_ZERO;
     financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.feesUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.blockNumber = event.block.number;
     financialMetrics.timestamp = event.block.timestamp;
 
@@ -134,11 +138,14 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
     protocol.slug = PROTOCOL_SLUG;
     protocol.schemaVersion = SCHEMA_VERSION;
     protocol.subgraphVersion = SUBGRAPH_VERSION;
+    protocol.methodologyVersion = METHODOLOGY_VERSION;
     protocol.network = NETWORK_ETHEREUM;
     protocol.type = PROTOCOL_TYPE;
     protocol.totalUniqueUsers = 0 as i32;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol._totalVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.totalDepositUSD = BIGDECIMAL_ONE;
+    protocol.totalBorrowUSD = BIGDECIMAL_ZERO;
     protocol.lendingType = LENDING_TYPE;
     protocol.riskType = PROTOCOL_RISK_TYPE;
     protocol._marketIds = [];
@@ -207,9 +214,15 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     // populate quantitative data
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.totalVolumeUSD = BIGDECIMAL_ZERO;
+    market.totalDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowUSD = BIGDECIMAL_ZERO;
+    market._totalBorrowNative = BIGINT_ZERO;
     let inputTokenBalances = new Array<BigInt>();
     inputTokenBalances.push(BIGINT_ZERO);
     market.inputTokenBalances = inputTokenBalances;
+    let inputTokenPrices = new Array<BigDecimal>();
+    inputTokenPrices.push(BIGDECIMAL_ZERO);
+    market.inputTokenPricesUSD = inputTokenPrices;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     let emissionsAmount = new Array<BigInt>();
@@ -222,6 +235,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.rewardTokenEmissionsUSD = emissionsUSD;
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
+    market._currentBlockNumber = event.block.number;
 
     // lending-specific data
     if (underlyingAddress == SAI_ADDRESS) {
@@ -243,10 +257,10 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market._reserveFactor = tryReserveFactor.reverted
       ? BIGDECIMAL_ZERO
       : tryReserveFactor.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    market._exchangeRate = INITIAL_EXCHANGE_RATE;
     market._supplySideRevenueUSDPerBlock = BIGDECIMAL_ZERO;
     market._protocolSideRevenueUSDPerBlock = BIGDECIMAL_ZERO;
     market._totalRevenueUSDPerBlock = BIGDECIMAL_ZERO;
-    market._outstandingBorrowAmount = BIGINT_ZERO;
     market.liquidationPenalty = protocol._liquidationPenalty;
 
     market.save();

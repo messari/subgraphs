@@ -7,7 +7,7 @@ import {
   getOrCreateUsageMetricSnapshot,
 } from "./getters";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount } from "../types/schema";
+import { Account, DailyActiveAccount } from "../types/schema";
 import { SECONDS_PER_DAY } from "./utils/constants";
 
 ///////////////////////////
@@ -22,7 +22,9 @@ export function updateFinancials(event: ethereum.Event): void {
 
   // update value/volume vars
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.totalVolumeUSD = protocol._totalVolumeUSD;
+  financialMetrics.totalVolumeUSD = protocol.totalVolumeUSD;
+  financialMetrics.totalDepositUSD = protocol.totalDepositUSD;
+  financialMetrics.totalBorrowUSD = protocol.totalBorrowUSD;
 
   if (event.block.number > financialMetrics.blockNumber) {
     // get block difference to catch any blocks that have no transactions (unlikely, but needs to be accounted)
@@ -40,7 +42,9 @@ export function updateFinancials(event: ethereum.Event): void {
       );
 
       // fees are just the totalRevenue (to be changed: https://github.com/messari/subgraphs/pull/47)
-      financialMetrics.feesUSD = financialMetrics.feesUSD.plus(market._totalRevenueUSDPerBlock.times(blockDiff));
+      financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
+        market._totalRevenueUSDPerBlock.times(blockDiff),
+      );
     }
   }
 
@@ -63,10 +67,10 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetrics.dailyTransactionCount += 1;
 
   let accountId = from.toHexString();
-  let account = _Account.load(accountId);
+  let account = Account.load(accountId);
   let protocol = getOrCreateLendingProtcol();
   if (!account) {
-    account = new _Account(accountId);
+    account = new Account(accountId);
     account.save();
 
     protocol.totalUniqueUsers += 1;
@@ -76,9 +80,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
     usageMetrics.activeUsers += 1;
   }
@@ -100,7 +104,7 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
   marketMetrics.inputTokenBalances = market.inputTokenBalances;
   let inputTokenPrices = marketMetrics.inputTokenPricesUSD;
-  inputTokenPrices[0] = market._inputTokenPrice;
+  inputTokenPrices[0] = market.inputTokenPricesUSD[0];
   marketMetrics.inputTokenPricesUSD = inputTokenPrices;
   marketMetrics.outputTokenSupply = market.outputTokenSupply;
   marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;

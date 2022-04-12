@@ -31,6 +31,11 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
+}
+
 export namespace LendingType {
   export const CDP = "CDP";
   export const POOLED = "POOLED";
@@ -39,11 +44,6 @@ export namespace LendingType {
 export namespace RiskType {
   export const GLOBAL = "GLOBAL";
   export const ISOLATED = "ISOLATED";
-}
-
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
 }
 
 //////////////////////////////
@@ -114,6 +114,8 @@ export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.10";
-export const SCHEMA_VERSION = "1.0.1";
+export const SUBGRAPH_VERSION = "1.4.11";
+export const SCHEMA_VERSION = "1.1.0";
+export const METHODOLOGY_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
+export const INITIAL_EXCHANGE_RATE = BigDecimal.fromString(".02");
