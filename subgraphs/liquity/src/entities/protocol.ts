@@ -65,12 +65,6 @@ export function getOrCreateFinancialsSnapshot(
   return financialsSnapshot;
 }
 
-export function incrementProtocolUniqueUsers(): void {
-  const protocol = getOrCreateLiquityProtocol();
-  protocol.totalUniqueUsers += 1;
-  protocol.save();
-}
-
 // Keep track of daily transaction count and daily/total unique users
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch

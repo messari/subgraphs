@@ -132,6 +132,7 @@ dataSources:
         - DailyActiveAccount
         - UsageMetricsDailySnapshot
         - Account
+        - _Price
       abis:
         - name: CollSurplusPool
           file: ./abis/CollSurplusPool.json

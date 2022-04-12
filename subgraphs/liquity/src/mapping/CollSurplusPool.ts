@@ -27,7 +27,7 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
     ).times(getCurrentETHPrice());
     createWithdraw(
       event,
-      trove.collateralSurplus,
+      trove.collateralSurplusChange,
       collateralSurplusUSD,
       borrower
     );
