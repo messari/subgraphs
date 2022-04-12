@@ -61,6 +61,7 @@ export const PROTOCOL_TYPE = ProtocolType.YIELD;
 export const PROTOCOL_NETWORK = Network.BSC;
 export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 // null address
 export const NULL_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");

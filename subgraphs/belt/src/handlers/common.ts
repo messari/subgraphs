@@ -1,6 +1,5 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Vault, _User as User } from "../../generated/schema";
-import { BIGINT_ZERO } from "../constant";
+import { Account, DailyActiveAccount, Vault } from "../../generated/schema";
 import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreateUserSnapshot,
@@ -11,49 +10,50 @@ import { getOrCreateToken } from "../entities/Token";
 import { getDay } from "../utils/numbers";
 import { getUSDPriceOfToken } from "./price";
 
-export function updateUsageMetrics(user: User, block: ethereum.Block): void {
+export function updateUsageMetrics(event: ethereum.Event): void {
+  let block = event.block;
+  let user = event.transaction.from;
+
+  let account = Account.load(user.toHex());
   let metrics = getOrCreateUserSnapshot(block);
   let protocol = getOrCreateProtocol();
   let day = getDay(block.timestamp);
 
-  metrics.protocol = protocol.id;
+  metrics.blockNumber = block.number;
+  metrics.timestamp = block.timestamp;
   metrics.dailyTransactionCount = metrics.dailyTransactionCount + 1;
 
-  // no metrics yet, initialize
-  if (metrics.blockNumber.equals(BigInt.zero())) {
-    metrics.blockNumber = block.number;
-    metrics.timestamp = block.timestamp;
-  }
-
   // is a new user
-  if (user.lastDayActive === 0) {
-    user.lastDayActive = day;
+  if (account == null) {
+    account = new Account(user.toHex());
+    account.save();
 
     metrics.totalUniqueUsers = metrics.totalUniqueUsers + 1;
-    metrics.activeUsers = metrics.activeUsers + 1;
 
     // update users on protocol
     protocol.totalUniqueUsers = protocol.totalUniqueUsers + 1;
     protocol.save();
   }
 
-  // new user of the day
-  else if (user.lastDayActive < day) {
-    user.lastDayActive = day;
+  let dailyAccountId = day
+    .toString()
+    .concat("-")
+    .concat(user.toHex());
+  let dailyActiveAccount = DailyActiveAccount.load(dailyAccountId);
+
+  // is a new user of the day
+  if (dailyActiveAccount == null) {
+    dailyActiveAccount = new DailyActiveAccount(dailyAccountId);
+    dailyActiveAccount.save();
 
     metrics.activeUsers = metrics.activeUsers + 1;
   }
 
-  user.save();
   metrics.save();
 }
 
 export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, block: ethereum.Block): void {
   let metrics = getOrCreateFinancialsDailySnapshot(block);
-  if (metrics.blockNumber.equals(BigInt.zero())) {
-    metrics.timestamp = block.timestamp;
-    metrics.blockNumber = block.number;
-  }
 
   let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
   let inputToken = getOrCreateToken(inputTokenAddress);
@@ -61,6 +61,8 @@ export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, b
   let inputTokenPrice = getUSDPriceOfToken(inputToken);
   let inputTokenAmountNormalized = inputTokenAmount.toBigDecimal().div(inputTokenDecimals.toBigDecimal());
 
+  metrics.timestamp = block.timestamp;
+  metrics.blockNumber = block.number;
   metrics.totalVolumeUSD = metrics.totalVolumeUSD.plus(inputTokenPrice.times(inputTokenAmountNormalized));
   metrics.totalValueLockedUSD = vault.totalValueLockedUSD;
 
@@ -70,6 +72,7 @@ export function updateFinancialMetrics(vault: Vault, inputTokenAmount: BigInt, b
 export function updateProtocolMetrics(amountUSD: BigDecimal, isDeposit: boolean): void {
   let protocol = getOrCreateProtocol();
 
+  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(amountUSD);
   protocol.totalValueLockedUSD = isDeposit
     ? protocol.totalValueLockedUSD.plus(amountUSD)
     : protocol.totalValueLockedUSD.minus(amountUSD);
@@ -88,11 +91,8 @@ export function updateVaultMetrics(vault: Vault, block: ethereum.Block): void {
   metrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
   metrics.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
   metrics.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
-
-  if (metrics.blockNumber.equals(BIGINT_ZERO)) {
-    metrics.blockNumber = block.number;
-    metrics.timestamp = block.timestamp;
-  }
+  metrics.blockNumber = block.number;
+  metrics.timestamp = block.timestamp;
 
   metrics.save();
 }

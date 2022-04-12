@@ -5,7 +5,6 @@ import { BIGINT_ZERO } from "../constant";
 import { getOrCreateProtocol } from "../entities/Protocol";
 import { createStrategy } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
-import { getOrCreateUser } from "../entities/User";
 import { getOrCreateVault } from "../entities/Vault";
 import { readValue } from "../utils/contracts";
 import { updateFinancialMetrics, updateUsageMetrics, updateVaultMetrics } from "./common";
@@ -28,7 +27,6 @@ export function handleDeposit(event: Deposit): void {
   }
 
   let amount = event.params.depositAmount;
-  let user = getOrCreateUser(event.transaction.from);
   let shares = event.params.sharesMinted;
 
   log.warning("[BELT] handleDeposit - vault {}, amount {}, shares {}", [
@@ -38,7 +36,7 @@ export function handleDeposit(event: Deposit): void {
   ]);
 
   deposit(event, vault);
-  updateUsageMetrics(user, event.block);
+  updateUsageMetrics(event);
   updateVaultMetrics(vault, event.block);
   updateFinancialMetrics(vault, amount, event.block);
 }
@@ -59,7 +57,6 @@ export function handleWithdraw(event: Withdraw): void {
   }
 
   let amount = event.params.withdrawAmount;
-  let user = getOrCreateUser(event.transaction.from);
   let shares = event.params.sharesBurnt;
 
   log.warning("[BELT] handleWithdraw - vault {}, amount {}, shares {}", [
@@ -69,7 +66,7 @@ export function handleWithdraw(event: Withdraw): void {
   ]);
 
   withdraw(event, vault);
-  updateUsageMetrics(user, event.block);
+  updateUsageMetrics(event);
   updateVaultMetrics(vault, event.block);
   updateFinancialMetrics(vault, amount, event.block);
 }

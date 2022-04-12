@@ -44,7 +44,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   let feePercentage = getFeePercentage(vault, event.params.strategyAddress.toHex(), VaultFeeType.DEPOSIT_FEE);
 
   let fees = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(fees);
+  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(fees);
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(fees);
   financialMetrics.save();
 

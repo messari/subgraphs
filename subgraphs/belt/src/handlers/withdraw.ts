@@ -48,7 +48,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   let depositFeesUSD = amountUSD.times(depositFeePercentage.div(BIGDECIMAL_HUNDRED));
 
   // only adding withdraw fee as deposit fee is accounted for
-  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(withdrawFeesUSD);
+  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(withdrawFeesUSD);
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(withdrawFeesUSD);
 
   // total revenue - (sum of all fees)

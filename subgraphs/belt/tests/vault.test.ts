@@ -271,16 +271,16 @@ test("financial metrics", () => {
     .times(price.toBigDecimal().div(decimals.toBigDecimal()));
 
   // 10% of the amount
-  let feesUSD = numerator
+  let totalRevenueUSD = numerator
     .toBigDecimal()
     .div(denominator.toBigDecimal())
     .times(amountUSD);
 
   // for deposit and withdraw
-  let protocolSideRevenueUSD = feesUSD;
-  let supplySideRevenueUSD = amountUSD.minus(BigDecimal.fromString("2").times(feesUSD));
+  let protocolSideRevenueUSD = totalRevenueUSD;
+  let supplySideRevenueUSD = amountUSD.minus(BigDecimal.fromString("2").times(totalRevenueUSD));
 
   assert.fieldEquals("FinancialsDailySnapshot", day, "protocolSideRevenueUSD", protocolSideRevenueUSD.toString());
-  assert.fieldEquals("FinancialsDailySnapshot", day, "feesUSD", protocolSideRevenueUSD.toString());
+  assert.fieldEquals("FinancialsDailySnapshot", day, "totalRevenueUSD", protocolSideRevenueUSD.toString());
   assert.fieldEquals("FinancialsDailySnapshot", day, "supplySideRevenueUSD", supplySideRevenueUSD.toString());
 });

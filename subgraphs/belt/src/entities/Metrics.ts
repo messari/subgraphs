@@ -40,7 +40,7 @@ export function getOrCreateFinancialsDailySnapshot(block: ethereum.Block): Finan
   snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
   snapshot.supplySideRevenueUSD = BIGDECIMAL_ZERO;
   snapshot.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  snapshot.feesUSD = BIGDECIMAL_ZERO;
+  snapshot.totalRevenueUSD = BIGDECIMAL_ZERO;
   snapshot.blockNumber = block.number;
   snapshot.timestamp = block.timestamp;
   snapshot.save();

@@ -2,6 +2,7 @@ import { YieldAggregator } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   PROTOCOL_ID,
+  PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_NETWORK,
   PROTOCOL_SCHEMA_VERSION,
@@ -26,8 +27,10 @@ export function getOrCreateProtocol(): YieldAggregator {
   protocol.type = PROTOCOL_TYPE;
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
   protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
   protocol.totalUniqueUsers = 0;
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
   protocol.save();
 
   return protocol;
