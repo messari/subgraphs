@@ -23,7 +23,12 @@ import {
 } from "../peer";
 import { ZERO_ADDRESS, VVSP_ADDRESS_HEX } from "../constant";
 
-import { getOrCreateYieldAggregator, getOrCreateVault, getOrCreateDeposit, getOrCreateWithdraw } from "../orm";
+import {
+  getOrCreateYieldAggregator,
+  getOrCreateVault,
+  getOrCreateDeposit,
+  getOrCreateWithdraw,
+} from "../orm";
 
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
 // we need to do so with the restrictions of AssemblyScript
@@ -272,7 +277,6 @@ export function handleWithdrawV3(event: Withdraw): void {
 export function handleTransferV3(event: Transfer): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
-  getOrCreateDeposit(event, dataSource.address());
   log.info("Entered handleTransferV3 in tx={}, pool={}", [
     event.transaction.hash.toHex(),
     poolAddressHex,
@@ -289,6 +293,7 @@ export function handleTransferV3(event: Transfer): void {
     );
     return;
   }
+  getOrCreateDeposit(event, dataSource.address());
   let interestFees = event.params.value
     .toBigDecimal()
     .div(getDecimalDivisor(poolV3.decimals()));

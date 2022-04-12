@@ -39,24 +39,6 @@ const genFunc = () => {
       version: 3,
       birthblock: 13044797,
     },
-    {
-      name: "vaDAI",
-      address: "0x0538C8bAc84E95A9dF8aC10Aad17DbE81b9E36ee",
-      version: 3,
-      birthblock: 12782830,
-    },
-    {
-      name: "vUSDT",
-      address: "0xBA680a906d8f624a5F11fba54D3C672f09F26e47",
-      version: 3,
-      birthblock: 12725974,
-    },
-    {
-      name: "vUNI",
-      address: "0xfF43C327410F960261057ba1DA787eD78B42c257",
-      version: 3,
-      birthblock: 12725830,
-    },
   ];
 
   console.info("Template context :", context);

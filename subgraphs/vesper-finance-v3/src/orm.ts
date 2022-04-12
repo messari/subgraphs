@@ -14,6 +14,7 @@ import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
+import { toUsd } from "./peer";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   let yAggr = YieldAggregator.load(CONTROLLER_ADDRESS_HEX);
@@ -145,6 +146,7 @@ export function getOrCreateDeposit(event: Transfer, vaultAddress: Address): Depo
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
     const poolv3 = PoolV3.bind(vaultAddress);
+    const token = getOrCreateToken(poolv3.token());
 
     deposit = new Deposit(id);
     deposit.vault = vaultAddress.toHexString();
@@ -156,8 +158,8 @@ export function getOrCreateDeposit(event: Transfer, vaultAddress: Address): Depo
     deposit.blockNumber = event.block.number;
     deposit.timestamp = event.block.timestamp;
     deposit.asset = getOrCreateToken(poolv3.token()).id;
-    deposit.amount = event.transaction.value;
-    deposit.amountUSD = BigDecimal.zero();
+    deposit.amount = event.params.value;
+    deposit.amountUSD = toUsd(event.params.value.toBigDecimal(), token.decimals, Address.fromString(token.id));
 
     deposit.save();
   }
@@ -172,6 +174,7 @@ export function getOrCreateWithdraw(event: WithdrawEvent, vaultAddress: Address)
   if (!withdraw) {
     const yAggr = getOrCreateYieldAggregator();
     const poolv3 = PoolV3.bind(vaultAddress);
+    const token = getOrCreateToken(poolv3.token());
 
     withdraw = new Withdraw(id);
     withdraw.vault = vaultAddress.toHexString();
@@ -183,8 +186,8 @@ export function getOrCreateWithdraw(event: WithdrawEvent, vaultAddress: Address)
     withdraw.blockNumber = event.block.number;
     withdraw.timestamp = event.block.timestamp;
     withdraw.asset = getOrCreateToken(poolv3.token()).id;
-    withdraw.amount = event.transaction.value;
-    withdraw.amountUSD = BigDecimal.zero();
+    withdraw.amount = event.params.amount;
+    withdraw.amountUSD = toUsd(event.params.amount.toBigDecimal(), token.decimals, Address.fromString(token.id));
 
     withdraw.save();
   }
