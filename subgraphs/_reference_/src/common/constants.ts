@@ -82,9 +82,11 @@ export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 
+export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
+export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);

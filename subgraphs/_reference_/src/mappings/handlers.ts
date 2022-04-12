@@ -4,6 +4,7 @@ import { PairCreated } from "../../generated/templates/Pair/Factory";
 import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees, createLiquidityPool } from "./helpers";
 import { updateFinancials, updateUsageMetrics, updatePoolMetrics } from "../common/metrics";
 import { getOrCreateDexAmm } from "../common/getters";
+import { getRewardsPerDay, RewardIntervalType } from "../common/rewards";
 
 // To improve readability and consistency, it is recommended that you put all
 // handlers in this file, and create helper functions to handle specific events
@@ -26,6 +27,7 @@ export function handleMint(event: Mint): void {
   updateUsageMetrics(event, event.params.sender);
   updateFinancials(event);
   updatePoolMetrics(event);
+
 }
 
 export function handleBurn(event: Burn): void {
@@ -33,6 +35,9 @@ export function handleBurn(event: Burn): void {
   updateUsageMetrics(event, event.transaction.from);
   updateFinancials(event);
   updatePoolMetrics(event);
+
+  // INT_ONE and BLOCK for reward amount and interval type are arbitrary since uniswap does not have reward emissions
+  getRewardsPerDay(event.block.timestamp, event.block.number, INT_ONE, RewardIntervalType.BLOCK)
 }
 
 export function handleSwap(event: Swap): void {
