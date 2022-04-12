@@ -14,7 +14,7 @@ import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../co
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
 import { Address } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE, DEFAULT_DECIMALS } from "../common/utils/constants";
+import { BIGDECIMAL_ONE, COLLATERAL_FACTOR_OFFSET, DEFAULT_DECIMALS } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
@@ -94,7 +94,7 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   let market = getOrCreateMarket(event, event.params.cToken);
-  let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(16));
+  let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(COLLATERAL_FACTOR_OFFSET));
   market.maximumLTV = newLTV;
   // collateral factor is the borrowing capacity. The liquidity a borrower has is the collateral factor
   // ex: if collateral factor = 75% and the user has 100 USD (normalized) they can borrow $75

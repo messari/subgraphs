@@ -1,5 +1,5 @@
 // store common calculations
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CToken } from "../../types/templates/CToken/CToken";
 
 // turn exponent into a BigDecimal number
