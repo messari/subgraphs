@@ -141,3 +141,6 @@ dist
 
 # WebStorm cache
 .idea
+
+# Matchstick generated file
+.bin
