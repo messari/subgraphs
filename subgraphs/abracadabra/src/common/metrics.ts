@@ -1,29 +1,40 @@
 import { BigDecimal, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../../generated/schema";
 import { SECONDS_PER_DAY, MIM, BIGDECIMAL_ZERO } from "./constants";
-import { getOrCreateMarketDailySnapshot, getOrCreateUsageMetricSnapshot, getOrCreateFinancials, getOrCreateLendingProtocol, getMarket, getOrCreateToken } from "./getters";
-import { fetchMimPriceUSD, getOrCreateTokenPriceEntity } from "./prices/prices"
-import { bigIntToBigDecimal } from "./utils/numbers"
-import { getTreasuryBalance } from "../staking" 
+import {
+  getOrCreateMarketDailySnapshot,
+  getOrCreateUsageMetricSnapshot,
+  getOrCreateFinancials,
+  getOrCreateLendingProtocol,
+  getMarket,
+  getOrCreateToken,
+} from "./getters";
+import { fetchMimPriceUSD, getOrCreateTokenPriceEntity } from "./prices/prices";
+import { bigIntToBigDecimal } from "./utils/numbers";
+import { getTreasuryBalance } from "../staking";
 
-const ABRA_USER_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(75),2)
-const ABRA_PROTOCOL_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(25),2)
+const ABRA_USER_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(75), 2);
+const ABRA_PROTOCOL_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(25), 2);
 
 // Update FinancialsDailySnapshots entity
-export function updateFinancials(event: ethereum.Event,feesUSD:BigDecimal): void {
+export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): void {
   // totalVolumeUSD is handled in updateMarketStats
   // feesUSD is handled in handleLogWithdrawFees
   // totalValueLockedUSD is handled in updateTVL()
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
-  let treasuryBalanceUSD = getTreasuryBalance()
+  let treasuryBalanceUSD = getTreasuryBalance();
   // // Update the block number and timestamp to that of the last transaction of that day
   financialsDailySnapshots.blockNumber = event.block.number;
   financialsDailySnapshots.timestamp = event.block.timestamp;
-  financialsDailySnapshots.feesUSD = financialsDailySnapshots.feesUSD.plus(feesUSD) // feesUSD comes from logAccrue which is accounted in MIM
-  financialsDailySnapshots.supplySideRevenueUSD = financialsDailySnapshots.supplySideRevenueUSD.plus(feesUSD.times(ABRA_USER_REVENUE_SHARE))
-  financialsDailySnapshots.protocolSideRevenueUSD = financialsDailySnapshots.protocolSideRevenueUSD.plus(feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE))
-  financialsDailySnapshots.protocolTreasuryUSD = treasuryBalanceUSD
+  financialsDailySnapshots.feesUSD = financialsDailySnapshots.feesUSD.plus(feesUSD); // feesUSD comes from logAccrue which is accounted in MIM
+  financialsDailySnapshots.supplySideRevenueUSD = financialsDailySnapshots.supplySideRevenueUSD.plus(
+    feesUSD.times(ABRA_USER_REVENUE_SHARE),
+  );
+  financialsDailySnapshots.protocolSideRevenueUSD = financialsDailySnapshots.protocolSideRevenueUSD.plus(
+    feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE),
+  );
+  financialsDailySnapshots.protocolTreasuryUSD = treasuryBalanceUSD;
   financialsDailySnapshots.save();
 }
 
@@ -68,7 +79,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     dailyActiveAccountFrom = new _DailyActiveAccount(dailyActiveAccountIdFrom);
     dailyActiveAccountFrom.save();
     usageDailySnapshot.activeUsers += 1;
-  }  
+  }
 
   let dailyActiveAccountIdTo = id.toString() + "-" + from.toHexString();
   let dailyActiveAccountTo = _DailyActiveAccount.load(dailyActiveAccountIdTo);
@@ -77,7 +88,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     dailyActiveAccountTo.save();
     usageDailySnapshot.activeUsers += 1;
   }
-  
+
   usageDailySnapshot.save();
 }
 
@@ -87,7 +98,7 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event);
   let market = getMarket(event.address.toHexString());
   let protocol = getOrCreateLendingProtocol();
-  let inputTokenPricesUSD = [getOrCreateTokenPriceEntity(market.inputTokens[0]).priceUSD]
+  let inputTokenPricesUSD = [getOrCreateTokenPriceEntity(market.inputTokens[0]).priceUSD];
 
   // // Update the block number and timestamp to that of the last transaction of that day
   marketDailySnapshot.blockNumber = event.block.number;
@@ -103,54 +114,63 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketDailySnapshot.save();
 }
 
-
 export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
-  let LendingProtocol = getOrCreateLendingProtocol()
-  let financialsDailySnapshots = getOrCreateFinancials(event)
-  let marketIdList = LendingProtocol.marketIdList
-  let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO
-  for (let i: i32 = 0; i < marketIdList.length; i++) { 
-    let marketAddress = marketIdList[i]
-    protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD)
+  let LendingProtocol = getOrCreateLendingProtocol();
+  let financialsDailySnapshots = getOrCreateFinancials(event);
+  let marketIdList = LendingProtocol.marketIdList;
+  let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
+  for (let i: i32 = 0; i < marketIdList.length; i++) {
+    let marketAddress = marketIdList[i];
+    protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD);
   }
-  LendingProtocol.totalValueLockedUSD = protocolTotalValueLockedUSD
+  LendingProtocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshots.totalValueLockedUSD = protocolTotalValueLockedUSD;
   LendingProtocol.save();
   financialsDailySnapshots.save();
 }
 
-export function updateMarketStats(marketId: string, eventType: string, asset:string, amount: BigInt, event: ethereum.Event): void {
-  let market = getMarket(marketId)
-  let token_decimals = getOrCreateToken(Address.fromString(asset)).decimals
+export function updateMarketStats(
+  marketId: string,
+  eventType: string,
+  asset: string,
+  amount: BigInt,
+  event: ethereum.Event,
+): void {
+  let market = getMarket(marketId);
+  let token_decimals = getOrCreateToken(Address.fromString(asset)).decimals;
   let financialsDailySnapshot = getOrCreateFinancials(event);
-  let priceUSD = getOrCreateTokenPriceEntity(asset).priceUSD
-  if (eventType == "DEPOSIT"){
-    let inputTokenBalances = market.inputTokenBalances
-    let inputTokenBalance = inputTokenBalances.pop()
-    let tvlUSD = bigIntToBigDecimal(inputTokenBalance,token_decimals).times(priceUSD)
-    inputTokenBalance = inputTokenBalance.plus(amount)
-    inputTokenBalances.push(inputTokenBalance)
-    market.inputTokenBalances = inputTokenBalances
-    market.totalValueLockedUSD = tvlUSD
-  } else if (eventType == "WITHDRAW"){
-    let inputTokenBalances = market.inputTokenBalances
-    let inputTokenBalance = inputTokenBalances.pop()
-    let tvlUSD = bigIntToBigDecimal(inputTokenBalance,token_decimals).times(priceUSD)
-    inputTokenBalance = inputTokenBalance.minus(amount)
-    inputTokenBalances.push(inputTokenBalance)
-    market.inputTokenBalances = inputTokenBalances
-    market.totalValueLockedUSD = tvlUSD
-  } else if (eventType == "BORROW"){
-    market.outputTokenSupply = market.outputTokenSupply.plus(amount)
-    market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount,token_decimals).times(priceUSD))
-    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(bigIntToBigDecimal(amount,token_decimals).times(priceUSD))
+  let priceUSD = getOrCreateTokenPriceEntity(asset).priceUSD;
+  if (eventType == "DEPOSIT") {
+    let inputTokenBalances = market.inputTokenBalances;
+    let inputTokenBalance = inputTokenBalances.pop();
+    let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token_decimals).times(priceUSD);
+    inputTokenBalance = inputTokenBalance.plus(amount);
+    inputTokenBalances.push(inputTokenBalance);
+    market.inputTokenBalances = inputTokenBalances;
+    market.totalValueLockedUSD = tvlUSD;
+  } else if (eventType == "WITHDRAW") {
+    let inputTokenBalances = market.inputTokenBalances;
+    let inputTokenBalance = inputTokenBalances.pop();
+    let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token_decimals).times(priceUSD);
+    inputTokenBalance = inputTokenBalance.minus(amount);
+    inputTokenBalances.push(inputTokenBalance);
+    market.inputTokenBalances = inputTokenBalances;
+    market.totalValueLockedUSD = tvlUSD;
+  } else if (eventType == "BORROW") {
+    market.outputTokenSupply = market.outputTokenSupply.plus(amount);
+    market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount, token_decimals).times(priceUSD));
+    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(
+      bigIntToBigDecimal(amount, token_decimals).times(priceUSD),
+    );
   } else if (eventType == "REPAY") {
-    market.outputTokenSupply = market.outputTokenSupply.minus(amount)
-    market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount,token_decimals).times(priceUSD))
-    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(bigIntToBigDecimal(amount,token_decimals).times(priceUSD))
+    market.outputTokenSupply = market.outputTokenSupply.minus(amount);
+    market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount, token_decimals).times(priceUSD));
+    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(
+      bigIntToBigDecimal(amount, token_decimals).times(priceUSD),
+    );
   }
-  financialsDailySnapshot.save()
-  market.outputTokenPriceUSD = getOrCreateTokenPriceEntity(MIM).priceUSD
-  market.save()
+  financialsDailySnapshot.save();
+  market.outputTokenPriceUSD = getOrCreateTokenPriceEntity(MIM).priceUSD;
+  market.save();
 }

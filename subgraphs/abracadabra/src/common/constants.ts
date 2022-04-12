@@ -115,16 +115,16 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const BENTOBOX_ADDRESS = "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966".toLowerCase()
+export const BENTOBOX_ADDRESS = "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966".toLowerCase();
 
 export const ABRA_ACCOUNTS = [
-  '0xfddfe525054efaad204600d00ca86adb1cc2ea8a'.toLowerCase(),
-  '0xb4EfdA6DAf5ef75D08869A0f9C0213278fb43b6C'.toLowerCase()
-]
+  "0xfddfe525054efaad204600d00ca86adb1cc2ea8a".toLowerCase(),
+  "0xb4EfdA6DAf5ef75D08869A0f9C0213278fb43b6C".toLowerCase(),
+];
 
-export const MIM = "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3".toLowerCase()
+export const MIM = "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3".toLowerCase();
 
-export const MIM_PRICE_ORACLE = "0x7A364e8770418566e3eb2001A96116E6138Eb32F".toLowerCase()
-export const SPELL = "0x090185f2135308BaD17527004364eBcC2D37e5F6".toLowerCase()
-export const STAKED_SPELL = "0x26FA3fFFB6EfE8c1E69103aCb4044C26B9A106a9".toLowerCase()
-export const TREASURY_ADDRESS = "0x5a7c5505f3cfb9a0d9a8493ec41bf27ee48c406d".toLowerCase()
+export const MIM_PRICE_ORACLE = "0x7A364e8770418566e3eb2001A96116E6138Eb32F".toLowerCase();
+export const SPELL = "0x090185f2135308BaD17527004364eBcC2D37e5F6".toLowerCase();
+export const STAKED_SPELL = "0x26FA3fFFB6EfE8c1E69103aCb4044C26B9A106a9".toLowerCase();
+export const TREASURY_ADDRESS = "0x5a7c5505f3cfb9a0d9a8493ec41bf27ee48c406d".toLowerCase();

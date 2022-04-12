@@ -1,7 +1,16 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
-import { Token, UsageMetricsDailySnapshot, FinancialsDailySnapshot, MarketDailySnapshot, LendingProtocol, Market, _TokenPricesUsd, _LiquidationCache } from "../../generated/schema";
-import { LogRepay } from "../../generated/templates/cauldron/cauldron"
+import {
+  Token,
+  UsageMetricsDailySnapshot,
+  FinancialsDailySnapshot,
+  MarketDailySnapshot,
+  LendingProtocol,
+  Market,
+  _TokenPricesUsd,
+  _LiquidationCache,
+} from "../../generated/schema";
+import { LogRepay } from "../../generated/templates/cauldron/cauldron";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
@@ -12,7 +21,7 @@ import {
   BENTOBOX_ADDRESS,
   LendingType,
   BIGINT_ONE,
-  BIGINT_ZERO
+  BIGINT_ZERO,
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -97,40 +106,45 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 ///////////////////////////
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
-  let LendingProtocolEntity = LendingProtocol.load(BENTOBOX_ADDRESS)
-  if (LendingProtocolEntity){
-    return LendingProtocolEntity
+  let LendingProtocolEntity = LendingProtocol.load(BENTOBOX_ADDRESS);
+  if (LendingProtocolEntity) {
+    return LendingProtocolEntity;
   }
-  LendingProtocolEntity = new LendingProtocol(BENTOBOX_ADDRESS)
-  LendingProtocolEntity.name = "Abracadabra Money"
-  LendingProtocolEntity.slug = "abra"
-  LendingProtocolEntity.schemaVersion = "1.0.1"
-  LendingProtocolEntity.subgraphVersion = "0.0.5"
-  LendingProtocolEntity.network = Network.ETHEREUM
-  LendingProtocolEntity.type = ProtocolType.LENDING
-  LendingProtocolEntity.totalUniqueUsers = INT_ZERO
-  LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO
-  LendingProtocolEntity.lendingType = LendingType.CDP
-  LendingProtocolEntity.save()
-  return LendingProtocolEntity
+  LendingProtocolEntity = new LendingProtocol(BENTOBOX_ADDRESS);
+  LendingProtocolEntity.name = "abracadabra";
+  LendingProtocolEntity.slug = "abra";
+  LendingProtocolEntity.schemaVersion = "1.0.1";
+  LendingProtocolEntity.subgraphVersion = "0.0.5";
+  LendingProtocolEntity.network = Network.ETHEREUM;
+  LendingProtocolEntity.type = ProtocolType.LENDING;
+  LendingProtocolEntity.totalUniqueUsers = INT_ZERO;
+  LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  LendingProtocolEntity.lendingType = LendingType.CDP;
+  LendingProtocolEntity.save();
+  return LendingProtocolEntity;
 }
 
 export function getMarket(marketId: string): Market {
   let market = Market.load(marketId);
   if (market) {
-      return market;
+    return market;
   }
-  return new Market("")
+  return new Market("");
 }
 
 ///////////////////////////
 ///// Helpers /////
 ///////////////////////////
 
-export function getCachedLiquidation(event: LogRepay): _LiquidationCache{
-  let cachedLiquidation = _LiquidationCache.load(event.transaction.hash.toHexString() + "_" + event.transactionLogIndex.minus(BIGINT_ONE).toString() + "_Liquidation")
+export function getCachedLiquidation(event: LogRepay): _LiquidationCache {
+  let cachedLiquidation = _LiquidationCache.load(
+    event.transaction.hash.toHexString() +
+      "_" +
+      event.transactionLogIndex.minus(BIGINT_ONE).toString() +
+      "_Liquidation",
+  );
   if (cachedLiquidation) {
     return cachedLiquidation;
   }
-  return new _LiquidationCache("")
+  return new _LiquidationCache("");
 }
