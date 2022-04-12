@@ -8,7 +8,14 @@ import {
   getOrCreateTradingFees,
   getOrCreateTransfer,
 } from "../utils/common";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, HELPER_STORE_ID, toBigInt, toDecimal, TransferType } from "../utils/constant";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  HELPER_STORE_ID,
+  toBigInt,
+  toDecimal,
+  TransferType,
+} from "../utils/constant";
 import { findNativeTokenPricePerToken } from "../utils/pricing";
 import { getOrCreateRewardToken, getOrCreateToken } from "../utils/token";
 
@@ -52,7 +59,9 @@ export function getOrCreatePool(
     for (let i = 0; i < inputTokens.length; i++) {
       inputTokenbalances.push(BIGINT_ZERO);
     }
-    pool.inputTokenBalances = inputTokenbalances.map<BigInt>(tokenBalance => tokenBalance);
+    pool.inputTokenBalances = inputTokenbalances.map<BigInt>(
+      tokenBalance => tokenBalance,
+    );
     let poolContract = ERC20.bind(event.address);
     let getTotalSupply = poolContract.try_totalSupply();
     if (!getTotalSupply.reverted) {
@@ -98,16 +107,22 @@ export function updateLpWithReward(
     let rewardToken = getOrCreateToken(rewardTokenAddress);
     pool.rewardTokens = [getOrCreateRewardToken(rewardTokenAddress).id];
     pool.rewardTokenEmissionsAmount = [rewardEmissionPerDay];
-    let rewardTokenEmissionsInNativeToken = findNativeTokenPricePerToken(rewardToken).times(
-      toDecimal(rewardEmissionPerDay),
-    );
-    pool.rewardTokenEmissionsUSD = [rewardTokenEmissionsInNativeToken.times(helperStore._value)];
+    let rewardTokenEmissionsInNativeToken = findNativeTokenPricePerToken(
+      rewardToken,
+    ).times(toDecimal(rewardEmissionPerDay));
+    pool.rewardTokenEmissionsUSD = [
+      rewardTokenEmissionsInNativeToken.times(helperStore._value),
+    ];
     pool.save();
   }
 }
 
 // Handle data from transfer event for mints. Used to populate deposit entity in the mint event.
-export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Address): void {
+export function handleTransferMint(
+  event: ethereum.Event,
+  value: BigInt,
+  to: Address,
+): void {
   let pool = LiquidityPool.load(event.address.toHexString());
   if (pool !== null) {
     let transfer = getOrCreateTransfer(event);
@@ -132,7 +147,11 @@ export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Add
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt, from: Address): void {
+export function handleTransferToPoolBurn(
+  event: ethereum.Event,
+  value: BigInt,
+  from: Address,
+): void {
   let transfer = getOrCreateTransfer(event);
   transfer._type = TransferType.BURN;
   transfer._sender = from.toHexString();
@@ -140,7 +159,11 @@ export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt, f
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: Address): void {
+export function handleTransferBurn(
+  event: ethereum.Event,
+  value: BigInt,
+  from: Address,
+): void {
   let pool = LiquidityPool.load(event.address.toHexString());
   if (pool !== null) {
     let transfer = getOrCreateTransfer(event);

@@ -1,33 +1,22 @@
-import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { DexAmmProtocol, LiquidityPoolFee, _Transfer } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
-  BSC_PROTOCOL_FEE,
-  BSC_SUPPLY_FEE,
-  FACTORY_ADDRESS,
   INT_ZERO,
   LiquidityPoolFeeType,
-  Network,
-  POLYGON_NETWORK,
-  POLYGON_PROTOCOL_FEE,
-  POLYGON_SUPPLY_FEE,
   ProtocolType,
-  TRADING_FEE
 } from "./constant";
+import { deployedNetwork } from "./networkConfig";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
-  let id = Address.fromString(FACTORY_ADDRESS).toHexString();
+  let id = Address.fromString(deployedNetwork.factoryAddress).toHexString();
   let protocol = DexAmmProtocol.load(id);
   if (!protocol) {
     protocol = new DexAmmProtocol(id);
     protocol.name = "apeswap finance";
     protocol.slug = "apeswap-finance";
-    if (dataSource.network() == Network.BSC.toLowerCase()) {
-      protocol.network = Network.BSC;
-    } else if (dataSource.network() == POLYGON_NETWORK) {
-      protocol.network = Network.POLYGON;
-    }
-    protocol.schemaVersion = "1.0.0";
+    protocol.network = deployedNetwork.network;
+    protocol.schemaVersion = "1.0.1";
     protocol.subgraphVersion = "1.0.0";
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalUniqueUsers = INT_ZERO;
@@ -45,7 +34,7 @@ export function getOrCreateTradingFees(poolAddress: Address): LiquidityPoolFee {
   if (tradingFee == null) {
     tradingFee = new LiquidityPoolFee(id);
     tradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-    tradingFee.feePercentage = TRADING_FEE;
+    tradingFee.feePercentage = deployedNetwork.tradingFee;
     tradingFee.save();
 
     return tradingFee as LiquidityPoolFee;
@@ -59,11 +48,7 @@ export function getOrCreateProtocolFeeShare(poolAddress: Address): LiquidityPool
   if (protocolFee == null) {
     protocolFee = new LiquidityPoolFee(id);
     protocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-    if (dataSource.network() == Network.BSC.toLowerCase()) {
-      protocolFee.feePercentage = BSC_PROTOCOL_FEE;
-    } else if (dataSource.network() == POLYGON_NETWORK) {
-      protocolFee.feePercentage = POLYGON_PROTOCOL_FEE;
-    }
+    protocolFee.feePercentage = deployedNetwork.protocolFee;
     protocolFee.save();
 
     return protocolFee as LiquidityPoolFee;
@@ -77,11 +62,8 @@ export function getOrCreateSupplyFeeShare(poolAddress: Address): LiquidityPoolFe
   if (supplyFee == null) {
     supplyFee = new LiquidityPoolFee(id);
     supplyFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-    if (dataSource.network() == Network.BSC.toLowerCase()) {
-      supplyFee.feePercentage = BSC_SUPPLY_FEE;
-    } else if (dataSource.network() == POLYGON_NETWORK) {
-      supplyFee.feePercentage = POLYGON_SUPPLY_FEE;
-    }
+    supplyFee.feePercentage = deployedNetwork.supplyFee;
+
     supplyFee.save();
 
     return supplyFee as LiquidityPoolFee;

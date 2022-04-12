@@ -3,7 +3,10 @@ import { LiquidityPool, Withdraw } from "../../generated/schema";
 import { getOrCreateProtocol } from "../utils/common";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, INT_ZERO, ZERO_ADDRESS } from "../utils/constant";
 
-export function getOrCreateWithdraw(event: ethereum.Event, pool: LiquidityPool): Withdraw {
+export function getOrCreateWithdraw(
+  event: ethereum.Event,
+  pool: LiquidityPool,
+): Withdraw {
   let transactionHash = event.transaction.hash;
   let logIndex = event.logIndex;
   let blockNumber = event.block.number;

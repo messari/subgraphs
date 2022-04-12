@@ -1,10 +1,21 @@
 import { BigDecimal, log, store } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { _HelperStore, LiquidityPool, Token, _Transfer } from "../../generated/schema";
-import { Burn, Mint, Swap as SwapEvent, Sync, Transfer } from "../../generated/templates/Pool/Pair";
+import {
+  Burn,
+  Mint,
+  Swap as SwapEvent,
+  Sync,
+  Transfer,
+} from "../../generated/templates/Pool/Pair";
 import { getOrCreateDeposit } from "../helpers/deposit";
 import { getOrCreateFinancials } from "../helpers/financials";
-import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn, updatePool } from "../helpers/pool";
+import {
+  handleTransferBurn,
+  handleTransferMint,
+  handleTransferToPoolBurn,
+  updatePool,
+} from "../helpers/pool";
 import { createPoolDailySnapshot } from "../helpers/poolDailySnapshot";
 import { getOrCreateSwap } from "../helpers/swap";
 import { updateUsageMetrics } from "../helpers/updateUsageMetrics";
@@ -25,8 +36,8 @@ import {
   toDecimal,
   ZERO_ADDRESS,
 } from "../utils/constant";
+import { deployedNetwork } from "../utils/networkConfig";
 import {
-  baseTokenPriceInUSD,
   findNativeTokenPricePerToken,
   getTrackedLiquidityUSD,
   getTrackedVolumeUSD,
@@ -36,6 +47,7 @@ export function handleTransfer(event: Transfer): void {
   log.info("Transfer mapping on pool {}", [event.address.toHexString()]);
   let from = event.params.from;
   let to = event.params.to;
+  let value = event.params.value;
   let id = event.address.toHexString();
   let fromHex = from.toHexString();
   let toHex = to.toHexString();
@@ -44,23 +56,23 @@ export function handleTransfer(event: Transfer): void {
   let pool = LiquidityPool.load(id);
   if (pool !== null) {
     // ignore initial transfers for first adds
-    if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
+    if (to.toHexString() == ZERO_ADDRESS && value.equals(BIGINT_THOUSAND)) {
       return;
     }
 
     // mint
     if (fromHex == ZERO_ADDRESS) {
-      handleTransferMint(event, event.params.value, event.params.to);
+      handleTransferMint(event, value, to);
     }
 
     // case where direct send first on Token withdrawls
     if (toHex == pool.id) {
-      handleTransferToPoolBurn(event, event.params.value, event.params.from);
+      handleTransferToPoolBurn(event, value, from);
     }
 
     // burn
     if (fromHex == pool.id && toHex == ZERO_ADDRESS) {
-      handleTransferBurn(event, event.params.value, event.params.from);
+      handleTransferBurn(event, value, from);
     }
   }
 }
@@ -68,15 +80,17 @@ export function handleTransfer(event: Transfer): void {
 export function handleMint(event: Mint): void {
   log.info("Mint mapping on pool {}", [event.address.toHexString()]);
   let id = event.address.toHexString();
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+  let poolAddress = event.address;
+  let sender = event.params.sender;
   let protocol = getOrCreateProtocol();
 
   let pool = LiquidityPool.load(id);
   if (pool !== null) {
     let transfer = getOrCreateTransfer(event);
-
     let token0 = Token.load(pool._token0)!;
     let token1 = Token.load(pool._token1)!;
-
     let amount0 = toDecimal(event.params.amount0, token0.decimals);
     let amount1 = toDecimal(event.params.amount1, token1.decimals);
 
@@ -95,7 +109,10 @@ export function handleMint(event: Mint): void {
     let deposit = getOrCreateDeposit(event, pool);
     deposit.from = transfer._sender!;
     deposit.to = pool.id;
-    deposit.inputTokenAmounts = [toBigInt(amount0, token0.decimals), toBigInt(amount1, token1.decimals)];
+    deposit.inputTokenAmounts = [
+      toBigInt(amount0, token0.decimals),
+      toBigInt(amount1, token1.decimals),
+    ];
     deposit.outputTokenAmount = transfer._liquidity!;
     deposit.amountUSD = amountTotalUSD;
 
@@ -107,23 +124,27 @@ export function handleMint(event: Mint): void {
     updatePool(pool);
 
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
+    createPoolDailySnapshot(poolAddress, blockNumber, timestamp, pool);
 
     // Take FinancialsDailySnapshot
-    let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
+    let financials = getOrCreateFinancials(protocol, timestamp, blockNumber);
     financials.totalValueLockedUSD = pool.totalValueLockedUSD;
     financials.totalVolumeUSD = pool.totalVolumeUSD;
 
     financials.save();
 
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(event.params.sender, protocol, event.block.timestamp, event.block.number);
+    updateUsageMetrics(sender, protocol, timestamp, blockNumber);
   }
 }
 
 export function handleBurn(event: Burn): void {
   log.info("Burn mapping on pool {}", [event.address.toHexString()]);
   let id = event.address.toHexString();
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+  let poolAddress = event.address;
+  let sender = event.params.sender;
   let protocol = getOrCreateProtocol();
 
   let pool = LiquidityPool.load(id);
@@ -148,7 +169,10 @@ export function handleBurn(event: Burn): void {
       let withdraw = getOrCreateWithdraw(event, pool);
       withdraw.from = pool.id;
       withdraw.to = transfer._sender!;
-      withdraw.inputTokenAmounts = [toBigInt(amount0, token0.decimals), toBigInt(amount1, token1.decimals)];
+      withdraw.inputTokenAmounts = [
+        toBigInt(amount0, token0.decimals),
+        toBigInt(amount1, token1.decimals),
+      ];
       withdraw.outputTokenAmount = transfer._liquidity!;
       withdraw.amountUSD = amountTotalUSD;
 
@@ -160,22 +184,26 @@ export function handleBurn(event: Burn): void {
       updatePool(pool);
 
       // Take a PoolDailySnapshot
-      createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
+      createPoolDailySnapshot(poolAddress, blockNumber, timestamp, pool);
 
       // Take FinancialsDailySnapshot
-      let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
+      let financials = getOrCreateFinancials(protocol, timestamp, blockNumber);
       financials.totalValueLockedUSD = pool.totalValueLockedUSD;
       financials.totalVolumeUSD = pool.totalVolumeUSD;
       financials.save();
 
       // Take UsageMetricsDailySnapshot
-      updateUsageMetrics(event.params.sender, protocol, event.block.timestamp, event.block.number);
+      updateUsageMetrics(sender, protocol, timestamp, blockNumber);
     }
   }
 }
 
 export function handleSwap(event: SwapEvent): void {
   log.info("Swap mapping on pool {}", [event.address.toHexString()]);
+  let blockNumber = event.block.number;
+  let timestamp = event.block.timestamp;
+  let poolAddress = event.address;
+  let sender = event.params.sender;
   let pool = LiquidityPool.load(event.address.toHexString());
   let protocol = getOrCreateProtocol();
 
@@ -195,7 +223,12 @@ export function handleSwap(event: SwapEvent): void {
     let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
 
     // Only accounts for volume through white listed tokens
-    let trackedAmountUSD = getTrackedVolumeUSD(amount0Total, token0, amount1Total, token1);
+    let trackedAmountUSD = getTrackedVolumeUSD(
+      amount0Total,
+      token0,
+      amount1Total,
+      token1,
+    );
 
     // update pair volume data, use tracked amount if we have it as its probably more accurate
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD);
@@ -221,29 +254,37 @@ export function handleSwap(event: SwapEvent): void {
     swap.save();
 
     // Take a PoolDailySnapshot
-    createPoolDailySnapshot(event.address, event.block.number, event.block.timestamp, pool);
+    createPoolDailySnapshot(poolAddress, blockNumber, timestamp, pool);
 
     // Take FinancialsDailySnapshot
-    let financials = getOrCreateFinancials(protocol, event.block.timestamp, event.block.number);
+    let financials = getOrCreateFinancials(protocol, timestamp, blockNumber);
     let tradingFee = getOrCreateTradingFees(event.address);
     let protocolFee = getOrCreateProtocolFeeShare(event.address);
     let supplyFee = getOrCreateSupplyFeeShare(event.address);
 
     let tradingFeeAmount = amount0Total.times(tradingFee.feePercentage);
 
-    let tradingFeeAmountUSD: BigDecimal = tradingFeeAmount.times(token0._derivedNativeToken).times(helperStore._value);
-    let protocolFeeAmountUSD: BigDecimal = tradingFeeAmountUSD.times(protocolFee.feePercentage);
+    let tradingFeeAmountUSD: BigDecimal = tradingFeeAmount
+      .times(token0._derivedNativeToken)
+      .times(helperStore._value);
+    let protocolFeeAmountUSD: BigDecimal = tradingFeeAmountUSD.times(
+      protocolFee.feePercentage,
+    );
     let supplyFeeAmountUSD = tradingFeeAmountUSD.times(supplyFee.feePercentage);
 
     financials.totalValueLockedUSD = pool.totalValueLockedUSD;
     financials.totalVolumeUSD = pool.totalVolumeUSD;
     financials.feesUSD = financials.feesUSD.plus(tradingFeeAmountUSD);
-    financials.supplySideRevenueUSD = financials.supplySideRevenueUSD.plus(supplyFeeAmountUSD);
-    financials.protocolSideRevenueUSD = financials.protocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+    financials.supplySideRevenueUSD = financials.supplySideRevenueUSD.plus(
+      supplyFeeAmountUSD,
+    );
+    financials.protocolSideRevenueUSD = financials.protocolSideRevenueUSD.plus(
+      protocolFeeAmountUSD,
+    );
     financials.save();
 
     // Take UsageMetricsDailySnapshot
-    updateUsageMetrics(event.params.sender, protocol, event.block.timestamp, event.block.number);
+    updateUsageMetrics(sender, protocol, timestamp, blockNumber);
   }
 }
 
@@ -268,16 +309,16 @@ export function handleSync(event: Sync): void {
     pool._reserve0 = toDecimal(reserve0, token0.decimals);
     pool._reserve1 = toDecimal(reserve1, token1.decimals);
 
-    if (pool._reserve1.notEqual(BIGDECIMAL_ZERO)) pool._token0Price = pool._reserve0.div(pool._reserve1);
-    else pool._token0Price = BIGDECIMAL_ZERO;
-    if (pool._reserve0.notEqual(BIGDECIMAL_ZERO)) pool._token1Price = pool._reserve1.div(pool._reserve0);
-    else pool._token1Price = BIGDECIMAL_ZERO;
+    if (pool._reserve1.equals(BIGDECIMAL_ZERO)) pool._token0Price = BIGDECIMAL_ZERO;
+    pool._token0Price = pool._reserve0.div(pool._reserve1);
 
+    if (pool._reserve0.equals(BIGDECIMAL_ZERO)) pool._token1Price = BIGDECIMAL_ZERO;
+    pool._token1Price = pool._reserve1.div(pool._reserve0);
     pool.save();
 
     // update Native Token price now that reserves could have changed
     let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
-    helperStore._value = baseTokenPriceInUSD();
+    helperStore._value = deployedNetwork.nativeTokenPriceInUSD;
     helperStore.save();
 
     token0._derivedNativeToken = findNativeTokenPricePerToken(token0 as Token);
@@ -287,21 +328,16 @@ export function handleSync(event: Sync): void {
 
     // get tracked liquidity - will be 0 if neither is in whitelist
     let trackedLiquidityInNativeToken: BigDecimal;
-    if (helperStore._value.notEqual(BIGDECIMAL_ZERO)) {
+    if (helperStore._value.equals(BIGDECIMAL_ZERO))
+      trackedLiquidityInNativeToken = BIGDECIMAL_ZERO;
+    else {
       let TrackedLiquidityUSD = getTrackedLiquidityUSD(
         pool._reserve0,
         token0 as Token,
         pool._reserve1,
         token1 as Token,
       );
-      log.info("Tracked liquidity for pool {} is {} at Native Token Price {}", [
-        TrackedLiquidityUSD.toString(),
-        event.address.toHexString(),
-        helperStore._value.toString(),
-      ]);
       trackedLiquidityInNativeToken = TrackedLiquidityUSD.div(helperStore._value);
-    } else {
-      trackedLiquidityInNativeToken = BIGDECIMAL_ZERO;
     }
 
     // use derived amounts within pair
@@ -317,19 +353,18 @@ export function handleSync(event: Sync): void {
     let getTotalSupply = poolContract.try_totalSupply();
     if (!getTotalSupply.reverted) {
       pool.outputTokenSupply = getTotalSupply.value;
-      log.info("TVLUSD for pool {} is {} and outputTokenSupply is {}", [
-        event.address.toHexString(),
-        pool.totalValueLockedUSD.toString(),
-        pool.outputTokenSupply.toString(),
-      ]);
-      pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(toDecimal(pool.outputTokenSupply));
+      pool.outputTokenPriceUSD = pool.totalValueLockedUSD.div(
+        toDecimal(pool.outputTokenSupply),
+      );
     }
 
     // use tracked amounts globally
     protocol._totalValueLockedInNativeToken = protocol._totalValueLockedInNativeToken.plus(
       trackedLiquidityInNativeToken,
     );
-    protocol.totalValueLockedUSD = protocol._totalValueLockedInNativeToken.times(helperStore._value);
+    protocol.totalValueLockedUSD = protocol._totalValueLockedInNativeToken.times(
+      helperStore._value,
+    );
 
     // save entities
     pool.save();

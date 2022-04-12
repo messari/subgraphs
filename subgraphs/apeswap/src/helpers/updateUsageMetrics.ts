@@ -1,5 +1,10 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount, DexAmmProtocol, UsageMetricsDailySnapshot } from "../../generated/schema";
+import {
+  _Account,
+  _DailyActiveAccount,
+  DexAmmProtocol,
+  UsageMetricsDailySnapshot,
+} from "../../generated/schema";
 import { INT_ONE, INT_ZERO, SECONDS_PER_DAY } from "../utils/constant";
 
 export function updateUsageMetrics(
@@ -11,7 +16,6 @@ export function updateUsageMetrics(
   // Number of days since Unix epoch
   let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = protocol.id;

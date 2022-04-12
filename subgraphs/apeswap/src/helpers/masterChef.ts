@@ -1,7 +1,12 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
-import { BIGINT_ZERO, BSC_SECONDS_PER_BLOCK, SECONDS_PER_DAY, ZERO_ADDRESS } from "../utils/constant";
+import {
+  BIGINT_ZERO,
+  BSC_SECONDS_PER_BLOCK,
+  SECONDS_PER_DAY,
+  ZERO_ADDRESS,
+} from "../utils/constant";
 import { updateLpWithReward } from "./pool";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
@@ -70,7 +75,8 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
   if (!getRewardToken.reverted) rewardTokenAddress = getRewardToken.value;
 
   let getRewardTokenPerBlock = poolContract.try_cakePerBlock();
-  if (!getRewardTokenPerBlock.reverted) rewardTokenPerBlock = getRewardTokenPerBlock.value;
+  if (!getRewardTokenPerBlock.reverted)
+    rewardTokenPerBlock = getRewardTokenPerBlock.value;
 
   let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
   if (!getMultiplier.reverted) multiplier = getMultiplier.value;

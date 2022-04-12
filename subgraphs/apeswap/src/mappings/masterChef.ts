@@ -1,8 +1,12 @@
 import {
-  Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw
+  Deposit as DepositEvent,
+  Withdraw as WithdrawEvent,
+  EmergencyWithdraw,
 } from "../../generated/MasterChef/MasterChef";
 import {
-  Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2
+  Deposit as DepositEventV2,
+  Withdraw as WithdrawEventV2,
+  EmergencyWithdraw as EmergencyWithdrawV2,
 } from "../../generated/MasterChef/MasterChefV2";
 import { handleReward, handleRewardV2 } from "../helpers/masterChef";
 
@@ -35,4 +39,3 @@ export function handleEmergencyWithdrawV2(event: EmergencyWithdrawV2): void {
   let pid = event.params.pid;
   handleRewardV2(event, pid);
 }
-
