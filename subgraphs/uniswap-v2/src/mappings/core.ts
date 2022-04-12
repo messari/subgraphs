@@ -23,7 +23,9 @@ import {
 } from '../common/metrics/metrics'
 
 import {
+  BIGDECIMAL_ONE,
   BIGINT_THOUSAND,
+  INT_ONE,
   ZERO_ADDRESS,
 } from '../common/utils/constants'
 
