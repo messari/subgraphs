@@ -244,8 +244,8 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
       market.name = inputToken.name;
     }
     market.isActive = true; // event MarketListed() makes a market active
-    market.canUseAsCollateral = false; // until Collateral is taken out
-    market.canBorrowFrom = false; // until Borrowed from
+    market.canUseAsCollateral = true; // until Collateral is taken out
+    market.canBorrowFrom = true;
 
     // calculations data
     market.maximumLTV = BIGDECIMAL_ZERO;

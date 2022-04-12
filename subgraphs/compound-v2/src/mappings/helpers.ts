@@ -481,7 +481,7 @@ export function updateTotalDepositUSD(event: ethereum.Event): void {
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingDecimals))
       .times(market.inputTokenPricesUSD[0]);
-    totalDepositUSD = totalDepositUSD.plus(market.totalBorrowUSD);
+    totalDepositUSD = totalDepositUSD.plus(market.totalDepositUSD);
     market.save();
   }
   protocol.totalDepositUSD = totalDepositUSD;

@@ -121,6 +121,11 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
 
 export function handleActionPaused(event: ActionPaused1): void {
   let market = getOrCreateMarket(event, event.params.cToken);
-  market.isActive = event.params.pauseState;
+  if (event.params.action == "Mint") {
+    market.isActive = event.params.pauseState;
+  } else if (event.params.action == "Borrow") {
+    market.canBorrowFrom = event.params.pauseState;
+  }
+
   market.save();
 }
