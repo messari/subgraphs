@@ -1,40 +1,37 @@
 # Liquity Lending Protocol Subgraph
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools:
 
-`Insert Calculation`
+`Collateral locked in Troves + LUSD and Collateral in stability pool`
 
-<Add notes to consider if any - delete if none>
+Ignores LQTY staked. Currently, the only Collateral is ETH. 
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
-`Insert Calculation`
+`Borrowing Fee + Redemption Fee + Liquidation Revenue (i.e. Liquidation reserve of 200 LUSD + Value of Collateral - Outstanding Loan Amount)`
 
-<Add notes to consider if any - delete if none>
-
+Borrowing fee is 0.5% to 5% depending on amount borrowed, Redemption fee is Borrowing fee + 0.5%
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`Insert Calculation`
+`Borrowing Fee + Redemption Fee + Part of Liquidation Revenue (Liquidation reserve of 200 LUSD + 0.5% of Collateral)`
 
-<Add notes to consider if any - delete if none>
+Part of Liquidation Revenue (Liquidation reserve of 200 LUSD + 0.5% of Collateral) goes to Liquidator 
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`Part of Liquidation Revenue (i.e. 99.5% of Collateral - Outstanding Loan Amount)`
 
 ### Total Unique Users
 
