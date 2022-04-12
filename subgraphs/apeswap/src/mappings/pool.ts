@@ -1,6 +1,11 @@
 import { BigDecimal, log, store } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
-import { _HelperStore, LiquidityPool, Token, _Transfer } from "../../generated/schema";
+import {
+  _HelperStore,
+  LiquidityPool,
+  Token,
+  _Transfer,
+} from "../../generated/schema";
 import {
   Burn,
   Mint,
@@ -309,11 +314,17 @@ export function handleSync(event: Sync): void {
     pool._reserve0 = toDecimal(reserve0, token0.decimals);
     pool._reserve1 = toDecimal(reserve1, token1.decimals);
 
-    if (pool._reserve1.equals(BIGDECIMAL_ZERO)) pool._token0Price = BIGDECIMAL_ZERO;
-    pool._token0Price = pool._reserve0.div(pool._reserve1);
+    if (pool._reserve1.equals(BIGDECIMAL_ZERO)) {
+      pool._token0Price = BIGDECIMAL_ZERO;
+    } else {
+      pool._token0Price = pool._reserve0.div(pool._reserve1);
+    }
 
-    if (pool._reserve0.equals(BIGDECIMAL_ZERO)) pool._token1Price = BIGDECIMAL_ZERO;
-    pool._token1Price = pool._reserve1.div(pool._reserve0);
+    if (pool._reserve0.equals(BIGDECIMAL_ZERO)){
+      pool._token1Price = BIGDECIMAL_ZERO;
+    } else {
+      pool._token1Price = pool._reserve1.div(pool._reserve0);
+    }
     pool.save();
 
     // update Native Token price now that reserves could have changed
@@ -337,7 +348,9 @@ export function handleSync(event: Sync): void {
         pool._reserve1,
         token1 as Token,
       );
-      trackedLiquidityInNativeToken = TrackedLiquidityUSD.div(helperStore._value);
+      trackedLiquidityInNativeToken = TrackedLiquidityUSD.div(
+        helperStore._value,
+      );
     }
 
     // use derived amounts within pair
@@ -346,7 +359,9 @@ export function handleSync(event: Sync): void {
       .times(token0._derivedNativeToken)
       .plus(pool._reserve1.times(token1._derivedNativeToken));
 
-    pool.totalValueLockedUSD = pool._nativeTokenReserve.times(helperStore._value);
+    pool.totalValueLockedUSD = pool._nativeTokenReserve.times(
+      helperStore._value,
+    );
 
     // Update pool OutputTokenSupply
     let poolContract = ERC20.bind(event.address);

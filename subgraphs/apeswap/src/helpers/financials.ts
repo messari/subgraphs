@@ -1,5 +1,8 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { DexAmmProtocol, FinancialsDailySnapshot } from "../../generated/schema";
+import {
+  DexAmmProtocol,
+  FinancialsDailySnapshot,
+} from "../../generated/schema";
 import { BIGDECIMAL_ZERO, SECONDS_PER_DAY } from "../utils/constant";
 
 export function getOrCreateFinancials(

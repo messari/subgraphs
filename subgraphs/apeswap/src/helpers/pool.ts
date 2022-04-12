@@ -62,15 +62,15 @@ export function getOrCreatePool(
     pool.inputTokenBalances = inputTokenbalances.map<BigInt>(
       tokenBalance => tokenBalance,
     );
-    let poolContract = ERC20.bind(event.address);
-    let getTotalSupply = poolContract.try_totalSupply();
-    if (!getTotalSupply.reverted) {
-    }
     pool.outputTokenSupply = BIGINT_ZERO;
     // OutputToken Price
     let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
-    let outputTokenPriceInNativeToken = findNativeTokenPricePerToken(outputToken);
-    pool.outputTokenPriceUSD = outputTokenPriceInNativeToken.times(helperStore._value);
+    let outputTokenPriceInNativeToken = findNativeTokenPricePerToken(
+      outputToken,
+    );
+    pool.outputTokenPriceUSD = outputTokenPriceInNativeToken.times(
+      helperStore._value,
+    );
     pool.rewardTokenEmissionsAmount = [];
     pool.rewardTokenEmissionsUSD = [];
     pool.createdTimestamp = event.block.timestamp;

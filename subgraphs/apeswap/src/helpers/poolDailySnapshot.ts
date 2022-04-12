@@ -26,7 +26,8 @@ export function createPoolDailySnapshot(
     poolDailySnapshot.inputTokenBalances = pool.inputTokenBalances;
     poolDailySnapshot.outputTokenSupply = pool.outputTokenSupply;
     poolDailySnapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-    poolDailySnapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    poolDailySnapshot.rewardTokenEmissionsAmount =
+      pool.rewardTokenEmissionsAmount;
     poolDailySnapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
     poolDailySnapshot.blockNumber = blockNumber;
     poolDailySnapshot.timestamp = timestamp;

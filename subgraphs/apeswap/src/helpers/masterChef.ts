@@ -39,7 +39,9 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
   }
 
   let getRewardToken = poolContract.try_BANANA();
-  if (!getRewardToken.reverted) rewardTokenAddress = getRewardToken.value;
+  if (!getRewardToken.reverted) {
+    rewardTokenAddress = getRewardToken.value;
+  } 
 
   // Calculate Reward Emission per sec
   let time = event.block.timestamp.minus(lastRewardTime);
@@ -49,7 +51,9 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
     .div(totalAllocPoint);
 
   // Reward Emission Per Day
-  let rewardEmissionPerDay = rewardEmissionPerSec.times(BigInt.fromI32(SECONDS_PER_DAY));
+  let rewardEmissionPerDay = rewardEmissionPerSec.times(
+    BigInt.fromI32(SECONDS_PER_DAY),
+  );
 
   updateLpWithReward(lpTokenAddress, rewardTokenAddress, rewardEmissionPerDay);
 }
@@ -72,17 +76,27 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
     lastRewardBlock = poolInfo.value2;
   }
   let getRewardToken = poolContract.try_cake();
-  if (!getRewardToken.reverted) rewardTokenAddress = getRewardToken.value;
+  if (!getRewardToken.reverted){
+    rewardTokenAddress = getRewardToken.value;
+  } 
 
   let getRewardTokenPerBlock = poolContract.try_cakePerBlock();
-  if (!getRewardTokenPerBlock.reverted)
+  if (!getRewardTokenPerBlock.reverted){
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
-
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
-  if (!getMultiplier.reverted) multiplier = getMultiplier.value;
+  }
+    
+  let getMultiplier = poolContract.try_getMultiplier(
+    lastRewardBlock,
+    event.block.number,
+  );
+  if (!getMultiplier.reverted) {
+    multiplier = getMultiplier.value;
+  }
 
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
-  if (!getTotalAllocPoint.reverted) totalAllocPoint = getTotalAllocPoint.value;
+  if (!getTotalAllocPoint.reverted) {
+    totalAllocPoint = getTotalAllocPoint.value;
+  } 
 
   // Calculate Reward Emission per Block
   let rewardToken = multiplier
@@ -93,6 +107,8 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
   // Calculate Reward emission per day
   // A block is estimated to be produced approximately every 5secs
   let rewardTokenPerSecond = rewardToken.div(BSC_SECONDS_PER_BLOCK);
-  let rewardTokenPerDay = rewardTokenPerSecond.times(BigInt.fromI32(SECONDS_PER_DAY));
+  let rewardTokenPerDay = rewardTokenPerSecond.times(
+    BigInt.fromI32(SECONDS_PER_DAY),
+  );
   updateLpWithReward(lpTokenAddress, rewardTokenAddress, rewardTokenPerDay);
 }

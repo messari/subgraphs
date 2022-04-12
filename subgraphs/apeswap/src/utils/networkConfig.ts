@@ -117,7 +117,9 @@ let polygonNetwork = new DeployedNetwork(
 
 
 export let deployedNetwork: DeployedNetwork;
-if (dataSource.network() == Network.BSC.toLowerCase())
+if (dataSource.network() == Network.BSC.toLowerCase()){
   deployedNetwork = bscNetwork;
-else if (dataSource.network() == POLYGON_NETWORK)
+} else if (dataSource.network() == POLYGON_NETWORK) {
   deployedNetwork = polygonNetwork;
+}
+  

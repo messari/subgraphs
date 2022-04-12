@@ -44,14 +44,11 @@ export namespace LiquidityPoolFeeType {
 export namespace TransferType {
   export const MINT = "MINT";
   export const BURN = "BURN";
-  // Pool addresses are also stored in the HelperStore
 }
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const DEFAULT_DECIMALS: i32 = 18;
-
-// ID number used by the helper store to track USD price of equivalent of the native token
-export const HELPER_STORE_ID = "1";
+export const HELPER_STORE_ID = "1"; // ID that track USD price of native token in helper store
 export const FEE_DECIMALS = 10;
 export const BSC_SECONDS_PER_BLOCK = BigInt.fromI32(5);
 export const INT_ZERO: i32 = 0;
