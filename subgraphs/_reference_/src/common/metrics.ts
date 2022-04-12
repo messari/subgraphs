@@ -1,5 +1,5 @@
 import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
+import { Account, DailyActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
 import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
 import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
 
@@ -31,10 +31,10 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetrics.dailyTransactionCount += 1;
 
   let accountId = from.toHexString();
-  let account = _Account.load(accountId);
+  let account = Account.load(accountId);
   let protocol = getOrCreateDexAmm();
   if (!account) {
-    account = new _Account(accountId);
+    account = new Account(accountId);
     account.save();
 
     protocol.totalUniqueUsers += 1;
@@ -44,9 +44,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
     usageMetrics.activeUsers += 1;
   }
