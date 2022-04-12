@@ -1,20 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal } from '@graphprotocol/graph-ts'
-<<<<<<< HEAD:subgraphs/uniswap-v2/src/mappings/Factory.ts
 import { PairCreated, SetFeeToCall } from '../../generated/Factory/Factory'
 import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/utils/constants'
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from '../common/getters'
 import { CreateLiquidityPool, UpdateTokenWhitelists } from '../common/helpers'
 import { findEthPerToken } from '../common/utils/price'
 import { getOrCreateToken, getOrCreateLPToken } from '../common/utils/tokens'
-=======
-import { PairCreated, SetFeeToCall } from './../generated/Factory/Factory'
-import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, TRADING_FEE_TO_OFF, TRADING_FEE_TO_ON, ZERO_ADDRESS } from './common/constants'
-import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from './common/getters'
-import { CreateLiquidityPool, UpdateTokenWhitelists } from './common/helpers'
-import { findEthPerToken } from './common/Price'
-import { getOrCreateToken, getOrCreateLPToken } from './common/tokens'
->>>>>>> masterMessari:subgraphs/uniswap-v2/src/Factory.ts
 
 export function handleNewPair(event: PairCreated): void {
 

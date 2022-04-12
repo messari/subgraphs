@@ -30,7 +30,6 @@ export namespace ProtocolType {
 }
 
 export namespace LiquidityPoolFeeType {
-<<<<<<< HEAD:subgraphs/uniswap-v2/src/common/utils/constants.ts
   export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE"
   export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE"
   export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE"
@@ -38,13 +37,6 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE"
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE"
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE"
-=======
-  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
-  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
-  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
-  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
-  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
->>>>>>> masterMessari:subgraphs/uniswap-v2/src/common/constants.ts
 }
 
 export namespace RewardTokenType {
