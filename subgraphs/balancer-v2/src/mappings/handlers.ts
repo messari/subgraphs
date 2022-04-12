@@ -1,7 +1,7 @@
 import {PoolBalanceChanged, PoolRegistered, Swap, TokensRegistered} from "../../generated/Vault/Vault";
 import {createPool, getOrCreateToken} from "../common/getters";
 import {LiquidityPool, _TokenPrice} from "../../generated/schema";
-import {Address, BigDecimal, BigInt, log} from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, BigInt, Bytes, log} from "@graphprotocol/graph-ts";
 import {BIGINT_ZERO} from "../common/constants";
 import {updateFinancials, updatePoolMetrics, updateUsageMetrics} from "../common/metrics";
 import {WeightedPool} from "../../generated/Vault/WeightedPool";
@@ -49,46 +49,24 @@ export function handleSwap(event: Swap): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString())
   if (pool == null) return
 
-  let newTokenInAmount: BigInt = BigInt.zero()
-  let newTokenOutAmount: BigInt = BigInt.zero()
   let tokenInIndex: i32 = 0
   let tokenOutIndex: i32 = 0
 
-
-  // pool.inputTokenBalances = pool.inputTokenBalances.map<BigInt>((token: BigInt, index: i32) => {
-  //   if (pool == null) return token
-  //   if (event.params.tokenIn.toHexString().toLowerCase() == pool.inputTokens[index].toLowerCase()) {
-  //     return token.plus(event.params.amountIn)
-  //   }
-  //
-  //   if (event.params.tokenOut.toHexString().toLowerCase() == pool.inputTokens[index].toLowerCase()) {
-  //     return token.minus(event.params.amountOut)
-  //   }
-  //
-  //   return token
-  // })
+  let newBalances = pool.inputTokenBalances
 
   for (let i:i32 = 0; i<pool.inputTokens.length; i++) {
-    if (event.params.tokenIn.toHexString().toLowerCase() == pool.inputTokens[i].toLowerCase()) {
-      newTokenInAmount = pool.inputTokenBalances[i].plus(event.params.amountIn)
+    if (event.params.tokenIn.equals(Bytes.fromHexString(pool.inputTokens[i]))) {
+      newBalances[i] = pool.inputTokenBalances[i].plus(event.params.amountIn)
       tokenInIndex = i
     }
 
-    if (event.params.tokenOut.toHexString().toLowerCase() == pool.inputTokens[i].toLowerCase()) {
-      newTokenOutAmount = pool.inputTokenBalances[i].minus(event.params.amountOut)
+    if (event.params.tokenOut.equals(Bytes.fromHexString(pool.inputTokens[i]))) {
+      newBalances[i] = pool.inputTokenBalances[i].minus(event.params.amountOut)
       tokenOutIndex = i
     }
   }
 
-  log.info(tokenInIndex.toString(), [])
-  log.info(tokenOutIndex.toString(), [])
-  log.info(newTokenInAmount.toString(), [])
-  log.info(newTokenOutAmount.toString(), [])
-  pool.inputTokenBalances[tokenInIndex] = newTokenInAmount
-  pool.inputTokenBalances[tokenOutIndex] = newTokenOutAmount
-
-
-  log.info(pool.inputTokenBalances.toString(), [])
+  pool.inputTokenBalances = newBalances
   pool.save()
 
   let weightPool = WeightedPool.bind(Address.fromString(pool.outputToken))

@@ -43,13 +43,13 @@ export function createNewPoolEvent(
 }
 
 export function createTokensRegisteredEvent(
-  id: string,
+  id: Bytes,
   tokens: Array<Address>,
   managers: Array<Address>
 ): TokensRegistered {
   let tokensRegistered = changetype<TokensRegistered>(newMockEvent())
 
-  let idParam = new ethereum.EventParam("id", ethereum.Value.fromString(id))
+  let idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id))
   let tokensParam = new ethereum.EventParam("tokens", ethereum.Value.fromAddressArray(tokens))
   let managersParam = new ethereum.EventParam("assetManagers", ethereum.Value.fromAddressArray(managers))
 
