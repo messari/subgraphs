@@ -1,5 +1,24 @@
 # Schema Definition
 
+## Versioning
+
+Every subgraph has a embedded versioning system in the `Protocol` entity/interface. We use 3 separate fields to version different aspects of the subgraphs for different stakeholders.
+
+### Schema Version
+
+There are two use cases for `schemaVersion`:
+
+1. For us to keep track if a subgraph is implemented to the latest version of the schema. Generally as we update the schema there is going to be a lag between the shared schema upgrade (in the root dir) and specific protocol's schema upgrade. This can be used to track if a protocol has upgraded to the latest schema
+2. For the consumer to know when there is a breaking change in the schema, which will cause a breaking change in their code.
+
+### Subgraph Version
+
+The field `subgraphVersion` this is mainly used for the specific subgraph developer to keep track the implementation. For example, if there is a major refactor, we should bump this version, but this has nothing to do with the schema and will no impact on downstream consumers. There may also be repository-wide implementation upgrades. For example, we might need to reimplement everything in Rust somewhere down the road (for substream upgrades), they it'll be a major upgrade on the implementation (major version bump) but again, no impact on schema or downstream consumer.
+
+### Methodology Version
+
+The field `methodologyVersion` is mainly used for data consumers to track how we calculate our metrics, and to which version of the code/subgraph that methodology corresponds to. For example, if Yahoo Finance uses our data and wants to know when we changed the definition of TVL, this is the best way to diff against that. With a single version, you can't immediately tell if the methodology has been changed
+
 ## ID
 
 ### Protocol ID
@@ -50,11 +69,13 @@ There are broadly two kinds of yields in DeFi:
 
 ### Reward Tokens
 
-There is a `RewardToken` entity in our schemas. This represents the extra token incentive associated with a particular protocol/pool (i.e. emission token), and is not the token associated with the base yield (i.e. LP token). Similarly, fields like `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD` also refer to the rewards that come from token incentives.
+There is a `RewardToken` entity in our schemas. This represents the extra token incentive associated with a particular protocol/pool (i.e. emission token), usually during a protocol's liquidity mining program, and is not the token associated with the base yield (i.e. LP token). Similarly, fields like `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD` also refer to the rewards that come from token incentives.
 
 Not all protocols have token rewards. For example, Uniswap doesn't have any token reward. For protocols that do, usually not all pools have token rewards. For example, for Sushiswap, only pools in the Onsen program have token rewards.
 
 It's also common for a single pool to have multiple reward tokens. For example, Sushiswap's MasterChef v2 allows for multiple `Rewarders`. Some Curve pools also have both CRV as a reward and also the pool token (e.g. FXS for FRAX, SNX for sUSD) as another reward.
+
+There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD`. In particular, you can calculate a theoretical emission amount based on the underlying emission equation, or you can calculate the realized amount based on harvests. It's recommended to use the theoretical amount as it's more accurate and consistent. When calculating these in a snapshot, you should calculate them as the per-block amount of the current block normalized to the during of that snapshot (e.g. normalize the per-block amount to the daily amount for a daily snapshot). The reasoning for that is when we show this data on the front-end, it'll be converted to an APR, which will drive user decision (e.g. decide where they want to invest their money in the future), so the data should be forward-looking.
 
 ## Usage Metrics
 
@@ -78,11 +99,18 @@ Here are some more detailed guidelines:
 
 ## Financial Metrics
 
-### Protocol Revenue
+Since the methodology for calculating financial metrics are protocol-independent, they are defined per-protocol in the `README.md` file of the protocol's subgraph folder.
 
-### Supply-Side Revenue
+That being said, here are some general definitions for certain fields:
 
-### Fees
+- **Total Revenue**: All new money entering the protocol from operations. This is fees from dexs. and total yield generated in yield aggregators.
+- **Supply Side Revenue**: portion of Total Rev paid to depositors. this is total yield generated less protocol fees in yield ags. This is fees directed to LPs in DEXes.
+- **Protocol Revenue**: portion of total revenue directed to protocol and its operations. Includes strategiest revenue and other operational funds. so this includes all protocol fees such as protocols' DEX fee portion, yield aggregator's performance fees etc.
+
+In the future, we may also consider more detailed financial metrics. But these are not needed for now:
+
+- **Operational Earnings**: Protocol Revenue after paying for operational expenses. Operational expenses would include strategiest fees in yield ag. Also includes consultant fees such as Gauntlet, GFX Labs contracts with the protocol (second part obv very manual but we should figure out how to leverage our intel prowess here for a metric no one else can put together at scale).
+- **Adj Operational Earnings**: Operational Earnings minus token emissions (in USD). This should represent net capital into the protocol before income redistribution, accounts for incentivized revenue.
 
 ## Internal Entities
 

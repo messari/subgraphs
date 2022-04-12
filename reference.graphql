@@ -206,7 +206,7 @@ interface Pool {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -467,7 +467,7 @@ type LiquidityPool implements Pool @entity {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -644,7 +644,7 @@ type Market implements Pool @entity {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -961,7 +961,7 @@ type Vault implements Pool @entity {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -1101,7 +1101,7 @@ type GenericPool implements Pool @entity {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -1137,3 +1137,17 @@ type GenericPool implements Pool @entity {
 
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 }
+
+# An account is a unique Ethereum address
+# Helps to accumulate total unique users
+type Account @entity {
+  " Address of the account "
+  id: ID!
+}
+
+# Helper entity for calculating daily active users
+type DailyActiveAccount @entity {
+  " { Days since Unix epoch }-{ Address of the account } "
+  id: ID!
+}
+
