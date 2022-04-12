@@ -12,7 +12,11 @@ import {
   _TokenTracker,
   LiquidityPoolFee
 } from "../../generated/schema"
+<<<<<<< HEAD
 import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO} from "../common/utils/constants"
+=======
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY} from "../common/constants"
+>>>>>>> masterMessari
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
@@ -40,9 +44,14 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
+<<<<<<< HEAD
     protocol.schemaVersion = "1.1.0"
     protocol.subgraphVersion = "1.0.2"
     protocol.methodologyVersion = "1.0.1"
+=======
+    protocol.schemaVersion = "1.0.1"
+    protocol.subgraphVersion = "1.0.1"
+>>>>>>> masterMessari
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.totalVolumeUSD = BIGDECIMAL_ZERO
     protocol.totalUniqueUsers = INT_ZERO

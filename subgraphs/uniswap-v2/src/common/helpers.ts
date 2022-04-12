@@ -16,11 +16,19 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
+<<<<<<< HEAD
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "../common/utils/constants"
 import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./utils/price"
 import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee } from "./getters"
 import { getOrCreateToken } from "./utils/tokens"
 import { updateVolumeAndFees } from "./metrics/metrics"
+=======
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE_TO_OFF, BIGDECIMAL_HUNDRED } from "../common/constants"
+import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./Price"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
+import { updateVolumeAndFees } from "./intervalUpdates"
+import { getOrCreateToken } from "./tokens"
+>>>>>>> masterMessari
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -28,9 +36,15 @@ export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADD
 export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
 
 function createPoolFees(poolAddressString: string): string[] {
+<<<<<<< HEAD
   let poolLpFee = new LiquidityPoolFee('lp-fee-'+poolAddressString)
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE
   poolLpFee.feePercentage = LP_FEE_TO_OFF
+=======
+  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
+  poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
+>>>>>>> masterMessari
 
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE

@@ -30,6 +30,7 @@ export namespace ProtocolType {
 }
 
 export namespace LiquidityPoolFeeType {
+<<<<<<< HEAD:subgraphs/uniswap-v2/src/common/utils/constants.ts
   export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE"
   export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE"
   export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE"
@@ -37,6 +38,13 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE"
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE"
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE"
+=======
+  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
+  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
+  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
+  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
+>>>>>>> masterMessari:subgraphs/uniswap-v2/src/common/constants.ts
 }
 
 export namespace RewardTokenType {
@@ -65,7 +73,7 @@ export const USDT_WETH_PAIR = '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // cr
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("100000");
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);

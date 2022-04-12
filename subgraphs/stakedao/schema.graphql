@@ -211,7 +211,7 @@ interface Pool {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   ##### Quantitative Data #####
@@ -326,7 +326,7 @@ type Vault @entity {
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
 
-  " Aditional tokens that are given as reward for position in a protocol "
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
 
   _rewardTokensIds: [String!]!

@@ -8,7 +8,7 @@ This document contains some information about issues you may run into, or tips a
 
 There are couple things you can do to significantly improve your indexing speed:
 
-- Set a startblock (Use the deployment block of the contracts).
+- Set a startblock (Use the deployment block of the contracts, [startblock app](https://startblock.vercel.app) may help).
 - Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
 - Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
 
@@ -25,6 +25,10 @@ You should navigate to the implementation contract first (Contract -> Read as Pr
 ### Price Oracles
 
 See [docs/Oracles.md](./Oracles.md)
+
+### Functions with Multiple Return Values
+
+Some functions in a smart contract can have multiple return values. You can bind the contract and make the function call as usual. However, the return values are embedded in `retval.value0` and `retval.value1` etc.
 
 ### Failed Transactions
 
@@ -47,6 +51,13 @@ If no event occurred throughout the duration of a snapshot, you can skip that sn
 You can leverage the Matchstick unit testing framework to better debug/test your code:
 
 https://github.com/LimeChain/matchstick/blob/main/README.md
+
+They have a YouTube series where they walkthrough the framework: https://www.youtube.com/watch?v=cB7o2n-QrnU
+
+Couple more tutorial videos:
+
+https://www.youtube.com/watch?v=T-orbT4gRiA
+https://www.youtube.com/watch?v=EFTHDIxOjVY
 
 Keep in mind that the test.ts file no longer needs to wrap all test() method calls into a runTests() function like older documentation specifies. Ensure that you have installed Rust, PostgreSQL, and Docker. If you are experiencing issues building the Dockerfile that is provided by matchstick documentation, confirm that all of the directories in the Dockerfile script are valid. In particular, step 15 attempts to copy the parent directory which is outiside of the build context. For some users, this throws an error and prevents execution. In this case, changing the step 15 to "COPY ./. ." can resolve this and facilitate a successful build. 
 
@@ -91,6 +102,18 @@ https://github.com/graphprotocol/graph-node#running-a-local-graph-node
 
 Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/) or contact me for one.
 
+#### Postgres troubleshooting
+
+For those new to Postgres, the local node can be confusing when it comes to database authentication and general configuration. Here are a few things to check if the Postgres aspect of setting up the local node is giving you issues. (NOTE: depending on your OS, the commands may vary)
+
+1. If calling the initdb command to initialize a database returns errors regarding non existent files, make sure that the directory returned from command `pg_config --pkglibdir` was installed correctly and actually contains the files required by the database initialization process. If it doesn't, the Postgres installation failed and must be reinstalled.
+
+2. The default port for the Postgres server is 5432. After running the start command, check if the server is up and listening by running command `sudo netstat -nlp | grep 5432`. Or you can run `sudo lsof -i -P -n | grep LISTEN` and check numerous processes/servers running on your machine. 
+
+3. Unless you have set some other default, the database system initialized from initdb is owned by the username on your system (along with the databases created within this system such as "graph-node"). However, this username from the system has not yet been made as a Postgres role that has read, write etc permissions in the Postgres system. If you try to connect to a database with this role/username, authentication will fail. You must add the user as a Postgres superuser role (there are queries you can run to just give this role permissions for one database rather than as a superuser, but for simplicity sake I wont get into that here).
+
+4. Start the Postgres cli with command `sudo -i -u postgres` followed by command `psql`. If inside the shell you run `\l`, you will see a list of databases, which "graph-node" will have an owner of the same name as your system user name. At this point, back out and run query `\du` to check if the owner of 'graph-node' database is in this list of roles. If not, run query `CREATE ROLE ***YOUR SYSTEM USERNAME*** WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD ***ANY PASSWORD***`;. This creates a superuser role with the proper name and will allow you to connect to the database with this user/password combo. Missing this step can cause authentication issues when attempting to build the node.
+
 ### Subgraph Forking
 
 You can avoid re-syncing your subgraph every time by "forking" it from an existing one, which should significantly speed up the iteration time. For more details: https://thegraph.com/docs/en/developer/subgraph-debug-forking/.
@@ -101,7 +124,7 @@ Here are some known issues with subgraph tooling that you may run into:
 
 ### Subgraph Issues
 
-- Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null	wasm` ([Github Issue](https://iboxshare.com/graphprotocol/graph-ts/issues/219))
+- Using a `derivedFrom` field in the graph code gives no compile time issues but fails when the graph syncs with error `unexpected null	wasm` ([Github Issue](https://github.com/graphprotocol/graph-ts/issues/219))
 - Event data can be different from contract call data as event data are calculated amid execution of a block whereas contract call data are calculated at the end of a block.
 - Note that **call-handlers** are not available on some EVM sidechains (e.g. Avalanche, Harmony, Polygon, etc). So you won't be able to use **call-handlers** in your subgraphs when indexing on these chains.
 
