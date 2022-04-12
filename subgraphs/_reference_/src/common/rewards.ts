@@ -1,6 +1,6 @@
-////////////////////////
-// NAME: CHRIS STEEGE //
-// VERSION 1.0.0      //
+//////////////////////////
+// AUTHOR: CHRIS STEEGE //
+// VERSION 1.0.0      ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //  
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
@@ -52,9 +52,9 @@ export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString
 
 export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString())
 
-// BUFFER_SIZE tells you how many elements in an array to store
-// Makes the buffer twice the maximum amount of blocks that can be stored given the block rate and storage interval
-export const BUFFER_SIZE = (RATE_IN_SECONDS as f64) / ((RATE_IN_SECONDS as f64) / (TIMESTAMP_STORAGE_INTERVAL as f64)) as i32
+// BUFFER_SIZE determined the size of the array
+// Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
+export const BUFFER_SIZE = ((RATE_IN_SECONDS as f64) / (TIMESTAMP_STORAGE_INTERVAL as f64)) as i32
 export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER"
 
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough 
