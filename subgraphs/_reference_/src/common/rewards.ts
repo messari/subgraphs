@@ -1,6 +1,6 @@
-//////////////////////////
-// AUTHOR: CHRIS STEEGE //
-// VERSION 1.0.0      ////
+
+/////////////////////
+// VERSION 1.0.0 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //  
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
