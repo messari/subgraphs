@@ -8,20 +8,25 @@
 
 import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
+import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./utils/constants";
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// WINDOW_SIZE_SECONDS and TIMESTAMP_STORAGE_INTERVALS can be modified. These are just recommended values - 'somewhat' arbitrary. //
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // The storage interval tells you to only store blocks where the timestamps are separated by at least this amount. 
 // Increasing this value will mean less blocks stored and less frequently computes blocksSpeed.
-export const TIMESTAMP_STORAGE_INTERVAL = 300 as i32
+export const TIMESTAMP_STORAGE_INTERVAL = 600
 
 // The window size determines the range of blocks that you track from the current block minus the window size.
 // Window of block time used to calculate the moving average.
 // Increasing means less deviation but also less sensitivity to changing block speeds.
 export const WINDOW_SIZE_SECONDS = 86400
+
+// BUFFER_SIZE determined the size of the array
+// Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval
+// Recommended value is (RATE_IN_SECODNDS / TIMESTAMP_STORAGE_INTERVAL) - > Round up to nearest even integer
+export const BUFFER_SIZE = 144
 
 // Add this entity to the schema.
 
@@ -36,30 +41,23 @@ export const WINDOW_SIZE_SECONDS = 86400
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER"
+
 // Describes whether the interval for which rewards are emitted is done by block or timestamp
 export namespace RewardIntervalType {
     export const BLOCK = "BLOCK"
     export const TIMESTAMP = "TIMESTAMP"
   }
 
-// Estimated seconds per block of the protocol
-export const STARTING_BLOCK_RATE_IN_SECONDS = getStartingBlockRate()
-
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
 // 86400 = 1 Day
 export const RATE_IN_SECONDS = 86400
 export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString())
 
+// Estimated seconds per block of the protocol
+export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(getStartingBlockRate())
+
 export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString())
-
-// BUFFER_SIZE determined the size of the array
-// Makes the buffer the maximum amount of blocks that can be stored given the block rate and storage interval - round up to even number
-let BUFFER_SIZE_TEMP = ((RATE_IN_SECONDS as f64) / (TIMESTAMP_STORAGE_INTERVAL as f64)) as i32
-if (BUFFER_SIZE_TEMP % INT_ZERO == INT_ONE) BUFFER_SIZE_TEMP += INT_ONE
-
-export const BUFFER_SIZE = BUFFER_SIZE_TEMP
-
-export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER"
 
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough 
 /** 
@@ -150,7 +148,7 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
     return rewardRate.times(circularBuffer.blocksPerDay)
 }
 
-export function getOrCreateCircularBuffer(): _CircularBuffer {
+function getOrCreateCircularBuffer(): _CircularBuffer {
     let circularBuffer = _CircularBuffer.load(CIRCULAR_BUFFER)
 
     if (!circularBuffer) {
@@ -166,7 +164,7 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
         circularBuffer.windowStartIndex = INT_ZERO
         circularBuffer.nextIndex = INT_ZERO
         circularBuffer.bufferSize = BUFFER_SIZE
-        circularBuffer.blocksPerDay = STARTING_BLOCK_RATE_IN_SECONDS
+        circularBuffer.blocksPerDay = STARTING_BLOCKS_PER_DAY
 
         circularBuffer.save()
     }
@@ -174,7 +172,7 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
     return circularBuffer
 } 
 
-export function getStartingBlockRate(): BigDecimal {
+function getStartingBlockRate(): BigDecimal {
     // Block rates pulled from google searches - rough estimates
 
     let network = dataSource.network()
