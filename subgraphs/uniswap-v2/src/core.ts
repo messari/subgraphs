@@ -65,7 +65,7 @@ export function handleMint(event: Mint): void {
 }
 
 export function handleBurn(event: Burn): void {
-  createWithdraw(event, event.params.amount0, event.params.amount1, event.params.sender, event.params.to)
+  createWithdraw(event, event.params.amount0, event.params.amount1)
   updateUsageMetrics(event, event.transaction.from)
   updateFinancials(event)
   updatePoolMetrics(event)

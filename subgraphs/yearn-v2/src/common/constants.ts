@@ -37,13 +37,6 @@ export namespace VaultFeeType {
   export const WITHDRAWLAL_FEE = "withdrawal-fee";
 }
 
-export namespace LiquidityPoolFeeType {
-  export const TRADING_FEE = "trading-fee";
-  export const PROTOCOL_FEE = "protocol-fee";
-  export const TIERED_FEE = "tiered-fee";
-  export const DYNAMIC_FEE = "dynamic-fee";
-}
-
 export namespace RewardTokenType {
   export const DEPOSIT = "deposit";
   export const BORROW = "borrow";
@@ -56,7 +49,7 @@ export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
-export const USDC_DENOMINATOR = BigDecimal.fromString("100000");
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export let BIGINT_ZERO = BigInt.fromI32(0);
 export let BIGINT_ONE = BigInt.fromI32(1);
 export let BIGINT_MAX = BigInt.fromString(
