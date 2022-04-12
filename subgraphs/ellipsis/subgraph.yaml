@@ -28,37 +28,37 @@ dataSources:
           handler: handleMetaPoolDeployed
       file: ./src/mappings/factory.ts
 
-  - kind: ethereum
-    name: 3EPS
-    network: bsc
-    source:
-      address: "0x160CAed03795365F3A589f10C379FfA7d75d4E76"
-      abi: StableSwap3EPS
-      startBlock: 5936381
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: Factory
-          file: ./abis/Factory.json
-        - name: StableSwap3EPS
-          file: ./abis/StableSwap3EPS.json
-        - name: ERC20
-          file: ./abis/IERC20.json
-      eventHandlers:
-        - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
-          handler: handleAddLiquidity
-        - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
-          handler: handleRemoveLiquidity
-        - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
-          handler: handleRemoveLiquidityImbalance
-        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
-          handler: handleRemoveLiquidityOne
-        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
-          handler: handleTokenExchange
-      file: ./src/mappings/3epsPool.ts
+  # - kind: ethereum
+  #   name: 3EPS
+  #   network: bsc
+  #   source:
+  #     address: "0x160CAed03795365F3A589f10C379FfA7d75d4E76"
+  #     abi: StableSwap3EPS
+  #     startBlock: 5936381
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     entities: []
+  #     abis:
+  #       - name: Factory
+  #         file: ./abis/Factory.json
+  #       - name: StableSwap3EPS
+  #         file: ./abis/StableSwap3EPS.json
+  #       - name: ERC20
+  #         file: ./abis/IERC20.json
+  #     eventHandlers:
+  #       - event: AddLiquidity(indexed address,uint256[3],uint256[3],uint256,uint256)
+  #         handler: handleAddLiquidity
+  #       - event: RemoveLiquidity(indexed address,uint256[3],uint256[3],uint256)
+  #         handler: handleRemoveLiquidity
+  #       - event: RemoveLiquidityImbalance(indexed address,uint256[3],uint256[3],uint256,uint256)
+  #         handler: handleRemoveLiquidityImbalance
+  #       - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+  #         handler: handleRemoveLiquidityOne
+  #       - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+  #         handler: handleTokenExchange
+  #     file: ./src/mappings/3epsPool.ts
       
   - kind: ethereum
     name: anyBTC
