@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "0.24.1"
+    "@graphprotocol/graph-ts": "0.24.1",
+    "@magic/format": "^0.0.40"
   }
 }

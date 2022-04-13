@@ -52,9 +52,9 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = BENTOBOX_ADDRESS;
 
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.activeUsers = INT_ZERO;
+    usageMetrics.totalUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
     usageMetrics.save();
   }
 
@@ -111,10 +111,10 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     return LendingProtocolEntity;
   }
   LendingProtocolEntity = new LendingProtocol(BENTOBOX_ADDRESS);
-  LendingProtocolEntity.name = "abracadabra";
-  LendingProtocolEntity.slug = "abra";
-  LendingProtocolEntity.schemaVersion = "1.0.1";
-  LendingProtocolEntity.subgraphVersion = "0.0.5";
+  LendingProtocolEntity.name = "Abracadabra Money";
+  LendingProtocolEntity.slug = "abracadabra";
+  LendingProtocolEntity.schemaVersion = "1.1.0";
+  LendingProtocolEntity.subgraphVersion = "0.0.6";
   LendingProtocolEntity.network = Network.ETHEREUM;
   LendingProtocolEntity.type = ProtocolType.LENDING;
   LendingProtocolEntity.totalUniqueUsers = INT_ZERO;
@@ -138,10 +138,10 @@ export function getMarket(marketId: string): Market {
 
 export function getCachedLiquidation(event: LogRepay): _LiquidationCache {
   let cachedLiquidation = _LiquidationCache.load(
-    event.transaction.hash.toHexString() +
+    "_Liquidation-" +
+      event.transaction.hash.toHexString() +
       "_" +
-      event.transactionLogIndex.minus(BIGINT_ONE).toString() +
-      "_Liquidation",
+      event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
   if (cachedLiquidation) {
     return cachedLiquidation;

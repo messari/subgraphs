@@ -1,5 +1,5 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { STAKED_SPELL, SPELL, TREASURY_ADDRESS, BIGDECIMAL_ZERO } from "./common/constants";
+import { STAKED_SPELL, SPELL, TREASURY_ADDRESS, BIGDECIMAL_ZERO, DEFAULT_DECIMALS } from "./common/constants";
 import { ERC20, Transfer } from "../generated/Spell/ERC20";
 import { updateUsageMetrics } from "./common/metrics";
 import { getOrCreateTokenPriceEntity } from "./common/prices/prices";
@@ -26,7 +26,7 @@ export function getTreasuryBalance(): BigDecimal {
   let treasurySpellBalance = spellContract.try_balanceOf(Address.fromString(TREASURY_ADDRESS));
   let treasurySpellBalanceUSD = BIGDECIMAL_ZERO;
   if (!treasurySpellBalance.reverted) {
-    treasurySpellBalanceUSD = bigIntToBigDecimal(treasurySpellBalance.value, 18).times(spellPriceUSD);
+    treasurySpellBalanceUSD = bigIntToBigDecimal(treasurySpellBalance.value, DEFAULT_DECIMALS).times(spellPriceUSD);
     return treasurySpellBalanceUSD;
   }
   return treasurySpellBalanceUSD;

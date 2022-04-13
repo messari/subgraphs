@@ -11,7 +11,7 @@ dataSources:
       startBlock: 12094175
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - LogDeploy
@@ -41,7 +41,7 @@ dataSources:
       startBlock: 13418156
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - LogDeploy
@@ -71,7 +71,7 @@ dataSources:
       startBlock: 12505995
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - LogDeploy
@@ -98,7 +98,7 @@ templates:
       abi: cauldron
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mapping.ts
       entities:
@@ -132,7 +132,7 @@ templates:
       abi: PriceOracle
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/common/prices/prices.ts
       entities:

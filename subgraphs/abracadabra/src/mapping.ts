@@ -10,7 +10,7 @@ import {
   LogAccrue,
 } from "../generated/templates/cauldron/cauldron";
 import { Deposit, Borrow, Repay, _Account, Liquidation, _LiquidationCache, _TokenPricesUsd } from "../generated/schema";
-import { BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
+import { NEG_INT_ONE, DEFAULT_DECIMALS, INT_ZERO, BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getCachedLiquidation } from "./common/getters";
 import { cauldron as CauldronDataSource } from "../generated/templates";
@@ -26,7 +26,7 @@ import { createMarket, createCachedLiquidation } from "./common/setters";
 
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
-  if (ABRA_ACCOUNTS.indexOf(account) > -1) {
+  if (ABRA_ACCOUNTS.indexOf(account) > NEG_INT_ONE) {
     createMarket(event.params.cloneAddress.toHexString(), event.block.number, event.block.timestamp);
     CauldronDataSource.create(event.params.cloneAddress);
   }
@@ -36,7 +36,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   let depositEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   let cauldronContract = cauldron.bind(event.address);
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
 
@@ -71,7 +71,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   }
   let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
   let cauldronContract = cauldron.bind(event.address);
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
@@ -102,7 +102,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   let borrowEvent = new Borrow(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   let mimPriceUSD = fetchMimPriceUSD(event);
-  let amountUSD = bigIntToBigDecimal(event.params.amount, 18).times(mimPriceUSD);
+  let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD);
 
   borrowEvent.hash = event.transaction.hash.toHexString();
   borrowEvent.logIndex = event.transactionLogIndex.toI32();
@@ -130,15 +130,14 @@ export function handleLogBorrow(event: LogBorrow): void {
 // 3) In logRepay, also check if from!=to and check if we saved the tx_hash - log_index +1 in a _LiquidationCache entity
 //    - Retrieve _LiquidationCache entity to obtain the collateral amount removed and subtract the MIM amount repayed from LogRepay to determine the profit in USD
 
-
 export function handleLiquidation(event: LogRepay): void {
   // Retrieve cached liquidation that holds amount of collateral to help calculate profit usd (obtained from log remove collateral with from != to)
   let cachedLiquidation = getCachedLiquidation(event); // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
   let liquidationEvent = new Liquidation(
-    event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString() + "_Liquidation",
+    "Liquidation-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
   );
   let market = getMarket(event.address.toHexString());
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
   let cauldronContract = cauldron.bind(event.address);
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let collateralAmount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(
@@ -147,7 +146,7 @@ export function handleLiquidation(event: LogRepay): void {
     false,
   );
   let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD);
-  let mimAmountUSD = bigIntToBigDecimal(event.params.amount, 18).times(fetchMimPriceUSD(event));
+  let mimAmountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(fetchMimPriceUSD(event));
 
   liquidationEvent.hash = event.transaction.hash.toHexString();
   liquidationEvent.logIndex = event.transactionLogIndex.toI32();
@@ -171,7 +170,7 @@ export function handleLogRepay(event: LogRepay): void {
   let repayEvent = new Repay(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   let mimPriceUSD = fetchMimPriceUSD(event);
-  let amountUSD = bigIntToBigDecimal(event.params.amount, 18).times(mimPriceUSD);
+  let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD);
 
   repayEvent.hash = event.transaction.hash.toHexString();
   repayEvent.logIndex = event.transactionLogIndex.toI32();
@@ -194,7 +193,7 @@ export function handleLogRepay(event: LogRepay): void {
 
 export function handleLogExchangeRate(event: LogExchangeRate): void {
   let market = getMarket(event.address.toHexString());
-  let token = getOrCreateToken(Address.fromString(market.inputTokens[0]));
+  let token = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
   let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(event.params.rate, token.decimals));
   let inputTokenBalances = market.inputTokenBalances;
   let inputTokenBalance = inputTokenBalances.pop();
@@ -207,6 +206,6 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
 
 export function handleLogAccrue(event: LogAccrue): void {
   let mimPriceUSD = fetchMimPriceUSD(event);
-  let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, 18).times(mimPriceUSD);
+  let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, DEFAULT_DECIMALS).times(mimPriceUSD);
   updateFinancials(event, feesUSD);
 }

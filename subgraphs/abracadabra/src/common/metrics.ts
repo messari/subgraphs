@@ -1,6 +1,14 @@
 import { BigDecimal, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { _Account, _DailyActiveAccount } from "../../generated/schema";
-import { SECONDS_PER_DAY, MIM, BIGDECIMAL_ZERO } from "./constants";
+import {
+  INT_ZERO,
+  INT_ONE,
+  SECONDS_PER_DAY,
+  MIM,
+  BIGDECIMAL_ZERO,
+  ABRA_USER_REVENUE_SHARE,
+  ABRA_PROTOCOL_REVENUE_SHARE,
+} from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
   getOrCreateUsageMetricSnapshot,
@@ -12,9 +20,6 @@ import {
 import { fetchMimPriceUSD, getOrCreateTokenPriceEntity } from "./prices/prices";
 import { bigIntToBigDecimal } from "./utils/numbers";
 import { getTreasuryBalance } from "../staking";
-
-const ABRA_USER_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(75), 2);
-const ABRA_PROTOCOL_REVENUE_SHARE = bigIntToBigDecimal(BigInt.fromI32(25), 2);
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): void {
@@ -47,7 +52,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   // Update the block number and timestamp to that of the last transaction of that day
   usageDailySnapshot.blockNumber = event.block.number;
   usageDailySnapshot.timestamp = event.block.timestamp;
-  usageDailySnapshot.dailyTransactionCount += 1;
+  usageDailySnapshot.dailyTransactionCount += INT_ONE;
 
   let fromAccountId = from.toHexString();
   let toAccountId = to.toHexString();
@@ -59,7 +64,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     fromAccount = new _Account(fromAccountId);
     fromAccount.save();
 
-    protocol.totalUniqueUsers += 1;
+    protocol.totalUniqueUsers += INT_ONE;
     protocol.save();
   }
 
@@ -67,7 +72,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     toAccount = new _Account(toAccountId);
     toAccount.save();
 
-    protocol.totalUniqueUsers += 1;
+    protocol.totalUniqueUsers += INT_ONE;
     protocol.save();
   }
   usageDailySnapshot.totalUniqueUsers = protocol.totalUniqueUsers;
@@ -78,7 +83,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   if (!dailyActiveAccountFrom) {
     dailyActiveAccountFrom = new _DailyActiveAccount(dailyActiveAccountIdFrom);
     dailyActiveAccountFrom.save();
-    usageDailySnapshot.activeUsers += 1;
+    usageDailySnapshot.activeUsers += INT_ONE;
   }
 
   let dailyActiveAccountIdTo = id.toString() + "-" + from.toHexString();
@@ -86,7 +91,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   if (!dailyActiveAccountTo) {
     dailyActiveAccountTo = new _DailyActiveAccount(dailyActiveAccountIdTo);
     dailyActiveAccountTo.save();
-    usageDailySnapshot.activeUsers += 1;
+    usageDailySnapshot.activeUsers += INT_ONE;
   }
 
   usageDailySnapshot.save();
@@ -98,7 +103,7 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event);
   let market = getMarket(event.address.toHexString());
   let protocol = getOrCreateLendingProtocol();
-  let inputTokenPricesUSD = [getOrCreateTokenPriceEntity(market.inputTokens[0]).priceUSD];
+  let inputTokenPricesUSD = [getOrCreateTokenPriceEntity(market.inputTokens[INT_ZERO]).priceUSD];
 
   // // Update the block number and timestamp to that of the last transaction of that day
   marketDailySnapshot.blockNumber = event.block.number;
@@ -120,7 +125,7 @@ export function updateTVL(event: ethereum.Event): void {
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let marketIdList = LendingProtocol.marketIdList;
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
-  for (let i: i32 = 0; i < marketIdList.length; i++) {
+  for (let i: i32 = INT_ZERO; i < marketIdList.length; i++) {
     let marketAddress = marketIdList[i];
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD);
   }

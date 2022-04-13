@@ -94,6 +94,7 @@ export const BIGINT_MAX = BigInt.fromString(
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
+export const NEG_INT_ONE = -1 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -128,3 +129,21 @@ export const MIM_PRICE_ORACLE = "0x7A364e8770418566e3eb2001A96116E6138Eb32F".toL
 export const SPELL = "0x090185f2135308BaD17527004364eBcC2D37e5F6".toLowerCase();
 export const STAKED_SPELL = "0x26FA3fFFB6EfE8c1E69103aCb4044C26B9A106a9".toLowerCase();
 export const TREASURY_ADDRESS = "0x5a7c5505f3cfb9a0d9a8493ec41bf27ee48c406d".toLowerCase();
+export const YV_USDT_MARKET = "0x551a7cff4de931f32893c928bbc3d25bf1fc5147".toLowerCase();
+export const YV_WETH_MARKET = "0x6Ff9061bB8f97d948942cEF376d98b51fA38B91f".toLowerCase();
+export const YV_YFI_MARKET = "0xffbf4892822e0d552cff317f65e1ee7b5d3d9ae6".toLowerCase();
+export const YV_USDC_MARKET = "0x6cbafee1fab76ca5b5e144c43b3b50d42b7c8c8f".toLowerCase();
+export const XSUSHI_MARKET = "0xbb02a884621fb8f5bfd263a67f58b65df5b090f3".toLowerCase();
+
+export const COLLATERIZATION_RATE_PRECISION = 5;
+
+export const LOW_RISK_COLLATERAL_RATE = 90000;
+export const HIGH_RISK_COLLATERAL_RATE = 75000;
+export const STABLE_RISK_COLLATERAL_RATE = 100000;
+export const LOW_RISK_INTEREST_RATE = 253509908;
+export const HIGH_RISK_INTEREST_RATE = 475331078;
+export const LOW_RISK_LIQUIDATION_PENALTY = 103000;
+export const HIGH_RISK_LIQUIDATION_PENALTY = 112500;
+
+export const ABRA_USER_REVENUE_SHARE = BigDecimal.fromString("0.75");
+export const ABRA_PROTOCOL_REVENUE_SHARE = BigDecimal.fromString("0.25");
