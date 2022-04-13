@@ -4,7 +4,7 @@ import { _HelperStore, _TokenTracker, _LiquidityPoolAmount } from '../../../gene
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
 import { safeDiv } from '../helpers'
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from '../getters'
-import { STABLE_COINS, WETH_ADDRESS, WETH_STABLE_POOL, WHITELIST_TOKENS } from '../../../config/_paramConfig'
+import { NetworkParameters } from '../../../config/_paramConfig'
 
 let MINIMUM_ETH_LOCKED = BigDecimal.fromString('60')
 
@@ -19,7 +19,7 @@ function token1PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
 
 export function getEthPriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
-  let poolAmounts = _LiquidityPoolAmount.load(WETH_STABLE_POOL)
+  let poolAmounts = _LiquidityPoolAmount.load(NetworkParameters.NATIVE_TOKEN_STABLE_COIN_POOL)
   if (poolAmounts !== null) {
     if (poolAmounts.inputTokenBalances[0] >= poolAmounts.inputTokenBalances[1]) return token0PairPrice(poolAmounts)
     return token1PairPrice(poolAmounts)
@@ -35,7 +35,7 @@ export function getEthPriceInUSD(): BigDecimal {
 
 
  export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
-  if (tokenTracker.id == WETH_ADDRESS) {
+  if (tokenTracker.id == NetworkParameters.NATIVE_TOKEN) {
     return BIGDECIMAL_ONE
   }
   let whiteList = tokenTracker.whitelistPools
@@ -47,7 +47,7 @@ export function getEthPriceInUSD(): BigDecimal {
 
   // hardcoded fix for incorrect rates
   // if whitelist includes token - get the safe price
-  if (STABLE_COINS.includes(tokenTracker.id)) {
+  if (NetworkParameters.STABLE_COINS.includes(tokenTracker.id)) {
     priceSoFar = safeDiv(BIGDECIMAL_ONE, ether.valueDecimal!)
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
@@ -101,17 +101,17 @@ export function getTrackedAmountUSD(
   let price1USD = tokenTracker1.derivedETH.times(ether.valueDecimal!)
 
   // both are whitelist tokens, return sum of both amounts
-  if (WHITELIST_TOKENS.includes(tokenTracker0.id) && WHITELIST_TOKENS.includes(tokenTracker1.id)) {
+  if (NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker0.id) && NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker1.id)) {
     return tokenAmount0.times(price0USD).plus(tokenAmount1.times(price1USD))
   }
 
   // take double value of the whitelisted token amount
-  if (WHITELIST_TOKENS.includes(tokenTracker0.id) && !WHITELIST_TOKENS.includes(tokenTracker1.id)) {
+  if (NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker0.id) && !NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker1.id)) {
     return tokenAmount0.times(price0USD).times(BIGDECIMAL_TWO)
   }
 
   // take double value of the whitelisted token amount
-  if (!WHITELIST_TOKENS.includes(tokenTracker0.id) && WHITELIST_TOKENS.includes(tokenTracker1.id)) {
+  if (!NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker0.id) && NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker1.id)) {
     return tokenAmount1.times(price1USD).times(BIGDECIMAL_TWO)
   }
 

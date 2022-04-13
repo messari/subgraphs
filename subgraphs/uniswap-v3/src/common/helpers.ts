@@ -20,9 +20,9 @@ import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, Liquid
 import { getLiquidityPool, getLiquidityPoolAmounts, getLiquidityPoolFee, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateTokenTracker } from "./getters"
 import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD } from "./utils/price"
 import { getOrCreateToken } from "./utils/tokens"
-import { FACTORY_ADDRESS, WHITELIST_TOKENS } from "../../config/_paramConfig"
+import { NetworkParameters } from "../../config/_paramConfig"
 
-export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
+export let factoryContract = FactoryContract.bind(Address.fromString(NetworkParameters.FACTORY_ADDRESS))
 
 // rebass tokens, dont count in tracked volume
 export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
@@ -94,14 +94,14 @@ function createPoolFees(poolAddressString: string, fee: i64): string[] {
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations. 
 export function UpdateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker1: _TokenTracker, poolAddress: Address): void {
   // update white listed pools
-  if (WHITELIST_TOKENS.includes(tokenTracker0.id)) {
+  if (NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker0.id)) {
     let newPools = tokenTracker1.whitelistPools
     newPools.push(poolAddress.toHexString())
     tokenTracker1.whitelistPools = newPools
     tokenTracker1.save()
   }
 
-  if (WHITELIST_TOKENS.includes(tokenTracker1.id)) {
+  if (NetworkParameters.WHITELIST_TOKENS.includes(tokenTracker1.id)) {
     let newPools = tokenTracker0.whitelistPools
     newPools.push(poolAddress.toHexString())
     tokenTracker0.whitelistPools = newPools

@@ -1,6 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { Address, ethereum } from "@graphprotocol/graph-ts"
-import { DEPLOYED_NETWORK, FACTORY_ADDRESS } from "../../config/_paramConfig"
+import { NetworkParameters } from "../../config/_paramConfig"
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -35,10 +35,10 @@ export function getOrCreateUsersHelper(): _HelperStore {
 }
 
 export function getOrCreateDex(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
+  let protocol = DexAmmProtocol.load(NetworkParameters.FACTORY_ADDRESS)
 
   if (protocol === null) {
-    protocol = new DexAmmProtocol(FACTORY_ADDRESS)
+    protocol = new DexAmmProtocol(NetworkParameters.FACTORY_ADDRESS)
     protocol.name = "Uniswap v3"
     protocol.slug = "uniswap-v3"
     protocol.schemaVersion = "1.1.0"
@@ -47,7 +47,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.totalVolumeUSD = BIGDECIMAL_ZERO
-    protocol.network = DEPLOYED_NETWORK
+    protocol.network = NetworkParameters.NETWORK
     protocol.type = ProtocolType.EXCHANGE
 
     protocol.save()
@@ -103,7 +103,7 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
   
     if (!usageMetrics) {
         usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-        usageMetrics.protocol = FACTORY_ADDRESS;
+        usageMetrics.protocol = NetworkParameters.FACTORY_ADDRESS;
   
         usageMetrics.activeUsers = 0;
         usageMetrics.totalUniqueUsers = 0;
@@ -121,7 +121,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
     
     if (!poolMetrics) {
         poolMetrics = new PoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
-        poolMetrics.protocol = FACTORY_ADDRESS;
+        poolMetrics.protocol = NetworkParameters.FACTORY_ADDRESS;
         poolMetrics.pool = poolAddress;
         poolMetrics.rewardTokenEmissionsAmount = []
         poolMetrics.rewardTokenEmissionsUSD = []
@@ -140,7 +140,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
   
     if (!financialMetrics) {
         financialMetrics = new FinancialsDailySnapshot(id.toString());
-        financialMetrics.protocol = FACTORY_ADDRESS;
+        financialMetrics.protocol = NetworkParameters.FACTORY_ADDRESS;
   
         financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO
         financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
