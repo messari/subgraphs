@@ -1,7 +1,7 @@
 import { PoolBalanceChanged, PoolRegistered, Swap, TokensRegistered } from "../../generated/Vault/Vault";
 import { createPool, getOrCreateToken } from "../common/getters";
 import { LiquidityPool, _TokenPrice } from "../../generated/schema";
-import { Address, BigDecimal, BigInt, Bytes, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { BIGINT_ZERO } from "../common/constants";
 import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from "../common/metrics";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
