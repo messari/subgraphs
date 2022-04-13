@@ -715,7 +715,7 @@ type Market implements Pool @entity {
 
   repays: [Repay!]! @derivedFrom(field: "market")
 
-  liquidations: [Liquidation!]! @derivedFrom(field: "market")
+  liquidates: [Liquidate!]! @derivedFrom(field: "market")
 }
 
 type MarketDailySnapshot implements PoolDailySnapshot @entity {
