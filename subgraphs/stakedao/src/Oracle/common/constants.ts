@@ -6,16 +6,6 @@ import { SushiSwapPair__getReservesResult } from "../../../generated/Controller/
 //////////////////////////////////? COMMON ?///////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-// export const MAINNET_ETH_NULL_ADDRESS = Address.fromString(
-//   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-// );
-// export const MAINNET_USDC_ADDRESS = Address.fromString(
-//   "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
-// );
-// export const MAINNET_WETH_ADDRESS = Address.fromString(
-//   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-// );
-
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 
