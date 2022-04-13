@@ -581,7 +581,7 @@ type Repay implements Event @entity {
   amountUSD: BigDecimal
 }
 
-type Liquidation implements Event @entity {
+type Liquidate implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
