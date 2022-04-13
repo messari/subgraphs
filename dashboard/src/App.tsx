@@ -8,10 +8,12 @@ import { Chart as ChartJS, registerables } from "chart.js";
 import { useEffect, useMemo, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import moment from "moment";
-
+export const toDate = (timestamp: number) =>{
+  return moment.unix(timestamp).format("YYYY-MM-DD")
+}
 export const Chart = (datasetLabel: string, dataChart: any, dataLength: number) => {
   if (dataChart) {
-    const labels = Array<string>(dataLength).fill("");
+    const labels = dataChart.map((e:any) =>toDate(e.date));
     const chartData = {
       labels,
       datasets: [
@@ -61,20 +63,22 @@ export const Chart = (datasetLabel: string, dataChart: any, dataLength: number) 
 
 export const Table = (datasetLabel: string, dataTable: any, dataLength: number) => {
   if (dataTable) {
-    // const labels = Array<string>(dataLength).fill("");
     const columns = [
-      { field: 'id', headerName: 'ID', width: 90 },
       { field: 'date', headerName: 'Date', width: 150, editable: true },
       {
         field: 'value',
         headerName: 'Value',
         width: 150,
-        editable: true,
       },
     ]
-    const tableData = dataTable.map((val: any, i: any)=>({id: i, date: moment.unix(val.date).format("MMMM Do YYYY"), value: val.value.toFixed(2)}));
+    const tableData = dataTable.map((val: any, i: any)=>({id: i, date: toDate(val.date), value: val.value.toLocaleString()}));
+    
     return (
-        <DataGrid         rows={tableData}
+        <DataGrid  initialState={{
+          sorting: {
+            sortModel: [{ field: 'date', sort: 'desc' }],
+          },
+        }}       rows={tableData}
       columns={columns}/>
     );
   }
@@ -116,6 +120,8 @@ function App() {
       protocols {
         name
         type
+        schemaVersion
+        subgraphVersion
       }
       financialsDailySnapshots {
         totalValueLockedUSD
@@ -155,6 +161,9 @@ function App() {
             <Typography>
               <p>Name - {data.protocols[0].name}</p>
               <p>Type - {data.protocols[0].type}</p>
+              <p>Schema Version - {data.protocols[0].schemaVersion}</p>
+              <p>Subgraph Version - {data.protocols[0].subgraphVersion}</p>
+              {/* <p>Methodology Version - {data.protocols[0].methodologyVersion}</p> */}
             </Typography>
             {chartData.map((item, i) => (
               <Grid container>
@@ -164,7 +173,7 @@ function App() {
                   );
                   const length = data[entities[i]].length;
                   return <>
-                  <Grid item xs={8}>
+                  <Grid id={name} item xs={8}>
                       {Chart(name, dataChart, length)}
                     </Grid>
                     <Grid item xs={4} marginY={4}>
