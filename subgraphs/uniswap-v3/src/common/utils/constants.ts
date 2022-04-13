@@ -4,44 +4,72 @@ import { BigDecimal, BigInt, dataSource } from '@graphprotocol/graph-ts';
 ///// Schema Enums /////
 ////////////////////////
 
-export namespace Network {
-  export const ARBITRUM = "ARBITRUM"
-  export const AVALANCHE = "AVALANCHE"
-  export const AURORA = "AURORA"
-  export const BSC = "BSC"
-  export const CELO = "CELO"
-  export const CRONOS = "CRONOS"
-  export const ETHEREUM = "ETHEREUM"
-  export const FANTOM = "FANTOM"
-  export const HARMONY = "HARMONY"
-  export const MOONBEAM = "MOONBEAM"
-  export const MOONRIVER = "MOONRIVER"
-  export const OPTIMISM = "OPTIMISM"
-  export const POLYGON = "POLYGON"
-  export const XDAI = "XDAI"
+// The network names corresponding to the Network enum in the schema.
+// They are mainly intended for convenience on the data consumer side.
+// The enum values are derived from Coingecko slugs (converted to uppercase
+// and replaced hyphens with underscores for Postgres enum compatibility)
+export namespace SchemaNetwork {
+  export const ARBITRUM = "ARBITRUM_ONE";
+  export const AVALANCHE = "AVALANCHE";
+  export const AURORA = "AURORA";
+  export const BSC = "BINANCE_SMART_CHAIN";
+  export const CELO = "CELO";
+  export const CRONOS = "CRONOS";
+  export const ETHEREUM = "ETHEREUM";
+  export const FANTOM = "FANTOM";
+  export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY_SHARD_0";
+  export const MOONBEAM = "MOONBEAM";
+  export const MOONRIVER = "MOONRIVER";
+  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
+  export const POLYGON = "POLYGON_POS";
+  export const XDAI = "XDAI";
+}
+
+// The network names corresponding to the ones in `dataSource.network()`
+// They should mainly be used for the ease of comparison.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
 }
 
 export namespace ProtocolType {
-  export const EXCHANGE = "EXCHANGE"
-  export const LENDING = "LENDING"
-  export const YIELD = "YIELD"
-  export const BRIDGE = "BRIDGE"
-  export const GENERIC = "GENERIC"
+  export const EXCHANGE = "EXCHANGE";
+  export const LENDING = "LENDING";
+  export const YIELD = "YIELD";
+  export const BRIDGE = "BRIDGE";
+  export const GENERIC = "GENERIC";
+}
+
+export namespace VaultFeeType {
+  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
+  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
 export namespace LiquidityPoolFeeType {
-  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE"
-  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE"
-  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE"
-  export const FIXED_LP_FEE = "FIXED_LP_FEE"
-  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE"
-  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE"
-  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE"
-}
-
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT"
-  export const BORROW = "BORROW"
+  export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
+  export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
+  export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_LP_FEE = "FIXED_LP_FEE";
+  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
+  export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
+  export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
 export namespace HelperStoreType {
@@ -52,7 +80,6 @@ export namespace HelperStoreType {
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 export const USDC_WETH_PAIR = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' // created 10008355
 export const DAI_WETH_PAIR = '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11' // created block 10042267
 export const USDT_WETH_PAIR = '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // created block 10093341
@@ -94,16 +121,3 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 );
 
 export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0")
-
-///////
-//////////////
-///////
-
-export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
-
-let network: string
-if (dataSource.network() == "mainnet") network = Network.ETHEREUM 
-else if (dataSource.network() == "optimism") network = Network.OPTIMISM
-else network = Network.ARBITRUM
-
-export const DEPLOYED_NETWORK = network

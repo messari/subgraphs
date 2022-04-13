@@ -9,6 +9,7 @@
     "remove-local": "graph remove --node http://localhost:8020/ uniswap-v3-alt",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 uniswap-v3-alt",
     "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:matic": "mustache config/matic.json subgraph.template.yaml > subgraph.yaml",
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
     "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml"
 

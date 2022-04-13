@@ -1,5 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
+import { FACTORY_ADDRESS } from "../../../config/_paramConfig";
 import {
   _HelperStore,
   _TokenTracker,
@@ -7,7 +8,7 @@ import {
   DailyActiveAccount,
   UsageMetricsDailySnapshot
 } from "../../../generated/schema"
-import { FACTORY_ADDRESS, INT_ONE, INT_ZERO, SECONDS_PER_DAY} from "../utils/constants"
+import { INT_ONE, INT_ZERO, SECONDS_PER_DAY} from "../utils/constants"
 import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./../getters";
 
 
@@ -100,7 +101,7 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
   
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
-    protocol.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
+    protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(trackedAmountUSD)
   
     financialMetrics.save()
     poolMetrics.save();

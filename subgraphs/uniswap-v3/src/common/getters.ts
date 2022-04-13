@@ -1,5 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { Address, ethereum } from "@graphprotocol/graph-ts"
+import { DEPLOYED_NETWORK, FACTORY_ADDRESS } from "../../config/_paramConfig"
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -12,7 +13,7 @@ import {
   LiquidityPoolFee,
 } from "../../generated/schema"
 
-import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEPLOYED_NETWORK } from "./utils/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, ProtocolType, SECONDS_PER_DAY } from "./utils/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
