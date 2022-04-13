@@ -1,9 +1,9 @@
 // import { log } from '@graphprotocol/graph-ts/index'
 import { BigDecimal, Address } from '@graphprotocol/graph-ts/index'
-import { UNTRACKED_PAIRS, safeDiv } from './helpers'
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './getters'
-import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from '../../generated/schema'
-import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, WETH_ADDRESS, USDC_WETH_PAIR, DAI_WETH_PAIR, USDT_WETH_PAIR, BIGDECIMAL_TWO, BIGINT_ZERO} from '../common/constants'
+import { UNTRACKED_PAIRS, safeDiv } from './../helpers'
+import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './../getters'
+import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from '../../../generated/schema'
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, WETH_ADDRESS, USDC_WETH_PAIR, DAI_WETH_PAIR, USDT_WETH_PAIR, BIGDECIMAL_TWO, BIGINT_ZERO} from './constants'
 
 function token0PairPrice(pool: _LiquidityPoolAmounts): BigDecimal {
   if (pool.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) {
@@ -151,7 +151,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
       let poolAmounts = getLiquidityPoolAmounts(poolAddress)
       let pool = getLiquidityPool(poolAddress)
 
-      if (pool.outputTokenSupply.gt(BIGINT_ZERO)) {
+      if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         if (pool.inputTokens[0] == tokenTracker.id) {
           // whitelist token is token1
           let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
@@ -164,7 +164,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
           }
         }
         if (pool.inputTokens[1] == tokenTracker.id) {
-          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[0].times(tokenTracker0.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
