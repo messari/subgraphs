@@ -156,6 +156,7 @@ export function createWithdraw(
 
   withdraw.save();
   market.save();
+  updateProtocolTVL(event); // also updates market TVL
   return true;
 }
 
