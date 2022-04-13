@@ -1,5 +1,6 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, ethereum } from "@graphprotocol/graph-ts"
+import { ERC20 } from "../../generated/Factory/ERC20"
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -10,49 +11,32 @@ import {
   _Transfer,
   _HelperStore,
   _TokenTracker,
-  LiquidityPoolFee
+  LiquidityPoolFee,
+  Token
 } from "../../generated/schema"
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO} from "../common/utils/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, DEFAULT_DECIMALS} from "./constants"
 
-export function getOrCreateEtherHelper(): _HelperStore {
-    let ether = _HelperStore.load(HelperStoreType.ETHER)
-    if (!ether) {
-        ether = new _HelperStore(HelperStoreType.ETHER)
-        ether.valueDecimal = BIGDECIMAL_ZERO
-        ether.save()
-    }
-    return ether
-}
-export function getOrCreateUsersHelper(): _HelperStore {
-    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
-    if (!uniqueUsersTotal) {
-        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-        uniqueUsersTotal.valueInt = INT_ZERO
-        uniqueUsersTotal.save()
-    }
-    return uniqueUsersTotal
-}
 
 export function getOrCreateDex(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
-
-  if (!protocol) {
-    protocol = new DexAmmProtocol(FACTORY_ADDRESS)
-    protocol.name = "Uniswap v2"
-    protocol.slug = "uniswap-v2"
-    protocol.schemaVersion = "1.1.0"
-    protocol.subgraphVersion = "1.0.2"
-    protocol.methodologyVersion = "1.0.1"
-    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
-    protocol.totalVolumeUSD = BIGDECIMAL_ZERO
-    protocol.totalUniqueUsers = INT_ZERO
-    protocol.network = Network.ETHEREUM
-    protocol.type = ProtocolType.EXCHANGE
-
-    protocol.save()
-  }  
-  return protocol
-}
+    let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
+  
+    if (!protocol) {
+      protocol = new DexAmmProtocol(FACTORY_ADDRESS)
+      protocol.name = "Uniswap v2"
+      protocol.slug = "uniswap-v2"
+      protocol.schemaVersion = "1.1.0"
+      protocol.subgraphVersion = "1.0.2"
+      protocol.methodologyVersion = "1.0.1"
+      protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
+      protocol.totalVolumeUSD = BIGDECIMAL_ZERO
+      protocol.totalUniqueUsers = INT_ZERO
+      protocol.network = Network.ETHEREUM
+      protocol.type = ProtocolType.EXCHANGE
+  
+      protocol.save()
+    }  
+    return protocol
+  }
 
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
@@ -149,4 +133,56 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
         financialMetrics.save()
     }
     return financialMetrics
+}
+
+export function getOrCreateToken(address: Address): Token {
+    let id = address.toHexString();
+    let token = Token.load(id);
+    if (!token) {
+      token = new Token(id);
+      let erc20Contract = ERC20.bind(address);
+      let decimals = erc20Contract.try_decimals();
+      // Using try_cause some values might be missing
+      let name = erc20Contract.try_name();
+      let symbol = erc20Contract.try_symbol();
+      // TODO: add overrides for name and symbol
+      token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
+      token.name = name.reverted ? '' : name.value;
+      token.symbol = symbol.reverted ? '' : symbol.value;
+      token.save();
+    }
+    return token as Token;
+  }
+  
+  export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
+    let id = tokenAddress.toHexString();
+    let token = Token.load(id)
+    // fetch info if null
+    if (token === null) {
+        token = new Token(tokenAddress.toHexString())
+        token.symbol = token0.name + '/' + token1.name
+        token.name = token0.name + '/' + token1.name + " LP"
+        token.decimals = DEFAULT_DECIMALS
+        token.save()
+    }
+    return token
+  }
+
+  export function getOrCreateEtherHelper(): _HelperStore {
+    let ether = _HelperStore.load(HelperStoreType.ETHER)
+    if (!ether) {
+        ether = new _HelperStore(HelperStoreType.ETHER)
+        ether.valueDecimal = BIGDECIMAL_ZERO
+        ether.save()
+    }
+    return ether
+}
+export function getOrCreateUsersHelper(): _HelperStore {
+    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
+    if (!uniqueUsersTotal) {
+        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
+        uniqueUsersTotal.valueInt = INT_ZERO
+        uniqueUsersTotal.save()
+    }
+    return uniqueUsersTotal
 }

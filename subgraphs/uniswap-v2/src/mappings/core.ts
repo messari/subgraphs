@@ -10,11 +10,11 @@ import {
   createSwapHandleVolumeAndFees
 } from '../common/creators'
 import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from '../common/handlers'
-import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from '../common/updates'
+import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from '../common/metrics'
 import {
   BIGINT_THOUSAND,
   ZERO_ADDRESS,
-} from '../common/utils/constants'
+} from '../common/constants'
 
 export function handleTransfer(event: Transfer): void {
 

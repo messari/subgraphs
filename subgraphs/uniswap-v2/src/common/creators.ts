@@ -16,11 +16,11 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "./utils/constants"
-import { getTrackedVolumeUSD } from "./utils/price"
-import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee } from "./getters"
-import { getOrCreateToken } from "./utils/tokens"
-import { updateVolumeAndFees, updateDepositHelper } from "./updates"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "./constants"
+import { getTrackedVolumeUSD } from "./price"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters"
+import { convertTokenToDecimal, savePoolId } from "./utils"
+import { updateVolumeAndFees, updateDepositHelper } from "./metrics"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -285,37 +285,4 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   swap.save()
 
   updateVolumeAndFees(event, trackedAmountUSD, tradingFeeAmountUSD, protocolFeeAmountUSD)
-}
-
-
-export function savePoolId(poolAddress: Address): void { 
-  let protocol = getOrCreateDex()
-  protocol._poolIds.push(poolAddress)
-  protocol.save()
-}
-
-// convert decimals 
-export function exponentToBigDecimal(decimals: i32): BigDecimal {
-  let bd = BigDecimal.fromString('1')
-  for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
-    bd = bd.times(BigDecimal.fromString('10'))
-  }
-  return bd
-}
-
-// convert emitted values to tokens count
-export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
-  if (exchangeDecimals == INT_ZERO) {
-    return tokenAmount.toBigDecimal()
-  }
-  return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
-}
-
-// return 0 if denominator is 0 in division
-export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
-  if (amount1.equals(BIGDECIMAL_ZERO)) {
-    return BIGDECIMAL_ZERO
-  } else {
-    return amount0.div(amount1)
-  }
 }
