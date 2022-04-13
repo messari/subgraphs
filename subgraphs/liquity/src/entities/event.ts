@@ -25,6 +25,7 @@ import {
 } from "./protocol";
 import { getOrCreateMarket } from "./market";
 import { getETHToken, getLUSDToken } from "./token";
+import { prefixID } from "../utils/strings";
 
 export function createDeposit(
   event: ethereum.Event,
@@ -36,7 +37,10 @@ export function createDeposit(
     log.critical("Invalid deposit amount: {}", [amountETH.toString()]);
   }
   const deposit = new Deposit(
-    `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-deposit`
+    prefixID(
+      "deposit",
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+    )
   );
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -63,7 +67,10 @@ export function createWithdraw(
     log.critical("Invalid withdraw amount: {}", [amountETH.toString()]);
   }
   const withdraw = new Withdraw(
-    `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-withdraw`
+    prefixID(
+      "withdraw",
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+    )
   );
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
@@ -90,7 +97,10 @@ export function createBorrow(
     log.critical("Invalid borrow amount: {}", [amountLUSD.toString()]);
   }
   const borrow = new Borrow(
-    `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-borrow`
+    prefixID(
+      "borrow",
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+    )
   );
   borrow.hash = event.transaction.hash.toHexString();
   borrow.logIndex = event.logIndex.toI32();
@@ -118,7 +128,10 @@ export function createRepay(
     log.critical("Invalid repay amount: {}", [amountLUSD.toString()]);
   }
   const repay = new Repay(
-    `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-repay`
+    prefixID(
+      "repay",
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+    )
   );
   repay.hash = event.transaction.hash.toHexString();
   repay.logIndex = event.logIndex.toI32();
@@ -143,7 +156,10 @@ export function createLiquidate(
   liquidator: Address
 ): void {
   const liquidate = new Liquidate(
-    `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-liquidation`
+    prefixID(
+      "liquidate",
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+    )
   );
   liquidate.hash = event.transaction.hash.toHexString();
   liquidate.logIndex = event.logIndex.toI32();
