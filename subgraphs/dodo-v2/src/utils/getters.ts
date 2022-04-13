@@ -263,7 +263,7 @@ export function getUSDprice(
   // from within a for loop causes a weird nondescript array error
   let tokenPrice1 = _TokenPrice.load(tokenAddress.toHexString() + sc1);
   if (!tokenPrice1) {
-    tokenPrice1 = new _TokenPrice(tokenAddress.toHex() + sc1);
+    tokenPrice1 = new _TokenPrice(tokenAddress.toHexString() + sc1);
     let token = getOrCreateToken(tokenAddress);
     tokenPrice1.token = token.id;
   }
@@ -274,7 +274,7 @@ export function getUSDprice(
 
   let tokenPrice2 = _TokenPrice.load(tokenAddress.toHexString() + sc2);
   if (!tokenPrice2) {
-    tokenPrice2 = new _TokenPrice(tokenAddress.toHex() + sc2);
+    tokenPrice2 = new _TokenPrice(tokenAddress.toHexString() + sc2);
     let token = getOrCreateToken(tokenAddress);
     tokenPrice2.token = token.id;
   }
@@ -286,7 +286,7 @@ export function getUSDprice(
 
   let tokenPrice3 = _TokenPrice.load(tokenAddress.toHexString() + sc3);
   if (!tokenPrice3) {
-    tokenPrice3 = new _TokenPrice(tokenAddress.toHex() + sc3);
+    tokenPrice3 = new _TokenPrice(tokenAddress.toHexString() + sc3);
     let token = getOrCreateToken(tokenAddress);
     tokenPrice3.token = token.id;
   }
@@ -336,16 +336,14 @@ export function setUSDpriceWETH(
   amount: BigInt,
   wETHamount: BigInt
 ): void {
-  let ethPricePerToken = safeDiv(
-    bigIntToBigDecimal(amount),
-    bigIntToBigDecimal(wETHamount)
-  );
+  let ethPricePerToken = amount.div(wETHamount);
 
   let pricePerToken = getUSDprice(
     trader,
     Address.fromString(WRAPPED_ETH),
-    BigInt.fromString(ethPricePerToken.toString())
+    ethPricePerToken
   );
+
   let token = getOrCreateToken(tokenAdd);
 
   let tokenPrice1 = _TokenPrice.load(
@@ -391,23 +389,6 @@ export function setUSDpriceWETH(
   tokenPrice3.save();
 }
 
-// type Deposit implements Event @entity {
-//   id: ID!
-//   hash: String!
-//   logIndex: Int!
-//   protocol: DexAmmProtocol!
-//   to: String!
-//   from: String!
-//   blockNumber: BigInt!
-//   timestamp: BigInt!
-//   inputTokens: [Token!]!
-//   outputToken: Token!
-//   inputTokenAmounts: [BigInt!]!
-//   outputTokenAmount: BigInt!
-//   amountUSD: BigDecimal!
-//   ##### DexAmm-Specific #####
-//   pool: LiquidityPool!
-// }
 export function createDeposit(
   event: ethereum.Event,
   to: Address,
@@ -473,22 +454,6 @@ export function createDeposit(
   deposit.pool = pool.id;
 }
 
-// id: ID!
-// hash: String!
-// logIndex: Int!
-// protocol: DexAmmProtocol!
-// to: String!
-// from: String!
-// blockNumber: BigInt!
-// timestamp: BigInt!
-// inputTokens: [Token!]!
-// outputToken: Token!
-// inputTokenAmounts: [BigInt!]!
-// outputTokenAmount: BigInt!
-// amountUSD: BigDecimal!
-// ##### DexAmm-Specific #####
-// pool: LiquidityPool!
-// }
 export function createWithdraw(
   event: ethereum.Event,
   to: Address,
@@ -554,24 +519,6 @@ export function createWithdraw(
   withdraw.pool = pool.id;
 }
 
-// type Swap implements Event @entity {
-//   id: ID!
-//   hash: String!
-//   logIndex: Int!
-//   protocol: DexAmmProtocol!
-//   to: String!
-//   from: String!
-//   blockNumber: BigInt!
-//   timestamp: BigInt!
-// tokenIn: Token!
-// amountIn: BigInt!
-// amountInUSD: BigDecimal!
-// tokenOut: Token!
-// amountOut: BigInt!
-// amountOutUSD: BigDecimal!
-//   ##### DexAmm-Specific #####
-//   pool: LiquidityPool!
-// }
 export function createSwap(
   event: ethereum.Event,
   trader: Address,
