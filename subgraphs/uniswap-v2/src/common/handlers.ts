@@ -1,5 +1,5 @@
 import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts"
-import { getLiquidityPool, getOrCreateTransfer } from "./getters"
+import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer } from "./getters"
 import { TransferType } from "./constants"
 
 // Handle data from transfer event for mints. Used to populate deposit entity in the mint event. 
@@ -61,4 +61,10 @@ export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Add
   
     transfer.save()
     pool.save()
+  }
+
+  export function savePoolId(poolAddress: Address): void { 
+    let protocol = getOrCreateDex()
+    protocol._poolIds.push(poolAddress)
+    protocol.save()
   }

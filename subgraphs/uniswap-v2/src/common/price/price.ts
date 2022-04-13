@@ -1,10 +1,10 @@
 // import { log } from '@graphprotocol/graph-ts/index'
 import { BigDecimal, Address } from '@graphprotocol/graph-ts/index'
-import { UNTRACKED_PAIRS } from './creators'
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './getters'
-import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from '../../generated/schema'
-import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, NATIVE_TOKEN, STABLE_ORACLE_POOLS, MINIMUM_LIQUIDITY_THRESHOLD_ETH, STABLE_COINS, WHITELIST, MINIMUM_USD_THRESHOLD_NEW_PAIRS} from './constants'
-import { safeDiv } from './utils'
+import { UNTRACKED_PAIRS } from './../creators'
+import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './../getters'
+import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from '../../../generated/schema'
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, NATIVE_TOKEN, STABLE_ORACLE_POOLS, MINIMUM_LIQUIDITY_THRESHOLD_ETH, STABLE_COINS, WHITELIST, MINIMUM_USD_THRESHOLD_NEW_PAIRS} from './../constants'
+import { safeDiv } from './../utils/utils'
 
 export function getEthPriceInUSD(): BigDecimal {
   let nativeAmount = BIGDECIMAL_ZERO

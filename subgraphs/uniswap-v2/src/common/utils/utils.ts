@@ -1,12 +1,5 @@
-import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts"
-import { getOrCreateDex } from "./getters"
-import { BIGDECIMAL_ZERO, INT_ONE, INT_ZERO } from "./constants"
-
-export function savePoolId(poolAddress: Address): void { 
-  let protocol = getOrCreateDex()
-  protocol._poolIds.push(poolAddress)
-  protocol.save()
-}
+import { BigInt, BigDecimal } from "@graphprotocol/graph-ts"
+import { BIGDECIMAL_ZERO, INT_ONE, INT_ZERO } from "./../constants"
 
 // convert decimals 
 export function exponentToBigDecimal(decimals: i32): BigDecimal {

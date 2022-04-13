@@ -10,7 +10,7 @@ import {
   createSwapHandleVolumeAndFees
 } from '../common/creators'
 import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from '../common/handlers'
-import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from '../common/metrics'
+import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from '../common/updateMetrics'
 import {
   BIGINT_THOUSAND,
   ZERO_ADDRESS,

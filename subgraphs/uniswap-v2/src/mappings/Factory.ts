@@ -3,8 +3,8 @@ import { BigDecimal } from '@graphprotocol/graph-ts'
 import { PairCreated, SetFeeToCall } from '../../generated/Factory/Factory'
 import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/constants'
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateLPToken, getOrCreateToken, getOrCreateTokenTracker } from '../common/getters'
-import { findEthPerToken } from '../common/price'
-import { updateTokenWhitelists } from '../common/metrics'
+import { findEthPerToken } from '../common/price/price'
+import { updateTokenWhitelists } from '../common/updateMetrics'
 import { createLiquidityPool } from '../common/creators'
 
 export function handleNewPair(event: PairCreated): void {

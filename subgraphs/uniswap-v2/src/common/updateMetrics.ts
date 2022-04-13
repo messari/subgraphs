@@ -2,8 +2,8 @@ import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts"
 import { Account, DailyActiveAccount, UsageMetricsDailySnapshot, _HelperStore, _TokenTracker } from "../../generated/schema"
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateToken, getOrCreateTokenTracker, getOrCreateUsersHelper } from "./getters"
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, FACTORY_ADDRESS, INT_ONE, SECONDS_PER_DAY, WHITELIST } from "./constants"
-import { findEthPerToken, getEthPriceInUSD} from "./price"
-import { convertTokenToDecimal } from "./utils"
+import { findEthPerToken, getEthPriceInUSD} from "./price/price"
+import { convertTokenToDecimal } from "./utils/utils"
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {

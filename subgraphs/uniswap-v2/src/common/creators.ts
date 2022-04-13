@@ -17,10 +17,11 @@ import {
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "./constants"
-import { getTrackedVolumeUSD } from "./price"
+import { getTrackedVolumeUSD } from "./price/price"
 import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters"
-import { convertTokenToDecimal, savePoolId } from "./utils"
-import { updateVolumeAndFees, updateDepositHelper } from "./metrics"
+import { convertTokenToDecimal } from "./utils/utils"
+import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics"
+import { savePoolId } from "./handlers"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
