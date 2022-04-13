@@ -36,8 +36,7 @@ export function handleDODOSwap(event: DODOSwap): void {
     event.address,
     [event.params.fromToken, event.params.toToken],
     event.params.trader,
-    [event.params.fromAmount, event.params.toAmount],
-    BigInt.fromI32(0)
+    [event.params.fromAmount, event.params.toAmount]
   );
 }
 

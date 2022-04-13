@@ -10,7 +10,10 @@ import {
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
   PoolDailySnapshot,
-  RewardToken
+  RewardToken,
+  Deposit,
+  Withdraw,
+  Swap
 } from "../../generated/schema";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -386,4 +389,231 @@ export function setUSDpriceWETH(
   tokenPrice3.currentUSDprice = pricePerToken;
 
   tokenPrice3.save();
+}
+
+// type Deposit implements Event @entity {
+//   id: ID!
+//   hash: String!
+//   logIndex: Int!
+//   protocol: DexAmmProtocol!
+//   to: String!
+//   from: String!
+//   blockNumber: BigInt!
+//   timestamp: BigInt!
+//   inputTokens: [Token!]!
+//   outputToken: Token!
+//   inputTokenAmounts: [BigInt!]!
+//   outputTokenAmount: BigInt!
+//   amountUSD: BigDecimal!
+//   ##### DexAmm-Specific #####
+//   pool: LiquidityPool!
+// }
+export function createDeposit(
+  event: ethereum.Event,
+  to: Address,
+  poolAdd: Address,
+  shareAmount: BigInt
+): void {
+  let deposit = new Deposit(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+
+  let pool = getOrCreatePool(
+    poolAdd,
+    poolAdd,
+    poolAdd,
+    event.block.number,
+    event.block.timestamp
+  );
+
+  let priorBalance = pool.inputTokenBalances;
+  let tokens = pool.inputTokens;
+
+  let token1 = ERC20.bind(Address.fromString(tokens[0]));
+  let token2 = ERC20.bind(Address.fromString(tokens[1]));
+
+  let tokenBal1 = token1.try_balanceOf(poolAdd);
+  if (tokenBal1.reverted) {
+    return;
+  }
+
+  let tokenBal2 = token2.try_balanceOf(poolAdd);
+  if (tokenBal2.reverted) {
+    return;
+  }
+
+  let difToken1 = tokenBal1.value - priorBalance[0];
+
+  let difToken2 = tokenBal2.value - priorBalance[1];
+
+  let priceUSDtoken1 = getUSDprice(
+    to,
+    Address.fromString(tokens[0]),
+    difToken1
+  );
+  let priceUSDtoken2 = getUSDprice(
+    to,
+    Address.fromString(tokens[1]),
+    difToken2
+  );
+  let usdTotal = priceUSDtoken1 + priceUSDtoken2;
+
+  deposit.hash = event.transaction.hash.toHexString();
+  deposit.logIndex = event.logIndex.toI32();
+  deposit.protocol = pool.protocol;
+  deposit.to = poolAdd.toString();
+  deposit.from = to.toString();
+  deposit.blockNumber = event.block.number;
+  deposit.timestamp = event.block.timestamp;
+  deposit.inputTokenAmounts = [difToken1, difToken2];
+  deposit.amountUSD = usdTotal;
+  deposit.pool = pool.id;
+}
+
+// id: ID!
+// hash: String!
+// logIndex: Int!
+// protocol: DexAmmProtocol!
+// to: String!
+// from: String!
+// blockNumber: BigInt!
+// timestamp: BigInt!
+// inputTokens: [Token!]!
+// outputToken: Token!
+// inputTokenAmounts: [BigInt!]!
+// outputTokenAmount: BigInt!
+// amountUSD: BigDecimal!
+// ##### DexAmm-Specific #####
+// pool: LiquidityPool!
+// }
+export function createWithdraw(
+  event: ethereum.Event,
+  to: Address,
+  poolAdd: Address,
+  shareAmount: BigInt
+): void {
+  let withdraw = new Withdraw(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+
+  let pool = getOrCreatePool(
+    poolAdd,
+    poolAdd,
+    poolAdd,
+    event.block.number,
+    event.block.timestamp
+  );
+
+  let priorBalance = pool.inputTokenBalances;
+  let tokens = pool.inputTokens;
+
+  let token1 = ERC20.bind(Address.fromString(tokens[0]));
+  let token2 = ERC20.bind(Address.fromString(tokens[1]));
+
+  let tokenBal1 = token1.try_balanceOf(poolAdd);
+  if (tokenBal1.reverted) {
+    return;
+  }
+
+  let tokenBal2 = token2.try_balanceOf(poolAdd);
+  if (tokenBal2.reverted) {
+    return;
+  }
+
+  let difToken1 = priorBalance[0] - tokenBal1.value;
+
+  let difToken2 = priorBalance[1] - tokenBal2.value;
+
+  let priceUSDtoken1 = getUSDprice(
+    to,
+    Address.fromString(tokens[0]),
+    difToken1
+  );
+  let priceUSDtoken2 = getUSDprice(
+    to,
+    Address.fromString(tokens[1]),
+    difToken2
+  );
+  let usdTotal = priceUSDtoken1 + priceUSDtoken2;
+
+  withdraw.hash = event.transaction.hash.toHexString();
+  withdraw.logIndex = event.logIndex.toI32();
+  withdraw.protocol = pool.protocol;
+  withdraw.to = poolAdd.toString();
+  withdraw.from = to.toString();
+  withdraw.blockNumber = event.block.number;
+  withdraw.timestamp = event.block.timestamp;
+  withdraw.inputTokenAmounts = [difToken1, difToken2];
+  withdraw.amountUSD = usdTotal;
+  withdraw.pool = pool.id;
+}
+
+// type Swap implements Event @entity {
+//   id: ID!
+//   hash: String!
+//   logIndex: Int!
+//   protocol: DexAmmProtocol!
+//   to: String!
+//   from: String!
+//   blockNumber: BigInt!
+//   timestamp: BigInt!
+// tokenIn: Token!
+// amountIn: BigInt!
+// amountInUSD: BigDecimal!
+// tokenOut: Token!
+// amountOut: BigInt!
+// amountOutUSD: BigDecimal!
+//   ##### DexAmm-Specific #####
+//   pool: LiquidityPool!
+// }
+export function createSwap(
+  event: ethereum.Event,
+  trader: Address,
+  poolAdd: Address,
+  tokenIn: Address,
+  tokenOut: Address,
+  amountIn: BigInt,
+  amountOut: BigInt
+): void {
+  let swap = new Swap(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+
+  let pool = getOrCreatePool(
+    poolAdd,
+    poolAdd,
+    poolAdd,
+    event.block.number,
+    event.block.timestamp
+  );
+  let inToken = getOrCreateToken(tokenIn);
+  let outToken = getOrCreateToken(tokenOut);
+
+  let priceUSDtoken1 = getUSDprice(trader, tokenIn, amountIn);
+
+  let priceUSDtoken2 = getUSDprice(trader, tokenOut, amountOut);
+
+  swap.hash = event.transaction.hash.toHexString();
+  swap.logIndex = event.logIndex.toI32();
+  swap.protocol = pool.protocol;
+  swap.to = trader.toString();
+  swap.from = poolAdd.toString();
+  swap.blockNumber = event.block.number;
+  swap.timestamp = event.block.timestamp;
+  swap.tokenIn = inToken.id;
+  swap.amountIn = amountIn;
+  swap.amountInUSD = priceUSDtoken1;
+  swap.tokenOut = outToken.id;
+  swap.amountOut = amountOut;
+  swap.amountOutUSD = priceUSDtoken2;
+  swap.pool = pool.id;
 }

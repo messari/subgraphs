@@ -28,20 +28,29 @@ import {
   updatePoolMetrics
 } from "./utils/metrics";
 
+import { createDeposit, createWithdraw, createSwap } from "./utils/getters";
+
+// event BuyShares(address to, uint256 increaseShares, uint256 totalShares);
+
 export function handleBuyShares(event: BuyShares): void {
-  updateUsageMetrics(event, event.params.to);
-  updateFinancials(event);
-  updatePoolMetrics(
+  createDeposit(
     event,
-    event.address,
-    [],
     event.params.to,
-    [],
+    event.address,
     event.params.increaseShares
   );
+  updateUsageMetrics(event, event.params.to);
+  updateFinancials(event);
 }
 
+// event SellShares(address payer, address to, uint256 decreaseShares, uint256 totalShares);
 export function handleSellShares(event: SellShares): void {
+  createWithdraw(
+    event,
+    event.params.to,
+    event.address,
+    event.params.decreaseShares
+  );
   updateUsageMetrics(event, event.params.payer);
   updateFinancials(event);
   // updatePoolMetrics(event);
@@ -58,6 +67,15 @@ export function handleSellShares(event: SellShares): void {
 // );
 
 export function handleDODOSwap(event: DODOSwap): void {
+  createSwap(
+    event,
+    event.params.trader,
+    event.address,
+    event.params.fromToken,
+    event.params.toToken,
+    event.params.fromAmount,
+    event.params.toAmount
+  );
   updateUsageMetrics(event, event.params.trader);
   updateFinancials(event);
   updatePoolMetrics(
@@ -65,7 +83,6 @@ export function handleDODOSwap(event: DODOSwap): void {
     event.address,
     [event.params.fromToken, event.params.toToken],
     event.params.trader,
-    [event.params.fromAmount, event.params.toAmount],
-    BigInt.fromI32(0)
+    [event.params.fromAmount, event.params.toAmount]
   );
 }
