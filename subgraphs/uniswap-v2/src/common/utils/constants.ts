@@ -58,10 +58,12 @@ export namespace TransferType {
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export const WETH_ADDRESS = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-export const USDC_WETH_PAIR = '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc' // created 10008355
-export const DAI_WETH_PAIR = '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11' // created block 10042267
-export const USDT_WETH_PAIR = '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // created block 10093341
+export const NATIVE_TOKEN = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // WETH
+export const STABLE_ORACLE_POOLS: string[] = [
+  '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc', // USDC/wETH created 10008355
+  '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11', // DAI/wETH created block 10042267
+  '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // USDT/wETH created block 10093341
+]
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;

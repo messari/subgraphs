@@ -16,11 +16,11 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "../common/utils/constants"
-import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./utils/price"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "./utils/constants"
+import { getTrackedVolumeUSD } from "./utils/price"
 import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee } from "./getters"
 import { getOrCreateToken } from "./utils/tokens"
-import { updateVolumeAndFees } from "./metrics/metrics"
+import { updateVolumeAndFees, updateDepositHelper } from "./updates"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -49,7 +49,7 @@ function createPoolFees(poolAddressString: string): string[] {
 }
 
 // Create a liquidity pool from PairCreated contract call
-export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: Address, token0: Token, token1: Token, LPtoken: Token): void {
+export function createLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: Address, token0: Token, token1: Token, LPtoken: Token): void {
   let poolAddressString = poolAddress.toHexString()
   let pool = new LiquidityPool(poolAddressString)
   let poolAmounts = new _LiquidityPoolAmounts(poolAddressString)
@@ -112,147 +112,6 @@ export function createAndIncrementDailyAccount(event: ethereum.Event, accountId:
     return INT_ZERO
 }
 
-// These whiteslists are used to track what pools the tokens are a part of. Used in price calculations. 
-export function UpdateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker1: _TokenTracker, poolAddress: Address): void {
-    // update white listed pools
-    if (WHITELIST.includes(tokenTracker0.id)) {
-      let newPools = tokenTracker1.whitelistPools
-      newPools.push(poolAddress.toHexString())
-      tokenTracker1.whitelistPools = newPools
-      tokenTracker1.save()
-    }
-  
-    if (WHITELIST.includes(tokenTracker1.id)) {
-      let newPools = tokenTracker0.whitelistPools
-      newPools.push(poolAddress.toHexString())
-      tokenTracker0.whitelistPools = newPools
-      tokenTracker0.save()
-    }
-}
-
-// Upate token balances based on reserves emitted from the sync event. 
-export function updateInputTokenBalances(poolAddress: string, reserve0: BigInt, reserve1: BigInt): void {
-  
-  let pool = getLiquidityPool(poolAddress)
-  let poolAmounts = getLiquidityPoolAmounts(poolAddress)
-
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]))
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]))
-
-  let tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals)
-  let tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals)
-
-  poolAmounts.inputTokenBalances = [tokenDecimal0, tokenDecimal1]
-  pool.inputTokenBalances = [reserve0, reserve1]
-
-  poolAmounts.save()
-  pool.save()
-}
-
-// Update tvl an token prices 
-export function updateTvlAndTokenPrices(poolAddress: string): void {
-  let pool = getLiquidityPool(poolAddress)
-
-  let protocol = getOrCreateDex()
-
-  // Get updated ETH price now that reserves could have changed
-  let ether = getOrCreateEtherHelper()
-  ether.valueDecimal = getEthPriceInUSD()
-
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]))
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]))
-
-  let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
-  let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
-  tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
-  tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
-
-  // Subtract the old pool tvl
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD)
-
-  let inputToken0 = convertTokenToDecimal(pool.inputTokenBalances[0], token0.decimals)
-  let inputToken1 = convertTokenToDecimal(pool.inputTokenBalances[1], token1.decimals)
-
-  // Get new tvl
-  let newTvl = tokenTracker0.derivedETH.times(inputToken0).times(ether.valueDecimal!).plus(tokenTracker1.derivedETH.times(inputToken1).times(ether.valueDecimal!))
-
-  // Add the new pool tvl
-  pool.totalValueLockedUSD =  newTvl
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl)
-
-  let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply!, DEFAULT_DECIMALS)
-
-  // Update LP token prices
-  if (pool.outputTokenSupply == BIGINT_ZERO) pool.outputTokenPriceUSD = BIGDECIMAL_ZERO
-  else pool.outputTokenPriceUSD = newTvl.div(outputTokenSupply)
-
-
-  pool.save()
-  protocol.save()
-  ether.save()
-}
-
-// Handle data from transfer event for mints. Used to populate deposit entity in the mint event. 
-export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Address): void {
-  let pool = getLiquidityPool(event.address.toHexString())
-  let transfer = getOrCreateTransfer(event)
-  
-  // Tracks supply of minted LP tokens 
-  pool.outputTokenSupply = pool.outputTokenSupply!.plus(value)
-
-  // create new mint if no mints so far or if last one is done already
-  if (!transfer.type) {
-    transfer.type = TransferType.MINT
-
-    // Address that is minted to
-    transfer.sender = to.toHexString()
-    transfer.liquidity = value
-  }
-
-  // This is done to remove a potential feeto mint --- Not active 
-  else if (transfer.type == TransferType.MINT) {
-    // Updates the liquidity if the previous mint was a fee mint
-    // Address that is minted to
-    transfer.sender = to.toHexString()
-    transfer.liquidity = value
-  }
-
-  transfer.save()
-  pool.save()
-}
-
-// Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
-export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt,from: Address): void {
-  let transfer = getOrCreateTransfer(event)
-
-  transfer.type = TransferType.BURN
-  transfer.sender = from.toHexString()
-
-  transfer.save()
-}
-
-// Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
-export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: Address): void {
-  let pool = getLiquidityPool(event.address.toHexString())
-  let transfer = getOrCreateTransfer(event)
-
-  // Tracks supply of minted LP tokens 
-  pool.outputTokenSupply = pool.outputTokenSupply!.minus(value)
-
-  // Uses address from the transfer to pool part of the burn. Otherwise create with this transfer event. 
-  if (transfer.type == TransferType.BURN) { 
-    transfer.liquidity = value
-  }
-  else {
-    transfer.type = TransferType.BURN
-    transfer.sender = from.toHexString()
-    transfer.liquidity = value
-  }
-
-  transfer.save()
-  pool.save()
-}
-
 // Generate the deposit entity and update deposit account for the according pool.
 export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address): void {
   let transfer = getOrCreateTransfer(event)
@@ -294,7 +153,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.outputTokenAmount = transfer.liquidity!
   deposit.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
 
-  UpdateDepositHelper(event.address)
+  updateDepositHelper(event.address)
 
   store.remove('_Transfer', transfer.id)
 
@@ -428,12 +287,6 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Address
   updateVolumeAndFees(event, trackedAmountUSD, tradingFeeAmountUSD, protocolFeeAmountUSD)
 }
 
-// Update store that tracks the deposit count per pool
-function UpdateDepositHelper(poolAddress: Address): void {
-  let poolDeposits = _HelperStore.load(poolAddress.toHexString())!
-  poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
-  poolDeposits.save()
-}
 
 export function savePoolId(poolAddress: Address): void { 
   let protocol = getOrCreateDex()
@@ -457,7 +310,6 @@ export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32
   }
   return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
 }
-
 
 // return 0 if denominator is 0 in division
 export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {

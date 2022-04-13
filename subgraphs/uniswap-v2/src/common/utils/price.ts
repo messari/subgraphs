@@ -1,9 +1,9 @@
 // import { log } from '@graphprotocol/graph-ts/index'
 import { BigDecimal, Address } from '@graphprotocol/graph-ts/index'
-import { UNTRACKED_PAIRS, safeDiv } from './../helpers'
+import { UNTRACKED_PAIRS, safeDiv } from '../creators'
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './../getters'
 import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from '../../../generated/schema'
-import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, WETH_ADDRESS, USDC_WETH_PAIR, DAI_WETH_PAIR, USDT_WETH_PAIR, BIGDECIMAL_TWO, BIGINT_ZERO} from './constants'
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, NATIVE_TOKEN} from './constants'
 
 function token0PairPrice(pool: _LiquidityPoolAmounts): BigDecimal {
   if (pool.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) {
@@ -91,47 +91,8 @@ let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('400000')
 // minimum liquidity for price to get tracked
 let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
 
-/**
- * Search through graph to find derived Eth per token.
- * @todo update to be derived ETH (add stablecoin estimates)
- **/
-// export function findEthPerToken(token: Token): BigDecimal {
-//   if (token.id == WETH_ADDRESS) {
-//     return BIGDECIMAL_ONE
-//   }
-//   // loop through whitelist and check if paired with any
-//   for (let i = 0; i < WHITELIST.length; ++i) {
-//     let pairAddress = factoryContract.getPair(Address.fromString(token.id), Address.fromString(WHITELIST[i]))
-//     if (pairAddress.toHexString() != ZERO_ADDRESS) {
-//       let pair = LiquidityPool.load(pairAddress.toHexString())
-//       if (pair == null){
-//         return BIGDECIMAL_ZERO
-//       }
-//       let token1 = Token.load(pair.inputTokens[1])
-//       if (token1 == null){
-//         return BIGDECIMAL_ZERO
-//       }
-//       let token1EthPrice = findEthPerToken(token1)
-//       if (pair.inputTokens[0] == token.id && token1EthPrice.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-//         return token1PairPrice(pair).times(token1EthPrice as BigDecimal) // return token1 per our token * Eth per token 1
-//       }
-//       let token0 = Token.load(pair.inputTokens[0])
-//       if (token0 == null){
-//         return BIGDECIMAL_ZERO
-//       }
-//       let token0EthPrice = findEthPerToken(token0)
-
-//       if (pair.inputTokens[1] == token.id && token0EthPrice.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
-//         return token0PairPrice(pair).times(token0EthPrice as BigDecimal) // return token0 per our token * ETH per token 0
-//       }
-//     }
-//   }
-//   return BIGDECIMAL_ZERO // nothing was found return 0
-// }
-
-
 export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
-  if (tokenTracker.id == WETH_ADDRESS) {
+  if (tokenTracker.id == NATIVE_TOKEN) {
     return BIGDECIMAL_ONE
   }
   let whiteList = tokenTracker.whitelistPools

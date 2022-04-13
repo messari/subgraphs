@@ -66,10 +66,6 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
     return LiquidityPoolFee.load(id)!
 }
 
-export function get(poolAddress: string): _LiquidityPoolAmounts {
-    return _LiquidityPoolAmounts.load(poolAddress)!
-}
-
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
     let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
     // fetch info if null
