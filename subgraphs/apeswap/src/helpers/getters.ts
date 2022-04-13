@@ -38,16 +38,16 @@ export function getOrCreateDex(): DexAmmProtocol {
 
   if (!protocol) {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
-    protocol.name = "Uniswap v2"
-    protocol.slug = "uniswap-v2"
+    protocol.name = "apeswap finance";
+    protocol.slug = "apeswap-finance";
     protocol.schemaVersion = "1.1.0"
     protocol.subgraphVersion = "1.0.2"
     protocol.methodologyVersion = "1.0.1"
+    protocol.network = DEPLOYED_NETWORK.network;
+    protocol.type = ProtocolType.EXCHANGE
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.totalVolumeUSD = BIGDECIMAL_ZERO
     protocol.totalUniqueUsers = INT_ZERO
-    protocol.network = Network.ETHEREUM
-    protocol.type = ProtocolType.EXCHANGE
 
     protocol.save()
   }  

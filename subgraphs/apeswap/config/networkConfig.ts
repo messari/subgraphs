@@ -1,10 +1,10 @@
 import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
-import { Factory } from "../../generated/Factory/Factory";
-import { Network, toPercentage } from "./constant";
+import { Factory } from "../generated/Factory/Factory";
+import { Network, toPercentage } from "../src/utils/constant";
 import {
   bscNativeTokenPriceInUSD,
   polygonNativeTokenPriceInUSD,
-} from "./pricing";
+} from "../src/utils/pricing";
 
 class DeployedNetwork {
   network: string; // The deployed network(e.g BSC or Polygon )

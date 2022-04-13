@@ -41,7 +41,7 @@ import {
   toDecimal,
   ZERO_ADDRESS,
 } from "../utils/constant";
-import { deployedNetwork } from "../utils/networkConfig";
+import { deployedNetwork } from "../../config/networkConfig";
 import {
   findNativeTokenPricePerToken,
   getTrackedLiquidityUSD,

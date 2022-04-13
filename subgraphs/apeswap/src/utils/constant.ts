@@ -4,20 +4,47 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Schema Enums /////
 ////////////////////////
 
-export namespace Network {
+// The network names corresponding to the Network enum in the schema.
+// They are mainly intended for convenience on the data consumer side.
+// The enum values are derived from Coingecko slugs (converted to uppercase
+// and replaced hyphens with underscores for Postgres enum compatibility)
+export namespace SchemaNetwork {
+  export const ARBITRUM = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BSC";
+  export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "POLYGON";
+  export const NEAR = "NEAR";
+  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
+  export const POLYGON = "POLYGON_POS";
   export const XDAI = "XDAI";
+}
+
+// The network names corresponding to the ones in `dataSource.network()`
+// They should mainly be used for the ease of comparison.
+// Note that they cannot be used as enums since they are lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
 }
 
 export namespace ProtocolType {
@@ -28,19 +55,26 @@ export namespace ProtocolType {
   export const GENERIC = "GENERIC";
 }
 
-export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
+export namespace VaultFeeType {
+  export const MANAGEMENT_FEE = "MANAGEMENT_FEE";
+  export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
 export namespace LiquidityPoolFeeType {
   export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
   export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
   export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_LP_FEE = "FIXED_LP_FEE";
+  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
-
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
+}
 export namespace TransferType {
   export const MINT = "MINT";
   export const BURN = "BURN";

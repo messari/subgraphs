@@ -7,7 +7,7 @@ import {
   STRING_TWO,
   ZERO_ADDRESS,
 } from "./constant";
-import { BSC, deployedNetwork, POLYGON } from "./networkConfig";
+import { BSC, deployedNetwork, POLYGON } from "../../config/networkConfig";
 import { getOrCreateToken } from "./token";
 
 // @returns Native token price in USD in the first network(in this case bsc newtwork)
