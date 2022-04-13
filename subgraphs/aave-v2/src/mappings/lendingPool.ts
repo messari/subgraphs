@@ -2,7 +2,8 @@ import {
   BigInt,
   Address,
   dataSource,
-  log
+  log,
+  BigDecimal
 } from '@graphprotocol/graph-ts';
 
 import {
@@ -117,7 +118,7 @@ export function handleDeposit (event: Deposit): void {
   // The reserve param is the asset contract address
   deposit.asset = event.params.reserve.toHexString();
   deposit.amount = event.params.amount;
-  
+
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
   deposit.amountUSD = amountUSD;
@@ -155,7 +156,7 @@ export function handleWithdraw (event: Withdraw): void {
   const withdraw = new WithdrawEntity(hash + '-' + event.logIndex.toHexString());
   // The tokens are sent to the address listed as the 'to' param field of the event
   // NOT 'to' property of event.transaction which marketAddr is set to
-  
+
   withdraw.to = event.transaction.from.toHexString();
   withdraw.market = marketAddr;
   withdraw.from = marketAddr;
@@ -166,7 +167,7 @@ export function handleWithdraw (event: Withdraw): void {
   withdraw.timestamp = event.block.timestamp;
   withdraw.blockNumber = event.block.number;
   withdraw.amount = event.params.amount;
-  
+
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
   withdraw.amountUSD = amountUSD;
@@ -213,7 +214,7 @@ export function handleBorrow (event: Borrow): void {
   borrow.timestamp = event.block.timestamp;
   borrow.blockNumber = event.block.number;
   borrow.amount = event.params.amount;
-  
+
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
   borrow.amountUSD = amountUSD;
@@ -266,7 +267,7 @@ export function handleRepay (event: Repay): void {
   repay.timestamp = event.block.timestamp;
   repay.blockNumber = event.block.number;
   repay.amount = event.params.amount;
-  
+
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const amountUSD = amountInUSD(token.id, token.decimals, event.params.amount, market);
   repay.amountUSD = amountUSD;
@@ -313,7 +314,7 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   liquidation.timestamp = event.block.timestamp;
   liquidation.blockNumber = event.block.number;
   liquidation.amount = event.params.liquidatedCollateralAmount;
-  
+
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const amountUSD = amountInUSD(token.id, token.decimals, event.params.liquidatedCollateralAmount, market);
   liquidation.amountUSD = amountUSD;
@@ -330,10 +331,20 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   // Update total value locked on the market level
   updateTVL(token, market, protocol, liquidation.amount, false);
   calculateRevenues(market, token);
+  market.save();
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   updateFinancials(event);
+
+  // Get the surplus percentage of the amount with the liquidation penalty/bonus
+  // The liquidationPenalty is the amount as a percentage of the collateral that was liquidated summed with the percentage of the collateral that is provided as a bonus
+  // This is represented by a 5 digit integer over 10000 (100%). The profit is the percentage over 100%
+  // For example, if the liquidationPenalty is 10500 (105%), the profit is 5% of the collateral liquidated.
+  const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'))
+  // This expression below divides the collaterall liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
+  liquidation.profitUSD = amountUSD.div(divideAmountBy);
+  log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString() + ' ' + amountUSD.times(market.liquidationPenalty.div(bigIntToBigDecimal(new BigInt(10).pow(18)))).toString(), []);
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
   liquidation.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   liquidation.save();

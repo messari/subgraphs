@@ -15,7 +15,8 @@ import {
   LendingProtocol,
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
-  UserAddr
+  Account,
+  DailyActiveAccount
 } from '../../generated/schema';
 
 import {
@@ -40,8 +41,6 @@ import { IERC20 } from '../../generated/templates/LendingPool/IERC20';
 import { AToken } from '../../generated/templates/AToken/AToken';
 
 import { LendingPool } from '../../generated/templates/LendingPool/LendingPool';
-
-import { IncentivesController } from '../../generated/templates';
 
 import { bigIntToBigDecimal } from '../common/utils/numbers';
 
@@ -81,6 +80,7 @@ export function initMarket (
     market.outputToken = ZERO_ADDRESS;
     market.inputTokens = inputTokens;
     market.inputTokenBalances = inputTokenBalances;
+    market.inputTokenPricesUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     market.sToken = ZERO_ADDRESS;
     market.vToken = ZERO_ADDRESS;
     market.rewardTokens = [];
@@ -95,8 +95,7 @@ export function initMarket (
     market.liquidationPenalty = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
     market.depositRate = BIGDECIMAL_ZERO;
-    market.totalFeesUSD = BIGDECIMAL_ZERO;
-    market.totalValueLocked = BIGINT_ZERO;
+    market.totalRevenueUSD = BIGDECIMAL_ZERO;
     market.totalVolumeUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
@@ -115,7 +114,7 @@ export function initMarket (
     market.outputTokenSupply = getOutputTokenSupply(Address.fromString(market.outputToken));
   }
   // There is no need to execute the below code until block 12251569 when incentive controller was deployed
-  if (blockNumber.gt(BigInt.fromString("12251569"))) {
+  if (blockNumber.gt(BigInt.fromString('12251569'))) {
     log.info('ENTERED PASSED BLOCK NUMBER FILTER ' + blockNumber.toString(), [])
     let rewardTokens = market.rewardTokens;
     if (rewardTokens === null) rewardTokens = [];
@@ -123,11 +122,11 @@ export function initMarket (
       // If the reward tokens have not been initialized on the market, attempt to pull them from the incentive controller
       const rewardTokenAddr = getRewardTokenAddress(market);
       if (rewardTokenAddr) {
-        const depositRewardToken = loadRewardToken(rewardTokenAddr, market, "DEPOSIT");
-        const borrowRewardToken = loadRewardToken(rewardTokenAddr, market, "BORROW");
+        const depositRewardToken = loadRewardToken(rewardTokenAddr, market, 'DEPOSIT');
+        const borrowRewardToken = loadRewardToken(rewardTokenAddr, market, 'BORROW');
         market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
         market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-        market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];        
+        market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
       }
     }
     // Get reward emissions
@@ -143,12 +142,12 @@ export function getCurrentRewardEmissions (market: Market): BigInt[] {
   // Attempt to get the incentives controller contract
   const incentivesController = initIncentivesController(market);
   if (!incentivesController) {
-    log.info('Failed to get current reward emissions, no incentive controller', [])
+    log.info('Failed to get current reward emissions, no incentive controller', []);
     return rewardEmissions;
   }
-  // From the incentives controller contract, get pull the "assets" values from the market aToken, sToken, and vToken
+  // From the incentives controller contract, get pull the 'assets' values from the market aToken, sToken, and vToken
   const incentivesControllerContract = IncentivesControllerContract.bind(incentivesController);
-  log.info('CHECKING INC CONT REW EMS ASSET VALS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value1.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value2.toString(), [])
+  log.info('CHECKING INC CONT REW EMS ASSET VALS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value1.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value2.toString(), []);
   const assetDataSupply = incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0;
   const assetDataBorrowStable = incentivesControllerContract.assets(Address.fromString(market.sToken)).value0;
   const assetDataBorrowVariable = incentivesControllerContract.assets(Address.fromString(market.sToken)).value0;
@@ -236,8 +235,9 @@ export function fetchProtocolEntity (protocolId: string): LendingProtocol {
     lendingProtocol.name = 'Aave-v2';
     lendingProtocol.slug = 'aave-v2';
     lendingProtocol.network = 'ETHEREUM';
-    lendingProtocol.totalFeesUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalDepositUSD = BIGDECIMAL_ZERO;
     lendingProtocol.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.protocolPriceOracle = ZERO_ADDRESS;
@@ -332,7 +332,9 @@ export function getMarketDailySnapshot (
   // As this function is called AFTER a transaction is completed, each snapshot's data will vary from the previous snapshot
 
   const token = initToken(Address.fromString(market.id));
-  marketSnapshot.totalValueLockedUSD = amountInUSD(token.id, token.decimals, market.totalValueLocked, market);
+  // The inputTokenBalances[0] is used as the total value locked denominated in tokens. The first index in the input token array will always be the reserve token
+  marketSnapshot.totalValueLockedUSD = amountInUSD(token.id, token.decimals, market.inputTokenBalances[0], market);
+  marketSnapshot.totalDepositUSD = marketSnapshot.totalValueLockedUSD;
   marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
   marketSnapshot.inputTokenBalances = market.inputTokenBalances;
   marketSnapshot.inputTokenPricesUSD = getTokenPricesList(market.inputTokens);
@@ -368,22 +370,20 @@ export function updateMetricsDailySnapshot (event: ethereum.Event): UsageMetrics
   }
 
   const userAddr = event.transaction.from;
-  let user = UserAddr.load(userAddr.toHexString());
-  let userCreated = false;
+  let user = Account.load(userAddr.toHexString());
   if (!user) {
-    user = new UserAddr(userAddr.toHexString());
+    user = new Account(userAddr.toHexString());
+    user.save();
     metricsDailySnapshot.totalUniqueUsers += 1;
     protocol.totalUniqueUsers += 1;
-    userCreated = true;
   }
-
-  const intDaysFromEpoch = BigInt.fromString(daysSinceEpoch);
-  if (user.mostRecentVisit.notEqual(intDaysFromEpoch) || userCreated) {
-    user.mostRecentVisit = intDaysFromEpoch;
+  let accountActive = DailyActiveAccount.load(daysSinceEpoch + '-' + userAddr.toHexString());
+  if (!accountActive) {
+    accountActive = new DailyActiveAccount(daysSinceEpoch + '-' + userAddr.toHexString());
+    accountActive.save();
     metricsDailySnapshot.activeUsers += 1;
   }
   protocol.save();
-  user.save();
   metricsDailySnapshot.dailyTransactionCount += 1;
   metricsDailySnapshot.blockNumber = event.block.number;
   metricsDailySnapshot.timestamp = event.block.timestamp;
@@ -404,9 +404,10 @@ export function updateFinancials (event: ethereum.Event): FinancialsDailySnapsho
   }
   log.info('FINANCIAL SNAPSHOT ' + financialsDailySnapshot.id + ' TRANSACTION ' + event.transaction.hash.toHexString(), []);
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialsDailySnapshot.totalDepositUSD = protocol.totalDepositUSD;
   financialsDailySnapshot.protocolSideRevenueUSD = protocol.protocolSideRevenueUSD;
   financialsDailySnapshot.supplySideRevenueUSD = protocol.supplySideRevenueUSD;
-  financialsDailySnapshot.feesUSD = protocol.totalFeesUSD;
+  financialsDailySnapshot.totalRevenueUSD = protocol.totalRevenueUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.save();
@@ -445,11 +446,17 @@ export function getAssetPriceInUSDC (tokenAddress: Address): BigDecimal {
   return assetPriceInUSDC;
 }
 
+const inputTokenPricesUSD: BigDecimal[] = [];
 export function amountInUSD (asset: string, decimals: number, amount: BigInt, market: Market): BigDecimal {
   // This function takes in a token and the amount of the token and converts the amount of that token into USD
+  // Also sets the market input/output token prices to the updated amount
   const amountInDecimals = bigIntToBigDecimal(amount, <i32>decimals);
   const priceInUSDC = getAssetPriceInUSDC(Address.fromString(asset));
   const amountUSD = amountInDecimals.times(priceInUSDC);
+  for (let i = 0; i < market.inputTokens.length; i++) {
+    inputTokenPricesUSD.push(priceInUSDC.truncate(3));
+  };
+  market.inputTokenPricesUSD = inputTokenPricesUSD;
   market.outputTokenPriceUSD = priceInUSDC.truncate(3);
   market.save();
   log.info(asset + ' TOKEN AMOUNT ' + amount.toString() + ' TIMES PRICE IN USD ' + priceInUSDC.toString() + ' === ' + amountUSD.toString(), []);
@@ -477,7 +484,7 @@ export function getCurrentRewardEmissionsUSD (market: Market): BigDecimal[] {
   const rewardTokenAddr = getRewardTokenAddress(market);
   if (!rewardTokenAddr) return rewardEmissionsUSD;
   // The DEPOSIT reward token is used as the default. Both the deposit and borrow reward token decimals are the same
-  const rewardToken = loadRewardToken(rewardTokenAddr, market, "DEPOSIT");
+  const rewardToken = loadRewardToken(rewardTokenAddr, market, 'DEPOSIT');
   // In the reward emissions arrays index 0 is for the deposit reward, index 1 for the borrow reward
   rewardEmissionsUSD[0] = amountInUSD(rewardTokenAddr.toHexString(), rewardToken.decimals, market.rewardTokenEmissionsAmount[0], market);
   rewardEmissionsUSD[1] = amountInUSD(rewardTokenAddr.toHexString(), rewardToken.decimals, market.rewardTokenEmissionsAmount[1], market);
@@ -502,6 +509,7 @@ export function getProtocolIdFromCtx (): string {
 
 export function calculateRevenues (market: Market, token: Token): void {
   // Calculate and save the fees and revenue on both market and protocol level
+  // Additionally calculate the total borrow amount on market and protocol
   // Pull S and V debt tokens to get the amount currently borrowed as stable debt or variable debt
   const STokenContract = SToken.bind(Address.fromString(market.sToken));
   const VTokenContract = VToken.bind(Address.fromString(market.vToken));
@@ -516,15 +524,15 @@ export function calculateRevenues (market: Market, token: Token): void {
   } else {
     log.info('IN REPAY FOR MARKET ' + market.id + ' S AND V REVERTED ' + s.reverted.toString() + ' ' + v.reverted.toString(), []);
   }
-  // Subtract prior market total fees protocol.feesUSD
+  // Subtract prior market total fees protocol.totalRevenueUSD
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
-  log.info('SUBTRACTING MARKET FROM PROTOCOL TOTAL FEES ' + protocol.totalFeesUSD.toString() + ' - ' + market.totalFeesUSD.toString(), [])
+  log.info('SUBTRACTING MARKET FROM PROTOCOL TOTAL FEES ' + protocol.totalRevenueUSD.toString() + ' - ' + market.totalRevenueUSD.toString(), [])
 
   // Get the protocol revenues/fees subtracting the market values before calculation
   const protoMinusMarketProtoRevenue = protocol.protocolSideRevenueUSD.minus(market.protocolSideRevenueUSD);
   const protoMinusMarketSupplyRevenue = protocol.supplySideRevenueUSD.minus(market.supplySideRevenueUSD);
-  const protoMinusMarketFees = protocol.totalFeesUSD.minus(market.totalFeesUSD);
+  const protoMinusMarketFees = protocol.totalRevenueUSD.minus(market.totalRevenueUSD);
   // Multiply total Variable value Locked in USD by market.variableBorrowRate
   const varAmountUSD = amountInUSD(token.id, token.decimals, market.totalVariableValueLocked, market);
   const varFees = varAmountUSD.times(market.variableBorrowRate);
@@ -533,12 +541,23 @@ export function calculateRevenues (market: Market, token: Token): void {
   const staFees = staAmountUSD.times(market.stableBorrowRate);
 
   // Add these values together, save to market and add protocol total
-  market.totalFeesUSD = staFees.plus(varFees).truncate(3);
-  protocol.totalFeesUSD = protoMinusMarketFees.plus(market.totalFeesUSD);
-  market.protocolSideRevenueUSD = market.totalFeesUSD.times(bigIntToBigDecimal(market.reserveFactor, 4)).truncate(3);
+  market.totalRevenueUSD = staFees.plus(varFees).truncate(3);
+  protocol.totalRevenueUSD = protoMinusMarketFees.plus(market.totalRevenueUSD);
+  market.protocolSideRevenueUSD = market.totalRevenueUSD.times(bigIntToBigDecimal(market.reserveFactor, 4)).truncate(3);
   protocol.protocolSideRevenueUSD = protoMinusMarketProtoRevenue.plus(market.protocolSideRevenueUSD);
-  market.supplySideRevenueUSD = market.totalFeesUSD.times(BIGDECIMAL_ONE.minus(bigIntToBigDecimal(market.reserveFactor, 4))).truncate(3);
+  market.supplySideRevenueUSD = market.totalRevenueUSD.times(BIGDECIMAL_ONE.minus(bigIntToBigDecimal(market.reserveFactor, 4))).truncate(3);
   protocol.supplySideRevenueUSD = protoMinusMarketSupplyRevenue.plus(market.supplySideRevenueUSD);
+
+  // CALCULATE totalBorrowUSD FIELDS ON MARKET AND PROTOCOL ENTITIES
+  // The sum in USD of s and v tokens on market is totalBorrowUSD
+
+  // Subtract the previously saved amount of the market TotalBorrowUSD value from the protocol totalBorrowUSD
+  // This gets the amount in USD out in borrows on the protocol not including this market
+  const tempProtocolBorrowTotal = protocol.totalBorrowUSD.minus(market.totalBorrowUSD);
+  // Sum the amount in USD of the stable borrows and variable borrows currently in use
+  market.totalBorrowUSD = staAmountUSD.plus(varAmountUSD);
+  // Add this markets new amount out in borrows to the protocol value
+  protocol.totalBorrowUSD = tempProtocolBorrowTotal.plus(market.totalBorrowUSD);
 
   market.save();
   protocol.save();
@@ -546,26 +565,27 @@ export function calculateRevenues (market: Market, token: Token): void {
 
 export function updateTVL (token: Token, market: Market, protocol: LendingProtocol, amountInTokens: BigInt, toSubtract: bool): void {
   // Update the total value locked in a market and the protocol overall after transactions
-  let newMarketTVL = market.totalValueLocked;
+  let newMarketTVL = market.inputTokenBalances[0];
   if (toSubtract) {
-    newMarketTVL = market.totalValueLocked.minus(amountInTokens);
+    newMarketTVL = newMarketTVL.minus(amountInTokens);
   } else {
-    newMarketTVL = market.totalValueLocked.plus(amountInTokens);
+    newMarketTVL = newMarketTVL.plus(amountInTokens);
   }
   // Subtract the PREVIOUSLY ADDED totalValueLockedUSD of the market from the protocol TVL
   // Subtracting the most recently added TVL of the market ensures that the correct
   // proportion of this market is deducted before adding the new market TVL to the protocol
   // Otherwise, the difference in asset USD/ETH price  since saving would deduct the incorrect proportion from the protocol TVL
-  log.info(market.id + ' market.totalValueLocked = ' + market.totalValueLocked.toString() + ' newMarketTVL = ' + newMarketTVL.toString() + ' amountInTokens = ' + amountInTokens.toString() + ' toSub ' + toSubtract.toString(), []);
+  log.info(market.id + ' newMarketTVL = ' + newMarketTVL.toString() + ' newMarketTVL = ' + newMarketTVL.toString() + ' amountInTokens = ' + amountInTokens.toString() + ' toSub ' + toSubtract.toString(), []);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD);
-  market.totalValueLocked = newMarketTVL;
   market.totalValueLockedUSD = amountInUSD(token.id, token.decimals, newMarketTVL, market);
+  market.totalDepositUSD = market.totalValueLockedUSD;
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
+  protocol.totalDepositUSD = protocol.totalValueLockedUSD;
   protocol.save();
   market.save();
 }
 
-export function emissionsPerDay(rewardRatePerSecond: BigInt): BigInt {
+export function emissionsPerDay (rewardRatePerSecond: BigInt): BigInt {
   // Take the reward rate per second, divide out the decimals and get the emissions per day
   return (rewardRatePerSecond.div(new BigInt(10).pow(18))).times(new BigInt(SECONDS_PER_DAY));
 }

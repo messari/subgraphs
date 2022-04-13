@@ -38,7 +38,7 @@ export function handleProxyCreated (event: ProxyCreated): void {
   const pool = event.params.id.toString();
   const address = event.params.newAddress;
   const context = initiateContext(event.address);
-  log.info('PROXY: ' + pool, [])
+  log.info('PROXY: ' + pool, []);
   if (pool == 'LENDING_POOL') {
     startIndexingLendingPool(address, context);
   } else if (pool == 'LENDING_POOL_CONFIGURATOR') {
@@ -47,7 +47,7 @@ export function handleProxyCreated (event: ProxyCreated): void {
 }
 
 export function handlePriceOracleUpdated (event: PriceOracleUpdated): void {
-  log.info('HANDLING PRICE ORACLE UPDATE TO ' + event.params.newAddress.toHexString(), [])
+  log.info('HANDLING PRICE ORACLE UPDATE TO ' + event.params.newAddress.toHexString(), []);
   const lendingProtocol = fetchProtocolEntity(protocolAddress);
   lendingProtocol.protocolPriceOracle = event.params.newAddress.toHexString();
   lendingProtocol.save();
@@ -66,14 +66,14 @@ export function handleLendingPoolConfiguratorUpdated (event: LendingPoolConfigur
 export function startIndexingLendingPool (poolAddress: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool/Market
   // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
-  log.info('START INDEXING LENDING POOL', [])
+  log.info('START INDEXING LENDING POOL', []);
   LendingPoolTemplate.createWithContext(poolAddress, context);
 }
 
 export function startIndexingLendingPoolConfigurator (configurator: Address, context: DataSourceContext): void {
   // Create a template for an implementation of a Lending Pool Configurator
   // This indexes for events within the lendingPoolConfigurator.ts mapping script
-  log.info('START INDEXING LENDING POOL CONFIG', [])
+  log.info('START INDEXING LENDING POOL CONFIG', []);
   LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
 }
 

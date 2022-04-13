@@ -1,13 +1,11 @@
 import {
   Burn,
   Mint,
-  Initialized,
   AToken
 } from '../../generated/templates/AToken/AToken';
 
 import {
   initMarket,
-  getMarketDailySnapshot,
   getMarketDailyId
 } from './utilFunctions';
 
@@ -17,15 +15,13 @@ import { MarketDailySnapshot } from '../../generated/schema';
 
 // Code written to pull a Token entity by its aToken. Leaving code commented here for now in case needed
 
-// ALL BELOW EVENT HANDLERS WILL TRIGGER A MARKET SNAPSHOT. VERIFY IF OTHER EVENTS FOR THIS TEMPLATE WILL NEED TO AS WELL
-
 // THE MINT/BURN HANDLERS ARE WHAT MANAGE THE OUTPUT TOKEN SUPPLY
-// Need to do more research about the scaling, liquidity index etc in order to properly update the balances after burn/mint.
-// The current supply/balance updating is more of a placeholder. These have to be revised and verified
+// These events update the market daily snapshot output token values
+// The mint/burn handlers are essentially extensions of deposit/withdraw events to manage the aToken/outputToken
 
 export function handleATokenMint (event: Mint): void {
   // Event handler for AToken mints. This gets triggered upon deposits
-  log.info('MINTING ATOKEN: ' + event.address.toHexString(), [])
+  log.info('MINTING ATOKEN: ' + event.address.toHexString(), []);
   const aTokenAddr = event.address;
   const aToken = AToken.bind(aTokenAddr);
   const tryInputToken = aToken.try_UNDERLYING_ASSET_ADDRESS();
@@ -34,8 +30,7 @@ export function handleATokenMint (event: Mint): void {
     marketAddr = tryInputToken.value.toHexString();
     const market = initMarket(event.block.number, event.block.timestamp, marketAddr);
     market.outputTokenSupply = aToken.totalSupply();
-    log.info('MINT getting incentive controller ' + market.outputTokenSupply.toString(), [])
-    // getMarketDailySnapshot(event, market);
+    log.info('MINT getting incentive controller ' + market.outputTokenSupply.toString(), []);
     const snapId = getMarketDailyId(event, market);
     const snap = MarketDailySnapshot.load(snapId);
     if (snap) {
@@ -71,15 +66,3 @@ export function handleATokenBurn (event: Burn): void {
     log.info('ATOKEN BURN REVERTED ' + marketAddr, []);
   }
 }
-
-// export function handleATokenInitialized (event: Initialized): void {
-//   // This function handles when an AToken is initialized in a new lending pool.
-//   // This function serves to get the reward token for a given market, as the incentives controller is received in the parametes
-//   log.info('INITIALIZE ATOKEN: ' + event.address.toHexString(), []);
-//   const aTokenAddr = event.address;
-//   const aToken = AToken.bind(aTokenAddr);
-//   const marketAddr = aToken.UNDERLYING_ASSET_ADDRESS();
-//   const market = initMarket(event.block.number, event.block.timestamp, marketAddr.toHexString());
-//   const incentivesControllerAddr = event.params.incentivesController;
-//   getMarketDailySnapshot(event, market);
-// }

@@ -24,8 +24,6 @@ import {
 
 import { Market } from '../../generated/schema';
 
-import { AToken } from '../../generated/templates/AToken/AToken';
-
 import { AToken as ATokenTemplate } from '../../generated/templates';
 
 import { BIGDECIMAL_ZERO } from '../common/constants';
