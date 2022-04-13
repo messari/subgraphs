@@ -1,21 +1,15 @@
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
 import {
   RewardPaid,
   AddRewardCall,
   Gauge as GaugeContract,
   RewardAdded,
 } from "../../generated/templates/Gauge/Gauge";
-
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import { getUsdPricePerToken } from "../Oracle";
 import { RewardToken, Vault as VaultStore } from "../../generated/schema";
-import {
-  ethereum,
-  BigInt,
-  Address,
-  log,
-  BigDecimal,
-} from "@graphprotocol/graph-ts";
+import { BigInt, Address, log, BigDecimal } from "@graphprotocol/graph-ts";
+
 export function handleRewardPaid(event: RewardPaid): void {
   const gaugeAddress = event.address;
   const gaugeContract = GaugeContract.bind(gaugeAddress);

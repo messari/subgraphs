@@ -8,8 +8,8 @@ import {
 
 import { getOrCreateStrategy } from "../modules/Strategy";
 import { Vault as VaultStore } from "../../generated/schema";
+import { Address, log, store } from "@graphprotocol/graph-ts";
 import { Vault as VaultTemplate } from "../../generated/templates";
-import { Address, dataSource, log, store } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
 import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
 

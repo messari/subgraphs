@@ -4,7 +4,7 @@ import { ChainLinkContract } from "../../../generated/templates/Vault/ChainLinkC
 
 export function getChainLinkContract(network: string): ChainLinkContract {
   return ChainLinkContract.bind(
-    Address.fromString(constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network))
+    constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network)
   );
 }
 

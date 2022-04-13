@@ -1,6 +1,6 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   SushiSwapPair as SushiSwapPairContract,
   SushiSwapPair__getReservesResult,
@@ -86,21 +86,32 @@ export function getPriceFromRouter(
   }
 
   let token0Decimals = utils.getTokenDecimals(token0Address);
-  let amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
+  let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
-  const sushiSwapRouter = SushiSwapRouterContract.bind(
-    constants.SUSHISWAP_CONTRACT_ADDRESSES.get(network)!
-  );
+  const routerAddresses = constants.SUSHISWAP_ROUTER_ADDRESS_MAP.get(network)!;
 
-  let amountOutArray = sushiSwapRouter.try_getAmountsOut(amountIn, path);
+  let routerAddressV1 = routerAddresses.get("routerV1");
+  let routerAddressV2 = routerAddresses.get("routerV2");
 
-  if (!amountOutArray.reverted) {
+  let amountOutArray: ethereum.CallResult<BigInt[]>;
+  if (routerAddressV1) {
+    const sushiSwapRouterV1 = SushiSwapRouterContract.bind(routerAddressV1);
+    amountOutArray = sushiSwapRouterV1.try_getAmountsOut(amountIn, path);
+    if (amountOutArray.reverted && routerAddressV2) {
+      const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressV2);
+      amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
+
+      if (amountOutArray.reverted) {
+        return constants.BIGDECIMAL_ZERO;
+      }
+    }
+
     let amountOut = amountOutArray.value[amountOutArray.value.length - 1];
-    let feeBips = BigInt.fromI32(30); // .3% per swap
+    let feeBips = BigInt.fromI32(30); // .3% per swap fees
 
     let amountOutBigDecimal = amountOut
-      .times(BigInt.fromI32(10000))
-      .div(BigInt.fromI32(10000).minus(feeBips.times(numberOfJumps)))
+      .times(constants.BIGINT_TEN_THOUSAND)
+      .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
     return amountOutBigDecimal;
@@ -137,14 +148,9 @@ export function getLpTokenPriceUsdc(
   }
 
   let pricePerLpTokenUsdc = totalLiquidity
-    .times(
-      BigInt.fromI32(10)
-        .pow(pairDecimals as u8)
-        .toBigDecimal()
-    )
+    .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
     .div(totalSupply.toBigDecimal());
 
-  log.warning("pricePerLpTokenUsdc: {}", [pricePerLpTokenUsdc.toString()]);
   return pricePerLpTokenUsdc;
 }
 

@@ -1,7 +1,12 @@
 import * as utils from "../common/utils";
 import { getPriceUsdc } from "./SushiSwapRouter";
 import * as constants from "../common/constants";
-import { Address, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+} from "@graphprotocol/graph-ts";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/Controller/CurveRegistry";
 
 export function getCurvePriceUsdc(
@@ -11,26 +16,24 @@ export function getCurvePriceUsdc(
   let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
 
   const curveRegistry = CurveRegistryContract.bind(
-    constants.CURVE_CONTRACT_ADDRESSES.get(network)!
+    constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!
   );
 
   let basePrice = getBasePrice(curveLpTokenAddress, curveRegistry, network);
   let virtualPrice = getVirtualPrice(curveLpTokenAddress);
 
   let usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
-  let decimalsAdjustment = BigInt.fromI32(18).minus(usdcDecimals);
+  let decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
 
   let price = virtualPrice
     .times(basePrice)
     .times(
-      BigInt.fromI32(10)
-        .pow(decimalsAdjustment.toI32() as u8)
-        .toBigDecimal()
+      constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
     )
     .div(
-      BigInt.fromI32(10)
-        .pow(decimalsAdjustment.plus(BigInt.fromI32(18)).toI32() as u8)
-        .toBigDecimal()
+      constants.BIGINT_TEN.pow(
+        decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8
+      ).toBigDecimal()
     );
 
   return price;
@@ -75,13 +78,13 @@ export function getUnderlyingCoinFromPool(
     coins = coinsArray.value;
   }
 
-  //? Use first coin from pool and if that is empty (due to error) fall back to second coin
+  // Use first coin from pool and if that is empty (due to error) fall back to second coin
   let preferredCoinAddress = coins[0];
   if (preferredCoinAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
     preferredCoinAddress = coins[1];
   }
 
-  //? Look for preferred coins (basic coins)
+  // Look for preferred coins (basic coins)
 
   let coinAddress: Address;
   for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
@@ -100,12 +103,10 @@ export function getUnderlyingCoinFromPool(
   return preferredCoinAddress;
 }
 
-export function getVirtualPrice(
-  curveLpTokenAddress: Address,
-): BigDecimal {
+export function getVirtualPrice(curveLpTokenAddress: Address): BigDecimal {
   let network = dataSource.network();
   const curveRegistry = CurveRegistryContract.bind(
-    constants.CURVE_CONTRACT_ADDRESSES.get(network)!
+    constants.CURVE_REGISTRY_ADDRESS_MAP.get(network)!
   );
 
   let virtualPrice = utils
@@ -118,7 +119,10 @@ export function getVirtualPrice(
   return virtualPrice;
 }
 
-export function getPriceUsdcRecommended(tokenAddress: Address, network: string): BigDecimal {
+export function getPriceUsdcRecommended(
+  tokenAddress: Address,
+  network: string
+): BigDecimal {
   return getPriceUsdc(tokenAddress, network);
 }
 
