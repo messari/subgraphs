@@ -8,7 +8,7 @@ import {
 import {
   Borrow,
   Deposit,
-  Liquidation,
+  Liquidate,
   Repay,
   Withdraw,
 } from "../../generated/schema";
@@ -135,31 +135,31 @@ export function createRepay(
   updateUsageMetrics(event, sender);
 }
 
-export function createLiquidation(
+export function createLiquidate(
   event: ethereum.Event,
   amountLiquidated: BigInt,
   amountLiquidatedUSD: BigDecimal,
   profitUSD: BigDecimal,
   liquidator: Address
 ): void {
-  const liquidation = new Liquidation(
+  const liquidate = new Liquidate(
     `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-liquidation`
   );
-  liquidation.hash = event.transaction.hash.toHexString();
-  liquidation.logIndex = event.logIndex.toI32();
-  liquidation.protocol = getOrCreateLiquityProtocol().id;
+  liquidate.hash = event.transaction.hash.toHexString();
+  liquidate.logIndex = event.logIndex.toI32();
+  liquidate.protocol = getOrCreateLiquityProtocol().id;
   // Liquidated funds may be spread across multiple addresses:
   // https://github.com/liquity/dev#liquidation-logic
   // but there is no data for this, so this is set to stability pool address
-  liquidation.to = STABILITY_POOL;
-  liquidation.from = liquidator.toHexString();
-  liquidation.blockNumber = event.block.number;
-  liquidation.timestamp = event.block.timestamp;
-  liquidation.market = getOrCreateMarket().id;
-  liquidation.asset = getETHToken().id;
-  liquidation.amount = amountLiquidated;
-  liquidation.amountUSD = amountLiquidatedUSD;
-  liquidation.profitUSD = profitUSD;
-  liquidation.save();
+  liquidate.to = STABILITY_POOL;
+  liquidate.from = liquidator.toHexString();
+  liquidate.blockNumber = event.block.number;
+  liquidate.timestamp = event.block.timestamp;
+  liquidate.market = getOrCreateMarket().id;
+  liquidate.asset = getETHToken().id;
+  liquidate.amount = amountLiquidated;
+  liquidate.amountUSD = amountLiquidatedUSD;
+  liquidate.profitUSD = profitUSD;
+  liquidate.save();
   updateUsageMetrics(event, liquidator);
 }

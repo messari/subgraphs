@@ -5,7 +5,7 @@ import {
 import {
   createBorrow,
   createDeposit,
-  createLiquidation,
+  createLiquidate,
   createRepay,
   createWithdraw,
 } from "../entities/event";
@@ -36,7 +36,7 @@ export function handleLiquidation(event: Liquidation): void {
   const profitUSD = bigIntToBigDecimal(event.params._collGasCompensation)
     .times(getCurrentETHPrice())
     .plus(bigIntToBigDecimal(event.params._LUSDGasCompensation));
-  createLiquidation(
+  createLiquidate(
     event,
     amountLiquidatedETH,
     amountLiquidatedUSD,
