@@ -15,12 +15,30 @@ export namespace Network {
   export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
   export const FANTOM = "FANTOM";
+  export const FUSE = "FUSE";
   export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
   export const POLYGON = "POLYGON_POS";
   export const XDAI = "XDAI";
+}
+
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
 }
 
 export namespace ProtocolType {
@@ -42,10 +60,11 @@ export namespace LiquidityPoolFeeType {
   export const FIXED_TRADING_FEE = "FIXED_TRADING_FEE";
   export const TIERED_TRADING_FEE = "TIERED_TRADING_FEE";
   export const DYNAMIC_TRADING_FEE = "DYNAMIC_TRADING_FEE";
+  export const FIXED_LP_FEE = "FIXED_LP_FEE";
+  export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
-
 export namespace RewardTokenType {
   export const DEPOSIT = "DEPOSIT";
   export const BORROW = "BORROW";

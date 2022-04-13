@@ -8,6 +8,7 @@
 
 import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
+import { SubgraphNetwork } from "./constants";
 import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./utils/constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -176,21 +177,21 @@ function getStartingBlockRate(): BigDecimal {
     // Block rates pulled from google searches - rough estimates
 
     let network = dataSource.network()
-    if (network == "mainnet") return BigDecimal.fromString("13.39")
-    else if (network == "arbitrum-one") return BigDecimal.fromString("15")
-    else if (network == "aurora") return BigDecimal.fromString("1.03")
-    else if (network == "bsc") return BigDecimal.fromString("5")
-    else if (network == "celo") return BigDecimal.fromString("5")
-    else if (network == "fantom") return BigDecimal.fromString("1")
-    else if (network == "optimism") return BigDecimal.fromString("12.5")
-    else if (network == "matic") return BigDecimal.fromString("2")
-    else if (network == "xdai") return BigDecimal.fromString("5")
+    if (network == SubgraphNetwork.ETHEREUM) return BigDecimal.fromString("13.39")
+    else if (network == SubgraphNetwork.ARBITRUM) return BigDecimal.fromString("15")
+    else if (network == SubgraphNetwork.AURORA) return BigDecimal.fromString("1.03")
+    else if (network == SubgraphNetwork.BSC) return BigDecimal.fromString("5")
+    else if (network == SubgraphNetwork.CELO) return BigDecimal.fromString("5")
+    else if (network == SubgraphNetwork.FANTOM) return BigDecimal.fromString("1")
+    else if (network == SubgraphNetwork.OPTIMISM) return BigDecimal.fromString("12.5")
+    else if (network == SubgraphNetwork.POLYGON) return BigDecimal.fromString("2")
+    else if (network == SubgraphNetwork.XDAI) return BigDecimal.fromString("5")
 
     // Blocks are mined as needed
-    else if (network == "avalanche") return BigDecimal.fromString("2.5")
+    // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
     // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
     // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
-    // else if (dataSource.network() == "moonbeam") return BigDecimal.fromString("13.39")
-    // else if (dataSource.network() == "moonriver") return BigDecimal.fromString("13.39")
+    // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
+    // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
     else return BIGDECIMAL_ZERO
 }
