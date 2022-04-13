@@ -14,13 +14,12 @@ export namespace SchemaNetwork {
   export const AURORA = "AURORA";
   export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
-  export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
+  export const NEAR = "NEAR";
   export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
   export const POLYGON = "POLYGON_POS";
   export const XDAI = "XDAI";
@@ -28,6 +27,7 @@ export namespace SchemaNetwork {
 
 // The network names corresponding to the ones in `dataSource.network()`
 // They should mainly be used for the ease of comparison.
+// Note that they cannot be used as enums since they are lower case.
 // See below for a complete list:
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace SubgraphNetwork {
