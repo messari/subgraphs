@@ -52,7 +52,7 @@ dataSources:
 
 templates:
   - kind: ethereum/contract
-    name: Pool
+    name: Pair
     network: matic
     source:
       abi: Pair

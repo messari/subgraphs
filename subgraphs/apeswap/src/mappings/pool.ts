@@ -12,7 +12,7 @@ import {
   Swap as SwapEvent,
   Sync,
   Transfer,
-} from "../../generated/templates/Pool/Pair";
+} from "../../generated/templates/Pair/Pair";
 import { getOrCreateDeposit } from "../helpers/deposit";
 import { getOrCreateFinancials } from "../helpers/financials";
 import {
@@ -41,12 +41,12 @@ import {
   toDecimal,
   ZERO_ADDRESS,
 } from "../utils/constant";
-import { deployedNetwork } from "../../config/networkConfig";
+import { deployedNetwork } from "../../config/_networkConfig";
 import {
   findNativeTokenPricePerToken,
   getTrackedLiquidityUSD,
   getTrackedVolumeUSD,
-} from "../utils/pricing";
+} from "../common/utils/price";
 
 export function handleTransfer(event: Transfer): void {
   log.info("Transfer mapping on pool {}", [event.address.toHexString()]);

@@ -183,6 +183,8 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+
+  _poolIds: [Bytes!]!
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -274,6 +276,7 @@ type LiquidityPool @entity {
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
 }
 
 #################################
@@ -475,6 +478,9 @@ type _TokenTracker @entity {
 type _LiquidityPoolAmounts @entity {
   " Smart contract address of the pool "
   id: ID!
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
+
 }

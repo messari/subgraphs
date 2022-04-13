@@ -80,6 +80,11 @@ export namespace TransferType {
   export const BURN = "BURN";
 }
 
+export namespace HelperStoreType {
+  export const ETHER = 'ETHER'
+  export const USERS = 'USERS'
+}
+
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const DEFAULT_DECIMALS: i32 = 18;
 export const HELPER_STORE_ID = "1"; // ID that track USD price of native token in helper store
@@ -102,6 +107,8 @@ export let BIGINT_THOUSAND = BigInt.fromI32(INT_THOUSAND);
 export let BIGDECIMAL_ZERO = BigDecimal.fromString(STRING_ZERO);
 export let BIGDECIMAL_ONE = BigDecimal.fromString(STRING_ONE);
 export let BIGDECIMAL_TWO = BigDecimal.fromString(STRING_TWO);
+export let BIGDECIMAL_HUNDRED = BigDecimal.fromString(STRING_HUNDRED);
+
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 
 export function toDecimal(value: BigInt, decimals: i32 = DEFAULT_DECIMALS): BigDecimal {
