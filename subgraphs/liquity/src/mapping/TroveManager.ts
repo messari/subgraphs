@@ -1,5 +1,6 @@
 import {
   Liquidation,
+  Redemption,
   TroveUpdated,
 } from "../../generated/TroveManager/TroveManager";
 import {
@@ -14,12 +15,24 @@ import { getCurrentETHPrice } from "../entities/price";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { BIGINT_ZERO } from "../utils/constants";
 import { _Trove } from "../../generated/schema";
+import {
+  addProtocolSideRevenue,
+  addSupplySideRevenue,
+} from "../entities/protocol";
 
 enum TroveManagerOperation {
   applyPendingRewards,
   liquidateInNormalMode,
   liquidateInRecoveryMode,
   redeemCollateral,
+}
+
+export function handleRedemption(event: Redemption): void {
+  const feeAmountETH = event.params._ETHFee;
+  const feeAmountUSD = bigIntToBigDecimal(feeAmountETH).times(
+    getCurrentETHPrice()
+  );
+  addProtocolSideRevenue(event, feeAmountUSD);
 }
 
 /**
@@ -43,6 +56,9 @@ export function handleLiquidation(event: Liquidation): void {
     profitUSD,
     event.transaction.from
   );
+  const supplySideRevenueUSD = amountLiquidatedUSD.minus(profitUSD);
+  addSupplySideRevenue(event, supplySideRevenueUSD);
+  addProtocolSideRevenue(event, profitUSD);
 }
 
 /**

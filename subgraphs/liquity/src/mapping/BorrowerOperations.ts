@@ -10,7 +10,7 @@ import {
 } from "../entities/event";
 import { getOrCreateTrove } from "../entities/trove";
 import { getCurrentETHPrice } from "../entities/price";
-import { addUSDFees } from "../entities/protocol";
+import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
 /**
@@ -21,7 +21,7 @@ import { bigIntToBigDecimal } from "../utils/numbers";
 export function handleLUSDBorrowingFeePaid(event: LUSDBorrowingFeePaid): void {
   const feeAmountLUSD = event.params._LUSDFee;
   const feeAmountUSD = bigIntToBigDecimal(feeAmountLUSD);
-  addUSDFees(event, feeAmountUSD);
+  addProtocolSideRevenue(event, feeAmountUSD);
 }
 
 /**

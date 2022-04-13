@@ -87,11 +87,12 @@ export function setMarketETHBalance(
 ): void {
   const balanceUSD = bigIntToBigDecimal(balanceETH).times(getCurrentETHPrice());
   const market = getOrCreateMarket();
+  const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD)
   market.totalValueLockedUSD = balanceUSD;
   market.totalDepositUSD = balanceUSD;
   market.inputTokenBalances = [balanceETH];
   market.inputTokenPricesUSD = [getCurrentETHPrice()];
   market.save();
   createMarketSnapshot(event, market);
-  updateUSDLocked(event, balanceUSD);
+  updateUSDLocked(event, netChangeUSD);
 }

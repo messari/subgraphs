@@ -14,6 +14,7 @@ import {
   SECONDS_PER_DAY,
   TROVE_MANAGER,
 } from "../utils/constants";
+import { getOrCreateMarket } from "./market";
 
 export function getOrCreateLiquityProtocol(): LendingProtocol {
   let protocol = LendingProtocol.load(TROVE_MANAGER);
@@ -94,15 +95,27 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetrics.save();
 }
 
-export function addUSDFees(
+export function addProtocolSideRevenue(
   event: ethereum.Event,
-  feeAmountUSD: BigDecimal
+  revenueAmountUSD: BigDecimal
 ): void {
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
   financialsSnapshot.totalRevenueUSD =
-    financialsSnapshot.totalRevenueUSD.plus(feeAmountUSD);
+    financialsSnapshot.totalRevenueUSD.plus(revenueAmountUSD);
+  financialsSnapshot.protocolSideRevenueUSD =
+    financialsSnapshot.protocolSideRevenueUSD.plus(revenueAmountUSD);
+  financialsSnapshot.save();
+}
+
+export function addSupplySideRevenue(
+  event: ethereum.Event,
+  revenueAmountUSD: BigDecimal
+): void {
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
+  financialsSnapshot.totalRevenueUSD =
+    financialsSnapshot.totalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.supplySideRevenueUSD =
-    financialsSnapshot.supplySideRevenueUSD.plus(feeAmountUSD);
+    financialsSnapshot.supplySideRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 }
 
@@ -121,15 +134,32 @@ export function addUSDVolume(
 
 export function updateUSDLocked(
   event: ethereum.Event,
-  lockedUSD: BigDecimal
+  netChangeUSD: BigDecimal
 ): void {
   const protocol = getOrCreateLiquityProtocol();
-  protocol.totalValueLockedUSD = lockedUSD;
-  protocol.totalDepositUSD = lockedUSD;
+  const totalValueLocked = protocol.totalValueLockedUSD.plus(netChangeUSD);
+  protocol.totalValueLockedUSD = totalValueLocked;
+  protocol.totalDepositUSD = totalValueLocked;
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
-  financialsSnapshot.totalValueLockedUSD = lockedUSD;
-  financialsSnapshot.totalDepositUSD = lockedUSD;
+  financialsSnapshot.totalValueLockedUSD = totalValueLocked;
+  financialsSnapshot.totalDepositUSD = totalValueLocked;
+  financialsSnapshot.save();
+}
+
+export function updateUSDLockedStabilityPool(
+  event: ethereum.Event,
+  stabilityPoolTVL: BigDecimal
+): void {
+  const protocol = getOrCreateLiquityProtocol();
+  const market = getOrCreateMarket();
+  const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);
+  protocol.totalValueLockedUSD = totalValueLocked;
+  protocol.totalDepositUSD = totalValueLocked;
+  protocol.save();
+  const financialsSnapshot = getOrCreateFinancialsSnapshot(event);
+  financialsSnapshot.totalValueLockedUSD = totalValueLocked;
+  financialsSnapshot.totalDepositUSD = totalValueLocked;
   financialsSnapshot.save();
 }
 

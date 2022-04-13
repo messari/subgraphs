@@ -23,6 +23,7 @@ dataSources:
         - UsageMetricsDailySnapshot
         - DailyActiveAccount
         - Account
+        - FinancialsDailySnapshot
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
@@ -31,6 +32,8 @@ dataSources:
           handler: handleLiquidation
         - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
+        - event: Redemption(uint256,uint256,uint256,uint256)
+          handler: handleRedemption
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
@@ -103,6 +106,7 @@ dataSources:
         - Token
         - MarketDailySnapshot
         - _Price
+        - FinancialsDailySnapshot
       abis:
         - name: ActivePool
           file: ./abis/ActivePool.json
@@ -140,3 +144,29 @@ dataSources:
         - event: CollBalanceUpdated(indexed address,uint256)
           handler: handleCollBalanceUpdated
       file: ./src/mapping/CollSurplusPool.ts
+  - kind: ethereum/contract
+    name: StabilityPool
+    network: mainnet
+    source:
+      address: "0x66017D22b0f8556afDd19FC67041899Eb65a21bb"
+      abi: StabilityPool
+      startBlock: 12178565
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Price
+        - LendingProtocol
+        - Token
+        - FinancialsDailySnapshot
+        - Market
+      abis:
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+      eventHandlers:
+        - event: StabilityPoolETHBalanceUpdated(uint256)
+          handler: handleStabilityPoolETHBalanceUpdated
+        - event: StabilityPoolLUSDBalanceUpdated(uint256)
+          handler: handleStabilityPoolLUSDBalanceUpdated
+      file: ./src/mapping/StabilityPool.ts
