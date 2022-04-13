@@ -1,44 +1,36 @@
 import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { Factory } from "../generated/Factory/Factory";
-import { Network, toPercentage } from "../src/utils/constant";
+import { SchemaNetwork, SubgraphNetwork, toPercentage } from "../src/utils/constant";
 import {
   bscNativeTokenPriceInUSD,
   polygonNativeTokenPriceInUSD,
 } from "../src/utils/pricing";
 
-class DeployedNetwork {
-  network: string; // The deployed network(e.g BSC or Polygon )
-  factoryContract: Factory; // Factory Contract of protocol in the network
-  factoryAddress: string; // factory address of the protocol in the network
-  tradingFee: BigDecimal; // trading fee of the protocol in the network
-  protocolFee: BigDecimal; // protocol fee of the protocol in the network
-  supplyFee: BigDecimal; // supply fee of the protocol in the network
-  wrappedNativeTokenAddress: string; // Address of wrapped native token
-  nativeTokenPriceInUSD: BigDecimal; // Current USD value of the Native token
-  whitelist: string[]; // A tokens whose amounts should contribute to tracked volume and liquidity
+let NETWORK: string; // The deployed network(e.g BSC or Polygon )
+let FACTORY_ADDRESS: string; // factory address of the protocol in the network
+let FACTORY_CONTRACT: Factory; // Factory Contract of protocol in the network
+let TRADING_FEE: BigDecimal; // trading fee of the protocol in the network
+let PROTOCOL_FEE: BigDecimal; // protocol fee of the protocol in the network
+let LP_FEE: BigDecimal; // supply fee of the protocol in the network
+let NATIVE_TOKEN: string; // Address of wrapped native token
+let WHITELIST_TOKENS: string[]; // A tokens whose amounts should contribute to tracked volume and liquidity
 
-  constructor(
-    network: string,
-    factoryContract: Factory,
-    factoryAddress: string,
-    tradingFee: BigDecimal,
-    protocolFee: BigDecimal,
-    supplyFee: BigDecimal,
-    wrappedNativeTokenAddress: string,
-    nativeTokenPriceInUSD: BigDecimal,
-    whitelist: string[],
-  ) {
-    this.network = network;
-    this.factoryContract = factoryContract;
-    this.factoryAddress = factoryAddress;
-    this.tradingFee = tradingFee;
-    this.protocolFee = protocolFee;
-    this.supplyFee = supplyFee;
-    this.wrappedNativeTokenAddress = wrappedNativeTokenAddress;
-    this.nativeTokenPriceInUSD = nativeTokenPriceInUSD;
-    this.whitelist = whitelist;
-  }
+if (dataSource.network !== SubgraphNetwork.BSC) {
+  NETWORK = SchemaNetwork.POLYGON
+  FACTORY_ADDRESS = "0xCf083Be4164828f00cAE704EC15a36D711491284";
+  FACTORY_CONTRACT = Factory.bind(Address.fromString(FACTORY_CONTRACT));
+  TRADING_FEE = toPercentage(0.1);
+  PROTOCOL_FEE = toPercentage(0.1);
+  LP_FEE
+  NATIVE_TOKEN = "0x0000000000000000000000000000000000000000";
+  WHITELIST_TOKENS = [
+
 }
+
+else (dataSource.network !== SubgraphNetwork.POLYGON) {
+}
+
+
 
 const POLYGON_NETWORK = "matic";
 const TRADING_FEE = toPercentage(BigDecimal.fromString("0.2"));
