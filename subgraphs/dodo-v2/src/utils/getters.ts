@@ -19,6 +19,7 @@ import {
   ZERO_BD,
   ZERO_BI,
   ONE_BI,
+  WRAPPED_ETH,
   Network,
   ProtocolType,
   RewardTokenType,
@@ -249,44 +250,51 @@ export function getUSDprice(
   let sc2 = STABLE_COINS[1];
   let sc3 = STABLE_COINS[2];
 
+  let divisionCounter = 0;
+
   log.info("address of token whos price is being checked: {} ", [
     tokenAddress.toHexString()
   ]);
   // let scAdd = STABLE_COINS[i];
   // for whatever reason trying to access the stablecoins array
   // from within a for loop causes a weird nondescript array error
-  log.info("Stablecoin being used: {} ", [sc1]);
   let tokenPrice1 = _TokenPrice.load(tokenAddress.toHexString() + sc1);
   if (!tokenPrice1) {
     tokenPrice1 = new _TokenPrice(tokenAddress.toHex() + sc1);
     let token = getOrCreateToken(tokenAddress);
     tokenPrice1.token = token.id;
   }
+  if (tokenPrice1.currentUSDprice > BigDecimal.fromString("0")) {
+    total = tokenPrice1.currentUSDprice;
+    divisionCounter++;
+  }
 
-  total = tokenPrice1.currentUSDprice;
-
-  log.info("Stablecoin being used: {} ", [sc2]);
   let tokenPrice2 = _TokenPrice.load(tokenAddress.toHexString() + sc2);
   if (!tokenPrice2) {
     tokenPrice2 = new _TokenPrice(tokenAddress.toHex() + sc2);
     let token = getOrCreateToken(tokenAddress);
     tokenPrice2.token = token.id;
   }
-  total = total + tokenPrice2.currentUSDprice;
 
-  log.info("Stablecoin being used: {} ", [sc3]);
+  if (tokenPrice2.currentUSDprice > BigDecimal.fromString("0")) {
+    total = total + tokenPrice2.currentUSDprice;
+    divisionCounter++;
+  }
+
   let tokenPrice3 = _TokenPrice.load(tokenAddress.toHexString() + sc3);
   if (!tokenPrice3) {
     tokenPrice3 = new _TokenPrice(tokenAddress.toHex() + sc3);
     let token = getOrCreateToken(tokenAddress);
     tokenPrice3.token = token.id;
   }
-  total = total + tokenPrice3.currentUSDprice;
-
+  if (tokenPrice3.currentUSDprice > BigDecimal.fromString("0")) {
+    total = total + tokenPrice3.currentUSDprice;
+    divisionCounter++;
+  }
   if (total == ZERO_BD) {
     return ZERO_BD;
   }
-  let price = safeDiv(total, BigDecimal.fromString("3"));
+  let price = safeDiv(total, BigDecimal.fromString(divisionCounter.toString()));
 
   return price;
 }
@@ -310,13 +318,72 @@ export function setUSDprice(
     tokenPrice = new _TokenPrice(
       tokenAdd.toHexString() + stableCoin.toHexString()
     );
-    log.info("ID of _TokenPrice being created setPrice: {} ", [
-      tokenAdd.toHexString() + stableCoin.toHexString()
-    ]);
+
     let token = getOrCreateToken(tokenAdd);
     tokenPrice.token = token.id;
   }
   tokenPrice.currentUSDprice = pricePerToken;
 
   tokenPrice.save();
+}
+
+export function setUSDpriceWETH(
+  tokenAdd: Address,
+  trader: Address,
+  amount: BigInt,
+  wETHamount: BigInt
+): void {
+  let ethPricePerToken = safeDiv(
+    bigIntToBigDecimal(amount),
+    bigIntToBigDecimal(wETHamount)
+  );
+
+  let pricePerToken = getUSDprice(
+    trader,
+    Address.fromString(WRAPPED_ETH),
+    BigInt.fromString(ethPricePerToken.toString())
+  );
+  let token = getOrCreateToken(tokenAdd);
+
+  let tokenPrice1 = _TokenPrice.load(
+    tokenAdd.toHexString() + Address.fromString(STABLE_COINS[0]).toHexString()
+  );
+
+  if (!tokenPrice1) {
+    tokenPrice1 = new _TokenPrice(
+      tokenAdd.toHexString() + Address.fromString(STABLE_COINS[0]).toHexString()
+    );
+    tokenPrice1.token = token.id;
+  }
+  tokenPrice1.currentUSDprice = pricePerToken;
+
+  tokenPrice1.save();
+
+  let tokenPrice2 = _TokenPrice.load(
+    tokenAdd.toHexString() + Address.fromString(STABLE_COINS[1]).toHexString()
+  );
+
+  if (!tokenPrice2) {
+    tokenPrice2 = new _TokenPrice(
+      tokenAdd.toHexString() + Address.fromString(STABLE_COINS[1]).toHexString()
+    );
+    tokenPrice2.token = token.id;
+  }
+  tokenPrice2.currentUSDprice = pricePerToken;
+
+  tokenPrice2.save();
+
+  let tokenPrice3 = _TokenPrice.load(
+    tokenAdd.toHexString() + Address.fromString(STABLE_COINS[2]).toHexString()
+  );
+
+  if (!tokenPrice3) {
+    tokenPrice3 = new _TokenPrice(
+      tokenAdd.toHexString() + Address.fromString(STABLE_COINS[2]).toHexString()
+    );
+    tokenPrice3.token = token.id;
+  }
+  tokenPrice3.currentUSDprice = pricePerToken;
+
+  tokenPrice3.save();
 }

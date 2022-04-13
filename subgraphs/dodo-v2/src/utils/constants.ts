@@ -10,15 +10,7 @@ export const DSPFactory_ADDRESS = "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4";
 /**
  * usd pricing
  */
-export const WRAPPED_BASE_COIN = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-//pricing supported stable coins
-export const STABLE_ONE_ADDRESS = "0xdac17f958d2ee523a2206206994597c13d831ec7"; //usdt
-export const STABLE_TWO_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"; //usdc
-//stable coins pairs
-export const STABLE_COIN_PAIR_ONE =
-  "0xc9f93163c99695c6526b799ebca2207fdf7d61ad"; //[USDT_USDC_PAIR]
-//base currency pair
-export const BASE_COIN_PAIR = "0x75c23271661d9d143dcb617222bc4bec783eff34"; //[WETH_USDC_PAIR]
+export const WRAPPED_ETH = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2";
 
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);

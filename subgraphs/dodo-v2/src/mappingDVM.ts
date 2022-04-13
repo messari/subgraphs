@@ -43,7 +43,14 @@ import {
 export function handleBuyShares(event: BuyShares): void {
   updateUsageMetrics(event, event.params.to);
   updateFinancials(event);
-  // updatePoolMetrics(event);
+  updatePoolMetrics(
+    event,
+    event.address,
+    [],
+    event.params.to,
+    [],
+    event.params.increaseShares
+  );
 }
 
 export function handleSellShares(event: SellShares): void {
@@ -60,6 +67,7 @@ export function handleDODOSwap(event: DODOSwap): void {
     event.address,
     [event.params.fromToken, event.params.toToken],
     event.params.trader,
-    [event.params.fromAmount, event.params.toAmount]
+    [event.params.fromAmount, event.params.toAmount],
+    BigInt.fromI32(0)
   );
 }

@@ -22,7 +22,8 @@ import {
   ADDRESS_ZERO,
   ZERO_BD,
   ONE_BI,
-  STABLE_COINS
+  STABLE_COINS,
+  WRAPPED_ETH
 } from "./constants";
 
 import {
@@ -32,7 +33,8 @@ import {
   getOrCreateFinancials,
   getOrCreatePool,
   getUSDprice,
-  setUSDprice
+  setUSDprice,
+  setUSDpriceWETH
 } from "./getters";
 
 import { ERC20 } from "../../generated/ERC20/ERC20";
@@ -100,85 +102,110 @@ export function updatePoolMetrics(
   poolAdd: Address,
   tokenAdds: Address[],
   trader: Address,
-  amount: BigInt[]
+  amount: BigInt[],
+  lpTokenEmitted: BigInt
 ): void {
   let poolMetrics = getOrCreatePoolDailySnapshot(event);
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
 
   let protocol = getOrCreateDexAmm(event.address);
 
-  let token1 = ERC20.bind(tokenAdds[0]);
-  let token2 = ERC20.bind(tokenAdds[1]);
-  let lpToken = ERC20.bind(Address.fromString(pool.outputToken));
+  if (lpTokenEmitted == BigInt.fromI32(0)) {
+    let token1 = ERC20.bind(tokenAdds[0]);
+    let token2 = ERC20.bind(tokenAdds[1]);
+    let lpToken = ERC20.bind(Address.fromString(pool.outputToken));
 
-  let poolInstance = DVM.bind(poolAdd);
+    let poolInstance = DVM.bind(poolAdd);
 
-  let tokenBal1 = token1.try_balanceOf(poolAdd);
-  if (tokenBal1.reverted) {
-    return;
-  }
+    let tokenBal1 = token1.try_balanceOf(poolAdd);
+    if (tokenBal1.reverted) {
+      return;
+    }
 
-  let tokenBal2 = token2.try_balanceOf(poolAdd);
-  if (tokenBal2.reverted) {
-    return;
-  }
+    let tokenBal2 = token2.try_balanceOf(poolAdd);
+    if (tokenBal2.reverted) {
+      return;
+    }
 
-  let lpSupply = poolInstance.try_totalSupply();
-  if (lpSupply.reverted) {
-    return;
-  }
+    let lpSupply = poolInstance.try_totalSupply();
+    if (lpSupply.reverted) {
+      return;
+    }
 
-  let totalUSDvalTransaction = ZERO_BD;
+    let totalUSDvalTransaction = ZERO_BD;
 
-  let totalUSDvalPool = ZERO_BD;
+    let totalUSDvalPool = ZERO_BD;
 
-  log.info("this is the transaction hash: {} ", [
-    event.transaction.hash.toHexString()
-  ]);
-  //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
-  //If either tokens are call the setUSDprice function to set a price for the other token
-  if (
-    tokenAdds[0] == Address.fromString(STABLE_COINS[0]) ||
-    tokenAdds[0] == Address.fromString(STABLE_COINS[1]) ||
-    tokenAdds[0] == Address.fromString(STABLE_COINS[2])
-  ) {
-    setUSDprice(tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
-  }
+    //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
+    //If either tokens are call the setUSDprice function to set a price for the other token
+    if (
+      tokenAdds[0] == Address.fromString(STABLE_COINS[0]) ||
+      tokenAdds[0] == Address.fromString(STABLE_COINS[1]) ||
+      tokenAdds[0] == Address.fromString(STABLE_COINS[2])
+    ) {
+      setUSDprice(tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
+    }
 
-  if (
-    tokenAdds[1] == Address.fromString(STABLE_COINS[0]) ||
-    tokenAdds[1] == Address.fromString(STABLE_COINS[1]) ||
-    tokenAdds[1] == Address.fromString(STABLE_COINS[2])
-  ) {
-    setUSDprice(tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
-  }
+    if (
+      tokenAdds[1] == Address.fromString(STABLE_COINS[0]) ||
+      tokenAdds[1] == Address.fromString(STABLE_COINS[1]) ||
+      tokenAdds[1] == Address.fromString(STABLE_COINS[2])
+    ) {
+      setUSDprice(tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
+    }
 
-  for (let i = 0; i < tokenAdds.length; i++) {
-    let usdValueOfTransaction = getUSDprice(tokenAdds[i], trader, amount[i]);
+    //check if either token is wETH and if so set current USD price through wETH
+    if (tokenAdds[0] == Address.fromString(WRAPPED_ETH)) {
+      setUSDpriceWETH(tokenAdds[1], trader, amount[1], amount[0]);
+    }
+
+    if (tokenAdds[1] == Address.fromString(WRAPPED_ETH)) {
+      setUSDpriceWETH(tokenAdds[0], trader, amount[0], amount[1]);
+    }
+
+    let usdValueOfTransaction: BigDecimal = BigDecimal.fromString("0");
+
+    usdValueOfTransaction = getUSDprice(tokenAdds[0], trader, amount[0]);
     log.info("this is the USD value returned: {} ", [
       usdValueOfTransaction.toString()
     ]);
+
+    let usdValueOfToken1 = getUSDprice(trader, tokenAdds[0], tokenBal1.value);
+    let usdValueOfToken2 = getUSDprice(trader, tokenAdds[1], tokenBal2.value);
+    let usdValofPool = usdValueOfToken1 + usdValueOfToken2;
+    let lpTokenUSD = getUSDprice(
+      Address.fromString(pool.outputToken),
+      trader,
+      BigInt.fromString("1000000000000000000")
+    );
+
+    poolMetrics.totalValueLockedUSD = usdValofPool;
+    poolMetrics.totalVolumeUSD = pool.totalVolumeUSD.plus(
+      usdValueOfTransaction
+    );
+    poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
+    poolMetrics.outputTokenSupply = lpSupply.value;
+    poolMetrics.outputTokenPriceUSD = lpTokenUSD;
+    poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.save();
+    pool.save();
+  } else {
+    let lpTokenUSD = getUSDprice(
+      Address.fromString(pool.outputToken),
+      trader,
+      lpTokenEmitted
+    );
+
+    poolMetrics.rewardTokenEmissionsAmount = [lpTokenEmitted];
+    poolMetrics.rewardTokenEmissionsUSD = [lpTokenUSD];
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.save();
+    pool.save();
   }
-
-  let usdValueOfToken1 = getUSDprice(tokenAdds[0], trader, tokenBal1.value);
-  let usdValueOfToken2 = getUSDprice(tokenAdds[1], trader, tokenBal2.value);
-  let usdValofPool = usdValueOfToken1 + usdValueOfToken2;
-  let lpTokenUSD = getUSDprice(
-    Address.fromString(pool.outputToken),
-    trader,
-    BigInt.fromString("1000000000000000000")
-  );
-
-  poolMetrics.totalValueLockedUSD = usdValofPool;
-  // poolMetrics.totalVolumeUSD = pool.totalVolumeUSD;
-  poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
-  poolMetrics.outputTokenSupply = lpSupply.value;
-  poolMetrics.outputTokenPriceUSD = lpTokenUSD;
-  // poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
-  // poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
-  poolMetrics.blockNumber = event.block.number;
-  poolMetrics.timestamp = event.block.timestamp;
-
-  poolMetrics.save();
-  pool.save();
 }

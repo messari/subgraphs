@@ -283,7 +283,7 @@ type Swap implements Event @entity {
 ##### Helper Entities #####
 ###########################
 
-# Helper entities are additional entities created to help with mapping.
+# Helper entities are additional entities cre[ated to help with mapping.
 # They are usually used to store internal states that would simplify
 # the mapping logic. All helper entities should be prefixed with an
 # underscore to differentiate them from the common schema.
@@ -304,3 +304,10 @@ type _TokenPrice @entity {
   token: Token!
   currentUSDprice: BigDecimal!
 }
+
+# type _DailyPoolstats @entity {
+#   id: ID!
+#   lpToken: Token!
+#   dailyEmissions: BigInt!
+#   deUSDamount: Bigint!
+# }
