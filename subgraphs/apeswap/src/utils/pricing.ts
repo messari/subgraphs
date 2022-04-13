@@ -1,5 +1,5 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { _HelperStore, LiquidityPool, Token } from "../../generated/schema";
+import { _HelperStore, LiquidityPool, Token, _LiquidityPoolAmounts } from "../../generated/schema";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -10,53 +10,50 @@ import {
 import { BSC, deployedNetwork, POLYGON } from "../../config/networkConfig";
 import { getOrCreateToken } from "./token";
 
-// @returns Native token price in USD in the first network(in this case bsc newtwork)
-export function bscNativeTokenPriceInUSD(): BigDecimal {
-  // fetch eth prices for each stablecoin
-  let usdtPair = LiquidityPool.load(
-    Address.fromString(BSC.USDT_WBNB_PAIR).toHexString(), // usdt is token0
-  ); // usdt is token0
-  let busdPair = LiquidityPool.load(
-    Address.fromString(BSC.BUSD_WBNB_PAIR).toHexString(), // busd is token1
-  ); // busd is token1
-  let daiPair = LiquidityPool.load(
-    Address.fromString(BSC.DAI_WBNB_PAIR).toHexString(), // dai is token0
-  ); // dai is token1
+function token0PairPrice(pool: _LiquidityPoolAmounts): BigDecimal {
+  if (pool.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) {
+    return pool.inputTokenBalances[0].div(pool.inputTokenBalances[1])
+  }
+  else return BIGDECIMAL_ZERO
+}
+function token1PairPrice(pool: _LiquidityPoolAmounts): BigDecimal {
+  if (pool.inputTokenBalances[0].notEqual(BIGDECIMAL_ZERO)) {
+    return pool.inputTokenBalances[1].div(pool.inputTokenBalances[0])
+  }
+  else return BIGDECIMAL_ZERO
+}
 
-  if (busdPair !== null && usdtPair !== null && daiPair !== null) {
-    let totalLiquidityInNativeToken = daiPair._reserve1
-      .plus(busdPair._reserve0)
-      .plus(usdtPair._reserve1);
-    if (totalLiquidityInNativeToken.notEqual(BIGDECIMAL_ZERO)) {
-      let daiWeight = daiPair._reserve1.div(totalLiquidityInNativeToken);
-      let busdWeight = busdPair._reserve0.div(totalLiquidityInNativeToken);
-      let usdtWeight = usdtPair._reserve1.div(totalLiquidityInNativeToken);
-      return daiPair._token0Price
-        .times(daiWeight)
-        .plus(busdPair._token1Price.times(busdWeight))
-        .plus(usdtPair._token0Price.times(usdtWeight));
-    }
-    return BIGDECIMAL_ZERO;
-    // busd and usdt have been created
-  } else if (busdPair !== null && usdtPair !== null) {
-    let totalLiquidityInNativeToken = busdPair._reserve0.plus(
-      usdtPair._reserve1,
-    );
-    if (totalLiquidityInNativeToken.notEqual(BIGDECIMAL_ZERO)) {
-      let busdWeight = busdPair._reserve0.div(totalLiquidityInNativeToken);
-      let usdtWeight = usdtPair._reserve1.div(totalLiquidityInNativeToken);
-      return busdPair._token1Price
-        .times(busdWeight)
-        .plus(usdtPair._token0Price.times(usdtWeight));
-      // usdt is the only pair so far
-    }
-    return BIGDECIMAL_ZERO;
-  } else if (busdPair !== null) {
-    return busdPair._token1Price;
-  } else if (usdtPair !== null) {
-    return usdtPair._token0Price;
+
+export function getEthPriceInUSD(): BigDecimal {
+  // fetch eth prices for each stablecoin
+  let Pair = _LiquidityPoolAmounts.load(BSC.BUSD_WBNB_PAIR) // dai is token0
+  let daiPair = _LiquidityPoolAmounts.load(BSC.DAI_WBNB_PAIR) // usdc is token0
+  let usdtPair = _LiquidityPoolAmounts.load(BSC.USDT_WBNB_PAIR) // usdt is token1
+
+  // all 3 have been created
+  if (daiPair !== null && usdcPair !== null && usdtPair !== null) {
+
+    let totalLiquidityETH = daiPair.inputTokenBalances[1].plus(usdcPair.inputTokenBalances[1]).plus(usdtPair.inputTokenBalances[0])
+    if (totalLiquidityETH == BIGDECIMAL_ZERO) return BIGDECIMAL_ZERO
+    let daiWeight = daiPair.inputTokenBalances[1].div(totalLiquidityETH)
+    let usdcWeight = usdcPair.inputTokenBalances[1].div(totalLiquidityETH)
+    let usdtWeight = usdtPair.inputTokenBalances[0].div(totalLiquidityETH)
+
+    return token0PairPrice(daiPair)
+      .times(daiWeight)
+      .plus(token0PairPrice(usdcPair).times(usdcWeight))
+      .plus(token1PairPrice(usdtPair).times(usdtWeight))
+    // dai and USDC have been created
+  } else if (daiPair !== null && usdcPair !== null) {
+    let totalLiquidityETH = daiPair.inputTokenBalances[1].plus(usdcPair.inputTokenBalances[1])
+    let daiWeight = daiPair.inputTokenBalances[1].div(totalLiquidityETH)
+    let usdcWeight = usdcPair.inputTokenBalances[1].div(totalLiquidityETH)
+    return token0PairPrice(daiPair).times(daiWeight).plus(token0PairPrice(usdcPair).times(usdcWeight))
+    // USDC is the only pair so far
+  } else if (usdcPair !== null) {
+    return token0PairPrice(usdcPair)
   } else {
-    return BIGDECIMAL_ZERO;
+    return BIGDECIMAL_ONE
   }
 }
 
