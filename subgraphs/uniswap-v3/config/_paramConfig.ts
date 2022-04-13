@@ -1,19 +1,19 @@
 import { dataSource } from '@graphprotocol/graph-ts';
 import { SchemaNetwork, SubgraphNetwork } from "../src/common/utils/constants"
 
-let DEPLOYED_NETWORK_TEMP: string
-let FACTORY_ADDRESS_TEMP: string
-let NATIVE_TOKEN_TEMP: string
-let NATIVE_TOKEN_STABLE_COIN_POOL_TEMP: string
-let WHITELIST_TOKENS_TEMP: string[]
-let STABLE_COINS_TEMP: string[]
+let DEPLOYED_NETWORK_TEMP: string           // Name of network deployed to
+let FACTORY_ADDRESS_TEMP: string            // Address of the factory contract
+let NATIVE_TOKEN_TEMP: string               // Address of the native token contract
+let NATIVE_TOKEN_ORACLE_POOL_TEMP: string   // Address of the native token oracle pool contract
+let WHITELIST_TOKENS_TEMP: string[]         // List of addresses of whitelisted tokens
+let STABLE_COINS_TEMP: string[]             // List of addresses of stable coins
 
 if (dataSource.network() == SubgraphNetwork.ETHEREUM) {
     DEPLOYED_NETWORK_TEMP = SchemaNetwork.ETHEREUM 
     FACTORY_ADDRESS_TEMP  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 
     NATIVE_TOKEN_TEMP = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
-    NATIVE_TOKEN_STABLE_COIN_POOL_TEMP = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8' // wETH/USDC
+    NATIVE_TOKEN_ORACLE_POOL_TEMP = '0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8' // wETH/USDC
 
     // token where amounts should contribute to tracked volume and liquidity
     // usually tokens that many tokens are paired with s
@@ -55,7 +55,7 @@ else if (dataSource.network() == SubgraphNetwork.POLYGON) {
     FACTORY_ADDRESS_TEMP  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 
     NATIVE_TOKEN_TEMP = '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'
-    NATIVE_TOKEN_STABLE_COIN_POOL_TEMP = '0x45dDa9cb7c25131DF268515131f647d726f50608' // wETH/USDC
+    NATIVE_TOKEN_ORACLE_POOL_TEMP = '0x45dDa9cb7c25131DF268515131f647d726f50608' // wETH/USDC
 
     // token where amounts should contribute to tracked volume and liquidity
     // usually tokens that many tokens are paired with s
@@ -83,7 +83,7 @@ else if (dataSource.network() == SubgraphNetwork.OPTIMISM) {
     FACTORY_ADDRESS_TEMP  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 
     NATIVE_TOKEN_TEMP = '0x4200000000000000000000000000000000000006'
-    NATIVE_TOKEN_STABLE_COIN_POOL_TEMP = '0x03aF20bDAaFfB4cC0A521796a223f7D85e2aAc31' // wETH/DAI
+    NATIVE_TOKEN_ORACLE_POOL_TEMP = '0x03aF20bDAaFfB4cC0A521796a223f7D85e2aAc31' // wETH/DAI
 
     // token where amounts should contribute to tracked volume and liquidity
     // usually tokens that many tokens are paired with s
@@ -111,7 +111,7 @@ else {
     FACTORY_ADDRESS_TEMP  = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 
     NATIVE_TOKEN_TEMP = '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1'
-    NATIVE_TOKEN_STABLE_COIN_POOL_TEMP = '0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443' // wETH/USDC
+    NATIVE_TOKEN_ORACLE_POOL_TEMP = '0xC31E54c7a869B9FcBEcc14363CF510d1c41fa443' // wETH/USDC
     // token where amounts should contribute to tracked volume and liquidity
     // usually tokens that many tokens are paired with s
     WHITELIST_TOKENS_TEMP = [
@@ -133,7 +133,7 @@ export namespace NetworkParameters {
     export const NETWORK = DEPLOYED_NETWORK_TEMP 
     export const FACTORY_ADDRESS = FACTORY_ADDRESS_TEMP
     export const NATIVE_TOKEN = NATIVE_TOKEN_TEMP
-    export const NATIVE_TOKEN_STABLE_COIN_POOL = NATIVE_TOKEN_STABLE_COIN_POOL_TEMP
+    export const NATIVE_TOKEN_ORACLE_POOL = NATIVE_TOKEN_ORACLE_POOL_TEMP
     export let WHITELIST_TOKENS = WHITELIST_TOKENS_TEMP
     export let STABLE_COINS = STABLE_COINS_TEMP
 }
