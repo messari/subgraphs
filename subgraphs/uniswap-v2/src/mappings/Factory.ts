@@ -1,11 +1,11 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal } from '@graphprotocol/graph-ts'
-import { PairCreated, SetFeeToCall } from './../generated/Factory/Factory'
-import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, TRADING_FEE_TO_OFF, TRADING_FEE_TO_ON, ZERO_ADDRESS } from './common/constants'
-import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from './common/getters'
-import { CreateLiquidityPool, UpdateTokenWhitelists } from './common/helpers'
-import { findEthPerToken } from './common/Price'
-import { getOrCreateToken, getOrCreateLPToken } from './common/tokens'
+import { PairCreated, SetFeeToCall } from '../../generated/Factory/Factory'
+import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/utils/constants'
+import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from '../common/getters'
+import { CreateLiquidityPool, UpdateTokenWhitelists } from '../common/helpers'
+import { findEthPerToken } from '../common/utils/price'
+import { getOrCreateToken, getOrCreateLPToken } from '../common/utils/tokens'
 
 export function handleNewPair(event: PairCreated): void {
 
@@ -33,28 +33,28 @@ export function handleNewPair(event: PairCreated): void {
 // The call handler is used to update feeTo as on or off for each pool
 export function handleFeeTo(call: SetFeeToCall): void {
   let protocol = getOrCreateDex()
-  let poolIds = protocol.poolIds
-  let tradingFeeUpdate: BigDecimal
+  let poolIds = protocol._poolIds
+  let lpFeeUpdate: BigDecimal
   let protocolFeeUpdate: BigDecimal
   if (call.inputs._feeTo.toHexString() != ZERO_ADDRESS)  {
-    tradingFeeUpdate = TRADING_FEE_TO_ON
+    lpFeeUpdate = LP_FEE_TO_ON
     protocolFeeUpdate = PROTOCOL_FEE_TO_ON
   } else {
-    tradingFeeUpdate = TRADING_FEE_TO_OFF
+    lpFeeUpdate = LP_FEE_TO_OFF
     protocolFeeUpdate = PROTOCOL_FEE_TO_OFF
   }
     for (let i = 0; i < poolIds.length; i++) {
       let pool = getLiquidityPool(poolIds[i].toHexString())
-      let tradingFeeId = pool.fees[0]
+      let lpFeeId = pool.fees[0]
       let protocolFeeId = pool.fees[1]
 
-      let tradingFee = getLiquidityPoolFee(tradingFeeId)
-      tradingFee.feePercentage = tradingFeeUpdate
+      let lpFee = getLiquidityPoolFee(lpFeeId)
+      lpFee.feePercentage = lpFeeUpdate
 
       let protocolFee = getLiquidityPoolFee(protocolFeeId)
       protocolFee.feePercentage = protocolFeeUpdate
 
-      tradingFee.save()
+      lpFee.save()
       protocolFee.save()
   }
 }
