@@ -6,80 +6,73 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 
-import { readValue } from "../common/utils";
-import * as constants from "../common/constants";
-import { getTokenPriceFromYearnLens } from "./YearnLens";
-import { getTokenPriceFromChainLink } from "./Chainlink";
-import { getTokenPriceFromSushiSwap } from "./SushiSwap";
-import { getTokenPriceFromCalculationCurve } from "./CalculationCurve";
-import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
+import * as constants from "./common/constants";
+import { getCurvePriceUsdc } from "./routers/CurveRouter";
+import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
+import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 
-export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = ERC20Contract.bind(tokenAddr);
+export function getUsdPricePerToken(tokenAddr: Address): BigDecimal[] {
+  let network = dataSource.network();
+  let decimals = BigInt.fromI32(10)
+    .pow(BigInt.fromI32(6).toI32() as u8)
+    .toBigDecimal();
 
-  let decimals = readValue<BigInt>(
-    token.try_decimals(),
-    constants.DEFAULT_DECIMALS
-  );
-
-  return decimals;
-}
-
-export function getUsdPricePerToken(tokenAddr: Address): [BigDecimal, BigInt] {
-  let netowrk = dataSource.network();
-
-  // 1. YearnLens
-  let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, netowrk);
-  if (yearnLensPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
-    return [yearnLensPrice, BigInt.fromI32(6)];
-  }
-
-  // 2. ChainLink
-  let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, netowrk);
-  if (chainLinkPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
-    return [chainLinkPrice, BigInt.fromI32(8)];
-  }
-
-  // 3. SushiSwap
-  let sushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, netowrk);
-  if (sushiSwapPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
-    return [sushiSwapPrice, BigInt.fromI32(6)];
-  }
-
-  // 4. CalculationCurve
-  let curvePrice = getTokenPriceFromCalculationCurve(tokenAddr, netowrk);
+  // ? 1. Curve Router
+  let curvePrice = getCurvePriceUsdc(tokenAddr, network);
   if (curvePrice.notEqual(constants.BIGDECIMAL_ZERO)) {
-    return [curvePrice, BigInt.fromI32(6)];
+    log.warning("[getCurvePriceUsdc] tokenAddress: {}, curvePrice: {}", [
+      tokenAddr.toHexString(),
+      curvePrice.div(decimals).toString(),
+    ]);
+
+    return [curvePrice, decimals];
   }
 
-  return [constants.BIGDECIMAL_ZERO, constants.BIGINT_ONE];
+  //? 2. Uniswap Router
+  let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
+  if (uniswapPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
+    log.warning("[getPriceUsdcUniswap] tokenAddress: {}, uniswapPrice: {}", [
+      tokenAddr.toHexString(),
+      uniswapPrice.div(decimals).toString(),
+    ]);
+
+    return [uniswapPrice, decimals];
+  }
+
+  //? 3. SushiSwap Router
+  let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
+  if (sushiswapPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
+    log.warning(
+      "[getPriceUsdcSushiswap] tokenAddress: {}, sushiswapPrice: {}",
+      [tokenAddr.toHexString(), sushiswapPrice.div(decimals).toString()]
+    );
+
+    return [sushiswapPrice, decimals];
+  }
+
+  // TODO: WIP - ChainLink Router
+  // //? 4. ChainLink
+  // let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, netowrk);
+  // if (chainLinkPrice.notEqual(constants.BIGDECIMAL_ZERO)) {
+  //   return [chainLinkPrice, BigInt.fromI32(8)];
+  // }
+
+  log.warning("Cannot Find Price For {}", [tokenAddr.toHexString()]);
+
+  return [
+    constants.BIGDECIMAL_ZERO,
+    BigInt.fromI32(10)
+      .pow(constants.BIGINT_ZERO.toI32() as u8)
+      .toBigDecimal(),
+  ];
 }
 
-export function getUsdPrice(
-  tokenAddr: Address,
-  amount: BigInt,
-  decimals?: null | BigInt
-): BigDecimal {
-  if (!decimals) {
-    decimals = getTokenDecimals(tokenAddr);
-  }
-
-  decimals = BigInt.fromI32(10).pow(decimals.toI32());
-
+export function getUsdPrice(tokenAddr: Address, amount: BigInt): BigDecimal {
   let usdPrice = getUsdPricePerToken(tokenAddr);
-  let usdDenominator = BigInt.fromI32(10).pow(usdPrice[1].toI32());
 
   if (usdPrice[0].notEqual(constants.BIGDECIMAL_ZERO)) {
-    return usdPrice[0]
-      .times(amount.toBigDecimal())
-      .div(decimals.toBigDecimal())
-      .div(usdDenominator.toBigDecimal());
+    return usdPrice[0].times(amount.toBigDecimal()).div(usdPrice[1]);
   }
-
-  log.warning("[UsdPrice] Cannot Find USD Price of token: {}, Decimals: {}", [
-    tokenAddr.toHexString(),
-    decimals.toString(),
-  ]);
 
   return constants.BIGDECIMAL_ZERO;
 }

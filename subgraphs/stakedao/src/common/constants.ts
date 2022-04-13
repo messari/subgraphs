@@ -44,12 +44,12 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
-export const ZERO_ADDRESS = "0x0";
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(1500);
 export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
 
+export const ZERO_ADDRESS_STRING = ("0x0");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
@@ -59,8 +59,9 @@ export const ETHEREUM_PROTOCOL_ID =
   "0x29D3782825432255041Db2EAfCB7174f5273f08A";
 export const ETH_MAINNET_CALCULATIONS_SUSHI_ADDRESS =
   "0x8263e161A855B644f582d9C164C66aABEe53f927";
-export const ETH_MAINNET_CALCULATIONS_CURVE_ADDRESS =
-  "0x25BF7b72815476Dd515044F9650Bf79bAd0Df655";
+export const ZERO_ADDRESS = Address.fromString(
+  "0x0000000000000000000000000000000000000000"
+);
 
 // Yearn registry contract
 export const USDC_DECIMALS = 6;
@@ -72,35 +73,4 @@ export const DAYS_PER_YEAR = BigInt.fromI32(365);
 export const MS_PER_DAY = BigInt.fromI32(24 * 60 * 60 * 1000);
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   BigInt.fromI32(24 * 60 * 60 * 1000)
-);
-
-///////////////////////////////////////////////////////////////////
-/////////////////////////////  ORACLE  ////////////////////////////
-///////////////////////////////////////////////////////////////////
-
-export const YEARN_LENS_CONTRACT_ADDRESS = new Map<string, string>();
-YEARN_LENS_CONTRACT_ADDRESS.set(
-  "mainnet",
-  "0x83d95e0d5f402511db06817aff3f9ea88224b030"
-);
-
-export const CALCULATION_CURVE_CONTRACT_ADDRESS = new Map<string, string>();
-CALCULATION_CURVE_CONTRACT_ADDRESS.set(
-  "mainnet",
-  "0x25BF7b72815476Dd515044F9650Bf79bAd0Df655"
-);
-
-
-export const CALCULATION_SUSHI_CONTRACT_ADDRESS = new Map<string, string>();
-CALCULATION_SUSHI_CONTRACT_ADDRESS.set(
-  "mainnet",
-  "0x8263e161A855B644f582d9C164C66aABEe53f927"
-);
-
-
-export const CHAIN_LINK_USD_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000348")
-export const CHAIN_LINK_CONTRACT_ADDRESS = new Map<string, string>();
-CHAIN_LINK_CONTRACT_ADDRESS.set(
-  "mainnet",
-  "0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"
 );

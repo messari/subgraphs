@@ -1,6 +1,6 @@
 import * as constants from "../common/constants";
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { ChainLinkContract } from "../../generated/templates/Vault/ChainLinkContract";
+import { ChainLinkContract } from "../../../generated/templates/Vault/ChainLinkContract";
 
 export function getChainLinkContract(network: string): ChainLinkContract {
   return ChainLinkContract.bind(
