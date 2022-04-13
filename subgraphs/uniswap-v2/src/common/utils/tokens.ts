@@ -1,8 +1,8 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { ERC20 } from '../../generated/Factory/ERC20'
+import { ERC20 } from '../../../generated/Factory/ERC20'
 import { Address } from '@graphprotocol/graph-ts'
-import { DEFAULT_DECIMALS } from '../common/constants'
-import { Token } from '../../generated/schema'
+import { DEFAULT_DECIMALS } from './constants'
+import { Token } from '../../../generated/schema'
 
 export function getOrCreateToken(address: Address): Token {
   let id = address.toHexString();

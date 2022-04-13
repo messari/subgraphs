@@ -4,12 +4,12 @@ import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
 import {
   _HelperStore,
   _TokenTracker,
-  _Account,
-  _DailyActiveAccount,
+  Account,
+  DailyActiveAccount,
   UsageMetricsDailySnapshot
-} from "../../generated/schema"
-import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./getters";
+} from "../../../generated/schema"
+import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "../utils/constants";
+import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./../getters";
 
 
 // Update FinancialsDailySnapshots entity
@@ -47,9 +47,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     usageMetrics.dailyTransactionCount += 1;
   
     let accountId = from.toHexString()
-    let account = _Account.load(accountId)
+    let account = Account.load(accountId)
     if (!account) {
-      account = new _Account(accountId);
+      account = new Account(accountId);
       account.save();
       totalUniqueUsers.valueInt += 1;
     }
@@ -58,9 +58,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
-    let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+    let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
     if (!dailyActiveAccount) {
-      dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+      dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
       dailyActiveAccount.save();
       usageMetrics.activeUsers += 1
     }
@@ -91,18 +91,21 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 // Update the volume and accrued fees for all relavant entities 
 export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, tradingFeeAmountUSD: BigDecimal, protocolFeeAmountUSD: BigDecimal): void {
     let pool = getLiquidityPool(event.address.toHexString())
+    let protocol = getOrCreateDex()
     let poolMetrics = getOrCreatePoolDailySnapshot(event);
     let financialMetrics = getOrCreateFinancials(event);
   
     financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
-    financialMetrics.feesUSD = financialMetrics.feesUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD)
+    financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD)
     financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(tradingFeeAmountUSD)
     financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(protocolFeeAmountUSD)
 
     poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
+    protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(trackedAmountUSD)
   
-    poolMetrics.save();
     financialMetrics.save()
+    poolMetrics.save();
+    protocol.save()
     pool.save()
 }
