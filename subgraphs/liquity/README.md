@@ -65,3 +65,13 @@ To be added
 ### Protocol Controlled Value
 
 To be added
+
+## Smart Contract Interactions
+
+### Events included in the subgraph
+
+![Liquity](../../docs/images/protocols/liquity.png "Liquity")
+
+See also official documentation for more detailed charts:
+
+https://github.com/liquity/dev#flow-of-ether-in-liquity
