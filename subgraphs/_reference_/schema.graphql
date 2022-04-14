@@ -579,3 +579,13 @@ type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }
+
+
+type _CircularBuffer @entity {
+    id: ID! 
+    blocks: [Int!]!
+    windowStartIndex: Int!
+    nextIndex: Int!
+    bufferSize: Int!
+    blocksPerDay: BigDecimal!
+}
