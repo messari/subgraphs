@@ -68,7 +68,7 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
 
 export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDailySnapshot {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let marketAddress = event.address.toHexString(); // TODO: might not be able to do this
+  let marketAddress = event.address.toHexString();
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
