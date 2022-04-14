@@ -41,7 +41,7 @@ import {
   rayToWad
 } from './utilFunctions';
 
-import { BIGINT_ZERO } from '../common/constants';
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from '../common/constants';
 
 import { bigIntToBigDecimal } from '../common/utils/numbers';
 
