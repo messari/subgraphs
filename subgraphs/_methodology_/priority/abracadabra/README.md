@@ -1,59 +1,44 @@
 # Abracadabra Lending Protocol Subgraph
+
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools:
+Sum across all Markets:
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`Total Collateral Tokens in USD from deposits and withdrawals`
 
 ### Total Revenue USD
 
-Sum across all Pools:
+Sum across all Markets:
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
-
+`Borrow Opening Fee * MIM Borrwed + Interest Rate * Amount MIM Borrowed + Liquidation Fee * Collateral Liquidated`
 
 ### Protocol-Side Revenue USD
+
 Portion of the Total Revenue allocated to the Protocol
 
-Sum across all Pools:
-
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`25% of Total Revenue USD is allocated to the Protocol Treasury`
 
 ### Supply-Side Revenue USD
+
 Portion of the Total Revenue allocated to the Supply-Side
 
-Sum across all Pools
-
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`75% of Total Revenue USD is awarded backed to Spell Stakers`
 
 ### Total Unique Users
 
-Count of  Unique Addresses which have interacted with the protocol via any transaction
-
-`Deposits`
-
-`Withdrawals`
+Count of Unique Addresses which have interacted with the protocol via any transaction
 
 `Borrows`
 
 `Repays`
 
+`Deposits`
+
+`Withdraws`
+
 `Liquidations`
 
-###  Reward Token Emissions Amount
+`Staking`
 
-To be added
-
-###  Protocol Controlled Value
-
-To be added 
