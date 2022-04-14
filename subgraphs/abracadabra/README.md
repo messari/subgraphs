@@ -1,4 +1,4 @@
-# Abracadabra Money Subgraph
+# Abracadabra Lending Protocol Subgraph
 
 ## Calculation Methodology v1.0.0
 
@@ -42,12 +42,6 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Staking`
 
-### Protocol Treasury USD
-
-Total USD amount of tokens held idly in the protocol treasury that are not used to gain revenue
-
-`Total Spell tokens held by the treasury address`
-
 ### Total Volume USD
 
 Sum across all Markets:
@@ -64,7 +58,7 @@ Amount of collateral for each Market
 
 Amount of MIM tokens minted for each Market
 
-`Sum of Borrows and Repays`
+`Sum of Borrows minus Repays`
 
 ### NO Reward Token Emissions
 

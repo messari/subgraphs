@@ -64,8 +64,10 @@ interface Protocol {
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
+
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
@@ -134,8 +136,10 @@ type FinancialsDailySnapshot @entity {
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositUSD: BigDecimal!
+
   " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
   totalBorrowUSD: BigDecimal!
+
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
   supplySideRevenueUSD: BigDecimal!
 
@@ -147,6 +151,7 @@ type FinancialsDailySnapshot @entity {
   
   " Block number of this snapshot "
   blockNumber: BigInt!
+
   " Timestamp of this snapshot "
   timestamp: BigInt!
 }
@@ -172,8 +177,10 @@ type LendingProtocol implements Protocol @entity {
 
   " Name of the protocol, including version. e.g. Aave v2 "
   name: String!
+
   " Slug of protocol, including version. e.g. aave-v2 "
   slug: String!
+
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
@@ -197,14 +204,21 @@ type LendingProtocol implements Protocol @entity {
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositUSD: BigDecimal!
+
   " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
   totalBorrowUSD: BigDecimal!
+
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
   ##### Lending-Specific #####
+
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
   lendingType: LendingType
+
   riskType: RiskType
 
   " Added to the schema, used to calculate tvl"
@@ -216,59 +230,82 @@ type LendingProtocol implements Protocol @entity {
 type Market @entity {
   " Smart contract address of the market "
   id: ID!
+
   " The protocol this pool belongs to "
   protocol: LendingProtocol!
+
   # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
   # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
   # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
   # and inputToken balances are used to calculate returns
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
   inputTokens: [Token!]!
+
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
+
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
+
   ##### Quantitative Data #####
   totalValueLockedUSD: BigDecimal!
+  
   " Total borrow volume in USD (i.e. total loan origination ) "
   totalVolumeUSD: BigDecimal!
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositUSD: BigDecimal!
+
   " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
   totalBorrowUSD: BigDecimal!
+
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
+
   " Price per share of input token in USD "
   inputTokenPricesUSD: [BigDecimal!]!
+
   " Total supply of output token "
   outputTokenSupply: BigInt!
+
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
+
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
+
   " Creation block number "
   createdBlockNumber: BigInt!
+
   " Pool snapshots "
   snapshots: [MarketDailySnapshot!]! @derivedFrom(field: "market")
+
   ##### Lending-Specific #####
   " Name of market "
   name: String
+
   " Is this market active or is it frozen "
   isActive: Boolean!
+
   " Can you use the output token as collateral "
   canUseAsCollateral: Boolean!
+
   " Can you borrow from this market "
   canBorrowFrom: Boolean!
+
   " Maximum loan-to-value ratio as a percentage value (e.g. 75% for DAI in Aave) "
   maximumLTV: BigDecimal!
 
   " Liquidation threshold as a percentage value (e.g. 80% for DAI in Aave). When it is reached, the position is defined as undercollateralised and could be liquidated "
   liquidationThreshold: BigDecimal!
+
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
@@ -289,7 +326,7 @@ type Market @entity {
 
   repays: [Repay!]! @derivedFrom(field: "market")
 
-  liquidations: [Liquidate!]! @derivedFrom(field: "market")
+  liquidations: [Liquidates!]! @derivedFrom(field: "market")
 }
 
 #################################
@@ -313,30 +350,41 @@ type MarketDailySnapshot @entity {
 
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositUSD: BigDecimal!
+
   " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
   totalBorrowUSD: BigDecimal!
+
   " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
+
   " Price per share of input token in USD "
   inputTokenPricesUSD: [BigDecimal!]!
+
   " Total supply of output token "
   outputTokenSupply: BigInt!
+
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
+
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
   
   " Block number of this snapshot "
   blockNumber: BigInt!
+
   " Timestamp of this snapshot "
   timestamp: BigInt!
+
   ##### Lending-Specific #####
   " Deposit interest rate in APY percentage "
   depositRate: BigDecimal!
+
   " Borrow interest rate in APY percentage "
   stableBorrowRate: BigDecimal!
+
   " Borrow interest rate in APY percentage "
   variableBorrowRate: BigDecimal!
 }
@@ -354,143 +402,206 @@ contracts.
 interface Event {
   " { Transaction hash }-{ Log index } "
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: Protocol!
+
   " Address that received the tokens "
   to: String!
+
   " Address that sent the tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
 }
 type Deposit implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: Protocol!
+
   " Market that tokens are deposited into "
   to: String!
+
   " Address that deposited tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   ##### Lending-Specific #####
   " The market this transaction interacted with "
   market: Market!
+
   " Token deposited "
   asset: Token!
+
   " Amount of token deposited in native units "
   amount: BigInt!
+
   " Amount of token deposited in USD "
   amountUSD: BigDecimal!
 }
 type Withdraw implements Event @entity {
   " { Transaction hash }-{ Log index }"
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: Protocol!
+
   " Address that received tokens "
   to: String!
+
   " Market that tokens are withdrawn from "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   ##### Lending-Specific #####
   " The market this transaction interacted with "
   market: Market!
+
   " Token withdrawn "
   asset: Token!
+
   " Amount of token withdrawn in native units "
   amount: BigInt!
+
   " Amount of token withdrawn in USD "
   amountUSD: BigDecimal!
 }
 type Borrow implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: Protocol!
+
   " Address that received tokens "
   to: String!
+
   " Market that tokens are borrowed from "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   ##### Lending-Specific #####
   " The market this transaction interacted with "
   market: Market!
+
   " Token borrowed "
   asset: Token!
+
   " Amount of token borrowed in native units "
   amount: BigInt!
+
   " Amount of token borrowed in USD "
   amountUSD: BigDecimal
 }
 type Repay implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: Protocol!
+
   " Market that tokens are repaid to "
   to: String!
+
   " Address that sent tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   ##### Lending-Specific #####
   " The market this transaction interacted with "
   market: Market!
+
   " Token repaid "
   asset: Token!
+
   " Amount of token repaid in native units "
   amount: BigInt!
+
   " Amount of token repaid in USD "
   amountUSD: BigDecimal
 }
 type Liquidate implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: Protocol!
+
   " Market that tokens are repaid to "
   to: String!
+
   " Address that carried out the liquidation "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   ##### Lending-Specific #####
   " The market this transaction interacted with "
   market: Market!
+
   " Token liquidated "
   asset: Token!
+
   " Amount of token liquidated in native units "
   amount: BigInt!
+
   " Amount of token liquidated in USD "
   amountUSD: BigDecimal
+  
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal
 }
