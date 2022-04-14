@@ -87,13 +87,11 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = BENTOBOX_ADDRESS;
 
-    financialMetrics.feesUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.feesUSD = BIGDECIMAL_ZERO;
-    financialMetrics.protocolTreasuryUSD = BIGDECIMAL_ZERO;
     financialMetrics.save();
   }
   return financialMetrics;
@@ -136,10 +134,7 @@ export function getMarket(marketId: string): Market {
 
 export function getLiquidateEvent(event: LogRepay): Liquidate {
   let liquidateEvent = Liquidate.load(
-    "liquidate-" +
-      event.transaction.hash.toHexString() +
-      "-" +
-      event.transactionLogIndex.minus(BIGINT_ONE).toString(),
+    "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
   if (liquidateEvent) {
     return liquidateEvent;

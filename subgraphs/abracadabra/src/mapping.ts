@@ -9,7 +9,7 @@ import {
   LogExchangeRate,
   LogAccrue,
 } from "../generated/templates/Cauldron/Cauldron";
-import { Deposit, Borrow, Repay, _Account, _TokenPricesUsd } from "../generated/schema";
+import { Deposit, Borrow, Repay, _TokenPricesUsd } from "../generated/schema";
 import { NEG_INT_ONE, DEFAULT_DECIMALS, INT_ZERO, BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getLiquidateEvent } from "./common/getters";

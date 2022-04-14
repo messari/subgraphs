@@ -1,11 +1,12 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Market, Liquidate } from "../../generated/schema";
-import { cauldron,LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
+import { cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
   BIGINT_ZERO,
+  BIGDECIMAL_ONE_HUNDRED,
   SECONDS_PER_YEAR,
   MIM,
   XSUSHI_MARKET,
@@ -59,101 +60,113 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(LOW_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
+      ).times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationPenalty = bigIntToBigDecimal(
         BigInt.fromI32(LOW_RISK_LIQUIDATION_PENALTY),
         COLLATERIZATION_RATE_PRECISION,
-      ).minus(BIGDECIMAL_ONE);
+      )
+        .minus(BIGDECIMAL_ONE)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationThreshold = bigIntToBigDecimal(
         BigInt.fromI32(LOW_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
-      MarketEntity.stableBorrowRate = bigIntToBigDecimal(
-        BigInt.fromI32(LOW_RISK_INTEREST_RATE),
-        DEFAULT_DECIMALS,
-      ).times(SECONDS_PER_YEAR);
+      ).times(BIGDECIMAL_ONE_HUNDRED);
+      MarketEntity.stableBorrowRate = bigIntToBigDecimal(BigInt.fromI32(LOW_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
     } else if (marketAddress.toLowerCase() == YV_WETH_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
+      ).times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationPenalty = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_LIQUIDATION_PENALTY),
         COLLATERIZATION_RATE_PRECISION,
-      ).minus(BIGDECIMAL_ONE);
+      )
+        .minus(BIGDECIMAL_ONE)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationThreshold = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
-      MarketEntity.stableBorrowRate = bigIntToBigDecimal(
-        BigInt.fromI32(HIGH_RISK_INTEREST_RATE),
-        DEFAULT_DECIMALS,
-      ).times(SECONDS_PER_YEAR);
+      ).times(BIGDECIMAL_ONE_HUNDRED);
+      MarketEntity.stableBorrowRate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
     } else if (marketAddress.toLowerCase() == YV_YFI_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
+      ).times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationPenalty = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_LIQUIDATION_PENALTY),
         COLLATERIZATION_RATE_PRECISION,
-      ).minus(BIGDECIMAL_ONE);
+      )
+        .minus(BIGDECIMAL_ONE)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationThreshold = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
-      MarketEntity.stableBorrowRate = bigIntToBigDecimal(
-        BigInt.fromI32(HIGH_RISK_INTEREST_RATE),
-        DEFAULT_DECIMALS,
-      ).times(SECONDS_PER_YEAR);
+      ).times(BIGDECIMAL_ONE_HUNDRED);
+      MarketEntity.stableBorrowRate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
     } else if (marketAddress.toLowerCase() == YV_USDC_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(STABLE_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
+      ).times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationPenalty = bigIntToBigDecimal(
         BigInt.fromI32(LOW_RISK_LIQUIDATION_PENALTY),
         COLLATERIZATION_RATE_PRECISION,
-      ).minus(BIGDECIMAL_ONE);
+      )
+        .minus(BIGDECIMAL_ONE)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationThreshold = bigIntToBigDecimal(
         BigInt.fromI32(STABLE_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
-      MarketEntity.stableBorrowRate = bigIntToBigDecimal(
-        BigInt.fromI32(LOW_RISK_INTEREST_RATE),
-        DEFAULT_DECIMALS,
-      ).times(SECONDS_PER_YEAR);
+      ).times(BIGDECIMAL_ONE_HUNDRED);
+      MarketEntity.stableBorrowRate = bigIntToBigDecimal(BigInt.fromI32(LOW_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
     } else if (marketAddress.toLowerCase() == XSUSHI_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
+      ).times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationPenalty = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_LIQUIDATION_PENALTY),
         COLLATERIZATION_RATE_PRECISION,
-      ).minus(BIGDECIMAL_ONE);
+      )
+        .minus(BIGDECIMAL_ONE)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       MarketEntity.liquidationThreshold = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
-      );
-      MarketEntity.stableBorrowRate = bigIntToBigDecimal(
-        BigInt.fromI32(HIGH_RISK_INTEREST_RATE),
-        DEFAULT_DECIMALS,
-      ).times(SECONDS_PER_YEAR);
+      ).times(BIGDECIMAL_ONE_HUNDRED);
+      MarketEntity.stableBorrowRate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
     } else {
       let maximumLTVCall = MarketContract.try_COLLATERIZATION_RATE();
       let liquidationPenaltyCall = MarketContract.try_LIQUIDATION_MULTIPLIER();
       let accrueInfoCall = MarketContract.try_accrueInfo();
       if (!maximumLTVCall.reverted && !liquidationPenaltyCall.reverted && !accrueInfoCall.reverted) {
-        MarketEntity.maximumLTV = bigIntToBigDecimal(maximumLTVCall.value, COLLATERIZATION_RATE_PRECISION);
+        MarketEntity.maximumLTV = bigIntToBigDecimal(maximumLTVCall.value, COLLATERIZATION_RATE_PRECISION).times(
+          BIGDECIMAL_ONE_HUNDRED,
+        );
         MarketEntity.liquidationPenalty = bigIntToBigDecimal(
           liquidationPenaltyCall.value,
           COLLATERIZATION_RATE_PRECISION,
-        ).minus(BIGDECIMAL_ONE);
-        MarketEntity.liquidationThreshold = bigIntToBigDecimal(maximumLTVCall.value, COLLATERIZATION_RATE_PRECISION);
-        MarketEntity.stableBorrowRate = bigIntToBigDecimal(accrueInfoCall.value.value2, DEFAULT_DECIMALS).times(
-          SECONDS_PER_YEAR,
-        );
+        )
+          .minus(BIGDECIMAL_ONE)
+          .times(BIGDECIMAL_ONE_HUNDRED);
+        MarketEntity.liquidationThreshold = bigIntToBigDecimal(
+          maximumLTVCall.value,
+          COLLATERIZATION_RATE_PRECISION,
+        ).times(BIGDECIMAL_ONE_HUNDRED);
+        MarketEntity.stableBorrowRate = bigIntToBigDecimal(accrueInfoCall.value.value2, DEFAULT_DECIMALS)
+          .times(SECONDS_PER_YEAR)
+          .times(BIGDECIMAL_ONE_HUNDRED);
       }
     }
     MarketEntity.depositRate = BIGDECIMAL_ZERO;

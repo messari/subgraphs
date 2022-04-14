@@ -99,6 +99,7 @@ export const NEG_INT_ONE = -1 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BigInt.fromI32(100));
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 

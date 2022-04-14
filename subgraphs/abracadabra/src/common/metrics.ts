@@ -1,8 +1,7 @@
 import { BigDecimal, BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount } from "../../generated/schema";
+import { Account, DailyActiveAccount } from "../../generated/schema";
 import {
   INT_ZERO,
-  INT_ONE,
   SECONDS_PER_DAY,
   MIM,
   BIGDECIMAL_ZERO,
@@ -19,7 +18,6 @@ import {
 } from "./getters";
 import { fetchMimPriceUSD, getOrCreateTokenPriceEntity } from "./prices/prices";
 import { bigIntToBigDecimal } from "./utils/numbers";
-import { getTreasuryBalance } from "../staking";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): void {
@@ -27,18 +25,16 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): vo
   // feesUSD is handled in handleLogWithdrawFees
   // totalValueLockedUSD is handled in updateTVL()
   let financialsDailySnapshots = getOrCreateFinancials(event);
-  let treasuryBalanceUSD = getTreasuryBalance();
   // // Update the block number and timestamp to that of the last transaction of that day
   financialsDailySnapshots.blockNumber = event.block.number;
   financialsDailySnapshots.timestamp = event.block.timestamp;
-  financialsDailySnapshots.feesUSD = financialsDailySnapshots.feesUSD.plus(feesUSD); // feesUSD comes from logAccrue which is accounted in MIM
+  financialsDailySnapshots.totalRevenueUSD = financialsDailySnapshots.totalRevenueUSD.plus(feesUSD); // feesUSD comes from logAccrue which is accounted in MIM
   financialsDailySnapshots.supplySideRevenueUSD = financialsDailySnapshots.supplySideRevenueUSD.plus(
     feesUSD.times(ABRA_USER_REVENUE_SHARE),
   );
   financialsDailySnapshots.protocolSideRevenueUSD = financialsDailySnapshots.protocolSideRevenueUSD.plus(
     feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE),
   );
-  financialsDailySnapshots.protocolTreasuryUSD = treasuryBalanceUSD;
   financialsDailySnapshots.save();
 }
 
@@ -55,12 +51,12 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
 
   let fromAccountId = from.toHexString();
   let toAccountId = to.toHexString();
-  let fromAccount = _Account.load(fromAccountId);
-  let toAccount = _Account.load(toAccountId);
+  let fromAccount = Account.load(fromAccountId);
+  let toAccount = Account.load(toAccountId);
 
   let protocol = getOrCreateLendingProtocol();
   if (!fromAccount) {
-    fromAccount = new _Account(fromAccountId);
+    fromAccount = new Account(fromAccountId);
     fromAccount.save();
 
     protocol.totalUniqueUsers += 1;
@@ -68,7 +64,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   }
 
   if (!toAccount) {
-    toAccount = new _Account(toAccountId);
+    toAccount = new Account(toAccountId);
     toAccount.save();
 
     protocol.totalUniqueUsers += 1;
@@ -78,17 +74,17 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountIdFrom = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccountFrom = _DailyActiveAccount.load(dailyActiveAccountIdFrom);
+  let dailyActiveAccountFrom = DailyActiveAccount.load(dailyActiveAccountIdFrom);
   if (!dailyActiveAccountFrom) {
-    dailyActiveAccountFrom = new _DailyActiveAccount(dailyActiveAccountIdFrom);
+    dailyActiveAccountFrom = new DailyActiveAccount(dailyActiveAccountIdFrom);
     dailyActiveAccountFrom.save();
     usageDailySnapshot.activeUsers += 1;
   }
 
   let dailyActiveAccountIdTo = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccountTo = _DailyActiveAccount.load(dailyActiveAccountIdTo);
+  let dailyActiveAccountTo = DailyActiveAccount.load(dailyActiveAccountIdTo);
   if (!dailyActiveAccountTo) {
-    dailyActiveAccountTo = new _DailyActiveAccount(dailyActiveAccountIdTo);
+    dailyActiveAccountTo = new DailyActiveAccount(dailyActiveAccountIdTo);
     dailyActiveAccountTo.save();
     usageDailySnapshot.activeUsers += 1;
   }
