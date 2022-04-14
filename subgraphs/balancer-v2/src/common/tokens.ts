@@ -28,7 +28,8 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
   return decimals.value;
 }
 
-export function scaleDown(token: Address, amount: BigInt): BigDecimal {
-  let decimals = fetchTokenDecimals(token);
+export function scaleDown(amount: BigInt, token: Address | null): BigDecimal {
+  let decimals = 18
+  if (token) decimals = fetchTokenDecimals(token);
   return amount.divDecimal(BigInt.fromI32(10).pow(u8(decimals)).toBigDecimal());
 }

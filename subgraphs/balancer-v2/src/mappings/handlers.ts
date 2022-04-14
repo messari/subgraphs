@@ -74,13 +74,14 @@ export function handleSwap(event: Swap): void {
   let hasWeights = !getWeightCall.reverted;
   let weightTokenOut: BigDecimal | null = null;
   let weightTokenIn: BigDecimal | null = null;
+
   if (hasWeights) {
-    weightTokenOut = getWeightCall.value[tokenOutIndex].divDecimal(BigInt.fromI32(10).pow(u8(18)).toBigDecimal());
-    weightTokenIn = getWeightCall.value[tokenInIndex].divDecimal(BigInt.fromI32(10).pow(u8(18)).toBigDecimal());
+    weightTokenOut = scaleDown(getWeightCall.value[tokenOutIndex], null);
+    weightTokenIn = scaleDown(getWeightCall.value[tokenInIndex], null);
   }
 
-  let tokenAmountIn = scaleDown(event.params.tokenIn, event.params.amountIn);
-  let tokenAmountOut = scaleDown(event.params.tokenOut, event.params.amountOut);
+  let tokenAmountIn = scaleDown(event.params.amountIn, event.params.tokenIn);
+  let tokenAmountOut = scaleDown(event.params.amountOut, event.params.tokenOut);
 
   const tokenInfo = calculatePrice(
     event.params.tokenIn,

@@ -6,7 +6,7 @@ import { Token } from "../generated/schema";
  * USDC-WETH: https://app.balancer.fi/#/pool/0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8000200000000000000000019
  */
 
-export const usdcWethPoolid = Bytes.fromHexString("0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8000200000000000000000019")
+export const usdcWethPoolId = Bytes.fromHexString("0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8000200000000000000000019")
 export const usdcWethPoolAddress = Address.fromString("0x96646936b91d6B9D7D0c47C496AfBF3D6ec7B6f8")
 mockMethod(usdcWethPoolAddress, "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
 mockMethod(usdcWethPoolAddress, "name", [], [], "string", [ethereum.Value.fromString("name")], false);

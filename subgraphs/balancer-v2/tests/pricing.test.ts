@@ -1,4 +1,4 @@
-import { test, assert, log } from "matchstick-as";
+import { test, assert } from "matchstick-as";
 import { BigDecimal, Address } from "@graphprotocol/graph-ts"
 import {calculatePrice} from "../src/common/pricing";
 import {weth, usdc, bal, gno} from "./state";
@@ -67,7 +67,6 @@ test('Calculate price of token when swapping with a previously stored base asset
     )
 
     if (tokenInfo == null) throw Error("Token information should not be null")
-    log.success(tokenInfo.price.toString(), [])
 
     let tokenPrice = new _TokenPrice(tokenInfo.address.toHexString())
     tokenPrice.lastUsdPrice = tokenInfo.price
