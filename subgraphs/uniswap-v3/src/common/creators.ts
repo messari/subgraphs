@@ -1,5 +1,10 @@
 // import { log } from '@graphprotocol/graph-ts'
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
 import { BigInt, BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
+=======
+import { BigInt, BigDecimal, Address, log, ethereum } from "@graphprotocol/graph-ts"
+import { Pool } from "../../generated/Factory/Pool"
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -15,12 +20,19 @@ import {
 import { Pool as PoolTemplate } from '../../generated/templates'
 import { Factory as FactoryContract } from '../../generated/templates/Pool/Factory'
 
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateEtherHelper, getOrCreateToken, getOrCreateTokenTracker } from "./getters"
 import { NetworkParameters } from "../../config/_paramConfig"
 import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ONE, BIGINT_ZERO, INT_ONE, INT_ZERO, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF } from "./constants"
 import { getTrackedAmountUSD, getEthPriceInUSD, findEthPerToken } from "./price/price"
 import { updateVolumeAndFees } from "./updateMetrics"
 import { convertFeeToPercent, convertTokenToDecimal, calculateFee } from "./utils/utils"
+=======
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGDECIMAL_TWO, BIGINT_ZERO, LiquidityPoolFeeType, BIGDECIMAL_TEN_THOUSAND, PROTOCOL_FEE_TO_OFF, BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, BIGDECIMAL_TEN, BIGINT_ONE } from "../common/constants"
+import { getLiquidityPool, getLiquidityPoolAmounts, getLiquidityPoolFee, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateTokenTracker } from "./getters"
+import { findEthPerToken, getEthPriceInUSD, getTrackedAmountUSD, WHITELIST_TOKENS } from "./pricing"
+import { getOrCreateToken } from "./tokens"
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts
 
 export let factoryContract = FactoryContract.bind(Address.fromString(NetworkParameters.FACTORY_ADDRESS))
 
@@ -65,6 +77,7 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   pool.save()
 }
 
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
 function createPoolFees(poolAddressString: string, fee: i64): string[] {
   // LP Fee
   let poolLpFee = new LiquidityPoolFee('lp-fee-'+poolAddressString)
@@ -76,11 +89,19 @@ function createPoolFees(poolAddressString: string, fee: i64): string[] {
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
+=======
+function convertFeeToPercent(fee: i64): BigDecimal {
+  return BigDecimal.fromString(fee.toString()).div(BIGDECIMAL_TEN_THOUSAND)
+}
+
+function createPoolFees(poolAddressString: string, fee: i64): string[] {
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts
   // Trading Fee
   let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
   poolTradingFee.feePercentage = convertFeeToPercent(fee)
 
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
   poolLpFee.save()
   poolProtocolFee.save()
   poolTradingFee.save()
@@ -88,6 +109,56 @@ function createPoolFees(poolAddressString: string, fee: i64): string[] {
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id]
 }
 
+=======
+  // Protocol Fee
+  let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
+  poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
+
+  poolTradingFee.save()
+  poolProtocolFee.save()
+
+  return [poolTradingFee.id, poolProtocolFee.id]
+}
+
+// These whiteslists are used to track what pools the tokens are a part of. Used in price calculations. 
+export function UpdateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker1: _TokenTracker, poolAddress: Address): void {
+  // update white listed pools
+  if (WHITELIST_TOKENS.includes(tokenTracker0.id)) {
+    let newPools = tokenTracker1.whitelistPools
+    newPools.push(poolAddress.toHexString())
+    tokenTracker1.whitelistPools = newPools
+    tokenTracker1.save()
+  }
+
+  if (WHITELIST_TOKENS.includes(tokenTracker1.id)) {
+    let newPools = tokenTracker0.whitelistPools
+    newPools.push(poolAddress.toHexString())
+    tokenTracker0.whitelistPools = newPools
+    tokenTracker0.save()
+  }
+}
+
+export function updatePrices(event: ethereum.Event): void {
+  let pool = getLiquidityPool(event.address.toHexString())
+
+  // Retrieve token Trackers
+  let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
+  let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+
+  // update ETH price now that prices could have changed
+  let ether = getOrCreateEtherHelper()
+  ether.valueDecimal = getEthPriceInUSD()
+
+  // update token prices
+  tokenTracker0.derivedETH = findEthPerToken(tokenTracker0 as _TokenTracker)
+  tokenTracker1.derivedETH = findEthPerToken(tokenTracker1 as _TokenTracker)
+  
+  tokenTracker0.save()
+  tokenTracker1.save()
+  ether.save()
+}
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts
 
 // Update store that tracks the deposit count per pool
 function incrementDepositHelper(poolAddress: string): void {
@@ -135,7 +206,11 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   pool.totalValueLockedUSD = totalValueLockedETH.times(ether.valueDecimal!)
 
   // Increment for NFT minted representing the position
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
   pool.outputTokenSupply = pool.outputTokenSupply!.plus(BIGINT_ONE)
+=======
+  pool.outputTokenSupply = pool.outputTokenSupply.plus(BIGINT_ONE)
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts
 
   // Add pool value back to protocol total value locked 
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
@@ -208,7 +283,11 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   pool.totalValueLockedUSD = totalValueLockedETH.times(ether.valueDecimal!)
 
   // Increment for NFT minted representing the position
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
   pool.outputTokenSupply = pool.outputTokenSupply!.minus(BIGINT_ONE)
+=======
+  pool.outputTokenSupply = pool.outputTokenSupply.minus(BIGINT_ONE)
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts
 
   // reset aggregates with new amounts
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD)
@@ -340,3 +419,84 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, amount0: Bi
   tokenTracker0.save()
   tokenTracker1.save()
 }
+<<<<<<< HEAD:subgraphs/uniswap-v3/src/common/creators.ts
+=======
+
+function percToDec(percentage: BigDecimal): BigDecimal {
+  return percentage.div(BIGDECIMAL_HUNDRED)
+}
+
+function calculateFee(pool: LiquidityPool, trackedAmountUSD: BigDecimal): BigDecimal[] {
+  let tradingFee = getLiquidityPoolFee(pool.fees[0])
+  let protocolFee = getLiquidityPoolFee(pool.fees[1])
+  let tradingFeeAmount = trackedAmountUSD.times(percToDec(tradingFee.feePercentage))
+  let protocolFeeAmount = trackedAmountUSD.times(percToDec(protocolFee.feePercentage))
+  
+  return [tradingFeeAmount, protocolFeeAmount]
+}
+
+// Update the volume and accrued fees for all relavant entities 
+export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, tradingFeeUSD: BigDecimal, protocolFeeUSD: BigDecimal): void {
+  let pool = getLiquidityPool(event.address.toHexString())
+  let poolMetrics = getOrCreatePoolDailySnapshot(event);
+  let financialMetrics = getOrCreateFinancials(event);
+
+  financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
+  financialMetrics.feesUSD = financialMetrics.feesUSD.plus(tradingFeeUSD).plus(protocolFeeUSD)
+  financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(tradingFeeUSD)
+  financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(protocolFeeUSD)
+
+  poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
+  pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
+
+  poolMetrics.save();
+  financialMetrics.save()
+  pool.save()
+}
+
+export function updateProtocolFees(event: ethereum.Event): void {
+  let poolContract = Pool.bind(event.address)
+  let pool = getLiquidityPool(event.address.toString())
+
+  let tradingFee = getLiquidityPoolFee(pool.fees[0])
+  let protocolFee = getLiquidityPoolFee(pool.fees[1])
+
+  // Get the total proportion of swap value collected as a fee
+  let totalPoolFee = tradingFee.feePercentage.plus(protocolFee.feePercentage)
+
+  // Value5 is the feeProtocol variabe in the slot0 struct of the pool contract 
+  let feeProtocol = poolContract.slot0().value5
+  let protocolFeeProportion = BIGDECIMAL_ONE.div(BigDecimal.fromString(feeProtocol.toString()))
+
+  // Update protocol and trading fees for this pool
+  tradingFee.feePercentage = totalPoolFee.times(BIGDECIMAL_ONE.minus(protocolFeeProportion))
+  protocolFee.feePercentage = totalPoolFee.times(protocolFeeProportion)
+
+  tradingFee.save()
+  protocolFee.save()
+}
+
+export function exponentToBigDecimal(decimals: i32): BigDecimal {
+    let bd = BIGDECIMAL_ONE
+    for (let i = INT_ZERO; i < (decimals as i32); i = i + INT_ONE) {
+      bd = bd.times(BIGDECIMAL_TEN)
+    }
+    return bd
+}
+  
+export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
+    if (exchangeDecimals == INT_ZERO) {
+      return tokenAmount.toBigDecimal()
+    }
+    return tokenAmount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals))
+}
+
+// return 0 if denominator is 0 in division
+export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
+  if (amount1.equals(BIGDECIMAL_ZERO)) {
+    return BIGDECIMAL_ZERO
+  } else {
+    return amount0.div(amount1)
+  }
+}
+>>>>>>> masterMessari:subgraphs/uniswap-v3/src/common/helpers.ts

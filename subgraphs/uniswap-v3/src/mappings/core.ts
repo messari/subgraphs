@@ -10,8 +10,14 @@ import {
   createDeposit,
   createWithdraw,
   createSwapHandleVolumeAndFees,
+<<<<<<< HEAD
 } from '../common/creators'
 import { updatePrices, updatePoolMetrics, updateProtocolFees, updateUsageMetrics, updateFinancials } from '../common/updateMetrics'
+=======
+  updateProtocolFees
+} from '../common/helpers'
+import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/intervalUpdates'
+>>>>>>> masterMessari
 
 export function handleInitialize(event: Initialize): void {
   updatePrices(event)

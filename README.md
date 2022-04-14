@@ -7,7 +7,7 @@
 - Add a folder under `subgraphs` with the name of the protocol you want to work on
 - Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`. Note `schema-common.graphql` is used for schema design and reference, and should never be used for implementation
 - Build the subgraph within that folder. Feel free to use the [reference subgraph](./subgraphs/_reference_/) as a reference.
-- Submit a pull request to this repo after you are done
+- Submit a PR (pull request) to this repo after you are done. Make sure you submit your PR as a draft if it's a work-in-progress.
 
 ## Recommended Development Workflow
 
@@ -20,7 +20,7 @@
   - For example, usually it's easier to start writing mappings for transactions and usage metrics
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio
-- Refer to the [methodology](https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/edit#gid=686701533) for metrics calculation (e.g. revenue, fees, TVL). Feel free to reach out to me if anything isn't clear
+- For metrics calculation (e.g. revenue, fees, TVL), please refer to the `README.md` in the protocol's subgraph folder for methodology. There is also a broader explanation of how different fields are defined in the schema in `docs/Schema.md`. Feel free to reach out to me if anything isn't clear
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
@@ -63,28 +63,43 @@
 🛠 = Feature complete. Additional testing required.  
 ✅ = Production-ready.  
 
-| Feature |  Status | Version |
+| Feature |  Status | Versions † |
 | ------- |  :------: | --- |
 | **DEX AMM** |    | |
-| Uniswap v2 | 🛠 | |
-| Uniswap v3 | 🔨 | |
+| [Uniswap v2](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 |
+| [Uniswap v3](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 |
 | Sushiswap | 🔨 | |
 | Curve | 🔨 | |
-| Balancer v2 | | |
+| Balancer v2 | 🔨 | |
 | Bancor v2 | 🔨 | |
 | Bancor v3 | | |
-| DODO v2 |  | |
+| DODO v2 | 🔨 | |
 | **Lending Protocols** |    |
 | Aave v2 | 🔨  | |
 | Compound | 🔨  | |
+| CREAM | 🔨  | |
 | Geist | 🔨  | |
 | Benqi | 🔨  | |
+| TrueFi |   | |
+| Maple Finance |   | |
+| **CDPs** |    |
+| MakerDAO |   | |
+| Abracadabra |   | |
+| Liquity | 🔨 | |
+| Alchemix |   | |
+| QiDAO |   | |
+| Inverse Finance |   | |
 | **Yield Aggregators** |     |
 | Yearn v2 | 🔨 | |
 | Convex Finance | 🔨  | |
 | Badger DAO | 🔨 | |
-| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 |
-| Beefy Finance |  | |
-| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠  | 1.0.0 |
+| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 |
+| Beefy Finance | 🔨 | |
+| Autofarm |  | |
+| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 |
 | Harvest Finance | 🔨  | |
-| Yield Yak |  | |
+| Vesper Finance | 🔨 | |
+| Belt Finance | 🔨 | |
+| Pancakebunny | 🔨 | |
+
+† Versions are schema version, subgraph version, methodology version respectively

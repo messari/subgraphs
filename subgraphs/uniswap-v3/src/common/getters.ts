@@ -12,21 +12,55 @@ import {
   UsageMetricsDailySnapshot,
   _LiquidityPoolAmount,
   LiquidityPoolFee,
+<<<<<<< HEAD
   Token,
+=======
+>>>>>>> masterMessari
 } from "../../generated/schema"
 import { INT_ZERO, BIGDECIMAL_ZERO, ProtocolType, HelperStoreType, DEFAULT_DECIMALS, SECONDS_PER_DAY } from "./constants"
 
+<<<<<<< HEAD
+=======
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "../common/constants"
+
+export function getOrCreateEtherHelper(): _HelperStore {
+    let ether = _HelperStore.load(HelperStoreType.ETHER)
+    if (ether === null) {
+        ether = new _HelperStore(HelperStoreType.ETHER)
+        ether.valueDecimal = BIGDECIMAL_ZERO
+        ether.save()
+    }
+    return ether
+}
+export function getOrCreateUsersHelper(): _HelperStore {
+    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
+    if (uniqueUsersTotal === null) {
+        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
+        uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO
+        uniqueUsersTotal.save()
+    }
+    return uniqueUsersTotal
+}
+>>>>>>> masterMessari
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkParameters.FACTORY_ADDRESS)
 
   if (protocol === null) {
+<<<<<<< HEAD
     protocol = new DexAmmProtocol(NetworkParameters.FACTORY_ADDRESS)
     protocol.name = "Uniswap v3"
     protocol.slug = "uniswap-v3"
     protocol.schemaVersion = "1.1.0"
     protocol.subgraphVersion = "1.0.1"
     protocol.methodologyVersion = "1.0.1"
+=======
+    protocol = new DexAmmProtocol(FACTORY_ADDRESS)
+    protocol.name = "Uniswap v3"
+    protocol.slug = "uniswap-v3"
+    protocol.schemaVersion = "1.0.1"
+    protocol.subgraphVersion = "1.0.0"
+>>>>>>> masterMessari
     protocol.totalUniqueUsers = INT_ZERO
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
     protocol.totalVolumeUSD = BIGDECIMAL_ZERO
@@ -46,6 +80,7 @@ export function getOrCreateDex(): DexAmmProtocol {
   return protocol
 }
 
+<<<<<<< HEAD
 export function getOrCreateToken(address: Address): Token {
     let id = address.toHexString();
     let token = Token.load(id);
@@ -79,6 +114,8 @@ export function getOrCreateToken(address: Address): Token {
     return token
   }
 
+=======
+>>>>>>> masterMessari
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
 }
