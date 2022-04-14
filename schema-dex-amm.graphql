@@ -1,20 +1,21 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.1.0
+# Version: 1.1.1
 
 enum Network {
-  ARBITRUM
-  AURORA
+  ARBITRUM_ONE
   AVALANCHE
-  BSC
+  AURORA
+  BINANCE_SMART_CHAIN
   CELO
   CRONOS
   ETHEREUM
   FANTOM
-  HARMONY
+  FUSE
+  HARMONY_SHARD_0
   MOONBEAM
   MOONRIVER
-  OPTIMISM
-  POLYGON
+  OPTIMISTIC_ETHEREUM
+  POLYGON_POS
   XDAI
 }
 
@@ -64,10 +65,8 @@ interface Protocol {
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
-
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
-
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
@@ -145,21 +144,17 @@ type FinancialsDailySnapshot @entity {
   
   " Block number of this snapshot "
   blockNumber: BigInt!
-
   " Timestamp of this snapshot "
   timestamp: BigInt!
 }
-
 type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
-
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
-
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
@@ -188,7 +183,7 @@ type DexAmmProtocol implements Protocol @entity {
   ##### DexAmm-Specific #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]! @derivedFrom(field: "protocol")
+  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -245,40 +240,29 @@ type LiquidityPool @entity {
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
-
   ##### Quantitative Data #####
-
   totalValueLockedUSD: BigDecimal!
-
   " Total swap volume in USD "
   totalVolumeUSD: BigDecimal!
-
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
-
   " Total supply of output token "
   outputTokenSupply: BigInt
-
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
-
+  " Total supply of output tokens that are staked "
+  stakedOutputTokenAmount: BigInt
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
-
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
   " Creation timestamp "
   createdTimestamp: BigInt!
-
   " Creation block number "
   createdBlockNumber: BigInt!
-
   " Pool snapshots "
   snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
-
   ##### DexAmm-Specific #####
-
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
 
@@ -325,21 +309,16 @@ type PoolDailySnapshot @entity {
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
-
   " Total amount of reward token emissions in a day, normalized to USD "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
   " Block number of this snapshot "
   blockNumber: BigInt!
-
   " Timestamp of this snapshot "
   timestamp: BigInt!
 }
-
 ##################################
 ##### Transaction-Level Data #####
 ##################################
-
 """
 An event is any user action that occurs in a protocol. Generally, they are Ethereum events
 emitted by a function in the smart contracts, stored in transaction receipts as event logs.
@@ -351,169 +330,114 @@ contracts.
 interface Event {
   " { Transaction hash }-{ Log index } "
   id: ID!
-
   " Transaction hash of the transaction that emitted this event "
   hash: String!
-
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
-
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
-
   " Address that received the tokens "
   to: String!
-
   " Address that sent the tokens "
   from: String!
-
   blockNumber: BigInt!
-
   timestamp: BigInt!
 }
-
 type Deposit implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
-
   " Transaction hash of the transaction that emitted this event "
   hash: String!
-
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
-
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
-
   " Address that received the tokens "
   to: String!
-
   " Address that sent the tokens "
   from: String!
-
   blockNumber: BigInt!
-
   timestamp: BigInt!
-
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
-
   " Output token of the pool. E.g. the UNI-LP token "
   outputToken: Token
-
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
-
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
-
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
-
   ##### DexAmm-Specific #####
-
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-
 type Withdraw implements Event @entity {
   " { Transaction hash }-{ Log index }"
   id: ID!
-
   " Transaction hash of the transaction that emitted this event "
   hash: String!
-
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
-
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
-
   " Address that received the tokens "
   to: String!
-
   " Address that sent the tokens "
   from: String!
-
   blockNumber: BigInt!
-
   timestamp: BigInt!
-
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
-
   " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
   outputToken: Token
-
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
-
   " Amount of output tokens in the token's native unit "
   outputTokenAmount: BigInt
-
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
-
   ##### DexAmm-Specific #####
-
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-
 type Swap implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
-
   " Transaction hash of the transaction that emitted this event "
   hash: String!
-
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
-
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
-
   " Address that received the tokens "
   to: String!
-
   " Address that sent the tokens "
   from: String!
-
   blockNumber: BigInt!
-
   timestamp: BigInt!
-
   " Token deposited into pool "
   tokenIn: Token!
-
   " Amount of token deposited into pool in native units "
   amountIn: BigInt!
-
   " Amount of token deposited into pool in USD "
   amountInUSD: BigDecimal!
-
   " Token withdrawn from pool "
   tokenOut: Token!
-
   " Amount of token withdrawn from pool in native units "
   amountOut: BigInt!
-
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
-
   ##### DexAmm-Specific #####
-
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity {
   " Address of the account "
   id: ID!
 }
-
 # Helper entity for calculating daily active users
 type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
