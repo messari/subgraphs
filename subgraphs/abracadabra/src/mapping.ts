@@ -8,12 +8,12 @@ import {
   cauldron,
   LogExchangeRate,
   LogAccrue,
-} from "../generated/templates/cauldron/cauldron";
-import { Deposit, Borrow, Repay, _Account, Liquidation, _LiquidationCache, _TokenPricesUsd } from "../generated/schema";
+} from "../generated/templates/Cauldron/Cauldron";
+import { Deposit, Borrow, Repay, _Account, _TokenPricesUsd } from "../generated/schema";
 import { NEG_INT_ONE, DEFAULT_DECIMALS, INT_ZERO, BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
-import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getCachedLiquidation } from "./common/getters";
-import { cauldron as CauldronDataSource } from "../generated/templates";
+import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getLiquidateEvent } from "./common/getters";
+import { cauldron as cauldronDataSource } from "../generated/templates";
 import { fetchMimPriceUSD, getOrCreateTokenPriceEntity, updateTokenPrice } from "./common/prices/prices";
 import {
   updateUsageMetrics,
@@ -22,13 +22,13 @@ import {
   updateMarketMetrics,
   updateFinancials,
 } from "./common/metrics";
-import { createMarket, createCachedLiquidation } from "./common/setters";
+import { createMarket, createLiquidateEvent } from "./common/setters";
 
 export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
   if (ABRA_ACCOUNTS.indexOf(account) > NEG_INT_ONE) {
     createMarket(event.params.cloneAddress.toHexString(), event.block.number, event.block.timestamp);
-    CauldronDataSource.create(event.params.cloneAddress);
+    cauldronDataSource.create(event.params.cloneAddress);
   }
 }
 
@@ -36,7 +36,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   let depositEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   let cauldronContract = cauldron.bind(event.address);
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
 
@@ -67,7 +67,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
 
 export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   if (event.params.from.toHexString() != event.params.to.toHexString()) {
-    createCachedLiquidation(event);
+    createLiquidateEvent(event);
   }
   let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
@@ -126,41 +126,38 @@ export function handleLogBorrow(event: LogBorrow): void {
 // Liquidation steps
 // - Liquidations are found in logRemoveCollateral event when from!=to, logRepay events are emitted directly after (logRemoveCollateral's log index +1)
 // 1) When handling logRemoveCollateral emitted by a market contract, check if from!=to in the log receipt
-// 2) If from!=to, save the collateral amount removed in _LiquidationCache entity
-// 3) In logRepay, also check if from!=to and check if we saved the tx_hash - log_index +1 in a _LiquidationCache entity
-//    - Retrieve _LiquidationCache entity to obtain the collateral amount removed and subtract the MIM amount repayed from LogRepay to determine the profit in USD
+// 2) If from!=to, save the collateral amount removed in Liquidate entity
+// 3) In logRepay, also check if from!=to and check if we saved the tx_hash - log_index +1 in a Liquidate entity
+//    - Retrieve Liquidate entity to obtain the collateral amount removed and subtract the MIM amount repayed from LogRepay to determine the profit in USD
 
 export function handleLiquidation(event: LogRepay): void {
   // Retrieve cached liquidation that holds amount of collateral to help calculate profit usd (obtained from log remove collateral with from != to)
-  let cachedLiquidation = getCachedLiquidation(event); // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
-  let liquidationEvent = new Liquidation(
-    "Liquidation-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
-  );
+  let liquidateEvent = getLiquidateEvent(event); // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
   let market = getMarket(event.address.toHexString());
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
   let cauldronContract = cauldron.bind(event.address);
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let collateralAmount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
-    cachedLiquidation.amountCollateral,
+    liquidateEvent.amount,
     false,
   );
   let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD);
   let mimAmountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(fetchMimPriceUSD(event));
 
-  liquidationEvent.hash = event.transaction.hash.toHexString();
-  liquidationEvent.logIndex = event.transactionLogIndex.toI32();
-  liquidationEvent.protocol = getOrCreateLendingProtocol().id;
-  liquidationEvent.to = event.params.to.toHexString();
-  liquidationEvent.from = event.params.from.toHexString();
-  liquidationEvent.blockNumber = event.block.number;
-  liquidationEvent.timestamp = event.block.timestamp;
-  liquidationEvent.market = market.id;
-  liquidationEvent.asset = collateralToken.id;
-  liquidationEvent.amount = collateralAmount;
-  liquidationEvent.amountUSD = collateralAmountUSD;
-  liquidationEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
-  liquidationEvent.save();
+  liquidateEvent.hash = event.transaction.hash.toHexString();
+  liquidateEvent.logIndex = event.transactionLogIndex.toI32();
+  liquidateEvent.protocol = getOrCreateLendingProtocol().id;
+  liquidateEvent.to = event.params.to.toHexString();
+  liquidateEvent.from = event.params.from.toHexString();
+  liquidateEvent.blockNumber = event.block.number;
+  liquidateEvent.timestamp = event.block.timestamp;
+  liquidateEvent.market = market.id;
+  liquidateEvent.asset = collateralToken.id;
+  liquidateEvent.amount = collateralAmount;
+  liquidateEvent.amountUSD = collateralAmountUSD;
+  liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
+  liquidateEvent.save();
 }
 
 export function handleLogRepay(event: LogRepay): void {

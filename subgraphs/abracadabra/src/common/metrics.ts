@@ -27,7 +27,6 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): vo
   // feesUSD is handled in handleLogWithdrawFees
   // totalValueLockedUSD is handled in updateTVL()
   let financialsDailySnapshots = getOrCreateFinancials(event);
-  let protocol = getOrCreateLendingProtocol();
   let treasuryBalanceUSD = getTreasuryBalance();
   // // Update the block number and timestamp to that of the last transaction of that day
   financialsDailySnapshots.blockNumber = event.block.number;
@@ -52,7 +51,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   // Update the block number and timestamp to that of the last transaction of that day
   usageDailySnapshot.blockNumber = event.block.number;
   usageDailySnapshot.timestamp = event.block.timestamp;
-  usageDailySnapshot.dailyTransactionCount += INT_ONE;
+  usageDailySnapshot.dailyTransactionCount += 1;
 
   let fromAccountId = from.toHexString();
   let toAccountId = to.toHexString();
@@ -64,7 +63,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     fromAccount = new _Account(fromAccountId);
     fromAccount.save();
 
-    protocol.totalUniqueUsers += INT_ONE;
+    protocol.totalUniqueUsers += 1;
     protocol.save();
   }
 
@@ -72,7 +71,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
     toAccount = new _Account(toAccountId);
     toAccount.save();
 
-    protocol.totalUniqueUsers += INT_ONE;
+    protocol.totalUniqueUsers += 1;
     protocol.save();
   }
   usageDailySnapshot.totalUniqueUsers = protocol.totalUniqueUsers;
@@ -83,7 +82,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   if (!dailyActiveAccountFrom) {
     dailyActiveAccountFrom = new _DailyActiveAccount(dailyActiveAccountIdFrom);
     dailyActiveAccountFrom.save();
-    usageDailySnapshot.activeUsers += INT_ONE;
+    usageDailySnapshot.activeUsers += 1;
   }
 
   let dailyActiveAccountIdTo = id.toString() + "-" + from.toHexString();
@@ -91,7 +90,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
   if (!dailyActiveAccountTo) {
     dailyActiveAccountTo = new _DailyActiveAccount(dailyActiveAccountIdTo);
     dailyActiveAccountTo.save();
-    usageDailySnapshot.activeUsers += INT_ONE;
+    usageDailySnapshot.activeUsers += 1;
   }
 
   usageDailySnapshot.save();
@@ -125,7 +124,7 @@ export function updateTVL(event: ethereum.Event): void {
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let marketIdList = LendingProtocol.marketIdList;
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
-  for (let i: i32 = INT_ZERO; i < marketIdList.length; i++) {
+  for (let i: i32 = 0; i < marketIdList.length; i++) {
     let marketAddress = marketIdList[i];
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD);
   }

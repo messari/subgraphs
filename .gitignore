@@ -1,6 +1,11 @@
 generated/
 build/
 
+**/.DS_Store
+
+# alternate placement for generated files
+types/
+
 ############################
 ##### Default Template #####
 ############################
@@ -135,6 +140,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
-# macOS
-.DS_Store

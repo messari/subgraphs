@@ -24,8 +24,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
-        - name: cauldron
-          file: ./abis/cauldron.json
+        - name: Cauldron
+          file: ./abis/Cauldron.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
       eventHandlers:
@@ -54,8 +54,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
-        - name: cauldron
-          file: ./abis/cauldron.json
+        - name: Cauldron
+          file: ./abis/Cauldron.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
       eventHandlers:
@@ -82,8 +82,8 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
-        - name: cauldron
-          file: ./abis/cauldron.json
+        - name: Cauldron
+          file: ./abis/Cauldron.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
       eventHandlers:
@@ -91,11 +91,11 @@ dataSources:
           handler: handleTransfer
       file: ./src/staking.ts
 templates:
-  - name: cauldron
+  - name: Cauldron
     kind: ethereum/contract
     network: mainnet
     source:
-      abi: cauldron
+      abi: Cauldron
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -104,8 +104,8 @@ templates:
       entities:
         - Market
       abis:
-        - name: cauldron
-          file: ./abis/cauldron.json
+        - name: Cauldron
+          file: ./abis/Cauldron.json
         - name: DegenBox
           file: ./abis/degenbox.json
         - name: ERC20

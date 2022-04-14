@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { Market, _LiquidationCache } from "../../generated/schema";
-import { cauldron } from "../../generated/templates/cauldron/cauldron";
+import { Market, Liquidate } from "../../generated/schema";
+import { cauldron,LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
   BIGDECIMAL_ZERO,
@@ -24,7 +24,6 @@ import {
   HIGH_RISK_LIQUIDATION_PENALTY,
 } from "../common/constants";
 import { bigIntToBigDecimal } from "./utils/numbers";
-import { LogRemoveCollateral } from "../../generated/templates/cauldron/cauldron";
 
 export function updateProtocolMarketList(marketAddress: string): void {
   let protocol = getOrCreateLendingProtocol();
@@ -164,10 +163,10 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
   updateProtocolMarketList(marketAddress);
 }
 
-export function createCachedLiquidation(event: LogRemoveCollateral): void {
-  let liquidation = new _LiquidationCache(
-    "_Liquidation-" + event.transaction.hash.toHexString() + "_" + event.transactionLogIndex.toString(),
+export function createLiquidateEvent(event: LogRemoveCollateral): void {
+  let liquidation = new Liquidate(
+    "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
   );
-  liquidation.amountCollateral = event.params.share;
+  liquidation.amount = event.params.share;
   liquidation.save();
 }

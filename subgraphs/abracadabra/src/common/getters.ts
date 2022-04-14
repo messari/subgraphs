@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   UsageMetricsDailySnapshot,
@@ -8,20 +8,18 @@ import {
   LendingProtocol,
   Market,
   _TokenPricesUsd,
-  _LiquidationCache,
+  Liquidate,
 } from "../../generated/schema";
 import { LogRepay } from "../../generated/templates/cauldron/cauldron";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
   Network,
-  INT_ZERO,
   ProtocolType,
   SECONDS_PER_DAY,
   BENTOBOX_ADDRESS,
   LendingType,
   BIGINT_ONE,
-  BIGINT_ZERO,
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -38,7 +36,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 }
 
 ///////////////////////////
-///// Metrics /////
+///////// Metrics /////////
 ///////////////////////////
 
 export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
@@ -52,9 +50,9 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = BENTOBOX_ADDRESS;
 
-    usageMetrics.activeUsers = INT_ZERO;
-    usageMetrics.totalUniqueUsers = INT_ZERO;
-    usageMetrics.dailyTransactionCount = INT_ZERO;
+    usageMetrics.activeUsers = 0;
+    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
     usageMetrics.save();
   }
 
@@ -101,7 +99,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
   return financialMetrics;
 }
 
-///////////////////////////
+////////////////////////////
 ///// Lending Specific /////
 ///////////////////////////
 
@@ -117,7 +115,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.subgraphVersion = "0.0.6";
   LendingProtocolEntity.network = Network.ETHEREUM;
   LendingProtocolEntity.type = ProtocolType.LENDING;
-  LendingProtocolEntity.totalUniqueUsers = INT_ZERO;
+  LendingProtocolEntity.totalUniqueUsers = 0;
   LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.lendingType = LendingType.CDP;
   LendingProtocolEntity.save();
@@ -133,18 +131,18 @@ export function getMarket(marketId: string): Market {
 }
 
 ///////////////////////////
-///// Helpers /////
+///////// Helpers /////////
 ///////////////////////////
 
-export function getCachedLiquidation(event: LogRepay): _LiquidationCache {
-  let cachedLiquidation = _LiquidationCache.load(
-    "_Liquidation-" +
+export function getLiquidateEvent(event: LogRepay): Liquidate {
+  let liquidateEvent = Liquidate.load(
+    "liquidate-" +
       event.transaction.hash.toHexString() +
-      "_" +
+      "-" +
       event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
-  if (cachedLiquidation) {
-    return cachedLiquidation;
+  if (liquidateEvent) {
+    return liquidateEvent;
   }
-  return new _LiquidationCache("");
+  return new Liquidate("");
 }

@@ -395,7 +395,7 @@ type Market @entity {
 
   repays: [Repay!]! @derivedFrom(field: "market")
 
-  liquidations: [Liquidation!]! @derivedFrom(field: "market")
+  liquidations: [Liquidate!]! @derivedFrom(field: "market")
 }
 
 type MarketDailySnapshot @entity {
@@ -634,7 +634,7 @@ type Repay implements Event @entity {
   amountUSD: BigDecimal
 }
 
-type Liquidation implements Event @entity {
+type Liquidate implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
@@ -693,13 +693,6 @@ type _Account @entity {
 type _DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
-}
-
-type _LiquidationCache @entity {
-  " Transaction Hash that is shared between two logs, Repay and RemoveCollateral"
-  id: ID!
-  " Stores amount of collateral taken in the liquidation to use in handleRepay to calculate profits"
-  amountCollateral: BigInt!
 }
 
 type _TokenPricesUsd @entity {
