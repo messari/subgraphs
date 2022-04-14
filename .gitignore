@@ -1,6 +1,11 @@
 generated/
 build/
 
+**/.DS_Store
+
+# alternate placement for generated files
+types/
+
 ############################
 ##### Default Template #####
 ############################

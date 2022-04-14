@@ -14,7 +14,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/factory.ts
+      file: ./src/mappings/factory.ts
       entities:
         - Token
         - DexAmmProtocol
@@ -23,6 +23,7 @@ dataSources:
         - Protocol
         - _PricesUSD
         - _TokenTracker
+        - _WindowTracker
       abis:
         - name: Factory
           file: ./abis/factory.json
@@ -48,7 +49,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/core.ts
+      file: ./src/mappings/core.ts
       entities:
         - LiqudityPool
         - Token
