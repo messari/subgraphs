@@ -140,37 +140,37 @@ export function updateMarketStats(
   let market = getMarket(marketId);
   let token_decimals = getOrCreateToken(Address.fromString(asset)).decimals;
   let financialsDailySnapshot = getOrCreateFinancials(event);
+  let protocol = getOrCreateLendingProtocol();
   let priceUSD = getOrCreateTokenPriceEntity(asset).priceUSD;
+  let tvlUSD = BIGDECIMAL_ZERO;
+  let totalVolumeUSD = BIGDECIMAL_ZERO;
   if (eventType == "DEPOSIT") {
     let inputTokenBalances = market.inputTokenBalances;
     let inputTokenBalance = inputTokenBalances.pop();
-    let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token_decimals).times(priceUSD);
+    tvlUSD = bigIntToBigDecimal(inputTokenBalance, token_decimals).times(priceUSD);
     inputTokenBalance = inputTokenBalance.plus(amount);
     inputTokenBalances.push(inputTokenBalance);
     market.inputTokenBalances = inputTokenBalances;
-    market.totalValueLockedUSD = tvlUSD;
   } else if (eventType == "WITHDRAW") {
     let inputTokenBalances = market.inputTokenBalances;
     let inputTokenBalance = inputTokenBalances.pop();
-    let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token_decimals).times(priceUSD);
+    tvlUSD = bigIntToBigDecimal(inputTokenBalance, token_decimals).times(priceUSD);
     inputTokenBalance = inputTokenBalance.minus(amount);
     inputTokenBalances.push(inputTokenBalance);
     market.inputTokenBalances = inputTokenBalances;
-    market.totalValueLockedUSD = tvlUSD;
   } else if (eventType == "BORROW") {
+    totalVolumeUSD = bigIntToBigDecimal(amount, token_decimals).times(priceUSD);
     market.outputTokenSupply = market.outputTokenSupply.plus(amount);
-    market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount, token_decimals).times(priceUSD));
-    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(
-      bigIntToBigDecimal(amount, token_decimals).times(priceUSD),
-    );
   } else if (eventType == "REPAY") {
+    totalVolumeUSD = bigIntToBigDecimal(amount, token_decimals).times(priceUSD);
     market.outputTokenSupply = market.outputTokenSupply.minus(amount);
-    market.totalVolumeUSD = market.totalVolumeUSD.plus(bigIntToBigDecimal(amount, token_decimals).times(priceUSD));
-    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(
-      bigIntToBigDecimal(amount, token_decimals).times(priceUSD),
-    );
   }
-  financialsDailySnapshot.save();
+  market.totalValueLockedUSD = tvlUSD;
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(totalVolumeUSD);
+  financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(totalVolumeUSD);
+  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(totalVolumeUSD);
   market.outputTokenPriceUSD = getOrCreateTokenPriceEntity(MIM).priceUSD;
   market.save();
+  financialsDailySnapshot.save();
+  protocol.save();
 }
