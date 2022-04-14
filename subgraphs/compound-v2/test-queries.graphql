@@ -1,0 +1,211 @@
+{
+  deposits(first: 15) {
+    id
+    hash
+    logIndex
+    protocol {
+      name
+    }
+    to
+    from
+    blockNumber
+    timestamp
+    market {
+      name
+    }
+    asset {
+      name
+    }
+    amount
+    amountUSD
+  }
+  withdraws(first: 15) {
+    id
+    hash
+    logIndex
+    protocol {
+      name
+    }
+    to
+    from
+    blockNumber
+    timestamp
+    market {
+      name
+    }
+    asset {
+      name
+    }
+    amount
+    amountUSD
+  }
+  borrows(first: 15) {
+    id
+    hash
+    logIndex
+    protocol {
+      name
+    }
+    to
+    from
+    blockNumber
+    timestamp
+    market {
+      name
+    }
+    asset {
+      name
+    }
+    amount
+    amountUSD
+  }
+  repays(first: 15) {
+    id
+    hash
+    logIndex
+    protocol {
+      name
+    }
+    to
+    from
+    blockNumber
+    timestamp
+    market {
+      name
+    }
+    asset {
+      name
+    }
+    amount
+    amountUSD
+  }
+  repays(first: 15) {
+    id
+    hash
+    logIndex
+    protocol {
+      name
+    }
+    to
+    from
+    blockNumber
+    timestamp
+    market {
+      name
+    }
+    asset {
+      name
+    }
+    amount
+    amountUSD
+  }
+  liquidations(first: 15) {
+    id
+    hash
+    logIndex
+    protocol {
+      name
+    }
+    to
+    from
+    blockNumber
+    timestamp
+    market {
+      name
+    }
+    asset {
+      name
+    }
+    amount
+    amountUSD
+    profitUSD
+  }
+  lendingProtocols(first: 1) {
+    id
+    name
+    slug
+    schemaVersion
+    subgraphVersion
+    network
+    type
+    totalUniqueUsers
+    totalValueLockedUSD
+    _totalVolumeUSD
+    lendingType
+    riskType
+    _liquidationPenalty
+  }
+  markets(first: 5) {
+    id
+    protocol {
+      name
+    }
+    inputTokens {
+      name
+    }
+    outputToken {
+      name
+    }
+    rewardTokens {
+      id
+      name
+    }
+    totalValueLockedUSD
+    totalVolumeUSD
+    _outstandingBorrowAmount
+    inputTokenBalances
+    _inputTokenPrice
+    _exchangeRate
+    outputTokenSupply
+    outputTokenPriceUSD
+    rewardTokenEmissionsAmount
+    rewardTokenEmissionsUSD
+    createdTimestamp
+    createdBlockNumber
+    name
+    isActive
+    canUseAsCollateral
+    canBorrowFrom
+    maximumLTV
+    liquidationThreshold
+    liquidationPenalty
+    depositRate
+    stableBorrowRate
+    variableBorrowRate
+    _reserveFactor
+    _supplySideRevenueUSD
+    _protocolSideRevenueUSD
+  }
+  usageMetricsDailySnapshots(first: 5) {
+    id
+    protocol {
+      name
+    }
+    activeUsers
+    totalUniqueUsers
+    dailyTransactionCount
+    blockNumber
+    timestamp
+  }
+  marketDailySnapshots(first: 20) {
+    id
+    protocol {
+      name
+    }
+    market {
+      name
+    }
+    totalValueLockedUSD
+    inputTokenBalances
+    inputTokenPricesUSD
+    outputTokenSupply
+    outputTokenPriceUSD
+    rewardTokenEmissionsAmount
+    rewardTokenEmissionsUSD
+    blockNumber
+    timestamp
+    depositRate
+    stableBorrowRate
+    variableBorrowRate
+  }
+}

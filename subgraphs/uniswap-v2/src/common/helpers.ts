@@ -1,8 +1,8 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts"
 import {
-  _Account,
-  _DailyActiveAccount,
+  Account,
+  DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
   _LiquidityPoolAmounts,
@@ -16,11 +16,11 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE_TO_OFF, BIGDECIMAL_HUNDRED } from "../common/constants"
-import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./Price"
-import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, savePoolId, getLiquidityPoolFee } from "./getters"
-import { updateVolumeAndFees } from "./intervalUpdates"
-import { getOrCreateToken } from "./tokens"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "../common/utils/constants"
+import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD, WHITELIST } from "./utils/price"
+import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee } from "./getters"
+import { getOrCreateToken } from "./utils/tokens"
+import { updateVolumeAndFees } from "./metrics/metrics"
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS))
 
@@ -28,18 +28,24 @@ export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADD
 export let UNTRACKED_PAIRS: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
 
 function createPoolFees(poolAddressString: string): string[] {
-  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
-  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
-  poolTradingFee.feePercentage = TRADING_FEE_TO_OFF
+  let poolLpFee = new LiquidityPoolFee('lp-fee-'+poolAddressString)
+  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE
+  poolLpFee.feePercentage = LP_FEE_TO_OFF
 
   let poolProtocolFee = new LiquidityPoolFee('protocol-fee-'+poolAddressString)
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
   poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
 
-  poolTradingFee.save()
-  poolProtocolFee.save()
+  let poolTradingFee = new LiquidityPoolFee('trading-fee-'+poolAddressString)
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
+  poolTradingFee.feePercentage = TRADING_FEE
 
-  return [poolTradingFee.id, poolProtocolFee.id]
+  poolLpFee.save()
+  poolProtocolFee.save()
+  poolTradingFee.save()
+
+
+  return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id]
 }
 
 // Create a liquidity pool from PairCreated contract call
@@ -79,9 +85,9 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
 
 // Create Account entity for participating account 
 export function createAndIncrementAccount(accountId: Address): i32 {
-    let account = _Account.load(accountId.toHexString())
+    let account = Account.load(accountId.toHexString())
     if (!account) {
-        account = new _Account(accountId.toHexString());
+        account = new Account(accountId.toHexString());
         account.save();
 
         return INT_ONE
@@ -96,9 +102,9 @@ export function createAndIncrementDailyAccount(event: ethereum.Event, accountId:
 
     // Combine the id and the user address to generate a unique user id for the day
     let dailyActiveAccountId = id.toString() + "-" + accountId.toHexString()
-    let account = _DailyActiveAccount.load(dailyActiveAccountId)
+    let account = DailyActiveAccount.load(dailyActiveAccountId)
     if (!account) {
-        account = new _DailyActiveAccount(accountId.toHexString());
+        account = new DailyActiveAccount(accountId.toHexString());
         account.save();
         
         return INT_ONE
@@ -174,7 +180,7 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
   pool.totalValueLockedUSD =  newTvl
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl)
 
-  let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply, DEFAULT_DECIMALS)
+  let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply!, DEFAULT_DECIMALS)
 
   // Update LP token prices
   if (pool.outputTokenSupply == BIGINT_ZERO) pool.outputTokenPriceUSD = BIGDECIMAL_ZERO
@@ -192,7 +198,7 @@ export function handleTransferMint(event: ethereum.Event, value: BigInt, to: Add
   let transfer = getOrCreateTransfer(event)
   
   // Tracks supply of minted LP tokens 
-  pool.outputTokenSupply = pool.outputTokenSupply.plus(value)
+  pool.outputTokenSupply = pool.outputTokenSupply!.plus(value)
 
   // create new mint if no mints so far or if last one is done already
   if (!transfer.type) {
@@ -225,14 +231,13 @@ export function handleTransferToPoolBurn(event: ethereum.Event, value: BigInt,fr
   transfer.save()
 }
 
-
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event. 
 export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: Address): void {
   let pool = getLiquidityPool(event.address.toHexString())
   let transfer = getOrCreateTransfer(event)
 
   // Tracks supply of minted LP tokens 
-  pool.outputTokenSupply = pool.outputTokenSupply.minus(value)
+  pool.outputTokenSupply = pool.outputTokenSupply!.minus(value)
 
   // Uses address from the transfer to pool part of the burn. Otherwise create with this transfer event. 
   if (transfer.type == TransferType.BURN) { 
@@ -428,6 +433,12 @@ function UpdateDepositHelper(poolAddress: Address): void {
   let poolDeposits = _HelperStore.load(poolAddress.toHexString())!
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
   poolDeposits.save()
+}
+
+export function savePoolId(poolAddress: Address): void { 
+  let protocol = getOrCreateDex()
+  protocol._poolIds.push(poolAddress)
+  protocol.save()
 }
 
 // convert decimals 
