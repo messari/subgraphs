@@ -62,7 +62,7 @@ Following calculation gives the COMP distributed (in COMP) to suppliers OR borro
 
 Not applicable to Compound v2
 
-### Reference and Useful Links
+## Reference and Useful Links
 
 Protocol: https://compound.finance/
 
