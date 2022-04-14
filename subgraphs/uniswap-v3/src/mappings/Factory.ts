@@ -1,10 +1,10 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { PoolCreated } from '../../generated//Factory/Factory'
 import { Address } from '@graphprotocol/graph-ts'
-import { findEthPerToken } from '../common/utils/price'
-import { getOrCreateDex, getOrCreateTokenTracker } from '../common/getters'
-import { CreateLiquidityPool, UpdateTokenWhitelists } from '../common/helpers'
-import { getOrCreateLPToken, getOrCreateToken } from '../common/utils/tokens'
+import { getOrCreateDex, getOrCreateLPToken, getOrCreateToken, getOrCreateTokenTracker } from '../common/getters'
+import { CreateLiquidityPool } from '../common/creators'
+import { findEthPerToken } from '../common/price/price'
+import { UpdateTokenWhitelists } from '../common/updateMetrics'
 
 export function handlePoolCreated(event: PoolCreated): void {
   // temp fix

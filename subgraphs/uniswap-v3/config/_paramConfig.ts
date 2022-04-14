@@ -1,5 +1,5 @@
 import { dataSource } from '@graphprotocol/graph-ts';
-import { SchemaNetwork, SubgraphNetwork } from "../src/common/utils/constants"
+import { SchemaNetwork, SubgraphNetwork } from "../src/common/constants"
 
 let DEPLOYED_NETWORK_TEMP: string           // Name of network deployed to
 let FACTORY_ADDRESS_TEMP: string            // Address of the factory contract

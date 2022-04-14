@@ -1,6 +1,7 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { Address, ethereum } from "@graphprotocol/graph-ts"
 import { NetworkParameters } from "../../config/_paramConfig"
+import { ERC20 } from "../../generated/Factory/ERC20"
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -11,28 +12,10 @@ import {
   UsageMetricsDailySnapshot,
   _LiquidityPoolAmount,
   LiquidityPoolFee,
+  Token,
 } from "../../generated/schema"
+import { INT_ZERO, BIGDECIMAL_ZERO, ProtocolType, HelperStoreType, DEFAULT_DECIMALS, SECONDS_PER_DAY } from "./constants"
 
-import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, ProtocolType, SECONDS_PER_DAY } from "./utils/constants"
-
-export function getOrCreateEtherHelper(): _HelperStore {
-    let ether = _HelperStore.load(HelperStoreType.ETHER)
-    if (ether === null) {
-        ether = new _HelperStore(HelperStoreType.ETHER)
-        ether.valueDecimal = BIGDECIMAL_ZERO
-        ether.save()
-    }
-    return ether
-}
-export function getOrCreateUsersHelper(): _HelperStore {
-    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
-    if (uniqueUsersTotal === null) {
-        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-        uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO
-        uniqueUsersTotal.save()
-    }
-    return uniqueUsersTotal
-}
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkParameters.FACTORY_ADDRESS)
@@ -62,6 +45,39 @@ export function getOrCreateDex(): DexAmmProtocol {
   }  
   return protocol
 }
+
+export function getOrCreateToken(address: Address): Token {
+    let id = address.toHexString();
+    let token = Token.load(id);
+    if (!token) {
+      token = new Token(id);
+      let erc20Contract = ERC20.bind(address);
+      let decimals = erc20Contract.try_decimals();
+      // Using try_cause some values might be missing
+      let name = erc20Contract.try_name();
+      let symbol = erc20Contract.try_symbol();
+      // TODO: add overrides for name and symbol
+      token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
+      token.name = name.reverted ? '' : name.value;
+      token.symbol = symbol.reverted ? '' : symbol.value;
+      token.save();
+    }
+    return token as Token;
+  }
+  
+  export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
+    let id = tokenAddress.toHexString();
+    let token = Token.load(id)
+    // fetch info if null
+    if (token === null) {
+        token = new Token(tokenAddress.toHexString())
+        token.symbol = token0.name + '/' + token1.name
+        token.name = token0.name + '/' + token1.name + " LP"
+        token.decimals = INT_ZERO
+        token.save()
+    }
+    return token
+  }
 
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
@@ -151,4 +167,23 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
         financialMetrics.save()
     }
     return financialMetrics
+}
+
+export function getOrCreateEtherHelper(): _HelperStore {
+    let ether = _HelperStore.load(HelperStoreType.ETHER)
+    if (ether === null) {
+        ether = new _HelperStore(HelperStoreType.ETHER)
+        ether.valueDecimal = BIGDECIMAL_ZERO
+        ether.save()
+    }
+    return ether
+}
+export function getOrCreateUsersHelper(): _HelperStore {
+    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
+    if (uniqueUsersTotal === null) {
+        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
+        uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO
+        uniqueUsersTotal.save()
+    }
+    return uniqueUsersTotal
 }

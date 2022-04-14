@@ -1,10 +1,10 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO } from './constants'
 import { _HelperStore, _TokenTracker, _LiquidityPoolAmount } from '../../../generated/schema'
 import { Address, BigDecimal } from '@graphprotocol/graph-ts'
-import { safeDiv } from '../helpers'
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from '../getters'
 import { NetworkParameters } from '../../../config/_paramConfig'
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGINT_ZERO, BIGDECIMAL_TWO } from '../constants'
+import { safeDiv } from '../utils/utils'
 
 let MINIMUM_ETH_LOCKED = BigDecimal.fromString('60')
 
@@ -19,7 +19,7 @@ function token1PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
 
 export function getEthPriceInUSD(): BigDecimal {
   // fetch eth prices for each stablecoin
-  let poolAmounts = _LiquidityPoolAmount.load(NetworkParameters.NATIVE_TOKEN_STABLE_COIN_POOL)
+  let poolAmounts = _LiquidityPoolAmount.load(NetworkParameters.NATIVE_TOKEN_ORACLE_POOL)
   if (poolAmounts !== null) {
     if (poolAmounts.inputTokenBalances[0] >= poolAmounts.inputTokenBalances[1]) return token0PairPrice(poolAmounts)
     return token1PairPrice(poolAmounts)

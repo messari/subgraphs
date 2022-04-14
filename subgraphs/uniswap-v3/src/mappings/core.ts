@@ -7,13 +7,11 @@ import {
   SetFeeProtocol
 } from '../../generated/templates/Pool/Pool'
 import {
-  updatePrices,
   createDeposit,
   createWithdraw,
   createSwapHandleVolumeAndFees,
-  updateProtocolFees
-} from '../common/helpers'
-import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from '../common/metrics/metrics'
+} from '../common/creators'
+import { updatePrices, updatePoolMetrics, updateProtocolFees, updateUsageMetrics, updateFinancials } from '../common/updateMetrics'
 
 export function handleInitialize(event: Initialize): void {
   updatePrices(event)
