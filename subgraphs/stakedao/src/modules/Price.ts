@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { Address, BigInt} from "@graphprotocol/graph-ts";
-import { getVirtualPrice } from "../Oracle/routers/CurveRouter";
+import { getVirtualPrice } from "../Prices/routers/CurveRouter";
 import { Vault } from "../../generated/templates/Vault/Vault";
 
 export function getPriceOfStakedTokens(

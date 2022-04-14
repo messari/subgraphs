@@ -6,8 +6,8 @@ import {
   Gauge as GaugeContract,
   RewardAdded,
 } from "../../generated/templates/Gauge/Gauge";
-import { getUsdPricePerToken } from "../Oracle";
-import { CustomPriceType } from "../Oracle/common/types";
+import { getUsdPricePerToken } from "../Prices";
+import { CustomPriceType } from "../Prices/common/types";
 import { RewardToken, Vault as VaultStore } from "../../generated/schema";
 import { BigInt, Address, log, BigDecimal } from "@graphprotocol/graph-ts";
 

@@ -1,4 +1,4 @@
-import * as constants from "../common/constants";
+import * as constants from "./constants";
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 export class Wrapped<T> {

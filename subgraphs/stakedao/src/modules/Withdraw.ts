@@ -5,7 +5,7 @@ import {
 } from "../../generated/schema";
 
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Oracle";
+import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import {
   Address,

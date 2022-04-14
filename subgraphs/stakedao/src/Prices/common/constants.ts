@@ -30,7 +30,6 @@ CURVE_CALCULATIONS_ADDRESS_MAP.set(
   Address.fromString("0x25BF7b72815476Dd515044F9650Bf79bAd0Df655") // CURVE_REGISTRY_MAINNET
 );
 
-
 export const CURVE_REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
 CURVE_REGISTRY_ADDRESS_MAP.set(
   "mainnet",

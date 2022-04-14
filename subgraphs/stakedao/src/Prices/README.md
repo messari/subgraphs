@@ -71,7 +71,7 @@ let tokenPrice = getUsdPrice(tokenAddr, amount);
 
 ```
 
-Oracle
+Prices
 ├── calculations
 │   ├── CalculationsCurve.ts
 │   └── CalculationsSushiSwap.ts
@@ -91,10 +91,11 @@ Oracle
 
 ## Development Status
 
-### Mainet
+### Mainnet
 
 🔨 = In progress.  
 🛠 = Feature complete. Additional testing required.
+`MultiCall` = If the method uses more than two `JSON RPC Call`.
 
 | Method                                                                               |      Type      | StartBlock | MultiCall | Status |
 | ------------------------------------------------------------------------------------ | :------------: | :--------: | :-------: | :----: |

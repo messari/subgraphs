@@ -6,9 +6,9 @@ import {
 
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { getUsdPricePerToken } from "../Oracle";
+import { getUsdPricePerToken } from "../Prices";
 import { getPriceOfStakedTokens } from "./Price";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function _Deposit(
   call: ethereum.Call,

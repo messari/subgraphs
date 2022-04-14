@@ -12,7 +12,7 @@ import {
 } from "../../generated/templates/Strategy/Strategy";
 
 import * as utils from "../common/utils";
-import { getUsdPricePerToken } from "../Oracle";
+import { getUsdPricePerToken } from "../Prices";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 export function handleHarvested(event: HarvestedEvent): void {
