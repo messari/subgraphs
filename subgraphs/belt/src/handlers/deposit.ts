@@ -8,7 +8,7 @@ import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
 import { updateVaultFees } from "../entities/Vault";
 import { readValue } from "../utils/contracts";
-import { updateProtocolMetrics } from "./common";
+import { updateAllMetrics } from "./common";
 import { getUSDPriceOfOutputToken, getUSDPriceOfToken } from "./price";
 
 export function deposit(event: DepositEvent, vault: Vault): void {
@@ -44,7 +44,6 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   let feePercentage = getFeePercentage(vault, event.params.strategyAddress.toHex(), VaultFeeType.DEPOSIT_FEE);
 
   let fees = amountUSD.times(feePercentage.div(BIGDECIMAL_HUNDRED));
-  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(fees);
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(fees);
   financialMetrics.save();
 
@@ -57,6 +56,6 @@ export function deposit(event: DepositEvent, vault: Vault): void {
   deposit.vault = vault.id;
   deposit.save();
 
-  // updating protocol amount locked
-  updateProtocolMetrics(amountUSD, true);
+  // updating the metrics
+  updateAllMetrics(event, vault);
 }

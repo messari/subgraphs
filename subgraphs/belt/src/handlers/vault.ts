@@ -7,7 +7,6 @@ import { createStrategy } from "../entities/Strategy";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateVault } from "../entities/Vault";
 import { readValue } from "../utils/contracts";
-import { updateFinancialMetrics, updateUsageMetrics, updateVaultMetrics } from "./common";
 import { deposit } from "./deposit";
 import { withdraw } from "./withdraw";
 
@@ -36,9 +35,6 @@ export function handleDeposit(event: Deposit): void {
   ]);
 
   deposit(event, vault);
-  updateUsageMetrics(event);
-  updateVaultMetrics(vault, event.block);
-  updateFinancialMetrics(vault, amount, event.block);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -66,9 +62,6 @@ export function handleWithdraw(event: Withdraw): void {
   ]);
 
   withdraw(event, vault);
-  updateUsageMetrics(event);
-  updateVaultMetrics(vault, event.block);
-  updateFinancialMetrics(vault, amount, event.block);
 }
 
 export function createVault(vaultAddress: Address, inputTokenAddress: Address, block: ethereum.Block): Vault {

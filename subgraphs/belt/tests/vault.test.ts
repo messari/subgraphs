@@ -60,20 +60,20 @@ test("vault deposit event", () => {
     "Vault",
     c.VAULT_ADDRESS,
     "totalValueLockedUSD",
-    inputTokenBalance
+    price
       .toBigDecimal()
       .div(decimals.toBigDecimal())
-      .times(price.toBigDecimal().div(decimals.toBigDecimal()))
+      .times(inputTokenBalance.toBigDecimal().div(decimals.toBigDecimal()))
       .toString(),
   );
   assert.fieldEquals(
     "Vault",
     c.VAULT_ADDRESS,
     "totalVolumeUSD",
-    depositAmount
+    price
       .toBigDecimal()
       .div(decimals.toBigDecimal())
-      .times(price.toBigDecimal().div(decimals.toBigDecimal()))
+      .times(depositAmount.toBigDecimal().div(decimals.toBigDecimal()))
       .toString(),
   );
   assert.fieldEquals("Vault", c.VAULT_ADDRESS, "inputTokenBalances", `[${inputTokenBalance}]`);
@@ -118,10 +118,10 @@ test("vault deposit event", () => {
     "Deposit",
     depositId,
     "amountUSD",
-    depositAmount
+    price
       .toBigDecimal()
       .div(decimals.toBigDecimal())
-      .times(price.toBigDecimal().div(decimals.toBigDecimal()))
+      .times(depositAmount.toBigDecimal().div(decimals.toBigDecimal()))
       .toString(),
   );
   assert.fieldEquals("Deposit", depositId, "vault", c.VAULT_ADDRESS);
@@ -131,10 +131,10 @@ test("vault deposit event", () => {
     "YieldAggregator",
     c.PROTOCOL_ID,
     "totalValueLockedUSD",
-    depositAmount
+    price
       .toBigDecimal()
       .div(decimals.toBigDecimal())
-      .times(price.toBigDecimal().div(decimals.toBigDecimal()))
+      .times(inputTokenBalance.toBigDecimal().div(decimals.toBigDecimal()))
       .toString(),
   );
 });
@@ -163,10 +163,10 @@ test("vault withdraw event", () => {
     "YieldAggregator",
     c.PROTOCOL_ID,
     "totalValueLockedUSD",
-    depositAmount
+    price
       .toBigDecimal()
       .div(decimals.toBigDecimal())
-      .times(price.toBigDecimal().div(decimals.toBigDecimal()))
+      .times(inputTokenBalance.toBigDecimal().div(decimals.toBigDecimal()))
       .toString(),
   );
 
@@ -179,9 +179,6 @@ test("vault withdraw event", () => {
   );
 
   handleWithdraw(withdrawalEvent);
-
-  // after withdraw decrease
-  assert.fieldEquals("YieldAggregator", c.PROTOCOL_ID, "totalValueLockedUSD", "0");
 
   // validating deposit
   let withdrawId = "withdraw-"
@@ -246,10 +243,22 @@ test("fees entity", () => {
     "fees",
     `[${withdrawFeeId}, ${depositFeeId}, ${withdrawFeeId2}, ${depositFeeId2}]`,
   );
+  assert.fieldEquals("VaultFee", withdrawFeeId, "feePercentage", "10");
+
+  mockStrategyFunctions(c.STRATEGY_ADDRESS_1, BigInt.fromString("5"), BigInt.fromString("100")); // 5% withdrawal fee
+
+  handleDeposit(
+    createDepositEvent(c.VAULT_ADDRESS, c.STRATEGY_ADDRESS_1, c.INPUT_TOKEN_ADDRESS, depositAmount, sharesMinted),
+  );
+
+  assert.fieldEquals("VaultFee", withdrawFeeId, "feePercentage", "5");
 });
 
 test("financial metrics", () => {
   clearStore();
+
+  mockStrategyFunctions(c.STRATEGY_ADDRESS_1, numerator, denominator); // 10% withdrawal fee
+  mockStrategyFunctions(c.STRATEGY_ADDRESS_2, numerator, denominator); // 10% withdrawal fee
 
   let withdrawAmount = BigInt.fromString("1000").times(decimals);
   let sharesMinted = BigInt.fromString("100").times(decimals);

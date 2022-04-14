@@ -1,8 +1,8 @@
 import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { SECONDS_PER_DAY, USDC_DENOMINATOR } from "../constant";
 
-export function getDay(timestamp: BigInt): i32 {
-  return timestamp.toI32() / SECONDS_PER_DAY;
+export function getDay(timestamp: BigInt): i64 {
+  return timestamp.toI64() / SECONDS_PER_DAY;
 }
 
 export function normalizedUsdcPrice(usdcPrice: BigInt): BigInt {

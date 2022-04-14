@@ -4,7 +4,7 @@ import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 import { getDay } from "../utils/numbers";
 import { getOrCreateProtocol } from "./Protocol";
 
-export function getOrCreateUserSnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricSnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
   let day = getDay(block.timestamp).toString();
   let snapshot = UsageMetricsDailySnapshot.load(day);
 

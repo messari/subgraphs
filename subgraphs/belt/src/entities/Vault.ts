@@ -55,6 +55,7 @@ export function updateVaultFees(vault: Vault, strategyAddress: Address): void {
     .concat(strategyAddress.toHex().toLowerCase())
     .concat("-")
     .concat(vault.id);
+
   createFeeType(withdrawFeeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
 
   let vaultContract = VaultContract.bind(Address.fromString(vault.id));
@@ -72,20 +73,6 @@ export function updateVaultFees(vault: Vault, strategyAddress: Address): void {
     .concat(strategyAddress.toHex().toLowerCase())
     .concat("-")
     .concat(vault.id);
+
   createFeeType(depositFeeId, VaultFeeType.DEPOSIT_FEE, feePercentage);
-
-  let fees = vault.fees;
-  let withdrawFeeIndex = fees.indexOf(withdrawFeeId);
-  let depositFeeIndex = fees.indexOf(depositFeeId);
-
-  if (withdrawFeeIndex !== -1) {
-    fees[withdrawFeeIndex] = withdrawFeeId;
-  }
-
-  if (depositFeeIndex !== -1) {
-    fees[depositFeeIndex] = depositFeeId;
-  }
-
-  vault.fees = fees;
-  vault.save();
 }

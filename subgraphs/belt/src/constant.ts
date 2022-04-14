@@ -56,10 +56,10 @@ export const SECONDS_PER_DAY = 84600;
 
 export const PROTOCOL_ID = Address.fromString("0xE0e514c71282b6f4e823703a39374Cf58dc3eA4f");
 export const PROTOCOL_NAME = "Belt Finance";
-export const PROTOCOL_SLUG = "belt";
+export const PROTOCOL_SLUG = "belt-finance";
 export const PROTOCOL_TYPE = ProtocolType.YIELD;
 export const PROTOCOL_NETWORK = Network.BSC;
-export const PROTOCOL_SCHEMA_VERSION = "1.0.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.1.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 

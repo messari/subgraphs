@@ -8,7 +8,7 @@ import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
 import { updateVaultFees } from "../entities/Vault";
 import { readValue } from "../utils/contracts";
-import { updateProtocolMetrics } from "./common";
+import { updateAllMetrics } from "./common";
 import { getUSDPriceOfToken } from "./price";
 
 export function withdraw(event: WithdrawEvent, vault: Vault): void {
@@ -48,9 +48,7 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   let depositFeesUSD = amountUSD.times(depositFeePercentage.div(BIGDECIMAL_HUNDRED));
 
   // only adding withdraw fee as deposit fee is accounted for
-  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(withdrawFeesUSD);
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(withdrawFeesUSD);
-
   // total revenue - (sum of all fees)
   financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
     amountUSD.minus(withdrawFeesUSD.plus(depositFeesUSD)),
@@ -66,6 +64,6 @@ export function withdraw(event: WithdrawEvent, vault: Vault): void {
   withdraw.vault = vault.id;
   withdraw.save();
 
-  // updating protocol locked usd
-  updateProtocolMetrics(amountUSD, false);
+  // updating metrics
+  updateAllMetrics(event, vault);
 }
