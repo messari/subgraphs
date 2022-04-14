@@ -78,7 +78,7 @@ Amount of MIM tokens minted for each Market
 
 ## Smart Contracts Interactions
 
-![Abracadabra](../../docs/images/protocols/uniswap-v2.png "Abracadabra")
+![Abracadabra](../../docs/images/protocols/abracadabra.png "Abracadabra")
 
 ## Build
 
