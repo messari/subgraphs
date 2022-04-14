@@ -1,3 +1,4 @@
 {
-    "network": "optimism"
+    "network": "optimism",
+    "startBlock": 0
 }
