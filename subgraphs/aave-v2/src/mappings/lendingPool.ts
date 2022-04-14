@@ -341,10 +341,14 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   // The liquidationPenalty is the amount as a percentage of the collateral that was liquidated summed with the percentage of the collateral that is provided as a bonus
   // This is represented by a 5 digit integer over 10000 (100%). The profit is the percentage over 100%
   // For example, if the liquidationPenalty is 10500 (105%), the profit is 5% of the collateral liquidated.
-  const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'))
-  // This expression below divides the collaterall liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
-  liquidation.profitUSD = amountUSD.div(divideAmountBy);
-  log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString() + ' ' + amountUSD.times(market.liquidationPenalty.div(bigIntToBigDecimal(new BigInt(10).pow(18)))).toString(), []);
+  if (market.liquidationPenalty.gt(BigDecimal.fromString('10000'))) {
+    const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'))
+    log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString() + ' divide amount by ' + divideAmountBy.toString(), []);
+    // This expression below divides the collaterall liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
+    liquidation.profitUSD = amountUSD.div(divideAmountBy);
+  } else {
+    liquidation.profitUSD = BIGDECIMAL_ZERO;
+  }
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
   liquidation.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   liquidation.save();
