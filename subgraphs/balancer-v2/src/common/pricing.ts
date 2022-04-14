@@ -5,17 +5,16 @@ import {
   USD_STABLE_ASSETS,
 } from "./constants";
 import { _TokenPrice } from "../../generated/schema";
+import {log} from "matchstick-as";
 
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
-  if (isUSDStable(asset)) {
-    usdValue = value;
-  } else {
-    // convert to USD
+
     let pricingAssetInUSD = _TokenPrice.load(asset.toHexString());
     if (pricingAssetInUSD != null) {
+      log.info(pricingAssetInUSD.lastUsdPrice.toString(), [])
+      log.info(value.toString(), [])
       usdValue = value.times(pricingAssetInUSD.lastUsdPrice);
-    }
   }
 
   return usdValue;

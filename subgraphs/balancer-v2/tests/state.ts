@@ -15,16 +15,16 @@ mockMethod(usdcWethPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethe
 mockMethod(usdcWethPoolAddress, "getNormalizedWeights", [], [], "uint256[]", [], true);
 
 export const weth = new Token("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
-weth.save()
 mockMethod(Address.fromString(weth.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
 mockMethod(Address.fromString(weth.id), "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(Address.fromString(weth.id), "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
+weth.save()
 
 export const usdc = new Token("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48");
-usdc.save()
 mockMethod(Address.fromString(usdc.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(6)], false);
 mockMethod(Address.fromString(usdc.id), "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(Address.fromString(usdc.id), "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
+usdc.save()
 
 /**
  * BAL-WETH: https://app.balancer.fi/#/pool/0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014

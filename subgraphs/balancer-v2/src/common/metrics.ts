@@ -4,6 +4,7 @@ import { SECONDS_PER_DAY } from "./constants";
 import { Account, DailyActiveAccount, _TokenPrice, LiquidityPool } from "../../generated/schema";
 import { isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
+import {log} from "matchstick-as";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -47,30 +48,40 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetrics.save();
 }
 
-export function updatePoolMetrics(id: string): void {
-  let pool = LiquidityPool.load(id);
-  if (!pool) return;
+export function updatePoolMetrics(pool: LiquidityPool): void {
   let totalValueLocked = BigDecimal.zero();
   let tokenWithoutPrice = false;
   for (let i = 0; i < pool.inputTokens.length; i++) {
     let currentToken = Address.fromString(pool.inputTokens[i]);
-    let currentTokenBalance = scaleDown(Address.fromString(pool.inputTokens[i]), pool.inputTokenBalances[i]);
-    let token: _TokenPrice | null = null;
+    log.info(pool.inputTokenBalances[i].toString(), [])
+    log.info(pool.inputTokens[i].toString(), [])
+    let currentTokenBalance = scaleDown(
+        pool.inputTokenBalances[i],
+        Address.fromString(pool.inputTokens[i]),
+    );
+
     if (isUSDStable(currentToken)) {
-      totalValueLocked.plus(currentTokenBalance);
+      log.info("usdc balance", [])
+      log.info(currentTokenBalance.toString(), [])
+      totalValueLocked = totalValueLocked.plus(currentTokenBalance);
       continue;
     }
 
-    token = _TokenPrice.load(currentToken.toHexString());
+    const token = _TokenPrice.load(currentToken.toHexString());
     if (token == null) {
+    log.info("jaja??????", [])
       tokenWithoutPrice = true;
-      break;
+      continue;
     }
 
+    log.info("before value in usd", [])
     let currentTokenValueInUsd = valueInUSD(currentTokenBalance, Address.fromString(token.id));
-    totalValueLocked.plus(currentTokenValueInUsd);
+    log.info("after value in usd", [])
+    log.info(currentTokenValueInUsd.toString(), [])
+    totalValueLocked = totalValueLocked.plus(currentTokenValueInUsd);
   }
 
+  log.info(tokenWithoutPrice.toString(), [])
   if (tokenWithoutPrice) return;
   pool.totalValueLockedUSD = totalValueLocked;
   pool.save();

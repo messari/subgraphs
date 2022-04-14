@@ -48,7 +48,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
   // fetch info if null
   if (token === null) {
-    token = new Token(tokenAddress.toHexString());
+    token = new Token(tokenAddress.toHexString().toLowerCase());
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress);

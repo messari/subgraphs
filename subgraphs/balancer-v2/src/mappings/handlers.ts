@@ -7,7 +7,7 @@ import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from "../comm
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { calculatePrice } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
-
+import { log } from "matchstick-as"
 export function handlePoolRegister(event: PoolRegistered): void {
   createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block);
 }
@@ -33,6 +33,8 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString());
   if (pool == null) return;
   let amounts: BigInt[] = [];
+  log.info(pool.inputTokenBalances.toString(), [])
+  log.info(pool.inputTokens.toString(), [])
   for (let i = 0; i < event.params.deltas.length; i++) {
     let currentAmount = pool.inputTokenBalances[i];
     amounts.push(currentAmount.plus(event.params.deltas[i]));
@@ -40,7 +42,11 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   pool.inputTokenBalances = amounts;
   pool.save();
 
-  updatePoolMetrics(event.params.poolId.toHexString());
+  log.info("////////////////", [])
+  log.info(pool.inputTokens.toString(), [])
+  log.info(pool.inputTokenBalances.toString(), [])
+  log.info("////////////////", [])
+  updatePoolMetrics(pool);
   updateUsageMetrics(event, event.transaction.from);
   updateFinancials(event);
 }
@@ -56,11 +62,19 @@ export function handleSwap(event: Swap): void {
 
   for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
     if (event.params.tokenIn.equals(Bytes.fromHexString(pool.inputTokens[i]))) {
+  log.info("ininininininin", [])
+  log.info(pool.inputTokenBalances[i].toString(), [])
+  log.info(event.params.amountIn.toString(), [])
+  log.info("ininininininin", [])
       newBalances[i] = pool.inputTokenBalances[i].plus(event.params.amountIn);
       tokenInIndex = i;
     }
 
     if (event.params.tokenOut.equals(Bytes.fromHexString(pool.inputTokens[i]))) {
+      log.info("outoutoutoutout", [])
+  log.info(pool.inputTokenBalances[i].toString(), [])
+  log.info(event.params.amountOut.toString(), [])
+  log.info("outoutoutoutout", [])
       newBalances[i] = pool.inputTokenBalances[i].minus(event.params.amountOut);
       tokenOutIndex = i;
     }
@@ -68,6 +82,11 @@ export function handleSwap(event: Swap): void {
 
   pool.inputTokenBalances = newBalances;
   pool.save();
+
+  log.info("////////////////", [])
+  log.info(pool.inputTokens.toString(), [])
+  log.info(pool.inputTokenBalances.toString(), [])
+  log.info("////////////////", [])
 
   let weightPool = WeightedPool.bind(Address.fromString(pool.outputToken));
   let getWeightCall = weightPool.try_getNormalizedWeights();
@@ -102,7 +121,7 @@ export function handleSwap(event: Swap): void {
     token.save();
   }
 
-  updatePoolMetrics(event.params.poolId.toHexString());
+  updatePoolMetrics(pool);
   updateUsageMetrics(event, event.transaction.from);
   updateFinancials(event);
 }
