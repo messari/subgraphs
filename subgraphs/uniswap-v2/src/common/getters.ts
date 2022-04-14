@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum } from "@graphprotocol/graph-ts"
+import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts"
 import { ERC20 } from "../../generated/Factory/ERC20"
 import {
   DexAmmProtocol,
@@ -7,7 +7,7 @@ import {
   UsageMetricsDailySnapshot,
   PoolDailySnapshot,
   FinancialsDailySnapshot,
-  _LiquidityPoolAmounts,
+  _LiquidityPoolAmount,
   _Transfer,
   _HelperStore,
   _TokenTracker,
@@ -38,24 +38,24 @@ export function getOrCreateDex(): DexAmmProtocol {
     return protocol
   }
 
-export function getLiquidityPool(poolAddress: string): LiquidityPool {
+export function getLiquidityPool(poolAddress: Bytes): LiquidityPool {
     return LiquidityPool.load(poolAddress)!
 }
 
-export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmounts {
-    return _LiquidityPoolAmounts.load(poolAddress)!
+export function getLiquidityPoolAmounts(poolAddress: Bytes): _LiquidityPoolAmount {
+    return _LiquidityPoolAmount.load(poolAddress)!
 }
 
-export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
+export function getLiquidityPoolFee(id: Bytes): LiquidityPoolFee {
     return LiquidityPoolFee.load(id)!
 }
 
-export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
-    let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
+export function getOrCreateTokenTracker(tokenAddress: Bytes): _TokenTracker {
+    let tokenTracker = _TokenTracker.load(tokenAddress)
     // fetch info if null
     if (!tokenTracker) {
 
-        tokenTracker = new _TokenTracker(tokenAddress.toHexString())
+        tokenTracker = new _TokenTracker(tokenAddress)
 
         tokenTracker.whitelistPools = []
         tokenTracker.save()
@@ -65,10 +65,9 @@ export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
 }
 
 export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
-    let transactionHash = event.transaction.hash.toHexString()
-    let transfer = _Transfer.load(transactionHash)
+    let transfer = _Transfer.load(event.transaction.hash)
     if (!transfer) {    
-        transfer = new _Transfer(transactionHash)
+        transfer = new _Transfer(event.transaction.hash)
         transfer.blockNumber = event.block.number
         transfer.timestamp = event.block.timestamp
     }
@@ -78,13 +77,13 @@ export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
 
 export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot{
     // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-
+    let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY
+    let id = Bytes.fromI32(dayID)
     // Create unique id for the day
-    let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+    let usageMetrics = UsageMetricsDailySnapshot.load(id);
   
     if (!usageMetrics) {
-        usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+        usageMetrics = new UsageMetricsDailySnapshot(id);
         usageMetrics.protocol = FACTORY_ADDRESS;
   
         usageMetrics.activeUsers = 0;
@@ -97,14 +96,14 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
 }
 
 export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySnapshot {
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-    let poolAddress = event.address.toHexString()
-    let poolMetrics = PoolDailySnapshot.load(poolAddress.concat("-").concat(id.toString()));
+    let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY
+    let id = Bytes.fromI32(dayID)
+    let poolMetrics = PoolDailySnapshot.load(event.address.concat(id));
     
     if (!poolMetrics) {
-        poolMetrics = new PoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
+        poolMetrics = new PoolDailySnapshot(event.address.concat(id));
         poolMetrics.protocol = FACTORY_ADDRESS;
-        poolMetrics.pool = poolAddress;
+        poolMetrics.pool = event.address;
         poolMetrics.rewardTokenEmissionsAmount = []
         poolMetrics.rewardTokenEmissionsUSD = []
 
@@ -116,12 +115,13 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
 
 export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
     // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+    let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY
+    let id = Bytes.fromI32(dayID)
 
-    let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+    let financialMetrics = FinancialsDailySnapshot.load(id);
   
     if (!financialMetrics) {
-        financialMetrics = new FinancialsDailySnapshot(id.toString());
+        financialMetrics = new FinancialsDailySnapshot(id);
         financialMetrics.protocol = FACTORY_ADDRESS;
   
         financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO
@@ -135,12 +135,11 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     return financialMetrics
 }
 
-export function getOrCreateToken(address: Address): Token {
-    let id = address.toHexString();
-    let token = Token.load(id);
+export function getOrCreateToken(address: Bytes): Token {
+    let token = Token.load(address);
     if (!token) {
-      token = new Token(id);
-      let erc20Contract = ERC20.bind(address);
+      token = new Token(address);
+      let erc20Contract = ERC20.bind(Address.fromBytes(address));
       let decimals = erc20Contract.try_decimals();
       // Using try_cause some values might be missing
       let name = erc20Contract.try_name();
@@ -154,12 +153,11 @@ export function getOrCreateToken(address: Address): Token {
     return token as Token;
   }
   
-  export function getOrCreateLPToken(tokenAddress: Address, token0: Token, token1: Token): Token {
-    let id = tokenAddress.toHexString();
-    let token = Token.load(id)
+  export function getOrCreateLPToken(tokenAddress: Bytes, token0: Token, token1: Token): Token {
+    let token = Token.load(tokenAddress)
     // fetch info if null
     if (token === null) {
-        token = new Token(tokenAddress.toHexString())
+        token = new Token(tokenAddress)
         token.symbol = token0.name + '/' + token1.name
         token.name = token0.name + '/' + token1.name + " LP"
         token.decimals = DEFAULT_DECIMALS

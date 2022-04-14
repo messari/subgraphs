@@ -1,4 +1,4 @@
-import { BigInt, BigDecimal } from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal, Bytes } from "@graphprotocol/graph-ts"
 import { BIGDECIMAL_ZERO, INT_ONE, INT_ZERO } from "./../constants"
 
 // convert decimals 
@@ -25,4 +25,12 @@ export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
   } else {
     return amount0.div(amount1)
   }
+}
+
+// convert string array to byte array
+export function toBytesArray(arr: string[]): Bytes[] {
+  let byteArr = new Array<Bytes>(arr.length)
+    for (let i = 0; i < arr.length; i++) {
+      byteArr[i] = Bytes.fromHexString(arr[i])
+  } return byteArr
 }

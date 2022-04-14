@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts"
+import { log, Address, BigDecimal, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts"
 import { Account, DailyActiveAccount, UsageMetricsDailySnapshot, _HelperStore, _TokenTracker } from "../../generated/schema"
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateToken, getOrCreateTokenTracker, getOrCreateUsersHelper } from "./getters"
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, FACTORY_ADDRESS, INT_ONE, SECONDS_PER_DAY, WHITELIST } from "./constants"
@@ -21,13 +21,14 @@ export function updateFinancials(event: ethereum.Event): void {
 
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY
+  let id = Bytes.fromI32(dayID)
+  let usageMetrics = UsageMetricsDailySnapshot.load(id);
   let totalUniqueUsers = getOrCreateUsersHelper()
   let protocol = getOrCreateDex()
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+    usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = FACTORY_ADDRESS
     usageMetrics.activeUsers = 0;
     usageMetrics.totalUniqueUsers = 0;
@@ -39,10 +40,9 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   usageMetrics.timestamp = event.block.timestamp;
   usageMetrics.dailyTransactionCount += 1;
 
-  let accountId = from.toHexString()
-  let account = Account.load(accountId)
+  let account = Account.load(from)
   if (!account) {
-    account = new Account(accountId);
+    account = new Account(from);
     account.save();
     totalUniqueUsers.valueInt += 1;
   }
@@ -50,7 +50,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   protocol.totalUniqueUsers = totalUniqueUsers.valueInt;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + from.toHexString()
+  let dailyActiveAccountId = id.concat(from)
   let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
@@ -68,7 +68,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 
   // get or create pool metrics
   let poolMetrics = getOrCreatePoolDailySnapshot(event)
-  let pool = getLiquidityPool(event.address.toHexString())
+  let pool = getLiquidityPool(event.address)
     
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
@@ -86,27 +86,27 @@ export function updateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker
     // update white listed pools
     if (WHITELIST.includes(tokenTracker0.id)) {
       let newPools = tokenTracker1.whitelistPools
-      newPools.push(poolAddress.toHexString())
+      newPools.push(poolAddress)
       tokenTracker1.whitelistPools = newPools
       tokenTracker1.save()
     }
   
     if (WHITELIST.includes(tokenTracker1.id)) {
       let newPools = tokenTracker0.whitelistPools
-      newPools.push(poolAddress.toHexString())
+      newPools.push(poolAddress)
       tokenTracker0.whitelistPools = newPools
       tokenTracker0.save()
     }
 }
 
 // Upate token balances based on reserves emitted from the sync event. 
-export function updateInputTokenBalances(poolAddress: string, reserve0: BigInt, reserve1: BigInt): void {
+export function updateInputTokenBalances(poolAddress: Address, reserve0: BigInt, reserve1: BigInt): void {
   
   let pool = getLiquidityPool(poolAddress)
   let poolAmounts = getLiquidityPoolAmounts(poolAddress)
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]))
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]))
+  let token0 = getOrCreateToken(pool.inputTokens[0])
+  let token1 = getOrCreateToken(pool.inputTokens[1])
 
   let tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals)
   let tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals)
@@ -119,20 +119,22 @@ export function updateInputTokenBalances(poolAddress: string, reserve0: BigInt, 
 }
 
 // Update tvl an token prices 
-export function updateTvlAndTokenPrices(poolAddress: string): void {
+export function updateTvlAndTokenPrices(poolAddress: Address): void {
   let pool = getLiquidityPool(poolAddress)
 
   let protocol = getOrCreateDex()
 
   // Get updated ETH price now that reserves could have changed
   let ether = getOrCreateEtherHelper()
+
   ether.valueDecimal = getEthPriceInUSD()
 
-  let token0 = getOrCreateToken(Address.fromString(pool.inputTokens[0]))
-  let token1 = getOrCreateToken(Address.fromString(pool.inputTokens[1]))
+  let token0 = getOrCreateToken(pool.inputTokens[0])
+  let token1 = getOrCreateToken(pool.inputTokens[1])
 
-  let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
-  let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0])
+  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1])
+
   tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
   tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
 
@@ -163,7 +165,7 @@ export function updateTvlAndTokenPrices(poolAddress: string): void {
 
 // Update the volume and accrued fees for all relavant entities 
 export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, tradingFeeAmountUSD: BigDecimal, protocolFeeAmountUSD: BigDecimal): void {
-    let pool = getLiquidityPool(event.address.toHexString())
+    let pool = getLiquidityPool(event.address)
     let protocol = getOrCreateDex()
     let poolMetrics = getOrCreatePoolDailySnapshot(event);
     let financialMetrics = getOrCreateFinancials(event);
@@ -185,7 +187,7 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
 
 // Update store that tracks the deposit count per pool
 export function updateDepositHelper(poolAddress: Address): void {
-    let poolDeposits = _HelperStore.load(poolAddress.toHexString())!
+    let poolDeposits = _HelperStore.load(poolAddress)!
     poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
     poolDeposits.save()
 }

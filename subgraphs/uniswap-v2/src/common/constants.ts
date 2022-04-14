@@ -1,4 +1,5 @@
-import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
+import { Address, BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts';
+import { toBytesArray } from './utils/utils';
 
 
 ////////////////////////
@@ -45,14 +46,14 @@ export namespace RewardTokenType {
 }
 
 export namespace HelperStoreType {
-  export const ETHER = 'ETHER'
-  export const USERS = 'USERS'
+  export const ETHER = Bytes.fromHexString('xETHER')
+  export const USERS = Bytes.fromHexString('xUSERS')
   // Pool addresses are also stored in the HelperStore
 }
 
 export namespace TransferType {
-  export const MINT = 'MINT'
-  export const BURN = 'BURN'
+  export const MINT = Bytes.fromHexString('MINT')
+  export const BURN = Bytes.fromHexString('BURN')
   // Pool addresses are also stored in the HelperStore
 }
 
@@ -105,20 +106,20 @@ export let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
 //////////////
 ///////
 
-export const FACTORY_ADDRESS = '0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f'
+export const FACTORY_ADDRESS: Address = Address.fromString('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f')
 
-export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000'
+export const ZERO_ADDRESS = Bytes.fromHexString('0x0000000000000000000000000000000000000000')
 
-export const NATIVE_TOKEN = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // WETH
+export const NATIVE_TOKEN = Bytes.fromHexString('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') // WETH
 
-export const STABLE_ORACLE_POOLS: string[] = [
+let STABLE_ORACLE_POOLS_TEMP: string[] = [
   '0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc', // USDC/wETH created 10008355
   '0xa478c2975ab1ea89e8196811f51a7b7ade33eb11', // DAI/wETH created block 10042267
   '0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852' // USDT/wETH created block 10093341
 ]
 
 // token where amounts should contribute to tracked volume and liquidity
-export let WHITELIST: string[] = [
+let WHITELIST_TEMP: string[] = [
   '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
   '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
@@ -141,7 +142,7 @@ export let WHITELIST: string[] = [
   '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599' // WBTC
 ]
 
-export let STABLE_COINS: string[] = [
+let STABLE_COINS_TEMP: string[] = [
   '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
   '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
   '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
@@ -149,3 +150,12 @@ export let STABLE_COINS: string[] = [
   '0x956f47f50a910163d8bf957cf5846d573e7f87ca', // FEI
   '0x4dd28568d05f09b02220b09c2cb307bfd837cb95'
 ]
+
+let UNTRACKED_PAIRS_TEMP: string[] = ['0x9ea3b5b4ec044b70375236a281986106457b20ef']
+
+
+export const STABLE_ORACLE_POOLS = toBytesArray(STABLE_ORACLE_POOLS_TEMP)
+export const WHITELIST = toBytesArray(WHITELIST_TEMP)
+export const STABLE_COINS = toBytesArray(STABLE_COINS_TEMP)
+export const UNTRACKED_PAIRS = toBytesArray(UNTRACKED_PAIRS_TEMP)
+

@@ -1,9 +1,8 @@
 // import { log } from '@graphprotocol/graph-ts/index'
-import { BigDecimal, Address } from '@graphprotocol/graph-ts/index'
-import { UNTRACKED_PAIRS } from './../creators'
+import { BigDecimal } from '@graphprotocol/graph-ts/index'
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from './../getters'
-import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from '../../../generated/schema'
-import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, NATIVE_TOKEN, STABLE_ORACLE_POOLS, MINIMUM_LIQUIDITY_THRESHOLD_ETH, STABLE_COINS, WHITELIST, MINIMUM_USD_THRESHOLD_NEW_PAIRS} from './../constants'
+import { _HelperStore, _LiquidityPoolAmount, _TokenTracker } from '../../../generated/schema'
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, NATIVE_TOKEN, STABLE_ORACLE_POOLS, MINIMUM_LIQUIDITY_THRESHOLD_ETH, STABLE_COINS, WHITELIST, MINIMUM_USD_THRESHOLD_NEW_PAIRS, UNTRACKED_PAIRS} from './../constants'
 import { safeDiv } from './../utils/utils'
 
 export function getEthPriceInUSD(): BigDecimal {
@@ -11,16 +10,25 @@ export function getEthPriceInUSD(): BigDecimal {
   let stableAmount = BIGDECIMAL_ZERO
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < STABLE_ORACLE_POOLS.length; i++) {
-    let pool = _LiquidityPoolAmounts.load(STABLE_ORACLE_POOLS[i]);
+    let pool = _LiquidityPoolAmount.load(STABLE_ORACLE_POOLS[i]);
     if (!pool) continue
-    if (pool.inputTokens[0] = NATIVE_TOKEN) {
-      nativeAmount = nativeAmount.plus(pool.inputTokenBalances[0])
-      stableAmount = stableAmount.plus(pool.inputTokenBalances[1])
+    if (pool.inputTokens[0] == NATIVE_TOKEN) {
+      if (pool.inputTokenBalances[1] > stableAmount) {
+        nativeAmount = pool.inputTokenBalances[0]
+        stableAmount = pool.inputTokenBalances[1]
+      }
+    } else {
+      if (pool.inputTokenBalances[0] > stableAmount) {
+        nativeAmount = pool.inputTokenBalances[1]
+        stableAmount = pool.inputTokenBalances[0]
+      }
     }
   }
   if (stableAmount.notEqual(BIGDECIMAL_ZERO)) {
-    return nativeAmount.div(stableAmount)
-  } else return BIGDECIMAL_ZERO
+    return stableAmount.div(nativeAmount)
+  } else {
+    return BIGDECIMAL_ZERO
+  }
 }
 
 export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
@@ -47,7 +55,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
       if (pool.outputTokenSupply!.gt(BIGINT_ZERO)) {
         if (pool.inputTokens[0] == tokenTracker.id) {
           // whitelist token is token1
-          let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
+          let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1])
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[1].times(tokenTracker1.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
@@ -57,7 +65,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
           }
         }
         if (pool.inputTokens[1] == tokenTracker.id) {
-          let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
+          let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0])
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[0].times(tokenTracker0.derivedETH)
           if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_LIQUIDITY_THRESHOLD_ETH)) {
@@ -83,7 +91,7 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   tokenTracker0: _TokenTracker,
   tokenAmount1: BigDecimal,
   tokenTracker1: _TokenTracker,
-  pool: _LiquidityPoolAmounts
+  pool: _LiquidityPoolAmount
 ): BigDecimal {
 
   let ether = getOrCreateEtherHelper()
