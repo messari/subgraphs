@@ -326,7 +326,7 @@ type Market @entity {
 
   repays: [Repay!]! @derivedFrom(field: "market")
 
-  liquidations: [Liquidates!]! @derivedFrom(field: "market")
+  liquidates: [Liquidate!]! @derivedFrom(field: "market")
 }
 
 #################################
@@ -601,7 +601,7 @@ type Liquidate implements Event @entity {
 
   " Amount of token liquidated in USD "
   amountUSD: BigDecimal
-  
+
   " Amount of profit from liquidation in USD "
   profitUSD: BigDecimal
 }
