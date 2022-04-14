@@ -43,3 +43,10 @@ export function calculateFee(pool: LiquidityPool, trackedAmountUSD: BigDecimal):
       return amount0.div(amount1)
     }
   }
+
+  // convert list array to lowercase
+export function toLowerCase(list: string[]): string[] {
+  for (let i = 0; i < list.length; i++) {
+    list[i] = list[i].toLowerCase()
+  } return list
+}

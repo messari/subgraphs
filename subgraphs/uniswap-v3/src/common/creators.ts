@@ -1,5 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { BigInt, BigDecimal, Address, log, ethereum } from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -50,6 +50,7 @@ export function CreateLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   pool.name = protocol.name + " " + LPtoken.symbol
   pool.symbol = LPtoken.symbol
 
+  poolAmounts.inputTokens = [token0.id, token1.id]
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO]
 
   // Used to track the number of deposits into the liquidity pool

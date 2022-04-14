@@ -6,23 +6,27 @@ import { NetworkParameters } from '../../../config/_paramConfig'
 import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGINT_ZERO, BIGDECIMAL_TWO } from '../constants'
 import { safeDiv } from '../utils/utils'
 
-let MINIMUM_ETH_LOCKED = BigDecimal.fromString('60')
-
-function token0PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
-  if (poolAmounts.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) return poolAmounts.inputTokenBalances[0].div(poolAmounts.inputTokenBalances[1])
-  else return BIGDECIMAL_ZERO
-}
-function token1PairPrice(poolAmounts: _LiquidityPoolAmount): BigDecimal {
-  if (poolAmounts.inputTokenBalances[0].notEqual(BIGDECIMAL_ZERO)) return poolAmounts.inputTokenBalances[1].div(poolAmounts.inputTokenBalances[0])
-  else return BIGDECIMAL_ZERO
-}
-
 export function getEthPriceInUSD(): BigDecimal {
-  // fetch eth prices for each stablecoin
-  let poolAmounts = _LiquidityPoolAmount.load(NetworkParameters.NATIVE_TOKEN_ORACLE_POOL)
-  if (poolAmounts !== null) {
-    if (poolAmounts.inputTokenBalances[0] >= poolAmounts.inputTokenBalances[1]) return token0PairPrice(poolAmounts)
-    return token1PairPrice(poolAmounts)
+  let nativeAmount = BIGDECIMAL_ZERO
+  let stableAmount = BIGDECIMAL_ZERO
+  // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
+  for (let i = 0; i < NetworkParameters.STABLE_ORACLE_POOLS.length; i++) {
+    let pool = _LiquidityPoolAmount.load(NetworkParameters.STABLE_ORACLE_POOLS[i].toLowerCase());
+    if (!pool) continue
+    if (pool.inputTokens[0] == NetworkParameters.NATIVE_TOKEN) {
+      if (pool.inputTokenBalances[1] > stableAmount) {
+        nativeAmount = pool.inputTokenBalances[0]
+        stableAmount = pool.inputTokenBalances[1]
+      }
+    } else {
+      if (pool.inputTokenBalances[0] > stableAmount) {
+        nativeAmount = pool.inputTokenBalances[1]
+        stableAmount = pool.inputTokenBalances[0]
+      }
+    }
+  }
+  if (stableAmount.notEqual(BIGDECIMAL_ZERO)) {
+    return stableAmount.div(nativeAmount)
   } else {
     return BIGDECIMAL_ZERO
   }
@@ -32,7 +36,6 @@ export function getEthPriceInUSD(): BigDecimal {
  * Search through graph to find derived Eth per token.
  * @todo update to be derived ETH (add stablecoin estimates)
  **/
-
 
  export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
   if (tokenTracker.id == NetworkParameters.NATIVE_TOKEN) {
@@ -61,20 +64,20 @@ export function getEthPriceInUSD(): BigDecimal {
           let tokenTracker1 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[1]))
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[1].times(tokenTracker1.derivedETH)
-          if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {
+          if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(NetworkParameters.MINIMUM_ETH_LOCKED)) {
             largestLiquidityETH = ethLocked
             // token1 per our token * Eth per token1
-            priceSoFar = token1PairPrice(poolAmounts).times(tokenTracker1.derivedETH as BigDecimal)
+            priceSoFar = safeDiv(poolAmounts.inputTokenBalances[1], poolAmounts.inputTokenBalances[0]).times(tokenTracker1.derivedETH as BigDecimal)
           }
         }
         if (pool.inputTokens[1] == tokenTracker.id) {
           let tokenTracker0 = getOrCreateTokenTracker(Address.fromString(pool.inputTokens[0]))
           // get the derived ETH in pool
           let ethLocked = poolAmounts.inputTokenBalances[0].times(tokenTracker0.derivedETH)
-          if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(MINIMUM_ETH_LOCKED)) {
+          if (ethLocked.gt(largestLiquidityETH) && ethLocked.gt(NetworkParameters.MINIMUM_ETH_LOCKED)) {
             largestLiquidityETH = ethLocked
             // token0 per our token * ETH per token0
-            priceSoFar = token0PairPrice(poolAmounts).times(tokenTracker0.derivedETH as BigDecimal)
+            priceSoFar = safeDiv(poolAmounts.inputTokenBalances[0], poolAmounts.inputTokenBalances[1]).times(tokenTracker0.derivedETH as BigDecimal)
           }
         }
       }
@@ -82,6 +85,7 @@ export function getEthPriceInUSD(): BigDecimal {
   }
   return priceSoFar // nothing was found return 0
 }
+
 /**
  * Accepts tokens and amounts, return tracked amount based on token whitelist
  * If one token on whitelist, return amount in that token converted to USD * 2.

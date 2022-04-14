@@ -1,3 +1,4 @@
 {
-    "network": "mainnet"
+    "network": "mainnet",
+    "startBlock": 12369621
 }

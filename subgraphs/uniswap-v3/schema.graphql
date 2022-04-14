@@ -447,6 +447,8 @@ type DailyActiveAccount @entity {
 type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "
   id: ID!
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  inputTokens: [Token!]!
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
 }
