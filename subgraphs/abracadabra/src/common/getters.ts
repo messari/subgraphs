@@ -10,7 +10,7 @@ import {
   _TokenPricesUsd,
   Liquidate,
 } from "../../generated/schema";
-import { LogRepay } from "../../generated/templates/cauldron/cauldron";
+import { LogRepay } from "../../generated/templates/Cauldron/Cauldron";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,

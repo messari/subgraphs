@@ -5,7 +5,7 @@ import {
   LogBorrow,
   LogRemoveCollateral,
   LogRepay,
-  cauldron,
+  Cauldron,
   LogExchangeRate,
   LogAccrue,
 } from "../generated/templates/Cauldron/Cauldron";
@@ -13,7 +13,7 @@ import { Deposit, Borrow, Repay, _TokenPricesUsd } from "../generated/schema";
 import { NEG_INT_ONE, DEFAULT_DECIMALS, INT_ZERO, BIGDECIMAL_ONE, MIM, ABRA_ACCOUNTS } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
 import { getOrCreateToken, getOrCreateLendingProtocol, getMarket, getLiquidateEvent } from "./common/getters";
-import { cauldron as cauldronDataSource } from "../generated/templates";
+import { Cauldron as CauldronDataSource } from "../generated/templates";
 import { fetchMimPriceUSD, getOrCreateTokenPriceEntity, updateTokenPrice } from "./common/prices/prices";
 import {
   updateUsageMetrics,
@@ -28,14 +28,14 @@ export function handleLogDeploy(event: LogDeploy): void {
   const account = event.transaction.from.toHex().toLowerCase();
   if (ABRA_ACCOUNTS.indexOf(account) > NEG_INT_ONE) {
     createMarket(event.params.cloneAddress.toHexString(), event.block.number, event.block.timestamp);
-    cauldronDataSource.create(event.params.cloneAddress);
+    CauldronDataSource.create(event.params.cloneAddress);
   }
 }
 
 export function handleLogAddCollateral(event: LogAddCollateral): void {
   let depositEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
-  let cauldronContract = cauldron.bind(event.address);
+  let CauldronContract = Cauldron.bind(event.address);
   let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
@@ -51,7 +51,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   depositEvent.asset = collateralToken.id;
   // Amount needs to be calculated differently as bentobox deals shares and amounts in a different way.
   // usage of toAmount function converts shares to actual amount based on collateral
-  depositEvent.amount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(
+  depositEvent.amount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
     event.params.share,
     false,
@@ -72,7 +72,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   let withdrawalEvent = new Deposit(event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString());
   let market = getMarket(event.address.toHexString());
   let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[INT_ZERO]));
-  let cauldronContract = cauldron.bind(event.address);
+  let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
 
@@ -85,7 +85,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   withdrawalEvent.timestamp = event.block.timestamp;
   withdrawalEvent.market = market.id;
   withdrawalEvent.asset = collateralToken.id;
-  withdrawalEvent.amount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(
+  withdrawalEvent.amount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
     event.params.share,
     false,
@@ -135,9 +135,9 @@ export function handleLiquidation(event: LogRepay): void {
   let liquidateEvent = getLiquidateEvent(event); // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
   let market = getMarket(event.address.toHexString());
   let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
-  let cauldronContract = cauldron.bind(event.address);
+  let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
-  let collateralAmount = DegenBox.bind(cauldronContract.bentoBox()).toAmount(
+  let collateralAmount = DegenBox.bind(CauldronContract.bentoBox()).toAmount(
     Address.fromString(collateralToken.id),
     liquidateEvent.amount,
     false,

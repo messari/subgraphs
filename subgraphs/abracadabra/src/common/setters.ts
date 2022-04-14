@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Market, Liquidate } from "../../generated/schema";
-import { cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
+import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
   BIGDECIMAL_ZERO,
@@ -36,7 +36,7 @@ export function updateProtocolMarketList(marketAddress: string): void {
 
 export function createMarket(marketAddress: string, blockNumber: BigInt, blockTimestamp: BigInt): void {
   let MarketEntity = new Market(marketAddress);
-  let MarketContract = cauldron.bind(Address.fromString(marketAddress));
+  let MarketContract = Cauldron.bind(Address.fromString(marketAddress));
   let collateralCall = MarketContract.try_collateral();
   if (!collateralCall.reverted) {
     let inputToken = getOrCreateToken(collateralCall.value);
