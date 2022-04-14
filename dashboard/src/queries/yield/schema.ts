@@ -18,8 +18,7 @@ export const schema100= ()  : Schema => {
           "totalVolumeUSD",
           "protocolSideRevenueUSD",
           "supplySideRevenueUSD",
-          "feesUSD",
-          "timestamp"
+          "feesUSD"
         ],
         [
           "totalUniqueUsers",
@@ -35,7 +34,7 @@ export const schema100= ()  : Schema => {
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots {
+        financialsDailySnapshots(first: 1000) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -43,7 +42,7 @@ export const schema100= ()  : Schema => {
           feesUSD
           timestamp
         }
-        usageMetricsDailySnapshots {
+        usageMetricsDailySnapshots(first: 1000) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
@@ -62,7 +61,6 @@ export const schema110= ()  : Schema => {
           "totalVolumeUSD",
           "protocolSideRevenueUSD",
           "supplySideRevenueUSD",
-          "timestamp",
           "totalRevenueUSD"
         ],
         [
@@ -80,7 +78,7 @@ export const schema110= ()  : Schema => {
           subgraphVersion
           methodologyVersion
         }
-        financialsDailySnapshots {
+        financialsDailySnapshots(first: 1000) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -88,7 +86,7 @@ export const schema110= ()  : Schema => {
           totalRevenueUSD
           timestamp
         }
-        usageMetricsDailySnapshots {
+        usageMetricsDailySnapshots(first: 1000) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
