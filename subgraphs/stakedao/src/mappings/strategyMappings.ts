@@ -60,10 +60,10 @@ export function handleHarvested(event: HarvestedEvent): void {
     let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
 
     financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-      inputTokenPrice[0]
+      inputTokenPrice.usdPrice
         .times(wantEarned.toBigDecimal())
         .div(inputTokenDecimals.toBigDecimal())
-        .div(inputTokenPrice[1])
+        .div(inputTokenPrice.decimals.toBigDecimal())
     );
 
     financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
@@ -85,7 +85,7 @@ export function handleHarvested(event: HarvestedEvent): void {
         event.transaction.hash.toHexString(),
         event.address.toHexString(),
         wantEarned.toString(),
-        inputTokenPrice[0].toString(),
+        inputTokenPrice.usdPrice.toString(),
         financialMetrics.supplySideRevenueUSD.toString(),
         financialMetrics.protocolSideRevenueUSD.toString(),
       ]

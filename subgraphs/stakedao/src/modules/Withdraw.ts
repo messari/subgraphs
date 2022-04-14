@@ -41,10 +41,10 @@ export function _Withdraw(
   let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
 
-  vault.totalValueLockedUSD = inputTokenPrice[0]
+  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalances[0].toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice[1]);
+    .div(inputTokenPrice.decimals.toBigDecimal());
 
   // vault.totalVolumeUSD remains same
 
@@ -65,21 +65,21 @@ export function _Withdraw(
     constants.VaultFeeType.WITHDRAWAL_FEE
   );
   financialMetrics.feesUSD = financialMetrics.feesUSD.plus(
-    inputTokenPrice[0]
+    inputTokenPrice.usdPrice
       .times(_withdrawAmount.toBigDecimal())
       .times(feesPercentage.times(BigDecimal.fromString("10")))
       .div(constants.BIGINT_HUNDRED.times(BigInt.fromI32(10)).toBigDecimal())
       .div(inputTokenDecimals.toBigDecimal())
-      .div(inputTokenPrice[1])
+      .div(inputTokenPrice.decimals.toBigDecimal())
   );
 
   // update deposit transaction
   transaction.asset = vault.inputTokens[0];
   transaction.amount = _withdrawAmount;
-  transaction.amountUSD = inputTokenPrice[0]
+  transaction.amountUSD = inputTokenPrice.usdPrice
     .times(_withdrawAmount.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice[1]);
+    .div(inputTokenPrice.decimals.toBigDecimal());
 
   financialMetrics.save();
   transaction.save();

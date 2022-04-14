@@ -7,6 +7,7 @@ import {
   RewardAdded,
 } from "../../generated/templates/Gauge/Gauge";
 import { getUsdPricePerToken } from "../Oracle";
+import { CustomPriceType } from "../Oracle/common/types";
 import { RewardToken, Vault as VaultStore } from "../../generated/schema";
 import { BigInt, Address, log, BigDecimal } from "@graphprotocol/graph-ts";
 
@@ -21,7 +22,7 @@ export function handleRewardPaid(event: RewardPaid): void {
 
   const vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
-    let rewardTokenDecimals: BigInt, rewardTokenPrice: BigDecimal[];
+    let rewardTokenDecimals: BigInt, rewardTokenPrice: CustomPriceType;
     let rewardTokenEmissionsAmount: Array<BigInt> = [];
     let rewardTokenEmissionsUSD: Array<BigDecimal> = [];
 
@@ -34,10 +35,10 @@ export function handleRewardPaid(event: RewardPaid): void {
 
       rewardTokenEmissionsAmount.push(event.params.reward);
       rewardTokenEmissionsUSD.push(
-        rewardTokenPrice[0]
+        rewardTokenPrice.usdPrice
           .times(event.params.reward.toBigDecimal())
           .div(rewardTokenDecimals.toBigDecimal())
-          .div(rewardTokenPrice[1])
+          .div(rewardTokenPrice.decimals.toBigDecimal())
       );
     }
     vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
@@ -119,13 +120,13 @@ export function handleRewardAdded(event: RewardAdded): void {
   let rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
 
   financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-    rewardTokenPrice[0]
+    rewardTokenPrice.usdPrice
       .times(supplySideRevenue.toBigDecimal())
       .div(rewardTokenDecimals.toBigDecimal())
   );
 
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD
-    .plus(rewardTokenPrice[0].times(protocolRevenue.toBigDecimal()))
+    .plus(rewardTokenPrice.usdPrice.times(protocolRevenue.toBigDecimal()))
     .plus(financialMetrics.feesUSD);
 
   financialMetrics.save();
@@ -137,7 +138,7 @@ export function handleRewardAdded(event: RewardAdded): void {
       supplySideRevenue.toString(),
       protocolRevenue.toString(),
       vault!._rewardTokensIds[0],
-      rewardTokenPrice.toString(),
+      rewardTokenPrice.usdPrice.toString(),
       financialMetrics.supplySideRevenueUSD.toString(),
       financialMetrics.protocolSideRevenueUSD.toString(),
       event.transaction.hash.toHexString(),

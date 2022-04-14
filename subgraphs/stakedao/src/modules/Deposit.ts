@@ -37,15 +37,15 @@ export function _Deposit(
   let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
 
-  vault.totalValueLockedUSD = inputTokenPrice[0]
+  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalances[0].toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal());
 
   vault.totalVolumeUSD = vault.totalVolumeUSD.plus(
-    inputTokenPrice[0]
+    inputTokenPrice.usdPrice
       .times(_depositAmount.toBigDecimal())
       .div(inputTokenDecimals.toBigDecimal())
-      .div(inputTokenPrice[1])
+      .div(inputTokenPrice.decimals.toBigDecimal())
   );
 
   vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(_depositAmount)];
@@ -60,10 +60,10 @@ export function _Deposit(
   // update deposit transaction
   transaction.asset = vault.inputTokens[0];
   transaction.amount = _depositAmount;
-  transaction.amountUSD = inputTokenPrice[0]
+  transaction.amountUSD = inputTokenPrice.usdPrice
     .times(_depositAmount.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice[1]);
+    .div(inputTokenPrice.decimals.toBigDecimal());
 
   transaction.save();
   vault.save();

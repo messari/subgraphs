@@ -1,5 +1,6 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
+import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/templates/Vault/CalculationsCurve";
 
@@ -14,17 +15,17 @@ export function getCalculationsCurveContract(
 export function getTokenPriceFromCalculationCurve(
   tokenAddr: Address,
   network: string
-): BigDecimal {
+): CustomPriceType {
   const calculationCurveContract = getCalculationsCurveContract(network);
 
   if (!calculationCurveContract) {
-    return constants.BIGDECIMAL_ZERO;
+    return new CustomPriceType();
   }
 
   let tokenPrice: BigDecimal = utils.readValue<BigInt>(
     calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
     constants.BIGINT_ZERO
   ).toBigDecimal();
-
-  return tokenPrice;
+  
+  return CustomPriceType.initialize(tokenPrice);
 }

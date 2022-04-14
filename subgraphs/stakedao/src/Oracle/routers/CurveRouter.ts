@@ -1,6 +1,7 @@
 import * as utils from "../common/utils";
 import { getPriceUsdc } from "./SushiSwapRouter";
 import * as constants from "../common/constants";
+import { CustomPriceType } from "../common/types";
 import {
   Address,
   BigDecimal,
@@ -12,7 +13,7 @@ import { CurveRegistry as CurveRegistryContract } from "../../../generated/Contr
 export function getCurvePriceUsdc(
   curveLpTokenAddress: Address,
   network: string
-): BigDecimal {
+): CustomPriceType {
   let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);
 
   const curveRegistry = CurveRegistryContract.bind(
@@ -26,7 +27,7 @@ export function getCurvePriceUsdc(
   let decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
 
   let price = virtualPrice
-    .times(basePrice)
+    .times(basePrice.usdPrice)
     .times(
       constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal()
     )
@@ -36,20 +37,20 @@ export function getCurvePriceUsdc(
       ).toBigDecimal()
     );
 
-  return price;
+  return CustomPriceType.initialize(price);
 }
 
 export function getBasePrice(
   curveLpTokenAddress: Address,
   curveRegistry: CurveRegistryContract,
   network: string
-): BigDecimal {
+): CustomPriceType {
   const poolAddress = curveRegistry.try_get_pool_from_lp_token(
     curveLpTokenAddress
   );
 
   if (poolAddress.reverted) {
-    return constants.BIGDECIMAL_ZERO;
+    return new CustomPriceType();
   }
 
   let underlyingCoinAddress = getUnderlyingCoinFromPool(
@@ -78,13 +79,13 @@ export function getUnderlyingCoinFromPool(
     coins = coinsArray.value;
   }
 
-  // Use first coin from pool and if that is empty (due to error) fall back to second coin
+  //? Use first coin from pool and if that is empty (due to error) fall back to second coin
   let preferredCoinAddress = coins[0];
   if (preferredCoinAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
     preferredCoinAddress = coins[1];
   }
 
-  // Look for preferred coins (basic coins)
+  //? Look for preferred coins (basic coins)
 
   let coinAddress: Address;
   for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
@@ -122,7 +123,7 @@ export function getVirtualPrice(curveLpTokenAddress: Address): BigDecimal {
 export function getPriceUsdcRecommended(
   tokenAddress: Address,
   network: string
-): BigDecimal {
+): CustomPriceType {
   return getPriceUsdc(tokenAddress, network);
 }
 
