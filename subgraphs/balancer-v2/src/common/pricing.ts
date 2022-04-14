@@ -1,11 +1,7 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   BASE_ASSETS,
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
-  BIGINT_ONE,
-  BIGINT_ZERO,
-  PRICING_ASSETS,
   USD_STABLE_ASSETS,
 } from "./constants";
 import { _TokenPrice } from "../../generated/schema";
@@ -28,12 +24,14 @@ export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
 export function calculateTokenValueInUsd(
   tokenAmount: BigDecimal,
   stableAmount: BigDecimal,
-  weightIn: BigDecimal | null,
-  weightOut: BigDecimal | null,
+  tokenWeight: BigDecimal | null,
+  stableWeight: BigDecimal | null,
 ): BigDecimal {
   if (tokenAmount.equals(BIGDECIMAL_ZERO) || stableAmount.equals(BIGDECIMAL_ZERO)) return BIGDECIMAL_ZERO;
-  const amountToDiv = weightIn && weightOut ? weightIn.div(stableAmount.div(weightOut)) : stableAmount;
-  return tokenAmount.div(amountToDiv);
+  if (stableWeight && tokenWeight) {
+    return stableAmount.div(stableWeight).div(tokenAmount.div(tokenWeight))
+  }
+  return stableAmount.div(tokenAmount);
 }
 
 export function isUSDStable(asset: Address): boolean {
@@ -50,31 +48,24 @@ export function isBaseAsset(asset: Address): boolean {
   return false;
 }
 
-export function isPricingAsset(asset: Address): boolean {
-  for (let i: i32 = 0; i < PRICING_ASSETS.length; i++) {
-    if (PRICING_ASSETS[i] == asset) return true;
-  }
-  return false;
-}
-
 export class TokenInfo {
   constructor(public address: Address, public price: BigDecimal) {}
 }
 
 export function calculatePrice(
   tokenA: Address,
-  tokenB: Address,
   amountA: BigDecimal,
-  amountB: BigDecimal,
   weightA: BigDecimal | null,
+  tokenB: Address,
+  amountB: BigDecimal,
   weightB: BigDecimal | null,
 ): TokenInfo | null {
+
   // If both tokens are stable the price is one
   if (isUSDStable(tokenB) && isUSDStable(tokenA)) return null;
 
   // If one of both tokens is stable we can calculate how much the other token is worth in usd terms
   if (isUSDStable(tokenB)) return new TokenInfo(tokenA, calculateTokenValueInUsd(amountA, amountB, weightA, weightB));
-
   if (isUSDStable(tokenA)) return new TokenInfo(tokenB, calculateTokenValueInUsd(amountB, amountA, weightB, weightA));
 
   /**
@@ -83,21 +74,21 @@ export function calculatePrice(
    * This is meant for tokens that do not share pools with stable coins (for example, COW)
    */
 
+  let tokenAPrice = _TokenPrice.load(tokenA.toHexString());
+  let tokenBPrice = _TokenPrice.load(tokenB.toHexString());
   // If both are base assets let's not re calculate price
-  if (isBaseAsset(tokenA) && isBaseAsset(tokenB)) return null;
 
-  if (isBaseAsset(tokenA)) {
-    let token = _TokenPrice.load(tokenA.toHexString());
-    if (token == null) return null;
-    let stableAmountB = amountB.times(token.lastUsdPrice);
-    return new TokenInfo(tokenB, calculateTokenValueInUsd(amountA, stableAmountB, weightA, weightB));
+  // TODO: Check which token has more liquidity
+  // if (isBaseAsset(tokenA) && isBaseAsset(tokenB)) return null;
+
+  if (isBaseAsset(tokenA) && tokenAPrice) {
+    let stableAmountA = amountA.times(tokenAPrice.lastUsdPrice);
+    return new TokenInfo(tokenB, calculateTokenValueInUsd(amountB, stableAmountA, weightB, weightA));
   }
 
-  if (isBaseAsset(tokenB)) {
-    let token = _TokenPrice.load(tokenB.toHexString());
-    if (token == null) return null;
-    let stableAmountA = amountA.times(token.lastUsdPrice);
-    return new TokenInfo(tokenA, calculateTokenValueInUsd(amountB, stableAmountA, weightB, weightA));
+  if (isBaseAsset(tokenB) && tokenBPrice) {
+    let stableAmountB = amountA.times(tokenBPrice.lastUsdPrice);
+    return new TokenInfo(tokenA, calculateTokenValueInUsd(amountA, stableAmountB, weightA, weightB));
   }
   return null;
 }

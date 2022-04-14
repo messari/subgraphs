@@ -1,4 +1,4 @@
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import {Address, BigInt, Bytes, ethereum} from "@graphprotocol/graph-ts";
 import { mockMethod } from "./helpers";
 import { Token } from "../generated/schema";
 
@@ -14,7 +14,7 @@ mockMethod(usdcWethPoolAddress, "symbol", [], [], "string", [ethereum.Value.from
 mockMethod(usdcWethPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(18)], false);
 mockMethod(usdcWethPoolAddress, "getNormalizedWeights", [], [], "uint256[]", [], true);
 
-export const weth = new Token("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2");
+export const weth = new Token("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
 weth.save()
 mockMethod(Address.fromString(weth.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
 mockMethod(Address.fromString(weth.id), "name", [], [], "string", [ethereum.Value.fromString("name")], false);
@@ -22,7 +22,7 @@ mockMethod(Address.fromString(weth.id), "symbol", [], [], "string", [ethereum.Va
 
 export const usdc = new Token("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48");
 usdc.save()
-mockMethod(Address.fromString(usdc.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
+mockMethod(Address.fromString(usdc.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(6)], false);
 mockMethod(Address.fromString(usdc.id), "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(Address.fromString(usdc.id), "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 
@@ -35,7 +35,7 @@ mockMethod(balWethPoolAddress, "decimals", [], [], "uint8", [ethereum.Value.from
 mockMethod(balWethPoolAddress, "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(balWethPoolAddress, "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 mockMethod(balWethPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(18)], false);
-mockMethod(balWethPoolAddress, "getNormalizedWeights", [], [], "uint256[]", [ethereum.Value.fromI32(800000000000000000), ethereum.Value.fromI32(200000000000000000)], false);
+mockMethod(balWethPoolAddress, "getNormalizedWeights", [], [], "uint256[]", [ethereum.Value.fromSignedBigInt(BigInt.fromI64(800000000000000000)), ethereum.Value.fromSignedBigInt(BigInt.fromI64(200000000000000000))], false);
 
 export const bal = new Token("0xba100000625a3754423978a60c9317c58a424e3D");
 bal.save();

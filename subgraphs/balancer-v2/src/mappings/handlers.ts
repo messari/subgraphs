@@ -84,10 +84,10 @@ export function handleSwap(event: Swap): void {
 
   const tokenInfo = calculatePrice(
     event.params.tokenIn,
-    event.params.tokenOut,
     tokenAmountIn,
-    tokenAmountOut,
     weightTokenIn,
+    event.params.tokenOut,
+    tokenAmountOut,
     weightTokenOut,
   );
 

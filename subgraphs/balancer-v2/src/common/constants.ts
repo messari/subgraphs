@@ -170,4 +170,3 @@ export let DAI: Address = forNetwork(daiAddressByNetwork, network);
 
 export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT];
 export let BASE_ASSETS: Address[] = [WETH, WMATIC, WBTC, BAL];
-export let PRICING_ASSETS: Address[] = USD_STABLE_ASSETS.concat(BASE_ASSETS);
