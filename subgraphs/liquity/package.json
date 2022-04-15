@@ -1,0 +1,20 @@
+{
+  "name": "liquity-subgraph",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ liquity",
+    "create-local": "graph create --node http://localhost:8020/ liquity",
+    "remove-local": "graph remove --node http://localhost:8020/ liquity",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 liquity"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.29.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2"
+  }
+}

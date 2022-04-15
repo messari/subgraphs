@@ -1,5 +1,5 @@
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { DEFAULT_DECIMALS } from "../common/constants";
 import {
   Token,
   VaultFee,
@@ -11,7 +11,6 @@ import {
   UsageMetricsDailySnapshot,
 } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
-import { Vault as VaultContract } from "../../generated/templates/Vault/Vault";
 import { BigInt, ethereum, Address, BigDecimal } from "@graphprotocol/graph-ts";
 
 export function getTimeInMillis(time: BigInt): BigInt {
@@ -23,19 +22,19 @@ export function getTimestampInMillis(block: ethereum.Block): BigInt {
 }
 
 export function getOrCreateYieldAggregator(id: string): YieldAggregator {
-  let protocol = YieldAggregator.load(id)
-  
+  let protocol = YieldAggregator.load(id);
+
   if (!protocol) {
     protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
     protocol.name = "Stake DAO";
     protocol.slug = "stake-dao";
     protocol.schemaVersion = "1.0.0";
-    protocol.subgraphVersion = "1.0.0"
+    protocol.subgraphVersion = "1.0.0";
     protocol.network = constants.Network.ETHEREUM;
     protocol.type = constants.ProtocolType.YIELD;
   }
 
-  return protocol
+  return protocol;
 }
 
 export function getOrCreateToken(address: Address): Token {
@@ -44,15 +43,16 @@ export function getOrCreateToken(address: Address): Token {
     token = new Token(address.toHexString());
 
     let erc20Contract = ERC20Contract.bind(address);
-    let name = erc20Contract.try_name();
-    let symbol = erc20Contract.try_symbol();
-    let decimals = erc20Contract.try_decimals();
+    let name = utils.readValue<string>(erc20Contract.try_name(), "");
+    let symbol = utils.readValue<string>(erc20Contract.try_symbol(), "");
+    let decimals = utils.readValue<BigInt>(
+      erc20Contract.try_decimals(),
+      constants.DEFAULT_DECIMALS
+    );
 
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
-    token.decimals = decimals.reverted
-      ? DEFAULT_DECIMALS
-      : decimals.value.toI32();
+    token.name = name;
+    token.symbol = symbol;
+    token.decimals = decimals.toI32();
 
     token.save();
   }
@@ -65,15 +65,16 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     rewardToken = new RewardToken(address.toHexString());
 
     let erc20Contract = ERC20Contract.bind(address);
-    let name = erc20Contract.try_name();
-    let symbol = erc20Contract.try_symbol();
-    let decimals = erc20Contract.try_decimals();
+    let name = utils.readValue<string>(erc20Contract.try_name(), "");
+    let symbol = utils.readValue<string>(erc20Contract.try_symbol(), "");
+    let decimals = utils.readValue<BigInt>(
+      erc20Contract.try_decimals(),
+      constants.DEFAULT_DECIMALS
+    );
 
-    rewardToken.name = name.reverted ? "" : name.value;
-    rewardToken.symbol = symbol.reverted ? "" : symbol.value;
-    rewardToken.decimals = decimals.reverted
-      ? DEFAULT_DECIMALS
-      : decimals.value.toI32();
+    rewardToken.name = name;
+    rewardToken.symbol = symbol;
+    rewardToken.decimals = decimals.toI32();
 
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
     rewardToken.save();
@@ -139,7 +140,9 @@ export function getOrCreateVaultSnapshots(
   return vaultSnapshots;
 }
 
-export function getOrCreateUsageMetricSnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricSnapshot(
+  block: ethereum.Block
+): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
 
@@ -157,4 +160,11 @@ export function getOrCreateUsageMetricSnapshot(block: ethereum.Block): UsageMetr
   }
 
   return usageMetrics;
+}
+
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
+  return callResult.reverted ? defaultValue : callResult.value;
 }

@@ -1,0 +1,5 @@
+node_modules/
+generated/
+build/
+*.log
+tests/.bin/
