@@ -4,7 +4,9 @@ import {
   BIGDECIMAL_ZERO,
   USD_STABLE_ASSETS,
 } from "./constants";
-import { _TokenPrice } from "../../generated/schema";
+import {_TokenPrice, LiquidityPool} from "../../generated/schema";
+import {log} from "matchstick-as";
+import {scaleDown} from "./tokens";
 
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
@@ -47,20 +49,31 @@ export class TokenInfo {
 }
 
 export function calculatePrice(
-  tokenA: Address,
-  amountA: BigDecimal,
-  weightA: BigDecimal | null,
-  tokenB: Address,
-  amountB: BigDecimal,
-  weightB: BigDecimal | null,
+  pool: LiquidityPool,
+  tokenIn: Address,
+  amountIn: BigDecimal,
+  weightIn: BigDecimal | null,
+  tokenInIndex: i32,
+  tokenOut: Address,
+  amountOut: BigDecimal,
+  weightOut: BigDecimal | null,
+  tokenOutIndex: i32,
 ): TokenInfo | null {
-
+  if (weightIn && weightOut) {
+    /**
+     * As the swap is with a WeightedPool, we can easily calculate the spot price between the two tokens
+     * based on the pool's weights and updated balances after the swap.
+     * Otherwise, we can get a simple measure of the price from the ratio of amount in vs amount out
+     */
+    amountIn = scaleDown(pool.inputTokenBalances[tokenInIndex], tokenIn)
+    amountOut = scaleDown(pool.inputTokenBalances[tokenOutIndex], tokenOut)
+  }
   // If both tokens are stable the price is one
-  if (isUSDStable(tokenB) && isUSDStable(tokenA)) return null;
+  if (isUSDStable(tokenOut) && isUSDStable(tokenIn)) return null;
 
   // If one of both tokens is stable we can calculate how much the other token is worth in usd terms
-  if (isUSDStable(tokenB)) return new TokenInfo(tokenA, calculateTokenValueInUsd(amountA, amountB, weightA, weightB));
-  if (isUSDStable(tokenA)) return new TokenInfo(tokenB, calculateTokenValueInUsd(amountB, amountA, weightB, weightA));
+  if (isUSDStable(tokenOut)) return new TokenInfo(tokenIn, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
+  if (isUSDStable(tokenIn)) return new TokenInfo(tokenOut, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
 
   /**
    * Base assets are known tokens that we can make sure they have a pool with a stable token
@@ -68,21 +81,20 @@ export function calculatePrice(
    * This is meant for tokens that do not share pools with stable coins (for example, COW)
    */
 
-  let tokenAPrice = _TokenPrice.load(tokenA.toHexString());
-  let tokenBPrice = _TokenPrice.load(tokenB.toHexString());
-  // If both are base assets let's not re calculate price
+  let tokenInPrice = _TokenPrice.load(tokenIn.toHexString());
+  let tokenOutPrice = _TokenPrice.load(tokenOut.toHexString());
 
   // TODO: Check which token has more liquidity
-  // if (isBaseAsset(tokenA) && isBaseAsset(tokenB)) return null;
+  // if (isBaseAsset(tokenIn) && isBaseAsset(tokenOut)) return null;
 
-  if (isBaseAsset(tokenA) && tokenAPrice) {
-    let stableAmountA = amountA.times(tokenAPrice.lastUsdPrice);
-    return new TokenInfo(tokenB, calculateTokenValueInUsd(amountB, stableAmountA, weightB, weightA));
+  if (isBaseAsset(tokenIn) && tokenInPrice) {
+    amountIn = amountIn.times(tokenInPrice.lastUsdPrice);
+    return new TokenInfo(tokenOut, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
   }
 
-  if (isBaseAsset(tokenB) && tokenBPrice) {
-    let stableAmountB = amountA.times(tokenBPrice.lastUsdPrice);
-    return new TokenInfo(tokenA, calculateTokenValueInUsd(amountA, stableAmountB, weightA, weightB));
+  if (isBaseAsset(tokenOut) && tokenOutPrice) {
+    amountOut = amountOut.times(tokenOutPrice.lastUsdPrice);
+    return new TokenInfo(tokenIn, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
   }
   return null;
 }

@@ -1,9 +1,10 @@
-import { BigInt, Bytes } from "@graphprotocol/graph-ts";
+import {Address, BigInt, Bytes} from "@graphprotocol/graph-ts";
 import { PoolBalanceChanged, PoolRegistered, Swap, TokensRegistered } from "../../generated/Vault/Vault";
 import { createPool, getOrCreateToken } from "../common/getters";
 import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
-import {updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics} from "../common/metrics";
+import { updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics } from "../common/metrics";
+import {log} from "matchstick-as";
 
 export function handlePoolRegister(event: PoolRegistered): void {
   createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block);
@@ -49,16 +50,15 @@ export function handleSwap(event: Swap): void {
 
   let tokenInIndex: i32 = 0;
   let tokenOutIndex: i32 = 0;
-
   let newBalances = pool.inputTokenBalances;
 
   for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
-    if (event.params.tokenIn.equals(Bytes.fromHexString(pool.inputTokens[i]))) {
+    if (event.params.tokenIn == Address.fromString(pool.inputTokens[i])) {
       newBalances[i] = pool.inputTokenBalances[i].plus(event.params.amountIn);
       tokenInIndex = i;
     }
 
-    if (event.params.tokenOut.equals(Bytes.fromHexString(pool.inputTokens[i]))) {
+    if (event.params.tokenOut == Address.fromString(pool.inputTokens[i])) {
       newBalances[i] = pool.inputTokenBalances[i].minus(event.params.amountOut);
       tokenOutIndex = i;
     }

@@ -1,4 +1,4 @@
-import {Address, BigDecimal, BigInt, ethereum} from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, BigInt, Bytes, ethereum} from "@graphprotocol/graph-ts";
 import { getOrCreateDex, getOrCreateFinancials, getOrCreateUsageMetricSnapshot } from "./getters";
 import { SECONDS_PER_DAY } from "./constants";
 import { Account, DailyActiveAccount, _TokenPrice, LiquidityPool } from "../../generated/schema";
@@ -104,18 +104,21 @@ export function updateTokenPrice(
   let tokenAmountOut = scaleDown(tokenBAmount, tokenB);
 
   const tokenInfo = calculatePrice(
+      pool,
       tokenA,
       tokenAmountIn,
       weightTokenA,
+      tokenAIndex,
       tokenB,
       tokenAmountOut,
       weightTokenB,
+      tokenBIndex,
   );
 
   if (tokenInfo) {
     let token = _TokenPrice.load(tokenInfo.address.toHexString());
     if (token == null) token = new _TokenPrice(tokenInfo.address.toHexString());
-    const index = token.id == tokenB.toHexString() ? tokenBIndex : tokenAIndex
+    const index = tokenInfo.address == tokenB ? tokenBIndex : tokenAIndex
     const currentBalance = scaleDown(
         pool.inputTokenBalances[index],
         Address.fromString(pool.inputTokens[index])
