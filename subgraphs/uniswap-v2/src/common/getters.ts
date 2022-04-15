@@ -26,7 +26,7 @@ export function getOrCreateDex(): DexAmmProtocol {
       protocol.slug = "uniswap-v2"
       protocol.schemaVersion = "1.1.0"
       protocol.subgraphVersion = "1.0.2"
-      protocol.methodologyVersion = "1.0.1"
+      protocol.methodologyVersion = "1.0.0"
       protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
       protocol.totalVolumeUSD = BIGDECIMAL_ZERO
       protocol.totalUniqueUsers = INT_ZERO
