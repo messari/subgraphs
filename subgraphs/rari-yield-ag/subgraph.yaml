@@ -1,0 +1,44 @@
+specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: TODO
+    network: mainnet
+    source:
+      address: "TODO"
+      abi: TODO
+      startBlock: TODO
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/mappings.ts
+      entities:
+        - TODO
+      abis:
+        - name: TODO
+          file: TODO
+      eventHandlers:
+        - event: TODO
+          handler: TODO
+templates:
+  - name: TODO
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: TODO
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/mappings.ts
+      entities:
+        - TODO
+      abis:
+        - name: TODO
+          file: TODO
+      eventHandlers:
+        - event: TODO
+          handler: TODO
