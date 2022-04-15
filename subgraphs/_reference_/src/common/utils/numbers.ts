@@ -8,6 +8,14 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
   );
 }
 
+export function powerBigDecimal(base: BigDecimal, power: i32): BigDecimal {
+  let product = base;
+  for (let i = 0; i < power; i++) {
+    product = product.times(base);
+  }
+  return product;
+}
+
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   let sum = BigDecimal.fromString("0");
   for (let i = 0; i < prices.length; i++) {

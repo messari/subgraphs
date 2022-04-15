@@ -11,6 +11,15 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   return bigDecimal;
 }
 
+// calculate the power of a BigDecimal (.pow() is not native to BigDecimal)
+export function powerBigDecimal(base: BigDecimal, power: i32): BigDecimal {
+  let product = base;
+  for (let i = 0; i < power; i++) {
+    product = product.times(base);
+  }
+  return product;
+}
+
 // get the amount in underlying token from cToken
 export function getExchangeRate(marketAddress: Address): BigInt {
   let cTokenContract = CToken.bind(marketAddress);

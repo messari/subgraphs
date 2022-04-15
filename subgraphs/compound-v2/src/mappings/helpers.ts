@@ -24,7 +24,7 @@ import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } fr
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CToken } from "../types/Comptroller/cToken";
 import { getUSDPriceOfToken } from "../common/prices/prices";
-import { exponentToBigDecimal, getExchangeRate } from "../common/utils/utils";
+import { exponentToBigDecimal, getExchangeRate, powerBigDecimal } from "../common/utils/utils";
 import { Comptroller } from "../types/Comptroller/Comptroller";
 import { PriceOracle2 } from "../types/Comptroller/PriceOracle2";
 
@@ -563,13 +563,9 @@ export function convertBlockRateToAPY(blockRate: BigInt): BigDecimal {
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
 
   let blockRateCalc = blockRate.toBigDecimal().div(mantissaFactorBD).times(BLOCKS_PER_DAY).plus(BIGDECIMAL_ONE);
-  let blockRateConst = blockRateCalc; // used to calculate BigDecimal power
 
-  // take the rate calcs to the power of DAYS_PER_YEAR
-  let daysInYear = 365;
-  for (let i = 0; i < daysInYear; i++) {
-    blockRateCalc = blockRateCalc.times(blockRateConst);
-  }
+  // take the power of BigDecimals
+  blockRateCalc = powerBigDecimal(blockRateCalc, DAYS_PER_YEAR);
 
   // finish APY calculation
   return blockRateCalc.minus(BIGDECIMAL_ONE).times(BigDecimal.fromString("100")).truncate(DEFAULT_DECIMALS);

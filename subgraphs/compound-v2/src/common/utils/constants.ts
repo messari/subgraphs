@@ -100,10 +100,12 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const DAYS_PER_YEAR = 365;
+export const MS_PER_YEAR = BigDecimal.fromString(DAYS_PER_YEAR.toString()).times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
+);
 export const BLOCKS_PER_DAY = BigDecimal.fromString("6570"); // blocks every 13.15 seconds
-export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(DAYS_PER_YEAR);
+export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -115,7 +117,7 @@ export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.17";
+export const SUBGRAPH_VERSION = "1.4.18";
 export const SCHEMA_VERSION = "1.1.0";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
