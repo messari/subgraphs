@@ -124,13 +124,11 @@ export function initMarket (
     if (rewardTokens.length === 0) {
       // If the reward tokens have not been initialized on the market, attempt to pull them from the incentive controller
       const rewardTokenAddr = getRewardTokenAddress(market);
-      if (rewardTokenAddr) {
-        const depositRewardToken = loadRewardToken(Address.fromString(contractAddrRewardToken), market, 'DEPOSIT');
-        const borrowRewardToken = loadRewardToken(Address.fromString(contractAddrRewardToken), market, 'BORROW');
-        market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
-        market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-        market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-      }
+      const depositRewardToken = loadRewardToken(Address.fromString(contractAddrRewardToken), market, 'DEPOSIT');
+      const borrowRewardToken = loadRewardToken(Address.fromString(contractAddrRewardToken), market, 'BORROW');
+      market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
+      market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+      market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     }
     // Get reward emissions
     market.rewardTokenEmissionsAmount = getCurrentRewardEmissions(market);
@@ -144,12 +142,8 @@ export function getCurrentRewardEmissions (market: Market): BigInt[] {
   const rewardEmissions = market.rewardTokenEmissionsAmount;
   // Attempt to get the incentives controller contract
   const incentivesController = initIncentivesController(market);
-  if (!incentivesController) {
-    log.info('Failed to get current reward emissions, no incentive controller', []);
-    return rewardEmissions;
-  }
   // From the incentives controller contract, get pull the 'assets' values from the market aToken, sToken, and vToken
-  const incentivesControllerContract = IncentivesControllerContract.bind(Address.fromString(contractAddrIncCont));
+  const incentivesControllerContract = IncentivesControllerContract.bind(incentivesController);
   if (!incentivesControllerContract.try_assets(Address.fromString(market.outputToken)).reverted) {
     log.info('REWARD EMISSIONS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value1.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value2.toString(), []);
     const assetDataSupply = incentivesControllerContract.try_assets(Address.fromString(market.outputToken)).value.value0;
@@ -241,14 +235,13 @@ export function loadRewardToken (assetAddr: Address, market: Market, type: strin
 
 export function fetchProtocolEntity (protocolId: string): LendingProtocol {
   // Load or create the Lending Protocol entity implementation
-  // Protocol Id is currently 'aave-v2' rather than a UUID. Need to ask what the UUID should be, ie. a hash, just a number, mix of values etc
   let lendingProtocol = LendingProtocol.load(protocolId);
   log.info('proto id: ' + protocolId, []);
   if (!lendingProtocol) {
     lendingProtocol = new LendingProtocol(protocolId);
     lendingProtocol.totalUniqueUsers = 0;
     lendingProtocol.subgraphVersion = '1.0.0';
-    lendingProtocol.schemaVersion = '1.0.0';
+    lendingProtocol.schemaVersion = '1.1.0';
     lendingProtocol.name = 'Aave-v2';
     lendingProtocol.slug = 'aave-v2';
     lendingProtocol.network = 'ETHEREUM';
@@ -266,12 +259,8 @@ export function fetchProtocolEntity (protocolId: string): LendingProtocol {
   return lendingProtocol as LendingProtocol;
 }
 
-export function getRewardTokenAddress (market: Market): Address | null {
+export function getRewardTokenAddress (market: Market): Address {
   const incentiveContAddr = initIncentivesController(market);
-  if (!incentiveContAddr) {
-    log.info('FAIL MARKET ' + market.id + ' COULD NOT GET INC CONT NOR REWARD TOKENS', [])
-    return Address.fromString(contractAddrRewardToken);
-  }
   // Instantiate IncentivesController to get access to contract read methods
   log.info('GET REWARD FROM INCENTIVE CONTROLLER ' + incentiveContAddr.toHexString() + ' market? ' + market.id, []);
   const contract = IncentivesControllerContract.bind(incentiveContAddr);
@@ -280,19 +269,18 @@ export function getRewardTokenAddress (market: Market): Address | null {
     log.info('REWARD TOKEN ON MARKET ' + market.id + ' is ' + contract.try_REWARD_TOKEN().value.toHexString(), []);
     return contract.try_REWARD_TOKEN().value;
   } else {
-    log.info('FAIL MARKET ' + market.id + ' REVERTED REWARD TOKEN', []);
+    log.info('FAILED TO GET REWARD TOKEN FROM ' + market.id + ' REVERTED REWARD TOKEN TO DEFAULT ' + contractAddrRewardToken, []);
     return Address.fromString(contractAddrRewardToken);
   }
 }
 
-export function initIncentivesController (market: Market): Address | null {
+export function initIncentivesController (market: Market): Address {
   // This function attempts to pull the incentives controller from the aToken/output token
-  log.info('INIT INC CONT MARKET: ' + market.id + ' aTOken: ' + market.outputToken, []);
+  log.info('INIT INCENTIVE CONT FROM MARKET: ' + market.id + ' aToken: ' + market.outputToken, []);
   const aToken = AToken.bind(Address.fromString(market.outputToken));
   if (!aToken.try_getIncentivesController().reverted) {
     const incContAddr = aToken.try_getIncentivesController().value;
     log.info('INCENTIVE CONTROLLER SUCCESS ' + incContAddr.toHexString(), []);
-    // IncentivesController.create(aToken.try_getIncentivesController().value);
     return incContAddr;
   } else {
     log.info('FAILED TO GET INCENTIVE CONTROLLER ' + aToken._address.toHexString() + ' ' + market.id, []);
@@ -496,7 +484,6 @@ export function getCurrentRewardEmissionsUSD (market: Market): BigDecimal[] {
   // Taking the reward emissions denominated in the reward token, convert it to the value in USD
   const rewardEmissionsUSD = market.rewardTokenEmissionsUSD;
   const rewardTokenAddr = getRewardTokenAddress(market);
-  if (!rewardTokenAddr) return rewardEmissionsUSD;
   // The DEPOSIT reward token is used as the default. Both the deposit and borrow reward token decimals are the same
   const rewardToken = loadRewardToken(rewardTokenAddr, market, 'DEPOSIT');
   // In the reward emissions arrays index 0 is for the deposit reward, index 1 for the borrow reward
