@@ -1,11 +1,19 @@
 import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal } from '@graphprotocol/graph-ts'
 import { PairCreated, SetFeeToCall } from '../../generated/Factory/Factory'
+<<<<<<< HEAD
 import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/constants'
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateLPToken, getOrCreateToken, getOrCreateTokenTracker } from '../common/getters'
 import { findEthPerToken } from '../common/price/price'
 import { updateTokenWhitelists } from '../common/updateMetrics'
 import { createLiquidityPool } from '../common/creators'
+=======
+import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/utils/constants'
+import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from '../common/getters'
+import { CreateLiquidityPool, UpdateTokenWhitelists } from '../common/helpers'
+import { findEthPerToken } from '../common/utils/price'
+import { getOrCreateToken, getOrCreateLPToken } from '../common/utils/tokens'
+>>>>>>> masterMessari
 
 export function handleNewPair(event: PairCreated): void {
   let protocol = getOrCreateDex()
@@ -36,7 +44,11 @@ export function handleFeeTo(call: SetFeeToCall): void {
   let poolIds = protocol._poolIds
   let lpFeeUpdate: BigDecimal
   let protocolFeeUpdate: BigDecimal
+<<<<<<< HEAD
   if (call.inputs._feeTo != ZERO_ADDRESS)  {
+=======
+  if (call.inputs._feeTo.toHexString() != ZERO_ADDRESS)  {
+>>>>>>> masterMessari
     lpFeeUpdate = LP_FEE_TO_ON
     protocolFeeUpdate = PROTOCOL_FEE_TO_ON
   } else {
@@ -44,7 +56,11 @@ export function handleFeeTo(call: SetFeeToCall): void {
     protocolFeeUpdate = PROTOCOL_FEE_TO_OFF
   }
     for (let i = 0; i < poolIds.length; i++) {
+<<<<<<< HEAD
       let pool = getLiquidityPool(poolIds[i])
+=======
+      let pool = getLiquidityPool(poolIds[i].toHexString())
+>>>>>>> masterMessari
       let lpFeeId = pool.fees[0]
       let protocolFeeId = pool.fees[1]
 
