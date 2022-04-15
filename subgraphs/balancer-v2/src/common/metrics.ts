@@ -1,9 +1,11 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, BigInt, ethereum} from "@graphprotocol/graph-ts";
 import { getOrCreateDex, getOrCreateFinancials, getOrCreateUsageMetricSnapshot } from "./getters";
 import { SECONDS_PER_DAY } from "./constants";
 import { Account, DailyActiveAccount, _TokenPrice, LiquidityPool } from "../../generated/schema";
-import { isUSDStable, valueInUSD } from "./pricing";
+import {calculatePrice, isUSDStable, valueInUSD} from "./pricing";
 import { scaleDown } from "./tokens";
+import {WeightedPool} from "../../generated/Vault/WeightedPool";
+import { log } from "matchstick-as"
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -75,4 +77,54 @@ export function updatePoolMetrics(pool: LiquidityPool): void {
   if (tokenWithoutPrice) return;
   pool.totalValueLockedUSD = totalValueLocked;
   pool.save();
+}
+
+export function updateTokenPrice(
+    pool: LiquidityPool,
+    tokenA: Address,
+    tokenAAmount: BigInt,
+    tokenAIndex: i32,
+    tokenB: Address,
+    tokenBAmount: BigInt,
+    tokenBIndex: i32,
+    blockNumber: BigInt
+): void {
+  let weightPool = WeightedPool.bind(Address.fromString(pool.outputToken));
+  let getWeightCall = weightPool.try_getNormalizedWeights();
+  let hasWeights = !getWeightCall.reverted;
+  let weightTokenB: BigDecimal | null = null;
+  let weightTokenA: BigDecimal | null = null;
+
+  if (hasWeights) {
+    weightTokenB = scaleDown(getWeightCall.value[tokenBIndex], null);
+    weightTokenA = scaleDown(getWeightCall.value[tokenAIndex], null);
+  }
+
+  let tokenAmountIn = scaleDown(tokenAAmount, tokenA);
+  let tokenAmountOut = scaleDown(tokenBAmount, tokenB);
+
+  const tokenInfo = calculatePrice(
+      tokenA,
+      tokenAmountIn,
+      weightTokenA,
+      tokenB,
+      tokenAmountOut,
+      weightTokenB,
+  );
+
+  if (tokenInfo) {
+    let token = _TokenPrice.load(tokenInfo.address.toHexString());
+    if (token == null) token = new _TokenPrice(tokenInfo.address.toHexString());
+    const index = token.id == tokenB.toHexString() ? tokenBIndex : tokenAIndex
+    const currentBalance = scaleDown(
+        pool.inputTokenBalances[index],
+        Address.fromString(pool.inputTokens[index])
+    )
+    // We make sure the current balance plus the new price is over 40k USD
+    if (currentBalance.times(tokenInfo.price).gt(BigDecimal.fromString('40000'))) {
+      token.block = blockNumber;
+      token.lastUsdPrice = tokenInfo.price;
+      token.save();
+    }
+  }
 }

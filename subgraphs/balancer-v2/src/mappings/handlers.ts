@@ -1,12 +1,9 @@
+import { BigInt, Bytes } from "@graphprotocol/graph-ts";
 import { PoolBalanceChanged, PoolRegistered, Swap, TokensRegistered } from "../../generated/Vault/Vault";
 import { createPool, getOrCreateToken } from "../common/getters";
-import { LiquidityPool, _TokenPrice } from "../../generated/schema";
-import { Address, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
-import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from "../common/metrics";
-import { WeightedPool } from "../../generated/Vault/WeightedPool";
-import { calculatePrice } from "../common/pricing";
-import { scaleDown } from "../common/tokens";
+import {updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics} from "../common/metrics";
 
 export function handlePoolRegister(event: PoolRegistered): void {
   createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block);
@@ -70,38 +67,16 @@ export function handleSwap(event: Swap): void {
   pool.inputTokenBalances = newBalances;
   pool.save();
 
-  let weightPool = WeightedPool.bind(Address.fromString(pool.outputToken));
-  let getWeightCall = weightPool.try_getNormalizedWeights();
-  let hasWeights = !getWeightCall.reverted;
-  let weightTokenOut: BigDecimal | null = null;
-  let weightTokenIn: BigDecimal | null = null;
-
-  if (hasWeights) {
-    weightTokenOut = scaleDown(getWeightCall.value[tokenOutIndex], null);
-    weightTokenIn = scaleDown(getWeightCall.value[tokenInIndex], null);
-  }
-
-  let tokenAmountIn = scaleDown(event.params.amountIn, event.params.tokenIn);
-  let tokenAmountOut = scaleDown(event.params.amountOut, event.params.tokenOut);
-
-  const tokenInfo = calculatePrice(
-    event.params.tokenIn,
-    tokenAmountIn,
-    weightTokenIn,
-    event.params.tokenOut,
-    tokenAmountOut,
-    weightTokenOut,
-  );
-
-  if (tokenInfo) {
-    let token = _TokenPrice.load(tokenInfo.address.toHexString());
-    if (token == null) {
-      token = new _TokenPrice(tokenInfo.address.toHexString());
-    }
-    token.block = event.block.number;
-    token.lastUsdPrice = tokenInfo.price;
-    token.save();
-  }
+  updateTokenPrice(
+      pool,
+      event.params.tokenIn,
+      event.params.amountIn,
+      tokenInIndex,
+      event.params.tokenOut,
+      event.params.amountOut,
+      tokenOutIndex,
+      event.block.number
+  )
 
   updatePoolMetrics(pool);
   updateUsageMetrics(event, event.transaction.from);

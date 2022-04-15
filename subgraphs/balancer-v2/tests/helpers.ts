@@ -13,7 +13,7 @@ export function mockMethod(
 ): void {
   const stringArgs = argsType.join(",");
   const signature = methodName + "(" + stringArgs + "):(" + returnType + ")";
-  let mockedFunction = createMockedFunction(address, methodName, signature).withArgs(argsValue);
+  const mockedFunction = createMockedFunction(address, methodName, signature).withArgs(argsValue);
   if (reverts) {
     mockedFunction.reverts();
     return;
@@ -22,17 +22,12 @@ export function mockMethod(
 }
 
 export function createNewPoolEvent(poolId: Bytes, poolAddress: Address, specialization: i32): PoolRegistered {
-  let newPool = changetype<PoolRegistered>(newMockEvent());
-  newPool.parameters = [];
+  const newPool = changetype<PoolRegistered>(newMockEvent());
+  const idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(poolId));
+  const addressParam = new ethereum.EventParam("poolAddress", ethereum.Value.fromAddress(poolAddress));
+  const specializationParam = new ethereum.EventParam("specialization", ethereum.Value.fromI32(specialization));
 
-  let idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(poolId));
-  let addressParam = new ethereum.EventParam("poolAddress", ethereum.Value.fromAddress(poolAddress));
-  let specializationParam = new ethereum.EventParam("specialization", ethereum.Value.fromI32(specialization));
-
-  newPool.parameters.push(idParam);
-  newPool.parameters.push(addressParam);
-  newPool.parameters.push(specializationParam);
-
+  newPool.parameters = [idParam, addressParam, specializationParam];
   return newPool;
 }
 
@@ -41,11 +36,11 @@ export function createTokensRegisteredEvent(
   tokens: Array<Address>,
   managers: Array<Address>,
 ): TokensRegistered {
-  let tokensRegistered = changetype<TokensRegistered>(newMockEvent());
+  const tokensRegistered = changetype<TokensRegistered>(newMockEvent());
 
-  let idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id));
-  let tokensParam = new ethereum.EventParam("tokens", ethereum.Value.fromAddressArray(tokens));
-  let managersParam = new ethereum.EventParam("assetManagers", ethereum.Value.fromAddressArray(managers));
+  const idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id));
+  const tokensParam = new ethereum.EventParam("tokens", ethereum.Value.fromAddressArray(tokens));
+  const managersParam = new ethereum.EventParam("assetManagers", ethereum.Value.fromAddressArray(managers));
 
   tokensRegistered.parameters = [idParam, tokensParam, managersParam];
 
@@ -59,13 +54,13 @@ export function createNewPoolBalanceChangeEvent(
   amounts: Array<BigInt>,
   feeAmounts: Array<BigInt>,
 ): PoolBalanceChanged {
-  let newPoolBalanceChangeEvent = changetype<PoolBalanceChanged>(newMockEvent());
+  const newPoolBalanceChangeEvent = changetype<PoolBalanceChanged>(newMockEvent());
 
-  let idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id));
-  let providerParam = new ethereum.EventParam("liquidityProvider", ethereum.Value.fromAddress(provider));
-  let tokensParam = new ethereum.EventParam("tokens", ethereum.Value.fromAddressArray(tokens));
-  let amountsParam = new ethereum.EventParam("deltas", ethereum.Value.fromSignedBigIntArray(amounts));
-  let feesParam = new ethereum.EventParam("protocolFeeAmounts", ethereum.Value.fromSignedBigIntArray(feeAmounts));
+  const idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id));
+  const providerParam = new ethereum.EventParam("liquidityProvider", ethereum.Value.fromAddress(provider));
+  const tokensParam = new ethereum.EventParam("tokens", ethereum.Value.fromAddressArray(tokens));
+  const amountsParam = new ethereum.EventParam("deltas", ethereum.Value.fromSignedBigIntArray(amounts));
+  const feesParam = new ethereum.EventParam("protocolFeeAmounts", ethereum.Value.fromSignedBigIntArray(feeAmounts));
 
   newPoolBalanceChangeEvent.parameters = [idParam, providerParam, tokensParam, amountsParam, feesParam];
   return newPoolBalanceChangeEvent;
@@ -78,13 +73,13 @@ export function createNewSwapEvent(
   amountIn: BigInt,
   amountOut: BigInt,
 ): Swap {
-  let newSwapEvent = changetype<Swap>(newMockEvent());
+  const newSwapEvent = changetype<Swap>(newMockEvent());
 
-  let idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id));
-  let tokenInParam = new ethereum.EventParam("tokenIn", ethereum.Value.fromAddress(tokenIn));
-  let tokenOutParam = new ethereum.EventParam("tokenOut", ethereum.Value.fromAddress(tokenOut));
-  let amountInParam = new ethereum.EventParam("amountIn", ethereum.Value.fromSignedBigInt(amountIn));
-  let amountOutParam = new ethereum.EventParam("amountOut", ethereum.Value.fromSignedBigInt(amountOut));
+  const idParam = new ethereum.EventParam("poolId", ethereum.Value.fromBytes(id));
+  const tokenInParam = new ethereum.EventParam("tokenIn", ethereum.Value.fromAddress(tokenIn));
+  const tokenOutParam = new ethereum.EventParam("tokenOut", ethereum.Value.fromAddress(tokenOut));
+  const amountInParam = new ethereum.EventParam("amountIn", ethereum.Value.fromSignedBigInt(amountIn));
+  const amountOutParam = new ethereum.EventParam("amountOut", ethereum.Value.fromSignedBigInt(amountOut));
 
   newSwapEvent.parameters = [idParam, tokenInParam, tokenOutParam, amountInParam, amountOutParam];
 

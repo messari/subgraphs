@@ -17,7 +17,7 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   LiquidityPoolFeeType,
-} from "../common/constants";
+} from "./constants";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
 
