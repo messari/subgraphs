@@ -540,42 +540,37 @@ export function updateMarketRates(market: Market): void {
 
   // APY rate calculation explained here: https://compound.finance/docs#protocol-math
   let contract = CToken.bind(Address.fromString(market.id));
-  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
   let trySupplyRatePerBlock = contract.try_supplyRatePerBlock();
-  let supplyRatePerBlock = trySupplyRatePerBlock.reverted ? BIGINT_ZERO : trySupplyRatePerBlock.value;
-  let supplyRateCalc = supplyRatePerBlock
-    .toBigDecimal()
-    .div(mantissaFactorBD)
-    .times(BLOCKS_PER_DAY)
-    .plus(BIGDECIMAL_ONE);
-  let supplyRatePow = supplyRateCalc; // used to calculate BigDecimal power
+  market.depositRate = trySupplyRatePerBlock.reverted
+    ? BIGDECIMAL_ZERO
+    : convertBlockRateToAPY(trySupplyRatePerBlock.value);
 
   // update borrow rates
   // Compound doesn't have "stable borrow rates" so the two equal each other
   // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
   let tryBorrowRatePerBlock = contract.try_borrowRatePerBlock();
-  let borrowRatePerBlock = tryBorrowRatePerBlock.reverted ? BIGINT_ZERO : tryBorrowRatePerBlock.value;
-  let borrowRateCalc = borrowRatePerBlock
-    .toBigDecimal()
-    .div(mantissaFactorBD)
-    .times(BLOCKS_PER_DAY)
-    .plus(BIGDECIMAL_ONE);
-  let borrowRatePow = borrowRateCalc; // used to calculate BigDecimal power
+  let borrowRate = tryBorrowRatePerBlock.reverted
+    ? BIGDECIMAL_ZERO
+    : convertBlockRateToAPY(tryBorrowRatePerBlock.value);
+
+  market.stableBorrowRate = borrowRate;
+  market.variableBorrowRate = borrowRate;
+
+  market.save();
+}
+
+export function convertBlockRateToAPY(blockRate: BigInt): BigDecimal {
+  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
+
+  let blockRateCalc = blockRate.toBigDecimal().div(mantissaFactorBD).times(BLOCKS_PER_DAY).plus(BIGDECIMAL_ONE);
+  let blockRateConst = blockRateCalc; // used to calculate BigDecimal power
 
   // take the rate calcs to the power of DAYS_PER_YEAR
   let daysInYear = 365;
   for (let i = 0; i < daysInYear; i++) {
-    borrowRateCalc = borrowRateCalc.times(borrowRatePow);
-    supplyRateCalc = supplyRateCalc.times(supplyRatePow);
+    blockRateCalc = blockRateCalc.times(blockRateConst);
   }
 
   // finish APY calculation
-  borrowRateCalc = borrowRateCalc.minus(BIGDECIMAL_ONE).times(BigDecimal.fromString("100")).truncate(DEFAULT_DECIMALS);
-  supplyRateCalc = supplyRateCalc.minus(BIGDECIMAL_ONE).times(BigDecimal.fromString("100")).truncate(DEFAULT_DECIMALS);
-
-  market.depositRate = supplyRateCalc;
-  market.stableBorrowRate = borrowRateCalc;
-  market.variableBorrowRate = borrowRateCalc;
-
-  market.save();
+  return blockRateCalc.minus(BIGDECIMAL_ONE).times(BigDecimal.fromString("100")).truncate(DEFAULT_DECIMALS);
 }
