@@ -23,7 +23,7 @@ import { convertTokenToDecimal } from "./utils/utils"
 import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics"
 import { savePoolId } from "./handlers"
 
-export let factoryContract = FactoryContract.bind(FACTORY_ADDRESS)
+export let factoryContract = FactoryContract.bind(Address.fromBytes(FACTORY_ADDRESS))
 
 // rebass tokens, dont count in tracked volume
 
@@ -135,7 +135,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   let token1USD = tokenTracker1.derivedETH.times(ether.valueDecimal!)
 
   let logIndexI32 = event.logIndex.toI32()
-  let deposit = new Deposit(event.transaction.hash.concatI32(logIndexI32))
+  let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()))
 
   deposit.hash = event.transaction.hash
   deposit.logIndex = logIndexI32
@@ -179,7 +179,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   let token1USD = tokenTracker1.derivedETH.times(ether.valueDecimal!)
 
   let logIndexI32 = event.logIndex.toI32()
-  let withdrawal = new Withdraw(event.transaction.hash.concatI32(logIndexI32))
+  let withdrawal = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()))
 
   withdrawal.hash = event.transaction.hash
   withdrawal.logIndex = event.logIndex.toI32()
@@ -253,7 +253,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Bytes, 
   }
 
   let logIndexI32 = event.logIndex.toI32()
-  let swap = new SwapEvent(event.transaction.hash.concatI32(logIndexI32))
+  let swap = new SwapEvent(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()))
 
   // update swap event
   swap.hash = event.transaction.hash

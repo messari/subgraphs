@@ -328,7 +328,7 @@ contracts.
 """
 interface Event {
   " { Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
@@ -344,7 +344,7 @@ interface Event {
 }
 type Deposit implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
@@ -373,7 +373,7 @@ type Deposit implements Event @entity(immutable: true) {
 }
 type Withdraw implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index }"
-  id: Bytes!
+  id: ID!
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
@@ -403,7 +403,7 @@ type Withdraw implements Event @entity(immutable: true) {
 }
 type Swap implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "

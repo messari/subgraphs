@@ -8,7 +8,6 @@ import { updateTokenWhitelists } from '../common/updateMetrics'
 import { createLiquidityPool } from '../common/creators'
 
 export function handleNewPair(event: PairCreated): void {
-  log.warning("Blah1", [])
   let protocol = getOrCreateDex()
 
   // create the tokens and tokentracker
@@ -28,13 +27,10 @@ export function handleNewPair(event: PairCreated): void {
 
   token0.save()
   token1.save()
-  log.warning("Blah2", [])
-
 }
 
 // The call handler is used to update feeTo as on or off for each pool
 export function handleFeeTo(call: SetFeeToCall): void {
-  log.warning("Blah3", [])
 
   let protocol = getOrCreateDex()
   let poolIds = protocol._poolIds
@@ -61,6 +57,4 @@ export function handleFeeTo(call: SetFeeToCall): void {
       lpFee.save()
       protocolFee.save()
   }
-  log.warning("Blah4", [])
-
 }

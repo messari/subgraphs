@@ -106,7 +106,7 @@ export let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
 //////////////
 ///////
 
-export const FACTORY_ADDRESS: Address = Address.fromString('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f')
+export const FACTORY_ADDRESS = Bytes.fromHexString('0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f')
 
 export const ZERO_ADDRESS = Bytes.fromHexString('0x0000000000000000000000000000000000000000')
 
