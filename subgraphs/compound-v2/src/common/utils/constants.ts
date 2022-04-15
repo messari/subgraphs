@@ -23,6 +23,28 @@ export namespace Network {
   export const XDAI = "XDAI";
 }
 
+// The network names corresponding to the ones in `dataSource.network()`
+// They should mainly be used for the ease of comparison.
+// Note that they cannot be used as enums since they are lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
+}
+
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
   export const LENDING = "LENDING";
@@ -85,8 +107,10 @@ export const BIGINT_MAX = BigInt.fromString(
 );
 
 export const INT_ZERO = 0 as i32;
+export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
+export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
