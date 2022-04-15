@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.1.0
+# Version: 1.1.1
 
 enum Network {
   ARBITRUM
@@ -287,6 +287,9 @@ type LiquidityPool @entity {
 
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
+
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  inputTokenWeights: [BigDecimal!]!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 
