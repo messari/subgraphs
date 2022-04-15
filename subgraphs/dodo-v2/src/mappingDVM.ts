@@ -62,7 +62,6 @@ export function handleSellShares(event: SellShares): void {
   );
   updateUsageMetrics(event, event.params.payer);
   updateFinancials(event);
-  // updatePoolMetrics(event);
 }
 
 export function handleDODOSwap(event: DODOSwap): void {

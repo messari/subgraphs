@@ -445,13 +445,18 @@ export function createDeposit(
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = pool.protocol;
-  deposit.to = poolAdd.toString();
-  deposit.from = to.toString();
+  deposit.to = poolAdd.toHexString();
+  deposit.from = to.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokenAmounts = [difToken1, difToken2];
   deposit.amountUSD = usdTotal;
   deposit.pool = pool.id;
+
+  pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
+
+  deposit.save();
+  pool.save();
 }
 
 export function createWithdraw(
@@ -464,9 +469,8 @@ export function createWithdraw(
     event.transaction.hash
       .toHexString()
       .concat("-")
-      .concat(event.logIndex.toString())
+      .concat(event.logIndex.toHexString())
   );
-
   let pool = getOrCreatePool(
     poolAdd,
     poolAdd,
@@ -477,7 +481,6 @@ export function createWithdraw(
 
   let priorBalance = pool.inputTokenBalances;
   let tokens = pool.inputTokens;
-
   let token1 = ERC20.bind(Address.fromString(tokens[0]));
   let token2 = ERC20.bind(Address.fromString(tokens[1]));
 
@@ -494,7 +497,6 @@ export function createWithdraw(
   let difToken1 = priorBalance[0] - tokenBal1.value;
 
   let difToken2 = priorBalance[1] - tokenBal2.value;
-
   let priceUSDtoken1 = getUSDprice(
     to,
     Address.fromString(tokens[0]),
@@ -506,17 +508,21 @@ export function createWithdraw(
     difToken2
   );
   let usdTotal = priceUSDtoken1 + priceUSDtoken2;
-
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.protocol = pool.protocol;
-  withdraw.to = poolAdd.toString();
-  withdraw.from = to.toString();
+  withdraw.to = poolAdd.toHexString();
+  withdraw.from = to.toHexString();
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.inputTokenAmounts = [difToken1, difToken2];
   withdraw.amountUSD = usdTotal;
   withdraw.pool = pool.id;
+
+  pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
+
+  withdraw.save();
+  pool.save();
 }
 
 export function createSwap(
@@ -552,8 +558,8 @@ export function createSwap(
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
   swap.protocol = pool.protocol;
-  swap.to = trader.toString();
-  swap.from = poolAdd.toString();
+  swap.to = trader.toHexString();
+  swap.from = poolAdd.toHexString();
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = inToken.id;
@@ -563,4 +569,6 @@ export function createSwap(
   swap.amountOut = amountOut;
   swap.amountOutUSD = priceUSDtoken2;
   swap.pool = pool.id;
+
+  swap.save();
 }

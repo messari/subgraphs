@@ -39,8 +39,8 @@ export function handleBuyShares(event: BuyShares): void {
     event.address,
     event.params.increaseShares
   );
-  updateUsageMetrics(event, event.params.to);
-  updateFinancials(event);
+  // updateUsageMetrics(event, event.params.to);
+  // updateFinancials(event);
 }
 
 // event SellShares(address payer, address to, uint256 decreaseShares, uint256 totalShares);
@@ -51,8 +51,8 @@ export function handleSellShares(event: SellShares): void {
     event.address,
     event.params.decreaseShares
   );
-  updateUsageMetrics(event, event.params.payer);
-  updateFinancials(event);
+  // updateUsageMetrics(event, event.params.payer);
+  // updateFinancials(event);
   // updatePoolMetrics(event);
 }
 
