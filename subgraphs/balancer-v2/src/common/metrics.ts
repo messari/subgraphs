@@ -4,7 +4,6 @@ import { SECONDS_PER_DAY } from "./constants";
 import { Account, DailyActiveAccount, _TokenPrice, LiquidityPool } from "../../generated/schema";
 import { isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
-import {log} from "matchstick-as";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -53,35 +52,26 @@ export function updatePoolMetrics(pool: LiquidityPool): void {
   let tokenWithoutPrice = false;
   for (let i = 0; i < pool.inputTokens.length; i++) {
     let currentToken = Address.fromString(pool.inputTokens[i]);
-    log.info(pool.inputTokenBalances[i].toString(), [])
-    log.info(pool.inputTokens[i].toString(), [])
     let currentTokenBalance = scaleDown(
         pool.inputTokenBalances[i],
         Address.fromString(pool.inputTokens[i]),
     );
 
     if (isUSDStable(currentToken)) {
-      log.info("usdc balance", [])
-      log.info(currentTokenBalance.toString(), [])
       totalValueLocked = totalValueLocked.plus(currentTokenBalance);
       continue;
     }
 
     const token = _TokenPrice.load(currentToken.toHexString());
     if (token == null) {
-    log.info("jaja??????", [])
       tokenWithoutPrice = true;
       continue;
     }
 
-    log.info("before value in usd", [])
     let currentTokenValueInUsd = valueInUSD(currentTokenBalance, Address.fromString(token.id));
-    log.info("after value in usd", [])
-    log.info(currentTokenValueInUsd.toString(), [])
     totalValueLocked = totalValueLocked.plus(currentTokenValueInUsd);
   }
 
-  log.info(tokenWithoutPrice.toString(), [])
   if (tokenWithoutPrice) return;
   pool.totalValueLockedUSD = totalValueLocked;
   pool.save();

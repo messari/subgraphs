@@ -1,4 +1,4 @@
-import { test, assert, log, logStore } from "matchstick-as";
+import { test, assert } from "matchstick-as";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   createNewPoolBalanceChangeEvent,
@@ -16,6 +16,7 @@ import {_TokenPrice, LiquidityPool} from "../generated/schema";
 import {usdcWethPoolId, gnoBalPoolAddress, usdc, weth} from "./state";
 
 const expectedWethPrice = '3010.039001622230703728310744540643'
+const expectedTVL = '144119111.1126040007689007440805288'
 
 test("Create and register pool", () => {
   let registerPoolEvent = createNewPoolEvent(usdcWethPoolId, gnoBalPoolAddress, 2);
@@ -37,7 +38,7 @@ test("Create and register pool", () => {
 });
 
 test("Handle pool balance change because of deposit", () => {
-  const newAmounts = [BigInt.fromI64(72094331532549), BigInt.fromI64(23928188153455141033647)];
+  const newAmounts = [BigInt.fromString("72094331532549"), BigInt.fromString("23928188153455141033647")];
   const deposit = createNewPoolBalanceChangeEvent(
     usdcWethPoolId,
     Address.fromString("0xf71d161fdc3895f21612d79f15aa819b7a3d296a"),
@@ -50,7 +51,6 @@ test("Handle pool balance change because of deposit", () => {
 
   let pool = LiquidityPool.load(usdcWethPoolId.toHexString());
   if (pool == null) throw new Error("Pool is not defined");
-  log.info(pool.inputTokenBalances.toString(), [])
   assert.equals(
     ethereum.Value.fromSignedBigIntArray(pool.inputTokenBalances),
     ethereum.Value.fromSignedBigIntArray(newAmounts),
@@ -61,8 +61,8 @@ test("Handle pool balance change because of deposit", () => {
  * Amounts inspired from https://etherscan.io/tx/0x792c49770ded77cb7bd2b1e9b2348431e2ec4b34fd93bbd0a17f854277566bfc
  */
 test("Handle swap and updates base asset usd price value", () => {
-  let amountIn = BigInt.fromI64(6807327166843002652);
-  let amountOut = BigInt.fromI64(20490320269);
+  let amountIn = BigInt.fromString("6807327166843002652");
+  let amountOut = BigInt.fromString("20490320269");
 
   let pool = LiquidityPool.load(usdcWethPoolId.toHexString());
   if (pool == null) throw new Error("Pool is not defined");
@@ -93,7 +93,5 @@ test("Handle swap and updates base asset usd price value", () => {
 
   pool = LiquidityPool.load(usdcWethPoolId.toHexString())
   if (pool == null) throw new Error("Pool is not defined");
-  log.info('pool total value logock', [])
-  log.info(pool.totalValueLockedUSD.toString(), [])
-  // logStore()
+  assert.stringEquals(pool.totalValueLockedUSD.toString(), expectedTVL)
 });
