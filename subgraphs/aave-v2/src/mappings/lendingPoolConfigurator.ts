@@ -18,7 +18,6 @@ import {
 import {
   initToken,
   initMarket,
-  getOutputTokenSupply,
   getAssetPriceInUSDC
 } from './utilFunctions';
 
@@ -48,7 +47,6 @@ export function handleReserveInitialized (event: ReserveInitialized): void {
   // Set the aToken contract from the param aToken
   initToken(event.params.aToken);
   market.outputToken = event.params.aToken.toHexString();
-  market.outputTokenSupply = getOutputTokenSupply(event.params.aToken);
   market.outputTokenPriceUSD = getAssetPriceInUSDC(event.params.aToken);
   // If the oracle returns 0 as the aToken price, default to the price of the underlying token
   if (market.outputTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {

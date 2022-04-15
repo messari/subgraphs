@@ -46,6 +46,14 @@ import { bigIntToBigDecimal } from '../common/utils/numbers';
 
 export const contractAddrUSDC = '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48';
 
+// Reward system fallback contract addresses
+// The incentive contract and reward token addresses are attempted to be fetched dynamically,
+// but in case of reverted calls, fallback to the default deployed addresses
+
+export const contractAddrIncCont = '0xd784927Ff2f95ba542BfC824c8a8a98F3495f6b5';
+
+export const contractAddrRewardToken = '0x4da27a545c0c5b758a6ba100e3a049001de870f5';
+
 export function initMarket (
   blockNumber: BigInt,
   timestamp: BigInt,
@@ -108,22 +116,17 @@ export function initMarket (
     } else {
       log.error('FAILED TO GET RESERVE', []);
     }
-  } else {
-    // If the market is not being created (and presumably the correct handlers have already added the outputToken after event that creates the market)
-    // Update outputToken data each time the market is loaded
-    market.outputTokenSupply = getOutputTokenSupply(Address.fromString(market.outputToken));
   }
-  // There is no need to execute the below code until block 12251569 when incentive controller was deployed
+  // No need to execute the below code until block 12251569 when incentive controller was deployed
   if (blockNumber.gt(BigInt.fromString('12251569'))) {
-    log.info('ENTERED PASSED BLOCK NUMBER FILTER ' + blockNumber.toString(), [])
     let rewardTokens = market.rewardTokens;
     if (rewardTokens === null) rewardTokens = [];
     if (rewardTokens.length === 0) {
       // If the reward tokens have not been initialized on the market, attempt to pull them from the incentive controller
       const rewardTokenAddr = getRewardTokenAddress(market);
       if (rewardTokenAddr) {
-        const depositRewardToken = loadRewardToken(rewardTokenAddr, market, 'DEPOSIT');
-        const borrowRewardToken = loadRewardToken(rewardTokenAddr, market, 'BORROW');
+        const depositRewardToken = loadRewardToken(Address.fromString(contractAddrRewardToken), market, 'DEPOSIT');
+        const borrowRewardToken = loadRewardToken(Address.fromString(contractAddrRewardToken), market, 'BORROW');
         market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
         market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
         market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -138,7 +141,7 @@ export function initMarket (
 }
 
 export function getCurrentRewardEmissions (market: Market): BigInt[] {
-  const rewardEmissions = [BIGINT_ZERO, BIGINT_ZERO];
+  const rewardEmissions = market.rewardTokenEmissionsAmount;
   // Attempt to get the incentives controller contract
   const incentivesController = initIncentivesController(market);
   if (!incentivesController) {
@@ -146,29 +149,43 @@ export function getCurrentRewardEmissions (market: Market): BigInt[] {
     return rewardEmissions;
   }
   // From the incentives controller contract, get pull the 'assets' values from the market aToken, sToken, and vToken
-  const incentivesControllerContract = IncentivesControllerContract.bind(incentivesController);
-  log.info('CHECKING INC CONT REW EMS ASSET VALS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value1.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value2.toString(), []);
-  const assetDataSupply = incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0;
-  const assetDataBorrowStable = incentivesControllerContract.assets(Address.fromString(market.sToken)).value0;
-  const assetDataBorrowVariable = incentivesControllerContract.assets(Address.fromString(market.sToken)).value0;
-  // Get the emissions per day for the aToken rewards
-  rewardEmissions[0] = emissionsPerDay(assetDataSupply);
-  // Get the emissions per second for both the sToken and vToken rewards, average them and get the daily emissions
-  rewardEmissions[1] = emissionsPerDay((assetDataBorrowStable.plus(assetDataBorrowVariable)).div(BIGINT_TWO));
+  const incentivesControllerContract = IncentivesControllerContract.bind(Address.fromString(contractAddrIncCont));
+  if (!incentivesControllerContract.try_assets(Address.fromString(market.outputToken)).reverted) {
+    log.info('REWARD EMISSIONS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value1.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value2.toString(), []);
+    const assetDataSupply = incentivesControllerContract.try_assets(Address.fromString(market.outputToken)).value.value0;
+    const assetDataBorrowStable = incentivesControllerContract.try_assets(Address.fromString(market.sToken)).value.value0;
+    const assetDataBorrowVariable = incentivesControllerContract.try_assets(Address.fromString(market.sToken)).value.value0;
+    // Get the emissions per day for the aToken rewards for deposits
+    rewardEmissions[0] = emissionsPerDay(assetDataSupply);
+    // Get the emissions per second for both the sToken and vToken rewards, average them and get the daily emissions for borrows
+    rewardEmissions[1] = emissionsPerDay((assetDataBorrowStable.plus(assetDataBorrowVariable)).div(BIGINT_TWO));
+  } else {
+    log.info('COULD NOT GET REWARD EMISSIONS FROM INC CONT ON MARKET: ' + market.id, []);
+    // The rewardEmissions array returned is already defaulted to zero vals
+  }
   return rewardEmissions;
 }
 
-export function getOutputTokenSupply (outputTokenAddr: Address): BigInt {
+export function getOutputTokenSupply (event: ethereum.Event): void {
+  const outputTokenAddr = event.address;
   const aTokenInstance = AToken.bind(outputTokenAddr);
   const tryTokenSupply = aTokenInstance.try_totalSupply();
-  log.info('OUTPUT TOKEN ' + outputTokenAddr.toHexString(), []);
-  let outputTokenSupply = BIGINT_ZERO;
   if (!tryTokenSupply.reverted) {
-    outputTokenSupply = tryTokenSupply.value;
+    log.info('OUTPUT TOKEN NOT REVERTED ' + outputTokenAddr.toHexString() + ' ' + tryTokenSupply.value.toString(), []);
+    const market = Market.load(aTokenInstance.UNDERLYING_ASSET_ADDRESS().toHexString());
+    if (!market) return;
+    market.outputTokenSupply = tryTokenSupply.value;
+    market.save();
+    // This funcion only gets called from mint/burn events which only happen following deposits and withdraws which update the market snapshot
+    // Calling the getMarketDailySnapshot function seems to cause some sort of overflow error, so only the outputTokenSupply field needs to be set
+    const snapId = getMarketDailyId(event, market);
+    const snap = MarketDailySnapshot.load(snapId);
+    if (!snap) return;
+    snap.outputTokenSupply = market.outputTokenSupply;
+    snap.save();
   } else {
     log.info('OUTPUT TOKEN SUPPLY CALL REVERTED FOR TOKEN ' + outputTokenAddr.toHexString(), []);
   }
-  return outputTokenSupply;
 }
 
 export function initToken (assetAddr: Address): Token {
@@ -253,7 +270,7 @@ export function getRewardTokenAddress (market: Market): Address | null {
   const incentiveContAddr = initIncentivesController(market);
   if (!incentiveContAddr) {
     log.info('FAIL MARKET ' + market.id + ' COULD NOT GET INC CONT NOR REWARD TOKENS', [])
-    return null;
+    return Address.fromString(contractAddrRewardToken);
   }
   // Instantiate IncentivesController to get access to contract read methods
   log.info('GET REWARD FROM INCENTIVE CONTROLLER ' + incentiveContAddr.toHexString() + ' market? ' + market.id, []);
@@ -264,7 +281,7 @@ export function getRewardTokenAddress (market: Market): Address | null {
     return contract.try_REWARD_TOKEN().value;
   } else {
     log.info('FAIL MARKET ' + market.id + ' REVERTED REWARD TOKEN', []);
-    return null;
+    return Address.fromString(contractAddrRewardToken);
   }
 }
 
@@ -279,7 +296,7 @@ export function initIncentivesController (market: Market): Address | null {
     return incContAddr;
   } else {
     log.info('FAILED TO GET INCENTIVE CONTROLLER ' + aToken._address.toHexString() + ' ' + market.id, []);
-    return null;
+    return Address.fromString(contractAddrIncCont);
   }
 }
 
@@ -365,8 +382,6 @@ export function updateMetricsDailySnapshot (event: ethereum.Event): UsageMetrics
     // Total unique users is the total unique users who have ever used the protocol, on the snapshot this grabs the number on a particular day
     metricsDailySnapshot.totalUniqueUsers = protocol.totalUniqueUsers;
     metricsDailySnapshot.dailyTransactionCount = 0;
-  } else {
-    log.info('LOADED METRIC SNAPSHOT ' + metricsDailySnapshot.id, []);
   }
 
   const userAddr = event.transaction.from;
@@ -421,7 +436,6 @@ export function getPriceOracle (): IPriceOracleGetter {
   const protocolId = getProtocolIdFromCtx();
   const lendingProtocol = fetchProtocolEntity(protocolId);
   const priceOracle = lendingProtocol.protocolPriceOracle;
-  log.info('GET PRICE ORACLE ' + priceOracle, [])
   return IPriceOracleGetter.bind(Address.fromString(priceOracle));
 }
 
@@ -480,7 +494,7 @@ export function getTokenPricesList (tokens: string[]): BigDecimal[] {
 
 export function getCurrentRewardEmissionsUSD (market: Market): BigDecimal[] {
   // Taking the reward emissions denominated in the reward token, convert it to the value in USD
-  const rewardEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  const rewardEmissionsUSD = market.rewardTokenEmissionsUSD;
   const rewardTokenAddr = getRewardTokenAddress(market);
   if (!rewardTokenAddr) return rewardEmissionsUSD;
   // The DEPOSIT reward token is used as the default. Both the deposit and borrow reward token decimals are the same
@@ -513,16 +527,15 @@ export function calculateRevenues (market: Market, token: Token): void {
   // Pull S and V debt tokens to get the amount currently borrowed as stable debt or variable debt
   const STokenContract = SToken.bind(Address.fromString(market.sToken));
   const VTokenContract = VToken.bind(Address.fromString(market.vToken));
+  const stableTokenSupply = STokenContract.try_totalSupply();
+  const variableTokenSupply = VTokenContract.try_totalSupply();
 
-  const s = STokenContract.try_totalSupply();
-  const v = VTokenContract.try_totalSupply();
-
-  if (!v.reverted && !s.reverted) {
-    log.info('IN REPAY FOR MARKET ' + market.id + ' S AND V SUPPLIES ' + s.value.toString() + ' ' + market.totalStableValueLocked.toString() + ' ' + v.value.toString() + ' ' + market.totalVariableValueLocked.toString(), []);
-    market.totalVariableValueLocked = v.value;
-    market.totalStableValueLocked = s.value;
+  if (!variableTokenSupply.reverted && !stableTokenSupply.reverted) {
+    log.info('IN REPAY FOR MARKET ' + market.id + ' STABLE OR VARIABLE TOKEN SUPPLIES ' + stableTokenSupply.value.toString() + ' ' + market.totalStableValueLocked.toString() + ' ' + variableTokenSupply.value.toString() + ' ' + market.totalVariableValueLocked.toString(), []);
+    market.totalVariableValueLocked = variableTokenSupply.value;
+    market.totalStableValueLocked = stableTokenSupply.value;
   } else {
-    log.info('IN REPAY FOR MARKET ' + market.id + ' S AND V REVERTED ' + s.reverted.toString() + ' ' + v.reverted.toString(), []);
+    log.info('IN REPAY FOR MARKET ' + market.id + ' COULD NOT GET STABLE OR VARIABLE TOKEN SUPPLIES ' + stableTokenSupply.reverted.toString() + ' ' + variableTokenSupply.reverted.toString(), []);
   }
   // Subtract prior market total fees protocol.totalRevenueUSD
   const protocolId = getProtocolIdFromCtx();
@@ -550,7 +563,6 @@ export function calculateRevenues (market: Market, token: Token): void {
 
   // CALCULATE totalBorrowUSD FIELDS ON MARKET AND PROTOCOL ENTITIES
   // The sum in USD of s and v tokens on market is totalBorrowUSD
-
   // Subtract the previously saved amount of the market TotalBorrowUSD value from the protocol totalBorrowUSD
   // This gets the amount in USD out in borrows on the protocol not including this market
   const tempProtocolBorrowTotal = protocol.totalBorrowUSD.minus(market.totalBorrowUSD);
@@ -575,14 +587,13 @@ export function updateTVL (token: Token, market: Market, protocol: LendingProtoc
   // Subtracting the most recently added TVL of the market ensures that the correct
   // proportion of this market is deducted before adding the new market TVL to the protocol
   // Otherwise, the difference in asset USD/ETH price  since saving would deduct the incorrect proportion from the protocol TVL
-  log.info(market.id + ' newMarketTVL = ' + newMarketTVL.toString() + ' newMarketTVL = ' + newMarketTVL.toString() + ' amountInTokens = ' + amountInTokens.toString() + ' toSub ' + toSubtract.toString(), []);
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = amountInUSD(token.id, token.decimals, newMarketTVL, market);
   market.totalDepositUSD = market.totalValueLockedUSD;
+  market.save();
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
   protocol.totalDepositUSD = protocol.totalValueLockedUSD;
   protocol.save();
-  market.save();
 }
 
 export function emissionsPerDay (rewardRatePerSecond: BigInt): BigInt {

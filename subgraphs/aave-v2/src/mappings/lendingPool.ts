@@ -147,7 +147,7 @@ export function handleDeposit (event: Deposit): void {
 
 export function handleWithdraw (event: Withdraw): void {
   // Withdraw event from a lending pool to a user triggers this handler
-  log.info('WITH AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
+  log.info('WITHDRAW AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
@@ -196,7 +196,7 @@ export function handleWithdraw (event: Withdraw): void {
 export function handleBorrow (event: Borrow): void {
   // Borrow event from a lending pool to a user triggers this handler
   // Stable: 1, Variable: 2
-  log.info('BORROW - MODE: ' + event.params.borrowRateMode.toString() + ' amt ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
+  log.info('BORROW - MODE: ' + event.params.borrowRateMode.toString() + ' amt ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
   // Depending on borrow mode, add to stable/variable tvl and trigger total fee calculation
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
@@ -250,7 +250,7 @@ export function handleBorrow (event: Borrow): void {
 
 export function handleRepay (event: Repay): void {
   // Repay event from a user who is paying back into a pool that they borrowed from
-  log.info('REPAY AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), [])
+  log.info('REPAY AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
@@ -342,7 +342,7 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   // This is represented by a 5 digit integer over 10000 (100%). The profit is the percentage over 100%
   // For example, if the liquidationPenalty is 10500 (105%), the profit is 5% of the collateral liquidated.
   if (market.liquidationPenalty.gt(BigDecimal.fromString('10000'))) {
-    const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'))
+    const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'));
     log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString() + ' divide amount by ' + divideAmountBy.toString(), []);
     // This expression below divides the collaterall liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
     liquidation.profitUSD = amountUSD.div(divideAmountBy);

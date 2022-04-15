@@ -37,6 +37,8 @@ templates:
       entities:
         - LendingPoolAddressesProvider
       abis:
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
       eventHandlers:
@@ -71,6 +73,8 @@ templates:
         - Position
         - PositionSnapshot
       abis:
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
         - name: AToken
           file: ./abis/AToken.json
         - name: VariableDebtToken
@@ -120,6 +124,8 @@ templates:
         - Position
         - PositionSnapshot
       abis:
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
         - name: AToken
           file: ./abis/AToken.json
         - name: LendingPoolConfigurator
@@ -174,33 +180,3 @@ templates:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleATokenMint
       file: src/mappings/aToken.ts
-  - kind: ethereum/contract
-    name: IncentivesController
-    network: mainnet
-    source:
-      abi: AaveIncentivesController
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - IncentivesController
-      abis:
-        - name: AaveIncentivesController
-          file: ./abis/AaveIncentivesController.json
-        - name: VariableDebtToken
-          file: ./abis/VariableDebtToken.json
-        - name: StableDebtToken
-          file: ./abis/StableDebtToken.json
-        - name: LendingPool
-          file: ./abis/LendingPool.json
-        - name: IERC20
-          file: ./abis/IERC20.json
-        - name: IPriceOracleGetter
-          file: ./abis/IPriceOracleGetter.json
-      eventHandlers:
-        - event: RewardsAccrued(indexed address,uint256)
-          handler: handleRewardsAccrued
-        - event: RewardsClaimed(indexed address,indexed address,indexed address,uint256)
-          handler: handleRewardsClaimed
-      file: src/mappings/incentivesController.ts
