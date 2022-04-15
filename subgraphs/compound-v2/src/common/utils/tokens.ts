@@ -1,6 +1,6 @@
-import { ERC20 } from "../../types/templates/CToken/ERC20";
-import { ERC20SymbolBytes } from "../../types/Comptroller/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../types/Comptroller/ERC20NameBytes";
+import { ERC20 } from "../../../generated/templates/CToken/ERC20";
+import { ERC20SymbolBytes } from "../../../generated/Comptroller/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../../generated/Comptroller/ERC20NameBytes";
 import { Address, log } from "@graphprotocol/graph-ts";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors

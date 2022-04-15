@@ -7,7 +7,7 @@ import {
   getOrCreateUsageMetricSnapshot,
 } from "./getters";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, DailyActiveAccount } from "../types/schema";
+import { Account, DailyActiveAccount } from "../../generated/schema";
 import { SECONDS_PER_DAY } from "./utils/constants";
 
 ///////////////////////////

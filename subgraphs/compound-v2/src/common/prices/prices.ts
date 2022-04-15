@@ -10,10 +10,10 @@ import {
   CUSDT_ADDRESS,
   CTUSD_ADDRESS,
 } from "../../common/utils/constants";
-import { Token, LendingProtocol, Market } from "../../types/schema";
+import { Token, LendingProtocol, Market } from "../../../generated/schema";
 import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
-import { PriceOracle2 } from "../../types/Comptroller/PriceOracle2";
-import { PriceOracle1 } from "../../types/Comptroller/PriceOracle1";
+import { PriceOracle2 } from "../../../generated/Comptroller/PriceOracle2";
+import { PriceOracle1 } from "../../../generated/Comptroller/PriceOracle1";
 import { exponentToBigDecimal } from "../utils/utils";
 
 // returns the token price

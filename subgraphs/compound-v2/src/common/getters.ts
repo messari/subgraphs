@@ -7,7 +7,7 @@ import {
   RewardToken,
   Token,
   UsageMetricsDailySnapshot,
-} from "../types/schema";
+} from "../../generated/schema";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -35,10 +35,10 @@ import {
   ZERO_ADDRESS,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { CToken } from "../types/Comptroller/cToken";
+import { CToken } from "../../generated/Comptroller/cToken";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
-import { Comptroller } from "../types/Comptroller/Comptroller";
+import { Comptroller } from "../../generated/Comptroller/Comptroller";
 
 ///////////////////
 //// Snapshots ////

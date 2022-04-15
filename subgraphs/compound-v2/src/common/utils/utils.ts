@@ -1,6 +1,6 @@
 // store common calculations
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CToken } from "../../types/templates/CToken/CToken";
+import { CToken } from "../../../generated/templates/CToken/CToken";
 
 // turn exponent into a BigDecimal number
 export function exponentToBigDecimal(decimals: i32): BigDecimal {

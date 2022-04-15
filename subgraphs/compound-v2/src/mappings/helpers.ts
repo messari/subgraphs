@@ -12,7 +12,6 @@ import {
   BIGDECIMAL_ONE,
   BLOCKS_PER_DAY,
   DAYS_PER_YEAR,
-  BIGINT_ONE,
 } from "../common/utils/constants";
 import {
   getOrCreateLendingProtcol,
@@ -20,13 +19,13 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
-import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../types/schema";
+import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CToken } from "../types/Comptroller/cToken";
+import { CToken } from "../../generated/Comptroller/cToken";
 import { getUSDPriceOfToken } from "../common/prices/prices";
 import { exponentToBigDecimal, getExchangeRate, powerBigDecimal } from "../common/utils/utils";
-import { Comptroller } from "../types/Comptroller/Comptroller";
-import { PriceOracle2 } from "../types/Comptroller/PriceOracle2";
+import { Comptroller } from "../../generated/Comptroller/Comptroller";
+import { PriceOracle2 } from "../../generated/Comptroller/PriceOracle2";
 
 //////////////////////////////
 //// Transaction Entities ////

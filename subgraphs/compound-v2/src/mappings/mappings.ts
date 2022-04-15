@@ -5,11 +5,11 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   NewPriceOracle,
-} from "../types/Comptroller/Comptroller";
+} from "../../generated/Comptroller/Comptroller";
 import { createBorrow, createDeposit, createLiquidation, createRepay, createWithdraw } from "./helpers";
-import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../types/templates/cToken/CToken";
-import { CToken } from "../types/templates";
-import { NewReserveFactor } from "../types/Comptroller/cToken";
+import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/cToken/CToken";
+import { CToken } from "../../generated/templates";
+import { NewReserveFactor } from "../../generated/Comptroller/cToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
