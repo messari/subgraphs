@@ -31,12 +31,12 @@
 
 ### Introductory
 
-- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
+- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
 - Query subgraphs using GraphQL: https://thegraph.com/docs/en/developer/graphql-api/
-- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
-- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
+- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
+- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
 - Creating a subgraph: https://thegraph.com/docs/en/developer/create-subgraph-hosted/
-- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
+- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
 
 ### Intermediate
 
