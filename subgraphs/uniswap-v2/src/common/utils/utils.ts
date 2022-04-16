@@ -1,4 +1,4 @@
-import { BigInt, BigDecimal, Bytes } from "@graphprotocol/graph-ts"
+import { BigInt, BigDecimal, Bytes, ethereum } from "@graphprotocol/graph-ts"
 import { BIGDECIMAL_ZERO, INT_ONE, INT_ZERO } from "./../constants"
 
 // convert decimals 
@@ -33,4 +33,11 @@ export function toBytesArray(arr: string[]): Bytes[] {
     for (let i = 0; i < arr.length; i++) {
       byteArr[i] = Bytes.fromHexString(arr[i])
   } return byteArr
+}
+
+export function readValue<T>(
+  callResult: ethereum.CallResult<T>,
+  defaultValue: T
+): T {
+  return callResult.reverted ? defaultValue : callResult.value;
 }

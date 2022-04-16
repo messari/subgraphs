@@ -128,12 +128,6 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals)
   let token1Amount = convertTokenToDecimal(amount1, token1.decimals)
 
-  let ether = getOrCreateEtherHelper()
-
-  // Gets token value in USD
-  let token0USD = tokenTracker0.derivedETH.times(ether.valueDecimal!)
-  let token1USD = tokenTracker1.derivedETH.times(ether.valueDecimal!)
-
   let logIndexI32 = event.logIndex.toI32()
   let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()))
 
@@ -148,7 +142,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.outputToken = pool.outputToken
   deposit.inputTokenAmounts = [amount0, amount1]
   deposit.outputTokenAmount = transfer.liquidity
-  deposit.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
+  deposit.amountUSD = tokenTracker0.derivedUSD.times(token0Amount).plus(tokenTracker1.derivedUSD.times(token1Amount))
 
   updateDepositHelper(event.address)
 
@@ -172,12 +166,6 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals)
   let token1Amount = convertTokenToDecimal(amount1, token1.decimals)
 
-  let ether = getOrCreateEtherHelper()
-
-  // Gets token value in USD
-  let token0USD = tokenTracker0.derivedETH.times(ether.valueDecimal!)
-  let token1USD = tokenTracker1.derivedETH.times(ether.valueDecimal!)
-
   let logIndexI32 = event.logIndex.toI32()
   let withdrawal = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()))
 
@@ -192,7 +180,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.outputToken = pool.outputToken
   withdrawal.inputTokenAmounts = [amount0, amount1]
   withdrawal.outputTokenAmount = transfer.liquidity
-  withdrawal.amountUSD = token0USD.times(token0Amount).plus(token1USD.times(token1Amount))
+  withdrawal.amountUSD = tokenTracker0.derivedUSD.times(token0Amount).plus(tokenTracker1.derivedUSD.times(token1Amount))
 
   store.remove('_Transfer', transfer.id.toHexString())
 
@@ -225,8 +213,8 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Bytes, 
   // ETH/USD prices
   let ether = getOrCreateEtherHelper()
 
-  let token0USD = tokenTracker0.derivedETH.times(amount0TotalConverted).times(ether.valueDecimal!)
-  let token1USD = tokenTracker1.derivedETH.times(amount1TotalConverted).times(ether.valueDecimal!)
+  let token0USD = tokenTracker0.derivedUSD.times(amount0TotalConverted)
+  let token1USD = tokenTracker1.derivedUSD.times(amount1TotalConverted)
 
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
@@ -243,13 +231,13 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Bytes, 
   if (amount0In != BIGINT_ZERO) {
     let tradingFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage))
     let protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage))
-    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
-    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedETH).times(ether.valueDecimal!)
+    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedUSD)
+    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedUSD)
   } else {
     let tradingFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage))
     let protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage))
-    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker1.derivedETH).times(ether.valueDecimal!)
-    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker1.derivedETH).times(ether.valueDecimal!)
+    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker1.derivedUSD)
+    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker1.derivedUSD)
   }
 
   let logIndexI32 = event.logIndex.toI32()
@@ -257,7 +245,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Bytes, 
 
   // update swap event
   swap.hash = event.transaction.hash
-  swap.logIndex = event.logIndex.toI32()
+  swap.logIndex = logIndexI32
   swap.protocol = protocol.id
   swap.to = to
   swap.from = sender

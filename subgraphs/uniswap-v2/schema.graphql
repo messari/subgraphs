@@ -27,15 +27,9 @@ enum ProtocolType {
   # Will add more
 }
 
-<<<<<<< HEAD
 type Token @entity(immutable: true) {
   " Smart contract address of the token "
   id: Bytes!
-=======
-type Token @entity {
-  " Smart contract address of the token "
-  id: ID!
->>>>>>> masterMessari
 
   " Mirrored from the smart contract "
   name: String!
@@ -48,15 +42,9 @@ enum RewardTokenType {
   BORROW
 }
 
-<<<<<<< HEAD
 type RewardToken @entity(immutable: true) {
   " Smart contract address of the reward token "
   id: Bytes!
-=======
-type RewardToken @entity {
-  " Smart contract address of the reward token "
-  id: ID!
->>>>>>> masterMessari
 
   " Mirrored from the smart contract "
   name: String!
@@ -196,11 +184,7 @@ type DexAmmProtocol implements Protocol @entity {
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
-<<<<<<< HEAD
   _poolIds: [LiquidityPool!]!
-=======
-  _poolIds: [Bytes!]!
->>>>>>> masterMessari
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -300,11 +284,7 @@ type LiquidityPool @entity {
 
 type PoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-<<<<<<< HEAD
   id: Bytes!
-=======
-  id: ID!
->>>>>>> masterMessari
 
   " The protocol this snapshot belongs to "
   protocol: DexAmmProtocol!
@@ -350,25 +330,15 @@ interface Event {
   " { Transaction hash }-{ Log index } "
   id: ID!
   " Transaction hash of the transaction that emitted this event "
-<<<<<<< HEAD
   hash: Bytes!
-=======
-  hash: String!
->>>>>>> masterMessari
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-<<<<<<< HEAD
   to: Bytes!
   " Address that sent the tokens "
   from: Bytes!
-=======
-  to: String!
-  " Address that sent the tokens "
-  from: String!
->>>>>>> masterMessari
   blockNumber: BigInt!
   timestamp: BigInt!
 }
@@ -382,15 +352,9 @@ type Deposit implements Event @entity(immutable: true) {
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-<<<<<<< HEAD
   to: Bytes!
   " Address that sent the tokens "
   from: Bytes!
-=======
-  to: String!
-  " Address that sent the tokens "
-  from: String!
->>>>>>> masterMessari
   blockNumber: BigInt!
   timestamp: BigInt!
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
@@ -407,33 +371,19 @@ type Deposit implements Event @entity(immutable: true) {
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-<<<<<<< HEAD
 type Withdraw implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index }"
   id: ID!
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
-=======
-type Withdraw implements Event @entity {
-  " { Transaction hash }-{ Log index }"
-  id: ID!
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
->>>>>>> masterMessari
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-<<<<<<< HEAD
   to: Bytes!
   " Address that sent the tokens "
   from: Bytes!
-=======
-  to: String!
-  " Address that sent the tokens "
-  from: String!
->>>>>>> masterMessari
   blockNumber: BigInt!
   timestamp: BigInt!
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
@@ -451,33 +401,19 @@ type Withdraw implements Event @entity {
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-<<<<<<< HEAD
 type Swap implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
   " Transaction hash of the transaction that emitted this event "
   hash: Bytes!
-=======
-type Swap implements Event @entity {
-  " { Transaction hash }-{ Log index } "
-  id: ID!
-  " Transaction hash of the transaction that emitted this event "
-  hash: String!
->>>>>>> masterMessari
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-<<<<<<< HEAD
   to: Bytes!
   " Address that sent the tokens "
   from: Bytes!
-=======
-  to: String!
-  " Address that sent the tokens "
-  from: String!
->>>>>>> masterMessari
   blockNumber: BigInt!
   timestamp: BigInt!
   " Token deposited into pool "
@@ -498,7 +434,6 @@ type Swap implements Event @entity {
 }
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
-<<<<<<< HEAD
 type Account @entity(immutable: true) {
   " Address of the account "
   id: Bytes!
@@ -507,16 +442,6 @@ type Account @entity(immutable: true) {
 type DailyActiveAccount @entity(immutable: true) {
   " { Days since Unix epoch }-{ Address of the account } "
   id: Bytes!
-=======
-type Account @entity {
-  " Address of the account "
-  id: ID!
-}
-# Helper entity for calculating daily active users
-type DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
-  id: ID!
->>>>>>> masterMessari
 }
 
 #Added Entities 
@@ -547,7 +472,7 @@ type _TokenTracker @entity {
   " pools token is in that are white listed for USD pricing "
   whitelistPools: [LiquidityPool!]!
   " derived price in ETH "
-  derivedETH: BigDecimal!
+  derivedUSD: BigDecimal!
 }
 
 type _LiquidityPoolAmount @entity {
@@ -557,17 +482,4 @@ type _LiquidityPoolAmount @entity {
   inputTokens: [Token!]!
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
-}
-
-type _BlockTracker @entity {
-    id: ID! 
-    blocks: [_Block!]!
-    windowStartIndex: Int!
-    blocksPerDay: BigDecimal!
-}
-
-type _Block @entity {
-  id: ID!
-  blockNumber: Int!
-  timestamp: Int!
 }

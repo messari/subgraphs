@@ -35,7 +35,7 @@ dataSources:
         ############## Price Oracle #################
         #############################################
         - name: ERC20
-          file: ./abis/Ethereum/ERC20.json
+          file: ./abis/Oracles/ERC20.json
         - name: CurveRegistry
           file: ./abis/Oracles/Curve/Registry.json
         - name: CalculationsCurve
@@ -100,6 +100,33 @@ templates:
           file: ./abis/pair.json
         - name: Factory
           file: ./abis/factory.json
+        #############################################
+        ############## Price Oracle #################
+        #############################################
+        - name: ERC20
+          file: ./abis/Oracles/ERC20.json
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

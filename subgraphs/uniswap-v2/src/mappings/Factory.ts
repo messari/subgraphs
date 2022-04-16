@@ -1,19 +1,11 @@
-import { log } from '@graphprotocol/graph-ts'
+import { Address, log } from '@graphprotocol/graph-ts'
 import { BigDecimal } from '@graphprotocol/graph-ts'
 import { PairCreated, SetFeeToCall } from '../../generated/Factory/Factory'
-<<<<<<< HEAD
 import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/constants'
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateLPToken, getOrCreateToken, getOrCreateTokenTracker } from '../common/getters'
-import { findEthPerToken } from '../common/price/price'
 import { updateTokenWhitelists } from '../common/updateMetrics'
 import { createLiquidityPool } from '../common/creators'
-=======
-import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, ZERO_ADDRESS } from '../common/utils/constants'
-import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateTokenTracker } from '../common/getters'
-import { CreateLiquidityPool, UpdateTokenWhitelists } from '../common/helpers'
-import { findEthPerToken } from '../common/utils/price'
-import { getOrCreateToken, getOrCreateLPToken } from '../common/utils/tokens'
->>>>>>> masterMessari
+import { getPriceUsdc } from '../Prices/routers/UniswapRouter'
 
 export function handleNewPair(event: PairCreated): void {
   let protocol = getOrCreateDex()
@@ -26,8 +18,26 @@ export function handleNewPair(event: PairCreated): void {
   let tokenTracker0 = getOrCreateTokenTracker(event.params.token0)
   let tokenTracker1 = getOrCreateTokenTracker(event.params.token1)
 
-  tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
-  tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
+  // Using function getUsdPricePerToken(tokenAddr: Address)
+  let fetchPrice0 = getPriceUsdc(Address.fromBytes(token0.id), protocol.network);
+  if (!fetchPrice0.reverted) {
+    tokenTracker0.derivedUSD = fetchPrice0.usdPrice.div(
+      fetchPrice0.decimals.toBigDecimal()
+    );
+  } else {
+    // default value of this variable, if reverted is BigDecimal Zero
+    tokenTracker0.derivedUSD = fetchPrice0.usdPrice
+  }
+
+  let fetchPrice1 = getPriceUsdc(Address.fromBytes(token0.id), protocol.network);
+  if (!fetchPrice1.reverted) {
+    tokenTracker1.derivedUSD = fetchPrice1.usdPrice.div(
+      fetchPrice1.decimals.toBigDecimal()
+    );
+  } else {
+    // default value of this variable, if reverted is BigDecimal Zero
+    tokenTracker1.derivedUSD = fetchPrice1.usdPrice
+  }
 
   updateTokenWhitelists(tokenTracker0, tokenTracker1, event.params.pair)
 
@@ -44,11 +54,7 @@ export function handleFeeTo(call: SetFeeToCall): void {
   let poolIds = protocol._poolIds
   let lpFeeUpdate: BigDecimal
   let protocolFeeUpdate: BigDecimal
-<<<<<<< HEAD
   if (call.inputs._feeTo != ZERO_ADDRESS)  {
-=======
-  if (call.inputs._feeTo.toHexString() != ZERO_ADDRESS)  {
->>>>>>> masterMessari
     lpFeeUpdate = LP_FEE_TO_ON
     protocolFeeUpdate = PROTOCOL_FEE_TO_ON
   } else {
@@ -56,11 +62,7 @@ export function handleFeeTo(call: SetFeeToCall): void {
     protocolFeeUpdate = PROTOCOL_FEE_TO_OFF
   }
     for (let i = 0; i < poolIds.length; i++) {
-<<<<<<< HEAD
       let pool = getLiquidityPool(poolIds[i])
-=======
-      let pool = getLiquidityPool(poolIds[i].toHexString())
->>>>>>> masterMessari
       let lpFeeId = pool.fees[0]
       let protocolFeeId = pool.fees[1]
 

@@ -2,8 +2,9 @@ import { log, Address, BigDecimal, BigInt, Bytes, ethereum } from "@graphprotoco
 import { Account, DailyActiveAccount, UsageMetricsDailySnapshot, _HelperStore, _TokenTracker } from "../../generated/schema"
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateEtherHelper, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateToken, getOrCreateTokenTracker, getOrCreateUsersHelper } from "./getters"
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, FACTORY_ADDRESS, INT_ONE, SECONDS_PER_DAY, WHITELIST } from "./constants"
-import { findEthPerToken, getEthPriceInUSD} from "./price/price"
 import { convertTokenToDecimal } from "./utils/utils"
+import { getUsdPricePerToken } from "../Prices"
+import { getPriceUsdc } from "../Prices/routers/UniswapRouter"
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -124,19 +125,32 @@ export function updateTvlAndTokenPrices(poolAddress: Address): void {
 
   let protocol = getOrCreateDex()
 
-  // Get updated ETH price now that reserves could have changed
-  let ether = getOrCreateEtherHelper()
-
-  ether.valueDecimal = getEthPriceInUSD()
-
   let token0 = getOrCreateToken(pool.inputTokens[0])
   let token1 = getOrCreateToken(pool.inputTokens[1])
 
   let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0])
   let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1])
 
-  tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
-  tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
+  // Using function getUsdPricePerToken(tokenAddr: Address)
+  let fetchPrice0 = getPriceUsdc(Address.fromBytes(token0.id), protocol.network)
+  if (!fetchPrice0.reverted) {
+    tokenTracker0.derivedUSD = fetchPrice0.usdPrice.div(
+      fetchPrice0.decimals.toBigDecimal()
+    );
+  } else {
+    // default value of this variable, if reverted is BigDecimal Zero
+    tokenTracker0.derivedUSD = fetchPrice0.usdPrice
+  }
+
+  let fetchPrice1 = getPriceUsdc(Address.fromBytes(token0.id), protocol.network)
+  if (!fetchPrice1.reverted) {
+    tokenTracker1.derivedUSD = fetchPrice1.usdPrice.div(
+      fetchPrice1.decimals.toBigDecimal()
+    );
+  } else {
+    // default value of this variable, if reverted is BigDecimal Zero
+    tokenTracker1.derivedUSD = fetchPrice1.usdPrice
+  }
 
   // Subtract the old pool tvl
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD)
@@ -145,7 +159,7 @@ export function updateTvlAndTokenPrices(poolAddress: Address): void {
   let inputToken1 = convertTokenToDecimal(pool.inputTokenBalances[1], token1.decimals)
 
   // Get new tvl
-  let newTvl = tokenTracker0.derivedETH.times(inputToken0).times(ether.valueDecimal!).plus(tokenTracker1.derivedETH.times(inputToken1).times(ether.valueDecimal!))
+  let newTvl = tokenTracker0.derivedUSD.times(inputToken0).plus(tokenTracker1.derivedUSD.times(inputToken1))
 
   // Add the new pool tvl
   pool.totalValueLockedUSD =  newTvl
@@ -160,7 +174,6 @@ export function updateTvlAndTokenPrices(poolAddress: Address): void {
 
   pool.save()
   protocol.save()
-  ether.save()
 }
 
 // Update the volume and accrued fees for all relavant entities 
