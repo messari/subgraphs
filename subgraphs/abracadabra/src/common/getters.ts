@@ -48,7 +48,7 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = BENTOBOX_ADDRESS;
+    usageMetrics.protocol = getOrCreateLendingProtocol().id;
 
     usageMetrics.activeUsers = 0;
     usageMetrics.totalUniqueUsers = 0;
@@ -85,7 +85,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = BENTOBOX_ADDRESS;
+    financialMetrics.protocol = getOrCreateLendingProtocol().id;
 
     financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
