@@ -22,7 +22,7 @@ import {
   Withdraw as WithdrawEntity,
   Borrow as BorrowEntity,
   Repay as RepayEntity,
-  Liquidation as LiquidationEntity,
+  Liquidate as LiquidateEntity,
   Market
 } from '../../generated/schema';
 
@@ -296,40 +296,40 @@ export function handleRepay (event: Repay): void {
 }
 
 export function handleLiquidationCall (event: LiquidationCall): void {
-  // Liquidation event where a users collateral assets are sold to reduce the ratio to borrowed assets
+  // Liquidate event where a users collateral assets are sold to reduce the ratio to borrowed assets
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.collateralAsset.toHexString();
   const protocolId = getProtocolIdFromCtx();
   const protocol = fetchProtocolEntity(protocolId);
   const token = initToken(event.params.collateralAsset);
-  const liquidation = new LiquidationEntity(hash + '-' + event.logIndex.toHexString());
-  // Liquidation.to is set to the market address
-  liquidation.to = marketAddr;
-  liquidation.market = marketAddr;
-  liquidation.from = event.params.liquidator.toHexString();
-  liquidation.hash = hash;
-  liquidation.logIndex = event.logIndex.toI32();
-  liquidation.asset = event.params.collateralAsset.toHexString();
-  liquidation.protocol = protocol.id || protocolId;
-  liquidation.timestamp = event.block.timestamp;
-  liquidation.blockNumber = event.block.number;
-  liquidation.amount = event.params.liquidatedCollateralAmount;
+  const liquidate = new LiquidateEntity(hash + '-' + event.logIndex.toHexString());
+  // liquidate.to is set to the market address
+  liquidate.to = marketAddr;
+  liquidate.market = marketAddr;
+  liquidate.from = event.params.liquidator.toHexString();
+  liquidate.hash = hash;
+  liquidate.logIndex = event.logIndex.toI32();
+  liquidate.asset = event.params.collateralAsset.toHexString();
+  liquidate.protocol = protocol.id || protocolId;
+  liquidate.timestamp = event.block.timestamp;
+  liquidate.blockNumber = event.block.number;
+  liquidate.amount = event.params.liquidatedCollateralAmount;
 
   let market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   const amountUSD = amountInUSD(token.id, token.decimals, event.params.liquidatedCollateralAmount, market);
-  liquidation.amountUSD = amountUSD;
+  liquidate.amountUSD = amountUSD;
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the crresponding values to the same index when added
-  const tokenBalanceIndex = getTokenBalanceIndex(market, liquidation.asset);
+  const tokenBalanceIndex = getTokenBalanceIndex(market, liquidate.asset);
   if (tokenBalanceIndex >= market.inputTokens.length) {
     // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
     market = initMarket(event.block.number, event.block.timestamp, marketAddr) as Market;
   }
   const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
-  const newBal = balanceAtIdx.plus(liquidation.amount);
+  const newBal = balanceAtIdx.plus(liquidate.amount);
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
 
   // Update total value locked on the market level
-  updateTVL(token, market, protocol, liquidation.amount, false);
+  updateTVL(token, market, protocol, liquidate.amount, false);
   calculateRevenues(market, token);
   market.save();
   // Update snapshots
@@ -344,14 +344,14 @@ export function handleLiquidationCall (event: LiquidationCall): void {
   if (market.liquidationPenalty.gt(BigDecimal.fromString('10000'))) {
     const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'));
     log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString() + ' divide amount by ' + divideAmountBy.toString(), []);
-    // This expression below divides the collaterall liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
-    liquidation.profitUSD = amountUSD.div(divideAmountBy);
+    // This expression below divides the collateral liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
+    liquidate.profitUSD = amountUSD.div(divideAmountBy);
   } else {
-    liquidation.profitUSD = BIGDECIMAL_ZERO;
+    liquidate.profitUSD = BIGDECIMAL_ZERO;
   }
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
-  liquidation.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
-  liquidation.save();
+  liquidate.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  liquidate.save();
 }
 
 export function handleReserveUsedAsCollateralEnabled (event: ReserveUsedAsCollateralEnabled): void {
