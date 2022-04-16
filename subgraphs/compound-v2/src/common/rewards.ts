@@ -70,8 +70,8 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.
 /**
  * @param {BigInt} currentTimestamp    - Timestamp for current event
  * @param {BigInt} currentBlockNumber  - Block nunmber of current event
- * @param {BigInt} rewardRate          - Rate of reward emissions per reward interval
- * @param {BigInt} rewardType          - Describes whether rewards are given per block or timestamp
+ * @param {BigDecimal} rewardRate      - Rate of reward emissions per reward interval
+ * @param {string} rewardType          - Describes whether rewards are given per block or timestamp
  * @returns {BigDecimal}               - Returns estimated blocks for specified rate
  */
 export function getRewardsPerDay(
@@ -163,7 +163,7 @@ export function getRewardsPerDay(
   return rewardRate.times(circularBuffer.blocksPerDay);
 }
 
-function getOrCreateCircularBuffer(): _CircularBuffer {
+export function getOrCreateCircularBuffer(): _CircularBuffer {
   let circularBuffer = _CircularBuffer.load(CIRCULAR_BUFFER);
 
   if (!circularBuffer) {

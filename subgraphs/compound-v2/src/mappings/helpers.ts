@@ -4,13 +4,10 @@ import {
   COMP_ADDRESS,
   COMPOUND_DECIMALS,
   DEFAULT_DECIMALS,
-  BLOCKS_PER_YEAR,
   RewardTokenType,
   CCOMP_ADDRESS,
   BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
   BIGDECIMAL_ONE,
-  BLOCKS_PER_DAY,
   DAYS_PER_YEAR,
 } from "../common/utils/constants";
 import {
@@ -19,13 +16,14 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
-import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../../generated/schema";
+import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CToken } from "../../generated/Comptroller/cToken";
 import { getUSDPriceOfToken } from "../common/prices/prices";
 import { exponentToBigDecimal, getExchangeRate, powerBigDecimal } from "../common/utils/utils";
 import { Comptroller } from "../../generated/Comptroller/Comptroller";
 import { PriceOracle2 } from "../../generated/Comptroller/PriceOracle2";
+import { getRewardsPerDay, RewardIntervalType, getOrCreateCircularBuffer } from "../common/rewards";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -350,7 +348,8 @@ export function createLiquidation(
 // b/c we want to capture all of the revenue from the previous block
 export function updatePrevBlockRevenues(market: Market): void {
   // update revenues for prev block
-  let borrowRatePerBlock = market.variableBorrowRate.div(BLOCKS_PER_YEAR);
+  let blocksPerYear = getOrCreateCircularBuffer().blocksPerDay.times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
+  let borrowRatePerBlock = market.variableBorrowRate.div(blocksPerYear);
   market._supplySideRevenueUSDPerBlock = market.totalBorrowUSD
     .times(borrowRatePerBlock)
     .times(BIGDECIMAL_ONE.minus(market._reserveFactor));
@@ -362,15 +361,15 @@ export function updatePrevBlockRevenues(market: Market): void {
 
 // accrue interests on outstanding borrows and supplys
 export function accrueInterestsOnBalances(market: Market): void {
-  let accruedSupplyInterest = market.inputTokenBalances[0]
-    .toBigDecimal()
-    .times(market.depositRate.div(BLOCKS_PER_YEAR));
+  let blocksPerYear = getOrCreateCircularBuffer().blocksPerDay.times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
+
+  let accruedSupplyInterest = market.inputTokenBalances[0].toBigDecimal().times(market.depositRate.div(blocksPerYear));
   let newInterestBigInt = BigInt.fromString(accruedSupplyInterest.truncate(0).toString());
   market.inputTokenBalances[0] = market.inputTokenBalances[0].plus(newInterestBigInt);
 
   let accruedBorrowedInterest = market._totalBorrowNative
     .toBigDecimal()
-    .times(market.variableBorrowRate.div(BLOCKS_PER_YEAR));
+    .times(market.variableBorrowRate.div(blocksPerYear));
   let newBorrowInterestBigInt = BigInt.fromString(accruedBorrowedInterest.truncate(0).toString());
   market._totalBorrowNative = market._totalBorrowNative.plus(newBorrowInterestBigInt);
 
@@ -476,33 +475,34 @@ export function updateTotalDepositUSD(event: ethereum.Event): void {
 export function updateRewards(event: ethereum.Event, market: Market): void {
   // COMP was not created until block 9601359
   if (event.block.number.toI32() > 9601359) {
-    let rewardTokenBorrow: RewardToken | null = null;
-    let rewardTokenDeposit: RewardToken | null = null;
+    let rewardTokenDeposit = getOrCreateRewardToken(
+      market.id,
+      Address.fromString(COMP_ADDRESS),
+      RewardTokenType.DEPOSIT,
+    );
+    let rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
+
     // check if market has COMP reward tokens
     if (market.rewardTokens == null) {
-      rewardTokenDeposit = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.DEPOSIT);
-      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
       let rewardTokenArr = new Array<string>();
       rewardTokenArr.push(rewardTokenDeposit.id);
       rewardTokenArr.push(rewardTokenBorrow.id);
       market.rewardTokens = rewardTokenArr;
     }
 
-    // get COMP distribution/block
-    if (rewardTokenBorrow == null) {
-      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
-    }
     let rewardDecimals = rewardTokenBorrow.decimals;
     let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
-    let tryDistribution = troller.try_compSpeeds(event.address);
+    let tryCompSpeedPerBlock = troller.try_compSpeeds(event.address);
 
     // get comp speed per day - this is the distribution amount for supplying and borrowing
-    let compPerDay = tryDistribution.reverted
-      ? BIGINT_ZERO
-      : tryDistribution.value
-          .times(BigInt.fromI32(4)) // 4 blocks/min
-          .times(BigInt.fromI32(60)) // 60 mins/hr
-          .times(BigInt.fromI32(24)); // 24 hrs/day
+    let compPerDay = tryCompSpeedPerBlock.reverted
+      ? BIGDECIMAL_ZERO
+      : getRewardsPerDay(
+          event.block.timestamp,
+          event.block.number,
+          tryCompSpeedPerBlock.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+          RewardIntervalType.BLOCK,
+        );
     let compPriceUSD = BIGDECIMAL_ZERO;
 
     // cCOMP was made at this block height 10960099
@@ -517,11 +517,14 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
       compPriceUSD = oracle.assetPrices(Address.fromString(COMP_ADDRESS)).toBigDecimal().div(exponentToBigDecimal(6)); // price returned with 6 decimals of precision per docs
     }
 
-    let compPerDayUSD = compPerDay.toBigDecimal().div(exponentToBigDecimal(rewardDecimals)).times(compPriceUSD);
+    let compPerDayUSD = compPerDay.times(compPriceUSD);
+    let compPerDayBI = BigInt.fromString(
+      compPerDay.times(exponentToBigDecimal(DEFAULT_DECIMALS)).truncate(0).toString(),
+    );
 
     let compAmountArr = new Array<BigInt>();
-    compAmountArr.push(compPerDay);
-    compAmountArr.push(compPerDay);
+    compAmountArr.push(compPerDayBI);
+    compAmountArr.push(compPerDayBI);
     market.rewardTokenEmissionsAmount = compAmountArr;
 
     let compAmountUSDArr = new Array<BigDecimal>();
@@ -530,6 +533,9 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
     market.rewardTokenEmissionsUSD = compAmountUSDArr;
 
     market.save();
+  } else {
+    // still run getRewardsPerDay() in order to keep accurate Circular Buffer
+    getRewardsPerDay(event.block.timestamp, event.block.number, BIGDECIMAL_ZERO, RewardIntervalType.BLOCK);
   }
 }
 
@@ -560,8 +566,9 @@ export function updateMarketRates(market: Market): void {
 
 export function convertBlockRateToAPY(blockRate: BigInt): BigDecimal {
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
+  let blocksPerDay = getOrCreateCircularBuffer().blocksPerDay;
 
-  let blockRateCalc = blockRate.toBigDecimal().div(mantissaFactorBD).times(BLOCKS_PER_DAY).plus(BIGDECIMAL_ONE);
+  let blockRateCalc = blockRate.toBigDecimal().div(mantissaFactorBD).times(blocksPerDay).plus(BIGDECIMAL_ONE);
 
   // take the power of BigDecimals
   blockRateCalc = powerBigDecimal(blockRateCalc, DAYS_PER_YEAR);
