@@ -46,7 +46,7 @@ export function handleTransfer(event: Transfer): void {
 
 export function handleSync(event: Sync): void {
   updateInputTokenBalances(event.address, event.params.reserve0, event.params.reserve1)
-  updateTvlAndTokenPrices(event.address)
+  updateTvlAndTokenPrices(event.address, event.block.number)
 }
 
 export function handleMint(event: Mint): void {

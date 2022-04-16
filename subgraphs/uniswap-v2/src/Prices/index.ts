@@ -27,19 +27,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     BigInt.fromI32(6).toI32() as u8
   ).toBigDecimal();
 
-  // 1. Yearn Lens Oracle
-  let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
-  if (!yearnLensPrice.reverted) {
-    log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(decimals).toString(),
-    ]);
-    return CustomPriceType.initialize(
-      yearnLensPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
-  }
-
   // 2. ChainLink Feed Registry
   let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
   if (!chainLinkPrice.reverted) {
@@ -49,6 +36,29 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return CustomPriceType.initialize(
       chainLinkPrice.usdPrice,
+      BigInt.fromI32(6)
+    );
+  }
+  
+  // 6. Uniswap Router
+  let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
+  if (!uniswapPrice.reverted) {
+    log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      uniswapPrice.usdPrice.div(decimals).toString(),
+    ]);
+    return CustomPriceType.initialize(uniswapPrice.usdPrice, BigInt.fromI32(6));
+  }
+
+  // 1. Yearn Lens Oracle
+  let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
+  if (!yearnLensPrice.reverted) {
+    log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      yearnLensPrice.usdPrice.div(decimals).toString(),
+    ]);
+    return CustomPriceType.initialize(
+      yearnLensPrice.usdPrice,
       BigInt.fromI32(6)
     );
   }
@@ -93,16 +103,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       curvePrice.usdPrice.div(decimals).toString(),
     ]);
     return CustomPriceType.initialize(curvePrice.usdPrice, BigInt.fromI32(6));
-  }
-
-  // 6. Uniswap Router
-  let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
-  if (!uniswapPrice.reverted) {
-    log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(decimals).toString(),
-    ]);
-    return CustomPriceType.initialize(uniswapPrice.usdPrice, BigInt.fromI32(6));
   }
 
   // 7. SushiSwap Router

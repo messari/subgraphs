@@ -210,9 +210,6 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Bytes, 
   let amount0TotalConverted = convertTokenToDecimal(amount0Total, token0.decimals)
   let amount1TotalConverted = convertTokenToDecimal(amount1Total, token1.decimals)
 
-  // ETH/USD prices
-  let ether = getOrCreateEtherHelper()
-
   let token0USD = tokenTracker0.derivedUSD.times(amount0TotalConverted)
   let token1USD = tokenTracker1.derivedUSD.times(amount1TotalConverted)
 
@@ -220,7 +217,7 @@ export function createSwapHandleVolumeAndFees(event: ethereum.Event, to: Bytes, 
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
 
   // only accounts for volume through white listed tokens
-  let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, tokenTracker0 as _TokenTracker, amount1TotalConverted, tokenTracker1 as _TokenTracker, poolAmounts as _LiquidityPoolAmount)
+  let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, tokenTracker0 as _TokenTracker, amount1TotalConverted, tokenTracker1 as _TokenTracker)
 
   let tradingFee = getLiquidityPoolFee(pool.fees[0])
   let protocolFee = getLiquidityPoolFee(pool.fees[1])

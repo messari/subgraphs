@@ -100,7 +100,7 @@ export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5")
 export let MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString('400000')
 
 // minimum liquidity for price to get tracked
-export let MINIMUM_LIQUIDITY_THRESHOLD_ETH = BigDecimal.fromString('1')
+export let MINIMUM_ETH_LOCKED = BigDecimal.fromString('2')
 
 ///////
 //////////////

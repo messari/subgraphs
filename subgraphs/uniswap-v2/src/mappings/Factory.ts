@@ -5,7 +5,6 @@ import { PROTOCOL_FEE_TO_OFF, PROTOCOL_FEE_TO_ON, LP_FEE_TO_OFF, LP_FEE_TO_ON, Z
 import { getLiquidityPool, getLiquidityPoolFee, getOrCreateDex, getOrCreateLPToken, getOrCreateToken, getOrCreateTokenTracker } from '../common/getters'
 import { updateTokenWhitelists } from '../common/updateMetrics'
 import { createLiquidityPool } from '../common/creators'
-import { getPriceUsdc } from '../Prices/routers/UniswapRouter'
 
 export function handleNewPair(event: PairCreated): void {
   let protocol = getOrCreateDex()
@@ -17,27 +16,6 @@ export function handleNewPair(event: PairCreated): void {
 
   let tokenTracker0 = getOrCreateTokenTracker(event.params.token0)
   let tokenTracker1 = getOrCreateTokenTracker(event.params.token1)
-
-  // Using function getUsdPricePerToken(tokenAddr: Address)
-  let fetchPrice0 = getPriceUsdc(Address.fromBytes(token0.id), protocol.network);
-  if (!fetchPrice0.reverted) {
-    tokenTracker0.derivedUSD = fetchPrice0.usdPrice.div(
-      fetchPrice0.decimals.toBigDecimal()
-    );
-  } else {
-    // default value of this variable, if reverted is BigDecimal Zero
-    tokenTracker0.derivedUSD = fetchPrice0.usdPrice
-  }
-
-  let fetchPrice1 = getPriceUsdc(Address.fromBytes(token0.id), protocol.network);
-  if (!fetchPrice1.reverted) {
-    tokenTracker1.derivedUSD = fetchPrice1.usdPrice.div(
-      fetchPrice1.decimals.toBigDecimal()
-    );
-  } else {
-    // default value of this variable, if reverted is BigDecimal Zero
-    tokenTracker1.derivedUSD = fetchPrice1.usdPrice
-  }
 
   updateTokenWhitelists(tokenTracker0, tokenTracker1, event.params.pair)
 
