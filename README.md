@@ -31,12 +31,12 @@
 
 ### Introductory
 
-- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
+- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
 - Query subgraphs using GraphQL: https://thegraph.com/docs/en/developer/graphql-api/
-- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
-- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
+- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
+- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
 - Creating a subgraph: https://thegraph.com/docs/en/developer/create-subgraph-hosted/
-- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
+- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
 
 ### Intermediate
 
@@ -57,12 +57,6 @@
   - Performance tips and tricks (for both mappings and queries)
 - [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
 
-## Common Errors
-
-- Creating a github PR
-  - If you fork the repo and initialize the subgraph within the subgraph subfolder you are working on (i.e. running 'graph init' *inside* the aave-v2 subfolder), the folder will be set as a git 'submodule' and thus any pushes you make to the forked repo will not include any local changes made. 
-    - To prevent this, make sure to delete the hidden .git folder that gets created upon running 'graph init' in your subgraph directory so that git does not recognize your subgraph as a submodule. You may need to enable your Finder tool to 'show hidden files and folders' when looking for the .git folder in your subgraph directory. 
-    
 ## Development Status
 
 🔨 = In progress.  
