@@ -31,12 +31,12 @@
 
 ### Introductory
 
-- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
+- Learn the basics of GraphQL: [https://graphql.org/learn/](https://graphql.org/learn/)
 - Query subgraphs using GraphQL: https://thegraph.com/docs/en/developer/graphql-api/
-- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
-- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
+- Get familiar with The Graph: [https://thegraph.academy/developers/](https://thegraph.academy/developers/)
+- Defining a subgraph: [https://thegraph.academy/developers/defining-a-subgraph/](https://thegraph.academy/developers/defining-a-subgraph/)
 - Creating a subgraph: https://thegraph.com/docs/en/developer/create-subgraph-hosted/
-- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
+- Deploying a subgraph using The Graph Studio: [https://thegraph.com/docs/en/studio/deploy-subgraph-studio/](https://thegraph.com/docs/en/studio/deploy-subgraph-studio/)
 
 ### Intermediate
 
@@ -57,55 +57,55 @@
   - Performance tips and tricks (for both mappings and queries)
 - [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
 
-## Common Errors
-
-- Creating a github PR
-  - If you fork the repo and initialize the subgraph within the subgraph subfolder you are working on (i.e. running 'graph init' *inside* the aave-v2 subfolder), the folder will be set as a git 'submodule' and thus any pushes you make to the forked repo will not include any local changes made. 
-    - To prevent this, make sure to delete the hidden .git folder that gets created upon running 'graph init' in your subgraph directory so that git does not recognize your subgraph as a submodule. You may need to enable your Finder tool to 'show hidden files and folders' when looking for the .git folder in your subgraph directory. 
-    
 ## Development Status
 
 🔨 = In progress.  
 🛠 = Feature complete. Additional testing required.  
 ✅ = Production-ready.  
 
-| Feature |  Status | Versions † |
-| ------- |  :------: | --- |
+| Protocol |  Status | Versions † | Deployments |
+| ------- |  :------: | --- | --- |
 | **DEX AMM** |    | |
-| [Uniswap v2](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 |
-| [Uniswap v3](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 |
-| Sushiswap | 🔨 | |
-| Curve | 🔨 | |
-| Balancer v2 | 🔨 | |
-| Bancor v2 | 🔨 | |
-| Bancor v3 | | |
-| DODO v2 | 🔨 | |
-| **Lending Protocols** |    |
-| Aave v2 | 🔨  | |
-| Compound | 🔨  | |
-| CREAM | 🔨  | |
-| Geist | 🔨  | |
-| Benqi | 🔨  | |
-| TrueFi |   | |
-| Maple Finance |   | |
-| **CDPs** |    |
-| MakerDAO |   | |
-| Abracadabra |   | |
-| Liquity | 🔨 | |
-| Alchemix |   | |
-| QiDAO |   | |
-| Inverse Finance |   | |
-| **Yield Aggregators** |     |
-| Yearn v2 | 🔨 | |
-| Convex Finance | 🔨  | |
-| Badger DAO | 🔨 | |
-| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 |
-| Beefy Finance | 🔨 | |
-| Autofarm |  | |
-| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 |
-| Harvest Finance | 🔨  | |
-| Vesper Finance | 🔨 | |
-| Belt Finance | 🔨 | |
-| Pancakebunny | 🔨 | |
+| [Apeswap](https://apeswap.finance/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 |  [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
+| Balancer v2 | 🔨 | | |
+| Bancor v2 | 🔨 | | |
+| Bancor v3 | | | |
+| Curve | 🔨 | | |
+| DODO v2 | 🔨 | | |
+| Saddle Finance | 🔨 | | |
+| Sushiswap | 🔨 | | |
+| [Uniswap v2](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 | |
+| [Uniswap v3](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | |
+| **Lending Protocols** |    | |
+| Aave v2 | 🔨 | | |
+| Benqi | 🔨 | | |
+| Compound | 🛠 | | |
+| CREAM | 🔨 | | |
+| Geist | 🔨 | | |
+| Hundred Finance | 🔨 | | |
+| TrueFi |   | | |
+| Maple Finance | 🔨 | | |
+| **CDPs** |    | |
+| Abracadabra | 🛠  |  | |
+| Alchemix |   | | |
+| Inverse Finance |   | | |
+| Liquity | 🛠 | | |
+| MakerDAO | 🔨 | | |
+| QiDAO |   | | |
+| **Yield Aggregators** |     | |
+| Autofarm |  | | |
+| Badger DAO | 🔨 | | |
+| Beefy Finance | 🔨 | | |
+| Belt Finance | 🔨 | | |
+| Convex Finance | 🔨  | | |
+| Harvest Finance | 🔨  | | |
+| Liquid Driver | 🔨  | | |
+| Pancakebunny | 🔨 | | |
+| Reaper Farm | 🔨  | | |
+| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | |
+| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | |
+| Vesper Finance | 🔨 | | |
+| Yield Yak | 🔨 | | |
+| Yearn v2 | 🔨 | | |
 
 † Versions are schema version, subgraph version, methodology version respectively
