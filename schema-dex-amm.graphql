@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.1.1
+# Version: 1.1.2
 
 enum Network {
   ARBITRUM
@@ -188,7 +188,7 @@ type DexAmmProtocol implements Protocol @entity {
   ##### DexAmm-Specific #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]! @derivedFrom(field: "protocol")
+  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
