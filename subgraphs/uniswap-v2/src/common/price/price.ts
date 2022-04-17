@@ -103,17 +103,17 @@ export function getEthPriceInUSD(): BigDecimal {
 
   // both are whitelist tokens, return sum of both amounts
   if (WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {
-    return tokenAmount0.times(price0USD).plus(tokenAmount1.times(price1USD))
+    return (tokenAmount0.times(price0USD).plus(tokenAmount1.times(price1USD))).div(BIGDECIMAL_TWO)
   }
 
   // take double value of the whitelisted token amount
   if (WHITELIST.includes(tokenTracker0.id) && !WHITELIST.includes(tokenTracker1.id)) {
-    return tokenAmount0.times(price0USD).times(BIGDECIMAL_TWO)
+    return tokenAmount0.times(price0USD)
   }
 
   // take double value of the whitelisted token amount
   if (!WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {
-    return tokenAmount1.times(price1USD).times(BIGDECIMAL_TWO)
+    return tokenAmount1.times(price1USD)
   }
 
   // neither token is on white list, tracked amount is 0
