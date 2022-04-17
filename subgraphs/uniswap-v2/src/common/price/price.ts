@@ -98,10 +98,8 @@ export function getEthPriceInUSD(): BigDecimal {
   tokenTracker1: _TokenTracker
 ): BigDecimal {
 
-  let ether = getOrCreateEtherHelper()
-
-  let price0USD = tokenTracker0.derivedETH.times(ether.valueDecimal!)
-  let price1USD = tokenTracker1.derivedETH.times(ether.valueDecimal!)
+  let price0USD = tokenTracker0.derivedUSD
+  let price1USD = tokenTracker1.derivedUSD
 
   // both are whitelist tokens, return sum of both amounts
   if (WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {

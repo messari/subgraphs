@@ -142,7 +142,7 @@ export function updateTvlAndTokenPrices(poolAddress: Address, blockNumber: BigIn
       tokenTracker0.derivedUSD = fetchPrice0.usdPrice
     }
 
-    let fetchPrice1 = getUsdPricePerToken(Address.fromBytes(token0.id));
+    let fetchPrice1 = getUsdPricePerToken(Address.fromBytes(token1.id));
     if (!fetchPrice1.reverted) {
       tokenTracker1.derivedUSD = fetchPrice1.usdPrice.div(
         fetchPrice1.decimals.toBigDecimal()
@@ -152,15 +152,15 @@ export function updateTvlAndTokenPrices(poolAddress: Address, blockNumber: BigIn
       tokenTracker1.derivedUSD = fetchPrice1.usdPrice
     }
   } else {
-     let ether = getOrCreateEtherHelper()
-    ether.valueDecimal = getEthPriceInUSD()
-    tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
-    tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
+      let ether = getOrCreateEtherHelper()
+      ether.valueDecimal = getEthPriceInUSD()
+      tokenTracker0.derivedETH = findEthPerToken(tokenTracker0)
+      tokenTracker1.derivedETH = findEthPerToken(tokenTracker1)
 
-    tokenTracker0.derivedUSD = ether.valueDecimal!.times(tokenTracker0.derivedETH)
-    tokenTracker1.derivedUSD = ether.valueDecimal!.times(tokenTracker1.derivedETH)
+      tokenTracker0.derivedUSD = ether.valueDecimal!.times(tokenTracker0.derivedETH)
+      tokenTracker1.derivedUSD = ether.valueDecimal!.times(tokenTracker1.derivedETH)
 
-    ether.save()
+      ether.save()
   }
 
   // Subtract the old pool tvl
