@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.1.2
+# Version: 1.1.3
 
 enum Network {
   ARBITRUM
@@ -261,6 +261,9 @@ type LiquidityPool @entity {
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
+  
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
