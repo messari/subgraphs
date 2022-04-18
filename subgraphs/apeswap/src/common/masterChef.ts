@@ -3,15 +3,14 @@ import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
 import {
   BIGINT_ZERO,
-  BSC_SECONDS_PER_BLOCK,
   SECONDS_PER_DAY,
   ZERO_ADDRESS,
-} from "../utils/constant";
-import { updateLpWithReward } from "./pool";
+} from "./constants";
+import { updateLpWithReward } from "./updateMetrics";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
-  let lpTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
-  let rewardTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
+  let lpTokenAddress = ZERO_ADDRESS;
+  let rewardTokenAddress = ZERO_ADDRESS;
   let rewardTokenPerSecond: BigInt = BIGINT_ZERO;
   let totalAllocPoint: BigInt = BIGINT_ZERO;
   let poolAllocPoint: BigInt = BIGINT_ZERO;
@@ -59,8 +58,8 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
 }
 
 export function handleReward(event: ethereum.Event, pid: BigInt): void {
-  let lpTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
-  let rewardTokenAddress: Address = Address.fromString(ZERO_ADDRESS);
+  let lpTokenAddress = ZERO_ADDRESS;
+  let rewardTokenAddress = ZERO_ADDRESS;
   let totalAllocPoint: BigInt = BIGINT_ZERO;
   let poolAllocPoint: BigInt = BIGINT_ZERO;
   let lastRewardBlock: BigInt = BIGINT_ZERO;
@@ -104,11 +103,6 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
     .times(poolAllocPoint)
     .div(totalAllocPoint);
 
-  // Calculate Reward emission per day
-  // A block is estimated to be produced approximately every 5secs
-  let rewardTokenPerSecond = rewardToken.div(BSC_SECONDS_PER_BLOCK);
-  let rewardTokenPerDay = rewardTokenPerSecond.times(
-    BigInt.fromI32(SECONDS_PER_DAY),
-  );
+
   updateLpWithReward(lpTokenAddress, rewardTokenAddress, rewardTokenPerDay);
 }

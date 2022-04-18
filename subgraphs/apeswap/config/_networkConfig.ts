@@ -6,11 +6,16 @@ import { toBytesArray, toPercentage } from "../src/common/utils/utils";
 let PROTOCOL_NAME_TEMP: string 
 let PROTOCOL_SLUG_TEMP: string
 let NETWORK_TEMP: string; // The deployed network(e.g BSC or Polygon )
+
 let FACTORY_ADDRESS_TEMP: string; // factory address of the protocol in the network
 let FACTORY_CONTRACT_TEMP: Factory; // Factory Contract of protocol in the network
+
 let TRADING_FEE_TEMP: BigDecimal; // trading fee of the protocol in the network
-let PROTOCOL_FEE_TEMP: BigDecimal; // protocol fee of the protocol in the network
-let LP_FEE_TEMP: BigDecimal; // supply fee of the protocol in the network
+let PROTOCOL_FEE_TO_ON_TEMP: BigDecimal; // protocol fee of the protocol in the network when protocol fee is on
+let LP_FEE_TO_ON_TEMP: BigDecimal; // supply fee of the protocol in the network when protocol fee is off
+let PROTOCOL_FEE_TO_OFF_TEMP: BigDecimal; // protocol fee of the protocol in the network when protocol fee is on
+let LP_FEE_TO_OFF_TEMP: BigDecimal; // supply fee of the protocol in the network when protocol fee is off
+
 let NATIVE_TOKEN_TEMP: string; // Address of wrapped native token
 let WHITELIST_TOKENS_TEMP: string[]; // A tokens whose amounts should contribute to tracked volume and liquidity
 let STABLE_COINS_TEMP: string[] // A list of stable coins
@@ -20,11 +25,16 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   PROTOCOL_NAME_TEMP = "Apeswap";
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = SchemaNetwork.POLYGON
+  
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
+  
   TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("0.2"));
-  PROTOCOL_FEE_TEMP = toPercentage(BigDecimal.fromString("0.15"));
-  LP_FEE_TEMP = toPercentage(BigDecimal.fromString("0.05"));
+  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.15"));
+  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.05"));
+  PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
+  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
+  
   NATIVE_TOKEN_TEMP = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
   WHITELIST_TOKENS_TEMP = [
     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
@@ -52,11 +62,16 @@ else {
   PROTOCOL_NAME_TEMP = "Apeswap";
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = SchemaNetwork.BSC
+
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP= Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
+  
   TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("0.2"));
-  PROTOCOL_FEE_TEMP = toPercentage(BigDecimal.fromString("0.05"));
-  LP_FEE_TEMP = toPercentage(BigDecimal.fromString("0.15"));
+  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.05"));
+  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.15"));
+  PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
+  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
+ 
   NATIVE_TOKEN_TEMP = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
   WHITELIST_TOKENS_TEMP = [
     "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
@@ -88,11 +103,16 @@ export namespace NetworkConfigs {
   export const PROTOCOL_NAME = PROTOCOL_NAME_TEMP;
   export const PROTOCOL_SLUG = PROTOCOL_SLUG_TEMP;
   export const NETWORK = NETWORK_TEMP;
+
   export const FACTORY_ADDRESS = Bytes.fromHexString(FACTORY_ADDRESS_TEMP);
   export const FACTORY_CONTRACT = FACTORY_CONTRACT_TEMP;
+  
   export const TRADING_FEE = TRADING_FEE_TEMP;
-  export const PROTOCOL_FEE = PROTOCOL_FEE_TEMP;
-  export const LP_FEE = LP_FEE_TEMP;
+  export const PROTOCOL_FEE_TO_ON = PROTOCOL_FEE_TO_ON_TEMP;
+  export const LP_FEE_TO_ON = LP_FEE_TO_ON_TEMP;
+  export const PROTOCOL_FEE_TO_OFF = PROTOCOL_FEE_TO_OFF_TEMP;
+  export const LP_FEE_TO_OFF = LP_FEE_TO_OFF_TEMP;
+  
   export const NATIVE_TOKEN = Bytes.fromHexString(NATIVE_TOKEN_TEMP)
   export const WHITELIST_TOKENS = toBytesArray(WHITELIST_TOKENS_TEMP)
   export const STABLE_COINS = toBytesArray(STABLE_COINS_TEMP)

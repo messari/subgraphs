@@ -8,7 +8,7 @@ import {
   Withdraw as WithdrawEventV2,
   EmergencyWithdraw as EmergencyWithdrawV2,
 } from "../../generated/MasterChef/MasterChefV2";
-import { handleReward, handleRewardV2 } from "../helpers/masterChef";
+import { handleReward, handleRewardV2 } from "../common/masterChef";
 
 export function handleDeposit(event: DepositEvent): void {
   let pid = event.params.pid;

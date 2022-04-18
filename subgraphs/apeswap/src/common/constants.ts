@@ -121,3 +121,5 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
+
+export const ZERO_ADDRESS = Bytes.fromHexString('0x0000000000000000000000000000000000000000')

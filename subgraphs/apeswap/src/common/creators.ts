@@ -16,29 +16,30 @@ import {
 } from "../../generated/schema"
 import { Factory as FactoryContract } from '../../generated/templates/Pair/Factory'
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, FACTORY_ADDRESS, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, PROTOCOL_FEE_TO_OFF, TRADING_FEE, BIGDECIMAL_HUNDRED, LP_FEE_TO_OFF } from "./constants"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED } from "./constants"
 import { getTrackedVolumeUSD } from "./price/price"
 import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters"
 import { convertTokenToDecimal } from "./utils/utils"
 import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics"
 import { savePoolId } from "./handlers"
+import { NetworkConfigs } from "../../config/_networkConfig"
 
-export let factoryContract = FactoryContract.bind(Address.fromBytes(FACTORY_ADDRESS))
+export let factoryContract = FactoryContract.bind(Address.fromBytes(NetworkConfigs.FACTORY_ADDRESS))
 
 // rebass tokens, dont count in tracked volume
 
 function createPoolFees(poolAddress: Bytes): Bytes[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat(Bytes.fromHexString('x-lp-fee')))
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE
-  poolLpFee.feePercentage = LP_FEE_TO_OFF
+  poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_ON
 
   let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat(Bytes.fromHexString('x-protocol-fee')))
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE
-  poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF
+  poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_ON
 
   let poolTradingFee = new LiquidityPoolFee(poolAddress.concat(Bytes.fromHexString('xtrading-fee')))
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE
-  poolTradingFee.feePercentage = TRADING_FEE
+  poolTradingFee.feePercentage = NetworkConfigs.TRADING_FEE
 
   poolLpFee.save()
   poolProtocolFee.save()
@@ -133,7 +134,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 
   deposit.hash = event.transaction.hash
   deposit.logIndex = logIndexI32
-  deposit.protocol = FACTORY_ADDRESS
+  deposit.protocol = NetworkConfigs.FACTORY_ADDRESS
   deposit.to = pool.id
   deposit.from = transfer.sender
   deposit.blockNumber = event.block.number
@@ -171,7 +172,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
 
   withdrawal.hash = event.transaction.hash
   withdrawal.logIndex = event.logIndex.toI32()
-  withdrawal.protocol = FACTORY_ADDRESS
+  withdrawal.protocol = NetworkConfigs.FACTORY_ADDRESS
   withdrawal.to = transfer.sender
   withdrawal.from = pool.id
   withdrawal.blockNumber = event.block.number
