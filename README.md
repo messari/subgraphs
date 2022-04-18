@@ -75,7 +75,7 @@
 | Saddle Finance | 🔨 | | |
 | Sushiswap | 🔨 | | |
 | [Uniswap v2](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) |
-| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](https://messari.io/asset-images/51809842-fb42-470e-ab2d-1095334a5a4d/16.png?v=2)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](https://messari.io/asset-images/a288b358-f3d3-4ecd-aa30-c45c84f666ee/16.png?v=2)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
+| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
 | **Lending Protocols** |    | |
 | Aave v2 | 🔨 | | |
 | Benqi | 🔨 | | |
