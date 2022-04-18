@@ -6,12 +6,12 @@
 - Fork this repository
 - Add a folder under `subgraphs` with the name of the protocol you want to work on
 - Copy over the corresponding schema from the root folder. For example, if you are working on a yield aggregator, you should copy over `schema-yield.graphql` to your folder and rename it to `schema.graphql`. Note `schema-common.graphql` is used for schema design and reference, and should never be used for implementation
-- Build the subgraph within that folder
-- Submit a pull request to this repo after you are done
+- Build the subgraph within that folder. Feel free to use the [reference subgraph](./subgraphs/_reference_/) as a reference.
+- Submit a PR (pull request) to this repo after you are done. Make sure you submit your PR as a draft if it's a work-in-progress.
 
 ## Recommended Development Workflow
 
-- Start with understanding the protocol and how it works
+- Start with understanding the protocol. An easy start could be interacting with the protocol UI on testnets, check transaction details on Etherscan and pay attention to key events that are emitted
 - Go over the smart contracts. Identify the ones that we need to pull data from
   - Usually each protocol has a factory contract that's responsible for tracking other contracts (e.g. Uniswap's Factory contract, Aave's Lending Pool Registry, Yearn's Registry)
   - Also a pool/vault contract that's responsible for pool level bookkeeping and transactions (e.g. Uniswap's Pair contract, Yearn's Vault contract, Aave's Lending Pool contract)
@@ -20,7 +20,7 @@
   - For example, usually it's easier to start writing mappings for transactions and usage metrics
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio
-- For specific metrics (esp. financial metrics), please refer to our [methodology](https://docs.google.com/spreadsheets/d/1C5n13sN57WVTK0SJNoQR0qLjV6SAGrFwzJoMkq8nNos/). Feel free to comment in the spreadsheet if anything is unclear or incorrect.
+- For metrics calculation (e.g. revenue, fees, TVL), please refer to the `README.md` in the protocol's subgraph folder for methodology. There is also a broader explanation of how different fields are defined in the schema in `docs/Schema.md`. Feel free to reach out to me if anything isn't clear
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
@@ -56,3 +56,50 @@
 - Building ambitious subgraphs (Part II) https://www.youtube.com/watch?v=1-8AW-lVfrA
   - Performance tips and tricks (for both mappings and queries)
 - [Documentation for the graph-node](https://github.com/graphprotocol/graph-node/tree/master/docs)
+
+## Development Status
+
+🔨 = In progress.  
+🛠 = Feature complete. Additional testing required.  
+✅ = Production-ready.  
+
+| Feature |  Status | Versions † |
+| ------- |  :------: | --- |
+| **DEX AMM** |    | |
+| [Uniswap v2](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 |
+| [Uniswap v3](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 |
+| Sushiswap | 🔨 | |
+| Curve | 🔨 | |
+| Balancer v2 | 🔨 | |
+| Bancor v2 | 🔨 | |
+| Bancor v3 | | |
+| DODO v2 | 🔨 | |
+| **Lending Protocols** |    |
+| Aave v2 | 🔨  | |
+| Compound | 🔨  | |
+| CREAM | 🔨  | |
+| Geist | 🔨  | |
+| Benqi | 🔨  | |
+| TrueFi |   | |
+| Maple Finance |   | |
+| **CDPs** |    |
+| MakerDAO |   | |
+| Abracadabra |   | |
+| Liquity | 🔨 | |
+| Alchemix |   | |
+| QiDAO |   | |
+| Inverse Finance |   | |
+| **Yield Aggregators** |     |
+| Yearn v2 | 🔨 | |
+| Convex Finance | 🔨  | |
+| Badger DAO | 🔨 | |
+| [Stake DAO](https://thegraph.com/hosted-service/subgraph/messari/stake-dao) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 |
+| Beefy Finance | 🔨 | |
+| Autofarm |  | |
+| [Tokemak](https://thegraph.com/hosted-service/subgraph/messari/tokemak) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 |
+| Harvest Finance | 🔨  | |
+| Vesper Finance | 🔨 | |
+| Belt Finance | 🔨 | |
+| Pancakebunny | 🔨 | |
+
+† Versions are schema version, subgraph version, methodology version respectively

@@ -1,0 +1,21 @@
+{
+  "name": "vesper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.29.0",
+    "@graphprotocol/graph-ts": "^0.26.0",
+    "fs-extra": "^10.0.1",
+    "lodash": "^4.17.21",
+    "mustache": "^4.2.0",
+    "vesper-metadata": "^2.60.0"
+  },
+  "scripts": {
+    "confgen": "node config_yaml_gen.js",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "allbuild": "yarn confgen && yarn codegen && yarn build",
+    "deploy": "graph deploy --product hosted-service jaideepdas/vesper-finance"
+  }
+}

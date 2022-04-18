@@ -1,0 +1,56 @@
+specVersion: 0.0.2
+description: Vesper finance subgraph
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+{{#pools}}
+  - kind: ethereum/contract
+    name: 'poolV{{version}}_{{name}}'
+    network: mainnet
+    source:
+      address: '{{address}}'
+      abi: PoolV{{version}}
+      startBlock: {{birthblock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV{{version}}
+          file: ./abis/pool-v{{version}}.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV{{version}}
+          file: ./abis/strategy-v{{version}}.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV{{version}}
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV{{version}}
+      blockHandlers:
+        - handler: handleBlockV{{version}}
+{{/pools}}
