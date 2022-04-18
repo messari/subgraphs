@@ -16,20 +16,13 @@ export class CustomPriceType {
 
   constructor() {
     this._usdPrice = new Wrapped(constants.BIGDECIMAL_ZERO);
-    this._decimals = new Wrapped(
-      constants.BIGINT_TEN.pow(constants.BIGINT_ZERO.toI32() as u8)
-    );
+    this._decimals = new Wrapped(constants.BIGINT_TEN.pow(constants.BIGINT_ZERO.toI32() as u8));
   }
 
-  static initialize(
-    _usdPrice: BigDecimal,
-    _decimals: BigInt = constants.BIGINT_ZERO
-  ): CustomPriceType {
+  static initialize(_usdPrice: BigDecimal, _decimals: BigInt = constants.BIGINT_ZERO): CustomPriceType {
     let result = new CustomPriceType();
     result._usdPrice = new Wrapped(_usdPrice);
-    result._decimals = new Wrapped(
-      constants.BIGINT_TEN.pow(_decimals.toI32() as u8)
-    );
+    result._decimals = new Wrapped(constants.BIGINT_TEN.pow(_decimals.toI32() as u8));
 
     return result;
   }

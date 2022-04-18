@@ -43,7 +43,7 @@ Following are some ways through which you can get the prices of tokens:
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { getUsdPricePerToken, getUsdPrice } from "../Oracle";
 
-// Method 1 
+// Method 1
 // Using function getUsdPricePerToken(tokenAddr: Address)
 
 let tokenPrice: BigDecimal;

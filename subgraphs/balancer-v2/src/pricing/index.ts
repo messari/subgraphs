@@ -1,10 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
 
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
@@ -23,9 +17,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
-  let decimals = constants.BIGINT_TEN.pow(
-      BigInt.fromI32(6).toI32() as u8
-  ).toBigDecimal();
+  let decimals = constants.BIGINT_TEN.pow(BigInt.fromI32(6).toI32() as u8).toBigDecimal();
 
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
@@ -34,10 +26,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       yearnLensPrice.usdPrice.div(decimals).toString(),
     ]);
-    return CustomPriceType.initialize(
-        yearnLensPrice.usdPrice,
-        BigInt.fromI32(6)
-    );
+    return CustomPriceType.initialize(yearnLensPrice.usdPrice, BigInt.fromI32(6));
   }
 
   // 2. ChainLink Feed Registry
@@ -47,42 +36,27 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       chainLinkPrice.usdPrice.div(decimals).toString(),
     ]);
-    return CustomPriceType.initialize(
-        chainLinkPrice.usdPrice,
-        BigInt.fromI32(6)
-    );
+    return CustomPriceType.initialize(chainLinkPrice.usdPrice, BigInt.fromI32(6));
   }
 
   // 3. CalculationsCurve
-  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
-      tokenAddr,
-      network
-  );
+  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddr, network);
   if (!calculationsCurvePrice.reverted) {
     log.warning("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
       calculationsCurvePrice.usdPrice.div(decimals).toString(),
     ]);
-    return CustomPriceType.initialize(
-        calculationsCurvePrice.usdPrice,
-        BigInt.fromI32(6)
-    );
+    return CustomPriceType.initialize(calculationsCurvePrice.usdPrice, BigInt.fromI32(6));
   }
 
   // 4. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
-      tokenAddr,
-      network
-  );
+  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, network);
   if (!calculationsSushiSwapPrice.reverted) {
     log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
       calculationsSushiSwapPrice.usdPrice.div(decimals).toString(),
     ]);
-    return CustomPriceType.initialize(
-        calculationsSushiSwapPrice.usdPrice,
-        BigInt.fromI32(6)
-    );
+    return CustomPriceType.initialize(calculationsSushiSwapPrice.usdPrice, BigInt.fromI32(6));
   }
 
   // 5. Curve Router
@@ -112,15 +86,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       sushiswapPrice.usdPrice.div(decimals).toString(),
     ]);
-    return CustomPriceType.initialize(
-        sushiswapPrice.usdPrice,
-        BigInt.fromI32(6)
-    );
+    return CustomPriceType.initialize(sushiswapPrice.usdPrice, BigInt.fromI32(6));
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
-    tokenAddr.toHexString(),
-  ]);
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
 
   return new CustomPriceType();
 }

@@ -6,6 +6,8 @@ import {
   LiquidityPoolFee,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
+  Swap,
+  PoolDailySnapshot,
 } from "../../generated/schema";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -38,7 +40,6 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.network = network;
     protocol.type = ProtocolType.EXCHANGE;
-
     protocol.save();
   }
   return protocol;
@@ -136,4 +137,45 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
   }
 
   return usageMetrics;
+}
+
+export function getOrCreateSwap(event: ethereum.Event, pool: LiquidityPool): Swap {
+  const id = event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString());
+  const protocol = getOrCreateDex();
+  let swap = Swap.load(id);
+
+  if (!swap) {
+    swap = new Swap(id);
+    swap.hash = event.transaction.hash.toHexString();
+    swap.logIndex = event.logIndex.toI32();
+    swap.from = event.transaction.from.toHexString();
+    swap.to = event.transaction.from.toHexString();
+    swap.blockNumber = event.block.number;
+    swap.timestamp = event.block.timestamp;
+    swap.protocol = protocol.id;
+    swap.pool = pool.id;
+  }
+
+  return swap;
+}
+
+export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPool): void {
+  // Number of days since Unix epoch
+  const daysSinceEpoch: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  const id = pool.id.concat("-").concat(daysSinceEpoch.toString());
+  let snapshot = PoolDailySnapshot.load(id);
+  if (!snapshot) {
+    snapshot = new PoolDailySnapshot(id);
+    snapshot.protocol = pool.protocol;
+    snapshot.pool = pool.id;
+    snapshot.inputTokenBalances = pool.inputTokenBalances;
+    pool.save();
+  }
+  snapshot.outputTokenSupply = pool.outputTokenSupply;
+  snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+  snapshot.totalVolumeUSD = pool.totalVolumeUSD;
+  snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
+  snapshot.save();
 }

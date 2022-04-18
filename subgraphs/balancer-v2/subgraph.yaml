@@ -20,6 +20,9 @@ dataSources:
         - AmmProtocol
         - Token
         - LiquidityPool
+        - _TokenPrice
+        - DailyActiveAccount
+        - Account
       abis:
         - name: Vault
           file: ./abis/Vault.json
