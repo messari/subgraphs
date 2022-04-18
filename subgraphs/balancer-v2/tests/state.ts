@@ -12,6 +12,7 @@ mockMethod(usdcWethPoolAddress, "name", [], [], "string", [ethereum.Value.fromSt
 mockMethod(usdcWethPoolAddress, "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 mockMethod(usdcWethPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(18)], false);
 mockMethod(usdcWethPoolAddress, "getNormalizedWeights", [], [], "uint256[]", [], true);
+mockMethod(usdcWethPoolAddress, "totalSupply", [], [], "uint256", [ethereum.Value.fromI32(100000)], false);
 
 export const weth = new Token("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
 mockMethod(Address.fromString(weth.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
@@ -35,6 +36,7 @@ mockMethod(umaUsdcPoolAddress, "name", [], [], "string", [ethereum.Value.fromStr
 mockMethod(umaUsdcPoolAddress, "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 mockMethod(umaUsdcPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(18)], false);
 mockMethod(umaUsdcPoolAddress, "getNormalizedWeights", [], [], "uint256[]", [], true);
+mockMethod(umaUsdcPoolAddress, "totalSupply", [], [], "uint256", [ethereum.Value.fromI32(100000)], false);
 
 export const uma = new Token("0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828");
 uma.save();
@@ -51,6 +53,7 @@ mockMethod(batWethPoolAddress, "decimals", [], [], "uint8", [ethereum.Value.from
 mockMethod(batWethPoolAddress, "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(batWethPoolAddress, "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 mockMethod(batWethPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(18)], false);
+mockMethod(batWethPoolAddress, "totalSupply", [], [], "uint256", [ethereum.Value.fromI32(100000)], false);
 mockMethod(
   batWethPoolAddress,
   "getNormalizedWeights",
@@ -81,6 +84,7 @@ mockMethod(umaWethPoolAddress, "decimals", [], [], "uint8", [ethereum.Value.from
 mockMethod(umaWethPoolAddress, "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(umaWethPoolAddress, "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 mockMethod(umaWethPoolAddress, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(18)], false);
+mockMethod(umaWethPoolAddress, "totalSupply", [], [], "uint256", [ethereum.Value.fromI32(100000)], false);
 mockMethod(
   umaWethPoolAddress,
   "getNormalizedWeights",

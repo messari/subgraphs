@@ -22,6 +22,7 @@ import {
 } from "./constants";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
+import {log} from "matchstick-as";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());

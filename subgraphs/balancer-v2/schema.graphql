@@ -284,7 +284,7 @@ type DexAmmProtocol implements Protocol @entity {
   ##### DexAmm-Specific #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]! @derivedFrom(field: "protocol")
+  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and

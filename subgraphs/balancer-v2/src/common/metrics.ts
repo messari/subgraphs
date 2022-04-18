@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateDex,
   getOrCreateFinancials,
@@ -14,10 +14,11 @@ import { getUsdPricePerToken } from "../pricing";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
-  const dex = getOrCreateDex()
+  let dex = getOrCreateDex()
   let totalValueLocked = BIGDECIMAL_ZERO
   let totalVolumeUsd = BIGDECIMAL_ZERO
-  for (let i = 0; dex.pools.length; i++) {
+
+  for (let i = 0; i < dex.pools.length; i++) {
     let pool = LiquidityPool.load(dex.pools[i])
     if (pool) {
       totalValueLocked = totalValueLocked.plus(pool.totalValueLockedUSD)
