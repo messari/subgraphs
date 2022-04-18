@@ -50,7 +50,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 }
 
 export function updatePoolMetrics(pool: LiquidityPool): void {
-  let totalValueLocked = BigDecimal.zero();
+  let newPoolLiquidity = BigDecimal.zero();
   let tokenWithoutPrice = false;
   for (let i = 0; i < pool.inputTokens.length; i++) {
     let currentToken = Address.fromString(pool.inputTokens[i]);
@@ -60,7 +60,7 @@ export function updatePoolMetrics(pool: LiquidityPool): void {
     );
 
     if (isUSDStable(currentToken)) {
-      totalValueLocked = totalValueLocked.plus(currentTokenBalance);
+      newPoolLiquidity = newPoolLiquidity.plus(currentTokenBalance);
       continue;
     }
 
@@ -71,11 +71,19 @@ export function updatePoolMetrics(pool: LiquidityPool): void {
     }
 
     let currentTokenValueInUsd = valueInUSD(currentTokenBalance, Address.fromString(token.id));
-    totalValueLocked = totalValueLocked.plus(currentTokenValueInUsd);
+    newPoolLiquidity = newPoolLiquidity.plus(currentTokenValueInUsd);
   }
 
   if (tokenWithoutPrice) return;
-  pool.totalValueLockedUSD = totalValueLocked;
+
+  let oldPoolLiquidity = pool.totalValueLockedUSD
+  let liquidityChange = newPoolLiquidity.minus(oldPoolLiquidity)
+
+  let protocol = getOrCreateDex()
+  protocol.totalValueLockedUSD  = protocol.totalValueLockedUSD.plus(liquidityChange)
+  protocol.save()
+
+  pool.totalValueLockedUSD = newPoolLiquidity;
   pool.save();
 }
 
@@ -94,25 +102,23 @@ export function updateTokenPrice(
   let hasWeights = !getWeightCall.reverted;
   let weightTokenB: BigDecimal | null = null;
   let weightTokenA: BigDecimal | null = null;
+  let tokenAmountIn = scaleDown(tokenAAmount, tokenA);
+  let tokenAmountOut = scaleDown(tokenBAmount, tokenB);
 
   if (hasWeights) {
     weightTokenB = scaleDown(getWeightCall.value[tokenBIndex], null);
     weightTokenA = scaleDown(getWeightCall.value[tokenAIndex], null);
+    tokenAmountIn = scaleDown(pool.inputTokenBalances[tokenAIndex], tokenA)
+    tokenAmountOut = scaleDown(pool.inputTokenBalances[tokenBIndex], tokenB)
   }
 
-  let tokenAmountIn = scaleDown(tokenAAmount, tokenA);
-  let tokenAmountOut = scaleDown(tokenBAmount, tokenB);
-
   const tokenInfo = calculatePrice(
-      pool,
       tokenA,
       tokenAmountIn,
       weightTokenA,
-      tokenAIndex,
       tokenB,
       tokenAmountOut,
       weightTokenB,
-      tokenBIndex,
   );
 
   if (tokenInfo) {

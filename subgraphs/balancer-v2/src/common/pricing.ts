@@ -49,25 +49,13 @@ export class TokenInfo {
 }
 
 export function calculatePrice(
-  pool: LiquidityPool,
   tokenIn: Address,
   amountIn: BigDecimal,
   weightIn: BigDecimal | null,
-  tokenInIndex: i32,
   tokenOut: Address,
   amountOut: BigDecimal,
   weightOut: BigDecimal | null,
-  tokenOutIndex: i32,
 ): TokenInfo | null {
-  if (weightIn && weightOut) {
-    /**
-     * As the swap is with a WeightedPool, we can easily calculate the spot price between the two tokens
-     * based on the pool's weights and updated balances after the swap.
-     * Otherwise, we can get a simple measure of the price from the ratio of amount in vs amount out
-     */
-    amountIn = scaleDown(pool.inputTokenBalances[tokenInIndex], tokenIn)
-    amountOut = scaleDown(pool.inputTokenBalances[tokenOutIndex], tokenOut)
-  }
   // If both tokens are stable the price is one
   if (isUSDStable(tokenOut) && isUSDStable(tokenIn)) return null;
 
