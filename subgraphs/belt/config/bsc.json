@@ -1,0 +1,40 @@
+{
+  "chain": "bsc",
+  "vaults": [
+    {
+      "name": "beltBTC",
+      "address": "0x51bd63F240fB13870550423D208452cA87c44444",
+      "startBlock": 6534653
+    },
+    {
+      "name": "beltETH",
+      "address": "0xAA20E8Cb61299df2357561C2AC2e1172bC68bc25",
+      "startBlock": 6536218
+    },
+    {
+      "name": "beltBNB",
+      "address": "0xa8Bb71facdd46445644C277F9499Dd22f6F0A30C",
+      "startBlock": 6699540
+    },
+    {
+      "name": "beltBUSD",
+      "address": "0x9171Bf7c050aC8B4cf7835e51F7b4841DFB2cCD0",
+      "startBlock": 6540911
+    },
+    {
+      "name": "beltUSDT",
+      "address": "0x55E1B1e49B969C018F2722445Cd2dD9818dDCC25",
+      "startBlock": 6540605
+    },
+    {
+      "name": "beltUSDC",
+      "address": "0x7a59bf07D529A5FdBab67D597d63d7D5a83E61E5",
+      "startBlock": 6540738
+    },
+    {
+      "name": "beltDAI",
+      "address": "0x9A86fc508a423AE8a243445dBA7eD5364118AB1D",
+      "startBlock": 6541024
+    }
+  ]
+}

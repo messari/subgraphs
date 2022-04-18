@@ -12,7 +12,7 @@ import {
 } from "../../generated/templates/Strategy/Strategy";
 
 import * as utils from "../common/utils";
-import { getUsdPriceOfToken } from "../modules/Price";
+import { getUsdPricePerToken } from "../Prices";
 import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 export function handleHarvested(event: HarvestedEvent): void {
@@ -57,12 +57,13 @@ export function handleHarvested(event: HarvestedEvent): void {
     let inputToken = Token.load(vault!.inputTokens[0]);
     let inputTokenAddress = Address.fromString(vault!.inputTokens[0]);
     let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
-    let inputTokenPrice = getUsdPriceOfToken(inputTokenAddress);
+    let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
 
     financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-      inputTokenPrice
+      inputTokenPrice.usdPrice
         .times(wantEarned.toBigDecimal())
         .div(inputTokenDecimals.toBigDecimal())
+        .div(inputTokenPrice.decimals.toBigDecimal())
     );
 
     financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
@@ -84,7 +85,7 @@ export function handleHarvested(event: HarvestedEvent): void {
         event.transaction.hash.toHexString(),
         event.address.toHexString(),
         wantEarned.toString(),
-        inputTokenPrice.toString(),
+        inputTokenPrice.usdPrice.toString(),
         financialMetrics.supplySideRevenueUSD.toString(),
         financialMetrics.protocolSideRevenueUSD.toString(),
       ]
