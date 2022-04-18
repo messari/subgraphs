@@ -31,6 +31,7 @@ export function getOrCreateProtocol(): YieldAggregator {
   protocol.totalUniqueUsers = 0;
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
   protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
+  protocol._vaultIds = [];
   protocol.save();
 
   return protocol;
