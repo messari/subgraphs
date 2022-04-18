@@ -11,7 +11,7 @@ dataSources:
       startBlock: 11360920
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - AddressesProviderRegistered
@@ -32,7 +32,7 @@ templates:
       abi: LendingPoolAddressesProvider
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - LendingPoolAddressesProvider
@@ -61,7 +61,7 @@ templates:
       abi: LendingPool
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Block
@@ -83,8 +83,12 @@ templates:
           file: ./abis/StableDebtToken.json
         - name: LendingPool
           file: ./abis/LendingPool.json
-        - name: IERC20
-          file: ./abis/IERC20.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
       eventHandlers:
@@ -112,7 +116,7 @@ templates:
       abi: LendingPoolConfigurator
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Block
@@ -132,8 +136,12 @@ templates:
           file: ./abis/LendingPoolConfigurator.json
         - name: LendingPool
           file: ./abis/LendingPool.json
-        - name: IERC20
-          file: ./abis/IERC20.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
       eventHandlers:
@@ -159,7 +167,7 @@ templates:
       abi: AToken
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - AToken
@@ -170,8 +178,6 @@ templates:
           file: ./abis/AaveIncentivesController.json
         - name: LendingPool
           file: ./abis/LendingPool.json
-        - name: IERC20
-          file: ./abis/IERC20.json
         - name: IPriceOracleGetter
           file: ./abis/IPriceOracleGetter.json
       eventHandlers:

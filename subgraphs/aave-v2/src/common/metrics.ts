@@ -1,7 +1,11 @@
 import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
-import { _Account, _DailyActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
-import { FACTORY_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreateUsageMetricSnapshot } from "./getters";
+import { Account, DailyActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
+import { PROTOCOL_ADDRESS, SECONDS_PER_DAY } from "./constants";
+import {
+  // getOrCreateDexAmm,
+  // getOrCreatePoolDailySnapshot,
+  getOrCreateUsageMetricSnapshot
+} from "./getters";
 
 // These are meant more as boilerplates that'll be filled out depending on the
 // subgraph, and will be different from subgraph to subgraph, hence left
@@ -22,36 +26,36 @@ export function updateFinancials(event: ethereum.Event): void {
 
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = getOrCreateUsageMetricSnapshot(event);
+  // let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  // let usageMetrics = getOrCreateUsageMetricSnapshot(event);
 
-  // Update the block number and timestamp to that of the last transaction of that day
-  usageMetrics.blockNumber = event.block.number;
-  usageMetrics.timestamp = event.block.timestamp;
-  usageMetrics.dailyTransactionCount += 1;
+  // // Update the block number and timestamp to that of the last transaction of that day
+  // usageMetrics.blockNumber = event.block.number;
+  // usageMetrics.timestamp = event.block.timestamp;
+  // usageMetrics.dailyTransactionCount += 1;
 
-  let accountId = from.toHexString();
-  let account = _Account.load(accountId);
-  let protocol = getOrCreateDexAmm();
-  if (!account) {
-    account = new _Account(accountId);
-    account.save();
+  // let accountId = from.toHexString();
+  // let account = Account.load(accountId);
+  // let protocol = getOrCreateDexAmm();
+  // if (!account) {
+  //   account = new Account(accountId);
+  //   account.save();
 
-    protocol.totalUniqueUsers += 1;
-    protocol.save();
-  }
-  usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
+  //   protocol.totalUniqueUsers += 1;
+  //   protocol.save();
+  // }
+  // usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
 
-  // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
-  if (!dailyActiveAccount) {
-    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
-    dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1;
-  }
+  // // Combine the id and the user address to generate a unique user id for the day
+  // let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
+  // let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
+  // if (!dailyActiveAccount) {
+  //   dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
+  //   dailyActiveAccount.save();
+  //   usageMetrics.activeUsers += 1;
+  // }
 
-  usageMetrics.save();
+  // usageMetrics.save();
 }
 
 // Update UsagePoolDailySnapshot entity

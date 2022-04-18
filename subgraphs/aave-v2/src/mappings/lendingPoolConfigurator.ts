@@ -1,5 +1,4 @@
 import {
-  Address,
   BigDecimal,
   dataSource,
   log
@@ -16,24 +15,22 @@ import {
 } from '../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator';
 
 import {
-  initToken,
-  initMarket,
-  getAssetPriceInUSDC
+  initMarket
 } from './utilFunctions';
 
 import { Market } from '../../generated/schema';
 
 import { AToken as ATokenTemplate } from '../../generated/templates';
 
-import { BIGDECIMAL_ZERO } from '../common/constants';
+import { getOrCreateToken } from '../common/getters';
 
-export function getLendingPoolFromCtx (): string {
+export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
   const context = dataSource.context();
   return context.getString('lendingPool');
 }
 
-export function handleReserveInitialized (event: ReserveInitialized): void {
+export function handleReserveInitialized(event: ReserveInitialized): void {
   // This function handles market entity from reserve creation event
   // Attempt to load or create the market implementation
 
@@ -45,20 +42,15 @@ export function handleReserveInitialized (event: ReserveInitialized): void {
   );
 
   // Set the aToken contract from the param aToken
-  initToken(event.params.aToken);
+  getOrCreateToken(event.params.aToken);
   market.outputToken = event.params.aToken.toHexString();
-  market.outputTokenPriceUSD = getAssetPriceInUSDC(event.params.aToken);
-  // If the oracle returns 0 as the aToken price, default to the price of the underlying token
-  if (market.outputTokenPriceUSD.equals(BIGDECIMAL_ZERO)) {
-    market.outputTokenPriceUSD = getAssetPriceInUSDC(Address.fromString(market.id));
-  }
   // Set the s/vToken addresses from params
   market.sToken = event.params.stableDebtToken.toHexString();
   market.vToken = event.params.variableDebtToken.toHexString();
   market.save();
 }
 
-export function handleCollateralConfigurationChanged (event: CollateralConfigurationChanged): void {
+export function handleCollateralConfigurationChanged(event: CollateralConfigurationChanged): void {
   // Adjust market LTV, liquidation, and collateral data when a reserve's collateral configuration has changed
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleCollateralConfigurationChanged' + marketAddr, [])
@@ -70,7 +62,7 @@ export function handleCollateralConfigurationChanged (event: CollateralConfigura
   market.save();
 }
 
-export function handleBorrowingEnabledOnReserve (event: BorrowingEnabledOnReserve): void {
+export function handleBorrowingEnabledOnReserve(event: BorrowingEnabledOnReserve): void {
   // Upon enabling borrowing on this market, set market.canBorrowFrom to true
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleBorrowingEnabledReserve' + marketAddr, []);
@@ -79,7 +71,7 @@ export function handleBorrowingEnabledOnReserve (event: BorrowingEnabledOnReserv
   market.save();
 }
 
-export function handleBorrowingDisabledOnReserve (event: BorrowingDisabledOnReserve): void {
+export function handleBorrowingDisabledOnReserve(event: BorrowingDisabledOnReserve): void {
   // Upon disabling borrowing on this market, set market.canBorrowFrom to false
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleBorrowingDisabledOnReserve' + marketAddr, []);
@@ -88,7 +80,7 @@ export function handleBorrowingDisabledOnReserve (event: BorrowingDisabledOnRese
   market.save();
 }
 
-export function handleReserveActivated (event: ReserveActivated): void {
+export function handleReserveActivated(event: ReserveActivated): void {
   // Upon activating this lending pool, set market.isActive to true
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleReserveActivated' + marketAddr, []);
@@ -97,7 +89,7 @@ export function handleReserveActivated (event: ReserveActivated): void {
   market.save();
 }
 
-export function handleReserveDeactivated (event: ReserveDeactivated): void {
+export function handleReserveDeactivated(event: ReserveDeactivated): void {
   // Upon deactivating this lending pool, set market.isActive to false
   const marketAddr = event.params.asset.toHexString();
   log.info('MarketAddr in lendingPoolConfigurator.ts handleReserveDeactivated' + marketAddr, []);
@@ -106,7 +98,7 @@ export function handleReserveDeactivated (event: ReserveDeactivated): void {
   market.save();
 }
 
-export function handleReserveFactorChanged (event: ReserveFactorChanged): void {
+export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
   // Handle the reserve factor change event
   const marketAddr = event.params.asset.toHexString();
   log.info('RESERVE FACTOR MarketAddr in lendingPoolConfigurator.ts handleReserveFactorChanged ' + marketAddr + ' ' + event.params.factor.toString(), []);
