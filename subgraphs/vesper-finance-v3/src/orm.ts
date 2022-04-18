@@ -216,16 +216,15 @@ export function updateVaultSupply(vault: Vault): void {
   const tokenAddress = poolv3.token();
   const supply_call = poolv3.try_totalSupply();
   const value_call = poolv3.try_totalValue();
+  const debt_call = poolv3.try_totalDebt();
   const token = Erc20Token.bind(tokenAddress);
+  const aggregator = getOrCreateYieldAggregator();
 
   if (!supply_call.reverted) {
     const shareRate = getShareToTokenRateV3(poolv3);
     vault.outputTokenSupply = supply_call.value;
     vault.outputTokenPriceUSD = toUsd(
-      supply_call.value
-        .toBigDecimal()
-        .times(shareRate)
-        .div(getDecimalDivisor(poolv3.decimals())),
+      supply_call.value.toBigDecimal().times(shareRate),
       token.decimals(),
       tokenAddress
     );
@@ -239,8 +238,28 @@ export function updateVaultSupply(vault: Vault): void {
       token.decimals(),
       tokenAddress
     );
-    vault.totalValueLockedUSD = BigDecimal.zero();
+
     vault.save();
+
+    aggregator.totalVolumeUSD = aggregator.totalVolumeUSD.plus(
+      vault.totalVolumeUSD
+    );
+    aggregator.save();
+  }
+
+  if (!debt_call.reverted) {
+    vault.totalValueLockedUSD = toUsd(
+      debt_call.value.toBigDecimal(),
+      token.decimals(),
+      tokenAddress
+    );
+
+    vault.save();
+
+    aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD.plus(
+      vault.totalValueLockedUSD
+    );
+    aggregator.save();
   }
 }
 

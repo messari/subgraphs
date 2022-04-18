@@ -254,21 +254,21 @@ function handleWithdrawFee(
 
 // See handleWithdrawFee for explanation.
 export function handleWithdrawV3(event: Withdraw): void {
-  let poolAddress = dataSource.address();
-  let poolV3 = PoolV3.bind(poolAddress);
   getOrCreateWithdraw(event, dataSource.address());
-  handleWithdrawFee(
-    getPoolV3(poolAddress.toHexString()),
-    event,
-    poolV3.feeWhitelist(),
-    poolV3
-      .withdrawFee()
-      .toBigDecimal()
-      .div(BigDecimal.fromString("10000")),
-    getShareToTokenRateV3(poolV3),
-    poolV3.token(),
-    poolV3.decimals()
-  );
+  // let poolAddress = dataSource.address();
+  // let poolV3 = PoolV3.bind(poolAddress);
+  // handleWithdrawFee(
+  //   getPoolV3(poolAddress.toHexString()),
+  //   event,
+  //   poolV3.feeWhitelist(),
+  //   poolV3
+  //     .withdrawFee()
+  //     .toBigDecimal()
+  //     .div(BigDecimal.fromString("10000")),
+  //   getShareToTokenRateV3(poolV3),
+  //   poolV3.token(),
+  //   poolV3.decimals()
+  // );
 }
 
 // This handler hooks on transferring of the fees for V3 Pools
@@ -294,23 +294,23 @@ export function handleTransferV3(event: Transfer): void {
     return;
   }
   getOrCreateDeposit(event, dataSource.address());
-  let interestFees = event.params.value
-    .toBigDecimal()
-    .div(getDecimalDivisor(poolV3.decimals()));
-  log.info("interestFees={}", [interestFees.toString()]);
-  let revenue = calculateRevenue(
-    interestFees,
-    getShareToTokenRateV3(poolV3),
-    poolV3.token()
-  );
-  log.info(
-    "Interest fees distribution for tx {} in poolV3 {}: ProtocolRevenue={}, supplySideRevenue={}",
-    [
-      event.transaction.hash.toHexString(),
-      poolAddressHex,
-      revenue.protocolRevenue.toString(),
-      revenue.supplySideRevenue.toString(),
-    ]
-  );
-  saveRevenue(getPoolV3(poolAddressHex), revenue);
+  // let interestFees = event.params.value
+  //   .toBigDecimal()
+  //   .div(getDecimalDivisor(poolV3.decimals()));
+  // log.info("interestFees={}", [interestFees.toString()]);
+  // let revenue = calculateRevenue(
+  //   interestFees,
+  //   getShareToTokenRateV3(poolV3),
+  //   poolV3.token()
+  // );
+  // log.info(
+  //   "Interest fees distribution for tx {} in poolV3 {}: ProtocolRevenue={}, supplySideRevenue={}",
+  //   [
+  //     event.transaction.hash.toHexString(),
+  //     poolAddressHex,
+  //     revenue.protocolRevenue.toString(),
+  //     revenue.supplySideRevenue.toString(),
+  //   ]
+  // );
+  // saveRevenue(getPoolV3(poolAddressHex), revenue);
 }
