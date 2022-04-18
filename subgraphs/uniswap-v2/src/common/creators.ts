@@ -56,8 +56,8 @@ export function createLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   pool.protocol = protocol.id
   pool.inputTokens =  [token0.id, token1.id]
   pool.outputToken = LPtoken.id
-  pool.totalValueLockedUSD = BIGDECIMAL_ZERO
-  pool.totalVolumeUSD = BIGDECIMAL_ZERO
+  pool.currentTvlUSD = BIGDECIMAL_ZERO
+  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO]
   pool.outputTokenSupply = BIGINT_ZERO 
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO

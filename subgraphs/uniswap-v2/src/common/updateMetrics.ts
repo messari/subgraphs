@@ -15,7 +15,7 @@ export function updateFinancials(event: ethereum.Event): void {
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
-  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD
+  financialMetrics.currentTvlUSD = protocol.currentTvlUSD
 
   financialMetrics.save();
 }
@@ -31,8 +31,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = FACTORY_ADDRESS
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
   }
   
@@ -47,8 +47,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     account.save();
     totalUniqueUsers.valueInt += 1;
   }
-  usageMetrics.totalUniqueUsers = totalUniqueUsers.valueInt;
-  protocol.totalUniqueUsers = totalUniqueUsers.valueInt;
+  usageMetrics.cumulativeUniqueUsers = totalUniqueUsers.valueInt;
+  protocol.cumulativeUniqueUsers = totalUniqueUsers.valueInt;
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.concat(from)
@@ -56,7 +56,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   if (!dailyActiveAccount) {
     dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1
+    usageMetrics.dailyActiveUsers += 1
   }
 
   totalUniqueUsers.save();
@@ -72,7 +72,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   let pool = getLiquidityPool(event.address)
     
   // Update the block number and timestamp to that of the last transaction of that day
-  poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
+  poolMetrics.currentTvlUSD = pool.currentTvlUSD;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances
   poolMetrics.outputTokenSupply = pool.outputTokenSupply
   poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD
@@ -164,7 +164,7 @@ export function updateTvlAndTokenPrices(poolAddress: Address, blockNumber: BigIn
   }
 
   // Subtract the old pool tvl
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD)
+  protocol.currentTvlUSD = protocol.currentTvlUSD.minus(pool.currentTvlUSD)
 
   let inputToken0 = convertTokenToDecimal(pool.inputTokenBalances[0], token0.decimals)
   let inputToken1 = convertTokenToDecimal(pool.inputTokenBalances[1], token1.decimals)
@@ -173,8 +173,8 @@ export function updateTvlAndTokenPrices(poolAddress: Address, blockNumber: BigIn
   let newTvl = tokenTracker0.derivedUSD.times(inputToken0).plus(tokenTracker1.derivedUSD.times(inputToken1))
 
   // Add the new pool tvl
-  pool.totalValueLockedUSD =  newTvl
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl)
+  pool.currentTvlUSD =  newTvl
+  protocol.currentTvlUSD = protocol.currentTvlUSD.plus(newTvl)
 
   let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply!, DEFAULT_DECIMALS)
 
@@ -196,14 +196,14 @@ export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: Big
     let poolMetrics = getOrCreatePoolDailySnapshot(event);
     let financialMetrics = getOrCreateFinancials(event);
   
-    financialMetrics.totalVolumeUSD = financialMetrics.totalVolumeUSD.plus(trackedAmountUSD)
-    financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD)
-    financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(tradingFeeAmountUSD)
-    financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(protocolFeeAmountUSD)
+    financialMetrics.cumulativeVolumeUSD = financialMetrics.cumulativeVolumeUSD.plus(trackedAmountUSD)
+    financialMetrics.cumulativeTotalRevenueUSD = financialMetrics.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD)
+    financialMetrics.cumulativeSupplySideRevenueUSD = financialMetrics.cumulativeSupplySideRevenueUSD.plus(tradingFeeAmountUSD)
+    financialMetrics.cumulativeProtocolSideRevenueUSD = financialMetrics.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD)
 
-    poolMetrics.totalVolumeUSD = poolMetrics.totalVolumeUSD.plus(trackedAmountUSD)
-    pool.totalVolumeUSD = pool.totalVolumeUSD.plus(trackedAmountUSD)
-    protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(trackedAmountUSD)
+    poolMetrics.cumulativeVolumeUSD = poolMetrics.cumulativeVolumeUSD.plus(trackedAmountUSD)
+    pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD)
+    protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD)
   
     financialMetrics.save()
     poolMetrics.save();

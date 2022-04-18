@@ -27,9 +27,9 @@ export function getOrCreateDex(): DexAmmProtocol {
       protocol.schemaVersion = "1.1.0"
       protocol.subgraphVersion = "1.0.2"
       protocol.methodologyVersion = "1.0.0"
-      protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
-      protocol.totalVolumeUSD = BIGDECIMAL_ZERO
-      protocol.totalUniqueUsers = INT_ZERO
+      protocol.currentTvlUSD = BIGDECIMAL_ZERO
+      protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO
+      protocol.cumulativeUniqueUsers = INT_ZERO
       protocol.network = Network.ETHEREUM
       protocol.type = ProtocolType.EXCHANGE
   
@@ -86,8 +86,8 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
         usageMetrics = new UsageMetricsDailySnapshot(id);
         usageMetrics.protocol = FACTORY_ADDRESS;
   
-        usageMetrics.activeUsers = 0;
-        usageMetrics.totalUniqueUsers = 0;
+        usageMetrics.dailyActiveUsers = 0;
+        usageMetrics.cumulativeUniqueUsers = 0;
         usageMetrics.dailyTransactionCount = 0;
         usageMetrics.save()
     }
@@ -104,8 +104,8 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
         poolMetrics = new PoolDailySnapshot(event.address.concat(id));
         poolMetrics.protocol = FACTORY_ADDRESS;
         poolMetrics.pool = event.address;
-        poolMetrics.rewardTokenEmissionsAmount = []
-        poolMetrics.rewardTokenEmissionsUSD = []
+        poolMetrics.currentRewardTokenEmissionsAmount = []
+        poolMetrics.currentRewardTokenEmissionsUSD = []
 
         poolMetrics.save()
     }
@@ -124,11 +124,11 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
         financialMetrics = new FinancialsDailySnapshot(id);
         financialMetrics.protocol = FACTORY_ADDRESS;
   
-        financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO
-        financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
-        financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
-        financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
-        financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
+        financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO
+        financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO
+        financialMetrics.currentTvlUSD = BIGDECIMAL_ZERO
+        financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO
+        financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO
 
         financialMetrics.save()
     }
