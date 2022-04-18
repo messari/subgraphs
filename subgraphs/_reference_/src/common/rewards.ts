@@ -68,9 +68,7 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.
 * @param {BigInt} rewardType          - Describes whether rewards are given per block or timestamp
 * @returns {BigDecimal}               - Returns estimated blocks for specified rate
 */
-export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: BigInt, rewardRate: BigDecimal, rewardType: string): BigDecimal {
-    if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
-
+export function updateCircularBuffer(currentTimestamp: BigInt, currentBlockNumber: BigInt, rewardRate: BigDecimal, rewardType: string): BigDecimal {
     let circularBuffer = getOrCreateCircularBuffer()
 
     // Create entity for the current block
@@ -95,7 +93,8 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
         circularBuffer.save()
 
         // return because there is only 1 reference point.
-        return circularBuffer.blocksPerDay.times(rewardRate)
+        if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
+        else return circularBuffer.blocksPerDay.times(rewardRate)
     }
 
     // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
@@ -105,7 +104,8 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
     else recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO]
 
     if (currentTimestampI32 - recentSavedTimestamp <= TIMESTAMP_STORAGE_INTERVAL) {
-        return circularBuffer.blocksPerDay.times(rewardRate)
+        if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
+        else return circularBuffer.blocksPerDay.times(rewardRate)
     }
 
     blocks[circularBuffer.nextIndex] = currentTimestampI32
@@ -146,7 +146,8 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
 
     circularBuffer.save()
     
-    return rewardRate.times(circularBuffer.blocksPerDay)
+    if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
+    else return rewardRate.times(circularBuffer.blocksPerDay)
 }
 
 function getOrCreateCircularBuffer(): _CircularBuffer {
