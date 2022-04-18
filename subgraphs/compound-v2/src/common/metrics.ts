@@ -113,7 +113,6 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 
   // lending-specific vars
   marketMetrics.depositRate = market.depositRate;
-  marketMetrics.stableBorrowRate = market.stableBorrowRate;
   marketMetrics.variableBorrowRate = market.variableBorrowRate;
 
   marketMetrics.save();

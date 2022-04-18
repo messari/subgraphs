@@ -15,6 +15,7 @@ import {
   INT_ONE,
   INT_TWO,
   INT_ZERO,
+  DEFAULT_DECIMALS,
 } from "./utils/constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +156,7 @@ export function getRewardsPerDay(
   let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(unnormalizedBlockSpeed);
 
   // Update BlockTracker with new values.
-  circularBuffer.blocksPerDay = normalizedBlockSpeed;
+  circularBuffer.blocksPerDay = normalizedBlockSpeed.truncate(DEFAULT_DECIMALS);
   circularBuffer.blocks = blocks;
 
   circularBuffer.save();
@@ -179,7 +180,7 @@ export function getOrCreateCircularBuffer(): _CircularBuffer {
     circularBuffer.windowStartIndex = INT_ZERO;
     circularBuffer.nextIndex = INT_ZERO;
     circularBuffer.bufferSize = BUFFER_SIZE;
-    circularBuffer.blocksPerDay = STARTING_BLOCKS_PER_DAY;
+    circularBuffer.blocksPerDay = STARTING_BLOCKS_PER_DAY.truncate(DEFAULT_DECIMALS);
 
     circularBuffer.save();
   }

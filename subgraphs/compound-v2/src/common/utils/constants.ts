@@ -101,6 +101,8 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_ONEHUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
@@ -115,6 +117,7 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_ONEHUNDRED = new BigDecimal(BIGINT_ONEHUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -139,7 +142,7 @@ export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.19";
+export const SUBGRAPH_VERSION = "1.4.24";
 export const SCHEMA_VERSION = "1.1.0";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;

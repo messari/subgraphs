@@ -118,6 +118,7 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
     .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     .minus(BIGDECIMAL_ONE);
   protocol._liquidationPenalty = liquidationPenalty;
+  protocol.save();
 
   // set liquidation penalty for each market
   for (let i = 0; i < protocol._marketIds.length; i++) {

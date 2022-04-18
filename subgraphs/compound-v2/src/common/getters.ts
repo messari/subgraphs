@@ -93,7 +93,6 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.depositRate = BIGDECIMAL_ZERO;
-    marketMetrics.stableBorrowRate = BIGDECIMAL_ZERO;
     marketMetrics.variableBorrowRate = BIGDECIMAL_ZERO;
 
     marketMetrics.save();
