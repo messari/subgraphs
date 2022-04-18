@@ -1,7 +1,10 @@
-import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, Bytes, dataSource } from "@graphprotocol/graph-ts";
 import { Factory } from "../generated/Factory/Factory";
-import { SchemaNetwork, SubgraphNetwork, toPercentage } from "../src/utils/constant";
+import { SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
+import { toBytesArray, toPercentage } from "../src/common/utils/utils";
 
+let PROTOCOL_NAME_TEMP: string 
+let PROTOCOL_SLUG_TEMP: string
 let NETWORK_TEMP: string; // The deployed network(e.g BSC or Polygon )
 let FACTORY_ADDRESS_TEMP: string; // factory address of the protocol in the network
 let FACTORY_CONTRACT_TEMP: Factory; // Factory Contract of protocol in the network
@@ -14,9 +17,11 @@ let STABLE_COINS_TEMP: string[] // A list of stable coins
 let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token] oracle pools
 
 if (dataSource.network() == SubgraphNetwork.POLYGON) {
+  PROTOCOL_NAME_TEMP = "Apeswap";
+  PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = SchemaNetwork.POLYGON
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
-  FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_CONTRACT_TEMP));
+  FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
   TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("0.2"));
   PROTOCOL_FEE_TEMP = toPercentage(BigDecimal.fromString("0.15"));
   LP_FEE_TEMP = toPercentage(BigDecimal.fromString("0.05"));
@@ -44,9 +49,11 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
 }
 
 else {
+  PROTOCOL_NAME_TEMP = "Apeswap";
+  PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = SchemaNetwork.BSC
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
-  FACTORY_CONTRACT_TEMP= Factory.bind(Address.fromString(FACTORY_CONTRACT_TEMP));
+  FACTORY_CONTRACT_TEMP= Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
   TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("0.2"));
   PROTOCOL_FEE_TEMP = toPercentage(BigDecimal.fromString("0.05"));
   LP_FEE_TEMP = toPercentage(BigDecimal.fromString("0.15"));
@@ -78,15 +85,17 @@ else {
 }
 
 export namespace NetworkConfigs {
+  export const PROTOCOL_NAME = PROTOCOL_NAME_TEMP;
+  export const PROTOCOL_SLUG = PROTOCOL_SLUG_TEMP;
   export const NETWORK = NETWORK_TEMP;
-  export const FACTORY_ADDRESS = FACTORY_ADDRESS_TEMP;
+  export const FACTORY_ADDRESS = Bytes.fromHexString(FACTORY_ADDRESS_TEMP);
   export const FACTORY_CONTRACT = FACTORY_CONTRACT_TEMP;
   export const TRADING_FEE = TRADING_FEE_TEMP;
   export const PROTOCOL_FEE = PROTOCOL_FEE_TEMP;
   export const LP_FEE = LP_FEE_TEMP;
-  export const NATIVE_TOKEN = NATIVE_TOKEN_TEMP;
-  export const WHITELIST_TOKENS = WHITELIST_TOKENS_TEMP;
-  export const STABLE_COINS = STABLE_COINS_TEMP;
-  export const STABLE_ORACLE_POOLS = STABLE_ORACLE_POOLS_TEMP;
+  export const NATIVE_TOKEN = Bytes.fromHexString(NATIVE_TOKEN_TEMP)
+  export const WHITELIST_TOKENS = toBytesArray(WHITELIST_TOKENS_TEMP)
+  export const STABLE_COINS = toBytesArray(STABLE_COINS_TEMP)
+  export const STABLE_ORACLE_POOLS = toBytesArray(STABLE_ORACLE_POOLS_TEMP)
 
 }

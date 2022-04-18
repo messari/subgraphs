@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts';
 
 ////////////////////////
 ///// Schema Enums /////
@@ -9,25 +9,25 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
 export namespace SchemaNetwork {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM = "ARBITRUM";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
   export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
+  export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const NEAR = "NEAR";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
+  export const OPTIMISM = "OPTIMISM";
+  export const POLYGON = "POLYGON";
   export const XDAI = "XDAI";
 }
 
 // The network names corresponding to the ones in `dataSource.network()`
 // They should mainly be used for the ease of comparison.
-// Note that they cannot be used as enums since they are lower case.
 // See below for a complete list:
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace SubgraphNetwork {
@@ -71,72 +71,53 @@ export namespace LiquidityPoolFeeType {
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
+
 export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT";
-  export const BORROW = "BORROW";
-}
-export namespace TransferType {
-  export const MINT = "MINT";
-  export const BURN = "BURN";
+  export const DEPOSIT = "DEPOSIT"
+  export const BORROW = "BORROW"
 }
 
 export namespace HelperStoreType {
-  export const ETHER = 'ETHER'
-  export const USERS = 'USERS'
+  export const ETHER = Bytes.fromHexString('xETHER')
+  export const USERS = Bytes.fromHexString('xUSERS')
+  // Pool addresses are also stored in the HelperStore
 }
 
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const DEFAULT_DECIMALS: i32 = 18;
-export const HELPER_STORE_ID = "1"; // ID that track USD price of native token in helper store
-export const FEE_DECIMALS = 10;
-export const BSC_SECONDS_PER_BLOCK = BigInt.fromI32(5);
-export const INT_ZERO: i32 = 0;
-export const INT_ONE: i32 = 1;
-export const INT_TWO: i32 = 2;
-export const INT_FIVE: i32 = 5;
-export const INT_TEN: i32 = 10;
-export const INT_THOUSAND: i32 = 1000;
-export const STRING_ZERO = "0";
-export const STRING_ONE = "1";
-export const STRING_TWO = "2";
-export const STRING_TEN = "10";
-export const STRING_HUNDRED = "100";
-export let BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
-export let BIGINT_ONE = BigInt.fromI32(INT_ONE);
-export let BIGINT_THOUSAND = BigInt.fromI32(INT_THOUSAND);
-export let BIGDECIMAL_ZERO = BigDecimal.fromString(STRING_ZERO);
-export let BIGDECIMAL_ONE = BigDecimal.fromString(STRING_ONE);
-export let BIGDECIMAL_TWO = BigDecimal.fromString(STRING_TWO);
-export let BIGDECIMAL_HUNDRED = BigDecimal.fromString(STRING_HUNDRED);
+export namespace TransferType {
+  export const MINT = Bytes.fromHexString('MINT')
+  export const BURN = Bytes.fromHexString('BURN')
+  // Pool addresses are also stored in the HelperStore
+}
 
+
+export const DEFAULT_DECIMALS = 18;
+export const USDC_DECIMALS = 6;
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
+export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_THOUSAND = BigInt.fromI32(1000)
+export const BIGINT_MAX = BigInt.fromString(
+  '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+);
+
+export const INT_NEGATIVE_ONE = -1 as i32
+export const INT_ZERO = 0 as i32
+export const INT_ONE = 1 as i32
+export const INT_TWO = 2 as i32
+export const INT_FOUR = 4 as i32
+
+export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
+export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
+
+export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
+export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
-
-export function toDecimal(value: BigInt, decimals: i32 = DEFAULT_DECIMALS): BigDecimal {
-  let decimal = BigInt.fromI32(decimals);
-  if (decimal == BIGINT_ZERO) {
-    return value.toBigDecimal();
-  }
-  return value.toBigDecimal().div(exponentToBigDecimal(decimal));
-}
-
-export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
-  let bd = BigDecimal.fromString(STRING_ONE);
-  for (let i = BIGINT_ZERO; i.lt(decimals as BigInt); i = i.plus(BIGINT_ONE)) {
-    bd = bd.times(BigDecimal.fromString(STRING_TEN));
-  }
-  return bd;
-}
-
-// Converters
-export function toBigInt(value: BigDecimal, decimals: i32 = DEFAULT_DECIMALS): BigInt {
-  return value.times(getPrecision(decimals).toBigDecimal()).truncate(INT_ZERO).digits;
-}
-
-// Helpers
-export function getPrecision(decimals: i32 = DEFAULT_DECIMALS): BigInt {
-  return BigInt.fromI32(INT_TEN).pow((<u8>decimals) as u8);
-}
-
-export function toPercentage(n: BigDecimal): BigDecimal {
-  return n.div(BigDecimal.fromString(STRING_HUNDRED));
-}
+export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
+export const MS_PER_YEAR = DAYS_PER_YEAR.times(
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+);
