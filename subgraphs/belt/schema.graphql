@@ -133,6 +133,9 @@ type YieldAggregator implements Protocol @entity {
 
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
+
+  " All vaults id of the protocol "
+  _vaultIds: [String!]!
 }
 
 ###############################
