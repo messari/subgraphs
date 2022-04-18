@@ -15,11 +15,11 @@ import {
   Swap as SwapEvent,
 } from "../../generated/schema"
 import { Pair as PairTemplate } from '../../generated/templates'
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED } from "./utils/constants"
-import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD } from "./utils/price"
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, DEFAULT_DECIMALS, SECONDS_PER_DAY, TransferType, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED } from "./constants"
+import { findEthPerToken, getEthPriceInUSD, getTrackedVolumeUSD } from "./price"
 import { getLiquidityPool, getOrCreateDex, getOrCreateEtherHelper, getOrCreateTokenTracker, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee } from "./getters"
 import { getOrCreateToken } from "./utils/tokens"
-import { updateVolumeAndFees } from "./metrics/metrics"
+import { updateVolumeAndFees } from "./metrics"
 import { NetworkConfigs } from "../../config/_networkConfig"
 
 // rebass tokens, dont count in tracked volume

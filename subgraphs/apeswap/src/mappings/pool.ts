@@ -46,7 +46,7 @@ import {
   findNativeTokenPricePerToken,
   getTrackedLiquidityUSD,
   getTrackedVolumeUSD,
-} from "../common/utils/price";
+} from "../common/price";
 
 export function handleTransfer(event: Transfer): void {
   log.info("Transfer mapping on pool {}", [event.address.toHexString()]);

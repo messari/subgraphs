@@ -1,6 +1,6 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts"
-import { NetworkConfigs } from "../../../config/_networkConfig";
+import { NetworkConfigs } from "../../config/_networkConfig";
 
 import {
   _HelperStore,
@@ -8,9 +8,9 @@ import {
   Account,
   DailyActiveAccount,
   UsageMetricsDailySnapshot
-} from "../../../generated/schema"
-import { SECONDS_PER_DAY } from "../utils/constants";
-import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./../getters";
+} from "../../generated/schema"
+import { SECONDS_PER_DAY } from "./constants";
+import { getLiquidityPool, getOrCreateDex, getOrCreateFinancials, getOrCreatePoolDailySnapshot, getOrCreateUsersHelper } from "./getters";
 
 
 // Update FinancialsDailySnapshots entity

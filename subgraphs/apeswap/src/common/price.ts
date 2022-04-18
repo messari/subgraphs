@@ -1,13 +1,13 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from "../../../generated/schema";
+import { _HelperStore, _LiquidityPoolAmounts, _TokenTracker } from "../../generated/schema";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_TWO,
   BIGDECIMAL_ZERO,
 } from "./constant";
-import { NetworkConfigs } from "../../../config/_networkConfig";
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from "../getters";
-import { safeDiv } from "../helpers";
+import { NetworkConfigs } from "../../config/_networkConfig";
+import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateEtherHelper, getOrCreateTokenTracker } from "./getters";
+import { safeDiv } from "./helpers";
 
 function token0PairPrice(pool: _LiquidityPoolAmounts): BigDecimal {
   if (pool.inputTokenBalances[1].notEqual(BIGDECIMAL_ZERO)) {
