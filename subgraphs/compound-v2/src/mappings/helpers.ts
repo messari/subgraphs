@@ -375,7 +375,9 @@ export function accrueInterestsOnBalances(market: Market, blockDifference: BigIn
     .times(market.depositRate.div(blocksPerYear))
     .times(blockDifference.toBigDecimal());
   let newInterestBigInt = BigInt.fromString(accruedSupplyInterest.truncate(0).toString());
-  market.inputTokenBalances[0] = market.inputTokenBalances[0].plus(newInterestBigInt);
+  let inputTokenBalance = new Array<BigInt>();
+  inputTokenBalance.push(market.inputTokenBalances[0].plus(newInterestBigInt));
+  market.inputTokenBalances = inputTokenBalance;
 
   let accruedBorrowedInterest = market._totalBorrowNative
     .toBigDecimal()
