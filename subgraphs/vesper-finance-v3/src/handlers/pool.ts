@@ -132,47 +132,47 @@ function handleTotalSupply(
 // and are restricted from thegraph to be hooked on.
 export function handleBlockV3(block: ethereum.Block): void {
   let poolAddress = dataSource.address();
-  let poolAddressHex = poolAddress.toHexString();
+  // let poolAddressHex = poolAddress.toHexString();
   const vault = getOrCreateVault(poolAddress, block.number, block.timestamp);
-  const aggregator = getOrCreateYieldAggregator();
-  log.info("Entered handleBlockV3 for address {}", [poolAddressHex]);
+  // const aggregator = getOrCreateYieldAggregator();
+  // log.info("Entered handleBlockV3 for address {}", [poolAddressHex]);
 
-  let pool = getPoolV3(poolAddressHex);
-  let poolV3 = PoolV3.bind(poolAddress);
-  log.info("Calculating values for pool {}", [poolAddressHex]);
-  let tokenAddress = poolV3.token();
-  handleTotalSupply(
-    block.number,
-    poolV3.try_totalSupply(),
-    pool,
-    tokenAddress,
-    getShareToTokenRateV3(poolV3)
-  );
-  log.info("pool {}, totalSupply={}", [
-    poolAddressHex,
-    pool.totalSupply.toString(),
-  ]);
-  let totalDebtCall = poolV3.try_totalDebt();
-  if (!totalDebtCall.reverted) {
-    pool.totalDebt = totalDebtCall.value;
-    let tokenDecimal = Erc20Token.bind(tokenAddress).decimals();
-    pool.totalDebtUsd = toUsd(
-      pool.totalDebt.toBigDecimal().div(getDecimalDivisor(tokenDecimal)),
-      tokenDecimal,
-      tokenAddress
-    );
-  }
-  log.info("pool {}, totalDebt={}", [
-    poolAddressHex,
-    pool.totalDebt.toString(),
-  ]);
+  // let pool = getPoolV3(poolAddressHex);
+  // let poolV3 = PoolV3.bind(poolAddress);
+  // log.info("Calculating values for pool {}", [poolAddressHex]);
+  // let tokenAddress = poolV3.token();
+  // handleTotalSupply(
+  //   block.number,
+  //   poolV3.try_totalSupply(),
+  //   pool,
+  //   tokenAddress,
+  //   getShareToTokenRateV3(poolV3)
+  // );
+  // log.info("pool {}, totalSupply={}", [
+  //   poolAddressHex,
+  //   pool.totalSupply.toString(),
+  // ]);
+  // let totalDebtCall = poolV3.try_totalDebt();
+  // if (!totalDebtCall.reverted) {
+  //   pool.totalDebt = totalDebtCall.value;
+  //   let tokenDecimal = Erc20Token.bind(tokenAddress).decimals();
+  //   pool.totalDebtUsd = toUsd(
+  //     pool.totalDebt.toBigDecimal().div(getDecimalDivisor(tokenDecimal)),
+  //     tokenDecimal,
+  //     tokenAddress
+  //   );
+  // }
+  // log.info("pool {}, totalDebt={}", [
+  //   poolAddressHex,
+  //   pool.totalDebt.toString(),
+  // ]);
 
-  aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD.plus(
-    pool.totalDebtUsd
-  );
+  // aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD.plus(
+  //   pool.totalDebtUsd
+  // );
 
-  aggregator.save();
-  pool.save();
+  // aggregator.save();
+  // pool.save();
 }
 
 // This handler is used to calculate the withdraw fees for every pool
