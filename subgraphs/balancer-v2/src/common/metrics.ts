@@ -6,6 +6,7 @@ import {calculatePrice, isUSDStable, valueInUSD} from "./pricing";
 import { scaleDown } from "./tokens";
 import {WeightedPool} from "../../generated/Vault/WeightedPool";
 import { log } from "matchstick-as"
+import {getUsdPricePerToken} from "../pricing";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -129,11 +130,19 @@ export function updateTokenPrice(
         pool.inputTokenBalances[index],
         Address.fromString(pool.inputTokens[index])
     )
-    // We make sure the current balance plus the new price is over 40k USD
+    // We check if current balance multiplied by the price is over 40k USD, if not,
+    // it means that the pool does have too much liquidity, so we fetch the price from
+    // external source
     if (currentBalance.times(tokenInfo.price).gt(BigDecimal.fromString('40000'))) {
       token.block = blockNumber;
       token.lastUsdPrice = tokenInfo.price;
-      token.save();
+    } else {
+      const price = getUsdPricePerToken(tokenInfo.address)
+      if (!price.reverted) {
+        token.block = blockNumber;
+        token.lastUsdPrice = price.usdPrice
+        token.save();
+      }
     }
   }
 }
