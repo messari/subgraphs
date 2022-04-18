@@ -18,8 +18,8 @@ export function updateFinancials(event: ethereum.Event): void {
   let totalValueLocked = BIGDECIMAL_ZERO
   let totalVolumeUsd = BIGDECIMAL_ZERO
 
-  for (let i = 0; i < dex.pools.length; i++) {
-    let pool = LiquidityPool.load(dex.pools[i])
+  for (let i = 0; i < dex._poolIds.length; i++) {
+    let pool = LiquidityPool.load(dex._poolIds[i])
     if (pool) {
       totalValueLocked = totalValueLocked.plus(pool.totalValueLockedUSD)
       totalVolumeUsd = totalVolumeUsd.plus(pool.totalVolumeUSD)

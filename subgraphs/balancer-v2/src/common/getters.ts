@@ -97,6 +97,9 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.createdTimestamp = blockInfo.timestamp;
   pool.outputToken = outputToken.id;
   pool.save();
+
+  protocol._poolIds = protocol._poolIds.concat([pool.id])
+  protocol.save()
 }
 
 export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
