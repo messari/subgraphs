@@ -112,7 +112,13 @@ For those new to Postgres, the local node can be confusing when it comes to data
 
 3. Unless you have set some other default, the database system initialized from initdb is owned by the username on your system (along with the databases created within this system such as "graph-node"). However, this username from the system has not yet been made as a Postgres role that has read, write etc permissions in the Postgres system. If you try to connect to a database with this role/username, authentication will fail. You must add the user as a Postgres superuser role (there are queries you can run to just give this role permissions for one database rather than as a superuser, but for simplicity sake I wont get into that here).
 
-4. Start the Postgres cli with command `sudo -i -u postgres` followed by command `psql`. If inside the shell you run `\l`, you will see a list of databases, which "graph-node" will have an owner of the same name as your system user name. At this point, back out and run query `\du` to check if the owner of 'graph-node' database is in this list of roles. If not, run query `CREATE ROLE ***YOUR SYSTEM USERNAME*** WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD ***ANY PASSWORD***`;. This creates a superuser role with the proper name and will allow you to connect to the database with this user/password combo. Missing this step can cause authentication issues when attempting to build the node.
+4. Start the Postgres cli with command `sudo -i -u postgres` followed by command `psql`. If inside the shell you run `\l`, you will see a list of databases, which "graph-node" will have an owner of the same name as your system user name. At this point, back out and run query `\du` to check if the owner of 'graph-node' database is in this list of roles. If not, run query `CREATE ROLE `*`myUser `*` WITH SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD `*`'password'`*`;`. This creates a superuser role with the proper name and will allow you to connect to the database with this user/password combo. Missing this step can cause authentication issues when attempting to build the node.
+   1. For windows users:
+        - The same logic applies, but some of the cli commands are different.
+        - To login to postgres-cli under the admin role: `psql -U postgres`
+        - Once you are in the postgres-cli the commands are the same as above (4)
+        - If you run `\du` and see that your user is already there, but need to alter the roles use `ALTER USER `*`myUser `*` SUPERUSER CREATEDB CREATEROLE LOGIN ENCRYPTED PASSWORD `*`'password'`*`;`. See [role altering docs](https://www.postgresql.org/docs/current/sql-alteruser.html) for more
+        - TODO: add picture and more
 
 ### Subgraph Forking
 
