@@ -86,7 +86,7 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
   
     if (!usageMetrics) {
         usageMetrics = new UsageMetricsDailySnapshot(id);
-        usageMetrics.protocol = FACTORY_ADDRESS;
+        usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
   
         usageMetrics.dailyActiveUsers = 0;
         usageMetrics.cumulativeUniqueUsers = 0;
@@ -104,7 +104,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
     
     if (!poolMetrics) {
         poolMetrics = new PoolDailySnapshot(event.address.concat(id));
-        poolMetrics.protocol = FACTORY_ADDRESS;
+        poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
         poolMetrics.pool = event.address;
         poolMetrics.currentRewardTokenEmissionsAmount = []
         poolMetrics.currentRewardTokenEmissionsUSD = []
@@ -124,7 +124,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
   
     if (!financialMetrics) {
         financialMetrics = new FinancialsDailySnapshot(id);
-        financialMetrics.protocol = FACTORY_ADDRESS;
+        financialMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
   
         financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO
         financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO
