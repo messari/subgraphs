@@ -133,7 +133,7 @@ function handleTotalSupply(
 export function handleBlockV3(block: ethereum.Block): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
-  const vault = getOrCreateVault(poolAddress);
+  const vault = getOrCreateVault(poolAddress, block.number, block.timestamp);
   const aggregator = getOrCreateYieldAggregator();
   log.info("Entered handleBlockV3 for address {}", [poolAddressHex]);
 

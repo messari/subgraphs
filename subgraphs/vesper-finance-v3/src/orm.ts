@@ -9,12 +9,16 @@ import {
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
-import { PoolV3, Transfer, Withdraw as WithdrawEvent } from "../generated/poolV3_vaUSDC/PoolV3";
+import {
+  PoolV3,
+  Transfer,
+  Withdraw as WithdrawEvent,
+} from "../generated/poolV3_vaUSDC/PoolV3";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
-import { toUsd } from "./peer";
+import { toUsd, getShareToTokenRateV3, getDecimalDivisor } from "./peer";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   let yAggr = YieldAggregator.load(CONTROLLER_ADDRESS_HEX);
@@ -91,13 +95,10 @@ export function updateVaultTokens(vault: Vault): void {
   const strategyAddresses = poolv3.getStrategies();
   const inputTokens: string[] = [];
   const inputTokenBalances: BigInt[] = [];
+  const tokenAddress = poolv3.token();
 
-  for (let i = 0, k = strategyAddresses.length; i < k; ++i) {
-    const st = StrategyV3.bind(strategyAddresses[i]);
-    const inputToken = getOrCreateToken(st.collateralToken());
-    inputTokens.push(inputToken.id);
-    inputTokenBalances.push(BigInt.zero());
-  }
+  inputTokens.push(tokenAddress.toHexString());
+  inputTokenBalances.push(poolv3.totalValue());
 
   vault.inputTokens = inputTokens;
   vault.inputTokenBalances = inputTokenBalances;
@@ -139,7 +140,10 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
-export function getOrCreateDeposit(event: Transfer, vaultAddress: Address): Deposit {
+export function getOrCreateDeposit(
+  event: Transfer,
+  vaultAddress: Address
+): Deposit {
   const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
   let deposit = Deposit.load(id);
 
@@ -159,7 +163,11 @@ export function getOrCreateDeposit(event: Transfer, vaultAddress: Address): Depo
     deposit.timestamp = event.block.timestamp;
     deposit.asset = getOrCreateToken(poolv3.token()).id;
     deposit.amount = event.params.value;
-    deposit.amountUSD = toUsd(event.params.value.toBigDecimal(), token.decimals, Address.fromString(token.id));
+    deposit.amountUSD = toUsd(
+      event.params.value.toBigDecimal(),
+      token.decimals,
+      Address.fromString(token.id)
+    );
 
     deposit.save();
   }
@@ -167,7 +175,10 @@ export function getOrCreateDeposit(event: Transfer, vaultAddress: Address): Depo
   return deposit;
 }
 
-export function getOrCreateWithdraw(event: WithdrawEvent, vaultAddress: Address): Withdraw {
+export function getOrCreateWithdraw(
+  event: WithdrawEvent,
+  vaultAddress: Address
+): Withdraw {
   const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
   let withdraw = Withdraw.load(id);
 
@@ -187,7 +198,11 @@ export function getOrCreateWithdraw(event: WithdrawEvent, vaultAddress: Address)
     withdraw.timestamp = event.block.timestamp;
     withdraw.asset = getOrCreateToken(poolv3.token()).id;
     withdraw.amount = event.params.amount;
-    withdraw.amountUSD = toUsd(event.params.amount.toBigDecimal(), token.decimals, Address.fromString(token.id));
+    withdraw.amountUSD = toUsd(
+      event.params.amount.toBigDecimal(),
+      token.decimals,
+      Address.fromString(token.id)
+    );
 
     withdraw.save();
   }
@@ -195,8 +210,44 @@ export function getOrCreateWithdraw(event: WithdrawEvent, vaultAddress: Address)
   return withdraw;
 }
 
+export function updateVaultSupply(vault: Vault): void {
+  const vaultAddress = Address.fromString(vault.id);
+  const poolv3 = PoolV3.bind(vaultAddress);
+  const tokenAddress = poolv3.token();
+  const supply_call = poolv3.try_totalSupply();
+  const value_call = poolv3.try_totalValue();
+  const token = Erc20Token.bind(tokenAddress);
+
+  if (!supply_call.reverted) {
+    const shareRate = getShareToTokenRateV3(poolv3);
+    vault.outputTokenSupply = supply_call.value;
+    vault.outputTokenPriceUSD = toUsd(
+      supply_call.value
+        .toBigDecimal()
+        .times(shareRate)
+        .div(getDecimalDivisor(poolv3.decimals())),
+      token.decimals(),
+      tokenAddress
+    );
+
+    vault.save();
+  }
+
+  if (!value_call.reverted) {
+    vault.totalVolumeUSD = toUsd(
+      value_call.value.toBigDecimal(),
+      token.decimals(),
+      tokenAddress
+    );
+    vault.totalValueLockedUSD = BigDecimal.zero();
+    vault.save();
+  }
+}
+
 export function getOrCreateVault(
   address: Address,
+  blockNumber: BigInt = BigInt.zero(),
+  blockTimestamp: BigInt = BigInt.zero(),
   updateOp: boolean = true
 ): Vault {
   let vault = Vault.load(address.toHexString());
@@ -210,8 +261,8 @@ export function getOrCreateVault(
     vault.totalVolumeUSD = BigDecimal.zero();
     vault.outputTokenSupply = BigInt.zero();
     vault.outputTokenPriceUSD = BigDecimal.zero();
-    vault.createdTimestamp = BigInt.zero();
-    vault.createdBlockNumber = BigInt.zero();
+    vault.createdTimestamp = blockTimestamp;
+    vault.createdBlockNumber = blockNumber;
     vault.protocol = yAggr.id;
     vault.name = poolv3.name();
     vault.symbol = poolv3.symbol();
@@ -224,6 +275,7 @@ export function getOrCreateVault(
     updateVaultFee(vault);
     updateVaultTokens(vault);
     updateVaultRewardTokens(vault);
+    updateVaultSupply(vault);
   }
 
   return vault;
