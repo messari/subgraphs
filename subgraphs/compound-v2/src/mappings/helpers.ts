@@ -8,9 +8,7 @@ import {
   CCOMP_ADDRESS,
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
-  DAYS_PER_YEAR,
-  BIGINT_TEN,
-  BIGDECIMAL_ONEHUNDRED,
+  DAYS_PER_YEAR
 } from "../common/utils/constants";
 import {
   getOrCreateLendingProtcol,
@@ -19,12 +17,12 @@ import {
   getOrCreateToken,
 } from "../common/getters";
 import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation } from "../../generated/schema";
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CToken } from "../../generated/Comptroller/cToken";
+import { Comptroller } from "../../generated/templates/CToken/Comptroller";
 import { getUSDPriceOfToken } from "../common/prices/prices";
-import { exponentToBigDecimal, getExchangeRate, pow } from "../common/utils/utils";
-import { Comptroller } from "../../generated/Comptroller/Comptroller";
-import { PriceOracle2 } from "../../generated/Comptroller/PriceOracle2";
+import { exponentToBigDecimal, getExchangeRate, powBigDecimal } from "../common/utils/utils";
+import { PriceOracle2 } from "../../generated/templates/CToken/PriceOracle2";
 import { getRewardsPerDay, RewardIntervalType, getOrCreateCircularBuffer } from "../common/rewards";
 
 //////////////////////////////
@@ -555,7 +553,6 @@ export function updateMarketRates(market: Market): void {
   // This fails on only the first call to cZRX. It is unclear why, but otherwise it works.
   // So we handle it like this.
 
-  // APY rate calculation explained here: https://compound.finance/docs#protocol-math
   let contract = CToken.bind(Address.fromString(market.id));
   let trySupplyRatePerBlock = contract.try_supplyRatePerBlock();
   market.depositRate = trySupplyRatePerBlock.reverted
@@ -572,16 +569,16 @@ export function updateMarketRates(market: Market): void {
   market.save();
 }
 
+// APY rate calculation explained here: https://compound.finance/docs#protocol-math
 export function convertBlockRateToAPY(blockRate: BigInt): BigDecimal {
-  let mantissaFactorBI = BIGINT_TEN.pow(DEFAULT_DECIMALS as u8);
-  log.warning("HERE", []);
+  let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
+  let blocksPerDay = getOrCreateCircularBuffer().blocksPerDay;
 
-  let blocksPerDay = BigInt.fromString(getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString());
-  log.warning("AFTER, blocks/day: {}", [blocksPerDay.toString()]);
-  let blockRateCalc = blockRate.times(blocksPerDay).plus(mantissaFactorBI);
+  let blockRateCalc = blockRate.toBigDecimal().div(mantissaFactorBD).times(blocksPerDay).plus(BIGDECIMAL_ONE);
 
-  let a = pow(mantissaFactorBI, blockRateCalc, 200 as u8);
-  let b = pow(mantissaFactorBI, blockRateCalc, 165 as u8);
+  // take the block rate calculation to the power of DAYS_PER_YEAR
+  blockRateCalc = powBigDecimal(blockRateCalc, DAYS_PER_YEAR);
 
-  return a.times(b).minus(BIGDECIMAL_ONE).times(BIGDECIMAL_ONEHUNDRED);
+  // finish APY calculation
+  return blockRateCalc.minus(BIGDECIMAL_ONE).times(BigDecimal.fromString("100")).truncate(DEFAULT_DECIMALS);
 }

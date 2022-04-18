@@ -1,4 +1,5 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -8,12 +9,20 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
   );
 }
 
-export function powerBigDecimal(base: BigDecimal, power: i32): BigDecimal {
-  let product = base;
-  for (let i = 0; i < power; i++) {
-    product = product.times(base);
+// utilizes exponentiation by squaring: https://stackoverflow.com/a/34660211
+// for all exp >= 0
+export function powBigDecimal(base: BigDecimal, exp: BigInt): BigDecimal {
+  if (exp.equals(BIGINT_ZERO)) {
+    return BIGDECIMAL_ONE;
   }
-  return product;
+
+  let temp = powBigDecimal(base, exp.div(BIGINT_TWO));
+
+  if (exp.mod(BIGINT_TWO).equals(BIGINT_ZERO)) {
+    return temp.times(temp);
+  } else {
+    return base.times(temp).times(temp);
+  }
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
