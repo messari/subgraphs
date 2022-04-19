@@ -197,4 +197,5 @@ function getStartingBlockRate(): BigDecimal {
     else {
         log.warning("getStartingBlockRate(): Network not found", [])
         return BIGDECIMAL_ZERO
+    }
 }
