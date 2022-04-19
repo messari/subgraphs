@@ -1,12 +1,12 @@
 
 /////////////////////
-// VERSION 1.0.0 ////
+// VERSION 1.0.1 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //  
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
 import { SubgraphNetwork } from "./constants";
 import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./utils/constants";
@@ -194,5 +194,7 @@ function getStartingBlockRate(): BigDecimal {
     // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
     // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
     // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
-    else return BIGDECIMAL_ZERO
+    else {
+        log.warning("getStartingBlockRate(): Network not found", [])
+        return BIGDECIMAL_ZERO
 }
