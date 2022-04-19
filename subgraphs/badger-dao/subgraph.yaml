@@ -1,0 +1,1637 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: bveCVX
+    network: mainnet
+    source:
+      address: "0xfd05D3C7fe2924020620A8bE4961bBaA747e6305"
+      startBlock: 13239091
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bbveCVX-CVX-f
+    network: mainnet
+    source:
+      address: "0x937B8E917d0F36eDEBBA8E459C5FB16F3b315551"
+      startBlock: 13495954
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bcvxCRV
+    network: mainnet
+    source:
+      address: "0x2B5455aac8d64C14786c3a29858E43b5945819C0"
+      startBlock: 12678302
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bcrvIbBTC
+    network: mainnet
+    source:
+      address: "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af"
+      startBlock: 13590998
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bcrvBADGER
+    network: mainnet
+    source:
+      address: "0xeC1c717A3b02582A4Aa2275260C583095536b613"
+      startBlock: 13998335
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bcrvRenBTC
+    network: mainnet
+    source:
+      address: "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545"
+      startBlock: 11380872
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bslpWbtcEth
+    network: mainnet
+    source:
+      address: "0x758A43EE2BFf8230eeb784879CdcFF4828F2544D"
+      startBlock: 11537600
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bslpWbtcBadger
+    network: mainnet
+    source:
+      address: "0x1862A18181346EBd9EdAf800804f89190DeF24a5"
+      startBlock: 11539529
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bDIGG
+    network: mainnet
+    source:
+      address: "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a"
+      startBlock: 11680422
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bslpWbtcDigg
+    network: mainnet
+    source:
+      address: "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6"
+      startBlock: 11681030
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: byvWBTC
+    network: mainnet
+    source:
+      address: "0x4b92d19c11435614CD49Af1b589001b7c08cD4D5"
+      startBlock: 12246710
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  - kind: ethereum
+    name: bcrvTricrypto2
+    network: mainnet
+    source:
+      address: "0x27E98fC7d05f54E544d16F58C194C2D7ba71e3B5"
+      startBlock: 12965932
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+
+  - kind: ethereum
+    name: native.bveCVX
+    network: mainnet
+    source:
+      address: "0x898111d1F4eB55025D0036568212425EE2274082"
+      startBlock: 14379068
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.bbveCVX-CVX-f
+    network: mainnet
+    source:
+      address: "0x98Ca7AFa876f0e15494E76E92C5b3658cdE1Ffe1"
+      startBlock: 13495973
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.cvxCrv
+    network: mainnet
+    source:
+      address: "0x826048381d65a65DAa51342C51d464428d301896"
+      startBlock: 12691828
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.bcrvIbBTC
+    network: mainnet
+    source:
+      address: "0x6D4BA00Fd7BB73b5aa5b3D6180c6f1B0c89f70D1"
+      startBlock: 13616629
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.badgerCrv
+    network: mainnet
+    source:
+      address: "0x1905FD2D2D09792eE058C2b46a05F11630a1EcA1"
+      startBlock: 14412273
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.renCrv
+    network: mainnet
+    source:
+      address: "0x61e16b46F74aEd8f9c2Ec6CB2dCb2258Bdfc7071"
+      startBlock: 13545116
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.sushiWbtcEth
+    network: mainnet
+    source:
+      address: "0x7A56d65254705B4Def63c68488C0182968C452ce"
+      startBlock: 11537603
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.sushiBadgerWbtc
+    network: mainnet
+    source:
+      address: "0x3a494D79AA78118795daad8AeFF5825C6c8dF7F1"
+      startBlock: 11539647
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.digg
+    network: mainnet
+    source:
+      address: "0x4a8651F2edD68850B944AD93f2c67af817F39F62"
+      startBlock: 11680429
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.sushiDiggWbtc
+    network: mainnet
+    source:
+      address: "0xaa8dddfe7DFA3C3269f1910d89E4413dD006D08a"
+      startBlock: 11681031
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.byvWBTC
+    network: mainnet
+    source:
+      address: "0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E"
+      startBlock: 12185982
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  - kind: ethereum
+    name: native.tricrypto2
+    network: mainnet
+    source:
+      address: "0x647eeb5C5ED5A71621183f09F6CE8fa66b96827d"
+      startBlock: 13544974
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts

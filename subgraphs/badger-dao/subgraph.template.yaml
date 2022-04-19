@@ -1,0 +1,145 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{#vaults}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      startBlock: {{ startBlock }}
+      abi: VaultV4
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: deposit(uint256,bytes32[])
+          handler: handleDeposit2
+        - function: depositAll()
+          handler: handleDepositAll
+        - function: depositAll(bytes32[])
+          handler: handleDepositAll2
+        - function: depositFor(address,uint256)
+          handler: handleDepositFor
+        - function: depositFor(address,uint256,bytes32[])
+          handler: handleDepositFor2
+        - function: withdraw(uint256)
+          handler: handleWithdraw
+        - function: withdrawAll()
+          handler: handleWithdrawAll
+      file: ./src/mappings/vault.ts
+  {{/vaults}}
+
+  {{#strategies}}
+  - kind: ethereum
+    name: {{ name }}
+    network: {{ chain }}
+    source:
+      address: "{{ address }}"
+      startBlock: {{ startBlock }}
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultV4
+          file: ./abis/VaultV4.json
+        - name: Strategy
+          file: ./abis/Strategy.json
+        - name: Controller
+          file: ./abis/Controller.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+
+        - name: CurveRegistry
+          file: ./abis/Oracles/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Oracles/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Oracles/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Oracles/ChainLink.json
+        - name: UniswapRouter
+          file: ./abis/Oracles/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Oracles/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Oracles/Uniswap/Pair.json
+        - name: SushiSwapRouter
+          file: ./abis/Oracles/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Oracles/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Oracles/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Oracles/Calculations/SushiSwap.json
+      callHandlers:
+        - function: setPerformanceFeeGovernance(uint256)
+          handler: handlePerformanceFee
+        - function: setWithdrawalFee(uint256)
+          handler: handleWithdrawalFee
+      file: ./src/mappings/strategy.ts
+  {{/strategies}}

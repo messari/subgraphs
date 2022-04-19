@@ -1,0 +1,20 @@
+{
+  "name": "badger-dao",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prepare": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "codegen": "rm -rf generated && graph codegen",
+    "build": "rm -rf build && graph build",
+    "test": "rm -rf tests/.bin && graph test",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "deploy": "graph deploy --product hosted-service ap-atul/badger-dao",
+    "create-local": "graph create --node http://localhost:8020/ ap-atul/badger-dao",
+    "remove-local": "graph remove --node http://localhost:8020/ ap-atul/badger-dao",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ap-atul/badger-dao"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.28.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  }
+}

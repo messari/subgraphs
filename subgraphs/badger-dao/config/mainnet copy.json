@@ -1,0 +1,127 @@
+{
+  "chain": "mainnet",
+  "vaults": [
+    {
+      "name": "bveCVX",
+      "address": "0xfd05D3C7fe2924020620A8bE4961bBaA747e6305",
+      "startBlock": 13239091
+    },
+    {
+      "name": "bbveCVX-CVX-f",
+      "address": "0x937B8E917d0F36eDEBBA8E459C5FB16F3b315551",
+      "startBlock": 13495954
+    },
+    {
+      "name": "bcvxCRV",
+      "address": "0x2B5455aac8d64C14786c3a29858E43b5945819C0",
+      "startBlock": 12678302
+    },
+    {
+      "name": "bcrvIbBTC",
+      "address": "0xaE96fF08771a109dc6650a1BdCa62F2d558E40af",
+      "startBlock": 13590998
+    },
+    {
+      "name": "bcrvBADGER",
+      "address": "0xeC1c717A3b02582A4Aa2275260C583095536b613",
+      "startBlock": 13998335
+    },
+    {
+      "name": "bcrvRenBTC",
+      "address": "0x6dEf55d2e18486B9dDfaA075bc4e4EE0B28c1545",
+      "startBlock": 11380872
+    },
+    {
+      "name": "bslpWbtcEth",
+      "address": "0x758A43EE2BFf8230eeb784879CdcFF4828F2544D",
+      "startBlock": 11537600
+    },
+    {
+      "name": "bslpWbtcBadger",
+      "address": "0x1862A18181346EBd9EdAf800804f89190DeF24a5",
+      "startBlock": 11539529
+    },
+    {
+      "name": "bDIGG",
+      "address": "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a",
+      "startBlock": 11680422
+    },
+    {
+      "name": "bslpWbtcDigg",
+      "address": "0x88128580ACdD9c04Ce47AFcE196875747bF2A9f6",
+      "startBlock": 11681030
+    },
+    {
+      "name": "byvWBTC",
+      "address": "0x4b92d19c11435614CD49Af1b589001b7c08cD4D5",
+      "startBlock": 12246710
+    },
+    {
+      "name": "bcrvTricrypto2",
+      "address": "0x27E98fC7d05f54E544d16F58C194C2D7ba71e3B5",
+      "startBlock": 12965932
+    }
+  ],
+  "strategies": [
+    {
+      "name": "native.bveCVX",
+      "address": "0x898111d1F4eB55025D0036568212425EE2274082",
+      "startBlock": 14379068
+    },
+    {
+      "name": "native.bbveCVX-CVX-f",
+      "address": "0x98Ca7AFa876f0e15494E76E92C5b3658cdE1Ffe1",
+      "startBlock": 13495973
+    },
+    {
+      "name": "native.cvxCrv",
+      "address": "0x826048381d65a65DAa51342C51d464428d301896",
+      "startBlock": 12691828
+    },
+    {
+      "name": "native.bcrvIbBTC",
+      "address": "0x6D4BA00Fd7BB73b5aa5b3D6180c6f1B0c89f70D1",
+      "startBlock": 13616629
+    },
+    {
+      "name": "native.badgerCrv",
+      "address": "0x1905FD2D2D09792eE058C2b46a05F11630a1EcA1",
+      "startBlock": 14412273
+    },
+    {
+      "name": "native.renCrv",
+      "address": "0x61e16b46F74aEd8f9c2Ec6CB2dCb2258Bdfc7071",
+      "startBlock": 13545116
+    },
+    {
+      "name": "native.sushiWbtcEth",
+      "address": "0x7A56d65254705B4Def63c68488C0182968C452ce",
+      "startBlock": 11537603
+    },
+    {
+      "name": "native.sushiBadgerWbtc",
+      "address": "0x3a494D79AA78118795daad8AeFF5825C6c8dF7F1",
+      "startBlock": 11539647
+    },
+    {
+      "name": "native.digg",
+      "address": "0x4a8651F2edD68850B944AD93f2c67af817F39F62",
+      "startBlock": 11680429
+    },
+    {
+      "name": "native.sushiDiggWbtc",
+      "address": "0xaa8dddfe7DFA3C3269f1910d89E4413dD006D08a",
+      "startBlock": 11681031
+    },
+    {
+      "name": "native.byvWBTC",
+      "address": "0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E",
+      "startBlock": 12185982
+    },
+    {
+      "name": "native.tricrypto2",
+      "address": "0x647eeb5C5ED5A71621183f09F6CE8fa66b96827d",
+      "startBlock": 13544974
+    }
+  ]
+}
