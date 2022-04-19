@@ -194,7 +194,7 @@ function getStartingBlockRate(): BigDecimal {
     // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
     // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
     else {
-        log.warning("Network not found", [])
+        log.warning("getStartingBlockRate(): Network not found", [])
         return BIGDECIMAL_ZERO
     }
 }
