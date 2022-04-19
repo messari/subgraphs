@@ -1,8 +1,10 @@
-# Lending Protocol Subgraph
+# Hundred Finance - Lending Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://hundred.finance/
+- https://docs.hundred.finance/
+- Add here
 
 ## Calculation Methodology v0.0.1
 

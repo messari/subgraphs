@@ -1,8 +1,11 @@
-# Lending Protocol Subgraph
+# Bastion Lending Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://bastionprotocol.com/
+- https://app.bastionprotocol.com/
+- https://bastionprotocol.gitbook.io/official/
+- Add here
 
 ## Calculation Methodology v0.0.1
 
