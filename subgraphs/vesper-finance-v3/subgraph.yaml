@@ -5,6 +5,198 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
+    name: 'poolV3_veLINK-DAI'
+    network: mainnet
+    source:
+      address: '0x252c805e999115158174dFC997BF5C1342aaDfF2'
+      abi: PoolV3
+      startBlock: 13954585
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_veDAI-LINK'
+    network: mainnet
+    source:
+      address: '0x83A99dAFf5f84B278D3150A36385fCDf04a0fecf'
+      abi: PoolV3
+      startBlock: 13952095
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_vaLINK'
+    network: mainnet
+    source:
+      address: '0xef4F4604106de23CDadfEAE08fcC34602cB475C1'
+      abi: PoolV3
+      startBlock: 13851009
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_veDAI-DPI'
+    network: mainnet
+    source:
+      address: '0xe4Fe646A43DAEC8323922cA3e4Fe782d70805d93'
+      abi: PoolV3
+      startBlock: 13755461
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
     name: 'poolV3_vaUSDC'
     network: mainnet
     source:
@@ -53,12 +245,348 @@ dataSources:
       blockHandlers:
         - handler: handleBlockV3
   - kind: ethereum/contract
+    name: 'poolV3_veDAI-ETH'
+    network: mainnet
+    source:
+      address: '0xabfF8F065318a8CF0dE66Bd1E90E976381859Ef0'
+      abi: PoolV3
+      startBlock: 13727647
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_veDAI-WBTC'
+    network: mainnet
+    source:
+      address: '0x35B225880df01cde935Db463D0e70a9e737D516E'
+      abi: PoolV3
+      startBlock: 13722797
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_vaDPI'
+    network: mainnet
+    source:
+      address: '0x9b91ab47cefC35dbe4DDCC7983fFA1fB40795663'
+      abi: PoolV3
+      startBlock: 13642194
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_vaWBTC'
+    network: mainnet
+    source:
+      address: '0x01e1d41C1159b745298724c5Fd3eAfF3da1C6efD'
+      abi: PoolV3
+      startBlock: 13266362
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
     name: 'poolV3_vaETH'
     network: mainnet
     source:
       address: '0xd1C117319B3595fbc39b471AB1fd485629eb05F2'
       abi: PoolV3
       startBlock: 13044797
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_vaDAI'
+    network: mainnet
+    source:
+      address: '0x0538C8bAc84E95A9dF8aC10Aad17DbE81b9E36ee'
+      abi: PoolV3
+      startBlock: 12782830
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_vUSDT'
+    network: mainnet
+    source:
+      address: '0xBA680a906d8f624a5F11fba54D3C672f09F26e47'
+      abi: PoolV3
+      startBlock: 12725974
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/handlers/pool.ts
+      entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - VesperPool
+      abis:
+        - name: Controller
+          file: ./abis/controller.json
+        - name: Erc20Token
+          file: ./abis/erc-20.json
+        - name: PoolV3
+          file: ./abis/pool-v3.json
+        - name: AddressList
+          file: ./abis/address-list.json
+        - name: StrategyV3
+          file: ./abis/strategy-v3.json
+        - name: PriceRouter
+          file: ./abis/uniswap.json
+        - name: PoolRewards
+          file: ./abis/pool-rewards.json
+        - name: PoolRewardsOld
+          file: ./abis/pool-rewards-old.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransferV3
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawV3
+      blockHandlers:
+        - handler: handleBlockV3
+  - kind: ethereum/contract
+    name: 'poolV3_vUNI'
+    network: mainnet
+    source:
+      address: '0xfF43C327410F960261057ba1DA787eD78B42c257'
+      abi: PoolV3
+      startBlock: 12725830
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

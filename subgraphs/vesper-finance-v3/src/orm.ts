@@ -192,8 +192,8 @@ export function getOrCreateWithdraw(
     withdraw.hash = event.transaction.hash.toHexString();
     withdraw.logIndex = event.logIndex.toI32();
     withdraw.protocol = yAggr.id;
-    withdraw.to = event.params.owner.toHexString();
-    withdraw.from = vaultAddress.toHexString();
+    withdraw.to = vaultAddress.toHexString();
+    withdraw.from = event.params.owner.toHexString();
     withdraw.blockNumber = event.block.number;
     withdraw.timestamp = event.block.timestamp;
     withdraw.asset = getOrCreateToken(poolv3.token()).id;
@@ -224,7 +224,7 @@ export function updateVaultSupply(vault: Vault): void {
     const shareRate = getShareToTokenRateV3(poolv3);
     vault.outputTokenSupply = supply_call.value;
     vault.outputTokenPriceUSD = toUsd(
-      supply_call.value.toBigDecimal().times(shareRate),
+      supply_call.value.toBigDecimal(),
       token.decimals(),
       tokenAddress
     );
@@ -276,6 +276,7 @@ export function getOrCreateVault(
     const poolv3 = PoolV3.bind(address);
 
     vault = new Vault(address.toHexString());
+    vault.outputToken = address.toHexString();
     vault.totalValueLockedUSD = BigDecimal.zero();
     vault.totalVolumeUSD = BigDecimal.zero();
     vault.outputTokenSupply = BigInt.zero();

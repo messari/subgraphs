@@ -26,20 +26,20 @@ const genFunc = () => {
     })),
   };
 
-  context.pools = [
-    {
-      name: "vaUSDC",
-      address: "0xa8b607Aa09B6A2E306F93e74c282Fb13f6A80452",
-      version: 3,
-      birthblock: 13729330,
-    },
-    {
-      name: "vaETH",
-      address: "0xd1C117319B3595fbc39b471AB1fd485629eb05F2",
-      version: 3,
-      birthblock: 13044797,
-    },
-  ];
+  // context.pools = [
+  //   {
+  //     name: "vaUSDC",
+  //     address: "0xa8b607Aa09B6A2E306F93e74c282Fb13f6A80452",
+  //     version: 3,
+  //     birthblock: 13729330,
+  //   },
+  //   {
+  //     name: "vaETH",
+  //     address: "0xd1C117319B3595fbc39b471AB1fd485629eb05F2",
+  //     version: 3,
+  //     birthblock: 13044797,
+  //   },
+  // ];
 
   console.info("Template context :", context);
   readFile("./subgraph.template.yaml", "utf8")
