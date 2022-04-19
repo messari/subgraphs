@@ -21,7 +21,9 @@ dataSources:
           file: ./abis/Ethereum/Registry_v1.json
         - name: Vault
           file: ./abis/Ethereum/Vaults/_vault_.json
-
+        - name: Strategy
+          file: ./abis/Ethereum/Strategies/_strategy_.json
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -81,6 +83,8 @@ dataSources:
           file: ./abis/Ethereum/Registry_v2.json
         - name: Vault
           file: ./abis/Ethereum/Vaults/_vault_.json
+        - name: Strategy
+          file: ./abis/Ethereum/Strategies/_strategy_.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -140,6 +144,8 @@ templates:
       abis:
         - name: Vault
           file: ./abis/Ethereum/Vaults/_vault_.json
+        - name: Strategy
+          file: ./abis/Ethereum/Strategies/_strategy_.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -267,5 +273,3 @@ templates:
       eventHandlers:
         - event: Cloned(indexed address)
           handler: handleCloned
-        - event: Harvested(uint256,uint256,uint256,uint256)
-          handler: handleHarvested

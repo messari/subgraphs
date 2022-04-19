@@ -12,7 +12,6 @@ import {
   Withdraw1Call,
   Withdraw2Call,
   Vault as VaultContract,
-  Transfer as TransferEvent,
   UpdateRewards as UpdateRewardsEvent,
   StrategyAdded as StrategyAddedV1Event,
   StrategyAdded1 as StrategyAddedV2Event,
@@ -23,22 +22,19 @@ import {
 } from "../../generated/Registry_v1/Vault";
 import { _Deposit } from "../modules/Deposit";
 import { _Withdraw } from "../modules/Withdraw";
-import { getOrCreateStrategy } from "../modules/Strategy";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
+import { getOrCreateStrategy, strategyReported } from "../modules/Strategy";
 
 export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
-  const performanceFee = event.params.performanceFee;
 
-  event.params.performanceFee;
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
     let strategy = getOrCreateStrategy(
       vaultAddress,
       strategyAddress,
-      performanceFee
     );
 
     StrategyTemplate.create(strategyAddress);
@@ -55,14 +51,12 @@ export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
 export function handleStrategyAdded_v2(event: StrategyAddedV2Event): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
-  const performanceFee = event.params.performanceFee;
 
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
     let strategy = getOrCreateStrategy(
       vaultAddress,
       strategyAddress,
-      performanceFee
     );
 
     StrategyTemplate.create(strategyAddress);
@@ -184,10 +178,10 @@ export function handleUpdatePerformanceFee(
       return;
     }
 
-    performanceFee!.feePercentage = event.params.performanceFee
+    performanceFee.feePercentage = event.params.performanceFee
       .div(BigInt.fromI32(100))
       .toBigDecimal();
-    performanceFee!.save();
+    performanceFee.save();
 
     log.warning("[updatePerformanceFee]\n TxHash: {}, performanceFee: {}", [
       event.transaction.hash.toHexString(),
@@ -210,10 +204,10 @@ export function handleUpdateManagementFee(
       return;
     }
 
-    performanceFee!.feePercentage = event.params.managementFee
+    performanceFee.feePercentage = event.params.managementFee
       .div(BigInt.fromI32(100))
       .toBigDecimal();
-    performanceFee!.save();
+    performanceFee.save();
 
     log.warning("[updateManagementFee]\n TxHash: {}, managementFee: {}", [
       event.transaction.hash.toHexString(),
@@ -222,82 +216,32 @@ export function handleUpdateManagementFee(
   }
 }
 
-export function handleTransfer(event: TransferEvent): void {
-  // log.info('[Vault mappings] Handle transfer: From: {} - To: {}. TX hash: {}', [
-  //   event.params.sender.toHexString(),
-  //   event.params.receiver.toHexString(),
-  //   event.transaction.hash.toHexString(),
-  // ]);
-  // if (
-  //   event.params.sender.toHexString() != ZERO_ADDRESS &&
-  //   event.params.receiver.toHexString() != ZERO_ADDRESS
-  // ) {
-  //   log.info(
-  //     '[Vault mappings] Processing transfer: From: {} - To: {}. TX hash: {}',
-  //     [
-  //       event.params.sender.toHexString(),
-  //       event.params.receiver.toHexString(),
-  //       event.transaction.hash.toHexString(),
-  //     ]
-  //   );
-  //   let vaultContract = VaultContract.bind(event.address);
-  //   let totalAssets = vaultContract.totalAssets();
-  //   let totalSupply = vaultContract.totalSupply();
-  //   let sharesAmount = event.params.value;
-  //   let amount = sharesAmount.times(totalAssets).div(totalSupply);
-  //   // share  = (amount * totalSupply) / totalAssets
-  //   // amount = (shares * totalAssets) / totalSupply
-  //   let token = getOrCreateToken(vaultContract.token())
-  //   let shareToken = getOrCreateToken(event.address)
-  //   let fromAccount = getOrCreateAccount(event.params.sender);
-  //   let toAccount = getOrCreateAccount(event.params.receiver);
-  //   let vault = VaultStore.load(event.address.toHexString());
-  //   if (vault) {
-  //     let isFeeToStrategy = tokenFeeLibrary.isFeeToStrategy(
-  //       vault,
-  //       toAccount,
-  //       amount
-  //     );
-  //     let isFeeToTreasury = tokenFeeLibrary.isFeeToTreasury(
-  //       vault,
-  //       toAccount,
-  //       amount
-  //     );
-  //   }
-  // } else {
-  //   log.info(
-  //     '[Vault mappings] Not processing transfer: From: {} - To: {}. TX hash: {}',
-  //     [
-  //       event.params.sender.toHexString(),
-  //       event.params.receiver.toHexString(),
-  //       event.transaction.hash.toHexString(),
-  //     ]
-  //   );
-  // }
-}
-
 export function handleStrategyReported_v1(
   event: OldStrategyReportedEvent
 ): void {
-  // const vaultAddress = event.address;
-  // const vaultContract = VaultContract.bind(vaultAddress);
-  // strategyReported(
-  //   event.params.gain,
-  //   event.params.loss,
-  //   vaultContract,
-  //   vaultContractAddress
-  // );
+  const vaultAddress = event.address;
+  const strategyAddress = event.params.strategy;
+  
+  strategyReported(
+    event,
+    vaultAddress,
+    strategyAddress,
+    event.params.gain,
+    event.params.debtAdded
+  );
 }
 
 export function handleStrategyReported_v2(
   event: NewStrategyReportedEvent
 ): void {
-  // const vaultAddress = event.address;
-  // const vaultContract = VaultContract.bind(vaultAddress);
-  // strategyReported(
-  //   event.params.gain,
-  //   event.params.loss,
-  //   vaultContract,
-  //   vaultContractAddress
-  // );
+  const vaultAddress = event.address;
+  const strategyAddress = event.params.strategy;
+
+  strategyReported(
+    event,
+    vaultAddress,
+    strategyAddress,
+    event.params.gain,
+    event.params.debtAdded
+  );
 }

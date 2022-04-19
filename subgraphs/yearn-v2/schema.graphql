@@ -455,9 +455,12 @@ type _Strategy @entity {
   " Strategy address "
   id: ID!
   
+  " Total invested amount "
+  totalDebt: BigInt!
+
+  " Last reported harvest timestamp "
+  lastReport: BigInt!
+
   " Address Of the Vault "
   vaultAddress: Bytes!
-
-  " Performance Fee of the Strategy "
-  performanceFee: VaultFee!
 }

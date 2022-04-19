@@ -371,7 +371,7 @@
     "gas": 2921
   },
   {
-    "name": "strategies",
+    "name": "strategies_v1",
     "outputs": [
       { "type": "uint256", "name": "performanceFee" },
       { "type": "uint256", "name": "activation" },
@@ -386,6 +386,24 @@
     "stateMutability": "view",
     "type": "function",
     "gas": 10292
+  },
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "strategies_v2",
+    "inputs": [{ "name": "arg0", "type": "address" }],
+    "outputs": [
+      { "name": "performanceFee", "type": "uint256" },
+      { "name": "activation", "type": "uint256" },
+      { "name": "debtRatio", "type": "uint256" },
+      { "name": "minDebtPerHarvest", "type": "uint256" },
+      { "name": "maxDebtPerHarvest", "type": "uint256" },
+      { "name": "lastReport", "type": "uint256" },
+      { "name": "totalDebt", "type": "uint256" },
+      { "name": "totalGain", "type": "uint256" },
+      { "name": "totalLoss", "type": "uint256" }
+    ],
+    "gas": 22641
   },
   {
     "name": "withdrawalQueue",
@@ -883,6 +901,21 @@
       { "type": "uint256", "name": "gain", "indexed": false },
       { "type": "uint256", "name": "loss", "indexed": false },
       { "type": "uint256", "name": "debtPaid", "indexed": false },
+      { "type": "uint256", "name": "totalGain", "indexed": false },
+      { "type": "uint256", "name": "totalLoss", "indexed": false },
+      { "type": "uint256", "name": "totalDebt", "indexed": false },
+      { "type": "uint256", "name": "debtAdded", "indexed": false },
+      { "type": "uint256", "name": "debtRatio", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "StrategyReported",
+    "inputs": [
+      { "type": "address", "name": "strategy", "indexed": true },
+      { "type": "uint256", "name": "gain", "indexed": false },
+      { "type": "uint256", "name": "loss", "indexed": false },
       { "type": "uint256", "name": "totalGain", "indexed": false },
       { "type": "uint256", "name": "totalLoss", "indexed": false },
       { "type": "uint256", "name": "totalDebt", "indexed": false },

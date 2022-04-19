@@ -16,6 +16,9 @@ export function getPriceOfStakedTokens(
     constants.BIGINT_ZERO
   );
 
-  let virtualPrice = BigInt.fromString(getVirtualPrice(tokenAddress).toString()).div(_decimals);
+  let virtualPrice = BigInt.fromString(
+    getVirtualPrice(tokenAddress).toString()
+  ).div(_decimals);
+  
   return pricePerShare.div(_decimals).times(virtualPrice);
 }

@@ -20,6 +20,17 @@ export function readValue<T>(
   return callResult.reverted ? defaultValue : callResult.value;
 }
 
+export function getTokenDecimals(tokenAddr: Address): BigInt {
+  const token = ERC20Contract.bind(tokenAddr);
+
+  let decimals = readValue<BigInt>(
+    token.try_decimals(),
+    constants.DEFAULT_DECIMALS
+  );
+
+  return decimals;
+}
+
 export function getOrCreateYieldAggregator(id: string): YieldAggregator {
   let protocol = YieldAggregator.load(id);
 
