@@ -28,9 +28,9 @@ enum ProtocolType {
   # Will add more
 }
 
-type Token @entity {
+type Token @entity(immutable: true) {
   " Smart contract address of the token "
-  id: Bytes!
+  id: ID!
 
   " Mirrored from the smart contract "
   name: String!
@@ -43,9 +43,9 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity(immutable: true) {
   " Smart contract address of the reward token "
-  id: Bytes!
+  id: ID!
 
   " Mirrored from the smart contract "
   name: String!
@@ -61,7 +61,7 @@ type RewardToken @entity {
 
 interface Protocol {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: Bytes!
+  id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -100,7 +100,7 @@ interface Protocol {
 
 type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: Bytes!
+  id: ID!
 
   protocol: DexAmmProtocol!
 
@@ -122,7 +122,7 @@ type UsageMetricsDailySnapshot @entity {
 
 type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
-  id: Bytes!
+  id: ID!
 
   protocol: DexAmmProtocol!
 
@@ -151,7 +151,7 @@ type FinancialsDailySnapshot @entity {
 }
 type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
-  id: Bytes!
+  id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
@@ -188,7 +188,7 @@ type DexAmmProtocol implements Protocol @entity {
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
-  _poolIds: [Bytes!]!
+  _poolIds: [String!]!
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -219,7 +219,7 @@ enum LiquidityPoolFeeType {
 }
 
 type LiquidityPoolFee @entity {
-  id: Bytes!
+  id: ID!
 
   feePercentage: BigDecimal!
 
@@ -232,7 +232,7 @@ type LiquidityPoolFee @entity {
 
 type LiquidityPool @entity {
   " Smart contract address of the pool "
-  id: Bytes!
+  id: ID!
 
   " The protocol this pool belongs to "
   protocol: DexAmmProtocol!
@@ -295,7 +295,7 @@ type LiquidityPool @entity {
 #################################
 type PoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
-  id: Bytes!
+  id: ID!
 
   " The protocol this snapshot belongs to "
   protocol: DexAmmProtocol!
@@ -348,34 +348,35 @@ contracts.
 """
 interface Event {
   " { Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: Bytes!
+  hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-  to: Bytes!
+  to: String!
   " Address that sent the tokens "
-  from: Bytes!
+  from: String!
   blockNumber: BigInt!
   timestamp: BigInt!
 }
-type Deposit implements Event @entity {
+type Deposit implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
   " Transaction hash of the transaction that emitted this event "
-  hash: Bytes!
+  hash: String!
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-  to: Bytes!
+  to: String!
   " Address that sent the tokens "
-  from: Bytes!
+  from: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
@@ -397,21 +398,21 @@ type Deposit implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index }"
-  id: Bytes!
+  id: ID!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: Bytes!
+  hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-  to: Bytes!
+  to: String!
   " Address that sent the tokens "
-  from: Bytes!
+  from: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
@@ -435,21 +436,21 @@ type Withdraw implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity {
+type Swap implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
-  id: Bytes!
+  id: ID!
 
   " Transaction hash of the transaction that emitted this event "
-  hash: Bytes!
+  hash: String!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
   " Address that received the tokens "
-  to: Bytes!
+  to: String!
   " Address that sent the tokens "
-  from: Bytes!
+  from: String!
   blockNumber: BigInt!
   timestamp: BigInt!
   " Token deposited into pool "
@@ -472,29 +473,29 @@ type Swap implements Event @entity {
 # Helps to accumulate total unique users
 type Account @entity {
   " Address of the account "
-  id: Bytes!
+  id: ID!
 }
 # Helper entity for calculating daily active users
 type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
-  id: Bytes!
+  id: ID!
 }
 
 #Added Entities
 
 " Thia entity is used to track data from the transfer events. Mainly, I want to track the executor of the deposit/withdraw and the liquidity minted/burned "
 type _Transfer @entity {
-  id: Bytes! # txn hash
+  id: ID! # txn hash
   blockNumber: BigInt!
   timestamp: BigInt!
-  sender: Bytes!
-  type: Bytes!
+  sender: ID!
+  type: ID!
   liquidity: BigInt
 }
 
 "  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
 type _HelperStore @entity {
-  id: Bytes!
+  id: ID!
   " price of ETH in USD "
   valueDecimal: BigDecimal
   " number of deposits, number of unique users "
@@ -503,7 +504,7 @@ type _HelperStore @entity {
 " This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
 type _TokenTracker @entity {
   " Token Address "
-  id: Bytes!
+  id: ID!
   " pools token is in that are white listed for USD pricing "
   whitelistPools: [LiquidityPool!]!
   " derived price in USD "
@@ -514,7 +515,7 @@ type _TokenTracker @entity {
 
 type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "
-  id: Bytes!
+  id: ID!
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
