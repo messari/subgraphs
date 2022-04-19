@@ -556,8 +556,10 @@ type _Transfer @entity {
 "  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
 type _HelperStore @entity {
   id: ID!
+
   " price of ETH in USD "
   valueDecimal: BigDecimal
+
   " number of deposits, number of unique users "
   valueInt: Int
 }
@@ -565,10 +567,13 @@ type _HelperStore @entity {
 type _TokenTracker @entity {
   " Token Address "
   id: ID!
+
   " pools token is in that are white listed for USD pricing "
   whitelistPools: [LiquidityPool!]!
+
   " derived price in USD "
   derivedUSD: BigDecimal!
+
   " derived price in ETH "
   derivedETH: BigDecimal!
 }
@@ -576,8 +581,10 @@ type _TokenTracker @entity {
 type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "
   id: ID!
+
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigDecimal!]!
 }
