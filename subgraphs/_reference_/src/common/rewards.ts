@@ -124,8 +124,7 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
         if (windowIndexBlockTimestamp < startTimestamp) {
             circularBuffer.windowStartIndex = circularBuffer.windowStartIndex + INT_TWO
             if (circularBuffer.windowStartIndex >= circularBuffer.bufferSize) circularBuffer.windowStartIndex = INT_ZERO
-        }
-        else break
+        } else break
     }
 
     // Wideness of the window in seconds.
