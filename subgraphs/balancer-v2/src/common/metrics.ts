@@ -6,28 +6,37 @@ import {
   updatePoolDailySnapshot,
 } from "./getters";
 import {BIGDECIMAL_ZERO, SECONDS_PER_DAY} from "./constants";
-import { Account, DailyActiveAccount, _TokenPrice, LiquidityPool, Swap } from "../../generated/schema";
+import {Account, DailyActiveAccount, _TokenPrice, LiquidityPool, Swap, LiquidityPoolFee} from "../../generated/schema";
 import { calculatePrice, isUSDStable, swapValueInUSD, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { getUsdPricePerToken } from "../pricing";
+import {log} from "matchstick-as";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
   let dex = getOrCreateDex()
   let totalValueLocked = BIGDECIMAL_ZERO
   let totalVolumeUsd = BIGDECIMAL_ZERO
+  let totalFeesUsd = BIGDECIMAL_ZERO
 
   for (let i = 0; i < dex._poolIds.length; i++) {
     let pool = LiquidityPool.load(dex._poolIds[i])
     if (pool) {
       totalValueLocked = totalValueLocked.plus(pool.totalValueLockedUSD)
       totalVolumeUsd = totalVolumeUsd.plus(pool.totalVolumeUSD)
+      totalFeesUsd = totalFeesUsd.plus(pool._totalSwapFee)
     }
   }
 
+  let supplySideRevenue = totalFeesUsd.times(BigDecimal.fromString("0.9"))
+  let protocolSideRevenue = totalFeesUsd.times(BigDecimal.fromString("0.1"))
+
   financialMetrics.totalValueLockedUSD = totalValueLocked;
   financialMetrics.totalVolumeUSD = totalVolumeUsd;
+  financialMetrics.feesUSD = totalFeesUsd;
+  financialMetrics.supplySideRevenueUSD = supplySideRevenue;
+  financialMetrics.protocolSideRevenueUSD = protocolSideRevenue;
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
 
@@ -106,10 +115,20 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
     let amountIn = scaleDown(swap.amountIn, tokenIn);
     let amountOut = scaleDown(swap.amountOut, tokenOut);
     let swapValue = swapValueInUSD(tokenIn, amountIn, tokenOut, amountOut);
+    let fee = LiquidityPoolFee.load(pool.fees[0])
+    if (fee) {
+      let swapFee = swapValue.times(fee.feePercentage)
+      pool._totalSwapFee = pool._totalSwapFee.plus(swapFee)
+    }
     pool.totalVolumeUSD = pool.totalVolumeUSD.plus(swapValue);
   }
   pool.totalValueLockedUSD = newPoolLiquidity;
-  pool.outputTokenPriceUSD = newPoolLiquidity.div(pool.outputTokenSupply.toBigDecimal());
+  pool.outputTokenPriceUSD = newPoolLiquidity.div(
+      scaleDown(
+          pool.outputTokenSupply,
+          Address.fromString(pool.outputToken)
+      )
+  );
   pool.save();
   updatePoolDailySnapshot(event, pool);
 }

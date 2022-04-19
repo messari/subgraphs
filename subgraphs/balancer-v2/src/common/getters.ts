@@ -91,6 +91,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.inputTokenBalances = [BIGINT_ZERO];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  pool._totalSwapFee = BIGDECIMAL_ZERO
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   pool.createdBlockNumber = blockInfo.number;
@@ -173,7 +174,6 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
     snapshot.protocol = pool.protocol;
     snapshot.pool = pool.id;
     snapshot.inputTokenBalances = pool.inputTokenBalances;
-    pool.save();
   }
   snapshot.outputTokenSupply = pool.outputTokenSupply;
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;

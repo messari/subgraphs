@@ -386,6 +386,8 @@ type LiquidityPool @entity {
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
+  _totalSwapFee: BigDecimal!
 }
 
 ##################################

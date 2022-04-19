@@ -4,7 +4,7 @@ import { createPool, getOrCreateToken, getOrCreateSwap } from "../common/getters
 import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
 import { updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics } from "../common/metrics";
-import { isUSDStable, swapValueInUSD, valueInUSD } from "../common/pricing";
+import { isUSDStable, valueInUSD } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";
 
@@ -96,14 +96,10 @@ export function handleSwap(event: Swap): void {
   swap.tokenIn = tokenIn.toHexString();
   swap.tokenOut = tokenOut.toHexString();
   swap.amountIn = event.params.amountIn;
-  swap.amountIn = event.params.amountOut;
+  swap.amountOut = event.params.amountOut;
   swap.amountInUSD = isUSDStable(tokenIn) ? amountIn : valueInUSD(amountIn, tokenIn);
   swap.amountOutUSD = isUSDStable(tokenOut) ? amountOut : valueInUSD(amountOut, tokenOut);
   swap.save();
-
-  const swapValue = swapValueInUSD(event.params.tokenIn, amountIn, event.params.tokenOut, amountOut);
-  pool.totalVolumeUSD = pool.totalVolumeUSD.plus(swapValue);
-  pool.save();
 
   updatePoolMetrics(event, pool);
   updateUsageMetrics(event, event.transaction.from);
