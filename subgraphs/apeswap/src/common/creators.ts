@@ -1,4 +1,4 @@
-// import { log } from "@graphprotocol/graph-ts"
+import { log } from "@graphprotocol/graph-ts"
 import { BigInt, BigDecimal, Address, store, ethereum, Bytes } from "@graphprotocol/graph-ts"
 import {
   Account,

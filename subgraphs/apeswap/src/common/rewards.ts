@@ -5,7 +5,7 @@
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
 import { SubgraphNetwork } from "./constants";
 import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
@@ -47,7 +47,7 @@ export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER"
 export namespace RewardIntervalType {
     export const BLOCK = "BLOCK"
     export const TIMESTAMP = "TIMESTAMP"
-  }
+}
 
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
 // 86400 = 1 Day
@@ -68,8 +68,6 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.
 * @returns {BigDecimal}               - Returns estimated blocks for specified rate
 */
 export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: BigInt, rewardRate: BigDecimal, rewardType: string): BigDecimal {
-    if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
-
     let circularBuffer = getOrCreateCircularBuffer()
 
     // Create entity for the current block
@@ -94,7 +92,8 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
         circularBuffer.save()
 
         // return because there is only 1 reference point.
-        return circularBuffer.blocksPerDay.times(rewardRate)
+        if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
+        else return circularBuffer.blocksPerDay.times(rewardRate)
     }
 
     // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
@@ -104,7 +103,8 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
     else recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO]
 
     if (currentTimestampI32 - recentSavedTimestamp <= TIMESTAMP_STORAGE_INTERVAL) {
-        return circularBuffer.blocksPerDay.times(rewardRate)
+        if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
+        else return circularBuffer.blocksPerDay.times(rewardRate)
     }
 
     blocks[circularBuffer.nextIndex] = currentTimestampI32
@@ -145,6 +145,7 @@ export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: B
 
     circularBuffer.save()
     
+    if (rewardType == RewardIntervalType.TIMESTAMP) return rewardRate.times(RATE_IN_SECONDS_BD)
     return rewardRate.times(circularBuffer.blocksPerDay)
 }
 
@@ -192,5 +193,8 @@ function getStartingBlockRate(): BigDecimal {
     // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
     // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
     // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
-    else return BIGDECIMAL_ZERO
+    else {
+        log.warning("Network not found", [])
+        return BIGDECIMAL_ZERO
+    }
 }

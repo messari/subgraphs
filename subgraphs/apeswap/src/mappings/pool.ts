@@ -5,11 +5,7 @@ import {
   _TokenTracker
 } from '../../generated/schema'
 import { Mint, Burn, Swap, Transfer, Sync } from '../../generated/templates/Pair/Pair'
-import {
-  createDeposit,
-  createWithdraw,
-  createSwapHandleVolumeAndFees
-} from '../common/creators'
+import {createDeposit, createWithdraw, createSwapHandleVolumeAndFees} from '../common/creators'
 import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from '../common/handlers'
 import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from '../common/updateMetrics'
 import {
@@ -18,7 +14,6 @@ import {
 } from '../common/constants'
 
 export function handleTransfer(event: Transfer): void {
-
   // ignore initial transfers for first adds
   if (event.params.to == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
     return
@@ -40,7 +35,6 @@ export function handleTransfer(event: Transfer): void {
   if (event.params.to == ZERO_ADDRESS && event.params.from == event.address) {
     handleTransferBurn(event, event.params.value, event.params.from)
   }
-
 }
 
 export function handleSync(event: Sync): void {

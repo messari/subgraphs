@@ -219,24 +219,3 @@ export function updateDepositHelper(poolAddress: Address): void {
     poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE
     poolDeposits.save()
 }
-
-export function updateLpWithReward(
-  lpTokenAddress: Address,
-  rewardTokenAddress: Address,
-  rewardEmissionPerDay: BigInt,
-): void {
-  let pool = LiquidityPool.load(lpTokenAddress.toHexString());
-  if (pool !== null) {
-    let helperStore = _HelperStore.load(HELPER_STORE_ID)!;
-    let rewardToken = getOrCreateToken(rewardTokenAddress);
-    pool.rewardTokens = [getOrCreateRewardToken(rewardTokenAddress).id];
-    pool.currentStakedOutputTokenAmount = [rewardEmissionPerDay];
-    let rewardTokenEmissionsInNativeToken = findNativeTokenPricePerToken(
-      rewardToken,
-    ).times(toDecimal(rewardEmissionPerDay));
-    pool.currentRewardTokenEmissionsUSD = [
-      rewardTokenEmissionsInNativeToken.times(helperStore._value),
-    ];
-    pool.save();
-  }
-}

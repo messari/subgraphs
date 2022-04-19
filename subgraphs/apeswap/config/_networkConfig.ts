@@ -1,6 +1,7 @@
-import { Address, BigDecimal, Bytes, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, Bytes, dataSource, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../generated/Factory/Factory";
 import { SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
+import { RewardIntervalType } from "../src/common/rewards";
 import { toBytesArray, toPercentage } from "../src/common/utils/utils";
 
 let PROTOCOL_NAME_TEMP: string 
@@ -15,6 +16,8 @@ let PROTOCOL_FEE_TO_ON_TEMP: BigDecimal; // protocol fee of the protocol in the 
 let LP_FEE_TO_ON_TEMP: BigDecimal; // supply fee of the protocol in the network when protocol fee is off
 let PROTOCOL_FEE_TO_OFF_TEMP: BigDecimal; // protocol fee of the protocol in the network when protocol fee is on
 let LP_FEE_TO_OFF_TEMP: BigDecimal; // supply fee of the protocol in the network when protocol fee is off
+
+let REWARD_INTERVAL_TYPE_TEMP: string
 
 let NATIVE_TOKEN_TEMP: string; // Address of wrapped native token
 let WHITELIST_TOKENS_TEMP: string[]; // A tokens whose amounts should contribute to tracked volume and liquidity
@@ -35,6 +38,8 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
   LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
   
+  REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.BLOCK
+
   NATIVE_TOKEN_TEMP = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
   WHITELIST_TOKENS_TEMP = [
     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
@@ -72,6 +77,8 @@ else {
   PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
   LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
  
+  REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.TIMESTAMP
+
   NATIVE_TOKEN_TEMP = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
   WHITELIST_TOKENS_TEMP = [
     "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
@@ -113,9 +120,10 @@ export namespace NetworkConfigs {
   export const PROTOCOL_FEE_TO_OFF = PROTOCOL_FEE_TO_OFF_TEMP;
   export const LP_FEE_TO_OFF = LP_FEE_TO_OFF_TEMP;
   
+  export const REWARD_INTERVAL_TYPE = REWARD_INTERVAL_TYPE_TEMP;
+  
   export const NATIVE_TOKEN = Bytes.fromHexString(NATIVE_TOKEN_TEMP)
   export const WHITELIST_TOKENS = toBytesArray(WHITELIST_TOKENS_TEMP)
   export const STABLE_COINS = toBytesArray(STABLE_COINS_TEMP)
   export const STABLE_ORACLE_POOLS = toBytesArray(STABLE_ORACLE_POOLS_TEMP)
-
 }

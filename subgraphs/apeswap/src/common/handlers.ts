@@ -1,6 +1,6 @@
 
    
-import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
+import { ethereum, BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts"
 import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer } from "./getters"
 import { TransferType } from "./constants"
 

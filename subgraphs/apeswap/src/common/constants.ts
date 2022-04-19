@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts';
+import { log, BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts';
 
 ////////////////////////
 ///// Schema Enums /////
@@ -8,11 +8,12 @@ import { BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts';
 // They are mainly intended for convenience on the data consumer side.
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
+
 export namespace SchemaNetwork {
   export const ARBITRUM = "ARBITRUM";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC";
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
@@ -34,7 +35,7 @@ export namespace SubgraphNetwork {
   export const ARBITRUM = "arbitrum-one";
   export const AVALANCHE = "avalanche";
   export const AURORA = "aurora";
-  export const BSC = "bnb";
+  export const BSC = "bsc";
   export const CELO = "celo";
   export const ETHEREUM = "mainnet";
   export const FANTOM = "fantom";
@@ -123,3 +124,4 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 );
 
 export const ZERO_ADDRESS = Bytes.fromHexString('0x0000000000000000000000000000000000000000')
+

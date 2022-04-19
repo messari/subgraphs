@@ -1,4 +1,4 @@
-// import { log } from "@graphprotocol/graph-ts"
+import { log } from "@graphprotocol/graph-ts"
 import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts"
 import { NetworkConfigs } from "../../config/_networkConfig"
 import { ERC20 } from "../../generated/Factory/ERC20"
@@ -17,7 +17,6 @@ import {
   RewardToken
 } from "../../generated/schema"
 import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType} from "./constants"
-
 
 export function getOrCreateDex(): DexAmmProtocol {
     let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS)
