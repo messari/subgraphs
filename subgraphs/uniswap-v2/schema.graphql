@@ -65,8 +65,10 @@ interface Protocol {
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
+
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
@@ -146,17 +148,21 @@ type FinancialsDailySnapshot @entity {
 
   " Block number of this snapshot "
   blockNumber: BigInt!
+
   " Timestamp of this snapshot "
   timestamp: BigInt!
 }
+
 type DexAmmProtocol implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
   " Name of the protocol, including version. e.g. Uniswap v3 "
   name: String!
+
   " Slug of protocol, including version. e.g. uniswap-v3 "
   slug: String!
+
   " Version of the subgraph schema, in SemVer format (e.g. 1.0.0) "
   schemaVersion: String!
 
@@ -245,7 +251,9 @@ type LiquidityPool @entity {
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
+
   ##### Quantitative Data #####
+
   " Current TVL (Total Value Locked) of this pool "
   currentTvlUSD: BigDecimal!
 
@@ -266,15 +274,21 @@ type LiquidityPool @entity {
 
   " Per-block reward token emission normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   currentRewardTokenEmissionsAmount: [BigInt!]
+
   " Per-block reward token emission normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   currentRewardTokenEmissionsUSD: [BigDecimal!]
+
   " Creation timestamp "
   createdTimestamp: BigInt!
+
   " Creation block number "
   createdBlockNumber: BigInt!
+
   " Pool snapshots "
   snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
+
   ##### DexAmm-Specific #####
+
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
   name: String
 
@@ -286,13 +300,18 @@ type LiquidityPool @entity {
 
   " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
+
   deposits: [Deposit!]! @derivedFrom(field: "pool")
+
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
+
   swaps: [Swap!]! @derivedFrom(field: "pool")
 }
+
 #################################
 ##### Pool-Level Timeseries #####
 #################################
+
 type PoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
@@ -355,34 +374,50 @@ interface Event {
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
+
   " Address that received the tokens "
   to: String!
+
   " Address that sent the tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
 }
+
 type Deposit implements Event @entity(immutable: true) {
   " { Transaction hash }-{ Log index } "
   id: ID!
+
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
+
   " Address that received the tokens "
   to: String!
+
   " Address that sent the tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
+
   " Output token of the pool. E.g. the UNI-LP token "
   outputToken: Token
+
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
@@ -407,14 +442,20 @@ type Withdraw implements Event @entity(immutable: true) {
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
+
   " Address that received the tokens "
   to: String!
+
   " Address that sent the tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
@@ -445,36 +486,51 @@ type Swap implements Event @entity(immutable: true) {
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
+
   " The protocol this transaction belongs to "
   protocol: DexAmmProtocol!
+
   " Address that received the tokens "
   to: String!
+
   " Address that sent the tokens "
   from: String!
+
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   " Token deposited into pool "
   tokenIn: Token!
+
   " Amount of token deposited into pool in native units "
   amountIn: BigInt!
+
   " Amount of token deposited into pool in USD "
   amountInUSD: BigDecimal!
+
   " Token withdrawn from pool "
   tokenOut: Token!
+
   " Amount of token withdrawn from pool in native units "
   amountOut: BigInt!
+
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
+
   ##### DexAmm-Specific #####
+
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
+
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity {
   " Address of the account "
   id: ID!
 }
+
 # Helper entity for calculating daily active users
 type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
@@ -487,9 +543,13 @@ type DailyActiveAccount @entity {
 type _Transfer @entity {
   id: ID! # txn hash
   blockNumber: BigInt!
+
   timestamp: BigInt!
+
   sender: ID!
+
   type: ID!
+
   liquidity: BigInt
 }
 
