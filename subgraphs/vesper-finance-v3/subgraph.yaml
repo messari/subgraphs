@@ -46,6 +46,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -94,6 +96,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -142,6 +146,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -190,6 +196,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -238,6 +246,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -286,6 +296,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -334,6 +346,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -382,6 +396,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -430,6 +446,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -478,6 +496,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -526,6 +546,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -574,6 +596,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
@@ -622,6 +646,8 @@ dataSources:
         - name: PoolRewardsOld
           file: ./abis/pool-rewards-old.json
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositV3
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)

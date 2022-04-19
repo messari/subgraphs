@@ -11,6 +11,7 @@ import {
   PoolV3,
   Transfer,
   Withdraw,
+  Deposit,
 } from "../../generated/poolV3_vaUSDC/PoolV3";
 import { Erc20Token } from "../../generated/poolV3_vaUSDC/Erc20Token";
 import { VesperPool } from "../../generated/schema";
@@ -26,8 +27,9 @@ import { ZERO_ADDRESS, VVSP_ADDRESS_HEX } from "../constant";
 import {
   getOrCreateYieldAggregator,
   getOrCreateVault,
-  getOrCreateDeposit,
+  getOrCreateTransfer,
   getOrCreateWithdraw,
+  getOrCreateDeposit,
 } from "../orm";
 
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
@@ -293,7 +295,7 @@ export function handleTransferV3(event: Transfer): void {
     );
     return;
   }
-  getOrCreateDeposit(event, dataSource.address());
+  getOrCreateTransfer(event, dataSource.address());
   // let interestFees = event.params.value
   //   .toBigDecimal()
   //   .div(getDecimalDivisor(poolV3.decimals()));
@@ -313,4 +315,8 @@ export function handleTransferV3(event: Transfer): void {
   //   ]
   // );
   // saveRevenue(getPoolV3(poolAddressHex), revenue);
+}
+
+export function handleDepositV3(event: Deposit): void {
+  getOrCreateDeposit(event, dataSource.address());
 }

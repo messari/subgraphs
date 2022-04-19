@@ -13,6 +13,7 @@ import {
   PoolV3,
   Transfer,
   Withdraw as WithdrawEvent,
+  Deposit as DepositEvent,
 } from "../generated/poolV3_vaUSDC/PoolV3";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
@@ -140,7 +141,7 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
-export function getOrCreateDeposit(
+export function getOrCreateTransfer(
   event: Transfer,
   vaultAddress: Address
 ): Deposit {
@@ -165,6 +166,41 @@ export function getOrCreateDeposit(
     deposit.amount = event.params.value;
     deposit.amountUSD = toUsd(
       event.params.value.toBigDecimal(),
+      token.decimals,
+      Address.fromString(token.id)
+    );
+
+    deposit.save();
+  }
+
+  return deposit;
+}
+
+export function getOrCreateDeposit(
+  event: DepositEvent,
+  vaultAddress: Address
+): Deposit {
+  const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
+  let deposit = Deposit.load(id);
+
+  if (!deposit) {
+    const yAggr = getOrCreateYieldAggregator();
+    const poolv3 = PoolV3.bind(vaultAddress);
+    const token = getOrCreateToken(poolv3.token());
+
+    deposit = new Deposit(id);
+    deposit.vault = vaultAddress.toHexString();
+    deposit.hash = event.transaction.hash.toHexString();
+    deposit.logIndex = event.logIndex.toI32();
+    deposit.protocol = yAggr.id;
+    deposit.to = vaultAddress.toHexString();
+    deposit.from = event.params.owner.toHexString();
+    deposit.blockNumber = event.block.number;
+    deposit.timestamp = event.block.timestamp;
+    deposit.asset = getOrCreateToken(poolv3.token()).id;
+    deposit.amount = event.params.amount;
+    deposit.amountUSD = toUsd(
+      event.params.shares.toBigDecimal(),
       token.decimals,
       Address.fromString(token.id)
     );
