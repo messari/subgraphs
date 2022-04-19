@@ -1,8 +1,10 @@
-# Lending Protocol Subgraph
+# Alchemix Lending Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://alchemix.fi/
+- https://alchemix-finance.gitbook.io/v2/
+- Add here
 
 ## Calculation Methodology v0.0.1
 
