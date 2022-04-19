@@ -7,6 +7,7 @@ import {
   BIGDECIMAL_ZERO,
   ABRA_USER_REVENUE_SHARE,
   ABRA_PROTOCOL_REVENUE_SHARE,
+  DEFAULT_DECIMALS,
 } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
@@ -125,7 +126,28 @@ export function updateTVL(event: ethereum.Event): void {
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD);
   }
   LendingProtocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
+  LendingProtocol.totalDepositUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshots.totalValueLockedUSD = protocolTotalValueLockedUSD;
+  financialsDailySnapshots.totalDepositUSD = protocolTotalValueLockedUSD;
+  LendingProtocol.save();
+  financialsDailySnapshots.save();
+}
+
+export function updateTotalBorrows(event: ethereum.Event): void {
+  // new user count handled in updateUsageMetrics
+  let LendingProtocol = getOrCreateLendingProtocol();
+  let financialsDailySnapshots = getOrCreateFinancials(event);
+  let marketIdList = LendingProtocol.marketIdList;
+  let totalBorrowUSD = BIGDECIMAL_ZERO;
+  let mimPriceUSD = fetchMimPriceUSD(event);
+  for (let i: i32 = 0; i < marketIdList.length; i++) {
+    let marketAddress = marketIdList[i];
+    totalBorrowUSD = totalBorrowUSD.plus(
+      bigIntToBigDecimal(getMarket(marketAddress).outputTokenSupply, DEFAULT_DECIMALS).times(mimPriceUSD),
+    );
+  }
+  LendingProtocol.totalBorrowUSD = totalBorrowUSD;
+  financialsDailySnapshots.totalBorrowUSD = totalBorrowUSD;
   LendingProtocol.save();
   financialsDailySnapshots.save();
 }
@@ -142,8 +164,9 @@ export function updateMarketStats(
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let priceUSD = getOrCreateTokenPriceEntity(asset).priceUSD;
-  let tvlUSD = BIGDECIMAL_ZERO;
-  let totalVolumeUSD = BIGDECIMAL_ZERO;
+  let mimPriceUSD = fetchMimPriceUSD(event);
+  let tvlUSD = market.totalValueLockedUSD;
+  let totalBorrowUSD = market.totalBorrowUSD;
   if (eventType == "DEPOSIT") {
     let inputTokenBalances = market.inputTokenBalances;
     let inputTokenBalance = inputTokenBalances.pop();
@@ -159,17 +182,26 @@ export function updateMarketStats(
     inputTokenBalances.push(inputTokenBalance);
     market.inputTokenBalances = inputTokenBalances;
   } else if (eventType == "BORROW") {
-    totalVolumeUSD = bigIntToBigDecimal(amount, token_decimals).times(priceUSD);
+    let eventVolumeUSD = bigIntToBigDecimal(amount, token_decimals).times(priceUSD);
+    market.totalVolumeUSD = market.totalVolumeUSD.plus(eventVolumeUSD);
     market.outputTokenSupply = market.outputTokenSupply.plus(amount);
+    totalBorrowUSD = bigIntToBigDecimal(market.outputTokenSupply.plus(amount)).times(mimPriceUSD);
+    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(eventVolumeUSD);
+    protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(eventVolumeUSD);
+    updateTotalBorrows(event);
   } else if (eventType == "REPAY") {
-    totalVolumeUSD = bigIntToBigDecimal(amount, token_decimals).times(priceUSD);
+    let eventVolumeUSD = bigIntToBigDecimal(amount, token_decimals).times(priceUSD);
+    market.totalVolumeUSD = market.totalVolumeUSD.plus(eventVolumeUSD);
     market.outputTokenSupply = market.outputTokenSupply.minus(amount);
+    totalBorrowUSD = bigIntToBigDecimal(market.outputTokenSupply.plus(amount)).times(mimPriceUSD);
+    financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(eventVolumeUSD);
+    protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(eventVolumeUSD);
+    updateTotalBorrows(event);
   }
   market.totalValueLockedUSD = tvlUSD;
-  market.totalVolumeUSD = market.totalVolumeUSD.plus(totalVolumeUSD);
-  financialsDailySnapshot.totalVolumeUSD = financialsDailySnapshot.totalVolumeUSD.plus(totalVolumeUSD);
-  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(totalVolumeUSD);
-  market.outputTokenPriceUSD = getOrCreateTokenPriceEntity(MIM).priceUSD;
+  market.totalDepositUSD = tvlUSD;
+  market.totalBorrowUSD = totalBorrowUSD;
+  market.outputTokenPriceUSD = mimPriceUSD;
   market.save();
   financialsDailySnapshot.save();
   protocol.save();
