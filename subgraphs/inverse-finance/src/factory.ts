@@ -1,8 +1,5 @@
-import {
-  Address,
-  log,
-} from "@graphprotocol/graph-ts"
-import { CToken } from "../generated/templates"
+import { Address, log } from "@graphprotocol/graph-ts";
+import { CToken } from "../generated/templates";
 import {
   Factory,
   MarketListed,
@@ -11,7 +8,7 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   DistributedBorrowerComp,
-  DistributedSupplierComp,  
+  DistributedSupplierComp,
 } from "../generated/Factory/Factory";
 import {
   MANTISSA_DECIMALS,
@@ -22,23 +19,23 @@ import {
   getOrCreateToken,
   getOrCreateUnderlyingToken,
   getOrCreateMarket,
-  getOrCreateProtocol
+  getOrCreateProtocol,
 } from "./common/getters";
 import { Market } from "../generated/schema";
-import { updateMarketEmission } from './common/helpers'
-import { decimalsToBigDecimal } from "./common/utils"
+import { updateMarketEmission } from "./common/helpers";
+import { decimalsToBigDecimal } from "./common/utils";
 
 export function handleMarketListed(event: MarketListed): void {
-  let protocol = getOrCreateProtocol()
-  
-  getOrCreateToken(event.params.cToken)
-  getOrCreateUnderlyingToken(event.params.cToken)
+  let protocol = getOrCreateProtocol();
+
+  getOrCreateToken(event.params.cToken);
+  getOrCreateUnderlyingToken(event.params.cToken);
 
   let marketAddr = event.params.cToken.toHexString();
   getOrCreateMarket(marketAddr, event);
 
   // trigger CToken template
-  CToken.create(event.params.cToken)
+  CToken.create(event.params.cToken);
 }
 
 export function handleMintBorrowPaused(event: ActionPaused1): void {
