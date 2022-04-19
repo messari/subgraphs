@@ -318,5 +318,23 @@ export function handleTransferV3(event: Transfer): void {
 }
 
 export function handleDepositV3(event: Deposit): void {
+  let poolAddress = dataSource.address();
+  let poolAddressHex = poolAddress.toHexString();
+  log.info("Entered handleTransferV3 in tx={}, pool={}", [
+    event.transaction.hash.toHex(),
+    poolAddressHex,
+  ]);
+  let poolV3 = PoolV3.bind(poolAddress);
+  if (
+    event.params.owner != ZERO_ADDRESS ||
+    !hasStrategy(poolV3.getStrategies(), dataSource.address())
+  ) {
+    let toHex = dataSource.address().toHexString();
+    log.info(
+      "Transfer Event for pool V3 {} was made by {} - it is not interest fees.",
+      [poolAddressHex, toHex]
+    );
+    return;
+  }
   getOrCreateDeposit(event, dataSource.address());
 }
