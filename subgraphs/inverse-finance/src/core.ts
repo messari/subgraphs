@@ -1,5 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { anDOLA_ADDRESS, BIGDECIMAL_ZERO } from "./common/constants";
+import { BIGDECIMAL_ZERO } from "./common/constants";
 
 import {
   Mint,
@@ -84,10 +84,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   let interestAccumulated = event.params.interestAccumulated;
-  // interest is accounted in DOLA
-  let pricePerToken = getUnderlyingTokenPricePerAmount(
-    Address.fromString(anDOLA_ADDRESS)
-  );
+  // interest is accounted in underlying token
+  let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
   let interestAccumulatedUSD = interestAccumulated
     .toBigDecimal()
     .times(pricePerToken);

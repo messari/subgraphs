@@ -4,9 +4,6 @@ import {
   BIGINT_ZERO,
   BIGDECIMAL_ZERO,
   FACTORY_ADDRESS,
-  DOLA_ADDRESS,
-  anDOLA_ADDRESS,
-  INV_ADDRESS,
   XINV_ADDRESS,
   SECONDS_PER_DAY,
   MANTISSA_DECIMALS,
@@ -147,9 +144,7 @@ export function createBorrow(event: Borrow): void {
   let borrow = BorrowSC.load(borrowId);
 
   if (borrow == null) {
-    let pricePerToken = getUnderlyingTokenPricePerAmount(
-      Address.fromString(anDOLA_ADDRESS)
-    );
+    let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
     borrow = new BorrowSC(borrowId);
 
     borrow.hash = event.transaction.hash.toHexString();
@@ -160,7 +155,7 @@ export function createBorrow(event: Borrow): void {
     borrow.blockNumber = event.block.number;
     borrow.timestamp = event.block.timestamp;
     borrow.market = event.address.toHexString();
-    borrow.asset = DOLA_ADDRESS;
+    borrow.asset = getOrCreateUnderlyingToken(event.address).id;
     borrow.amount = event.params.borrowAmount;
     borrow.amountUSD = borrow.amount.toBigDecimal().times(pricePerToken);
 
@@ -178,9 +173,7 @@ export function createRepay(event: RepayBorrow): void {
   let repay = Repay.load(repayId);
 
   if (repay == null) {
-    let pricePerToken = getUnderlyingTokenPricePerAmount(
-      Address.fromString(anDOLA_ADDRESS)
-    );
+    let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
     repay = new Repay(repayId);
 
     repay.hash = event.transaction.hash.toHexString();
@@ -191,7 +184,7 @@ export function createRepay(event: RepayBorrow): void {
     repay.blockNumber = event.block.number;
     repay.timestamp = event.block.timestamp;
     repay.market = event.address.toHexString();
-    repay.asset = DOLA_ADDRESS;
+    repay.asset = getOrCreateUnderlyingToken(event.address).id;
     repay.amount = event.params.repayAmount;
     repay.amountUSD = repay.amount.toBigDecimal().times(pricePerToken);
 
@@ -212,8 +205,8 @@ export function createLiquidate(event: LiquidateBorrow): void {
     let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(
       event.address
     );
-    let pricePerDOLA = getUnderlyingTokenPricePerAmount(
-      Address.fromString(anDOLA_ADDRESS)
+    let pricePerCollateralToken = getUnderlyingTokenPricePerAmount(
+      event.params.cTokenCollateral
     );
 
     liquidate = new Liquidate(liquidateId);
@@ -230,10 +223,10 @@ export function createLiquidate(event: LiquidateBorrow): void {
     liquidate.amount = event.params.seizeTokens;
     liquidate.amountUSD = liquidate.amount
       .toBigDecimal()
-      .times(pricePerUnderlyingToken);
+      .times(pricePerCollateralToken);
     let repayAmountUSD = event.params.repayAmount
       .toBigDecimal()
-      .times(pricePerDOLA);
+      .times(pricePerUnderlyingToken);
 
     liquidate.profitUSD = liquidate.amountUSD!.minus(repayAmountUSD);
 
@@ -246,29 +239,32 @@ export function createLiquidate(event: LiquidateBorrow): void {
 // Update UsageMetricsDailySnapshots entity and LendingProtocol.totalUniqueUsers
 export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   // Number of days since Unix epoch
-  let days: string = (
-    event.block.timestamp.toI64() / SECONDS_PER_DAY
-  ).toString();
+  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY
+  let daysStr: string = days.toString();
+  let daysPrior = days - 1
+  let daysPriorStr: string = daysPrior.toString();
   let accountId: string = user.toHexString();
-  let dailyActiveAccountId: string = days + "-" + accountId;
+  let dailyActiveAccountId: string = daysStr + "-" + accountId;
 
   //let protocol = getOrCreateProtocol()
   // Account entity keeps user addresses
   let isUniqueUser = createAndIncrementAccount(accountId);
-  let isDailyActiveUser = createAndIncrementAccount(dailyActiveAccountId);
+  let isDailyActiveUser = createAndIncrementDailyAccount(dailyActiveAccountId);
 
-  let usageMetrics = UsageMetricsDailySnapshot.load(days);
+  let usageMetrics = UsageMetricsDailySnapshot.load(daysStr);
+  let usageMetricsPrior = UsageMetricsDailySnapshot.load(daysPriorStr)
+  let totalUniqueUsersPriorDay = (usageMetricsPrior == null) ? 0 : usageMetricsPrior.totalUniqueUsers
   if (usageMetrics == null) {
-    usageMetrics = new UsageMetricsDailySnapshot(days);
+    usageMetrics = new UsageMetricsDailySnapshot(daysStr);
     usageMetrics.protocol = FACTORY_ADDRESS;
     usageMetrics.activeUsers = 0;
     usageMetrics.totalUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
   }
 
-  usageMetrics.activeUsers += isUniqueUser;
-  usageMetrics.totalUniqueUsers += isDailyActiveUser;
-  usageMetrics.dailyTransactionCount += 1;
+  usageMetrics.activeUsers += isDailyActiveUser;
+  usageMetrics.totalUniqueUsers = totalUniqueUsersPriorDay + isUniqueUser;
+  usageMetrics.dailyTransactionCount += 1; //increment whenever updateUsageMetrics is called
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetrics.blockNumber = event.block.number;
@@ -280,6 +276,7 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   let protocol = getOrCreateProtocol();
   if (protocol == null) {
     log.error("LendingProtocol entity is null{}; something went wrong", [""]);
+    return
   }
 
   protocol.totalUniqueUsers += isUniqueUser;
@@ -400,8 +397,8 @@ export function updateMarket(
   if (market != null) {
     let tokenContract = CErc20.bind(event.address);
     // To get the price of DOLA, fixed at 1
-    let pricePerDOLA = getUnderlyingTokenPricePerAmount(
-      Address.fromString(anDOLA_ADDRESS)
+    let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(
+      event.address
     );
     // To get the price of the underlying (input) token
     let inputTokenPrice = getUnderlyingTokenPrice(event.address);
@@ -426,10 +423,10 @@ export function updateMarket(
     } else {
       market.totalBorrowUSD = totalBorrows.value
         .toBigDecimal()
-        .times(pricePerDOLA);
+        .times(pricePerUnderlyingToken);
     }
     if (borrowAmount != BIGINT_ZERO) {
-      let borrowAmountUSD = borrowAmount.toBigDecimal().times(pricePerDOLA);
+      let borrowAmountUSD = borrowAmount.toBigDecimal().times(pricePerUnderlyingToken);
 
       market.totalVolumeUSD = market.totalVolumeUSD.plus(borrowAmountUSD);
     }
@@ -525,17 +522,17 @@ export function updateMarketRates(event: ethereum.Event): void {
   let borrowRate = tokenContract.try_borrowRatePerBlock();
   let depositRate = tokenContract.try_supplyRatePerBlock();
   if (borrowRate.reverted) {
-    log.warning("Failed to get borrowRatePerBlock() for Market {} at tx hash {}", [
-      marketId,
-      event.transaction.hash.toHexString(),
-    ]);
+    log.warning(
+      "Failed to get borrowRatePerBlock() for Market {} at tx hash {}",
+      [marketId, event.transaction.hash.toHexString()]
+    );
     return;
   }
   if (depositRate.reverted) {
-    log.warning("Failed to get supplyRatePerBlock() for Market {} at tx hash {}", [
-      marketId,
-      event.transaction.hash.toHexString(),
-    ]);
+    log.warning(
+      "Failed to get supplyRatePerBlock() for Market {} at tx hash {}",
+      [marketId, event.transaction.hash.toHexString()]
+    );
     return;
   }
 

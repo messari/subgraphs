@@ -86,7 +86,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
 );
 export const BLOCKS_PER_DAY = BigDecimal.fromString("6570"); // blocks every 13.15 seconds
-export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(DAYS_PER_YEAR)
+export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(DAYS_PER_YEAR);
 
 export const MANTISSA_DECIMALS = 18;
 
@@ -96,5 +96,5 @@ export const FACTORY_ADDRESS = "0x4dCf7407AE5C07f8681e1659f626E114A7667339";
 export const INV_ADDRESS = "0x41D5D79431A913C4aE7d69a668ecdfE5fF9DFB68";
 // xINV contract address
 export const XINV_ADDRESS = "0x65b35d6Eb7006e0e607BC54EB2dFD459923476fE";
-export const anDOLA_ADDRESS = "0x7Fcb7DAC61eE35b3D4a51117A7c58D53f0a8a670";
-export const DOLA_ADDRESS = "0x865377367054516e17014CcdED1e7d814EDC9ce4";
+//export const anDOLA_ADDRESS = "0x7Fcb7DAC61eE35b3D4a51117A7c58D53f0a8a670";
+//export const DOLA_ADDRESS = "0x865377367054516e17014CcdED1e7d814EDC9ce4";
