@@ -257,7 +257,8 @@ export function createSwapHandleVolumeAndFees(
     amount0TotalConverted,
     tokenTracker0 as _TokenTracker,
     amount1TotalConverted,
-    tokenTracker1 as _TokenTracker
+    tokenTracker1 as _TokenTracker,
+    pool
   );
 
   let tradingFee = getLiquidityPoolFee(pool.fees[0]);
