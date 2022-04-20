@@ -2,17 +2,18 @@ import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../config/_networkConfig";
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
+import { BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
 import {
-  BIGINT_ZERO,
-  ZERO_ADDRESS,
-} from "./constants";
-import { getLiquidityPool, getOrCreateEtherHelper, getOrCreateTokenTracker } from "./getters";
-import { findEthPerToken, getEthPriceInUSD } from "./price/price";
+  getLiquidityPool,
+  getOrCreateNativeTokenHelper,
+  getOrCreateTokenTracker,
+} from "./getters";
+import { findNativeTokenPerToken, getNativeTokenPriceInUSD } from "./price/price";
 import { getRewardsPerDay } from "./rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
-  let pool = getLiquidityPool(event.address)
-  
+  let pool = getLiquidityPool(event.address);
+
   let poolContract = MasterChefV2.bind(event.address);
 
   let getRewardTokenPerSecond = poolContract.try_bananaPerSecond();
@@ -43,26 +44,37 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
     .times(poolAllocPoint)
     .div(totalAllocPoint);
 
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString())
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.REWARD_INTERVAL_TYPE)
+  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardTokenRateBigDecimal,
+    NetworkConfigs.REWARD_INTERVAL_TYPE,
+  );
 
   let rewardTokenTracker = getOrCreateTokenTracker(pool.rewardTokens![0]);
-  rewardTokenTracker.derivedETH = findEthPerToken(rewardTokenTracker);
+  rewardTokenTracker.derivedNativeToken = findNativeTokenPerToken(rewardTokenTracker);
 
-  let ether = getOrCreateEtherHelper()
-  ether.valueDecimal = getEthPriceInUSD()
+  let nativeToken = getOrCreateNativeTokenHelper();
+  nativeToken.valueDecimal = getNativeTokenPriceInUSD();
 
-  pool.currentRewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())]
-  pool.currentRewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardTokenTracker.derivedETH).times(ether.valueDecimal!)]
+  pool.currentRewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.toString()),
+  ];
+  pool.currentRewardTokenEmissionsUSD = [
+    rewardTokenPerDay
+      .times(rewardTokenTracker.derivedNativeToken)
+      .times(nativeToken.valueDecimal!),
+  ];
 
-  rewardTokenTracker.save()
-  ether.save()
-  pool.save()
+  rewardTokenTracker.save();
+  nativeToken.save();
+  pool.save();
 }
 
 export function handleReward(event: ethereum.Event, pid: BigInt): void {
-  let pool = getLiquidityPool(event.address)
-  
+  let pool = getLiquidityPool(event.address);
+
   let poolContract = MasterChef.bind(event.address);
   let getPoolInfo = poolContract.try_getPoolInfo(pid);
   let lpTokenAddress = ZERO_ADDRESS;
@@ -77,15 +89,12 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
 
   let getRewardTokenPerBlock = poolContract.try_cakePerBlock();
   let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
-  if (!getRewardTokenPerBlock.reverted){
+  if (!getRewardTokenPerBlock.reverted) {
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
   }
-    
-  let getMultiplier = poolContract.try_getMultiplier(
-    lastRewardBlock,
-    event.block.number,
-  );
-  
+
+  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
+
   let multiplier: BigInt = BIGINT_ZERO;
   if (!getMultiplier.reverted) {
     multiplier = getMultiplier.value;
@@ -95,7 +104,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
   let totalAllocPoint: BigInt = BIGINT_ZERO;
   if (!getTotalAllocPoint.reverted) {
     totalAllocPoint = getTotalAllocPoint.value;
-  } 
+  }
 
   // Calculate Reward Emission per Block
   let rewardTokenRate = multiplier
@@ -103,19 +112,30 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
     .times(poolAllocPoint)
     .div(totalAllocPoint);
 
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString())
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.REWARD_INTERVAL_TYPE)
-  
+  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
+  let rewardTokenPerDay = getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    rewardTokenRateBigDecimal,
+    NetworkConfigs.REWARD_INTERVAL_TYPE,
+  );
+
   let rewardTokenTracker = getOrCreateTokenTracker(pool.rewardTokens![0]);
-  rewardTokenTracker.derivedETH = findEthPerToken(rewardTokenTracker);
-  
-  let ether = getOrCreateEtherHelper()
-  ether.valueDecimal = getEthPriceInUSD()
-  
-  pool.currentRewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())]
-  pool.currentRewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardTokenTracker.derivedETH).times(ether.valueDecimal!)]
-  
-  rewardTokenTracker.save()
-  ether.save()
-  pool.save()
+  rewardTokenTracker.derivedNativeToken = findNativeTokenPerToken(rewardTokenTracker);
+
+  let nativeToken = getOrCreateNativeTokenHelper();
+  nativeToken.valueDecimal = getNativeTokenPriceInUSD();
+
+  pool.currentRewardTokenEmissionsAmount = [
+    BigInt.fromString(rewardTokenPerDay.toString()),
+  ];
+  pool.currentRewardTokenEmissionsUSD = [
+    rewardTokenPerDay
+      .times(rewardTokenTracker.derivedNativeToken)
+      .times(nativeToken.valueDecimal!),
+  ];
+
+  rewardTokenTracker.save();
+  nativeToken.save();
+  pool.save();
 }

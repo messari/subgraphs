@@ -1,4 +1,4 @@
-import { log, BigDecimal, BigInt, Bytes } from '@graphprotocol/graph-ts';
+import { log, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -74,22 +74,21 @@ export namespace LiquidityPoolFeeType {
 }
 
 export namespace RewardTokenType {
-  export const DEPOSIT = "DEPOSIT"
-  export const BORROW = "BORROW"
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
 }
 
 export namespace HelperStoreType {
-  export const ETHER = Bytes.fromHexString('xETHER')
-  export const USERS = Bytes.fromHexString('xUSERS')
+  export const NATIVE_TOKEN = Bytes.fromHexString("xNATIVE_TOKEN");
+  export const USERS = Bytes.fromHexString("xUSERS");
   // Pool addresses are also stored in the HelperStore
 }
 
 export namespace TransferType {
-  export const MINT = Bytes.fromHexString('MINT')
-  export const BURN = Bytes.fromHexString('BURN')
+  export const MINT = Bytes.fromHexString("MINT");
+  export const BURN = Bytes.fromHexString("BURN");
   // Pool addresses are also stored in the HelperStore
 }
-
 
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
@@ -99,16 +98,16 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
-export const BIGINT_THOUSAND = BigInt.fromI32(1000)
+export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
-  '115792089237316195423570985008687907853269984665640564039457584007913129639935'
+  "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 
-export const INT_NEGATIVE_ONE = -1 as i32
-export const INT_ZERO = 0 as i32
-export const INT_ONE = 1 as i32
-export const INT_TWO = 2 as i32
-export const INT_FOUR = 4 as i32
+export const INT_NEGATIVE_ONE = -1 as i32;
+export const INT_ZERO = 0 as i32;
+export const INT_ONE = 1 as i32;
+export const INT_TWO = 2 as i32;
+export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
@@ -120,8 +119,9 @@ export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000))
+  new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
 );
 
-export const ZERO_ADDRESS = Bytes.fromHexString('0x0000000000000000000000000000000000000000')
-
+export const ZERO_ADDRESS = Bytes.fromHexString(
+  "0x0000000000000000000000000000000000000000",
+);
