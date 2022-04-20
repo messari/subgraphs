@@ -1,8 +1,12 @@
-# Lending Protocol Subgraph
+# Venus Lending Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://venus.io/
+- https://app.venus.io/dashboard
+- https://docs.venus.io/docs/getstarted#guides
+- 
+- Add here
 
 ## Calculation Methodology v0.0.1
 

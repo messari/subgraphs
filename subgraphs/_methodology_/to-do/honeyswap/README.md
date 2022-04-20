@@ -1,8 +1,11 @@
-# Lending Protocol Subgraph
+# Honeyswap - DEX Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://honeyswap.org/
+- https://app.honeyswap.org/#/swap
+- https://wiki.1hive.org/projects/honeyswap
+- Add here
 
 ## Calculation Methodology v0.0.1
 
@@ -45,15 +48,11 @@ Sum across all Pools
 
 Count of  Unique Addresses which have interacted with the protocol via any transaction
 
+`Swaps`
+
 `Deposits`
 
-`Withdrawals`
-
-`Borrows`
-
-`Repays`
-
-`Liquidations`
+`Withdraws`
 
 ###  Reward Token Emissions Amount
 
