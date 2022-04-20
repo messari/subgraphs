@@ -28,6 +28,8 @@ import {
   updatePoolMetrics
 } from "./utils/metrics";
 
+import { createDeposit, createWithdraw, createSwap } from "./utils/setters";
+
 export function handleBid(event: Bid): void {
   //updateUsageMetrics(event, event.params.to);
   // updateFinancials(event);

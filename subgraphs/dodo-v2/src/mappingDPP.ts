@@ -22,15 +22,21 @@ import {
   Swap
 } from "../generated/schema";
 
-import {
-  updateFinancials,
-  updateUsageMetrics,
-  updatePoolMetrics
-} from "./utils/metrics";
+import { updateUsageMetrics, updatePoolMetrics } from "./utils/metrics";
+
+import { createSwap } from "./utils/setters";
 
 export function handleDODOSwap(event: DODOSwap): void {
+  createSwap(
+    event,
+    event.params.trader,
+    event.address,
+    event.params.fromToken,
+    event.params.toToken,
+    event.params.fromAmount,
+    event.params.toAmount
+  );
   updateUsageMetrics(event, event.params.trader);
-  updateFinancials(event);
   updatePoolMetrics(
     event,
     event.address,

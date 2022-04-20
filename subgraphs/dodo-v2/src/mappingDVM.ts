@@ -22,13 +22,9 @@ import {
   Swap
 } from "../generated/schema";
 
-import {
-  updateFinancials,
-  updateUsageMetrics,
-  updatePoolMetrics
-} from "./utils/metrics";
+import { updateUsageMetrics, updatePoolMetrics } from "./utils/metrics";
 
-import { createDeposit, createWithdraw, createSwap } from "./utils/getters";
+import { createDeposit, createWithdraw, createSwap } from "./utils/setters";
 
 // event BuyShares(address to, uint256 increaseShares, uint256 totalShares);
 //
@@ -50,7 +46,6 @@ export function handleBuyShares(event: BuyShares): void {
     event.params.increaseShares
   );
   updateUsageMetrics(event, event.params.to);
-  updateFinancials(event);
 }
 
 export function handleSellShares(event: SellShares): void {
@@ -61,7 +56,6 @@ export function handleSellShares(event: SellShares): void {
     event.params.decreaseShares
   );
   updateUsageMetrics(event, event.params.payer);
-  updateFinancials(event);
 }
 
 export function handleDODOSwap(event: DODOSwap): void {
@@ -75,7 +69,6 @@ export function handleDODOSwap(event: DODOSwap): void {
     event.params.toAmount
   );
   updateUsageMetrics(event, event.params.trader);
-  updateFinancials(event);
   updatePoolMetrics(
     event,
     event.address,

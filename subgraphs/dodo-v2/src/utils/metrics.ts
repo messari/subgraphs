@@ -32,10 +32,10 @@ import {
   getOrCreateUsageMetricSnapshot,
   getOrCreateFinancials,
   getOrCreatePool,
-  getUSDprice,
-  setUSDprice,
-  setUSDpriceWETH
+  getUSDprice
 } from "./getters";
+
+import { setUSDprice, setUSDpriceWETH } from "./setters";
 
 import { ERC20 } from "../../generated/ERC20/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
@@ -44,18 +44,24 @@ import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
 
 // Update FinancialsDailySnapshots entity
-export function updateFinancials(event: ethereum.Event): void {
+export function updateFinancials(
+  event: ethereum.Event,
+  usdTVL: BigDecimal,
+  usdTVolume: BigDecimal
+): void {
   let financialMetrics = getOrCreateFinancials(event);
   let protocol = getOrCreateDexAmm(event.address);
 
-  // financialMetrics.totalValueLockedUSD = usdPriceOfToken;
+  financialMetrics.protocol = protocol.id;
+  let previousVL = financialMetrics.totalValueLockedUSD;
+  financialMetrics.totalValueLockedUSD = previousVL + usdTVL;
   // financialMetrics.protocolTreasuryUSD = protocol.protocolTreasuryUSD;
   // financialMetrics.protocolControlledValueUSD =
   //   protocol.protocolControlledValueUSD;
-  // financialMetrics.totalVolumeUSD = protocol.totalVolumeUSD;
+  let tVolume = financialMetrics.totalVolumeUSD;
+  financialMetrics.totalVolumeUSD = tVolume + usdTVolume;
   // financialMetrics.supplySideRevenueUSD = protocol.supplySideRevenueUSD;
   // financialMetrics.protocolSideRevenueUSD = protocol.protocolSideRevenueUSD;
-  // financialMetrics.feesUSD = protocol.feesUSD;
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
 
@@ -177,8 +183,9 @@ export function updatePoolMetrics(
     BigInt.fromString("1000000000000000000")
   );
 
+  let tvUSD = pool.totalVolumeUSD.plus(usdValueOfTransaction);
   poolMetrics.totalValueLockedUSD = usdValofPool;
-  poolMetrics.totalVolumeUSD = pool.totalVolumeUSD.plus(usdValueOfTransaction);
+  poolMetrics.totalVolumeUSD = tvUSD;
   poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
   poolMetrics.outputTokenSupply = lpSupply.value;
   poolMetrics.outputTokenPriceUSD = lpTokenUSD;
@@ -187,6 +194,15 @@ export function updatePoolMetrics(
   poolMetrics.blockNumber = event.block.number;
   poolMetrics.timestamp = event.block.timestamp;
 
+  updateFinancials(event, usdValofPool, tvUSD);
   poolMetrics.save();
   pool.save();
 }
+
+export function updateFees(
+  event: ethereum.Event,
+  poolAdd: Address,
+  tokenAdds: Address[],
+  trader: Address,
+  amount: BigInt[]
+): void {}
