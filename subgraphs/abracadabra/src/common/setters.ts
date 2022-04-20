@@ -42,9 +42,10 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     let inputToken = getOrCreateToken(collateralCall.value);
     MarketEntity.protocol = getOrCreateLendingProtocol().id;
     MarketEntity.inputTokens = [inputToken.id];
-    MarketEntity.outputToken = MIM;
     MarketEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
     MarketEntity.totalVolumeUSD = BIGDECIMAL_ZERO;
+    MarketEntity.totalBorrowUSD = BIGDECIMAL_ZERO;
+    MarketEntity.totalDepositUSD = BIGDECIMAL_ZERO;
     MarketEntity.inputTokenBalances = [BIGINT_ZERO];
     MarketEntity.outputToken = getOrCreateToken(Address.fromString(MIM)).id;
     MarketEntity.outputTokenSupply = BIGINT_ZERO;

@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.1.0
+# Version: 1.1.3
 
 enum Network {
   ARBITRUM
@@ -188,7 +188,7 @@ type DexAmmProtocol implements Protocol @entity {
   ##### DexAmm-Specific #####
 
   " All pools that belong to this protocol "
-  pools: [Pool!]! @derivedFrom(field: "protocol")
+  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -261,6 +261,9 @@ type LiquidityPool @entity {
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
+  
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -287,6 +290,9 @@ type LiquidityPool @entity {
 
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
+
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  inputTokenWeights: [BigDecimal!]!
 
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 
