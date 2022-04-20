@@ -104,7 +104,11 @@ export function strategyReported(
     .div(inputTokenDecimals.toBigDecimal());
 
   // Caluculating strategistFee
-  let strategistFee = gain.times(strategistFeeValue).div(constants.MAX_BPS);
+  let strategistFee = gain
+    .times(strategistFeeValue)
+    .div(constants.MAX_BPS)
+    .toBigDecimal()
+    .div(inputTokenDecimals.toBigDecimal());
 
   // Caluculating performanceFee
   let performanceFeeValue = utils.readValue<BigInt>(
@@ -127,7 +131,6 @@ export function strategyReported(
   if (managementFee.plus(performanceFee).notEqual(constants.BIGDECIMAL_ZERO)) {
     protocolEarnings = totalSharesMinted.minus(
       strategistFee
-      .toBigDecimal()
         .times(totalSharesMinted)
         .div(managementFee.plus(performanceFee))
     );
@@ -165,11 +168,7 @@ export function strategyReported(
 
   // totalRevenueUSD = PerformanceFee + ManagementFee + StratergyFee + Gains
   financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
-    gainUsd.plus(
-      outputTokenPriceUsd.times(
-        totalSharesMinted
-      )
-    )
+    gainUsd.plus(outputTokenPriceUsd.times(totalSharesMinted))
   );
 
   vaultStore!.inputTokenBalances = [
