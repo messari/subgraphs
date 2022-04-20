@@ -4,9 +4,9 @@ import { calculatePrice } from "../src/common/pricing";
 import { weth, usdc, bal, gno } from "./state";
 import { _TokenPrice } from "../generated/schema";
 
-const expectedWethPriceInUsd = "3045.15826324921630545044492607652";
-const expectedBalPriceInUsd = "15.14895512317371825584230215638522";
-const expectedGnoPriceInUsd = "348.0842849269167592882439357671437";
+const EXPECTED_WETH_PRICE_IN_USD = "3045.15826324921630545044492607652";
+const EXPECTED_BAL_PRICE_IN_USD = "15.14895512317371825584230215638522";
+const EXPECTED_GNO_PRICE_IN_USD = "348.0842849269167592882439357671437";
 
 test("Calculate price of token when swapping with stable", () => {
   const wethAmount = BigDecimal.fromString("25.744921874224422104");
@@ -26,7 +26,7 @@ test("Calculate price of token when swapping with stable", () => {
   const tokenPrice = new _TokenPrice(tokenInfo.address.toHexString());
   tokenPrice.lastUsdPrice = tokenInfo.price;
   tokenPrice.save();
-  assert.stringEquals(tokenInfo.price.toString(), expectedWethPriceInUsd);
+  assert.stringEquals(tokenInfo.price.toString(), EXPECTED_WETH_PRICE_IN_USD);
 });
 
 test("Calculate price of token when swapping with a previously stored base asset", () => {
@@ -47,7 +47,7 @@ test("Calculate price of token when swapping with a previously stored base asset
   const tokenPrice = new _TokenPrice(tokenInfo.address.toHexString());
   tokenPrice.lastUsdPrice = tokenInfo.price;
   tokenPrice.save();
-  assert.stringEquals(tokenPrice.lastUsdPrice.toString(), expectedBalPriceInUsd);
+  assert.stringEquals(tokenPrice.lastUsdPrice.toString(), EXPECTED_BAL_PRICE_IN_USD);
 });
 
 test("Calculate price of token when swapping with a previously stored base asset in a weighted pool", () => {
@@ -64,5 +64,5 @@ test("Calculate price of token when swapping with a previously stored base asset
   );
 
   if (tokenInfo == null) throw Error("Token information should not be null");
-  assert.stringEquals(tokenInfo.price.toString(), expectedGnoPriceInUsd);
+  assert.stringEquals(tokenInfo.price.toString(), EXPECTED_GNO_PRICE_IN_USD);
 });

@@ -1,8 +1,6 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { BASE_ASSETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
-import { _TokenPrice, LiquidityPool } from "../../generated/schema";
-import { log } from "matchstick-as";
-import { scaleDown } from "./tokens";
+import { _TokenPrice } from "../../generated/schema";
 
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
@@ -69,9 +67,6 @@ export function calculatePrice(
 
   let tokenInPrice = _TokenPrice.load(tokenIn.toHexString());
   let tokenOutPrice = _TokenPrice.load(tokenOut.toHexString());
-
-  // TODO: Check which token has more liquidity
-  // if (isBaseAsset(tokenIn) && isBaseAsset(tokenOut)) return null;
 
   if (isBaseAsset(tokenIn) && tokenInPrice) {
     amountIn = amountIn.times(tokenInPrice.lastUsdPrice);

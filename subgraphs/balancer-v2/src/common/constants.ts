@@ -108,6 +108,12 @@ let vaultAddressByNetwork: AddressByNetwork = {
   arbitrum: "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
 };
 
+let feeCollectorAddressByNetwork: AddressByNetwork = {
+  mainnet: "0xce88686553686da562ce7cea497ce749da109f9f",
+  polygon: "0xce88686553686da562ce7cea497ce749da109f9f",
+  arbitrum: "0xce88686553686da562ce7cea497ce749da109f9f",
+};
+
 let wethAddressByNetwork: AddressByNetwork = {
   mainnet: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
   polygon: "0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
@@ -160,6 +166,7 @@ function forNetwork(addressByNetwork: AddressByNetwork, network: string): Addres
 }
 
 export let VAULT_ADDRESS = forNetwork(vaultAddressByNetwork, network);
+export let FEE_COLLECTOR_ADDRESS = forNetwork(feeCollectorAddressByNetwork, network);
 export let WETH: Address = forNetwork(wethAddressByNetwork, network);
 export let WMATIC: Address = forNetwork(wMaticAddressByNetwork, network);
 export let WBTC: Address = forNetwork(wbtcAddressByNetwork, network);

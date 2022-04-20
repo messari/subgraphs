@@ -13,7 +13,7 @@ dataSources:
       startBlock: 12272146
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
@@ -32,6 +32,8 @@ dataSources:
           file: ./abis/WeightedPool.json
         - name: ConvergentCurvePool
           file: ./abis/ConvergentCurvePool.json
+        - name: ProtocolFeesCollector
+          file: ./abis/ProtocolFeesCollector.json
 
         ###########################################
         ############## Price Oracle ###############

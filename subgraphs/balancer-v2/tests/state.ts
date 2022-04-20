@@ -1,6 +1,8 @@
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { mockMethod } from "./helpers";
 import { Token } from "../generated/schema";
+import { FEE_COLLECTOR_ADDRESS } from "../src/common/constants";
+import { createMockedFunction } from "matchstick-as";
 
 /**
  * USDC-WETH: https://app.balancer.fi/#/pool/0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8000200000000000000000019
@@ -111,3 +113,17 @@ bal.save();
 mockMethod(Address.fromString(bal.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
 mockMethod(Address.fromString(bal.id), "name", [], [], "string", [ethereum.Value.fromString("name")], false);
 mockMethod(Address.fromString(bal.id), "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
+
+/**
+ * External contracts mock
+ */
+mockMethod(FEE_COLLECTOR_ADDRESS, "getSwapFeePercentage", [], [], "uint256", [ethereum.Value.fromI32(100000)], false);
+const NEW_BAT_PRICE = "30";
+// Mock oracle contract
+createMockedFunction(
+  Address.fromString("0x83d95e0d5f402511db06817aff3f9ea88224b030"),
+  "getPriceUsdcRecommended",
+  "getPriceUsdcRecommended(address):(uint256)",
+)
+  .withArgs([ethereum.Value.fromAddress(Address.fromString(bat.id))])
+  .returns([ethereum.Value.fromUnsignedBigInt(BigInt.fromString(NEW_BAT_PRICE))]);

@@ -9,7 +9,6 @@ import {
   Swap,
   PoolDailySnapshot,
 } from "../../generated/schema";
-
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
@@ -22,7 +21,6 @@ import {
 } from "./constants";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
-import {log} from "matchstick-as";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -36,8 +34,8 @@ export function getOrCreateDex(): DexAmmProtocol {
   if (protocol === null) {
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
-    protocol.schemaVersion = "0.0.2";
-    protocol.subgraphVersion = "0.0.2";
+    protocol.schemaVersion = "1.1.0";
+    protocol.subgraphVersion = "1.1.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.network = network;
     protocol.type = ProtocolType.EXCHANGE;
@@ -91,7 +89,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.inputTokenBalances = [BIGINT_ZERO];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool._totalSwapFee = BIGDECIMAL_ZERO
+  pool._totalSwapFee = BIGDECIMAL_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   pool.createdBlockNumber = blockInfo.number;
@@ -99,8 +97,8 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.outputToken = outputToken.id;
   pool.save();
 
-  protocol._poolIds = protocol._poolIds.concat([pool.id])
-  protocol.save()
+  protocol._poolIds = protocol._poolIds.concat([pool.id]);
+  protocol.save();
 }
 
 export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
