@@ -1,6 +1,9 @@
-# Lending Protocol Subgraph
+# Ubeswap - DEX Protocol Subgraph
 
 ## Useful Links
+
+- https://ubeswap.org/
+- https://docs.ubeswap.org/
 
 Add here
 
@@ -45,15 +48,11 @@ Sum across all Pools
 
 Count of  Unique Addresses which have interacted with the protocol via any transaction
 
+`Swaps`
+
 `Deposits`
 
-`Withdrawals`
-
-`Borrows`
-
-`Repays`
-
-`Liquidations`
+`Withdraws`
 
 ###  Reward Token Emissions Amount
 

@@ -1,8 +1,11 @@
-# Lending Protocol Subgraph
+# SCREAM V1 Lending Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://scream.sh/
+- https://docs.scream.sh/
+- https://scream.sh/apps
+- Add here
 
 ## Calculation Methodology v0.0.1
 

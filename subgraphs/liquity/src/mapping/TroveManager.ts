@@ -56,7 +56,12 @@ export function handleLiquidation(event: Liquidation): void {
     profitUSD,
     event.transaction.from
   );
-  const supplySideRevenueUSD = amountLiquidatedUSD.minus(profitUSD);
+  const liquidatedDebtUSD = bigIntToBigDecimal(event.params._liquidatedDebt);
+  const supplySideRevenueUSD = bigIntToBigDecimal(
+    amountLiquidatedETH.minus(event.params._collGasCompensation)
+  )
+    .times(getCurrentETHPrice())
+    .minus(liquidatedDebtUSD);
   addSupplySideRevenue(event, supplySideRevenueUSD);
   addProtocolSideRevenue(event, profitUSD);
 }
