@@ -9,7 +9,6 @@ import { updateTokenPrice } from "../../common/prices/prices"
 
 export function handleFile(event: LogNote): void {
     let what = event.params.arg2.toString()
-    //let data = BigInt.fromUnsignedBytes(Bytes.fromUint8Array(event.params.data.subarray(68, 100)))
     if (what == 'mat') {
         log.info("spot handleFile",[event.transaction.hash.toHexString()])
         let ilk = event.params.arg1

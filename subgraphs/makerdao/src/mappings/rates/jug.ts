@@ -1,12 +1,10 @@
-import { Bytes, BigInt, Address, BigDecimal, bigInt } from '@graphprotocol/graph-ts';
+import { Address} from '@graphprotocol/graph-ts';
 import { LogNote } from "../../../generated/Jug/Jug";
 import { getMarketFromIlk } from "../../common/getters"
 import { bigIntToBigDecimal, round } from "./../../common/utils/numbers";
 import { BIGDECIMAL_ONE, BIGDECIMAL_ONE_HUNDRED, MCD_JUG_ADDRESS, SECONDS_PER_YEAR_BIGDECIMAL } from "../../common/constants";
 import { Jug } from "../../../generated/templates/Jug/Jug"
-export function handleInit(event: LogNote): void {
 
-}
 
 // Updates the stable borrow rate for the market
 export function handleFile(event: LogNote): void {

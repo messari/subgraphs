@@ -31,23 +31,6 @@ export function handleCage(event:GemLogNote): void {
   market.save()
 }
 
-export function handleFile(event: LogNote): void {
-
-}
-
-export function handleSlip(event: LogNote): void {
-
-}
-
-export function handleFlux(event: LogNote): void {
-
-}
-
-export function handleMove(event: LogNote): void {
-  //if (event.params.arg2.toHexString() == MCD_VOW_ADDRESS){ // and event.params.arg1.toHexString() is not a PSM contract and tx_hash not in liquidation_excluded_tx (Exclude Flop income)
-
-}
-
 export function handleEvent(event: LogNote, market: Market, eventType: string, amountCollateral: BigInt, amountCollateralUSD: BigDecimal, amountDAI: BigInt ): void {
   let protocol = getOrCreateLendingProtocol()
   if (eventType == "DEPOSIT"){
@@ -155,9 +138,6 @@ export function handleFrob(event: LogNote): void {
   financialsDailySnapshot.save()
   updateMarketMetrics(ilk,event)
   updateTVL(event)
-}
-
-export function handleFork(event: LogNote): void {
 }
 
 // Liquidate a Vault
