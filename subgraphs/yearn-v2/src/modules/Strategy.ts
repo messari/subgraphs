@@ -40,7 +40,8 @@ export function createFeeType(
 
 export function getOrCreateStrategy(
   vaultAddress: Address,
-  _strategyAddress: Address
+  _strategyAddress: Address,
+  performanceFee: BigInt
 ): _Strategy {
   let strategy = _Strategy.load(_strategyAddress.toHexString());
 
@@ -50,6 +51,7 @@ export function getOrCreateStrategy(
     strategy.totalDebt = constants.BIGINT_ZERO;
     strategy.lastReport = constants.BIGINT_ZERO;
     strategy.vaultAddress = vaultAddress;
+    strategy.performanceFee = performanceFee;
   }
   return strategy;
 }
@@ -62,34 +64,20 @@ export function strategyReported(
   debtAdded: BigInt
 ): void {
   const vaultStore = VaultStore.load(vaultAddress.toHexString());
-  const strategyStore = getOrCreateStrategy(vaultAddress, strategyAddress);
+  const strategyStore = getOrCreateStrategy(
+    vaultAddress,
+    strategyAddress,
+    constants.BIGINT_ZERO
+  );
 
   const vaultContract = VaultContract.bind(vaultAddress);
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  let reportTimestamp: BigInt, strategistFeeValue: BigInt;
-  let vaultStrategiesCal_v1 = vaultContract.try_strategies_v1(strategyAddress);
-
-  if (vaultStrategiesCal_v1.reverted) {
-    let vaultStrategiesCall_v2 = vaultContract.try_strategies_v2(
-      strategyAddress
-    );
-
-    if (vaultStrategiesCall_v2.reverted) {
-      log.warning("Vault Strategies Call Failed, vault: {}, strategy: {}", [
-        vaultAddress.toHexString(),
-        strategyAddress.toHexString(),
-      ]);
-
-      return;
-    } else {
-      reportTimestamp = vaultStrategiesCall_v2.value.value5;
-      strategistFeeValue = vaultStrategiesCall_v2.value.value0;
-    }
-  } else {
-    reportTimestamp = vaultStrategiesCal_v1.value.value4;
-    strategistFeeValue = vaultStrategiesCal_v1.value.value0;
-  }
+  let reportTimestamp = utils.readValue<BigInt>(
+    vaultContract.try_lastReport(),
+    constants.BIGINT_ZERO
+  );
+  let strategistFeeValue = strategyStore.performanceFee;
 
   let delegatedAssets = utils.readValue<BigInt>(
     strategyContract.try_delegatedAssets(),
@@ -121,11 +109,16 @@ export function strategyReported(
   let totalSupply = vaultContract.totalSupply();
   let totalSharesMinted = totalSupply.minus(vaultStore!.outputTokenSupply);
 
-  let protocolEarnings = totalSharesMinted.minus(
-    strategistFee
-      .times(totalSharesMinted)
-      .div(managementFee.plus(performanceFee))
-  );
+  let protocolEarnings: BigInt;
+  if (managementFee.plus(performanceFee).notEqual(constants.BIGINT_ZERO)) {
+    protocolEarnings = totalSharesMinted.minus(
+      strategistFee
+        .times(totalSharesMinted)
+        .div(managementFee.plus(performanceFee))
+    );
+  } else {
+    protocolEarnings = constants.BIGINT_ZERO;
+  }
 
   let inputToken = Token.load(vaultStore!.inputTokens[0]);
   let inputTokenAddress = Address.fromString(vaultStore!.inputTokens[0]);
@@ -176,7 +169,9 @@ export function strategyReported(
   strategyStore.lastReport = reportTimestamp;
 
   log.warning(
-    "[StrategyReported] vaultAddress: {}, strategyAddress: {}, totalSharesMinted: {}, protocolSideRevenue: {}, supplySideRevenueUSD: {}, totalRevenueUSD: {}",
+    "[StrategyReported] vaultAddress: {}, strategyAddress: {}, totalSharesMinted: {}, \
+    protocolSideRevenue: {}, supplySideRevenueUSD: {}, totalRevenueUSD: {}, outputTokenPrice: {}, \
+    protocolEarnings: {}, managementFee: {}, performanceFee: {}, TxnHash: {}",
     [
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
@@ -184,6 +179,11 @@ export function strategyReported(
       financialMetrics.protocolSideRevenueUSD.toString(),
       financialMetrics.supplySideRevenueUSD.toString(),
       financialMetrics.totalRevenueUSD.toString(),
+      outputTokenPriceUsd.toString(),
+      protocolEarnings.toString(),
+      managementFee.toString(), 
+      performanceFee.toString(),
+      event.transaction.hash.toHexString(),
     ]
   );
 

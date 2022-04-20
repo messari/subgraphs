@@ -463,4 +463,7 @@ type _Strategy @entity {
 
   " Address Of the Vault "
   vaultAddress: Bytes!
+
+  " Performance Fee of the Strategy "
+  performanceFee: BigInt!
 }

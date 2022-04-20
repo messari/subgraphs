@@ -29,12 +29,14 @@ import { getOrCreateStrategy, strategyReported } from "../modules/Strategy";
 export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
+  const performanceFee = event.params.performanceFee;
 
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
     let strategy = getOrCreateStrategy(
       vaultAddress,
       strategyAddress,
+      performanceFee
     );
 
     StrategyTemplate.create(strategyAddress);
@@ -51,12 +53,14 @@ export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
 export function handleStrategyAdded_v2(event: StrategyAddedV2Event): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
+  const performanceFee = event.params.performanceFee;
 
   let vault = VaultStore.load(vaultAddress.toHexString());
   if (vault) {
     let strategy = getOrCreateStrategy(
       vaultAddress,
       strategyAddress,
+      performanceFee
     );
 
     StrategyTemplate.create(strategyAddress);
@@ -71,9 +75,7 @@ export function handleStrategyAdded_v2(event: StrategyAddedV2Event): void {
 }
 
 export function handleUpdateRewards(event: UpdateRewardsEvent): void {
-  // const rewardsAddress = event.params.rewards
-  // let treasury = new _Treasury(rewardsAddress.toHexString())
-  // treasury.save()
+  // TODO: 
 }
 
 export function handleDeposit(call: DepositCall): void {
