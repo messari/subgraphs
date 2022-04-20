@@ -128,7 +128,10 @@ export function strategyReported(
     .div(inputTokenDecimals.toBigDecimal());
 
   let protocolEarnings: BigDecimal;
-  if (managementFee.plus(performanceFee).notEqual(constants.BIGDECIMAL_ZERO)) {
+  if (
+    managementFee.plus(performanceFee).notEqual(constants.BIGDECIMAL_ZERO) &&
+    totalSharesMinted.notEqual(constants.BIGDECIMAL_ZERO)
+  ) {
     protocolEarnings = totalSharesMinted.minus(
       strategistFee
         .times(totalSharesMinted)
