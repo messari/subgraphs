@@ -35,6 +35,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewDVM(address,address,address,address)
           handler: handleNewDVM
@@ -74,6 +76,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewCP(address,address,address,address)
           handler: handleNewCP
@@ -112,6 +116,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewDPP(address,address,address,address)
           handler: handleNewDPP
@@ -152,6 +158,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewDSP(address,address,address,address)
           handler: handleNewDSP
@@ -192,6 +200,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: BuyShares(address,uint256,uint256)
           handler: handleBuyShares
@@ -234,6 +244,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: Bid(address,uint256,uint256)
           handler: handleBid
@@ -275,6 +287,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
@@ -315,6 +329,8 @@ dataSources:
           file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: BuyShares(address,uint256,uint256)
           handler: handleBuyShares
@@ -323,3 +339,4 @@ dataSources:
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
       file: ./src/mappingDSP.ts
+  # # blank

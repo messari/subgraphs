@@ -10,7 +10,8 @@ import {
   _Account,
   _DailyActiveAccount,
   UsageMetricsDailySnapshot,
-  LiquidityPool
+  LiquidityPool,
+  LiquidityPoolFee
 } from "../../generated/schema";
 
 import {
@@ -26,6 +27,8 @@ import {
   WRAPPED_ETH
 } from "./constants";
 
+import { bigIntToBigDecimal } from "./numbers";
+
 import {
   getOrCreateDexAmm,
   getOrCreatePoolDailySnapshot,
@@ -37,17 +40,19 @@ import {
 
 import { setUSDprice, setUSDpriceWETH } from "./setters";
 
-import { ERC20 } from "../../generated/ERC20/ERC20";
+import { ERC20 } from "../../generated/CP/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
 import { CP } from "../../generated/CP/CP";
 import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
+import { FeeRateModel } from "../../generated/CP/FeeRateModel";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(
   event: ethereum.Event,
   usdTVL: BigDecimal,
-  usdTVolume: BigDecimal
+  usdTVolume: BigDecimal,
+  usdValFees: BigDecimal
 ): void {
   let financialMetrics = getOrCreateFinancials(event);
   let protocol = getOrCreateDexAmm(event.address);
@@ -55,17 +60,23 @@ export function updateFinancials(
   financialMetrics.protocol = protocol.id;
   let previousVL = financialMetrics.totalValueLockedUSD;
   financialMetrics.totalValueLockedUSD = previousVL + usdTVL;
-  // financialMetrics.protocolTreasuryUSD = protocol.protocolTreasuryUSD;
-  // financialMetrics.protocolControlledValueUSD =
-  //   protocol.protocolControlledValueUSD;
   let tVolume = financialMetrics.totalVolumeUSD;
   financialMetrics.totalVolumeUSD = tVolume + usdTVolume;
-  // financialMetrics.supplySideRevenueUSD = protocol.supplySideRevenueUSD;
-  // financialMetrics.protocolSideRevenueUSD = protocol.protocolSideRevenueUSD;
+  let previouspsr = financialMetrics.protocolSideRevenueUSD;
+  financialMetrics.protocolSideRevenueUSD = previouspsr + usdValFees;
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
 
   financialMetrics.save();
+}
+
+//Needs to calculate the amount of tokens earned for each share sold
+export function updateSupplySide(
+  event: ethereum.Event,
+  usdValueEarned: BigDecimal
+): void {
+  let financialMetrics = getOrCreateFinancials(event);
+  financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD;
 }
 
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
@@ -136,10 +147,6 @@ export function updatePoolMetrics(
     return;
   }
 
-  let totalUSDvalTransaction = ZERO_BD;
-
-  let totalUSDvalPool = ZERO_BD;
-
   //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
   //If either tokens are call the setUSDprice function to set a price for the other token
   if (
@@ -194,7 +201,8 @@ export function updatePoolMetrics(
   poolMetrics.blockNumber = event.block.number;
   poolMetrics.timestamp = event.block.timestamp;
 
-  updateFinancials(event, usdValofPool, tvUSD);
+  let usdValOfFees = updateFees(event, poolAdd, usdValueOfTransaction, trader);
+  updateFinancials(event, usdValofPool, tvUSD, usdValOfFees);
   poolMetrics.save();
   pool.save();
 }
@@ -202,7 +210,29 @@ export function updatePoolMetrics(
 export function updateFees(
   event: ethereum.Event,
   poolAdd: Address,
-  tokenAdds: Address[],
-  trader: Address,
-  amount: BigInt[]
-): void {}
+  usdValOfTrade: BigDecimal,
+  trader: Address
+): BigDecimal {
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+  let poolFee = new LiquidityPoolFee(id.toString());
+  let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
+  let poolInstance = DVM.bind(poolAdd);
+
+  let feeMcontract = poolInstance._MT_FEE_RATE_MODEL_();
+  let feeMInstance = FeeRateModel.bind(feeMcontract);
+
+  let feeRate = feeMInstance.try_getFeeRate(trader);
+  if (feeRate.reverted) {
+    return BigDecimal.fromString("0");
+  }
+
+  let fr = feeRate.value;
+  let usdValOfFees = usdValOfTrade * BigDecimal.fromString("fr");
+
+  poolFee.pool = pool.id;
+  poolFee.feePercentage = BigDecimal.fromString("0");
+  poolFee.feeType = "TIERED_TRADING_FEE";
+  poolFee.usdValueOfFee = usdValOfFees;
+  return usdValOfFees;
+}

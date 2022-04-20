@@ -147,6 +147,7 @@ type LiquidityPoolFee @entity {
   pool: LiquidityPool!
   feePercentage: BigDecimal!
   feeType: LiquidityPoolFeeType!
+  usdValueOfFee: BigDecimal!
 }
 
 ###############################
@@ -302,10 +303,3 @@ type _TokenPrice @entity {
   token: Token!
   currentUSDprice: BigDecimal!
 }
-
-# type _DailyPoolstats @entity {
-#   id: ID!
-#   lpToken: Token!
-#   dailyEmissions: BigInt!
-#   deUSDamount: Bigint!
-# }
