@@ -9,6 +9,8 @@ import {
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
   DAYS_PER_YEAR,
+  USDC_DECIMALS,
+  BIGINT_ZERO,
 } from "../common/utils/constants";
 import {
   getOrCreateLendingProtcol,
@@ -16,14 +18,15 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
-import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation } from "../../generated/schema";
+import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation, RewardToken } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { CToken } from "../../generated/Comptroller/CToken";
 import { Comptroller } from "../../generated/templates/CToken/Comptroller";
-import { getUSDPriceOfToken } from "../common/prices/prices";
+import { getUSDPriceOfToken } from "../common/prices";
 import { exponentToBigDecimal, getExchangeRate, powBigDecimal } from "../common/utils/utils";
 import { PriceOracle2 } from "../../generated/templates/CToken/PriceOracle2";
 import { getRewardsPerDay, RewardIntervalType, getOrCreateCircularBuffer } from "../common/rewards";
+import { getUsdPricePerToken } from "../common/prices/index";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -486,68 +489,53 @@ export function updateTotalDepositUSD(event: ethereum.Event): void {
 }
 
 export function updateRewards(event: ethereum.Event, market: Market): void {
-  // COMP was not created until block 9601359
-  if (event.block.number.toI32() > 9601359) {
-    let rewardTokenDeposit = getOrCreateRewardToken(
-      market.id,
-      Address.fromString(COMP_ADDRESS),
-      RewardTokenType.DEPOSIT,
-    );
-    let rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
-
+  // COMP was not created until block 10271924: https://etherscan.io/tx/0x03dab5602fb58bb44c1a248fd1b283ca46b539969fe02db144983247d00cfb89
+  if (event.block.number.toI32() > 10271924) {
+    let rewardTokenBorrow: RewardToken | null = null;
+    let rewardTokenDeposit: RewardToken | null = null;
     // check if market has COMP reward tokens
     if (market.rewardTokens == null) {
+      rewardTokenDeposit = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.DEPOSIT);
+      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
       let rewardTokenArr = new Array<string>();
       rewardTokenArr.push(rewardTokenDeposit.id);
       rewardTokenArr.push(rewardTokenBorrow.id);
       market.rewardTokens = rewardTokenArr;
     }
-
+    // get COMP distribution/block
+    if (rewardTokenBorrow == null) {
+      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
+    }
+    let rewardDecimals = rewardTokenBorrow.decimals;
     let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
-    let tryCompSpeedPerBlock = troller.try_compSpeeds(event.address);
-
+    let blocksPerDay = BigInt.fromString(getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString());
+    let tryDistribution = troller.try_compSpeeds(event.address);
     // get comp speed per day - this is the distribution amount for supplying and borrowing
-    let compPerDay = tryCompSpeedPerBlock.reverted
-      ? BIGDECIMAL_ZERO
-      : getRewardsPerDay(
-          event.block.timestamp,
-          event.block.number,
-          tryCompSpeedPerBlock.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-          RewardIntervalType.BLOCK,
-        );
+    let compPerDay = tryDistribution.reverted ? BIGINT_ZERO : tryDistribution.value.times(blocksPerDay);
     let compPriceUSD = BIGDECIMAL_ZERO;
 
     // cCOMP was made at this block height 10960099
     if (event.block.number.toI32() > 10960099) {
       let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
-      compPriceUSD = getUSDPriceOfToken(compMarket, event.block.number.toI32());
+      compPriceUSD = compMarket.inputTokenPricesUSD[0];
     } else {
-      // try to get COMP price using assetPrices() and prices[] mapping in SimplePriceOracle.sol
-      let protocol = getOrCreateLendingProtcol();
-      let oracleAddress = changetype<Address>(protocol._priceOracle);
-      let oracle = PriceOracle2.bind(oracleAddress);
-      compPriceUSD = oracle.assetPrices(Address.fromString(COMP_ADDRESS)).toBigDecimal().div(exponentToBigDecimal(6)); // price returned with 6 decimals of precision per docs
+      // try to get COMP price between blocks 10271924 - 10960099 using UniswapRouter
+      compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS)).usdPrice.div(
+        exponentToBigDecimal(USDC_DECIMALS),
+      );
     }
 
-    let compPerDayUSD = compPerDay.times(compPriceUSD);
-    let compPerDayBI = BigInt.fromString(
-      compPerDay.times(exponentToBigDecimal(DEFAULT_DECIMALS)).truncate(0).toString(),
-    );
+    let compPerDayUSD = compPerDay.toBigDecimal().div(exponentToBigDecimal(rewardDecimals)).times(compPriceUSD);
 
     let compAmountArr = new Array<BigInt>();
-    compAmountArr.push(compPerDayBI);
-    compAmountArr.push(compPerDayBI);
+    compAmountArr.push(compPerDay);
+    compAmountArr.push(compPerDay);
     market.rewardTokenEmissionsAmount = compAmountArr;
-
     let compAmountUSDArr = new Array<BigDecimal>();
     compAmountUSDArr.push(compPerDayUSD);
     compAmountUSDArr.push(compPerDayUSD);
     market.rewardTokenEmissionsUSD = compAmountUSDArr;
-
     market.save();
-  } else {
-    // still run getRewardsPerDay() in order to keep accurate Circular Buffer
-    getRewardsPerDay(event.block.timestamp, event.block.number, BIGDECIMAL_ZERO, RewardIntervalType.BLOCK);
   }
 }
 
