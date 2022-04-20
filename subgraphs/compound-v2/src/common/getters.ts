@@ -35,7 +35,7 @@ import {
   ZERO_ADDRESS,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { CToken } from "../../generated/Comptroller/cToken";
+import { CToken } from "../../generated/Comptroller/CToken";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
 import { Comptroller } from "../../generated/Comptroller/Comptroller";

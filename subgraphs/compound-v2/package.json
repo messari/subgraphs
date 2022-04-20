@@ -8,9 +8,10 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ compound-v2",
-    "create-local": "graph create --node http://localhost:8000/ compound-v2",
-    "remove-local": "graph remove --node http://localhost:8000/ compound-v2",
-    "deploy-local": "graph deploy --node http://localhost:8000/ --ipfs http://localhost:5001 compound-v2"
+    "create-local": "graph create --node http://localhost:8020/ compound-v2",
+    "remove-local": "graph remove --node http://localhost:8020/ compound-v2",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 compound-v2",
+    "deploy-local-fork": "graph deploy compound-v2 --node http://localhost:8020/ --ipfs http://localhost:5001 --debug-fork [REDACTED]"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.1",

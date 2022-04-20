@@ -8,7 +8,7 @@ import {
   CCOMP_ADDRESS,
   BIGDECIMAL_ZERO,
   BIGDECIMAL_ONE,
-  DAYS_PER_YEAR
+  DAYS_PER_YEAR,
 } from "../common/utils/constants";
 import {
   getOrCreateLendingProtcol,
@@ -18,7 +18,7 @@ import {
 } from "../common/getters";
 import { Market, Deposit, Withdraw, Borrow, Repay, Liquidation } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { CToken } from "../../generated/Comptroller/cToken";
+import { CToken } from "../../generated/Comptroller/CToken";
 import { Comptroller } from "../../generated/templates/CToken/Comptroller";
 import { getUSDPriceOfToken } from "../common/prices/prices";
 import { exponentToBigDecimal, getExchangeRate, powBigDecimal } from "../common/utils/utils";

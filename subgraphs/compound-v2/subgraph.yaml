@@ -9,7 +9,7 @@ dataSources:
     source:
       address: "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
       abi: Comptroller
-      startBlock: 7710671
+      startBlock: 9601364
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -23,7 +23,7 @@ dataSources:
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CToken
-          file: ./abis/CToken.json
+          file: ./abis/cToken.json
         - name: PriceOracle1
           file: ./abis/PriceOracle1.json
         - name: PriceOracle2
@@ -66,7 +66,7 @@ templates:
         - name: Comptroller
           file: ./abis/Comptroller.json
         - name: CToken
-          file: ./abis/CToken.json
+          file: ./abis/cToken.json
         - name: PriceOracle1
           file: ./abis/PriceOracle1.json
         - name: PriceOracle2
