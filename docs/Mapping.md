@@ -12,6 +12,11 @@ There are couple things you can do to significantly improve your indexing speed:
 - Avoid call handlers and block handlers. Also depending on the Ethereum node ran by an indexer, call handlers and block handlers may or may not be supported (esp. on alt-EVM chains).
 - Limit the number of contract calls you perform. If you do need to perform contract calls, save the data, so you won't have to do repeated calls.
 
+### Forks and Multichain
+
+- You should put fork/network-specific configs in the `config` folder of each subgraph.
+- Each `config` folder will contain `json` files with the fork/network-specific config. Then use `mustache` in combination with node scripts to deploy all networks and forks of a single subgraph.
+
 ## Common Issues
 
 ### Proxy
