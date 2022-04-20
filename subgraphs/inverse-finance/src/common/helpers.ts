@@ -239,9 +239,9 @@ export function createLiquidate(event: LiquidateBorrow): void {
 // Update UsageMetricsDailySnapshots entity and LendingProtocol.totalUniqueUsers
 export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   // Number of days since Unix epoch
-  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY
+  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let daysStr: string = days.toString();
-  let daysPrior = days - 1
+  let daysPrior = days - 1;
   let daysPriorStr: string = daysPrior.toString();
   let accountId: string = user.toHexString();
   let dailyActiveAccountId: string = daysStr + "-" + accountId;
@@ -252,8 +252,9 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   let isDailyActiveUser = createAndIncrementDailyAccount(dailyActiveAccountId);
 
   let usageMetrics = UsageMetricsDailySnapshot.load(daysStr);
-  let usageMetricsPrior = UsageMetricsDailySnapshot.load(daysPriorStr)
-  let totalUniqueUsersPriorDay = (usageMetricsPrior == null) ? 0 : usageMetricsPrior.totalUniqueUsers
+  let usageMetricsPrior = UsageMetricsDailySnapshot.load(daysPriorStr);
+  let totalUniqueUsersPriorDay =
+    usageMetricsPrior == null ? 0 : usageMetricsPrior.totalUniqueUsers;
   if (usageMetrics == null) {
     usageMetrics = new UsageMetricsDailySnapshot(daysStr);
     usageMetrics.protocol = FACTORY_ADDRESS;
@@ -276,7 +277,7 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   let protocol = getOrCreateProtocol();
   if (protocol == null) {
     log.error("LendingProtocol entity is null{}; something went wrong", [""]);
-    return
+    return;
   }
 
   protocol.totalUniqueUsers += isUniqueUser;
@@ -325,19 +326,22 @@ export function updateFinancials(event: ethereum.Event): void {
 
 export function updateFinancialsRevenue(
   event: ethereum.Event,
-  newRewardUSD: BigDecimal = BIGDECIMAL_ZERO,
-  newProtocolRevenueUSD: BigDecimal = BIGDECIMAL_ZERO
+  newProtocolRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
+  newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO
 ): void {
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-    newRewardUSD
+  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
+    newTotalRevenueUSD
   );
+
   financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
     newProtocolRevenueUSD
   );
-  financialMetrics.totalRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-    financialMetrics.protocolSideRevenueUSD
+
+  financialMetrics.supplySideRevenueUSD = newTotalRevenueUSD.minus(
+    newProtocolRevenueUSD
   );
+
   financialMetrics.save();
 }
 
@@ -426,7 +430,9 @@ export function updateMarket(
         .times(pricePerUnderlyingToken);
     }
     if (borrowAmount != BIGINT_ZERO) {
-      let borrowAmountUSD = borrowAmount.toBigDecimal().times(pricePerUnderlyingToken);
+      let borrowAmountUSD = borrowAmount
+        .toBigDecimal()
+        .times(pricePerUnderlyingToken);
 
       market.totalVolumeUSD = market.totalVolumeUSD.plus(borrowAmountUSD);
     }
@@ -507,8 +513,9 @@ export function updateMarketEmission(
 
   market.save();
 
-  let newEmissionUSD = newEmissionAmount.toBigDecimal().times(pricePerToken);
-  updateFinancialsRevenue(event, newEmissionUSD, BIGDECIMAL_ZERO);
+  //Not accounting emission reward as revenue (etierh supply or borrow)
+  //let newEmissionUSD = newEmissionAmount.toBigDecimal().times(pricePerToken);
+  //updateFinancialsRevenue(event, newEmissionUSD, BIGDECIMAL_ZERO);
 }
 
 export function updateMarketRates(event: ethereum.Event): void {
@@ -518,6 +525,12 @@ export function updateMarketRates(event: ethereum.Event): void {
     event.transaction.hash.toHexString(),
   ]);
 
+  let market = getOrCreateMarket(marketId, event);
+  if (market == null) {
+    log.error("Market {} does not exist.", [marketId]);
+    return;
+  }
+
   let tokenContract = CErc20.bind(event.address);
   let borrowRate = tokenContract.try_borrowRatePerBlock();
   let depositRate = tokenContract.try_supplyRatePerBlock();
@@ -526,35 +539,40 @@ export function updateMarketRates(event: ethereum.Event): void {
       "Failed to get borrowRatePerBlock() for Market {} at tx hash {}",
       [marketId, event.transaction.hash.toHexString()]
     );
-    return;
+  } else {
+    market.variableBorrowRate = borrowRate.value
+      .toBigDecimal()
+      .times(BLOCKS_PER_YEAR)
+      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
   if (depositRate.reverted) {
     log.warning(
       "Failed to get supplyRatePerBlock() for Market {} at tx hash {}",
       [marketId, event.transaction.hash.toHexString()]
     );
-    return;
+  } else {
+    market.depositRate = depositRate.value
+      .toBigDecimal()
+      .times(BLOCKS_PER_YEAR)
+      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
 
-  let market = getOrCreateMarket(marketId, event);
-  if (market == null) {
-    log.error("Market {} does not exist.", [marketId]);
-    return;
+  let interestRateModelContract = JumpRateModelV2.bind(
+    tokenContract.interestRateModel()
+  );
+  // TODO: this is the baseRatePerYear, which applies when utilization rate is below kink
+  let baseRatePerBlock = interestRateModelContract.try_baseRatePerBlock();
+  if (baseRatePerBlock.reverted) {
+    log.warning("Failed to get baseRatePerBlock for Market {} at tx hash {}", [
+      marketId,
+      event.transaction.hash.toHexString(),
+    ]);
+  } else {
+    market.stableBorrowRate = baseRatePerBlock.value
+      .toBigDecimal()
+      .times(BLOCKS_PER_YEAR)
+      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
-
-  // TODO: As far as I can see, inverse finance has no stableBorrowRate
-  // this returns 0
-  //market.stableBorrowRate = interestRateModelContract.baseRatePerBlock()
-  //                                                   .toBigDecimal()
-  //                                                   .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
-  market.variableBorrowRate = borrowRate.value
-    .toBigDecimal()
-    .times(BLOCKS_PER_YEAR)
-    .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
-  market.depositRate = depositRate.value
-    .toBigDecimal()
-    .times(BLOCKS_PER_YEAR)
-    .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
 
   market.save();
 }
