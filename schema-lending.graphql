@@ -8,11 +8,9 @@ enum Network {
   AVALANCHE
   BNB # aka Binance Smart Chain
   CELO
-  CRONOS
   MAINNET
   FANTOM
   FUSE
-  HARMONY
   MOONBEAM
   MOONRIVER
   NEAR_MAINNET

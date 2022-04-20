@@ -8,11 +8,9 @@ enum Network {
   AVALANCHE
   BNB # aka Binance Smart Chain
   CELO
-  CRONOS
   MAINNET
   FANTOM
   FUSE
-  HARMONY
   MOONBEAM
   MOONRIVER
   NEAR_MAINNET
@@ -34,9 +32,13 @@ type Token @entity {
   " Smart contract address of the token "
   id: ID!
 
-  " Mirrored from the smart contract "
+  " Name of the token, mirrored from the smart contract "
   name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
   symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 }
 
@@ -52,19 +54,54 @@ type RewardToken @entity {
   " Smart contract address of the reward token "
   id: ID!
 
-  " Mirrored from the smart contract "
+  " Name of the token, mirrored from the smart contract "
   name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
   symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 
+  " The type of the reward token "
   type: RewardTokenType!
 }
 
+# Note that trading fee is the fee paid *by* the users, whereas LP fee and
+# protocol fee are fees paid *to* the corresponding parties.
+# Most of the time, trading fee = liquidity provider fee + protocol fee,
+# but not always. Thus we explicitly specify all different fee types.
+enum LiquidityPoolFeeType {
+  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
+  FIXED_TRADING_FEE
+
+  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
+  TIERED_TRADING_FEE
+
+  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_TRADING_FEE
+
+  " Fixed fee that's paid to the LP, as a percentage of the traded amount. e.g. 0.25% for Sushiswap, 0.02% for Curve v1. "
+  FIXED_LP_FEE
+
+  " Some protocols use dynamic LP fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_LP_FEE
+
+  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
+  FIXED_PROTOCOL_FEE
+
+  " Some protocols use dynamic protocol fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
+  DYNAMIC_PROTOCOL_FEE
+}
+
 type LiquidityPoolFee @entity {
+  " { Fee type }-{ Pool address } "
   id: ID!
 
+  " Fee as a percentage of the trade (swap) amount. Does not always apply "
   feePercentage: BigDecimal!
 
+  " Type of fee this pool uses "
   feeType: LiquidityPoolFeeType!
 }
 
@@ -91,8 +128,10 @@ interface Protocol {
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
   methodologyVersion: String!
 
+  " The blockchain network this subgraph is indexing on "
   network: Network!
 
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
 
   ##### Quantitative Data #####
@@ -117,8 +156,10 @@ interface Protocol {
 
   ##### Snapshots #####
 
+  " Daily usage metrics for this protocol "
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
+  " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
@@ -141,8 +182,10 @@ type DexAmmProtocol implements Protocol @entity {
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
   methodologyVersion: String!
 
+  " The blockchain network this subgraph is indexing on "
   network: Network!
 
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
 
   ##### Quantitative Data #####
@@ -170,8 +213,10 @@ type DexAmmProtocol implements Protocol @entity {
 
   ##### Snapshots #####
 
+  " Daily usage metrics for this protocol "
   usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
+  " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   ##### Pools #####
@@ -188,6 +233,7 @@ type UsageMetricsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
+  " Protocol this snapshot is associated with "
   protocol: DexAmmProtocol!
 
   " # of unique daily active users "
@@ -219,6 +265,7 @@ type FinancialsDailySnapshot @entity {
   " ID is # of days since Unix epoch time "
   id: ID!
 
+  " Protocol this snapshot is associated with "
   protocol: DexAmmProtocol!
 
   " Current TVL (Total Value Locked) of the entire protocol "
@@ -256,33 +303,6 @@ type FinancialsDailySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
-}
-
-# Note that trading fee is the fee paid *by* the users, whereas LP fee and
-# protocol fee are fees paid *to* the corresponding parties.
-# Most of the time, trading fee = liquidity provider fee + protocol fee,
-# but not always. Thus we explicitly specify all different fee types.
-enum LiquidityPoolFeeType {
-  " Total fixed fee paid by the user per trade, as a percentage of the traded amount. e.g. 0.3% for Uniswap v2, 0.3% for Sushiswap, 0.04% for Curve v1. "
-  FIXED_TRADING_FEE
-
-  " Some protocols use tiered fees instead of fixed fee (e.g. DYDX, DODO). Set `feePercentage` as 0 but handle the tiered fees in the mapping code. "
-  TIERED_TRADING_FEE
-
-  " Some protocols use dynamic fees instead of fixed fee (e.g. Balancer v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
-  DYNAMIC_TRADING_FEE
-
-  " Fixed fee that's paid to the LP, as a percentage of the traded amount. e.g. 0.25% for Sushiswap, 0.02% for Curve v1. "
-  FIXED_LP_FEE
-
-  " Some protocols use dynamic LP fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
-  DYNAMIC_LP_FEE
-
-  " Fixed fee that's paid to the protocol, as a percentage of the traded amount. e.g. 0.05% for Sushiswap, 0.02% for Curve v1. "
-  FIXED_PROTOCOL_FEE
-
-  " Some protocols use dynamic protocol fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
-  DYNAMIC_PROTOCOL_FEE
 }
 
 ###############################
@@ -359,10 +379,13 @@ type LiquidityPool @entity {
 
   ##### Events #####
 
+  " All deposit (add liquidity) events occurred in this pool "
   deposits: [Deposit!]! @derivedFrom(field: "pool")
 
+  " All withdraw (remove liquidity) events occurred in this pool "
   withdraws: [Withdraw!]! @derivedFrom(field: "pool")
 
+  " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 }
 
@@ -432,7 +455,7 @@ store them as events, although they are not technically Ethereum events emitted 
 contracts.
 """
 interface Event {
-  " { Transaction hash }-{ Log index } "
+  " { Event type }-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -450,13 +473,15 @@ interface Event {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 }
 
 type Deposit implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+  " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -474,8 +499,10 @@ type Deposit implements Event @entity {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
@@ -498,7 +525,7 @@ type Deposit implements Event @entity {
 }
 
 type Withdraw implements Event @entity {
-  " { Transaction hash }-{ Log index }"
+  " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -516,8 +543,10 @@ type Withdraw implements Event @entity {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
@@ -540,7 +569,7 @@ type Withdraw implements Event @entity {
 }
 
 type Swap implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+  " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -558,8 +587,10 @@ type Swap implements Event @entity {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   " Token deposited into pool "
