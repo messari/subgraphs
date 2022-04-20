@@ -6,9 +6,9 @@ dataSources:
     name: Factory
     network: bsc
     source:
-      address: '0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6'
+      address: "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6"
       abi: Factory
-      startBlock: 4855900	
+      startBlock: 4855900
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -28,9 +28,9 @@ dataSources:
     name: MasterChef
     network: bsc
     source:
-      address: '0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9'
+      address: "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9"
       abi: MasterChef
-      startBlock: 14803526	
+      startBlock: 14803526
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

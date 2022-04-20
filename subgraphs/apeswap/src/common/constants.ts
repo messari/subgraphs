@@ -79,14 +79,14 @@ export namespace RewardTokenType {
 }
 
 export namespace HelperStoreType {
-  export const NATIVE_TOKEN = Bytes.fromHexString("xNATIVE_TOKEN");
-  export const USERS = Bytes.fromHexString("xUSERS");
+  export const NATIVE_TOKEN = "NATIVE_TOKEN";
+  export const USERS = "USERS";
   // Pool addresses are also stored in the HelperStore
 }
 
 export namespace TransferType {
-  export const MINT = Bytes.fromHexString("MINT");
-  export const BURN = Bytes.fromHexString("BURN");
+  export const MINT = "MINT";
+  export const BURN = "BURN";
   // Pool addresses are also stored in the HelperStore
 }
 
@@ -122,6 +122,4 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
   new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)),
 );
 
-export const ZERO_ADDRESS = Bytes.fromHexString(
-  "0x0000000000000000000000000000000000000000",
-);
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";

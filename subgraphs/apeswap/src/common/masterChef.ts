@@ -12,7 +12,7 @@ import { findNativeTokenPerToken, getNativeTokenPriceInUSD } from "./price/price
 import { getRewardsPerDay } from "./rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
-  let pool = getLiquidityPool(event.address);
+  let pool = getLiquidityPool(event.address.toHexString());
 
   let poolContract = MasterChefV2.bind(event.address);
 
@@ -73,7 +73,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
 }
 
 export function handleReward(event: ethereum.Event, pid: BigInt): void {
-  let pool = getLiquidityPool(event.address);
+  let pool = getLiquidityPool(event.address.toHexString());
 
   let poolContract = MasterChef.bind(event.address);
   let getPoolInfo = poolContract.try_getPoolInfo(pid);
@@ -82,7 +82,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
   let lastRewardBlock: BigInt = BIGINT_ZERO;
   if (!getPoolInfo.reverted) {
     let poolInfo = getPoolInfo.value;
-    lpTokenAddress = poolInfo.value0;
+    lpTokenAddress = poolInfo.value0.toHexString();
     poolAllocPoint = poolInfo.value1;
     lastRewardBlock = poolInfo.value2;
   }

@@ -22,43 +22,53 @@ import { BIGINT_THOUSAND, ZERO_ADDRESS } from "../common/constants";
 
 export function handleTransfer(event: Transfer): void {
   // ignore initial transfers for first adds
-  if (event.params.to == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
+  if (
+    event.params.to.toHexString() == ZERO_ADDRESS &&
+    event.params.value.equals(BIGINT_THOUSAND)
+  ) {
     return;
   }
 
   // mints
-  if (event.params.from == ZERO_ADDRESS) {
-    handleTransferMint(event, event.params.value, event.params.to);
+  if (event.params.from.toHexString() == ZERO_ADDRESS) {
+    handleTransferMint(event, event.params.value, event.params.to.toHexString());
   }
   // Case where direct send first on native token withdrawls.
   // For burns, mint tokens are first transferred to the pool before transferred for burn.
   // This gets the EOA that made the burn loaded into the _Transfer.
 
   if (event.params.to == event.address) {
-    handleTransferToPoolBurn(event, event.params.value, event.params.from);
+    handleTransferToPoolBurn(event, event.params.value, event.params.from.toHexString());
   }
 
   // burn
-  if (event.params.to == ZERO_ADDRESS && event.params.from == event.address) {
-    handleTransferBurn(event, event.params.value, event.params.from);
+  if (
+    event.params.to.toHexString() == ZERO_ADDRESS &&
+    event.params.from == event.address
+  ) {
+    handleTransferBurn(event, event.params.value, event.params.from.toHexString());
   }
 }
 
 export function handleSync(event: Sync): void {
-  updateInputTokenBalances(event.address, event.params.reserve0, event.params.reserve1);
-  updateTvlAndTokenPrices(event.address, event.block.number);
+  updateInputTokenBalances(
+    event.address.toHexString(),
+    event.params.reserve0,
+    event.params.reserve1,
+  );
+  updateTvlAndTokenPrices(event.address.toHexString(), event.block.number);
 }
 
 export function handleMint(event: Mint): void {
   createDeposit(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.params.sender);
+  updateUsageMetrics(event, event.params.sender.toHexString());
   updateFinancials(event);
   updatePoolMetrics(event);
 }
 
 export function handleBurn(event: Burn): void {
   createWithdraw(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.transaction.from);
+  updateUsageMetrics(event, event.transaction.from.toHexString());
   updateFinancials(event);
   updatePoolMetrics(event);
 }
@@ -66,8 +76,8 @@ export function handleBurn(event: Burn): void {
 export function handleSwap(event: Swap): void {
   createSwapHandleVolumeAndFees(
     event,
-    event.params.to,
-    event.params.sender,
+    event.params.to.toHexString(),
+    event.params.sender.toHexString(),
     event.params.amount0In,
     event.params.amount1In,
     event.params.amount0Out,
@@ -75,5 +85,5 @@ export function handleSwap(event: Swap): void {
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.transaction.from);
+  updateUsageMetrics(event, event.transaction.from.toHexString());
 }

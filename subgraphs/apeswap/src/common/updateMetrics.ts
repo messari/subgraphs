@@ -50,10 +50,10 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.save();
 }
 
-export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
+export function updateUsageMetrics(event: ethereum.Event, from: string): void {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = Bytes.fromI32(dayID);
+  let id = dayID.toString();
   let usageMetrics = UsageMetricsDailySnapshot.load(id);
   let totalUniqueUsers = getOrCreateUsersHelper();
   let protocol = getOrCreateDex();
@@ -98,7 +98,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 export function updatePoolMetrics(event: ethereum.Event): void {
   // get or create pool metrics
   let poolMetrics = getOrCreatePoolDailySnapshot(event);
-  let pool = getLiquidityPool(event.address);
+  let pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetrics.currentTvlUSD = pool.currentTvlUSD;
@@ -115,7 +115,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 export function updateTokenWhitelists(
   tokenTracker0: _TokenTracker,
   tokenTracker1: _TokenTracker,
-  poolAddress: Address,
+  poolAddress: string,
 ): void {
   // update white listed pools
   if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenTracker0.id)) {
@@ -135,7 +135,7 @@ export function updateTokenWhitelists(
 
 // Upate token balances based on reserves emitted from the sync event.
 export function updateInputTokenBalances(
-  poolAddress: Address,
+  poolAddress: string,
   reserve0: BigInt,
   reserve1: BigInt,
 ): void {
@@ -156,7 +156,7 @@ export function updateInputTokenBalances(
 }
 
 // Update tvl an token prices
-export function updateTvlAndTokenPrices(poolAddress: Address, blockNumber: BigInt): void {
+export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt): void {
   let pool = getLiquidityPool(poolAddress);
   let poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
@@ -213,7 +213,7 @@ export function updateVolumeAndFees(
   tradingFeeAmountUSD: BigDecimal,
   protocolFeeAmountUSD: BigDecimal,
 ): void {
-  let pool = getLiquidityPool(event.address);
+  let pool = getLiquidityPool(event.address.toHexString());
   let protocol = getOrCreateDex();
   let poolMetrics = getOrCreatePoolDailySnapshot(event);
   let financialMetrics = getOrCreateFinancials(event);
@@ -245,7 +245,7 @@ export function updateVolumeAndFees(
 
 // Update store that tracks the deposit count per pool
 export function updateDepositHelper(poolAddress: Address): void {
-  let poolDeposits = _HelperStore.load(poolAddress)!;
+  let poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
 }
