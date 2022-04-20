@@ -31,6 +31,7 @@ import {
   SECONDS_PER_DAY,
   LiquidityPoolFeeType,
   BIGDECIMAL_HUNDRED,
+  FeeSwitch,
 } from "./constants";
 import { getTrackedVolumeUSD } from "./price/price";
 import {
@@ -55,15 +56,21 @@ export let factoryContract = FactoryContract.bind(
 
 function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
-  poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_ON;
-
   let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
-  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-  poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_ON;
-
   let poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+
+  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+
+  if (NetworkConfigs.FEE_ON_OFF == FeeSwitch.ON) {
+    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_ON;
+    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_ON;
+  } else {
+    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_OFF;
+    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_OFF;
+  }
+
   poolTradingFee.feePercentage = NetworkConfigs.TRADING_FEE;
 
   poolLpFee.save();

@@ -1,6 +1,6 @@
 import { Address, BigDecimal, Bytes, dataSource, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../generated/Factory/Factory";
-import { SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
+import { FeeSwitch, SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
 import { RewardIntervalType } from "../src/common/rewards";
 import { toBytesArray, toPercentage } from "../src/common/utils/utils";
 
@@ -12,6 +12,7 @@ let FACTORY_ADDRESS_TEMP: string; // factory address of the protocol in the netw
 let FACTORY_CONTRACT_TEMP: Factory; // Factory Contract of protocol in the network
 
 let TRADING_FEE_TEMP: BigDecimal; // trading fee of the protocol in the network
+let FEE_ON_OFF_TEMP: string;
 let PROTOCOL_FEE_TO_ON_TEMP: BigDecimal; // protocol fee of the protocol in the network when protocol fee is on
 let LP_FEE_TO_ON_TEMP: BigDecimal; // supply fee of the protocol in the network when protocol fee is off
 let PROTOCOL_FEE_TO_OFF_TEMP: BigDecimal; // protocol fee of the protocol in the network when protocol fee is on
@@ -37,6 +38,7 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.05"));
   PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
   LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
+  FEE_ON_OFF_TEMP = FeeSwitch.ON;
 
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.BLOCK;
 
@@ -74,6 +76,7 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.15"));
   PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
   LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
+  FEE_ON_OFF_TEMP = FeeSwitch.ON;
 
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.TIMESTAMP;
 
@@ -117,6 +120,7 @@ export namespace NetworkConfigs {
   export const LP_FEE_TO_ON = LP_FEE_TO_ON_TEMP;
   export const PROTOCOL_FEE_TO_OFF = PROTOCOL_FEE_TO_OFF_TEMP;
   export const LP_FEE_TO_OFF = LP_FEE_TO_OFF_TEMP;
+  export const FEE_ON_OFF = FEE_ON_OFF_TEMP;
 
   export const REWARD_INTERVAL_TYPE = REWARD_INTERVAL_TYPE_TEMP;
 

@@ -90,6 +90,12 @@ export namespace TransferType {
   // Pool addresses are also stored in the HelperStore
 }
 
+export namespace FeeSwitch {
+  export const ON = "ON";
+  export const OFF = "OFF";
+  // Pool addresses are also stored in the HelperStore
+}
+
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
