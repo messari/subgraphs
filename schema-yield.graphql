@@ -57,6 +57,28 @@ type RewardToken @entity {
   type: RewardTokenType!
 }
 
+enum VaultFeeType {
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
+  DEPOSIT_FEE
+
+  " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
+  WITHDRAWAL_FEE
+
+  " Fees charged by the protocol during harvest, in percentages of the interest accrued "
+  PERFORMANCE_FEE
+
+  " Fees charged by the protocol on a periodic basis, in percentages of the total principal "
+  MANAGEMENT_FEE
+}
+
+type VaultFee @entity {
+  id: ID!
+
+  feePercentage: BigDecimal!
+
+  feeType: VaultFeeType!
+}
+
 #############################
 ##### Protocol Metadata #####
 #############################
@@ -192,28 +214,6 @@ type FinancialsDailySnapshot @entity {
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
-}
-
-enum VaultFeeType {
-  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
-  DEPOSIT_FEE
-
-  " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
-  WITHDRAWAL_FEE
-
-  " Fees charged by the protocol during harvest, in percentages of the interest accrued "
-  PERFORMANCE_FEE
-
-  " Fees charged by the protocol on a periodic basis, in percentages of the total principal "
-  MANAGEMENT_FEE
-}
-
-type VaultFee @entity {
-  id: ID!
-
-  feePercentage: BigDecimal!
-
-  feeType: VaultFeeType!
 }
 
 ###############################
