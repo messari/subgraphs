@@ -1,8 +1,11 @@
-# Lending Protocol Subgraph
+# Euler Lending Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://www.euler.finance/
+- https://docs.euler.finance/developers/integration-guide
+- https://app.euler.finance/
+- Add here
 
 ## Calculation Methodology v0.0.1
 

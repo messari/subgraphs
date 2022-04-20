@@ -1,8 +1,11 @@
-# Lending Protocol Subgraph
+# Spookyswap - DEX Protocol Subgraph
 
 ## Useful Links
 
-Add here
+- https://spookyswap.finance/
+- https://docs.spookyswap.finance/
+- https://info.spookyswap.finance/
+- Add here
 
 ## Calculation Methodology v0.0.1
 
@@ -45,15 +48,11 @@ Sum across all Pools
 
 Count of  Unique Addresses which have interacted with the protocol via any transaction
 
+`Swaps`
+
 `Deposits`
 
-`Withdrawals`
-
-`Borrows`
-
-`Repays`
-
-`Liquidations`
+`Withdraws`
 
 ###  Reward Token Emissions Amount
 
