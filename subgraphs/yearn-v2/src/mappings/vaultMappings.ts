@@ -25,6 +25,7 @@ import { _Withdraw } from "../modules/Withdraw";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import { updateFinancials, updateUsageMetrics } from "../modules/Metrics";
 import { getOrCreateStrategy, strategyReported } from "../modules/Strategy";
+import { Transfer as TransferEvent } from "../../generated/templates/Vault/Vault";
 
 export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
   const vaultAddress = event.address;

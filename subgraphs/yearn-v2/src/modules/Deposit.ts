@@ -93,8 +93,8 @@ export function _Deposit(
   vault.outputTokenPriceUSD = getPriceOfStakedTokens(
     Address.fromString(vault.id),
     inputTokenAddress,
-    inputTokenDecimals
-  ).toBigDecimal();
+    inputTokenDecimals.toBigDecimal()
+  );
 
   // update deposit transaction
   transaction.asset = vault.inputTokens[0];
