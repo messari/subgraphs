@@ -51,6 +51,7 @@ import {
   getUnderlyingTokenPrice,
 } from "./getters";
 import { decimalsToBigDecimal } from "./utils";
+import { BLOCKS_PER_YEAR } from "./constants";
 
 // Create Account entity for participating account
 // return 1 if account is new, 0 if account already exists
@@ -416,11 +417,17 @@ export function updateMarket(
     market.totalValueLockedUSD = market.totalDepositUSD;
     market.outputTokenSupply = tokenContract.totalSupply();
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO; // Not tradeable & has no price
-    market.totalBorrowUSD = tokenContract
-      .totalBorrows()
-      .toBigDecimal()
-      .times(pricePerDOLA);
-
+    let totalBorrows = tokenContract.try_totalBorrows();
+    if (totalBorrows.reverted) {
+      log.warning(
+        "Failed to get totalBorrows for market {} at tx hash {}; Not updating Market.totalBorrowUSD",
+        [marketId, event.transaction.hash.toHexString()]
+      );
+    } else {
+      market.totalBorrowUSD = totalBorrows.value
+        .toBigDecimal()
+        .times(pricePerDOLA);
+    }
     if (borrowAmount != BIGINT_ZERO) {
       let borrowAmountUSD = borrowAmount.toBigDecimal().times(pricePerDOLA);
 
@@ -509,28 +516,33 @@ export function updateMarketEmission(
 
 export function updateMarketRates(event: ethereum.Event): void {
   let marketId = event.address.toHexString();
+  log.info("Updating rates for Market {} at tx hash {} ...", [
+    marketId,
+    event.transaction.hash.toHexString(),
+  ]);
+
   let tokenContract = CErc20.bind(event.address);
-  let interestRateModelAddr = tokenContract.interestRateModel();
-  let interestRateModelContract = JumpRateModelV2.bind(interestRateModelAddr);
-  let cash = tokenContract.getCash();
-  let borrows = tokenContract.totalBorrows();
-  let reserves = tokenContract.totalReserves();
-  let reserveFactorMantissa = tokenContract.reserveFactorMantissa();
-  let borrowRate = interestRateModelContract.getBorrowRate(
-    cash,
-    borrows,
-    reserves
-  );
-  let depositRate = interestRateModelContract.getSupplyRate(
-    cash,
-    borrows,
-    reserves,
-    reserveFactorMantissa
-  );
+  let borrowRate = tokenContract.try_borrowRatePerBlock();
+  let depositRate = tokenContract.try_supplyRatePerBlock();
+  if (borrowRate.reverted) {
+    log.warning("Failed to get borrowRatePerBlock() for Market {} at tx hash {}", [
+      marketId,
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
+  if (depositRate.reverted) {
+    log.warning("Failed to get supplyRatePerBlock() for Market {} at tx hash {}", [
+      marketId,
+      event.transaction.hash.toHexString(),
+    ]);
+    return;
+  }
 
   let market = getOrCreateMarket(marketId, event);
   if (market == null) {
     log.error("Market {} does not exist.", [marketId]);
+    return;
   }
 
   // TODO: As far as I can see, inverse finance has no stableBorrowRate
@@ -538,11 +550,13 @@ export function updateMarketRates(event: ethereum.Event): void {
   //market.stableBorrowRate = interestRateModelContract.baseRatePerBlock()
   //                                                   .toBigDecimal()
   //                                                   .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
-  market.variableBorrowRate = borrowRate
+  market.variableBorrowRate = borrowRate.value
     .toBigDecimal()
+    .times(BLOCKS_PER_YEAR)
     .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
-  market.depositRate = depositRate
+  market.depositRate = depositRate.value
     .toBigDecimal()
+    .times(BLOCKS_PER_YEAR)
     .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
 
   market.save();
