@@ -105,58 +105,64 @@ export function findEthPerToken(tokenTracker: _TokenTracker): BigDecimal {
  */
 export function getTrackedVolumeUSD(
   tokenAmount0: BigDecimal,
-  token0: _TokenTracker,
+  tokenTracker0: _TokenTracker,
   tokenAmount1: BigDecimal,
-  token1: _TokenTracker,
-  pool: LiquidityPool
+  tokenTracker1: _TokenTracker,
+  pool: _LiquidityPoolAmount
 ): BigDecimal {
-  let price0 = token0.derivedUSD;
-  let price1 = token1.derivedUSD;
+  let ether = getOrCreateEtherHelper();
+
+  let price0 = tokenTracker0.derivedETH.times(ether.valueDecimal!);
+  let price1 = tokenTracker1.derivedETH.times(ether.valueDecimal!);
 
   // dont count tracked volume on these pairs - usually rebass tokens
   if (UNTRACKED_PAIRS.includes(pool.id)) {
     return BIGDECIMAL_ZERO;
   }
 
+  let poolDeposits = _HelperStore.load(pool.id);
+  if (poolDeposits == null) return BIGDECIMAL_ZERO;
+
   // if less than 5 LPs, require high minimum reserve amount amount or return 0
-  if (pool.liquidityProviderCount.lt(BigInt.fromI32(5))) {
-    let reserve0USD = pair.reserve0.times(price0);
-    let reserve1USD = pair.reserve1.times(price1);
-    if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
+  // Updated from original subgraph. Number of deposits may not equal number of liquidity providers
+  if (poolDeposits.valueInt < 5) {
+    let reserve0USD = pool.inputTokenBalances[0].times(price0);
+    let reserve1USD = pool.inputTokenBalances[1].times(price1);
+    if (WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {
       if (reserve0USD.plus(reserve1USD).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
-        return ZERO_BD;
+        return BIGDECIMAL_ZERO;
       }
     }
-    if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
-      if (reserve0USD.times(BigDecimal.fromString("2")).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
-        return ZERO_BD;
+    if (WHITELIST.includes(tokenTracker0.id) && !WHITELIST.includes(tokenTracker1.id)) {
+      if (reserve0USD.times(BIGDECIMAL_TWO).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
+        return BIGDECIMAL_ZERO;
       }
     }
-    if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
-      if (reserve1USD.times(BigDecimal.fromString("2")).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
-        return ZERO_BD;
+    if (!WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {
+      if (reserve1USD.times(BIGDECIMAL_TWO).lt(MINIMUM_USD_THRESHOLD_NEW_PAIRS)) {
+        return BIGDECIMAL_ZERO;
       }
     }
   }
 
   // both are whitelist tokens, take average of both amounts
-  if (WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
+  if (WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {
     return tokenAmount0
       .times(price0)
       .plus(tokenAmount1.times(price1))
-      .div(BigDecimal.fromString("2"));
+      .div(BIGDECIMAL_TWO);
   }
 
   // take full value of the whitelisted token amount
-  if (WHITELIST.includes(token0.id) && !WHITELIST.includes(token1.id)) {
+  if (WHITELIST.includes(tokenTracker0.id) && !WHITELIST.includes(tokenTracker1.id)) {
     return tokenAmount0.times(price0);
   }
 
   // take full value of the whitelisted token amount
-  if (!WHITELIST.includes(token0.id) && WHITELIST.includes(token1.id)) {
+  if (!WHITELIST.includes(tokenTracker0.id) && WHITELIST.includes(tokenTracker1.id)) {
     return tokenAmount1.times(price1);
   }
 
   // neither token is on white list, tracked volume is 0
-  return ZERO_BD;
+  return BIGDECIMAL_ZERO;
 }
