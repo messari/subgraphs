@@ -40,8 +40,13 @@ type Token @entity {
   decimals: Int!
 }
 
+# Note a market can have reward tokens for both lenders and borrowers.
+# In that case, include one for each and use the corresponding type.
 enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
   DEPOSIT
+
+  " For reward tokens awarded to borrowers "
   BORROW
 }
 

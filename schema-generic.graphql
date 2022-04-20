@@ -30,6 +30,36 @@ enum ProtocolType {
   # Will add more
 }
 
+type Token @entity {
+  " Smart contract address of the token "
+  id: ID!
+
+  " Mirrored from the smart contract "
+  name: String!
+  symbol: String!
+  decimals: Int!
+}
+
+enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
+  DEPOSIT
+
+  " For reward tokens awarded to borrowers "
+  BORROW
+}
+
+type RewardToken @entity {
+  " Smart contract address of the reward token "
+  id: ID!
+
+  " Mirrored from the smart contract "
+  name: String!
+  symbol: String!
+  decimals: Int!
+
+  type: RewardTokenType!
+}
+
 #############################
 ##### Protocol Metadata #####
 #############################

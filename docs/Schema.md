@@ -27,17 +27,17 @@ All subgraphs follow a set of standardized schemas. This standardization brings 
   - token amount: All token amounts should be BigInt to preserve precision (i.e. in wei)
   - dollar amount: All USD amounts (including prices) should be BigDecimal
 - Certain prefixes may be used to indicate a particular type of value:
-  - *current*: indicates this is a spot balance. In other words, the value as of this point in time. E.g. `currentTvlUSD` means the total TVL of the protocol/pool as of now.
   - *cumulative*: sum of all historical data from day 1 up to this point. E.g. `cumulativeDepositUSD` means all deposits has ever been made to this protocol/pool.
-  - *daily*: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique in the past day.
+  - *daily/hourly*: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique active users on a given day, up till now.
+  - All other quantitative field indicates a spot balance. In other words, the value at this point in time. E.g. `totalValueLockedUSD` means the total TVL of the protocol/pool as of now.
 - Use plurals when referring to multiple items, ususally stored as an array (e.g. tokens, balances).
 
 ### Quantitative Data
 
 - There are 3 ways in which quantitative data are stored and fetched:
-  1. Real-time: you can get real-time data by querying on specific entities. For example, get `currentTvlUSD` from a `Pool`.
+  1. Real-time: you can get real-time data by querying on specific entities. For example, get `totalValueLockedUSD` from a `Pool`.
   2. Point-in-time: you can get point-in-time (including historical) data on specific entities using [time-travel queries](https://thegraph.com/docs/en/developer/graphql-api/#time-travel-queries).
-  3. Time-series: the best way to get time-series data is by querying for snapshots. For example, get `currentTvlUSD` from `PoolDailySnapshot`.
+  3. Time-series: the best way to get time-series data is by querying for snapshots. For example, get `totalValueLockedUSD` from `PoolDailySnapshot`.
 
 ## Versioning
 

@@ -41,7 +41,10 @@ type Token @entity {
 }
 
 enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
   DEPOSIT
+
+  " For reward tokens awarded to borrowers "
   BORROW
 }
 
