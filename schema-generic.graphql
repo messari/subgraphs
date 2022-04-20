@@ -3,20 +3,22 @@
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
-  ARBITRUM
+  ARBITRUM_ONE
   AURORA
   AVALANCHE
-  BSC
+  BNB # aka Binance Smart Chain
   CELO
   CRONOS
-  ETHEREUM
+  MAINNET
   FANTOM
+  FUSE
   HARMONY
   MOONBEAM
   MOONRIVER
+  NEAR_MAINNET
   OPTIMISM
-  POLYGON
-  XDAI
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
 }
 
 enum ProtocolType {
