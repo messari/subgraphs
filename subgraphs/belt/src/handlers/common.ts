@@ -61,8 +61,8 @@ function updateProtocolMetrics(): void {
   let totalVolumeUSD = BIGDECIMAL_ZERO;
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
-  for (let i = 0; i < protocol.vaults.length; i++) {
-    let vaultId = protocol.vaults[i];
+  for (let i = 0; i < protocol._vaultIds.length; i++) {
+    let vaultId = protocol._vaultIds[i];
     let vault = Vault.load(vaultId);
 
     if (vault) {
