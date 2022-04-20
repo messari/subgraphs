@@ -306,7 +306,6 @@ export function createSwapHandleVolumeAndFees(
     let protocolFeeAmount = amount1TotalConverted.times(
       percToDec(protocolFee.feePercentage),
     );
-    s;
     tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker1.derivedUSD);
     protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker1.derivedUSD);
   }
