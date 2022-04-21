@@ -59,10 +59,8 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
   let nativeToken = getOrCreateNativeTokenHelper();
   nativeToken.valueDecimal = getNativeTokenPriceInUSD();
 
-  pool.currentRewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
-  ];
-  pool.currentRewardTokenEmissionsUSD = [
+  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
+  pool.rewardTokenEmissionsUSD = [
     rewardTokenPerDay
       .times(rewardTokenTracker.derivedNativeToken)
       .times(nativeToken.valueDecimal!),
@@ -128,10 +126,8 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
   let nativeToken = getOrCreateNativeTokenHelper();
   nativeToken.valueDecimal = getNativeTokenPriceInUSD();
 
-  pool.currentRewardTokenEmissionsAmount = [
-    BigInt.fromString(rewardTokenPerDay.toString()),
-  ];
-  pool.currentRewardTokenEmissionsUSD = [
+  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
+  pool.rewardTokenEmissionsUSD = [
     rewardTokenPerDay
       .times(rewardTokenTracker.derivedNativeToken)
       .times(nativeToken.valueDecimal!),

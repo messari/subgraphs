@@ -36,7 +36,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "1.0.2";
     protocol.methodologyVersion = "1.0.0";
-    protocol.currentTvlUSD = BIGDECIMAL_ZERO;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = NetworkConfigs.NETWORK;
@@ -124,8 +124,8 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
     );
     poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
-    poolMetrics.currentRewardTokenEmissionsAmount = [];
-    poolMetrics.currentRewardTokenEmissionsUSD = [];
+    poolMetrics.rewardTokenEmissionsAmount = [];
+    poolMetrics.rewardTokenEmissionsUSD = [];
 
     poolMetrics.save();
   }
@@ -146,7 +146,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
     financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    financialMetrics.currentTvlUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 

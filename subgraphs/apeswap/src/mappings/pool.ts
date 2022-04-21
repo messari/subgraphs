@@ -18,7 +18,7 @@ import {
   updateTvlAndTokenPrices,
   updateUsageMetrics,
 } from "../common/updateMetrics";
-import { BIGINT_THOUSAND, ZERO_ADDRESS } from "../common/constants";
+import { BIGINT_THOUSAND, UsageType, ZERO_ADDRESS } from "../common/constants";
 
 export function handleTransfer(event: Transfer): void {
   // ignore initial transfers for first adds
@@ -61,14 +61,14 @@ export function handleSync(event: Sync): void {
 
 export function handleMint(event: Mint): void {
   createDeposit(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.params.sender.toHexString());
+  updateUsageMetrics(event, event.params.sender.toHexString(), UsageType.DEPOSIT);
   updateFinancials(event);
   updatePoolMetrics(event);
 }
 
 export function handleBurn(event: Burn): void {
   createWithdraw(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.transaction.from.toHexString());
+  updateUsageMetrics(event, event.transaction.from.toHexString(), UsageType.WITHDRAW);
   updateFinancials(event);
   updatePoolMetrics(event);
 }
@@ -85,5 +85,5 @@ export function handleSwap(event: Swap): void {
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.transaction.from.toHexString());
+  updateUsageMetrics(event, event.transaction.from.toHexString(), UsageType.SWAP);
 }
