@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 
 export const ROUTER_ADDRESS = Address.fromString(
   "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
@@ -15,3 +15,5 @@ export const VVSP_ADDRESS_HEX = "0xbA4cFE5741b357FA371b506e5db0774aBFeCf8Fc";
 export const ZERO_ADDRESS_HEX = "0x0000000000000000000000000000000000000000";
 export const VVSP_ADDRESS = Address.fromHexString(VVSP_ADDRESS_HEX);
 export const ZERO_ADDRESS = Address.fromHexString(ZERO_ADDRESS_HEX);
+export const USDC_DENOMINATOR = BigInt.fromString("1000000");
+export const SECONDS_PER_DAY = 84600;

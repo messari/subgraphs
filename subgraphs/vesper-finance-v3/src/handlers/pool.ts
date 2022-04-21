@@ -30,7 +30,7 @@ import {
   getOrCreateTransfer,
   getOrCreateWithdraw,
   getOrCreateDeposit,
-} from "../orm";
+} from "../entities";
 
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
 // we need to do so with the restrictions of AssemblyScript
