@@ -7,6 +7,7 @@ import {
   Deposit,
   Withdraw,
   Account,
+  DailyActiveAccount,
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX, ZERO_ADDRESS } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
@@ -21,6 +22,7 @@ import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
 import { toUsd, getShareToTokenRateV3, getDecimalDivisor } from "./peer";
+import { getDay } from "./utils";
 
 interface getOrCreateResponse<T> {
   object: T;
@@ -146,10 +148,10 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
-export function getOrCreateAccount(
-  address: Address
-): Account {
+export function getOrCreateAccount(address: Address, timestamp: BigInt): Account {
+  let dailyId = `${getDay(timestamp)}-${address.toHexString()}`;
   let object = Account.load(address.toHexString());
+  let dailyObject = DailyActiveAccount.load(dailyId);
   let created = false;
 
   if (!object) {
@@ -161,6 +163,10 @@ export function getOrCreateAccount(
     yAggr.save();
   }
 
+  if (!dailyObject) {
+    dailyObject = new DailyActiveAccount(dailyId);
+    dailyObject.save();
+  }
   return object;
 }
 
@@ -175,7 +181,7 @@ export function getOrCreateTransfer(
     const yAggr = getOrCreateYieldAggregator();
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
-    getOrCreateAccount(event.params.from);
+    getOrCreateAccount(event.params.from, event.block.timestamp);
 
     deposit = new Deposit(id);
     deposit.vault = vaultAddress.toHexString();
@@ -216,7 +222,7 @@ export function getOrCreateDeposit(
     const yAggr = getOrCreateYieldAggregator();
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
-    getOrCreateAccount(event.params.owner);
+    getOrCreateAccount(event.params.owner, event.block.timestamp);
 
     deposit = new Deposit(id);
     deposit.vault = vaultAddress.toHexString();

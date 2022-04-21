@@ -31,6 +31,7 @@ import {
   getOrCreateWithdraw,
   getOrCreateDeposit,
 } from "../entities";
+import { updateAllSnapshots } from "../snapshots";
 
 // these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
 // we need to do so with the restrictions of AssemblyScript
@@ -258,6 +259,7 @@ function handleWithdrawFee(
 export function handleWithdrawV3(event: Withdraw): void {
   getOrCreateVault(dataSource.address(), event.block.number, event.block.timestamp);
   getOrCreateWithdraw(event, dataSource.address());
+  updateAllSnapshots(event, dataSource.address());
   // let poolAddress = dataSource.address();
   // let poolV3 = PoolV3.bind(poolAddress);
   // handleWithdrawFee(
@@ -298,6 +300,7 @@ export function handleTransferV3(event: Transfer): void {
   }
   getOrCreateVault(dataSource.address(), event.block.number, event.block.timestamp);
   getOrCreateTransfer(event, dataSource.address());
+  updateAllSnapshots(event, dataSource.address());
   // let interestFees = event.params.value
   //   .toBigDecimal()
   //   .div(getDecimalDivisor(poolV3.decimals()));
@@ -340,4 +343,5 @@ export function handleDepositV3(event: Deposit): void {
   }
   getOrCreateVault(dataSource.address(), event.block.number, event.block.timestamp);
   getOrCreateDeposit(event, dataSource.address());
+  updateAllSnapshots(event, dataSource.address());
 }
