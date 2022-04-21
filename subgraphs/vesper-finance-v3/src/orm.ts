@@ -8,7 +8,7 @@ import {
   Withdraw,
   Account,
 } from "../generated/schema";
-import { CONTROLLER_ADDRESS_HEX } from "./constant";
+import { CONTROLLER_ADDRESS_HEX, ZERO_ADDRESS } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   PoolV3,

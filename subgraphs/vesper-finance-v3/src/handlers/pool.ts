@@ -327,11 +327,11 @@ export function handleDepositV3(event: Deposit): void {
   let poolV3 = PoolV3.bind(poolAddress);
   if (
     event.params.owner != ZERO_ADDRESS ||
-    !hasStrategy(poolV3.getStrategies(), dataSource.address())
+    !hasStrategy(poolV3.getStrategies(), event.params.owner)
   ) {
-    let toHex = dataSource.address().toHexString();
+    let toHex = event.params.owner.toHexString();
     log.info(
-      "Transfer Event for pool V3 {} was made by {} - it is not interest fees.",
+      "Deposit Event for pool V3 {} was made by {} - it is not interest fees.",
       [poolAddressHex, toHex]
     );
     return;
