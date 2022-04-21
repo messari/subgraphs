@@ -11,6 +11,7 @@ let NETWORK_TEMP: string; // The deployed network(e.g BSC or Polygon )
 let FACTORY_ADDRESS_TEMP: string; // factory address of the protocol in the network
 let FACTORY_CONTRACT_TEMP: Factory; // Factory Contract of protocol in the network
 
+// Fees in percentage
 let TRADING_FEE_TEMP: BigDecimal; // trading fee of the protocol in the network
 let FEE_ON_OFF_TEMP: string;
 let PROTOCOL_FEE_TO_ON_TEMP: BigDecimal; // protocol fee of the protocol in the network when protocol fee is on
@@ -33,11 +34,11 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
 
-  TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("0.2"));
-  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.15"));
-  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.05"));
+  TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("2"));
+  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("1.5"));
+  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.5"));
   PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
-  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
+  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("2"));
   FEE_ON_OFF_TEMP = FeeSwitch.ON;
 
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.BLOCK;
@@ -71,11 +72,11 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
 
-  TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("0.2"));
-  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.05"));
-  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.15"));
+  TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("2"));
+  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.5"));
+  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("1.5"));
   PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
-  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.20"));
+  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("2"));
   FEE_ON_OFF_TEMP = FeeSwitch.ON;
 
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.TIMESTAMP;
