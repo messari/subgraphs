@@ -53,6 +53,4 @@ dataSources:
           handler: handleTransferV{{version}}
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV{{version}}
-      blockHandlers:
-        - handler: handleBlockV{{version}}
 {{/pools}}

@@ -52,8 +52,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-LINK'
     network: mainnet
@@ -102,8 +100,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vaLINK'
     network: mainnet
@@ -152,8 +148,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-DPI'
     network: mainnet
@@ -202,8 +196,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vaUSDC'
     network: mainnet
@@ -252,8 +244,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-ETH'
     network: mainnet
@@ -302,8 +292,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-WBTC'
     network: mainnet
@@ -352,8 +340,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vaDPI'
     network: mainnet
@@ -402,8 +388,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vaWBTC'
     network: mainnet
@@ -452,8 +436,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vaETH'
     network: mainnet
@@ -502,8 +484,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vaDAI'
     network: mainnet
@@ -552,8 +532,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vUSDT'
     network: mainnet
@@ -602,8 +580,6 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3
   - kind: ethereum/contract
     name: 'poolV3_vUNI'
     network: mainnet
@@ -652,5 +628,3 @@ dataSources:
           handler: handleTransferV3
         - event: Withdraw(indexed address,uint256,uint256)
           handler: handleWithdrawV3
-      blockHandlers:
-        - handler: handleBlockV3

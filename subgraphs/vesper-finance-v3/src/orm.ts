@@ -39,7 +39,6 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     yAggr.network = "ETHEREUM";
     yAggr.type = "YIELD";
     yAggr.totalUniqueUsers = 0;
-    yAggr.totalValueLockedUSD = BigDecimal.zero();
     yAggr.save();
   }
 
@@ -349,16 +348,11 @@ export function getOrCreateVault(
 
     vault = new Vault(address.toHexString());
     vault.outputToken = address.toHexString();
-    vault.totalValueLockedUSD = BigDecimal.zero();
-    vault.totalVolumeUSD = BigDecimal.zero();
-    vault.outputTokenSupply = BigInt.zero();
-    vault.outputTokenPriceUSD = BigDecimal.zero();
     vault.createdTimestamp = blockTimestamp;
     vault.createdBlockNumber = blockNumber;
     vault.protocol = yAggr.id;
     vault.name = poolv3.name();
     vault.symbol = poolv3.symbol();
-    vault.depositLimit = BigInt.zero();
     vault.pricePerShare = poolv3.pricePerShare();
 
     vault.save();
