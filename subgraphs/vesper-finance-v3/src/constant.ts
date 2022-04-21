@@ -13,7 +13,7 @@ export const CONTROLLER_ADDRESS_HEX =
   "0xa4F1671d3Aee73C05b552d57f2d16d3cfcBd0217";
 export const VVSP_ADDRESS_HEX = "0xbA4cFE5741b357FA371b506e5db0774aBFeCf8Fc";
 export const ZERO_ADDRESS_HEX = "0x0000000000000000000000000000000000000000";
-export const VVSP_ADDRESS = Address.fromHexString(VVSP_ADDRESS_HEX);
-export const ZERO_ADDRESS = Address.fromHexString(ZERO_ADDRESS_HEX);
+export const VVSP_ADDRESS = Address.fromString(VVSP_ADDRESS_HEX);
+export const ZERO_ADDRESS = Address.fromString(ZERO_ADDRESS_HEX);
 export const USDC_DENOMINATOR = BigInt.fromString("1000000");
 export const SECONDS_PER_DAY = 84600;
