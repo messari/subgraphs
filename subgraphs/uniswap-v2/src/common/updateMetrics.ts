@@ -25,6 +25,7 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
   financialMetrics.currentTvlUSD = protocol.currentTvlUSD;
+  financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
 
   financialMetrics.save();
 }
@@ -81,6 +82,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 
   // Update the block number and timestamp to that of the last transaction of that day
   poolMetrics.currentTvlUSD = pool.currentTvlUSD;
+  poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
   poolMetrics.outputTokenSupply = pool.outputTokenSupply;
   poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
@@ -182,20 +184,16 @@ export function updateVolumeAndFees(
 ): void {
   let pool = getLiquidityPool(event.address.toHexString());
   let protocol = getOrCreateDex();
-  let poolMetrics = getOrCreatePoolDailySnapshot(event);
   let financialMetrics = getOrCreateFinancials(event);
 
-  financialMetrics.cumulativeVolumeUSD = financialMetrics.cumulativeVolumeUSD.plus(trackedAmountUSD);
   financialMetrics.cumulativeTotalRevenueUSD = financialMetrics.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD);
   financialMetrics.cumulativeSupplySideRevenueUSD = financialMetrics.cumulativeSupplySideRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.cumulativeProtocolSideRevenueUSD = financialMetrics.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-  poolMetrics.cumulativeVolumeUSD = poolMetrics.cumulativeVolumeUSD.plus(trackedAmountUSD);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
 
   financialMetrics.save();
-  poolMetrics.save();
   protocol.save();
   pool.save();
 }
