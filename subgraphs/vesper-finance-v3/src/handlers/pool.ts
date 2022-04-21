@@ -257,7 +257,11 @@ function handleWithdrawFee(
 
 // See handleWithdrawFee for explanation.
 export function handleWithdrawV3(event: Withdraw): void {
-  getOrCreateVault(dataSource.address(), event.block.number, event.block.timestamp);
+  getOrCreateVault(
+    dataSource.address(),
+    event.block.number,
+    event.block.timestamp
+  );
   getOrCreateWithdraw(event, dataSource.address());
   updateAllSnapshots(event, dataSource.address());
   // let poolAddress = dataSource.address();
@@ -288,8 +292,8 @@ export function handleTransferV3(event: Transfer): void {
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.from != ZERO_ADDRESS ||
-    !hasStrategy(poolV3.getStrategies(), event.params.to)
+    event.params.from.toHexString() === ZERO_ADDRESS.toHexString() ||
+    hasStrategy(poolV3.getStrategies(), event.params.to)
   ) {
     let toHex = event.params.to.toHexString();
     log.info(
@@ -298,7 +302,11 @@ export function handleTransferV3(event: Transfer): void {
     );
     return;
   }
-  getOrCreateVault(dataSource.address(), event.block.number, event.block.timestamp);
+  getOrCreateVault(
+    dataSource.address(),
+    event.block.number,
+    event.block.timestamp
+  );
   getOrCreateTransfer(event, dataSource.address());
   updateAllSnapshots(event, dataSource.address());
   // let interestFees = event.params.value
@@ -331,8 +339,8 @@ export function handleDepositV3(event: Deposit): void {
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.owner != ZERO_ADDRESS ||
-    !hasStrategy(poolV3.getStrategies(), event.params.owner)
+    event.params.owner.toHexString() === ZERO_ADDRESS.toHexString() ||
+    hasStrategy(poolV3.getStrategies(), event.params.owner)
   ) {
     let toHex = event.params.owner.toHexString();
     log.info(
@@ -341,7 +349,11 @@ export function handleDepositV3(event: Deposit): void {
     );
     return;
   }
-  getOrCreateVault(dataSource.address(), event.block.number, event.block.timestamp);
+  getOrCreateVault(
+    dataSource.address(),
+    event.block.number,
+    event.block.timestamp
+  );
   getOrCreateDeposit(event, dataSource.address());
   updateAllSnapshots(event, dataSource.address());
 }
