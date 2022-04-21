@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import {
   DexAmmProtocol,
@@ -14,17 +14,7 @@ import {
   LiquidityPoolFee,
   Token,
 } from "../../generated/schema";
-import {
-  BIGDECIMAL_ZERO,
-  HelperStoreType,
-  Network,
-  INT_ZERO,
-  FACTORY_ADDRESS,
-  ProtocolType,
-  SECONDS_PER_DAY,
-  BIGINT_ZERO,
-  DEFAULT_DECIMALS,
-} from "./constants";
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(FACTORY_ADDRESS);
@@ -36,7 +26,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.schemaVersion = "1.1.0";
     protocol.subgraphVersion = "1.0.2";
     protocol.methodologyVersion = "1.0.0";
-    protocol.currentTvlUSD = BIGDECIMAL_ZERO;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = Network.ETHEREUM;
@@ -122,8 +112,8 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
     );
     poolMetrics.protocol = FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
-    poolMetrics.currentRewardTokenEmissionsAmount = [];
-    poolMetrics.currentRewardTokenEmissionsUSD = [];
+    poolMetrics.rewardTokenEmissionsAmount = [];
+    poolMetrics.rewardTokenEmissionsUSD = [];
 
     poolMetrics.save();
   }
@@ -144,7 +134,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
     financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    financialMetrics.currentTvlUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 

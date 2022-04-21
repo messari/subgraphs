@@ -11,7 +11,7 @@ import {
   getOrCreateTokenTracker,
   getOrCreateUsersHelper,
 } from "./getters";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, FACTORY_ADDRESS, INT_ONE, SECONDS_PER_DAY, WHITELIST } from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, FACTORY_ADDRESS, INT_ONE, SECONDS_PER_DAY, UsageType, WHITELIST } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
 import { getUsdPricePerToken } from "../Prices/index";
 import { findEthPerToken, getEthPriceInUSD } from "./price/price";
@@ -24,13 +24,13 @@ export function updateFinancials(event: ethereum.Event): void {
   // Update the block number and timestamp to that of the last transaction of that day
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
-  financialMetrics.currentTvlUSD = protocol.currentTvlUSD;
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
 
   financialMetrics.save();
 }
 
-export function updateUsageMetrics(event: ethereum.Event, from: string): void {
+export function updateUsageMetrics(event: ethereum.Event, from: string, usageType: string): void {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
@@ -50,6 +50,13 @@ export function updateUsageMetrics(event: ethereum.Event, from: string): void {
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
   usageMetrics.dailyTransactionCount += 1;
+  if (usageType == UsageType.DEPOSIT) {
+    usageMetrics.dailyDepositCount += 1;
+  } else if (usageType == UsageType.WITHDRAW) {
+    usageMetrics.dailyWithdrawCount += 1;
+  } else if (usageType == UsageType.SWAP) {
+    usageMetrics.dailySwapCount += 1;
+  }
 
   let account = Account.load(from);
   if (!account) {
@@ -81,7 +88,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   let pool = getLiquidityPool(event.address.toHexString());
 
   // Update the block number and timestamp to that of the last transaction of that day
-  poolMetrics.currentTvlUSD = pool.currentTvlUSD;
+  poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
   poolMetrics.outputTokenSupply = pool.outputTokenSupply;
@@ -151,7 +158,7 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   ether.save();
 
   // Subtract the old pool tvl
-  protocol.currentTvlUSD = protocol.currentTvlUSD.minus(pool.currentTvlUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
 
   let inputToken0 = convertTokenToDecimal(pool.inputTokenBalances[0], token0.decimals);
   let inputToken1 = convertTokenToDecimal(pool.inputTokenBalances[1], token1.decimals);
@@ -160,8 +167,8 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   let newTvl = tokenTracker0.derivedUSD.times(inputToken0).plus(tokenTracker1.derivedUSD.times(inputToken1));
 
   // Add the new pool tvl
-  pool.currentTvlUSD = newTvl;
-  protocol.currentTvlUSD = protocol.currentTvlUSD.plus(newTvl);
+  pool.totalValueLockedUSD = newTvl;
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl);
 
   let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply!, DEFAULT_DECIMALS);
 
@@ -179,16 +186,25 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
 export function updateVolumeAndFees(
   event: ethereum.Event,
   trackedAmountUSD: BigDecimal,
-  tradingFeeAmountUSD: BigDecimal,
+  supplyFeeAmountUSD: BigDecimal,
   protocolFeeAmountUSD: BigDecimal
 ): void {
   let pool = getLiquidityPool(event.address.toHexString());
   let protocol = getOrCreateDex();
   let financialMetrics = getOrCreateFinancials(event);
+  let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
-  financialMetrics.cumulativeTotalRevenueUSD = financialMetrics.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD).plus(protocolFeeAmountUSD);
-  financialMetrics.cumulativeSupplySideRevenueUSD = financialMetrics.cumulativeSupplySideRevenueUSD.plus(tradingFeeAmountUSD);
-  financialMetrics.cumulativeProtocolSideRevenueUSD = financialMetrics.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
