@@ -248,8 +248,8 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
 
   //let protocol = getOrCreateProtocol()
   // Account entity keeps user addresses
-  let isUniqueUser = createAndIncrementAccount(accountId);
-  let isDailyActiveUser = createAndIncrementDailyAccount(dailyActiveAccountId);
+  let isNewUniqueUser = createAndIncrementAccount(accountId);
+  let isNewDailyActiveUser = createAndIncrementDailyAccount(dailyActiveAccountId);
 
   let usageMetrics = UsageMetricsDailySnapshot.load(daysStr);
   let usageMetricsPrior = UsageMetricsDailySnapshot.load(daysPriorStr);
@@ -259,12 +259,12 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
     usageMetrics = new UsageMetricsDailySnapshot(daysStr);
     usageMetrics.protocol = FACTORY_ADDRESS;
     usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.totalUniqueUsers = totalUniqueUsersPriorDay;
     usageMetrics.dailyTransactionCount = 0;
   }
 
-  usageMetrics.activeUsers += isDailyActiveUser;
-  usageMetrics.totalUniqueUsers = totalUniqueUsersPriorDay + isUniqueUser;
+  usageMetrics.activeUsers += isNewDailyActiveUser;
+  usageMetrics.totalUniqueUsers += isNewUniqueUser;
   usageMetrics.dailyTransactionCount += 1; //increment whenever updateUsageMetrics is called
 
   // Update the block number and timestamp to that of the last transaction of that day
@@ -280,7 +280,7 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
     return;
   }
 
-  protocol.totalUniqueUsers += isUniqueUser;
+  protocol.totalUniqueUsers += isNewUniqueUser;
   protocol.save();
 }
 
@@ -462,7 +462,8 @@ export function updateProtocol(event: ethereum.Event): void {
 
   let protocol = getOrCreateProtocol();
   if (protocol == null) {
-    log.error("LendingProtocol entity is null{}; something went wrong", [""]);
+    log.error("LendingProtocol entity is empty {}; something went wrong", [""]);
+    return;
   }
 
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
@@ -497,6 +498,7 @@ export function updateMarketEmission(
   let market = getOrCreateMarket(marketId, event);
   if (market == null) {
     log.error("Market {} does not exist.", [marketId]);
+    return;
   }
 
   //let INVPrice = getUnderlyingTokenPrice(Address.fromString(XINV_ADDRESS))
@@ -557,9 +559,17 @@ export function updateMarketRates(event: ethereum.Event): void {
       .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
 
-  let interestRateModelContract = JumpRateModelV2.bind(
-    tokenContract.interestRateModel()
-  );
+  let interestRateModel = tokenContract.try_interestRateModel();
+  if (interestRateModel.reverted) {
+    log.warning("Failed to get interestRateModel for Market {} at tx hash {}", [
+      marketId,
+      event.transaction.hash.toHexString(),
+    ]);
+    market.save();
+    return;
+  }
+
+  let interestRateModelContract = JumpRateModelV2.bind(interestRateModel.value);
   // TODO: this is the baseRatePerYear, which applies when utilization rate is below kink
   let baseRatePerBlock = interestRateModelContract.try_baseRatePerBlock();
   if (baseRatePerBlock.reverted) {
