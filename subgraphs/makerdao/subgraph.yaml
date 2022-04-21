@@ -43,6 +43,7 @@ dataSources:
         - Vault
       eventHandlers:
         ### Administration ### 0x65fae35e00000000000000000000000000000000000000000000000000000000
+        # function rely(usr address)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: '0x65fae35e00000000000000000000000000000000000000000000000000000000'
           handler: handleRely
@@ -237,7 +238,6 @@ dataSources:
         # function file(bytes32 ilk, bytes32 what, uint256 data)
         - event: File(indexed bytes32,indexed bytes32,uint256)
           handler: handleFileDog
-  # Used to deploy new user proxy instances
   - name: DsProxyFactory
     kind: ethereum/contract
     network: mainnet
@@ -261,6 +261,35 @@ dataSources:
       eventHandlers:
         - event: Created(indexed address,indexed address,address,address)
           handler: handleCreated
+  # Allow users to interact with their Vaults in an easy way, treating them as non-fungible tokens (NFTs)
+  - name: CdpManager
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: CdpManager
+      address: '0x5ef30b9986345249bc32d8928b7ee64de9435e39'
+      startBlock: 8928198
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/users/users.ts
+      abis:
+        - name: CdpManager
+          file: ./abis/CdpManager.json
+        - name: DsProxy
+          file: ./abis/DsProxy.json
+      entities:
+        - _Proxy
+      eventHandlers:
+        # function give(uint cdp, address dst)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: '0xfcafcc6800000000000000000000000000000000000000000000000000000000'
+          handler: handleGive
+        # function frob(cdp uint256, dink int256, dart int256)
+        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
+          topic0: '0x45e6bdcd00000000000000000000000000000000000000000000000000000000'
+          handler: handleFrob
 templates:
   - name: Deploy
     kind: ethereum/contract
@@ -328,25 +357,6 @@ templates:
           file: ./abis/Cat.json
         - name: Deploy
           file: ./abis/Deploy.json
-  - name: DSProxy
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: DSProxy
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/users/users.ts
-      entities:
-        - Market
-      abis:
-        - name: DSProxy
-          file: ./abis/DSProxy.json
-      eventHandlers:
-        - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,uint256,bytes)
-          topic0: '0x1cff79cd00000000000000000000000000000000000000000000000000000000'
-          handler: handleExecute
   - name: GemJoin
     kind: ethereum/contract
     network: mainnet
@@ -366,3 +376,18 @@ templates:
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
           topic0: '0x6924500900000000000000000000000000000000000000000000000000000000'
           handler: handleCage
+  - name: DsProxy
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: DsProxy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/common/getters.ts
+      entities:
+        - Market
+      abis:
+        - name: DsProxy
+          file: ./abis/DsProxy.json

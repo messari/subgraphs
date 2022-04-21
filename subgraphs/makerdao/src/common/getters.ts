@@ -8,6 +8,7 @@ import {
   LendingProtocol,
   Market,
   _Ilk,
+  _Proxy,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -19,6 +20,7 @@ import {
   VAT_ADDRESS,
   ZERO_ADDRESS,
 } from "../common/constants";
+import { DsProxy } from "../../generated/templates/DsProxy/DsProxy";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -108,6 +110,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.slug = "makerdao";
   LendingProtocolEntity.schemaVersion = "1.1.0";
   LendingProtocolEntity.subgraphVersion = "0.0.6";
+  LendingProtocolEntity.methodologyVersion = "0.0.1";
   LendingProtocolEntity.network = Network.ETHEREUM;
   LendingProtocolEntity.type = ProtocolType.LENDING;
   LendingProtocolEntity.totalUniqueUsers = 0;
@@ -147,3 +150,17 @@ export function getMarket(marketAddress: string): Market {
   return new Market(marketAddress);
 }
 
+export function getProxy(proxyAddress:Address): _Proxy {
+  let proxy = _Proxy.load(proxyAddress.toHexString())
+  if(!proxy){
+    proxy = new _Proxy(proxyAddress.toHexString())
+    let ownerCall = DsProxy.bind(proxyAddress).try_owner()
+    if (!ownerCall.reverted){
+      proxy.owner = ownerCall.value.toHexString()
+    } else {
+      proxy.owner = ZERO_ADDRESS
+    }
+    proxy.save()
+  }
+  return proxy
+}

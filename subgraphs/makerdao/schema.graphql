@@ -640,3 +640,10 @@ type _Ilk @entity {
   id: ID!
   marketAddress: String!
 }
+
+# User CDP vault
+type _Proxy @entity {
+  " Address of CDP vault"
+  id: ID!
+  owner: String!
+}

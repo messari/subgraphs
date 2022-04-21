@@ -1,4 +1,4 @@
-import { Bytes, BigInt, ByteArray, Address, log } from '@graphprotocol/graph-ts';
+import { Address, log } from '@graphprotocol/graph-ts';
 import { LogNote, Poke } from './../../../generated/Spot/Spot'
 import { getMarketFromIlk } from "../../common/getters"
 import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE_HUNDRED, MCD_SPOT_ADDRESS, DEFAULT_DECIMALS } from "../../common/constants";
@@ -6,6 +6,7 @@ import { bigIntToBigDecimal, bytesToUnsignedBigInt } from "../../common/utils/nu
 import { Spot } from "../../../generated/templates/Spot/Spot";
 import { _TokenPricesUsd } from '../../../generated/schema'
 import { updateTokenPrice } from "../../common/prices/prices"
+import { updateTVL } from '../../common/metrics';
 
 export function handleFile(event: LogNote): void {
     let what = event.params.arg2.toString()
@@ -30,6 +31,7 @@ export function handleFile(event: LogNote): void {
     let tokenAddress = market.inputTokens[0]
     let priceUSD = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.val), DEFAULT_DECIMALS)
     updateTokenPrice(tokenAddress,priceUSD,event)
+    updateTVL(event)
     market.inputTokenPricesUSD = [priceUSD]
     market.save()
 }

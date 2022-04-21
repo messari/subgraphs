@@ -7,12 +7,12 @@ import { createMarket } from "./common/setters"
 import { bigIntToBigDecimal, bytesToSignedInt, absValBigInt, absValBigDecimal } from "./common/utils/numbers"
 import { getOrCreateTokenPriceEntity } from "./common/prices/prices"
 import { getOrCreateFinancials } from "./common/getters"
-import { updateTVL,updateMarketMetrics } from "./common/metrics"
+import { updateTVL,updateMarketMetrics, updateUsageMetrics } from "./common/metrics"
 import { GemJoin } from "../generated/Vat/GemJoin"
 import { createEntityID } from "./common/utils/strings"
 import { GemJoin as GemJoinDataSource } from "../generated/templates"
 import { LogNote as GemLogNote } from "../generated/templates/GemJoin/GemJoin"
-
+import { bytesToUnsignedBigInt } from "./common/utils/numbers"
 
 export function handleRely(event: LogNote): void {
   let marketAddress = Address.fromString(event.params.arg1.toHexString().substring(26))
@@ -170,15 +170,14 @@ export function handleGrab(event: LogNote): void {
   handleEvent(event, market, "LIQUIDATE", dink, ΔcollateralUSD, dart)
   updateMarketMetrics(ilk,event)
   updateTVL(event)
-}
-
-export function handleHeal(event: LogNote): void {
+  updateUsageMetrics(event,event.transaction.from) // add liquidator
 }
 
 export function handleSuck(event: LogNote): void {
   if (event.params.arg1.toHexString().toLowerCase()==VOW_ADDRESS_TOPIC && event.params.arg2.toHexString().toLowerCase()==POT_ADDRESS_TOPIC){
     let FinancialsDailySnapshot = getOrCreateFinancials(event)
-    let accumSavings = bigIntToBigDecimal(BigInt.fromI64(event.params.arg3.toI64()),RAD)
+    let accumSavings = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3),RAD)
+    log.debug("supplySideRevenueUSD = {}",[accumSavings.toString()])
     FinancialsDailySnapshot.supplySideRevenueUSD = FinancialsDailySnapshot.supplySideRevenueUSD.plus(accumSavings)
     FinancialsDailySnapshot.save()
   }
@@ -200,4 +199,3 @@ export function handleFold(event: LogNote): void {
   financialsDailySnapshot.save()
   market.save()
 }
-
