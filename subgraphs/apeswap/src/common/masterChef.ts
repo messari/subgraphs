@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../config/_networkConfig";
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
@@ -12,6 +12,7 @@ import { findNativeTokenPerToken, getNativeTokenPriceInUSD } from "./price/price
 import { getRewardsPerDay } from "./rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
+  log.warning("handleRewardV2", []);
   let pool = getLiquidityPool(event.address.toHexString());
 
   let poolContract = MasterChefV2.bind(event.address);
@@ -73,6 +74,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
 }
 
 export function handleReward(event: ethereum.Event, pid: BigInt): void {
+  log.warning("handleRewardV1", []);
   let pool = getLiquidityPool(event.address.toHexString());
 
   let poolContract = MasterChef.bind(event.address);

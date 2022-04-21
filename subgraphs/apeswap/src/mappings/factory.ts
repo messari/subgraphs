@@ -10,8 +10,6 @@ import {
 import { updateTokenWhitelists } from "../common/updateMetrics";
 import { createLiquidityPool } from "../common/creators";
 
-log.warning(dataSource.network().toString(), []);
-
 export function handleNewPair(event: PairCreated): void {
   let protocol = getOrCreateDex();
 
