@@ -6,7 +6,7 @@ enum Network {
   ARBITRUM_ONE
   AURORA
   AVALANCHE
-  BNB # aka Binance Smart Chain
+  BSC # aka BNB Chain
   CELO
   MAINNET
   FANTOM
@@ -32,10 +32,20 @@ type Token @entity {
   " Smart contract address of the token "
   id: ID!
 
-  " Mirrored from the smart contract "
+  " Name of the token, mirrored from the smart contract "
   name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
   symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
   decimals: Int!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
 }
 
 enum RewardTokenType {
@@ -47,15 +57,26 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity {
-  " Smart contract address of the reward token "
+  " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
-  " Mirrored from the smart contract "
+  " Name of the token, mirrored from the smart contract "
   name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
   symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 
+  " The type of the reward token "
   type: RewardTokenType!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
 }
 
 #############################

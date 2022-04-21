@@ -6,7 +6,7 @@ enum Network {
   ARBITRUM_ONE
   AURORA
   AVALANCHE
-  BNB # aka Binance Smart Chain
+  BSC # aka BNB Chain
   CELO
   MAINNET
   FANTOM
@@ -40,6 +40,12 @@ type Token @entity {
 
   " The number of decimal places this token uses, default to 18 "
   decimals: Int!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
 }
 
 enum RewardTokenType {
@@ -51,7 +57,7 @@ enum RewardTokenType {
 }
 
 type RewardToken @entity {
-  " Smart contract address of the reward token "
+  " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
   " Name of the token, mirrored from the smart contract "
@@ -65,6 +71,12 @@ type RewardToken @entity {
 
   " The type of the reward token "
   type: RewardTokenType!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -99,7 +111,7 @@ type LiquidityPoolFee @entity {
   id: ID!
 
   " Fee as a percentage of the trade (swap) amount. Does not always apply "
-  feePercentage: BigDecimal!
+  feePercentage: BigDecimal
 
   " Type of fee this pool uses "
   feeType: LiquidityPoolFeeType!
@@ -248,11 +260,11 @@ type UsageMetricsDailySnapshot @entity {
   " Total number of deposits (add liquidity) in a day "
   dailyDepositCount: Int!
 
-  " Total number of deposits (remove liquidity) in a day "
+  " Total number of withdrawals (remove liquidity) in a day "
   dailyWithdrawCount: Int!
 
   " Total number of trades (swaps) in a day "
-  dailySwapCount: Int!  
+  dailySwapCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -344,9 +356,6 @@ type LiquidityPool @entity {
 
   " Current TVL (Total Value Locked) of this pool in USD "
   totalValueLockedUSD: BigDecimal!
-
-  " All trade volume occurred in a given day, in USD "
-  dailyVolumeUSD: BigDecimal!
 
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!

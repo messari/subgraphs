@@ -12,7 +12,7 @@ export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BNB = "BNB"; // aka Binance Smart Chain
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
