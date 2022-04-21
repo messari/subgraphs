@@ -32,7 +32,9 @@ You can use the factory contract address for a protocol as the protocol ID. Here
 
 ### Entity ID
 
-Entity IDs are usually defined by either an address, a transaction hash, a log index, or some combination of these. IDs are unique per entity type but can be the same in different entities. For example, a `Protocol` entity and a `Withdraw` entity can have the same ID. Note that entity types that derive from the same interface cannot have the same IDs. For example, a `Withdraw` entity and a `Deposit` entity cannot have the same ID since they both implement the `Event` interface. In this case, we prefix the ID by `withdraw-` or `deposit-` in order to make them unique.
+Entity IDs are usually defined by either an address, a transaction hash, a log index, or some combination of these. IDs are unique per entity type but can be the same in different entities. For example, a `Protocol` entity and a `Withdraw` entity can have the same ID.
+
+Note that entity types that derive from the same interface cannot have the same IDs. For example, a `Withdraw` entity and a `Deposit` entity cannot have the same ID since they both implement the `Event` interface. In this case, we prefix the ID by `withdraw-` or `deposit-` in order to make them unique. You can use the helper function `prefixID(string, string)` in `common/utils/strings.ts` to make this easier.
 
 ## Transaction vs. Event
 
@@ -73,9 +75,11 @@ There is a `RewardToken` entity in our schemas. This represents the extra token 
 
 Not all protocols have token rewards. For example, Uniswap doesn't have any token reward. For protocols that do, usually not all pools have token rewards. For example, for Sushiswap, only pools in the Onsen program have token rewards.
 
-It's also common for a single pool to have multiple reward tokens. For example, Sushiswap's MasterChef v2 allows for multiple `Rewarders`. Some Curve pools also have both CRV as a reward and also the pool token (e.g. FXS for FRAX, SNX for sUSD) as another reward.
+It's also common for a single pool to have multiple reward tokens. For example, Sushiswap's MasterChef v2 allows for multiple `Rewarders`. Some Curve pools also have both CRV as a reward and also the pool token (e.g. FXS for FRAX, SNX for sUSD) as another reward. Similarly, for Lending Protocols, it's possible for a single Market to have reward tokens for both the lender (deposit) and the borrower (borrow). In that case, you should include two reward tokens for that Market, one with reward type as deposit and one with reward type as borrow.
 
-There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD`. In particular, you can calculate a theoretical emission amount based on the underlying emission equation, or you can calculate the realized amount based on harvests. It's recommended to use the theoretical amount as it's more accurate and consistent. When calculating these in a snapshot, you should calculate them as the per-block amount of the current block normalized to the during of that snapshot (e.g. normalize the per-block amount to the daily amount for a daily snapshot). The reasoning for that is when we show this data on the front-end, it'll be converted to an APR, which will drive user decision (e.g. decide where they want to invest their money in the future), so the data should be forward-looking.
+There are different ways to calculate `rewardTokenEmissionsAmount` and `rewardTokenEmissionsUSD`. In particular, you can calculate a theoretical emission amount based on the underlying emission equation, or you can calculate the realized amount based on harvests. It's recommended to use the theoretical amount as it's more accurate and consistent. When calculating these in a snapshot, you should calculate them as the per-block amount of the current block normalized to the during of that snapshot (e.g. normalize the per-block amount to the daily amount for a daily snapshot). The reasoning for that is when we show this data on the front-end, it'll be converted to an APY, which will drive user decision (e.g. decide where they want to invest their money in the future), so the data should be forward-looking.
+
+When handling reward tokens that need to be staked (e.g. in the MasterChef contract), make sure you also keep track of `stakedOutputTokenAmount`, which will be needed to calculate reward APY.
 
 ## Usage Metrics
 
