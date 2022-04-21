@@ -28,6 +28,7 @@ All subgraphs follow a set of standardized schemas. This standardization brings 
   - dollar amount: All USD amounts (including prices) should be BigDecimal
 - All rates should be stored as percentage values as `BigDecimal`. For example, 70.50% should be stored as `70.5`.
 - Use plurals when referring to multiple items, usually stored as an array (e.g. tokens, balances).
+- Optional fields that don't apply to an entity should be left as `null` instead of initialized with 0 or empty string.
 - Certain prefixes may be used to indicate a particular type of value:
   - *cumulative*: sum of all historical data from day 1 up to this point. E.g. `cumulativeDepositUSD` means all deposits has ever been made to this protocol/pool.
   - *daily/hourly*: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique active users on a given day, up till now.
