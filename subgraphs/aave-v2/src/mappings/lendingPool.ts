@@ -85,6 +85,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   const market = initMarket(event.block.number, event.block.timestamp, event.params.reserve.toHexString()) as Market;
   const token = getOrCreateToken(Address.fromString(market.id));
   // The rates provided in params are in ray format (27 dec). Convert to decimal format
+  log.info('RES UPDATE PARAMS: ' + event.params.liquidityRate.toString() + ' ' + event.params.variableBorrowRate.toString() + ' ' + event.params.stableBorrowRate.toString(), [])
   market.depositRate = bigIntToBigDecimal(rayToWad(event.params.liquidityRate));
   market.variableBorrowRate = bigIntToBigDecimal(rayToWad(event.params.variableBorrowRate));
   market.stableBorrowRate = bigIntToBigDecimal(rayToWad(event.params.stableBorrowRate));

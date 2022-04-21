@@ -125,8 +125,8 @@ export function initMarket(
       log.error('FAILED TO GET RESERVE', []);
     }
   }
-  // No need to execute the below code until block 12251569 when incentive controller was deployed
-  if (blockNumber.gt(BigInt.fromString('12251569'))) {
+  // No need to execute the below code until block 12317479 when incentive controller was deployed and started calculating rewards
+  if (blockNumber.gt(BigInt.fromString('12317479'))) {
     let rewardTokens = market.rewardTokens;
     if (rewardTokens === null) rewardTokens = [];
     if (rewardTokens.length === 0) {
@@ -156,14 +156,24 @@ export function getCurrentRewardEmissions(market: Market): BigInt[] {
   // From the incentives controller contract, get pull the 'assets' values from the market aToken, sToken, and vToken
   const incentivesControllerContract = IncentivesControllerContract.bind(incentivesController);
   if (!incentivesControllerContract.try_assets(Address.fromString(market.outputToken)).reverted) {
-    log.info('REWARD EMISSIONS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value1.toString() + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value2.toString(), []);
+    log.info('REWARD EMISSIONS ' + market.outputToken + ' ' + incentivesControllerContract.assets(Address.fromString(market.outputToken)).value0.toString(), []);
     const assetDataSupply = incentivesControllerContract.try_assets(Address.fromString(market.outputToken)).value.value0;
     const assetDataBorrowStable = incentivesControllerContract.try_assets(Address.fromString(market.sToken)).value.value0;
-    const assetDataBorrowVariable = incentivesControllerContract.try_assets(Address.fromString(market.sToken)).value.value0;
+    const assetDataBorrowVariable = incentivesControllerContract.try_assets(Address.fromString(market.vToken)).value.value0;
     // Get the emissions per day for the aToken rewards for deposits
-    rewardEmissions[0] = emissionsPerDay(assetDataSupply);
+    if (!assetDataSupply.equals(BIGINT_ZERO)) {
+      rewardEmissions[0] = emissionsPerDay(assetDataSupply);
+    } else {
+      rewardEmissions[0] = BIGINT_ZERO;
+    }
     // Get the emissions per second for both the sToken and vToken rewards, average them and get the daily emissions for borrows
-    rewardEmissions[1] = emissionsPerDay((assetDataBorrowStable.plus(assetDataBorrowVariable)).div(BIGINT_TWO));
+    const borrowRewardsAvgRate = (assetDataBorrowStable.plus(assetDataBorrowVariable)).div(BIGINT_TWO);
+    log.info('BORROW AVG RATE: ' + assetDataBorrowStable.toString() + ' + ' + assetDataBorrowVariable.toString() + ' = ' + (assetDataBorrowStable.plus(assetDataBorrowVariable)).toString() + ' /2 = ' + borrowRewardsAvgRate.toString(), [])
+    if (!borrowRewardsAvgRate.equals(BIGINT_ZERO)) {
+      rewardEmissions[1] = emissionsPerDay(borrowRewardsAvgRate);
+    } else {
+      rewardEmissions[1] = BIGINT_ZERO;
+    }
   } else {
     log.info('COULD NOT GET REWARD EMISSIONS FROM INC CONT ON MARKET: ' + market.id, []);
     // The rewardEmissions array returned is already defaulted to zero vals
@@ -548,7 +558,9 @@ export function updateTVL(token: Token, market: Market, protocol: LendingProtoco
 
 export function emissionsPerDay(rewardRatePerSecond: BigInt): BigInt {
   // Take the reward rate per second, divide out the decimals and get the emissions per day
-  return (rewardRatePerSecond.div(new BigInt(10).pow(18))).times(new BigInt(SECONDS_PER_DAY));
+  const dec18 = BigInt.fromString('10').pow(18);
+  log.info('RETURN ' + rewardRatePerSecond.toString() + ' ' + dec18.toString() + ' ' + (rewardRatePerSecond.div(dec18)).toString() + (rewardRatePerSecond.times(BigInt.fromI32(<i32>SECONDS_PER_DAY))).div(dec18).toString(), []);
+  return (rewardRatePerSecond.times(BigInt.fromI32(<i32>SECONDS_PER_DAY))).div(dec18);
 }
 
 export function getDaysSinceEpoch(secondsSinceEpoch: number): string {

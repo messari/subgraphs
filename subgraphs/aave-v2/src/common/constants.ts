@@ -144,7 +144,9 @@ export const INCENTIVE_CONTROLLER_ADDRESS = '0xd784927Ff2f95ba542BfC824c8a8a98F3
 // For the Ethereum Mainnet, this is stkAAVE. Will need to set this in a config file depending on whether the network is Matic or Avax
 export const REWARD_TOKEN_ADDRESS = '0x4da27a545c0c5b758a6ba100e3a049001de870f5';
 
-export const SUBGRAPH_VERSION = '1.1.23';
+export const LENDING_POOL_ADDRESS = '0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9';
+
+export const SUBGRAPH_VERSION = '1.1.25';
 export const SCHEMA_VERSION = '1.1.0';
 export const PROTOCOL_NAME = 'Aave-v2';
 export const PROTOCOL_SLUG = 'aave-v2';
