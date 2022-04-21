@@ -359,6 +359,7 @@ export function getOrCreateVault(
     vault.name = poolv3.name();
     vault.symbol = poolv3.symbol();
     vault.depositLimit = BigInt.zero();
+    vault.pricePerShare = poolv3.pricePerShare();
 
     vault.save();
   }

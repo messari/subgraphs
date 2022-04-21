@@ -1,5 +1,5 @@
 # Subgraph Schema: Yield Aggregator
-# Version: 1.1.0
+# Version: 1.1.1
 
 enum Network {
   ARBITRUM
@@ -253,6 +253,9 @@ type Vault @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
+  " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
+  pricePerShare: BigInt!
+
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
 
@@ -310,6 +313,9 @@ type VaultDailySnapshot @entity {
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
+
+  " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
+  pricePerShare: BigInt!
 
   " Total amount of reward token emissions in a day, in token's native amount "
   rewardTokenEmissionsAmount: [BigInt!]
