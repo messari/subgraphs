@@ -1,0 +1,23 @@
+{
+  "name": "belt",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prepare": "mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "codegen": "rm -rf generated && graph codegen",
+    "build": "rm -rf build && graph build",
+    "test": "rm -rf tests/.bin && graph test",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ ap-atul/belt",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "create-local": "graph create --node http://localhost:8020/ ap-atul/belt",
+    "remove-local": "graph remove --node http://localhost:8020/ ap-atul/belt",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ap-atul/belt"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.28.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "matchstick-as": "^0.4.2"
+  }
+}
