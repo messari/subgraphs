@@ -1,0 +1,19 @@
+{
+  "name": "abracadabra",
+  "license": "UNLICENSED",
+  "scripts": {
+    "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
+    "prettier:check": "prettier --check --config ./.prettierrc.yaml \"**/*.{js,json,md,ts}\"",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ tannishmango/abracadabra",
+    "create-local": "graph create --node http://localhost:8020/ tannishmango/abracadabra",
+    "remove-local": "graph remove --node http://localhost:8020/ tannishmango/abracadabra",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 tannishmango/abracadabra"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-ts": "0.24.1",
+    "@magic/format": "^0.0.40"
+  }
+}
