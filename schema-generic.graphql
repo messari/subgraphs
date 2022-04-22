@@ -212,6 +212,9 @@ type Pool @entity {
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
 
+  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
+  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null.
+
   " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
   inputTokens: [Token!]!
 

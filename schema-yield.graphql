@@ -296,14 +296,9 @@ type Vault @entity {
 
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
-
-  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
-  # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null 
-  # and inputToken balances are used to calculate returns
   
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
-  inputTokens: [Token!]!
+  " Token that need to be deposited to take a position in protocol "
+  inputToken: Token!
 
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
@@ -328,8 +323,8 @@ type Vault @entity {
   " Current TVL (Total Value Locked) of this pool in USD "
   totalValueLockedUSD: BigDecimal!
 
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
+  " Amount of input token in the pool "
+  inputTokenBalance: BigInt!
 
   " Total supply of output token "
   outputTokenSupply: BigInt
@@ -380,8 +375,8 @@ type VaultDailySnapshot @entity {
   " Current TVL (Total Value Locked) of this pool in USD "
   totalValueLockedUSD: BigDecimal!
 
-  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
+  " Amount of input token in the pool "
+  inputTokenBalance: BigInt!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
