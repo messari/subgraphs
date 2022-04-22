@@ -4,9 +4,9 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:apeswap-bsc": "mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:apeswap-polygon": "mustache config/apeswap/polygon.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:apeswap-bsc": "mustache config/apeswap/bsc.json templates/apeswap.template.yaml > subgraph.yaml",
+    "prepare:apeswap-polygon": "mustache config/apeswap/polygon.json templates/apeswap.template.yaml > subgraph.yaml",
+    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json templates/uniswap.v2.template.yaml > subgraph.yaml",
     "bsc-hosted-deploy": "graph deploy --product hosted-service steege/apeswap",
     "bsc-mainnet-deploy": "graph deploy --node https://api.thegraph.com/deploy/ steegecs/apeswap-bsc",
     "polygon-hosted-deploy": "graph deploy --product hosted-service steegecs/apeswap-polygon",

@@ -54,6 +54,8 @@ export const CIRCULAR_BUFFER = "CIRCULAR_BUFFER";
 export namespace RewardIntervalType {
   export const BLOCK = "BLOCK";
   export const TIMESTAMP = "TIMESTAMP";
+  export const NONE = "NONE";
+
 }
 
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
@@ -206,14 +208,14 @@ function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
   let network = dataSource.network();
-  if (network == SubgraphNetwork.ETHEREUM) return BigDecimal.fromString("13.39");
+  if (network == SubgraphNetwork.MAINNET) return BigDecimal.fromString("13.39");
   else if (network == SubgraphNetwork.ARBITRUM) return BigDecimal.fromString("15");
   else if (network == SubgraphNetwork.AURORA) return BigDecimal.fromString("1.03");
   else if (network == SubgraphNetwork.BSC) return BigDecimal.fromString("5");
   else if (network == SubgraphNetwork.CELO) return BigDecimal.fromString("5");
   else if (network == SubgraphNetwork.FANTOM) return BigDecimal.fromString("1");
   else if (network == SubgraphNetwork.OPTIMISM) return BigDecimal.fromString("12.5");
-  else if (network == SubgraphNetwork.POLYGON) return BigDecimal.fromString("2");
+  else if (network == SubgraphNetwork.MATIC) return BigDecimal.fromString("2");
   else if (network == SubgraphNetwork.XDAI) return BigDecimal.fromString("5");
   // Blocks are mined as needed
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")

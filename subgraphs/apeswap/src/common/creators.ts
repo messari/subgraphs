@@ -18,7 +18,7 @@ import { Factory as FactoryContract } from "../../generated/templates/Pair/Facto
 import { Pair as PairTemplate } from "../../generated/templates";
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED, FeeSwitch } from "./constants";
 import { getTrackedVolumeUSD } from "./price/price";
-import { getLiquidityPool, getOrCreateDex, getOrCreateTokenWhitelist, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters";
+import { getLiquidityPool, getOrCreateDex, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics";
 import { savePoolId } from "./handlers";
@@ -128,8 +128,8 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 
   let pool = getLiquidityPool(event.address.toHexString());
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -146,7 +146,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.from = transfer.sender;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-  deposit.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
+  deposit.inputTokens = [pool.inputTokens[INT_ZERO], pool.inputTokens[INT_ONE]];
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
@@ -165,8 +165,8 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
 
   let pool = getLiquidityPool(event.address.toHexString());
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -183,7 +183,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
-  withdrawal.inputTokens = [pool.inputTokens[0], pool.inputTokens[1]];
+  withdrawal.inputTokens = [pool.inputTokens[INT_ZERO], pool.inputTokens[INT_ONE]];
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
@@ -231,8 +231,8 @@ export function createSwapHandleVolumeAndFees(
   // only accounts for volume through white listed tokens
   let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, token0 as Token, amount1TotalConverted, token1 as Token);
 
-  let tradingFee = getLiquidityPoolFee(pool.fees[0]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[1]);
+  let tradingFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
+  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
   let tradingFeeAmountUSD: BigDecimal;
   let protocolFeeAmountUSD: BigDecimal;

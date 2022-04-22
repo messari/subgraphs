@@ -1,7 +1,7 @@
 import { log } from "@graphprotocol/graph-ts";
 import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs, Protocol } from "../../config/_networkConfig";
-import { ERC20 } from "../../generated/Factory/ERC20";
+import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
   DexAmmProtocol,
   LiquidityPool,
@@ -25,9 +25,9 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(NetworkConfigs.FACTORY_ADDRESS);
     protocol.name = NetworkConfigs.PROTOCOL_NAME;
     protocol.slug = NetworkConfigs.PROTOCOL_SLUG;
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.0.2";
-    protocol.methodologyVersion = "1.0.0";
+    protocol.schemaVersion = NetworkConfigs.PROTOCOL_SCHEMA_VERSION;
+    protocol.subgraphVersion = NetworkConfigs.PROTOCOL_SUBGRAPH_VERSION;
+    protocol.methodologyVersion = NetworkConfigs.PROTOCOL_METHODOLOGY_VERSION;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
@@ -86,12 +86,12 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
 
-    usageMetrics.dailyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
-    usageMetrics.dailyDepositCount = 0;
-    usageMetrics.dailyWithdrawCount = 0;
-    usageMetrics.dailySwapCount = 0;
+    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
+    usageMetrics.dailyDepositCount = INT_ZERO;
+    usageMetrics.dailyWithdrawCount = INT_ZERO;
+    usageMetrics.dailySwapCount = INT_ZERO;
 
     usageMetrics.save();
   }
@@ -158,7 +158,7 @@ export function getOrCreateToken(address: string): Token {
   let token = Token.load(address);
   if (!token) {
     token = new Token(address);
-    let erc20Contract = ERC20.bind(Address.fromString(address));
+    let erc20Contract = TokenABI.bind(Address.fromString(address));
     let decimals = erc20Contract.try_decimals();
     // Using try_cause some values might be missing
     let name = erc20Contract.try_name();

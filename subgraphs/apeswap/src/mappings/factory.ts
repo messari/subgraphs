@@ -5,7 +5,7 @@ import { getOrCreateDex, getOrCreateLPToken, getOrCreateToken } from "../common/
 import { updateTokenWhitelists } from "../common/updateMetrics";
 import { createLiquidityPool } from "../common/creators";
 
-export function handleNewPair(event: PairCreated): void {
+export function handlePairCreated(event: PairCreated): void {
   let protocol = getOrCreateDex();
 
   // create the tokens and tokentracker

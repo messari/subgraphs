@@ -16,14 +16,14 @@ export namespace SchemaNetwork {
   export const BSC = "BSC";
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "POLYGON";
+  export const MATIC = "MATIC";
   export const XDAI = "XDAI";
 }
 
@@ -37,14 +37,14 @@ export namespace SubgraphNetwork {
   export const AURORA = "aurora";
   export const BSC = "bsc";
   export const CELO = "celo";
-  export const ETHEREUM = "mainnet";
+  export const MAINNET = "mainnet";
   export const FANTOM = "fantom";
   export const FUSE = "fuse";
   export const MOONBEAM = "moonbeam";
   export const MOONRIVER = "moonriver";
   export const NEAR = "near-mainnet";
   export const OPTIMISM = "optimism";
-  export const POLYGON = "matic";
+  export const MATIC = "matic";
   export const XDAI = "xdai";
 }
 

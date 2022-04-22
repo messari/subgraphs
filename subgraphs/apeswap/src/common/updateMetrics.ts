@@ -30,6 +30,7 @@ import {
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   INT_ONE,
+  INT_ZERO,
   SECONDS_PER_DAY,
   UsageType,
 } from "./constants";
@@ -66,19 +67,19 @@ export function updateUsageMetrics(
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
-    usageMetrics.dailyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
-    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
   }
 
   // Update the block number and timestamp to that of the last transaction of that day
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
-  usageMetrics.dailyTransactionCount += 1;
+  usageMetrics.dailyTransactionCount += INT_ONE;
   if (usageType == UsageType.DEPOSIT) {
-    usageMetrics.dailyDepositCount += 1;
+    usageMetrics.dailyDepositCount += INT_ONE;
   } else if (usageType == UsageType.WITHDRAW) {
-    usageMetrics.dailyWithdrawCount += 1;
+    usageMetrics.dailyWithdrawCount += INT_ONE;
   } else if (usageType == UsageType.SWAP) {
     usageMetrics.dailySwapCount += 1;
   }
@@ -87,7 +88,7 @@ export function updateUsageMetrics(
   if (!account) {
     account = new Account(from);
     account.save();
-    totalUniqueUsers.valueInt += 1;
+    totalUniqueUsers.valueInt += INT_ONE;
   }
   usageMetrics.cumulativeUniqueUsers = totalUniqueUsers.valueInt;
   protocol.cumulativeUniqueUsers = totalUniqueUsers.valueInt;
@@ -98,7 +99,7 @@ export function updateUsageMetrics(
   if (!dailyActiveAccount) {
     dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
-    usageMetrics.dailyActiveUsers += 1;
+    usageMetrics.dailyActiveUsers += INT_ONE;
   }
 
   totalUniqueUsers.save();
@@ -158,8 +159,8 @@ export function updateInputTokenBalances(
   let pool = getLiquidityPool(poolAddress);
   let poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
-  let token0 = getOrCreateToken(pool.inputTokens[0]);
-  let token1 = getOrCreateToken(pool.inputTokens[1]);
+  let token0 = getOrCreateToken(pool.inputTokens[INT_ZERO]);
+  let token1 = getOrCreateToken(pool.inputTokens[INT_ONE]);
 
   let tokenDecimal0 = convertTokenToDecimal(reserve0, token0.decimals);
   let tokenDecimal1 = convertTokenToDecimal(reserve1, token1.decimals);

@@ -2,7 +2,7 @@ import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../config/_networkConfig";
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
-import { BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
+import { BIGINT_ZERO, INT_ZERO, ZERO_ADDRESS } from "./constants";
 import { getLiquidityPool, getOrCreateToken } from "./getters";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { getRewardsPerDay } from "./rewards";
@@ -51,7 +51,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
 
   let nativeToken = updateNativeTokenPriceInUSD();
 
-  let rewardToken = getOrCreateToken(pool.rewardTokens![0]);
+  let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
@@ -113,7 +113,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
 
   let nativeToken = updateNativeTokenPriceInUSD();
 
-  let rewardToken = getOrCreateToken(pool.rewardTokens![0]);
+  let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];

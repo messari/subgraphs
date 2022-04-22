@@ -1,4 +1,5 @@
 import { Address, BigDecimal, Bytes, dataSource, log } from "@graphprotocol/graph-ts";
+import { TokenABI } from "../generated/Factory/TokenABI";
 import { Factory } from "../generated/Factory/Factory";
 import { FeeSwitch, SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
 import { RewardIntervalType } from "../src/common/rewards";
@@ -10,12 +11,15 @@ export namespace Protocol {
 }
 
 // Choose which protocol you are indexing. The deployed network will already be determined
-let PROTOCOL_NAME_TEMP = Protocol.APESWAP;
+let PROTOCOL_NAME_TEMP = Protocol.UNISWAPV2;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let PROTOCOL_SLUG_TEMP: string;
 let NETWORK_TEMP: string; // The deployed network(e.g BSC or Polygon )
+let PROTOCOL_SCHEMA_VERSION_TEMP: string;
+let PROTOCOL_SUBGRAPH_VERSION_TEMP: string;
+let PROTOCOL_METHODOLOGY_VERSION_TEMP: string;
 
 let FACTORY_ADDRESS_TEMP: string; // factory address of the protocol in the network
 let FACTORY_CONTRACT_TEMP: Factory; // Factory Contract of protocol in the network
@@ -36,10 +40,15 @@ let STABLE_COINS_TEMP: string[]; // A list of stable coins
 let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token] oracle pools
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+log.warning("HEELO", [])
+if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == SubgraphNetwork.MAINNET) {
+  log.warning("HEELO1", [])
 
-if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == SubgraphNetwork.ETHEREUM) {
   PROTOCOL_SLUG_TEMP = "uniswap-v2";
-  NETWORK_TEMP = SchemaNetwork.ETHEREUM;
+  NETWORK_TEMP = SchemaNetwork.MAINNET;
+  PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
+  PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
+  PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
 
   FACTORY_ADDRESS_TEMP = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
@@ -51,7 +60,7 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
   LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("3");
   FEE_ON_OFF_TEMP = FeeSwitch.OFF;
 
-  // REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType;
+  REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.NONE;
 
   NATIVE_TOKEN_TEMP = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
   WHITELIST_TOKENS_TEMP = [
@@ -90,9 +99,13 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
     "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11", // DAI/wETH created block 10042267
     "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852", // USDT/wETH created block 10093341
   ];
-} else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == SubgraphNetwork.POLYGON) {
+  log.warning("HEELO2", [])
+} else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == SubgraphNetwork.MATIC) {
   PROTOCOL_SLUG_TEMP = "apeswap";
-  NETWORK_TEMP = SchemaNetwork.POLYGON;
+  NETWORK_TEMP = SchemaNetwork.MATIC;
+  PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
+  PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
+  PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
 
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
@@ -130,6 +143,9 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == SubgraphNetwork.BSC) {
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = SchemaNetwork.BSC;
+  PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
+  PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
+  PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
 
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
@@ -174,6 +190,9 @@ export namespace NetworkConfigs {
   export const PROTOCOL_NAME = PROTOCOL_NAME_TEMP;
   export const PROTOCOL_SLUG = PROTOCOL_SLUG_TEMP;
   export const NETWORK = NETWORK_TEMP;
+  export const PROTOCOL_SCHEMA_VERSION = PROTOCOL_SCHEMA_VERSION_TEMP;
+  export const PROTOCOL_SUBGRAPH_VERSION = PROTOCOL_SUBGRAPH_VERSION_TEMP;
+  export const PROTOCOL_METHODOLOGY_VERSION = PROTOCOL_METHODOLOGY_VERSION_TEMP;
 
   export const FACTORY_ADDRESS = FACTORY_ADDRESS_TEMP;
   export const FACTORY_CONTRACT = FACTORY_CONTRACT_TEMP;
