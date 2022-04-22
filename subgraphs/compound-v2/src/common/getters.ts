@@ -34,7 +34,7 @@ import {
   SUBGRAPH_VERSION,
   ZERO_ADDRESS,
 } from "./utils/constants";
-import { fetchTokenDecimals, fetchTokenName, fetchTokenSymbol } from "./utils/tokens";
+import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
 import { CToken } from "../../generated/Comptroller/CToken";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
@@ -293,9 +293,9 @@ export function getOrCreateToken(tokenAddress: string): Token {
       token.symbol = ETH_SYMBOL;
       token.decimals = DEFAULT_DECIMALS;
     } else {
-      token.name = fetchTokenName(Address.fromString(tokenAddress));
-      token.symbol = fetchTokenSymbol(Address.fromString(tokenAddress));
-      token.decimals = fetchTokenDecimals(Address.fromString(tokenAddress));
+      token.name = getAssetName(Address.fromString(tokenAddress));
+      token.symbol = getAssetSymbol(Address.fromString(tokenAddress));
+      token.decimals = getAssetDecimals(Address.fromString(tokenAddress));
     }
     token.save();
   }
@@ -307,9 +307,9 @@ export function getOrCreateRewardToken(marketAddress: string, tokenAddress: Addr
   let rewardToken = RewardToken.load(id);
   if (rewardToken == null) {
     rewardToken = new RewardToken(id);
-    rewardToken.name = fetchTokenName(tokenAddress);
-    rewardToken.symbol = fetchTokenSymbol(tokenAddress);
-    rewardToken.decimals = fetchTokenDecimals(tokenAddress);
+    rewardToken.name = getAssetName(tokenAddress);
+    rewardToken.symbol = getAssetSymbol(tokenAddress);
+    rewardToken.decimals = getAssetDecimals(tokenAddress);
     rewardToken.type = type;
     rewardToken.save();
   }

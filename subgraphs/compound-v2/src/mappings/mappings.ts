@@ -126,12 +126,6 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
   protocol._liquidationPenalty = liquidationPenalty;
   protocol.save();
 
-  log.warning("liquidation incentive: {} calculated: {} old liquidation incentive: {}", [
-    event.params.newLiquidationIncentiveMantissa.toString(),
-    liquidationPenalty.toString(),
-    event.params.oldLiquidationIncentiveMantissa.toString(),
-  ]);
-
   // set liquidation penalty for each market
   for (let i = 0; i < protocol._marketIds.length; i++) {
     let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));

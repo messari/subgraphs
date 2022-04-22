@@ -519,7 +519,7 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
       let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
       compPriceUSD = compMarket.inputTokenPricesUSD[0];
     } else {
-      // try to get COMP price between blocks 10271924 - 10960099 using UniswapRouter
+      // try to get COMP price between blocks 10271924 - 10960099 using price oracle library
       compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS)).usdPrice.div(
         exponentToBigDecimal(USDC_DECIMALS),
       );
