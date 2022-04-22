@@ -667,18 +667,12 @@ type _HelperStore @entity {
 }
 
 " This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
-type _TokenTracker @entity {
+type _TokenWhitelist @entity {
   " Token Address "
   id: ID!
 
   " pools token is in that are white listed for USD pricing "
   whitelistPools: [LiquidityPool!]!
-
-  " derived price in USD "
-  derivedUSD: BigDecimal!
-
-  " derived price in Native Token "
-  derivedNativeToken: BigDecimal!
 }
 
 type _LiquidityPoolAmount @entity {

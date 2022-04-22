@@ -1,5 +1,5 @@
 import { log } from "@graphprotocol/graph-ts";
-import { _HelperStore, _TokenTracker } from "../../generated/schema";
+import { _HelperStore } from "../../generated/schema";
 import { Mint, Burn, Swap, Transfer, Sync } from "../../generated/templates/Pair/Pair";
 import {
   createDeposit,

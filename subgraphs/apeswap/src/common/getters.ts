@@ -11,7 +11,7 @@ import {
   _LiquidityPoolAmount,
   _Transfer,
   _HelperStore,
-  _TokenTracker,
+  _TokenWhitelist,
   LiquidityPoolFee,
   Token,
   RewardToken,
@@ -24,6 +24,7 @@ import {
   SECONDS_PER_DAY,
   DEFAULT_DECIMALS,
   RewardTokenType,
+  BIGINT_ZERO,
 } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
@@ -59,11 +60,11 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
 
-export function getOrCreateTokenTracker(tokenAddress: string): _TokenTracker {
-  let tokenTracker = _TokenTracker.load(tokenAddress);
+export function getOrCreateTokenWhitelist(tokenAddress: string): _TokenWhitelist {
+  let tokenTracker = _TokenWhitelist.load(tokenAddress);
   // fetch info if null
   if (!tokenTracker) {
-    tokenTracker = new _TokenTracker(tokenAddress);
+    tokenTracker = new _TokenWhitelist(tokenAddress);
 
     tokenTracker.whitelistPools = [];
     tokenTracker.save();
@@ -99,6 +100,10 @@ export function getOrCreateUsageMetricSnapshot(
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.dailySwapCount = 0;
+
     usageMetrics.save();
   }
 
@@ -144,11 +149,16 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics = new FinancialsDailySnapshot(id);
     financialMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
 
-    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.save();
   }
@@ -168,6 +178,8 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token as Token;
@@ -185,20 +197,13 @@ export function getOrCreateLPToken(
     token.symbol = token0.name + "/" + token1.name;
     token.name = token0.name + "/" + token1.name + " LP";
     token.decimals = DEFAULT_DECIMALS;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token;
 }
 
-export function getOrCreateNativeTokenHelper(): _HelperStore {
-  let nativeToken = _HelperStore.load(HelperStoreType.NATIVE_TOKEN);
-  if (!nativeToken) {
-    nativeToken = new _HelperStore(HelperStoreType.NATIVE_TOKEN);
-    nativeToken.valueDecimal = BIGDECIMAL_ZERO;
-    nativeToken.save();
-  }
-  return nativeToken;
-}
 export function getOrCreateUsersHelper(): _HelperStore {
   let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS);
   if (!uniqueUsersTotal) {

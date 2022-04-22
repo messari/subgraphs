@@ -11,7 +11,7 @@ import {
   Account,
   DailyActiveAccount,
   _HelperStore,
-  _TokenTracker,
+  _TokenWhitelist,
   _LiquidityPoolAmount,
   Token,
   DexAmmProtocol,
@@ -37,7 +37,7 @@ import { getTrackedVolumeUSD } from "./price/price";
 import {
   getLiquidityPool,
   getOrCreateDex,
-  getOrCreateTokenTracker,
+  getOrCreateTokenWhitelist,
   getLiquidityPoolAmounts,
   getOrCreateTransfer,
   getLiquidityPoolFee,
@@ -170,8 +170,6 @@ export function createDeposit(
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -194,9 +192,9 @@ export function createDeposit(
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
-  deposit.amountUSD = tokenTracker0.derivedUSD
-    .times(token0Amount)
-    .plus(tokenTracker1.derivedUSD.times(token1Amount));
+  deposit.amountUSD = token0
+    .lastPriceUSD!.times(token0Amount)
+    .plus(token1.lastPriceUSD!.times(token1Amount));
 
   updateDepositHelper(event.address);
 
@@ -217,8 +215,6 @@ export function createWithdraw(
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -241,9 +237,9 @@ export function createWithdraw(
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
-  withdrawal.amountUSD = tokenTracker0.derivedUSD
-    .times(token0Amount)
-    .plus(tokenTracker1.derivedUSD.times(token1Amount));
+  withdrawal.amountUSD = token0
+    .lastPriceUSD!.times(token0Amount)
+    .plus(token1.lastPriceUSD!.times(token1Amount));
 
   store.remove("_Transfer", transfer.id);
 
@@ -270,8 +266,6 @@ export function createSwapHandleVolumeAndFees(
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
 
   // totals for volume updates
   let amount0Total = amount0Out.plus(amount0In);
@@ -280,8 +274,8 @@ export function createSwapHandleVolumeAndFees(
   let amount0TotalConverted = convertTokenToDecimal(amount0Total, token0.decimals);
   let amount1TotalConverted = convertTokenToDecimal(amount1Total, token1.decimals);
 
-  let token0USD = tokenTracker0.derivedUSD.times(amount0TotalConverted);
-  let token1USD = tokenTracker1.derivedUSD.times(amount1TotalConverted);
+  let token0USD = token0.lastPriceUSD!.times(amount0TotalConverted);
+  let token1USD = token1.lastPriceUSD!.times(amount1TotalConverted);
 
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
@@ -289,9 +283,9 @@ export function createSwapHandleVolumeAndFees(
   // only accounts for volume through white listed tokens
   let trackedAmountUSD = getTrackedVolumeUSD(
     amount0TotalConverted,
-    tokenTracker0 as _TokenTracker,
+    token0 as Token,
     amount1TotalConverted,
-    tokenTracker1 as _TokenTracker,
+    token1 as Token,
   );
 
   let tradingFee = getLiquidityPoolFee(pool.fees[0]);
@@ -307,8 +301,8 @@ export function createSwapHandleVolumeAndFees(
     let protocolFeeAmount = amount0TotalConverted.times(
       percToDec(protocolFee.feePercentage!),
     );
-    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedUSD);
-    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedUSD);
+    tradingFeeAmountUSD = tradingFeeAmount.times(token0.lastPriceUSD!);
+    protocolFeeAmountUSD = protocolFeeAmount.times(token0.lastPriceUSD!);
   } else {
     let tradingFeeAmount = amount1TotalConverted.times(
       percToDec(tradingFee.feePercentage!),
@@ -316,8 +310,8 @@ export function createSwapHandleVolumeAndFees(
     let protocolFeeAmount = amount1TotalConverted.times(
       percToDec(protocolFee.feePercentage!),
     );
-    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker1.derivedUSD);
-    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker1.derivedUSD);
+    tradingFeeAmountUSD = tradingFeeAmount.times(token1.lastPriceUSD!);
+    protocolFeeAmountUSD = protocolFeeAmount.times(token1.lastPriceUSD!);
   }
 
   let logIndexI32 = event.logIndex.toI32();

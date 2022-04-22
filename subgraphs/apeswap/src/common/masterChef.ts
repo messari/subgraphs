@@ -3,12 +3,8 @@ import { NetworkConfigs } from "../../config/_networkConfig";
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
 import { BIGINT_ZERO, ZERO_ADDRESS } from "./constants";
-import {
-  getLiquidityPool,
-  getOrCreateNativeTokenHelper,
-  getOrCreateTokenTracker,
-} from "./getters";
-import { findNativeTokenPerToken, getNativeTokenPriceInUSD } from "./price/price";
+import { getLiquidityPool, getOrCreateToken } from "./getters";
+import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { getRewardsPerDay } from "./rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
@@ -53,20 +49,15 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt): void {
     NetworkConfigs.REWARD_INTERVAL_TYPE,
   );
 
-  let rewardTokenTracker = getOrCreateTokenTracker(pool.rewardTokens![0]);
-  rewardTokenTracker.derivedNativeToken = findNativeTokenPerToken(rewardTokenTracker);
+  let nativeToken = updateNativeTokenPriceInUSD();
 
-  let nativeToken = getOrCreateNativeTokenHelper();
-  nativeToken.valueDecimal = getNativeTokenPriceInUSD();
+  let rewardToken = getOrCreateToken(pool.rewardTokens![0]);
+  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [
-    rewardTokenPerDay
-      .times(rewardTokenTracker.derivedNativeToken)
-      .times(nativeToken.valueDecimal!),
-  ];
+  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
-  rewardTokenTracker.save();
+  rewardToken.save();
   nativeToken.save();
   pool.save();
 }
@@ -120,20 +111,15 @@ export function handleReward(event: ethereum.Event, pid: BigInt): void {
     NetworkConfigs.REWARD_INTERVAL_TYPE,
   );
 
-  let rewardTokenTracker = getOrCreateTokenTracker(pool.rewardTokens![0]);
-  rewardTokenTracker.derivedNativeToken = findNativeTokenPerToken(rewardTokenTracker);
+  let nativeToken = updateNativeTokenPriceInUSD();
 
-  let nativeToken = getOrCreateNativeTokenHelper();
-  nativeToken.valueDecimal = getNativeTokenPriceInUSD();
+  let rewardToken = getOrCreateToken(pool.rewardTokens![0]);
+  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
   pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [
-    rewardTokenPerDay
-      .times(rewardTokenTracker.derivedNativeToken)
-      .times(nativeToken.valueDecimal!),
-  ];
+  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
-  rewardTokenTracker.save();
+  rewardToken.save();
   nativeToken.save();
   pool.save();
 }
