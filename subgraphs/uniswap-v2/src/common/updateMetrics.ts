@@ -1,20 +1,19 @@
 import { log, dataSource, Address, BigDecimal, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { Account, DailyActiveAccount, UsageMetricsDailySnapshot, _HelperStore, _TokenTracker } from "../../generated/schema";
+import { Account, DailyActiveAccount, Token, UsageMetricsDailySnapshot, _HelperStore, _TokenWhitelist } from "../../generated/schema";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
   getOrCreateDex,
-  getOrCreateEtherHelper,
   getOrCreateFinancials,
   getOrCreatePoolDailySnapshot,
   getOrCreateToken,
-  getOrCreateTokenTracker,
+  getOrCreateTokenWhitelist,
   getOrCreateUsersHelper,
 } from "./getters";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, FACTORY_ADDRESS, INT_ONE, SECONDS_PER_DAY, UsageType, WHITELIST } from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, SECONDS_PER_DAY, UsageType } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
-import { getUsdPricePerToken } from "../Prices/index";
-import { findEthPerToken, getEthPriceInUSD } from "./price/price";
+import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
+import { NetworkConfigs } from "../../config/_networkConfig";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -40,7 +39,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: string, usageTyp
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
-    usageMetrics.protocol = FACTORY_ADDRESS;
+    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
@@ -100,20 +99,23 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 }
 
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
-export function updateTokenWhitelists(tokenTracker0: _TokenTracker, tokenTracker1: _TokenTracker, poolAddress: string): void {
+export function updateTokenWhitelists(token0: Token, token1: Token, poolAddress: string): void {
+  let tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
+  let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
+
   // update white listed pools
-  if (WHITELIST.includes(tokenTracker0.id)) {
-    let newPools = tokenTracker1.whitelistPools;
+  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist0.id)) {
+    let newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
-    tokenTracker1.whitelistPools = newPools;
-    tokenTracker1.save();
+    tokenWhitelist1.whitelistPools = newPools;
+    tokenWhitelist1.save();
   }
 
-  if (WHITELIST.includes(tokenTracker1.id)) {
-    let newPools = tokenTracker0.whitelistPools;
+  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist1.id)) {
+    let newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
-    tokenTracker0.whitelistPools = newPools;
-    tokenTracker0.save();
+    tokenWhitelist0.whitelistPools = newPools;
+    tokenWhitelist0.save();
   }
 }
 
@@ -144,18 +146,10 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
 
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
+  let nativeToken = updateNativeTokenPriceInUSD();
 
-  let ether = getOrCreateEtherHelper();
-  ether.valueDecimal = getEthPriceInUSD();
-  tokenTracker0.derivedETH = findEthPerToken(tokenTracker0);
-  tokenTracker1.derivedETH = findEthPerToken(tokenTracker1);
-
-  tokenTracker0.derivedUSD = ether.valueDecimal!.times(tokenTracker0.derivedETH);
-  tokenTracker1.derivedUSD = ether.valueDecimal!.times(tokenTracker1.derivedETH);
-
-  ether.save();
+  token0.lastPriceUSD = findNativeTokenPerToken(token0, nativeToken);
+  token1.lastPriceUSD = findNativeTokenPerToken(token1, nativeToken);
 
   // Subtract the old pool tvl
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
@@ -164,7 +158,7 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   let inputToken1 = convertTokenToDecimal(pool.inputTokenBalances[1], token1.decimals);
 
   // Get new tvl
-  let newTvl = tokenTracker0.derivedUSD.times(inputToken0).plus(tokenTracker1.derivedUSD.times(inputToken1));
+  let newTvl = token0.lastPriceUSD!.times(inputToken0).plus(token1.lastPriceUSD!.times(inputToken1));
 
   // Add the new pool tvl
   pool.totalValueLockedUSD = newTvl;
@@ -178,17 +172,13 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
 
   pool.save();
   protocol.save();
-  tokenTracker0.save();
-  tokenTracker1.save();
+  token0.save();
+  token1.save();
+  nativeToken.save();
 }
 
 // Update the volume and accrued fees for all relavant entities
-export function updateVolumeAndFees(
-  event: ethereum.Event,
-  trackedAmountUSD: BigDecimal,
-  supplyFeeAmountUSD: BigDecimal,
-  protocolFeeAmountUSD: BigDecimal
-): void {
+export function updateVolumeAndFees(event: ethereum.Event, trackedAmountUSD: BigDecimal, supplyFeeAmountUSD: BigDecimal, protocolFeeAmountUSD: BigDecimal): void {
   let pool = getLiquidityPool(event.address.toHexString());
   let protocol = getOrCreateDex();
   let financialMetrics = getOrCreateFinancials(event);
@@ -206,6 +196,7 @@ export function updateVolumeAndFees(
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
+  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(trackedAmountUSD);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
 
@@ -215,8 +206,8 @@ export function updateVolumeAndFees(
 }
 
 // Update store that tracks the deposit count per pool
-export function updateDepositHelper(poolAddress: string): void {
-  let poolDeposits = _HelperStore.load(poolAddress)!;
+export function updateDepositHelper(poolAddress: Address): void {
+  let poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
 }

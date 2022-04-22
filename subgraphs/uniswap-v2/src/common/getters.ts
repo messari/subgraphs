@@ -1,5 +1,6 @@
-// import { log } from "@graphprotocol/graph-ts"
-import { Address, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../config/_networkConfig";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import {
   DexAmmProtocol,
@@ -10,26 +11,27 @@ import {
   _LiquidityPoolAmount,
   _Transfer,
   _HelperStore,
-  _TokenTracker,
+  _TokenWhitelist,
   LiquidityPoolFee,
   Token,
+  RewardToken,
 } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "./constants";
+import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType, BIGINT_ZERO } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS);
+  let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(FACTORY_ADDRESS);
-    protocol.name = "Uniswap v2";
-    protocol.slug = "uniswap-v2";
-    protocol.schemaVersion = "1.1.0";
+    protocol = new DexAmmProtocol(NetworkConfigs.FACTORY_ADDRESS);
+    protocol.name = NetworkConfigs.PROTOCOL_NAME;
+    protocol.slug = NetworkConfigs.PROTOCOL_SLUG;
+    protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "1.0.2";
     protocol.methodologyVersion = "1.0.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.network = Network.ETHEREUM;
+    protocol.network = NetworkConfigs.NETWORK;
     protocol.type = ProtocolType.EXCHANGE;
 
     protocol.save();
@@ -49,11 +51,11 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
 }
 
-export function getOrCreateTokenTracker(tokenAddress: string): _TokenTracker {
-  let tokenTracker = _TokenTracker.load(tokenAddress);
+export function getOrCreateTokenWhitelist(tokenAddress: string): _TokenWhitelist {
+  let tokenTracker = _TokenWhitelist.load(tokenAddress);
   // fetch info if null
   if (!tokenTracker) {
-    tokenTracker = new _TokenTracker(tokenAddress);
+    tokenTracker = new _TokenWhitelist(tokenAddress);
 
     tokenTracker.whitelistPools = [];
     tokenTracker.save();
@@ -82,11 +84,15 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id);
-    usageMetrics.protocol = FACTORY_ADDRESS;
+    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.dailySwapCount = 0;
+
     usageMetrics.save();
   }
 
@@ -110,7 +116,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
         .concat("-")
         .concat(id)
     );
-    poolMetrics.protocol = FACTORY_ADDRESS;
+    poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.rewardTokenEmissionsAmount = [];
     poolMetrics.rewardTokenEmissionsUSD = [];
@@ -130,13 +136,18 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id);
-    financialMetrics.protocol = FACTORY_ADDRESS;
+    financialMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+
+    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.save();
   }
@@ -156,6 +167,8 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value.toI32();
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token as Token;
@@ -169,20 +182,13 @@ export function getOrCreateLPToken(tokenAddress: string, token0: Token, token1: 
     token.symbol = token0.name + "/" + token1.name;
     token.name = token0.name + "/" + token1.name + " LP";
     token.decimals = DEFAULT_DECIMALS;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token;
 }
 
-export function getOrCreateEtherHelper(): _HelperStore {
-  let ether = _HelperStore.load(HelperStoreType.ETHER);
-  if (!ether) {
-    ether = new _HelperStore(HelperStoreType.ETHER);
-    ether.valueDecimal = BIGDECIMAL_ZERO;
-    ether.save();
-  }
-  return ether;
-}
 export function getOrCreateUsersHelper(): _HelperStore {
   let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS);
   if (!uniqueUsersTotal) {
@@ -191,4 +197,20 @@ export function getOrCreateUsersHelper(): _HelperStore {
     uniqueUsersTotal.save();
   }
   return uniqueUsersTotal;
+}
+
+export function getOrCreateRewardToken(address: string): RewardToken {
+  let rewardToken = RewardToken.load(address);
+  if (rewardToken == null) {
+    let token = getOrCreateToken(address);
+    rewardToken = new RewardToken(address);
+    rewardToken.name = token.name;
+    rewardToken.symbol = token.symbol;
+    rewardToken.decimals = token.decimals;
+    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.save();
+
+    return rewardToken as RewardToken;
+  }
+  return rewardToken as RewardToken;
 }

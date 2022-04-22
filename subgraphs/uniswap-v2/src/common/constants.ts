@@ -5,7 +5,13 @@ import { toBytesArray } from "./utils/utils";
 ///// Schema Enums /////
 ////////////////////////
 
-export namespace Network {
+// The network names corresponding to the Network enum in the schema.
+// They are mainly intended for convenience on the data consumer side.
+// The enum values are derived from Coingecko slugs (converted to uppercase
+// and replaced hyphens with underscores for Postgres enum compatibility)
+
+export namespace SchemaNetwork {
+  export const ARBITRUM = "ARBITRUM";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
   export const BSC = "BSC";
@@ -13,7 +19,8 @@ export namespace Network {
   export const CRONOS = "CRONOS";
   export const ETHEREUM = "ETHEREUM";
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY";
+  export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const OPTIMISM = "OPTIMISM";
@@ -21,6 +28,26 @@ export namespace Network {
   export const XDAI = "XDAI";
 }
 
+// The network names corresponding to the ones in `dataSource.network()`
+// They should mainly be used for the ease of comparison.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bsc";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
+}
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
   export const LENDING = "LENDING";
@@ -60,6 +87,12 @@ export namespace UsageType {
   export const DEPOSIT = "DEPOSIT";
   export const WITHDRAW = "WITHDRAW";
   export const SWAP = "SWAP";
+  // Pool addresses are also stored in the HelperStore
+}
+
+export namespace FeeSwitch {
+  export const ON = "ON";
+  export const OFF = "OFF";
   // Pool addresses are also stored in the HelperStore
 }
 
@@ -105,8 +138,6 @@ export let MINIMUM_ETH_LOCKED = BigDecimal.fromString("2");
 ///////
 //////////////
 ///////
-
-export const FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 

@@ -1,10 +1,10 @@
 import { log } from "@graphprotocol/graph-ts";
-import { _HelperStore, _TokenTracker } from "../../generated/schema";
+import { _HelperStore } from "../../generated/schema";
 import { Mint, Burn, Swap, Transfer, Sync } from "../../generated/templates/Pair/Pair";
 import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees } from "../common/creators";
 import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from "../common/handlers";
 import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from "../common/updateMetrics";
-import { BIGDECIMAL_ONE, BIGINT_THOUSAND, INT_ONE, UsageType, ZERO_ADDRESS } from "../common/constants";
+import { BIGINT_THOUSAND, UsageType, ZERO_ADDRESS } from "../common/constants";
 
 export function handleTransfer(event: Transfer): void {
   // ignore initial transfers for first adds
@@ -16,7 +16,7 @@ export function handleTransfer(event: Transfer): void {
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     handleTransferMint(event, event.params.value, event.params.to.toHexString());
   }
-  // Case where direct send first on ETH withdrawls.
+  // Case where direct send first on native token withdrawls.
   // For burns, mint tokens are first transferred to the pool before transferred for burn.
   // This gets the EOA that made the burn loaded into the _Transfer.
 
@@ -52,8 +52,8 @@ export function handleBurn(event: Burn): void {
 export function handleSwap(event: Swap): void {
   createSwapHandleVolumeAndFees(
     event,
-    event.params.to,
-    event.params.sender,
+    event.params.to.toHexString(),
+    event.params.sender.toHexString(),
     event.params.amount0In,
     event.params.amount1In,
     event.params.amount0Out,

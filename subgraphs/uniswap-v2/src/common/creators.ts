@@ -4,7 +4,7 @@ import {
   Account,
   DailyActiveAccount,
   _HelperStore,
-  _TokenTracker,
+  _TokenWhitelist,
   _LiquidityPoolAmount,
   Token,
   DexAmmProtocol,
@@ -16,50 +16,36 @@ import {
 } from "../../generated/schema";
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
 import { Pair as PairTemplate } from "../../generated/templates";
-import {
-  BIGDECIMAL_ZERO,
-  INT_ZERO,
-  INT_ONE,
-  FACTORY_ADDRESS,
-  BIGINT_ZERO,
-  SECONDS_PER_DAY,
-  LiquidityPoolFeeType,
-  PROTOCOL_FEE_TO_OFF,
-  TRADING_FEE,
-  BIGDECIMAL_HUNDRED,
-  LP_FEE_TO_OFF,
-} from "./constants";
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED, FeeSwitch } from "./constants";
 import { getTrackedVolumeUSD } from "./price/price";
-import {
-  getLiquidityPool,
-  getOrCreateDex,
-  getOrCreateEtherHelper,
-  getOrCreateTokenTracker,
-  getLiquidityPoolAmounts,
-  getOrCreateTransfer,
-  getLiquidityPoolFee,
-  getOrCreateToken,
-} from "./getters";
+import { getLiquidityPool, getOrCreateDex, getOrCreateTokenWhitelist, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics";
 import { savePoolId } from "./handlers";
+import { NetworkConfigs } from "../../config/_networkConfig";
 
-export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS));
+export let factoryContract = FactoryContract.bind(Address.fromString(NetworkConfigs.FACTORY_ADDRESS));
 
 // rebass tokens, dont count in tracked volume
 
 function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
-  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
-  poolLpFee.feePercentage = LP_FEE_TO_OFF;
-
   let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
-  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-  poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_OFF;
-
   let poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+
+  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-  poolTradingFee.feePercentage = TRADING_FEE;
+
+  if (NetworkConfigs.FEE_ON_OFF == FeeSwitch.ON) {
+    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_ON;
+    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_ON;
+  } else {
+    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_OFF;
+    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_OFF;
+  }
+
+  poolTradingFee.feePercentage = NetworkConfigs.TRADING_FEE;
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -69,14 +55,7 @@ function createPoolFees(poolAddress: string): string[] {
 }
 
 // Create a liquidity pool from PairCreated contract call
-export function createLiquidityPool(
-  event: ethereum.Event,
-  protocol: DexAmmProtocol,
-  poolAddress: string,
-  token0: Token,
-  token1: Token,
-  LPtoken: Token
-): void {
+export function createLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: string, token0: Token, token1: Token, LPtoken: Token): void {
   let pool = new LiquidityPool(poolAddress);
   let poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
@@ -88,6 +67,9 @@ export function createLiquidityPool(
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  pool.rewardTokens;
+  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   pool.fees = createPoolFees(poolAddress);
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
@@ -148,8 +130,6 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -161,7 +141,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 
   deposit.hash = transactionHash;
   deposit.logIndex = logIndexI32;
-  deposit.protocol = FACTORY_ADDRESS;
+  deposit.protocol = NetworkConfigs.FACTORY_ADDRESS;
   deposit.to = pool.id;
   deposit.from = transfer.sender;
   deposit.blockNumber = event.block.number;
@@ -170,9 +150,9 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.outputToken = pool.outputToken;
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
-  deposit.amountUSD = tokenTracker0.derivedUSD.times(token0Amount).plus(tokenTracker1.derivedUSD.times(token1Amount));
+  deposit.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
 
-  updateDepositHelper(event.address.toHexString());
+  updateDepositHelper(event.address);
 
   store.remove("_Transfer", transfer.id);
 
@@ -187,8 +167,6 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
 
   // update exchange info (except balances, sync will cover that)
   let token0Amount = convertTokenToDecimal(amount0, token0.decimals);
@@ -199,8 +177,8 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   let withdrawal = new Withdraw(transactionHash.concat("-").concat(event.logIndex.toString()));
 
   withdrawal.hash = transactionHash;
-  withdrawal.logIndex = logIndexI32;
-  withdrawal.protocol = FACTORY_ADDRESS;
+  withdrawal.logIndex = event.logIndex.toI32();
+  withdrawal.protocol = NetworkConfigs.FACTORY_ADDRESS;
   withdrawal.to = transfer.sender;
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
@@ -209,7 +187,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.outputToken = pool.outputToken;
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
-  withdrawal.amountUSD = tokenTracker0.derivedUSD.times(token0Amount).plus(tokenTracker1.derivedUSD.times(token1Amount));
+  withdrawal.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
 
   store.remove("_Transfer", transfer.id);
 
@@ -223,8 +201,8 @@ function percToDec(percentage: BigDecimal): BigDecimal {
 // Handle swaps data and update entities volumes and fees
 export function createSwapHandleVolumeAndFees(
   event: ethereum.Event,
-  to: Bytes,
-  sender: Bytes,
+  to: string,
+  sender: string,
   amount0In: BigInt,
   amount1In: BigInt,
   amount0Out: BigInt,
@@ -236,8 +214,6 @@ export function createSwapHandleVolumeAndFees(
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
-  let tokenTracker0 = getOrCreateTokenTracker(pool.inputTokens[0]);
-  let tokenTracker1 = getOrCreateTokenTracker(pool.inputTokens[1]);
 
   // totals for volume updates
   let amount0Total = amount0Out.plus(amount0In);
@@ -246,20 +222,14 @@ export function createSwapHandleVolumeAndFees(
   let amount0TotalConverted = convertTokenToDecimal(amount0Total, token0.decimals);
   let amount1TotalConverted = convertTokenToDecimal(amount1Total, token1.decimals);
 
-  let token0USD = tokenTracker0.derivedUSD.times(amount0TotalConverted);
-  let token1USD = tokenTracker1.derivedUSD.times(amount1TotalConverted);
+  let token0USD = token0.lastPriceUSD!.times(amount0TotalConverted);
+  let token1USD = token1.lastPriceUSD!.times(amount1TotalConverted);
 
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
 
   // only accounts for volume through white listed tokens
-  let trackedAmountUSD = getTrackedVolumeUSD(
-    amount0TotalConverted,
-    tokenTracker0 as _TokenTracker,
-    amount1TotalConverted,
-    tokenTracker1 as _TokenTracker,
-    poolAmounts
-  );
+  let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, token0 as Token, amount1TotalConverted, token1 as Token);
 
   let tradingFee = getLiquidityPoolFee(pool.fees[0]);
   let protocolFee = getLiquidityPoolFee(pool.fees[1]);
@@ -270,13 +240,13 @@ export function createSwapHandleVolumeAndFees(
   if (amount0In != BIGINT_ZERO) {
     let tradingFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage!));
     let protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage!));
-    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker0.derivedUSD);
-    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker0.derivedUSD);
+    tradingFeeAmountUSD = tradingFeeAmount.times(token0.lastPriceUSD!);
+    protocolFeeAmountUSD = protocolFeeAmount.times(token0.lastPriceUSD!);
   } else {
     let tradingFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage!));
     let protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage!));
-    tradingFeeAmountUSD = tradingFeeAmount.times(tokenTracker1.derivedUSD);
-    protocolFeeAmountUSD = protocolFeeAmount.times(tokenTracker1.derivedUSD);
+    tradingFeeAmountUSD = tradingFeeAmount.times(token1.lastPriceUSD!);
+    protocolFeeAmountUSD = protocolFeeAmount.times(token1.lastPriceUSD!);
   }
 
   let logIndexI32 = event.logIndex.toI32();
@@ -287,8 +257,8 @@ export function createSwapHandleVolumeAndFees(
   swap.hash = transactionHash;
   swap.logIndex = logIndexI32;
   swap.protocol = protocol.id;
-  swap.to = to.toHexString();
-  swap.from = sender.toHexString();
+  swap.to = to;
+  swap.from = sender;
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.tokenIn = amount0In != BIGINT_ZERO ? token0.id : token1.id;
