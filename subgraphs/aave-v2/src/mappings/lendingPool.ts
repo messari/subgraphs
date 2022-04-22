@@ -82,8 +82,9 @@ export function setTokenBalanceArray(newBal: BigInt, tokenBalanceIndex: number, 
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // This event handler updates the deposit/borrow rates on a market when the state of a reserve is updated
+  const token = getOrCreateToken(event.params.reserve);
   const market = initMarket(event.block.number, event.block.timestamp, event.params.reserve.toHexString()) as Market;
-  const token = getOrCreateToken(Address.fromString(market.id));
+  log.info('ABOUT TO CREATE TOKEN ' + market.id, [])
   // The rates provided in params are in ray format (27 dec). Convert to decimal format
   log.info('RES UPDATE PARAMS: ' + event.params.liquidityRate.toString() + ' ' + event.params.variableBorrowRate.toString() + ' ' + event.params.stableBorrowRate.toString(), [])
   market.depositRate = bigIntToBigDecimal(rayToWad(event.params.liquidityRate));
@@ -98,7 +99,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 // Market address is set to value returned from getLendingPoolFromCtx(), which pulls the current marketAddr from context
 
 export function handleDeposit(event: Deposit): void {
-  log.info('DEPO' + event.transaction.hash.toHexString(), []);
+  log.info('DEPO' + event.transaction.hash.toHexString() + ' ' + event.params.reserve.toHexString(), []);
   // Deposit event to a lending pool triggers this handler
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
@@ -149,7 +150,7 @@ export function handleDeposit(event: Deposit): void {
 
 export function handleWithdraw(event: Withdraw): void {
   // Withdraw event from a lending pool to a user triggers this handler
-  log.info('WITHDRAW AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
+  log.info('WITHDRAW AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString() + ' ' + event.params.reserve.toHexString(), []);
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();
@@ -198,7 +199,7 @@ export function handleWithdraw(event: Withdraw): void {
 export function handleBorrow(event: Borrow): void {
   // Borrow event from a lending pool to a user triggers this handler
   // Stable: 1, Variable: 2
-  log.info('BORROW - MODE: ' + event.params.borrowRateMode.toString() + ' amt ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
+  log.info('BORROW - MODE: '  + event.params.reserve.toHexString() + ' amt ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
   // Depending on borrow mode, add to stable/variable tvl and trigger total fee calculation
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
@@ -252,7 +253,7 @@ export function handleBorrow(event: Borrow): void {
 
 export function handleRepay(event: Repay): void {
   // Repay event from a user who is paying back into a pool that they borrowed from
-  log.info('REPAY AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString(), []);
+  log.info('REPAY AMT ' + event.params.amount.toString() + ' ' + event.transaction.hash.toHexString() + ' ' + event.params.reserve.toHexString(), []);
   const hash = event.transaction.hash.toHexString();
   const marketAddr = event.params.reserve.toHexString();
   const protocolId = getProtocolIdFromCtx();

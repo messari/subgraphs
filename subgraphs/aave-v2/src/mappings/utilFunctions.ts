@@ -56,13 +56,17 @@ import { IPriceOracleGetter } from '../../generated/templates/LendingPool/IPrice
 
 import { getOrCreateToken } from '../common/getters';
 
-import { ERC20 } from '../../generated/templates/LendingPool/ERC20';
-
 import { AToken } from '../../generated/templates/AToken/AToken';
 
 import { LendingPool } from '../../generated/templates/LendingPool/LendingPool';
 
 import { bigIntToBigDecimal } from '../common/utils/numbers';
+
+import {
+  fetchTokenDecimals,
+  fetchTokenName,
+  fetchTokenSymbol
+} from '../common/tokens';
 
 export function initMarket(
   blockNumber: BigInt,
@@ -131,7 +135,7 @@ export function initMarket(
     if (rewardTokens === null) rewardTokens = [];
     if (rewardTokens.length === 0) {
       // If the reward tokens have not been initialized on the market, attempt to pull them from the incentive controller
-      const rewardTokenFromIncController = getRewardTokenAddress(market);
+      const rewardTokenFromIncController = Address.fromString(REWARD_TOKEN_ADDRESS);
       const depositRewardToken = loadRewardToken(rewardTokenFromIncController, RewardTokenType.DEPOSIT);
       const borrowRewardToken = loadRewardToken(rewardTokenFromIncController, RewardTokenType.BORROW);
       market.rewardTokens = [depositRewardToken.id, borrowRewardToken.id];
@@ -207,24 +211,14 @@ export function loadRewardToken(assetAddr: Address, type: string): RewardToken {
   let asset = RewardToken.load(type + '-' + assetAddr.toHex());
   if (asset === null) {
     asset = new RewardToken(type + '-' + assetAddr.toHex());
-    const tokenInstance = ERC20.bind(assetAddr);
-    const tryName = tokenInstance.try_name();
-    if (!tryName.reverted) {
-      asset.name = tryName.value;
-    }
-    const trySymbol = tokenInstance.try_symbol();
-    if (!trySymbol.reverted) {
-      asset.symbol = trySymbol.value;
-    }
-    const tryDecimals = tokenInstance.try_decimals();
-    if (!tryDecimals.reverted) {
-      asset.decimals = tryDecimals.value;
-    }
+    asset.symbol = fetchTokenSymbol(assetAddr);
+    asset.name = fetchTokenName(assetAddr);
+    asset.decimals = fetchTokenDecimals(assetAddr);
     asset.type = type;
     asset.save();
   }
-
   getOrCreateToken(assetAddr);
+  log.info("EXITING REWARD TOKEN LOAD " + asset.decimals.toString() + ' ' + asset.name + ' ' + asset.id, [])
   return asset as RewardToken;
 }
 
@@ -252,21 +246,6 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
     lendingProtocol.save();
   }
   return lendingProtocol as LendingProtocol;
-}
-
-export function getRewardTokenAddress(market: Market): Address {
-  const incentiveContAddr = initIncentivesController(market);
-  // Instantiate IncentivesController to get access to contract read methods
-  log.info('GET REWARD FROM INCENTIVE CONTROLLER ' + incentiveContAddr.toHexString() + ' market? ' + market.id, []);
-  const contract = IncentivesControllerContract.bind(incentiveContAddr);
-  // Attempt to get the contract Reward Token's address
-  if (!contract.try_REWARD_TOKEN().reverted) {
-    log.info('REWARD TOKEN ON MARKET ' + market.id + ' is ' + contract.try_REWARD_TOKEN().value.toHexString(), []);
-    return contract.try_REWARD_TOKEN().value;
-  } else {
-    log.info('FAILED TO GET REWARD TOKEN FROM ' + market.id + ' REVERTED REWARD TOKEN TO DEFAULT ' + REWARD_TOKEN_ADDRESS, []);
-    return Address.fromString(REWARD_TOKEN_ADDRESS);
-  }
 }
 
 export function initIncentivesController(market: Market): Address {
@@ -455,7 +434,7 @@ export function amountInUSD(priceInUSDC: BigDecimal, decimals: number, amount: B
 export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
   // Taking the reward emissions denominated in the reward token, convert it to the value in USD
   const rewardEmissionsUSD = market.rewardTokenEmissionsUSD;
-  const rewardTokenAddr = getRewardTokenAddress(market);
+  const rewardTokenAddr = Address.fromString(REWARD_TOKEN_ADDRESS);
   // The DEPOSIT reward token is used as the default. Both the deposit and borrow reward token decimals are the same
   const rewardToken = loadRewardToken(rewardTokenAddr, RewardTokenType.DEPOSIT);
   // In the reward emissions arrays index 0 is for the deposit reward, index 1 for the borrow reward
