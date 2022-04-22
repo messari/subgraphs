@@ -12,6 +12,7 @@ export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 
+export const DEFAULT_USD_DECIMALS = BIGINT_TEN.pow(6);
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
 export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
