@@ -315,10 +315,10 @@ type Market @entity {
   " Deposit interest rate in APY percentage "
   depositRate: BigDecimal!
 
-  " Borrow interest rate in APY percentage "
-  stableBorrowRate: BigDecimal!
+  " Stable borrow interest rate in APY percentage. Leave as null if no stable borrow rate "
+  stableBorrowRate: BigDecimal
 
-  " Borrow interest rate in APY percentage "
+  " Variable borrow interest rate in APY percentage "
   variableBorrowRate: BigDecimal!
 
   deposits: [Deposit!]! @derivedFrom(field: "market")
@@ -329,7 +329,7 @@ type Market @entity {
 
   repays: [Repay!]! @derivedFrom(field: "market")
 
-  liquidations: [Liquidation!]! @derivedFrom(field: "market")
+  liquidates: [Liquidate!]! @derivedFrom(field: "market")
 }
 
 #################################
@@ -386,10 +386,10 @@ type MarketDailySnapshot @entity {
   " Deposit interest rate in APY percentage "
   depositRate: BigDecimal!
 
-  " Borrow interest rate in APY percentage "
-  stableBorrowRate: BigDecimal!
+  " Stable borrow interest rate in APY percentage. Leave as null if no stable borrow rate "
+  stableBorrowRate: BigDecimal
 
-  " Borrow interest rate in APY percentage "
+  " Variable borrow interest rate in APY percentage "
   variableBorrowRate: BigDecimal!
 }
 
@@ -581,7 +581,7 @@ type Repay implements Event @entity {
   amountUSD: BigDecimal
 }
 
-type Liquidation implements Event @entity {
+type Liquidate implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
