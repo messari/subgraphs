@@ -34,11 +34,11 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
 
-  TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("2"));
-  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("1.5"));
-  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.5"));
-  PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
-  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("2"));
+  TRADING_FEE_TEMP = BigDecimal.fromString("2");
+  PROTOCOL_FEE_TO_ON_TEMP = BigDecimal.fromString("1.5");
+  LP_FEE_TO_ON_TEMP = BigDecimal.fromString("0.5");
+  PROTOCOL_FEE_TO_OFF_TEMP = BigDecimal.fromString("0.0");
+  LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("2");
   FEE_ON_OFF_TEMP = FeeSwitch.ON;
 
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.BLOCK;
@@ -72,11 +72,11 @@ if (dataSource.network() == SubgraphNetwork.POLYGON) {
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
 
-  TRADING_FEE_TEMP = toPercentage(BigDecimal.fromString("2"));
-  PROTOCOL_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("0.5"));
-  LP_FEE_TO_ON_TEMP = toPercentage(BigDecimal.fromString("1.5"));
-  PROTOCOL_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("0.0"));
-  LP_FEE_TO_OFF_TEMP = toPercentage(BigDecimal.fromString("2"));
+  TRADING_FEE_TEMP = BigDecimal.fromString("2");
+  PROTOCOL_FEE_TO_ON_TEMP = BigDecimal.fromString("0.5");
+  LP_FEE_TO_ON_TEMP = BigDecimal.fromString("1.5");
+  PROTOCOL_FEE_TO_OFF_TEMP = BigDecimal.fromString("0.0");
+  LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("2");
   FEE_ON_OFF_TEMP = FeeSwitch.ON;
 
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.TIMESTAMP;
