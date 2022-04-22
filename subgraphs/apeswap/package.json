@@ -4,15 +4,16 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:bsc": "mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
-    "prepare:polygon": "mustache config/polygon.json subgraph.template.yaml > subgraph.yaml",
-    "bsc-hosted-deploy": "graph deploy --product hosted-service masterbid/apeswap",
-    "bsc-mainnet-deploy": "graph deploy --node https://api.thegraph.com/deploy/ masterbid/apeswap",
-    "polygon-hosted-deploy": "graph deploy --product hosted-service masterbid/apeswap-polygon",
-    "polygon-mainnet-deploy": "graph deploy --node https://api.thegraph.com/deploy/ masterbid/apeswap-polygon",
-    "create-local": "graph create --node http://localhost:8020/ masterbid/apeswap",
-    "remove-local": "graph remove --node http://localhost:8020/ masterbid/apeswap",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 masterbid/apeswap"
+    "prepare:apeswap-bsc": "mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:apeswap-polygon": "mustache config/apeswap/polygon.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "bsc-hosted-deploy": "graph deploy --product hosted-service steege/apeswap",
+    "bsc-mainnet-deploy": "graph deploy --node https://api.thegraph.com/deploy/ steegecs/apeswap-bsc",
+    "polygon-hosted-deploy": "graph deploy --product hosted-service steegecs/apeswap-polygon",
+    "polygon-mainnet-deploy": "graph deploy --node https://api.thegraph.com/deploy/ steegecs/apeswap-polygon",
+    "create-local": "graph create --node http://localhost:8020/ steegecs/apeswap",
+    "remove-local": "graph remove --node http://localhost:8020/ steegecs/apeswap",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 steegecs/apeswap"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",

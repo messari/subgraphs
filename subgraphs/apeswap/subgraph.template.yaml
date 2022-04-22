@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: {{network}}
+    network: { { network } }
     source:
-      address: '{{address}}'
+      address: "{{address}}"
       abi: Factory
-      startBlock: {{startBlock}}	
+      startBlock: { { startBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,9 +16,9 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/Factory.json
+          file: ./abis/apeswap/Factory.json
         - name: ERC20
-          file: ./abis/IERC20.json
+          file: ./abis/apeswap/IERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
@@ -26,34 +26,34 @@ dataSources:
 
   - kind: ethereum
     name: MasterChef
-    network: {{network}}
+    network: { { network } }
     source:
-      address: '{{masterChefAddress}}'
-      abi: {{abi}}
-      startBlock: {{masterChefStartBlock}}	
+      address: "{{masterChefAddress}}"
+      abi: { { abi } }
+      startBlock: { { masterChefStartBlock } }
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: {{abi}}
-          file: ./abis/{{abi}}.json
+        - name: { { abi } }
+          file: ./abis/apeswap/{{abi}}.json
         - name: ERC20
-          file: ./abis/IERC20.json
+          file: ./abis/apeswap/IERC20.json
       eventHandlers:
         - event: Deposit({{depositParams}})
-          handler: {{depositHandler}}
+          handler: { { depositHandler } }
         - event: Withdraw({{withdrawParams}})
-          handler: {{withdrawHandler}}
+          handler: { { withdrawHandler } }
         - event: EmergencyWithdraw({{emergencyWithdrawParams}})
-          handler: {{emergencyWithdrawHandler}}
+          handler: { { emergencyWithdrawHandler } }
       file: ./src/mappings/masterChef.ts
 
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: {{network}}
+    network: { { network } }
     source:
       abi: Pair
     mapping:
@@ -64,11 +64,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/Pair.json
+          file: ./abis/apeswap/Pair.json
         - name: Factory
-          file: ./abis/Factory.json
+          file: ./abis/apeswap/Factory.json
         - name: ERC20
-          file: ./abis/IERC20.json
+          file: ./abis/apeswap/IERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

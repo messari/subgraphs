@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
 import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/_networkConfig";
+import { NetworkConfigs, Protocol } from "../../config/_networkConfig";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import {
   DexAmmProtocol,
@@ -16,16 +16,7 @@ import {
   Token,
   RewardToken,
 } from "../../generated/schema";
-import {
-  BIGDECIMAL_ZERO,
-  HelperStoreType,
-  INT_ZERO,
-  ProtocolType,
-  SECONDS_PER_DAY,
-  DEFAULT_DECIMALS,
-  RewardTokenType,
-  BIGINT_ZERO,
-} from "./constants";
+import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType, BIGINT_ZERO } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
@@ -84,9 +75,7 @@ export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
   return transfer;
 }
 
-export function getOrCreateUsageMetricSnapshot(
-  event: ethereum.Event,
-): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
@@ -117,7 +106,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
     event.address
       .toHexString()
       .concat("-")
-      .concat(id),
+      .concat(id)
   );
 
   if (!poolMetrics) {
@@ -125,7 +114,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
       event.address
         .toHexString()
         .concat("-")
-        .concat(id),
+        .concat(id)
     );
     poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
@@ -185,11 +174,7 @@ export function getOrCreateToken(address: string): Token {
   return token as Token;
 }
 
-export function getOrCreateLPToken(
-  tokenAddress: string,
-  token0: Token,
-  token1: Token,
-): Token {
+export function getOrCreateLPToken(tokenAddress: string, token0: Token, token1: Token): Token {
   let token = Token.load(tokenAddress);
   // fetch info if null
   if (token === null) {
