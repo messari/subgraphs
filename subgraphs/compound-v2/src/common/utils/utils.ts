@@ -18,6 +18,11 @@ export function getExchangeRate(marketAddress: Address): BigInt {
   return cTokenContract.exchangeRateStored();
 }
 
+// (a/b)^n where n [0, 255]
+export function pow(a: BigInt, b: BigInt, n: u8): BigDecimal {
+  return a.pow(n).toBigDecimal().div(b.pow(n).toBigDecimal());
+}
+
 // utilizes exponentiation by squaring: https://stackoverflow.com/a/34660211
 // for all exp >= 0
 export function powBigDecimal(base: BigDecimal, exp: BigInt): BigDecimal {

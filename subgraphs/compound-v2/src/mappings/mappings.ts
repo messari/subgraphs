@@ -13,9 +13,8 @@ import { NewReserveFactor } from "../../generated/Comptroller/CToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ONEHUNDRED,
   BIGDECIMAL_ZERO,
   COLLATERAL_FACTOR_OFFSET,

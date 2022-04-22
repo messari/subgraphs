@@ -341,12 +341,12 @@ type Market @entity {
   _exchangeRate: BigDecimal!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
-  _supplySideRevenueUSDPerBlock: BigDecimal!
+  _supplySideRevenueUSD: BigDecimal!
 
   " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
-  _protocolSideRevenueUSDPerBlock: BigDecimal!
+  _protocolSideRevenueUSD: BigDecimal!
 
-  _totalRevenueUSDPerBlock: BigDecimal!
+  _totalRevenueUSD: BigDecimal!
 
   deposits: [Deposit!]! @derivedFrom(field: "market")
 

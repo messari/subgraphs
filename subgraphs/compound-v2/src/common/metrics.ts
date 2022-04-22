@@ -9,6 +9,7 @@ import {
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, DailyActiveAccount } from "../../generated/schema";
 import { SECONDS_PER_DAY } from "./utils/constants";
+import { BIGDECIMAL_ZERO } from "./prices/common/constants";
 
 ///////////////////////////
 //// Snapshot Entities ////
@@ -27,25 +28,20 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.totalBorrowUSD = protocol.totalBorrowUSD;
 
   if (event.block.number > financialMetrics.blockNumber) {
-    // get block difference to catch any blocks that have no transactions (unlikely, but needs to be accounted)
-    let blockDiff = event.block.number.minus(financialMetrics.blockNumber).toBigDecimal();
-
     // only add to revenues if the financialMetrics has not seen this block number
+    let supplyRevenue = BIGDECIMAL_ZERO;
+    let protocolRevenue = BIGDECIMAL_ZERO;
+    let totalRevenue = BIGDECIMAL_ZERO;
     for (let i = 0; i < protocol._marketIds.length; i++) {
       let market = getOrCreateMarket(event, event.address);
 
-      financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-        market._supplySideRevenueUSDPerBlock.times(blockDiff),
-      );
-      financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
-        market._protocolSideRevenueUSDPerBlock.times(blockDiff),
-      );
-
-      // fees are just the totalRevenue (to be changed: https://github.com/messari/subgraphs/pull/47)
-      financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
-        market._totalRevenueUSDPerBlock.times(blockDiff),
-      );
+      supplyRevenue = supplyRevenue.plus(market._supplySideRevenueUSD);
+      protocolRevenue = protocolRevenue.plus(market._protocolSideRevenueUSD);
+      totalRevenue = totalRevenue.plus(market._totalRevenueUSD);
     }
+    financialMetrics.supplySideRevenueUSD = supplyRevenue;
+    financialMetrics.protocolSideRevenueUSD = protocolRevenue;
+    financialMetrics.totalRevenueUSD = totalRevenue;
   }
 
   // update the block number and timestamp

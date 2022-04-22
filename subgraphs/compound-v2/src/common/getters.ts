@@ -36,7 +36,7 @@ import {
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
 import { CToken } from "../../generated/Comptroller/CToken";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
 import { Comptroller } from "../../generated/Comptroller/Comptroller";
 
@@ -76,20 +76,12 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
     marketMetrics.protocol = COMPTROLLER_ADDRESS;
     marketMetrics.market = marketAddress;
     marketMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    let inputBalances = new Array<BigInt>();
-    inputBalances.push(BIGINT_ZERO);
-    marketMetrics.inputTokenBalances = inputBalances;
-    let inputPrices = new Array<BigDecimal>();
-    marketMetrics.inputTokenPricesUSD = inputPrices;
+    marketMetrics.inputTokenBalances = [BIGINT_ZERO];
+    marketMetrics.inputTokenPricesUSD = [BIGDECIMAL_ZERO];
     marketMetrics.outputTokenSupply = BIGINT_ZERO;
     marketMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    let emissionsAmount = new Array<BigInt>();
-    emissionsAmount.push(BIGINT_ZERO);
-    marketMetrics.rewardTokenEmissionsAmount = emissionsAmount;
-    let emissionsUSD = new Array<BigDecimal>();
-    emissionsUSD.push(BIGDECIMAL_ZERO);
-    emissionsUSD.push(BIGDECIMAL_ZERO);
-    marketMetrics.rewardTokenEmissionsUSD = emissionsUSD;
+    marketMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+    marketMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     marketMetrics.blockNumber = event.block.number;
     marketMetrics.timestamp = event.block.timestamp;
     marketMetrics.depositRate = BIGDECIMAL_ZERO;
@@ -200,14 +192,9 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         Address.fromString(COMP_ADDRESS),
         RewardTokenType.BORROW,
       );
-      let rewardTokenArr = new Array<string>();
-      rewardTokenArr.push(rewardTokenDeposit.id);
-      rewardTokenArr.push(rewardTokenBorrow.id);
-      market.rewardTokens = rewardTokenArr;
+      market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
     }
-    let inputTokens = new Array<string>();
-    inputTokens.push(inputToken.id);
-    market.inputTokens = inputTokens;
+    market.inputTokens = [inputToken.id];
     market.outputToken = outputToken.id;
 
     // populate quantitative data
@@ -216,22 +203,12 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.totalDepositUSD = BIGDECIMAL_ZERO;
     market.totalBorrowUSD = BIGDECIMAL_ZERO;
     market._totalBorrowNative = BIGINT_ZERO;
-    let inputTokenBalances = new Array<BigInt>();
-    inputTokenBalances.push(BIGINT_ZERO);
-    market.inputTokenBalances = inputTokenBalances;
-    let inputTokenPrices = new Array<BigDecimal>();
-    inputTokenPrices.push(BIGDECIMAL_ZERO);
-    market.inputTokenPricesUSD = inputTokenPrices;
+    market.inputTokenBalances = [BIGINT_ZERO];
+    market.inputTokenPricesUSD = [BIGDECIMAL_ZERO];
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    let emissionsAmount = new Array<BigInt>();
-    emissionsAmount.push(BIGINT_ZERO);
-    emissionsAmount.push(BIGINT_ZERO);
-    market.rewardTokenEmissionsAmount = emissionsAmount;
-    let emissionsUSD = new Array<BigDecimal>();
-    emissionsUSD.push(BIGDECIMAL_ZERO);
-    emissionsUSD.push(BIGDECIMAL_ZERO);
-    market.rewardTokenEmissionsUSD = emissionsUSD;
+    market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+    market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
     market._currentBlockNumber = event.block.number;
@@ -257,9 +234,9 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
       ? BIGDECIMAL_ZERO
       : tryReserveFactor.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
     market._exchangeRate = INITIAL_EXCHANGE_RATE;
-    market._supplySideRevenueUSDPerBlock = BIGDECIMAL_ZERO;
-    market._protocolSideRevenueUSDPerBlock = BIGDECIMAL_ZERO;
-    market._totalRevenueUSDPerBlock = BIGDECIMAL_ZERO;
+    market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
+    market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    market._totalRevenueUSD = BIGDECIMAL_ZERO;
     market.liquidationPenalty = protocol._liquidationPenalty;
 
     market.save();
