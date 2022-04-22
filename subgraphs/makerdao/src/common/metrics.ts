@@ -1,13 +1,6 @@
-import { BigDecimal, Address, ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Address, ethereum, Bytes } from "@graphprotocol/graph-ts";
 import { Account, DailyActiveAccount } from "../../generated/schema";
-import {
-  INT_ZERO,
-  SECONDS_PER_DAY,
-  BIGDECIMAL_ZERO,
-  BIGDECIMAL_ONE,
-  MCD_VAT_ADDRESS,
-  RAD,
-} from "./constants";
+import { INT_ZERO, SECONDS_PER_DAY, BIGDECIMAL_ZERO, BIGDECIMAL_ONE, MCD_VAT_ADDRESS, RAD } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
   getOrCreateUsageMetricSnapshot,
@@ -57,10 +50,10 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 }
 
 // Update MarketDailySnapshot entity
-export function updateMarketMetrics(ilk:Bytes,event: ethereum.Event): void {
+export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   // get or create market metrics
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event);
-  let market = getMarketFromIlk(ilk)
+  let market = getMarketFromIlk(ilk);
   let protocol = getOrCreateLendingProtocol();
   let inputTokenPricesUSD = [getOrCreateTokenPriceEntity(market.inputTokens[INT_ZERO]).priceUSD];
 
@@ -90,10 +83,10 @@ export function updateTVL(event: ethereum.Event): void {
     let marketAddress = marketIdList[i];
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD);
   }
-  let totalBorrowUSD = bigIntToBigDecimal(Vat.bind(Address.fromString(MCD_VAT_ADDRESS)).debt(),RAD);
+  let totalBorrowUSD = bigIntToBigDecimal(Vat.bind(Address.fromString(MCD_VAT_ADDRESS)).debt(), RAD);
   LendingProtocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
   LendingProtocol.totalDepositUSD = protocolTotalValueLockedUSD;
-  LendingProtocol.totalBorrowUSD = totalBorrowUSD
+  LendingProtocol.totalBorrowUSD = totalBorrowUSD;
   financialsDailySnapshot.totalValueLockedUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshot.totalDepositUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshot.totalBorrowUSD = totalBorrowUSD; // current balance
@@ -102,5 +95,3 @@ export function updateTVL(event: ethereum.Event): void {
   LendingProtocol.save();
   financialsDailySnapshot.save();
 }
-
-

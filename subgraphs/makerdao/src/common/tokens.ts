@@ -6,7 +6,6 @@ import { Address } from "@graphprotocol/graph-ts";
 export const INVALID_TOKEN_DECIMALS = 9999;
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
-
 export function fetchTokenSymbol(tokenAddress: Address): string {
   let contract = ERC20.bind(tokenAddress);
   let contractSymbolBytes = ERC20SymbolBytes.bind(tokenAddress);

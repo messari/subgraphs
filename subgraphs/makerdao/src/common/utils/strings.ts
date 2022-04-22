@@ -44,5 +44,5 @@ export function enumToPrefix(snake: string): string {
 }
 
 export function createEntityID(event: ethereum.Event): string {
-  return event.transaction.hash.toHexString() + "-" + event.logIndex.toString()
- }
+  return event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+}

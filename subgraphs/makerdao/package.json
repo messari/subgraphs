@@ -2,6 +2,7 @@
   "name": "makerdao",
   "license": "UNLICENSED",
   "scripts": {
+    "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ tannishmango/makerdao",
@@ -11,7 +12,6 @@
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "0.24.1",
-    "@protofire/subgraph-toolkit": "^0.1.2"
+    "@graphprotocol/graph-ts": "0.24.1"
   }
 }

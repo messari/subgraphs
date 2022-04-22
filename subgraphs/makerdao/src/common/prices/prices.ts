@@ -1,9 +1,7 @@
-
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { _TokenPricesUsd } from "../../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, BIGDECIMAL_ONE } from "../../common/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
-
 
 export function getOrCreateTokenPriceEntity(tokenAddress: string): _TokenPricesUsd {
   let tokenPriceEntity = _TokenPricesUsd.load(tokenAddress);

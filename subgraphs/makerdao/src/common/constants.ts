@@ -86,6 +86,10 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_THREE = BigInt.fromI32(3);
+export const BIGINT_SIX = BigInt.fromI32(6);
+export const BIGINT_TWELVE = BigInt.fromI32(12);
+
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
@@ -100,9 +104,13 @@ export const NEG_INT_ONE = -1 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
-export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BigInt.fromI32(100));
-export const BIGDECIMAL_NEG_ONE = BigDecimal.fromString("-1")
+export const BIGDECIMAL_THREE = new BigDecimal(BIGINT_THREE);
 
+export const BIGDECIMAL_SIX = new BigDecimal(BIGINT_SIX);
+export const BIGDECIMAL_TWELVE = new BigDecimal(BIGINT_TWELVE);
+export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BigInt.fromI32(100));
+export const BIGDECIMAL_ONE_THOUSAND = new BigDecimal(BigInt.fromI32(1000));
+export const BIGDECIMAL_NEG_ONE = BigDecimal.fromString("-1");
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -115,9 +123,9 @@ export const RAD = 45 as i32;
 /////////////////////
 
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
-export const SECONDS_PER_YEAR = new BigDecimal(BigInt.fromI32(60 * 60 * 24 * 365));
+export const SECONDS_PER_YEAR = 60 * 60 * 24 * 365;
 export const SECONDS_PER_YEAR_BIGINT = BigInt.fromI32(60 * 60 * 24 * 365);
-export const SECONDS_PER_YEAR_BIGDECIMAL = new BigDecimal((BigInt.fromI32(60 * 60 * 24 * 365)));
+export const SECONDS_PER_YEAR_BIGDECIMAL = new BigDecimal(BigInt.fromI32(60 * 60 * 24 * 365));
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
@@ -133,15 +141,14 @@ export const MCD_CAT_ADDRESS = "0x78F2c2AF65126834c51822F56Be0d7469D7A523E".toLo
 export const MCD_CAT_V2_ADDRESS = "0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea".toLowerCase();
 export const MCD_VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
 export const MCD_VOW_ADDRESS = "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
-export const ILK_REGISTRY_1_ADDRESS = "0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24".toLowerCase(); 
+export const ILK_REGISTRY_1_ADDRESS = "0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24".toLowerCase();
 export const ILK_REGISTRY_1_STARTBLOCK = BigInt.fromI32(10744721);
-export const ILK_REGISTRY_2_ADDRESS = "0x5a464C28D19848f44199D003BeF5ecc87d090F87".toLowerCase(); 
+export const ILK_REGISTRY_2_ADDRESS = "0x5a464C28D19848f44199D003BeF5ecc87d090F87".toLowerCase();
 export const ILK_REGISTRY_2_STARTBLOCK = BigInt.fromI32(12251871);
 
-export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase()
+export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
-export const ADDRESS_LENGTH = 20
+export const ADDRESS_LENGTH = 20;
 
 export const VOW_ADDRESS_TOPIC = "0x000000000000000000000000a950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
 export const POT_ADDRESS_TOPIC = "0x000000000000000000000000197e90f9fad81970ba7976f33cbd77088e5d7cf7".toLowerCase();
-

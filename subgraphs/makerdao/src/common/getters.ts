@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, Bytes, ethereum, log, BigInt } from "@graphprotocol/graph-ts";
+import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   UsageMetricsDailySnapshot,
@@ -124,17 +124,16 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
 ///////// Helpers /////////
 ///////////////////////////
 
-function getIlkMarketAddress(ilk:Bytes): string {
-  let ilkEntity = _Ilk.load(ilk.toString())
-  if (!ilkEntity){
-    return ZERO_ADDRESS
+function getIlkMarketAddress(ilk: Bytes): string {
+  let ilkEntity = _Ilk.load(ilk.toString());
+  if (!ilkEntity) {
+    return ZERO_ADDRESS;
   }
-  return ilkEntity.marketAddress
+  return ilkEntity.marketAddress;
 }
 
-
 export function getMarketFromIlk(ilk: Bytes): Market {
-  let marketAddress = getIlkMarketAddress(ilk)
+  let marketAddress = getIlkMarketAddress(ilk);
   let market = Market.load(marketAddress);
   if (market) {
     return market;
@@ -150,17 +149,17 @@ export function getMarket(marketAddress: string): Market {
   return new Market(marketAddress);
 }
 
-export function getProxy(proxyAddress:Address): _Proxy {
-  let proxy = _Proxy.load(proxyAddress.toHexString())
-  if(!proxy){
-    proxy = new _Proxy(proxyAddress.toHexString())
-    let ownerCall = DsProxy.bind(proxyAddress).try_owner()
-    if (!ownerCall.reverted){
-      proxy.owner = ownerCall.value.toHexString()
+export function getProxy(proxyAddress: Address): _Proxy {
+  let proxy = _Proxy.load(proxyAddress.toHexString());
+  if (!proxy) {
+    proxy = new _Proxy(proxyAddress.toHexString());
+    let ownerCall = DsProxy.bind(proxyAddress).try_owner();
+    if (!ownerCall.reverted) {
+      proxy.owner = ownerCall.value.toHexString();
     } else {
-      proxy.owner = ZERO_ADDRESS
+      proxy.owner = ZERO_ADDRESS;
     }
-    proxy.save()
+    proxy.save();
   }
-  return proxy
+  return proxy;
 }

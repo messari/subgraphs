@@ -1,14 +1,8 @@
 import { Address, Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { Market, _Ilk } from "../../generated/schema";
 import { getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
-import { GemJoin } from "../../generated/Vat/GemJoin"
-import {
-  BIGDECIMAL_ZERO,
-  BIGDECIMAL_ONE,
-  BIGINT_ZERO,
-  DAI,
-} from "../common/constants";
-
+import { GemJoin } from "../../generated/Vat/GemJoin";
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGINT_ZERO, DAI } from "../common/constants";
 
 export function updateProtocolMarketList(marketAddress: string): void {
   let protocol = getOrCreateLendingProtocol();
@@ -18,14 +12,14 @@ export function updateProtocolMarketList(marketAddress: string): void {
   protocol.save();
 }
 
-function createIlk(ilkBytes:Bytes,marketAddress:Address): void {
-  let ilk = new _Ilk(ilkBytes.toString())
-  ilk.marketAddress = marketAddress.toHexString()
-  ilk.save()
+function createIlk(ilkBytes: Bytes, marketAddress: Address): void {
+  let ilk = new _Ilk(ilkBytes.toString());
+  ilk.marketAddress = marketAddress.toHexString();
+  ilk.save();
 }
 
-export function createMarket(ilk: Bytes, marketAddress:Address, blockNumber: BigInt, blockTimestamp: BigInt): void {
-  createIlk(ilk,marketAddress)
+export function createMarket(ilk: Bytes, marketAddress: Address, blockNumber: BigInt, blockTimestamp: BigInt): void {
+  createIlk(ilk, marketAddress);
   let MarketEntity = new Market(marketAddress.toHexString());
   let MarketContract = GemJoin.bind(marketAddress);
   let inputToken = getOrCreateToken(MarketContract.gem());
