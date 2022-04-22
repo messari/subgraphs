@@ -29,4 +29,3 @@ export function handleFile(event: LogNote): void {
     }
   }
 }
-

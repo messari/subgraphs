@@ -1,7 +1,6 @@
 import { Address, Bytes, BigInt } from "@graphprotocol/graph-ts";
 import { Market, _Ilk } from "../../generated/schema";
 import { getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
-import { GemJoin } from "../../generated/Vat/GemJoin";
 import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGINT_ZERO, DAI } from "../common/constants";
 
 export function updateProtocolMarketList(marketAddress: string): void {
@@ -18,11 +17,16 @@ function createIlk(ilkBytes: Bytes, marketAddress: Address): void {
   ilk.save();
 }
 
-export function createMarket(ilk: Bytes, marketAddress: Address, blockNumber: BigInt, blockTimestamp: BigInt): void {
+export function createMarket(
+  ilk: Bytes,
+  gemAddress: Address,
+  marketAddress: Address,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt,
+): void {
   createIlk(ilk, marketAddress);
   let MarketEntity = new Market(marketAddress.toHexString());
-  let MarketContract = GemJoin.bind(marketAddress);
-  let inputToken = getOrCreateToken(MarketContract.gem());
+  let inputToken = getOrCreateToken(gemAddress);
   MarketEntity.protocol = getOrCreateLendingProtocol().id;
   MarketEntity.inputTokens = [inputToken.id];
   MarketEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -30,6 +34,8 @@ export function createMarket(ilk: Bytes, marketAddress: Address, blockNumber: Bi
   MarketEntity.outputToken = getOrCreateToken(Address.fromString(DAI)).id;
   MarketEntity.outputTokenSupply = BIGINT_ZERO;
   MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
+  MarketEntity.totalBorrowUSD = BIGDECIMAL_ZERO;
+  MarketEntity.totalDepositUSD = BIGDECIMAL_ZERO;
   MarketEntity.createdTimestamp = blockTimestamp;
   MarketEntity.createdBlockNumber = blockNumber;
   MarketEntity.name = ilk.toString();

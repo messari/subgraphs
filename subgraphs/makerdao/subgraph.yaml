@@ -61,6 +61,10 @@ dataSources:
           handler: handleGrab
 
         ### Settlement ###
+        # function heal(uint256 rad)
+        - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
+          topic0: '0xf37ac61c00000000000000000000000000000000000000000000000000000000'
+          handler: handleHeal
         # function suck(address u, address v, uint256 rad)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: '0xf24e23eb00000000000000000000000000000000000000000000000000000000'

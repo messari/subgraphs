@@ -1,6 +1,6 @@
 import { Address, ethereum, Bytes } from "@graphprotocol/graph-ts";
 import { Account, DailyActiveAccount } from "../../generated/schema";
-import { INT_ZERO, SECONDS_PER_DAY, BIGDECIMAL_ZERO, BIGDECIMAL_ONE, MCD_VAT_ADDRESS, RAD } from "./constants";
+import { INT_ZERO, SECONDS_PER_DAY, BIGDECIMAL_ZERO, BIGDECIMAL_ONE } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
   getOrCreateUsageMetricSnapshot,
@@ -10,8 +10,6 @@ import {
 } from "./getters";
 import { getOrCreateTokenPriceEntity } from "./prices/prices";
 import { getMarketFromIlk } from "../common/getters";
-import { Vat } from "../../generated/Vat/Vat";
-import { bigIntToBigDecimal } from "./utils/numbers";
 
 // usageDailySnapshot
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
@@ -75,6 +73,7 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
 
 export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
+  // totalBorrowUSD handled in handleFold, handleSuck, handleHeal, handleFrob,
   let LendingProtocol = getOrCreateLendingProtocol();
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let marketIdList = LendingProtocol.marketIdList;
@@ -83,13 +82,10 @@ export function updateTVL(event: ethereum.Event): void {
     let marketAddress = marketIdList[i];
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(getMarket(marketAddress).totalValueLockedUSD);
   }
-  let totalBorrowUSD = bigIntToBigDecimal(Vat.bind(Address.fromString(MCD_VAT_ADDRESS)).debt(), RAD);
   LendingProtocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
   LendingProtocol.totalDepositUSD = protocolTotalValueLockedUSD;
-  LendingProtocol.totalBorrowUSD = totalBorrowUSD;
   financialsDailySnapshot.totalValueLockedUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshot.totalDepositUSD = protocolTotalValueLockedUSD;
-  financialsDailySnapshot.totalBorrowUSD = totalBorrowUSD; // current balance
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   LendingProtocol.save();
