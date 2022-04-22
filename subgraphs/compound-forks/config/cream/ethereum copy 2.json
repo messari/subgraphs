@@ -1,0 +1,16 @@
+{
+  "network": "mainnet",
+  "name": "cream",
+  "startBlock": 10579797,
+  "protocolAddress": "0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258",
+  "file": "./src/mappings/cream/mappings.ts",
+  "COMP_ADDRESS": "0x2ba592F78dB6436527729929AAf6c908497cB200",
+  "CCOMP_ADDRESS": "0x892B14321a4FCba80669aE30Bd0cd99a7ECF6aC0",
+  "CUSDT_ADDRESS": "0x797AAB1ce7c01eB727ab980762bA88e7133d2157",
+  "CETH_ADDRESS": "0xD06527D5e56A3495252A528C4987003b712860eE",
+  "COMP_BLOCK": 10594024,
+  "CCOMP_BLOCK": 10638857,
+  "NAME": "Cream",
+  "SLUG": "Cream",
+  "DECIMALS": 8
+}

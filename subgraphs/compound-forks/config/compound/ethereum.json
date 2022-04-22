@@ -1,0 +1,16 @@
+{
+  "network": "mainnet",
+  "name": "compound",
+  "startBlock": 7710671,
+  "file": "./src/mappings/compound/mappings.ts",
+  "protocolAddress": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
+  "COMP_ADDRESS": "0xc00e94cb662c3520282e6f5717214004a7f26888",
+  "CCOMP_ADDRESS": "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4",
+  "CUSDT_ADDRESS": "0xf650c3d88d12db855b8bf7d11be6c55a4e07dcc9",
+  "CETH_ADDRESS": "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5",
+  "COMP_BLOCK": 9601359,
+  "CCOMP_BLOCK": 10960099,
+  "NAME": "Compound v2",
+  "SLUG": "Compound-v2",
+  "DECIMALS": 8
+}

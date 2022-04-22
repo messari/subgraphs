@@ -5,17 +5,17 @@ schema:
 
 dataSources:
   - kind: ethereum/contract
-    name: cream
-    network: mainnet
+    name: {{name}}
+    network: {{network}}
     source:
-      startBlock: 10579797
-      address: "0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258"
+      startBlock: {{startBlock}}
+      address: "{{protocolAddress}}"
       abi: Comptroller
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: "./src/mappings/cream/mappings.ts" 
+      file: "./src/mappings/{{name}}/mappings.ts" 
       entities:
         - LendingProtocol
         - Market
@@ -49,7 +49,7 @@ dataSources:
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: mainnet
+    network: {{network}}
     source:
       abi: CToken
     mapping:

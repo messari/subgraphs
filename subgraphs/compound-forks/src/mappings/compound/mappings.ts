@@ -1,5 +1,6 @@
 // map blockchain data to entities outlined in schema.graphql
 import {
+  ActionPaused1,
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
@@ -13,57 +14,22 @@ import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../..
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../../common/getters";
 import { exponentToBigDecimal } from "../../common/utils/utils";
 import { Address, DataSourceContext } from "@graphprotocol/graph-ts";
-import { BIGDECIMAL_ONE, COMPTROLLER_ADDRESS, DEFAULT_DECIMALS } from "../../common/utils/constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
+  COLLATERAL_FACTOR_OFFSET,
+  COMPTROLLER_ADDRESS,
+  DEFAULT_DECIMALS,
+} from "../../common/utils/constants";
 
-export function handleMint(event: Mint): void {
-  if (
-    createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter, COMPTROLLER_ADDRESS)
-  ) {
-    updateUsageMetrics(event, event.params.minter, COMPTROLLER_ADDRESS);
-    updateFinancials(event, COMPTROLLER_ADDRESS);
-    updateMarketMetrics(event, COMPTROLLER_ADDRESS);
+export function handleActionPaused(event: ActionPaused1): void {
+  let market = getOrCreateMarket(event, event.params.cToken, COMPTROLLER_ADDRESS);
+  if (event.params.action == "Mint") {
+    market.isActive = event.params.pauseState;
+  } else if (event.params.action == "Borrow") {
+    market.canBorrowFrom = event.params.pauseState;
   }
-}
-
-export function handleRedeem(event: Redeem): void {
-  if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount, COMPTROLLER_ADDRESS)) {
-    updateUsageMetrics(event, event.params.redeemer, COMPTROLLER_ADDRESS);
-    updateFinancials(event, COMPTROLLER_ADDRESS);
-    updateMarketMetrics(event, COMPTROLLER_ADDRESS);
-  }
-}
-
-export function handleBorrow(event: Borrow): void {
-  if (createBorrow(event, event.params.borrower, event.params.borrowAmount, COMPTROLLER_ADDRESS)) {
-    updateUsageMetrics(event, event.params.borrower, COMPTROLLER_ADDRESS);
-    updateFinancials(event, COMPTROLLER_ADDRESS);
-    updateMarketMetrics(event, COMPTROLLER_ADDRESS);
-  }
-}
-
-export function handleRepayBorrow(event: RepayBorrow): void {
-  if (createRepay(event, event.params.payer, event.params.repayAmount, COMPTROLLER_ADDRESS)) {
-    updateUsageMetrics(event, event.params.payer, COMPTROLLER_ADDRESS);
-    updateFinancials(event, COMPTROLLER_ADDRESS);
-    updateMarketMetrics(event, COMPTROLLER_ADDRESS);
-  }
-}
-
-export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  if (
-    createLiquidation(
-      event,
-      event.params.cTokenCollateral,
-      event.params.liquidator,
-      event.params.seizeTokens,
-      event.params.repayAmount,
-      COMPTROLLER_ADDRESS,
-    )
-  ) {
-    updateUsageMetrics(event, event.params.liquidator, COMPTROLLER_ADDRESS);
-    updateFinancials(event, COMPTROLLER_ADDRESS);
-    updateMarketMetrics(event, COMPTROLLER_ADDRESS);
-  }
+  market.save();
 }
 
 export function handleMarketListed(event: MarketListed): void {
@@ -82,28 +48,20 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
   lendingProtocol.save();
 }
 
-export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let market = getOrCreateMarket(event, event.address, COMPTROLLER_ADDRESS);
-
-  // update financials in case the reserve is updated and no other compound transactions happen in that block
-  // intended for capturing accurate revenues
-  updateFinancials(event, COMPTROLLER_ADDRESS);
-
-  // get reserve factor
-  market._reserveFactor = event.params.newReserveFactorMantissa
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
-  market.save();
-}
-
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   let market = getOrCreateMarket(event, event.params.cToken, COMPTROLLER_ADDRESS);
-  let newLTV = event.params.newCollateralFactorMantissa.toBigDecimal().div(exponentToBigDecimal(16));
+  let newLTV = event.params.newCollateralFactorMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(COLLATERAL_FACTOR_OFFSET));
   market.maximumLTV = newLTV;
   // collateral factor is the borrowing capacity. The liquidity a borrower has is the collateral factor
   // ex: if collateral factor = 75% and the user has 100 USD (normalized) they can borrow $75
   //     if that ratio rises above 75% they are at risk of liquidation
   market.liquidationThreshold = newLTV;
+  if (market.maximumLTV == BIGDECIMAL_ZERO) {
+    // when collateral factor is 0 the asset CANNOT be used as collateral
+    market.canUseAsCollateral = false;
+  }
   market.save();
 }
 

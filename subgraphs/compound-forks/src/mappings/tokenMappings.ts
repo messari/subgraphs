@@ -27,7 +27,9 @@ export function handleMint(event: Mint): void {
 export function handleRedeem(event: Redeem): void {
   const context = dataSource.context();
   const protocolAddress = context.getString("protocolAddress");
-  if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount, protocolAddress)) {
+  if (
+    createWithdraw(event, event.params.redeemer, event.params.redeemAmount, event.params.redeemTokens, protocolAddress)
+  ) {
     updateUsageMetrics(event, event.params.redeemer, protocolAddress);
     updateFinancials(event, protocolAddress);
     updateMarketMetrics(event, protocolAddress);

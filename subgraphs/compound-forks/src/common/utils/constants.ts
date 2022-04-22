@@ -180,7 +180,8 @@ export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
-export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
+export const BLOCKS_PER_DAY = BigDecimal.fromString("6570"); // blocks every 13.15 seconds
+export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(DAYS_PER_YEAR);
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -190,6 +191,8 @@ export const NETWORK_ETHEREUM = Network.ETHEREUM;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
-export const SUBGRAPH_VERSION = "1.4.10";
-export const SCHEMA_VERSION = "1.0.1";
+export const SUBGRAPH_VERSION = "1.4.16";
+export const SCHEMA_VERSION = "1.1.0";
 export const COMPOUND_DECIMALS = 8;
+export const INITIAL_EXCHANGE_RATE = BigDecimal.fromString(".02");
+export const COLLATERAL_FACTOR_OFFSET = 16;
