@@ -31,10 +31,18 @@ export function getPriceUsdc(tokenAddress: Address, network: string): CustomPric
 }
 
 export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): CustomPriceType {
-  return getPriceFromRouter(tokenAddress, constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!, network);
+  return getPriceFromRouter(
+    tokenAddress,
+    constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!,
+    network,
+  );
 }
 
-export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
+export function getPriceFromRouter(
+  token0Address: Address,
+  token1Address: Address,
+  network: string,
+): CustomPriceType {
   let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
   let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
 
@@ -127,7 +135,10 @@ export function getLpTokenPriceUsdc(tokenAddress: Address, network: string): Cus
   return CustomPriceType.initialize(pricePerLpTokenUsdc);
 }
 
-export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: string): CustomPriceType {
+export function getLpTokenTotalLiquidityUsdc(
+  tokenAddress: Address,
+  network: string,
+): CustomPriceType {
   const sushiSwapPair = SushiSwapPairContract.bind(tokenAddress);
 
   let token0Address = utils.readValue<Address>(sushiSwapPair.try_token0(), constants.ZERO_ADDRESS);
@@ -160,16 +171,14 @@ export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: str
 
   if (reserve0.notEqual(constants.BIGINT_ZERO) || reserve1.notEqual(constants.BIGINT_ZERO)) {
     let totalLiquidity = reserve0
-      .div(constants.BIGINT_TEN)
-      .pow(token0Decimals.toI32() as u8)
+      .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
       .toBigDecimal()
-      .times(token0Price.usdPrice)
+      .times(token0Price.usdPrice.div(constants.BIGINT_TEN.pow(6).toBigDecimal()))
       .plus(
         reserve1
-          .div(constants.BIGINT_TEN)
-          .pow(token1Decimals.toI32() as u8)
+          .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
           .toBigDecimal()
-          .times(token1Price.usdPrice),
+          .times(token1Price.usdPrice.div(constants.BIGINT_TEN.pow(6).toBigDecimal())),
       );
 
     return CustomPriceType.initialize(totalLiquidity);

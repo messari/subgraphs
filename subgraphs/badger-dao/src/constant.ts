@@ -66,9 +66,29 @@ export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 // null address
 export const NULL_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
 
-// chainlink's token price contract
-export const BSC_CHAINLINK_PRICE_ADDRESS = "0x0377954c16c5c47322F3BA09E6c32eF25b62E57B";
-export const BSC_BNB_CHAINLINK_PRICE_ADDRESS = "0xe4DE571bCe6c099D9152a09231FA3c65F1A564B5"; // after 8M block
+// tokens array separated by router which provides their prices for faster lookup
+export namespace RouterType {
+  export const SUSHI_ROUTER = "SUSHI_ROUTER";
+  export const CURVE_ROUTER = "CURVE_ROUTER";
+  export const YEARN_ROUTER = "YEARN_ROUTER";
+}
 
-// WBNB token address
-export const WRAPPED_BNB = Address.fromString("0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c");
+export const SUSHI_ROUTER_TOKENS = [
+  Address.fromString("0x4e3fbd56cd56c3e72c1403e103b45db9da5b9d2b"),
+  Address.fromString("0x62b9c7356a2dc64a1969e19c23e4f579f9810aa7"),
+  Address.fromString("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"),
+  Address.fromString("0x798d1be841a82a273720ce31c822c61a67a601c3"),
+  Address.fromString("0x9a13867048e01c663ce8ce2fe0cdae69ff9f35e3"),
+  Address.fromString("0xceff51756c56ceffca006cd410b03ffc46dd3a58"),
+  Address.fromString("0x110492b31c59716ac47337e616804e3e3adc0b4a"),
+];
+
+export const CURVE_ROUTER_TOKENS = [
+  Address.fromString("0x49849c98ae39fff122806c06791fa73784fb3675"),
+];
+
+export const YEARN_ROUTER_TOKENS = [
+  Address.fromString("0xc4ad29ba4b3c580e6d59105fff484999997675ff"),
+  Address.fromString("0x04c90c198b2eff55716079bc06d7ccc4aa4d7512"),
+  Address.fromString("0xfbdca68601f835b27790d98bbb8ec7f05fdeaa9b"),
+];
