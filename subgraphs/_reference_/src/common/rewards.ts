@@ -115,7 +115,9 @@ export function getRewardsPerDay(
     // return because there is only 1 reference point.
     if (rewardType == RewardIntervalType.TIMESTAMP) {
       return rewardRate.times(RATE_IN_SECONDS_BD);
-    } else return circularBuffer.blocksPerDay.times(rewardRate);
+    } else {
+      return circularBuffer.blocksPerDay.times(rewardRate);
+    }
   }
 
   // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
@@ -123,23 +125,25 @@ export function getRewardsPerDay(
   let recentSavedTimestamp: i32;
   if (circularBuffer.nextIndex == INT_ZERO)
     recentSavedTimestamp = blocks[circularBuffer.bufferSize - INT_TWO];
-  else recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO];
-
-  if (
-    currentTimestampI32 - recentSavedTimestamp <=
-    TIMESTAMP_STORAGE_INTERVAL
-  ) {
+  else {
+    recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO];
+  }
+  
+  if (currentTimestampI32 - recentSavedTimestamp <= TIMESTAMP_STORAGE_INTERVAL) {
     if (rewardType == RewardIntervalType.TIMESTAMP) {
       return rewardRate.times(RATE_IN_SECONDS_BD);
-    } else return circularBuffer.blocksPerDay.times(rewardRate);
+    } else {
+      return circularBuffer.blocksPerDay.times(rewardRate);
+    }
   }
 
   blocks[circularBuffer.nextIndex] = currentTimestampI32;
   blocks[circularBuffer.nextIndex + INT_ONE] = currentBlockNumberI32;
   if (circularBuffer.nextIndex >= BUFFER_SIZE - INT_TWO) {
     circularBuffer.nextIndex = INT_ZERO;
-  } else circularBuffer.nextIndex += INT_TWO;
-
+  } else {
+    circularBuffer.nextIndex += INT_TWO;
+  }
   // The timestamp at the start of the window (default 24 hours in seconds).
   let startTimestamp = currentTimestampI32 - WINDOW_SIZE_SECONDS;
 
@@ -150,9 +154,12 @@ export function getRewardsPerDay(
     // Shift the start of the window if the current timestamp moves out of desired rate window
     if (windowIndexBlockTimestamp < startTimestamp) {
       circularBuffer.windowStartIndex = circularBuffer.windowStartIndex + INT_TWO;
-      if (circularBuffer.windowStartIndex >= circularBuffer.bufferSize)
+      if (circularBuffer.windowStartIndex >= circularBuffer.bufferSize) {
         circularBuffer.windowStartIndex = INT_ZERO;
-    } else break;
+      }
+    } else {
+      break;
+    }
   }
 
   // Wideness of the window in seconds.
