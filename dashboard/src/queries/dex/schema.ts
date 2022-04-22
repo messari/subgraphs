@@ -1,38 +1,41 @@
 import { Schema, Versions } from "../../constants";
 
-export const schema= (version: string)  : Schema => {
-    switch(version){
-        case Versions.Schema100:
-            return schema100()
-        case Versions.Schema110:
-            return schema110()
-        default:
-            return schema100()
-    }
-}
-export const schema100= ()  : Schema => {
-    const entities = ["financialsDailySnapshots","usageMetricsDailySnapshots"];
-    const entititesData = [
-        [
-          "totalValueLockedUSD",
-          "totalVolumeUSD",
-          "protocolSideRevenueUSD",
-          "supplySideRevenueUSD",
-          "feesUSD"
-        ],
-        [
-          "totalUniqueUsers",
-          "dailyTransactionCount",
-          "activeUsers"
-        ]
-      ];
-      const query =`
-      {
+export const schema = (version: string): Schema => {
+  switch (version) {
+    case Versions.Schema100:
+      return schema100();
+    case Versions.Schema110:
+      return schema110();
+    default:
+      return schema100();
+  }
+};
+export const schema100 = (): Schema => {
+  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "poolDailySnapshots"];
+  const entitiesData = [
+    ["totalValueLockedUSD", "totalVolumeUSD", "protocolSideRevenueUSD", "supplySideRevenueUSD", "feesUSD"],
+    ["totalUniqueUsers", "dailyTransactionCount", "activeUsers"],
+    [
+      "totalValueLockedUSD",
+      "totalVolumeUSD",
+      "inputTokenBalances",
+      "outputTokenSupply",
+      "outputTokenPriceUSD",
+      "rewardTokenEmissionsAmount",
+      "rewardTokenEmissionsUSD",
+    ],
+  ];
+  const query = `
+      query Data($poolId: String){
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
+        }
+        liquidityPools {
+          id
+          name
         }
         financialsDailySnapshots(first: 1000) {
           totalValueLockedUSD
@@ -48,43 +51,75 @@ export const schema100= ()  : Schema => {
           activeUsers
           timestamp
         }
+        poolDailySnapshots(first:1000, where: {pool: $poolId}) {
+          totalValueLockedUSD
+          inputTokenBalances
+          outputTokenSupply
+          outputTokenPriceUSD
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
+          totalVolumeUSD
+          timestamp
+        }
+        liquidityPool(id: $poolId){
+          fees{
+            feePercentage
+            feeType
+          }
+          inputTokens {
+            name
+          }
+          outputToken {
+            name
+          }
+          rewardTokens {
+            name
+          }
+          name
+          symbol
+        }
       }
-    `
-    return {entities,entititesData,query}
-}
+    `;
 
-export const schema110= ()  : Schema => {
-    const entities = ["financialsDailySnapshots","usageMetricsDailySnapshots"];
-    const entititesData = [
-        [
-          "totalValueLockedUSD",
-          "totalVolumeUSD",
-          "protocolSideRevenueUSD",
-          "supplySideRevenueUSD",
-          "totalRevenueUSD"
-        ],
-        [
-          "totalUniqueUsers",
-          "dailyTransactionCount",
-          "activeUsers"
-        ]
-      ];
-      const query =`
-      {
+  const poolData = ["name", "symbol", "fees", "inputTokens", "outputToken", "rewardTokens"];
+
+  return { entities, entitiesData, query, poolData };
+};
+
+export const schema110 = (): Schema => {
+  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "poolDailySnapshots"];
+  const entitiesData = [
+    ["totalValueLockedUSD", "totalVolumeUSD", "protocolSideRevenueUSD", "supplySideRevenueUSD", "totalRevenueUSD"],
+    ["totalUniqueUsers", "dailyTransactionCount", "activeUsers"],
+    [
+      "totalValueLockedUSD",
+      "totalVolumeUSD",
+      "inputTokenBalances",
+      "outputTokenSupply",
+      "outputTokenPriceUSD",
+      "rewardTokenEmissionsAmount",
+      "rewardTokenEmissionsUSD",
+    ],
+  ];
+
+  const query = `
+      query Data($poolId: String){
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
-          methodologyVersion
         }
         financialsDailySnapshots(first: 1000) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
           supplySideRevenueUSD
-          totalRevenueUSD
           timestamp
+        }
+        liquidityPools {
+          id
+          name
         }
         usageMetricsDailySnapshots(first: 1000) {
           totalUniqueUsers
@@ -92,8 +127,37 @@ export const schema110= ()  : Schema => {
           activeUsers
           timestamp
         }
+        poolDailySnapshots(first:1000, where: {pool: $poolId}) {
+          totalValueLockedUSD
+          inputTokenBalances
+          outputTokenSupply
+          outputTokenPriceUSD
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
+          totalVolumeUSD
+          timestamp
+        }
+        liquidityPool(id: $poolId){
+          fees{
+            feePercentage
+            feeType
+          }
+          inputTokens{
+            decimals
+            name
+          }
+          outputToken {
+            name
+          }
+          rewardTokens {
+            name
+          }
+          name
+          symbol
+        }
       }
-    `
-    return {entities,entititesData,query}
-}
+      `;
+  const poolData = ["name", "symbol", "fees", "inputTokens", "outputToken", "rewardTokens"];
 
+  return { entities, entitiesData, query, poolData };
+};
