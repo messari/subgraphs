@@ -142,6 +142,66 @@ export function setUSDpriceWETH(
   tokenPrice3.save();
 }
 
+export function setPriceLP(
+  event: ethereum.Event,
+  poolAdd: Address,
+  trader: Address
+): void {
+  let tokenPrice = _TokenPrice.load(poolAdd.toHexString());
+
+  if (!tokenPrice) {
+    tokenPrice = new _TokenPrice(poolAdd.toHexString());
+    let token = getOrCreateToken(poolAdd);
+    tokenPrice.token = token.id;
+  }
+
+  let pool = getOrCreatePool(
+    poolAdd,
+    poolAdd,
+    poolAdd,
+    event.block.number,
+    event.block.timestamp
+  );
+
+  let tokens = pool.inputTokens;
+
+  let token1 = ERC20.bind(Address.fromString(tokens[0]));
+  let token2 = ERC20.bind(Address.fromString(tokens[1]));
+  let lpToken = ERC20.bind(poolAdd);
+
+  let tokenBal1 = token1.try_balanceOf(poolAdd);
+  if (tokenBal1.reverted) {
+    return;
+  }
+
+  let tokenBal2 = token2.try_balanceOf(poolAdd);
+  if (tokenBal2.reverted) {
+    return;
+  }
+
+  let tokeBal1Val = getUSDprice(
+    trader,
+    Address.fromString(tokens[0]),
+    tokenBal1.value
+  );
+
+  let tokeBal2Val = getUSDprice(
+    trader,
+    Address.fromString(tokens[1]),
+    tokenBal2.value
+  );
+
+  let totalValPool = tokeBal1Val + tokeBal2Val;
+
+  let totalSupplyLP = lpToken.totalSupply();
+
+  let valueOfOneLP = safeDiv(totalValPool, bigIntToBigDecimal(totalSupplyLP));
+
+  tokenPrice.currentUSDprice = valueOfOneLP;
+
+  tokenPrice.save();
+}
+
 export function createDeposit(
   event: ethereum.Event,
   to: Address,

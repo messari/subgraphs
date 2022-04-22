@@ -148,6 +148,7 @@ type LiquidityPoolFee @entity {
   feePercentage: BigDecimal!
   feeType: LiquidityPoolFeeType!
   usdValueOfFee: BigDecimal!
+  lpMTRatio: BigDecimal!
 }
 
 ###############################
