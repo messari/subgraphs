@@ -102,6 +102,8 @@ https://github.com/graphprotocol/graph-node#running-a-local-graph-node
 
 Note that you need a Ethereum RPC for your `graph-node` to connect to. You can get one for free at [Alchemy](https://www.alchemy.com/) or contact me for one.
 
+A [video tutorial](https://youtu.be/nH_pZWgQb7g) on how to run the graph-node locally using cargo.
+
 ### Postgres troubleshooting
 
 For those new to Postgres, the local node can be confusing when it comes to database authentication and general configuration. Here are a few things to check if the Postgres aspect of setting up the local node is giving you issues. 
