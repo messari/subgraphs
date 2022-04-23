@@ -37,7 +37,6 @@ export function _NewVault(
 
     vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vault.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vault.stakedOutputTokenAmount = constants.BIGINT_ZERO;
     
     vault.createdBlockNumber = block.number;
     vault.createdTimestamp = block.timestamp;
