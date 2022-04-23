@@ -214,7 +214,10 @@ type DexAmmProtocol implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -224,7 +227,7 @@ type DexAmmProtocol implements Protocol @entity {
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
-  poolIds: [string!]!
+  _poolIds: [String!]!
 }
 
 ###############################
@@ -255,6 +258,38 @@ type UsageMetricsDailySnapshot @entity {
 
   " Total number of trades (swaps) in a day "
   dailySwapCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type UsageMetricsHourlySnapshot @entity {
+  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " Protocol this snapshot is associated with "
+  protocol: DexAmmProtocol!
+
+  " # of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
+
+  " Total number of deposits (add liquidity) in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals (remove liquidity) in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of trades (swaps) in an hour "
+  hourlySwapCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -373,8 +408,11 @@ type LiquidityPool @entity {
 
   ##### Snapshots #####
 
-  " Liquidity pool snapshots "
-  snapshots: [LiquidityPoolDailySnapshot!]! @derivedFrom(field: "pool")
+  " Liquidity pool daily snapshots "
+  dailySnapshots: [LiquidityPoolDailySnapshot!]! @derivedFrom(field: "pool")
+
+  " Liquidity pool hourly snapshots "
+  hourlySnapshots: [LiquidityPoolHourlySnapshot!]! @derivedFrom(field: "pool")
 
   ##### Events #####
 
@@ -416,6 +454,9 @@ type LiquidityPoolDailySnapshot @entity {
   " All trade volume occurred in a given day, in USD "
   dailyVolumeUSD: BigDecimal!
 
+  " All trade volume occurred in a given day for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumeByTokenAmount: [BigInt!]!
+
   " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
   dailyVolumeByTokenUSD: [BigDecimal!]!
 
@@ -441,6 +482,61 @@ type LiquidityPoolDailySnapshot @entity {
   rewardTokenEmissionsAmount: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+}
+
+type LiquidityPoolHourlySnapshot @entity {
+  " { Smart contract address of the pool }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: DexAmmProtocol!
+
+  " The pool this snapshot belongs to "
+  pool: LiquidityPool!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of this pool "
+  totalValueLockedUSD: BigDecimal!
+
+  " All trade volume occurred in a given hour, in USD "
+  hourlyVolumeUSD: BigDecimal!
+
+  " All trade volume occurred in a given hour for a specific input token, in native amount. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeByTokenAmount: [BigInt!]!
+
+  " All trade volume occurred in a given hour for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  hourlyVolumeByTokenUSD: [BigDecimal!]!
+
+  " All historical trade volume occurred in this pool, in USD "
+  cumulativeVolumeUSD: BigDecimal!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigInt!]!
+
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  inputTokenWeights: [BigDecimal!]!
+
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+  
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
@@ -624,9 +720,9 @@ type Account @entity {
   id: ID!
 }
 
-# Helper entity for calculating daily active users
-type DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity {
+  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }
 

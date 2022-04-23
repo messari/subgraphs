@@ -2,7 +2,6 @@ import { log } from "@graphprotocol/graph-ts";
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
-  DailyActiveAccount,
   _HelperStore,
   _TokenWhitelist,
   _LiquidityPoolAmount,
@@ -103,24 +102,6 @@ export function createAndIncrementAccount(accountId: string): i32 {
   return INT_ZERO;
 }
 
-// Create DailyActiveAccount entity for participating account
-export function createAndIncrementDailyAccount(event: ethereum.Event, accountId: string): i32 {
-  // Number of days since Unix epoch
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
-
-  // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.concat(accountId);
-  let account = DailyActiveAccount.load(dailyActiveAccountId);
-  if (!account) {
-    account = new DailyActiveAccount(accountId);
-    account.save();
-
-    return INT_ONE;
-  }
-  return INT_ZERO;
-}
-
 // Generate the deposit entity and update deposit account for the according pool.
 export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt): void {
   let transfer = getOrCreateTransfer(event);
@@ -209,7 +190,6 @@ export function createSwapHandleVolumeAndFees(
 ): void {
   let protocol = getOrCreateDex();
   let pool = getLiquidityPool(event.address.toHexString());
-  let poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
@@ -270,5 +250,5 @@ export function createSwapHandleVolumeAndFees(
   let token0VolumeUSD = amount0TotalConverted.times(token0.lastPriceUSD!);
   let token1VolumeUSD = amount1TotalConverted.times(token1.lastPriceUSD!);
 
-  updateVolumeAndFees(event, token0VolumeUSD, token1VolumeUSD, tradingFeeAmountUSD, protocolFeeAmountUSD);
+  updateVolumeAndFees(event, token0VolumeUSD, token1VolumeUSD, amount0Total, amount1Total, tradingFeeAmountUSD, protocolFeeAmountUSD);
 }

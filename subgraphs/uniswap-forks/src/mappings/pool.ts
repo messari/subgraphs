@@ -1,31 +1,14 @@
 // import { log } from "@graphprotocol/graph-ts";
 import { _HelperStore } from "../../generated/schema";
 import { Mint, Burn, Swap, Transfer, Sync } from "../../generated/templates/Pair/Pair";
-import {
-  createDeposit,
-  createWithdraw,
-  createSwapHandleVolumeAndFees,
-} from "../common/creators";
-import {
-  handleTransferBurn,
-  handleTransferMint,
-  handleTransferToPoolBurn,
-} from "../common/handlers";
-import {
-  updateFinancials,
-  updateInputTokenBalances,
-  updatePoolMetrics,
-  updateTvlAndTokenPrices,
-  updateUsageMetrics,
-} from "../common/updateMetrics";
+import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees } from "../common/creators";
+import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from "../common/handlers";
+import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from "../common/updateMetrics";
 import { BIGINT_THOUSAND, UsageType, ZERO_ADDRESS } from "../common/constants";
 
 export function handleTransfer(event: Transfer): void {
   // ignore initial transfers for first adds
-  if (
-    event.params.to.toHexString() == ZERO_ADDRESS &&
-    event.params.value.equals(BIGINT_THOUSAND)
-  ) {
+  if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
     return;
   }
 
@@ -38,24 +21,17 @@ export function handleTransfer(event: Transfer): void {
   // This gets the EOA that made the burn loaded into the _Transfer.
 
   if (event.params.to == event.address) {
-    handleTransferToPoolBurn(event, event.params.value, event.params.from.toHexString());
+    handleTransferToPoolBurn(event, event.params.from.toHexString());
   }
 
   // burn
-  if (
-    event.params.to.toHexString() == ZERO_ADDRESS &&
-    event.params.from == event.address
-  ) {
+  if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from == event.address) {
     handleTransferBurn(event, event.params.value, event.params.from.toHexString());
   }
 }
 
 export function handleSync(event: Sync): void {
-  updateInputTokenBalances(
-    event.address.toHexString(),
-    event.params.reserve0,
-    event.params.reserve1,
-  );
+  updateInputTokenBalances(event.address.toHexString(), event.params.reserve0, event.params.reserve1);
   updateTvlAndTokenPrices(event.address.toHexString(), event.block.number);
 }
 
@@ -81,7 +57,7 @@ export function handleSwap(event: Swap): void {
     event.params.amount0In,
     event.params.amount1In,
     event.params.amount0Out,
-    event.params.amount1Out,
+    event.params.amount1Out
   );
   updateFinancials(event);
   updatePoolMetrics(event);

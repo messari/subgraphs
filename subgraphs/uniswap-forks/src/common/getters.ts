@@ -15,8 +15,9 @@ import {
   LiquidityPoolFee,
   Token,
   RewardToken,
+  LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, HelperStoreType, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType, BIGINT_ZERO } from "./constants";
+import { BIGDECIMAL_ZERO, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType, BIGINT_ZERO } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
@@ -78,7 +79,7 @@ export function getOrCreateTransfer(event: ethereum.Event): _Transfer {
   return transfer;
 }
 
-export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
@@ -105,7 +106,34 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
   return usageMetrics;
 }
 
-export function getOrCreatePoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
+export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+  // Number of days since Unix epoch
+  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let id = dayID.toString();
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsDailySnapshot.load(id);
+
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsDailySnapshot(id);
+    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+
+    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
+    usageMetrics.dailyDepositCount = INT_ZERO;
+    usageMetrics.dailyWithdrawCount = INT_ZERO;
+    usageMetrics.dailySwapCount = INT_ZERO;
+
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
+}
+
+export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
   let poolMetrics = LiquidityPoolDailySnapshot.load(
@@ -140,7 +168,42 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): LiquidityPo
   return poolMetrics;
 }
 
-export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
+export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
+  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let id = dayID.toString();
+  let poolMetrics = LiquidityPoolHourlySnapshot.load(
+    event.address
+      .toHexString()
+      .concat("-")
+      .concat(id)
+  );
+
+  if (!poolMetrics) {
+    poolMetrics = new LiquidityPoolHourlySnapshot(
+      event.address
+        .toHexString()
+        .concat("-")
+        .concat(id)
+    );
+    poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.save();
+  }
+
+  return poolMetrics;
+}
+
+export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
@@ -201,16 +264,6 @@ export function getOrCreateLPToken(tokenAddress: string, token0: Token, token1: 
     token.save();
   }
   return token;
-}
-
-export function getOrCreateUsersHelper(): _HelperStore {
-  let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS);
-  if (!uniqueUsersTotal) {
-    uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS);
-    uniqueUsersTotal.valueInt = INT_ZERO;
-    uniqueUsersTotal.save();
-  }
-  return uniqueUsersTotal;
 }
 
 export function getOrCreateRewardToken(address: string): RewardToken {

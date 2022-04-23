@@ -3,11 +3,7 @@ import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer } from "./getters
 import { TransferType } from "./constants";
 
 // Handle data from transfer event for mints. Used to populate deposit entity in the mint event.
-export function handleTransferMint(
-  event: ethereum.Event,
-  value: BigInt,
-  to: string,
-): void {
+export function handleTransferMint(event: ethereum.Event, value: BigInt, to: string): void {
   let pool = getLiquidityPool(event.address.toHexString());
   let transfer = getOrCreateTransfer(event);
 
@@ -23,10 +19,10 @@ export function handleTransferMint(
     transfer.sender = to;
     transfer.liquidity = value;
   } else if (transfer.type == TransferType.MINT) {
-      // Updates the liquidity if the previous mint was a fee mint
-      // Address that is minted to
-      transfer.sender = to;
-      transfer.liquidity = value;
+    // Updates the liquidity if the previous mint was a fee mint
+    // Address that is minted to
+    transfer.sender = to;
+    transfer.liquidity = value;
   }
 
   transfer.save();
@@ -34,11 +30,7 @@ export function handleTransferMint(
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferToPoolBurn(
-  event: ethereum.Event,
-  value: BigInt,
-  from: string,
-): void {
+export function handleTransferToPoolBurn(event: ethereum.Event, from: string): void {
   let transfer = getOrCreateTransfer(event);
 
   transfer.type = TransferType.BURN;
@@ -48,11 +40,7 @@ export function handleTransferToPoolBurn(
 }
 
 // Handle data from transfer event for burns. Used to populate deposit entity in the burn event.
-export function handleTransferBurn(
-  event: ethereum.Event,
-  value: BigInt,
-  from: string,
-): void {
+export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: string): void {
   let pool = getLiquidityPool(event.address.toHexString());
   let transfer = getOrCreateTransfer(event);
 
