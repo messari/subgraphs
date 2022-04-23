@@ -1,18 +1,8 @@
 import { log } from "@graphprotocol/graph-ts/index";
 import { BigDecimal } from "@graphprotocol/graph-ts/index";
-import {
-  getLiquidityPool,
-  getLiquidityPoolAmounts,
-  getOrCreateToken,
-  getOrCreateTokenWhitelist,
-} from "./../getters";
+import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateToken, getOrCreateTokenWhitelist } from "./../getters";
 import { Token, _HelperStore, _LiquidityPoolAmount } from "../../../generated/schema";
-import {
-  BIGDECIMAL_ZERO,
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_TWO,
-  BIGINT_ZERO,
-} from "./../constants";
+import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, MINIMUM_LIQUIDITY_THRESHOLD } from "./../constants";
 import { safeDiv } from "../utils/utils";
 import { NetworkConfigs } from "../../../config/_networkConfig";
 
@@ -71,81 +61,25 @@ export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDe
           // whitelist token is token1
           let token1 = getOrCreateToken(pool.inputTokens[1]);
           // get the derived NativeToken in pool
-          let nativeTokenLocked = poolAmounts.inputTokenBalances[1].times(
-            token1.lastPriceUSD!,
-          );
-          if (nativeTokenLocked.gt(largestLiquidityNativeToken)) {
+          let nativeTokenLocked = poolAmounts.inputTokenBalances[1].times(token1.lastPriceUSD!);
+          if (nativeTokenLocked.gt(largestLiquidityNativeToken) && nativeTokenLocked.gt(MINIMUM_LIQUIDITY_THRESHOLD)) {
             largestLiquidityNativeToken = nativeTokenLocked;
             // token1 per our token * nativeToken per token1
-            priceSoFar = safeDiv(
-              poolAmounts.inputTokenBalances[1],
-              poolAmounts.inputTokenBalances[0],
-            ).times(token1.lastPriceUSD! as BigDecimal);
+            priceSoFar = safeDiv(poolAmounts.inputTokenBalances[1], poolAmounts.inputTokenBalances[0]).times(token1.lastPriceUSD! as BigDecimal);
           }
         }
         if (pool.inputTokens[1] == token.id) {
           let token0 = getOrCreateToken(pool.inputTokens[0]);
           // get the derived nativeToken in pool
-          let nativeTokenLocked = poolAmounts.inputTokenBalances[0].times(
-            token0.lastPriceUSD!,
-          );
-          if (nativeTokenLocked.gt(largestLiquidityNativeToken)) {
+          let nativeTokenLocked = poolAmounts.inputTokenBalances[0].times(token0.lastPriceUSD!);
+          if (nativeTokenLocked.gt(largestLiquidityNativeToken) && nativeTokenLocked.gt(MINIMUM_LIQUIDITY_THRESHOLD)) {
             largestLiquidityNativeToken = nativeTokenLocked;
             // token0 per our token * NativeToken per token0
-            priceSoFar = safeDiv(
-              poolAmounts.inputTokenBalances[0],
-              poolAmounts.inputTokenBalances[1],
-            ).times(token0.lastPriceUSD! as BigDecimal);
+            priceSoFar = safeDiv(poolAmounts.inputTokenBalances[0], poolAmounts.inputTokenBalances[1]).times(token0.lastPriceUSD! as BigDecimal);
           }
         }
       }
     }
   }
   return priceSoFar; // nothing was found return 0
-}
-
-/**
- * Accepts tokens and amounts, return tracked amount based on token whitelist
- * If one token on whitelist, return amount in that token converted to USD.
- * If both are, return average of two amounts
- * If neither is, return 0
- */
-export function getTrackedVolumeUSD(
-  tokenAmount0: BigDecimal,
-  token0: Token,
-  tokenAmount1: BigDecimal,
-  token1: Token,
-): BigDecimal {
-  let price0USD = token0.lastPriceUSD!;
-  let price1USD = token1.lastPriceUSD!;
-
-  // both are whitelist tokens, return sum of both amounts
-  if (
-    NetworkConfigs.WHITELIST_TOKENS.includes(token0.id) &&
-    NetworkConfigs.WHITELIST_TOKENS.includes(token1.id)
-  ) {
-    return tokenAmount0
-      .times(price0USD)
-      .plus(tokenAmount1.times(price1USD))
-      .div(BIGDECIMAL_TWO);
-  }
-
-  // take double value of the whitelisted token amount
-  if (
-    NetworkConfigs.WHITELIST_TOKENS.includes(token0.id) &&
-    !NetworkConfigs.WHITELIST_TOKENS.includes(token1.id)
-  ) {
-    return tokenAmount0.times(price0USD);
-  }
-
-  // take double value of the whitelisted token amount
-  if (
-    !NetworkConfigs.WHITELIST_TOKENS.includes(token0.id) &&
-    NetworkConfigs.WHITELIST_TOKENS.includes(token1.id)
-  ) {
-    return tokenAmount1.times(price1USD);
-  }
-
-  // neither token is on white list, tracked amount is 0
-  return BIGDECIMAL_ZERO;
 }

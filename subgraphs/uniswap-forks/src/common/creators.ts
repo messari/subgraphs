@@ -17,7 +17,6 @@ import {
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED, FeeSwitch } from "./constants";
-import { getTrackedVolumeUSD } from "./price/price";
 import { getLiquidityPool, getOrCreateDex, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics";
@@ -228,9 +227,6 @@ export function createSwapHandleVolumeAndFees(
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
 
-  // only accounts for volume through white listed tokens
-  let trackedAmountUSD = getTrackedVolumeUSD(amount0TotalConverted, token0 as Token, amount1TotalConverted, token1 as Token);
-
   let tradingFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
   let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
@@ -271,5 +267,8 @@ export function createSwapHandleVolumeAndFees(
 
   swap.save();
 
-  updateVolumeAndFees(event, trackedAmountUSD, tradingFeeAmountUSD, protocolFeeAmountUSD);
+  let token0VolumeUSD = amount0TotalConverted.times(token0.lastPriceUSD!);
+  let token1VolumeUSD = amount1TotalConverted.times(token1.lastPriceUSD!);
+
+  updateVolumeAndFees(event, token0VolumeUSD, token1VolumeUSD, tradingFeeAmountUSD, protocolFeeAmountUSD);
 }

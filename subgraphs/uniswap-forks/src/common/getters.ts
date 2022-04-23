@@ -6,7 +6,7 @@ import {
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
-  PoolDailySnapshot,
+  LiquidityPoolDailySnapshot,
   FinancialsDailySnapshot,
   _LiquidityPoolAmount,
   _Transfer,
@@ -30,6 +30,9 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.methodologyVersion = NetworkConfigs.PROTOCOL_METHODOLOGY_VERSION;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.network = NetworkConfigs.NETWORK;
     protocol.type = ProtocolType.EXCHANGE;
@@ -93,16 +96,19 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
     usageMetrics.dailyWithdrawCount = INT_ZERO;
     usageMetrics.dailySwapCount = INT_ZERO;
 
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+
     usageMetrics.save();
   }
 
   return usageMetrics;
 }
 
-export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySnapshot {
+export function getOrCreatePoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
-  let poolMetrics = PoolDailySnapshot.load(
+  let poolMetrics = LiquidityPoolDailySnapshot.load(
     event.address
       .toHexString()
       .concat("-")
@@ -110,7 +116,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
   );
 
   if (!poolMetrics) {
-    poolMetrics = new PoolDailySnapshot(
+    poolMetrics = new LiquidityPoolDailySnapshot(
       event.address
         .toHexString()
         .concat("-")
@@ -118,8 +124,15 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySn
     );
     poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
-    poolMetrics.rewardTokenEmissionsAmount = [];
-    poolMetrics.rewardTokenEmissionsUSD = [];
+    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
 
     poolMetrics.save();
   }
@@ -138,16 +151,19 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics = new FinancialsDailySnapshot(id);
     financialMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
 
-    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
 
     financialMetrics.save();
   }
@@ -167,8 +183,6 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
-    token.lastPriceUSD = BIGDECIMAL_ZERO;
-    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token as Token;
@@ -204,9 +218,7 @@ export function getOrCreateRewardToken(address: string): RewardToken {
   if (rewardToken == null) {
     let token = getOrCreateToken(address);
     rewardToken = new RewardToken(address);
-    rewardToken.name = token.name;
-    rewardToken.symbol = token.symbol;
-    rewardToken.decimals = token.decimals;
+    rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;
     rewardToken.save();
 

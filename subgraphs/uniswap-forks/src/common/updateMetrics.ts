@@ -1,17 +1,5 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  ethereum,
-} from "@graphprotocol/graph-ts";
-import {
-  Account,
-  DailyActiveAccount,
-  Token,
-  UsageMetricsDailySnapshot,
-  _HelperStore,
-  _TokenWhitelist,
-} from "../../generated/schema";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Account, DailyActiveAccount, Token, UsageMetricsDailySnapshot, _HelperStore, _TokenWhitelist } from "../../generated/schema";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
@@ -22,15 +10,7 @@ import {
   getOrCreateTokenWhitelist,
   getOrCreateUsersHelper,
 } from "./getters";
-import {
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  DEFAULT_DECIMALS,
-  INT_ONE,
-  INT_ZERO,
-  SECONDS_PER_DAY,
-  UsageType,
-} from "./constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_ZERO, SECONDS_PER_DAY, UsageType } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { NetworkConfigs } from "../../config/_networkConfig";
@@ -49,11 +29,7 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.save();
 }
 
-export function updateUsageMetrics(
-  event: ethereum.Event,
-  from: string,
-  usageType: string,
-): void {
+export function updateUsageMetrics(event: ethereum.Event, from: string, usageType: string): void {
   // Number of days since Unix epoch
   let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let id = dayID.toString();
@@ -114,6 +90,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   poolMetrics.totalValueLockedUSD = pool.totalValueLockedUSD;
   poolMetrics.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   poolMetrics.inputTokenBalances = pool.inputTokenBalances;
+  poolMetrics.inputTokenWeights = pool.inputTokenWeights;
   poolMetrics.outputTokenSupply = pool.outputTokenSupply;
   poolMetrics.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   poolMetrics.blockNumber = event.block.number;
@@ -123,11 +100,7 @@ export function updatePoolMetrics(event: ethereum.Event): void {
 }
 
 // These whiteslists are used to track what pools the tokens are a part of. Used in price calculations.
-export function updateTokenWhitelists(
-  token0: Token,
-  token1: Token,
-  poolAddress: string,
-): void {
+export function updateTokenWhitelists(token0: Token, token1: Token, poolAddress: string): void {
   let tokenWhitelist0 = getOrCreateTokenWhitelist(token0.id);
   let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
@@ -148,11 +121,7 @@ export function updateTokenWhitelists(
 }
 
 // Upate token balances based on reserves emitted from the sync event.
-export function updateInputTokenBalances(
-  poolAddress: string,
-  reserve0: BigInt,
-  reserve1: BigInt,
-): void {
+export function updateInputTokenBalances(poolAddress: string, reserve0: BigInt, reserve1: BigInt): void {
   let pool = getLiquidityPool(poolAddress);
   let poolAmounts = getLiquidityPoolAmounts(poolAddress);
 
@@ -184,26 +153,19 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   token1.lastPriceUSD = findNativeTokenPerToken(token1, nativeToken);
 
   // Subtract the old pool tvl
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    pool.totalValueLockedUSD,
-  );
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
 
   let inputToken0 = convertTokenToDecimal(pool.inputTokenBalances[0], token0.decimals);
   let inputToken1 = convertTokenToDecimal(pool.inputTokenBalances[1], token1.decimals);
 
   // Get new tvl
-  let newTvl = token0
-    .lastPriceUSD!.times(inputToken0)
-    .plus(token1.lastPriceUSD!.times(inputToken1));
+  let newTvl = token0.lastPriceUSD!.times(inputToken0).plus(token1.lastPriceUSD!.times(inputToken1));
 
   // Add the new pool tvl
   pool.totalValueLockedUSD = newTvl;
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(newTvl);
 
-  let outputTokenSupply = convertTokenToDecimal(
-    pool.outputTokenSupply!,
-    DEFAULT_DECIMALS,
-  );
+  let outputTokenSupply = convertTokenToDecimal(pool.outputTokenSupply!, DEFAULT_DECIMALS);
 
   // Update LP token prices
   if (pool.outputTokenSupply == BIGINT_ZERO) {
@@ -222,48 +184,40 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
 // Update the volume and accrued fees for all relavant entities
 export function updateVolumeAndFees(
   event: ethereum.Event,
-  trackedAmountUSD: BigDecimal,
+  token0VolumeUSD: BigDecimal,
+  token1VolumeUSD: BigDecimal,
   supplyFeeAmountUSD: BigDecimal,
-  protocolFeeAmountUSD: BigDecimal,
+  protocolFeeAmountUSD: BigDecimal
 ): void {
   let pool = getLiquidityPool(event.address.toHexString());
   let protocol = getOrCreateDex();
   let financialMetrics = getOrCreateFinancials(event);
+  let poolMetrics = getOrCreatePoolDailySnapshot(event);
+
+  let trackedAmountUSD = token0VolumeUSD.plus(token1VolumeUSD);
+
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    tradingFeeAmountUSD,
-  );
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    supplyFeeAmountUSD,
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    protocolFeeAmountUSD,
-  );
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    tradingFeeAmountUSD,
-  );
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
-    supplyFeeAmountUSD,
-  );
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
-    protocolFeeAmountUSD,
-  );
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
-  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(
-    trackedAmountUSD,
-  );
+  poolMetrics.dailyVolumeByTokenUSD = [poolMetrics.dailyVolumeByTokenUSD[INT_ZERO].plus(token0VolumeUSD), poolMetrics.dailyVolumeByTokenUSD[INT_ONE].plus(token1VolumeUSD)];
+
+  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(trackedAmountUSD);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
 
   financialMetrics.save();
+  poolMetrics.save();
   protocol.save();
   pool.save();
 }

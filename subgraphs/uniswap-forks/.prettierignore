@@ -2,3 +2,6 @@ abis
 build
 generated
 node_modules
+templates
+package.json
+schema.graphql
