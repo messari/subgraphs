@@ -34,6 +34,7 @@ let LP_FEE_TO_OFF_TEMP: BigDecimal; // supply fee of the protocol in the network
 let REWARD_INTERVAL_TYPE_TEMP: string;
 
 let NATIVE_TOKEN_TEMP: string; // Address of wrapped native token
+let REWARD_TOKENS_TEMP: string[]; // Address of reward token
 let WHITELIST_TOKENS_TEMP: string[]; // A tokens whose amounts should contribute to tracked volume and liquidity
 let STABLE_COINS_TEMP: string[]; // A list of stable coins
 let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token] oracle pools
@@ -41,7 +42,6 @@ let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == SubgraphNetwork.MAINNET) {
-
   PROTOCOL_SLUG_TEMP = "uniswap-v2";
   NETWORK_TEMP = SchemaNetwork.MAINNET;
   PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
@@ -59,6 +59,7 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
   FEE_ON_OFF_TEMP = FeeSwitch.OFF;
 
   NATIVE_TOKEN_TEMP = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+  REWARD_TOKENS_TEMP = [];
   WHITELIST_TOKENS_TEMP = [
     "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH
     "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
@@ -95,7 +96,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
     "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11", // DAI/wETH created block 10042267
     "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852", // USDT/wETH created block 10093341
   ];
-
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == SubgraphNetwork.MATIC) {
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = SchemaNetwork.MATIC;
@@ -116,6 +116,7 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.BLOCK;
 
   NATIVE_TOKEN_TEMP = "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
+  REWARD_TOKENS_TEMP = ["0x603c7f932ED1fc6575303D8Fb018fDCBb0f39a95"];
   WHITELIST_TOKENS_TEMP = [
     "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC
     "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063", // DAI
@@ -156,6 +157,7 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
   REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.TIMESTAMP;
 
   NATIVE_TOKEN_TEMP = "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c";
+  REWARD_TOKENS_TEMP = ["0x5d47bAbA0d66083C52009271faF3F50DCc01023C"];
   WHITELIST_TOKENS_TEMP = [
     "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
     "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
@@ -203,6 +205,7 @@ export namespace NetworkConfigs {
   export const REWARD_INTERVAL_TYPE = REWARD_INTERVAL_TYPE_TEMP;
 
   export const NATIVE_TOKEN = NATIVE_TOKEN_TEMP;
+  export const REWARD_TOKENS = REWARD_TOKENS_TEMP;
   export const WHITELIST_TOKENS = WHITELIST_TOKENS_TEMP;
   export const STABLE_COINS = STABLE_COINS_TEMP;
   export const STABLE_ORACLE_POOLS = STABLE_ORACLE_POOLS_TEMP;

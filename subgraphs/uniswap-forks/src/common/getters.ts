@@ -248,6 +248,8 @@ export function getOrCreateToken(address: string): Token {
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
     token.name = name.reverted ? "" : name.value;
     token.symbol = symbol.reverted ? "" : symbol.value;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
   return token as Token;

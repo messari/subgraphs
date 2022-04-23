@@ -292,3 +292,13 @@ export function updateDepositHelper(poolAddress: Address): void {
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
 }
+
+export function updateStakedTokens(event: ethereum.Event, amount: BigInt, usageType: string): void {
+  let pool = getLiquidityPool(event.address.toHexString());
+  if (usageType == UsageType.DEPOSIT) {
+    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  } else {
+    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
+  }
+  pool.save();
+}

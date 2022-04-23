@@ -65,7 +65,8 @@ export function createLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens;
+  pool.rewardTokens = NetworkConfigs.REWARD_TOKENS;
+  pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   pool.fees = createPoolFees(poolAddress);
@@ -133,8 +134,6 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
 
   updateDepositHelper(event.address);
-
-  store.remove("_Transfer", transfer.id);
 
   deposit.save();
 }
