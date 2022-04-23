@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
-import { Address, Bytes, ethereum } from "@graphprotocol/graph-ts";
-import { NetworkConfigs, Protocol } from "../../config/_networkConfig";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../config/_networkConfig";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
   DexAmmProtocol,

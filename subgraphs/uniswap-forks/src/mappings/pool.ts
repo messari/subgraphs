@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts";
+// import { log } from "@graphprotocol/graph-ts";
 import { _HelperStore } from "../../generated/schema";
 import { Mint, Burn, Swap, Transfer, Sync } from "../../generated/templates/Pair/Pair";
 import {

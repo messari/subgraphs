@@ -1,5 +1,4 @@
 import { Address, BigDecimal, Bytes, dataSource, log } from "@graphprotocol/graph-ts";
-import { TokenABI } from "../generated/Factory/TokenABI";
 import { Factory } from "../generated/Factory/Factory";
 import { FeeSwitch, SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
 import { RewardIntervalType } from "../src/common/rewards";
@@ -58,8 +57,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
   PROTOCOL_FEE_TO_OFF_TEMP = BigDecimal.fromString("0.0");
   LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("3");
   FEE_ON_OFF_TEMP = FeeSwitch.OFF;
-
-  REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.NONE;
 
   NATIVE_TOKEN_TEMP = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
   WHITELIST_TOKENS_TEMP = [

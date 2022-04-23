@@ -1,10 +1,7 @@
 import {
-  log,
-  dataSource,
   Address,
   BigDecimal,
   BigInt,
-  Bytes,
   ethereum,
 } from "@graphprotocol/graph-ts";
 import {

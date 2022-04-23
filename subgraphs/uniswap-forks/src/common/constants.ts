@@ -1,4 +1,4 @@
-import { log, BigDecimal, BigInt, Bytes } from "@graphprotocol/graph-ts";
+import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////

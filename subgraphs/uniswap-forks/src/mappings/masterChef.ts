@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts";
+// import { log } from "@graphprotocol/graph-ts";
 import {
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
