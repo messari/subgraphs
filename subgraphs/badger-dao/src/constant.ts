@@ -66,11 +66,25 @@ export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 // null address
 export const NULL_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
 
+// chainlink contract address for individual token
+export const CHAINLINK_BADGER_USD = Address.fromString(
+  "0x66a47b7206130e6FF64854EF0E1EDfa237E65339",
+);
+export const CHAINLINK_BTC_USD = Address.fromString("0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c");
+
+// BADGERWBTC-f pool contract https://curve.fi/factory-crypto/4
+export const BADGER_WBTC_POOL_CONTRACT = Address.fromString(
+  "0x50f3752289e1456BfA505afd37B241bca23e685d",
+);
+export const BADGER_TOKEN = Address.fromString("0x3472A5A71965499acd81997a54BBA8D852C6E53d");
+export const WBTC_TOKEN = Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599");
+
 // tokens array separated by router which provides their prices for faster lookup
 export namespace RouterType {
   export const SUSHI_ROUTER = "SUSHI_ROUTER";
   export const CURVE_ROUTER = "CURVE_ROUTER";
   export const YEARN_ROUTER = "YEARN_ROUTER";
+  export const CHAINLINK_CUSTOM = "CHAINLINK_CUSTOM";
 }
 
 export const SUSHI_ROUTER_TOKENS = [
@@ -91,4 +105,8 @@ export const YEARN_ROUTER_TOKENS = [
   Address.fromString("0xc4ad29ba4b3c580e6d59105fff484999997675ff"),
   Address.fromString("0x04c90c198b2eff55716079bc06d7ccc4aa4d7512"),
   Address.fromString("0xfbdca68601f835b27790d98bbb8ec7f05fdeaa9b"),
+];
+
+export const CHAINLINK_CUSTOM_TOKENS = [
+  Address.fromString("0x137469b55d1f15651ba46a89d0588e97dd0b6562"),
 ];

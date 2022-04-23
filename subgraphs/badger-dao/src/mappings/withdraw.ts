@@ -26,7 +26,6 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
 
   let pricePerShare = readValue<BigInt>(vaultContract.try_getPricePerFullShare(), BIGINT_ZERO);
   let try_price = getUsdPricePerToken(inputTokenAddress);
-  log.warning("[oracle] decimals {}", [try_price.decimals.toString()]);
   let inputTokenPrice = try_price.reverted
     ? try_price.usdPrice
     : try_price.usdPrice.div(try_price.decimals.toBigDecimal());

@@ -1,9 +1,14 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { DEFAULT_DECIMALS } from "../constant";
+import { BIGINT_TEN, DEFAULT_DECIMALS } from "../constant";
 
-export function getPriceOfStakeToken(inputTokenPrice: BigDecimal, pricePerShare: BigInt): BigDecimal {
+export function getPriceOfStakeToken(
+  inputTokenPrice: BigDecimal,
+  pricePerShare: BigInt,
+): BigDecimal {
+  let decimals = BIGINT_TEN.pow(DEFAULT_DECIMALS as u8);
+
   return pricePerShare
     .toBigDecimal()
-    .div(BigDecimal.fromString(DEFAULT_DECIMALS.toString()))
+    .div(decimals.toBigDecimal())
     .times(inputTokenPrice);
 }

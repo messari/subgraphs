@@ -59,6 +59,10 @@ dataSources:
           file: ./abis/Oracles/SushiSwap/Pair.json
         - name: CalculationsSushiSwap
           file: ./abis/Oracles/Calculations/SushiSwap.json
+        - name: PoolContract
+          file: ./abis/Oracles/Custom/PoolContract.json
+        - name: ChainLinkSolo
+          file: ./abis/Oracles/Custom/ChainLinkSolo.json
       callHandlers:
         - function: deposit(uint256)
           handler: handleDeposit
@@ -136,6 +140,10 @@ dataSources:
           file: ./abis/Oracles/SushiSwap/Pair.json
         - name: CalculationsSushiSwap
           file: ./abis/Oracles/Calculations/SushiSwap.json
+        - name: PoolContract
+          file: ./abis/Oracles/Custom/PoolContract.json
+        - name: ChainLinkSolo
+          file: ./abis/Oracles/Custom/ChainLinkSolo.json
       callHandlers:
         - function: setPerformanceFeeGovernance(uint256)
           handler: handlePerformanceFee

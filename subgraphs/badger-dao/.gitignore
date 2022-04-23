@@ -3,3 +3,9 @@ generated/
 build/
 *.log
 tests/.bin/
+
+
+# custom
+mainnet.original.json
+BADGER_WBTC.md
+subgraph.yaml
