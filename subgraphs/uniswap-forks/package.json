@@ -6,10 +6,10 @@
     "build": "graph build",
 
     "prepare:apeswap-bsc": "mustache config/apeswap/bsc.json templates/apeswap.template.yaml > subgraph.yaml",
-    "prepare:apeswap-polygon": "mustache config/apeswap/polygon.json templates/apeswap.template.yaml > subgraph.yaml",
+    "prepare:apeswap-matic": "mustache config/apeswap/polygon.json templates/apeswap.template.yaml > subgraph.yaml",
     "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json templates/uniswap.v2.template.yaml > subgraph.yaml",
 
-    "deploy-apeswap-bsc": "graph deploy --product hosted-service steege/apeswap-bsc",
+    "deploy-apeswap-bsc": "graph deploy --product hosted-service steegecs/apeswap-bsc",
     "deploy-apeswap-matic": "graph deploy  --product hosted-service steegecs/apeswap-polygon",
     "deploy-uniswap-v2-mainnet": "graph deploy --product hosted-service steegecs/uniswap-v2" 
      
