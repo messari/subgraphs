@@ -4,23 +4,33 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Schema Enums /////
 ////////////////////////
 
-// The enum values are derived from Coingecko slugs (converted to uppercase
-// and replaced hyphens with underscores for Postgres enum compatibility)
+// The network names corresponding to the Network enum in the schema.
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
+}
+
+export namespace ProtocolType {
+  export const EXCHANGE = "EXCHANGE";
+  export const LENDING = "LENDING";
+  export const YIELD = "YIELD";
+  export const BRIDGE = "BRIDGE";
+  export const GENERIC = "GENERIC";
 }
 
 // The network names corresponding to the ones in `dataSource.network()`
@@ -43,14 +53,6 @@ export namespace SubgraphNetwork {
   export const OPTIMISM = "optimism";
   export const POLYGON = "matic";
   export const XDAI = "xdai";
-}
-
-export namespace ProtocolType {
-  export const EXCHANGE = "EXCHANGE";
-  export const LENDING = "LENDING";
-  export const YIELD = "YIELD";
-  export const BRIDGE = "BRIDGE";
-  export const GENERIC = "GENERIC";
 }
 
 export namespace RewardTokenType {
@@ -134,14 +136,14 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.toBigDecimal().times(new BigDecimal(Big
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const NETWORK_ETHEREUM = Network.ETHEREUM;
+export const NETWORK_ETHEREUM = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
 export const SUBGRAPH_VERSION = "1.4.39";
-export const SCHEMA_VERSION = "1.1.0";
+export const SCHEMA_VERSION = "1.2.0";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
 export const INITIAL_EXCHANGE_RATE = BigDecimal.fromString(".02");
