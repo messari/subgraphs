@@ -188,16 +188,14 @@ export function getLpTokenTotalLiquidityUsdc(
     reserve1.notEqual(constants.BIGINT_ZERO)
   ) {
     let totalLiquidity = reserve0
-      .div(constants.BIGINT_TEN)
-      .pow(token0Decimals.toI32() as u8)
+      .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
       .toBigDecimal()
-      .times(token0Price.usdPrice)
+      .times(token0Price.usdPrice.div(constants.DEFAULT_USDC_DECIMALS.toBigDecimal()))
       .plus(
         reserve1
-          .div(constants.BIGINT_TEN)
-          .pow(token1Decimals.toI32() as u8)
+          .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
           .toBigDecimal()
-          .times(token1Price.usdPrice)
+          .times(token1Price.usdPrice.div(constants.DEFAULT_USDC_DECIMALS.toBigDecimal()))
       );
 
     return CustomPriceType.initialize(totalLiquidity);
