@@ -246,7 +246,7 @@ type LendingProtocol implements Protocol @entity {
   " Sum of all historical borrows/mints in USD (i.e. total loan origination). "
   cumulativeBorrowUSD: BigDecimal
 
-  " Total supply of minted tokens in native amounts. Only applies to CDP "
+  " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
   mintedTokenSupplies: [BigInt!]
 
   ##### Snapshots #####
@@ -257,7 +257,7 @@ type LendingProtocol implements Protocol @entity {
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
-  ##### Pools #####
+  ##### Markets #####
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
@@ -348,7 +348,7 @@ type FinancialsDailySnapshot @entity {
   " Sum of all historical borrows/mints in USD (i.e. total loan origination). "
   cumulativeBorrowUSD: BigDecimal
 
-  " Total supply of minted tokens in native amounts. Only applies to CDP "
+  " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
   mintedTokenSupplies: [BigInt!]
   
   " Block number of this snapshot "

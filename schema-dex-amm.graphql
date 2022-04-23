@@ -371,8 +371,8 @@ type LiquidityPool @entity {
 
   ##### Snapshots #####
 
-  " Pool snapshots "
-  snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
+  " Liquidity pool snapshots "
+  snapshots: [LiquidityPoolDailySnapshot!]! @derivedFrom(field: "pool")
 
   ##### Events #####
 
@@ -390,7 +390,7 @@ type LiquidityPool @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type PoolDailySnapshot @entity {
+type LiquidityPoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
 
