@@ -23,8 +23,9 @@
 - Added more detailed usage metrics: deposit/withdraw/repay/liquidate count.
 - Added `InterestRate` entity and made `rates` into an array.
 - Added `mintedTokens` and `mintedTokenSupplies` to the `LendingProtocol` entity.
-- Added `  exchangeRate: BigDecimal` to `Market` and `MarketDailySnapshot` entity.
+- Added `exchangeRate: BigDecimal` to `Market` and `MarketDailySnapshot` entity.
 - Assume only a single input token (i.e. changed `inputTokens` to `inputToken`).
+- Updated comments to the `Liquidate` event for clarity.
 
 ### Yield Aggregator
 
