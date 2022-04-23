@@ -114,8 +114,8 @@ export const BIGDECIMAL_NEG_ONE = BigDecimal.fromString("-1");
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
-export const RAY = 27 as i32;
 export const WAD = 18 as i32;
+export const RAY = 27 as i32;
 export const RAD = 45 as i32;
 
 /////////////////////

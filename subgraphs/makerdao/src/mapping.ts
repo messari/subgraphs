@@ -1,4 +1,4 @@
-import { BigInt, Address, Bytes, log, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, Address, Bytes, log, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vat, LogNote } from "../generated/Vat/Vat";
 import { Borrow, Deposit, Liquidate, Market, Repay, Withdraw, _Ilk } from "../generated/schema";
 import {
@@ -16,7 +16,7 @@ import { createMarket } from "./common/setters";
 import { bigIntToBigDecimal, bytesToSignedInt, absValBigInt, absValBigDecimal } from "./common/utils/numbers";
 import { getOrCreateTokenPriceEntity } from "./common/prices/prices";
 import { getOrCreateFinancials } from "./common/getters";
-import { updateTVL, updateMarketMetrics, updateUsageMetrics } from "./common/metrics";
+import { updateTVL, updateMarketMetrics, updateUsageMetrics, updateTotalBorrowUSD } from "./common/metrics";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { createEntityID } from "./common/utils/strings";
 import { GemJoin as GemJoinDataSource } from "../generated/templates";
@@ -135,22 +135,17 @@ export function handleFrob(event: LogNote): void {
   let dink = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(132, 164))); // change in collateral
   let dart = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(164, 196))); // change in debt
   let market = getMarketFromIlk(ilk);
-  let financialsDailySnapshot = getOrCreateFinancials(event);
-  let protocol = getOrCreateLendingProtocol();
   let collateralToken = getOrCreateToken(Address.fromString(market.inputTokens[0]));
   let collateralTokenUSD = getOrCreateTokenPriceEntity(collateralToken.id).priceUSD;
   let inputTokenBalances = market.inputTokenBalances;
   let inputTokenBalance = inputTokenBalances[0];
   let inputTokenBalancePost = inputTokenBalance.plus(dink);
   let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD);
-  let totalBorrowUSD = protocol.totalBorrowUSD.plus(bigIntToBigDecimal(dart, WAD).times(market.debtMultiplier)); // protocol debt: add dart * rate to protocol debt
   market.inputTokenBalances = [inputTokenBalancePost];
   market.outputTokenSupply = market.outputTokenSupply.plus(dart);
   market.totalBorrowUSD = bigIntToBigDecimal(market.outputTokenSupply, WAD);
   market.totalDepositUSD = bigIntToBigDecimal(inputTokenBalancePost, WAD).times(collateralTokenUSD);
   market.totalValueLockedUSD = market.totalDepositUSD;
-  financialsDailySnapshot.totalBorrowUSD = totalBorrowUSD;
-  protocol.totalBorrowUSD = totalBorrowUSD;
   if (dart.gt(BIGINT_ZERO)) {
     log.debug("dart", [dart.toString()]);
     handleEvent(event, market, "DEPOSIT", dink, ΔcollateralUSD, dart);
@@ -159,8 +154,7 @@ export function handleFrob(event: LogNote): void {
     handleEvent(event, market, "WITHDRAW", dink, ΔcollateralUSD, dart);
   }
   market.save();
-  financialsDailySnapshot.save();
-  protocol.save();
+  updateTotalBorrowUSD(event); // protocol debt: add dart * rate to protocol debt
   updateMarketMetrics(ilk, event);
   updateTVL(event);
 }
@@ -201,30 +195,20 @@ export function handleGrab(event: LogNote): void {
 // Create/destroy equal quantities of stablecoin and system debt
 export function handleHeal(event: LogNote): void {
   let rad = bigIntToBigDecimal(bytesToSignedInt(event.params.arg1), RAY);
-  let FinancialsDailySnapshot = getOrCreateFinancials(event);
-  let protocol = getOrCreateLendingProtocol();
-  let totalBorrowUSD = protocol.totalBorrowUSD.minus(rad);
-  FinancialsDailySnapshot.totalBorrowUSD = totalBorrowUSD;
-  protocol.totalBorrowUSD = totalBorrowUSD;
-  FinancialsDailySnapshot.save();
-  protocol.save();
+  updateTotalBorrowUSD(event); // subtract debt
 }
 
 export function handleSuck(event: LogNote): void {
+  let rad = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
+  updateTotalBorrowUSD(event); // add debt
   if (
     event.params.arg1.toHexString().toLowerCase() == VOW_ADDRESS_TOPIC &&
     event.params.arg2.toHexString().toLowerCase() == POT_ADDRESS_TOPIC
   ) {
     let FinancialsDailySnapshot = getOrCreateFinancials(event);
-    let protocol = getOrCreateLendingProtocol();
-    let accumSavings = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
-    let totalBorrowUSD = protocol.totalBorrowUSD.plus(accumSavings);
-    log.debug("supplySideRevenueUSD = {}", [accumSavings.toString()]);
-    FinancialsDailySnapshot.supplySideRevenueUSD = FinancialsDailySnapshot.supplySideRevenueUSD.plus(accumSavings);
-    FinancialsDailySnapshot.totalBorrowUSD = totalBorrowUSD;
-    protocol.totalBorrowUSD = totalBorrowUSD;
+    log.debug("supplySideRevenueUSD = {}", [rad.toString()]);
+    FinancialsDailySnapshot.supplySideRevenueUSD = FinancialsDailySnapshot.supplySideRevenueUSD.plus(rad);
     FinancialsDailySnapshot.save();
-    protocol.save();
   }
 }
 
@@ -234,18 +218,16 @@ export function handleFold(event: LogNote): void {
   log.debug("dRate = {}", [dRate.toString()]);
   let market = getMarketFromIlk(ilk);
   let rad = bigIntToBigDecimal(market.outputTokenSupply, WAD).times(dRate);
+  log.debug("handleFold rad = {}", [rad.toString()]);
   // stability fee collection, fold is called when someone calls jug.drip which increases debt balance for user
   let feesAccrued = dRate.times(market.totalBorrowUSD); // change in rate multiplied by total borrowed amt, compounded
   let financialsDailySnapshot = getOrCreateFinancials(event);
-  let protocol = getOrCreateLendingProtocol();
-  let totalBorrowUSD = protocol.totalBorrowUSD.plus(rad);
   financialsDailySnapshot.protocolSideRevenueUSD = financialsDailySnapshot.protocolSideRevenueUSD.plus(feesAccrued);
   financialsDailySnapshot.totalRevenueUSD = financialsDailySnapshot.totalRevenueUSD.plus(feesAccrued);
-  financialsDailySnapshot.totalBorrowUSD = totalBorrowUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   market.debtMultiplier = market.debtMultiplier.plus(dRate);
-  protocol.totalBorrowUSD = totalBorrowUSD;
   financialsDailySnapshot.save();
   market.save();
+  updateTotalBorrowUSD(event); // add debt
 }

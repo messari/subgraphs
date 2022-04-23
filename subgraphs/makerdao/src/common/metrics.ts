@@ -1,6 +1,6 @@
-import { Address, ethereum, Bytes } from "@graphprotocol/graph-ts";
+import { Address, ethereum, Bytes, BigDecimal, bigInt } from "@graphprotocol/graph-ts";
 import { Account, DailyActiveAccount } from "../../generated/schema";
-import { INT_ZERO, SECONDS_PER_DAY, BIGDECIMAL_ZERO, BIGDECIMAL_ONE } from "./constants";
+import { INT_ZERO, SECONDS_PER_DAY, BIGDECIMAL_ZERO, BIGDECIMAL_ONE, VAT_ADDRESS, RAD } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
   getOrCreateUsageMetricSnapshot,
@@ -10,6 +10,8 @@ import {
 } from "./getters";
 import { getOrCreateTokenPriceEntity } from "./prices/prices";
 import { getMarketFromIlk } from "../common/getters";
+import { Vat } from "../../generated/Vat/Vat";
+import { bigIntToBigDecimal } from "./utils/numbers";
 
 // usageDailySnapshot
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
@@ -73,7 +75,7 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
 
 export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
-  // totalBorrowUSD handled in handleFold, handleSuck, handleHeal, handleFrob,
+  // totalBorrowUSD handled updateTotalBorrowUSD
   let LendingProtocol = getOrCreateLendingProtocol();
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let marketIdList = LendingProtocol.marketIdList;
@@ -90,4 +92,15 @@ export function updateTVL(event: ethereum.Event): void {
   financialsDailySnapshot.timestamp = event.block.timestamp;
   LendingProtocol.save();
   financialsDailySnapshot.save();
+}
+
+export function updateTotalBorrowUSD(event: ethereum.Event): void {
+  // Called in handleFold, handleSuck, handleHeal, handleFrob
+  let FinancialsDailySnapshot = getOrCreateFinancials(event);
+  let protocol = getOrCreateLendingProtocol();
+  let totalBorrowUSD = bigIntToBigDecimal(Vat.bind(Address.fromString(VAT_ADDRESS)).debt(), RAD);
+  FinancialsDailySnapshot.totalBorrowUSD = totalBorrowUSD;
+  protocol.totalBorrowUSD = totalBorrowUSD;
+  FinancialsDailySnapshot.save();
+  protocol.save();
 }
