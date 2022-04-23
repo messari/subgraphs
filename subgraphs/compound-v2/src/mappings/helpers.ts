@@ -510,6 +510,13 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
       );
     }
 
+    if (compPriceUSD == BIGDECIMAL_ZERO) {
+      // try again if cCOMP didn't return the price properly for some reason in the future
+      compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS)).usdPrice.div(
+        exponentToBigDecimal(USDC_DECIMALS),
+      );
+    }
+
     let compPerDayUSD = compPerDay.toBigDecimal().div(exponentToBigDecimal(rewardDecimals)).times(compPriceUSD);
     market.rewardTokenEmissionsAmount = [compPerDay, compPerDay];
     market.rewardTokenEmissionsUSD = [compPerDayUSD, compPerDayUSD];

@@ -27,22 +27,19 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.totalDepositUSD = protocol.totalDepositUSD;
   financialMetrics.totalBorrowUSD = protocol.totalBorrowUSD;
 
-  if (event.block.number > financialMetrics.blockNumber) {
-    // only add to revenues if the financialMetrics has not seen this block number
-    let supplyRevenue = BIGDECIMAL_ZERO;
-    let protocolRevenue = BIGDECIMAL_ZERO;
-    let totalRevenue = BIGDECIMAL_ZERO;
-    for (let i = 0; i < protocol._marketIds.length; i++) {
-      let market = getOrCreateMarket(event, event.address);
+  let supplyRevenue = BIGDECIMAL_ZERO;
+  let protocolRevenue = BIGDECIMAL_ZERO;
+  let totalRevenue = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol._marketIds.length; i++) {
+    let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
 
-      supplyRevenue = supplyRevenue.plus(market._supplySideRevenueUSD);
-      protocolRevenue = protocolRevenue.plus(market._protocolSideRevenueUSD);
-      totalRevenue = totalRevenue.plus(market._totalRevenueUSD);
-    }
-    financialMetrics.supplySideRevenueUSD = supplyRevenue;
-    financialMetrics.protocolSideRevenueUSD = protocolRevenue;
-    financialMetrics.totalRevenueUSD = totalRevenue;
+    supplyRevenue = supplyRevenue.plus(market._supplySideRevenueUSD);
+    protocolRevenue = protocolRevenue.plus(market._protocolSideRevenueUSD);
+    totalRevenue = totalRevenue.plus(market._totalRevenueUSD);
   }
+  financialMetrics.supplySideRevenueUSD = supplyRevenue;
+  financialMetrics.protocolSideRevenueUSD = protocolRevenue;
+  financialMetrics.totalRevenueUSD = totalRevenue;
 
   // update the block number and timestamp
   financialMetrics.blockNumber = event.block.number;
