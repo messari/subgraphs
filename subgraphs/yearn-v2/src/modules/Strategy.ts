@@ -1,12 +1,6 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import {
-  Token,
-  VaultFee,
-  _Strategy,
-  Vault as VaultStore,
-} from "../../generated/schema";
-import {
   log,
   BigInt,
   Address,
@@ -14,46 +8,94 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import { getUsdPricePerToken } from "../Prices";
-import { getPriceOfStakedTokens } from "./Price";
+import { getPriceOfOutputTokens } from "./Price";
+import {
+  getOrCreateFinancialDailySnapshots,
+  getOrCreateStrategy,
+} from "../common/initializers";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
+import { Token, _Strategy, Vault as VaultStore } from "../../generated/schema";
 import { Strategy as StrategyContract } from "../../generated/templates/Vault/Strategy";
 
-export function createFeeType(
-  feeId: string,
-  feeType: string,
-  try_feePercentage: ethereum.CallResult<BigInt>,
-  defaultFeePercentage: BigInt
-): void {
-  const fees = new VaultFee(feeId);
+export function getStrategyInfo(
+  strategyAddress: Address,
+  vaultContract: VaultContract
+): BigInt[] {
+  let performanceFee: BigInt = constants.BIGINT_ZERO;
+  let lastReport: BigInt = constants.BIGINT_ZERO;
 
-  let feePercentage = try_feePercentage.reverted
-    ? defaultFeePercentage
-    : try_feePercentage.value;
+  let strategyData_v1 = vaultContract.try_strategies_v1(strategyAddress);
+  if (strategyData_v1.reverted) {
+    let strategyData_v2 = vaultContract.try_strategies_v2(strategyAddress);
 
-  fees.feeType = feeType;
-  fees.feePercentage = feePercentage
-    .toBigDecimal()
-    .div(BigDecimal.fromString("100"));
+    if (strategyData_v2.reverted) {
+      lastReport = utils.readValue<BigInt>(
+        vaultContract.try_lastReport(),
+        constants.BIGINT_ZERO
+      );
 
-  fees.save();
+      return [constants.DEFAULT_PERFORMANCE_FEE, lastReport];
+    } else {
+      performanceFee = strategyData_v2.value.value0;
+      lastReport = strategyData_v2.value.value5;
+    }
+  } else {
+    performanceFee = strategyData_v1.value.value0;
+    lastReport = strategyData_v1.value.value4;
+  }
+
+  return [performanceFee, lastReport];
 }
 
-export function getOrCreateStrategy(
-  vaultAddress: Address,
-  _strategyAddress: Address,
-  performanceFee: BigInt
-): _Strategy {
-  let strategy = _Strategy.load(_strategyAddress.toHexString());
+export function calculateManagementFee(
+  vaultContract: VaultContract,
+  strategyStore: _Strategy,
+  lastReport: BigInt,
+  delegatedAssets: BigInt,
+  inputTokenDecimals: BigInt
+): BigDecimal {
+  let managementFee = utils.readValue<BigInt>(
+    vaultContract.try_managementFee(),
+    constants.DEFAULT_MANAGEMENT_FEE
+  );
 
-  if (!strategy) {
-    strategy = new _Strategy(_strategyAddress.toHexString());
+  return strategyStore.totalDebt
+    .minus(delegatedAssets)
+    .times(lastReport.minus(strategyStore.lastReport))
+    .times(managementFee)
+    .div(constants.MAX_BPS)
+    .div(constants.SECONDS_PER_YEAR)
+    .toBigDecimal()
+    .div(inputTokenDecimals.toBigDecimal());
+}
 
-    strategy.totalDebt = constants.BIGINT_ZERO;
-    strategy.lastReport = constants.BIGINT_ZERO;
-    strategy.vaultAddress = vaultAddress;
-    strategy.performanceFee = performanceFee;
-  }
-  return strategy;
+export function calculatePerformanceFee(
+  vaultContract: VaultContract,
+  inputTokenDecimals: BigInt,
+  gain: BigInt
+): BigDecimal {
+  let performanceFeeValue = utils.readValue<BigInt>(
+    vaultContract.try_performanceFee(),
+    constants.DEFAULT_PERFORMANCE_FEE
+  );
+
+  return gain
+    .times(performanceFeeValue)
+    .div(constants.MAX_BPS)
+    .toBigDecimal()
+    .div(inputTokenDecimals.toBigDecimal());
+}
+
+export function calculateStrategyFee(
+  inputTokenDecimals: BigInt,
+  strategyPerformanceFee: BigInt,
+  gain: BigInt
+): BigDecimal {
+  return gain
+    .times(strategyPerformanceFee)
+    .div(constants.MAX_BPS)
+    .toBigDecimal()
+    .div(inputTokenDecimals.toBigDecimal());
 }
 
 export function strategyReported(
@@ -61,65 +103,36 @@ export function strategyReported(
   vaultAddress: Address,
   strategyAddress: Address,
   gain: BigInt,
-  debtAdded: BigInt
+  debtAdded: BigInt,
+  debtPaid: BigInt
 ): void {
+  if (gain == constants.BIGINT_ZERO) {
+    return;
+  }
+
   const vaultStore = VaultStore.load(vaultAddress.toHexString());
+  const vaultContract = VaultContract.bind(vaultAddress);
+
   const strategyStore = getOrCreateStrategy(
     vaultAddress,
     strategyAddress,
     constants.BIGINT_ZERO
   );
-
-  const vaultContract = VaultContract.bind(vaultAddress);
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  let reportTimestamp = utils.readValue<BigInt>(
-    vaultContract.try_lastReport(),
-    constants.BIGINT_ZERO
-  );
-  let strategistFeeValue = strategyStore.performanceFee;
+  let strategyInfo = getStrategyInfo(strategyAddress, vaultContract);
+  let strategyPerformanceFee = strategyInfo[0];
+  let lastReport = strategyInfo[1];
 
   let delegatedAssets = utils.readValue<BigInt>(
     strategyContract.try_delegatedAssets(),
     constants.BIGINT_ZERO
   );
 
-  let inputToken = Token.load(vaultStore!.inputTokens[0]);
-  let inputTokenAddress = Address.fromString(vaultStore!.inputTokens[0]);
+  let inputToken = Token.load(vaultStore!.inputToken);
+  let inputTokenAddress = Address.fromString(vaultStore!.inputToken);
   let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-
-  // Caluculating managementFee
-  let managementFeeValue = utils.readValue<BigInt>(
-    vaultContract.try_managementFee(),
-    constants.BIGINT_ZERO
-  );
-  let managementFee = strategyStore.totalDebt
-    .minus(delegatedAssets)
-    .times(reportTimestamp.minus(strategyStore.lastReport))
-    .times(managementFeeValue)
-    .div(constants.MAX_BPS)
-    .div(constants.SECONDS_PER_YEAR)
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal());
-
-  // Caluculating strategistFee
-  let strategistFee = gain
-    .times(strategistFeeValue)
-    .div(constants.MAX_BPS)
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal());
-
-  // Caluculating performanceFee
-  let performanceFeeValue = utils.readValue<BigInt>(
-    vaultContract.try_performanceFee(),
-    constants.BIGINT_ZERO
-  );
-  let performanceFee = gain
-    .times(performanceFeeValue)
-    .div(constants.MAX_BPS)
-    .toBigDecimal()
-    .div(inputTokenDecimals.toBigDecimal());
 
   let totalSupply = vaultContract.totalSupply();
   let totalSharesMinted = totalSupply
@@ -127,81 +140,84 @@ export function strategyReported(
     .toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal());
 
-  let protocolEarnings: BigDecimal;
-  if (
-    managementFee.plus(performanceFee).notEqual(constants.BIGDECIMAL_ZERO) &&
-    totalSharesMinted.notEqual(constants.BIGDECIMAL_ZERO)
-  ) {
-    protocolEarnings = totalSharesMinted.minus(
-      strategistFee
-        .times(totalSharesMinted)
-        .div(managementFee.plus(performanceFee))
-    );
-  } else {
-    protocolEarnings = constants.BIGDECIMAL_ZERO;
+  const managementFee = calculateManagementFee(
+    vaultContract,
+    strategyStore,
+    lastReport,
+    delegatedAssets,
+    inputTokenDecimals
+  );
+
+  const performanceFee = calculatePerformanceFee(
+    vaultContract,
+    inputTokenDecimals,
+    gain
+  );
+
+  const strategistFee = calculateStrategyFee(
+    inputTokenDecimals,
+    strategyPerformanceFee,
+    gain
+  );
+
+  let totalFee = managementFee.plus(performanceFee).plus(strategistFee);
+
+  let strategistReward = constants.BIGDECIMAL_ZERO;
+  if (strategistFee > constants.BIGDECIMAL_ZERO) {
+    strategistReward = strategistFee.times(totalSharesMinted).div(totalFee);
   }
 
-  let outputTokenPriceUsd = getPriceOfStakedTokens(
+  let gainUSD = inputTokenPrice.usdPrice
+    .times(gain.toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
+    .div(inputTokenPrice.decimals.toBigDecimal());
+
+  let outputTokenPriceUsd = getPriceOfOutputTokens(
     Address.fromString(vaultStore!.id),
     inputTokenAddress,
     inputTokenDecimals.toBigDecimal()
   );
 
-  let gainUsd = inputTokenPrice.usdPrice
-    .times(gain.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+  let protocolEarnings = totalSharesMinted.minus(strategistReward);
+  let protocolEarningsUSD = protocolEarnings.times(outputTokenPriceUsd);
 
-  let financialMetricsId: i64 =
-    event.block.timestamp.toI64() / constants.SECONDS_PER_DAY;
+  const financialMetrics = getOrCreateFinancialDailySnapshots(event.block);
 
-  const financialMetrics = utils.getOrCreateFinancialSnapshots(
-    financialMetricsId.toString()
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
+    outputTokenPriceUsd.times(protocolEarningsUSD)
   );
-
-  // protocolSideRevenueUSD = PerformanceFee + ManagementFee
-  financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
-    outputTokenPriceUsd.times(protocolEarnings)
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
+    gainUSD
   );
-
-  // supplySideRevenue = Gains
-  financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-    gainUsd
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
+    gainUSD.plus(outputTokenPriceUsd.times(totalSharesMinted))
   );
+  financialMetrics.save();
 
-  // totalRevenueUSD = PerformanceFee + ManagementFee + StratergyFee + Gains
-  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
-    gainUsd.plus(outputTokenPriceUsd.times(totalSharesMinted))
-  );
-
-  vaultStore!.inputTokenBalances = [
-    vaultStore!.inputTokenBalances[0].plus(gain),
-  ];
+  vaultStore!.inputTokenBalance = vaultStore!.inputTokenBalance.plus(gain);
   vaultStore!.outputTokenSupply = totalSupply;
+  vaultStore!.save();
 
-  strategyStore.totalDebt = strategyStore.totalDebt.plus(debtAdded);
-  strategyStore.lastReport = reportTimestamp;
+  strategyStore.totalDebt = strategyStore.totalDebt
+    .plus(debtAdded)
+    .minus(debtPaid);
+  strategyStore.lastReport = lastReport;
+  strategyStore.save();
 
   log.warning(
-    "[StrategyReported] vaultAddress: {}, strategyAddress: {}, totalSharesMinted: {}, \
-    protocolSideRevenue: {}, supplySideRevenueUSD: {}, totalRevenueUSD: {}, outputTokenPrice: {}, \
-    protocolEarnings: {}, managementFee: {}, performanceFee: {}, TxnHash: {}",
+    "[StrategyReported] vaultAddress: {}, strategyAddress: {}, totalSharesMinted: {}, outputTokenPrice: {}, \
+    strategistReward: {}, inputTokenBalances: {}, outputTokenSupply: {}, totalDebt: {}, lastReport: {}, TxnHash: {}",
     [
       vaultAddress.toHexString(),
       strategyAddress.toHexString(),
       totalSharesMinted.toString(),
-      financialMetrics.protocolSideRevenueUSD.toString(),
-      financialMetrics.supplySideRevenueUSD.toString(),
-      financialMetrics.totalRevenueUSD.toString(),
       outputTokenPriceUsd.toString(),
-      protocolEarnings.toString(),
-      managementFee.toString(),
-      performanceFee.toString(),
+      strategistReward.toString(),
+      vaultStore!.inputTokenBalance.toString(),
+      vaultStore!.outputTokenSupply.toString(),
+      strategyStore.totalDebt.toString(),
+      strategyStore.lastReport.toString(),
       event.transaction.hash.toHexString(),
     ]
   );
-
-  financialMetrics.save();
-  strategyStore.save();
-  vaultStore!.save();
 }

@@ -9,7 +9,7 @@ import {
 import { Vault } from "../../generated/templates/Vault/Vault";
 import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
 
-export function getPriceOfStakedTokens(
+export function getPriceOfOutputTokens(
   vaultAddress: Address,
   tokenAddress: Address,
   _decimals: BigDecimal

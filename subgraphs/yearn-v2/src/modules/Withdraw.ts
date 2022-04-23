@@ -3,26 +3,54 @@ import {
   Vault as VaultStore,
   Withdraw as WithdrawTransaction,
 } from "../../generated/schema";
-
+import {
+  log,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import {
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+} from "../common/initializers";
 import * as utils from "../common/utils";
-import * as constants from "../common/constants";
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { getUsdPricePerToken } from "../Prices";
-
+import * as constants from "../common/constants";
+import { getPriceOfOutputTokens } from "./Price";
+import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 
 export function createWithdrawTransaction(
-  id: string,
-  call: ethereum.Call
+  call: ethereum.Call,
+  assetId: string,
+  amount: BigInt,
+  amountUSD: BigDecimal
 ): WithdrawTransaction {
-  let transaction = new WithdrawTransaction(id);
-  transaction.logIndex = call.transaction.index.toI32();
-  transaction.to = call.to.toHexString();
-  transaction.from = call.transaction.from.toHexString();
-  transaction.hash = call.transaction.hash.toHexString();
-  transaction.timestamp = utils.getTimestampInMillis(call.block);
-  transaction.blockNumber = call.block.number;
-  transaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
-  transaction.vault = call.to.toHexString();
+  let transactionId = "withdraw-" + call.transaction.hash.toHexString();
+
+  let transaction = WithdrawTransaction.load(transactionId);
+
+  if (!transaction) {
+    transaction = new WithdrawTransaction(transactionId);
+
+    transaction.vault = call.to.toHexString();
+    transaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+
+    transaction.to = call.to.toHexString();
+    transaction.from = call.transaction.from.toHexString();
+
+    transaction.hash = call.transaction.hash.toHexString();
+    transaction.logIndex = call.transaction.index.toI32();
+
+    transaction.asset = assetId;
+    transaction.amount = amount;
+    transaction.amountUSD = amountUSD;
+
+    transaction.timestamp = utils.getTimestampInMillis(call.block);
+    transaction.blockNumber = call.block.number;
+
+    transaction.save();
+  }
 
   return transaction;
 }
@@ -30,66 +58,67 @@ export function createWithdrawTransaction(
 export function _Withdraw(
   call: ethereum.Call,
   vault: VaultStore,
-  _withdrawAmount: BigInt,
-  _sharesBurnt: BigInt
+  withdrawAmount: BigInt,
+  sharesBurnt: BigInt
 ): void {
-  let id = "withdraw-" + call.transaction.hash.toHexString();
+  const vaultAddress = Address.fromString(vault.id);
+  const vaultContract = VaultContract.bind(vaultAddress);
 
-  let transaction = WithdrawTransaction.load(id);
-  if (transaction) {
-    return;
-  }
-
-  transaction = createWithdrawTransaction(id, call);
-
-  let inputToken = Token.load(vault.inputTokens[0]);
-  let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
-  let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
+  let inputToken = Token.load(vault.inputToken);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
 
   vault.totalValueLockedUSD = inputTokenPrice.usdPrice
-    .times(vault.inputTokenBalances[0].toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal());
-  // vault.totalVolumeUSD remains same
+    .times(vault.inputTokenBalance.toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
+    .div(inputTokenPrice.decimals.toBigDecimal());
 
-  vault.inputTokenBalances = [
-    vault.inputTokenBalances[0].minus(_withdrawAmount),
-  ];
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(_sharesBurnt);
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
 
-  // Update Financial Metrics FeesUSD
-  let financialMetricsId: i64 =
-    call.block.timestamp.toI64() / constants.SECONDS_PER_DAY;
-  const financialMetrics = utils.getOrCreateFinancialSnapshots(
-    financialMetricsId.toString()
+  vault.outputTokenPriceUSD = getPriceOfOutputTokens(
+    vaultAddress,
+    inputTokenAddress,
+    inputTokenDecimals.toBigDecimal()
   );
 
-  let feesPercentage = utils.getFeePercentage(
-    vault.id,
-    constants.VaultFeeType.WITHDRAWAL_FEE
-  );
-  financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
-    inputTokenPrice.usdPrice
-      .times(_withdrawAmount.toBigDecimal())
-      .times(feesPercentage.times(BigDecimal.fromString("10")))
-      .div(constants.BIGINT_HUNDRED.times(BigInt.fromI32(10)).toBigDecimal())
-      .div(inputTokenDecimals.toBigDecimal())
-  );
-
-  // update deposit transaction
-  transaction.asset = vault.inputTokens[0];
-  transaction.amount = _withdrawAmount;
-  transaction.amountUSD = inputTokenPrice.usdPrice
-    .times(_withdrawAmount.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal());
-
-  financialMetrics.save();
-  transaction.save();
+  vault.pricePerShare = utils
+    .readValue<BigInt>(vaultContract.try_pricePerShare(), constants.BIGINT_ZERO)
+    .toBigDecimal();
   vault.save();
+
+  let withdrawAmountUSD = inputTokenPrice.usdPrice
+    .times(withdrawAmount.toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
+    .div(inputTokenPrice.decimals.toBigDecimal());
+
+  createWithdrawTransaction(
+    call,
+    vault.inputToken,
+    withdrawAmount,
+    withdrawAmountUSD
+  );
+
+  // Update hourly and daily withdraw transaction count
+  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(call.block);
+  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
+    call.block
+  );
+
+  metricsDailySnapshot.dailyWithdrawCount += 1;
+  metricsHourlySnapshot.hourlyWithdrawCount += 1;
+
+  metricsDailySnapshot.save();
+  metricsHourlySnapshot.save();
 
   log.info(
     "[Withdrawn] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",
-    [call.transaction.hash.toHexString(), vault.id, _sharesBurnt.toString(), _withdrawAmount.toString()]
+    [
+      call.transaction.hash.toHexString(),
+      vault.id,
+      sharesBurnt.toString(),
+      withdrawAmount.toString(),
+    ]
   );
 }
-
