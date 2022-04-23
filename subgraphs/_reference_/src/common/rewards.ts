@@ -123,9 +123,9 @@ export function getRewardsPerDay(
   // Add current timestamp and block numnber to array if new block is at least X blocks later than previously stored.
   // Used to save memory and efficiency on array resizing.
   let recentSavedTimestamp: i32;
-  if (circularBuffer.nextIndex == INT_ZERO)
+  if (circularBuffer.nextIndex == INT_ZERO) {
     recentSavedTimestamp = blocks[circularBuffer.bufferSize - INT_TWO];
-  else {
+  } else {
     recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO];
   }
   
@@ -192,7 +192,9 @@ export function getRewardsPerDay(
 
   if (rewardType == RewardIntervalType.TIMESTAMP) {
     return rewardRate.times(RATE_IN_SECONDS_BD);
-  } else return rewardRate.times(circularBuffer.blocksPerDay);
+  } else {
+    return rewardRate.times(circularBuffer.blocksPerDay);
+  }
 }
 
 function getOrCreateCircularBuffer(): _CircularBuffer {
