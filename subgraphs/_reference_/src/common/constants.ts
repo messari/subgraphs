@@ -5,46 +5,24 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////////
 
 // The network names corresponding to the Network enum in the schema.
-// They are mainly intended for convenience on the data consumer side.
-// The enum values are derived from Coingecko slugs (converted to uppercase
-// and replaced hyphens with underscores for Postgres enum compatibility)
-export namespace SchemaNetwork {
-  export const ARBITRUM = "ARBITRUM_ONE";
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace Network {
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const NEAR = "NEAR";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
-}
-
-// The network names corresponding to the ones in `dataSource.network()`
-// They should mainly be used for the ease of comparison.
-// Note that they cannot be used as enums since they are lower case.
-// See below for a complete list:
-// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
-export namespace SubgraphNetwork {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BSC = "bnb";
-  export const CELO = "celo";
-  export const ETHEREUM = "mainnet";
-  export const FANTOM = "fantom";
-  export const FUSE = "fuse";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const NEAR = "near-mainnet";
-  export const OPTIMISM = "optimism";
-  export const POLYGON = "matic";
-  export const XDAI = "xdai";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {

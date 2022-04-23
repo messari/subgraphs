@@ -111,6 +111,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.slug = "abracadabra";
   LendingProtocolEntity.schemaVersion = "1.1.0";
   LendingProtocolEntity.subgraphVersion = "0.0.6";
+  LendingProtocolEntity.methodologyVersion = "1.0.0";
   LendingProtocolEntity.network = Network.ETHEREUM;
   LendingProtocolEntity.type = ProtocolType.LENDING;
   LendingProtocolEntity.totalUniqueUsers = 0;
