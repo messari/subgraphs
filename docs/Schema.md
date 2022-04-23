@@ -1,5 +1,46 @@
 # Schema Definition
 
+All subgraphs follow a set of standardized schemas. This standardization brings some important benefits:
+
+**It makes it extremely easy for people to consume the subgraph data.**
+
+- Every protocol has slightly different terminology and definition, making it difficult for people to make sense of their data.
+- You will only need a single set of queries / pipeline to pull data from all supported protocols.
+- All data are normalized in the same way, which saves you a huge amount of work.
+
+**It makes it easy for developers to contribute.**
+
+- Defining a subgraph schema from scratch can be a daunting task as there are many edge cases and nuances to consider. Our schema is battle-tested, making it a great starting point for any subgraph.
+- We have a large set of subgraph implementations for you to refer to, and a wealth of tribal knowledge tracked in PRs and comments.
+- We have a set of common libraries that you can leverage. Some of them took weeks to implement.
+- We have great tooling you can use to validate your subgraph.
+
+***
+
+## Naming Conventions
+
+- Enum values should be in all caps.
+- Common types:
+  - hash/address: `String`
+  - block height: `BigInt`
+  - timestamp: unix timestamp in `BigInt`
+  - token amount: All token amounts should be BigInt to preserve precision (i.e. in wei)
+  - dollar amount: All USD amounts (including prices) should be BigDecimal
+- All rates should be stored as percentage values as `BigDecimal`. For example, 70.50% should be stored as `70.5`.
+- Use plurals when referring to multiple items, usually stored as an array (e.g. tokens, balances).
+- Optional fields that don't apply to an entity should be left as `null` instead of initialized with 0 or empty string.
+- Certain prefixes may be used to indicate a particular type of value:
+  - *cumulative*: sum of all historical data from day 1 up to this point. E.g. `cumulativeDepositUSD` means all deposits has ever been made to this protocol/pool.
+  - *daily/hourly*: this only applies to snapshots and represents the sum of the snapshot interval (i.e. daily aggregate). E.g. `dailyActiveUsers` means all unique active users on a given day, up till now.
+  - All other quantitative field indicates a spot balance. In other words, the value at this point in time. E.g. `totalValueLockedUSD` means the total TVL of the protocol/pool as of now.
+
+### Quantitative Data
+
+- There are 3 ways in which quantitative data are stored and fetched:
+  1. Real-time: you can get real-time data by querying on specific entities. For example, get `totalValueLockedUSD` from a `Pool`.
+  2. Point-in-time: you can get point-in-time (including historical) data on specific entities using [time-travel queries](https://thegraph.com/docs/en/developer/graphql-api/#time-travel-queries).
+  3. Time-series: the best way to get time-series data is by querying for snapshots. For example, get `totalValueLockedUSD` from `PoolDailySnapshot`.
+
 ## Versioning
 
 Every subgraph has a embedded versioning system in the `Protocol` entity/interface. We use 3 separate fields to version different aspects of the subgraphs for different stakeholders.
@@ -123,7 +164,7 @@ There are situations where you may want to have additional entities in your sche
 - Entities to save internal states of your subgraph for aggregation (e.g. counting)
 - Entities to cached contract call result (e.g. prices)
 
-In general, feel free to add extra entities that tracks the internal state of the subgraph as you see fit. Make sure you prefix these entities with an underscore (e.g. `_User`) to differentiate it from entities in the common schema.
+In general, feel free to add extra entities that tracks the internal state of the subgraph as you see fit. Make sure you prefix these entities with an underscore (e.g. `_User`) to differentiate it from entities in the common schema. The same applies to extra fields within existing entities.
 
 Make sure these changes are **strictly** additive. If you need to **modify** existing entities, please let me know and we can go through it together.
 
