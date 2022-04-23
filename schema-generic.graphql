@@ -119,7 +119,10 @@ type Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
@@ -149,6 +152,29 @@ type UsageMetricsDailySnapshot @entity {
 
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
   dailyTransactionCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type UsageMetricsHourlySnapshot @entity {
+  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " Protocol this snapshot is associated with "
+  protocol: Protocol!
+
+  " # of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -255,8 +281,11 @@ type Pool @entity {
 
   ##### Snapshots #####
 
-  " Pool snapshots "
-  snapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
+  " Pool daily snapshots "
+  dailySnapshots: [PoolDailySnapshot!]! @derivedFrom(field: "pool")
+
+  " Pool hourly snapshots "
+  hourlySnapshots: [PoolHourlySnapshot!]! @derivedFrom(field: "pool")
 }
 
 type PoolDailySnapshot @entity {
@@ -299,6 +328,46 @@ type PoolDailySnapshot @entity {
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
+type PoolHourlySnapshot @entity {
+  " { Smart contract address of the pool }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: Protocol!
+
+  " The pool this snapshot belongs to "
+  pool: Pool!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  ##### Quantitative Data #####
+
+  " Current TVL (Total Value Locked) of this pool "
+  totalValueLockedUSD: BigDecimal!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigInt!]!
+
+  " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+  
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+}
+
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
 type Account @entity {
@@ -306,8 +375,8 @@ type Account @entity {
   id: ID!
 }
 
-# Helper entity for calculating daily active users
-type DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity {
+  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }

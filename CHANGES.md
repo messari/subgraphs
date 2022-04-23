@@ -10,6 +10,7 @@
 - Added `lastPriceUSD` and `lastPriceBlockNumber` as optional fields in the `Token` entity for tracking prices.
 - Refactored `RewardToken` to include `Token` as a field.
 - For snapshots, now saving both `cumulative` values and `daily` aggregates.
+- Now saving hourly snapshots for usage metrics and pool data.
 
 ### DEX-AMM
 
@@ -22,6 +23,7 @@
 ### Lending Protocol
 
 - Added more detailed usage metrics: deposit/withdraw/repay/liquidate count.
+- Now aggregating deposit/borrow/liquidation USD values.
 - Added `InterestRate` entity and made `rates` into an array.
 - Added `mintedTokens` and `mintedTokenSupplies` to the `LendingProtocol` entity.
 - Added `exchangeRate: BigDecimal` to `Market` and `MarketDailySnapshot` entity.

@@ -198,12 +198,15 @@ type YieldAggregator implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
-  ##### Yield-Specific #####
+  ##### Vaults #####
   
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
@@ -234,6 +237,35 @@ type UsageMetricsDailySnapshot @entity {
 
   " Total number of withdrawals in a day "
   dailyWithdrawCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type UsageMetricsHourlySnapshot @entity {
+  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " Protocol this snapshot is associated with "
+  protocol: YieldAggregator!
+
+  " # of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
+
+  " Total number of deposits in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals in an hour "
+  hourlyWithdrawCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -346,8 +378,11 @@ type Vault @entity {
 
   ##### Snapshots #####
 
-  " Vault snapshots "
-  snapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
+  " Vault daily snapshots "
+  dailySnapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
+
+  " Vault hourly snapshots "
+  hourlySnapshots: [VaultHourlySnapshot!]! @derivedFrom(field: "vault")
 
   ##### Events #####
 
@@ -390,10 +425,51 @@ type VaultDailySnapshot @entity {
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmount: BigInt
 
-  " Total amount of reward token emissions in a day, in token's native amount "
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
 
-  " Total amount of reward token emissions in a day, normalized to USD "
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+  
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type VaultHourlySnapshot @entity {
+  " { Smart contract address of the vault }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: YieldAggregator!
+
+  " The vault this snapshot belongs to "
+  vault: Vault!
+
+  " Current TVL (Total Value Locked) of this pool in USD "
+  totalValueLockedUSD: BigDecimal!
+
+  " Amount of input token in the pool "
+  inputTokenBalance: BigInt!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
+  pricePerShare: BigInt
+  
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
   
   " Block number of this snapshot "
@@ -524,8 +600,8 @@ type Account @entity {
   id: ID!
 }
 
-# Helper entity for calculating daily active users
-type DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity {
+  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }
