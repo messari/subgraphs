@@ -414,6 +414,9 @@ type LiquidityPoolDailySnapshot @entity {
   " All trade volume occurred in a given day, in USD "
   dailyVolumeUSD: BigDecimal!
 
+  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumeByTokenUSD: [BigDecimal!]!
+
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 

@@ -15,6 +15,7 @@
 
 - Added more detailed usage metrics: deposit/withdraw/swap count.
 - Added `inputTokenWeights: [BigDecimal!]!` to track pool composition.
+- Added per-token volume `dailyVolumeByTokenUSD: [BigDecimal!]!` to `LiquidityPoolDailySnapshot`.
 - Named `PoolDailySnapshot` to `LiquidityPoolDailySnapshot` for consistency.
 - Added `stakedOutputTokenAmount: BigInt` to `LiquidityPool` and `LiquidityPoolDailySnapshot`.
 
