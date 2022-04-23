@@ -209,8 +209,11 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   );
 
   // Update LP token prices
-  if (pool.outputTokenSupply == BIGINT_ZERO) pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  else pool.outputTokenPriceUSD = newTvl.div(outputTokenSupply);
+  if (pool.outputTokenSupply == BIGINT_ZERO) {
+    pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  } else {
+    pool.outputTokenPriceUSD = newTvl.div(outputTokenSupply);
+  }
 
   pool.save();
   protocol.save();

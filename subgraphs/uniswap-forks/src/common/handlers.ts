@@ -14,21 +14,19 @@ export function handleTransferMint(
   // Tracks supply of minted LP tokens
   pool.outputTokenSupply = pool.outputTokenSupply!.plus(value);
 
-  // create new mint if no mints so far or if last one is done already
+  // if - create new mint if no mints so far or if last one is done already
+  // else - This is done to remove a potential feeto mint --- Not active
   if (!transfer.type) {
     transfer.type = TransferType.MINT;
 
     // Address that is minted to
     transfer.sender = to;
     transfer.liquidity = value;
-  }
-
-  // This is done to remove a potential feeto mint --- Not active
-  else if (transfer.type == TransferType.MINT) {
-    // Updates the liquidity if the previous mint was a fee mint
-    // Address that is minted to
-    transfer.sender = to;
-    transfer.liquidity = value;
+  } else if (transfer.type == TransferType.MINT) {
+      // Updates the liquidity if the previous mint was a fee mint
+      // Address that is minted to
+      transfer.sender = to;
+      transfer.liquidity = value;
   }
 
   transfer.save();
