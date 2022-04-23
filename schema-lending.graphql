@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 1.1.0
+# Version: 1.2.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
