@@ -154,6 +154,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
     poolMetrics.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
@@ -189,6 +190,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
     poolMetrics.hourlyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
