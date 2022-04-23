@@ -11,8 +11,8 @@
 
     "deploy-apeswap-bsc": "graph deploy --product hosted-service steege/apeswap",
     "deploy-apeswap-matic": "graph deploy  --product hosted-service steegecs/apeswap-polygon",
-    "deploy-uniswap-v2-mainnet": "graph deploy --product hosted-service steegecs/apeswap-polygon"
-    
+    "deploy-uniswap-v2-mainnet": "graph deploy --product hosted-service steegecs/apeswap-polygon" 
+     
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",

@@ -60,23 +60,11 @@ type RewardToken @entity {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
-  " Name of the token, mirrored from the smart contract "
-  name: String!
-
-  " Symbol of the token, mirrored from the smart contract "
-  symbol: String!
-
-  " The number of decimal places this token uses, default to 18 "
-  decimals: Int!
+  " Reference to the actual token "
+  token: Token!
 
   " The type of the reward token "
   type: RewardTokenType!
-
-  " Optional field to track the price of a token, mostly for caching purposes "
-  lastPriceUSD: BigDecimal
-
-  " Optional field to track the block number of the last token price "
-  lastPriceBlockNumber: BigInt
 }
 
 # Note that trading fee is the fee paid *by* the users, whereas LP fee and
@@ -404,7 +392,7 @@ type LiquidityPool @entity {
 ##### Pool-Level Timeseries #####
 #################################
 
-type PoolDailySnapshot @entity {
+type LiquidityPoolDailySnapshot @entity {
   " { Smart contract address of the pool }-{ # of days since Unix epoch time } "
   id: ID!
 
@@ -427,6 +415,9 @@ type PoolDailySnapshot @entity {
 
   " All trade volume occurred in a given day, in USD "
   dailyVolumeUSD: BigDecimal!
+
+  " All trade volume occurred in a given day for a specific input token, in USD. The ordering should be the same as the pool's `inputTokens` field. "
+  dailyVolumeByTokenUSD: [BigDecimal!]!
 
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
