@@ -41,7 +41,8 @@ function getUsdPriceRate(decimals: i32, address: Address): BigDecimal | null {
   // divide by one unit of USDC
   return ratesCall.value
     .pop()
-    .toBigDecimal();
+    .toBigDecimal()
+    .div(getDecimalDivisor(6));
 }
 
 export function toUsd(
@@ -73,8 +74,7 @@ export function toUsd(
   ]);
   // explicit cast required
   return amountIn
-    .times(usdRate as BigDecimal)
-    .div(resultDecimals.toBigDecimal());
+    .times(usdRate as BigDecimal);
 }
 
 export function getStrategyAddress(poolAddress: Address): Address {
