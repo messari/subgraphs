@@ -9,10 +9,7 @@ export function handleOwnerChanged(event: OwnerChanged): void {
   if (event.params.owner == Address.fromString(ZERO_ADDRESS)) {
     let tokenContract = INV.bind(event.address);
 
-    let depositTokenId = prefixID(
-      RewardTokenType.DEPOSIT,
-      event.address.toHexString()
-    );
+    let depositTokenId = prefixID(RewardTokenType.DEPOSIT, event.address.toHexString());
     let depositRewardToken = RewardToken.load(depositTokenId);
 
     if (depositRewardToken == null) {
@@ -25,10 +22,7 @@ export function handleOwnerChanged(event: OwnerChanged): void {
 
     depositRewardToken.save();
 
-    let borrowTokenId = prefixID(
-      RewardTokenType.BORROW,
-      event.address.toHexString()
-    );
+    let borrowTokenId = prefixID(RewardTokenType.BORROW, event.address.toHexString());
     let borrowRewardToken = RewardToken.load(borrowTokenId);
 
     if (borrowRewardToken == null) {

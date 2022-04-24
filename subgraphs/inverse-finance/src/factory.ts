@@ -10,17 +10,8 @@ import {
   DistributedBorrowerComp,
   DistributedSupplierComp,
 } from "../generated/Factory/Factory";
-import {
-  MANTISSA_DECIMALS,
-  BIGDECIMAL_ONE,
-  FACTORY_ADDRESS,
-} from "./common/constants";
-import {
-  getOrCreateToken,
-  getOrCreateUnderlyingToken,
-  getOrCreateMarket,
-  getOrCreateProtocol,
-} from "./common/getters";
+import { MANTISSA_DECIMALS, BIGDECIMAL_ONE, FACTORY_ADDRESS } from "./common/constants";
+import { getOrCreateToken, getOrCreateUnderlyingToken, getOrCreateMarket, getOrCreateProtocol } from "./common/getters";
 import { Market } from "../generated/schema";
 import { updateMarketEmission } from "./common/helpers";
 import { decimalsToBigDecimal } from "./common/utils";
@@ -73,9 +64,7 @@ export function handleNewCloseFactor(event: NewCloseFactor): void {
   // Nothing we need here
 }
 
-export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
-): void {
+export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
   let marketAddrs = factoryContract.getAllMarkets();
   for (let i = 0; i < marketAddrs.length; i++) {
@@ -96,17 +85,13 @@ export function handleNewLiquidationIncentive(
   }
 }
 
-export function handleDistributedBorrowerComp(
-  event: DistributedBorrowerComp
-): void {
+export function handleDistributedBorrowerComp(event: DistributedBorrowerComp): void {
   let marketId = event.params.cToken.toHexString();
   let newEmissionAmount = event.params.compDelta;
   updateMarketEmission(marketId, newEmissionAmount, event);
 }
 
-export function handleDistributedSupplierComp(
-  event: DistributedSupplierComp
-): void {
+export function handleDistributedSupplierComp(event: DistributedSupplierComp): void {
   let marketId = event.params.cToken.toHexString();
   let newEmissionAmount = event.params.compDelta;
   updateMarketEmission(marketId, newEmissionAmount, event);
