@@ -7,7 +7,6 @@
     "@graphprotocol/graph-cli": "^0.29.0",
     "@graphprotocol/graph-ts": "^0.26.0",
     "fs-extra": "^10.0.1",
-    "lodash": "^4.17.21",
     "mustache": "^4.2.0",
     "vesper-metadata": "^2.60.0"
   },

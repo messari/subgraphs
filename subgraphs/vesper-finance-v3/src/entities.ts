@@ -104,6 +104,10 @@ export function updateVaultTokens(vault: Vault): void {
   const inputTokens: string[] = [];
   const inputTokenBalances: BigInt[] = [];
   const tokenAddress = poolv3.token();
+  const token = Erc20Token.bind(tokenAddress);
+  const oldTVL = vault.totalValueLockedUSD || BigDecimal.zero();
+  const newTVL = poolv3.totalValue();
+  const aggregator = getOrCreateYieldAggregator();
 
   inputTokens.push(tokenAddress.toHexString());
   inputTokenBalances.push(poolv3.totalValue());
@@ -111,7 +115,20 @@ export function updateVaultTokens(vault: Vault): void {
   vault.inputTokens = inputTokens;
   vault.inputTokenBalances = inputTokenBalances;
 
+  if (newTVL) {
+    vault.totalValueLockedUSD = toUsd(
+      newTVL.toBigDecimal(),
+      token.decimals(),
+      tokenAddress
+    );
+
+    aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD
+      .minus(oldTVL)
+      .plus(vault.totalValueLockedUSD);
+  }
+
   vault.save();
+  aggregator.save();
 }
 
 export function updateVaultRewardTokens(vault: Vault): void {
@@ -148,7 +165,10 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
-export function getOrCreateAccount(address: Address, timestamp: BigInt): Account {
+export function getOrCreateAccount(
+  address: Address,
+  timestamp: BigInt
+): Account {
   let dailyId = `${getDay(timestamp)}-${address.toHexString()}`;
   let object = Account.load(address.toHexString());
   let dailyObject = DailyActiveAccount.load(dailyId);
@@ -293,12 +313,10 @@ export function updateVaultSupply(vault: Vault): void {
   const tokenAddress = poolv3.token();
   const supply_call = poolv3.try_totalSupply();
   const value_call = poolv3.try_totalValue();
-  const debt_call = poolv3.try_totalDebt();
   const token = Erc20Token.bind(tokenAddress);
   const aggregator = getOrCreateYieldAggregator();
 
   if (!supply_call.reverted) {
-    const shareRate = getShareToTokenRateV3(poolv3);
     vault.outputTokenSupply = supply_call.value;
     vault.outputTokenPriceUSD = toUsd(
       supply_call.value.toBigDecimal(),
@@ -310,6 +328,7 @@ export function updateVaultSupply(vault: Vault): void {
   }
 
   if (!value_call.reverted) {
+    // TODO : add deposit amount not subtract
     vault.totalVolumeUSD = toUsd(
       value_call.value.toBigDecimal(),
       token.decimals(),
@@ -320,21 +339,6 @@ export function updateVaultSupply(vault: Vault): void {
 
     aggregator.totalVolumeUSD = aggregator.totalVolumeUSD.plus(
       vault.totalVolumeUSD
-    );
-    aggregator.save();
-  }
-
-  if (!debt_call.reverted) {
-    vault.totalValueLockedUSD = toUsd(
-      debt_call.value.toBigDecimal(),
-      token.decimals(),
-      tokenAddress
-    );
-
-    vault.save();
-
-    aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD.plus(
-      vault.totalValueLockedUSD
     );
     aggregator.save();
   }

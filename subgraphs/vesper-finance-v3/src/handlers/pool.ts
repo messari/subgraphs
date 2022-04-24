@@ -266,7 +266,7 @@ export function handleWithdrawV3(event: Withdraw): void {
   let poolAddressHex = poolAddress.toHexString();
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.owner === ZERO_ADDRESS ||
+    event.params.owner.equals(ZERO_ADDRESS) ||
     hasStrategy(poolV3.getStrategies(), event.params.owner)
   ) {
     let toHex = event.params.owner.toHexString();
@@ -306,7 +306,7 @@ export function handleTransferV3(event: Transfer): void {
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.from === ZERO_ADDRESS ||
+    event.params.from.equals(ZERO_ADDRESS) ||
     hasStrategy(poolV3.getStrategies(), event.params.to)
   ) {
     let toHex = event.params.to.toHexString();
@@ -353,7 +353,7 @@ export function handleDepositV3(event: Deposit): void {
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.owner === ZERO_ADDRESS ||
+    event.params.owner.equals(ZERO_ADDRESS) ||
     hasStrategy(poolV3.getStrategies(), event.params.owner)
   ) {
     let toHex = event.params.owner.toHexString();

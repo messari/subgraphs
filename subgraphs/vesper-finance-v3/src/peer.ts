@@ -41,8 +41,7 @@ function getUsdPriceRate(decimals: i32, address: Address): BigDecimal | null {
   // divide by one unit of USDC
   return ratesCall.value
     .pop()
-    .toBigDecimal()
-    .div(getDecimalDivisor(6));
+    .toBigDecimal();
 }
 
 export function toUsd(
@@ -51,6 +50,8 @@ export function toUsd(
   tokenAddress: Address
 ): BigDecimal {
   // if we are converting from Usdc, it's the same destiniy token, so we return the same value
+  const resultDecimals = BigInt.fromI32(10).pow(8);
+
   if (tokenAddress == USDC_ADDRESS) {
     return amountIn;
   }
@@ -58,7 +59,7 @@ export function toUsd(
   if (amountIn === BigDecimal.fromString("0")) {
     return amountIn;
   }
-  let usdRate = getUsdPriceRate(decimals, tokenAddress);
+  const usdRate = getUsdPriceRate(decimals, tokenAddress);
   if (!usdRate) {
     log.info("Cannot convert {} from address={} to USDC as rate was null", [
       amountIn.toString(),
@@ -71,7 +72,9 @@ export function toUsd(
     usdRate.toString(),
   ]);
   // explicit cast required
-  return amountIn.times(usdRate as BigDecimal);
+  return amountIn
+    .times(usdRate as BigDecimal)
+    .div(resultDecimals.toBigDecimal());
 }
 
 export function getStrategyAddress(poolAddress: Address): Address {
