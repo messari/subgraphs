@@ -3,6 +3,7 @@ import { CToken } from "../generated/templates";
 import {
   Factory,
   MarketListed,
+  ActionPaused,
   ActionPaused1,
   NewCloseFactor,
   NewCollateralFactor,
@@ -27,6 +28,28 @@ export function handleMarketListed(event: MarketListed): void {
 
   // trigger CToken template
   CToken.create(event.params.cToken);
+}
+
+export function handleTransferSeizePaused(event: ActionPaused): void {
+  if (event.params.action == "Transfer") {
+    // reset market.isActive based on whether 'Transfer' is paused
+    // 'Transfer' pause pauses all markets
+    // once 'Transfer' is paused, it is no longer possible to deposit/withdraw
+    let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
+    let marketAddrs = factoryContract.getAllMarkets();
+    for (let i = 0; i < marketAddrs.length; i++) {
+      let marketId = marketAddrs[i].toHexString();
+      let market = Market.load(marketId);
+
+      if (market != null) {
+        market.isActive = !event.params.pauseState;
+
+        market.save();
+      } else {
+        log.warning("Market {} does not exist.", [marketId]);
+      }
+    }
+  }
 }
 
 export function handleMintBorrowPaused(event: ActionPaused1): void {
