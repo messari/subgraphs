@@ -10,6 +10,7 @@ import { createFeeType } from "./Strategy";
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
+  let protocol = getOrCreateProtocol();
 
   if (vault) {
     return vault;
@@ -17,7 +18,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
 
   vault = new Vault(id.toHex());
 
-  vault.protocol = getOrCreateProtocol().id;
+  vault.protocol = protocol.id;
   vault.inputTokens = [];
   vault.outputToken = "";
   vault.rewardTokens = [];
@@ -35,6 +36,13 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.depositLimit = BIGINT_ZERO;
   vault.fees = [];
   vault.save();
+
+  // storing vault ids
+  let vaultIds = protocol._vaultIds;
+  vaultIds.push(vault.id);
+
+  protocol._vaultIds = vaultIds;
+  protocol.save();
 
   return vault;
 }

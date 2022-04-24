@@ -285,11 +285,16 @@ test("financial metrics", () => {
     .div(denominator.toBigDecimal())
     .times(amountUSD);
 
+  let totalValueLockedUSD = price
+    .toBigDecimal()
+    .div(decimals.toBigDecimal())
+    .times(inputTokenBalance.toBigDecimal().div(decimals.toBigDecimal()));
+
   // for deposit and withdraw
   let protocolSideRevenueUSD = totalRevenueUSD;
   let supplySideRevenueUSD = amountUSD.minus(BigDecimal.fromString("2").times(totalRevenueUSD));
 
   assert.fieldEquals("FinancialsDailySnapshot", day, "protocolSideRevenueUSD", protocolSideRevenueUSD.toString());
-  assert.fieldEquals("FinancialsDailySnapshot", day, "totalRevenueUSD", protocolSideRevenueUSD.toString());
+  assert.fieldEquals("FinancialsDailySnapshot", day, "totalRevenueUSD", totalValueLockedUSD.toString());
   assert.fieldEquals("FinancialsDailySnapshot", day, "supplySideRevenueUSD", supplySideRevenueUSD.toString());
 });
