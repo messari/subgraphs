@@ -1,6 +1,6 @@
 import { CollBalanceUpdated } from "../../generated/CollSurplusPool/CollSurplusPool";
 import { createWithdraw } from "../entities/event";
-import { getCurrentETHPrice } from "../entities/price";
+import { getCurrentETHPrice } from "../entities/token";
 import { getOrCreateTrove } from "../entities/trove";
 import { BIGINT_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
