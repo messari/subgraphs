@@ -29,3 +29,15 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 
   return sorted[mid - 1];
 }
+
+// Ray is 27 decimal Wad is 18 decimal
+
+export function rayToWad(a: BigInt): BigInt {
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
+  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+}
+
+export function wadToRay(a: BigInt): BigInt {
+  const result = a.times(BigInt.fromI32(10).pow(9));
+  return result;
+}

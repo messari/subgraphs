@@ -24,18 +24,12 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_TWO,
   BIGINT_ZERO,
-  SECONDS_PER_DAY,
   ZERO_ADDRESS,
   SchemaNetwork,
   ProtocolType,
   RewardTokenType,
   LENDING_TYPE,
   RISK_TYPE,
-  SUPPLY_SIDE_REVENUE_USD,
-  PROTOCOL_SIDE_REVENUE_USD,
-  TOTAL_DEPOSIT_USD,
-  TOTAL_VALUE_LOCKED_USD,
-  TOTAL_REVENUE_USD,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   SCHEMA_VERSION,
@@ -54,19 +48,20 @@ import { VariableDebtToken as VToken } from '../../generated/templates/LendingPo
 
 import { IPriceOracleGetter } from '../../generated/templates/LendingPool/IPriceOracleGetter';
 
-import { getOrCreateToken } from '../common/getters';
+import { getDaysSinceEpoch, getOrCreateToken } from '../common/getters';
 
 import { AToken } from '../../generated/templates/AToken/AToken';
 
 import { LendingPool } from '../../generated/templates/LendingPool/LendingPool';
 
-import { bigIntToBigDecimal } from '../common/utils/numbers';
+import { bigIntToBigDecimal, rayToWad } from '../common/utils/numbers';
 
 import {
   fetchTokenDecimals,
   fetchTokenName,
   fetchTokenSymbol
 } from '../common/tokens';
+import { emissionsPerDay } from '../common/rewards';
 
 export function initMarket(
   blockNumber: BigInt,
@@ -154,7 +149,8 @@ export function initMarket(
 }
 
 export function getCurrentRewardEmissions(market: Market): BigInt[] {
-  const rewardEmissions = market.rewardTokenEmissionsAmount;
+  let depositRewardEmissions = market.rewardTokenEmissionsAmount[0];
+  let borrowRewardEmissions = market.rewardTokenEmissionsAmount[1];
   // Attempt to get the incentives controller contract
   const incentivesController = initIncentivesController(market);
   // From the incentives controller contract, get pull the 'assets' values from the market aToken, sToken, and vToken
@@ -166,40 +162,52 @@ export function getCurrentRewardEmissions(market: Market): BigInt[] {
     const assetDataBorrowVariable = incentivesControllerContract.try_assets(Address.fromString(market.vToken)).value.value0;
     // Get the emissions per day for the aToken rewards for deposits
     if (!assetDataSupply.equals(BIGINT_ZERO)) {
-      rewardEmissions[0] = emissionsPerDay(assetDataSupply);
+      depositRewardEmissions = emissionsPerDay(assetDataSupply);
     } else {
-      rewardEmissions[0] = BIGINT_ZERO;
+      depositRewardEmissions = BIGINT_ZERO;
     }
     // Get the emissions per second for both the sToken and vToken rewards, average them and get the daily emissions for borrows
     const borrowRewardsAvgRate = (assetDataBorrowStable.plus(assetDataBorrowVariable)).div(BIGINT_TWO);
     log.info('BORROW AVG RATE: ' + assetDataBorrowStable.toString() + ' + ' + assetDataBorrowVariable.toString() + ' = ' + (assetDataBorrowStable.plus(assetDataBorrowVariable)).toString() + ' /2 = ' + borrowRewardsAvgRate.toString(), [])
     if (!borrowRewardsAvgRate.equals(BIGINT_ZERO)) {
-      rewardEmissions[1] = emissionsPerDay(borrowRewardsAvgRate);
+      borrowRewardEmissions = emissionsPerDay(borrowRewardsAvgRate);
     } else {
-      rewardEmissions[1] = BIGINT_ZERO;
+      borrowRewardEmissions = BIGINT_ZERO;
     }
   } else {
     log.info('COULD NOT GET REWARD EMISSIONS FROM INC CONT ON MARKET: ' + market.id, []);
-    // The rewardEmissions array returned is already defaulted to zero vals
+    // The array returned with current emissions
   }
-  return rewardEmissions;
+  return [depositRewardEmissions, borrowRewardEmissions];
 }
 
-export function getOutputTokenSupply(event: ethereum.Event): void {
+export function updateOutputTokenSupply(event: ethereum.Event): void {
   const outputTokenAddr = event.address;
   const aTokenInstance = AToken.bind(outputTokenAddr);
   const tryTokenSupply = aTokenInstance.try_totalSupply();
   if (!tryTokenSupply.reverted) {
-    log.info('OUTPUT TOKEN NOT REVERTED ' + outputTokenAddr.toHexString() + ' ' + tryTokenSupply.value.toString(), []);
-    const market = Market.load(aTokenInstance.UNDERLYING_ASSET_ADDRESS().toHexString());
-    if (!market) return;
+    const aToken = getOrCreateToken(outputTokenAddr);
+    log.info('OUTPUT TOKEN SUPPLY FETCHED ' + outputTokenAddr.toHexString() + ' ' + tryTokenSupply.value.toString(), []);
+    let marketId = '';
+    if (aToken.underlyingAsset !== '') {
+      marketId = aToken.underlyingAsset;
+    } else {
+      marketId = aTokenInstance.UNDERLYING_ASSET_ADDRESS().toHexString();
+    }
+    const market = Market.load(marketId);
+    if (!market) {
+      return;
+    }
     market.outputTokenSupply = tryTokenSupply.value;
     market.save();
+
     // This funcion only gets called from mint/burn events which only happen following deposits and withdraws which update the market snapshot
     // Calling the getMarketDailySnapshot function seems to cause some sort of overflow error, so only the outputTokenSupply field needs to be set
     const snapId = getMarketDailyId(event, market);
     const snap = MarketDailySnapshot.load(snapId);
-    if (!snap) return;
+    if (!snap) {
+      return;
+    }
     snap.outputTokenSupply = market.outputTokenSupply;
     snap.save();
   } else {
@@ -235,11 +243,11 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
     lendingProtocol.schemaVersion = SCHEMA_VERSION;
     lendingProtocol.name = PROTOCOL_NAME;
     lendingProtocol.slug = PROTOCOL_SLUG;
-    lendingProtocol.totalRevenueUSD = TOTAL_REVENUE_USD;
-    lendingProtocol.totalValueLockedUSD = TOTAL_VALUE_LOCKED_USD;
-    lendingProtocol.totalDepositUSD = TOTAL_DEPOSIT_USD;
-    lendingProtocol.protocolSideRevenueUSD = PROTOCOL_SIDE_REVENUE_USD;
-    lendingProtocol.supplySideRevenueUSD = SUPPLY_SIDE_REVENUE_USD;
+    lendingProtocol.totalRevenueUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalDepositUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.protocolPriceOracle = PRICE_ORACLE_ADDRESS;
     lendingProtocol.lendingType = LENDING_TYPE;
     lendingProtocol.riskType = RISK_TYPE;
@@ -533,27 +541,4 @@ export function updateTVL(token: Token, market: Market, protocol: LendingProtoco
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
   protocol.totalDepositUSD = protocol.totalValueLockedUSD;
   protocol.save();
-}
-
-export function emissionsPerDay(rewardRatePerSecond: BigInt): BigInt {
-  // Take the reward rate per second, divide out the decimals and get the emissions per day
-  const dec18 = BigInt.fromString('10').pow(18);
-  log.info('RETURN ' + rewardRatePerSecond.toString() + ' ' + dec18.toString() + ' ' + (rewardRatePerSecond.div(dec18)).toString() + (rewardRatePerSecond.times(BigInt.fromI32(<i32>SECONDS_PER_DAY))).div(dec18).toString(), []);
-  return (rewardRatePerSecond.times(BigInt.fromI32(<i32>SECONDS_PER_DAY))).div(dec18);
-}
-
-export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
-  return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
-}
-
-// Ray is 27 decimal Wad is 18 decimal
-
-export function rayToWad(a: BigInt): BigInt {
-  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
-  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
-}
-
-export function wadToRay(a: BigInt): BigInt {
-  const result = a.times(BigInt.fromI32(10).pow(9));
-  return result;
 }

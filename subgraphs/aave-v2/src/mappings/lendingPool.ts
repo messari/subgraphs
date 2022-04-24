@@ -34,17 +34,15 @@ import {
   updateFinancials,
   getMarketDailySnapshot,
   updateMetricsDailySnapshot,
-  getDaysSinceEpoch,
   updateTVL,
   calculateRevenues,
-  rayToWad
 } from './utilFunctions';
 
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from '../common/constants';
 
-import { bigIntToBigDecimal } from '../common/utils/numbers';
+import { bigIntToBigDecimal, rayToWad } from '../common/utils/numbers';
 
-import { getOrCreateToken } from '../common/getters';
+import { getDaysSinceEpoch, getOrCreateToken } from '../common/getters';
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool/market address with context
@@ -91,7 +89,7 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   market.variableBorrowRate = bigIntToBigDecimal(rayToWad(event.params.variableBorrowRate));
   market.stableBorrowRate = bigIntToBigDecimal(rayToWad(event.params.stableBorrowRate));
   log.info('RESERVE DATA UPDATED DEC: ' + token.decimals.toString() + ' ' + market.depositRate.toString() + ' ' + market.variableBorrowRate.toString() + ' ' + event.params.variableBorrowRate.toString() + ' ' + market.stableBorrowRate.toString() + ' ' + event.params.stableBorrowRate.toString(), [])
-  market.save()
+  market.save();
 }
 
 // BELOW EVENT HANDLERS EXECUTE ON USER ACTIONS UPON A LENDING POOL
@@ -187,6 +185,7 @@ export function handleWithdraw(event: Withdraw): void {
   // Update total value locked on the market level
   updateTVL(token, market, protocol, withdraw.amount, true);
   market.save();
+
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
@@ -335,20 +334,16 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   updateTVL(token, market, protocol, liquidate.amount, false);
   calculateRevenues(market, token);
   market.save();
+
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
   updateFinancials(event);
 
-  // Get the surplus percentage of the amount with the liquidation penalty/bonus
-  // The liquidationPenalty is the amount as a percentage of the collateral that was liquidated summed with the percentage of the collateral that is provided as a bonus
-  // This is represented by a 5 digit integer over 10000 (100%). The profit is the percentage over 100%
-  // For example, if the liquidationPenalty is 10500 (105%), the profit is 5% of the collateral liquidated.
-  if (market.liquidationPenalty.gt(BigDecimal.fromString('10000'))) {
-    const divideAmountBy = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'));
-    log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString() + ' divide amount by ' + divideAmountBy.toString(), []);
-    // This expression below divides the collateral liquidated amt in USD by the profit percentage as a number (5% means the amount is to be divided 5)
-    liquidate.profitUSD = amountUSD.div(divideAmountBy);
+  if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+    log.info('LIQUIDATION PROFITS: ' + hash + ' liquidated collateral amount usd ' + amountUSD.toString() + ' liq penalty ' + market.liquidationPenalty.toString(), []);
+    // This expression below multiplies the collateral liquidated amt in USD by the liquidation penalty percentage as a number (5% means the amount is to be multiplied by 5) and then divided by 100
+    liquidate.profitUSD = amountUSD.times(market.liquidationPenalty).div(BigDecimal.fromString('100'));
   } else {
     liquidate.profitUSD = BIGDECIMAL_ZERO;
   }

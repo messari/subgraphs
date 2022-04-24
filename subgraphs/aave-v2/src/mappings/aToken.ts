@@ -3,9 +3,7 @@ import {
   Mint
 } from '../../generated/templates/AToken/AToken';
 
-import {
-  getOutputTokenSupply
-} from './utilFunctions';
+import { updateOutputTokenSupply } from './utilFunctions';
 
 import { log } from '@graphprotocol/graph-ts';
 
@@ -14,12 +12,12 @@ import { log } from '@graphprotocol/graph-ts';
 
 export function handleATokenMint(event: Mint): void {
   // Event handler for AToken mints. This gets triggered upon deposits
-  log.info('MINTING ATOKEN: ' + event.address.toHexString(), []);
-  getOutputTokenSupply(event);
+  log.info(event.params.from.toHexString() + ' ' + event.transaction.from.toHexString() + ' MINTING ATOKEN: ' + event.address.toHexString(), []);
+  updateOutputTokenSupply(event);
 }
 
 export function handleATokenBurn(event: Burn): void {
   // Event handler for AToken burns. This gets triggered upon withdraws
-  log.info('BURNING ATOKEN: ' + event.address.toHexString(), []);
-  getOutputTokenSupply(event);
+  log.info(event.params.from.toHexString() + ' ' + event.transaction.from.toHexString() + ' BURNING ATOKEN: ' + event.address.toHexString(), []);
+  updateOutputTokenSupply(event);
 }

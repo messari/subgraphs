@@ -35,6 +35,7 @@ type Token @entity {
   name: String!
   symbol: String!
   decimals: Int!
+  underlyingAsset: String!
 }
 
 enum RewardTokenType {

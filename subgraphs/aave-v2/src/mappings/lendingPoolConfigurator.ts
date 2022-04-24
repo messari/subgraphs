@@ -14,15 +14,15 @@ import {
   ReserveFactorChanged
 } from '../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator';
 
-import {
-  initMarket
-} from './utilFunctions';
+import { initMarket } from './utilFunctions';
 
 import { Market } from '../../generated/schema';
 
 import { AToken as ATokenTemplate } from '../../generated/templates';
 
 import { getOrCreateToken } from '../common/getters';
+
+import { BIGDECIMAL_ZERO } from '../common/constants';
 
 export function getLendingPoolFromCtx(): string {
   // Get the lending pool with context
@@ -42,7 +42,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   );
 
   // Set the aToken contract from the param aToken
-  getOrCreateToken(event.params.aToken);
+  getOrCreateToken(event.params.aToken, market.id);
   market.outputToken = event.params.aToken.toHexString();
   // Set the s/vToken addresses from params
   market.sToken = event.params.stableDebtToken.toHexString();
@@ -58,7 +58,14 @@ export function handleCollateralConfigurationChanged(event: CollateralConfigurat
   market.maximumLTV = new BigDecimal(event.params.ltv);
   market.liquidationThreshold = new BigDecimal(event.params.liquidationThreshold);
   // The liquidation bonus value is equal to the liquidation penalty, the naming is a matter of which side of the liquidation a user is on
+  // The liquidationBonus parameter comes out as above 100%, represented by a 5 digit integer over 10000 (100%).
+  // To extract the expected value in the liquidationPenalty field: convert to BigDecimal, subtract by 10000 and divide by 100
   market.liquidationPenalty = new BigDecimal(event.params.liquidationBonus);
+  if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
+    market.liquidationPenalty = market.liquidationPenalty.minus(BigDecimal.fromString('10000')).div(BigDecimal.fromString('100'));
+  } else {
+    market.liquidationPenalty = BIGDECIMAL_ZERO;
+  }
   market.save();
 }
 

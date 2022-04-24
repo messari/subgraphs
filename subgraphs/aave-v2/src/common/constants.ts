@@ -103,6 +103,7 @@ export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
@@ -150,10 +151,5 @@ export const SUBGRAPH_VERSION = '1.1.26';
 export const SCHEMA_VERSION = '1.1.0';
 export const PROTOCOL_NAME = 'Aave-v2';
 export const PROTOCOL_SLUG = 'aave-v2';
-export const TOTAL_REVENUE_USD = BIGDECIMAL_ZERO;
-export const TOTAL_VALUE_LOCKED_USD = BIGDECIMAL_ZERO;
-export const TOTAL_DEPOSIT_USD = BIGDECIMAL_ZERO;
-export const PROTOCOL_SIDE_REVENUE_USD = BIGDECIMAL_ZERO;
-export const SUPPLY_SIDE_REVENUE_USD = BIGDECIMAL_ZERO;
 export const LENDING_TYPE = 'POOLED';
 export const RISK_TYPE = 'ISOLATED';
