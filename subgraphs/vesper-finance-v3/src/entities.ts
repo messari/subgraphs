@@ -199,12 +199,13 @@ export function getOrCreateTransfer(
 
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
+    const vault = getOrCreateVault(vaultAddress, event.block.number, event.block.timestamp, false)
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
     getOrCreateAccount(event.params.from, event.block.timestamp);
 
     deposit = new Deposit(id);
-    deposit.vault = vaultAddress.toHexString();
+    deposit.vault = vault.id;
     deposit.hash = event.transaction.hash.toHexString();
     deposit.logIndex = event.logIndex.toI32();
     deposit.protocol = yAggr.id;
@@ -220,12 +221,13 @@ export function getOrCreateTransfer(
       Address.fromString(token.id)
     );
 
+    
+    vault.totalVolumeUSD = vault.totalVolumeUSD.plus(deposit.amountUSD);
+    yAggr.totalVolumeUSD = yAggr.totalVolumeUSD.plus(deposit.amountUSD);
+    
     deposit.save();
-
-    // if (accountRes.created) {
-    //   yAggr.totalUniqueUsers += 1;
-    //   yAggr.save();
-    // }
+    vault.save();
+    yAggr.save();
   }
 
   return deposit;
@@ -240,6 +242,7 @@ export function getOrCreateDeposit(
 
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
+    const vault = getOrCreateVault(vaultAddress, event.block.number, event.block.timestamp, false)
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
     getOrCreateAccount(event.params.owner, event.block.timestamp);
@@ -261,12 +264,12 @@ export function getOrCreateDeposit(
       Address.fromString(token.id)
     );
 
+    vault.totalVolumeUSD = vault.totalVolumeUSD.plus(deposit.amountUSD);
+    yAggr.totalVolumeUSD = yAggr.totalVolumeUSD.plus(deposit.amountUSD);
+    
     deposit.save();
-
-    // if (accountRes.created) {
-    //   yAggr.totalUniqueUsers += 1;
-    //   yAggr.save();
-    // }
+    vault.save();
+    yAggr.save();
   }
 
   return deposit;
@@ -312,9 +315,7 @@ export function updateVaultSupply(vault: Vault): void {
   const poolv3 = PoolV3.bind(vaultAddress);
   const tokenAddress = poolv3.token();
   const supply_call = poolv3.try_totalSupply();
-  const value_call = poolv3.try_totalValue();
   const token = Erc20Token.bind(tokenAddress);
-  const aggregator = getOrCreateYieldAggregator();
 
   if (!supply_call.reverted) {
     vault.outputTokenSupply = supply_call.value;
@@ -325,22 +326,6 @@ export function updateVaultSupply(vault: Vault): void {
     );
 
     vault.save();
-  }
-
-  if (!value_call.reverted) {
-    // TODO : add deposit amount not subtract
-    vault.totalVolumeUSD = toUsd(
-      value_call.value.toBigDecimal(),
-      token.decimals(),
-      tokenAddress
-    );
-
-    vault.save();
-
-    aggregator.totalVolumeUSD = aggregator.totalVolumeUSD.plus(
-      vault.totalVolumeUSD
-    );
-    aggregator.save();
   }
 }
 
