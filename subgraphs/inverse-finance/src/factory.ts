@@ -50,7 +50,6 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
     let ltvFactor = event.params.newCollateralFactorMantissa
       .toBigDecimal()
       .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
-    // TODO: Verify assumption correct?
     market.maximumLTV = ltvFactor;
     market.liquidationThreshold = ltvFactor;
     market.save();
