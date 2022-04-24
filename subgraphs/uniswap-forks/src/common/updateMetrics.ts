@@ -10,7 +10,7 @@ import {
   getOrCreateToken,
   getOrCreateTokenWhitelist,
 } from "./getters";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
+import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { NetworkConfigs } from "../../config/_networkConfig";
@@ -236,13 +236,26 @@ export function updateVolumeAndFees(
   supplyFeeAmountUSD: BigDecimal,
   protocolFeeAmountUSD: BigDecimal
 ): void {
-  let pool = getLiquidityPool(event.address.toHexString());
+  let poolAddress = event.address.toHexString();
+  let pool = getLiquidityPool(poolAddress);
   let protocol = getOrCreateDex();
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
+  let depositHelper = _HelperStore.load(poolAddress)!;
 
-  let trackedAmountUSD = token0VolumeUSD.plus(token1VolumeUSD);
+  let trackedAmountUSD: BigDecimal;
+  if (depositHelper.valueInt < 5) {
+    trackedAmountUSD = BIGDECIMAL_ZERO;
+    token0VolumeUSD = BIGDECIMAL_ZERO;
+    token1VolumeUSD = BIGDECIMAL_ZERO;
+  } else if (token0VolumeUSD == BIGDECIMAL_ZERO) {
+    trackedAmountUSD = token1VolumeUSD;
+  } else if (token1VolumeUSD == BIGDECIMAL_ZERO) {
+    trackedAmountUSD = token0VolumeUSD;
+  } else {
+    trackedAmountUSD = token0VolumeUSD.plus(token1VolumeUSD).div(BIGDECIMAL_TWO);
+  }
 
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
