@@ -51,7 +51,6 @@ export function toUsd(
   tokenAddress: Address
 ): BigDecimal {
   // if we are converting from Usdc, it's the same destiniy token, so we return the same value
-  const resultDecimals = BigInt.fromI32(10).pow(8);
 
   if (tokenAddress == USDC_ADDRESS) {
     return amountIn;
@@ -74,7 +73,8 @@ export function toUsd(
   ]);
   // explicit cast required
   return amountIn
-    .times(usdRate as BigDecimal);
+    .times(usdRate as BigDecimal)
+    .div(getDecimalDivisor(decimals));
 }
 
 export function getStrategyAddress(poolAddress: Address): Address {

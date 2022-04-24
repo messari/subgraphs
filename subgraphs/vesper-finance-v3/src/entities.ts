@@ -21,7 +21,7 @@ import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
-import { toUsd, getShareToTokenRateV3, getDecimalDivisor } from "./peer";
+import { toUsd } from "./peer";
 import { getDay } from "./utils";
 
 interface getOrCreateResponse<T> {
