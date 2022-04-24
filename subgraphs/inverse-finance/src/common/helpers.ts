@@ -371,6 +371,7 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   marketMetrics.depositRate = market.depositRate;
+  //inverse finance does not have stable borrow rate
   //marketMetrics.stableBorrowRate = market.stableBorrowRate
   marketMetrics.variableBorrowRate = market.variableBorrowRate;
 
@@ -436,7 +437,6 @@ export function updateMarket(
 
       market.totalVolumeUSD = market.totalVolumeUSD.plus(borrowAmountUSD);
     }
-    //TODO: It may make sense to merge them into updateMarket?
     //
     //These two are updated in updateMarketEmission
     // triggered by comptroller.DistributedBorrowerComp and
@@ -445,7 +445,6 @@ export function updateMarket(
     //market.rewardTokenEmissionsUSD
     //These three are updated in updateMarketRates
     //market.depositRate
-    //market.stableBorrowRate
     //market.variableBorrowRate
 
     market.save();
@@ -554,31 +553,6 @@ export function updateMarketRates(event: ethereum.Event): void {
     );
   } else {
     market.depositRate = depositRate.value
-      .toBigDecimal()
-      .times(BLOCKS_PER_YEAR)
-      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
-  }
-
-  let interestRateModel = tokenContract.try_interestRateModel();
-  if (interestRateModel.reverted) {
-    log.warning("Failed to get interestRateModel for Market {} at tx hash {}", [
-      marketId,
-      event.transaction.hash.toHexString(),
-    ]);
-    market.save();
-    return;
-  }
-
-  let interestRateModelContract = JumpRateModelV2.bind(interestRateModel.value);
-  // TODO: this is the baseRatePerYear, which applies when utilization rate is below kink
-  let baseRatePerBlock = interestRateModelContract.try_baseRatePerBlock();
-  if (baseRatePerBlock.reverted) {
-    log.warning("Failed to get baseRatePerBlock for Market {} at tx hash {}", [
-      marketId,
-      event.transaction.hash.toHexString(),
-    ]);
-  } else {
-    market.stableBorrowRate = baseRatePerBlock.value
       .toBigDecimal()
       .times(BLOCKS_PER_YEAR)
       .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
