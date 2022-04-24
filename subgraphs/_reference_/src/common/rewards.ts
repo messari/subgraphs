@@ -8,7 +8,7 @@
 
 import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
-import { SubgraphNetwork } from "./constants";
+import { BIGINT_TEN_TO_EIGHTEENTH, SECONDS_PER_DAY, SubgraphNetwork } from "./constants";
 import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./utils/constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,3 +195,9 @@ function getStartingBlockRate(): BigDecimal {
     // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
     else return BIGDECIMAL_ZERO
 }
+
+export function emissionsPerDay(rewardRatePerSecond: BigInt): BigInt {
+    // Take the reward rate per second, divide out the decimals and get the emissions per day
+    const dec18 = BIGINT_TEN_TO_EIGHTEENTH;
+    return (rewardRatePerSecond.times(BigInt.fromI32(<i32>SECONDS_PER_DAY))).div(dec18);
+  }
