@@ -321,12 +321,13 @@ export function getMarketDailySnapshot(
   const token = getOrCreateToken(Address.fromString(market.id));
   // The inputTokenBalances[0] is used as the total value locked denominated in tokens. The first index in the input token array will always be the reserve token
   marketSnapshot.totalValueLockedUSD = amountInUSD(market.inputTokenPricesUSD[0], token.decimals, market.inputTokenBalances[0], market);
-  marketSnapshot.totalDepositUSD = marketSnapshot.totalValueLockedUSD;
   marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
   marketSnapshot.inputTokenBalances = market.inputTokenBalances;
   marketSnapshot.inputTokenPricesUSD = market.inputTokenPricesUSD;
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
   marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketSnapshot.totalBorrowUSD = market.totalBorrowUSD;
+  marketSnapshot.totalDepositUSD = market.totalDepositUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.depositRate = market.depositRate;
@@ -522,7 +523,7 @@ export function calculateRevenues(market: Market, token: Token): void {
   protocol.save();
 }
 
-export function updateTVL(token: Token, market: Market, protocol: LendingProtocol, amountInTokens: BigInt, toSubtract: bool): void {
+export function updateTVL(tx: string, token: Token, market: Market, protocol: LendingProtocol, amountInTokens: BigInt, toSubtract: bool): void {
   // Update the total value locked in a market and the protocol overall after transactions
   let newMarketTVL = market.inputTokenBalances[0];
   if (toSubtract) {
@@ -534,10 +535,20 @@ export function updateTVL(token: Token, market: Market, protocol: LendingProtoco
   // Subtracting the most recently added TVL of the market ensures that the correct
   // proportion of this market is deducted before adding the new market TVL to the protocol
   // Otherwise, the difference in asset USD/ETH price  since saving would deduct the incorrect proportion from the protocol TVL
+  
+  if (protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD).lt(BIGDECIMAL_ZERO)) {
+    log.warning("WARNING: TVL TO BE SET TO " + protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD).toString() + ' BEFORE ' + protocol.totalValueLockedUSD.toString() + ' TRANSACTION ' + tx, [])
+  } 
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = amountInUSD(market.inputTokenPricesUSD[0], token.decimals, newMarketTVL, market);
   market.totalDepositUSD = market.totalValueLockedUSD;
   market.save();
+  if (protocol.totalValueLockedUSD.gt(BIGDECIMAL_ZERO) && protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD).lt(BIGDECIMAL_ZERO)) {
+    log.warning("TVL ABOUT TO ENTER NEGATIVES - TRANSACTION: " + tx + ' CHECK FOR FLASHLOAN OR OTHER EVENT FOR TEMPORARY DISRUPTION.', []);
+  }
+  if (protocol.totalValueLockedUSD.lt(BIGDECIMAL_ZERO) && protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD).gt(BIGDECIMAL_ZERO)) {
+    log.warning("TVL WAS NEGATIVE, NOW POSITIVE - TRANSACTION: " + tx + " CHECK FOR REPAYMENT", []);
+  }
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
   protocol.totalDepositUSD = protocol.totalValueLockedUSD;
   protocol.save();

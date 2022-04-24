@@ -44,12 +44,6 @@ import { bigIntToBigDecimal, rayToWad } from '../common/utils/numbers';
 
 import { getDaysSinceEpoch, getOrCreateToken } from '../common/getters';
 
-export function getLendingPoolFromCtx(): string {
-  // Get the lending pool/market address with context
-  const context = dataSource.context();
-  return context.getString('lendingPool');
-}
-
 export function getTokenBalanceIndex(market: Market, asset: string): number {
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the corresponding values to the same index when added
   let tokenBalanceIndex = market.inputTokens.indexOf(asset);
@@ -94,7 +88,6 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
 
 // BELOW EVENT HANDLERS EXECUTE ON USER ACTIONS UPON A LENDING POOL
 // The transaction is sent to the market address, but event.transaction.to can be null, so this cannot be set for the 'to' field of the below entities
-// Market address is set to value returned from getLendingPoolFromCtx(), which pulls the current marketAddr from context
 
 export function handleDeposit(event: Deposit): void {
   log.info('DEPO' + event.transaction.hash.toHexString() + ' ' + event.params.reserve.toHexString(), []);
@@ -134,7 +127,7 @@ export function handleDeposit(event: Deposit): void {
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
 
   // Update total value locked on the market level
-  updateTVL(token, market, protocol, deposit.amount, false);
+  updateTVL(hash, token, market, protocol, deposit.amount, false);
   market.save();
 
   // Update snapshots
@@ -183,7 +176,7 @@ export function handleWithdraw(event: Withdraw): void {
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
 
   // Update total value locked on the market level
-  updateTVL(token, market, protocol, withdraw.amount, true);
+  updateTVL(hash, token, market, protocol, withdraw.amount, true);
   market.save();
 
   // Update snapshots
@@ -232,7 +225,7 @@ export function handleBorrow(event: Borrow): void {
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
 
   // Update total value locked on the market level
-  updateTVL(token, market, protocol, borrow.amount, true);
+  updateTVL(hash, token, market, protocol, borrow.amount, true);
   // Calculate the revenues and fees as a result of the borrow
   calculateRevenues(market, token);
   market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
@@ -284,7 +277,7 @@ export function handleRepay(event: Repay): void {
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
 
   // Update total value locked on the market level
-  updateTVL(token, market, protocol, repay.amount, false);
+  updateTVL(hash, token, market, protocol, repay.amount, false);
   calculateRevenues(market, token);
   market.save();
 
@@ -331,7 +324,7 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   market.inputTokenBalances = setTokenBalanceArray(newBal, tokenBalanceIndex, market.inputTokenBalances);
 
   // Update total value locked on the market level
-  updateTVL(token, market, protocol, liquidate.amount, false);
+  updateTVL(hash, token, market, protocol, liquidate.amount, false);
   calculateRevenues(market, token);
   market.save();
 
