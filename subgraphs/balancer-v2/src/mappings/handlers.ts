@@ -1,6 +1,6 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { PoolBalanceChanged, PoolRegistered, TokensRegistered, Swap } from "../../generated/Vault/Vault";
-import { createPool, getOrCreateToken, getOrCreateSwap } from "../common/getters";
+import { createPool, getOrCreateToken, getOrCreateSwap, getOrCreateDex } from "../common/getters";
 import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
 import {
@@ -41,7 +41,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString());
   if (pool == null) return;
   let amounts: BigInt[] = new Array<BigInt>();
-
+  let protocol = getOrCreateDex();
   for (let i = 0; i < event.params.deltas.length; i++) {
     let currentAmount = pool.inputTokenBalances[i];
     amounts.push(currentAmount.plus(event.params.deltas[i]));
@@ -52,6 +52,10 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
       let formattedAmount = scaleDown(tokenFee, tokenAddress);
       let price = fetchPrice(tokenAddress);
       pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price));
+      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(formattedAmount.times(price));
+      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+        formattedAmount.times(price),
+      );
     }
   }
 
@@ -62,6 +66,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   }
   pool.inputTokenBalances = amounts;
   pool.save();
+  protocol.save();
 
   updatePoolMetrics(event, pool);
   updateUsageMetrics(event, event.transaction.from);

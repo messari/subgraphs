@@ -13,7 +13,7 @@ export namespace Network {
   export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const ETHEREUM = "MAINNET";
   export const FANTOM = "FANTOM";
   export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
@@ -86,6 +86,7 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 /////////////////////
 
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
+export const SECONDS_PER_HOUR = 60 * 60;
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));

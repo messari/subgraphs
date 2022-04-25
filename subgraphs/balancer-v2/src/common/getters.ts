@@ -8,6 +8,7 @@ import {
   UsageMetricsDailySnapshot,
   Swap,
   LiquidityPoolDailySnapshot,
+  LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -18,6 +19,7 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   LiquidityPoolFeeType,
+  SECONDS_PER_HOUR,
 } from "./constants";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
@@ -83,6 +85,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   fee.feeType = LiquidityPoolFeeType.DYNAMIC_TRADING_FEE;
   fee.save();
 
+  pool.name = outputToken.name;
   pool.protocol = protocol.id;
   pool.fees = [fee.id];
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -181,17 +184,96 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
     snapshot.pool = pool.id;
     snapshot.inputTokenBalances = pool.inputTokenBalances;
     snapshot.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    let dailyVolumeByTokenAmount = new Array<BigInt>();
+    let dailyVolumeByTokenUSD = new Array<BigDecimal>();
+    for (let i = 0; i < pool.inputTokens.length; i++) {
+      dailyVolumeByTokenAmount.push(BIGINT_ZERO);
+      dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+    }
+    snapshot.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
+    snapshot.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
   }
 
   let swapId = event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString());
   let swap = Swap.load(swapId);
   if (swap) {
+    let newTokensAmount = snapshot.dailyVolumeByTokenAmount;
+    let newTokensUSD = snapshot.dailyVolumeByTokenUSD;
+    for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
+      if (Address.fromString(swap.tokenIn) == Address.fromString(pool.inputTokens[i])) {
+        newTokensAmount[i] = newTokensAmount[i].plus(swap.amountIn);
+        newTokensUSD[i] = newTokensUSD[i].plus(swap.amountInUSD);
+      }
+
+      if (Address.fromString(swap.tokenOut) == Address.fromString(pool.inputTokens[i])) {
+        newTokensAmount[i] = newTokensAmount[i].minus(swap.amountOut);
+        newTokensUSD[i] = newTokensUSD[i].minus(swap.amountOutUSD);
+      }
+    }
     let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(BigDecimal.fromString("2"));
     snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(swapValue);
+    snapshot.dailyVolumeByTokenAmount = newTokensAmount;
+    snapshot.dailyVolumeByTokenUSD = newTokensUSD;
   }
   snapshot.outputTokenSupply = pool.outputTokenSupply;
+  snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  snapshot.inputTokenBalances = pool.inputTokenBalances;
+  snapshot.inputTokenWeights = pool.inputTokenWeights;
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
+  snapshot.save();
+}
+
+export function updatePoolHourlySnapshot(event: ethereum.Event, pool: LiquidityPool): void {
+  // Number of days since Unix epoch
+  const hoursSinceEpoch: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  const id = pool.id.concat("-").concat(hoursSinceEpoch.toString());
+  let snapshot = LiquidityPoolHourlySnapshot.load(id);
+  if (!snapshot) {
+    snapshot = new LiquidityPoolHourlySnapshot(id);
+    snapshot.protocol = pool.protocol;
+    snapshot.pool = pool.id;
+    snapshot.inputTokenBalances = pool.inputTokenBalances;
+    snapshot.hourlyVolumeUSD = BIGDECIMAL_ZERO;
+    let hourlyVolumeByTokenAmount = new Array<BigInt>();
+    let hourlyVolumeByTokenUSD = new Array<BigDecimal>();
+    for (let i = 0; i < pool.inputTokens.length; i++) {
+      hourlyVolumeByTokenAmount.push(BIGINT_ZERO);
+      hourlyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+    }
+    snapshot.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
+    snapshot.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
+  }
+
+  let swapId = event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString());
+  let swap = Swap.load(swapId);
+  if (swap) {
+    let newTokensAmount = snapshot.hourlyVolumeByTokenAmount;
+    let newTokensUSD = snapshot.hourlyVolumeByTokenUSD;
+    for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
+      if (Address.fromString(swap.tokenIn) == Address.fromString(pool.inputTokens[i])) {
+        newTokensAmount[i] = newTokensAmount[i].plus(swap.amountIn);
+        newTokensUSD[i] = newTokensUSD[i].plus(swap.amountInUSD);
+      }
+
+      if (Address.fromString(swap.tokenOut) == Address.fromString(pool.inputTokens[i])) {
+        newTokensAmount[i] = newTokensAmount[i].minus(swap.amountOut);
+        newTokensUSD[i] = newTokensUSD[i].minus(swap.amountOutUSD);
+      }
+    }
+    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(BigDecimal.fromString("2"));
+    snapshot.hourlyVolumeUSD = snapshot.hourlyVolumeUSD.plus(swapValue);
+    snapshot.hourlyVolumeByTokenAmount = newTokensAmount;
+    snapshot.hourlyVolumeByTokenUSD = newTokensUSD;
+  }
+  snapshot.outputTokenSupply = pool.outputTokenSupply;
+  snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
+  snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
+  snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
+  snapshot.inputTokenBalances = pool.inputTokenBalances;
+  snapshot.inputTokenWeights = pool.inputTokenWeights;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
   snapshot.save();
