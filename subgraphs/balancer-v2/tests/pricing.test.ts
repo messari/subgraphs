@@ -2,7 +2,7 @@ import { test, assert, log } from "matchstick-as";
 import { BigDecimal, Address } from "@graphprotocol/graph-ts";
 import { calculatePrice } from "../src/common/pricing";
 import { weth, usdc, bal, gno } from "./state";
-import { _TokenPrice } from "../generated/schema";
+import { Token } from "../generated/schema";
 
 const EXPECTED_WETH_PRICE_IN_USD = "3045.15826324921630545044492607652";
 const EXPECTED_BAL_PRICE_IN_USD = "15.14895512317371825584230215638522";
@@ -23,9 +23,9 @@ test("Calculate price of token when swapping with stable", () => {
 
   if (tokenInfo == null) throw Error("Token information should not be null");
 
-  const tokenPrice = new _TokenPrice(tokenInfo.address.toHexString());
-  tokenPrice.lastUsdPrice = tokenInfo.price;
-  tokenPrice.save();
+  const token = new Token(tokenInfo.address.toHexString());
+  token.lastPriceUSD = tokenInfo.price;
+  token.save();
   assert.stringEquals(tokenInfo.price.toString(), EXPECTED_WETH_PRICE_IN_USD);
 });
 
@@ -44,10 +44,10 @@ test("Calculate price of token when swapping with a previously stored base asset
 
   if (tokenInfo == null) throw Error("Token information should not be null");
 
-  const tokenPrice = new _TokenPrice(tokenInfo.address.toHexString());
-  tokenPrice.lastUsdPrice = tokenInfo.price;
-  tokenPrice.save();
-  assert.stringEquals(tokenPrice.lastUsdPrice.toString(), EXPECTED_BAL_PRICE_IN_USD);
+  const token = new Token(tokenInfo.address.toHexString());
+  token.lastPriceUSD = tokenInfo.price;
+  token.save();
+  assert.stringEquals(tokenInfo.price.toString(), EXPECTED_BAL_PRICE_IN_USD);
 });
 
 test("Calculate price of token when swapping with a previously stored base asset in a weighted pool", () => {

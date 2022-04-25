@@ -1,4 +1,4 @@
-import { Address, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, BigInt, dataSource, ethereum} from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -7,7 +7,7 @@ import {
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   Swap,
-  PoolDailySnapshot,
+  LiquidityPoolDailySnapshot,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -34,8 +34,9 @@ export function getOrCreateDex(): DexAmmProtocol {
   if (protocol === null) {
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
-    protocol.schemaVersion = "1.1.0";
-    protocol.subgraphVersion = "1.1.0";
+    protocol.schemaVersion = "1.2.0";
+    protocol.subgraphVersion = "1.2.0";
+    protocol.methodologyVersion = "1.2.0"
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.network = network;
     protocol.type = ProtocolType.EXCHANGE;
@@ -85,7 +86,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.protocol = protocol.id;
   pool.fees = [fee.id];
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  pool.totalVolumeUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
@@ -111,11 +112,15 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = getOrCreateDex().id;
 
-    financialMetrics.feesUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.save();
   }
@@ -133,9 +138,12 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = getOrCreateDex().id;
 
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.dailySwapCount = 0;
     usageMetrics.save();
   }
 
@@ -166,16 +174,23 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
   // Number of days since Unix epoch
   const daysSinceEpoch: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   const id = pool.id.concat("-").concat(daysSinceEpoch.toString());
-  let snapshot = PoolDailySnapshot.load(id);
+  let snapshot = LiquidityPoolDailySnapshot.load(id);
   if (!snapshot) {
-    snapshot = new PoolDailySnapshot(id);
+    snapshot = new LiquidityPoolDailySnapshot(id);
     snapshot.protocol = pool.protocol;
     snapshot.pool = pool.id;
     snapshot.inputTokenBalances = pool.inputTokenBalances;
+    snapshot.dailyVolumeUSD = BIGDECIMAL_ZERO
+  }
+
+  let swapId = event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString());
+  let swap = Swap.load(swapId)
+  if (swap) {
+    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(BigDecimal.fromString("2"))
+    snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(swapValue)
   }
   snapshot.outputTokenSupply = pool.outputTokenSupply;
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
-  snapshot.totalVolumeUSD = pool.totalVolumeUSD;
   snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;

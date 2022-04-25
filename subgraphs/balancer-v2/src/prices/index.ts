@@ -11,7 +11,6 @@ import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
-  log.warning("q se comenta", []);
   // Check if tokenAddr is a NULL Address
   if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();

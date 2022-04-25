@@ -3,18 +3,19 @@ import { PoolBalanceChanged, PoolRegistered, TokensRegistered, Swap } from "../.
 import { createPool, getOrCreateToken, getOrCreateSwap } from "../common/getters";
 import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
-import { updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics } from "../common/metrics";
+import {fetchPrice, updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics} from "../common/metrics";
 import { isUSDStable, valueInUSD } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";
+import {updateWeight} from "../common/weight";
 
 export function handlePoolRegister(event: PoolRegistered): void {
   createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block);
 }
 
 export function handleTokensRegister(event: TokensRegistered): void {
-  let tokens: string[] = [];
-  let tokensAmount: BigInt[] = [];
+  let tokens: string[] = new Array<string>();
+  let tokensAmount: BigInt[] = new Array<BigInt>();
   for (let i = 0; i < event.params.tokens.length; i++) {
     let token = getOrCreateToken(event.params.tokens[i]);
     tokens.push(token.id);
@@ -27,16 +28,25 @@ export function handleTokensRegister(event: TokensRegistered): void {
   pool.inputTokens = tokens;
   pool.inputTokenBalances = tokensAmount;
   pool.save();
+  updateWeight(pool.id)
 }
 
 export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString());
   if (pool == null) return;
-  let amounts: BigInt[] = [];
+  let amounts: BigInt[] = new Array<BigInt>();
 
   for (let i = 0; i < event.params.deltas.length; i++) {
     let currentAmount = pool.inputTokenBalances[i];
     amounts.push(currentAmount.plus(event.params.deltas[i]));
+
+    let tokenFee = event.params.protocolFeeAmounts[i]
+    if (tokenFee.gt(BigInt.zero())) {
+      let tokenAddress = event.params.tokens[i]
+      let formattedAmount = scaleDown(tokenFee, tokenAddress)
+      let price = fetchPrice(tokenAddress)
+      pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price))
+    }
   }
 
   const outputToken = ERC20.bind(Address.fromString(pool.outputToken));
@@ -55,6 +65,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
 export function handleSwap(event: Swap): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString());
   if (pool == null) return;
+  updateWeight(pool.id)
 
   const tokenIn = event.params.tokenIn;
   const tokenOut = event.params.tokenOut;

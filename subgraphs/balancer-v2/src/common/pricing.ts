@@ -1,12 +1,13 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { BASE_ASSETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
-import { _TokenPrice } from "../../generated/schema";
+import { BASE_ASSETS, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
+import { Token } from "../../generated/schema";
 
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
-  let pricingAssetInUSD = _TokenPrice.load(asset.toHexString());
-  if (pricingAssetInUSD != null) {
-    usdValue = value.times(pricingAssetInUSD.lastUsdPrice);
+  let token = Token.load(asset.toHexString());
+  let tokenPrice = token!.lastPriceUSD
+  if (token && tokenPrice) {
+    usdValue = value.times(tokenPrice);
   }
   return usdValue;
 }
@@ -43,21 +44,21 @@ export class TokenInfo {
 }
 
 export function calculatePrice(
-  tokenIn: Address,
+  tokenInAddress: Address,
   amountIn: BigDecimal,
   weightIn: BigDecimal | null,
-  tokenOut: Address,
+  tokenOutAddress: Address,
   amountOut: BigDecimal,
   weightOut: BigDecimal | null,
 ): TokenInfo | null {
   // If both tokens are stable the price is one
-  if (isUSDStable(tokenOut) && isUSDStable(tokenIn)) return null;
+  if (isUSDStable(tokenOutAddress) && isUSDStable(tokenInAddress)) return null;
 
   // If one of both tokens is stable we can calculate how much the other token is worth in usd terms
-  if (isUSDStable(tokenOut))
-    return new TokenInfo(tokenIn, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
-  if (isUSDStable(tokenIn))
-    return new TokenInfo(tokenOut, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
+  if (isUSDStable(tokenOutAddress))
+    return new TokenInfo(tokenInAddress, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
+  if (isUSDStable(tokenInAddress))
+    return new TokenInfo(tokenOutAddress, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
 
   /**
    * Base assets are known tokens that we can make sure they have a pool with a stable token
@@ -65,37 +66,24 @@ export function calculatePrice(
    * This is meant for tokens that do not share pools with stable coins (for example, COW)
    */
 
-  let tokenInPrice = _TokenPrice.load(tokenIn.toHexString());
-  let tokenOutPrice = _TokenPrice.load(tokenOut.toHexString());
+  let tokenIn = Token.load(tokenInAddress.toHexString());
+  let tokenOut = Token.load(tokenOutAddress.toHexString());
 
-  if (isBaseAsset(tokenIn) && tokenInPrice) {
-    amountIn = amountIn.times(tokenInPrice.lastUsdPrice);
-    return new TokenInfo(tokenOut, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
+  let tokenInPrice: BigDecimal | null = null
+  let tokenOutPrice: BigDecimal | null = null
+
+  if (tokenIn) tokenInPrice = tokenIn.lastPriceUSD
+  if (tokenOut) tokenOutPrice = tokenOut.lastPriceUSD
+
+  if (isBaseAsset(tokenInAddress) && tokenInPrice) {
+    amountIn = amountIn.times(tokenInPrice);
+    return new TokenInfo(tokenOutAddress, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
   }
 
-  if (isBaseAsset(tokenOut) && tokenOutPrice) {
-    amountOut = amountOut.times(tokenOutPrice.lastUsdPrice);
-    return new TokenInfo(tokenIn, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
+  if (isBaseAsset(tokenOutAddress) && tokenOutPrice) {
+    amountOut = amountOut.times(tokenOutPrice);
+    return new TokenInfo(tokenInAddress, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
   }
 
   return null;
-}
-
-export function swapValueInUSD(
-  tokenIn: Address,
-  tokenAmountIn: BigDecimal,
-  tokenOut: Address,
-  tokenAmountOut: BigDecimal,
-): BigDecimal {
-  if (isUSDStable(tokenIn)) return tokenAmountIn;
-  if (isUSDStable(tokenOut)) return tokenAmountOut;
-
-  let tokenInSwapValueUSD = valueInUSD(tokenAmountIn, tokenIn);
-  let tokenOutSwapValueUSD = valueInUSD(tokenAmountOut, tokenOut);
-
-  let divisor =
-    tokenInSwapValueUSD.gt(BIGDECIMAL_ZERO) && tokenOutSwapValueUSD.gt(BIGDECIMAL_ZERO)
-      ? BigDecimal.fromString("2")
-      : BIGDECIMAL_ONE;
-  return tokenInSwapValueUSD.plus(tokenOutSwapValueUSD).div(divisor);
 }

@@ -13,7 +13,7 @@ import {
   handleSwap,
   handleTokensRegister,
 } from "../src/mappings/handlers";
-import { _TokenPrice, LiquidityPool } from "../generated/schema";
+import {LiquidityPool, Token} from "../generated/schema";
 import {
   usdcWethPoolId,
   batWethPoolId,
@@ -99,15 +99,16 @@ test("Handle swap and updates base asset usd price value", () => {
     ethereum.Value.fromSignedBigIntArray(newAmounts),
   );
 
-  let token = _TokenPrice.load(weth.id);
-  if (!token) throw Error("Token price is not defined");
+  let token = Token.load(weth.id);
+  let tokenPrice = token!.lastPriceUSD
+  if (!tokenPrice) throw Error("Token price is not defined");
 
-  assert.stringEquals(token.lastUsdPrice.toString(), EXPECTED_WETH_PRICE);
+  assert.stringEquals(tokenPrice.toString(), EXPECTED_WETH_PRICE);
 
   pool = LiquidityPool.load(usdcWethPoolId.toHexString());
   if (pool == null) throw new Error("Pool is not defined");
   assert.stringEquals(pool.totalValueLockedUSD.toString(), EXPECTED_TVL);
-  assert.stringEquals(pool.totalVolumeUSD.toString(), EXPECTED_SWAP_VOLUME);
+  assert.stringEquals(pool.cumulativeVolumeUSD.toString(), EXPECTED_SWAP_VOLUME);
 });
 
 test("Pool with stable and not base asset", () => {
@@ -142,10 +143,11 @@ test("Pool with stable and not base asset", () => {
     amountOut,
   );
   handleSwap(swap);
-  let token = _TokenPrice.load(uma.id.toLowerCase());
-  if (token == null) throw Error("Token price is not defined");
+  let token = Token.load(uma.id.toLowerCase());
+  let tokenPrice = token!.lastPriceUSD
+  if (!tokenPrice) throw Error("Token price is not defined");
 
-  assert.stringEquals(token.lastUsdPrice.toString(), EXPECTED_UMA_PRICE);
+  assert.stringEquals(tokenPrice.toString(), EXPECTED_UMA_PRICE);
 });
 
 // Mock oracle contract
@@ -200,9 +202,10 @@ test("Pool with weth and weight with low liquidity: Weth is the out token", () =
     amountOut,
   );
   handleSwap(swap);
-  let token = _TokenPrice.load(bat.id.toLowerCase());
-  if (!token) throw Error("Token price should be defined");
-  assert.stringEquals(token.lastUsdPrice.toString(), "30");
+  let token = Token.load(bat.id.toLowerCase());
+  let tokenPrice = token!.lastPriceUSD
+  if (!tokenPrice) throw Error("Token price should be defined");
+  assert.stringEquals(tokenPrice.toString(), "30");
 });
 
 // Mock oracle contract
@@ -236,9 +239,9 @@ test("Pool with weth and weight: Weth is the in token", () => {
     [new BigInt(0), new BigInt(0)],
   );
 
-  let w = _TokenPrice.load(weth.id);
-  if (w == null) throw new Error();
-  w.lastUsdPrice = BigDecimal.fromString("2569.87");
+  let w = Token.load(weth.id);
+  if (!w) throw new Error();
+  w.lastPriceUSD = BigDecimal.fromString("2569.87");
   w.save();
 
   handlePoolBalanceChanged(deposit);
@@ -253,7 +256,8 @@ test("Pool with weth and weight: Weth is the in token", () => {
     amountOut,
   );
   handleSwap(swap);
-  let token = _TokenPrice.load(uma.id.toLowerCase());
-  if (!token) throw Error("Token price should be defined");
-  assert.stringEquals(token.lastUsdPrice.toString(), "70");
+  let token = Token.load(uma.id.toLowerCase());
+  let tokenPrice = token!.lastPriceUSD
+  if (!tokenPrice) throw Error("Token price should be defined");
+  assert.stringEquals(tokenPrice.toString(), "70");
 });
