@@ -16,6 +16,9 @@ import {
   Transfer,
   Withdraw as WithdrawEvent,
   Deposit as DepositEvent,
+  TransferCall,
+  DepositCall,
+  WithdrawCall,
 } from "../generated/poolV3_vaUSDC/PoolV3";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
@@ -191,40 +194,44 @@ export function getOrCreateAccount(
 }
 
 export function getOrCreateTransfer(
-  event: Transfer,
+  call: TransferCall,
   vaultAddress: Address
 ): Deposit {
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
+  const id = `${call.transaction.hash.toHexString()}-${call.transaction.index}`;
   let deposit = Deposit.load(id);
 
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
-    const vault = getOrCreateVault(vaultAddress, event.block.number, event.block.timestamp, false)
+    const vault = getOrCreateVault(
+      vaultAddress,
+      call.block.number,
+      call.block.timestamp,
+      false
+    );
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
-    getOrCreateAccount(event.params.from, event.block.timestamp);
+    getOrCreateAccount(call.from, call.block.timestamp);
 
     deposit = new Deposit(id);
     deposit.vault = vault.id;
-    deposit.hash = event.transaction.hash.toHexString();
-    deposit.logIndex = event.logIndex.toI32();
+    deposit.hash = call.transaction.hash.toHexString();
+    deposit.logIndex = call.transaction.index.toI32();
     deposit.protocol = yAggr.id;
-    deposit.to = event.params.to.toHexString();
-    deposit.from = event.params.from.toHexString();
-    deposit.blockNumber = event.block.number;
-    deposit.timestamp = event.block.timestamp;
+    deposit.to = call.to.toHexString();
+    deposit.from = call.from.toHexString();
+    deposit.blockNumber = call.block.number;
+    deposit.timestamp = call.block.timestamp;
     deposit.asset = getOrCreateToken(poolv3.token()).id;
-    deposit.amount = event.params.value;
+    deposit.amount = call.inputs.amount;
     deposit.amountUSD = toUsd(
-      event.params.value.toBigDecimal(),
+      call.inputs.amount.toBigDecimal(),
       token.decimals,
       Address.fromString(token.id)
     );
 
-    
     vault.totalVolumeUSD = vault.totalVolumeUSD.plus(deposit.amountUSD);
     yAggr.totalVolumeUSD = yAggr.totalVolumeUSD.plus(deposit.amountUSD);
-    
+
     deposit.save();
     vault.save();
     yAggr.save();
@@ -234,39 +241,44 @@ export function getOrCreateTransfer(
 }
 
 export function getOrCreateDeposit(
-  event: DepositEvent,
+  call: DepositCall,
   vaultAddress: Address
 ): Deposit {
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
+  const id = `${call.transaction.hash.toHexString()}-${call.transaction.index}`;
   let deposit = Deposit.load(id);
 
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
-    const vault = getOrCreateVault(vaultAddress, event.block.number, event.block.timestamp, false)
+    const vault = getOrCreateVault(
+      vaultAddress,
+      call.block.number,
+      call.block.timestamp,
+      false
+    );
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
-    getOrCreateAccount(event.params.owner, event.block.timestamp);
+    getOrCreateAccount(call.from, call.block.timestamp);
 
     deposit = new Deposit(id);
     deposit.vault = vaultAddress.toHexString();
-    deposit.hash = event.transaction.hash.toHexString();
-    deposit.logIndex = event.logIndex.toI32();
+    deposit.hash = call.transaction.hash.toHexString();
+    deposit.logIndex = call.transaction.index.toI32();
     deposit.protocol = yAggr.id;
     deposit.to = vaultAddress.toHexString();
-    deposit.from = event.params.owner.toHexString();
-    deposit.blockNumber = event.block.number;
-    deposit.timestamp = event.block.timestamp;
+    deposit.from = call.from.toHexString();
+    deposit.blockNumber = call.block.number;
+    deposit.timestamp = call.block.timestamp;
     deposit.asset = getOrCreateToken(poolv3.token()).id;
-    deposit.amount = event.params.amount;
+    deposit.amount = call.inputs._amount;
     deposit.amountUSD = toUsd(
-      event.params.shares.toBigDecimal(),
+      call.inputs._amount.toBigDecimal(),
       token.decimals,
       Address.fromString(token.id)
     );
 
     vault.totalVolumeUSD = vault.totalVolumeUSD.plus(deposit.amountUSD);
     yAggr.totalVolumeUSD = yAggr.totalVolumeUSD.plus(deposit.amountUSD);
-    
+
     deposit.save();
     vault.save();
     yAggr.save();
@@ -276,10 +288,10 @@ export function getOrCreateDeposit(
 }
 
 export function getOrCreateWithdraw(
-  event: WithdrawEvent,
+  call: WithdrawCall,
   vaultAddress: Address
 ): Withdraw {
-  const id = `${event.transaction.hash.toHexString()}-${event.logIndex}`;
+  const id = `${call.transaction.hash.toHexString()}-${call.transaction.index}`;
   let withdraw = Withdraw.load(id);
 
   if (!withdraw) {
@@ -289,17 +301,17 @@ export function getOrCreateWithdraw(
 
     withdraw = new Withdraw(id);
     withdraw.vault = vaultAddress.toHexString();
-    withdraw.hash = event.transaction.hash.toHexString();
-    withdraw.logIndex = event.logIndex.toI32();
+    withdraw.hash = call.transaction.hash.toHexString();
+    withdraw.logIndex = call.transaction.index.toI32();
     withdraw.protocol = yAggr.id;
     withdraw.to = vaultAddress.toHexString();
-    withdraw.from = event.params.owner.toHexString();
-    withdraw.blockNumber = event.block.number;
-    withdraw.timestamp = event.block.timestamp;
+    withdraw.from = call.from.toHexString();
+    withdraw.blockNumber = call.block.number;
+    withdraw.timestamp = call.block.timestamp;
     withdraw.asset = getOrCreateToken(poolv3.token()).id;
-    withdraw.amount = event.params.amount;
+    withdraw.amount = call.inputs._shares;
     withdraw.amountUSD = toUsd(
-      event.params.amount.toBigDecimal(),
+      call.inputs._shares.toBigDecimal(),
       token.decimals,
       Address.fromString(token.id)
     );

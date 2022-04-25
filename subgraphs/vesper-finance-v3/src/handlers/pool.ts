@@ -12,6 +12,9 @@ import {
   Transfer,
   Withdraw,
   Deposit,
+  TransferCall,
+  DepositCall,
+  WithdrawCall,
 } from "../../generated/poolV3_vaUSDC/PoolV3";
 import { Erc20Token } from "../../generated/poolV3_vaUSDC/Erc20Token";
 import { VesperPool } from "../../generated/schema";
@@ -32,12 +35,6 @@ import {
   getOrCreateDeposit,
 } from "../entities";
 import { updateAllSnapshots } from "../snapshots";
-
-// these functions compiles to AssemblyScript. Therefore although we are allowed to code in TS in this file
-// we need to do so with the restrictions of AssemblyScript
-// * no union types allowed (so we can't reuse a function here)
-// * comparisons should be made with == (unless comparing exact pointers)
-// * no destructuring
 
 class Revenue {
   protocolRevenue: BigDecimal;
@@ -130,58 +127,6 @@ function handleTotalSupply(
   );
 }
 
-// This handler is called for every block for v3 Pools. It is used to persist
-// totalSupply and totalDebt(), as there are no events for these methods
-// and are restricted from thegraph to be hooked on.
-// export function handleBlockV3(block: ethereum.Block): void {
-//   let poolAddress = dataSource.address();
-//   // let poolAddressHex = poolAddress.toHexString();
-//   const vault = getOrCreateVault(poolAddress, block.number, block.timestamp);
-//   // const aggregator = getOrCreateYieldAggregator();
-//   // log.info("Entered handleBlockV3 for address {}", [poolAddressHex]);
-
-//   // let pool = getPoolV3(poolAddressHex);
-//   // let poolV3 = PoolV3.bind(poolAddress);
-//   // log.info("Calculating values for pool {}", [poolAddressHex]);
-//   // let tokenAddress = poolV3.token();
-//   // handleTotalSupply(
-//   //   block.number,
-//   //   poolV3.try_totalSupply(),
-//   //   pool,
-//   //   tokenAddress,
-//   //   getShareToTokenRateV3(poolV3)
-//   // );
-//   // log.info("pool {}, totalSupply={}", [
-//   //   poolAddressHex,
-//   //   pool.totalSupply.toString(),
-//   // ]);
-//   // let totalDebtCall = poolV3.try_totalDebt();
-//   // if (!totalDebtCall.reverted) {
-//   //   pool.totalDebt = totalDebtCall.value;
-//   //   let tokenDecimal = Erc20Token.bind(tokenAddress).decimals();
-//   //   pool.totalDebtUsd = toUsd(
-//   //     pool.totalDebt.toBigDecimal().div(getDecimalDivisor(tokenDecimal)),
-//   //     tokenDecimal,
-//   //     tokenAddress
-//   //   );
-//   // }
-//   // log.info("pool {}, totalDebt={}", [
-//   //   poolAddressHex,
-//   //   pool.totalDebt.toString(),
-//   // ]);
-
-//   // aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD.plus(
-//   //   pool.totalDebtUsd
-//   // );
-
-//   // aggregator.save();
-//   // pool.save();
-// }
-
-// This handler is used to calculate the withdraw fees for every pool
-// The Withdraw event is fired in every withdraw, and the fees are calculated if the address
-// withdrawing is not whitelisted - in that case it is 0
-// vVSP does not have withdraw fees either
 function handleWithdrawFee(
   pool: VesperPool,
   event: Withdraw,
@@ -256,60 +201,43 @@ function handleWithdrawFee(
 }
 
 // See handleWithdrawFee for explanation.
-export function handleWithdrawV3(event: Withdraw): void {
+export function handleWithdrawV3(call: WithdrawCall): void {
   getOrCreateVault(
     dataSource.address(),
-    event.block.number,
-    event.block.timestamp
+    call.block.number,
+    call.block.timestamp
   );
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.owner.equals(ZERO_ADDRESS) ||
-    hasStrategy(poolV3.getStrategies(), event.params.owner)
+    call.to.equals(ZERO_ADDRESS) ||
+    hasStrategy(poolV3.getStrategies(), call.to)
   ) {
-    let toHex = event.params.owner.toHexString();
+    let toHex = call.to.toHexString();
     log.info(
       "Withdraw Event for pool V3 {} was made by {} - it is not interest fees.",
       [poolAddressHex, toHex]
     );
     return;
   }
-  getOrCreateWithdraw(event, dataSource.address());
-  updateAllSnapshots(event, dataSource.address());
-  // let poolAddress = dataSource.address();
-  // let poolV3 = PoolV3.bind(poolAddress);
-  // handleWithdrawFee(
-  //   getPoolV3(poolAddress.toHexString()),
-  //   event,
-  //   poolV3.feeWhitelist(),
-  //   poolV3
-  //     .withdrawFee()
-  //     .toBigDecimal()
-  //     .div(BigDecimal.fromString("10000")),
-  //   getShareToTokenRateV3(poolV3),
-  //   poolV3.token(),
-  //   poolV3.decimals()
-  // );
+  getOrCreateWithdraw(call, dataSource.address());
+  updateAllSnapshots(call, dataSource.address());
 }
 
-// This handler hooks on transferring of the fees for V3 Pools
-// Strategies of the pool transfer the fees to the pool as an amount of shares
-// this is done through minting of the shares, hence the Transfer event is emitted.
-export function handleTransferV3(event: Transfer): void {
+export function handleTransferV3(call: TransferCall): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
   log.info("Entered handleTransferV3 in tx={}, pool={}", [
-    event.transaction.hash.toHex(),
+    call.transaction.hash.toHex(),
     poolAddressHex,
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.from.equals(ZERO_ADDRESS) ||
-    hasStrategy(poolV3.getStrategies(), event.params.to)
+    call.from.equals(ZERO_ADDRESS) ||
+    hasStrategy(poolV3.getStrategies(), call.from)
   ) {
-    let toHex = event.params.to.toHexString();
+    let toHex = call.from.toHexString();
     log.info(
       "Transfer Event for pool V3 {} was made by {} - it is not interest fees.",
       [poolAddressHex, toHex]
@@ -318,45 +246,26 @@ export function handleTransferV3(event: Transfer): void {
   }
   getOrCreateVault(
     dataSource.address(),
-    event.block.number,
-    event.block.timestamp
+    call.block.number,
+    call.block.timestamp
   );
-  getOrCreateTransfer(event, dataSource.address());
-  updateAllSnapshots(event, dataSource.address());
-  // let interestFees = event.params.value
-  //   .toBigDecimal()
-  //   .div(getDecimalDivisor(poolV3.decimals()));
-  // log.info("interestFees={}", [interestFees.toString()]);
-  // let revenue = calculateRevenue(
-  //   interestFees,
-  //   getShareToTokenRateV3(poolV3),
-  //   poolV3.token()
-  // );
-  // log.info(
-  //   "Interest fees distribution for tx {} in poolV3 {}: ProtocolRevenue={}, supplySideRevenue={}",
-  //   [
-  //     event.transaction.hash.toHexString(),
-  //     poolAddressHex,
-  //     revenue.protocolRevenue.toString(),
-  //     revenue.supplySideRevenue.toString(),
-  //   ]
-  // );
-  // saveRevenue(getPoolV3(poolAddressHex), revenue);
+  getOrCreateTransfer(call, dataSource.address());
+  updateAllSnapshots(call, dataSource.address());
 }
 
-export function handleDepositV3(event: Deposit): void {
+export function handleDepositV3(call: DepositCall): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
   log.info("Entered handleTransferV3 in tx={}, pool={}", [
-    event.transaction.hash.toHex(),
+    call.transaction.hash.toHex(),
     poolAddressHex,
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
   if (
-    event.params.owner.equals(ZERO_ADDRESS) ||
-    hasStrategy(poolV3.getStrategies(), event.params.owner)
+    call.from.equals(ZERO_ADDRESS) ||
+    hasStrategy(poolV3.getStrategies(), call.from)
   ) {
-    let toHex = event.params.owner.toHexString();
+    let toHex = call.from.toHexString();
     log.info(
       "Deposit Event for pool V3 {} was made by {} - it is not interest fees.",
       [poolAddressHex, toHex]
@@ -365,9 +274,9 @@ export function handleDepositV3(event: Deposit): void {
   }
   getOrCreateVault(
     dataSource.address(),
-    event.block.number,
-    event.block.timestamp
+    call.block.number,
+    call.block.timestamp
   );
-  getOrCreateDeposit(event, dataSource.address());
-  updateAllSnapshots(event, dataSource.address());
+  getOrCreateDeposit(call, dataSource.address());
+  updateAllSnapshots(call, dataSource.address());
 }

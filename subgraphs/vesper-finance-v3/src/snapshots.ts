@@ -8,9 +8,9 @@ import { getDay } from "./utils";
 import { getOrCreateYieldAggregator, getOrCreateVault } from "./entities";
 
 export function getOrCreateUsageMetricsDailySnapshot(
-  event: ethereum.Event
+  call: ethereum.Call
 ): UsageMetricsDailySnapshot {
-  const day = getDay(event.block.timestamp);
+  const day = getDay(call.block.timestamp);
   const protocol = getOrCreateYieldAggregator();
   let object = UsageMetricsDailySnapshot.load(day.toString());
 
@@ -26,8 +26,8 @@ export function getOrCreateUsageMetricsDailySnapshot(
   }
 
   object.totalUniqueUsers = protocol.totalUniqueUsers;
-  object.blockNumber = event.block.number;
-  object.timestamp = event.block.timestamp;
+  object.blockNumber = call.block.number;
+  object.timestamp = call.block.timestamp;
 
   object.save();
 
@@ -35,9 +35,9 @@ export function getOrCreateUsageMetricsDailySnapshot(
 }
 
 export function getOrCreateFinancialsDailySnapshot(
-  event: ethereum.Event
+  call: ethereum.Call
 ): FinancialsDailySnapshot {
-  const day = getDay(event.block.timestamp);
+  const day = getDay(call.block.timestamp);
   const protocol = getOrCreateYieldAggregator();
   let object = FinancialsDailySnapshot.load(day.toString());
 
@@ -49,8 +49,8 @@ export function getOrCreateFinancialsDailySnapshot(
   object.totalVolumeUSD = protocol.totalVolumeUSD;
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
   object.totalRevenueUSD = protocol.totalValueLockedUSD;
-  object.blockNumber = event.block.number;
-  object.timestamp = event.block.timestamp;
+  object.blockNumber = call.block.number;
+  object.timestamp = call.block.timestamp;
 
   object.save();
 
@@ -58,16 +58,16 @@ export function getOrCreateFinancialsDailySnapshot(
 }
 
 export function getOrCreateVaultDailySnapshot(
-  event: ethereum.Event,
+  call: ethereum.Call,
   vaultAddress: Address
 ): VaultDailySnapshot {
-  const day = getDay(event.block.timestamp);
+  const day = getDay(call.block.timestamp);
   const id = `${vaultAddress.toHexString()}-${day}`;
   const protocol = getOrCreateYieldAggregator();
   const vault = getOrCreateVault(
     vaultAddress,
-    event.block.number,
-    event.block.timestamp,
+    call.block.number,
+    call.block.timestamp,
     false
   );
   let object = VaultDailySnapshot.load(id);
@@ -85,8 +85,8 @@ export function getOrCreateVaultDailySnapshot(
   object.outputTokenPriceUSD = vault.outputTokenPriceUSD;
   object.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
   object.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
-  object.blockNumber = event.block.number;
-  object.timestamp = event.block.timestamp;
+  object.blockNumber = call.block.number;
+  object.timestamp = call.block.timestamp;
 
   object.save();
 
@@ -94,10 +94,10 @@ export function getOrCreateVaultDailySnapshot(
 }
 
 export function updateAllSnapshots(
-  event: ethereum.Event,
+  call: ethereum.Call,
   vaultAddress: Address
 ): void {
-  getOrCreateUsageMetricsDailySnapshot(event);
-  getOrCreateFinancialsDailySnapshot(event);
-  getOrCreateVaultDailySnapshot(event, vaultAddress);
+  getOrCreateUsageMetricsDailySnapshot(call);
+  getOrCreateFinancialsDailySnapshot(call);
+  getOrCreateVaultDailySnapshot(call, vaultAddress);
 }
