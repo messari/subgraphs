@@ -5,9 +5,9 @@ import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGINT_ZERO, DAI } from "../common/con
 
 export function updateProtocolMarketList(marketAddress: string): void {
   let protocol = getOrCreateLendingProtocol();
-  let marketIdList = protocol.marketIdList;
+  let marketIdList = protocol.marketIDList;
   marketIdList.push(marketAddress);
-  protocol.marketIdList = marketIdList;
+  protocol.marketIDList = marketIdList;
   protocol.save();
 }
 
@@ -28,14 +28,18 @@ export function createMarket(
   let MarketEntity = new Market(marketAddress.toHexString());
   let inputToken = getOrCreateToken(gemAddress);
   MarketEntity.protocol = getOrCreateLendingProtocol().id;
-  MarketEntity.inputTokens = [inputToken.id];
+  MarketEntity.inputToken = inputToken.id;
   MarketEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  MarketEntity.inputTokenBalances = [BIGINT_ZERO];
+  MarketEntity.inputTokenBalance = BIGINT_ZERO;
+  MarketEntity.inputTokenPriceUSD = BIGDECIMAL_ZERO;
   MarketEntity.outputToken = getOrCreateToken(Address.fromString(DAI)).id;
   MarketEntity.outputTokenSupply = BIGINT_ZERO;
   MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
-  MarketEntity.totalBorrowUSD = BIGDECIMAL_ZERO;
-  MarketEntity.totalDepositUSD = BIGDECIMAL_ZERO;
+  MarketEntity.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  MarketEntity.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  MarketEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  MarketEntity.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  MarketEntity.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
   MarketEntity.createdTimestamp = blockTimestamp;
   MarketEntity.createdBlockNumber = blockNumber;
   MarketEntity.name = ilk.toString();
@@ -45,9 +49,7 @@ export function createMarket(
   MarketEntity.maximumLTV = BIGDECIMAL_ZERO;
   MarketEntity.liquidationThreshold = BIGDECIMAL_ZERO;
   MarketEntity.liquidationPenalty = BIGDECIMAL_ZERO;
-  MarketEntity.stableBorrowRate = BIGDECIMAL_ZERO;
-  MarketEntity.depositRate = BIGDECIMAL_ZERO;
-  MarketEntity.variableBorrowRate = BIGDECIMAL_ZERO;
+  MarketEntity.rates = [BIGDECIMAL_ZERO.toString()];
   MarketEntity.save();
   updateProtocolMarketList(marketAddress.toHexString());
 }

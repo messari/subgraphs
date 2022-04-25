@@ -4,7 +4,6 @@ import { getMarketFromIlk } from "../../common/getters";
 import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE_HUNDRED, MCD_SPOT_ADDRESS, DEFAULT_DECIMALS } from "../../common/constants";
 import { bigIntToBigDecimal, bytesToUnsignedBigInt } from "../../common/utils/numbers";
 import { Spot } from "../../../generated/templates/Spot/Spot";
-import { _TokenPricesUsd } from "../../../generated/schema";
 import { updateTokenPrice } from "../../common/prices/prices";
 import { updateTVL } from "../../common/metrics";
 
@@ -28,10 +27,10 @@ export function handleFile(event: LogNote): void {
 export function handlePoke(event: Poke): void {
   let ilk = event.params.ilk;
   let market = getMarketFromIlk(ilk);
-  let tokenAddress = market.inputTokens[0];
+  let tokenAddress = market.inputToken;
   let priceUSD = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.val), DEFAULT_DECIMALS);
+  market.inputTokenPriceUSD = priceUSD;
+  market.save();
   updateTokenPrice(tokenAddress, priceUSD, event);
   updateTVL(event);
-  market.inputTokenPricesUSD = [priceUSD];
-  market.save();
 }

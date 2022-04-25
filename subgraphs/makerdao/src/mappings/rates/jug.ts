@@ -1,6 +1,6 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { LogNote } from "../../../generated/Jug/Jug";
-import { getMarketFromIlk } from "../../common/getters";
+import { getMarketFromIlk, getOrCreateInterestRate } from "../../common/getters";
 import { bigIntToBigDecimal, bigDecimalExponential, round } from "./../../common/utils/numbers";
 import {
   BIGDECIMAL_ONE,
@@ -11,6 +11,7 @@ import {
 } from "../../common/constants";
 import { Jug } from "../../../generated/templates/Jug/Jug";
 
+
 // Updates the stable borrow rate for the market
 export function handleFile(event: LogNote): void {
   let signature = event.params.sig.toHexString();
@@ -20,11 +21,14 @@ export function handleFile(event: LogNote): void {
     if (what == "duty") {
       let jugContract = Jug.bind(Address.fromString(MCD_JUG_ADDRESS));
       let market = getMarketFromIlk(ilk);
-      let interestRate = bigIntToBigDecimal(jugContract.ilks(ilk).value0, RAY).minus(BIGDECIMAL_ONE);
-      let interestRateAnnualized = bigDecimalExponential(interestRate, SECONDS_PER_YEAR_BIGDECIMAL).times(
+      let interestRate = getOrCreateInterestRate(market.id);
+      let rate = bigIntToBigDecimal(jugContract.ilks(ilk).value0, RAY).minus(BIGDECIMAL_ONE);
+      let interestRateAnnualized = bigDecimalExponential(rate, SECONDS_PER_YEAR_BIGDECIMAL).times(
         BIGDECIMAL_ONE_HUNDRED,
       );
-      market.stableBorrowRate = round(interestRateAnnualized);
+      interestRate.rate = round(interestRateAnnualized);
+      interestRate.save()
+      market.rates = [interestRate.id]
       market.save();
     }
   }

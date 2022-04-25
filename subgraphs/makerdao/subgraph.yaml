@@ -97,6 +97,8 @@ dataSources:
           file: ./abis/Deploy.json
         - name: IlkRegistry
           file: ./abis/IlkRegistry.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - CollateralType
         - SystemState
@@ -128,6 +130,8 @@ dataSources:
           file: ./abis/Deploy.json
         - name: IlkRegistry
           file: ./abis/IlkRegistry.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - CollateralPrice
         - CollateralType
@@ -165,6 +169,8 @@ dataSources:
           file: ./abis/Deploy.json
         - name: IlkRegistry
           file: ./abis/IlkRegistry.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - CollateralType
         - SystemState
@@ -200,6 +206,8 @@ dataSources:
           file: ./abis/Deploy.json
         - name: IlkRegistry
           file: ./abis/IlkRegistry.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - CollateralType
         - SystemState
@@ -234,6 +242,8 @@ dataSources:
           file: ./abis/Deploy.json
         - name: IlkRegistry
           file: ./abis/IlkRegistry.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - CollateralType
         - SystemState
@@ -259,6 +269,8 @@ dataSources:
           file: ./abis/DSProxyFactory.json
         - name: Vat
           file: ./abis/Vat.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - Account
         - _Proxy
@@ -283,6 +295,8 @@ dataSources:
           file: ./abis/CdpManager.json
         - name: DsProxy
           file: ./abis/DsProxy.json
+        - name: ERC20
+          file: ./abis/erc20.json
       entities:
         - _Proxy
       eventHandlers:
@@ -310,6 +324,8 @@ templates:
       abis:
         - name: Deploy
           file: ./abis/Deploy.json
+        - name: ERC20
+          file: ./abis/erc20.json
   - name: Jug
     kind: ethereum/contract
     network: mainnet
@@ -327,6 +343,8 @@ templates:
           file: ./abis/Jug.json
         - name: Deploy
           file: ./abis/Deploy.json
+        - name: ERC20
+          file: ./abis/erc20.json
   - name: Spot
     kind: ethereum/contract
     network: mainnet
@@ -344,6 +362,8 @@ templates:
           file: ./abis/Spot.json
         - name: Deploy
           file: ./abis/Deploy.json
+        - name: ERC20
+          file: ./abis/erc20.json
   - name: Cat
     kind: ethereum/contract
     network: mainnet
@@ -361,6 +381,8 @@ templates:
           file: ./abis/Cat.json
         - name: Deploy
           file: ./abis/Deploy.json
+        - name: ERC20
+          file: ./abis/erc20.json
   - name: GemJoin
     kind: ethereum/contract
     network: mainnet
@@ -376,6 +398,8 @@ templates:
       abis:
         - name: GemJoin
           file: ./abis/GemJoin.json
+        - name: ERC20
+          file: ./abis/erc20.json
       eventHandlers:
         - event: LogNote(indexed bytes4,indexed address,indexed bytes32,indexed bytes32,bytes)
           topic0: '0x6924500900000000000000000000000000000000000000000000000000000000'
@@ -395,3 +419,5 @@ templates:
       abis:
         - name: DsProxy
           file: ./abis/DsProxy.json
+        - name: ERC20
+          file: ./abis/erc20.json

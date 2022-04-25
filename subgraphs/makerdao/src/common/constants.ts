@@ -13,7 +13,7 @@ export namespace Network {
   export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET";
   export const FANTOM = "FANTOM";
   export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
@@ -58,6 +58,16 @@ export namespace LendingType {
 export namespace RiskType {
   export const GLOBAL = "GLOBAL";
   export const ISOLATED = "ISOLATED";
+}
+
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED_TERM = "FIXED_TERM";
+}
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROW = "BORROWER";
 }
 
 //////////////////////////////
@@ -122,6 +132,7 @@ export const RAD = 45 as i32;
 ///// Date/Time /////
 /////////////////////
 
+export const SECONDS_PER_HOUR = 60 * 60; // 360
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_YEAR = 60 * 60 * 24 * 365;
 export const SECONDS_PER_YEAR_BIGINT = BigInt.fromI32(60 * 60 * 24 * 365);
