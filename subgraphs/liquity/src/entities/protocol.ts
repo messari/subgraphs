@@ -157,6 +157,8 @@ export function addProtocolSideRevenue(
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.dailyProtocolSideRevenueUSD =
     financialsSnapshot.dailyProtocolSideRevenueUSD.plus(revenueAmountUSD);
+  financialsSnapshot.dailyTotalRevenueUSD =
+    financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 }
 
@@ -173,6 +175,8 @@ export function addSupplySideRevenue(
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.dailySupplySideRevenueUSD =
     financialsSnapshot.dailySupplySideRevenueUSD.plus(revenueAmountUSD);
+  financialsSnapshot.dailyTotalRevenueUSD =
+    financialsSnapshot.dailyTotalRevenueUSD.plus(revenueAmountUSD);
   financialsSnapshot.save();
 }
 
