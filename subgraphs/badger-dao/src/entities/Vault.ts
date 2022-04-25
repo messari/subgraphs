@@ -1,8 +1,8 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Controller } from "../../generated/bveCVX/Controller";
 import { Strategy as StrategyContract } from "../../generated/bveCVX/Strategy";
-import { VaultV4 as VaultContract } from "../../generated/bveCVX/VaultV4";
 import { VaultV2 as VaultV2Contract } from "../../generated/bveCVX/VaultV2";
+import { VaultV4 as VaultContract } from "../../generated/bveCVX/VaultV4";
 import { Vault, VaultFee, _Strategy } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, NULL_ADDRESS, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
@@ -21,23 +21,23 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault = new Vault(id.toHex());
 
   vault.protocol = protocol.id;
-  vault.inputTokens = [];
-  vault.outputToken = "";
-  vault.rewardTokens = [];
-  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  vault.totalVolumeUSD = BIGDECIMAL_ZERO;
-  vault.inputTokenBalances = [];
-  vault.outputTokenSupply = BIGINT_ZERO;
-  vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  vault.pricePerShare = BIGINT_ZERO;
-  vault.rewardTokenEmissionsAmount = [];
-  vault.rewardTokenEmissionsUSD = [];
-  vault.createdTimestamp = block.timestamp;
-  vault.createdBlockNumber = block.number;
   vault.name = "";
   vault.symbol = "";
+  vault.inputToken = "";
+  vault.outputToken = "";
+  vault.rewardTokens = [];
   vault.depositLimit = BIGINT_ZERO;
   vault.fees = [];
+  vault.createdTimestamp = block.timestamp;
+  vault.createdBlockNumber = block.number;
+  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  vault.inputTokenBalance = BIGINT_ZERO;
+  vault.outputTokenSupply = BIGINT_ZERO;
+  vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  vault.pricePerShare = BIGDECIMAL_ZERO;
+  vault.stakedOutputTokenAmount = BIGINT_ZERO;
+  vault.rewardTokenEmissionsAmount = [];
+  vault.rewardTokenEmissionsUSD = [];
   vault.save();
 
   // storing vault ids
@@ -61,8 +61,8 @@ export function createVault(call: ethereum.Call, vaultAddress: Address): Vault {
 
   let inputTokenAddress = readValue<Address>(vaultContract.try_token(), NULL_ADDRESS);
   let inputToken = getOrCreateToken(inputTokenAddress);
-  vault.inputTokens = [inputToken.id];
-  vault.inputTokenBalances = [BIGINT_ZERO];
+  vault.inputToken = inputToken.id;
+  vault.inputTokenBalance = BIGINT_ZERO;
 
   let outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
@@ -71,7 +71,10 @@ export function createVault(call: ethereum.Call, vaultAddress: Address): Vault {
 
   let controllerAddress = readValue<Address>(vaultContract.try_controller(), NULL_ADDRESS);
   let controllerContract = Controller.bind(controllerAddress);
-  let strategyAddress = readValue<Address>(controllerContract.try_strategies(inputTokenAddress), NULL_ADDRESS);
+  let strategyAddress = readValue<Address>(
+    controllerContract.try_strategies(inputTokenAddress),
+    NULL_ADDRESS,
+  );
 
   if (strategyAddress.notEqual(NULL_ADDRESS)) {
     let strategy = new _Strategy(strategyAddress.toHex());
@@ -82,7 +85,10 @@ export function createVault(call: ethereum.Call, vaultAddress: Address): Vault {
     let strategyContract = StrategyContract.bind(strategyAddress);
 
     let performanceFeeId = enumToPrefix(VaultFeeType.PERFORMANCE_FEE).concat(vaultAddress.toHex());
-    let performanceFee = readValue<BigInt>(strategyContract.try_performanceFeeGovernance(), BIGINT_ZERO);
+    let performanceFee = readValue<BigInt>(
+      strategyContract.try_performanceFeeGovernance(),
+      BIGINT_ZERO,
+    );
     createFeeType(performanceFeeId, performanceFee.toBigDecimal(), VaultFeeType.PERFORMANCE_FEE);
 
     let withdrawFeeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE).concat(vaultAddress.toHex());
@@ -102,7 +108,7 @@ export function getFeePercentage(vault: Vault, feeType: string): BigDecimal {
     let fee = VaultFee.load(feeId);
 
     if (fee && fee.feeType == feeType) {
-      return fee.feePercentage;
+      return fee.feePercentage || BIGDECIMAL_ZERO;
     }
   }
 

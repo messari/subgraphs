@@ -1,4 +1,7 @@
-import { SetPerformanceFeeGovernanceCall, SetWithdrawalFeeCall } from "../../generated/native.bveCVX/Strategy";
+import {
+  SetPerformanceFeeGovernanceCall,
+  SetWithdrawalFeeCall,
+} from "../../generated/native.bveCVX/Strategy";
 import { VaultFee, _Strategy } from "../../generated/schema";
 import { VaultFeeType } from "../constant";
 import { enumToPrefix } from "../utils/strings";

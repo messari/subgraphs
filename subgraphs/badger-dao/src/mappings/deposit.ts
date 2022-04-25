@@ -15,7 +15,7 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
   let vaultAddress = Address.fromString(vault.id);
   let vaultContract = VaultContract.bind(vaultAddress);
 
-  let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
   let tokenContract = ERC20.bind(inputTokenAddress);
 
   let depositAmount = amount
@@ -23,22 +23,25 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
     : readValue<BigInt>(tokenContract.try_balanceOf(call.transaction.from), BIGINT_ZERO);
 
   let pricePerShare = getPricePerShare(vaultAddress);
-  let try_price = getUsdPricePerToken(inputTokenAddress);
+  let try_price = getUsdPricePerToken(inputTokenAddress, call.block);
   let inputTokenPrice = try_price.reverted
     ? try_price.usdPrice
     : try_price.usdPrice.div(try_price.decimals.toBigDecimal());
 
   let token = getOrCreateToken(inputTokenAddress);
+  token.lastPriceBlockNumber = call.block.number;
+  token.lastPriceUSD = inputTokenPrice;
+  token.save();
+
   let tokenDecimals = BIGINT_TEN.pow(token.decimals as u8);
   let amountUSD = inputTokenPrice.times(
     depositAmount.toBigDecimal().div(tokenDecimals.toBigDecimal()),
   );
 
-  vault.pricePerShare = pricePerShare;
-  vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(depositAmount)];
-  vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD);
+  vault.pricePerShare = pricePerShare.toBigDecimal();
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
   vault.totalValueLockedUSD = inputTokenPrice.times(
-    vault.inputTokenBalances[0].toBigDecimal().div(tokenDecimals.toBigDecimal()),
+    vault.inputTokenBalance.toBigDecimal().div(tokenDecimals.toBigDecimal()),
   );
   vault.outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
   vault.outputTokenPriceUSD = getPriceOfStakeToken(inputTokenPrice, pricePerShare);
@@ -51,7 +54,7 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
       inputTokenAddress.toHex(),
       depositAmount.toString(),
       amountUSD.toString(),
-      vault.inputTokenBalances[0].toString(),
+      vault.inputTokenBalance.toString(),
       vault.outputTokenSupply.toString(),
       call.transaction.hash.toHex(),
     ],
@@ -64,8 +67,8 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
   deposit.from = call.transaction.from.toHex();
   deposit.to = vault.id;
   deposit.vault = vault.id;
-  deposit.asset = vault.inputTokens[0];
+  deposit.asset = vault.inputToken;
   deposit.save();
 
-  updateAllMetrics(call, vault);
+  updateAllMetrics(call, vault, true);
 }

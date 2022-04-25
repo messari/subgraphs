@@ -3,6 +3,7 @@ import { VaultV4 as VaultContract } from "../../generated/bveCVX/VaultV4";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGINT_TEN, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
+import { getOrCreateProtocol } from "../entities/Protocol";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
 import { getFeePercentage, getPricePerShare } from "../entities/Vault";
@@ -12,11 +13,11 @@ import { updateAllMetrics } from "./common";
 import { getPriceOfStakeToken } from "./price";
 
 export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | null): void {
-  let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
   let vaultAddress = Address.fromString(vault.id);
   let vaultContract = VaultContract.bind(vaultAddress);
 
-  let pool = vault.inputTokenBalances[0];
+  let pool = vault.inputTokenBalance;
   let outputTokenSupply = vault.outputTokenSupply;
 
   let sharesBurnt = shares
@@ -25,20 +26,22 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
   let withdrawAmount = pool.times(sharesBurnt).div(outputTokenSupply);
 
   let pricePerShare = getPricePerShare(vaultAddress);
-  let try_price = getUsdPricePerToken(inputTokenAddress);
+  let try_price = getUsdPricePerToken(inputTokenAddress, call.block);
   let inputTokenPrice = try_price.reverted
     ? try_price.usdPrice
     : try_price.usdPrice.div(try_price.decimals.toBigDecimal());
 
   let token = getOrCreateToken(inputTokenAddress);
+  token.lastPriceBlockNumber = call.block.number;
+  token.lastPriceUSD = inputTokenPrice;
+
   let tokenDecimals = BIGINT_TEN.pow(token.decimals as u8).toBigDecimal();
   let amountUSD = inputTokenPrice.times(withdrawAmount.toBigDecimal().div(tokenDecimals));
 
-  vault.pricePerShare = pricePerShare;
-  vault.inputTokenBalances = [vault.inputTokenBalances[0].minus(withdrawAmount)];
-  vault.totalVolumeUSD = vault.totalVolumeUSD.plus(amountUSD);
+  vault.pricePerShare = pricePerShare.toBigDecimal();
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
   vault.totalValueLockedUSD = inputTokenPrice.times(
-    vault.inputTokenBalances[0].toBigDecimal().div(tokenDecimals),
+    vault.inputTokenBalance.toBigDecimal().div(tokenDecimals),
   );
   vault.outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
   vault.outputTokenPriceUSD = getPriceOfStakeToken(inputTokenPrice, pricePerShare);
@@ -48,11 +51,11 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
     "[BADGER] withdraw -  vault {}  token {}  amount {} amountUSD {} shares {} inputTokenBalance {} outputTokenSupply {} txHash {}",
     [
       vaultAddress.toHex(),
-      vault.inputTokens[0],
+      vault.inputToken,
       withdrawAmount.toString(),
       amountUSD.toString(),
       sharesBurnt.toString(),
-      vault.inputTokenBalances[0].toString(),
+      vault.inputTokenBalance.toString(),
       vault.outputTokenSupply.toString(),
       call.transaction.hash.toHex(),
     ],
@@ -65,16 +68,14 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
   withdraw.from = call.transaction.from.toHex();
   withdraw.to = vault.id;
   withdraw.vault = vault.id;
-  withdraw.asset = vault.inputTokens[0];
+  withdraw.asset = vault.inputToken;
   withdraw.save();
 
   updateRevenue(call, vault, amountUSD);
-  updateAllMetrics(call, vault);
+  updateAllMetrics(call, vault, false);
 }
 
 function updateRevenue(call: ethereum.Call, vault: Vault, amountUSD: BigDecimal): void {
-  let metrics = getOrCreateFinancialsDailySnapshot(call.block);
-
   let withdrawFee = getFeePercentage(vault, VaultFeeType.WITHDRAWAL_FEE);
   let withdrawFeeAmount = amountUSD.times(withdrawFee.div(BIGDECIMAL_HUNDRED));
 
@@ -85,13 +86,31 @@ function updateRevenue(call: ethereum.Call, vault: Vault, amountUSD: BigDecimal)
     BigDecimal.fromString("1").minus(performanceFee.div(BIGDECIMAL_HUNDRED)),
   );
 
-  metrics.protocolSideRevenueUSD = metrics.protocolSideRevenueUSD.plus(
-    withdrawFeeAmount.plus(performanceFeeAmount),
-  );
-  metrics.supplySideRevenueUSD = metrics.supplySideRevenueUSD.plus(
-    amountAfterPerformance.minus(withdrawFeeAmount),
-  );
-  metrics.totalRevenueUSD = metrics.totalRevenueUSD.plus(amountUSD.times(withdrawFee));
+  let protocol = getOrCreateProtocol();
+  let financial = getOrCreateFinancialsDailySnapshot(call.block);
 
-  metrics.save();
+  let protocolSideRevenue = withdrawFeeAmount.plus(performanceFeeAmount);
+  let supplySideRevenue = amountAfterPerformance.minus(withdrawFeeAmount);
+  let totalRevenue = amountUSD.times(withdrawFee);
+
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+    protocolSideRevenue,
+  );
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    supplySideRevenue,
+  );
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenue);
+  protocol.save();
+
+  financial.dailyProtocolSideRevenueUSD = financial.dailyProtocolSideRevenueUSD.plus(
+    protocolSideRevenue,
+  );
+  financial.dailySupplySideRevenueUSD = financial.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  financial.dailyTotalRevenueUSD = financial.dailyTotalRevenueUSD.plus(totalRevenue);
+  financial.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financial.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financial.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financial.blockNumber = call.block.number;
+  financial.timestamp = call.block.timestamp;
+  financial.save();
 }

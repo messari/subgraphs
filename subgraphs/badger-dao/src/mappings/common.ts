@@ -1,64 +1,69 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, DailyActiveAccount, Vault } from "../../generated/schema";
-import { BIGDECIMAL_ZERO } from "../constant";
+import { Account, ActiveAccount, Vault } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 import {
-  getOrCreateFinancialsDailySnapshot,
-  getOrCreateUsageMetricSnapshot,
+  getOrCreateHourlyDailySnapshot,
+  getOrCreateUsageMetricDailySnapshot,
   getOrCreateVaultDailySnapshot,
+  getOrCreateVaultHourlySnapshot,
 } from "../entities/Metrics";
 import { getOrCreateProtocol } from "../entities/Protocol";
 import { getDay } from "../utils/numbers";
 
-function updateUsageMetrics(call: ethereum.Call): void {
-  // Number of days since Unix epoch
-  let id: i64 = getDay(call.block.timestamp);
-  let usageMetrics = getOrCreateUsageMetricSnapshot(call.block);
+function updateUsageMetrics(call: ethereum.Call, isDeposit: bool): void {
+  let dailyMetrics = getOrCreateUsageMetricDailySnapshot(call.block);
+  let hourlyMetrics = getOrCreateHourlyDailySnapshot(call.block);
+  let protocol = getOrCreateProtocol();
 
   // Update the block number and timestamp to that of the last transaction of that day
-  usageMetrics.blockNumber = call.block.number;
-  usageMetrics.timestamp = call.block.timestamp;
-  usageMetrics.dailyTransactionCount += 1;
+  dailyMetrics.blockNumber = call.block.number;
+  dailyMetrics.timestamp = call.block.timestamp;
+  dailyMetrics.dailyTransactionCount += 1;
+
+  hourlyMetrics.blockNumber = call.block.number;
+  hourlyMetrics.timestamp = call.block.timestamp;
+  hourlyMetrics.hourlyTransactionCount += 1;
+
+  if (isDeposit) {
+    dailyMetrics.dailyDepositCount += 1;
+    hourlyMetrics.hourlyDepositCount += 1;
+  } else {
+    dailyMetrics.dailyWithdrawCount += 1;
+    hourlyMetrics.hourlyWithdrawCount += 1;
+  }
 
   let accountId = call.transaction.from.toHexString();
   let account = Account.load(accountId);
-  let protocol = getOrCreateProtocol();
   if (!account) {
     account = new Account(accountId);
     account.save();
 
-    protocol.totalUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
-  usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
 
-  // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + call.transaction.from.toHexString();
-  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
-  if (!dailyActiveAccount) {
-    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
-    dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1;
+  let activeAccountId = call.transaction.from
+    .toHexString()
+    .concat("-")
+    .concat(getDay(call.block.timestamp).toString());
+  let activeAccount = ActiveAccount.load(activeAccountId);
+  if (!activeAccount) {
+    activeAccount = new ActiveAccount(activeAccountId);
+    activeAccount.save();
+
+    dailyMetrics.dailyActiveUsers += 1;
+    hourlyMetrics.hourlyActiveUsers += 1;
   }
 
-  usageMetrics.save();
-}
+  hourlyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  hourlyMetrics.save();
 
-function updateFinancialMetrics(block: ethereum.Block): void {
-  let metrics = getOrCreateFinancialsDailySnapshot(block);
-  let protocol = getOrCreateProtocol();
-
-  metrics.timestamp = block.timestamp;
-  metrics.blockNumber = block.number;
-  metrics.totalVolumeUSD = protocol.totalVolumeUSD;
-  metrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  metrics.totalRevenueUSD = protocol.totalValueLockedUSD;
-
-  metrics.save();
+  dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailyMetrics.save();
 }
 
 function updateProtocolMetrics(): void {
   let protocol = getOrCreateProtocol();
-  let totalVolumeUSD = BIGDECIMAL_ZERO;
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
   for (let i = 0; i < protocol._vaultIds.length; i++) {
@@ -66,38 +71,44 @@ function updateProtocolMetrics(): void {
     let vault = Vault.load(vaultId);
 
     if (vault) {
-      totalVolumeUSD = totalVolumeUSD.plus(vault.totalVolumeUSD);
       totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
     }
   }
 
-  protocol.totalVolumeUSD = totalVolumeUSD;
   protocol.totalValueLockedUSD = totalValueLockedUSD;
-
   protocol.save();
 }
 
 function updateVaultMetrics(vault: Vault, block: ethereum.Block): void {
-  let metrics = getOrCreateVaultDailySnapshot(Address.fromString(vault.id), block);
+  let daily = getOrCreateVaultDailySnapshot(Address.fromString(vault.id), block);
+  daily.vault = vault.id;
+  daily.totalValueLockedUSD = vault.totalValueLockedUSD;
+  daily.inputTokenBalance = vault.inputTokenBalance;
+  daily.outputTokenSupply = vault.outputTokenSupply || BIGINT_ZERO;
+  daily.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  daily.pricePerShare = vault.pricePerShare;
+  daily.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  daily.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  daily.blockNumber = block.number;
+  daily.timestamp = block.timestamp;
+  daily.save();
 
-  metrics.vault = vault.id;
-  metrics.totalValueLockedUSD = vault.totalValueLockedUSD;
-  metrics.totalVolumeUSD = vault.totalVolumeUSD;
-  metrics.inputTokenBalances = vault.inputTokenBalances;
-  metrics.outputTokenSupply = vault.outputTokenSupply;
-  metrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
-  metrics.pricePerShare = vault.pricePerShare;
-  metrics.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
-  metrics.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
-  metrics.blockNumber = block.number;
-  metrics.timestamp = block.timestamp;
-
-  metrics.save();
+  let hourly = getOrCreateVaultHourlySnapshot(Address.fromString(vault.id), block);
+  hourly.vault = vault.id;
+  hourly.totalValueLockedUSD = vault.totalValueLockedUSD;
+  hourly.inputTokenBalance = vault.inputTokenBalance;
+  hourly.outputTokenSupply = vault.outputTokenSupply || BIGINT_ZERO;
+  hourly.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  hourly.pricePerShare = vault.pricePerShare;
+  hourly.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  hourly.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  hourly.blockNumber = block.number;
+  hourly.timestamp = block.timestamp;
+  hourly.save();
 }
 
-export function updateAllMetrics(call: ethereum.Call, vault: Vault): void {
+export function updateAllMetrics(call: ethereum.Call, vault: Vault, isDeposit: bool): void {
+  updateUsageMetrics(call, isDeposit);
+  updateProtocolMetrics(); // updates TVL
   updateVaultMetrics(vault, call.block);
-  updateProtocolMetrics();
-  updateUsageMetrics(call);
-  updateFinancialMetrics(call.block);
 }
