@@ -1,18 +1,26 @@
+# Introduction
+
 The following tests are done to compare performance difference with the addition or subtraction of different indexing objectives or the substitution of methods for performinging indexing operations.
 
-Test 1.1
-The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation. This is done by deploy nearly identical subgraphs where the only difference is the price oracle.
-The performance can be measured by estimating the blocks per second that is indexed by each of similar intervals of time. The prices are calculated around each deposit, withdraw, and swap event for both tokens involved.
+## Test 1.1
 
-- Note - the performance should be accurate but not totally precise since the end blocks are not the same. Some blocks index slower than others due to high volume
+- The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation. This is done by deploying nearly identical subgraphs where the only difference is the price oracle.
+- The performance can be measured by estimating the blocks per second indexing speed for each subgraph deployment accross similar intervals of time. The prices are calculated around each deposit, withdraw, and swap event for both tokens involved.
 
-Price Oracles:
-Oracle 1 - Pheonix's Oracle used and described in the _reference_ subgraph
-Oracle 2 - Oracle developed by the uniswap team which calculates price using pool ratios
+* Note - the performance should be accurate but not totally precise since the end blocks are not the same. Some blocks index slower than others due to high volume
 
-- Oracle 1
-  Start time - 1:03:16 PM April 21 2022
-  Start block - 10,207,858
+### Price Oracles:
+
+- Oracle 1 - Pheonix's Oracle used and described in the _reference_ subgraph
+
+- Oracle 2 - Oracle developed by the uniswap team which calculates price using pool ratios
+
+### Checkpoints
+
+#### Oracle 1
+
+- Start time - 1:03:16 PM April 21 2022
+- Start block - 10,207,858
 
 * Checkpoint 1 - 2:17:23 PM April 21 2022
   - End block - 10,219,356
@@ -29,9 +37,10 @@ Oracle 2 - Oracle developed by the uniswap team which calculates price using poo
   - Seconds between start and end - 204,928
   - Blocks per second - 1.272
 
-- Oracle 2
-  Start time - 12:48:52 PM April 21 2022
-  Start block - 10,207,858
+#### Oracle 2
+
+- Start time - 12:48:52 PM April 21 2022
+- Start block - 10,207,858
 
 * Checkpoint 1 - 2:14:41 PM April 21 2022
   - End block - 10,224,219
@@ -44,18 +53,24 @@ Oracle 2 - Oracle developed by the uniswap team which calculates price using poo
   - Seconds between start and end - 76,096
   - Blocks per second - 1.9463 Blocks per second
 
-Results - Test 1.1
-The best comparison to here is between the 3rd checkout of the Oracle 1 test and the 2nd checkout of the Oracle 2 test. This is because the end on blocks on the checkpoints are nearest to each other with a wide time interval. The results of this test tell me that that Oracle 1 performs about 35% slower than oracle 2 across a ~150,000 block interval.
+### Results - Test 1.1
 
-Test 1.1
+- The best comparison to here is between the 3rd checkout of the Oracle 1 test and the 2nd checkout of the Oracle 2 test. This is because the end on blocks on the checkpoints are nearest to each other with a wide time interval.
+- The results of this test tell me that that Oracle 1 performs about 35% slower than oracle 2 across a ~150,000 block interval.
+
+## Test 1.2
+
 The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation again with 2 modifications to pheonix's price oracle.
 
 1. In the previous test, there were two contract calls made per price calculation - one for chainlink, and the uniswap router. In this test, the chainlink contract call does not occur unless the oracle is available (past block 12864088). Only the uniswap router will be called for the duration of this test.
 2. The price will only be calculated once per block for each token. The oracle pheonix developed calculated the token price based on the block number anyways, so calculating multiple times per block is pointless.
 
-- Oracle 1
-  Start time - 10:58:17 AM April 25 2022
-  Start block - 10,207,858
+### Checkpoints
+
+#### Oracle 1 - Gets price once per block
+
+- Start time - 10:58:17 AM April 25 2022
+- Start block - 10,207,858
 
 * Checkpoint 1 - 2:26:13 PM April 25 2022
   - End block - 10,233,252
@@ -63,9 +78,10 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Seconds between start and end - 12,476
   - Blocks per second - 2.0354 blocks per seconds
 
-- Oracle 2
-  Start time - 11:00:23 AM April 25 2022
-  Start block - 10,207,858
+#### Oracle 2 - Gets price at every swap/deposit/withdraw
+
+- Start time - 11:00:23 AM April 25 2022
+- Start block - 10,207,858
 
 * Checkpoint 1 - 2:25:31 PM April 25 2022
   - End block - 10,233,547
@@ -73,11 +89,12 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Seconds between start and end - 12,308
   - Blocks per second - 2.0871 blocks per seconds
 
-- Oracle 2 - call price per token once per block
-  Start time - 2:44:35 AM April 25 2022
-  Start block - 10,207,858
+#### Oracle 2 - Gets price once per block
 
-* Checkpoint 1 -
+Start time - 2:44:35 AM April 25 2022
+Start block - 10,207,858
+
+- Checkpoint 1 -
   - End block -
   - Block Difference -
   - Seconds between start and end -
