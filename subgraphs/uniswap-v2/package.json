@@ -1,6 +1,6 @@
 {
   "name": "uniswap-v2",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
