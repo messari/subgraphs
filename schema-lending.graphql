@@ -248,7 +248,7 @@ type LendingProtocol implements Protocol @entity {
   cumulativeDepositUSD: BigDecimal!
 
   " Current balance of all borrowed/minted assets (not historical cumulative), in USD. "
-  totalBorrowUSD: BigDecimal!
+  totalBorrowBalanceUSD: BigDecimal!
 
   " Sum of all historical borrows/mints in USD (i.e. total loan origination). "
   cumulativeBorrowUSD: BigDecimal!
