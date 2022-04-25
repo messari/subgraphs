@@ -1,8 +1,8 @@
 # Introduction
 
-The following tests are done to compare performance difference with the addition or subtraction of different indexing objectives or the substitution of methods for performinging indexing operations.
+The following tests are done to compare performance difference with the addition or subtraction of different indexing objectives or the substitution of methods for performing indexing operations.
 
-## Test 1.1
+## Price Oracle Test 1.0
 
 - The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation. This is done by deploying nearly identical subgraphs where the only difference is the price oracle.
 - The performance can be measured by estimating the blocks per second indexing speed for each subgraph deployment accross similar intervals of time. The prices are calculated around each deposit, withdraw, and swap event for both tokens involved.
@@ -53,14 +53,14 @@ The following tests are done to compare performance difference with the addition
   - Seconds between start and end - 76,096
   - Blocks per second - 1.9463 Blocks per second
 
-### Results - Test 1.1
+### Results
 
 - The best comparison to here is between the 3rd checkout of the Oracle 1 test and the 2nd checkout of the Oracle 2 test. This is because the end on blocks on the checkpoints are nearest to each other with a wide time interval.
 - The results of this test tell me that that Oracle 1 performs about 35% slower than oracle 2 across a ~150,000 block interval.
 
-## Test 1.2
+## Price Oracle Test 1.1
 
-The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation again with 2 modifications to pheonix's price oracle.
+The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation again with 2 modifications to pheonix's price oracle:
 
 1. In the previous test, there were two contract calls made per price calculation - one for chainlink, and the uniswap router. In this test, the chainlink contract call does not occur unless the oracle is available (past block 12864088). Only the uniswap router will be called for the duration of this test.
 2. The price will only be calculated once per block for each token. The oracle pheonix developed calculated the token price based on the block number anyways, so calculating multiple times per block is pointless.
@@ -100,12 +100,17 @@ Start block - 10,207,858
   - Seconds between start and end -
   - Blocks per second -
 
-Test 2.1
-The purpose of this test is to check how much adding entities that track hourly metrics affects the indexing speed of the uniswap v2 subgraph. In this test, I adding hourly metrics for financials, usaage, and pools in addition to the daily metrics. The tests were were started at the same block number and near the same time.
+## Hourly Metrics Test 1.0
 
-- With hourly metrics
-  Start time - 4:47:00 PM April 23 2022
-  Start block - 10000834
+- The purpose of this test is to check how much adding entities that track hourly metrics affects the indexing speed of the uniswap v2 subgraph.
+- In this test, I adding hourly metrics for financials, usaage, and pools in addition to the daily metrics. The tests were were started at the same block number and near the same time.
+
+### Checkpoints
+
+#### With Hourly Metrics
+
+- Start time - 4:47:00 PM April 23 2022
+- Start block - 10000834
 
 * Checkpoint 1 - 10:05:54 PM April 23 2022
   - End block - 10285287
@@ -113,9 +118,10 @@ The purpose of this test is to check how much adding entities that track hourly 
   - Seconds between start and end - 62318
   - Blocks per second - 4.5646 Blocks per second
 
-- Without hourly metrics
-  Start time - 4:50:00 PM April 23 2022
-  Start block - 10000834
+#### Without Hourly Metrics
+
+- Start time - 4:50:00 PM April 23 2022
+- Start block - 10000834
 
 * Checkpoint 1 - 10:07:25 PM April 23 2022
   - End block - 10285442
@@ -123,4 +129,7 @@ The purpose of this test is to check how much adding entities that track hourly 
   - Seconds between start and end - 62245
   - Blocks per second - 4.5724 Blocks per second
 
-The results after a a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph. An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
+### Results
+
+- The results after a a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph.
+- An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
