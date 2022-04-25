@@ -1,0 +1,16 @@
+{
+  "name": "yearn-v2",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ harsh9200/yearn-v2",
+    "create-local": "graph create --node http://localhost:8020/  harsh9200/yearn-v2",
+    "remove-local": "graph remove --node http://localhost:8020/  harsh9200/yearn-v2",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001  harsh9200/yearn-v2"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  }
+}
