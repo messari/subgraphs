@@ -9,7 +9,7 @@ import {
   Account,
   DailyActiveAccount,
 } from "../generated/schema";
-import { CONTROLLER_ADDRESS_HEX, VVSP_ADDRESS } from "./constant";
+import { CONTROLLER_ADDRESS_HEX, VESPER_TOKEN } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   PoolV3,
@@ -352,7 +352,7 @@ export function getOrCreateVault(
   if (!vault) {
     const yAggr = getOrCreateYieldAggregator();
     const poolv3 = PoolV3.bind(address);
-    const outputToken = getOrCreateToken(VVSP_ADDRESS);
+    const outputToken = getOrCreateToken(VESPER_TOKEN);
 
     vault = new Vault(address.toHexString());
     vault.outputToken = outputToken.id;
