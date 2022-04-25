@@ -1,0 +1,11 @@
+{
+  "startBlock": "12750809",
+  "network": "bnb",
+
+  "BentoBoxAddress": "0x090185f2135308BaD17527004364eBcC2D37e5F6",
+  "DegenBoxEnabled": false,
+  "SpellEnabled": false,
+  "OffchainAggregatorEnabled": true,
+  "OffchainAggregatorAddress": "0xc9d267542b23b41fb93397a93e5a1d7b80ea5a01",
+  "OffchainAggregatorStartBlock": "11916333"
+}
