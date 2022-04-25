@@ -16,9 +16,9 @@ import {
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED, FeeSwitch } from "./constants";
-import { getLiquidityPool, getOrCreateDex, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken } from "./getters";
+import { getLiquidityPool, getOrCreateDex, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken, getOrCreateLPToken } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
-import { updateVolumeAndFees, updateDepositHelper } from "./updateMetrics";
+import { updateVolumeAndFees, updateDepositHelper, updateTokenWhitelists } from "./updateMetrics";
 import { savePoolId } from "./handlers";
 import { NetworkConfigs } from "../../config/_networkConfig";
 
@@ -53,7 +53,16 @@ function createPoolFees(poolAddress: string): string[] {
 }
 
 // Create a liquidity pool from PairCreated contract call
-export function createLiquidityPool(event: ethereum.Event, protocol: DexAmmProtocol, poolAddress: string, token0: Token, token1: Token, LPtoken: Token): void {
+export function createLiquidityPool(event: ethereum.Event, poolAddress: string, token0Address: string, token1Address: string): void {
+  let protocol = getOrCreateDex();
+
+  // create the tokens and tokentracker
+  let token0 = getOrCreateToken(token0Address);
+  let token1 = getOrCreateToken(token1Address);
+  let LPtoken = getOrCreateLPToken(poolAddress, token0, token1);
+
+  updateTokenWhitelists(token0, token1, poolAddress);
+
   let pool = new LiquidityPool(poolAddress);
   let poolAmounts = new _LiquidityPoolAmount(poolAddress);
 
@@ -79,16 +88,19 @@ export function createLiquidityPool(event: ethereum.Event, protocol: DexAmmProto
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   savePoolId(poolAddress);
 
-  pool.save();
-  poolAmounts.save();
-
   // Used to track the number of deposits in a liquidity pool
   let poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
-  poolDeposits.save();
 
   // create the tracked contract based on the template
   PairTemplate.create(Address.fromString(poolAddress));
+
+  pool.save();
+  token0.save();
+  token1.save();
+  LPtoken.save();
+  poolAmounts.save();
+  poolDeposits.save();
 }
 
 // Create Account entity for participating account
