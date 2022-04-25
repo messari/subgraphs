@@ -190,7 +190,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.cumulativeUniqueUsers = 0;
   LendingProtocolEntity.totalValueLockedUSD = BIGDECIMAL_ZERO;
   LendingProtocolEntity.lendingType = LendingType.CDP;
-  LendingProtocolEntity.mintedTokens = [getOrCreateToken(Address.fromString(DAI)).id]
+  LendingProtocolEntity.mintedTokens = [getOrCreateToken(Address.fromString(DAI)).id];
   LendingProtocolEntity.save();
   return LendingProtocolEntity;
 }
@@ -239,15 +239,15 @@ export function getProxy(proxyAddress: Address): _Proxy {
   return proxy;
 }
 
-export function getOrCreateInterestRate(marketAddress:string): InterestRate {
+export function getOrCreateInterestRate(marketAddress: string): InterestRate {
   let interestRate = InterestRate.load("BORROWER-" + "STABLE-" + marketAddress);
-  if (interestRate){
-    return interestRate
+  if (interestRate) {
+    return interestRate;
   }
   interestRate = new InterestRate("BORROWER-" + "STABLE-" + marketAddress);
   interestRate.side = InterestRateSide.BORROW;
   interestRate.type = InterestRateType.STABLE;
   interestRate.rate = BIGDECIMAL_ONE;
   interestRate.save();
-  return interestRate
+  return interestRate;
 }

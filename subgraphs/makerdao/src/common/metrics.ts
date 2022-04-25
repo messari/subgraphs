@@ -1,6 +1,14 @@
 import { Address, ethereum, Bytes } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount } from "../../generated/schema";
-import { SECONDS_PER_DAY, BIGDECIMAL_ZERO, BIGDECIMAL_ONE, VAT_ADDRESS, RAD, BIGINT_ZERO, SECONDS_PER_HOUR } from "./constants";
+import {
+  SECONDS_PER_DAY,
+  BIGDECIMAL_ZERO,
+  BIGDECIMAL_ONE,
+  VAT_ADDRESS,
+  RAD,
+  BIGINT_ZERO,
+  SECONDS_PER_HOUR,
+} from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
@@ -26,7 +34,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Update the block number and timestamp to that of the last transaction of that day
   usageHourlySnapshot.blockNumber = event.block.number;
   usageHourlySnapshot.timestamp = event.block.timestamp;
-  usageHourlySnapshot.hourlyTransactionCount += 1;  
+  usageHourlySnapshot.hourlyTransactionCount += 1;
 
   usageDailySnapshot.blockNumber = event.block.number;
   usageDailySnapshot.timestamp = event.block.timestamp;
@@ -42,7 +50,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
-  
+
   usageHourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageDailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
@@ -70,10 +78,10 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 // Update MarketDailySnapshot entity
 export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   let market = getMarketFromIlk(ilk);
-  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event,market.id);
-  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event,market.id);
+  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
   let protocol = getOrCreateLendingProtocol();
-  
+
   marketHourlySnapshot.protocol = protocol.id;
   marketHourlySnapshot.market = market.id;
   marketHourlySnapshot.rates = market.rates;
@@ -101,9 +109,9 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
   marketDailySnapshot.outputTokenPriceUSD = BIGDECIMAL_ONE;
-  
-  marketHourlySnapshot.save()
-  marketHourlySnapshot.save()
+
+  marketHourlySnapshot.save();
+  marketHourlySnapshot.save();
 }
 
 export function updateTVL(event: ethereum.Event): void {
@@ -116,19 +124,19 @@ export function updateTVL(event: ethereum.Event): void {
   let protocolMintedTokenSupply = BIGINT_ZERO;
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
-    let market = getMarket(marketAddress)
+    let market = getMarket(marketAddress);
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(market.totalValueLockedUSD);
   }
-  financialsDailySnapshot.mintedTokenSupplies = [protocolMintedTokenSupply]
+  financialsDailySnapshot.mintedTokenSupplies = [protocolMintedTokenSupply];
   financialsDailySnapshot.totalValueLockedUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshot.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
-  protocol.mintedTokenSupplies = [protocolMintedTokenSupply]
+  protocol.mintedTokenSupplies = [protocolMintedTokenSupply];
   protocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
   protocol.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
-  
+
   financialsDailySnapshot.save();
   protocol.save();
 }

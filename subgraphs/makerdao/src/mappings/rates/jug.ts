@@ -11,7 +11,6 @@ import {
 } from "../../common/constants";
 import { Jug } from "../../../generated/templates/Jug/Jug";
 
-
 // Updates the stable borrow rate for the market
 export function handleFile(event: LogNote): void {
   let signature = event.params.sig.toHexString();
@@ -27,8 +26,8 @@ export function handleFile(event: LogNote): void {
         BIGDECIMAL_ONE_HUNDRED,
       );
       interestRate.rate = round(interestRateAnnualized);
-      interestRate.save()
-      market.rates = [interestRate.id]
+      interestRate.save();
+      market.rates = [interestRate.id];
       market.save();
     }
   }
