@@ -11,9 +11,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import moment from "moment";
 import { schema } from "./queries/schema";
 import { PoolName, PoolNames } from "./constants";
-import { TabContext, TabList } from "@mui/lab";
+import { TabContext } from "@mui/lab";
 export const toDate = (timestamp: number) => {
-  // console.log(moment.unix(Number(timestamp)).format("YYYY-MM-DD"))
   return moment.unix(timestamp).format("YYYY-MM-DD");
 };
 export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number) => {
@@ -81,7 +80,6 @@ export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: n
       date: toDate(val.date),
       value: val.value.toLocaleString(),
     }));
-    // console.log(tableData)
     return (
       <DataGrid
         initialState={{
@@ -92,6 +90,41 @@ export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: n
         rows={tableData}
         columns={columns}
       />
+    );
+  }
+  return null;
+};
+
+
+export const TableEvents = (_datasetLabel: string, dataTable: any) => {
+  if (dataTable && dataTable[0]) {
+    const tableData = dataTable.map((val:any,i:any) => { return {id:i ,date: toDate(val.timestamp),...val}})
+    const columns = Object.entries(dataTable[0]).filter(function([k, val]) {
+      if(k.includes("typename")){
+        return false 
+      }
+      return true;
+    }).map(([k, val])=> {
+      
+      return { field: k, headerName: k, width: 250 }
+    })
+    columns.push({ field: 'date', headerName: 'date', width: 250 })
+
+
+    return (
+      <Box height={750} margin={6}>
+      <Typography fontSize={20}><b>{_datasetLabel.toUpperCase()}</b></Typography>
+      <DataGrid
+        pageSize={10}
+        initialState={{
+          sorting: {
+            sortModel: [{ field: "timestamp", sort: "desc" }],
+          },
+        }}
+        rows={tableData}
+        columns={columns}
+      />
+      </Box>
     );
   }
   return null;
@@ -125,6 +158,7 @@ function App() {
     entities,
     poolData,
     query: graphQuery,
+    events,
   } = schema(data2?.protocols[0].type, data2?.protocols[0].schemaVersion);
   const queryMain = gql`
     ${graphQuery}
@@ -151,7 +185,6 @@ function App() {
   const parseMetaData = (value: any, item: string,poolValues:any) =>{
     
     if (item.includes("Tokens")) {
-      // return value.map((token:any) => <p>{item} - {token.name}</p>)
       return value.map((token: any, i: number) => {
         let returnVal = token.name;
         if (i < value.length - 1) {
@@ -343,6 +376,15 @@ function App() {
                       })}
                     </Grid>
                   ))}
+                </TabPanel>
+                <TabPanel value="3">
+                      
+                      {
+                        events.map((e,i)=>{
+                          return TableEvents(e, data[e])
+                      
+                        })
+                      }
                 </TabPanel>
               </TabContext>
 

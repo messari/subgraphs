@@ -78,11 +78,26 @@ export const schema100 = (): Schema => {
           symbol
           depositLimit
         }
+        withdraws(first: 1000, id: $poolId) {
+          amountUSD
+          amount
+          blockNumber
+          from
+          timestamp
+        }
+        deposits(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
       }
     `;
   const poolData = ["name", "symbol", "fees", "depositLimit", "inputTokens", "outputToken", "rewardTokens"];
-
-  return { entities, entitiesData, query, poolData };
+  const events = ["withdraws","deposits"]
+  
+  return { entities, entitiesData, query, poolData,events };
 };
 
 export const schema110 = (): Schema => {
@@ -100,6 +115,7 @@ export const schema110 = (): Schema => {
       "rewardTokenEmissionsUSD",
     ],
   ];
+  const events = ["withdraws","deposits"]
 
   const query = `
       query Data($poolId: String){
@@ -154,9 +170,24 @@ export const schema110 = (): Schema => {
           symbol
           depositLimit
         }
+        withdraws(first: 1000, id: $poolId) {
+          amountUSD
+          amount
+          blockNumber
+          from
+          timestamp
+        }
+        deposits(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
+
       }
       `;
   const poolData = ["name", "symbol", "fees", "depositLimit", "inputTokens", "outputToken", "rewardTokens"];
 
-  return { entities, entitiesData, query, poolData };
+  return { entities, entitiesData, query, poolData ,events};
 };

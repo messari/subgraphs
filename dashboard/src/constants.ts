@@ -24,4 +24,6 @@ export interface Schema {
   entitiesData: string[][];
   query: string;
   poolData: string[];
+  events: string[];
+
 }

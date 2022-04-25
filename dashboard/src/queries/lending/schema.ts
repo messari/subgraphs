@@ -81,6 +81,43 @@ export const schema100 = (): Schema => {
          stableBorrowRate
          variableBorrowRate
         }
+         
+        withdraws(first: 1000, id: $poolId) {
+          amountUSD
+          amount
+          blockNumber
+          from
+          timestamp
+        }
+        repays(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
+        liquidates(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+          profitUSD
+        }
+        deposits(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
+        borrows(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
       }
     `;
   const poolData = [
@@ -98,7 +135,8 @@ export const schema100 = (): Schema => {
     "canUseAsCollateral",
   ];
 
-  return { entities, entitiesData, query, poolData };
+  const events = ["withdraws","repays","liquidates","deposits","borrows"]
+  return { entities, entitiesData, query, poolData ,events};
 };
 
 export const schema110 = (): Schema => {
@@ -185,7 +223,45 @@ export const schema110 = (): Schema => {
          stableBorrowRate
          variableBorrowRate
         }
+        
+        withdraws(first: 1000, id: $poolId) {
+          amountUSD
+          amount
+          blockNumber
+          from
+          timestamp
+        }
+        repays(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
+        liquidates(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+          profitUSD
+        }
+        deposits(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
+        borrows(first: 1000, id: $poolId) {
+          timestamp
+          blockNumber
+          from
+          amount
+          amountUSD
+        }
       }
       `;
-  return { entities, entitiesData, query, poolData };
-};
+      const events = ["withdraws","repays","liquidates","deposits","borrows"]
+      return { entities, entitiesData, query, poolData ,events};
+    };
