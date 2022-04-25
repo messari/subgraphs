@@ -1,7 +1,6 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts"
+import { Address, ethereum } from "@graphprotocol/graph-ts"
 import {
-  Token,
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
@@ -9,14 +8,11 @@ import {
   FinancialsDailySnapshot,
   _LiquidityPoolAmounts,
   _Transfer,
-  _Account,
-  _DailyActiveAccount,
   _HelperStore,
   _TokenTracker,
   LiquidityPoolFee
 } from "../../generated/schema"
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from './tokens'
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO, INT_ONE } from "../common/constants"
+import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, BIGINT_ZERO} from "../common/utils/constants"
 
 export function getOrCreateEtherHelper(): _HelperStore {
     let ether = _HelperStore.load(HelperStoreType.ETHER)
@@ -44,21 +40,18 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS)
     protocol.name = "Uniswap v2"
     protocol.slug = "uniswap-v2"
-    protocol.schemaVersion = "1.0.0"
-    protocol.subgraphVersion = "1.0.0"
+    protocol.schemaVersion = "1.1.0"
+    protocol.subgraphVersion = "1.0.2"
+    protocol.methodologyVersion = "1.0.1"
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
+    protocol.totalVolumeUSD = BIGDECIMAL_ZERO
+    protocol.totalUniqueUsers = INT_ZERO
     protocol.network = Network.ETHEREUM
     protocol.type = ProtocolType.EXCHANGE
 
     protocol.save()
   }  
   return protocol
-}
-
-export function savePoolId(poolAddress: Address): void { 
-    let protocol = getOrCreateDex()
-    protocol.poolIds.push(poolAddress)
-    protocol.save()
 }
 
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
@@ -75,19 +68,6 @@ export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
 
 export function get(poolAddress: string): _LiquidityPoolAmounts {
     return _LiquidityPoolAmounts.load(poolAddress)!
-}
-
-export function getOrCreateToken(tokenAddress: Address): Token {
-    let token = Token.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (!token) {
-        token = new Token(tokenAddress.toHexString())
-        token.symbol = fetchTokenSymbol(tokenAddress)
-        token.name = fetchTokenName(tokenAddress)
-        token.decimals = fetchTokenDecimals(tokenAddress)
-        token.save()
-    }
-    return token
 }
 
 export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
@@ -164,7 +144,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
         financialMetrics = new FinancialsDailySnapshot(id.toString());
         financialMetrics.protocol = FACTORY_ADDRESS;
   
-        financialMetrics.feesUSD = BIGDECIMAL_ZERO
+        financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO
         financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
         financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
         financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO

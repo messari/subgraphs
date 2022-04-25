@@ -1,8 +1,6 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
-  _Account,
-  _DailyActiveAccount,
   Token,
   DexAmmProtocol,
   LiquidityPool,

@@ -3,7 +3,6 @@ import {
   YieldAggregator,
   _DailyActiveAccount,
   Vault as VaultStore,
-  UsageMetricsDailySnapshot,
 } from "../../generated/schema";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
