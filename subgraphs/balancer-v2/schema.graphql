@@ -220,7 +220,6 @@ type DexAmmProtocol implements Protocol @entity {
   _poolIds: [String!]!
 }
 
-
 ###############################
 ##### Protocol Timeseries #####
 ###############################
@@ -537,7 +536,6 @@ type LiquidityPoolHourlySnapshot @entity {
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 }
-
 
 ##################################
 ##### Transaction-Level Data #####

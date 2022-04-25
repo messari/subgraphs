@@ -6,14 +6,7 @@ import {
   updatePoolDailySnapshot,
 } from "./getters";
 import { BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import {
-  Account,
-  DailyActiveAccount,
-  LiquidityPool,
-  Swap,
-  LiquidityPoolFee,
-  Token
-} from "../../generated/schema";
+import { Account, DailyActiveAccount, LiquidityPool, Swap, LiquidityPoolFee, Token } from "../../generated/schema";
 import { calculatePrice, isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
@@ -36,7 +29,7 @@ export function updateFinancials(event: ethereum.Event): void {
       totalVolumeUsd = totalVolumeUsd.plus(pool.cumulativeVolumeUSD);
       totalRevenueGeneratedFee = totalRevenueGeneratedFee.plus(pool._sideRevenueGeneratedFee);
       totalProtocolGeneratedFee = totalProtocolGeneratedFee.plus(pool._protocolGeneratedFee);
-      totalFeesUsd = totalFeesUsd.plus(pool._totalSwapFee)
+      totalFeesUsd = totalFeesUsd.plus(pool._totalSwapFee);
     }
   }
 
@@ -98,7 +91,7 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
     }
 
     const token = Token.load(currentToken.toHexString());
-    let tokenPrice: BigDecimal | null = token!.lastPriceUSD
+    let tokenPrice: BigDecimal | null = token!.lastPriceUSD;
     if (!token || !tokenPrice) {
       tokenWithoutPrice = true;
       continue;
@@ -119,17 +112,17 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
 
   const swap = Swap.load(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString()));
   if (swap) {
-    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(BigDecimal.fromString("2"))
+    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(BigDecimal.fromString("2"));
     let fee = LiquidityPoolFee.load(pool.fees[0]);
     if (fee) {
       let feesCollector = ProtocolFeesCollector.bind(FEE_COLLECTOR_ADDRESS);
       let protocolSwapPercentage = scaleDown(feesCollector.getSwapFeePercentage(), null);
-      let supplySidePercentage = BigDecimal.fromString("1").minus(protocolSwapPercentage)
+      let supplySidePercentage = BigDecimal.fromString("1").minus(protocolSwapPercentage);
       let swapFee = swapValue.times(fee.feePercentage);
 
       pool._totalSwapFee = pool._totalSwapFee.plus(swapFee);
-      pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(swapFee.times(protocolSwapPercentage))
-      pool._sideRevenueGeneratedFee = pool._sideRevenueGeneratedFee.plus(swapFee.times(supplySidePercentage))
+      pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(swapFee.times(protocolSwapPercentage));
+      pool._sideRevenueGeneratedFee = pool._sideRevenueGeneratedFee.plus(swapFee.times(supplySidePercentage));
     }
     pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(swapValue);
   }
@@ -152,7 +145,7 @@ export function updateTokenPrice(
   tokenBIndex: i32,
   blockNumber: BigInt,
 ): void {
-  let hasWeights = !!pool.inputTokenWeights.length
+  let hasWeights = !!pool.inputTokenWeights.length;
 
   let weightTokenB: BigDecimal | null = null;
   let weightTokenA: BigDecimal | null = null;
@@ -160,8 +153,8 @@ export function updateTokenPrice(
   let tokenAmountOut = scaleDown(tokenBAmount, tokenB);
 
   if (hasWeights) {
-    weightTokenB = pool.inputTokenWeights[tokenBIndex]
-    weightTokenA = pool.inputTokenWeights[tokenAIndex]
+    weightTokenB = pool.inputTokenWeights[tokenBIndex];
+    weightTokenA = pool.inputTokenWeights[tokenAIndex];
     tokenAmountIn = scaleDown(pool.inputTokenBalances[tokenAIndex], tokenA);
     tokenAmountOut = scaleDown(pool.inputTokenBalances[tokenBIndex], tokenB);
   }
@@ -212,12 +205,12 @@ export function updateTokenPrice(
  * @returns Previously stored price, otherwise fetch it from oracle
  */
 export function fetchPrice(tokenAddress: Address): BigDecimal {
-  let token = Token.load(tokenAddress.toHexString())
-  let tokenPrice: BigDecimal | null = null
-  if (token) tokenPrice = token.lastPriceUSD
-  if (tokenPrice) return tokenPrice
+  let token = Token.load(tokenAddress.toHexString());
+  let tokenPrice: BigDecimal | null = null;
+  if (token) tokenPrice = token.lastPriceUSD;
+  if (tokenPrice) return tokenPrice;
 
-  let price = getUsdPricePerToken(tokenAddress)
-  if (!price.reverted) return price.usdPrice.div(price.decimals.toBigDecimal())
-  return price.usdPrice
+  let price = getUsdPricePerToken(tokenAddress);
+  if (!price.reverted) return price.usdPrice.div(price.decimals.toBigDecimal());
+  return price.usdPrice;
 }

@@ -16,13 +16,7 @@
     "@graphprotocol/graph-ts": "0.26.0"
   },
   "devDependencies": {
-    "husky": "7.0.4",
     "matchstick-as": "^0.4.2",
     "prettier": "2.6.1"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run format"
-    }
   }
 }

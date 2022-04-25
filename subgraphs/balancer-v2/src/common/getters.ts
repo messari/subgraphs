@@ -1,4 +1,4 @@
-import {Address, BigDecimal, BigInt, dataSource, ethereum} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -36,7 +36,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.name = "Balancer V2";
     protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "1.2.0";
-    protocol.methodologyVersion = "1.2.0"
+    protocol.methodologyVersion = "1.2.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.network = network;
     protocol.type = ProtocolType.EXCHANGE;
@@ -180,14 +180,14 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
     snapshot.protocol = pool.protocol;
     snapshot.pool = pool.id;
     snapshot.inputTokenBalances = pool.inputTokenBalances;
-    snapshot.dailyVolumeUSD = BIGDECIMAL_ZERO
+    snapshot.dailyVolumeUSD = BIGDECIMAL_ZERO;
   }
 
   let swapId = event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString());
-  let swap = Swap.load(swapId)
+  let swap = Swap.load(swapId);
   if (swap) {
-    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(BigDecimal.fromString("2"))
-    snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(swapValue)
+    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(BigDecimal.fromString("2"));
+    snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(swapValue);
   }
   snapshot.outputTokenSupply = pool.outputTokenSupply;
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;

@@ -5,7 +5,7 @@ import { Token } from "../../generated/schema";
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
   let token = Token.load(asset.toHexString());
-  let tokenPrice = token!.lastPriceUSD
+  let tokenPrice = token!.lastPriceUSD;
   if (token && tokenPrice) {
     usdValue = value.times(tokenPrice);
   }
@@ -69,11 +69,11 @@ export function calculatePrice(
   let tokenIn = Token.load(tokenInAddress.toHexString());
   let tokenOut = Token.load(tokenOutAddress.toHexString());
 
-  let tokenInPrice: BigDecimal | null = null
-  let tokenOutPrice: BigDecimal | null = null
+  let tokenInPrice: BigDecimal | null = null;
+  let tokenOutPrice: BigDecimal | null = null;
 
-  if (tokenIn) tokenInPrice = tokenIn.lastPriceUSD
-  if (tokenOut) tokenOutPrice = tokenOut.lastPriceUSD
+  if (tokenIn) tokenInPrice = tokenIn.lastPriceUSD;
+  if (tokenOut) tokenOutPrice = tokenOut.lastPriceUSD;
 
   if (isBaseAsset(tokenInAddress) && tokenInPrice) {
     amountIn = amountIn.times(tokenInPrice);

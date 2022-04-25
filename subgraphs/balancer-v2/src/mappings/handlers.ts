@@ -3,11 +3,17 @@ import { PoolBalanceChanged, PoolRegistered, TokensRegistered, Swap } from "../.
 import { createPool, getOrCreateToken, getOrCreateSwap } from "../common/getters";
 import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
-import {fetchPrice, updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics} from "../common/metrics";
+import {
+  fetchPrice,
+  updateFinancials,
+  updatePoolMetrics,
+  updateTokenPrice,
+  updateUsageMetrics,
+} from "../common/metrics";
 import { isUSDStable, valueInUSD } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";
-import {updateWeight} from "../common/weight";
+import { updateWeight } from "../common/weight";
 
 export function handlePoolRegister(event: PoolRegistered): void {
   createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block);
@@ -28,7 +34,7 @@ export function handleTokensRegister(event: TokensRegistered): void {
   pool.inputTokens = tokens;
   pool.inputTokenBalances = tokensAmount;
   pool.save();
-  updateWeight(pool.id)
+  updateWeight(pool.id);
 }
 
 export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
@@ -40,12 +46,12 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
     let currentAmount = pool.inputTokenBalances[i];
     amounts.push(currentAmount.plus(event.params.deltas[i]));
 
-    let tokenFee = event.params.protocolFeeAmounts[i]
+    let tokenFee = event.params.protocolFeeAmounts[i];
     if (tokenFee.gt(BigInt.zero())) {
-      let tokenAddress = event.params.tokens[i]
-      let formattedAmount = scaleDown(tokenFee, tokenAddress)
-      let price = fetchPrice(tokenAddress)
-      pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price))
+      let tokenAddress = event.params.tokens[i];
+      let formattedAmount = scaleDown(tokenFee, tokenAddress);
+      let price = fetchPrice(tokenAddress);
+      pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price));
     }
   }
 
@@ -65,7 +71,7 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
 export function handleSwap(event: Swap): void {
   let pool = LiquidityPool.load(event.params.poolId.toHexString());
   if (pool == null) return;
-  updateWeight(pool.id)
+  updateWeight(pool.id);
 
   const tokenIn = event.params.tokenIn;
   const tokenOut = event.params.tokenOut;

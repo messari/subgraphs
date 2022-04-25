@@ -13,7 +13,7 @@ import {
   handleSwap,
   handleTokensRegister,
 } from "../src/mappings/handlers";
-import {LiquidityPool, Token} from "../generated/schema";
+import { LiquidityPool, Token } from "../generated/schema";
 import {
   usdcWethPoolId,
   batWethPoolId,
@@ -100,7 +100,7 @@ test("Handle swap and updates base asset usd price value", () => {
   );
 
   let token = Token.load(weth.id);
-  let tokenPrice = token!.lastPriceUSD
+  let tokenPrice = token!.lastPriceUSD;
   if (!tokenPrice) throw Error("Token price is not defined");
 
   assert.stringEquals(tokenPrice.toString(), EXPECTED_WETH_PRICE);
@@ -144,7 +144,7 @@ test("Pool with stable and not base asset", () => {
   );
   handleSwap(swap);
   let token = Token.load(uma.id.toLowerCase());
-  let tokenPrice = token!.lastPriceUSD
+  let tokenPrice = token!.lastPriceUSD;
   if (!tokenPrice) throw Error("Token price is not defined");
 
   assert.stringEquals(tokenPrice.toString(), EXPECTED_UMA_PRICE);
@@ -203,7 +203,7 @@ test("Pool with weth and weight with low liquidity: Weth is the out token", () =
   );
   handleSwap(swap);
   let token = Token.load(bat.id.toLowerCase());
-  let tokenPrice = token!.lastPriceUSD
+  let tokenPrice = token!.lastPriceUSD;
   if (!tokenPrice) throw Error("Token price should be defined");
   assert.stringEquals(tokenPrice.toString(), "30");
 });
@@ -257,7 +257,7 @@ test("Pool with weth and weight: Weth is the in token", () => {
   );
   handleSwap(swap);
   let token = Token.load(uma.id.toLowerCase());
-  let tokenPrice = token!.lastPriceUSD
+  let tokenPrice = token!.lastPriceUSD;
   if (!tokenPrice) throw Error("Token price should be defined");
   assert.stringEquals(tokenPrice.toString(), "70");
 });
