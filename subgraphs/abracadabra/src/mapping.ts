@@ -237,6 +237,7 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
   let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(event.params.rate, token.decimals));
   let inputTokenBalance = market.inputTokenBalance;
   let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
+  market.inputTokenPriceUSD = priceUSD;
   market.totalValueLockedUSD = tvlUSD;
   market.save();
   updateTVL(event);

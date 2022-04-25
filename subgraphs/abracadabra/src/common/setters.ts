@@ -49,7 +49,7 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.inputTokenBalance = BIGINT_ZERO;
     MarketEntity.outputToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).id;
     MarketEntity.outputTokenSupply = BIGINT_ZERO;
-    MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
     MarketEntity.createdTimestamp = blockTimestamp;
     MarketEntity.createdBlockNumber = blockNumber;
     MarketEntity.name = inputToken.name + " Market";

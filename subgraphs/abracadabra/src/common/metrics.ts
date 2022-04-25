@@ -1,7 +1,6 @@
-import { BigDecimal, BigInt, Address, ethereum, dataSource, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Address, ethereum, dataSource } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount } from "../../generated/schema";
 import {
-  INT_ZERO,
   SECONDS_PER_DAY,
   BIGDECIMAL_ZERO,
   ABRA_USER_REVENUE_SHARE,
@@ -204,25 +203,21 @@ export function updateTVL(event: ethereum.Event): void {
 
 export function updateTotalBorrows(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
-  let LendingProtocol = getOrCreateLendingProtocol();
+  let protocol = getOrCreateLendingProtocol();
   let financialsDailySnapshots = getOrCreateFinancials(event);
-  let marketIdList = LendingProtocol.marketIDList;
-  let totalBorrowUSD = BIGDECIMAL_ZERO;
+  let marketIDList = protocol.marketIDList;
   let mimPriceUSD = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD;
-  if (!mimPriceUSD) {
-    mimPriceUSD = BIGDECIMAL_ONE;
+  mimPriceUSD = mimPriceUSD.gt(BIGDECIMAL_ZERO) ? mimPriceUSD : BIGDECIMAL_ONE;
+  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  for (let i: i32 = 0; i < marketIDList.length; i++) {
+    let marketAddress = marketIDList[i];
+    let market = getMarket(marketAddress);
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(bigIntToBigDecimal(market.outputTokenSupply, DEFAULT_DECIMALS).times(mimPriceUSD))
   }
-  for (let i: i32 = 0; i < marketIdList.length; i++) {
-    let marketAddress = marketIdList[i];
-    let outputTokenSupply = bigIntToBigDecimal(getMarket(marketAddress).outputTokenSupply, DEFAULT_DECIMALS).times(
-      mimPriceUSD,
-    );
-    totalBorrowUSD = totalBorrowUSD.plus(outputTokenSupply);
-  }
-  LendingProtocol.totalBorrowBalanceUSD = totalBorrowUSD;
-  financialsDailySnapshots.totalBorrowBalanceUSD = totalBorrowUSD;
-  LendingProtocol.save();
+  financialsDailySnapshots.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   financialsDailySnapshots.save();
+  protocol.save();
 }
 
 export function updateMarketStats(
@@ -241,12 +236,11 @@ export function updateMarketStats(
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let priceUSD = token.lastPriceUSD;
-  let tvlUSD = market.totalValueLockedUSD;
-  let marketTotalBorrowUSD = market.totalBorrowBalanceUSD;
   if (eventType == "DEPOSIT") {
     let inputTokenBalance = market.inputTokenBalance.plus(amount);
-    tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
     market.inputTokenBalance = inputTokenBalance;
+    market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
+    market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyDepositCount += 1;
     usageDailySnapshot.dailyDepositCount += 1;
     marketHourlySnapshot.cumulativeDepositUSD = marketHourlySnapshot.cumulativeDepositUSD.plus(
@@ -262,15 +256,16 @@ export function updateMarketStats(
       bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
     );
   } else if (eventType == "WITHDRAW") {
-    let inputTokenBalance = market.inputTokenBalance.plus(amount);
-    tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
-    inputTokenBalance = inputTokenBalance.minus(amount);
+    let inputTokenBalance = market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
+    market.totalValueLockedUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
+    market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyWithdrawCount += 1;
     usageDailySnapshot.dailyWithdrawCount += 1;
   } else if (eventType == "BORROW") {
-    market.outputTokenSupply = market.outputTokenSupply.plus(amount);
-    marketTotalBorrowUSD = bigIntToBigDecimal(market.outputTokenSupply.plus(amount), token.decimals).times(priceUSD);
+    let outputTokenSupply = market.outputTokenSupply.plus(amount);
+    market.outputTokenSupply = outputTokenSupply
+    market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
     marketHourlySnapshot.cumulativeBorrowUSD = marketHourlySnapshot.cumulativeBorrowUSD.plus(
@@ -286,8 +281,9 @@ export function updateMarketStats(
       bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
     );
   } else if (eventType == "REPAY") {
-    market.outputTokenSupply = market.outputTokenSupply.minus(amount);
-    marketTotalBorrowUSD = bigIntToBigDecimal(market.outputTokenSupply.plus(amount), token.decimals).times(priceUSD);
+    let outputTokenSupply = market.outputTokenSupply.minus(amount);
+    market.outputTokenSupply = outputTokenSupply;
+    market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyRepayCount += 1;
     usageDailySnapshot.dailyRepayCount += 1;
   }
@@ -295,9 +291,7 @@ export function updateMarketStats(
   usageHourlySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.blockNumber = event.block.number;
   usageDailySnapshot.timestamp = event.block.timestamp;
-  market.totalValueLockedUSD = tvlUSD;
-  market.totalDepositBalanceUSD = tvlUSD;
-  market.totalBorrowBalanceUSD = marketTotalBorrowUSD;
+  market.inputTokenPriceUSD = getOrCreateToken(Address.fromString(market.inputToken)).lastPriceUSD;
   market.outputTokenPriceUSD =
     asset.toLowerCase() == getMIMAddress(dataSource.network()).toLowerCase()
       ? priceUSD
