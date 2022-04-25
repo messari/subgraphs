@@ -5,7 +5,7 @@ import { BIGDECIMAL_HUNDRED, BIGINT_TEN, BIGINT_ZERO, VaultFeeType } from "../co
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
-import { getFeePercentage } from "../entities/Vault";
+import { getFeePercentage, getPricePerShare } from "../entities/Vault";
 import { getUsdPricePerToken } from "../price";
 import { readValue } from "../utils/contracts";
 import { updateAllMetrics } from "./common";
@@ -24,7 +24,7 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
     : readValue<BigInt>(vaultContract.try_balanceOf(call.transaction.from), BIGINT_ZERO);
   let withdrawAmount = pool.times(sharesBurnt).div(outputTokenSupply);
 
-  let pricePerShare = readValue<BigInt>(vaultContract.try_getPricePerFullShare(), BIGINT_ZERO);
+  let pricePerShare = getPricePerShare(vaultAddress);
   let try_price = getUsdPricePerToken(inputTokenAddress);
   let inputTokenPrice = try_price.reverted
     ? try_price.usdPrice

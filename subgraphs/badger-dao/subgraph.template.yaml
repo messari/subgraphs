@@ -30,6 +30,8 @@ dataSources:
       abis:
         - name: VaultV4
           file: ./abis/VaultV4.json
+        - name: VaultV2
+          file: ./abis/VaultV2.json
         - name: Strategy
           file: ./abis/Strategy.json
         - name: Controller
@@ -111,6 +113,8 @@ dataSources:
       abis:
         - name: VaultV4
           file: ./abis/VaultV4.json
+        - name: VaultV2
+          file: ./abis/VaultV2.json
         - name: Strategy
           file: ./abis/Strategy.json
         - name: Controller

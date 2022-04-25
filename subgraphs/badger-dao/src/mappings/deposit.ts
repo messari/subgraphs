@@ -5,6 +5,7 @@ import { Vault } from "../../generated/schema";
 import { BIGINT_TEN, BIGINT_ZERO } from "../constant";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
+import { getPricePerShare } from "../entities/Vault";
 import { getUsdPricePerToken } from "../price";
 import { readValue } from "../utils/contracts";
 import { updateAllMetrics } from "./common";
@@ -21,7 +22,7 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
     ? amount
     : readValue<BigInt>(tokenContract.try_balanceOf(call.transaction.from), BIGINT_ZERO);
 
-  let pricePerShare = readValue<BigInt>(vaultContract.try_getPricePerFullShare(), BIGINT_ZERO);
+  let pricePerShare = getPricePerShare(vaultAddress);
   let try_price = getUsdPricePerToken(inputTokenAddress);
   let inputTokenPrice = try_price.reverted
     ? try_price.usdPrice

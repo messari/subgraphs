@@ -2,6 +2,7 @@ import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Controller } from "../../generated/bveCVX/Controller";
 import { Strategy as StrategyContract } from "../../generated/bveCVX/Strategy";
 import { VaultV4 as VaultContract } from "../../generated/bveCVX/VaultV4";
+import { VaultV2 as VaultV2Contract } from "../../generated/bveCVX/VaultV2";
 import { Vault, VaultFee, _Strategy } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, NULL_ADDRESS, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
@@ -114,4 +115,16 @@ function createFeeType(id: string, feePercentage: BigDecimal, feeType: string): 
   fee.feePercentage = feePercentage;
   fee.feeType = feeType;
   fee.save();
+}
+
+export function getPricePerShare(vaultAddress: Address): BigInt {
+  let vaultV4Contract = VaultContract.bind(vaultAddress);
+  let value = readValue<BigInt>(vaultV4Contract.try_getPricePerFullShare(), BIGINT_ZERO);
+
+  if (value.isZero()) {
+    let vaultV2Contract = VaultV2Contract.bind(vaultAddress);
+    value = readValue<BigInt>(vaultV2Contract.try_pricePerShare(), BIGINT_ZERO);
+  }
+
+  return value;
 }
