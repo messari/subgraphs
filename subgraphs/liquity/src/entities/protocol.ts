@@ -93,9 +93,9 @@ export function getOrCreateFinancialsSnapshot(
     protocol.cumulativeProtocolSideRevenueUSD;
   financialsSnapshot.cumulativeTotalRevenueUSD =
     protocol.cumulativeTotalRevenueUSD;
-  financialsSnapshot.totalDepositBalanceUSD = protocol.totalDepositUSD;
+  financialsSnapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
   financialsSnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-  financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowUSD;
+  financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
   financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
   financialsSnapshot.blockNumber = event.block.number;
@@ -103,7 +103,7 @@ export function getOrCreateFinancialsSnapshot(
   return financialsSnapshot;
 }
 
-// Keep track of and cumulative unique users and daily/hourly active users
+// Keep track of cumulative unique users and daily/hourly active users
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   const timestamp = event.block.timestamp.toI64();
   const day = `${timestamp / SECONDS_PER_DAY}`;
@@ -278,7 +278,7 @@ export function updateProtocolUSDLocked(
   const protocol = getOrCreateLiquityProtocol();
   const totalValueLocked = protocol.totalValueLockedUSD.plus(netChangeUSD);
   protocol.totalValueLockedUSD = totalValueLocked;
-  protocol.totalDepositUSD = totalValueLocked;
+  protocol.totalDepositBalanceUSD = totalValueLocked;
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
@@ -292,7 +292,7 @@ export function updateProtocolUSDLockedStabilityPool(
   const market = getOrCreateMarket();
   const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);
   protocol.totalValueLockedUSD = totalValueLocked;
-  protocol.totalDepositUSD = totalValueLocked;
+  protocol.totalDepositBalanceUSD = totalValueLocked;
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.save();
@@ -304,7 +304,7 @@ export function updateProtocolBorrowBalance(
   totalLUSDSupply: BigInt
 ): void {
   const protocol = getOrCreateLiquityProtocol();
-  protocol.totalBorrowUSD = borrowedUSD;
+  protocol.totalBorrowBalanceUSD = borrowedUSD;
   protocol.mintedTokenSupplies = [totalLUSDSupply];
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);

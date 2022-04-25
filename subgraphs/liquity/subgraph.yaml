@@ -23,6 +23,8 @@ dataSources:
         - Liquidate
         - LendingProtocol
         - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
         - Token
         - UsageMetricsDailySnapshot
         - UsageMetricsHourlySnapshot
@@ -62,6 +64,8 @@ dataSources:
         - Borrow
         - Repay
         - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
         - Token
         - ActiveAccount
         - UsageMetricsDailySnapshot
@@ -112,6 +116,7 @@ dataSources:
         - LendingProtocol
         - Token
         - MarketDailySnapshot
+        - MarketHourlySnapshot
         - FinancialsDailySnapshot
       abis:
         - name: ActivePool
