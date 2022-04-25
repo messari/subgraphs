@@ -62,7 +62,7 @@ The following tests are done to compare performance difference with the addition
 
 The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation again with 2 modifications to pheonix's price oracle:
 
-1. In the previous test, there were two contract calls made per price calculation - one for chainlink, and the uniswap router. In this test, the chainlink contract call does not occur unless the oracle is available (past block 12864088). Only the uniswap router will be called for the duration of this test.
+1. In the previous test, there were two contract calls made per price calculation - one for chainlink, and the uniswap router. In this test, the chainlink contract call does not occur unless the oracle is available (past block 12864088). Only the uniswap router will be called if it is available.
 2. The price will only be calculated once per block for each token. The oracle pheonix developed calculated the token price based on the block number anyways, so calculating multiple times per block is pointless.
 
 ### Checkpoints
@@ -94,10 +94,10 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 Start time - 2:44:35 AM April 25 2022
 Start block - 10,207,858
 
-- Checkpoint 1 -
-  - End block -
-  - Block Difference -
-  - Seconds between start and end -
+- Checkpoint 1 - 5:17:49
+  - End block - 10227390
+  - Block Difference - 19,532
+  - Seconds between start and end - 9,194
   - Blocks per second -
 
 ## Hourly Metrics Test 1.0
