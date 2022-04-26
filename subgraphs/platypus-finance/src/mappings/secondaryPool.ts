@@ -9,7 +9,7 @@ import {
   PriceDeviationUpdated,
   HaircutRateUpdated,
   AssetAdded,
-} from "../generated/Pool/Pool";
+} from "../../generated/SecondaryPool/SecondaryPool";
 
 export function handleDeposit(event: Deposit): void {}
 export function handleWithdraw(event: Withdraw): void {}

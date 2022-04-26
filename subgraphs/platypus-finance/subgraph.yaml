@@ -9,7 +9,7 @@ dataSources:
     source:
       address: '0x68c5f4374228BEEdFa078e77b5ed93C28a2f713E'
       abi: MasterPlatypus
-      # startBlock:
+      startBlock: 12092791
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -74,7 +74,7 @@ dataSources:
     source:
       address: '0x66357dCaCe80431aee0A7507e2E361B7e2402370'
       abi: Pool
-      # startBlock:
+      startBlock: 7409737
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -134,7 +134,7 @@ dataSources:
     source:
       address: '0xe0D166DE15665bC4B7185B2e35E847E51316E126'
       abi: SecondaryPool
-      # startBlock:
+      startBlock: 13022769
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
