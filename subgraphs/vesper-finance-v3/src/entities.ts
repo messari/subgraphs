@@ -13,14 +13,10 @@ import { CONTROLLER_ADDRESS_HEX, VESPER_TOKEN } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   PoolV3,
-  Transfer,
-  Withdraw as WithdrawEvent,
-  Deposit as DepositEvent,
   TransferCall,
   DepositCall,
   WithdrawCall,
 } from "../generated/poolV3_vaUSDC/PoolV3";
-import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
 import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
@@ -177,7 +173,7 @@ export function getOrCreateAccount(
 
   if (!object) {
     const yAggr = getOrCreateYieldAggregator();
-    
+
     object = new Account(address.toHexString());
     object.save();
 

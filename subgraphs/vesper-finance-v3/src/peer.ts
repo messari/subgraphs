@@ -1,5 +1,4 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { VesperPool } from "../generated/schema";
 import { PoolV3 } from "../generated/poolV3_vaUSDC/PoolV3";
 import { Controller } from "../generated/poolV3_vaUSDC/Controller";
 import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
@@ -72,9 +71,7 @@ export function toUsd(
     usdRate.toString(),
   ]);
   // explicit cast required
-  return amountIn
-    .times(usdRate as BigDecimal)
-    .div(getDecimalDivisor(decimals));
+  return amountIn.times(usdRate as BigDecimal).div(getDecimalDivisor(decimals));
 }
 
 export function getStrategyAddress(poolAddress: Address): Address {
@@ -112,34 +109,48 @@ export function getShareToTokenRateV3(pool: PoolV3): BigDecimal {
     .div(getDecimalDivisor(pool.decimals()));
 }
 
-export function getPoolV3(address: string): VesperPool {
-  let pool = VesperPool.load(address);
-  if (pool != null) {
-    log.info("Returning VesperPool query for address {}", [address]);
-    // Casting required because here we know poolsQuery is not null, but the AssemblyScript compiler
-    // is not picking it up
-    return pool as VesperPool;
+export class Revenue {
+  protocolRevenue: BigDecimal;
+  protocolRevenueUsd: BigDecimal;
+  supplySideRevenue: BigDecimal;
+  supplySideRevenueUsd: BigDecimal;
+  constructor(
+    _protocolRevenue: BigDecimal,
+    _supplySideRevenue: BigDecimal,
+    shareToTokenRate: BigDecimal,
+    tokenAddress: Address
+  ) {
+    let tokenDecimals = Erc20Token.bind(tokenAddress).decimals();
+    let protocolRevenue = _protocolRevenue.times(shareToTokenRate);
+    this.protocolRevenue = protocolRevenue;
+    this.protocolRevenueUsd = toUsd(
+      protocolRevenue,
+      tokenDecimals,
+      tokenAddress
+    );
+    let supplySideRevenue = _supplySideRevenue.times(shareToTokenRate);
+    this.supplySideRevenue = supplySideRevenue;
+    this.supplySideRevenueUsd = toUsd(
+      supplySideRevenue,
+      tokenDecimals,
+      tokenAddress
+    );
   }
-  log.info("Creating new instance of poolV3 for address {}", [address]);
-  let poolV3 = PoolV3.bind(Address.fromString(address));
-  let newPool = new VesperPool(address);
-  let zeroString = BigDecimal.fromString("0");
-  newPool.totalDebt = BigInt.fromString("0");
-  newPool.totalDebtUsd = zeroString;
-  newPool.totalSupply = BigInt.fromString("0");
-  newPool.totalSupplyUsd = zeroString;
-  newPool.totalRevenue = zeroString;
-  newPool.totalRevenueUsd = zeroString;
-  newPool.protocolRevenue = zeroString;
-  newPool.protocolRevenueUsd = zeroString;
-  newPool.supplySideRevenue = zeroString;
-  newPool.supplySideRevenueUsd = zeroString;
-  newPool.poolName = poolV3.name();
-  newPool.poolToken = poolV3.symbol();
-  newPool.poolTokenDecimals = poolV3.decimals();
-  newPool.poolVersion = 3;
-  let token = Erc20Token.bind(poolV3.token());
-  newPool.collateralToken = token.symbol();
-  newPool.collateralTokenDecimals = token.decimals();
-  return newPool;
+}
+
+export function calculateRevenue(
+  interest: BigDecimal,
+  shareToTokenRate: BigDecimal,
+  tokenAddress: Address
+): Revenue {
+  // 95% of the fees go to the protocol revenue
+  let protocolRevenue = interest.times(BigDecimal.fromString("0.95"));
+  // 5% of the fees go to the supply-side revenue
+  let supplySideRevenue = interest.times(BigDecimal.fromString("0.05"));
+  return new Revenue(
+    protocolRevenue,
+    supplySideRevenue,
+    shareToTokenRate,
+    tokenAddress
+  );
 }

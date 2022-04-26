@@ -35,7 +35,9 @@ export function getOrCreateUsageMetricsDailySnapshot(
 }
 
 export function getOrCreateFinancialsDailySnapshot(
-  call: ethereum.Call
+  call: ethereum.Call,
+  protocolRevenueUsd: BigDecimal = BigDecimal.zero(),
+  supplySideRevenueUsd: BigDecimal = BigDecimal.zero()
 ): FinancialsDailySnapshot {
   const day = getDay(call.block.timestamp);
   const protocol = getOrCreateYieldAggregator();
@@ -49,8 +51,8 @@ export function getOrCreateFinancialsDailySnapshot(
   object.totalVolumeUSD = protocol.totalVolumeUSD;
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
   object.totalRevenueUSD = protocol.totalValueLockedUSD;
-  object.supplySideRevenueUSD = BigDecimal.zero();
-  object.protocolSideRevenueUSD = BigDecimal.zero();
+  object.protocolSideRevenueUSD = object.protocolSideRevenueUSD.plus(protocolRevenueUsd);
+  object.supplySideRevenueUSD = object.supplySideRevenueUSD.plus(supplySideRevenueUsd);
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
 
@@ -98,9 +100,15 @@ export function getOrCreateVaultDailySnapshot(
 
 export function updateAllSnapshots(
   call: ethereum.Call,
-  vaultAddress: Address
+  vaultAddress: Address,
+  protocolRevenueUsd: BigDecimal = BigDecimal.zero(),
+  supplySideRevenueUsd: BigDecimal = BigDecimal.zero()
 ): void {
   getOrCreateUsageMetricsDailySnapshot(call);
-  getOrCreateFinancialsDailySnapshot(call);
+  getOrCreateFinancialsDailySnapshot(
+    call,
+    protocolRevenueUsd,
+    supplySideRevenueUsd
+  );
   getOrCreateVaultDailySnapshot(call, vaultAddress);
 }
