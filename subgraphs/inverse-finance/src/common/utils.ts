@@ -1,4 +1,7 @@
-import { BigDecimal } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from '@graphprotocol/graph-ts';
+import { SECONDS_PER_DAY } from '../../../compound-v2/src/common/utils/constants';
+import { SECONDS_PER_HOUR } from './constants';
+import { toBigInt } from '../../../apeswap/src/utils/constant';
 
 // Converts upper snake case to lower kebab case and appends a hyphen.
 // (e.g. "TRADING_FEE" to "trading-fee-"), mainly used to create entity IDs
@@ -19,4 +22,11 @@ export function decimalsToBigDecimal(decimals: i32): BigDecimal {
     bd = bd.times(BigDecimal.fromString("10"));
   }
   return bd;
+}
+
+// returns hours (24-hour format) from timestamp
+export function timestampToHH(timestamp: i64): BigInt {
+  let secondsPastMidnight = timestamp % SECONDS_PER_DAY;
+  let hours = secondsPastMidnight / SECONDS_PER_HOUR;
+  return BigInt.fromI32(hours)
 }

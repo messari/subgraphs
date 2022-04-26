@@ -12,8 +12,7 @@ import {
   MarketDailySnapshot,
   FinancialsDailySnapshot,
   Account,
-  DailyActiveAccount,
-  _HelperStore,
+  ActiveAccount
 } from "../../generated/schema";
 import {
   Network,
@@ -114,11 +113,10 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
     ////// quantitative data //////
-    protocol.totalUniqueUsers = INT_ZERO;
+    protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
-    protocol.totalDepositUSD = BIGDECIMAL_ZERO;
-    protocol.totalBorrowUSD = BIGDECIMAL_ZERO;
+    protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     //protocol.usageMetrics
     //protocol.financialMetrics
     //protocol.markets
@@ -144,7 +142,7 @@ export function getOrCreateMarket(marketAddr: string, event: ethereum.Event): Ma
 
     market = new Market(marketAddr);
     market.protocol = FACTORY_ADDRESS;
-    market.inputTokens = [asset];
+    market.inputToken = asset;
     market.outputToken = marketAddr; //Token.load(marketAddr).id
     market.rewardTokens = [
       prefixID(RewardTokenType.DEPOSIT, INV_ADDRESS),
@@ -152,11 +150,11 @@ export function getOrCreateMarket(marketAddr: string, event: ethereum.Event): Ma
     ];
 
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    market.totalVolumeUSD = BIGDECIMAL_ZERO;
-    market.totalDepositUSD = BIGDECIMAL_ZERO;
-    market.totalBorrowUSD = BIGDECIMAL_ZERO;
-    market.inputTokenBalances = [BIGINT_ZERO];
-    market.inputTokenPricesUSD = [BIGDECIMAL_ZERO];
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.rewardTokenEmissionsAmount = [BIGINT_ZERO];
@@ -171,10 +169,10 @@ export function getOrCreateMarket(marketAddr: string, event: ethereum.Event): Ma
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
     market.liquidationPenalty = BIGDECIMAL_ZERO;
-    market.depositRate = BIGDECIMAL_ZERO;
+    market.rates = []; //TODO: use InterestRate entity
     //inverse finance does not have stable borrow rate
     //market.stableBorrowRate = BIGDECIMAL_ZERO
-    market.variableBorrowRate = BIGDECIMAL_ZERO;
+    
     //market.deposits
     //market.withdraws
     //market.borrows
@@ -189,18 +187,6 @@ export function getOrCreateMarket(marketAddr: string, event: ethereum.Event): Ma
   return market;
 }
 
-// Unused
-export function getOrCreateHelperStore(id: string): _HelperStore {
-  let store = _HelperStore.load(id);
-
-  if (store == null) {
-    store = new _HelperStore(id);
-    store.valueDecimal = BIGDECIMAL_ZERO;
-    store.valueInt = INT_ZERO;
-  }
-  return store;
-}
-
 export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
   let days: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   let financialMetrics = FinancialsDailySnapshot.load(days);
@@ -208,12 +194,12 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
     financialMetrics = new FinancialsDailySnapshot(days);
     financialMetrics.protocol = FACTORY_ADDRESS;
     financialMetrics.protocolControlledValueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalDepositUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalBorrowUSD = BIGDECIMAL_ZERO;
-    financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.totalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    financialMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   return financialMetrics;
 }

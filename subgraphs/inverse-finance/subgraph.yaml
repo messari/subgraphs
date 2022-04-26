@@ -85,7 +85,7 @@ templates:
         - Repay
         - Liquidate
         - Account
-        - DailyActiveAccount
+        - ActiveAccount
         - UsageMetricsDailySnapshot
         - FinancialsDailySnapshot
         - MarketDailySnapshot

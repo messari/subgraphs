@@ -7,16 +7,14 @@ import { prefixID } from "./common/utils";
 export function handleOwnerChanged(event: OwnerChanged): void {
   // this only happens when the constructor() of the INV contract is called
   if (event.params.owner == Address.fromString(ZERO_ADDRESS)) {
-    let tokenContract = INV.bind(event.address);
+    let tokenAddr = event.address.toHexString()
 
-    let depositTokenId = prefixID(RewardTokenType.DEPOSIT, event.address.toHexString());
+    let depositTokenId = prefixID(RewardTokenType.DEPOSIT, tokenAddr);
     let depositRewardToken = RewardToken.load(depositTokenId);
 
     if (depositRewardToken == null) {
       depositRewardToken = new RewardToken(depositTokenId);
-      depositRewardToken.name = tokenContract.name();
-      depositRewardToken.symbol = tokenContract.symbol();
-      depositRewardToken.decimals = tokenContract.decimals();
+      depositRewardToken.token = tokenAddr;
       depositRewardToken.type = RewardTokenType.DEPOSIT;
     }
 
@@ -27,9 +25,7 @@ export function handleOwnerChanged(event: OwnerChanged): void {
 
     if (borrowRewardToken == null) {
       borrowRewardToken = new RewardToken(borrowTokenId);
-      borrowRewardToken.name = tokenContract.name();
-      borrowRewardToken.symbol = tokenContract.symbol();
-      borrowRewardToken.decimals = tokenContract.decimals();
+      borrowRewardToken.token = tokenAddr;
       borrowRewardToken.type = RewardTokenType.BORROW;
     }
 
