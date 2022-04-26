@@ -6,7 +6,7 @@ dataSources:
     name: fWETHContract
     network: mainnet
     source:
-      address: "0x9b3be0cc5dd26fd0254088d03d8206792715588b"
+      address: "0xFE09e53A81Fe2808bc493ea64319109B5bAa573e"
       abi: fWETHContract
       startBlock: 11086824
     mapping:
@@ -18,7 +18,19 @@ dataSources:
       abis:
         - name: fWETHContract
           file: ./abis/fWETHContract.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
+        - event: Invest(uint256)
+          handler: handleInvest
+        - event: StrategyAnnounced(address,uint256)
+          handler: handleStrategyAnnounced
+        - event: StrategyChanged(address,address)
+          handler: handleStrategyChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
       file: ./src/mapping.ts
