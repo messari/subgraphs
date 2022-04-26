@@ -11,10 +11,10 @@
     "create-local": "graph create --node http://localhost:8020/ compound-forks",
     "remove-local": "graph remove --node http://localhost:8020/ compound-forks",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 compound-forks",
-    "thegraph:deploy:mainnet-cream": "yarn build:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ cream-mainnet",
+    "thegraph:deploy:mainnet-cream": "graph deploy dhruvjain1122/cream --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "prepare:mainnet-cream": "mustache config/cream/ethereum.json subgraph.template.yaml > subgraph.yaml",
-    "build:mainnet-cream": "yarn prepare:mainnet-cream && graph build",
-    "deploy:mainnet-cream": "yarn prepare:mainnet-cream && yarn build:mainnet-cream && yarn thegraph:deploy:mainnet-cream"
+    "build:mainnet-cream": "npm run prepare:mainnet-cream && graph build",
+    "deploy:mainnet-cream": "npm run prepare:mainnet-cream && npm run build:mainnet-cream && npm run thegraph:deploy:mainnet-cream"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.1",

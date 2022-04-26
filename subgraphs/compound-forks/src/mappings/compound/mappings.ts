@@ -6,11 +6,7 @@ import {
   NewLiquidationIncentive,
   NewPriceOracle,
 } from "../../../generated/Comptroller/Comptroller";
-import { createBorrow, createDeposit, createLiquidation, createRepay, createWithdraw } from "../helpers";
-import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../../generated/templates/cToken/CToken";
 import { CToken } from "../../../generated/templates";
-import { NewReserveFactor } from "../../../generated/Comptroller/cToken";
-import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../../common/getters";
 import { exponentToBigDecimal } from "../../common/utils/utils";
 import { Address, DataSourceContext } from "@graphprotocol/graph-ts";

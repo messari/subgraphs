@@ -12,7 +12,7 @@ import { NewReserveFactor } from "../../../generated/Comptroller/cToken";
 import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../../common/getters";
 import { exponentToBigDecimal } from "../../common/utils/utils";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, DataSourceContext } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
@@ -23,7 +23,9 @@ import {
 
 export function handleMarketListed(event: MarketListed): void {
   // create new market now that the data source is instantiated
-  CToken.create(event.params.cToken);
+  let context = new DataSourceContext();
+  context.setString("protocolAddress", CREAM_COMPTROLLER_ADDRESS);
+  CToken.createWithContext(event.params.cToken, context);  
   getOrCreateMarket(event, event.params.cToken, CREAM_COMPTROLLER_ADDRESS);
 }
 
