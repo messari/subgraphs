@@ -12,10 +12,14 @@ import {
   USDC_DECIMALS,
   BIGINT_ZERO,
   BIGDECIMAL_ONEHUNDRED,
+  InterestRateSide,
+  InterestRateType,
 } from "../common/utils/constants";
 import {
+  getOrCreateFinancials,
   getOrCreateLendingProtcol,
   getOrCreateMarket,
+  getOrCreateRate,
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
@@ -347,25 +351,47 @@ export function createLiquidation(
 
 // must happen before any other fields are updated for the new block
 // b/c we want to capture all of the revenue from the previous block
-export function updatePrevBlockRevenues(market: Market, blockDifference: BigInt): void {
+export function updatePrevBlockRevenues(market: Market, blockDifference: BigInt, event: ethereum.Event): void {
   // update revenues for prev block
   let blocksPerYear = getOrCreateCircularBuffer().blocksPerDay.times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
-  let borrowRatePerBlock = market.variableBorrowRate.div(blocksPerYear);
-  let supplySideRevenueUSDPerBlock = market.totalBorrowUSD
+  let borrowRate = getOrCreateRate(InterestRateSide.BORROWER, InterestRateType.VARIABLE, market.id).rate;
+  let borrowRatePerBlock = borrowRate.div(blocksPerYear);
+  let supplySideRevenueUSDPerBlock = market.totalBorrowBalanceUSD
     .times(borrowRatePerBlock)
     .times(BIGDECIMAL_ONE.minus(market._reserveFactor));
-  let protocolSideRevenueUSDPerBlock = market.totalBorrowUSD.times(borrowRatePerBlock).times(market._reserveFactor);
-  let totalRevenueUSDPerBlock = market.totalBorrowUSD.times(borrowRatePerBlock);
+  let protocolSideRevenueUSDPerBlock = market.totalBorrowBalanceUSD
+    .times(borrowRatePerBlock)
+    .times(market._reserveFactor);
+  let totalRevenueUSDPerBlock = market.totalBorrowBalanceUSD.times(borrowRatePerBlock);
 
-  market._supplySideRevenueUSD = market._supplySideRevenueUSD.plus(
+  let protocol = getOrCreateLendingProtcol();
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
     supplySideRevenueUSDPerBlock.times(blockDifference.toBigDecimal()),
   );
-  market._protocolSideRevenueUSD = market._protocolSideRevenueUSD.plus(
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
     protocolSideRevenueUSDPerBlock.times(blockDifference.toBigDecimal()),
   );
-  market._totalRevenueUSD = market._totalRevenueUSD.plus(totalRevenueUSDPerBlock.times(blockDifference.toBigDecimal()));
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+    totalRevenueUSDPerBlock.times(blockDifference.toBigDecimal()),
+  );
+  protocol.save();
 
-  market.save();
+  // update revenues for financial Snapshot
+  let financialMetrics = getOrCreateFinancials(event);
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
+    supplySideRevenueUSDPerBlock.times(blockDifference.toBigDecimal()),
+  );
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSDPerBlock.times(blockDifference.toBigDecimal()),
+  );
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
+    totalRevenueUSDPerBlock.times(blockDifference.toBigDecimal()),
+  );
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+
+  financialMetrics.save();
 }
 
 // accrue interests on outstanding borrows and supplys

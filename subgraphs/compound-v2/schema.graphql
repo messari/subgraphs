@@ -371,7 +371,7 @@ type FinancialsDailySnapshot @entity {
 
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -504,14 +504,6 @@ type Market @entity {
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
 
-    " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
-  _supplySideRevenueUSD: BigDecimal!
-
-  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
-  _protocolSideRevenueUSD: BigDecimal!
-
-  _totalRevenueUSD: BigDecimal!
-
   ##### Token Balances #####
 
   " Amount of input tokens in the market "
@@ -586,7 +578,7 @@ type MarketDailySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 
@@ -658,7 +650,7 @@ type MarketHourlySnapshot @entity {
 
   " The pool this snapshot belongs to "
   market: Market!
-  
+
   " Block number of this snapshot "
   blockNumber: BigInt!
 

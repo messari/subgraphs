@@ -70,6 +70,17 @@ export namespace RiskType {
   export const ISOLATED = "ISOLATED";
 }
 
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED_TERM = "FIXED_TERM";
+}
+
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -139,7 +150,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.toBigDecimal().times(new BigDecimal(Big
 
 export const NETWORK_ETHEREUM = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
-export const LENDING_TYPE = LendingType.POOLED;
+export const LENDING_TYPE = LendingType.CDP;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";

@@ -59,18 +59,12 @@ export namespace RewardIntervalType {
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
 // 86400 = 1 Day
 export const RATE_IN_SECONDS = 86400;
-export const RATE_IN_SECONDS_BD = BigDecimal.fromString(
-  RATE_IN_SECONDS.toString()
-);
+export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString());
 
 // Estimated seconds per block of the protocol
-export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(
-  getStartingBlockRate()
-);
+export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(getStartingBlockRate());
 
-export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(
-  WINDOW_SIZE_SECONDS.toString()
-);
+export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString());
 
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough
 /**
@@ -84,7 +78,7 @@ export function getRewardsPerDay(
   currentTimestamp: BigInt,
   currentBlockNumber: BigInt,
   rewardRate: BigDecimal,
-  rewardType: string
+  rewardType: string,
 ): BigDecimal {
   let circularBuffer = getOrCreateCircularBuffer();
 
@@ -95,9 +89,7 @@ export function getRewardsPerDay(
   let blocks = circularBuffer.blocks;
 
   // Interval between index and the index of the start of the window block
-  let windowWidth = abs(
-    circularBuffer.windowStartIndex - circularBuffer.nextIndex
-  );
+  let windowWidth = abs(circularBuffer.windowStartIndex - circularBuffer.nextIndex);
   if (windowWidth == INT_ZERO) {
     if (circularBuffer.nextIndex >= circularBuffer.bufferSize) {
       blocks[INT_ZERO] = currentTimestampI32;
@@ -127,7 +119,7 @@ export function getRewardsPerDay(
   } else {
     recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO];
   }
-  
+
   if (currentTimestampI32 - recentSavedTimestamp <= TIMESTAMP_STORAGE_INTERVAL) {
     if (rewardType == RewardIntervalType.TIMESTAMP) {
       return rewardRate.times(RATE_IN_SECONDS_BD);
@@ -163,25 +155,19 @@ export function getRewardsPerDay(
 
   // Wideness of the window in seconds.
   let windowSecondsCount = BigDecimal.fromString(
-    (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
+    (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString(),
   );
 
   // Wideness of the window in blocks.
   let windowBlocksCount = BigDecimal.fromString(
-    (
-      currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
-    ).toString()
+    (currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]).toString(),
   );
 
   // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(
-    windowSecondsCount
-  ).times(windowBlocksCount);
+  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
   // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(unnormalizedBlockSpeed);
 
   // Update BlockTracker with new values.
   circularBuffer.blocksPerDay = normalizedBlockSpeed;

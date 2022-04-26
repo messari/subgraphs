@@ -10,7 +10,6 @@ import {
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./utils/constants";
-import { BIGDECIMAL_ZERO } from "./prices/common/constants";
 
 ///////////////////////////
 //// Snapshot Entities ////
@@ -22,25 +21,16 @@ export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtcol();
 
-  // update value/volume vars
+  // update vars
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.totalVolumeUSD = protocol.totalVolumeUSD;
-  financialMetrics.totalDepositUSD = protocol.totalDepositUSD;
-  financialMetrics.totalBorrowUSD = protocol.totalBorrowUSD;
+  financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
+  financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+  financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+  financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
 
-  let supplyRevenue = BIGDECIMAL_ZERO;
-  let protocolRevenue = BIGDECIMAL_ZERO;
-  let totalRevenue = BIGDECIMAL_ZERO;
-  for (let i = 0; i < protocol._marketIds.length; i++) {
-    let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
-
-    supplyRevenue = supplyRevenue.plus(market._supplySideRevenueUSD);
-    protocolRevenue = protocolRevenue.plus(market._protocolSideRevenueUSD);
-    totalRevenue = totalRevenue.plus(market._totalRevenueUSD);
-  }
-  financialMetrics.supplySideRevenueUSD = supplyRevenue;
-  financialMetrics.protocolSideRevenueUSD = protocolRevenue;
-  financialMetrics.totalRevenueUSD = totalRevenue;
+  // TODO: update dailyDeposit / dailyBorrow / dailyLiquidate in helpers.ts
 
   // update the block number and timestamp
   financialMetrics.blockNumber = event.block.number;
@@ -53,7 +43,7 @@ export function updateFinancials(event: ethereum.Event): void {
 export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: String): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 = (event.block.timestamp.toI64() - (id * SECONDS_PER_DAY)) / SECONDS_PER_HOUR;
+  let hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
   let dailyMetrics = getOrCreateUsageDailySnapshot(event);
   let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 
@@ -138,26 +128,27 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 /////////////////
 
 function updateTransactionCount(
-  dailyUsage: UsageMetricsDailySnapshot, 
-  hourlyUsage: UsageMetricsHourlySnapshot, 
-  transaction: String): void {
-    if (transaction == "deposit") {
-      hourlyUsage.hourlyDepositCount += 1;
-      dailyUsage.dailyDepositCount += 1;
-    } else if (transaction == "withdraw") {
-      hourlyUsage.hourlyWithdrawCount += 1;
-      dailyUsage.dailyWithdrawCount += 1;
-    } else if (transaction == "borrow") {
-      hourlyUsage.hourlyBorrowCount += 1;
-      dailyUsage.dailyBorrowCount += 1;
-    } else if (transaction == "repay") {
-      hourlyUsage.hourlyRepayCount += 1;
-      dailyUsage.dailyRepayCount += 1;
-    } else if (transaction == "liquidate") {
-      hourlyUsage.hourlyLiquidateCount += 1;
-      dailyUsage.dailyLiquidateCount += 1;
-    }
+  dailyUsage: UsageMetricsDailySnapshot,
+  hourlyUsage: UsageMetricsHourlySnapshot,
+  transaction: String,
+): void {
+  if (transaction == "deposit") {
+    hourlyUsage.hourlyDepositCount += 1;
+    dailyUsage.dailyDepositCount += 1;
+  } else if (transaction == "withdraw") {
+    hourlyUsage.hourlyWithdrawCount += 1;
+    dailyUsage.dailyWithdrawCount += 1;
+  } else if (transaction == "borrow") {
+    hourlyUsage.hourlyBorrowCount += 1;
+    dailyUsage.dailyBorrowCount += 1;
+  } else if (transaction == "repay") {
+    hourlyUsage.hourlyRepayCount += 1;
+    dailyUsage.dailyRepayCount += 1;
+  } else if (transaction == "liquidate") {
+    hourlyUsage.hourlyLiquidateCount += 1;
+    dailyUsage.dailyLiquidateCount += 1;
+  }
 
-    hourlyUsage.save();
-    dailyUsage.save();
+  hourlyUsage.save();
+  dailyUsage.save();
 }

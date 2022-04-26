@@ -1,6 +1,7 @@
 // get or create snapshots and metrics
 import {
   FinancialsDailySnapshot,
+  InterestRate,
   LendingProtocol,
   Market,
   MarketDailySnapshot,
@@ -21,6 +22,8 @@ import {
   ETH_NAME,
   ETH_SYMBOL,
   INITIAL_EXCHANGE_RATE,
+  InterestRateSide,
+  InterestRateType,
   LENDING_TYPE,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
@@ -76,7 +79,7 @@ export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetri
 export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
   let days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 = (event.block.timestamp.toI64() - (days * SECONDS_PER_DAY)) / SECONDS_PER_HOUR; 
+  let hour: i64 = (event.block.timestamp.toI64() - days * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
 
   // Create unique id for the day
   let id = days.toString() + "-" + hour.toString();
@@ -111,17 +114,24 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
     marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = COMPTROLLER_ADDRESS;
     marketMetrics.market = marketAddress;
+    marketMetrics.blockNumber = event.block.timestamp;
+    marketMetrics.timestamp = event.block.timestamp;
+    marketMetrics.rates = [];
     marketMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    marketMetrics.inputTokenBalances = [BIGINT_ZERO];
-    marketMetrics.inputTokenPricesUSD = [BIGDECIMAL_ZERO];
+    marketMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
+    marketMetrics.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    marketMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    marketMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    marketMetrics.inputTokenBalance = BIGINT_ZERO;
+    marketMetrics.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     marketMetrics.outputTokenSupply = BIGINT_ZERO;
     marketMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    marketMetrics.exchangeRate = BIGDECIMAL_ZERO;
     marketMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
     marketMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-    marketMetrics.blockNumber = event.block.number;
-    marketMetrics.timestamp = event.block.timestamp;
-    marketMetrics.depositRate = BIGDECIMAL_ZERO;
-    marketMetrics.variableBorrowRate = BIGDECIMAL_ZERO;
 
     marketMetrics.save();
   }
@@ -168,14 +178,20 @@ export function getOrCreateLendingProtcol(): LendingProtocol {
     protocol.methodologyVersion = METHODOLOGY_VERSION;
     protocol.network = NETWORK_ETHEREUM;
     protocol.type = PROTOCOL_TYPE;
-    protocol.totalUniqueUsers = 0 as i32;
-    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
-    protocol.totalDepositUSD = BIGDECIMAL_ONE;
-    protocol.totalBorrowUSD = BIGDECIMAL_ZERO;
     protocol.lendingType = LENDING_TYPE;
     protocol.riskType = PROTOCOL_RISK_TYPE;
-    protocol._marketIds = [];
+    protocol.mintedTokens = [];
+    protocol.cumulativeUniqueUsers = 0;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    protocol.mintedTokenSupplies = [];
 
     // get initial liquidation penalty
     let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
@@ -210,39 +226,52 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     let marketIds = protocol._marketIds;
     marketIds.push(marketAddress.toHexString());
     protocol._marketIds = marketIds;
-    protocol.save();
     market.protocol = protocol.id;
 
     // create/add Tokens
     let inputToken = getOrCreateToken(underlyingAddress);
     let outputToken = getOrCreateCToken(marketAddress, cTokenContract);
-    // COMP was not created until block 9601359
-    if (event.block.number.toI32() > 9601359) {
-      let rewardTokenDeposit = getOrCreateRewardToken(
-        marketAddress.toHexString(),
-        Address.fromString(COMP_ADDRESS),
-        RewardTokenType.DEPOSIT,
-      );
-      let rewardTokenBorrow = getOrCreateRewardToken(
-        marketAddress.toHexString(),
-        Address.fromString(COMP_ADDRESS),
-        RewardTokenType.BORROW,
-      );
+    market.inputToken = inputToken.id;
+    market.outputToken = outputToken.id;
+    // COMP was not given as rewards until block 10271924
+    if (event.block.number.toI32() > 10271924) {
+      let rewardTokenDeposit = getOrCreateRewardToken(RewardTokenType.DEPOSIT);
+      let rewardTokenBorrow = getOrCreateRewardToken(RewardTokenType.BORROW);
       market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
     }
-    market.inputTokens = [inputToken.id];
-    market.outputToken = outputToken.id;
+
+    // add cToken as mintedTokens to protocol
+    let mintedTokens = protocol.mintedTokens;
+    mintedTokens!.push(outputToken.id);
+    protocol.mintedTokens = mintedTokens;
+    let mintedTokenSupplies = protocol.mintedTokenSupplies;
+    mintedTokenSupplies!.push(BIGINT_ZERO);
+    protocol.mintedTokenSupplies = mintedTokenSupplies;
+    protocol.save();
+
+    // create/add rates
+    let depositRate = getOrCreateRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, marketAddress.toHexString());
+    let borrowRate = getOrCreateRate(InterestRateSide.BORROWER, InterestRateType.VARIABLE, marketAddress.toHexString());
+    market.rates = [depositRate.id, borrowRate.id];
 
     // populate quantitative data
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    market.totalVolumeUSD = BIGDECIMAL_ZERO;
-    market.totalDepositUSD = BIGDECIMAL_ZERO;
-    market.totalBorrowUSD = BIGDECIMAL_ZERO;
-    market._totalBorrowNative = BIGINT_ZERO;
-    market.inputTokenBalances = [BIGINT_ZERO];
-    market.inputTokenPricesUSD = [BIGDECIMAL_ZERO];
+    market._currentDepositBalance = BIGINT_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market._currentBorrowBalance = BIGINT_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.exchangeRate = INITIAL_EXCHANGE_RATE;
+    let tryReserveFactor = cTokenContract.try_reserveFactorMantissa();
+    market._reserveFactor = tryReserveFactor.reverted
+      ? BIGDECIMAL_ZERO
+      : tryReserveFactor.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
     market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
     market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     market.createdTimestamp = event.block.timestamp;
@@ -256,24 +285,8 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
       market.name = inputToken.name;
     }
     market.isActive = true; // event MarketListed() makes a market active
-    market.canUseAsCollateral = true; // initially true - if collateral factor = 0 -> false
+    market.canUseAsCollateral = true; // initially true - if collateral factor = 0 then false
     market.canBorrowFrom = true; // initially active until event ActionPaused()
-
-    // calculations data
-    market.maximumLTV = BIGDECIMAL_ZERO;
-    market.liquidationThreshold = BIGDECIMAL_ZERO;
-    market.depositRate = BIGDECIMAL_ZERO;
-    market.stableBorrowRate = BIGDECIMAL_ZERO;
-    market.variableBorrowRate = BIGDECIMAL_ZERO;
-    let tryReserveFactor = cTokenContract.try_reserveFactorMantissa();
-    market._reserveFactor = tryReserveFactor.reverted
-      ? BIGDECIMAL_ZERO
-      : tryReserveFactor.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
-    market._exchangeRate = INITIAL_EXCHANGE_RATE;
-    market._supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    market._protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    market._totalRevenueUSD = BIGDECIMAL_ZERO;
-    market.liquidationPenalty = protocol._liquidationPenalty;
 
     market.save();
   }
@@ -310,21 +323,33 @@ export function getOrCreateToken(tokenAddress: string): Token {
       token.symbol = getAssetSymbol(Address.fromString(tokenAddress));
       token.decimals = getAssetDecimals(Address.fromString(tokenAddress));
     }
+
     token.save();
   }
   return token;
 }
 
-export function getOrCreateRewardToken(marketAddress: string, tokenAddress: Address, type: string): RewardToken {
-  let id = type + "-" + marketAddress;
+export function getOrCreateRewardToken(type: string): RewardToken {
+  let id = type + "-" + COMP_ADDRESS;
   let rewardToken = RewardToken.load(id);
   if (rewardToken == null) {
     rewardToken = new RewardToken(id);
-    rewardToken.name = getAssetName(tokenAddress);
-    rewardToken.symbol = getAssetSymbol(tokenAddress);
-    rewardToken.decimals = getAssetDecimals(tokenAddress);
+    rewardToken.token = getOrCreateToken(COMP_ADDRESS).id;
     rewardToken.type = type;
     rewardToken.save();
   }
   return rewardToken;
+}
+
+export function getOrCreateRate(rateSide: string, rateType: string, marketId: string): InterestRate {
+  let id = rateSide + "-" + rateType + "-" + marketId;
+  let rate = InterestRate.load(id);
+  if (rate == null) {
+    rate = new InterestRate(id);
+    rate.rate = BIGDECIMAL_ZERO;
+    rate.side = rateSide;
+    rate.type = rateType;
+    rate.save();
+  }
+  return rate;
 }
