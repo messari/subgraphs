@@ -31,10 +31,8 @@ Sum across all Markets:
 
 `(Change in market debt multiplier rate value from Vat Fold event * market total borrow usd) + (Liquidations per market * liquidation penalty per market)`
 
-<<<<<<< HEAD
 ### Protocol-Side Revenue USD
 
-=======
 
 ### Protocol-Side Revenue USD
 >>>>>>> origin/master
@@ -45,10 +43,7 @@ Sum across all Markets:
 `(Change in market debt multiplier rate value from Vat Fold event * market total borrow usd) + (Liquidations per market * liquidation penalty per market)`
 
 ### Supply-Side Revenue USD
-<<<<<<< HEAD
 
-=======
->>>>>>> origin/master
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Markets
@@ -60,7 +55,6 @@ Sum across all Markets
 Count of Unique Addresses which have interacted with the protocol via any transaction
 
 `'Frob' events emitted by CDP proxy addresses which include deposits withdrawals + 'Give' events emitted during a CDP swap to a new owner + from address from 'Grab' events emitted by Vat during liquidations`
-<<<<<<< HEAD
 
 ### NO Reward Token Emissions
 
@@ -95,5 +89,3 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 - Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
 - Deploy to Subgraph Studio: `graph deploy --studio <SUBGRAPH_NAME>`
 - Deploy to Hosted Service: `graph deploy --product hosted-service <GITHUB_USER>/<SUBGRAPH_NAME>`
-=======
->>>>>>> origin/master
