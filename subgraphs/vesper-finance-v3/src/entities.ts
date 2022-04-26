@@ -197,7 +197,7 @@ export function getOrCreateTransfer(
   call: TransferCall,
   vaultAddress: Address
 ): Deposit {
-  const id = `${call.transaction.hash.toHexString()}-${call.transaction.index}`;
+  const id = `deposit-${call.transaction.hash.toHexString()}-${call.transaction.index}`;
   let deposit = Deposit.load(id);
 
   if (!deposit) {
@@ -244,7 +244,7 @@ export function getOrCreateDeposit(
   call: DepositCall,
   vaultAddress: Address
 ): Deposit {
-  const id = `${call.transaction.hash.toHexString()}-${call.transaction.index}`;
+  const id = `deposit-${call.transaction.hash.toHexString()}-${call.transaction.index}`;
   let deposit = Deposit.load(id);
 
   if (!deposit) {
@@ -291,7 +291,7 @@ export function getOrCreateWithdraw(
   call: WithdrawCall,
   vaultAddress: Address
 ): Withdraw {
-  const id = `${call.transaction.hash.toHexString()}-${call.transaction.index}`;
+  const id = `withdraw-${call.transaction.hash.toHexString()}-${call.transaction.index}`;
   let withdraw = Withdraw.load(id);
 
   if (!withdraw) {
