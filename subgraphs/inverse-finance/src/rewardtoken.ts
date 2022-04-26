@@ -9,7 +9,7 @@ export function handleOwnerChanged(event: OwnerChanged): void {
   if (event.params.owner == Address.fromString(ZERO_ADDRESS)) {
     let tokenAddr = event.address.toHexString()
 
-    let depositTokenId = prefixID(RewardTokenType.DEPOSIT, tokenAddr);
+    let depositTokenId = prefixID(tokenAddr, RewardTokenType.DEPOSIT);
     let depositRewardToken = RewardToken.load(depositTokenId);
 
     if (depositRewardToken == null) {
@@ -20,7 +20,7 @@ export function handleOwnerChanged(event: OwnerChanged): void {
 
     depositRewardToken.save();
 
-    let borrowTokenId = prefixID(RewardTokenType.BORROW, event.address.toHexString());
+    let borrowTokenId = prefixID(tokenAddr, RewardTokenType.BORROW);
     let borrowRewardToken = RewardToken.load(borrowTokenId);
 
     if (borrowRewardToken == null) {

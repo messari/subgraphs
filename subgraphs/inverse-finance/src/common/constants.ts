@@ -55,6 +55,17 @@ export namespace RiskType {
   export const ISOLATED = "ISOLATED";
 }
 
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED_TERM = "FIXED_TERM";
+}
+
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const DEFAULT_DECIMALS = 18;

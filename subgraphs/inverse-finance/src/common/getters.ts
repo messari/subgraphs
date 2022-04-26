@@ -4,6 +4,7 @@ import { PriceOracle } from "../../generated/Factory/PriceOracle";
 import { CErc20 } from "../../generated/templates/CToken/CErc20";
 import { ERC20 } from "../../generated/Factory/ERC20";
 import { decimalsToBigDecimal, prefixID } from "./utils";
+import { InterestRate } from "../../generated/schema";
 import {
   Token,
   LendingProtocol,
@@ -12,7 +13,7 @@ import {
   MarketDailySnapshot,
   FinancialsDailySnapshot,
   Account,
-  ActiveAccount
+  ActiveAccount,
 } from "../../generated/schema";
 import {
   Network,
@@ -28,6 +29,8 @@ import {
   SECONDS_PER_DAY,
   MANTISSA_DECIMALS,
   RewardTokenType,
+  InterestRateType,
+  InterestRateSide,
 } from "../common/constants";
 
 export function getOrCreateToken(cToken: Address): Token {
@@ -145,8 +148,8 @@ export function getOrCreateMarket(marketAddr: string, event: ethereum.Event): Ma
     market.inputToken = asset;
     market.outputToken = marketAddr; //Token.load(marketAddr).id
     market.rewardTokens = [
-      prefixID(RewardTokenType.DEPOSIT, INV_ADDRESS),
-      prefixID(RewardTokenType.BORROW, INV_ADDRESS),
+      prefixID(INV_ADDRESS, RewardTokenType.DEPOSIT),
+      prefixID(INV_ADDRESS, RewardTokenType.BORROW),
     ];
 
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -172,7 +175,7 @@ export function getOrCreateMarket(marketAddr: string, event: ethereum.Event): Ma
     market.rates = []; //TODO: use InterestRate entity
     //inverse finance does not have stable borrow rate
     //market.stableBorrowRate = BIGDECIMAL_ZERO
-    
+
     //market.deposits
     //market.withdraws
     //market.borrows
@@ -202,4 +205,25 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   return financialMetrics;
+}
+
+export function getOrCreateInterestRate(
+  id: string | null = null,
+  side: string = InterestRateSide.BORROWER,
+  type: string = InterestRateType.VARIABLE,
+  marketId: string = ZERO_ADDRESS,
+): InterestRate {
+  if (id == null) {
+    assert(marketId != ZERO_ADDRESS, "The marketId must be specified when InterestRate id is null");
+    id = prefixID(marketId, side, type);
+  }
+
+  let interestRate = InterestRate.load(id!);
+  if (interestRate == null) {
+    interestRate = new InterestRate(id!);
+    interestRate.rate = BIGDECIMAL_ZERO;
+    interestRate.side = side;
+    interestRate.type = type;
+  }
+  return interestRate;
 }

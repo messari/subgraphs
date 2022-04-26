@@ -7,6 +7,8 @@ import {
   XINV_ADDRESS,
   SECONDS_PER_DAY,
   MANTISSA_DECIMALS,
+  InterestRateSide,
+  InterestRateType,
 } from "./constants";
 import { CErc20, Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/CToken/CErc20";
 import { JumpRateModelV2 } from "../../generated/templates/CToken/JumpRateModelV2";
@@ -25,7 +27,7 @@ import {
 } from "../../generated/schema";
 import { Factory } from "../../generated/Factory/Factory";
 import { log, ethereum, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
-import { getUnderlyingTokenPricePerAmount } from "./getters";
+import { getUnderlyingTokenPricePerAmount, getOrCreateInterestRate } from "./getters";
 import {
   getOrCreateProtocol,
   getOrCreateToken,
@@ -203,7 +205,7 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   // Number of days since Unix epoch
   let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let hours = event.block.timestamp.toI64() % SECONDS_PER_DAY;
-  
+
   let daysStr: string = days.toString();
   let daysPrior = days - 1;
   let daysPriorStr: string = daysPrior.toString();
@@ -263,9 +265,12 @@ export function updateFinancials(event: ethereum.Event): void {
     if (market != null) {
       financialMetrics.protocolControlledValueUSD = BIGDECIMAL_ZERO;
       financialMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-      financialMetrics.totalDepositBalanceUSD = financialMetrics.totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
-      financialMetrics.totalBorrowBalanceUSD = financialMetrics.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
-
+      financialMetrics.totalDepositBalanceUSD = financialMetrics.totalDepositBalanceUSD.plus(
+        market.totalDepositBalanceUSD,
+      );
+      financialMetrics.totalBorrowBalanceUSD = financialMetrics.totalBorrowBalanceUSD.plus(
+        market.totalBorrowBalanceUSD,
+      );
     }
   }
   // Update the block number and timestamp to that of the last transaction of that day
@@ -283,7 +288,9 @@ export function updateFinancialsRevenue(
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
 
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
+    newProtocolRevenueUSD,
+  );
 
   financialMetrics.dailySupplySideRevenueUSD = newTotalRevenueUSD.minus(newProtocolRevenueUSD);
 
@@ -425,42 +432,49 @@ export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt
   market.save();
 }
 
-export function updateMarketRates(event: ethereum.Event): void {
+// Update InterestRate entity
+export function updateInterestRates(event: ethereum.Event): void {
   let marketId = event.address.toHexString();
   log.info("Updating rates for Market {} at tx hash {} ...", [marketId, event.transaction.hash.toHexString()]);
 
-  let market = getOrCreateMarket(marketId, event);
-  if (market == null) {
-    log.error("Market {} does not exist.", [marketId]);
+  let borrowerInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.BORROWER, InterestRateType.VARIABLE);
+  let lenderInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE);
+  if (borrowerInterestRate == null) {
+    log.error("Borrower InterestRate for market {} does not exist.", [marketId]);
+    return;
+  }
+  if (lenderInterestRate == null) {
+    log.error("Lender InterestRate for market {} does not exist.", [marketId]);
     return;
   }
 
   let tokenContract = CErc20.bind(event.address);
-  let borrowRate = tokenContract.try_borrowRatePerBlock();
-  let depositRate = tokenContract.try_supplyRatePerBlock();
-  if (borrowRate.reverted) {
+  let tryBorrowRate = tokenContract.try_borrowRatePerBlock();
+  let tryDepositRate = tokenContract.try_supplyRatePerBlock();
+  if (tryBorrowRate.reverted) {
     log.warning("Failed to get borrowRatePerBlock() for Market {} at tx hash {}", [
       marketId,
       event.transaction.hash.toHexString(),
     ]);
   } else {
-    let rates_borrow = borrowRate.value
+    borrowerInterestRate.rate = tryBorrowRate.value
       .toBigDecimal()
       .times(BLOCKS_PER_YEAR)
       .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
-  if (depositRate.reverted) {
+  if (tryDepositRate.reverted) {
     log.warning("Failed to get supplyRatePerBlock() for Market {} at tx hash {}", [
       marketId,
       event.transaction.hash.toHexString(),
     ]);
   } else {
-    let rates_deposit = depositRate.value
+    lenderInterestRate.rate = tryDepositRate.value
       .toBigDecimal()
       .times(BLOCKS_PER_YEAR)
       .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
   // TODO: update InterestRate entity with rates_deposit and rates_borrow
 
-  market.save();
+  borrowerInterestRate.save();
+  lenderInterestRate.save();
 }

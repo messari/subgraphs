@@ -21,7 +21,7 @@ import {
   updateFinancials,
   updateFinancialsRevenue,
   updateProtocol,
-  updateMarketRates,
+  updateInterestRates,
 } from "./common/helpers";
 
 import { getUnderlyingTokenPricePerAmount } from "./common/getters";
@@ -32,7 +32,7 @@ export function handleMint(event: Mint): void {
   let user = event.params.minter;
   createDeposit(event);
   updateMarket(event);
-  updateMarketRates(event);
+  updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
   updateFinancials(event);
@@ -43,7 +43,7 @@ export function handleRedeem(event: Redeem): void {
   let user = event.params.redeemer;
   createWithdraw(event);
   updateMarket(event);
-  updateMarketRates(event);
+  updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
   updateFinancials(event);
@@ -55,7 +55,7 @@ export function handleBorrow(event: Borrow): void {
   let borrowAmount = event.params.borrowAmount;
   createBorrow(event);
   updateMarket(event, borrowAmount);
-  updateMarketRates(event);
+  updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
   updateFinancials(event);
@@ -66,7 +66,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   let user = event.params.payer;
   createRepay(event);
   updateMarket(event);
-  updateMarketRates(event);
+  updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
   updateFinancials(event);
@@ -77,7 +77,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let user = event.params.liquidator;
   createLiquidate(event);
   updateMarket(event);
-  updateMarketRates(event);
+  updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
   updateFinancials(event);
@@ -91,21 +91,17 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   // reserveFactor = Fraction of interest currently set aside for reserves
   let reserveFactor = BIGDECIMAL_ZERO;
   if (reserveFactorRes.reverted) {
-    log.warning(
-      "Failed to call reserveFactorMantissa for Market {} at tx hash {}",
-      [event.address.toHexString(), event.transaction.hash.toHexString()]
-    );
+    log.warning("Failed to call reserveFactorMantissa for Market {} at tx hash {}", [
+      event.address.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]);
   } else {
-    reserveFactor = reserveFactorRes.value
-      .toBigDecimal()
-      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
+    reserveFactor = reserveFactorRes.value.toBigDecimal().div(decimalsToBigDecimal(MANTISSA_DECIMALS));
   }
 
   // interest is accounted in underlying token
   let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
-  let interestAccumulatedUSD = interestAccumulated
-    .toBigDecimal()
-    .times(pricePerToken);
+  let interestAccumulatedUSD = interestAccumulated.toBigDecimal().times(pricePerToken);
   let protocalRevenueUSD = interestAccumulatedUSD.times(reserveFactor);
   updateFinancialsRevenue(event, protocalRevenueUSD, interestAccumulatedUSD);
 }
