@@ -65,6 +65,12 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 1. In the previous test, there were two contract calls made per price calculation - one for chainlink, and the uniswap router. In this test, the chainlink contract call does not occur unless the oracle is available (past block 12864088). Only the uniswap router will be called if it is available.
 2. The price will only be calculated once per block for each token. The oracle pheonix developed calculated the token price based on the block number anyways, so calculating multiple times per block is pointless.
 
+### Price Oracles:
+
+- Oracle 1 - Pheonix's Oracle used and described in the _reference_ subgraph
+
+- Oracle 2 - Oracle developed by the uniswap team which calculates price using pool ratios
+
 ### Checkpoints
 
 #### Oracle 1
@@ -80,10 +86,17 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Blocks per second - 2.0354 blocks per seconds
 
 * Checkpoint 2 - 9:53:37 PM April 25 2022
+
   - End block - 10,284,245
   - Block Difference - 76,387
   - Seconds between start and end - 39,320
   - Blocks per second - 1.9427 blocks per seconds
+
+* Checkpoint 3 - 9:03:45 AM April 26 2022
+  - End block - 10,331,012
+  - Block Difference - 123,154
+  - Seconds between start and end - 79,528
+  - Blocks per second - 1.5486 blocks per seconds
 
 #### Oracle 2
 
@@ -98,21 +111,21 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Blocks per second - 2.0871 blocks per seconds
 
 * Checkpoint 2 - 9:51:46 PM April 25 2022
+
   - End block - 10,287,118
   - Block Difference - 79,260
   - Seconds between start and end - 39,083
   - Blocks per second - 2.0278 blocks per seconds
 
-#### Oracle 2 - Gets price once per block
+* Checkpoint 2 - 9:07:27 AM April 25 2022
+  - End block - 10,336,413
+  - Block Difference - 128,555
+  - Seconds between start and end - 79,624
+  - Blocks per second - 1.6145 blocks per seconds
 
-Start time - 2:44:35 AM April 25 2022
-Start block - 10,207,858
+#### Results
 
-- Checkpoint 1 - 5:17:49
-  - End block - 10227390
-  - Block Difference - 19,532
-  - Seconds between start and end - 9,194
-  - Blocks per second -
+- The results after an approximately 22 hour test indicate that the use of Pheonix's oracle in the uniswap v2 subgraph results in a roughly 4% decrease in indexing speed. While this is substantial, it is a much diminished difference in pace when compart to Test 1.0.
 
 ## Hourly Metrics Test 1.0
 
