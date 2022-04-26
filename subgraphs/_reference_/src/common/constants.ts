@@ -76,6 +76,12 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace UsageType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const SWAP = "SWAP";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -125,6 +131,7 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 /////////////////////
 
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
+export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
@@ -141,3 +148,8 @@ export const ETH_NAME = "Ether"
 /////////////////////////////
 
 export const FACTORY_ADDRESS = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+export const TRADING_FEE = BigDecimal.fromString("3");
+export const PROTOCOL_FEE_TO_ON = BigDecimal.fromString("0.5");
+export const LP_FEE_TO_ON = BigDecimal.fromString("2.5");
+export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0.0");
+export const LP_FEE_TO_OFF = BigDecimal.fromString("3");
