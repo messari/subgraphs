@@ -1,0 +1,10 @@
+{
+  "network": "arbitrum-one",
+
+  "Registry_v1-Address": "0x3199437193625DCcD6F9C9e98BDf93582200Eb1f",
+  "Registry_v1-StartBlock": "4841854",
+  
+  "registry_v2-isEnabled": false,
+
+  "manualVaults": []
+}
