@@ -6,6 +6,8 @@ export const schema = (version: string): Schema => {
       return schema100();
     case Versions.Schema110:
       return schema110();
+    case Versions.Schema120:
+      return schema120();
     default:
       return schema100();
   }
@@ -194,7 +196,7 @@ export const schema110 = (): Schema => {
           activeUsers
           timestamp
         }
-        marketDailySnapshots(first:1000, where: {market: $poolId}) {
+        marketDailySnapshots(first:1000, market: $poolId) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -265,3 +267,209 @@ export const schema110 = (): Schema => {
       const events = ["withdraws","repays","liquidates","deposits","borrows"]
       return { entities, entitiesData, query, poolData ,events};
     };
+
+export const schema120 = (): Schema => {
+  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots", "UsageMetricsHourlySnapshot", "marketHourlySnapshots"];
+  const entitiesData = [
+    // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
+    [
+      "totalValueLockedUSD",
+      "protocolControlledValueUSD",
+      "mintedTokenSupplies",
+      "dailySupplySideRevenueUSD",
+      "cumulativeSupplySideRevenueUSD",
+      "dailyProtocolSideRevenueUSD",
+      "cumulativeProtocolSideRevenueUSD",
+      "dailyTotalRevenueUSD", 
+      "cumulativeTotalRevenueUSD",
+      "dailyLiquidateUSD",
+      "cumulativeLiquidateUSD",
+      "timestamp"
+    ],
+    [
+      "dailyActiveUsers",
+      "cumulativeUniqueUsers",
+      "dailyTransactionCount",
+      "dailyDepositCount",
+      "dailyWithdrawCount",
+      "dailyBorrowCount",
+      "dailyRepayCount",
+      "dailyLiquidateCount",
+      "timestamp"
+    ],
+    [
+      "market",
+      "totalValueLockedUSD",
+      "totalVolumeUSD",
+      "totalDepositBalanceUSD",
+      "dailyDepositUSD",
+      "cumulativeDepositUSD",
+      "totalBorrowBalanceUSD",
+      "dailyBorrowUSD",
+      "cumulativeBorrowUSD",
+      "dailyLiquidateUSD",
+      "cumulativeLiquidateUSD",
+      "inputTokenBalance",
+      "inputTokenPriceUSD",
+      "outputTokenSupply",
+      "outputTokenPriceUSD",
+      "exchangeRate",
+      "stakedOutputTokenAmount",
+      "rewardTokenEmissionsAmount",
+      "rewardTokenEmissionsUSD",
+      "timestamp"
+    ],
+    [
+      "hourlyActiveUsers",
+      "cumulativeUniqueUsers",
+      "hourlyTransactionCount",
+      "hourlyDepositCount",
+      "hourlyWithdrawCount",
+      "hourlyBorrowCount",
+      "hourlyRepayCount",
+      "hourlyLiquidateCount",
+      "timestamp"
+    ],
+    [
+      "market",
+      "totalValueLockedUSD",
+      "totalDepositBalanceUSD",
+      "hourlyDepositUSD",
+      "cumulativeDepositUSD",
+      "totalBorrowBalanceUSD",
+      "hourlyBorrowUSD",
+      "cumulativeBorrowUSD",
+      "hourlyLiquidateUSD",
+      "cumulativeLiquidateUSD",
+      "inputTokenBalance",
+      "inputTokenPriceUSD",
+      "outputTokenSupply",
+      "outputTokenPriceUSD",
+      "exchangeRate",
+      "stakedOutputTokenAmount",
+      "rewardTokenEmissionsAmount",
+      "rewardTokenEmissionsUSD",
+      "timestamp"
+    ]
+  ];
+  const entitiesQuery = entities.map((entity, index) => {
+    let options = "";
+    if (entity === "marketDailySnapshots" || entity === "marketHourlySnapshots") {
+      options = ", market: $poolId"
+    }
+    const baseStr = entity + "(first: 1000" + options + ") {"
+    // If certain fields which refer to other entities are present, add {id} to pull the id of that inset entity
+    // It is added this way to not be included in the entitiesData sub arrays
+    const poolIdx = entitiesData[index].indexOf('market');
+    if (poolIdx >= 0) {
+      entitiesData[index][poolIdx] += '{id}';
+    }
+    const fields = entitiesData[index].join(",");
+    return baseStr + fields + '}'
+  });
+
+  const eventsFields = [
+    "hash",
+    "to",
+    "from",
+    "timestamp",
+    "asset{id}",
+    "amount",
+    "amountUSD",
+    "market{id}"
+  ];
+
+  const events = ["withdraws","repays","liquidates","deposits","borrows"]
+  const eventsQuery = events.map((event) => {
+    let options = "";
+    const baseStr = event + "(first: 1000, id: $poolId" + options + ") {"
+    let fields = eventsFields.join(",");
+    if (event === "liquidates") {
+      fields += ",profitUSD"
+    }
+    return baseStr + fields + '}'
+  });
+  
+  const poolData = [
+    "name",
+    "inputToken",
+    "outputToken",
+    "rewardTokens",
+    "isActive",
+    "canUseAsCollateral",
+    "canBorrowFrom",
+    "maximumLTV",
+    "liquidationThreshold",
+    "liquidationPenalty",
+    "totalValueLockedUSD",
+    "totalDepositBalanceUSD",
+    "cumulativeDepositUSD",
+    "totalBorrowBalanceUSD",
+    "cumulativeBorrowUSD",
+    "cumulativeLiquidateUSD",
+    "inputTokenBalance",
+    "inputTokenPriceUSD",
+    "outputTokenSupply",
+    "outputTokenPriceUSD",
+    "exchangeRate",
+    "depositRate",
+    "stableBorrowRate",
+    "variableBorrowRate",
+    "rewardTokenEmissionsAmount",
+    "rewardTokenEmissionsUSD"
+  ];
+  const query = `
+    query Data($poolId: String){
+      protocols {
+        name
+        type
+        schemaVersion
+        subgraphVersion
+      }
+      markets {
+        id
+        name
+      }
+      ${entitiesQuery}
+      ${eventsQuery}
+      market(id:$poolId){
+        inputToken{
+          decimals
+          name
+        }
+        rewardTokens{
+          name
+        }
+        outputToken{
+          name
+        }
+
+        name
+        isActive
+        canUseAsCollateral
+        canBorrowFrom
+        maximumLTV
+        liquidationThreshold
+        liquidationPenalty
+        totalValueLockedUSD
+        totalDepositBalanceUSD
+        cumulativeDepositUSD
+        totalBorrowBalanceUSD
+        cumulativeBorrowUSD
+        cumulativeLiquidateUSD
+        inputTokenBalance
+        inputTokenPriceUSD
+        outputTokenSupply
+        outputTokenPriceUSD
+        exchangeRate
+        depositRate
+        stableBorrowRate
+        variableBorrowRate
+        rewardTokenEmissionsAmount
+        rewardTokenEmissionsUSD
+      }
+    }
+    `;
+  return { entities, entitiesData, query, poolData ,events};
+};
+

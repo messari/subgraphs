@@ -8,6 +8,7 @@ export namespace ProtocolType {
 export namespace Versions {
   export const Schema100 = "1.0.0";
   export const Schema110 = "1.1.0";
+  export const Schema120 = "1.2.0";
 }
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",

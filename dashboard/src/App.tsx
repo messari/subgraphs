@@ -130,7 +130,7 @@ export const TableEvents = (_datasetLabel: string, dataTable: any) => {
   return null;
 };
 function App() {
-  const [subgraphUrl, setSubgraphUrl] = useState<string>("");
+  const [subgraphUrl, setSubgraphUrl] = useState<string>("https://api.studio.thegraph.com/query/22815/aave-v2-test/v1.1.30");
   const [urlTextField, setTextField] = useState<string>("");
   const [poolId, setPoolId] = useState<string>("");
 
@@ -250,6 +250,7 @@ function App() {
   const AllData = () =>
     useMemo(() => {
       if (data) {
+        console.log('FULL DATA' + JSON.stringify(data))
         return (
           <>
             <Typography>
@@ -274,6 +275,7 @@ function App() {
                   {entitiesData.map((item, i) => (
                     <Grid container>
                       {item.map((name) => {
+                        console.log('ENTITY', i, item)
                         let dataName = name;
                         if (data[entities[i]].length < 1) {
                           return null;
@@ -395,6 +397,7 @@ function App() {
       }
       return null;
     }, [data, tabValue]);
+  console.log('CLIENT', client)
   return (
     <div className="App">
       <TextField
