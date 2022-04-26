@@ -4,12 +4,12 @@ import { bigIntToBigDecimal, calculateAverage, safeDiv } from "./numbers";
 
 import {
   Token,
-  _TokenPrice,
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
   FinancialsDailySnapshot,
-  PoolDailySnapshot,
+  LiquidityPoolDailySnapshot,
   RewardToken,
   Deposit,
   Withdraw,
@@ -26,6 +26,7 @@ import {
   Network,
   ProtocolType,
   RewardTokenType,
+  SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
   DODOLpToken_ADDRESS,
   vDODOToken_ADDRESS,
@@ -45,17 +46,18 @@ import { CP } from "../../generated/CP/CP";
 import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
 
-export function getOrCreateRewardToken(rewardToken: Address): RewardToken {
-  let token = RewardToken.load(rewardToken.toHexString());
+import { setUSDprice } from "./setters";
+
+export function getOrCreateRewardToken(rewardToken: Address): Token {
+  let token = getOrCreateToken(rewardToken);
   // fetch info if null
-  if (!token) {
-    token = new RewardToken(rewardToken.toHexString());
-    token.symbol = fetchTokenSymbol(rewardToken);
-    token.name = fetchTokenName(rewardToken);
-    token.decimals = fetchTokenDecimals(rewardToken);
-    token.type = RewardTokenType.DEPOSIT;
-    token.save();
+  let rt = RewardToken.load(rewardToken.toHexString());
+  if (!rt) {
+    rt = new RewardToken(rewardToken.toHexString());
+    rt.token = token.id;
+    rt.type = RewardTokenType.DEPOSIT;
   }
+  rt.save();
   return token;
 }
 
@@ -67,6 +69,8 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress);
+    token.lastPriceUSD = ZERO_BD;
+    token.lastPriceBlockNumber = ZERO_BI;
     token.save();
   }
   return token;
@@ -82,11 +86,16 @@ export function getOrCreateDexAmm(factoryAddress: Address): DexAmmProtocol {
     protocol.slug = "messari-dodo";
     protocol.schemaVersion = "1.0.0";
     protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.1.3";
-    protocol.network = Network.ETHEREUM;
+    protocol.methodologyVersion = "1.2.0";
+    protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
-    protocol.totalUniqueUsers = 0;
     protocol.totalValueLockedUSD = ZERO_BD;
+    protocol.protocolControlledValueUSD = ZERO_BD;
+    protocol.cumulativeVolumeUSD = ZERO_BD;
+    protocol.cumulativeSupplySideRevenueUSD = ZERO_BD;
+    protocol.cumulativeProtocolSideRevenueUSD = ZERO_BD;
+    protocol.cumulativeTotalRevenueUSD = ZERO_BD;
+    protocol.cumulativeUniqueUsers = 0;
 
     protocol.save();
   }
@@ -111,14 +120,21 @@ export function getOrCreatePool(
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toHex());
     pool.protocol = dodo.id;
+    pool.name = fetchTokenName(poolAddress);
+    pool.symbol = fetchTokenSymbol(poolAddress);
     pool.inputTokens = [it.id, ot.id];
     pool.outputToken = lpToken.id;
     pool.rewardTokens = [dodoLp.id, vdodo.id];
     pool.totalValueLockedUSD = ZERO_BD;
-    pool.totalVolumeUSD = ZERO_BD;
+    pool.cumulativeVolumeUSD = ZERO_BD;
     pool.inputTokenBalances = [ZERO_BI, ZERO_BI];
+    pool.inputTokenWeights = [
+      BigDecimal.fromString("0.5"),
+      BigDecimal.fromString("0.5")
+    ];
     pool.outputTokenSupply = ZERO_BI;
     pool.outputTokenPriceUSD = ZERO_BD;
+    pool.stakedOutputTokenAmount = ZERO_BI;
     pool.rewardTokenEmissionsAmount = [ZERO_BI];
     pool.rewardTokenEmissionsUSD = [ZERO_BD];
     pool.createdTimestamp = timestamp;
@@ -128,7 +144,7 @@ export function getOrCreatePool(
   return pool;
 }
 
-export function getOrCreateUsageMetricSnapshot(
+export function getOrCreateDailyUsageSnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
@@ -141,9 +157,43 @@ export function getOrCreateUsageMetricSnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
     usageMetrics.protocol = getProtocolFromPool(event.address);
 
-    usageMetrics.activeUsers = 0;
-    usageMetrics.totalUniqueUsers = 0;
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
     usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.dailySwapCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
+}
+
+export function getOrCreateHourlyUsageSnapshot(
+  event: ethereum.Event
+): UsageMetricsHourlySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
+
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
+    usageMetrics.protocol = getProtocolFromPool(event.address);
+
+    usageMetrics.hourlyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.hourlyTransactionCount = 0;
+    usageMetrics.hourlyDepositCount = 0;
+    usageMetrics.hourlyWithdrawCount = 0;
+    usageMetrics.hourlySwapCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+
     usageMetrics.save();
   }
 
@@ -161,11 +211,18 @@ export function getOrCreateFinancials(
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = getProtocolFromPool(event.address);
-    financialMetrics.totalVolumeUSD = ZERO_BD;
     financialMetrics.totalValueLockedUSD = ZERO_BD;
-    financialMetrics.supplySideRevenueUSD = ZERO_BD;
-    financialMetrics.protocolSideRevenueUSD = ZERO_BD;
-    financialMetrics.totalRevenueUSD = ZERO_BD;
+    financialMetrics.protocolControlledValueUSD = ZERO_BD;
+    financialMetrics.dailyVolumeUSD = ZERO_BD;
+    financialMetrics.cumulativeVolumeUSD = ZERO_BD;
+    financialMetrics.dailySupplySideRevenueUSD = ZERO_BD;
+    financialMetrics.cumulativeSupplySideRevenueUSD = ZERO_BD;
+    financialMetrics.dailyProtocolSideRevenueUSD = ZERO_BD;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = ZERO_BD;
+    financialMetrics.dailyTotalRevenueUSD = ZERO_BD;
+    financialMetrics.cumulativeTotalRevenueUSD = ZERO_BD;
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
 
     financialMetrics.save();
   }
@@ -174,20 +231,87 @@ export function getOrCreateFinancials(
 
 export function getOrCreatePoolDailySnapshot(
   event: ethereum.Event
-): PoolDailySnapshot {
+): LiquidityPoolDailySnapshot {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolAddress = event.address.toHexString();
-  let poolMetrics = PoolDailySnapshot.load(
+  let poolMetrics = LiquidityPoolDailySnapshot.load(
     poolAddress.concat("-").concat(id.toString())
   );
 
   if (!poolMetrics) {
-    poolMetrics = new PoolDailySnapshot(
+    poolMetrics = new LiquidityPoolDailySnapshot(
       poolAddress.concat("-").concat(id.toString())
     );
 
+    let pool = getOrCreatePool(
+      event.address,
+      event.address,
+      event.address,
+      event.block.number,
+      event.block.timestamp
+    );
+
     poolMetrics.protocol = getProtocolFromPool(event.address);
-    poolMetrics.pool = poolAddress;
+    poolMetrics.pool = pool.id;
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.totalValueLockedUSD = BigDecimal.fromString("0");
+    poolMetrics.dailyVolumeUSD = BigDecimal.fromString("0");
+    poolMetrics.dailyVolumeByTokenAmount = [];
+    poolMetrics.dailyVolumeByTokenUSD = [];
+    poolMetrics.cumulativeVolumeUSD = BigDecimal.fromString("0");
+    poolMetrics.inputTokenBalances = [];
+    poolMetrics.inputTokenWeights = [];
+    poolMetrics.outputTokenSupply = ZERO_BI;
+    poolMetrics.outputTokenPriceUSD = BigDecimal.fromString("0");
+    poolMetrics.stakedOutputTokenAmount = ZERO_BI;
+    poolMetrics.rewardTokenEmissionsAmount = [];
+    poolMetrics.rewardTokenEmissionsUSD = [];
+
+    poolMetrics.save();
+  }
+
+  return poolMetrics;
+}
+
+export function getLiquidityPoolHourlySnapshot(
+  event: ethereum.Event
+): LiquidityPoolHourlySnapshot {
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  let poolAddress = event.address.toHexString();
+  let poolMetrics = LiquidityPoolHourlySnapshot.load(
+    poolAddress.concat("-").concat(id.toString())
+  );
+
+  if (!poolMetrics) {
+    poolMetrics = new LiquidityPoolHourlySnapshot(
+      poolAddress.concat("-").concat(id.toString())
+    );
+
+    let pool = getOrCreatePool(
+      event.address,
+      event.address,
+      event.address,
+      event.block.number,
+      event.block.timestamp
+    );
+
+    poolMetrics.protocol = getProtocolFromPool(event.address);
+    poolMetrics.pool = pool.id;
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.totalValueLockedUSD = BigDecimal.fromString("0");
+    poolMetrics.dailyVolumeUSD = BigDecimal.fromString("0");
+    poolMetrics.dailyVolumeByTokenAmount = [];
+    poolMetrics.dailyVolumeByTokenUSD = [];
+    poolMetrics.cumulativeVolumeUSD = BigDecimal.fromString("0");
+    poolMetrics.inputTokenBalances = [];
+    poolMetrics.inputTokenWeights = [];
+    poolMetrics.outputTokenSupply = ZERO_BI;
+    poolMetrics.outputTokenPriceUSD = BigDecimal.fromString("0");
+    poolMetrics.stakedOutputTokenAmount = ZERO_BI;
     poolMetrics.rewardTokenEmissionsAmount = [];
     poolMetrics.rewardTokenEmissionsUSD = [];
 
@@ -221,62 +345,12 @@ function getProtocolFromPool(poolAddress: Address): string {
   return factoryAdd;
 }
 
-export function getUSDprice(
-  trader: Address,
-  tokenAddress: Address,
-  amount: BigInt
-): BigDecimal {
-  let total = ZERO_BD;
-
-  let sc1 = STABLE_COINS[0];
-  let sc2 = STABLE_COINS[1];
-  let sc3 = STABLE_COINS[2];
-
-  let divisionCounter = 0;
-
-  log.info("address of token whos price is being checked: {} ", [
-    tokenAddress.toHexString()
-  ]);
-  // let scAdd = STABLE_COINS[i];
-  // for whatever reason trying to access the stablecoins array
-  // from within a for loop causes a weird nondescript array error
-  let tokenPrice1 = _TokenPrice.load(tokenAddress.toHexString() + sc1);
-  if (!tokenPrice1) {
-    tokenPrice1 = new _TokenPrice(tokenAddress.toHexString() + sc1);
-    let token = getOrCreateToken(tokenAddress);
-    tokenPrice1.token = token.id;
+export function getUSDprice(tokenAddress: Address, amount: BigInt): BigDecimal {
+  let token = getOrCreateToken(tokenAddress);
+  let lp = token.lastPriceUSD;
+  if (!lp) {
+    lp = ZERO_BD;
   }
-  if (tokenPrice1.currentUSDprice > BigDecimal.fromString("0")) {
-    total = tokenPrice1.currentUSDprice;
-    divisionCounter++;
-  }
-
-  let tokenPrice2 = _TokenPrice.load(tokenAddress.toHexString() + sc2);
-  if (!tokenPrice2) {
-    tokenPrice2 = new _TokenPrice(tokenAddress.toHexString() + sc2);
-    let token = getOrCreateToken(tokenAddress);
-    tokenPrice2.token = token.id;
-  }
-
-  if (tokenPrice2.currentUSDprice > BigDecimal.fromString("0")) {
-    total = total + tokenPrice2.currentUSDprice;
-    divisionCounter++;
-  }
-
-  let tokenPrice3 = _TokenPrice.load(tokenAddress.toHexString() + sc3);
-  if (!tokenPrice3) {
-    tokenPrice3 = new _TokenPrice(tokenAddress.toHexString() + sc3);
-    let token = getOrCreateToken(tokenAddress);
-    tokenPrice3.token = token.id;
-  }
-  if (tokenPrice3.currentUSDprice > BigDecimal.fromString("0")) {
-    total = total + tokenPrice3.currentUSDprice;
-    divisionCounter++;
-  }
-  if (total == ZERO_BD) {
-    return ZERO_BD;
-  }
-  let price = safeDiv(total, BigDecimal.fromString(divisionCounter.toString()));
-
+  let price = bigIntToBigDecimal(amount) * lp;
   return price;
 }

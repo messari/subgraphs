@@ -32,7 +32,9 @@ import { bigIntToBigDecimal } from "./numbers";
 import {
   getOrCreateDexAmm,
   getOrCreatePoolDailySnapshot,
-  getOrCreateUsageMetricSnapshot,
+  getLiquidityPoolHourlySnapshot,
+  getOrCreateDailyUsageSnapshot,
+  getOrCreateHourlyUsageSnapshot,
   getOrCreateFinancials,
   getOrCreatePool,
   getUSDprice
@@ -66,13 +68,13 @@ export function updateFinancials(
   financialMetrics.protocol = protocol.id;
   let previousVL = financialMetrics.totalValueLockedUSD;
   financialMetrics.totalValueLockedUSD = previousVL + usdTVL;
-  let tVolume = financialMetrics.totalVolumeUSD;
-  financialMetrics.totalVolumeUSD = tVolume + usdTVolume;
+  let tVolume = financialMetrics.cumulativeVolumeUSD;
+  financialMetrics.cumulativeVolumeUSD = tVolume + usdTVolume;
 
-  let previouspsr = financialMetrics.protocolSideRevenueUSD;
-  financialMetrics.protocolSideRevenueUSD = previouspsr + usdValLP;
-  let previousssr = financialMetrics.protocolSideRevenueUSD;
-  financialMetrics.supplySideRevenueUSD = previousssr + usdValMT;
+  let previouspsr = financialMetrics.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = previouspsr + usdValLP;
+  let previousssr = financialMetrics.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = previousssr + usdValMT;
 
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
@@ -80,15 +82,24 @@ export function updateFinancials(
   financialMetrics.save();
 }
 
-export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
+export function updateUsageMetrics(
+  event: ethereum.Event,
+  from: Address,
+  isD: bool,
+  isW: bool
+): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = getOrCreateUsageMetricSnapshot(event);
+  let usageMetricsDaily = getOrCreateDailyUsageSnapshot(event);
+  let usageMetricsHourly = getOrCreateHourlyUsageSnapshot(event);
 
   // Update the block number and timestamp to that of the last transaction of that day
-  usageMetrics.blockNumber = event.block.number;
-  usageMetrics.timestamp = event.block.timestamp;
-  usageMetrics.dailyTransactionCount += 1;
+  usageMetricsDaily.blockNumber = event.block.number;
+  usageMetricsDaily.timestamp = event.block.timestamp;
+  usageMetricsDaily.dailyTransactionCount += 1;
+  usageMetricsHourly.blockNumber = event.block.number;
+  usageMetricsHourly.timestamp = event.block.timestamp;
+  usageMetricsHourly.hourlyTransactionCount += 1;
 
   let accountId = from.toHexString();
   let account = _Account.load(accountId);
@@ -96,11 +107,11 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   if (!account) {
     account = new _Account(accountId);
     account.save();
-
-    protocol.totalUniqueUsers += 1;
+    usageMetricsDaily.cumulativeUniqueUsers += 1;
+    usageMetricsHourly.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
-  usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
@@ -108,10 +119,22 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   if (!dailyActiveAccount) {
     dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1;
   }
 
-  usageMetrics.save();
+  if (isD) {
+    usageMetricsDaily.dailyDepositCount += 1;
+    usageMetricsHourly.hourlyDepositCount += 1;
+  }
+  if (isW) {
+    usageMetricsDaily.dailyWithdrawCount += 1;
+    usageMetricsHourly.hourlyWithdrawCount += 1;
+  }
+  if (!isD && !isW) {
+    usageMetricsDaily.dailySwapCount += 1;
+    usageMetricsHourly.hourlySwapCount += 1;
+  }
+  usageMetricsDaily.save();
+  usageMetricsHourly.save();
 }
 
 // Update UsagePoolDailySnapshot entity
@@ -147,7 +170,6 @@ export function updatePoolMetrics(
   if (lpSupply.reverted) {
     return;
   }
-
   //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
   //If either tokens are call the setUSDprice function to set a price for the other token
   if (
@@ -155,7 +177,7 @@ export function updatePoolMetrics(
     tokenAdds[0] == Address.fromString(STABLE_COINS[1]) ||
     tokenAdds[0] == Address.fromString(STABLE_COINS[2])
   ) {
-    setUSDprice(tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
+    setUSDprice(event, tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
   }
 
   if (
@@ -163,37 +185,36 @@ export function updatePoolMetrics(
     tokenAdds[1] == Address.fromString(STABLE_COINS[1]) ||
     tokenAdds[1] == Address.fromString(STABLE_COINS[2])
   ) {
-    setUSDprice(tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
+    setUSDprice(event, tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
   }
 
   //check if either token is wETH and if so set current USD price through wETH
   if (tokenAdds[0] == Address.fromString(WRAPPED_ETH)) {
-    setUSDpriceWETH(tokenAdds[1], trader, amount[1], amount[0]);
+    setUSDpriceWETH(event, tokenAdds[1], trader, amount[1], amount[0]);
   }
 
   if (tokenAdds[1] == Address.fromString(WRAPPED_ETH)) {
-    setUSDpriceWETH(tokenAdds[0], trader, amount[0], amount[1]);
+    setUSDpriceWETH(event, tokenAdds[0], trader, amount[0], amount[1]);
   }
 
   let usdValueOfTransaction: BigDecimal = BigDecimal.fromString("0");
 
-  usdValueOfTransaction = getUSDprice(tokenAdds[0], trader, amount[0]);
+  usdValueOfTransaction = getUSDprice(tokenAdds[0], amount[0]);
   log.info("this is the USD value returned: {} ", [
     usdValueOfTransaction.toString()
   ]);
 
-  let usdValueOfToken1 = getUSDprice(trader, tokenAdds[0], tokenBal1.value);
-  let usdValueOfToken2 = getUSDprice(trader, tokenAdds[1], tokenBal2.value);
+  let usdValueOfToken1 = getUSDprice(tokenAdds[0], tokenBal1.value);
+  let usdValueOfToken2 = getUSDprice(tokenAdds[1], tokenBal2.value);
   let usdValofPool = usdValueOfToken1 + usdValueOfToken2;
   let lpTokenUSD = getUSDprice(
     Address.fromString(pool.outputToken),
-    trader,
     BigInt.fromString("1000000000000000000")
   );
 
-  let tvUSD = pool.totalVolumeUSD.plus(usdValueOfTransaction);
+  let tvUSD = pool.cumulativeVolumeUSD.plus(usdValueOfTransaction);
   poolMetrics.totalValueLockedUSD = usdValofPool;
-  poolMetrics.totalVolumeUSD = tvUSD;
+  poolMetrics.cumulativeVolumeUSD = tvUSD;
   poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
   poolMetrics.outputTokenSupply = lpSupply.value;
   poolMetrics.outputTokenPriceUSD = lpTokenUSD;

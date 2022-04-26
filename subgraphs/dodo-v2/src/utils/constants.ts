@@ -18,7 +18,8 @@ export let ZERO_BD = BigDecimal.fromString("0");
 export let ONE_BD = BigDecimal.fromString("1");
 export let BI_18 = BigInt.fromI32(18);
 
-export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
+export const SECONDS_PER_HOUR = 60 * 60;
+export const SECONDS_PER_DAY = SECONDS_PER_HOUR * 24; // 86400
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
@@ -32,7 +33,7 @@ export namespace Network {
   export const BSC = "BSC";
   export const CELO = "CELO";
   export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET";
   export const FANTOM = "FANTOM";
   export const HARMONY = "HARMONY";
   export const MOONBEAM = "MOONBEAM";
@@ -67,3 +68,5 @@ export const STABLE_COINS: string[] = [
   "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // usdc
   "0xdac17f958d2ee523a2206206994597c13d831ec7" // usdt
 ];
+
+export const TRUE: bool = true;

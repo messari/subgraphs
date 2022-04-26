@@ -4,27 +4,17 @@ import { bigIntToBigDecimal, calculateAverage, safeDiv } from "./numbers";
 
 import {
   Token,
-  _TokenPrice,
   DexAmmProtocol,
   LiquidityPool,
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
-  PoolDailySnapshot,
   RewardToken,
   Deposit,
   Withdraw,
   Swap
 } from "../../generated/schema";
 
-import {
-  getOrCreateDexAmm,
-  getOrCreatePoolDailySnapshot,
-  getOrCreateUsageMetricSnapshot,
-  getOrCreateFinancials,
-  getOrCreatePool,
-  getUSDprice,
-  getOrCreateToken
-} from "./getters";
+import { getOrCreatePool, getUSDprice, getOrCreateToken } from "./getters";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 
@@ -56,6 +46,7 @@ import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
 
 export function setUSDprice(
+  event: ethereum.Event,
   tokenAdd: Address,
   amount: BigInt,
   stableCoin: Address,
@@ -65,95 +56,41 @@ export function setUSDprice(
     bigIntToBigDecimal(amount),
     bigIntToBigDecimal(scAmount)
   );
-
-  let tokenPrice = _TokenPrice.load(
-    tokenAdd.toHexString() + stableCoin.toHexString()
-  );
-
-  if (!tokenPrice) {
-    tokenPrice = new _TokenPrice(
-      tokenAdd.toHexString() + stableCoin.toHexString()
-    );
-
-    let token = getOrCreateToken(tokenAdd);
-    tokenPrice.token = token.id;
-  }
-  tokenPrice.currentUSDprice = pricePerToken;
-
-  tokenPrice.save();
+  let token = getOrCreateToken(tokenAdd);
+  token.lastPriceUSD = pricePerToken;
+  token.lastPriceBlockNumber = event.block.number;
+  token.save();
 }
 
+/////////////////////////////////////////////////
+
 export function setUSDpriceWETH(
+  event: ethereum.Event,
   tokenAdd: Address,
   trader: Address,
   amount: BigInt,
   wETHamount: BigInt
 ): void {
   let ethPricePerToken = amount.div(wETHamount);
-
   let pricePerToken = getUSDprice(
-    trader,
     Address.fromString(WRAPPED_ETH),
     ethPricePerToken
   );
 
   let token = getOrCreateToken(tokenAdd);
-
-  let tokenPrice1 = _TokenPrice.load(
-    tokenAdd.toHexString() + Address.fromString(STABLE_COINS[0]).toHexString()
-  );
-
-  if (!tokenPrice1) {
-    tokenPrice1 = new _TokenPrice(
-      tokenAdd.toHexString() + Address.fromString(STABLE_COINS[0]).toHexString()
-    );
-    tokenPrice1.token = token.id;
-  }
-  tokenPrice1.currentUSDprice = pricePerToken;
-
-  tokenPrice1.save();
-
-  let tokenPrice2 = _TokenPrice.load(
-    tokenAdd.toHexString() + Address.fromString(STABLE_COINS[1]).toHexString()
-  );
-
-  if (!tokenPrice2) {
-    tokenPrice2 = new _TokenPrice(
-      tokenAdd.toHexString() + Address.fromString(STABLE_COINS[1]).toHexString()
-    );
-    tokenPrice2.token = token.id;
-  }
-  tokenPrice2.currentUSDprice = pricePerToken;
-
-  tokenPrice2.save();
-
-  let tokenPrice3 = _TokenPrice.load(
-    tokenAdd.toHexString() + Address.fromString(STABLE_COINS[2]).toHexString()
-  );
-
-  if (!tokenPrice3) {
-    tokenPrice3 = new _TokenPrice(
-      tokenAdd.toHexString() + Address.fromString(STABLE_COINS[2]).toHexString()
-    );
-    tokenPrice3.token = token.id;
-  }
-  tokenPrice3.currentUSDprice = pricePerToken;
-
-  tokenPrice3.save();
+  token.lastPriceUSD = pricePerToken;
+  token.lastPriceBlockNumber = event.block.number;
+  token.save();
 }
+
+/////////////////////////////////////////////////
 
 export function setPriceLP(
   event: ethereum.Event,
   poolAdd: Address,
   trader: Address
 ): void {
-  let tokenPrice = _TokenPrice.load(poolAdd.toHexString());
-
-  if (!tokenPrice) {
-    tokenPrice = new _TokenPrice(poolAdd.toHexString());
-    let token = getOrCreateToken(poolAdd);
-    tokenPrice.token = token.id;
-  }
+  let token = getOrCreateToken(poolAdd);
 
   let pool = getOrCreatePool(
     poolAdd,
@@ -179,28 +116,20 @@ export function setPriceLP(
     return;
   }
 
-  let tokeBal1Val = getUSDprice(
-    trader,
-    Address.fromString(tokens[0]),
-    tokenBal1.value
-  );
+  let tokeBal1Val = getUSDprice(Address.fromString(tokens[0]), tokenBal1.value);
 
-  let tokeBal2Val = getUSDprice(
-    trader,
-    Address.fromString(tokens[1]),
-    tokenBal2.value
-  );
+  let tokeBal2Val = getUSDprice(Address.fromString(tokens[1]), tokenBal2.value);
 
   let totalValPool = tokeBal1Val + tokeBal2Val;
-
   let totalSupplyLP = lpToken.totalSupply();
-
   let valueOfOneLP = safeDiv(totalValPool, bigIntToBigDecimal(totalSupplyLP));
+  token.lastPriceUSD = valueOfOneLP;
+  token.lastPriceBlockNumber = event.block.number;
 
-  tokenPrice.currentUSDprice = valueOfOneLP;
-
-  tokenPrice.save();
+  token.save();
 }
+
+/////////////////////////////////
 
 export function createDeposit(
   event: ethereum.Event,
@@ -250,13 +179,16 @@ export function createDeposit(
   let tokenAdd2 = Address.fromString(tokens[1]);
 
   if (difToken1 > BigInt.fromI32(0)) {
-    priceUSDtoken1 = getUSDprice(to, tokenAdd1, difToken1);
+    priceUSDtoken1 = getUSDprice(tokenAdd1, difToken1);
   }
 
   if (difToken2 > BigInt.fromI32(0)) {
-    priceUSDtoken2 = getUSDprice(to, tokenAdd2, difToken2);
+    priceUSDtoken2 = getUSDprice(tokenAdd2, difToken2);
   }
+
   let usdTotal = priceUSDtoken1 + priceUSDtoken2;
+
+  let lpToken = getOrCreateToken(poolAdd);
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -265,7 +197,10 @@ export function createDeposit(
   deposit.from = to.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
+  deposit.inputTokens = tokens;
+  deposit.outputToken = lpToken.id;
   deposit.inputTokenAmounts = [difToken1, difToken2];
+  deposit.outputTokenAmount = shareAmount;
   deposit.amountUSD = usdTotal;
   deposit.pool = pool.id;
 
@@ -310,14 +245,8 @@ export function createWithdraw(
     return;
   }
 
-  let pB1 = priorBalance[0];
-  let pB2 = priorBalance[1];
-
-  let tB1 = tokenBal1.value;
-  let tB2 = tokenBal2.value;
-
-  let difToken1 = pB1 - tB1;
-  let difToken2 = pB2 - tB2;
+  let difToken1 = priorBalance[0] - tokenBal1.value;
+  let difToken2 = priorBalance[1] - tokenBal2.value;
 
   let priceUSDtoken1 = BigDecimal.fromString("0");
   let priceUSDtoken2 = BigDecimal.fromString("0");
@@ -326,14 +255,16 @@ export function createWithdraw(
   let tokenAdd2 = Address.fromString(tokens[1]);
 
   if (difToken1 > BigInt.fromI32(0)) {
-    priceUSDtoken1 = getUSDprice(to, tokenAdd1, difToken1);
+    priceUSDtoken1 = getUSDprice(tokenAdd1, difToken1);
   }
 
   if (difToken2 > BigInt.fromI32(0)) {
-    priceUSDtoken2 = getUSDprice(to, tokenAdd2, difToken2);
+    priceUSDtoken2 = getUSDprice(tokenAdd2, difToken2);
   }
 
   let usdTotal = priceUSDtoken1 + priceUSDtoken2;
+
+  let lpToken = getOrCreateToken(poolAdd);
 
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
@@ -342,7 +273,10 @@ export function createWithdraw(
   withdraw.from = to.toHexString();
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
+  withdraw.inputTokens = tokens;
+  withdraw.outputToken = lpToken.id;
   withdraw.inputTokenAmounts = [difToken1, difToken2];
+  withdraw.outputTokenAmount = shareAmount;
   withdraw.amountUSD = usdTotal;
   withdraw.pool = pool.id;
 
@@ -378,9 +312,9 @@ export function createSwap(
   let inToken = getOrCreateToken(tokenIn);
   let outToken = getOrCreateToken(tokenOut);
 
-  let priceUSDtoken1 = getUSDprice(trader, tokenIn, amountIn);
+  let priceUSDtoken1 = getUSDprice(tokenIn, amountIn);
 
-  let priceUSDtoken2 = getUSDprice(trader, tokenOut, amountOut);
+  let priceUSDtoken2 = getUSDprice(tokenOut, amountOut);
 
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();

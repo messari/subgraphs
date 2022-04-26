@@ -1,26 +1,4 @@
-import { BigInt, BigDecimal, Address } from "@graphprotocol/graph-ts";
-import {
-  DODOLpToken_ADDRESS,
-  vDODOToken_ADDRESS,
-  ZERO_BI,
-  ONE_BI,
-  ZERO_BD,
-  ADDRESS_ZERO
-} from "./utils/constants";
-
 import { CP, Bid, Cancel, Settle } from "../generated/CP/CP";
-
-import {
-  DexAmmProtocol,
-  LiquidityPool,
-  Token,
-  RewardToken,
-  PoolDailySnapshot,
-  LiquidityPoolFee,
-  Deposit,
-  Withdraw,
-  Swap
-} from "../generated/schema";
 
 import {
   updateFinancials,
@@ -28,22 +6,22 @@ import {
   updatePoolMetrics
 } from "./utils/metrics";
 
-import { createDeposit, createWithdraw, createSwap } from "./utils/setters";
+import { createDeposit, createWithdraw } from "./utils/setters";
 
 export function handleBid(event: Bid): void {
-  //updateUsageMetrics(event, event.params.to);
-  // updateFinancials(event);
-  // updatePoolMetrics(event);
+  createDeposit(event, event.params.to, event.address, event.params.amount);
+  updateUsageMetrics(event, event.params.to, true, false);
 }
 
 export function handleCancel(event: Cancel): void {
-  //  updateUsageMetrics(event, event.params.payer);
-  // updateFinancials(event);
-  // updatePoolMetrics(event);
+  createWithdraw(event, event.params.to, event.address, event.params.amount);
+  updateUsageMetrics(event, event.params.to, false, true);
 }
 
 export function handleSettle(event: Settle): void {
-  //  updateUsageMetrics(event, event.params.trader);
-  // updateFinancials(event);
-  // updatePoolMetrics(event);
+  //the settle event doesnt supply any params however
+  //the settle function call in CPFunding creates a DVM and handles its
+  // logic by transfering all tokens and logic over to the created DVM
+  // This means we shouldnt need to actually track anything with this event as
+  // it will already be tracked through DVM graph logic
 }
