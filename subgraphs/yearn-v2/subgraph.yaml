@@ -182,8 +182,6 @@ templates:
           file: ./abis/Prices/Calculations/SushiSwap.json
         
       eventHandlers:
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
         - event: UpdatePerformanceFee(uint256)
           handler: handleUpdatePerformanceFee
         - event: UpdateManagementFee(uint256)
