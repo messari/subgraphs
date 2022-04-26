@@ -55,6 +55,9 @@ export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_TEN = new BigDecimal(BIGINT_TEN);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
+// default MAX FEE
+export const MAX_FEE = BigDecimal.fromString("10000");
+
 // no of seconds of a day
 export const SECONDS_PER_DAY = 84600;
 export const SECONDS_PER_HOUR = 3600;

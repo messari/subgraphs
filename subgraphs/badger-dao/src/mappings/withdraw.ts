@@ -17,13 +17,10 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
   let vaultAddress = Address.fromString(vault.id);
   let vaultContract = VaultContract.bind(vaultAddress);
 
-  let pool = vault.inputTokenBalance;
-  let outputTokenSupply = vault.outputTokenSupply;
-
-  let sharesBurnt = shares
-    ? shares
-    : readValue<BigInt>(vaultContract.try_balanceOf(call.transaction.from), BIGINT_ZERO);
-  let withdrawAmount = pool.times(sharesBurnt).div(outputTokenSupply);
+  let prevOutputTokenSupply = vault.outputTokenSupply;
+  let currOutputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
+  let withdrawAmount = prevOutputTokenSupply.minus(currOutputTokenSupply);
+  let inputTokenBalance = readValue<BigInt>(vaultContract.try_balance(), BIGINT_ZERO);
 
   let pricePerShare = getPricePerShare(vaultAddress);
   let try_price = getUsdPricePerToken(inputTokenAddress, call.block);
@@ -39,22 +36,21 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
   let amountUSD = inputTokenPrice.times(withdrawAmount.toBigDecimal().div(tokenDecimals));
 
   vault.pricePerShare = pricePerShare.toBigDecimal();
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+  vault.inputTokenBalance = inputTokenBalance;
   vault.totalValueLockedUSD = inputTokenPrice.times(
-    vault.inputTokenBalance.toBigDecimal().div(tokenDecimals),
+    inputTokenBalance.toBigDecimal().div(tokenDecimals),
   );
-  vault.outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
+  vault.outputTokenSupply = currOutputTokenSupply;
   vault.outputTokenPriceUSD = getPriceOfStakeToken(inputTokenPrice, pricePerShare);
   vault.save();
 
   log.warning(
-    "[BADGER] withdraw -  vault {}  token {}  amount {} amountUSD {} shares {} inputTokenBalance {} outputTokenSupply {} txHash {}",
+    "[BADGER] withdraw -  vault {}  token {}  amount {} amountUSD {} inputTokenBalance {} outputTokenSupply {} txHash {}",
     [
       vaultAddress.toHex(),
       vault.inputToken,
       withdrawAmount.toString(),
       amountUSD.toString(),
-      sharesBurnt.toString(),
       vault.inputTokenBalance.toString(),
       vault.outputTokenSupply.toString(),
       call.transaction.hash.toHex(),

@@ -4,7 +4,14 @@ import { Strategy as StrategyContract } from "../../generated/bveCVX/Strategy";
 import { VaultV2 as VaultV2Contract } from "../../generated/bveCVX/VaultV2";
 import { VaultV4 as VaultContract } from "../../generated/bveCVX/VaultV4";
 import { Vault, VaultFee, _Strategy } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, NULL_ADDRESS, VaultFeeType } from "../constant";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  MAX_FEE,
+  NULL_ADDRESS,
+  VaultFeeType,
+} from "../constant";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
@@ -118,7 +125,7 @@ export function getFeePercentage(vault: Vault, feeType: string): BigDecimal {
 function createFeeType(id: string, feePercentage: BigDecimal, feeType: string): void {
   let fee = new VaultFee(id);
 
-  fee.feePercentage = feePercentage;
+  fee.feePercentage = feePercentage.div(MAX_FEE).times(BIGDECIMAL_HUNDRED);
   fee.feeType = feeType;
   fee.save();
 }

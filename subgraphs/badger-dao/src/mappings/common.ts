@@ -2,6 +2,7 @@ import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, Vault } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 import {
+  getOrCreateFinancialsDailySnapshot,
   getOrCreateHourlyDailySnapshot,
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateVaultDailySnapshot,
@@ -62,7 +63,7 @@ function updateUsageMetrics(call: ethereum.Call, isDeposit: bool): void {
   dailyMetrics.save();
 }
 
-function updateProtocolMetrics(): void {
+function updateProtocolMetrics(block: ethereum.Block): void {
   let protocol = getOrCreateProtocol();
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
@@ -74,6 +75,10 @@ function updateProtocolMetrics(): void {
       totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
     }
   }
+
+  let financial = getOrCreateFinancialsDailySnapshot(block);
+  financial.totalValueLockedUSD = totalValueLockedUSD;
+  financial.save();
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
@@ -109,6 +114,6 @@ function updateVaultMetrics(vault: Vault, block: ethereum.Block): void {
 
 export function updateAllMetrics(call: ethereum.Call, vault: Vault, isDeposit: bool): void {
   updateUsageMetrics(call, isDeposit);
-  updateProtocolMetrics(); // updates TVL
+  updateProtocolMetrics(call.block); // updates TVL
   updateVaultMetrics(vault, call.block);
 }

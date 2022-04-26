@@ -3,7 +3,7 @@ import {
   SetWithdrawalFeeCall,
 } from "../../generated/native.bveCVX/Strategy";
 import { VaultFee, _Strategy } from "../../generated/schema";
-import { VaultFeeType } from "../constant";
+import { BIGDECIMAL_HUNDRED, MAX_FEE, VaultFeeType } from "../constant";
 import { enumToPrefix } from "../utils/strings";
 
 export function handlePerformanceFee(call: SetPerformanceFeeGovernanceCall): void {
@@ -16,7 +16,10 @@ export function handlePerformanceFee(call: SetPerformanceFeeGovernanceCall): voi
 
     let performanceFee = new VaultFee(performanceFeeId);
     performanceFee.feeType = VaultFeeType.PERFORMANCE_FEE;
-    performanceFee.feePercentage = call.inputs._performanceFeeGovernance.toBigDecimal();
+    performanceFee.feePercentage = call.inputs._performanceFeeGovernance
+      .toBigDecimal()
+      .div(MAX_FEE)
+      .times(BIGDECIMAL_HUNDRED);
     performanceFee.save();
   }
 }
@@ -31,7 +34,10 @@ export function handleWithdrawalFee(call: SetWithdrawalFeeCall): void {
 
     let withdrawFee = new VaultFee(withdrawFeeId);
     withdrawFee.feeType = VaultFeeType.WITHDRAWAL_FEE;
-    withdrawFee.feePercentage = call.inputs._withdrawalFee.toBigDecimal();
+    withdrawFee.feePercentage = call.inputs._withdrawalFee
+      .toBigDecimal()
+      .div(MAX_FEE)
+      .times(BIGDECIMAL_HUNDRED);
     withdrawFee.save();
   }
 }

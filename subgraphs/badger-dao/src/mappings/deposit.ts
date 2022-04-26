@@ -1,5 +1,4 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { ERC20 } from "../../generated/bveCVX/ERC20";
 import { VaultV4 as VaultContract } from "../../generated/bveCVX/VaultV4";
 import { Vault } from "../../generated/schema";
 import { BIGINT_TEN, BIGINT_ZERO } from "../constant";
@@ -16,11 +15,10 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
   let vaultContract = VaultContract.bind(vaultAddress);
 
   let inputTokenAddress = Address.fromString(vault.inputToken);
-  let tokenContract = ERC20.bind(inputTokenAddress);
-
-  let depositAmount = amount
-    ? amount
-    : readValue<BigInt>(tokenContract.try_balanceOf(call.transaction.from), BIGINT_ZERO);
+  let prevTokenBalance = vault.inputTokenBalance;
+  let inputTokenBalance = readValue<BigInt>(vaultContract.try_balance(), BIGINT_ZERO);
+  let depositAmount = inputTokenBalance.minus(prevTokenBalance);
+  let outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
 
   let pricePerShare = getPricePerShare(vaultAddress);
   let try_price = getUsdPricePerToken(inputTokenAddress, call.block);
@@ -38,15 +36,6 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
     depositAmount.toBigDecimal().div(tokenDecimals.toBigDecimal()),
   );
 
-  vault.pricePerShare = pricePerShare.toBigDecimal();
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-  vault.totalValueLockedUSD = inputTokenPrice.times(
-    vault.inputTokenBalance.toBigDecimal().div(tokenDecimals.toBigDecimal()),
-  );
-  vault.outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
-  vault.outputTokenPriceUSD = getPriceOfStakeToken(inputTokenPrice, pricePerShare);
-  vault.save();
-
   log.warning(
     "[BADGER] deposit -  vault {}  token {}  amount {} amountUSD {} inputTokenBalance {}  outputTokenSupply {} txHash {}",
     [
@@ -54,11 +43,20 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
       inputTokenAddress.toHex(),
       depositAmount.toString(),
       amountUSD.toString(),
-      vault.inputTokenBalance.toString(),
-      vault.outputTokenSupply.toString(),
+      inputTokenBalance.toString(),
+      outputTokenSupply.toString(),
       call.transaction.hash.toHex(),
     ],
   );
+
+  vault.pricePerShare = pricePerShare.toBigDecimal();
+  vault.inputTokenBalance = inputTokenBalance;
+  vault.totalValueLockedUSD = inputTokenPrice.times(
+    inputTokenBalance.toBigDecimal().div(tokenDecimals.toBigDecimal()),
+  );
+  vault.outputTokenSupply = outputTokenSupply;
+  vault.outputTokenPriceUSD = getPriceOfStakeToken(inputTokenPrice, pricePerShare);
+  vault.save();
 
   let deposit = getOrCreateDeposit(call);
 
