@@ -1,0 +1,22 @@
+{
+  "name": "harvest-finance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "rm -rf generated && graph codegen",
+    "build": "rm -rf build && graph build",
+    "test": "rm -rf tests/.bin && graph test",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ ap-atul/belt",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "lint": "eslint \"src/**/*.ts\" --fix",
+    "create-local": "graph create --node http://localhost:8020/ ap-atul/belt",
+    "remove-local": "graph remove --node http://localhost:8020/ ap-atul/belt",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ap-atul/belt"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.21.1",
+    "@graphprotocol/graph-ts": "0.20.0"
+  },
+  "devDependencies": {
+    "graphpack": "^1.0.9"
+  }
+}
