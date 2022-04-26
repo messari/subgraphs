@@ -170,6 +170,7 @@ export function updatePoolMetrics(
   if (lpSupply.reverted) {
     return;
   }
+
   //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
   //If either tokens are call the setUSDprice function to set a price for the other token
   if (

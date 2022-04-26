@@ -52,11 +52,12 @@ export function setUSDprice(
   stableCoin: Address,
   scAmount: BigInt
 ): void {
+  let token = getOrCreateToken(tokenAdd);
+
   let pricePerToken = safeDiv(
     bigIntToBigDecimal(amount),
     bigIntToBigDecimal(scAmount)
   );
-  let token = getOrCreateToken(tokenAdd);
   token.lastPriceUSD = pricePerToken;
   token.lastPriceBlockNumber = event.block.number;
   token.save();

@@ -7,12 +7,12 @@
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ messari-dodo",
     "create-local": "graph create --node http://localhost:8020/ messari-dodo",
     "remove-local": "graph remove --node http://localhost:8020/ messari-dodo",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 messari-dodo"
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 messari-dodo",
+    "test": "graph test"
   },
   "dependencies": {
-    "@coingecko/cg-api-ts": "^0.0.51",
     "@graphprotocol/graph-cli": "0.29.0",
     "@graphprotocol/graph-ts": "0.26.0",
-    "coingecko-api-v3": "^0.0.13"
+    "matchstick-as": "^0.4.2"
   }
 }
