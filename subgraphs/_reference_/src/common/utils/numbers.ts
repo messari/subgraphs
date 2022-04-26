@@ -8,6 +8,16 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
   );
 }
 
+// returns 10^exp
+export function exponentToBigDecimal(exp: i32): BigDecimal {
+  let bd = BigDecimal.fromString("1");
+  const ten = BigDecimal.fromString("10");
+  for (let i = 0; i < exp; i++) {
+    bd = bd.times(ten);
+  }
+  return bd;
+}
+
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
   let sum = BigDecimal.fromString("0");
   for (let i = 0; i < prices.length; i++) {
