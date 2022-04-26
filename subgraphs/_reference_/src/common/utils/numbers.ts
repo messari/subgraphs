@@ -9,9 +9,14 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
   );
 }
 
-// (a/b)^n where n [0, 255]
-export function pow(a: BigInt, b: BigInt, n: u8): BigDecimal {
-  return a.pow(n).toBigDecimal().div(b.pow(n).toBigDecimal())
+// returns 10^exp
+export function exponentToBigDecimal(exp: i32): BigDecimal {
+  let bd = BigDecimal.fromString("1");
+  const ten = BigDecimal.fromString("10");
+  for (let i = 0; i < exp; i++) {
+    bd = bd.times(ten);
+  }
+  return bd;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
