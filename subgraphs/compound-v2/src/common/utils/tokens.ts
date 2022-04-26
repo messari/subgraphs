@@ -1,7 +1,7 @@
 import { ERC20 } from "../../../generated/Comptroller/ERC20";
 import { ERC20SymbolBytes } from "../../../generated/templates/CToken/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../../generated/templates/CToken//ERC20NameBytes";
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
 export function getAssetName(address: Address): string {
