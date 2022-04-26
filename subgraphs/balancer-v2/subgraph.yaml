@@ -17,10 +17,10 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
-        - AmmProtocol
+        - DexAmmProtocol
         - Token
         - LiquidityPool
-        - _TokenPrice
+        - Swap
         - DailyActiveAccount
         - Account
       abis:
@@ -74,3 +74,23 @@ dataSources:
           handler: handlePoolBalanceChanged
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleSwap
+templates:
+  - kind: ethereum/contract
+    name: WeightedPool
+    network: mainnet
+    source:
+      abi: WeightedPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - WeightedPool
+        - LiquidityPoolFee
+      abis:
+        - name: WeightedPool
+          file: ./abis/WeightedPool.json
+      eventHandlers:
+        - event: SwapFeePercentageChanged(uint256)
+          handler: handleSwapFeePercentageChange

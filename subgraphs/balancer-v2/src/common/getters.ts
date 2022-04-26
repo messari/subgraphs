@@ -10,7 +10,7 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
+import {fetchTokenSymbol, fetchTokenName, fetchTokenDecimals, scaleDown} from "./tokens";
 import {
   BIGDECIMAL_ZERO,
   Network,
@@ -21,6 +21,7 @@ import {
   LiquidityPoolFeeType,
   SECONDS_PER_HOUR,
 } from "./constants";
+import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates"
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
 
@@ -69,6 +70,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   let swapFees: BigInt = BigInt.fromI32(0);
   let swapFeesCall = wwPoolInstance.try_getSwapFeePercentage();
   if (!swapFeesCall.reverted) {
+    WeightedPoolTemplate.create(address)
     swapFees = swapFeesCall.value;
   } else {
     let convergentCurvePool = ConvergentCurvePool.bind(address);
@@ -78,7 +80,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
     }
   }
 
-  let feeInDecimals = swapFees.divDecimal(BigInt.fromI32(10).pow(18).toBigDecimal());
+  let feeInDecimals = scaleDown(swapFees, null);
 
   let fee = new LiquidityPoolFee(id);
   fee.feePercentage = feeInDecimals;
