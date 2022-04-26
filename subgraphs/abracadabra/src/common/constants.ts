@@ -7,20 +7,20 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const MAINNET = "MAINNET";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -174,5 +174,5 @@ export const CHAINLINK_ORACLE_DECIMALS = 8 as i32;
 export const ETH_NETWORK = "mainnet";
 export const FTM_NETWORK = "fantom";
 export const ARB_NETWORK = "arbitrum-one";
-export const BNB_NETWORK = "bsc";
+export const BSC_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";

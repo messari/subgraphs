@@ -25,7 +25,7 @@ import {
   BENTOBOX_ADDRESS_MAINNET,
   AVALANCHE_NETWORK,
   BENTOBOX_ADDRESS_AVALANCHE,
-  BNB_NETWORK,
+  BSC_NETWORK,
   BENTOBOX_ADDRESS_BSC,
   ARB_NETWORK,
   BENTOBOX_ADDRESS_ARBITRUM,
@@ -205,7 +205,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.subgraphVersion = "0.0.6";
   LendingProtocolEntity.methodologyVersion = "1.0.0";
   if (dataSource.network() == ARB_NETWORK) {
-    LendingProtocolEntity.network = Network.ARBITRUM;
+    LendingProtocolEntity.network = Network.ARBITRUM_ONE;
   } else {
     LendingProtocolEntity.network = getNetwork(dataSource.network());
   }
@@ -250,7 +250,7 @@ export function getBentoBoxAddress(network: string): string {
     return BENTOBOX_ADDRESS_ARBITRUM;
   } else if (network == FTM_NETWORK) {
     return BENTOBOX_ADDRESS_FANTOM;
-  } else if (network == BNB_NETWORK) {
+  } else if (network == BSC_NETWORK) {
     return BENTOBOX_ADDRESS_BSC;
   }
   return "";
@@ -265,7 +265,7 @@ export function getMIMAddress(network: string): string {
     return MIM_ARBITRUM;
   } else if (network == FTM_NETWORK) {
     return MIM_FANTOM;
-  } else if (network == BNB_NETWORK) {
+  } else if (network == BSC_NETWORK) {
     return MIM_BSC;
   }
   return "";
@@ -290,10 +290,10 @@ export function getNetwork(network: string): string {
   } else if (network == AVALANCHE_NETWORK) {
     return Network.AVALANCHE;
   } else if (network == ARB_NETWORK) {
-    return Network.ARBITRUM;
+    return Network.ARBITRUM_ONE;
   } else if (network == FTM_NETWORK) {
     return Network.FANTOM;
-  } else if (network == BNB_NETWORK) {
+  } else if (network == BSC_NETWORK) {
     return Network.BSC;
   }
   return "";
