@@ -10,7 +10,7 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
 } from "../../generated/schema";
-import {fetchTokenSymbol, fetchTokenName, fetchTokenDecimals, scaleDown} from "./tokens";
+import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals, scaleDown } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
   Network,
@@ -21,20 +21,21 @@ import {
   LiquidityPoolFeeType,
   SECONDS_PER_HOUR,
 } from "./constants";
-import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates"
+import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
-  let network = dataSource.network();
-  if (network === "polygon") {
-    network = Network.POLYGON;
-  } else {
-    network = Network.ETHEREUM;
-  }
-
   if (protocol === null) {
+    let network = dataSource.network();
+    if (network === "matic") {
+      network = Network.POLYGON;
+    } else if (network === "arbitrum-one") {
+      network = Network.ARBITRUM;
+    } else {
+      network = Network.ETHEREUM;
+    }
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
     protocol.schemaVersion = "1.2.0";
@@ -70,7 +71,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   let swapFees: BigInt = BigInt.fromI32(0);
   let swapFeesCall = wwPoolInstance.try_getSwapFeePercentage();
   if (!swapFeesCall.reverted) {
-    WeightedPoolTemplate.create(address)
+    WeightedPoolTemplate.create(address);
     swapFees = swapFeesCall.value;
   } else {
     let convergentCurvePool = ConvergentCurvePool.bind(address);
@@ -96,6 +97,8 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool._totalSwapFee = BIGDECIMAL_ZERO;
+  pool._protocolGeneratedFee = BIGDECIMAL_ZERO;
+  pool._sideRevenueGeneratedFee = BIGDECIMAL_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   pool.createdBlockNumber = blockInfo.number;

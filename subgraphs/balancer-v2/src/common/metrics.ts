@@ -51,7 +51,7 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.totalValueLockedUSD = totalValueLocked;
   financialMetrics.cumulativeVolumeUSD = totalVolumeUsd;
   financialMetrics.cumulativeTotalRevenueUSD = totalFeesUsd;
-  financialMetrics.dailyVolumeUSD = dailyVolumeUsd
+  financialMetrics.dailyVolumeUSD = dailyVolumeUsd;
   financialMetrics.cumulativeSupplySideRevenueUSD = totalRevenueGeneratedFee;
   financialMetrics.cumulativeProtocolSideRevenueUSD = totalProtocolGeneratedFee;
   financialMetrics.blockNumber = event.block.number;
@@ -210,6 +210,8 @@ export function updateTokenPrice(
       return;
     }
   }
+
+  if (getOrCreateDex().network == "MAINNET") return
 
   if (!isUSDStable(tokenA)) {
     const tokenPrice = new Token(tokenA.toHexString());

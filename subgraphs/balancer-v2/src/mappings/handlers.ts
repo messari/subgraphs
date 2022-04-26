@@ -1,7 +1,7 @@
 import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { PoolBalanceChanged, PoolRegistered, TokensRegistered, Swap } from "../../generated/Vault/Vault";
 import { createPool, getOrCreateToken, getOrCreateSwap, getOrCreateDex } from "../common/getters";
-import {LiquidityPool, LiquidityPoolFee} from "../../generated/schema";
+import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { BIGINT_ZERO } from "../common/constants";
 import {
   fetchPrice,
@@ -14,16 +14,16 @@ import { isUSDStable, valueInUSD } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";
 import { updateWeight } from "../common/weight";
-import {SwapFeePercentageChanged, WeightedPool} from "../../generated/Vault/WeightedPool";
+import { SwapFeePercentageChanged, WeightedPool } from "../../generated/Vault/WeightedPool";
 
 export function handleSwapFeePercentageChange(event: SwapFeePercentageChanged): void {
-  let poolContract = WeightedPool.bind(event.address)
-  let poolIdCall = poolContract.try_getPoolId()
+  let poolContract = WeightedPool.bind(event.address);
+  let poolIdCall = poolContract.try_getPoolId();
   if (!poolIdCall.reverted) {
-    let fee = LiquidityPoolFee.load(poolIdCall.value.toHexString())
+    let fee = LiquidityPoolFee.load(poolIdCall.value.toHexString());
     if (fee) {
-      fee.feePercentage = scaleDown(event.params.swapFeePercentage, null)
-      fee.save()
+      fee.feePercentage = scaleDown(event.params.swapFeePercentage, null);
+      fee.save();
     }
   }
 }
