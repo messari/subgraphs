@@ -5,10 +5,11 @@ import {
   getOrCreateToken,
   getOrCreateSwap,
   getOrCreateDex,
-  getOrCreateHourlyUsageMetricSnapshot, getOrCreateDailyUsageMetricSnapshot
+  getOrCreateHourlyUsageMetricSnapshot,
+  getOrCreateDailyUsageMetricSnapshot,
 } from "../common/getters";
-import {Deposit, LiquidityPool, LiquidityPoolFee, Withdraw} from "../../generated/schema";
-import {BIGDECIMAL_ZERO, BIGINT_ZERO} from "../common/constants";
+import { Deposit, LiquidityPool, LiquidityPoolFee, Withdraw } from "../../generated/schema";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import {
   fetchPrice,
   updateFinancials,
@@ -67,19 +68,19 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
   if (amounts.length === 0) return;
   let total: BigInt = amounts.reduce<BigInt>((sum, amount) => sum.plus(amount), new BigInt(0));
 
-  let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event)
-  let dailyUsage = getOrCreateDailyUsageMetricSnapshot(event)
+  let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event);
+  let dailyUsage = getOrCreateDailyUsageMetricSnapshot(event);
 
   if (total.gt(BIGINT_ZERO)) {
-    hourlyUsage.hourlyDepositCount += 1
-    dailyUsage.dailyDepositCount += 1
+    hourlyUsage.hourlyDepositCount += 1;
+    dailyUsage.dailyDepositCount += 1;
   } else {
-    hourlyUsage.hourlyWithdrawCount += 1
-    dailyUsage.dailyWithdrawCount += 1
+    hourlyUsage.hourlyWithdrawCount += 1;
+    dailyUsage.dailyWithdrawCount += 1;
   }
 
-  hourlyUsage.save()
-  dailyUsage.save()
+  hourlyUsage.save();
+  dailyUsage.save();
 
   for (let i = 0; i < event.params.deltas.length; i++) {
     let currentAmount = pool.inputTokenBalances[i];
@@ -162,12 +163,12 @@ export function handleSwap(event: Swap): void {
   swap.amountOutUSD = isUSDStable(tokenOut) ? amountOut : valueInUSD(amountOut, tokenOut);
   swap.save();
 
-  let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event)
-  let dailyUsage = getOrCreateDailyUsageMetricSnapshot(event)
-  hourlyUsage.hourlySwapCount += 1
-  dailyUsage.dailySwapCount += 1
-  hourlyUsage.save()
-  dailyUsage.save()
+  let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event);
+  let dailyUsage = getOrCreateDailyUsageMetricSnapshot(event);
+  hourlyUsage.hourlySwapCount += 1;
+  dailyUsage.dailySwapCount += 1;
+  hourlyUsage.save();
+  dailyUsage.save();
 
   updatePoolMetrics(event, pool);
   updateUsageMetrics(event, event.transaction.from);

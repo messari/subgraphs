@@ -28,7 +28,7 @@ import {
   umaWethPoolId,
   umaWethPoolAddress,
 } from "./state";
-import {getOrCreateDex} from "../src/common/getters";
+import { getOrCreateDex } from "../src/common/getters";
 
 const EXPECTED_WETH_PRICE = "3010.039001622230703728310744540643";
 const EXPECTED_TVL = "144119111.1126040007689007440805288";
@@ -181,9 +181,9 @@ test("Pool with weth and weight with low liquidity: Weth is the out token", () =
   handlePoolRegister(registerPoolEvent);
   handleTokensRegister(tokensRegisterEvent);
 
-  const protocol = getOrCreateDex()
-  protocol.network = "MAINNET"
-  protocol.save()
+  const protocol = getOrCreateDex();
+  protocol.network = "MAINNET";
+  protocol.save();
 
   const depositAmounts = [BigInt.fromString("2449718558752805947"), BigInt.fromString("6770241474953669666076")];
 

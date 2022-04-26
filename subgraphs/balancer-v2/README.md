@@ -75,7 +75,7 @@ To be added
 ## Deploy
 
 - Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
-- Deploy to Hosted Service: 
+- Deploy to Hosted Service:
   - Mainnet `yarn deploy:mainnet`
   - Polygon `yarn deploy:polygon`
   - Arbitrum `yarn deploy:arbitrum`

@@ -8,7 +8,8 @@ import {
   UsageMetricsDailySnapshot,
   Swap,
   LiquidityPoolDailySnapshot,
-  LiquidityPoolHourlySnapshot, UsageMetricsHourlySnapshot, Deposit,
+  LiquidityPoolHourlySnapshot,
+  UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals, scaleDown } from "./tokens";
 import {
@@ -29,12 +30,16 @@ export function getOrCreateDex(): DexAmmProtocol {
   if (protocol === null) {
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
-    protocol.slug = "balancer-v2"
+    protocol.slug = "balancer-v2";
     protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "1.2.0";
     protocol.methodologyVersion = "1.2.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.network = dataSource.network().toUpperCase();
+    let network = dataSource.network()
+    if (network == "arbitrum-one") {
+      network = "arbitrum_one"
+    }
+    protocol.network = network.toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.save();
   }

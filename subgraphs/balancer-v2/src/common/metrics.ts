@@ -4,9 +4,10 @@ import {
   getOrCreateFinancials,
   getOrCreateDailyUsageMetricSnapshot,
   updatePoolDailySnapshot,
-  updatePoolHourlySnapshot, getOrCreateHourlyUsageMetricSnapshot,
+  updatePoolHourlySnapshot,
+  getOrCreateHourlyUsageMetricSnapshot,
 } from "./getters";
-import {BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR} from "./constants";
+import { BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 import {
   Account,
   DailyActiveAccount,
@@ -14,7 +15,8 @@ import {
   Swap,
   LiquidityPoolFee,
   Token,
-  LiquidityPoolDailySnapshot, _HourlyActiveAccount,
+  LiquidityPoolDailySnapshot,
+  _HourlyActiveAccount,
 } from "../../generated/schema";
 import { calculatePrice, isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
@@ -231,7 +233,7 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network != "MAINNET") return
+  if (getOrCreateDex().network != "MAINNET") return;
 
   if (!isUSDStable(tokenA)) {
     const tokenPrice = new Token(tokenA.toHexString());
