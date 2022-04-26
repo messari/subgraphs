@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -14,7 +14,7 @@ import {
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
-  SchemaNetwork,
+  Network,
   INT_ZERO,
   FACTORY_ADDRESS,
   ProtocolType,
@@ -238,7 +238,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.network = SchemaNetwork.MAINNET;
+    protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
 
     protocol.save();

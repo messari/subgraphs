@@ -36,22 +36,19 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   usageMetricsDaily.blockNumber = event.block.number;
   usageMetricsDaily.timestamp = event.block.timestamp;
   usageMetricsDaily.dailyTransactionCount += INT_ONE;
-  if (usageType == UsageType.DEPOSIT) {
-    usageMetricsDaily.dailyDepositCount += INT_ONE;
-  } else if (usageType == UsageType.WITHDRAW) {
-    usageMetricsDaily.dailyWithdrawCount += INT_ONE;
-  } else if (usageType == UsageType.SWAP) {
-    usageMetricsDaily.dailySwapCount += INT_ONE;
-  }
 
   usageMetricsHourly.blockNumber = event.block.number;
   usageMetricsHourly.timestamp = event.block.timestamp;
   usageMetricsHourly.hourlyTransactionCount += INT_ONE;
+
   if (usageType == UsageType.DEPOSIT) {
+    usageMetricsDaily.dailyDepositCount += INT_ONE;
     usageMetricsHourly.hourlyDepositCount += INT_ONE;
   } else if (usageType == UsageType.WITHDRAW) {
+    usageMetricsDaily.dailyWithdrawCount += INT_ONE;
     usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
   } else if (usageType == UsageType.SWAP) {
+    usageMetricsDaily.dailySwapCount += INT_ONE;
     usageMetricsHourly.hourlySwapCount += INT_ONE;
   }
 
