@@ -4,6 +4,10 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Schema Enums /////
 ////////////////////////
 
+// The network names corresponding to the Network enum in the schema.
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
