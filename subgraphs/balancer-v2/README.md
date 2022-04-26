@@ -67,9 +67,15 @@ To be added
 ## Build
 
 - Generate code from manifest and schema: `yarn codegen`
-- Build subgraph: `yarn build`
+- Build subgraph:
+  - Mainnet: `yarn build:mainnet`
+  - Polygon: `yarn build:polygon`
+  - Arbitrum: `yarn build:arbitrum`
 
 ## Deploy
 
 - Authenticate (just once): `graph auth --product hosted-service <ACCESS_TOKEN>`
-- Deploy to Hosted Service: `graph init --product hosted-service cbrzn/balancer-v2`
+- Deploy to Hosted Service: 
+  - Mainnet `yarn deploy:mainnet`
+  - Polygon `yarn deploy:polygon`
+  - Arbitrum `yarn deploy:arbitrum`
