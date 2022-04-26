@@ -3,7 +3,7 @@ import {
   FinancialsDailySnapshot,
   VaultDailySnapshot,
 } from "../generated/schema";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { getDay } from "./utils";
 import { getOrCreateYieldAggregator, getOrCreateVault } from "./entities";
 
@@ -49,6 +49,8 @@ export function getOrCreateFinancialsDailySnapshot(
   object.totalVolumeUSD = protocol.totalVolumeUSD;
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
   object.totalRevenueUSD = protocol.totalValueLockedUSD;
+  object.supplySideRevenueUSD = BigDecimal.zero();
+  object.protocolSideRevenueUSD = BigDecimal.zero();
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
 
@@ -87,6 +89,7 @@ export function getOrCreateVaultDailySnapshot(
   object.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
+  object.pricePerShare = vault.pricePerShare;
 
   object.save();
 
