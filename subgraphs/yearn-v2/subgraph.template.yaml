@@ -287,6 +287,10 @@ templates:
           file: ./abis/Prices/Calculations/SushiSwap.json
         
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositEvent
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawEvent
         - event: UpdatePerformanceFee(uint256)
           handler: handleUpdatePerformanceFee
         - event: UpdateManagementFee(uint256)
