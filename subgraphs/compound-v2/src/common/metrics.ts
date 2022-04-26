@@ -4,11 +4,12 @@ import {
   getOrCreateLendingProtcol,
   getOrCreateMarket,
   getOrCreateMarketDailySnapshot,
-  getOrCreateUsageMetricSnapshot,
+  getOrCreateUsageDailySnapshot,
+  getOrCreateUsageHourlySnapshot,
 } from "./getters";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, DailyActiveAccount } from "../../generated/schema";
-import { SECONDS_PER_DAY } from "./utils/constants";
+import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./utils/constants";
 import { BIGDECIMAL_ZERO } from "./prices/common/constants";
 
 ///////////////////////////
@@ -49,15 +50,22 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 // update a given UsageMetricDailySnapshot
-export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
+export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: String): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = getOrCreateUsageMetricSnapshot(event);
+  let hour: i64 = (event.block.timestamp.toI64() - (id * SECONDS_PER_DAY)) / SECONDS_PER_HOUR;
+  let dailyMetrics = getOrCreateUsageDailySnapshot(event);
+  let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 
   // Update the block number and timestamp to that of the last transaction of that day
-  usageMetrics.blockNumber = event.block.number;
-  usageMetrics.timestamp = event.block.timestamp;
-  usageMetrics.dailyTransactionCount += 1;
+  dailyMetrics.blockNumber = event.block.number;
+  dailyMetrics.timestamp = event.block.timestamp;
+  dailyMetrics.dailyTransactionCount += 1;
+
+  // update hourlyMetrics
+  hourlyMetrics.blockNumber = event.block.number;
+  hourlyMetrics.timestamp = event.block.timestamp;
+  hourlyMetrics.hourlyTransactionCount += 1;
 
   let accountId = from.toHexString();
   let account = Account.load(accountId);
@@ -66,21 +74,35 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     account = new Account(accountId);
     account.save();
 
-    protocol.totalUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
-  usageMetrics.totalUniqueUsers = protocol.totalUniqueUsers;
+  hourlyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailyMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccountId = from.toHexString() + "-" + id.toString();
+  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
-    usageMetrics.activeUsers += 1;
+    dailyMetrics.dailyActiveUsers += 1;
   }
 
-  usageMetrics.save();
+  // create active account for hourlyMetrics
+  let hourlyActiveAccountId = dailyActiveAccountId + "-" + hour.toString();
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
+    hourlyActiveAccount.save();
+    hourlyMetrics.hourlyActiveUsers += 1;
+  }
+
+  // update transaction for daily/hourly metrics
+  updateTransactionCount(dailyMetrics, hourlyMetrics, transaction);
+
+  hourlyMetrics.save();
+  dailyMetrics.save();
 }
 
 // update a given MarketDailySnapshot
@@ -109,4 +131,33 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketMetrics.variableBorrowRate = market.variableBorrowRate;
 
   marketMetrics.save();
+}
+
+/////////////////
+//// Helpers ////
+/////////////////
+
+function updateTransactionCount(
+  dailyUsage: UsageMetricsDailySnapshot, 
+  hourlyUsage: UsageMetricsHourlySnapshot, 
+  transaction: String): void {
+    if (transaction == "deposit") {
+      hourlyUsage.hourlyDepositCount += 1;
+      dailyUsage.dailyDepositCount += 1;
+    } else if (transaction == "withdraw") {
+      hourlyUsage.hourlyWithdrawCount += 1;
+      dailyUsage.dailyWithdrawCount += 1;
+    } else if (transaction == "borrow") {
+      hourlyUsage.hourlyBorrowCount += 1;
+      dailyUsage.dailyBorrowCount += 1;
+    } else if (transaction == "repay") {
+      hourlyUsage.hourlyRepayCount += 1;
+      dailyUsage.dailyRepayCount += 1;
+    } else if (transaction == "liquidate") {
+      hourlyUsage.hourlyLiquidateCount += 1;
+      dailyUsage.dailyLiquidateCount += 1;
+    }
+
+    hourlyUsage.save();
+    dailyUsage.save();
 }
