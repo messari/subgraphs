@@ -74,9 +74,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
         BigInt.fromI32(LOW_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
       ).times(BIGDECIMAL_ONE_HUNDRED);
-      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(LOW_RISK_INTEREST_RATE), DEFAULT_DECIMALS).times(SECONDS_PER_YEAR).times(BIGDECIMAL_ONE_HUNDRED);
+      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(LOW_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
-      MarketEntity.rates = [interestRate.id]
+      MarketEntity.rates = [interestRate.id];
     } else if (marketAddress.toLowerCase() == YV_WETH_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
@@ -92,9 +94,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
       ).times(BIGDECIMAL_ONE_HUNDRED);
-      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS).times(SECONDS_PER_YEAR).times(BIGDECIMAL_ONE_HUNDRED);
+      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
-      MarketEntity.rates = [interestRate.id]
+      MarketEntity.rates = [interestRate.id];
     } else if (marketAddress.toLowerCase() == YV_YFI_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
@@ -110,9 +114,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
       ).times(BIGDECIMAL_ONE_HUNDRED);
-      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS).times(SECONDS_PER_YEAR).times(BIGDECIMAL_ONE_HUNDRED);
+      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
-      MarketEntity.rates = [interestRate.id]
+      MarketEntity.rates = [interestRate.id];
     } else if (marketAddress.toLowerCase() == YV_USDC_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(STABLE_RISK_COLLATERAL_RATE),
@@ -128,9 +134,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
         BigInt.fromI32(STABLE_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
       ).times(BIGDECIMAL_ONE_HUNDRED);
-      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(LOW_RISK_INTEREST_RATE), DEFAULT_DECIMALS).times(SECONDS_PER_YEAR).times(BIGDECIMAL_ONE_HUNDRED);
+      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(LOW_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
-      MarketEntity.rates = [interestRate.id]
+      MarketEntity.rates = [interestRate.id];
     } else if (marketAddress.toLowerCase() == XSUSHI_MARKET.toLowerCase()) {
       MarketEntity.maximumLTV = bigIntToBigDecimal(
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
@@ -146,9 +154,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
         BigInt.fromI32(HIGH_RISK_COLLATERAL_RATE),
         COLLATERIZATION_RATE_PRECISION,
       ).times(BIGDECIMAL_ONE_HUNDRED);
-      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS).times(SECONDS_PER_YEAR).times(BIGDECIMAL_ONE_HUNDRED);
+      interestRate.rate = bigIntToBigDecimal(BigInt.fromI32(HIGH_RISK_INTEREST_RATE), DEFAULT_DECIMALS)
+        .times(SECONDS_PER_YEAR)
+        .times(BIGDECIMAL_ONE_HUNDRED);
       interestRate.save();
-      MarketEntity.rates = [interestRate.id]
+      MarketEntity.rates = [interestRate.id];
     } else {
       let maximumLTVCall = MarketContract.try_COLLATERIZATION_RATE();
       let liquidationPenaltyCall = MarketContract.try_LIQUIDATION_MULTIPLIER();
@@ -167,9 +177,11 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
           maximumLTVCall.value,
           COLLATERIZATION_RATE_PRECISION,
         ).times(BIGDECIMAL_ONE_HUNDRED);
-        interestRate.rate = bigIntToBigDecimal(accrueInfoCall.value.value2, DEFAULT_DECIMALS).times(SECONDS_PER_YEAR).times(BIGDECIMAL_ONE_HUNDRED);
+        interestRate.rate = bigIntToBigDecimal(accrueInfoCall.value.value2, DEFAULT_DECIMALS)
+          .times(SECONDS_PER_YEAR)
+          .times(BIGDECIMAL_ONE_HUNDRED);
         interestRate.save();
-        MarketEntity.rates = [interestRate.id]
+        MarketEntity.rates = [interestRate.id];
       }
     }
   }

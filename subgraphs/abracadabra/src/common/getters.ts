@@ -55,7 +55,8 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress);
-    token.lastPriceUSD = tokenAddress == Address.fromString(getMIMAddress(dataSource.network())) ? BIGDECIMAL_ONE : BIGDECIMAL_ZERO;
+    token.lastPriceUSD =
+      tokenAddress == Address.fromString(getMIMAddress(dataSource.network())) ? BIGDECIMAL_ONE : BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }

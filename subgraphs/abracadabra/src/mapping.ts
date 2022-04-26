@@ -1,5 +1,5 @@
-import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
-import { DegenBox, LogDeploy } from "../generated/DegenBox/DegenBox";
+import { Address, dataSource } from "@graphprotocol/graph-ts";
+import { DegenBox, LogDeploy } from "../generated/bentoBox/DegenBox";
 import {
   LogAddCollateral,
   LogBorrow,
@@ -10,8 +10,8 @@ import {
   LogAccrue,
 } from "../generated/templates/Cauldron/Cauldron";
 import { Deposit, Borrow, Repay } from "../generated/schema";
-import { NEG_INT_ONE, DEFAULT_DECIMALS, INT_ZERO, BIGDECIMAL_ONE, ABRA_ACCOUNTS } from "./common/constants";
-import { bigIntToBigDecimal } from "./common/utils/numbers";
+import { NEG_INT_ONE, DEFAULT_DECIMALS, BIGDECIMAL_ONE, ABRA_ACCOUNTS } from "./common/constants";
+import { bigIntToBigDecimal, divBigDecimal } from "./common/utils/numbers";
 import {
   getOrCreateToken,
   getOrCreateLendingProtocol,
@@ -144,8 +144,6 @@ export function handleLogBorrow(event: LogBorrow): void {
 // 3) In logRepay, also check if from!=to and check if we saved the tx_hash - log_index +1 in a Liquidate entity
 //    - Retrieve Liquidate entity to obtain the collateral amount removed and subtract the MIM amount repayed from LogRepay to determine the profit in USD
 
-export function updateLiquidationMetrics(event: ethereum.Event): void {}
-
 export function handleLiquidation(event: LogRepay): void {
   // Retrieve cached liquidation that holds amount of collateral to help calculate profit usd (obtained from log remove collateral with from != to)
   let liquidateEvent = getLiquidateEvent(event); // retrieve cached liquidation by subtracting 1 from the current event log index (as we registered the liquidation in logRemoveCollateral that occurs 1 log index before this event)
@@ -234,7 +232,7 @@ export function handleLogRepay(event: LogRepay): void {
 export function handleLogExchangeRate(event: LogExchangeRate): void {
   let market = getMarket(event.address.toHexString());
   let token = getOrCreateToken(Address.fromString(market.inputToken));
-  let priceUSD = BIGDECIMAL_ONE.div(bigIntToBigDecimal(event.params.rate, token.decimals));
+  let priceUSD = divBigDecimal(BIGDECIMAL_ONE, bigIntToBigDecimal(event.params.rate, token.decimals));
   let inputTokenBalance = market.inputTokenBalance;
   let tvlUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
   market.inputTokenPriceUSD = priceUSD;

@@ -174,5 +174,5 @@ export const CHAINLINK_ORACLE_DECIMALS = 8 as i32;
 export const ETH_NETWORK = "mainnet";
 export const FTM_NETWORK = "fantom";
 export const ARB_NETWORK = "arbitrum-one";
-export const BNB_NETWORK = "bnb";
+export const BNB_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";

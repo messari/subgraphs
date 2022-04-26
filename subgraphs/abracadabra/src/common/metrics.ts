@@ -212,7 +212,9 @@ export function updateTotalBorrows(event: ethereum.Event): void {
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
-    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(bigIntToBigDecimal(market.outputTokenSupply, DEFAULT_DECIMALS).times(mimPriceUSD))
+    totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
+      bigIntToBigDecimal(market.outputTokenSupply, DEFAULT_DECIMALS).times(mimPriceUSD),
+    );
   }
   financialsDailySnapshots.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
@@ -264,7 +266,7 @@ export function updateMarketStats(
     usageDailySnapshot.dailyWithdrawCount += 1;
   } else if (eventType == "BORROW") {
     let outputTokenSupply = market.outputTokenSupply.plus(amount);
-    market.outputTokenSupply = outputTokenSupply
+    market.outputTokenSupply = outputTokenSupply;
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
