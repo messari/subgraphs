@@ -137,23 +137,23 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 #### With Hourly Metrics
 
 - Start time - 4:47:00 PM April 23 2022
-- Start block - 10000834
+- Start block - 10,000,834
 
 * Checkpoint 1 - 10:05:54 PM April 23 2022
-  - End block - 10285287
+  - End block - 10,285,287
   - Block Difference - 284,453
-  - Seconds between start and end - 62318
+  - Seconds between start and end - 62,318
   - Blocks per second - 4.5646 Blocks per second
 
 #### Without Hourly Metrics
 
 - Start time - 4:50:00 PM April 23 2022
-- Start block - 10000834
+- Start block - 10,000,834
 
 * Checkpoint 1 - 10:07:25 PM April 23 2022
-  - End block - 10285442
+  - End block - 10,285,442
   - Block Difference - 284,608
-  - Seconds between start and end - 62245
+  - Seconds between start and end - 62,245
   - Blocks per second - 4.5724 Blocks per second
 
 ### Results
