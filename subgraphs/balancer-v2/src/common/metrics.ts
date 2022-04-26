@@ -2,11 +2,11 @@ import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateDex,
   getOrCreateFinancials,
-  getOrCreateUsageMetricSnapshot,
+  getOrCreateDailyUsageMetricSnapshot,
   updatePoolDailySnapshot,
-  updatePoolHourlySnapshot,
+  updatePoolHourlySnapshot, getOrCreateHourlyUsageMetricSnapshot,
 } from "./getters";
-import { BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY } from "./constants";
+import {BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR} from "./constants";
 import {
   Account,
   DailyActiveAccount,
@@ -14,7 +14,7 @@ import {
   Swap,
   LiquidityPoolFee,
   Token,
-  LiquidityPoolDailySnapshot,
+  LiquidityPoolDailySnapshot, _HourlyActiveAccount,
 } from "../../generated/schema";
 import { calculatePrice, isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
@@ -62,13 +62,22 @@ export function updateFinancials(event: ethereum.Event): void {
 
 export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   // Number of days since Unix epoch
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let usageMetrics = getOrCreateUsageMetricSnapshot(event);
+  let dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  // Number of hours since Unix epoch
+  let hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+
+  let dailyUsageMetrics = getOrCreateDailyUsageMetricSnapshot(event);
+  let hourlyUsageMetrics = getOrCreateHourlyUsageMetricSnapshot(event);
 
   // Update the block number and timestamp to that of the last transaction of that day
-  usageMetrics.blockNumber = event.block.number;
-  usageMetrics.timestamp = event.block.timestamp;
-  usageMetrics.dailyTransactionCount += 1;
+  dailyUsageMetrics.blockNumber = event.block.number;
+  dailyUsageMetrics.timestamp = event.block.timestamp;
+  dailyUsageMetrics.dailyTransactionCount += 1;
+
+  // Update the block number and timestamp to that of the last transaction of that hour
+  hourlyUsageMetrics.blockNumber = event.block.number;
+  hourlyUsageMetrics.timestamp = event.block.timestamp;
+  hourlyUsageMetrics.hourlyTransactionCount += 1;
 
   let accountId = from.toHexString();
   let account = Account.load(accountId);
@@ -80,18 +89,29 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
-  usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailyUsageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  hourlyUsageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
+  let dailyActiveAccountId = dailyId.toString() + "-" + from.toHexString();
   let dailyActiveAccount = DailyActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new DailyActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
-    usageMetrics.dailyActiveUsers += 1;
+    dailyUsageMetrics.dailyActiveUsers += 1;
+  }
+  dailyUsageMetrics.save();
+
+  // Combine the id and the user address to generate a unique user id for the hour
+  let hourlyActiveAccountId = hourlyId.toString() + "-" + from.toHexString();
+  let hourlyActiveAccount = _HourlyActiveAccount.load(hourlyActiveAccountId);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new _HourlyActiveAccount(hourlyActiveAccountId);
+    hourlyActiveAccount.save();
+    hourlyUsageMetrics.hourlyActiveUsers += 1;
   }
 
-  usageMetrics.save();
+  hourlyUsageMetrics.save();
 }
 
 export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): void {
@@ -211,7 +231,7 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network == "MAINNET") return
+  if (getOrCreateDex().network != "MAINNET") return
 
   if (!isUSDStable(tokenA)) {
     const tokenPrice = new Token(tokenA.toHexString());

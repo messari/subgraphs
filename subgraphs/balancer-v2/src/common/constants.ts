@@ -4,23 +4,25 @@ import { BigDecimal, BigInt, Address, dataSource } from "@graphprotocol/graph-ts
 ///// Schema Enums /////
 ////////////////////////
 
-// The enum values are derived from Coingecko slugs (converted to uppercase
-// and replaced hyphens with underscores for Postgres enum compatibility)
+// The network names corresponding to the Network enum in the schema.
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
-    export const ARBITRUM = "ARBITRUM_ONE";
+    export const ARBITRUM_ONE = "ARBITRUM_ONE";
     export const AVALANCHE = "AVALANCHE";
     export const AURORA = "AURORA";
-    export const BSC = "BINANCE_SMART_CHAIN";
+    export const BSC = "BSC"; // aka BNB Chain
     export const CELO = "CELO";
-    export const CRONOS = "CRONOS";
-    export const ETHEREUM = "MAINNET";
+    export const MAINNET = "MAINNET"; // Ethereum mainnet
     export const FANTOM = "FANTOM";
-    export const HARMONY = "HARMONY_SHARD_0";
+    export const FUSE = "FUSE";
     export const MOONBEAM = "MOONBEAM";
     export const MOONRIVER = "MOONRIVER";
-    export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-    export const POLYGON = "MATIC";
-    export const XDAI = "XDAI";
+    export const NEAR_MAINNET = "NEAR_MAINNET";
+    export const OPTIMISM = "OPTIMISM";
+    export const MATIC = "MATIC"; // aka Polygon
+    export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {

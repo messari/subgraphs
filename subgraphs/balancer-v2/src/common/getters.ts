@@ -8,12 +8,11 @@ import {
   UsageMetricsDailySnapshot,
   Swap,
   LiquidityPoolDailySnapshot,
-  LiquidityPoolHourlySnapshot,
+  LiquidityPoolHourlySnapshot, UsageMetricsHourlySnapshot, Deposit,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals, scaleDown } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
-  Network,
   VAULT_ADDRESS,
   ProtocolType,
   SECONDS_PER_DAY,
@@ -28,21 +27,14 @@ import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
   if (protocol === null) {
-    let network = dataSource.network();
-    if (network === "matic") {
-      network = Network.POLYGON;
-    } else if (network === "arbitrum-one") {
-      network = Network.ARBITRUM;
-    } else {
-      network = Network.ETHEREUM;
-    }
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
+    protocol.slug = "balancer-v2"
     protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "1.2.0";
     protocol.methodologyVersion = "1.2.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.network = network;
+    protocol.network = dataSource.network().toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.save();
   }
@@ -135,7 +127,7 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
   return financialMetrics;
 }
 
-export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -152,6 +144,29 @@ export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetr
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyWithdrawCount = 0;
     usageMetrics.dailySwapCount = 0;
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
+}
+
+export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
+
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
+    usageMetrics.protocol = getOrCreateDex().id;
+
+    usageMetrics.hourlyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.hourlyTransactionCount = 0;
+    usageMetrics.hourlyDepositCount = 0;
+    usageMetrics.hourlyWithdrawCount = 0;
+    usageMetrics.hourlySwapCount = 0;
     usageMetrics.save();
   }
 

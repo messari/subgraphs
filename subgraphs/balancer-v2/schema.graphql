@@ -729,3 +729,9 @@ type DailyActiveAccount @entity {
   " { Days since Unix epoch }-{ Address of the account } "
   id: ID!
 }
+
+# Helper entity for calculating daily active users
+type _HourlyActiveAccount @entity {
+  " { Hours since Unix epoch }-{ Address of the account } "
+  id: ID!
+}
