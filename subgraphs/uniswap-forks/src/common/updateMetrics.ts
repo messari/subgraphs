@@ -21,7 +21,19 @@ import {
   getOrCreateToken,
   getOrCreateTokenWhitelist,
 } from "./getters";
-import { BIGDECIMAL_HUNDRED, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_TWO,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  DEFAULT_DECIMALS,
+  INT_ONE,
+  INT_TWO,
+  INT_ZERO,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  UsageType,
+} from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { NetworkConfigs } from "../../config/_networkConfig";
@@ -237,13 +249,15 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
   nativeToken.save();
 }
 
-// Update the volume and accrued fees for all relavant entities
-export function updateVolume(
+function percToDec(percentage: BigDecimal): BigDecimal {
+  return percentage.div(BIGDECIMAL_HUNDRED);
+}
+
+export function updateVolumeAndFees(
   event: ethereum.Event,
   protocol: DexAmmProtocol,
   pool: LiquidityPool,
-  token0VolumeUSD: BigDecimal,
-  token1VolumeUSD: BigDecimal,
+  trackedAmountUSD: BigDecimal[],
   token0Amount: BigInt,
   token1Amount: BigInt
 ): void {
@@ -251,82 +265,33 @@ export function updateVolume(
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
-  let depositHelper = _HelperStore.load(poolAddress)!;
-
-  // Only track volume where there is at least 5 deposits in the pool
-  // Also, only track volume for tokens that are whitelisted
-  let trackedAmountUSD: BigDecimal;
-  if (depositHelper.valueInt < 5) {
-    trackedAmountUSD = BIGDECIMAL_ZERO;
-    token0VolumeUSD = BIGDECIMAL_ZERO;
-    token1VolumeUSD = BIGDECIMAL_ZERO;
-  } else if (token0VolumeUSD == BIGDECIMAL_ZERO && NetworkConfigs.WHITELIST_TOKENS.includes(pool.inputTokens[0])) {
-    trackedAmountUSD = token1VolumeUSD;
-  } else if (token1VolumeUSD == BIGDECIMAL_ZERO && NetworkConfigs.WHITELIST_TOKENS.includes(pool.inputTokens[1])) {
-    trackedAmountUSD = token0VolumeUSD;
-  } else {
-    trackedAmountUSD = token0VolumeUSD.plus(token1VolumeUSD).div(BIGDECIMAL_TWO);
-  }
+  let supplyFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
+  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
 
   // Update volume occurred during swaps
   poolMetricsDaily.dailyVolumeByTokenUSD = [
-    poolMetricsDaily.dailyVolumeByTokenUSD[INT_ZERO].plus(token0VolumeUSD),
-    poolMetricsDaily.dailyVolumeByTokenUSD[INT_ONE].plus(token1VolumeUSD),
+    poolMetricsDaily.dailyVolumeByTokenUSD[INT_ZERO].plus(trackedAmountUSD[INT_ZERO]),
+    poolMetricsDaily.dailyVolumeByTokenUSD[INT_ONE].plus(trackedAmountUSD[INT_ONE]),
   ];
   poolMetricsDaily.dailyVolumeByTokenAmount = [
     poolMetricsDaily.dailyVolumeByTokenAmount[INT_ZERO].plus(token0Amount),
     poolMetricsDaily.dailyVolumeByTokenAmount[INT_ONE].plus(token1Amount),
   ];
   poolMetricsHourly.hourlyVolumeByTokenUSD = [
-    poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ZERO].plus(token0VolumeUSD),
-    poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ONE].plus(token1VolumeUSD),
+    poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ZERO].plus(trackedAmountUSD[INT_ZERO]),
+    poolMetricsHourly.hourlyVolumeByTokenUSD[INT_ONE].plus(trackedAmountUSD[INT_ONE]),
   ];
   poolMetricsHourly.hourlyVolumeByTokenAmount = [
     poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ZERO].plus(token0Amount),
     poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ONE].plus(token1Amount),
   ];
 
-  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(trackedAmountUSD);
-  pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD);
-  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD);
+  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
+  pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
+  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
 
-  financialMetrics.save();
-  poolMetricsDaily.save();
-  poolMetricsHourly.save();
-  protocol.save();
-  pool.save();
-}
-
-export function updateFees(
-  event: ethereum.Event,
-  protocol: DexAmmProtocol,
-  pool: LiquidityPool,
-  token0: Token,
-  token1: Token,
-  amount0In: BigInt,
-  amount0TotalConverted: BigDecimal,
-  amount1TotalConverted: BigDecimal
-): void {
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-
-  let tradingFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
-
-  let supplyFeeAmountUSD: BigDecimal;
-  let protocolFeeAmountUSD: BigDecimal;
-
-  if (amount0In != BIGINT_ZERO) {
-    let supplyFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage!));
-    let protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage!));
-    supplyFeeAmountUSD = supplyFeeAmount.times(token0.lastPriceUSD!);
-    protocolFeeAmountUSD = protocolFeeAmount.times(token0.lastPriceUSD!);
-  } else {
-    let supplyFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage!));
-    let protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage!));
-    supplyFeeAmountUSD = supplyFeeAmount.times(token1.lastPriceUSD!);
-    protocolFeeAmountUSD = protocolFeeAmount.times(token1.lastPriceUSD!);
-  }
-
+  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(supplyFee.feePercentage!));
+  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(protocolFee.feePercentage!));
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
@@ -344,10 +309,6 @@ export function updateFees(
 
   financialMetrics.save();
   protocol.save();
-}
-
-function percToDec(percentage: BigDecimal): BigDecimal {
-  return percentage.div(BIGDECIMAL_HUNDRED);
 }
 
 // Update store that tracks the deposit count per pool

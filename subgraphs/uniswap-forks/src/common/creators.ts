@@ -1,14 +1,15 @@
 import { log } from "@graphprotocol/graph-ts";
-import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import { Account, _HelperStore, _TokenWhitelist, _LiquidityPoolAmount, LiquidityPool, LiquidityPoolFee, Deposit, Withdraw, Swap as SwapEvent } from "../../generated/schema";
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, FeeSwitch } from "./constants";
-import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken } from "./getters";
+import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken, getLiquidityPoolAmounts } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
-import { updateDepositHelper, updateTokenWhitelists, updateVolume, updateFees } from "./updateMetrics";
+import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
 import { savePoolId } from "./handlers";
 import { NetworkConfigs } from "../../config/_networkConfig";
+import { getTrackedVolumeUSD } from "./price/price";
 
 export let factoryContract = FactoryContract.bind(Address.fromString(NetworkConfigs.FACTORY_ADDRESS));
 
@@ -185,6 +186,7 @@ export function createSwapHandleVolumeAndFees(
 ): void {
   let protocol = getOrCreateDex();
   let pool = getLiquidityPool(event.address.toHexString());
+  let poolAmounts = getLiquidityPoolAmounts(event.address.toHexString());
 
   let token0 = getOrCreateToken(pool.inputTokens[0]);
   let token1 = getOrCreateToken(pool.inputTokens[1]);
@@ -224,9 +226,7 @@ export function createSwapHandleVolumeAndFees(
 
   swap.save();
 
-  let token0VolumeUSD = amount0TotalConverted.times(token0.lastPriceUSD!);
-  let token1VolumeUSD = amount1TotalConverted.times(token1.lastPriceUSD!);
-
-  updateVolume(event, protocol, pool, token0VolumeUSD, token1VolumeUSD, amount0Total, amount1Total);
-  updateFees(event, protocol, pool, token0, token1, amount0In, amount0TotalConverted, amount1TotalConverted);
+  // only accounts for volume through white listed tokens
+  let trackedAmountUSD = getTrackedVolumeUSD(poolAmounts, amount0TotalConverted, token0, amount1TotalConverted, token1);
+  updateVolumeAndFees(event, protocol, pool, trackedAmountUSD, amount0Total, amount1Total);
 }
