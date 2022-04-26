@@ -67,27 +67,41 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 
 ### Checkpoints
 
-#### Oracle 1 - Gets price once per block
+#### Oracle 1
 
 - Start time - 10:58:17 AM April 25 2022
 - Start block - 10,207,858
 
 * Checkpoint 1 - 2:26:13 PM April 25 2022
+
   - End block - 10,233,252
   - Block Difference - 25,394
   - Seconds between start and end - 12,476
   - Blocks per second - 2.0354 blocks per seconds
 
-#### Oracle 2 - Gets price at every swap/deposit/withdraw
+* Checkpoint 2 - 9:53:37 PM April 25 2022
+  - End block - 10,284,245
+  - Block Difference - 76,387
+  - Seconds between start and end - 39,320
+  - Blocks per second - 1.9427 blocks per seconds
+
+#### Oracle 2
 
 - Start time - 11:00:23 AM April 25 2022
 - Start block - 10,207,858
 
 * Checkpoint 1 - 2:25:31 PM April 25 2022
+
   - End block - 10,233,547
   - Block Difference - 25,689
   - Seconds between start and end - 12,308
   - Blocks per second - 2.0871 blocks per seconds
+
+* Checkpoint 2 - 9:51:46 PM April 25 2022
+  - End block - 10,287,118
+  - Block Difference - 79,260
+  - Seconds between start and end - 39,083
+  - Blocks per second - 2.0278 blocks per seconds
 
 #### Oracle 2 - Gets price once per block
 
