@@ -63,7 +63,7 @@ The following tests are done to compare performance difference with the addition
 The purpose of this test is to compare the performance of 2 price oracles in the uniswap v2 subgraph implementation again with 2 modifications to pheonix's price oracle:
 
 1. In the previous test, there were two contract calls made per price calculation - one for chainlink, and the uniswap router. In this test, the chainlink contract call does not occur unless the oracle is available (past block 12864088). Only the uniswap router will be called if it is available.
-2. The price will only be calculated once per block for each token. The oracle pheonix developed calculated the token price based on the block number anyways, so calculating multiple times per block is pointless.
+2. The price will only be calculated once per block for each token. The oracle pheonix developed calculates the token price based on the block number anyways, so calculating multiple times per block is pointless.
 
 ### Price Oracles:
 
