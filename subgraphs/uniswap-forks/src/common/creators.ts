@@ -1,24 +1,12 @@
 import { log } from "@graphprotocol/graph-ts";
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  _HelperStore,
-  _TokenWhitelist,
-  _LiquidityPoolAmount,
-  Token,
-  DexAmmProtocol,
-  LiquidityPool,
-  LiquidityPoolFee,
-  Deposit,
-  Withdraw,
-  Swap as SwapEvent,
-} from "../../generated/schema";
+import { Account, _HelperStore, _TokenWhitelist, _LiquidityPoolAmount, LiquidityPool, LiquidityPoolFee, Deposit, Withdraw, Swap as SwapEvent } from "../../generated/schema";
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
 import { Pair as PairTemplate } from "../../generated/templates";
-import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, SECONDS_PER_DAY, LiquidityPoolFeeType, BIGDECIMAL_HUNDRED, FeeSwitch } from "./constants";
-import { getLiquidityPool, getOrCreateDex, getLiquidityPoolAmounts, getOrCreateTransfer, getLiquidityPoolFee, getOrCreateToken, getOrCreateLPToken } from "./getters";
+import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, FeeSwitch } from "./constants";
+import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
-import { updateVolumeAndFees, updateDepositHelper, updateTokenWhitelists } from "./updateMetrics";
+import { updateDepositHelper, updateTokenWhitelists, updateVolume, updateFees } from "./updateMetrics";
 import { savePoolId } from "./handlers";
 import { NetworkConfigs } from "../../config/_networkConfig";
 
@@ -185,10 +173,6 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.save();
 }
 
-function percToDec(percentage: BigDecimal): BigDecimal {
-  return percentage.div(BIGDECIMAL_HUNDRED);
-}
-
 // Handle swaps data and update entities volumes and fees
 export function createSwapHandleVolumeAndFees(
   event: ethereum.Event,
@@ -218,24 +202,6 @@ export function createSwapHandleVolumeAndFees(
   // /// get total amounts of derived USD for tracking
   // let derivedAmountUSD = token1USD.plus(token0USD).div(BIGDECIMAL_TWO)
 
-  let tradingFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
-  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
-
-  let tradingFeeAmountUSD: BigDecimal;
-  let protocolFeeAmountUSD: BigDecimal;
-
-  if (amount0In != BIGINT_ZERO) {
-    let tradingFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage!));
-    let protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage!));
-    tradingFeeAmountUSD = tradingFeeAmount.times(token0.lastPriceUSD!);
-    protocolFeeAmountUSD = protocolFeeAmount.times(token0.lastPriceUSD!);
-  } else {
-    let tradingFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage!));
-    let protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage!));
-    tradingFeeAmountUSD = tradingFeeAmount.times(token1.lastPriceUSD!);
-    protocolFeeAmountUSD = protocolFeeAmount.times(token1.lastPriceUSD!);
-  }
-
   let logIndexI32 = event.logIndex.toI32();
   let transactionHash = event.transaction.hash.toHexString();
   let swap = new SwapEvent(transactionHash.concat("-").concat(event.logIndex.toString()));
@@ -261,5 +227,6 @@ export function createSwapHandleVolumeAndFees(
   let token0VolumeUSD = amount0TotalConverted.times(token0.lastPriceUSD!);
   let token1VolumeUSD = amount1TotalConverted.times(token1.lastPriceUSD!);
 
-  updateVolumeAndFees(event, token0VolumeUSD, token1VolumeUSD, amount0Total, amount1Total, tradingFeeAmountUSD, protocolFeeAmountUSD);
+  updateVolume(event, protocol, pool, token0VolumeUSD, token1VolumeUSD, amount0Total, amount1Total);
+  updateFees(event, protocol, pool, token0, token1, amount0In, amount0TotalConverted, amount1TotalConverted);
 }

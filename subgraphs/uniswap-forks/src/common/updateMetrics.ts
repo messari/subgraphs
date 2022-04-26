@@ -1,8 +1,19 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount, Token, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot, _HelperStore, _TokenWhitelist } from "../../generated/schema";
+import {
+  Account,
+  ActiveAccount,
+  DexAmmProtocol,
+  LiquidityPool,
+  Token,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
+  _HelperStore,
+  _TokenWhitelist,
+} from "../../generated/schema";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
+  getLiquidityPoolFee,
   getOrCreateDex,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateLiquidityPoolDailySnapshot,
@@ -10,7 +21,7 @@ import {
   getOrCreateToken,
   getOrCreateTokenWhitelist,
 } from "./getters";
-import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { NetworkConfigs } from "../../config/_networkConfig";
@@ -227,50 +238,37 @@ export function updateTvlAndTokenPrices(poolAddress: string, blockNumber: BigInt
 }
 
 // Update the volume and accrued fees for all relavant entities
-export function updateVolumeAndFees(
+export function updateVolume(
   event: ethereum.Event,
+  protocol: DexAmmProtocol,
+  pool: LiquidityPool,
   token0VolumeUSD: BigDecimal,
   token1VolumeUSD: BigDecimal,
   token0Amount: BigInt,
-  token1Amount: BigInt,
-  supplyFeeAmountUSD: BigDecimal,
-  protocolFeeAmountUSD: BigDecimal
+  token1Amount: BigInt
 ): void {
   let poolAddress = event.address.toHexString();
-  let pool = getLiquidityPool(poolAddress);
-  let protocol = getOrCreateDex();
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
   let depositHelper = _HelperStore.load(poolAddress)!;
 
+  // Only track volume where there is at least 5 deposits in the pool
+  // Also, only track volume for tokens that are whitelisted
   let trackedAmountUSD: BigDecimal;
   if (depositHelper.valueInt < 5) {
     trackedAmountUSD = BIGDECIMAL_ZERO;
     token0VolumeUSD = BIGDECIMAL_ZERO;
     token1VolumeUSD = BIGDECIMAL_ZERO;
-  } else if (token0VolumeUSD == BIGDECIMAL_ZERO) {
+  } else if (token0VolumeUSD == BIGDECIMAL_ZERO && NetworkConfigs.WHITELIST_TOKENS.includes(pool.inputTokens[0])) {
     trackedAmountUSD = token1VolumeUSD;
-  } else if (token1VolumeUSD == BIGDECIMAL_ZERO) {
+  } else if (token1VolumeUSD == BIGDECIMAL_ZERO && NetworkConfigs.WHITELIST_TOKENS.includes(pool.inputTokens[1])) {
     trackedAmountUSD = token0VolumeUSD;
   } else {
     trackedAmountUSD = token0VolumeUSD.plus(token1VolumeUSD).div(BIGDECIMAL_TWO);
   }
 
-  let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
-
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
-
-  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
-  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
-
-  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-
+  // Update volume occurred during swaps
   poolMetricsDaily.dailyVolumeByTokenUSD = [
     poolMetricsDaily.dailyVolumeByTokenUSD[INT_ZERO].plus(token0VolumeUSD),
     poolMetricsDaily.dailyVolumeByTokenUSD[INT_ONE].plus(token1VolumeUSD),
@@ -297,6 +295,59 @@ export function updateVolumeAndFees(
   poolMetricsHourly.save();
   protocol.save();
   pool.save();
+}
+
+export function updateFees(
+  event: ethereum.Event,
+  protocol: DexAmmProtocol,
+  pool: LiquidityPool,
+  token0: Token,
+  token1: Token,
+  amount0In: BigInt,
+  amount0TotalConverted: BigDecimal,
+  amount1TotalConverted: BigDecimal
+): void {
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+
+  let tradingFee = getLiquidityPoolFee(pool.fees[INT_ZERO]);
+  let protocolFee = getLiquidityPoolFee(pool.fees[INT_ONE]);
+
+  let supplyFeeAmountUSD: BigDecimal;
+  let protocolFeeAmountUSD: BigDecimal;
+
+  if (amount0In != BIGINT_ZERO) {
+    let supplyFeeAmount = amount0TotalConverted.times(percToDec(tradingFee.feePercentage!));
+    let protocolFeeAmount = amount0TotalConverted.times(percToDec(protocolFee.feePercentage!));
+    supplyFeeAmountUSD = supplyFeeAmount.times(token0.lastPriceUSD!);
+    protocolFeeAmountUSD = protocolFeeAmount.times(token0.lastPriceUSD!);
+  } else {
+    let supplyFeeAmount = amount1TotalConverted.times(percToDec(tradingFee.feePercentage!));
+    let protocolFeeAmount = amount1TotalConverted.times(percToDec(protocolFee.feePercentage!));
+    supplyFeeAmountUSD = supplyFeeAmount.times(token1.lastPriceUSD!);
+    protocolFeeAmountUSD = protocolFeeAmount.times(token1.lastPriceUSD!);
+  }
+
+  let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
+
+  // Update fees collected during swaps
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+  financialMetrics.save();
+  protocol.save();
+}
+
+function percToDec(percentage: BigDecimal): BigDecimal {
+  return percentage.div(BIGDECIMAL_HUNDRED);
 }
 
 // Update store that tracks the deposit count per pool
