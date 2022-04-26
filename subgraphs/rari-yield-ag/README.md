@@ -60,12 +60,14 @@ To be added
 
 Protocol: https://rari.capital/
 
-Docs: https://docs.rari.capital/yag/
+Docs: 
+
+- https://docs.rari.capital/yag/
+- https://info.rari.capital/products/earn/
+- https://info.rari.capital/risk/earn/
 
 Smart contracts: https://github.com/Rari-Capital/vaults
 
 Deployed addresses: https://docs.rari.capital/contracts/#rari-usdc-pool
 
 Existing subgraphs: `NA`
-
-Existing Subgraph in Studio: TBA
