@@ -32,9 +32,9 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      callHandlers:
-        - function: setFeeTo(address)
-          handler: handleFeeTo
+      ##callHandlers:
+        ##- function: setFeeTo(address)
+          ##handler: handleFeeTo
 templates:
   - kind: ethereum/contract
     name: Pair

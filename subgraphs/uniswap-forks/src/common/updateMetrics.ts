@@ -286,6 +286,9 @@ export function updateVolumeAndFees(
     poolMetricsHourly.hourlyVolumeByTokenAmount[INT_ONE].plus(token1Amount),
   ];
 
+  poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
+  poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
+
   financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
@@ -308,7 +311,10 @@ export function updateVolumeAndFees(
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
   financialMetrics.save();
+  poolMetricsDaily.save();
+  poolMetricsHourly.save();
   protocol.save();
+  pool.save();
 }
 
 // Update store that tracks the deposit count per pool
