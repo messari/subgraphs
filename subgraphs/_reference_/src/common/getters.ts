@@ -14,7 +14,7 @@ import {
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
-  Network,
+  SchemaNetwork,
   INT_ZERO,
   FACTORY_ADDRESS,
   ProtocolType,
@@ -238,7 +238,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.network = Network.MAINNET;
+    protocol.network = SchemaNetwork.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
 
     protocol.save();

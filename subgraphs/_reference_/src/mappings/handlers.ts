@@ -4,7 +4,7 @@ import { PairCreated } from "../../generated/templates/Pair/Factory";
 import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees, createLiquidityPool } from "./helpers";
 import { updateFinancials, updateUsageMetrics, updatePoolMetrics } from "../common/metrics";
 import { getRewardsPerDay, RewardIntervalType } from "../common/rewards";
-import { BIGDECIMAL_ONE, INT_ONE, UsageType } from "../common/constants";
+import { BIGDECIMAL_ONE, UsageType } from "../common/constants";
 
 // To improve readability and consistency, it is recommended that you put all
 // handlers in this file, and create helper functions to handle specific events

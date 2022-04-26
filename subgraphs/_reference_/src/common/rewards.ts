@@ -16,7 +16,7 @@ import {
   INT_ONE,
   INT_TWO,
   INT_ZERO,
-} from "./utils/constants";
+} from "./constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -225,7 +225,7 @@ function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
   let network = dataSource.network();
-  if (network == SubgraphNetwork.ETHEREUM) {
+  if (network == SubgraphNetwork.MAINNET) {
     return BigDecimal.fromString("13.39");
   } else if (network == SubgraphNetwork.ARBITRUM) {
     return BigDecimal.fromString("15");
@@ -239,7 +239,7 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("1");
   } else if (network == SubgraphNetwork.OPTIMISM) {
     return BigDecimal.fromString("12.5");
-  } else if (network == SubgraphNetwork.POLYGON) {
+  } else if (network == SubgraphNetwork.MATIC) {
     return BigDecimal.fromString("2");
   } else if (network == SubgraphNetwork.XDAI) {
     return BigDecimal.fromString("5");

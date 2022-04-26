@@ -4,25 +4,42 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Schema Enums /////
 ////////////////////////
 
-// The network names corresponding to the Network enum in the schema.
-// They also correspond to the ones in `dataSource.network()` after converting to lower case.
-// See below for a complete list:
-// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
-export namespace Network {
-  export const ARBITRUM_ONE = "ARBITRUM_ONE";
+export namespace SchemaNetwork {
+  export const ARBITRUM = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BSC"; // aka BNB Chain
+  export const BSC = "BSC";
   export const CELO = "CELO";
-  export const MAINNET = "MAINNET"; // Ethereum mainnet
+  export const MAINNET = "MAINNET";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const NEAR = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
-  export const MATIC = "MATIC"; // aka Polygon
-  export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const MATIC = "MATIC";
+  export const XDAI = "XDAI";
+}
+
+// The network names corresponding to the ones in `dataSource.network()`
+// They should mainly be used for the ease of comparison.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bsc";
+  export const CELO = "celo";
+  export const MAINNET = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const MATIC = "matic";
+  export const XDAI = "xdai";
 }
 
 export namespace ProtocolType {
