@@ -1,7 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY } from "../../../compound-v2/src/common/utils/constants";
-import { SECONDS_PER_HOUR } from "./constants";
-import { toBigInt } from "../../../apeswap/src/utils/constant";
+import { SECONDS_PER_HOUR, SECONDS_PER_DAY } from "./constants";
 
 // Converts snake case to kebab case and appends a hyphen.
 // (e.g. "TRADING_FEE" to "trading-fee-"), mainly used to create entity IDs

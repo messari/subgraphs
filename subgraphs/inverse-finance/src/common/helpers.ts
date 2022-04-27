@@ -66,12 +66,18 @@ export function createAndIncrementActiveAccount(activeAccountId: string): i32 {
   return INT_ZERO;
 }
 
-export function createDeposit(event: Mint): void {
+// populate deposit entity; 
+// update 
+//    - market.cumulativeDepositUSD
+//    - protocol.cumulativeDepositUSD
+export function updateDeposit(event: Mint): void {
   let depositId = event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString();
   let deposit = Deposit.load(depositId);
+  let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
+  let depositAmount = event.params.mintAmount;
+  let depositAmountUSD = depositAmount.toBigDecimal().times(pricePerUnderlyingToken);
 
   if (deposit == null) {
-    let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
     deposit = new Deposit(depositId);
 
     deposit.hash = event.transaction.hash.toHexString();
@@ -83,12 +89,23 @@ export function createDeposit(event: Mint): void {
     deposit.timestamp = event.block.timestamp;
     deposit.market = event.address.toHexString();
     deposit.asset = getOrCreateUnderlyingToken(event.address).id;
-    deposit.amount = event.params.mintAmount;
-    deposit.amountUSD = deposit.amount.toBigDecimal().times(pricePerToken);
+    deposit.amount = depositAmount;
+    deposit.amountUSD = depositAmountUSD;
     deposit.save();
   } else {
     log.warning("Deposit {} already exists", [depositId]);
   }
+
+  // update Market.cumulativeDepositUSD
+  let marketId = event.address.toHexString();
+  let market = getOrCreateMarket(marketId, event)
+  market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositAmountUSD);
+  market.save()
+
+  // update protocol.cumulativeDepositUSD
+  let protocol = getOrCreateProtocol()
+  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(depositAmountUSD)
+  protocol.save()
 }
 
 export function createWithdraw(event: Redeem): void {
@@ -117,12 +134,14 @@ export function createWithdraw(event: Redeem): void {
   }
 }
 
-export function createBorrow(event: Borrow): void {
+export function updateBorrow(event: Borrow): void {
   let borrowId = event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString();
   let borrow = BorrowSC.load(borrowId);
+  let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
+  let borrowAmount = event.params.borrowAmount
+  let borrowAmountUSD = borrowAmount.toBigDecimal().times(pricePerUnderlyingToken);
 
-  if (borrow == null) {
-    let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
+  if (borrow == null) {  
     borrow = new BorrowSC(borrowId);
 
     borrow.hash = event.transaction.hash.toHexString();
@@ -134,13 +153,38 @@ export function createBorrow(event: Borrow): void {
     borrow.timestamp = event.block.timestamp;
     borrow.market = event.address.toHexString();
     borrow.asset = getOrCreateUnderlyingToken(event.address).id;
-    borrow.amount = event.params.borrowAmount;
-    borrow.amountUSD = borrow.amount.toBigDecimal().times(pricePerToken);
+    borrow.amount = borrowAmount;
+    borrow.amountUSD = borrowAmountUSD;
 
     borrow.save();
   } else {
     log.warning("Borrow {} already exists", [borrowId]);
   }
+
+// TODO: move to updateMarket
+/*   let tryTotalBorrows = tokenContract.try_totalBorrows();
+  if (tryTotalBorrows.reverted) {
+    log.warning("Failed to get totalBorrows for market {} at tx hash {}; Not updating Market.totalBorrowBalanceUSD", [
+      marketId,
+      event.transaction.hash.toHexString(),
+    ]);
+  } else {
+    market.totalBorrowBalanceUSD = tryTotalBorrows.value
+                                        .toBigDecimal()
+                                        .times(pricePerUnderlyingToken);
+  } */
+
+  // update Market.cumulativeBorrowUSD
+  let marketId = event.address.toHexString();
+  let market = getOrCreateMarket(marketId, event)
+  market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrowAmountUSD);
+  market.save()
+
+  // update protocol.cumulativeBorrowUSD
+  let protocol = getOrCreateProtocol()
+  // protocol.totalBorrowBalanceUSD updated in updateProtocol()
+  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(borrowAmountUSD)
+  protocol.save()
 }
 
 export function createRepay(event: RepayBorrow): void {
@@ -169,14 +213,16 @@ export function createRepay(event: RepayBorrow): void {
   }
 }
 
-export function createLiquidate(event: LiquidateBorrow): void {
+export function updateLiquidate(event: LiquidateBorrow): void {
   let liquidateId = event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString();
   let liquidate = Liquidate.load(liquidateId);
 
-  if (liquidate == null) {
-    let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
-    let pricePerCollateralToken = getUnderlyingTokenPricePerAmount(event.params.cTokenCollateral);
+  let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
+  let pricePerCollateralToken = getUnderlyingTokenPricePerAmount(event.params.cTokenCollateral);
+  let liquidateAmount = event.params.seizeTokens
+  let liquidateAmountUSD = liquidateAmount.toBigDecimal().times(pricePerCollateralToken)
 
+  if (liquidate == null) {
     liquidate = new Liquidate(liquidateId);
 
     liquidate.hash = event.transaction.hash.toHexString();
@@ -188,8 +234,8 @@ export function createLiquidate(event: LiquidateBorrow): void {
     liquidate.timestamp = event.block.timestamp;
     liquidate.market = event.address.toHexString();
     liquidate.asset = event.params.cTokenCollateral.toHexString();
-    liquidate.amount = event.params.seizeTokens;
-    liquidate.amountUSD = liquidate.amount.toBigDecimal().times(pricePerCollateralToken);
+    liquidate.amount = liquidateAmount;
+    liquidate.amountUSD = liquidateAmountUSD;
     let repayAmountUSD = event.params.repayAmount.toBigDecimal().times(pricePerUnderlyingToken);
 
     liquidate.profitUSD = liquidate.amountUSD!.minus(repayAmountUSD);
@@ -198,6 +244,18 @@ export function createLiquidate(event: LiquidateBorrow): void {
   } else {
     log.warning("Liquidate {} already exists", [liquidateId]);
   }
+
+  // update market.cumulativeLiquidateUSD
+  let marketId = event.address.toHexString();
+  let market = getOrCreateMarket(marketId, event)
+  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidateAmountUSD)
+  market.save()
+
+  // update protocol.cumulativeLiquidateUSD
+  let protocol = getOrCreateProtocol()
+  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidateAmountUSD)
+  protocol.save()  
+
 }
 
 // Update UsageMetricsDailySnapshots entity and LendingProtocol.cumulativeUniqueUsers
@@ -263,8 +321,7 @@ export function updateFinancials(event: ethereum.Event): void {
     let market = Market.load(marketId);
 
     if (market != null) {
-      financialMetrics.protocolControlledValueUSD = BIGDECIMAL_ZERO;
-      financialMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+      financialMetrics.cumulativeBorrowUSD = financialMetrics.cumulativeBorrowUSD.plus(market.cumulativeBorrowUSD);
       financialMetrics.totalDepositBalanceUSD = financialMetrics.totalDepositBalanceUSD.plus(
         market.totalDepositBalanceUSD,
       );
@@ -280,7 +337,7 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.save();
 }
 
-export function updateFinancialsRevenue(
+export function updateRevenue(
   event: ethereum.Event,
   newProtocolRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
   newTotalRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
@@ -295,6 +352,14 @@ export function updateFinancialsRevenue(
   financialMetrics.dailySupplySideRevenueUSD = newTotalRevenueUSD.minus(newProtocolRevenueUSD);
 
   financialMetrics.save();
+
+  let protocol = getOrCreateProtocol();
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newProtocolRevenueUSD);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeTotalRevenueUSD.minus(
+    protocol.cumulativeProtocolSideRevenueUSD,
+  );
+  protocol.save();
 }
 
 // Update MarketDailySnapshot entity
@@ -343,7 +408,7 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
   let market = getOrCreateMarket(marketId, event);
   if (market != null) {
     let tokenContract = CErc20.bind(event.address);
-    let pricePerUnderlyingToken = getUnderlyingTokenPricePerAmount(event.address);
+    
     // To get the price of the underlying (input) token
     let inputTokenPrice = getUnderlyingTokenPrice(event.address);
     let pricePerInputToken = getUnderlyingTokenPricePerAmount(event.address);
@@ -355,20 +420,6 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     market.totalValueLockedUSD = market.totalDepositBalanceUSD;
     market.outputTokenSupply = tokenContract.totalSupply();
     market.outputTokenPriceUSD = BIGDECIMAL_ZERO; // Not tradeable & has no price
-    let totalBorrows = tokenContract.try_totalBorrows();
-    if (totalBorrows.reverted) {
-      log.warning("Failed to get totalBorrows for market {} at tx hash {}; Not updating Market.totalBorrowBalanceUSD", [
-        marketId,
-        event.transaction.hash.toHexString(),
-      ]);
-    } else {
-      market.totalBorrowBalanceUSD = totalBorrows.value.toBigDecimal().times(pricePerUnderlyingToken);
-    }
-    if (borrowAmount != BIGINT_ZERO) {
-      let borrowAmountUSD = borrowAmount.toBigDecimal().times(pricePerUnderlyingToken);
-
-      market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrowAmountUSD);
-    }
     //
     //These two are updated in updateMarketEmission
     // triggered by comptroller.DistributedBorrowerComp and
@@ -400,6 +451,8 @@ export function updateProtocol(event: ethereum.Event): void {
   // sum over AllMarkets
   let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
   let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  let mintedTokens: string[] = [];
+  let mintedTokenSupplies: BigInt[] = [];
   for (let i = 0; i < marketAddrs.length; i++) {
     let marketId = marketAddrs[i].toHexString();
     let market = Market.load(marketId);
@@ -408,9 +461,17 @@ export function updateProtocol(event: ethereum.Event): void {
       totalDepositBalanceUSD = totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
       totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
     }
+
+    let tokenContract = CErc20.bind(event.address);
+    mintedTokens.push(marketId);
+    mintedTokenSupplies.push(tokenContract.totalSupply());
   }
+
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  protocol.totalValueLockedUSD = totalDepositBalanceUSD;
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
+  protocol.mintedTokens = mintedTokens;
+  protocol.mintedTokenSupplies = mintedTokenSupplies;
 
   protocol.save();
 }

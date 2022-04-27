@@ -26,6 +26,8 @@ export function handleMarketListed(event: MarketListed): void {
   let marketAddr = event.params.cToken.toHexString();
   getOrCreateMarket(marketAddr, event);
 
+  // update protocol.mintedTokens & protocol.mintedTokenSupplies handled in updateProtocol()
+
   // trigger CToken template
   CToken.create(event.params.cToken);
 }

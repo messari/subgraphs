@@ -10,16 +10,16 @@ import {
   AccrueInterest,
 } from "../generated/templates/CToken/CErc20";
 import {
-  createDeposit,
+  updateDeposit,
   createWithdraw,
-  createBorrow,
+  updateBorrow,
   createRepay,
-  createLiquidate,
+  updateLiquidate,
   updateUsageMetrics,
   updateMarket,
   updateMarketMetrics,
   updateFinancials,
-  updateFinancialsRevenue,
+  updateRevenue,
   updateProtocol,
   updateInterestRates,
 } from "./common/helpers";
@@ -30,7 +30,7 @@ import { decimalsToBigDecimal } from "./common/utils";
 
 export function handleMint(event: Mint): void {
   let user = event.params.minter;
-  createDeposit(event);
+  updateDeposit(event);
   updateMarket(event);
   updateInterestRates(event);
   updateUsageMetrics(event, user);
@@ -52,9 +52,8 @@ export function handleRedeem(event: Redeem): void {
 
 export function handleBorrow(event: Borrow): void {
   let user = event.params.borrower;
-  let borrowAmount = event.params.borrowAmount;
-  createBorrow(event);
-  updateMarket(event, borrowAmount);
+  updateBorrow(event);
+  updateMarket(event);
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
@@ -75,7 +74,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let user = event.params.liquidator;
-  createLiquidate(event);
+  updateLiquidate(event);
   updateMarket(event);
   updateInterestRates(event);
   updateUsageMetrics(event, user);
@@ -103,5 +102,5 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let pricePerToken = getUnderlyingTokenPricePerAmount(event.address);
   let interestAccumulatedUSD = interestAccumulated.toBigDecimal().times(pricePerToken);
   let protocalRevenueUSD = interestAccumulatedUSD.times(reserveFactor);
-  updateFinancialsRevenue(event, protocalRevenueUSD, interestAccumulatedUSD);
+  updateRevenue(event, protocalRevenueUSD, interestAccumulatedUSD);
 }

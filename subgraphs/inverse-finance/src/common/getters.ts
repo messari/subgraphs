@@ -110,21 +110,31 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol = new LendingProtocol(FACTORY_ADDRESS);
     protocol.name = "Inverse Finance v1";
     protocol.slug = "inverse-finance-v1";
-    protocol.schemaVersion = "1.1.0";
-    protocol.subgraphVersion = "1.1.0";
-    protocol.methodologyVersion = "1.1.0";
+    protocol.schemaVersion = "1.2.0";
+    protocol.subgraphVersion = "1.2.0";
+    protocol.methodologyVersion = "1.2.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
+    protocol.lendingType = LendingType.CDP;
+    protocol.riskType = RiskType.GLOBAL;
+    protocol.mintedTokens = []
+    protocol.mintedTokenSupplies = []
     ////// quantitative data //////
     protocol.cumulativeUniqueUsers = INT_ZERO;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+
     //protocol.usageMetrics
     //protocol.financialMetrics
     //protocol.markets
-    protocol.lendingType = LendingType.CDP;
-    protocol.riskType = RiskType.GLOBAL;
+    
 
     protocol.save();
   }
@@ -196,7 +206,6 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
   if (financialMetrics == null) {
     financialMetrics = new FinancialsDailySnapshot(days);
     financialMetrics.protocol = FACTORY_ADDRESS;
-    financialMetrics.protocolControlledValueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     financialMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
