@@ -3,9 +3,10 @@ import { Market } from "../../../generated/schema";
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { getUSDPriceOfToken as getUSDPriceOfTokenCompound } from "./compound/prices";
 import { getUSDPriceOfToken as getUSDPriceOfTokenCream } from "./cream/prices";
+import { protocolAddress } from "../../data";
 
 // returns the token price
-export function getUSDPriceOfToken(market: Market, blockNumber: i32, protocolAddress: string): BigDecimal {
+export function getUSDPriceOfToken(market: Market, blockNumber: i32): BigDecimal {
   let tokenPrice = BIGDECIMAL_ZERO;
 
   if (protocolAddress.toLowerCase() == COMPTROLLER_ADDRESS.toLowerCase()) {

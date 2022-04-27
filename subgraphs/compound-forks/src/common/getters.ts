@@ -19,7 +19,6 @@ import {
   INITIAL_EXCHANGE_RATE,
   LENDING_TYPE,
   NETWORK_ETHEREUM,
-  PROTOCOL_DATA,
   PROTOCOL_RISK_TYPE,
   PROTOCOL_TYPE,
   RewardTokenType,
@@ -33,15 +32,12 @@ import { CToken } from "../../generated/Comptroller/cToken";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
 import { Comptroller } from "../../generated/Comptroller/Comptroller";
-
+import { protocolAddress, CETH_ADDRESS, COMP_ADDRESS, NAME, SLUG } from "../data";
 ///////////////////
 //// Snapshots ////
 ///////////////////
 
-export function getOrCreateUsageMetricSnapshot(
-  event: ethereum.Event,
-  protocolAddress: string,
-): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -63,7 +59,7 @@ export function getOrCreateUsageMetricSnapshot(
   return usageMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, protocolAddress: string): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDailySnapshot {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketAddress = event.address.toHexString();
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
@@ -99,7 +95,7 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, protocolAd
   return marketMetrics;
 }
 
-export function getOrCreateFinancials(event: ethereum.Event, protocolAddress: string): FinancialsDailySnapshot {
+export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -124,13 +120,13 @@ export function getOrCreateFinancials(event: ethereum.Event, protocolAddress: st
 ///// Lending Specific /////
 ////////////////////////////
 
-export function getOrCreateLendingProtcol(protocolAddress: string): LendingProtocol {
+export function getOrCreateLendingProtcol(): LendingProtocol {
   let protocol = LendingProtocol.load(protocolAddress);
 
   if (!protocol) {
     protocol = new LendingProtocol(protocolAddress);
-    protocol.name = PROTOCOL_DATA.get(protocolAddress).NAME;
-    protocol.slug = PROTOCOL_DATA.get(protocolAddress).SLUG;
+    protocol.name = NAME;
+    protocol.slug = SLUG;
     protocol.schemaVersion = SCHEMA_VERSION;
     protocol.subgraphVersion = SUBGRAPH_VERSION;
     protocol.network = NETWORK_ETHEREUM;
@@ -156,7 +152,7 @@ export function getOrCreateLendingProtcol(protocolAddress: string): LendingProto
   return protocol;
 }
 
-export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address, protocolAddress: string): Market {
+export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address): Market {
   let market = Market.load(marketAddress.toHexString());
 
   if (!market) {
@@ -164,7 +160,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address,
     let cTokenContract = CToken.bind(marketAddress);
     let underlyingAddress: string;
     let underlying = cTokenContract.try_underlying();
-    if (marketAddress.toHexString().toLowerCase() == PROTOCOL_DATA.get(protocolAddress).CETH_ADDRESS.toLowerCase()) {
+    if (marketAddress.toHexString().toLowerCase() == CETH_ADDRESS.toLowerCase()) {
       underlyingAddress = ETH_ADDRESS;
     } else if (underlying.reverted) {
       underlyingAddress = ZERO_ADDRESS;
@@ -173,7 +169,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address,
     }
 
     // add market id to protocol
-    let protocol = getOrCreateLendingProtcol(protocolAddress);
+    let protocol = getOrCreateLendingProtcol();
     let marketIds = protocol._marketIds;
     marketIds.push(marketAddress.toHexString());
     protocol._marketIds = marketIds;
@@ -187,12 +183,12 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address,
     if (event.block.number.toI32() > 9601359) {
       let rewardTokenDeposit = getOrCreateRewardToken(
         marketAddress.toHexString(),
-        Address.fromString(PROTOCOL_DATA.get(protocolAddress).COMP_ADDRESS),
+        Address.fromString(COMP_ADDRESS),
         RewardTokenType.DEPOSIT,
       );
       let rewardTokenBorrow = getOrCreateRewardToken(
         marketAddress.toHexString(),
-        Address.fromString(PROTOCOL_DATA.get(protocolAddress).COMP_ADDRESS),
+        Address.fromString(COMP_ADDRESS),
         RewardTokenType.BORROW,
       );
       let rewardTokenArr = new Array<string>();

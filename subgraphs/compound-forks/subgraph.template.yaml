@@ -15,7 +15,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: "./src/mappings/{{name}}/mappings.ts" 
+      file: "./src/mappings/{{name}}/mappings.ts"
       entities:
         - LendingProtocol
         - Market
