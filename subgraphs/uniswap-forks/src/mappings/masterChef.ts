@@ -1,43 +1,42 @@
 // import { log } from "@graphprotocol/graph-ts";
-import { ethereum } from "@graphprotocol/graph-ts";
+import { ethereum, log } from "@graphprotocol/graph-ts";
 import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../generated/MasterChef/MasterChef";
-import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2 } from "../../generated/MasterChef/MasterChefV2";
+import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2, LogPoolAddition } from "../../generated/MasterChef/MasterChefV2";
+import { _HelperStore } from "../../generated/schema";
 import { UsageType } from "../common/constants";
 import { handleReward, handleRewardV2 } from "../common/masterChef";
-import { updateStakedTokens } from "../common/updateMetrics";
 
 export function handleDeposit(event: DepositEvent): void {
-  let pid = event.params.pid;
-  updateStakedTokens(event, event.params.amount, UsageType.DEPOSIT);
-  handleReward(event, pid);
+  handleReward(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
 }
 
 export function handleDepositV2(event: DepositEventV2): void {
-  let pid = event.params.pid;
-  updateStakedTokens(event, event.params.amount, UsageType.DEPOSIT);
-  handleRewardV2(event, pid);
+  handleRewardV2(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
 }
 
-export function handleWithraw(event: WithdrawEvent): void {
-  let pid = event.params.pid;
-  updateStakedTokens(event, event.params.amount, UsageType.WITHDRAW);
-  handleReward(event, pid);
+export function handleWithdraw(event: WithdrawEvent): void {
+  handleReward(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
 }
 
-export function handleWithrawV2(event: WithdrawEventV2): void {
-  let pid = event.params.pid;
-  updateStakedTokens(event, event.params.amount, UsageType.WITHDRAW);
-  handleRewardV2(event, pid);
+export function handleWithdrawV2(event: WithdrawEventV2): void {
+  handleRewardV2(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
 }
 
 export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
-  let pid = event.params.pid;
-  updateStakedTokens(event, event.params.amount, UsageType.WITHDRAW);
-  handleReward(event, pid);
+  handleReward(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
 }
 
 export function handleEmergencyWithdrawV2(event: EmergencyWithdrawV2): void {
-  let pid = event.params.pid;
-  updateStakedTokens(event, event.params.amount, UsageType.WITHDRAW);
-  handleRewardV2(event, pid);
+  handleRewardV2(event, event.params.pid, event.params.amount, UsageType.WITHDRAW);
 }
+
+// export function logPoolAddition(event: LogPoolAddition): void {
+//   let pidPoolMapping = new _HelperStore(event.params.pid.toString());
+//   pidPoolMapping.valueString = event.params.lpToken.toHexString();
+//   pidPoolMapping.save();
+// }
+// export function logPoolAdditionV2(event: LogPoolAdditionV2): void {
+//   let pidPoolMapping = new _HelperStore(event.params.pid.toString());
+//   pidPoolMapping.valueString = event.params.lpToken.toHexString();
+//   pidPoolMapping.save();
+// }

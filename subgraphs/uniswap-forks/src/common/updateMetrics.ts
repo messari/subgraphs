@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -322,14 +322,4 @@ export function updateDepositHelper(poolAddress: Address): void {
   let poolDeposits = _HelperStore.load(poolAddress.toHexString())!;
   poolDeposits.valueInt = poolDeposits.valueInt + INT_ONE;
   poolDeposits.save();
-}
-
-export function updateStakedTokens(event: ethereum.Event, amount: BigInt, usageType: string): void {
-  let pool = getLiquidityPool(event.address.toHexString());
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
-  pool.save();
 }

@@ -5,7 +5,6 @@ import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees } from "..
 import { handleTransferBurn, handleTransferMint, handleTransferToPoolBurn } from "../common/handlers";
 import { updateFinancials, updateInputTokenBalances, updatePoolMetrics, updateTvlAndTokenPrices, updateUsageMetrics } from "../common/updateMetrics";
 import { BIGINT_THOUSAND, UsageType, ZERO_ADDRESS } from "../common/constants";
-import { log } from "@graphprotocol/graph-ts";
 
 export function handleTransfer(event: Transfer): void {
   // ignore initial transfers for first adds

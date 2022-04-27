@@ -751,6 +751,9 @@ type _HelperStore @entity {
 
   " number of deposits, number of unique users "
   valueInt: Int
+
+  " Contains the address mapping for MasterChef pool id "
+  valueString: String
 }
 
 " This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
