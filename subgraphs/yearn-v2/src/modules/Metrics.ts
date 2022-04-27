@@ -1,6 +1,5 @@
 import {
   ActiveAccount,
-  Vault as VaultStore,
 } from "../../generated/schema";
 import {
   getOrCreateAccount,
@@ -14,7 +13,6 @@ import {
 } from "../common/initializers";
 import * as constants from "../common/constants";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { _NewVault } from "./Vault";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   const account = getOrCreateAccount(from.toHexString());
