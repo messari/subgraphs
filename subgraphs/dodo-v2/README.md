@@ -5,7 +5,7 @@
 
 Sum across all Pools:
 
-`Sum of Pool Assers`
+`Sum of Pool Assets`
 
 ignore the LP staking (mining) and crowdpooling
 
