@@ -7,10 +7,9 @@ import { getOrCreateProtocol } from "../entities/Protocol";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateWithdraw } from "../entities/Transaction";
 import { getFeePercentage, getPricePerShare } from "../entities/Vault";
-import { getUsdPricePerToken } from "../price";
 import { readValue } from "../utils/contracts";
 import { updateAllMetrics } from "./common";
-import { getPriceOfStakeToken } from "./price";
+import { getOrUpdateTokenPrice, getPriceOfStakeToken } from "./price";
 
 export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | null): void {
   let inputTokenAddress = Address.fromString(vault.inputToken);
@@ -23,14 +22,8 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
   let inputTokenBalance = readValue<BigInt>(vaultContract.try_balance(), BIGINT_ZERO);
 
   let pricePerShare = getPricePerShare(vaultAddress);
-  let try_price = getUsdPricePerToken(inputTokenAddress, call.block);
-  let inputTokenPrice = try_price.reverted
-    ? try_price.usdPrice
-    : try_price.usdPrice.div(try_price.decimals.toBigDecimal());
-
   let token = getOrCreateToken(inputTokenAddress);
-  token.lastPriceBlockNumber = call.block.number;
-  token.lastPriceUSD = inputTokenPrice;
+  let inputTokenPrice = getOrUpdateTokenPrice(token, call.block);
 
   let tokenDecimals = BIGINT_TEN.pow(token.decimals as u8).toBigDecimal();
   let amountUSD = inputTokenPrice.times(withdrawAmount.toBigDecimal().div(tokenDecimals));

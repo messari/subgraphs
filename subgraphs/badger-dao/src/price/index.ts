@@ -1,6 +1,5 @@
 import { Address, BigDecimal, BigInt, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import {
-  BIGINT_ZERO,
   CHAINLINK_CUSTOM_TOKENS,
   CURVE_ROUTER_TOKENS,
   RouterType,
@@ -34,36 +33,42 @@ export function getUsdPricePerToken(tokenAddr: Address, block: ethereum.Block): 
   let routerToUse = getRouterTypeForToken(tokenAddr);
 
   // 2. ChainLink Feed Registry
-  let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
-  if (!chainLinkPrice.reverted) {
-    log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {} Block: {}", [
-      tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(decimals).toString(),
-      block.number.toString(),
-    ]);
-    return CustomPriceType.initialize(chainLinkPrice.usdPrice, BigInt.fromI32(6));
+  if (block.number.ge(BigInt.fromString("12864088"))) {
+    let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
+    if (!chainLinkPrice.reverted) {
+      log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {} Block: {}", [
+        tokenAddr.toHexString(),
+        chainLinkPrice.usdPrice.div(decimals).toString(),
+        block.number.toString(),
+      ]);
+      return CustomPriceType.initialize(chainLinkPrice.usdPrice, BigInt.fromI32(6));
+    }
   }
 
   // 3. CalculationsCurve
-  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddr, network);
-  if (!calculationsCurvePrice.reverted) {
-    log.warning("[CalculationsCurve] tokenAddress: {}, Price: {} Block: {}", [
-      tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.div(decimals).toString(),
-      block.number.toString(),
-    ]);
-    return CustomPriceType.initialize(calculationsCurvePrice.usdPrice, BigInt.fromI32(6));
+  if (block.number.ge(BigInt.fromString("12370088"))) {
+    let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddr, network);
+    if (!calculationsCurvePrice.reverted) {
+      log.warning("[CalculationsCurve] tokenAddress: {}, Price: {} Block: {}", [
+        tokenAddr.toHexString(),
+        calculationsCurvePrice.usdPrice.div(decimals).toString(),
+        block.number.toString(),
+      ]);
+      return CustomPriceType.initialize(calculationsCurvePrice.usdPrice, BigInt.fromI32(6));
+    }
   }
 
   // 4. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, network);
-  if (!calculationsSushiSwapPrice.reverted) {
-    log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {} Block: {}", [
-      tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.div(decimals).toString(),
-      block.number.toString(),
-    ]);
-    return CustomPriceType.initialize(calculationsSushiSwapPrice.usdPrice, BigInt.fromI32(6));
+  if (block.number.ge(BigInt.fromString("12692284"))) {
+    let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, network);
+    if (!calculationsSushiSwapPrice.reverted) {
+      log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {} Block: {}", [
+        tokenAddr.toHexString(),
+        calculationsSushiSwapPrice.usdPrice.div(decimals).toString(),
+        block.number.toString(),
+      ]);
+      return CustomPriceType.initialize(calculationsSushiSwapPrice.usdPrice, BigInt.fromI32(6));
+    }
   }
 
   if (routerToUse == RouterType.CURVE_ROUTER) {
@@ -110,7 +115,7 @@ export function getUsdPricePerToken(tokenAddr: Address, block: ethereum.Block): 
         chainLinkPrice.usdPrice.div(chainLinkPrice.decimals.toBigDecimal()).toString(),
         block.number.toString(),
       ]);
-      return CustomPriceType.initialize(chainLinkPrice.usdPrice, BIGINT_ZERO);
+      return CustomPriceType.initialize(chainLinkPrice.usdPrice, constants.BIGINT_ZERO);
     }
   }
 

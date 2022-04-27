@@ -5,10 +5,9 @@ import { BIGINT_TEN, BIGINT_ZERO } from "../constant";
 import { getOrCreateToken } from "../entities/Token";
 import { getOrCreateDeposit } from "../entities/Transaction";
 import { getPricePerShare } from "../entities/Vault";
-import { getUsdPricePerToken } from "../price";
 import { readValue } from "../utils/contracts";
 import { updateAllMetrics } from "./common";
-import { getPriceOfStakeToken } from "./price";
+import { getOrUpdateTokenPrice, getPriceOfStakeToken } from "./price";
 
 export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null): void {
   let vaultAddress = Address.fromString(vault.id);
@@ -21,15 +20,8 @@ export function deposit(call: ethereum.Call, vault: Vault, amount: BigInt | null
   let outputTokenSupply = readValue<BigInt>(vaultContract.try_totalSupply(), BIGINT_ZERO);
 
   let pricePerShare = getPricePerShare(vaultAddress);
-  let try_price = getUsdPricePerToken(inputTokenAddress, call.block);
-  let inputTokenPrice = try_price.reverted
-    ? try_price.usdPrice
-    : try_price.usdPrice.div(try_price.decimals.toBigDecimal());
-
   let token = getOrCreateToken(inputTokenAddress);
-  token.lastPriceBlockNumber = call.block.number;
-  token.lastPriceUSD = inputTokenPrice;
-  token.save();
+  let inputTokenPrice = getOrUpdateTokenPrice(token, call.block);
 
   let tokenDecimals = BIGINT_TEN.pow(token.decimals as u8);
   let amountUSD = inputTokenPrice.times(

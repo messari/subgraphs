@@ -5,7 +5,9 @@ import { CustomPriceType } from "../common/types";
 import * as utils from "../common/utils";
 
 export function getYearnLensContract(network: string): YearnLensContract {
-  return YearnLensContract.bind(Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)));
+  return YearnLensContract.bind(
+    Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)),
+  );
 }
 
 export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string): CustomPriceType {
@@ -16,7 +18,10 @@ export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string):
   }
 
   let tokenPrice: BigDecimal = utils
-    .readValue<BigInt>(yearnLensContract.try_getPriceUsdcRecommended(tokenAddr), constants.BIGINT_ZERO)
+    .readValue<BigInt>(
+      yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
+      constants.BIGINT_ZERO,
+    )
     .toBigDecimal();
 
   return CustomPriceType.initialize(tokenPrice);

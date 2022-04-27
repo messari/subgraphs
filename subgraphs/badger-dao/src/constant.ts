@@ -103,6 +103,7 @@ export const SUSHI_ROUTER_TOKENS = [
   Address.fromString("0x9a13867048e01c663ce8ce2fe0cdae69ff9f35e3"),
   Address.fromString("0xceff51756c56ceffca006cd410b03ffc46dd3a58"),
   Address.fromString("0x110492b31c59716ac47337e616804e3e3adc0b4a"),
+  Address.fromString("0x798d1be841a82a273720ce31c822c61a67a601c3"),
 ];
 
 export const CURVE_ROUTER_TOKENS = [

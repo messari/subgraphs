@@ -8,7 +8,10 @@ export function getCalculationsCurveContract(network: string): CalculationsCurve
   return CalculationsCurveContract.bind(constants.CURVE_CALCULATIONS_ADDRESS_MAP.get(network)!);
 }
 
-export function getTokenPriceFromCalculationCurve(tokenAddr: Address, network: string): CustomPriceType {
+export function getTokenPriceFromCalculationCurve(
+  tokenAddr: Address,
+  network: string,
+): CustomPriceType {
   const calculationCurveContract = getCalculationsCurveContract(network);
 
   if (!calculationCurveContract) {
@@ -16,7 +19,10 @@ export function getTokenPriceFromCalculationCurve(tokenAddr: Address, network: s
   }
 
   let tokenPrice: BigDecimal = utils
-    .readValue<BigInt>(calculationCurveContract.try_getCurvePriceUsdc(tokenAddr), constants.BIGINT_ZERO)
+    .readValue<BigInt>(
+      calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
+      constants.BIGINT_ZERO,
+    )
     .toBigDecimal();
 
   return CustomPriceType.initialize(tokenPrice);

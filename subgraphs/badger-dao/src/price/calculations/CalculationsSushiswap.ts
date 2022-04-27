@@ -19,5 +19,5 @@ export function getTokenPriceFromSushiSwap(tokenAddr: Address, network: string):
     .readValue<BigInt>(curveContract.try_getPriceUsdc(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
 }
