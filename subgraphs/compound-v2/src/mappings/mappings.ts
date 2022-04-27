@@ -18,7 +18,7 @@ import {
 } from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ONEHUNDRED,
   BIGDECIMAL_ZERO,
@@ -83,7 +83,15 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 export function handleMarketListed(event: MarketListed): void {
   // create new market now that the data source is instantiated
   CToken.create(event.params.cToken);
-  getOrCreateMarket(event, event.params.cToken);
+  let market = getOrCreateMarket(event, event.params.cToken);
+
+  // add market to protocol marketId list
+  let protocol = getOrCreateLendingProtcol();
+  let ids = protocol._marketIds;
+  ids.push(market.id);
+  protocol._marketIds = ids;
+
+  protocol.save();
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {

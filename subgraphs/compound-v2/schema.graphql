@@ -516,7 +516,7 @@ type Market @entity {
   outputTokenPriceUSD: BigDecimal!
 
   " Amount of input token per full share of output token. Only applies when the output token exists "
-  exchangeRate: BigDecimal
+  exchangeRate: BigDecimal!
 
   " Market reserve factor "
   _reserveFactor: BigDecimal!

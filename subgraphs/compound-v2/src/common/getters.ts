@@ -269,9 +269,6 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
 
     // add market id to protocol
     let protocol = getOrCreateLendingProtcol();
-    let marketIds = protocol._marketIds;
-    marketIds.push(marketAddress.toHexString());
-    protocol._marketIds = marketIds;
     market.protocol = protocol.id;
 
     // create/add Tokens
@@ -323,6 +320,9 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.isActive = true; // event MarketListed() makes a market active
     market.canUseAsCollateral = true; // initially true - if collateral factor = 0 then false
     market.canBorrowFrom = true; // initially active until event ActionPaused()
+
+    // set liquidationPenalty
+    market.liquidationPenalty = protocol._liquidationPenalty;
 
     market.save();
   }

@@ -29,8 +29,13 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
   financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  // Note: daily balances updated in respective functions in helpers.ts
 
-  // TODO: update dailyDeposit / dailyBorrow / dailyLiquidate in helpers.ts
+  // update revenues
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  // Note: daily revenue calculations done in helpers.ts:updatePrevBlockRevenues()
 
   // update the block number and timestamp
   financialMetrics.blockNumber = event.block.number;
@@ -119,8 +124,7 @@ export function updateMarketDailyMetrics(event: ethereum.Event): void {
   marketMetrics.exchangeRate = market.exchangeRate;
   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-
-  // TODO update daily depost / borrow / liquidate in helpers.ts
+  // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
   marketMetrics.save();
 }
@@ -149,8 +153,7 @@ export function updateMarketHourlyMetrics(event: ethereum.Event): void {
   marketMetrics.exchangeRate = market.exchangeRate;
   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-
-  // TODO update hourly depost / borrow / liquidate in helpers.ts
+  // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.tss
 
   marketMetrics.save();
 }
