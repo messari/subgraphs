@@ -1,8 +1,9 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
-import { DexAmmProtocol, LiquidityPool, Token } from "../../generated/schema";
+import { Deposit, DexAmmProtocol, LiquidityPool, Token } from "../../generated/schema";
 import { Asset as AssetContract } from "../../generated/templates/Asset/Asset";
 import { POOL_PROXY, SECONDARYPOOL_PROXY } from "../common/constants";
+import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrFetchTokenUsdPrice } from "../common/getters";
 
 export let assetContract = AssetContract.bind(Address.fromString(PoolAddress));
 export let assetContract = AssetContract.bind(Address.fromString(PoolAddress));
@@ -27,13 +28,33 @@ export function createLiquidityPool(
 }
 
 // Generate the deposit entity and update deposit account for the according pool.
-export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: BigInt, sender: Address): void {
-  // let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
-  // deposit.hash = event.transaction.hash.toHexString();
-  // deposit.logIndex = event.logIndex.toI32();
-  // deposit.protocol = FACTORY_ADDRESS;
-  // ..
-  // deposit.save();
+export function createDeposit(
+  event: ethereum.Event,
+  amount: BigInt,
+  inputToken: Address,
+  liquidity: BigInt,
+  to: Address,
+  sender: Address,
+): void {
+  let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+
+  let protocol = getOrCreateDexAmm();
+  let pool = getOrCreateLiquidityPool(event.address);
+
+  // fetch price in USD
+  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputToken).times(new BigDecimal(amount));
+
+  deposit.hash = event.transaction.hash.toHexString();
+  deposit.logIndex = event.logIndex.toI32();
+  deposit.protocol = protocol.id;
+  deposit.to = pool.id;
+  deposit.from = sender.toHexString();
+  deposit.blockNumber = event.block.number;
+  deposit.timestamp = event.block.timestamp;
+  deposit.inputTokens = [inputToken.toHexString()];
+  // deposit.outputToken have to be deteminded based in the inputToken
+  deposit.amountUSD = amountInUSD;
+  deposit.save();
 }
 
 // Generate the withdraw entity

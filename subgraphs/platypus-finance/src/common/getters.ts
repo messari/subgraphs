@@ -10,10 +10,12 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPoolParamsHelper,
+  Deposit,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import { BIGDECIMAL_ZERO, Network, INT_ZERO, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY } from "../common/constants";
 import { getDays, getHours } from "./utils/datetime";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -41,7 +43,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     poolParam.SlippageParamsC1 = new BigInt(376927610599998308);
     poolParam.SlippageParamsXThreshold = new BigInt(329811659274998519);
     poolParam.HaircutRate = new BigInt(0.0003e18);
-    poolParam.RetentionRatio = new BigInt(10**18);
+    poolParam.RetentionRatio = new BigInt(10 ** 18);
     poolParam.PriceDeviation = new BigInt(0.02e18);
 
     poolParam.save();
@@ -179,4 +181,15 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.save();
   }
   return protocol;
+}
+
+export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddres: Address): BigDecimal {
+  let token = getOrCreateToken(tokenAddres);
+  if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
+    let tokenPrice = getUsdPrice(tokenAddres, BigInt.fromI32(1));
+    token.lastPriceUSD = tokenPrice;
+    token.lastPriceBlockNumber = event.block.number;
+    token.save();
+  }
+  return token.lastPriceUSD;
 }
