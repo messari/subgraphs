@@ -25,7 +25,16 @@ import {
   getOrCreateRewardToken,
   getOrCreateToken,
 } from "../common/getters";
-import { Market, Deposit, Withdraw, Borrow, Repay, Liquidate, RewardToken } from "../../generated/schema";
+import {
+  Market,
+  Deposit,
+  Withdraw,
+  Borrow,
+  Repay,
+  Liquidate,
+  RewardToken,
+  LendingProtocol,
+} from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { CToken } from "../../generated/Comptroller/CToken";
 import { Comptroller } from "../../generated/templates/CToken/Comptroller";
@@ -400,18 +409,38 @@ export function updatePrevBlockRevenues(market: Market, blockDifference: BigInt,
     .times(blockDifference.toBigDecimal());
   let newTotalRevenueUSD = market.totalBorrowBalanceUSD.times(borrowRatePerBlock).times(blockDifference.toBigDecimal());
 
-  let protocol = getOrCreateLendingProtcol();
+  let protocol = LendingProtocol.load(COMPTROLLER_ADDRESS);
+  if (!protocol) {
+    protocol = getOrCreateLendingProtcol();
+  }
+  log.warning("protocol - totalRevBefore: {} market: {} block: {}", [
+    protocol.cumulativeTotalRevenueUSD.toString(),
+    market.name!.toString(),
+    event.block.number.toString(),
+  ]);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newProtocolSideRevenueUSD);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalRevenueUSD);
   protocol.save();
+  log.warning("protocol - newRev: {} totalRevAfter: {}", [
+    newTotalRevenueUSD.toString(),
+    protocol.cumulativeTotalRevenueUSD.toString(),
+  ]);
 
   // update revenues for financial Snapshot
   let financialMetrics = getOrCreateFinancials(event);
+  if (financialMetrics.dailySupplySideRevenueUSD.equals(BIGDECIMAL_ZERO)) {
+    log.warning("HERRERER", []);
+  }
+  log.warning("metrics - dailyRevB4: {}", [financialMetrics.dailyTotalRevenueUSD.toString()]);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(newSupplySideRevenueUSD);
   financialMetrics.dailyProtocolSideRevenueUSD =
     financialMetrics.dailyProtocolSideRevenueUSD.plus(newProtocolSideRevenueUSD);
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newTotalRevenueUSD);
+  log.warning("metrics - newRev: {} dailyRevAfter: {}", [
+    newTotalRevenueUSD.toString(),
+    financialMetrics.dailyTotalRevenueUSD.toString(),
+  ]);
 
   financialMetrics.save();
 }
