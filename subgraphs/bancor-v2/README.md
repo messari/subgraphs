@@ -1,39 +1,42 @@
-# Bancor v2 Subgraph
+# Bancor v2.1 Subgraph
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Pools:
 
-`Sum of Pool Assers`
+`Sum of Pool Assets`
 
-ignore the LP staking (mining) and crowdpooling
+https://bancor-network.gitbook.io/v2.1/guides/querying-a-pool-contract
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
-`PoolFeeModel * Pool Volume`
+`PoolFee * Pool Volume`
 
-Each pool has its own fee model - will need to pull for each. ignore fee discounts for vDODO holders. Private pools are different to a degree (single LP).
+Note - Bancor supplies BNT liquidity. Fees on this liquidity go to covering IL losses of outside LPs. As such, this would still be considered revenue (and protocol revenue). Each pool can have its own fee 
+
+https://bancor-network.gitbook.io/v2.1/guides/measuring-trading-volume
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`Insert Calculation`
+`PoolFee * Pool Volume * (Protocol BNT / Total TVL)`
 
-Unclear if protocol portion - TokenTerminal suggest no protocol revenue. DODO docs reference vDODO holders could potentially earn protocol fees suggesting there is a mechnism in place
+This should be the fee revenue attributed to Bancor-supplied BNT 
+-- future note: LP fees are subsequently used to compensate users for IL. This should be a operating expense in the future. If Fee Income > IL payouts, then native tokens dumped for more BNT by the protocol. 
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`PoolFeeModel * Pool Volume`
+`PoolFeeModel * Pool Volume * (1 - (Protocol BNT / Total TVL)`
 
-<Add notes to consider if any - delete if none>
+This should be fee income not given to Bancor
 
 ### Total Unique Users
 
@@ -52,11 +55,14 @@ To be added
 ###  Protocol Controlled Value
 
 To be added
+  
+  
 
 ## Links
 
 - Protocol website: https://www.bancor.network/
 - Protocol documentation: https://docs.bancor.network/
+- Version 2.1 Docs: https://bancor-network.gitbook.io/v2.1/faqs
 - Smart contracts: https://github.com/bancorprotocol/contracts-solidity
 - Deployed addresses: https://docs.bancor.network/ethereum-contracts/addresses
 - Existing subgraphs: https://thegraph.com/hosted-service/subgraph/blocklytics/bancor
