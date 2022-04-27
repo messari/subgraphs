@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -28,4 +29,11 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
   }
 
   return sorted[mid - 1];
+}
+
+export function divBigDecimal(numerator: BigDecimal, denominator: BigDecimal): BigDecimal {
+  if (denominator.equals(BIGDECIMAL_ZERO)) {
+    return BigDecimal.fromString("0");
+  }
+  return numerator.div(denominator);
 }
