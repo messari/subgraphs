@@ -19,3 +19,4 @@ export const USDC_DENOMINATOR = BigInt.fromString("1000000");
 export const SECONDS_PER_DAY = 84600;
 export const VESPER_TOKEN_HEX = "0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421";
 export const VESPER_TOKEN = Address.fromString(VESPER_TOKEN_HEX);
+export const SECONDS_PER_HOUR = 3600;

@@ -1,5 +1,5 @@
 import { ethereum, BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY, USDC_DENOMINATOR } from "./constant";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR, USDC_DENOMINATOR } from "./constant";
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
@@ -10,6 +10,10 @@ export function readValue<T>(
 
 export function getDay(timestamp: BigInt): i64 {
   return timestamp.toI64() / SECONDS_PER_DAY;
+}
+
+export function getHour(timestamp: BigInt): i32 {
+  return timestamp.toI32() / SECONDS_PER_HOUR;
 }
 
 export function normalizedUsdcPrice(usdcPrice: BigInt): BigInt {

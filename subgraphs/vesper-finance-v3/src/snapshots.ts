@@ -3,7 +3,7 @@ import {
   FinancialsDailySnapshot,
   VaultDailySnapshot,
 } from "../generated/schema";
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { getDay } from "./utils";
 import { getOrCreateYieldAggregator, getOrCreateVault } from "./entities";
 
@@ -18,14 +18,13 @@ export function getOrCreateUsageMetricsDailySnapshot(
     object = new UsageMetricsDailySnapshot(day.toString());
 
     object.protocol = protocol.id;
-    object.activeUsers = 1;
+    object.dailyActiveUsers = 1;
     object.dailyTransactionCount = 1;
   } else {
-    object.activeUsers += 1;
+    object.dailyActiveUsers += 1;
     object.dailyTransactionCount += 1;
   }
-
-  object.totalUniqueUsers = protocol.totalUniqueUsers;
+  
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
 
@@ -48,11 +47,10 @@ export function getOrCreateFinancialsDailySnapshot(
     object.protocol = protocol.id;
   }
 
-  object.totalVolumeUSD = protocol.totalVolumeUSD;
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  object.totalRevenueUSD = protocol.totalValueLockedUSD;
-  object.protocolSideRevenueUSD = object.protocolSideRevenueUSD.plus(protocolRevenueUsd);
-  object.supplySideRevenueUSD = object.supplySideRevenueUSD.plus(supplySideRevenueUsd);
+  object.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  object.dailyProtocolSideRevenueUSD = object.dailyProtocolSideRevenueUSD.plus(protocolRevenueUsd);
+  object.dailySupplySideRevenueUSD = object.dailySupplySideRevenueUSD.plus(supplySideRevenueUsd);
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
 
@@ -83,9 +81,7 @@ export function getOrCreateVaultDailySnapshot(
   }
 
   object.totalValueLockedUSD = vault.totalValueLockedUSD;
-  object.totalVolumeUSD = vault.totalVolumeUSD;
-  object.inputTokenBalances = vault.inputTokenBalances;
-  object.outputTokenSupply = vault.outputTokenSupply;
+  object.inputTokenBalance = vault.inputTokenBalance;
   object.outputTokenPriceUSD = vault.outputTokenPriceUSD;
   object.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
   object.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;

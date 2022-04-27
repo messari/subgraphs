@@ -7,7 +7,7 @@ import {
   Deposit,
   Withdraw,
   Account,
-  DailyActiveAccount,
+  ActiveAccount,
 } from "../generated/schema";
 import { CONTROLLER_ADDRESS_HEX, VESPER_TOKEN } from "./constant";
 import { BigDecimal, Address, BigInt, log } from "@graphprotocol/graph-ts";
@@ -21,7 +21,7 @@ import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
 import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
 import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
 import { toUsd } from "./peer";
-import { getDay } from "./utils";
+import { getDay, getHour } from "./utils";
 
 interface getOrCreateResponse<T> {
   object: T;
@@ -37,7 +37,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     yAggr.slug = "vesper-finance-v3";
     yAggr.schemaVersion = "1.1.1";
     yAggr.subgraphVersion = "1.1.1";
-    yAggr.network = "ETHEREUM";
+    yAggr.network = "MAINNET";
     yAggr.type = "YIELD";
     yAggr.save();
   }
@@ -60,19 +60,19 @@ export function getOrCreateToken(address: Address): Token {
   return token;
 }
 export function getOrCreateRewardToken(address: Address): RewardToken {
-  let token = RewardToken.load(address.toHexString());
+  const id = `DEPOSIT-${address.toHexString()}`;
+  let rewardToken = RewardToken.load(id);
+  
+  if (!rewardToken) {
+    const token = getOrCreateToken(address);
 
-  if (!token) {
-    const erc20Token = Erc20Token.bind(address);
-    token = new RewardToken(address.toHexString());
-    token.type = "DEPOSIT";
-    token.name = erc20Token.name();
-    token.symbol = erc20Token.symbol();
-    token.decimals = erc20Token.decimals();
-    token.save();
+    rewardToken = new RewardToken(id);
+    rewardToken.token = token.id;
+    rewardToken.type = "DEPOSIT";
+    rewardToken.save();
   }
 
-  return token;
+  return rewardToken;
 }
 
 export function updateVaultFee(vault: Vault): void {
@@ -98,7 +98,6 @@ export function updateVaultFee(vault: Vault): void {
 export function updateVaultTokens(vault: Vault): void {
   const vaultAddress = Address.fromString(vault.id);
   const poolv3 = PoolV3.bind(vaultAddress);
-  const strategyAddresses = poolv3.getStrategies();
   const inputTokens: string[] = [];
   const inputTokenBalances: BigInt[] = [];
   const tokenAddress = poolv3.token();
@@ -109,9 +108,6 @@ export function updateVaultTokens(vault: Vault): void {
 
   inputTokens.push(tokenAddress.toHexString());
   inputTokenBalances.push(poolv3.totalValue());
-
-  vault.inputTokens = inputTokens;
-  vault.inputTokenBalances = inputTokenBalances;
 
   if (newTVL) {
     vault.totalValueLockedUSD = toUsd(
@@ -167,22 +163,19 @@ export function getOrCreateAccount(
   address: Address,
   timestamp: BigInt
 ): Account {
-  let dailyId = `${getDay(timestamp)}-${address.toHexString()}`;
+  let activeId = `${address.toHexString()}-${getDay(timestamp)}-${getHour(
+    timestamp
+  )}`;
   let object = Account.load(address.toHexString());
-  let dailyObject = DailyActiveAccount.load(dailyId);
+  let dailyObject = ActiveAccount.load(activeId);
 
   if (!object) {
-    const yAggr = getOrCreateYieldAggregator();
-
     object = new Account(address.toHexString());
     object.save();
-
-    yAggr.totalUniqueUsers += 1;
-    yAggr.save();
   }
 
   if (!dailyObject) {
-    dailyObject = new DailyActiveAccount(dailyId);
+    dailyObject = new ActiveAccount(activeId);
     dailyObject.save();
   }
   return object;
@@ -192,23 +185,19 @@ export function getOrCreateTransfer(
   call: TransferCall,
   vaultAddress: Address
 ): Deposit {
-  const id = `deposit-${call.transaction.hash.toHexString()}-${call.transaction.index}`;
+  const id = `deposit-${call.transaction.hash.toHexString()}-${
+    call.transaction.index
+  }`;
   let deposit = Deposit.load(id);
 
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
-    const vault = getOrCreateVault(
-      vaultAddress,
-      call.block.number,
-      call.block.timestamp,
-      false
-    );
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
     getOrCreateAccount(call.from, call.block.timestamp);
 
     deposit = new Deposit(id);
-    deposit.vault = vault.id;
+    deposit.vault = vaultAddress.toHexString();
     deposit.hash = call.transaction.hash.toHexString();
     deposit.logIndex = call.transaction.index.toI32();
     deposit.protocol = yAggr.id;
@@ -224,12 +213,7 @@ export function getOrCreateTransfer(
       Address.fromString(token.id)
     );
 
-    vault.totalVolumeUSD = vault.totalVolumeUSD.plus(deposit.amountUSD);
-    yAggr.totalVolumeUSD = yAggr.totalVolumeUSD.plus(deposit.amountUSD);
-
     deposit.save();
-    vault.save();
-    yAggr.save();
   }
 
   return deposit;
@@ -239,17 +223,13 @@ export function getOrCreateDeposit(
   call: DepositCall,
   vaultAddress: Address
 ): Deposit {
-  const id = `deposit-${call.transaction.hash.toHexString()}-${call.transaction.index}`;
+  const id = `deposit-${call.transaction.hash.toHexString()}-${
+    call.transaction.index
+  }`;
   let deposit = Deposit.load(id);
 
   if (!deposit) {
     const yAggr = getOrCreateYieldAggregator();
-    const vault = getOrCreateVault(
-      vaultAddress,
-      call.block.number,
-      call.block.timestamp,
-      false
-    );
     const poolv3 = PoolV3.bind(vaultAddress);
     const token = getOrCreateToken(poolv3.token());
     getOrCreateAccount(call.from, call.block.timestamp);
@@ -271,12 +251,7 @@ export function getOrCreateDeposit(
       Address.fromString(token.id)
     );
 
-    vault.totalVolumeUSD = vault.totalVolumeUSD.plus(deposit.amountUSD);
-    yAggr.totalVolumeUSD = yAggr.totalVolumeUSD.plus(deposit.amountUSD);
-
     deposit.save();
-    vault.save();
-    yAggr.save();
   }
 
   return deposit;
@@ -286,7 +261,9 @@ export function getOrCreateWithdraw(
   call: WithdrawCall,
   vaultAddress: Address
 ): Withdraw {
-  const id = `withdraw-${call.transaction.hash.toHexString()}-${call.transaction.index}`;
+  const id = `withdraw-${call.transaction.hash.toHexString()}-${
+    call.transaction.index
+  }`;
   let withdraw = Withdraw.load(id);
 
   if (!withdraw) {
@@ -356,7 +333,7 @@ export function getOrCreateVault(
     vault.protocol = yAggr.id;
     vault.name = poolv3.name();
     vault.symbol = poolv3.symbol();
-    vault.pricePerShare = poolv3.pricePerShare();
+    vault.pricePerShare = poolv3.pricePerShare().toBigDecimal();
 
     vault.save();
   }
