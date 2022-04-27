@@ -35,8 +35,9 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     yAggr = new YieldAggregator(CONTROLLER_ADDRESS_HEX);
     yAggr.name = "Vesper Finance V3";
     yAggr.slug = "vesper-finance-v3";
-    yAggr.schemaVersion = "1.1.1";
-    yAggr.subgraphVersion = "1.1.1";
+    yAggr.schemaVersion = "1.2.0";
+    yAggr.subgraphVersion = "1.0.0";
+    yAggr.methodologyVersion = "1.0.0";
     yAggr.network = "MAINNET";
     yAggr.type = "YIELD";
     yAggr.save();
@@ -170,8 +171,12 @@ export function getOrCreateAccount(
   let dailyObject = ActiveAccount.load(activeId);
 
   if (!object) {
+    const yAggr = getOrCreateYieldAggregator();
     object = new Account(address.toHexString());
     object.save();
+
+    yAggr.cumulativeUniqueUsers += 1;
+    yAggr.save();
   }
 
   if (!dailyObject) {
