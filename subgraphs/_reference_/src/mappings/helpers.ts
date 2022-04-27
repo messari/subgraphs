@@ -3,7 +3,7 @@ import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO, FACTORY_ADDRESS, LiquidityPoolFeeType, LP_FEE_TO_ON, PROTOCOL_FEE_TO_ON, TRADING_FEE } from "../common/constants";
+import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO, FACTORY_ADDRESS, LiquidityPoolFeeType, LP_FEE_TO_ON, PROTOCOL_FEE_TO_ON, TRADING_FEE } from "../common/constants";
 import { getOrCreateDex, getOrCreateToken } from "../common/getters";
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS));
@@ -26,6 +26,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: Address,
   pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
   pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
   pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)]
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
