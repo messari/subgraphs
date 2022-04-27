@@ -748,3 +748,18 @@ type LiquidityPoolParamsHelper @entity {
   PriceDeviation: BigInt!
   HaircutRate: BigInt!
 }
+
+type Asset @entity {
+  " { Reward token type }-{ Smart contract address of the output token } "
+  id: ID!
+
+  " Reference to the pool associated with the token"
+  pool: LiquidityPool!
+
+  " Reference to the actual token "
+  maxSupply: BigInt!
+
+  " Reference to the underlying token "
+  token: Token!
+
+}
