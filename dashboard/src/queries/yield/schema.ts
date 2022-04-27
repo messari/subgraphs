@@ -1,6 +1,6 @@
 import { Schema, Versions } from "../../constants";
 
-export const schema = (version: string): Schema => {
+export const schema = (version: string, tryNextSchema: Boolean = false): Schema => {
   switch (version) {
     case Versions.Schema100:
       return schema100();
@@ -195,7 +195,13 @@ export const schema110 = (): Schema => {
 };
 
 export const schema120 = (): Schema => {
-  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "vaultDailySnapshots", "UsageMetricsHourlySnapshot", "vaultHourlySnapshots"];
+  const entities = [
+    "financialsDailySnapshots",
+    "usageMetricsDailySnapshots",
+    "vaultDailySnapshots",
+    "usageMetricsHourlySnapshots",
+    "vaultHourlySnapshots"
+  ];
   const entitiesData = [
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     [
@@ -220,7 +226,6 @@ export const schema120 = (): Schema => {
     [
       "vault",
       "totalValueLockedUSD",
-      "totalVolumeUSD",
       "inputTokenBalance",
       "outputTokenSupply",
       "outputTokenPriceUSD",
@@ -254,7 +259,7 @@ export const schema120 = (): Schema => {
   const entitiesQuery = entities.map((entity, index) => {
     let options = "";
     if (entity === "vaultDailySnapshots" || entity === "vaultHourlySnapshots") {
-      options = ", vault: $poolId"
+      options = ", where: {vault: $poolId}"
     }
     // If certain fields which refer to other entities are present, add {id} to pull the id of that inset entity
     // It is added this way to not be included in the entitiesData sub arrays
@@ -272,16 +277,14 @@ export const schema120 = (): Schema => {
     "to",
     "from",
     "timestamp",
-    "asset{id}",
     "amount",
-    "amountUSD",
-    "vault{id}"
+    "amountUSD"
   ];
   const eventsQuery = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 1000, id: $poolId" + options + ") {"
-    const fields = eventsFields.join(",");
-    return baseStr + fields + '}'
+    const baseStr = event + "(first: 1000, where: {vault: $poolId}" + options + ") { "
+    const fields = eventsFields.join(", ");
+    return baseStr + fields + ' }'
   });
   const poolData = [
     "name",
@@ -314,19 +317,19 @@ export const schema120 = (): Schema => {
           name
           symbol
           depositLimit
-          timestamp
+          
           fees{
             feePercentage
             feeType
           }
-          inputTokens {
-            name
-          }
+
           outputToken {
             name
           }
           rewardTokens {
-            name
+            token {
+              name
+            }
           }
           rewardTokenEmissionsAmount
           rewardTokenEmissionsUSD
@@ -334,6 +337,7 @@ export const schema120 = (): Schema => {
         }
       }
       `;
+      console.log('query', query);
 
   return { entities, entitiesData, query, poolData ,events};
 };

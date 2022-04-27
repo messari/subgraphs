@@ -1,10 +1,16 @@
 import { Schema, Versions } from "../../constants";
 
-export const schema = (version: string): Schema => {
+export const schema = (version: string, tryNextSchema: Boolean = false): Schema => {
   switch (version) {
     case Versions.Schema100:
+      if (tryNextSchema) {
+        return schema110();
+      }
       return schema100();
     case Versions.Schema110:
+      if (tryNextSchema) {
+        return schema120();
+      }
       return schema110();
     case Versions.Schema120:
       return schema120();
@@ -269,7 +275,13 @@ export const schema110 = (): Schema => {
     };
 
 export const schema120 = (): Schema => {
-  const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots", "UsageMetricsHourlySnapshot", "marketHourlySnapshots"];
+  const entities = [
+    "financialsDailySnapshots",
+    "usageMetricsDailySnapshots",
+    "marketDailySnapshots",
+    "usageMetricsHourlySnapshots",
+    "marketHourlySnapshots"
+  ];
   const entitiesData = [
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     [
@@ -300,7 +312,6 @@ export const schema120 = (): Schema => {
     [
       "market",
       "totalValueLockedUSD",
-      "totalVolumeUSD",
       "totalDepositBalanceUSD",
       "dailyDepositUSD",
       "cumulativeDepositUSD",
@@ -314,7 +325,6 @@ export const schema120 = (): Schema => {
       "outputTokenSupply",
       "outputTokenPriceUSD",
       "exchangeRate",
-      "stakedOutputTokenAmount",
       "rewardTokenEmissionsAmount",
       "rewardTokenEmissionsUSD",
       "timestamp"
@@ -346,7 +356,6 @@ export const schema120 = (): Schema => {
       "outputTokenSupply",
       "outputTokenPriceUSD",
       "exchangeRate",
-      "stakedOutputTokenAmount",
       "rewardTokenEmissionsAmount",
       "rewardTokenEmissionsUSD",
       "timestamp"
@@ -355,7 +364,7 @@ export const schema120 = (): Schema => {
   const entitiesQuery = entities.map((entity, index) => {
     let options = "";
     if (entity === "marketDailySnapshots" || entity === "marketHourlySnapshots") {
-      options = ", market: $poolId"
+      options = ", where: {market: $poolId}"
     }
     const baseStr = entity + "(first: 1000" + options + ") {"
     // If certain fields which refer to other entities are present, add {id} to pull the id of that inset entity
@@ -373,21 +382,19 @@ export const schema120 = (): Schema => {
     "to",
     "from",
     "timestamp",
-    "asset{id}",
     "amount",
-    "amountUSD",
-    "market{id}"
+    "amountUSD"
   ];
 
   const events = ["withdraws","repays","liquidates","deposits","borrows"]
   const eventsQuery = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 1000, id: $poolId" + options + ") {"
-    let fields = eventsFields.join(",");
+    const baseStr = event + "(first: 1000, where: {market: $poolId}" + options + ") { "
+    let fields = eventsFields.join(", ");
     if (event === "liquidates") {
-      fields += ",profitUSD"
+      fields += ", profitUSD"
     }
-    return baseStr + fields + '}'
+    return baseStr + fields + ' }'
   });
   
   const poolData = [
@@ -433,14 +440,12 @@ export const schema120 = (): Schema => {
       ${entitiesQuery}
       ${eventsQuery}
       market(id:$poolId){
-        inputToken{
+        inputToken {
           decimals
           name
         }
-        rewardTokens{
-          name
-        }
-        outputToken{
+
+        outputToken {
           name
         }
 
@@ -462,14 +467,13 @@ export const schema120 = (): Schema => {
         outputTokenSupply
         outputTokenPriceUSD
         exchangeRate
-        depositRate
-        stableBorrowRate
-        variableBorrowRate
         rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
       }
     }
     `;
+    console.log('query', query);
+
   return { entities, entitiesData, query, poolData ,events};
 };
 

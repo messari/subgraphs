@@ -1,16 +1,16 @@
 import "./App.css";
 import { Button, CircularProgress, Grid, MenuItem, Paper, Select, SelectChangeEvent, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography } from "@mui/material";
 import TabPanel from '@mui/lab/TabPanel';
-import { ApolloClient, gql, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
+import { ApolloClient, ApolloError, DocumentNode, gql, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 import { Line } from "react-chartjs-2";
 import { Box } from "@mui/system";
 
 import { Chart as ChartJS, registerables } from "chart.js";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import moment from "moment";
 import { schema } from "./queries/schema";
-import { PoolName, PoolNames } from "./constants";
+import { PoolName, PoolNames, Versions } from "./constants";
 import { TabContext } from "@mui/lab";
 export const toDate = (timestamp: number) => {
   return moment.unix(timestamp).format("YYYY-MM-DD");
@@ -130,9 +130,10 @@ export const TableEvents = (_datasetLabel: string, dataTable: any) => {
   return null;
 };
 function App() {
-  const [subgraphUrl, setSubgraphUrl] = useState<string>("https://api.studio.thegraph.com/query/22815/aave-v2-test/v1.1.30");
+  const [subgraphUrl, setSubgraphUrl] = useState<string>("");
   const [urlTextField, setTextField] = useState<string>("");
   const [poolId, setPoolId] = useState<string>("");
+  const [schemaVersion, setSchemaVersion] = useState<string>("");
 
   ChartJS.register(...registerables);
 
@@ -153,17 +154,19 @@ function App() {
     }
   `;
   const { data: data2, loading: loading2, error: error2, refetch: refetch2 } = useQuery(query, { client });
+  if (!schemaVersion && data2?.protocols[0].schemaVersion) {
+    setSchemaVersion(data2?.protocols[0].schemaVersion);
+  }
   const {
     entitiesData,
     entities,
     poolData,
     query: graphQuery,
     events,
-  } = schema(data2?.protocols[0].type, data2?.protocols[0].schemaVersion);
-  const queryMain = gql`
+  } = schema(data2?.protocols[0].type, schemaVersion);
+  let queryMain = gql`
     ${graphQuery}
   `;
-
   const [getData, { data, loading, error, refetch }] = useLazyQuery(queryMain, { variables: { poolId }, client });
   const [tabValue, setTabValue] = useState('1');
 
@@ -250,7 +253,7 @@ function App() {
   const AllData = () =>
     useMemo(() => {
       if (data) {
-        console.log('FULL DATA' + JSON.stringify(data))
+        console.log('DATA', data)
         return (
           <>
             <Typography>
@@ -266,48 +269,70 @@ function App() {
                 </Box>
                 <TabPanel value="1"><p>Name - {data.protocols[0].name}</p>
                   <p>Type - {data.protocols[0].type}</p>
-                  <p>Schema Version - {data.protocols[0].schemaVersion}</p>
+                  <p>Schema Version - {schemaVersion}</p>
                   <p>Subgraph Version - {data.protocols[0].subgraphVersion}</p>
                   {data?.protocols[0]?.methodologyVersion ? (
                     <p>Methodology Version - {data.protocols[0].methodologyVersion}</p>
                   ) : null}
 
-                  {entitiesData.map((item, i) => (
+                  {entitiesData.map((item, i) => {
+                    const entity = entities[i];
+                    return (
                     <Grid container>
                       {item.map((name) => {
-                        console.log('ENTITY', i, item)
-                        let dataName = name;
-                        if (data[entities[i]].length < 1) {
+
+                        // 'name' values listed here do not need a graph
+                        if (name === 'timestamp') {
                           return null;
                         }
-                        if (entities[i].includes("market") || entities[i].includes("vault") || entities[i].includes("pool")) {
-                          return null
-                        }
+                        // console.log('ENTITY', i, item, entity)
+                        
+                        // This expression takes the data sources of each chart and filters out values/y coordinates that are not numeric
+                        // The values that are generally filtered out are objects/arrays where multiple values are held in one entity field
+                        const currentData = data[entity].filter((e: { [x: string]: any }) => {
+                          return !isNaN(Number(e[name]))
+                        });
 
-                        const dataChart = data[entities[i]].map((e: { [x: string]: any }) => ({
-                          date: Number(e.timestamp),
-                          value: Number(e[name]),
-                        }));
-                        const length = data[entities[i]].length;
-                        if (!data[entities[i]][0][name]) {
+                        // If the data set for a graph is 0, return
+                        if (currentData.length < 1) {
+                          return null;
+                        }
+                        // The following entities are displayed on a different tab
+                        if (entity.includes("market") || entity.includes("vault") || entity.includes("pool")) {
                           return null;
                         }
 
-                        return (
-                          <>
-                            <Grid id={dataName} item xs={8}>
-                              {Chart(dataName, dataChart, length)}
+                        // The sum of all y coordinate values
+                        // This is used to detect erroneous outputs on a graph (ie all 0 vals)
+                        let sum = 0;
+                        const dataChart = currentData.map((e: { [x: string]: any }) => {
+                          // Later on will put functions to detect error patterns in the data
+                          sum += Number(e[name]);
+                          return { date: Number(e.timestamp), value: Number(e[name])}
+                        });
+
+                        const length = currentData.length;
+                        
+                        // The label on the graph. 
+                        const label = entity + '-' + name;
+
+                          return (
+                            <>
+                            {sum ? null: <h4 style={{color: 'red'}}>ALL VALUES ARE ZERO. Evaluate how data is collected for the {name} field on {entity}</h4>}
+                            <Grid id={label} item xs={8}>
+                              {Chart(label, dataChart, length)}
                             </Grid>
                             <Grid item xs={4} marginY={4}>
-                              {TableChart(dataName, dataChart, length)}
+                              {TableChart(label, dataChart, length)}
                             </Grid>
                           </>
                         );
                       })}
                     </Grid>
-                  ))}
+                  )})}
                 </TabPanel>
                 <TabPanel value="2">
+                  {poolDropDown()}
                   {poolId
                     ?
                     <TableContainer component={Paper} sx={{justifyContent:"center", display:"flex", alignItems:"center"}}>
@@ -380,11 +405,19 @@ function App() {
                   ))}
                 </TabPanel>
                 <TabPanel value="3">
-                      
+                  {poolDropDown()}
+
                       {
                         events.map((e,i)=>{
-                          return TableEvents(e, data[e])
-                      
+                          console.log('e', e, i, data[e])
+                          let eventError = null;
+                          if (!poolId && data[e].length > 0) {
+                            eventError = <h3 style={{color: "red"}}>A pool has not been selected, there should not be events</h3>
+                          }
+                          if (poolId && data[e].length === 0) {
+                            eventError = <h3 style={{color: "red"}}>No {e} events on pool {poolId}</h3>
+                          }
+                          return <React.Fragment>{eventError}{TableEvents(e, data[e])}</React.Fragment>;
                         })
                       }
                 </TabPanel>
@@ -397,7 +430,6 @@ function App() {
       }
       return null;
     }, [data, tabValue]);
-  console.log('CLIENT', client)
   return (
     <div className="App">
       <TextField
@@ -406,24 +438,28 @@ function App() {
         fullWidth
         onChange={(event) => setTextField(event.target.value)}
       />
-      {
-        data 
-        ?
-        poolDropDown()
-        :(<TextField
-        sx={{ maxWidth: 1000, margin: 2 }}
-        label="Pool Id(Optional)"
-        fullWidth
-        onChange={(event) => setPoolId(event.target.value)}
-      />)
-
-      }
 
       <Box marginTop={1}>
-        <Button onClick={() => setSubgraphUrl(urlTextField)}>Show Graphs</Button>
+        <Button onClick={() => {
+          setSchemaVersion("");
+          setSubgraphUrl(urlTextField);
+        }}>Show Graphs</Button>
       </Box>
       {(loading2 || loading) && !!subgraphUrl ? <CircularProgress sx={{ margin: 6 }} size={50} /> : null}
-      {(error2 || error) && !!subgraphUrl ? "Error Please check if you enter correct URL" : null}
+      {(error2 || error) && (!loading2 || loading) && !!subgraphUrl ? <h2>Error Please check if you entered the correct URL</h2> : null}
+      {(error2 || error) && (!loading2 || loading) && !data ? <h2>Detected schema type {(data2?.protocols[0].type)} and version {data2?.protocols[0].schemaVersion}</h2>: null}
+      {(error2 || error) && (!loading2 || loading) && !data ? (
+      <Box marginTop={1}>
+        <h3>If this is not the expected schema version, select a different version from the following list:</h3>
+        {Versions.SchemaVersions.map((version: string) => {
+          if (version === data2?.protocols[0].schemaVersion) {
+            return null;
+          }
+          return <Button onClick={() => setSchemaVersion(version)}>Schema {version}</Button>
+        })
+        }
+        <h4>If the version is incorrect, update "schemaVersion" field on the protocol entity in the mapping file.</h4>
+      </Box>): null}
       {AllData()}
     </div>
   );
