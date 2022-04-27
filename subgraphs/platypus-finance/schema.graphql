@@ -726,3 +726,25 @@ type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }
+
+
+type LiquidityPoolParamsHelper @entity {
+  " Smart contract address of the pool "
+  id: ID!
+
+  " The protocol this pool belongs to "
+  protocol: DexAmmProtocol!
+
+  " Address of the Dev and the Oracle "
+  Dev: String!
+  Oracle: String!
+
+  " SlippageParams for this pool"
+  SlippageParamsK: BigInt!
+  SlippageParamsN: BigInt!
+  SlippageParamsC1: BigInt!
+  SlippageParamsXThreshold: BigInt!
+  RetentionRatio: BigInt!
+  PriceDeviation: BigInt!
+  HaircutRate: BigInt!
+}

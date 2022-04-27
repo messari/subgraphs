@@ -38,7 +38,6 @@ dataSources:
           file: ./abis/secondaryPool.json
         - name: Router
           file: ./abis/router.json
-
       eventHandlers:
         - event: Add(indexed uint256,uint256,indexed address,indexed address)
           handler: handleAdd

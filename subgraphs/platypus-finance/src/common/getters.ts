@@ -9,6 +9,7 @@ import {
   FinancialsDailySnapshot,
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
+  LiquidityPoolParamsHelper,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import { BIGDECIMAL_ZERO, Network, INT_ZERO, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY } from "../common/constants";
@@ -32,7 +33,18 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
   // fetch info if null
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toHexString());
+    let poolParam = new LiquidityPoolParamsHelper(poolAddress.toHexString());
 
+    poolParam.Dev = PROTOCOL_ADMIN;
+    poolParam.SlippageParamsK = new BigInt(0.00002e18);
+    poolParam.SlippageParamsN = new BigInt(7);
+    poolParam.SlippageParamsC1 = new BigInt(376927610599998308);
+    poolParam.SlippageParamsXThreshold = new BigInt(329811659274998519);
+    poolParam.HaircutRate = new BigInt(0.0003e18);
+    poolParam.RetentionRatio = new BigInt(10**18);
+    poolParam.PriceDeviation = new BigInt(0.02e18);
+
+    poolParam.save();
     pool.save();
   }
   return pool;
