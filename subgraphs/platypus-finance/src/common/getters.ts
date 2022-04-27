@@ -1,4 +1,4 @@
-// import { log } from "@graphprotocol/graph-ts"
+import { log } from "@graphprotocol/graph-ts";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
@@ -17,7 +17,6 @@ import { BIGDECIMAL_ZERO, Network, INT_ZERO, PROTOCOL_ADMIN, ProtocolType, SECON
 import { getDays, getHours } from "./utils/datetime";
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
-
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -40,13 +39,13 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     let poolParam = new LiquidityPoolParamsHelper(poolAddress.toHexString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
-    poolParam.SlippageParamsK = BigDecimal.fromString('0.00002e18');
-    poolParam.SlippageParamsN = BigDecimal.fromString('7');
-    poolParam.SlippageParamsC1 = BigDecimal.fromString('376927610599998308');
-    poolParam.SlippageParamsXThreshold = BigDecimal.fromString('329811659274998519');
-    poolParam.HaircutRate = BigDecimal.fromString('0.0003e18');
-    poolParam.RetentionRatio =  exponentToBigDecimal(18);
-    poolParam.PriceDeviation = BigDecimal.fromString('0.02e18');
+    poolParam.SlippageParamsK = BigDecimal.fromString("0.00002e18");
+    poolParam.SlippageParamsN = BigDecimal.fromString("7");
+    poolParam.SlippageParamsC1 = BigDecimal.fromString("376927610599998308");
+    poolParam.SlippageParamsXThreshold = BigDecimal.fromString("329811659274998519");
+    poolParam.HaircutRate = BigDecimal.fromString("0.0003e18");
+    poolParam.RetentionRatio = exponentToBigDecimal(18);
+    poolParam.PriceDeviation = BigDecimal.fromString("0.02e18");
 
     poolParam.save();
     pool.save();
@@ -185,10 +184,12 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddres: Address): BigDecimal {
-  let token = getOrCreateToken(tokenAddres);
+export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddress: Address): BigDecimal {
+  let token = getOrCreateToken(tokenAddress);
+
   if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
-    let tokenPrice = getUsdPrice(tokenAddres, BigInt.fromI32(1));
+    log.debug("UPDATE THE PRICE!", []);
+    let tokenPrice = getUsdPrice(tokenAddress, BigInt.fromI32(1));
     token.lastPriceUSD = tokenPrice;
     token.lastPriceBlockNumber = event.block.number;
     token.save();

@@ -1,3 +1,5 @@
+import { log } from "@graphprotocol/graph-ts";
+
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
@@ -9,7 +11,7 @@ import {
 import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/Pool/SushiSwapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
-  if (tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!) {
+  if (tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get("AVAX")!) {
     return false;
   }
 
@@ -24,9 +26,6 @@ export function isLpToken(tokenAddress: Address, network: string): bool {
 }
 
 export function getPriceUsdc(tokenAddress: Address, network: string): CustomPriceType {
-  if (isLpToken(tokenAddress, network)) {
-    return getLpTokenPriceUsdc(tokenAddress, network);
-  }
   return getPriceFromRouterUsdc(tokenAddress, network);
 }
 
@@ -35,8 +34,14 @@ export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): 
 }
 
 export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
-  let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
+  log.warning("getPriceFromRouter t0:{} t1:{} network:{}", [
+    token0Address.toHexString(),
+    token1Address.toHexString(),
+    network,
+  ]);
+
+  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("AVAX")!;
+  let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WAVAX")!;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
@@ -70,21 +75,18 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
 
   const routerAddresses = constants.SUSHISWAP_ROUTER_ADDRESS_MAP.get(network)!;
 
-  let routerAddressV1 = routerAddresses.get("routerV1");
   let routerAddressV2 = routerAddresses.get("routerV2");
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
-  if (routerAddressV1) {
-    const sushiSwapRouterV1 = SushiSwapRouterContract.bind(routerAddressV1);
-    amountOutArray = sushiSwapRouterV1.try_getAmountsOut(amountIn, path);
-    if (amountOutArray.reverted && routerAddressV2) {
-      const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressV2);
-      amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
+  if (routerAddressV2) {
+    const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressV2);
+    amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
 
-      if (amountOutArray.reverted) {
-        return new CustomPriceType();
-      }
+    log.warning("sushiswap r2:{} revert:{}", [routerAddressV2.toHexString(), amountOutArray.reverted.toString()]);
+
+    if (amountOutArray.reverted) {
+      return new CustomPriceType();
     }
 
     let amountOut = amountOutArray.value[amountOutArray.value.length - 1];

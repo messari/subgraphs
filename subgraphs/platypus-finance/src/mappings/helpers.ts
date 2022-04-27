@@ -2,8 +2,13 @@
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import { Deposit, DexAmmProtocol, LiquidityPool, Token } from "../../generated/schema";
 import { Asset as AssetContract } from "../../generated/templates/Asset/Asset";
-import { POOL_PROXY, SECONDARYPOOL_PROXY } from "../common/constants";
-import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, getOrFetchTokenUsdPrice } from "../common/getters";
+import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, POOL_PROXY, SECONDARYPOOL_PROXY } from "../common/constants";
+import {
+  getOrCreateDexAmm,
+  getOrCreateLiquidityPool,
+  getOrCreateToken,
+  getOrFetchTokenUsdPrice,
+} from "../common/getters";
 
 // export let assetContract = AssetContract.bind(Address.fromString(POOL_PROXY));
 
@@ -39,8 +44,10 @@ export function createDeposit(
 
   let protocol = getOrCreateDexAmm();
   let pool = getOrCreateLiquidityPool(event.address);
-  let inputToken = getOrCreateToken(inputTokenAddress)
+  let inputToken = getOrCreateToken(inputTokenAddress);
 
+  // fetch price in USD
+  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputTokenAddress).times(new BigDecimal(amount));
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
@@ -49,10 +56,9 @@ export function createDeposit(
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [inputToken.id];
-  deposit.inputTokenAmounts = [liquidity];
 
   // deposit.outputToken have to be deteminded based in the inputToken
-  deposit.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
+  deposit.amountUSD = amountInUSD;
   deposit.save();
 }
 

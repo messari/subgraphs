@@ -46,6 +46,8 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  _assets: Asset! @derivedFrom(field: "token")
 }
 
 enum RewardTokenType {
@@ -425,6 +427,8 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
+  _assets: [Asset!]! @derivedFrom(field: "pool")
 }
 
 #################################
@@ -761,5 +765,4 @@ type Asset @entity {
 
   " Reference to the underlying token "
   token: Token!
-
 }
