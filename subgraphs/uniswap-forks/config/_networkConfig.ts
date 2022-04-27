@@ -1,6 +1,6 @@
 import { Address, BigDecimal, Bytes, dataSource, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../generated/Factory/Factory";
-import { FeeSwitch, SchemaNetwork, SubgraphNetwork } from "../src/common/constants";
+import { FeeSwitch, Network } from "../src/common/constants";
 import { RewardIntervalType } from "../src/common/rewards";
 import { toBytesArray } from "../src/common/utils/utils";
 
@@ -10,7 +10,7 @@ export namespace Protocol {
 }
 
 // Choose which protocol you are indexing. The deployed network will already be determined
-let PROTOCOL_NAME_TEMP = Protocol.UNISWAPV2;
+let PROTOCOL_NAME_TEMP = Protocol.APESWAP;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,9 +43,9 @@ let UNTRACKED_PAIRS_TEMP: string[]; // rebass tokens, dont count in tracked volu
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == SubgraphNetwork.MAINNET) {
+if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.MAINNET.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "uniswap-v2";
-  NETWORK_TEMP = SchemaNetwork.MAINNET;
+  NETWORK_TEMP = Network.MAINNET;
   PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
   PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
   PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
@@ -99,9 +99,9 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
     "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852", // USDT/wETH created block 10093341
   ];
   UNTRACKED_PAIRS_TEMP = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
-} else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == SubgraphNetwork.MATIC) {
+} else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.MATIC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "apeswap";
-  NETWORK_TEMP = SchemaNetwork.MATIC;
+  NETWORK_TEMP = Network.MATIC;
   PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
   PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
   PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
@@ -140,9 +140,9 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Subgraph
     "0x65d43b64e3b31965cd5ea367d4c2b94c03084797", // WMATIC/USDT
     "0x019011032a7ac3a87ee885b6c08467ac46ad11cd", // WMATIC/USDC
   ];
-} else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == SubgraphNetwork.BSC) {
+} else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.BSC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "apeswap";
-  NETWORK_TEMP = SchemaNetwork.BSC;
+  NETWORK_TEMP = Network.BSC;
   PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
   PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
   PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";

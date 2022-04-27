@@ -9,43 +9,21 @@ import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
 
-export namespace SchemaNetwork {
-  export const ARBITRUM = "ARBITRUM";
+export namespace Network {
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BSC";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const MAINNET = "MAINNET";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
-  export const HARMONY = "HARMONY_SHARD_0";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
-  export const MATIC = "MATIC";
-  export const XDAI = "XDAI";
-}
-
-// The network names corresponding to the ones in `dataSource.network()`
-// They should mainly be used for the ease of comparison.
-// See below for a complete list:
-// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
-export namespace SubgraphNetwork {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BSC = "bsc";
-  export const CELO = "celo";
-  export const MAINNET = "mainnet";
-  export const FANTOM = "fantom";
-  export const FUSE = "fuse";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const NEAR = "near-mainnet";
-  export const OPTIMISM = "optimism";
-  export const MATIC = "matic";
-  export const XDAI = "xdai";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {

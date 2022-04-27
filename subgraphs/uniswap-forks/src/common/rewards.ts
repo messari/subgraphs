@@ -7,15 +7,8 @@
 
 import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
-import { SubgraphNetwork } from "./constants";
-import {
-  BIGDECIMAL_ZERO,
-  INT_FOUR,
-  INT_NEGATIVE_ONE,
-  INT_ONE,
-  INT_TWO,
-  INT_ZERO,
-} from "./constants";
+import { Network } from "./constants";
+import { BIGDECIMAL_ZERO, INT_FOUR, INT_NEGATIVE_ONE, INT_ONE, INT_TWO, INT_ZERO } from "./constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -59,18 +52,12 @@ export namespace RewardIntervalType {
 // Forecast period. This gives you the time period that you want to estimate count of blocks per interval, based on moving average block speed.
 // 86400 = 1 Day
 export const RATE_IN_SECONDS = 86400;
-export const RATE_IN_SECONDS_BD = BigDecimal.fromString(
-  RATE_IN_SECONDS.toString()
-);
+export const RATE_IN_SECONDS_BD = BigDecimal.fromString(RATE_IN_SECONDS.toString());
 
 // Estimated seconds per block of the protocol
-export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(
-  getStartingBlockRate()
-);
+export const STARTING_BLOCKS_PER_DAY = RATE_IN_SECONDS_BD.div(getStartingBlockRate());
 
-export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(
-  WINDOW_SIZE_SECONDS.toString()
-);
+export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(WINDOW_SIZE_SECONDS.toString());
 
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough
 /**
@@ -80,12 +67,7 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(
  * @param {BigInt} rewardType          - Describes whether rewards are given per block or timestamp
  * @returns {BigDecimal}               - Returns estimated blocks for specified rate
  */
-export function getRewardsPerDay(
-  currentTimestamp: BigInt,
-  currentBlockNumber: BigInt,
-  rewardRate: BigDecimal,
-  rewardType: string
-): BigDecimal {
+export function getRewardsPerDay(currentTimestamp: BigInt, currentBlockNumber: BigInt, rewardRate: BigDecimal, rewardType: string): BigDecimal {
   let circularBuffer = getOrCreateCircularBuffer();
 
   // Create entity for the current block
@@ -95,9 +77,7 @@ export function getRewardsPerDay(
   let blocks = circularBuffer.blocks;
 
   // Interval between index and the index of the start of the window block
-  let windowWidth = abs(
-    circularBuffer.windowStartIndex - circularBuffer.nextIndex
-  );
+  let windowWidth = abs(circularBuffer.windowStartIndex - circularBuffer.nextIndex);
   if (windowWidth == INT_ZERO) {
     if (circularBuffer.nextIndex >= circularBuffer.bufferSize) {
       blocks[INT_ZERO] = currentTimestampI32;
@@ -127,7 +107,7 @@ export function getRewardsPerDay(
   } else {
     recentSavedTimestamp = blocks[circularBuffer.nextIndex - INT_TWO];
   }
-  
+
   if (currentTimestampI32 - recentSavedTimestamp <= TIMESTAMP_STORAGE_INTERVAL) {
     if (rewardType == RewardIntervalType.TIMESTAMP) {
       return rewardRate.times(RATE_IN_SECONDS_BD);
@@ -162,26 +142,16 @@ export function getRewardsPerDay(
   }
 
   // Wideness of the window in seconds.
-  let windowSecondsCount = BigDecimal.fromString(
-    (currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString()
-  );
+  let windowSecondsCount = BigDecimal.fromString((currentTimestampI32 - blocks[circularBuffer.windowStartIndex]).toString());
 
   // Wideness of the window in blocks.
-  let windowBlocksCount = BigDecimal.fromString(
-    (
-      currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]
-    ).toString()
-  );
+  let windowBlocksCount = BigDecimal.fromString((currentBlockNumberI32 - blocks[circularBuffer.windowStartIndex + INT_ONE]).toString());
 
   // Estimate block speed for the window in seconds.
-  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(
-    windowSecondsCount
-  ).times(windowBlocksCount);
+  let unnormalizedBlockSpeed = WINDOW_SIZE_SECONDS_BD.div(windowSecondsCount).times(windowBlocksCount);
 
   // block speed converted to specified rate.
-  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(
-    WINDOW_SIZE_SECONDS_BD
-  ).times(unnormalizedBlockSpeed);
+  let normalizedBlockSpeed = RATE_IN_SECONDS_BD.div(WINDOW_SIZE_SECONDS_BD).times(unnormalizedBlockSpeed);
 
   // Update BlockTracker with new values.
   circularBuffer.blocksPerDay = normalizedBlockSpeed;
@@ -224,23 +194,23 @@ function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
   let network = dataSource.network();
-  if (network == SubgraphNetwork.MAINNET) {
+  if (network == Network.MAINNET.toLowerCase()) {
     return BigDecimal.fromString("13.39");
-  } else if (network == SubgraphNetwork.ARBITRUM) {
+  } else if (network == Network.ARBITRUM_ONE.toLowerCase()) {
     return BigDecimal.fromString("15");
-  } else if (network == SubgraphNetwork.AURORA) {
+  } else if (network == Network.AURORA.toLowerCase()) {
     return BigDecimal.fromString("1.03");
-  } else if (network == SubgraphNetwork.BSC) {
+  } else if (network == Network.BSC.toLowerCase()) {
     return BigDecimal.fromString("5");
-  } else if (network == SubgraphNetwork.CELO) {
+  } else if (network == Network.CELO.toLowerCase()) {
     return BigDecimal.fromString("5");
-  } else if (network == SubgraphNetwork.FANTOM) {
+  } else if (network == Network.FANTOM.toLowerCase()) {
     return BigDecimal.fromString("1");
-  } else if (network == SubgraphNetwork.OPTIMISM) {
+  } else if (network == Network.OPTIMISM.toLowerCase()) {
     return BigDecimal.fromString("12.5");
-  } else if (network == SubgraphNetwork.MATIC) {
+  } else if (network == Network.MATIC.toLowerCase()) {
     return BigDecimal.fromString("2");
-  } else if (network == SubgraphNetwork.XDAI) {
+  } else if (network == Network.XDAI.toLowerCase()) {
     return BigDecimal.fromString("5");
   }
   // Blocks are mined as needed
