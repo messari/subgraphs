@@ -5,15 +5,32 @@
     "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
     "prettier:check": "prettier --check --config ./.prettierrc.yaml \"**/*.{js,json,md,ts}\"",
     "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ tannishmango/abracadabra",
-    "create-local": "graph create --node http://localhost:8020/ tannishmango/abracadabra",
-    "remove-local": "graph remove --node http://localhost:8020/ tannishmango/abracadabra",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 tannishmango/abracadabra"
+    "build:mainnet": "yarn prepare:mainnet && graph build",
+    "build:avalanche": "yarn prepare:avalanche && graph build",
+    "build:fantom": "yarn prepare:fantom && graph build",
+    "build:arbitrum": "yarn prepare:arbitrum && graph build",
+    "build:bsc": "yarn prepare:bsc && graph build",
+    "thegraph:deploy:mainnet": "yarn build:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/abracadabra-mainnet",
+    "thegraph:deploy:avalanche": "yarn build:avalanche && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/abracadabra-avalanche",
+    "thegraph:deploy:fantom": "yarn build:fantom && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/abracadabra-fantom",
+    "thegraph:deploy:bsc": "yarn build:bsc && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/abracadabra-bnb",
+    "thegraph:deploy:arbitrum": "yarn build:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/abracadabra-arbitrum",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:avalanche": "mustache config/avalanche.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:fantom": "mustache config/fantom.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:bsc": "mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:mainnet": "yarn prepare:mainnet && yarn build:mainnet && yarn thegraph:deploy:mainnet",
+    "deploy:avalanche": "yarn prepare:avalanche && yarn build:avalanche && yarn thegraph:deploy:avalanche",
+    "deploy:fantom": "yarn prepare:fantom && yarn build:fantom && yarn thegraph:deploy:fantom",
+    "deploy:arbitrum": "yarn prepare:arbitrum && yarn build:arbitrum && yarn thegraph:deploy:arbitrum",
+    "deploy:bsc": "yarn prepare:bsc && yarn build:bsc && yarn thegraph:deploy:bsc",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ tannishmango/abracadabra"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
     "@graphprotocol/graph-ts": "0.24.1",
-    "@magic/format": "^0.0.40"
+    "@magic/format": "^0.0.40",
+    "mustache": "^4.2.0"
   }
 }
