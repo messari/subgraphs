@@ -201,8 +201,8 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity = new LendingProtocol(getBentoBoxAddress(dataSource.network()));
   LendingProtocolEntity.name = "Abracadabra Money";
   LendingProtocolEntity.slug = "abracadabra";
-  LendingProtocolEntity.schemaVersion = "1.1.0";
-  LendingProtocolEntity.subgraphVersion = "0.0.6";
+  LendingProtocolEntity.schemaVersion = "1.2.0";
+  LendingProtocolEntity.subgraphVersion = "1.0.0";
   LendingProtocolEntity.methodologyVersion = "1.0.0";
   if (dataSource.network() == ARB_NETWORK) {
     LendingProtocolEntity.network = Network.ARBITRUM_ONE;
