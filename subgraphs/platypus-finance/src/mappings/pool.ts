@@ -1,5 +1,5 @@
 // Pools are the liqudity pools (there are only 2 in platypus)
-
+import { log } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   Withdraw,
@@ -15,6 +15,20 @@ import {
 import { createDeposit } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
+  log.debug(
+    "Block number: {}, block hash: {}, transaction hash: {}, amount: {}, token:{}, liquidity:{}, to:{}, sender: {}",
+    [
+      event.block.number.toString(), // "47596000"
+      event.block.hash.toHexString(), // "0x..."
+      event.transaction.hash.toHexString(), // "0x..."
+      event.params.amount.toString(),
+      event.params.token.toHexString(),
+      event.params.liquidity.toString(),
+      event.params.to.toHexString(),
+      event.params.sender.toHexString(),
+    ],
+  );
+
   createDeposit(
     event,
     event.params.amount,

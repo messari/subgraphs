@@ -3,10 +3,9 @@ import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/gra
 import { Deposit, DexAmmProtocol, LiquidityPool, Token } from "../../generated/schema";
 import { Asset as AssetContract } from "../../generated/templates/Asset/Asset";
 import { POOL_PROXY, SECONDARYPOOL_PROXY } from "../common/constants";
-import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrFetchTokenUsdPrice } from "../common/getters";
+import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, getOrFetchTokenUsdPrice } from "../common/getters";
 
-export let assetContract = AssetContract.bind(Address.fromString(PoolAddress));
-export let assetContract = AssetContract.bind(Address.fromString(PoolAddress));
+// export let assetContract = AssetContract.bind(Address.fromString(POOL_PROXY));
 
 // Create a liquidity pool from PairCreated contract call
 export function createLiquidityPool(
@@ -31,7 +30,7 @@ export function createLiquidityPool(
 export function createDeposit(
   event: ethereum.Event,
   amount: BigInt,
-  inputToken: Address,
+  inputTokenAddress: Address,
   liquidity: BigInt,
   to: Address,
   sender: Address,
@@ -40,9 +39,7 @@ export function createDeposit(
 
   let protocol = getOrCreateDexAmm();
   let pool = getOrCreateLiquidityPool(event.address);
-
-  // fetch price in USD
-  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputToken).times(new BigDecimal(amount));
+  let inputToken = getOrCreateToken(inputTokenAddress)
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -51,9 +48,11 @@ export function createDeposit(
   deposit.from = sender.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-  deposit.inputTokens = [inputToken.toHexString()];
+  deposit.inputTokens = [inputToken.id];
+  deposit.inputTokenAmounts = [liquidity];
+
   // deposit.outputToken have to be deteminded based in the inputToken
-  deposit.amountUSD = amountInUSD;
+  deposit.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
   deposit.save();
 }
 
