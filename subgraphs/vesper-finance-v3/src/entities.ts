@@ -63,7 +63,7 @@ export function getOrCreateToken(address: Address): Token {
 export function getOrCreateRewardToken(address: Address): RewardToken {
   const id = `DEPOSIT-${address.toHexString()}`;
   let rewardToken = RewardToken.load(id);
-  
+
   if (!rewardToken) {
     const token = getOrCreateToken(address);
 
@@ -77,8 +77,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 }
 
 export function updateVaultFee(vault: Vault): void {
-  // const id = `WITHDRAWAL_FEE_${vault.id}`;
-  const id = vault.id;
+  const id = `WITHDRAWAL_FEE-${vault.id}`;
   const vaultAddress = Address.fromString(vault.id);
   const poolv3 = PoolV3.bind(vaultAddress);
   let fee = VaultFee.load(id);
@@ -99,16 +98,14 @@ export function updateVaultFee(vault: Vault): void {
 export function updateVaultTokens(vault: Vault): void {
   const vaultAddress = Address.fromString(vault.id);
   const poolv3 = PoolV3.bind(vaultAddress);
-  const inputTokens: string[] = [];
-  const inputTokenBalances: BigInt[] = [];
   const tokenAddress = poolv3.token();
   const token = Erc20Token.bind(tokenAddress);
   const oldTVL = vault.totalValueLockedUSD || BigDecimal.zero();
   const newTVL = poolv3.totalValue();
   const aggregator = getOrCreateYieldAggregator();
 
-  inputTokens.push(tokenAddress.toHexString());
-  inputTokenBalances.push(poolv3.totalValue());
+  vault.inputToken = tokenAddress.toHexString();
+  vault.inputTokenBalance = newTVL;
 
   if (newTVL) {
     vault.totalValueLockedUSD = toUsd(
