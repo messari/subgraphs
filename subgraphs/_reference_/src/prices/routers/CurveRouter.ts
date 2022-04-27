@@ -22,7 +22,7 @@ export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string)
     .times(constants.BIGINT_TEN.pow(decimalsAdjustment.toI32() as u8).toBigDecimal())
     .div(constants.BIGINT_TEN.pow(decimalsAdjustment.plus(constants.DEFAULT_DECIMALS).toI32() as u8).toBigDecimal());
 
-  return CustomPriceType.initialize(price, 6);
+  return CustomPriceType.initialize(price, constants.DEFAULT_USDC_DECIMALS);
 }
 
 export function getPoolFromLpToken(lpAddress: Address, curveRegistry: CurveRegistryContract, network: string): Address {

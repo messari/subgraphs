@@ -6,12 +6,29 @@ import { SushiSwapPair__getReservesResult } from "../../../generated/UniswapV2Fa
 /////////////////////////////////// COMMON ////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+export namespace Network {
+  export const ARBITRUM_ONE = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb"; // aka BNB Chain
+  export const CELO = "celo";
+  export const MAINNET = "mainnet"; // Ethereum mainnet
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONRIVER = "moonriver";
+  export const NEAR_MAINNET = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const MATIC = "matic"; // aka Polygon
+  export const XDAI = "xdai"; // aka Gnosis Chain
+}
+
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 
+export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
 export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
@@ -23,43 +40,43 @@ export const ZERO_ADDRESS = Address.fromString("0x000000000000000000000000000000
 
 export const CURVE_CALCULATIONS_ADDRESS_MAP = new TypedMap<string, Address>();
 CURVE_CALCULATIONS_ADDRESS_MAP.set(
-  "mainnet",
+  Network.MAINNET,
   Address.fromString("0x25BF7b72815476Dd515044F9650Bf79bAd0Df655"), // CALCULATIONS_CURVE_MAINNET
 );
 CURVE_CALCULATIONS_ADDRESS_MAP.set(
-  "fantom",
+  Network.FANTOM,
   Address.fromString("0x0b53e9df372e72d8fdcdbedfbb56059957a37128"), // CALCULATIONS_CURVE_FANTOM
 );
 CURVE_CALCULATIONS_ADDRESS_MAP.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   Address.fromString("0x26f698491daf32771217abc1356dae48c7230c75"), // CALCULATIONS_CURVE_ARBITRUM_ONE
 );
 
 export const CURVE_REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
 CURVE_REGISTRY_ADDRESS_MAP.set(
-  "mainnet",
+  Network.MAINNET,
   Address.fromString("0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c"), // CURVE_REGISTRY_MAINNET
 );
 CURVE_REGISTRY_ADDRESS_MAP.set(
-  "fantom",
+  Network.FANTOM,
   Address.fromString("0x0f854EA9F38ceA4B1c2FC79047E9D0134419D5d6"), // CURVE_REGISTRY_FANTOM
 );
 CURVE_REGISTRY_ADDRESS_MAP.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351"), // CURVE_REGISTRY_ARBITRUM_ONE
 );
 
 export const CURVE_POOL_REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
 CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
-  "mainnet",
+  Network.MAINNET,
   Address.fromString("0x8F942C20D02bEfc377D41445793068908E2250D0"), // CURVE_POOL_REGISTRY_MAINNET
 );
 CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
-  "fantom",
+  Network.FANTOM,
   Address.fromString("0x4fb93D7d320E8A263F22f62C2059dFC2A8bCbC4c"), // CURVE_POOL_REGISTRY_FANTOM
 );
 CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   Address.fromString("0x0E9fBb167DF83EdE3240D6a5fa5d40c6C6851e15"), // CURVE_POOL_REGISTRY_ARBITRUM_ONE
 );
 
@@ -75,15 +92,15 @@ export const SUSHISWAP_DEFAULT_RESERVE_CALL = new SushiSwapPair__getReservesResu
 
 export const SUSHISWAP_CALCULATIONS_ADDRESS_MAP = new TypedMap<string, Address>();
 SUSHISWAP_CALCULATIONS_ADDRESS_MAP.set(
-  "mainnet",
+  Network.MAINNET,
   Address.fromString("0x8263e161A855B644f582d9C164C66aABEe53f927"), // CALCULATIONS_SUSHISWAP_MAINNET
 );
 SUSHISWAP_CALCULATIONS_ADDRESS_MAP.set(
-  "fantom",
+  Network.FANTOM,
   Address.fromString("0xec7Ac8AC897f5082B2c3d4e8D2173F992A097F24"), // CALCULATIONS_SUSHISWAP_FANTOM
 );
 SUSHISWAP_CALCULATIONS_ADDRESS_MAP.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   Address.fromString("0x5EA7E501c9A23F4A76Dc7D33a11D995B13a1dD25"), // CALCULATIONS_SUSHISWAP_ARBITRUM_ONE
 );
 
@@ -119,29 +136,29 @@ SUSHISWAP_ROUTER_ADDRESS_ARBITRUM_ONE.set(
 
 export const SUSHISWAP_WETH_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_WETH_ADDRESS.set(
-  "mainnet",
+  Network.MAINNET,
   Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"), // SUSHISWAP_WETH_ADDRESS_MAINNET
 );
 SUSHISWAP_WETH_ADDRESS.set(
-  "fantom",
+  Network.FANTOM,
   Address.fromString("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"), // SUSHISWAP_WFTM_ADDRESS_FANTOM
 );
 SUSHISWAP_WETH_ADDRESS.set(
-  "fantom",
+  Network.FANTOM,
   Address.fromString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1"), // SUSHISWAP_WETH_ADDRESS_ARBITRUM_ONE
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS_MAP = new TypedMap<string, TypedMap<string, Address>>();
 SUSHISWAP_ROUTER_ADDRESS_MAP.set(
-  "mainnet",
+  Network.MAINNET,
   SUSHISWAP_ROUTER_ADDRESS_MAINNET, // SUSHISWAP_ROUTER_MAINNET
 );
 SUSHISWAP_ROUTER_ADDRESS_MAP.set(
-  "fantom",
+  Network.FANTOM,
   SUSHISWAP_ROUTER_ADDRESS_FANTOM, // SUSHISWAP_ROUTER_FANTOM
 );
 SUSHISWAP_ROUTER_ADDRESS_MAP.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   SUSHISWAP_ROUTER_ADDRESS_ARBITRUM_ONE, // SUSHISWAP_ROUTER_ARBITRUM_ONE
 );
 
@@ -183,15 +200,15 @@ UNISWAP_ROUTER_ADDRESS_ARBITRUM_ONE.set(
 
 export const UNISWAP_ROUTER_CONTRACT_ADDRESSES = new TypedMap<string, TypedMap<string, Address>>();
 UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
-  "mainnet",
+  Network.MAINNET,
   UNISWAP_ROUTER_ADDRESS_MAINNET, // UNISWAP_ROUTER_MAINNET
 );
 UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
-  "fantom",
+  Network.FANTOM,
   SPOOKY_SWAP_ROUTER_ADDRESS_FANTOM, // UNISWAP FORKED SPOOKY_SWAP_FANTOM
 );
 UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   UNISWAP_ROUTER_ADDRESS_ARBITRUM_ONE, // UNISWAP FORKED SPOOKY_SWAP_FANTOM
 );
 
@@ -201,15 +218,15 @@ UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
 
 export const YEARN_LENS_CONTRACT_ADDRESS = new Map<string, string>();
 YEARN_LENS_CONTRACT_ADDRESS.set(
-  "mainnet",
+  Network.MAINNET,
   "0x83d95e0d5f402511db06817aff3f9ea88224b030", // YEARN_LENS_ORACLE_ADDRESS_MAINNET
 );
 YEARN_LENS_CONTRACT_ADDRESS.set(
-  "fantom",
+  Network.FANTOM,
   "0x0000000000000000000000000000000000000000", // YEARN_LENS_ORACLE_ADDRESS_FANTOM
 );
 YEARN_LENS_CONTRACT_ADDRESS.set(
-  "arbitrum-one",
+  Network.ARBITRUM_ONE,
   "0x0000000000000000000000000000000000000000", // YEARN_LENS_ORACLE_ADDRESS_ARBITRUM_ONE
 );
 
@@ -220,9 +237,9 @@ YEARN_LENS_CONTRACT_ADDRESS.set(
 export const CHAIN_LINK_USD_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000348");
 
 export const CHAIN_LINK_CONTRACT_ADDRESS = new Map<string, Address>();
-CHAIN_LINK_CONTRACT_ADDRESS.set("mainnet", Address.fromString("0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"));
-CHAIN_LINK_CONTRACT_ADDRESS.set("fantom", Address.fromString("0x0000000000000000000000000000000000000000"));
-CHAIN_LINK_CONTRACT_ADDRESS.set("fantom", Address.fromString("0x0000000000000000000000000000000000000000"));
+CHAIN_LINK_CONTRACT_ADDRESS.set(Network.MAINNET, Address.fromString("0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"));
+CHAIN_LINK_CONTRACT_ADDRESS.set(Network.FANTOM, Address.fromString("0x0000000000000000000000000000000000000000"));
+CHAIN_LINK_CONTRACT_ADDRESS.set(Network.ARBITRUM_ONE, Address.fromString("0x0000000000000000000000000000000000000000"));
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
@@ -281,11 +298,6 @@ WHITELIST_TOKENS_ARBITRUM_ONE.set("LINK", Address.fromString("0xf97f4df75117a78c
 WHITELIST_TOKENS_ARBITRUM_ONE.set("CRV", Address.fromString("0x11cdb42b0eb46d95f990bedd4695a6e3fa034978"));
 
 export const WHITELIST_TOKENS_MAP = new TypedMap<string, TypedMap<string, Address>>();
-WHITELIST_TOKENS_MAP.set("mainnet", WHITELIST_TOKENS_MAINNET);
-WHITELIST_TOKENS_MAP.set("fantom", WHITELIST_TOKENS_FANTOM);
-WHITELIST_TOKENS_MAP.set("arbitrum-one", WHITELIST_TOKENS_ARBITRUM_ONE);
-
-export const WHITELIST_TOKENS_FORMAT = new TypedMap<string, Address>();
-WHITELIST_TOKENS_MAP.set("bnb", WHITELIST_TOKENS_FORMAT);
-WHITELIST_TOKENS_MAP.set("matic", WHITELIST_TOKENS_FORMAT);
-WHITELIST_TOKENS_MAP.set("avalanche", WHITELIST_TOKENS_FORMAT);
+WHITELIST_TOKENS_MAP.set(Network.MAINNET, WHITELIST_TOKENS_MAINNET);
+WHITELIST_TOKENS_MAP.set(Network.FANTOM, WHITELIST_TOKENS_FANTOM);
+WHITELIST_TOKENS_MAP.set(Network.ARBITRUM_ONE, WHITELIST_TOKENS_ARBITRUM_ONE);

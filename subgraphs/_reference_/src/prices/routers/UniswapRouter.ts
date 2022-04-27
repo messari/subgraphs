@@ -92,7 +92,7 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal, 6);
+    return CustomPriceType.initialize(amountOutBigDecimal, constants.DEFAULT_USDC_DECIMALS);
   }
 
   return new CustomPriceType();
@@ -120,7 +120,7 @@ export function getLpTokenPriceUsdc(tokenAddress: Address, network: string): Cus
     .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
     .div(totalSupply.toBigDecimal());
 
-  return CustomPriceType.initialize(pricePerLpTokenUsdc, 6);
+  return CustomPriceType.initialize(pricePerLpTokenUsdc, constants.DEFAULT_USDC_DECIMALS);
 }
 
 export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: string): CustomPriceType {
@@ -167,7 +167,7 @@ export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: str
 
     let totalLiquidity = liquidity0.plus(liquidity1);
 
-    return CustomPriceType.initialize(totalLiquidity, 6);
+    return CustomPriceType.initialize(totalLiquidity, constants.DEFAULT_USDC_DECIMALS);
   }
   return new CustomPriceType();
 }
