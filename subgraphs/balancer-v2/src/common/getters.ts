@@ -35,10 +35,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.subgraphVersion = "1.2.0";
     protocol.methodologyVersion = "1.2.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    let network = dataSource.network()
-    if (network == "arbitrum-one") {
-      network = "arbitrum_one"
-    }
+    let network = hyphenToUnderscore(dataSource.network())
     protocol.network = network.toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.save();
@@ -302,4 +299,10 @@ export function updatePoolHourlySnapshot(event: ethereum.Event, pool: LiquidityP
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
   snapshot.save();
+}
+
+// Converts hyphen to underscore in a string
+// (e.g. "arbitrum-one" to "arbitrum_one"), mainly used in network
+function hyphenToUnderscore(word: string): string {
+  return word.replace("-", "_");
 }
