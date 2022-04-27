@@ -483,9 +483,6 @@ type Market @entity {
   " Current TVL (Total Value Locked) of this market "
   totalValueLockedUSD: BigDecimal!
 
-  " Current amount of deposits in native underlying unit "
-  _currentDepositBalance: BigInt!
-
   " Current balance of all deposited assets (not historical cumulative), in USD "
   totalDepositBalanceUSD: BigDecimal!
 

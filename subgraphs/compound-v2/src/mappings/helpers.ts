@@ -14,6 +14,7 @@ import {
   BIGDECIMAL_ONEHUNDRED,
   InterestRateSide,
   InterestRateType,
+  PROTOCOL_SLUG,
 } from "../common/utils/constants";
 import {
   getOrCreateFinancials,
@@ -41,6 +42,7 @@ import { getUsdPricePerToken } from "../common/prices/index";
 export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens: BigInt, sender: Address): bool {
   let marketAddress = event.address;
   let market = getOrCreateMarket(event, marketAddress);
+  let protocol = getOrCreateLendingProtcol();
 
   // grab local vars
   let blockNumber = event.block.number;
@@ -60,34 +62,35 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   deposit.blockNumber = blockNumber;
   deposit.timestamp = event.block.timestamp;
   deposit.market = marketAddress.toHexString();
-  deposit.asset = market.inputTokens[0];
+  deposit.asset = market.inputToken;
   deposit.amount = amount;
 
   // get/update prices/rates/accrue interest/rewards for market
   if (market._currentBlockNumber < event.block.number) {
     let blockDiff = event.block.number.minus(market._currentBlockNumber);
-    updatePrevBlockRevenues(market, blockDiff);
+    updatePrevBlockRevenues(market, blockDiff, event);
     updateMarketPrices(market, event);
     accrueInterestsOnBalances(market, blockDiff);
     updateMarketRates(market);
     updateRewards(event, market);
     market._currentBlockNumber = event.block.number;
   }
-  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  deposit.amountUSD = market.inputTokenPricesUSD[0].times(decimalAmount);
+  deposit.amountUSD = market.inputTokenPriceUSD.times(decimalAmount);
 
   // update cToken supply
   market.outputTokenSupply = market.outputTokenSupply.plus(mintTokens);
 
   // update inputTokensBalance
-  let inputBalance = market.inputTokenBalances;
-  inputBalance = [inputBalance[0].plus(amount)];
-  market.inputTokenBalances = inputBalance;
+  market.inputTokenBalance = market.inputTokenBalance.plus(amount);
 
   // update protocol totalDepositUSD
+  market.totalDepositBalanceUSD = market.totalDepositBalanceUSD.plus(deposit.amountUSD);
+  protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(deposit.amountUSD);
   updateTotalDepositUSD(event);
 
+  protocol.save();
   market.save();
   deposit.save();
   updateProtocolTVL(event); // also updates market TVL
@@ -123,27 +126,25 @@ export function createWithdraw(
   withdraw.blockNumber = blockNumber;
   withdraw.timestamp = event.block.timestamp;
   withdraw.market = marketAddress.toHexString();
-  withdraw.asset = market.inputTokens[0];
+  withdraw.asset = market.inputToken;
   withdraw.amount = underlyingAmount;
 
   // get/update prices/rates/accrue interest/rewards for market
   if (market._currentBlockNumber < event.block.number) {
     let blockDiff = event.block.number.minus(market._currentBlockNumber);
-    updatePrevBlockRevenues(market, blockDiff);
+    updatePrevBlockRevenues(market, blockDiff, event);
     updateMarketPrices(market, event);
     accrueInterestsOnBalances(market, blockDiff);
     updateMarketRates(market);
     updateRewards(event, market);
     market._currentBlockNumber = event.block.number;
   }
-  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let decimalAmount = underlyingAmount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  withdraw.amountUSD = market.inputTokenPricesUSD[0].times(decimalAmount);
+  withdraw.amountUSD = market.inputTokenPriceUSD.times(decimalAmount);
 
   // update inputTokenBalances
-  let inputBalance = market.inputTokenBalances;
-  inputBalance = [inputBalance[0].minus(underlyingAmount)];
-  market.inputTokenBalances = inputBalance;
+  market.inputTokenBalance = market.inputTokenBalance.minus(underlyingAmount);
 
   // update outputTokenSupply
   market.outputTokenSupply = market.outputTokenSupply.minus(cTokenAmount);
@@ -184,29 +185,29 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.blockNumber = blockNumber;
   borrow.timestamp = event.block.timestamp;
   borrow.market = marketAddress.toHexString();
-  borrow.asset = market.inputTokens[0];
+  borrow.asset = market.inputToken;
   borrow.amount = amount;
 
   // get/update prices/rates/accrue interest/rewards for market
   if (market._currentBlockNumber < event.block.number) {
     let blockDiff = event.block.number.minus(market._currentBlockNumber);
-    updatePrevBlockRevenues(market, blockDiff);
+    updatePrevBlockRevenues(market, blockDiff, event);
     updateMarketPrices(market, event);
     accrueInterestsOnBalances(market, blockDiff);
     updateMarketRates(market);
     updateRewards(event, market);
     market._currentBlockNumber = event.block.number;
   }
-  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
-  market._totalBorrowNative = market._totalBorrowNative.plus(amount); // must be after revenue updates
+  let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
+  market._currentBorrowBalance = market._currentBorrowBalance.plus(amount); // must be after revenue updates
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  borrow.amountUSD = market.inputTokenPricesUSD[0].times(decimalAmount);
+  borrow.amountUSD = market.inputTokenPriceUSD.times(decimalAmount);
 
-  // update borrow volume (ie, market.totalVolumeUSD)
-  market.totalVolumeUSD = market.totalVolumeUSD.plus(borrow.amountUSD!);
+  // update total borrow balance
+  market.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD.plus(borrow.amountUSD!);
   // update total volume on protocol level
   let protocol = getOrCreateLendingProtcol();
-  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(borrow.amountUSD!);
+  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(borrow.amountUSD!);
 
   // update protocol totalBorrowUSD
   updateTotalBorrowUSD(event);
@@ -241,23 +242,23 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.blockNumber = blockNumber;
   repay.timestamp = event.block.timestamp;
   repay.market = marketAddress.toHexString();
-  repay.asset = market.inputTokens[0];
+  repay.asset = market.inputToken;
   repay.amount = amount;
 
   // get/update prices/rates/accrue interest/rewards for market
   if (market._currentBlockNumber < event.block.number) {
     let blockDiff = event.block.number.minus(market._currentBlockNumber);
-    updatePrevBlockRevenues(market, blockDiff);
+    updatePrevBlockRevenues(market, blockDiff, event);
     updateMarketPrices(market, event);
     accrueInterestsOnBalances(market, blockDiff);
     updateMarketRates(market);
     updateRewards(event, market);
     market._currentBlockNumber = event.block.number;
   }
-  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
-  market._totalBorrowNative = market._totalBorrowNative.minus(amount); // must be after revenue updates
+  let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
+  market._currentBorrowBalance = market._currentBorrowBalance.minus(amount); // must be after revenue updates
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
-  repay.amountUSD = market.inputTokenPricesUSD[0].times(decimalAmount);
+  repay.amountUSD = market.inputTokenPriceUSD.times(decimalAmount);
 
   // update protocol totalBorrowUSD
   updateTotalBorrowUSD(event);
@@ -309,7 +310,7 @@ export function createLiquidate(
   // get/update prices/rates/accrue interest/rewards for market
   if (market._currentBlockNumber < event.block.number) {
     let blockDiff = event.block.number.minus(market._currentBlockNumber);
-    updatePrevBlockRevenues(market, blockDiff);
+    updatePrevBlockRevenues(market, blockDiff, event);
     updateMarketPrices(market, event);
     accrueInterestsOnBalances(market, blockDiff);
     updateMarketRates(market);
@@ -318,7 +319,7 @@ export function createLiquidate(
   }
   if (liquidatedMarket._currentBlockNumber < event.block.number) {
     let blockDiff = event.block.number.minus(liquidatedMarket._currentBlockNumber);
-    updatePrevBlockRevenues(liquidatedMarket, blockDiff);
+    updatePrevBlockRevenues(liquidatedMarket, blockDiff, event);
     updateMarketPrices(liquidatedMarket, event);
     accrueInterestsOnBalances(liquidatedMarket, blockDiff);
     updateMarketRates(liquidatedMarket);
@@ -332,12 +333,15 @@ export function createLiquidate(
     .toBigDecimal()
     .div(exponentToBigDecimal(COMPOUND_DECIMALS))
     .times(liquidatedMarket.outputTokenPriceUSD);
-  let repayUnderlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let repayUnderlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let costUSD: BigDecimal = repaidAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(repayUnderlyingDecimals))
-    .times(market.inputTokenPricesUSD[0]);
+    .times(market.inputTokenPriceUSD);
   liquidation.profitUSD = liquidation.amountUSD!.minus(costUSD);
+
+  // update cumulative liquidations
+  liquidatedMarket.cumulativeLiquidateUSD = liquidatedMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
 
   liquidatedMarket.save();
   market.save();
@@ -399,25 +403,27 @@ export function updatePrevBlockRevenues(market: Market, blockDifference: BigInt,
 export function accrueInterestsOnBalances(market: Market, blockDifference: BigInt): void {
   let blocksPerYear = getOrCreateCircularBuffer().blocksPerDay.times(BigDecimal.fromString(DAYS_PER_YEAR.toString()));
 
-  let accruedSupplyInterest = market.inputTokenBalances[0]
+  let depositRate = getOrCreateRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, market.id).rate;
+  let accruedSupplyInterest = market.inputTokenBalance
     .toBigDecimal()
-    .times(market.depositRate.div(blocksPerYear))
+    .times(depositRate.div(blocksPerYear))
     .times(blockDifference.toBigDecimal());
-  let newInterestBigInt = BigInt.fromString(accruedSupplyInterest.truncate(0).toString());
-  market.inputTokenBalances = [market.inputTokenBalances[0].plus(newInterestBigInt)];
+  let newDepositInterest = BigInt.fromString(accruedSupplyInterest.truncate(0).toString());
+  market.inputTokenBalance = market.inputTokenBalance.plus(newDepositInterest);
 
-  let accruedBorrowedInterest = market._totalBorrowNative
+  let borrowRate = getOrCreateRate(InterestRateSide.BORROWER, InterestRateType.VARIABLE, market.id).rate;
+  let accruedBorrowedInterest = market._currentBorrowBalance
     .toBigDecimal()
-    .times(market.variableBorrowRate.div(blocksPerYear))
+    .times(borrowRate.div(blocksPerYear))
     .times(blockDifference.toBigDecimal());
-  let newBorrowInterestBigInt = BigInt.fromString(accruedBorrowedInterest.truncate(0).toString());
-  market._totalBorrowNative = market._totalBorrowNative.plus(newBorrowInterestBigInt);
+  let newBorrowInterest = BigInt.fromString(accruedBorrowedInterest.truncate(0).toString());
+  market._currentBorrowBalance = market._currentBorrowBalance.plus(newBorrowInterest);
 
   market.save();
 }
 
 export function updateMarketPrices(market: Market, event: ethereum.Event): void {
-  let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
+  let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let mantissaFactorBD = exponentToBigDecimal(DEFAULT_DECIMALS);
   let exchangeRate = getExchangeRate(Address.fromString(market.id));
 
@@ -432,14 +438,14 @@ export function updateMarketPrices(market: Market, event: ethereum.Event): void 
    *    - must multiply by cTokenDecimals, so 10^COMPOUND_DECIMALS
    *    - must divide by mantissaFactorBD, so 10^18
    */
-  market._exchangeRate = exchangeRate
+  market.exchangeRate = exchangeRate
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingDecimals))
     .times(exponentToBigDecimal(COMPOUND_DECIMALS))
     .div(mantissaFactorBD)
     .truncate(DEFAULT_DECIMALS);
-  market.inputTokenPricesUSD = [getUSDPriceOfToken(market, event.block.number.toI32())];
-  market.outputTokenPriceUSD = market._exchangeRate.times(market.inputTokenPricesUSD[0]);
+  market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
+  market.outputTokenPriceUSD = market.exchangeRate!.times(market.inputTokenPriceUSD);
 
   market.save();
 }
@@ -451,12 +457,12 @@ export function updateProtocolTVL(event: ethereum.Event): void {
   // loop through each market
   for (let i = 0; i < protocol._marketIds.length; i++) {
     let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
-    market.inputTokenPricesUSD = [getUSDPriceOfToken(market, event.block.number.toI32())];
-    let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
-    market.totalValueLockedUSD = market.inputTokenBalances[0]
+    market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
+    let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
+    market.totalValueLockedUSD = market.inputTokenBalance
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingDecimals))
-      .times(market.inputTokenPricesUSD[0]);
+      .times(market.inputTokenPriceUSD);
     totalValueLockedUSD = totalValueLockedUSD.plus(market.totalValueLockedUSD);
     market.save();
   }
@@ -470,16 +476,17 @@ export function updateTotalBorrowUSD(event: ethereum.Event): void {
 
   for (let i = 0; i < protocol._marketIds.length; i++) {
     let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
-    let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
-    market.totalBorrowUSD = market._totalBorrowNative
+    market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
+    let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
+    market.totalBorrowBalanceUSD = market._currentBorrowBalance
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingDecimals))
-      .times(market.inputTokenPricesUSD[0])
+      .times(market.inputTokenPriceUSD)
       .truncate(DEFAULT_DECIMALS);
-    totalBorrowUSD = totalBorrowUSD.plus(market.totalBorrowUSD);
+    totalBorrowUSD = totalBorrowUSD.plus(market.totalBorrowBalanceUSD);
     market.save();
   }
-  protocol.totalBorrowUSD = totalBorrowUSD;
+  protocol.totalBorrowBalanceUSD = totalBorrowUSD;
   protocol.save();
 }
 
@@ -489,16 +496,17 @@ export function updateTotalDepositUSD(event: ethereum.Event): void {
 
   for (let i = 0; i < protocol._marketIds.length; i++) {
     let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
-    let underlyingDecimals = getOrCreateToken(market.inputTokens[0]).decimals;
-    market.totalDepositUSD = market.inputTokenBalances[0]
+    market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
+    let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
+    market.totalDepositBalanceUSD = market.inputTokenBalance
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingDecimals))
-      .times(market.inputTokenPricesUSD[0])
+      .times(market.inputTokenPriceUSD)
       .truncate(DEFAULT_DECIMALS);
-    totalDepositUSD = totalDepositUSD.plus(market.totalDepositUSD);
+    totalDepositUSD = totalDepositUSD.plus(market.totalDepositBalanceUSD);
     market.save();
   }
-  protocol.totalDepositUSD = totalDepositUSD;
+  protocol.totalDepositBalanceUSD = totalDepositUSD;
   protocol.save();
 }
 
@@ -509,15 +517,15 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
     let rewardTokenDeposit: RewardToken | null = null;
     // check if market has COMP reward tokens
     if (market.rewardTokens == null) {
-      rewardTokenDeposit = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.DEPOSIT);
-      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
+      rewardTokenDeposit = getOrCreateRewardToken(RewardTokenType.DEPOSIT);
+      rewardTokenBorrow = getOrCreateRewardToken(RewardTokenType.BORROW);
       market.rewardTokens = [rewardTokenDeposit.id, rewardTokenBorrow.id];
     }
     // get COMP distribution/block
     if (rewardTokenBorrow == null) {
-      rewardTokenBorrow = getOrCreateRewardToken(market.id, Address.fromString(COMP_ADDRESS), RewardTokenType.BORROW);
+      rewardTokenBorrow = getOrCreateRewardToken(RewardTokenType.BORROW);
     }
-    let rewardDecimals = rewardTokenBorrow.decimals;
+    let rewardDecimals = getOrCreateToken(rewardTokenBorrow.token).decimals;
     let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
     let blocksPerDay = BigInt.fromString(getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString());
     let tryDistribution = troller.try_compSpeeds(event.address);
@@ -528,7 +536,7 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
     // cCOMP was made at this block height 10960099
     if (event.block.number.toI32() > 10960099) {
       let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
-      compPriceUSD = compMarket.inputTokenPricesUSD[0];
+      compPriceUSD = compMarket.inputTokenPriceUSD;
     } else {
       // try to get COMP price between blocks 10271924 - 10960099 using price oracle library
       compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS), event.block.number.toI32()).usdPrice.div(
@@ -549,18 +557,20 @@ export function updateMarketRates(market: Market): void {
 
   let contract = CToken.bind(Address.fromString(market.id));
   let trySupplyRatePerBlock = contract.try_supplyRatePerBlock();
-  market.depositRate = trySupplyRatePerBlock.reverted
+  let depositRate = getOrCreateRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, market.id);
+  let borrowRate = getOrCreateRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, market.id);
+  depositRate.rate = trySupplyRatePerBlock.reverted
     ? BIGDECIMAL_ZERO
     : convertBlockRateToAPY(trySupplyRatePerBlock.value);
+  depositRate.save();
 
   // update borrow rates
   // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
   let tryBorrowRatePerBlock = contract.try_borrowRatePerBlock();
-  market.variableBorrowRate = tryBorrowRatePerBlock.reverted
+  borrowRate.rate = tryBorrowRatePerBlock.reverted
     ? BIGDECIMAL_ZERO
     : convertBlockRateToAPY(tryBorrowRatePerBlock.value);
-
-  market.save();
+  borrowRate.save();
 }
 
 // APY rate calculation explained here: https://compound.finance/docs#protocol-math

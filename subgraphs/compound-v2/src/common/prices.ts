@@ -20,7 +20,7 @@ import { exponentToBigDecimal } from "./utils/utils";
 // returns the token price
 export function getUSDPriceOfToken(market: Market, blockNumber: i32): BigDecimal {
   let cTokenAddress = market.id;
-  let getToken = Token.load(market.inputTokens[0]);
+  let getToken = Token.load(market.inputToken);
   if (getToken == null) {
     log.error("Couldn't find input token for market {}", [market.id]);
     return BIGDECIMAL_ZERO;

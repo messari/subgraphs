@@ -15,7 +15,8 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 // get the amount in underlying token from cToken
 export function getExchangeRate(marketAddress: Address): BigInt {
   let cTokenContract = CToken.bind(marketAddress);
-  return cTokenContract.exchangeRateStored();
+  let tryExchangeRate = cTokenContract.try_exchangeRateStored();
+  return tryExchangeRate.reverted ? BIGINT_ZERO : tryExchangeRate.value;
 }
 
 // (a/b)^n where n [0, 255]

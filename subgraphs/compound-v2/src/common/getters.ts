@@ -293,7 +293,6 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
 
     // populate quantitative data
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    market._currentDepositBalance = BIGINT_ZERO;
     market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
     market._currentBorrowBalance = BIGINT_ZERO;
