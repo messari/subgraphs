@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
-import { ERC20 } from "../../generated/UniswapV2Factory/ERC20";
-import { ERC20SymbolBytes } from "../../generated/UniswapV2Factory/ERC20SymbolBytes";
-import { ERC20NameBytes } from "../../generated/UniswapV2Factory/ERC20NameBytes";
+import { ERC20 } from "../../generated/Pool/ERC20";
+import { ERC20SymbolBytes } from "../../generated/Pool/ERC20SymbolBytes";
+import { ERC20NameBytes } from "../../generated/Pool/ERC20NameBytes";
 import { Address } from "@graphprotocol/graph-ts";
 
 export const INVALID_TOKEN_DECIMALS = 9999;

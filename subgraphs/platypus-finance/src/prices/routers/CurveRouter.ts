@@ -3,7 +3,7 @@ import { getPriceUsdc } from "./SushiSwapRouter";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/UniswapV2Factory/CurveRegistry";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/Pool/CurveRegistry";
 
 export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string): CustomPriceType {
   let tokensMapping = constants.WHITELIST_TOKENS_MAP.get(network);

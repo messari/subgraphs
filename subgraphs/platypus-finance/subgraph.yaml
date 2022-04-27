@@ -99,6 +99,8 @@ dataSources:
           file: ./abis/router.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: PricesERC20
+          file: ./abis/Prices/ERC20.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
         - name: CalculationsCurve
@@ -177,7 +179,7 @@ dataSources:
         - name: Router
           file: ./abis/router.json
         - name: ERC20
-          file: ./abis/ERC20.json
+          file: ./abis/Prices/ERC20.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
         - name: CalculationsCurve

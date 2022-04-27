@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { UniswapPair__getReservesResult } from "../../../generated/UniswapV2Factory/UniswapPair";
-import { SushiSwapPair__getReservesResult } from "../../../generated/UniswapV2Factory/SushiSwapPair";
+import { UniswapPair__getReservesResult } from "../../../generated/Pool/UniswapPair";
+import { SushiSwapPair__getReservesResult } from "../../../generated/Pool/SushiSwapPair";
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// COMMON ////////////////////////////////

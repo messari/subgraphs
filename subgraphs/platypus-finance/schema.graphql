@@ -740,13 +740,13 @@ type LiquidityPoolParamsHelper @entity {
   Oracle: String!
 
   " SlippageParams for this pool"
-  SlippageParamsK: BigInt!
-  SlippageParamsN: BigInt!
-  SlippageParamsC1: BigInt!
-  SlippageParamsXThreshold: BigInt!
-  RetentionRatio: BigInt!
-  PriceDeviation: BigInt!
-  HaircutRate: BigInt!
+  SlippageParamsK: BigDecimal!
+  SlippageParamsN: BigDecimal!
+  SlippageParamsC1: BigDecimal!
+  SlippageParamsXThreshold: BigDecimal!
+  RetentionRatio: BigDecimal!
+  PriceDeviation: BigDecimal!
+  HaircutRate: BigDecimal!
 }
 
 type Asset @entity {

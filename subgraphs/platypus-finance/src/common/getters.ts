@@ -15,7 +15,9 @@ import {
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import { BIGDECIMAL_ZERO, Network, INT_ZERO, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY } from "../common/constants";
 import { getDays, getHours } from "./utils/datetime";
+import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
+
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -38,13 +40,13 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     let poolParam = new LiquidityPoolParamsHelper(poolAddress.toHexString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
-    poolParam.SlippageParamsK = new BigInt(0.00002e18);
-    poolParam.SlippageParamsN = new BigInt(7);
-    poolParam.SlippageParamsC1 = new BigInt(376927610599998308);
-    poolParam.SlippageParamsXThreshold = new BigInt(329811659274998519);
-    poolParam.HaircutRate = new BigInt(0.0003e18);
-    poolParam.RetentionRatio = new BigInt(10 ** 18);
-    poolParam.PriceDeviation = new BigInt(0.02e18);
+    poolParam.SlippageParamsK = BigDecimal.fromString('0.00002e18');
+    poolParam.SlippageParamsN = BigDecimal.fromString('7');
+    poolParam.SlippageParamsC1 = BigDecimal.fromString('376927610599998308');
+    poolParam.SlippageParamsXThreshold = BigDecimal.fromString('329811659274998519');
+    poolParam.HaircutRate = BigDecimal.fromString('0.0003e18');
+    poolParam.RetentionRatio =  exponentToBigDecimal(18);
+    poolParam.PriceDeviation = BigDecimal.fromString('0.02e18');
 
     poolParam.save();
     pool.save();
@@ -191,5 +193,5 @@ export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddres: Addr
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
-  return token.lastPriceUSD;
+  return token.lastPriceUSD!;
 }

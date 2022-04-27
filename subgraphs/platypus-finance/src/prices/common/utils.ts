@@ -1,5 +1,5 @@
 import * as constants from "./constants";
-import { ERC20 } from "../../../generated/UniswapV2Factory/ERC20";
+import { PricesERC20 } from "../../../generated/Pool/PricesERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
@@ -7,7 +7,7 @@ export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = ERC20.bind(tokenAddr);
+  const token = PricesERC20.bind(tokenAddr);
 
   let decimals = readValue<BigInt>(token.try_decimals(), constants.DEFAULT_DECIMALS);
 
