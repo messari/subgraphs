@@ -4,12 +4,13 @@ import {
   getOrCreateLendingProtcol,
   getOrCreateMarket,
   getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
 } from "./getters";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./utils/constants";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./utils/constants";
 
 ///////////////////////////
 //// Snapshot Entities ////
@@ -23,7 +24,6 @@ export function updateFinancials(event: ethereum.Event): void {
 
   // update vars
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
   financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
   financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
   financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
@@ -40,7 +40,7 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 // update a given UsageMetricDailySnapshot
-export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: String): void {
+export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
@@ -96,8 +96,7 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 }
 
 // update a given MarketDailySnapshot
-export function updateMarketMetrics(event: ethereum.Event): void {
-  // Number of days since Unix epoch
+export function updateMarketDailyMetrics(event: ethereum.Event): void {
   let marketMetrics = getOrCreateMarketDailySnapshot(event);
   let market = getOrCreateMarket(event, event.address);
 
@@ -106,19 +105,52 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketMetrics.timestamp = event.block.timestamp;
 
   // update other vars
+  marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
-  marketMetrics.inputTokenBalances = market.inputTokenBalances;
-  let inputTokenPrices = marketMetrics.inputTokenPricesUSD;
-  inputTokenPrices[0] = market.inputTokenPricesUSD[0];
-  marketMetrics.inputTokenPricesUSD = inputTokenPrices;
+  marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
+  marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+  marketMetrics.inputTokenBalance = market.inputTokenBalance;
+  marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketMetrics.outputTokenSupply = market.outputTokenSupply;
   marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketMetrics.exchangeRate = market.exchangeRate;
   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
 
-  // lending-specific vars
-  marketMetrics.depositRate = market.depositRate;
-  marketMetrics.variableBorrowRate = market.variableBorrowRate;
+  // TODO update daily depost / borrow / liquidate in helpers.ts
+
+  marketMetrics.save();
+}
+
+// update a given MarketHourlySnapshot
+export function updateMarketHourlyMetrics(event: ethereum.Event): void {
+  let marketMetrics = getOrCreateMarketHourlySnapshot(event);
+  let market = getOrCreateMarket(event, event.address);
+
+  // update to latest block/timestamp
+  marketMetrics.blockNumber = event.block.number;
+  marketMetrics.timestamp = event.block.timestamp;
+
+  // update other vars
+  marketMetrics.rates = market.rates;
+  marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
+  marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
+  marketMetrics.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  marketMetrics.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  marketMetrics.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+  marketMetrics.inputTokenBalance = market.inputTokenBalance;
+  marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketMetrics.outputTokenSupply = market.outputTokenSupply;
+  marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketMetrics.exchangeRate = market.exchangeRate;
+  marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+  marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+  // TODO update hourly depost / borrow / liquidate in helpers.ts
 
   marketMetrics.save();
 }
@@ -130,21 +162,21 @@ export function updateMarketMetrics(event: ethereum.Event): void {
 function updateTransactionCount(
   dailyUsage: UsageMetricsDailySnapshot,
   hourlyUsage: UsageMetricsHourlySnapshot,
-  transaction: String,
+  transaction: string,
 ): void {
-  if (transaction == "deposit") {
+  if (transaction == TransactionType.DEPOSIT) {
     hourlyUsage.hourlyDepositCount += 1;
     dailyUsage.dailyDepositCount += 1;
-  } else if (transaction == "withdraw") {
+  } else if (transaction == TransactionType.WITHDRAW) {
     hourlyUsage.hourlyWithdrawCount += 1;
     dailyUsage.dailyWithdrawCount += 1;
-  } else if (transaction == "borrow") {
+  } else if (transaction == TransactionType.BORROW) {
     hourlyUsage.hourlyBorrowCount += 1;
     dailyUsage.dailyBorrowCount += 1;
-  } else if (transaction == "repay") {
+  } else if (transaction == TransactionType.REPAY) {
     hourlyUsage.hourlyRepayCount += 1;
     dailyUsage.dailyRepayCount += 1;
-  } else if (transaction == "liquidate") {
+  } else if (transaction == TransactionType.LIQUIDATE) {
     hourlyUsage.hourlyLiquidateCount += 1;
     dailyUsage.dailyLiquidateCount += 1;
   }

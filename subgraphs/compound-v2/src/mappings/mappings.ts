@@ -6,11 +6,16 @@ import {
   NewLiquidationIncentive,
   NewPriceOracle,
 } from "../../generated/Comptroller/Comptroller";
-import { createBorrow, createDeposit, createLiquidation, createRepay, createWithdraw } from "./helpers";
+import { createBorrow, createDeposit, createLiquidate, createRepay, createWithdraw } from "./helpers";
 import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/CToken/CToken";
 import { CToken } from "../../generated/templates";
 import { NewReserveFactor } from "../../generated/Comptroller/CToken";
-import { updateFinancials, updateMarketMetrics, updateUsageMetrics } from "../common/metrics";
+import {
+  updateFinancials,
+  updateMarketDailyMetrics,
+  updateMarketHourlyMetrics,
+  updateUsageMetrics,
+} from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
 import { Address } from "@graphprotocol/graph-ts";
@@ -19,43 +24,48 @@ import {
   BIGDECIMAL_ZERO,
   COLLATERAL_FACTOR_OFFSET,
   DEFAULT_DECIMALS,
+  TransactionType,
 } from "../common/utils/constants";
 
 export function handleMint(event: Mint): void {
   if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
-    updateUsageMetrics(event, event.params.minter);
+    updateUsageMetrics(event, event.params.minter, TransactionType.DEPOSIT);
     updateFinancials(event);
-    updateMarketMetrics(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
   }
 }
 
 export function handleRedeem(event: Redeem): void {
   if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount, event.params.redeemTokens)) {
-    updateUsageMetrics(event, event.params.redeemer);
+    updateUsageMetrics(event, event.params.redeemer, TransactionType.WITHDRAW);
     updateFinancials(event);
-    updateMarketMetrics(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
   }
 }
 
 export function handleBorrow(event: Borrow): void {
   if (createBorrow(event, event.params.borrower, event.params.borrowAmount)) {
-    updateUsageMetrics(event, event.params.borrower);
+    updateUsageMetrics(event, event.params.borrower, TransactionType.BORROW);
     updateFinancials(event);
-    updateMarketMetrics(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
   }
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
   if (createRepay(event, event.params.payer, event.params.repayAmount)) {
-    updateUsageMetrics(event, event.params.payer);
+    updateUsageMetrics(event, event.params.payer, TransactionType.REPAY);
     updateFinancials(event);
-    updateMarketMetrics(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
   }
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   if (
-    createLiquidation(
+    createLiquidate(
       event,
       event.params.cTokenCollateral,
       event.params.liquidator,
@@ -63,9 +73,10 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
       event.params.repayAmount,
     )
   ) {
-    updateUsageMetrics(event, event.params.liquidator);
+    updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
     updateFinancials(event);
-    updateMarketMetrics(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
   }
 }
 

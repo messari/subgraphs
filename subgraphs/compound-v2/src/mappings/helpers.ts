@@ -268,7 +268,7 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
 }
 
 // create Liquidation entity, return false if any markets are null
-export function createLiquidation(
+export function createLiquidate(
   event: ethereum.Event,
   liquidatedToken: Address,
   liquidator: Address,
@@ -290,7 +290,7 @@ export function createLiquidation(
   let id = transactionHash + "-" + logIndex.toString();
 
   // create liquidation entity
-  let liquidation = new Liquidation(id);
+  let liquidation = new Liquidate(id);
 
   // populate liquidations vars
   liquidation.hash = transactionHash;
@@ -531,14 +531,7 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
       compPriceUSD = compMarket.inputTokenPricesUSD[0];
     } else {
       // try to get COMP price between blocks 10271924 - 10960099 using price oracle library
-      compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS)).usdPrice.div(
-        exponentToBigDecimal(USDC_DECIMALS),
-      );
-    }
-
-    if (compPriceUSD == BIGDECIMAL_ZERO) {
-      // try again if cCOMP didn't return the price properly for some reason in the future
-      compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS)).usdPrice.div(
+      compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS), event.block.number.toI32()).usdPrice.div(
         exponentToBigDecimal(USDC_DECIMALS),
       );
     }

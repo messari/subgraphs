@@ -81,6 +81,14 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace TransactionType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATE = "LIQUIDATE";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -150,7 +158,7 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.toBigDecimal().times(new BigDecimal(Big
 
 export const NETWORK_ETHEREUM = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
-export const LENDING_TYPE = LendingType.CDP;
+export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
