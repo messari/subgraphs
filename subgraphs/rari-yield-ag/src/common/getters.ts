@@ -86,28 +86,3 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
   }
   return financialMetrics;
 }
-
-/////////////////////////////////////
-///// Yield Aggregator Specific /////
-/////////////////////////////////////
-
-export function getOrCreateToken(tokenAddress: string): Token {
-  let token = Token.load(tokenAddress);
-
-  if (token == null) {
-    token = new Token(tokenAddress);
-
-    // check for ETH token - unique
-    if (tokenAddress == ETH_ADDRESS) {
-      token.name = ETH_NAME;
-      token.symbol = ETH_SYMBOL;
-      token.decimals = DEFAULT_DECIMALS;
-    } else {
-      token.name = getAssetName(Address.fromString(tokenAddress));
-      token.symbol = getAssetSymbol(Address.fromString(tokenAddress));
-      token.decimals = getAssetDecimals(Address.fromString(tokenAddress));
-    }
-    token.save();
-  }
-  return token;
-}

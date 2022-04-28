@@ -4,41 +4,24 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: TODO
+    name: RariYieldFundManager
     network: mainnet
     source:
-      address: "TODO"
-      abi: TODO
-      startBlock: TODO
+      address: "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6"
+      abi: ./abis/yield-pool/RariYieldFundManager.json
+      startBlock: 11094078
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/mappings.ts
       entities:
-        - TODO
+        - Deposit
+        - Withdraw
       abis:
-        - name: TODO
-          file: TODO
+        - name: RariYieldFundManager
+          file: ./abis/yield-pool/RariYieldFundManager.json
       eventHandlers:
-        - event: TODO
-          handler: TODO
-templates:
-  - name: TODO
-    kind: ethereum/contract
-    network: mainnet
-    source:
-      abi: TODO
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/mappings.ts
-      entities:
-        - TODO
-      abis:
-        - name: TODO
-          file: TODO
-      eventHandlers:
-        - event: TODO
-          handler: TODO
+        - event: Deposit(string,address,address,uint256,uint256)
+          handler: handleYieldDeposit
+  - kind: # TODO

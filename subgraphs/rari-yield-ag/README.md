@@ -60,13 +60,17 @@ To be added
 
 Protocol: https://rari.capital/
 
-Docs: 
+Docs:
 
 - https://docs.rari.capital/yag/
 - https://info.rari.capital/products/earn/
 - https://info.rari.capital/risk/earn/
 
-Smart contracts: https://github.com/Rari-Capital/vaults
+Smart contracts:
+
+- [Yield Pool](https://github.com/Rari-Capital/rari-yield-pool-contracts)
+- [Ethereum Pool](https://github.com/Rari-Capital/rari-ethereum-pool-contracts)
+- [Stables _ie_ USDC/DAI/USDT/TUSD/BUSD/mUSD Pool](https://github.com/Rari-Capital/rari-stable-pool-contracts)
 
 Deployed addresses: https://docs.rari.capital/contracts/#rari-usdc-pool
 
