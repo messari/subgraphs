@@ -41,7 +41,7 @@ import {
   ZERO_ADDRESS,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { CToken } from "../../generated/Comptroller/CToken";
+import { CTokenNew } from "../../generated/Comptroller/CTokenNew";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { exponentToBigDecimal } from "./utils/utils";
 import { Comptroller } from "../../generated/Comptroller/Comptroller";
@@ -256,7 +256,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
 
   if (!market) {
     market = new Market(marketAddress.toHexString());
-    let cTokenContract = CToken.bind(marketAddress);
+    let cTokenContract = CTokenNew.bind(marketAddress);
     let underlyingAddress: string;
     let underlying = cTokenContract.try_underlying();
     if (marketAddress.toHexString().toLowerCase() == CETH_ADDRESS) {
@@ -309,7 +309,8 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
-    market._currentBlockNumber = event.block.number;
+    market._lastRateUpdateBlock = event.block.number;
+    market._lastRevenueUpdateBlock = event.block.number;
 
     // lending-specific data
     if (underlyingAddress == SAI_ADDRESS) {
@@ -330,7 +331,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
   return market;
 }
 
-export function getOrCreateCToken(tokenAddress: Address, cTokenContract: CToken): Token {
+export function getOrCreateCToken(tokenAddress: Address, cTokenContract: CTokenNew): Token {
   let cToken = Token.load(tokenAddress.toHexString());
 
   if (cToken == null) {

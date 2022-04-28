@@ -1,6 +1,6 @@
 // store common calculations
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CToken } from "../../../generated/templates/CToken/CToken";
+import { CTokenNew } from "../../../generated/Comptroller/CTokenNew";
 import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "./constants";
 
 // turn exponent into a BigDecimal number
@@ -14,7 +14,7 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
 
 // get the amount in underlying token from cToken
 export function getExchangeRate(marketAddress: Address): BigInt {
-  let cTokenContract = CToken.bind(marketAddress);
+  let cTokenContract = CTokenNew.bind(marketAddress);
   let tryExchangeRate = cTokenContract.try_exchangeRateStored();
   return tryExchangeRate.reverted ? BIGINT_ZERO : tryExchangeRate.value;
 }

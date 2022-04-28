@@ -6,10 +6,34 @@ import {
   NewLiquidationIncentive,
   NewPriceOracle,
 } from "../../generated/Comptroller/Comptroller";
-import { createBorrow, createDeposit, createLiquidate, createRepay, createWithdraw } from "./helpers";
-import { Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/CToken/CToken";
-import { CToken } from "../../generated/templates";
-import { NewReserveFactor } from "../../generated/Comptroller/CToken";
+import {
+  accrueInterestOnBorrow,
+  createBorrow,
+  createDeposit,
+  createLiquidate,
+  createRepay,
+  createWithdraw,
+  updatePrevBlockRevenues,
+} from "./helpers";
+import {
+  Mint as MintNew,
+  Redeem as RedeemNew,
+  Borrow as BorrowNew,
+  RepayBorrow as RepayBorrowNew,
+  LiquidateBorrow as LiquidateBorrowNew,
+  AccrueInterest as AccrueInterestNew,
+  NewReserveFactor as NewReserveFactorNew,
+} from "../../generated/templates/CTokenNew/CTokenNew";
+import {
+  Mint as MintOld,
+  Redeem as RedeemOld,
+  Borrow as BorrowOld,
+  RepayBorrow as RepayBorrowOld,
+  LiquidateBorrow as LiquidateBorrowOld,
+  AccrueInterest as AccrueInterestOld,
+  NewReserveFactor as NewReserveFactorOld,
+} from "../../generated/templates/CTokenOld/CTokenOld";
+import { CTokenOld, CTokenNew } from "../../generated/templates";
 import {
   updateFinancials,
   updateMarketDailyMetrics,
@@ -18,7 +42,7 @@ import {
 } from "../common/metrics";
 import { getOrCreateLendingProtcol, getOrCreateMarket } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ONEHUNDRED,
   BIGDECIMAL_ZERO,
@@ -27,62 +51,98 @@ import {
   TransactionType,
 } from "../common/utils/constants";
 
-export function handleMint(event: Mint): void {
-  if (createDeposit(event, event.params.mintAmount, event.params.mintTokens, event.params.minter)) {
-    updateUsageMetrics(event, event.params.minter, TransactionType.DEPOSIT);
-    updateFinancials(event);
-    updateMarketDailyMetrics(event);
-    updateMarketHourlyMetrics(event);
-  }
+//////////////////////////////////
+//// CTokenNew Level Handlers ////
+//////////////////////////////////
+
+export function handleMintNew(event: MintNew): void {
+  mint(event, event.params.mintAmount, event.params.mintTokens, event.params.minter);
 }
 
-export function handleRedeem(event: Redeem): void {
-  if (createWithdraw(event, event.params.redeemer, event.params.redeemAmount, event.params.redeemTokens)) {
-    updateUsageMetrics(event, event.params.redeemer, TransactionType.WITHDRAW);
-    updateFinancials(event);
-    updateMarketDailyMetrics(event);
-    updateMarketHourlyMetrics(event);
-  }
+export function handleRedeemNew(event: RedeemNew): void {
+  redeem(event, event.params.redeemer, event.params.redeemAmount, event.params.redeemTokens);
 }
 
-export function handleBorrow(event: Borrow): void {
-  if (createBorrow(event, event.params.borrower, event.params.borrowAmount)) {
-    updateUsageMetrics(event, event.params.borrower, TransactionType.BORROW);
-    updateFinancials(event);
-    updateMarketDailyMetrics(event);
-    updateMarketHourlyMetrics(event);
-  }
+export function handleBorrowNew(event: BorrowNew): void {
+  borrow(event, event.params.borrower, event.params.borrowAmount);
 }
 
-export function handleRepayBorrow(event: RepayBorrow): void {
-  if (createRepay(event, event.params.payer, event.params.repayAmount)) {
-    updateUsageMetrics(event, event.params.payer, TransactionType.REPAY);
-    updateFinancials(event);
-    updateMarketDailyMetrics(event);
-    updateMarketHourlyMetrics(event);
-  }
+export function handleRepayBorrowNew(event: RepayBorrowNew): void {
+  repayBorrow(event, event.params.payer, event.params.repayAmount);
 }
 
-export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  if (
-    createLiquidate(
-      event,
-      event.params.cTokenCollateral,
-      event.params.liquidator,
-      event.params.seizeTokens,
-      event.params.repayAmount,
-    )
-  ) {
-    updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
-    updateFinancials(event);
-    updateMarketDailyMetrics(event);
-    updateMarketHourlyMetrics(event);
-  }
+export function handleLiquidateBorrowNew(event: LiquidateBorrowNew): void {
+  liquidateBorrow(
+    event,
+    event.params.cTokenCollateral,
+    event.params.liquidator,
+    event.params.seizeTokens,
+    event.params.repayAmount,
+  );
 }
+
+export function handleNewReserveFactorNew(event: NewReserveFactorNew): void {
+  newReserveFactor(event, event.params.newReserveFactorMantissa);
+}
+
+// this version of AccrueInterest has 4 parameters
+export function handleAccrueInterestNew(event: AccrueInterestNew): void {
+  accrueInterest(event, event.params.totalBorrows);
+}
+
+//////////////////////////////////
+//// CTokenOld Level Handlers ////
+//////////////////////////////////
+
+export function handleMintOld(event: MintOld): void {
+  mint(event, event.params.mintAmount, event.params.mintTokens, event.params.minter);
+}
+
+export function handleRedeemOld(event: RedeemOld): void {
+  redeem(event, event.params.redeemer, event.params.redeemAmount, event.params.redeemTokens);
+}
+
+export function handleBorrowOld(event: BorrowOld): void {
+  borrow(event, event.params.borrower, event.params.borrowAmount);
+}
+
+export function handleRepayBorrowOld(event: RepayBorrowOld): void {
+  repayBorrow(event, event.params.payer, event.params.repayAmount);
+}
+
+export function handleLiquidateBorrowOld(event: LiquidateBorrowOld): void {
+  liquidateBorrow(
+    event,
+    event.params.cTokenCollateral,
+    event.params.liquidator,
+    event.params.seizeTokens,
+    event.params.repayAmount,
+  );
+}
+
+export function handleNewReserveFactorOld(event: NewReserveFactorOld): void {
+  newReserveFactor(event, event.params.newReserveFactorMantissa);
+}
+
+// this version of AccrueInterest has 4 parameters
+export function handleAccrueInterestOld(event: AccrueInterestOld): void {
+  accrueInterest(event, event.params.totalBorrows);
+}
+
+////////////////////////////////////
+//// Comptroller Level Handlers ////
+////////////////////////////////////
 
 export function handleMarketListed(event: MarketListed): void {
   // create new market now that the data source is instantiated
-  CToken.create(event.params.cToken);
+
+  // create CToken with new abi
+  if (event.block.number.toI32() >= 8983575) {
+    CTokenNew.create(event.params.cToken);
+  } else {
+    // create CToken with old abi
+    CTokenOld.create(event.params.cToken);
+  }
   let market = getOrCreateMarket(event, event.params.cToken);
 
   // add market to protocol marketId list
@@ -100,20 +160,6 @@ export function handleNewPriceOracle(event: NewPriceOracle): void {
 
   lendingProtocol._priceOracle = event.params.newPriceOracle;
   lendingProtocol.save();
-}
-
-export function handleNewReserveFactor(event: NewReserveFactor): void {
-  let market = getOrCreateMarket(event, event.address);
-
-  // update financials in case the reserve is updated and no other compound transactions happen in that block
-  // intended for capturing accurate revenues
-  updateFinancials(event);
-
-  // get reserve factor
-  market._reserveFactor = event.params.newReserveFactorMantissa
-    .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS));
-  market.save();
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
@@ -161,4 +207,77 @@ export function handleActionPaused(event: ActionPaused1): void {
   }
 
   market.save();
+}
+
+////////////////////////
+//// CToken Helpers ////
+////////////////////////
+
+function mint(event: ethereum.Event, mintAmount: BigInt, mintTokens: BigInt, minter: Address): void {
+  if (createDeposit(event, mintAmount, mintTokens, minter)) {
+    updateUsageMetrics(event, minter, TransactionType.DEPOSIT);
+    updateFinancials(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
+  }
+}
+
+function redeem(event: ethereum.Event, redeemer: Address, redeemAmount: BigInt, redeemTokens: BigInt): void {
+  if (createWithdraw(event, redeemer, redeemAmount, redeemTokens)) {
+    updateUsageMetrics(event, redeemer, TransactionType.WITHDRAW);
+    updateFinancials(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
+  }
+}
+
+function borrow(event: ethereum.Event, borrower: Address, borrowAmount: BigInt): void {
+  if (createBorrow(event, borrower, borrowAmount)) {
+    updateUsageMetrics(event, borrower, TransactionType.BORROW);
+    updateFinancials(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
+  }
+}
+
+function repayBorrow(event: ethereum.Event, payer: Address, repayAmount: BigInt): void {
+  if (createRepay(event, payer, repayAmount)) {
+    updateUsageMetrics(event, payer, TransactionType.REPAY);
+    updateFinancials(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
+  }
+}
+
+function liquidateBorrow(
+  event: ethereum.Event,
+  cTokenCollateral: Address,
+  liquidator: Address,
+  seizeTokens: BigInt,
+  repayAmount: BigInt,
+): void {
+  if (createLiquidate(event, cTokenCollateral, liquidator, seizeTokens, repayAmount)) {
+    updateUsageMetrics(event, liquidator, TransactionType.LIQUIDATE);
+    updateFinancials(event);
+    updateMarketDailyMetrics(event);
+    updateMarketHourlyMetrics(event);
+  }
+}
+
+function newReserveFactor(event: ethereum.Event, newReserveFactorMantissa: BigInt): void {
+  let market = getOrCreateMarket(event, event.address);
+
+  // update financials in case the reserve is updated and no other compound transactions happen in that block
+  // intended for capturing accurate revenues
+  let blockDiff = event.block.number.minus(market._lastRevenueUpdateBlock);
+  updatePrevBlockRevenues(market, blockDiff, event, market.totalBorrowBalanceUSD);
+  market._lastRevenueUpdateBlock = event.block.number;
+
+  // get reserve factor
+  market._reserveFactor = newReserveFactorMantissa.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  market.save();
+}
+
+function accrueInterest(event: ethereum.Event, totalBorrows: BigInt): void {
+  accrueInterestOnBorrow(event, totalBorrows);
 }
