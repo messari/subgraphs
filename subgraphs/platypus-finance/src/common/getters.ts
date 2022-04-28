@@ -31,11 +31,13 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateLiquidityPoolHelper(poolAddress: String): LiquidityPool {
+export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
   let pool = LiquidityPool.load(poolAddress.toString());
   // fetch info if null
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toString());
+    pool.protocol = getOrCreateDexAmm().id;
+
     let poolParam = new LiquidityPoolParamsHelper(poolAddress.toString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
@@ -51,10 +53,6 @@ export function getOrCreateLiquidityPoolHelper(poolAddress: String): LiquidityPo
     pool.save();
   }
   return pool;
-}
-
-export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
-  return getOrCreateLiquidityPoolHelper(poolAddress.toHexString());
 }
 
 export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {

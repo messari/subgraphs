@@ -14,7 +14,6 @@ import {
   getOrCreateHourlyUsageMetricSnapshot,
   getOrCreateLiquidityPool,
   getOrCreateLiquidityPoolDailySnapshot,
-  getOrCreateLiquidityPoolHelper,
   getOrCreateLiquidityPoolHourlySnapshot,
 } from "../common/getters";
 import { getDays, getHours } from "../common/utils/datetime";
@@ -25,14 +24,15 @@ export function updateProtocolTVL(event: ethereum.Event): void {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
 
   // loop through each pool and update total value locked in USD for protocol and each pool
-  for (let i = 0; i < protocol.pools.length; i++) {
-    let pool = getOrCreateLiquidityPoolHelper(protocol.pools[i]);
+  // for (let i = 0; i < protocol.pools.length; i++) {
+    // let pool = getOrCreateLiquidityPoolHelper(protocol.pools[i]);
     // pool TVL
     // fetch prices for all tokens
     // for each token poolTvl += inputBalanceForToken * getOrFetchPrice(token);
     // update pool tvl
     // pool.save()
-  }
+  // }
+
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
 }

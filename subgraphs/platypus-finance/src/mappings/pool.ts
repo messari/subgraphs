@@ -23,6 +23,12 @@ export function handleDeposit(event: Deposit): void {
   // 3. Update Protocol Usage Metrics - Timeseries
   // 4. Update Pool Metrics - Timeseries
 
+
+  // Pending
+  //  Update Token Balances in Pool Entity 
+  //  Update TVL for pools and protocol
+  //  HandleSwap Pending:
+  //  
   // Create Deposit
   createDeposit(
     event,
