@@ -79,15 +79,13 @@ export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetri
 
 export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 = (event.block.timestamp.toI64() - days * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the day
-  let id = days.toString() + "-" + hour.toString();
-  let usageMetrics = UsageMetricsHourlySnapshot.load(id);
+  let usageMetrics = UsageMetricsHourlySnapshot.load(hour.toString());
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsHourlySnapshot(id);
+    usageMetrics = new UsageMetricsHourlySnapshot(hour.toString());
     usageMetrics.protocol = COMPTROLLER_ADDRESS;
 
     usageMetrics.hourlyActiveUsers = 0;
@@ -142,10 +140,9 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
 }
 
 export function getOrCreateMarketHourlySnapshot(event: ethereum.Event): MarketHourlySnapshot {
-  let days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 = (event.block.timestamp.toI64() - days * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketAddress = event.address.toHexString();
-  let id = marketAddress + "-" + days.toString() + "-" + hour.toString();
+  let id = marketAddress + "-" + hour.toString();
   let marketMetrics = MarketHourlySnapshot.load(id);
 
   if (!marketMetrics) {
