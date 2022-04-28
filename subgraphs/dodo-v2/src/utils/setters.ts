@@ -87,19 +87,13 @@ export function setUSDpriceWETH(
 /////////////////////////////////////////////////
 
 export function setPriceLP(
-  event: ethereum.Event,
-  poolAdd: Address,
-  trader: Address
+  timestamp: BigInt,
+  blockNumber: BigInt,
+  poolAdd: Address
 ): void {
   let token = getOrCreateToken(poolAdd);
 
-  let pool = getOrCreatePool(
-    poolAdd,
-    poolAdd,
-    poolAdd,
-    event.block.number,
-    event.block.timestamp
-  );
+  let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, blockNumber, timestamp);
 
   let tokens = pool.inputTokens;
 
@@ -125,7 +119,7 @@ export function setPriceLP(
   let totalSupplyLP = lpToken.totalSupply();
   let valueOfOneLP = safeDiv(totalValPool, bigIntToBigDecimal(totalSupplyLP));
   token.lastPriceUSD = valueOfOneLP;
-  token.lastPriceBlockNumber = event.block.number;
+  token.lastPriceBlockNumber = blockNumber;
 
   token.save();
 }

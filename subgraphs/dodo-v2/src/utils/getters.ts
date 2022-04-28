@@ -46,7 +46,7 @@ import { CP } from "../../generated/CP/CP";
 import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
 
-import { setUSDprice } from "./setters";
+import { setPriceLP } from "./setters";
 
 export function getOrCreateRewardToken(rewardToken: Address): Token {
   let token = getOrCreateToken(rewardToken);
@@ -116,6 +116,7 @@ export function getOrCreatePool(
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
   let lpToken = getOrCreateToken(poolAddress);
+  setPriceLP(timestamp, blockNumber, poolAddress);
 
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toHex());

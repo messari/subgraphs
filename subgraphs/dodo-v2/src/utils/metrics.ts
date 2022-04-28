@@ -226,7 +226,7 @@ export function updatePoolMetrics(
 
   let feesArray = updateFees(event, poolAdd, usdValueOfTransaction, trader);
   updateFinancials(event, usdValofPool, tvUSD, feesArray);
-  setPriceLP(event, poolAdd, trader);
+  setPriceLP(event.block.timestamp, event.block.number, poolAdd);
   poolMetrics.save();
   pool.save();
 }
