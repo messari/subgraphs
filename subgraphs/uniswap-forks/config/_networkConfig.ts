@@ -16,9 +16,6 @@ let PROTOCOL_NAME_TEMP = Protocol.UNISWAPV2;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let PROTOCOL_SLUG_TEMP: string;
 let NETWORK_TEMP: string; // The deployed network(e.g BSC or Polygon )
-let PROTOCOL_SCHEMA_VERSION_TEMP: string;
-let PROTOCOL_SUBGRAPH_VERSION_TEMP: string;
-let PROTOCOL_METHODOLOGY_VERSION_TEMP: string;
 
 let FACTORY_ADDRESS_TEMP: string; // factory address of the protocol in the network
 let FACTORY_CONTRACT_TEMP: Factory; // Factory Contract of protocol in the network
@@ -46,9 +43,6 @@ let UNTRACKED_PAIRS_TEMP: string[]; // rebass tokens, dont count in tracked volu
 if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.MAINNET.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "uniswap-v2";
   NETWORK_TEMP = Network.MAINNET;
-  PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
-  PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
-  PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
 
   FACTORY_ADDRESS_TEMP = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
@@ -102,9 +96,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.MATIC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.MATIC;
-  PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
-  PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
-  PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
 
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
@@ -143,9 +134,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.BSC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.BSC;
-  PROTOCOL_SCHEMA_VERSION_TEMP = "1.2.0";
-  PROTOCOL_SUBGRAPH_VERSION_TEMP = "1.0.2";
-  PROTOCOL_METHODOLOGY_VERSION_TEMP = "1.0.0";
 
   FACTORY_ADDRESS_TEMP = "0xCf083Be4164828f00cAE704EC15a36D711491284";
   FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
@@ -191,9 +179,6 @@ export namespace NetworkConfigs {
   export const PROTOCOL_NAME = PROTOCOL_NAME_TEMP;
   export const PROTOCOL_SLUG = PROTOCOL_SLUG_TEMP;
   export const NETWORK = NETWORK_TEMP;
-  export const PROTOCOL_SCHEMA_VERSION = PROTOCOL_SCHEMA_VERSION_TEMP;
-  export const PROTOCOL_SUBGRAPH_VERSION = PROTOCOL_SUBGRAPH_VERSION_TEMP;
-  export const PROTOCOL_METHODOLOGY_VERSION = PROTOCOL_METHODOLOGY_VERSION_TEMP;
 
   export const FACTORY_ADDRESS = FACTORY_ADDRESS_TEMP;
   export const FACTORY_CONTRACT = FACTORY_CONTRACT_TEMP;

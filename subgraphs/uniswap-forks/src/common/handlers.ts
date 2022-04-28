@@ -59,9 +59,3 @@ export function handleTransferBurn(event: ethereum.Event, value: BigInt, from: s
   transfer.save();
   pool.save();
 }
-
-export function savePoolId(poolAddress: string): void {
-  let protocol = getOrCreateDex();
-  protocol._poolIds.push(poolAddress);
-  protocol.save();
-}

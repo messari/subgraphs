@@ -7,7 +7,6 @@ import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, 
 import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken, getLiquidityPoolAmounts } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
-import { savePoolId } from "./handlers";
 import { NetworkConfigs } from "../../config/_networkConfig";
 import { getTrackedVolumeUSD } from "./price/price";
 
@@ -76,7 +75,6 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
 
   poolAmounts.inputTokens = [token0.id, token1.id];
   poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
-  savePoolId(poolAddress);
 
   // Used to track the number of deposits in a liquidity pool
   let poolDeposits = new _HelperStore(poolAddress);
