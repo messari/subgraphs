@@ -6,7 +6,7 @@
 - https://alchemix-finance.gitbook.io/v2/
 - Add here
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
@@ -20,7 +20,7 @@ Ignores ALCX staked.
 
 Sum across all Vaults:
 
-`Harvested Yield on TVL + Transmuter`
+`Harvested Yield on TVL + Harvested Yield on Transmuter Funds`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
@@ -36,7 +36,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Vaults
 
-`(Harvested Yield on TVL + Transmuter) * 90%`
+`(Harvested Yield on TVL + Harvested Yield on Transmuter Funds) * 90%`
 
 ### Total Unique Users
 
