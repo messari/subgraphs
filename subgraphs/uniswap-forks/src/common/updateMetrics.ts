@@ -20,6 +20,8 @@ import {
   getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateToken,
   getOrCreateTokenWhitelist,
+  getOrCreateUsageMetricDailySnapshot,
+  getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
 import {
   BIGDECIMAL_HUNDRED,
@@ -53,7 +55,35 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetricsDaily.save();
 }
 
-export function updateUsageMetrics(event: ethereum.Event, from: string, usageType: string): void {
+// Update usage metrics entities
+export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, usageType: string): void {
+  let from = fromAddress.toHexString();
+
+  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
+  let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
+
+  let protocol = getOrCreateDex();
+
+  // Update the block number and timestamp to that of the last transaction of that day
+  usageMetricsDaily.blockNumber = event.block.number;
+  usageMetricsDaily.timestamp = event.block.timestamp;
+  usageMetricsDaily.dailyTransactionCount += INT_ONE;
+
+  usageMetricsHourly.blockNumber = event.block.number;
+  usageMetricsHourly.timestamp = event.block.timestamp;
+  usageMetricsHourly.hourlyTransactionCount += INT_ONE;
+
+  if (usageType == UsageType.DEPOSIT) {
+    usageMetricsDaily.dailyDepositCount += INT_ONE;
+    usageMetricsHourly.hourlyDepositCount += INT_ONE;
+  } else if (usageType == UsageType.WITHDRAW) {
+    usageMetricsDaily.dailyWithdrawCount += INT_ONE;
+    usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
+  } else if (usageType == UsageType.SWAP) {
+    usageMetricsDaily.dailySwapCount += INT_ONE;
+    usageMetricsHourly.hourlySwapCount += INT_ONE;
+  }
+
   // Number of days since Unix epoch
   let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
@@ -61,52 +91,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: string, usageTyp
   let dayId = day.toString();
   let hourId = hour.toString();
 
-  let usageMetricsDaily = UsageMetricsDailySnapshot.load(dayId);
-  let usageMetricsHourly = UsageMetricsHourlySnapshot.load(dayId.concat(hourId));
-
-  let protocol = getOrCreateDex();
-
-  if (!usageMetricsDaily) {
-    usageMetricsDaily = new UsageMetricsDailySnapshot(dayId);
-    usageMetricsDaily.protocol = NetworkConfigs.FACTORY_ADDRESS;
-    usageMetricsDaily.dailyActiveUsers = INT_ZERO;
-    usageMetricsDaily.cumulativeUniqueUsers = INT_ZERO;
-    usageMetricsDaily.dailyTransactionCount = INT_ZERO;
-  }
-
-  if (!usageMetricsHourly) {
-    usageMetricsHourly = new UsageMetricsHourlySnapshot(dayId.concat(hourId));
-    usageMetricsHourly.protocol = NetworkConfigs.FACTORY_ADDRESS;
-    usageMetricsHourly.hourlyActiveUsers = INT_ZERO;
-    usageMetricsHourly.cumulativeUniqueUsers = INT_ZERO;
-    usageMetricsHourly.hourlyTransactionCount = INT_ZERO;
-  }
-
-  // Update the block number and timestamp to that of the last transaction of that day
-  usageMetricsDaily.blockNumber = event.block.number;
-  usageMetricsDaily.timestamp = event.block.timestamp;
-  usageMetricsDaily.dailyTransactionCount += INT_ONE;
-  if (usageType == UsageType.DEPOSIT) {
-    usageMetricsDaily.dailyDepositCount += INT_ONE;
-  } else if (usageType == UsageType.WITHDRAW) {
-    usageMetricsDaily.dailyWithdrawCount += INT_ONE;
-  } else if (usageType == UsageType.SWAP) {
-    usageMetricsDaily.dailySwapCount += INT_ONE;
-  }
-
-  usageMetricsHourly.blockNumber = event.block.number;
-  usageMetricsHourly.timestamp = event.block.timestamp;
-  usageMetricsHourly.hourlyTransactionCount += INT_ONE;
-  if (usageType == UsageType.DEPOSIT) {
-    usageMetricsHourly.hourlyDepositCount += INT_ONE;
-  } else if (usageType == UsageType.WITHDRAW) {
-    usageMetricsHourly.hourlyWithdrawCount += INT_ONE;
-  } else if (usageType == UsageType.SWAP) {
-    usageMetricsHourly.hourlySwapCount += INT_ONE;
-  }
-
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = dayId.concat(from);
+  let dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -114,7 +100,11 @@ export function updateUsageMetrics(event: ethereum.Event, from: string, usageTyp
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = dayId.concat(hourId).concat(from);
+  let hourlyActiveAccountId = from
+    .concat("-")
+    .concat(dayId)
+    .concat("-")
+    .concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);

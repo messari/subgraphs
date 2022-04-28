@@ -16,8 +16,9 @@ import {
   Token,
   RewardToken,
   LiquidityPoolHourlySnapshot,
+  UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType, BIGINT_ZERO } from "./constants";
+import { BIGDECIMAL_ZERO, INT_ZERO, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS, RewardTokenType, BIGINT_ZERO, SECONDS_PER_HOUR } from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
@@ -105,24 +106,26 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
   return usageMetrics;
 }
-
-export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
+  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+
+  let dayId = day.toString();
+  let hourId = hour.toString();
   // Create unique id for the day
-  let usageMetrics = UsageMetricsDailySnapshot.load(id);
+  let usageMetrics = UsageMetricsHourlySnapshot.load(dayId.concat("-").concat(hourId));
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(id);
+    usageMetrics = new UsageMetricsHourlySnapshot(dayId.concat("-").concat(hourId));
     usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
 
-    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
-    usageMetrics.dailyTransactionCount = INT_ZERO;
-    usageMetrics.dailyDepositCount = INT_ZERO;
-    usageMetrics.dailyWithdrawCount = INT_ZERO;
-    usageMetrics.dailySwapCount = INT_ZERO;
+    usageMetrics.hourlyTransactionCount = INT_ZERO;
+    usageMetrics.hourlyDepositCount = INT_ZERO;
+    usageMetrics.hourlyWithdrawCount = INT_ZERO;
+    usageMetrics.hourlySwapCount = INT_ZERO;
 
     usageMetrics.blockNumber = event.block.number;
     usageMetrics.timestamp = event.block.timestamp;
@@ -170,13 +173,18 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
 }
 
 export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
+  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+
+  let dayId = day.toString();
+  let hourId = hour.toString();
   let poolMetrics = LiquidityPoolHourlySnapshot.load(
     event.address
       .toHexString()
       .concat("-")
-      .concat(id)
+      .concat(dayId)
+      .concat("-")
+      .concat(hourId)
   );
 
   if (!poolMetrics) {
@@ -184,7 +192,9 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
       event.address
         .toHexString()
         .concat("-")
-        .concat(id)
+        .concat(dayId)
+        .concat("-")
+        .concat(hourId)
     );
     poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
