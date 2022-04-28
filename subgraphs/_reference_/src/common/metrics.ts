@@ -60,7 +60,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   let hourId = hour.toString();
   
   // Combine the id and the user address to generate a unique user id for the day
-  let dailyActiveAccountId = dayId.concat(from);
+  let dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
     dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
@@ -68,7 +68,11 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = dayId.concat(hourId).concat(from);
+  let hourlyActiveAccountId = from
+    .concat("-")
+    .concat(dayId)
+    .concat("-")
+    .concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);

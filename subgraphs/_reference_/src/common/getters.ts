@@ -83,21 +83,18 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
   return usageMetrics;
 }
-
 export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
-  // Number of days and hours since Unix epoch
+  // Number of days since Unix epoch
   let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
   let dayId = day.toString();
   let hourId = hour.toString();
-
-  let id = dayId.concat(hourId)
   // Create unique id for the day
-  let usageMetrics = UsageMetricsHourlySnapshot.load(id);
+  let usageMetrics = UsageMetricsHourlySnapshot.load(dayId.concat("-").concat(hourId));
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsHourlySnapshot(id);
+    usageMetrics = new UsageMetricsHourlySnapshot(dayId.concat("-").concat(hourId));
     usageMetrics.protocol = FACTORY_ADDRESS;
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
@@ -153,13 +150,18 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
 }
 
 export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
+  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+
+  let dayId = day.toString();
+  let hourId = hour.toString();
   let poolMetrics = LiquidityPoolHourlySnapshot.load(
     event.address
       .toHexString()
       .concat("-")
-      .concat(id)
+      .concat(dayId)
+      .concat("-")
+      .concat(hourId)
   );
 
   if (!poolMetrics) {
@@ -167,7 +169,9 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
       event.address
         .toHexString()
         .concat("-")
-        .concat(id)
+        .concat(dayId)
+        .concat("-")
+        .concat(hourId)
     );
     poolMetrics.protocol = FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
