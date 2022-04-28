@@ -99,7 +99,7 @@ export function createDeposit(
   deposit.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
 
   deposit.save();
-  updateBalancesInPool(event, deposit, TransactionType.DEPOSIT);
+  updateBalancesInPool<Deposit>(event, deposit, TransactionType.DEPOSIT);
   updateProtocolTVL(event);
 }
 
@@ -134,7 +134,7 @@ export function createWithdraw(
   withdraw.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
 
   withdraw.save();
-  updateBalancesInPool(event, withdraw, TransactionType.WITHDRAW);
+  updateBalancesInPool<Withdraw>(event, withdraw, TransactionType.WITHDRAW);
   updateProtocolTVL(event);
 }
 
@@ -158,24 +158,26 @@ export function createSwapHandleVolumeAndFees(
   // updateVolumeAndFees(event, trackedAmountUSD, feeUSD);
 }
 
-export function updateBalancesInPool(
+// T extends is a work-around for not having union types in assemblyscript
+export function updateBalancesInPool<T extends Deposit>(
   event: ethereum.Event,
-  transaction: Deposit | Withdraw,
+  transaction: T,
   transactionType: TransactionType,
-) {
-  let pool = getOrCreateLiquidityPool(Address.fromHexString(transaction.pool));
+): void {
+  let pool = getOrCreateLiquidityPool(Address.fromString(transaction.pool));
+  let balances: BigInt[] = pool.inputTokenBalances;
 
   for (let i = 0; i < pool.inputTokens.length; i++) {
     for (let j = 0; j < transaction.inputTokens.length; j++) {
       if (pool.inputTokens[i] === transaction.inputTokens[j]) {
         if (transactionType === TransactionType.DEPOSIT) {
-          pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(transaction.inputTokenAmounts[j]);
+          balances[i] = balances[i].plus(transaction.inputTokenAmounts[j]);
         } else if (transactionType === TransactionType.WITHDRAW) {
-          pool.inputTokenBalances[i] = pool.inputTokenBalances[i].minus(transaction.inputTokenAmounts[j]);
+          balances[i] = balances[i].minus(transaction.inputTokenAmounts[j]);
         }
       }
     }
   }
-
+  pool.inputTokenBalances = balances;
   pool.save();
 }
