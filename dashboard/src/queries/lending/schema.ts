@@ -1,21 +1,20 @@
 import { Schema, Versions } from "../../constants";
 
-export const schema = (version: string, tryNextSchema: Boolean = false): Schema => {
-  switch (version) {
+export const schema = (version: string): Schema => {
+    // TEMPORARY? NEED TO CONSIDER KINDS OF CHANGES THAT DEFINE A SCHEMA UPDATE FROM 1.1.0 TO 1.2.0 VS UPDATE FROM 1.1.0 TO 1.1.1
+  // The version group uses the first two digits  of the schema version and defaults to that schema.
+  const versionGroupArr = version.split('.');
+  versionGroupArr.pop();
+  const versionGroup = versionGroupArr.join('.') + '.0';
+  switch (versionGroup) {
     case Versions.Schema100:
-      if (tryNextSchema) {
-        return schema110();
-      }
       return schema100();
     case Versions.Schema110:
-      if (tryNextSchema) {
-        return schema120();
-      }
       return schema110();
     case Versions.Schema120:
       return schema120();
     default:
-      return schema100();
+      return schema120();
   }
 };
 export const schema100 = (): Schema => {
@@ -232,21 +231,21 @@ export const schema110 = (): Schema => {
          variableBorrowRate
         }
         
-        withdraws(first: 1000, id: $poolId) {
+        withdraws(first: 1000, where: {market: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        repays(first: 1000, id: $poolId) {
+        repays(first: 1000, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        liquidates(first: 1000, id: $poolId) {
+        liquidates(first: 1000, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -254,14 +253,14 @@ export const schema110 = (): Schema => {
           amountUSD
           profitUSD
         }
-        deposits(first: 1000, id: $poolId) {
+        deposits(first: 1000, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        borrows(first: 1000, id: $poolId) {
+        borrows(first: 1000, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -310,7 +309,6 @@ export const schema120 = (): Schema => {
       "timestamp"
     ],
     [
-      "market",
       "totalValueLockedUSD",
       "totalDepositBalanceUSD",
       "dailyDepositUSD",
@@ -341,7 +339,6 @@ export const schema120 = (): Schema => {
       "timestamp"
     ],
     [
-      "market",
       "totalValueLockedUSD",
       "totalDepositBalanceUSD",
       "hourlyDepositUSD",
@@ -364,17 +361,11 @@ export const schema120 = (): Schema => {
   const entitiesQuery = entities.map((entity, index) => {
     let options = "";
     if (entity === "marketDailySnapshots" || entity === "marketHourlySnapshots") {
-      options = ", where: {market: $poolId}"
+      options = ", where: {market: $poolId}";
     }
-    const baseStr = entity + "(first: 1000" + options + ") {"
-    // If certain fields which refer to other entities are present, add {id} to pull the id of that inset entity
-    // It is added this way to not be included in the entitiesData sub arrays
-    const poolIdx = entitiesData[index].indexOf('market');
-    if (poolIdx >= 0) {
-      entitiesData[index][poolIdx] += '{id}';
-    }
+    const baseStr = entity + "(first: 1000" + options + ") {";
     const fields = entitiesData[index].join(",");
-    return baseStr + fields + '}'
+    return baseStr + fields + '}';
   });
 
   const eventsFields = [

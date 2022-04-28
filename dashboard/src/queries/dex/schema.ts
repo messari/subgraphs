@@ -1,8 +1,12 @@
 import { Schema, Versions } from "../../constants";
 
 export const schema = (version: string): Schema => {
-
-  switch (version) {
+  // TEMPORARY? NEED TO CONSIDER KINDS OF CHANGES THAT DEFINE A SCHEMA UPDATE FROM 1.1.0 TO 1.2.0 VS UPDATE FROM 1.1.0 TO 1.1.1
+  // The version group uses the first two digits  of the schema version and defaults to that schema.
+  const versionGroupArr = version.split('.');
+  versionGroupArr.pop();
+  const versionGroup = versionGroupArr.join('.') + '.0';
+  switch (versionGroup) {
     case Versions.Schema100:
       return schema100();
     case Versions.Schema110:
@@ -10,7 +14,7 @@ export const schema = (version: string): Schema => {
     case Versions.Schema120:
       return schema120();
     default:
-      return schema100();
+      return schema120();
   }
 };
 export const schema100 = (): Schema => {
@@ -241,7 +245,6 @@ export const schema120 = (): Schema => {
       "timestamp"
     ],
     [
-      "pool",
       "totalValueLockedUSD",
       "dailyVolumeUSD",
       "dailyVolumeByTokenAmount",
@@ -266,7 +269,6 @@ export const schema120 = (): Schema => {
       "timestamp"
     ],
     [
-      "pool",
       "totalValueLockedUSD",
       "hourlyVolumeUSD",
       "hourlyVolumeByTokenAmount",
@@ -287,15 +289,9 @@ export const schema120 = (): Schema => {
     if (entity === "liquidityPoolDailySnapshots" || entity === "liquidityPoolHourlySnapshots") {
       options = ", where: {pool: $poolId}"
     }
-    const baseStr = entity + "(first: 1000" + options + ") {"
-    // If certain fields which refer to other entities are present, add {id} to pull the id of that inset entity
-    // It is added this way to not be included in the entitiesData sub arrays
-    const poolIdx = entitiesData[index].indexOf('pool');
-    if (poolIdx >= 0) {
-      entitiesData[index][poolIdx] += '{id}';
-    }
-    const fields = entitiesData[index].join(",");
-    return baseStr + fields + '}'
+    const baseStr = entity + "(first: 1000" + options + ") {";
+    const fields =  entitiesData[index].join(",");
+    return baseStr + fields + '}';
   });
 
   const eventsFields = [
