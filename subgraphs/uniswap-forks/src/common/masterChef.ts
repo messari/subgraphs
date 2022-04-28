@@ -100,7 +100,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
 
   let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
 
-  let multiplier: BigInt = BIGINT_ZERO;
+  let multiplier: BigInt = BIGINT_ONE;
   if (!getMultiplier.reverted) {
     multiplier = getMultiplier.value;
   }

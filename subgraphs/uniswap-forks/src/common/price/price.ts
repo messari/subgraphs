@@ -49,7 +49,7 @@ export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDe
   // hardcoded fix for incorrect rates
   // if whitelist includes token - get the safe price
   if (NetworkConfigs.STABLE_COINS.includes(token.id)) {
-    priceSoFar = safeDiv(BIGDECIMAL_ONE, nativeToken.lastPriceUSD!);
+    priceSoFar = BIGDECIMAL_ONE;
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
       let poolAddress = whiteList[i];
