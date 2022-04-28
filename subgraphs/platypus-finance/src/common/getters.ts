@@ -56,6 +56,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     let _pools: string[] = protocol.pools;
     _pools.push(pool.id);
     protocol.pools = _pools;
+    protocol.save()
   }
   return pool;
 }

@@ -231,7 +231,7 @@ type DexAmmProtocol implements Protocol @entity {
   ##### Pools #####
 
   " All pools that belong to this protocol "
-  pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+  pools: [LiquidityPool!]!
 }
 
 ###############################

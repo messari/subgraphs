@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -33,8 +33,8 @@ export function updateProtocolTVL(event: ethereum.Event): void {
 
     for (let i = 0; i < pool.inputTokens.length; i++) {
       let token = getOrCreateToken(Address.fromString(pool.inputTokens[i]));
-      let usdValue = pool.inputTokenBalances[i].div(BIGINT_TEN.pow(token.decimals as u8));
-      poolLockedValue = poolLockedValue.plus(bigIntToBigDecimal(usdValue));
+      let usdValue = bigIntToBigDecimal(pool.inputTokenBalances[i], token.decimals);
+      poolLockedValue = poolLockedValue.plus(usdValue);
     }
 
     pool.totalValueLockedUSD = poolLockedValue;
