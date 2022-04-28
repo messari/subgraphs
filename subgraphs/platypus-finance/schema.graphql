@@ -765,13 +765,13 @@ type Asset @entity {
   maxSupply: BigInt!
   
   " Asset contract cash "
-  cash: BigInt!
+  cash: BigInt
 
   " Asset contract liability "
-  liability: BigInt!
+  liability: BigInt
 
   " Asset contract coverageRatio "
-  coverageRatio: BigInt!
+  coverageRatio: BigInt
 
   " Reference to the underlying token "
   token: Token!
