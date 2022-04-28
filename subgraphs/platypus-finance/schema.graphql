@@ -775,4 +775,11 @@ type Asset @entity {
 
   " Reference to the underlying token "
   token: Token!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
 }

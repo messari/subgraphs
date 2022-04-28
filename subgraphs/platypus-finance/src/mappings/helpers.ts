@@ -41,6 +41,8 @@ export function createAsset(
   asset.token = tokenAddress.toHexString();
   asset.pool = poolAddress.toHexString();
   asset.maxSupply = BigInt.zero();
+  asset.blockNumber = event.block.number;
+  asset.timestamp = event.block.timestamp;
   asset.save();
 
   const token = getOrCreateToken(tokenAddress);
