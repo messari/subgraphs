@@ -83,7 +83,7 @@ export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): Usa
   let hours: i64 = new Date(utcSeconds * 1000).getUTCHours();
 
   // " { # of days since Unix epoch time }-{ HH: hour of the day } "
-  let id: string = days + "-" + hours;
+  let id: string = days.toString().concat("-").concat(hours.toString());
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
@@ -127,7 +127,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
   let hours: i64 = getHours(timestamp);
   // " { # of days since Unix epoch time }-{ HH: hour of the day } "
 
-  let id: string = days + "-" + hours;
+  let id: string = days.toString().concat("-").concat(hours.toString())
 
   let poolAddress = event.address.toHexString();
 

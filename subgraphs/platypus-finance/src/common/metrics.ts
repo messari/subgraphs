@@ -75,7 +75,7 @@ function handleHourlyAccount(
   let timestamp = event.block.timestamp.toI64();
   let days = getDays(timestamp);
   let hours = getHours(timestamp);
-  let hourlyAccountId = user.toHexString() + "-" + days + "-" + hours;
+  let hourlyAccountId = user.toHexString().concat("-").concat(days.toString()).concat("-").concat(hours.toString());
 
   let hourlyAccount = ActiveAccount.load(hourlyAccountId);
   if (!hourlyAccount) {
@@ -96,7 +96,7 @@ function handleDailyAccount(
 ): void {
   let timestamp = event.block.timestamp.toI64();
   let days = getDays(timestamp);
-  let dailyAccountId = user.toHexString() + "-" + days;
+  let dailyAccountId = user.toHexString().concat("-").concat(days.toString());
 
   let dailyAccount = ActiveAccount.load(dailyAccountId);
   if (!dailyAccount) {
@@ -139,7 +139,7 @@ function updateDailyUsageMetrcs(
   user: Address,
   protocol: DexAmmProtocol,
   transactionType: TransactionType,
-) {
+): void {
   let snapshot = getOrCreateDailyUsageMetricSnapshot(event);
 
   handleAccount(event, user, protocol);
