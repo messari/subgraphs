@@ -21,42 +21,47 @@ import { getPriceOfOutputTokens } from "./Price";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 
 export function createWithdrawTransaction(
-  call: ethereum.Call,
+  to: Address,
+  vaultAddress: Address,
+  transaction: ethereum.Transaction,
+  block: ethereum.Block,
   assetId: string,
   amount: BigInt,
   amountUSD: BigDecimal
 ): WithdrawTransaction {
-  let transactionId = "withdraw-" + call.transaction.hash.toHexString();
+  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
-  let transaction = WithdrawTransaction.load(transactionId);
+  let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
-  if (!transaction) {
-    transaction = new WithdrawTransaction(transactionId);
+  if (!withdrawTransaction) {
+    withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
-    transaction.vault = call.to.toHexString();
-    transaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    withdrawTransaction.vault = vaultAddress.toHexString();
+    withdrawTransaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
-    transaction.to = call.to.toHexString();
-    transaction.from = call.transaction.from.toHexString();
+    withdrawTransaction.to = to.toHexString();
+    withdrawTransaction.from = transaction.from.toHexString();
 
-    transaction.hash = call.transaction.hash.toHexString();
-    transaction.logIndex = call.transaction.index.toI32();
+    withdrawTransaction.hash = transaction.hash.toHexString();
+    withdrawTransaction.logIndex = transaction.index.toI32();
 
-    transaction.asset = assetId;
-    transaction.amount = amount;
-    transaction.amountUSD = amountUSD;
+    withdrawTransaction.asset = assetId;
+    withdrawTransaction.amount = amount;
+    withdrawTransaction.amountUSD = amountUSD;
 
-    transaction.timestamp = utils.getTimestampInMillis(call.block);
-    transaction.blockNumber = call.block.number;
+    withdrawTransaction.timestamp = utils.getTimestampInMillis(block);
+    withdrawTransaction.blockNumber = block.number;
 
-    transaction.save();
+    withdrawTransaction.save();
   }
 
-  return transaction;
+  return withdrawTransaction;
 }
 
 export function _Withdraw(
-  call: ethereum.Call,
+  to: Address,
+  transaction: ethereum.Transaction,
+  block: ethereum.Block,
   vault: VaultStore,
   withdrawAmount: BigInt,
   sharesBurnt: BigInt
@@ -72,7 +77,7 @@ export function _Withdraw(
   vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+    .div(inputTokenPrice.decimalsBaseTen);
 
   vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
@@ -91,20 +96,21 @@ export function _Withdraw(
   let withdrawAmountUSD = inputTokenPrice.usdPrice
     .times(withdrawAmount.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+    .div(inputTokenPrice.decimalsBaseTen);
 
   createWithdrawTransaction(
-    call,
+    to, 
+    vaultAddress,
+    transaction,
+    block,
     vault.inputToken,
     withdrawAmount,
     withdrawAmountUSD
   );
 
   // Update hourly and daily withdraw transaction count
-  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(call.block);
-  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(
-    call.block
-  );
+  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
+  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
   metricsDailySnapshot.dailyWithdrawCount += 1;
   metricsHourlySnapshot.hourlyWithdrawCount += 1;
@@ -115,7 +121,7 @@ export function _Withdraw(
   log.info(
     "[Withdrawn] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",
     [
-      call.transaction.hash.toHexString(),
+      transaction.hash.toHexString(),
       vault.id,
       sharesBurnt.toString(),
       withdrawAmount.toString(),
