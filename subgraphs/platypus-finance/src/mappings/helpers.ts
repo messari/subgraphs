@@ -1,6 +1,7 @@
 import { log } from "@graphprotocol/graph-ts";
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import { Asset, Deposit, DexAmmProtocol, LiquidityPool, Token, Withdraw } from "../../generated/schema";
+import { TransactionType } from "../common/constants";
 import {
   getOrCreateDexAmm,
   getOrCreateLiquidityPool,
@@ -48,12 +49,17 @@ export function createAsset(
 
   const pool = getOrCreateLiquidityPool(poolAddress);
 
-  let inputTokens: string[] = pool.inputTokens;
   let assets: string[] = pool._assets;
-  inputTokens.push(token.id);
+  let inputTokens: string[] = pool.inputTokens;
+  let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
+
   assets.push(assetAddress.toHexString());
+  inputTokens.push(token.id);
+  inputTokenBalances.push(BigInt.zero());
+
   pool._assets = assets;
   pool.inputTokens = inputTokens;
+  pool.inputTokenBalances = inputTokenBalances;
 
   pool.save();
 }
@@ -74,11 +80,11 @@ export function createDeposit(
   let inputToken = getOrCreateToken(inputTokenAddress);
 
   // fetch price in USD
-  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputTokenAddress);
+
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
-  deposit.to = pool.id;
+  deposit.to = to.toHexString();
   deposit.pool = pool.id;
   deposit.from = sender.toHexString();
   deposit.blockNumber = event.block.number;
@@ -86,10 +92,12 @@ export function createDeposit(
   deposit.inputTokens = [inputToken.id];
   deposit.inputTokenAmounts = [amount];
   deposit.outputToken = inputToken._asset;
-  // deposit.outputToken have to be deteminded based in the inputToken
-  deposit.amountUSD = amountInUSD;
-  deposit.save();
+  deposit.outputTokenAmount = liquidity;
 
+  deposit.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
+
+  deposit.save();
+  updateBalancesInPool(event, deposit, TransactionType.DEPOSIT);
   updateProtocolTVL(event);
 }
 
@@ -108,12 +116,10 @@ export function createWithdraw(
   let pool = getOrCreateLiquidityPool(event.address);
   let inputToken = getOrCreateToken(inputTokenAddress);
 
-  // fetch price in USD
-  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputTokenAddress);
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.protocol = protocol.id;
-  withdraw.to = pool.id;
+  withdraw.to = to.toHexString();
   withdraw.pool = pool.id;
   withdraw.from = sender.toHexString();
   withdraw.blockNumber = event.block.number;
@@ -121,10 +127,12 @@ export function createWithdraw(
   withdraw.inputTokens = [inputToken.id];
   withdraw.inputTokenAmounts = [amount];
   withdraw.outputToken = inputToken._asset;
-  // withdraw.outputToken have to be deteminded based in the inputToken
-  withdraw.amountUSD = amountInUSD;
-  withdraw.save();
+  withdraw.outputTokenAmount = liquidity;
 
+  withdraw.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
+
+  withdraw.save();
+  updateBalancesInPool(event, withdraw, TransactionType.WITHDRAW);
   updateProtocolTVL(event);
 }
 
@@ -146,4 +154,26 @@ export function createSwapHandleVolumeAndFees(
   // ..
   // swap.save();
   // updateVolumeAndFees(event, trackedAmountUSD, feeUSD);
+}
+
+export function updateBalancesInPool(
+  event: ethereum.Event,
+  transaction: Deposit | Withdraw,
+  transactionType: TransactionType,
+) {
+  let pool = getOrCreateLiquidityPool(Address.fromHexString(transaction.pool));
+
+  for (let i = 0; i < pool.inputTokens.length; i++) {
+    for (let j = 0; j < transaction.inputTokens.length; j++) {
+      if (pool.inputTokens[i] === transaction.inputTokens[j]) {
+        if (transactionType === TransactionType.DEPOSIT) {
+          pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(transaction.inputTokenAmounts[j]);
+        } else if (transactionType === TransactionType.WITHDRAW) {
+          pool.inputTokenBalances[i] = pool.inputTokenBalances[i].minus(transaction.inputTokenAmounts[j]);
+        }
+      }
+    }
+  }
+
+  pool.save();
 }
