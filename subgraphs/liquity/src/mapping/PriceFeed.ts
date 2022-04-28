@@ -1,6 +1,5 @@
 import { LastGoodPriceUpdated } from "../../generated/PriceFeed/PriceFeed";
-import { _Price } from "../../generated/schema";
-import { setCurrentETHPrice } from "../entities/price";
+import { setCurrentETHPrice } from "../entities/token";
 
 /**
  * Emitted whenever latest ETH price is fetched from oracle
@@ -8,5 +7,5 @@ import { setCurrentETHPrice } from "../entities/price";
  * @param event LastGoodPriceUpdated event
  */
 export function handleLastGoodPriceUpdated(event: LastGoodPriceUpdated): void {
-  setCurrentETHPrice(event.params._lastGoodPrice);
+  setCurrentETHPrice(event.block.number, event.params._lastGoodPrice);
 }

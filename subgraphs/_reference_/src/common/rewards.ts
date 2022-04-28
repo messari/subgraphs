@@ -1,6 +1,6 @@
 
 /////////////////////
-// VERSION 1.0.1 ////
+// VERSION 1.0.2 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
@@ -8,7 +8,7 @@
 
 import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
-import { SubgraphNetwork } from "./constants";
+import { Network } from "./constants";
 import {
   BIGDECIMAL_ZERO,
   INT_FOUR,
@@ -16,7 +16,7 @@ import {
   INT_ONE,
   INT_TWO,
   INT_ZERO,
-} from "./utils/constants";
+} from "./constants";
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // WINDOW_SIZE_SECONDS, TIMESTAMP_STORAGE_INTERVALS, and BUFFER_SIZE can be modified. These are just recommended values - 'somewhat' arbitrary. //
@@ -37,14 +37,24 @@ export const WINDOW_SIZE_SECONDS = 86400;
 export const BUFFER_SIZE = 144;
 
 // Add this entity to the schema.
-
 // type _CircularBuffer @entity {
-//     id: ID!
-//     blocks: [Int!]!
-//     windowStartIndex: Int!
-//     nextIndex: Int!
-//     bufferSize: Int!
-//     blocksPerDay: BigDecimal!
+//   " 'CIRCULAR_BUFFER' " 
+//   id: ID! 
+
+//   " Array of sorted block numbers sorted continuously "
+//   blocks: [Int!]!
+
+//   " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+//   windowStartIndex: Int!
+
+//   " The next index in the blocks array that will be replaced with the newest block "
+//   nextIndex: Int!
+
+//   " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+//   bufferSize: Int!
+
+//   " The current calculated number of blocks per day based on calculated block speed "
+//   blocksPerDay: BigDecimal!
 // }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,31 +235,31 @@ function getStartingBlockRate(): BigDecimal {
   // Block rates pulled from google searches - rough estimates
 
   let network = dataSource.network();
-  if (network == SubgraphNetwork.ETHEREUM) {
+  if (network == Network.MAINNET.toLowerCase()) {
     return BigDecimal.fromString("13.39");
-  } else if (network == SubgraphNetwork.ARBITRUM) {
+  } else if (network == Network.ARBITRUM_ONE.toLowerCase()) {
     return BigDecimal.fromString("15");
-  } else if (network == SubgraphNetwork.AURORA) {
+  } else if (network == Network.AURORA.toLowerCase()) {
     return BigDecimal.fromString("1.03");
-  } else if (network == SubgraphNetwork.BSC) {
+  } else if (network == Network.BSC.toLowerCase()) {
     return BigDecimal.fromString("5");
-  } else if (network == SubgraphNetwork.CELO) {
+  } else if (network == Network.CELO.toLowerCase()) {
     return BigDecimal.fromString("5");
-  } else if (network == SubgraphNetwork.FANTOM) {
+  } else if (network == Network.FANTOM.toLowerCase()) {
     return BigDecimal.fromString("1");
-  } else if (network == SubgraphNetwork.OPTIMISM) {
+  } else if (network == Network.OPTIMISM.toLowerCase()) {
     return BigDecimal.fromString("12.5");
-  } else if (network == SubgraphNetwork.POLYGON) {
+  } else if (network == Network.MATIC.toLowerCase()) {
     return BigDecimal.fromString("2");
-  } else if (network == SubgraphNetwork.XDAI) {
+  } else if (network == Network.XDAI.toLowerCase()) {
     return BigDecimal.fromString("5");
   }
   // Blocks are mined as needed
-  // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
+  // else if (network == Network.AVALANCHE.toLowerCase()) return BigDecimal.fromString("2.5")
   // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
   // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == SubgraphNetwork.MOONBEAM) return BigDecimal.fromString("13.39")
-  // else if (dataSource.network() == SubgraphNetwork.MOONRIVER) return BigDecimal.fromString("13.39")
+  // else if (dataSource.network() == SubgraphNetwork.MOONBEAM.toLowerCase()) return BigDecimal.fromString("13.39")
+  // else if (dataSource.network() == SubgraphNetwork.MOONRIVER.toLowerCase()) return BigDecimal.fromString("13.39")
   else {
     log.warning("getStartingBlockRate(): Network not found", []);
     return BIGDECIMAL_ZERO;
