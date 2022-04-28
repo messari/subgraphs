@@ -1,21 +1,22 @@
 # Subgraph Schema: Lending Protocol
-# Version: 1.1.0
+# Version: 1.2.0
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
-  ARBITRUM
+  ARBITRUM_ONE
   AURORA
   AVALANCHE
-  BSC
+  BSC # aka BNB Chain
   CELO
-  CRONOS
-  ETHEREUM
+  MAINNET # Ethereum Mainnet
   FANTOM
-  HARMONY
+  FUSE
   MOONBEAM
   MOONRIVER
+  NEAR_MAINNET
   OPTIMISM
-  POLYGON
-  XDAI
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
 }
 
 enum ProtocolType {
@@ -31,27 +32,98 @@ type Token @entity {
   " Smart contract address of the token "
   id: ID!
 
-  " Mirrored from the smart contract "
+  " Name of the token, mirrored from the smart contract "
   name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
   symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
   decimals: Int!
+
+  " Optional field to track the price of a token, mostly for caching purposes "
+  lastPriceUSD: BigDecimal
+
+  " Optional field to track the block number of the last token price "
+  lastPriceBlockNumber: BigInt
 }
 
 enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
   DEPOSIT
+
+  " For reward tokens awarded to borrowers "
   BORROW
 }
 
 type RewardToken @entity {
-  " Smart contract address of the reward token "
+  " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
-  " Mirrored from the smart contract "
-  name: String!
-  symbol: String!
-  decimals: Int!
+  " Reference to the actual token "
+  token: Token!
 
+  " The type of the reward token "
   type: RewardTokenType!
+}
+
+enum LendingType {
+  " Collateralized Debt Position (CDP) protocols have singular isolated positions created by users. We aggregate them to give a single view of a market "
+  CDP
+
+  " Pooled protocols pool all users assets into a single market "
+  POOLED
+}
+
+enum RiskType {
+  " Global risk means each users position in a market is combined for one score to determine if they can be liquidated "
+  GLOBAL
+
+  " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
+  ISOLATED
+}
+
+enum InterestRateType {
+  " Stable interest rate (e.g. Aave) "
+  STABLE
+
+  " Variable interest rate (e.g. Compound) "
+  VARIABLE
+
+  " Fixed term interest rate (e.g. Notional) "
+  FIXED_TERM
+}
+
+enum InterestRateSide {
+  " Interest rate accrued by lenders "
+  LENDER
+
+  " Interest rate paid by borrowers "
+  BORROWER
+}
+
+# Most markets only have a single interest rate given a specific type.
+# However, fixed term lending protocols can have multiple rates with
+# different duration/maturity per market. You can append a counter
+# to the IDs to differentiate.
+type InterestRate @entity {
+  " { Interest rate side }-{ Interest rate type }-{ Market ID } "
+  id: ID!
+
+  " Interest rate in percentage APY. E.g. 5.21% should be stored as 5.21 "
+  rate: BigDecimal!
+
+  " Duration of the loan in days. Only applies to fixed term lending (e.g. Notional) "
+  duration: Int
+
+  " Maturity of the loan in block height. Only applies to fixed term lending (e.g. Notional) "
+  maturityBlock: BigInt
+
+  " The party the interest is paid to / received from "
+  side: InterestRateSide!
+
+  " The type of interest rate (e.g. stable, fixed, variable, etc) "
+  type: InterestRateType!
 }
 
 #############################
@@ -77,99 +149,44 @@ interface Protocol {
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
   methodologyVersion: String!
 
+  " The blockchain network this subgraph is indexing on "
   network: Network!
 
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
 
-  " # of total/cumulative unique users "
-  totalUniqueUsers: Int!
+  ##### Quantitative Data #####
 
+  " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
-  " Total volume in USD "
-  totalVolumeUSD: BigDecimal!
-
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
-
-  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
-}
-
-###############################
-##### Protocol Timeseries #####
-###############################
-
-type UsageMetricsDailySnapshot @entity {
-  " ID is # of days since Unix epoch time "
-  id: ID!
-
-  protocol: Protocol!
-
-  " # of unique daily active users "
-  activeUsers: Int!
-
-  " # of total/cumulative unique users "
-  totalUniqueUsers: Int!
-
-  " Total number of transaction occurred in a day. Transactions include all entities that implement the Event interface. "
-  dailyTransactionCount: Int!
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-}
-
-type FinancialsDailySnapshot @entity {
-  " ID is # of days since Unix epoch time "
-  id: ID!
-
-  protocol: Protocol!
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Only relevant for protocols with PCV. "
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
 
-  " Total volume in USD "
-  totalVolumeUSD: BigDecimal!
-
-  " Current balance of all deposited assets (not historical cumulative), in USD "
-  totalDepositUSD: BigDecimal!
-
-  " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
-  totalBorrowUSD: BigDecimal!
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
-  supplySideRevenueUSD: BigDecimal!
+  cumulativeSupplySideRevenueUSD: BigDecimal!
 
   " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
-  protocolSideRevenueUSD: BigDecimal!
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
 
-  " Total revenue accrued by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
-  totalRevenueUSD: BigDecimal!
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  cumulativeTotalRevenueUSD: BigDecimal!
 
-  " Block number of this snapshot "
-  blockNumber: BigInt!
+  ##### Snapshots #####
 
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-}
+  " Daily usage metrics for this protocol "
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
 
-enum LendingType {
-  " Collateralized Debt Position (CDP) protocols have singular isolated positions created by users. We aggregate them to give a single view of a market "
-  CDP
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
 
-  " Pooled protocols pool all users assets into a single market "
-  POOLED
-}
-
-enum RiskType {
-  " Global risk means each users position in a market is combined for one score to determine if they can be liquidated "
-  GLOBAL
-
-  " Isolated risk means each users position in a market or CDP is isolated for risk of liquidation "
-  ISOLATED
+  " Daily financial metrics for this protocol "
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
 type LendingProtocol implements Protocol @entity {
@@ -191,36 +208,225 @@ type LendingProtocol implements Protocol @entity {
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
   methodologyVersion: String!
 
+  " The blockchain network this subgraph is indexing on "
   network: Network!
 
+  " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
 
-  " # of total/cumulative unique users "
-  totalUniqueUsers: Int!
+  " The specific lending protocol type "
+  lendingType: LendingType
 
+  " Risk type of the lending protocol "
+  riskType: RiskType
+
+  " Tokens that can be minted. Only applies to CDP "
+  mintedTokens: [Token!]
+
+  ##### Quantitative Data #####
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Current TVL (Total Value Locked) of the entire protocol "
   totalValueLockedUSD: BigDecimal!
 
-  " Total borrow volume in USD (i.e. total loan origination ) "
-  totalVolumeUSD: BigDecimal!
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
 
-  " Current balance of all deposited assets (not historical cumulative), in USD "
-  totalDepositUSD: BigDecimal!
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
 
-  " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
-  totalBorrowUSD: BigDecimal!
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
 
-  usageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "protocol")
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  cumulativeTotalRevenueUSD: BigDecimal!
 
+  " Current balance of all deposited assets, in USD. Note this metric should be the same as TVL. "
+  totalDepositBalanceUSD: BigDecimal!
+
+  " Sum of all historical deposits in USD (only considers deposits and not withdrawals) "
+  cumulativeDepositUSD: BigDecimal!
+
+  " Current balance of all borrowed/minted assets (not historical cumulative), in USD. "
+  totalBorrowBalanceUSD: BigDecimal!
+
+  " Sum of all historical borrows/mints in USD (i.e. total loan origination). "
+  cumulativeBorrowUSD: BigDecimal!
+
+  " Sum of all historical liquidations in USD "
+  cumulativeLiquidateUSD: BigDecimal!
+
+  " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
+  mintedTokenSupplies: [BigInt!]
+
+  ##### Snapshots #####
+
+  " Daily usage metrics for this protocol "
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
+    @derivedFrom(field: "protocol")
+
+  " Hourly usage metrics for this protocol "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
+    @derivedFrom(field: "protocol")
+
+  " Daily financial metrics for this protocol "
   financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 
-  ##### Lending-Specific #####
+  ##### Markets #####
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+}
 
-  lendingType: LendingType
+###############################
+##### Protocol Timeseries #####
+###############################
 
-  riskType: RiskType
+type UsageMetricsDailySnapshot @entity {
+  " ID is # of days since Unix epoch time "
+  id: ID!
+
+  " Protocol this snapshot is associated with "
+  protocol: LendingProtocol!
+
+  " # of unique daily active users "
+  dailyActiveUsers: Int!
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
+  dailyTransactionCount: Int!
+
+  " Total number of deposits in a day "
+  dailyDepositCount: Int!
+
+  " Total number of withdrawals in a day "
+  dailyWithdrawCount: Int!
+
+  " Total number of borrows/mints in a day "
+  dailyBorrowCount: Int!
+
+  " Total number of repayments/burns in a day "
+  dailyRepayCount: Int!
+
+  " Total number of liquidations in a day "
+  dailyLiquidateCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type UsageMetricsHourlySnapshot @entity {
+  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " Protocol this snapshot is associated with "
+  protocol: LendingProtocol!
+
+  " # of unique hourly active users "
+  hourlyActiveUsers: Int!
+
+  " # of cumulative unique users "
+  cumulativeUniqueUsers: Int!
+
+  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
+  hourlyTransactionCount: Int!
+
+  " Total number of deposits in an hour "
+  hourlyDepositCount: Int!
+
+  " Total number of withdrawals in an hour "
+  hourlyWithdrawCount: Int!
+
+  " Total number of borrows/mints in an hour "
+  hourlyBorrowCount: Int!
+
+  " Total number of repayments/burns in an hour "
+  hourlyRepayCount: Int!
+
+  " Total number of liquidations in an hour "
+  hourlyLiquidateCount: Int!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type FinancialsDailySnapshot @entity {
+  " ID is # of days since Unix epoch time "
+  id: ID!
+
+  " Protocol this snapshot is associated with "
+  protocol: LendingProtocol!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  " Current TVL (Total Value Locked) of the entire protocol "
+  totalValueLockedUSD: BigDecimal!
+
+  " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
+  protocolControlledValueUSD: BigDecimal
+
+  " Total supply of minted tokens in native amounts, with same ordering as mintedTokens. Only applies to CDP "
+  mintedTokenSupplies: [BigInt!]
+
+  ##### Revenue #####
+
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  dailySupplySideRevenueUSD: BigDecimal!
+
+  " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
+  cumulativeSupplySideRevenueUSD: BigDecimal!
+
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  dailyProtocolSideRevenueUSD: BigDecimal!
+
+  " Gross revenue for the protocol (revenue claimed by protocol). Examples: AMM protocol fee (Sushi’s 0.05%). OpenSea 10% sell fee. "
+  cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  dailyTotalRevenueUSD: BigDecimal!
+
+  " All revenue generated by the protocol. e.g. 0.30% of swap fee in Sushiswap, all yield generated by Yearn. "
+  cumulativeTotalRevenueUSD: BigDecimal!
+
+  ##### Lending Activities #####
+
+  " Current balance of all deposited assets, in USD. Note this metric should be the same as TVL. "
+  totalDepositBalanceUSD: BigDecimal!
+
+  " Total assets deposited on a given day, in USD "
+  dailyDepositUSD: BigDecimal!
+
+  " Sum of all historical deposits in USD (only considers deposits and not withdrawals) "
+  cumulativeDepositUSD: BigDecimal!
+
+  " Current balance of all borrowed/minted assets, in USD. "
+  totalBorrowBalanceUSD: BigDecimal!
+
+  " Total assets borrowed/minted on a given day, in USD. "
+  dailyBorrowUSD: BigDecimal!
+
+  " Sum of all historical borrows/mints in USD (i.e. total loan origination). "
+  cumulativeBorrowUSD: BigDecimal!
+
+  " Total assets liquidated on a given day, in USD. "
+  dailyLiquidateUSD: BigDecimal!
+
+  " Sum of all historical liquidations in USD "
+  cumulativeLiquidateUSD: BigDecimal!
 }
 
 ###############################
@@ -233,62 +439,6 @@ type Market @entity {
 
   " The protocol this pool belongs to "
   protocol: LendingProtocol!
-
-  # Generally protocols accept one or multiple tokens and mint tokens to the depositor to track ownership
-  # Some protocols reward DAO tokens or other incentivisation tokens to holders of LP tokens
-  # Some protocols don't mint any tokens to track ownership, in that case outputToken is null
-  # and inputToken balances are used to calculate returns
-
-  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool "
-  inputTokens: [Token!]!
-
-  " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
-
-  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
-
-  ##### Quantitative Data #####
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Total borrow volume in USD (i.e. total loan origination ) "
-  totalVolumeUSD: BigDecimal!
-
-  " Current balance of all deposited assets (not historical cumulative), in USD "
-  totalDepositUSD: BigDecimal!
-
-  " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
-  totalBorrowUSD: BigDecimal!
-
-  " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Price per share of input token in USD "
-  inputTokenPricesUSD: [BigDecimal!]!
-
-  " Total supply of output token "
-  outputTokenSupply: BigInt!
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
-
-  " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
-
-  " Creation timestamp "
-  createdTimestamp: BigInt!
-
-  " Creation block number "
-  createdBlockNumber: BigInt!
-
-  " Pool snapshots "
-  snapshots: [MarketDailySnapshot!]! @derivedFrom(field: "market")
-
-  ##### Lending-Specific #####
 
   " Name of market "
   name: String
@@ -311,23 +461,90 @@ type Market @entity {
   " Liquidation penalty (or the liquidation bonus for liquidators) as a percentage value. It is the penalty/bonus price on the collateral when liquidators purchase it as part of the liquidation of a loan that has passed the liquidation threshold "
   liquidationPenalty: BigDecimal!
 
-  " Deposit interest rate in APY percentage "
-  depositRate: BigDecimal!
+  " Token that need to be deposited to take a position in protocol "
+  inputToken: Token!
 
-  " Borrow interest rate in APY percentage "
-  stableBorrowRate: BigDecimal!
+  " Token that is minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist "
+  outputToken: Token
 
-  " Borrow interest rate in APY percentage "
-  variableBorrowRate: BigDecimal!
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
 
+  ##### Quantitative Data #####
+
+  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
+  rates: [InterestRate!]!
+
+  " Current TVL (Total Value Locked) of this market "
+  totalValueLockedUSD: BigDecimal!
+
+  " Current balance of all deposited assets (not historical cumulative), in USD "
+  totalDepositBalanceUSD: BigDecimal!
+
+  " Sum of all historical deposits in USD (only considers deposits and not withdrawals) "
+  cumulativeDepositUSD: BigDecimal!
+
+  " Current balance of all borrowed/minted assets (not historical cumulative), in USD "
+  totalBorrowBalanceUSD: BigDecimal!
+
+  " Sum of all historical borrows/mints in USD (i.e. total loan origination) "
+  cumulativeBorrowUSD: BigDecimal!
+
+  " Sum of all historical liquidations in USD "
+  cumulativeLiquidateUSD: BigDecimal!
+
+  ##### Token Balances #####
+
+  " Amount of input tokens in the market "
+  inputTokenBalance: BigInt!
+
+  " Price per share of input token in USD "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Amount of input token per full share of output token. Only applies when the output token exists "
+  exchangeRate: BigDecimal
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Creation timestamp "
+  createdTimestamp: BigInt!
+
+  " Creation block number "
+  createdBlockNumber: BigInt!
+
+  ##### Snapshots #####
+
+  " Market daily snapshots "
+  dailySnapshots: [MarketDailySnapshot!]! @derivedFrom(field: "market")
+
+  " Market hourly snapshots "
+  hourlySnapshots: [MarketHourlySnapshot!]! @derivedFrom(field: "market")
+
+  ##### Events #####
+
+  " All deposits made to this market "
   deposits: [Deposit!]! @derivedFrom(field: "market")
 
+  " All withdrawals made from this market "
   withdraws: [Withdraw!]! @derivedFrom(field: "market")
 
+  " All borrows from this market "
   borrows: [Borrow!]! @derivedFrom(field: "market")
 
+  " All repayments to this market "
   repays: [Repay!]! @derivedFrom(field: "market")
 
+  " All liquidations made to this market "
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 }
 
@@ -340,39 +557,10 @@ type MarketDailySnapshot @entity {
   id: ID!
 
   " The protocol this snapshot belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " The pool this snapshot belongs to "
   market: Market!
-
-  totalValueLockedUSD: BigDecimal!
-
-  " Total borrow volume in USD (i.e. total loan origination ) "
-  totalVolumeUSD: BigDecimal!
-
-  " Current balance of all deposited assets (not historical cumulative), in USD "
-  totalDepositUSD: BigDecimal!
-
-  " Current balance of all borrowed assets (not historical cumulative), in USD. In the case of CDPs, this will be all minted assets "
-  totalBorrowUSD: BigDecimal!
-
-  " Amount of input tokens in the market. The ordering should be the same as the market's `inputTokens` field. "
-  inputTokenBalances: [BigInt!]!
-
-  " Price per share of input token in USD "
-  inputTokenPricesUSD: [BigDecimal!]!
-
-  " Total supply of output token "
-  outputTokenSupply: BigInt!
-
-  " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
-
-  " Total amount of reward token emissions in a day, in token's native amount "
-  rewardTokenEmissionsAmount: [BigInt!]
-
-  " Total amount of reward token emissions in a day, normalized to USD "
-  rewardTokenEmissionsUSD: [BigDecimal!]
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -380,16 +568,132 @@ type MarketDailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  ##### Lending-Specific #####
+  ##### Quantitative Data #####
 
-  " Deposit interest rate in APY percentage "
-  depositRate: BigDecimal!
+  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
+  rates: [InterestRate!]!
 
-  " Borrow interest rate in APY percentage "
-  stableBorrowRate: BigDecimal!
+  " Current TVL (Total Value Locked) of this market "
+  totalValueLockedUSD: BigDecimal!
 
-  " Borrow interest rate in APY percentage "
-  variableBorrowRate: BigDecimal!
+  " Current balance of all deposited assets (not historical cumulative), in USD. Same as pool TVL. "
+  totalDepositBalanceUSD: BigDecimal!
+
+  " Sum of all deposits made on a given day, in USD "
+  dailyDepositUSD: BigDecimal!
+
+  " Sum of all historical deposits in USD (only considers deposits and not withdrawals) "
+  cumulativeDepositUSD: BigDecimal!
+
+  " Current balance of all borrowed/minted assets (not historical cumulative), in USD. "
+  totalBorrowBalanceUSD: BigDecimal!
+
+  " Sum of all borrows/mints made on a given day, in USD "
+  dailyBorrowUSD: BigDecimal!
+
+  " Sum of all historical borrows/mints in USD (i.e. total loan origination) "
+  cumulativeBorrowUSD: BigDecimal!
+
+  " Total assets liquidated on a given day, in USD. "
+  dailyLiquidateUSD: BigDecimal!
+
+  " Sum of all historical liquidations in USD "
+  cumulativeLiquidateUSD: BigDecimal!
+
+  ##### Token Balances #####
+
+  " Amount of input token in the market. "
+  inputTokenBalance: BigInt!
+
+  " Price per share of input token in USD "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Amount of input token per full share of output token. Only applies when the output token exists "
+  exchangeRate: BigDecimal
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+}
+
+type MarketHourlySnapshot @entity {
+  " { Smart contract address of the market }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: LendingProtocol!
+
+  " The pool this snapshot belongs to "
+  market: Market!
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  ##### Quantitative Data #####
+
+  " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
+  rates: [InterestRate!]!
+
+  " Current TVL (Total Value Locked) of this market "
+  totalValueLockedUSD: BigDecimal!
+
+  " Current balance of all deposited assets (not historical cumulative), in USD. Same as pool TVL. "
+  totalDepositBalanceUSD: BigDecimal!
+
+  " Sum of all deposits made in a given hour, in USD "
+  hourlyDepositUSD: BigDecimal!
+
+  " Sum of all historical deposits in USD (only considers deposits and not withdrawals) "
+  cumulativeDepositUSD: BigDecimal!
+
+  " Current balance of all borrowed/minted assets (not historical cumulative), in USD. "
+  totalBorrowBalanceUSD: BigDecimal!
+
+  " Sum of all borrows/mints made in a given hour, in USD "
+  hourlyBorrowUSD: BigDecimal!
+
+  " Sum of all historical borrows/mints in USD (i.e. total loan origination) "
+  cumulativeBorrowUSD: BigDecimal!
+
+  " Total assets liquidated in a given hour, in USD. "
+  hourlyLiquidateUSD: BigDecimal!
+
+  " Sum of all historical liquidations in USD "
+  cumulativeLiquidateUSD: BigDecimal!
+
+  ##### Token Balances #####
+
+  " Amount of input token in the market. "
+  inputTokenBalance: BigInt!
+
+  " Price per share of input token in USD "
+  inputTokenPriceUSD: BigDecimal!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt!
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal!
+
+  " Amount of input token per full share of output token. Only applies when the output token exists "
+  exchangeRate: BigDecimal
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 }
 
 ##################################
@@ -415,7 +719,7 @@ interface Event {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " Address that received the tokens "
   to: String!
@@ -423,8 +727,10 @@ interface Event {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 }
 
@@ -439,7 +745,7 @@ type Deposit implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " Market that tokens are deposited into "
   to: String!
@@ -447,8 +753,10 @@ type Deposit implements Event @entity {
   " Address that deposited tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   ##### Lending-Specific #####
@@ -477,7 +785,7 @@ type Withdraw implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " Address that received tokens "
   to: String!
@@ -485,8 +793,10 @@ type Withdraw implements Event @entity {
   " Market that tokens are withdrawn from "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   ##### Lending-Specific #####
@@ -497,6 +807,10 @@ type Withdraw implements Event @entity {
   " Token withdrawn "
   asset: Token!
 
+  # Certain protocols (e.g. MakerDAO) uses a negative amount for withdraws. You
+  # should convert them to positive for consistency.
+  # e.g. Event log 27 in https://etherscan.io/tx/0xe957cf6252c7712c218c842c1ade672bf5ce529f8512f7a5ce7ebc8afa4ec690#eventlog
+
   " Amount of token withdrawn in native units "
   amount: BigInt!
 
@@ -504,6 +818,7 @@ type Withdraw implements Event @entity {
   amountUSD: BigDecimal!
 }
 
+# For CDPs, use this for mint events
 type Borrow implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
@@ -515,7 +830,7 @@ type Borrow implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " Address that received tokens "
   to: String!
@@ -523,8 +838,10 @@ type Borrow implements Event @entity {
   " Market that tokens are borrowed from "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   ##### Lending-Specific #####
@@ -542,6 +859,7 @@ type Borrow implements Event @entity {
   amountUSD: BigDecimal
 }
 
+# For CDPs, use this for burn events
 type Repay implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
@@ -553,7 +871,7 @@ type Repay implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " Market that tokens are repaid to "
   to: String!
@@ -561,8 +879,10 @@ type Repay implements Event @entity {
   " Address that sent tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   ##### Lending-Specific #####
@@ -591,7 +911,7 @@ type Liquidate implements Event @entity {
   logIndex: Int!
 
   " The protocol this transaction belongs to "
-  protocol: Protocol!
+  protocol: LendingProtocol!
 
   " Market that tokens are repaid to "
   to: String!
@@ -599,22 +919,24 @@ type Liquidate implements Event @entity {
   " Address that carried out the liquidation "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   ##### Lending-Specific #####
 
-  " The market this transaction interacted with "
+  " The market of which the debt is repaid to "
   market: Market!
 
-  " Token liquidated "
+  " Collateral liquidated (e.g. cToken) "
   asset: Token!
 
-  " Amount of token liquidated in native units "
+  " Amount of collateral liquidated in native units "
   amount: BigInt!
 
-  " Amount of token liquidated in USD "
+  " Amount of collateral liquidated in USD "
   amountUSD: BigDecimal
 
   " Amount of profit from liquidation in USD "
@@ -628,9 +950,9 @@ type Account @entity {
   id: ID!
 }
 
-# Helper entity for calculating daily active users
-type DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity {
+  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }
 
@@ -649,11 +971,4 @@ type _Trove @entity {
   collateralSurplus: BigInt!
   " Last change to collateralSurplus "
   collateralSurplusChange: BigInt!
-}
-
-type _Price @entity {
-  " Token symbol, only used for ETH "
-  id: ID!
-  " Current price of token "
-  price: BigDecimal!
 }
