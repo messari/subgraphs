@@ -12,7 +12,7 @@
 
 Sum across all Vaults:
 
-`Vault Deposit TVL + Deposits in Transmuter`
+`Vault Deposits + Deposits in Transmuter`
 
 Ignores ALCX staked. 
 
@@ -20,14 +20,14 @@ Ignores ALCX staked.
 
 Sum across all Vaults:
 
-`Harvested Yield on TVL + Harvested Yield on Transmuter Funds`
+`Harvested Yield on Vaults + Harvested Yield on Transmuter Funds`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Vaults:
 
-`(Harvested Yield on TVL + Harvested Yield on Transmuter Funds) * 10%`
+`(Harvested Yield on Vaults + Harvested Yield on Transmuter Funds) * 10%`
 
 <Add notes to consider if any - delete if none>
 
