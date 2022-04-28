@@ -7,6 +7,8 @@ Sum across all Pools:
 
 `Sum of Pool Assets`
 
+do inlcude protocol-deposited BNT as TVL
+
 https://bancor-network.gitbook.io/v2.1/guides/querying-a-pool-contract
 
 ### Total Revenue USD
