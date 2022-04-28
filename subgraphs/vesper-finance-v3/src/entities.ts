@@ -161,10 +161,23 @@ export function updateVaultRewardEmission(
   vaultAddress: Address,
   rewardAddress: Address
 ): void {
-  log.info("Reward updated for vault: {}, {}", [
-    vaultAddress.toHexString(),
-    rewardAddress.toHexString(),
-  ]);
+  const vault = getOrCreateVault(
+    vaultAddress,
+    BigInt.zero(),
+    BigInt.zero(),
+    false
+  );
+  const rewardv3 = PoolRewards.bind(rewardAddress);
+  const rewards_call = rewardv3.try_rewardPerToken();
+
+  if (!rewards_call.reverted) {
+    for (let i = 0, k = rewards_call.value.value0.length; i < k; ++i) {
+      const rtAddress = rewards_call.value.value0[i];
+      const rtAmount = rewards_call.value.value1[i];
+
+      log.info("Vault reward - {}, {}", [rtAddress.toHexString(), rtAmount.toString()]);
+    }
+  }
 }
 
 export function getOrCreateAccount(
