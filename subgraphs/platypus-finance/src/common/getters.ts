@@ -51,6 +51,11 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
 
     poolParam.save();
     pool.save();
+
+    let protocol = getOrCreateDexAmm();
+    let _pools: string[] = protocol.pools;
+    _pools.push(pool.id);
+    protocol.pools = _pools;
   }
   return pool;
 }
@@ -125,7 +130,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
   let hours: i64 = getHours(timestamp);
   // " { # of days since Unix epoch time }-{ HH: hour of the day } "
 
-  let id: string = days.toString().concat("-").concat(hours.toString())
+  let id: string = days.toString().concat("-").concat(hours.toString());
 
   let poolAddress = event.address.toHexString();
 

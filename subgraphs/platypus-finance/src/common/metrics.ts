@@ -15,25 +15,35 @@ import {
   getOrCreateLiquidityPool,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
+  getOrCreateToken,
 } from "../common/getters";
 import { getDays, getHours } from "../common/utils/datetime";
+import { BIGINT_TEN } from "../prices/common/constants";
 import { BIGDECIMAL_ZERO, TransactionType } from "./constants";
+import { bigIntToBigDecimal } from "./utils/numbers";
 
 export function updateProtocolTVL(event: ethereum.Event): void {
   let protocol = getOrCreateDexAmm();
-  let totalValueLockedUSD = BIGDECIMAL_ZERO;
+  let protocolLockedValue = BIGDECIMAL_ZERO;
 
   // loop through each pool and update total value locked in USD for protocol and each pool
-  // for (let i = 0; i < protocol.pools.length; i++) {
-    // let pool = getOrCreateLiquidityPoolHelper(protocol.pools[i]);
-    // pool TVL
-    // fetch prices for all tokens
-    // for each token poolTvl += inputBalanceForToken * getOrFetchPrice(token);
-    // update pool tvl
-    // pool.save()
-  // }
+  for (let i = 0; i < protocol.pools.length; i++) {
+    let poolLockedValue = BIGDECIMAL_ZERO;
+    let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]));
 
-  protocol.totalValueLockedUSD = totalValueLockedUSD;
+    for (let i = 0; i < pool.inputTokens.length; i++) {
+      let token = getOrCreateToken(Address.fromString(pool.inputTokens[i]));
+      let usdValue = pool.inputTokenBalances[i].div(BIGINT_TEN.pow(token.decimals as u8));
+      poolLockedValue = poolLockedValue.plus(bigIntToBigDecimal(usdValue));
+    }
+
+    pool.totalValueLockedUSD = poolLockedValue;
+    pool.save();
+
+    protocolLockedValue = protocolLockedValue.plus(poolLockedValue);
+  }
+
+  protocol.totalValueLockedUSD = protocolLockedValue;
   protocol.save();
 }
 

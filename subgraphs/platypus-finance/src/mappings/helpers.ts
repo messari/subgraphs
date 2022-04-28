@@ -10,27 +10,6 @@ import {
 } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
 
-// export let assetContract = AssetContract.bind(Address.fromString(POOL_PROXY));
-
-// Create a liquidity pool from PairCreated contract call
-export function createLiquidityPool(
-  event: ethereum.Event,
-  protocol: DexAmmProtocol,
-  poolAddress: Address,
-  token0: Token,
-  token1: Token,
-  LPtoken: Token,
-): void {
-  // let pool = new LiquidityPool(poolAddress.toHexString());
-  // pool.protocol = protocol.id;
-  // pool.inputTokens = [token0.id, token1.id];
-  // pool.outputToken = LPtoken.id;
-  // ...
-  // pool.save();
-  // // create the tracked contract based on the template
-  // PairTemplate.create(poolAddress);
-}
-
 export function createAsset(
   event: ethereum.Event,
   poolAddress: Address,
@@ -167,9 +146,10 @@ export function updateBalancesInPool<T extends Deposit>(
   let pool = getOrCreateLiquidityPool(Address.fromString(transaction.pool));
   let balances: BigInt[] = pool.inputTokenBalances;
 
-  for (let i = 0; i < pool.inputTokens.length; i++) {
-    for (let j = 0; j < transaction.inputTokens.length; j++) {
+  for (let j = 0; j < transaction.inputTokens.length; j++) {
+    for (let i = 0; i < pool.inputTokens.length; i++) {
       if (pool.inputTokens[i] === transaction.inputTokens[j]) {
+        log.debug("MATCHED pool.inputTokens[{}] === transaction.inputTokens [{}]", [i.toString(), j.toString()]);
         if (transactionType === TransactionType.DEPOSIT) {
           balances[i] = balances[i].plus(transaction.inputTokenAmounts[j]);
         } else if (transactionType === TransactionType.WITHDRAW) {
@@ -178,6 +158,10 @@ export function updateBalancesInPool<T extends Deposit>(
       }
     }
   }
+  log.debug("token {} balances {}", [
+    transaction.inputTokens.map<string>(x => x.toString()).join(" "),
+    balances.map<string>(x => x.toString()).join(" "),
+  ]);
   pool.inputTokenBalances = balances;
   pool.save();
 }
