@@ -157,6 +157,16 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
+export function updateVaultRewardEmission(
+  vaultAddress: Address,
+  rewardAddress: Address
+): void {
+  log.info("Reward updated for vault: {}, {}", [
+    vaultAddress.toHexString(),
+    rewardAddress.toHexString(),
+  ]);
+}
+
 export function getOrCreateAccount(
   address: Address,
   timestamp: BigInt

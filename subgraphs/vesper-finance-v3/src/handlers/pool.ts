@@ -4,6 +4,7 @@ import {
   TransferCall,
   DepositCall,
   WithdrawCall,
+  UpdatePoolRewardsCall,
 } from "../../generated/poolV3_vaUSDC/PoolV3";
 import {
   hasStrategy,
@@ -18,6 +19,7 @@ import {
   getOrCreateTransfer,
   getOrCreateWithdraw,
   getOrCreateDeposit,
+  updateVaultRewardEmission,
 } from "../entities";
 import { updateAllSnapshots } from "../snapshots";
 import { Erc20Token } from "../../generated/poolV3_vaUSDC/Erc20Token";
@@ -143,4 +145,8 @@ export function handleDepositV3(call: DepositCall): void {
     revenue.protocolRevenueUsd,
     revenue.supplySideRevenueUsd
   );
+}
+
+export function handleUpdatePoolRewardsV3(call: UpdatePoolRewardsCall): void {
+  updateVaultRewardEmission(dataSource.address(), call.inputs._newPoolRewards);
 }

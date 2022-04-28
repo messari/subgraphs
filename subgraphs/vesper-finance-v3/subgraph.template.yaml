@@ -49,8 +49,8 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV{{version}}
-        - function: transfer(address,uint256)
-          handler: handleTransferV{{version}}
         - function: deposit(uint256)
           handler: handleDepositV{{version}}
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewardsV{{version}}
 {{/pools}}

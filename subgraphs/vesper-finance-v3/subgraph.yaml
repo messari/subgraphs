@@ -48,10 +48,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-LINK'
     network: mainnet
@@ -96,10 +96,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vaLINK'
     network: mainnet
@@ -144,10 +144,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-DPI'
     network: mainnet
@@ -192,10 +192,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vaUSDC'
     network: mainnet
@@ -240,10 +240,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-ETH'
     network: mainnet
@@ -288,10 +288,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_veDAI-WBTC'
     network: mainnet
@@ -336,10 +336,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vaDPI'
     network: mainnet
@@ -384,10 +384,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vaWBTC'
     network: mainnet
@@ -432,10 +432,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vaETH'
     network: mainnet
@@ -480,10 +480,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vaDAI'
     network: mainnet
@@ -528,10 +528,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vUSDT'
     network: mainnet
@@ -576,10 +576,10 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
   - kind: ethereum/contract
     name: 'poolV3_vUNI'
     network: mainnet
@@ -624,7 +624,7 @@ dataSources:
       callHandlers:
         - function: withdraw(uint256)
           handler: handleWithdrawV3
-        - function: transfer(address,uint256)
-          handler: handleTransferV3
         - function: deposit(uint256)
           handler: handleDepositV3
+        - function: updatePoolRewards(address)
+          handler: handleUpdatePoolRewards3
