@@ -149,3 +149,9 @@ export const POOL_IMP = "0xb3f1a27256616c6599547e4de2c7492ecc5041fb";
 
 export const SECONDARYPOOL_PROXY = "0xe0D166DE15665bC4B7185B2e35E847E51316E126";
 export const SECONDARYPOOLPOOL_IMP = "0x97191b9fff9ec15ed23d3ff7fdf74bd494fa7dff";
+
+export enum TransactionType {
+  DEPOSIT,
+  WITHDRAW,
+  SWAP,
+}

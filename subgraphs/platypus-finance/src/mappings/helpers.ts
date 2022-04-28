@@ -1,6 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
-import { Asset, Deposit, DexAmmProtocol, LiquidityPool, Token } from "../../generated/schema";
+import { Asset, Deposit, DexAmmProtocol, LiquidityPool, Token, Withdraw } from "../../generated/schema";
 import { SushiSwapRouterAvax as SushiSwapRouterContract } from "../../generated/Pool/SushiSwapRouterAvax";
 import {
   getOrCreateDexAmm,
@@ -8,6 +8,7 @@ import {
   getOrCreateToken,
   getOrFetchTokenUsdPrice,
 } from "../common/getters";
+import { updateProtocolTVL } from "../common/metrics";
 
 // export let assetContract = AssetContract.bind(Address.fromString(POOL_PROXY));
 
@@ -58,7 +59,6 @@ export function createAsset(
   pool.save();
 }
 
-
 // Generate the deposit entity and update deposit account for the according pool.
 export function createDeposit(
   event: ethereum.Event,
@@ -90,22 +90,43 @@ export function createDeposit(
   // deposit.outputToken have to be deteminded based in the inputToken
   deposit.amountUSD = amountInUSD;
   deposit.save();
+
+  updateProtocolTVL(event);
 }
 
 // Generate the withdraw entity
 export function createWithdraw(
   event: ethereum.Event,
-  amount0: BigInt,
-  amount1: BigInt,
-  sender: Address,
+  amount: BigInt,
+  inputTokenAddress: Address,
+  liquidity: BigInt,
   to: Address,
+  sender: Address,
 ): void {
-  // let withdrawal = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
-  // withdrawal.hash = event.transaction.hash.toHexString();
-  // withdrawal.logIndex = event.logIndex.toI32();
-  // withdrawal.protocol = FACTORY_ADDRESS;
-  // ..
-  // withdrawal.save();
+  let withdraw = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+
+  let protocol = getOrCreateDexAmm();
+  let pool = getOrCreateLiquidityPool(event.address);
+  let inputToken = getOrCreateToken(inputTokenAddress);
+
+  // fetch price in USD
+  let amountInUSD: BigDecimal = getPriceFromSushiSwapRouter(inputTokenAddress, amount);
+  withdraw.hash = event.transaction.hash.toHexString();
+  withdraw.logIndex = event.logIndex.toI32();
+  withdraw.protocol = protocol.id;
+  withdraw.to = pool.id;
+  withdraw.pool = pool.id;
+  withdraw.from = sender.toHexString();
+  withdraw.blockNumber = event.block.number;
+  withdraw.timestamp = event.block.timestamp;
+  withdraw.inputTokens = [inputToken.id];
+  withdraw.inputTokenAmounts = [amount];
+  withdraw.outputToken = inputToken._asset;
+  // withdraw.outputToken have to be deteminded based in the inputToken
+  withdraw.amountUSD = amountInUSD;
+  withdraw.save();
+
+  updateProtocolTVL(event);
 }
 
 // Handle swaps data and update entities volumes and fees
@@ -140,7 +161,7 @@ export function getPriceFromSushiSwapRouter(tokenAddress: Address, amount: BigIn
 
   const path_string: string = path.map<string>(x => x.toHexString()).join("-");
   log.warning("sushiswap amountIn:{} path:{}", [amountIn.toString(), path_string]);
-  
+
   const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressesV2);
   let amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
 

@@ -12,23 +12,18 @@ import {
   HaircutRateUpdated,
   AssetAdded,
 } from "../../generated/Pool/Pool";
-import { createDeposit, createAsset } from "./helpers";
+import { TransactionType } from "../common/constants";
+import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from "../common/metrics";
+import { createDeposit, createAsset, createWithdraw } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
-  // log.debug(
-  //   "Block number: {}, block hash: {}, transaction hash: {}, amount: {}, token:{}, liquidity:{}, to:{}, sender: {}",
-  //   [
-  //     event.block.number.toString(), // "47596000"
-  //     event.block.hash.toHexString(), // "0x..."
-  //     event.transaction.hash.toHexString(), // "0x..."
-  //     event.params.amount.toString(),
-  //     event.params.token.toHexString(),
-  //     event.params.liquidity.toString(),
-  //     event.params.to.toHexString(),
-  //     event.params.sender.toHexString(),
-  //   ],
-  // );
+  // steps to implement
+  // 1. Create Deposit
+  // 2. Update Financials
+  // 3. Update Protocol Usage Metrics - Timeseries
+  // 4. Update Pool Metrics - Timeseries
 
+  // Create Deposit
   createDeposit(
     event,
     event.params.amount,
@@ -37,17 +32,36 @@ export function handleDeposit(event: Deposit): void {
     event.params.to,
     event.params.sender,
   );
-  // create Deposit
   // Update Financials
-  // Update Usage Metrics
+  updateFinancials(event);
+  // Update Protocol Usage Metrics
+  updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   // Update Pool Metrics
+  updatePoolMetrics(event, event.address);
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  // create Deposit
+  // steps to implement
+  // 1. create Deposit
+  // 2. Update Financials
+  // 3. Update Protocol Usage Metrics
+  // 4. Update Pool Metrics
+
+  // Create Deposit
+  createWithdraw(
+    event,
+    event.params.amount,
+    event.params.token,
+    event.params.liquidity,
+    event.params.to,
+    event.params.sender,
+  );
   // Update Financials
-  // Update Usage Metrics
+  updateFinancials(event);
+  // Update Protocol Usage Metrics
+  updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   // Update Pool Metrics
+  updatePoolMetrics(event, event.address);
 }
 
 export function handleSwap(event: Swap): void {
@@ -58,12 +72,7 @@ export function handleSwap(event: Swap): void {
 }
 
 export function handleAssetAdded(event: AssetAdded): void {
-  createAsset(
-    event,
-    event.address,
-    event.params.token,
-    event.params.asset,
-  );
+  createAsset(event, event.address, event.params.token, event.params.asset);
 
   // A new LP token is added to this pool
   // Initialize Asset Contract with Address

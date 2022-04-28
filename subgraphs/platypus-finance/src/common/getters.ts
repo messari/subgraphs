@@ -31,12 +31,12 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
-  let pool = LiquidityPool.load(poolAddress.toHexString());
+export function getOrCreateLiquidityPoolHelper(poolAddress: String): LiquidityPool {
+  let pool = LiquidityPool.load(poolAddress.toString());
   // fetch info if null
   if (!pool) {
-    pool = new LiquidityPool(poolAddress.toHexString());
-    let poolParam = new LiquidityPoolParamsHelper(poolAddress.toHexString());
+    pool = new LiquidityPool(poolAddress.toString());
+    let poolParam = new LiquidityPoolParamsHelper(poolAddress.toString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
     poolParam.SlippageParamsK = BigDecimal.fromString("0.00002e18");
@@ -51,6 +51,10 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     pool.save();
   }
   return pool;
+}
+
+export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
+  return getOrCreateLiquidityPoolHelper(poolAddress.toHexString());
 }
 
 export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
@@ -86,7 +90,7 @@ export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): Usa
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
-    usageMetrics.protocol = PROTOCOL_ADMIN;
+    usageMetrics.protocol = getOrCreateDexAmm().id;
 
     usageMetrics.save();
   }
@@ -153,7 +157,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = PROTOCOL_ADMIN;
+    financialMetrics.protocol = getOrCreateDexAmm().id;
 
     financialMetrics.blockNumber = event.block.number;
     financialMetrics.timestamp = event.block.timestamp;
