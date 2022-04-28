@@ -1,5 +1,5 @@
 /////////////////////
-// VERSION 1.0.1 ////
+// VERSION 1.0.2 ////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // The purpose of this program is to dynamically estimate the blocks generated for the 24 HR period following the most recent update. //
 // It does so by calculating the moving average block rate for an arbitrary length of time preceding the current block.               //
@@ -29,15 +29,24 @@ export const WINDOW_SIZE_SECONDS = 86400;
 export const BUFFER_SIZE = 144;
 
 // Add this entity to the schema.
-
 // type _CircularBuffer @entity {
-//     id: ID!
-//     blocks: [Int!]!
-//     windowStartIndex: Int!
-//     nextIndex: Int!
-//     bufferSize: Int!
-//     blocksPerDay: BigDecimal!
-// }
+//   " 'CIRCULAR_BUFFER' "
+//   id: ID!
+
+//   " Array of sorted block numbers sorted continuously "
+//   blocks: [Int!]!
+
+//   " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+//   windowStartIndex: Int!
+
+//   " The next index in the blocks array that will be replaced with the newest block "
+//   nextIndex: Int!
+
+//   " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+//   bufferSize: Int!
+
+//   " The current calculated number of blocks per day based on calculated block speed "
+//   blocksPerDay: BigDecimal!
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
