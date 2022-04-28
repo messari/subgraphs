@@ -12,25 +12,22 @@
 
 Sum across all Vaults:
 
-`Insert Calculation`
+`Vault Deposit TVL + Deposits in Transmuter`
 
-<Add notes to consider if any - delete if none>
+Ignores ALCX staked. 
 
 ### Total Revenue USD
 
 Sum across all Vaults:
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
-
+`Harvested Yield on TVL + Transmuter`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Vaults:
 
-`Insert Calculation`
+`(Harvested Yield on TVL + Harvested Yield on Transmuter Funds) * 10%`
 
 <Add notes to consider if any - delete if none>
 
@@ -39,9 +36,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Vaults
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`(Harvested Yield on TVL + Transmuter) * 90%`
 
 ### Total Unique Users
 
