@@ -7,26 +7,26 @@ import {
   createMockedFunction
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { BuyShares, SellShares, DODOSwap } from "../generated/DVM/DVM";
+import { BuyShares, SellShares, DODOSwap } from "../generated/DSP/DSP";
 import {
   handleBuyShares,
   handleSellShares,
   handleDODOSwap
-} from "../src/mappingDVM";
+} from "../src/mappingDSP";
 import { ERC20 } from "../generated/CP/ERC20";
-import { DVM } from "../generated/DVM/DVM";
+import { DSP } from "../generated/DSP/DSP";
 import {
   createERC20Instance,
-  createNewDVMEvent
+  createNewDSPEvent
 } from "./helpers/factory_helpers.test";
 import {
   createBuySharesEvent,
   createSellSharesEvent,
   createDODOSwapEvent
-} from "./helpers/helpers_DVM.test";
+} from "./helpers/helpers_DSP.test";
 
 test("Can handle a BuyShares Event", () => {
-  let newDVMevent = createNewDVMEvent(
+  let newDSPevent = createNewDSPEvent(
     "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
     "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
     "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
@@ -41,7 +41,7 @@ test("Can handle a BuyShares Event", () => {
 });
 
 test("Can handle a SellShares Event", () => {
-  let newDVMevent = createNewDVMEvent(
+  let newDSPevent = createNewDSPEvent(
     "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
     "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
     "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
@@ -57,7 +57,7 @@ test("Can handle a SellShares Event", () => {
 });
 
 test("Can handle a DODOSwap Event", () => {
-  let newDVMevent = createNewDVMEvent(
+  let newDSPevent = createNewDSPEvent(
     "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
     "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
     "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
