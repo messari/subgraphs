@@ -45,6 +45,8 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     );
     return;
   }
+
+  updateVaultRewardEmission(dataSource.address());
   getOrCreateWithdraw(call, dataSource.address());
   updateAllSnapshots(call, dataSource.address());
 }
@@ -68,6 +70,8 @@ export function handleTransferV3(call: TransferCall): void {
     );
     return;
   }
+
+  updateVaultRewardEmission(dataSource.address());
   getOrCreateVault(
     dataSource.address(),
     call.block.number,
@@ -117,6 +121,8 @@ export function handleDepositV3(call: DepositCall): void {
     );
     return;
   }
+
+  updateVaultRewardEmission(dataSource.address());
   getOrCreateVault(
     dataSource.address(),
     call.block.number,
@@ -147,6 +153,3 @@ export function handleDepositV3(call: DepositCall): void {
   );
 }
 
-export function handleUpdatePoolRewardsV3(call: UpdatePoolRewardsCall): void {
-  updateVaultRewardEmission(dataSource.address(), call.inputs._newPoolRewards);
-}

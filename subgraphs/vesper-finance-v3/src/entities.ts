@@ -157,37 +157,59 @@ export function updateVaultRewardTokens(vault: Vault): void {
   }
 }
 
-export function updateVaultRewardEmission(
-  vaultAddress: Address,
-  rewardAddress: Address
-): void {
+export function updateVaultRewardEmission(vaultAddress: Address): void {
+  const poolv3 = PoolV3.bind(vaultAddress);
   const vault = getOrCreateVault(
     vaultAddress,
     BigInt.zero(),
     BigInt.zero(),
     false
   );
+  const rewardAddress = poolv3.poolRewards();
+
   const rewardv3 = PoolRewards.bind(rewardAddress);
   const rewardOld = PoolRewardsOld.bind(rewardAddress);
   const rewards_call = rewardv3.try_rewardPerToken();
+  const amounts: BigInt[] = [];
+  const usds: BigDecimal[] = [];
 
   if (!rewards_call.reverted) {
     for (let i = 0, k = rewards_call.value.value0.length; i < k; ++i) {
       const rtAddress = rewards_call.value.value0[i];
       const rtAmount = rewards_call.value.value1[i];
+      const token = Erc20Token.bind(rtAddress);
 
-      log.info("Vault reward - {}, {}, {}", [rewardAddress.toHexString(), rtAddress.toHexString(), rtAmount.toString()]);
+      amounts.push(rtAmount);
+      usds.push(toUsd(rtAmount.toBigDecimal(), token.decimals(), rtAddress));
+
+      log.info("Vault reward - {}, {}, {}", [
+        rewardAddress.toHexString(),
+        rtAddress.toHexString(),
+        rtAmount.toString(),
+      ]);
     }
   } else {
     const rewardsold_call = rewardOld.try_rewardPerToken();
 
     if (!rewardsold_call.reverted) {
       const rtAddress = rewardOld.rewardToken();
-      const rtAmount = rewardsold_call.value.toString();
-      
-      log.info("Vault reward - {}, {}, {}", [rewardAddress.toHexString(), rtAddress.toHexString(), rtAmount.toString()]);
+      const rtAmount = rewardsold_call.value;
+      const token = Erc20Token.bind(rtAddress);
+
+      amounts.push(rtAmount);
+      usds.push(toUsd(rtAmount.toBigDecimal(), token.decimals(), rtAddress));
+
+      log.info("Vault reward - {}, {}, {}", [
+        rewardAddress.toHexString(),
+        rtAddress.toHexString(),
+        rtAmount.toString(),
+      ]);
     }
   }
+
+  vault.rewardTokenEmissionsAmount = amounts;
+  vault.rewardTokenEmissionsUSD = usds;
+  vault.save();
 }
 
 export function getOrCreateAccount(

@@ -51,6 +51,4 @@ dataSources:
           handler: handleWithdrawV{{version}}
         - function: deposit(uint256)
           handler: handleDepositV{{version}}
-        - function: updatePoolRewards(address)
-          handler: handleUpdatePoolRewardsV{{version}}
 {{/pools}}
