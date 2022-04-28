@@ -168,6 +168,7 @@ export function updateVaultRewardEmission(
     false
   );
   const rewardv3 = PoolRewards.bind(rewardAddress);
+  const rewardOld = PoolRewardsOld.bind(rewardAddress);
   const rewards_call = rewardv3.try_rewardPerToken();
 
   if (!rewards_call.reverted) {
@@ -175,7 +176,16 @@ export function updateVaultRewardEmission(
       const rtAddress = rewards_call.value.value0[i];
       const rtAmount = rewards_call.value.value1[i];
 
-      log.info("Vault reward - {}, {}", [rtAddress.toHexString(), rtAmount.toString()]);
+      log.info("Vault reward - {}, {}, {}", [rewardAddress.toHexString(), rtAddress.toHexString(), rtAmount.toString()]);
+    }
+  } else {
+    const rewardsold_call = rewardOld.try_rewardPerToken();
+
+    if (!rewardsold_call.reverted) {
+      const rtAddress = rewardOld.rewardToken();
+      const rtAmount = rewardsold_call.value.toString();
+      
+      log.info("Vault reward - {}, {}, {}", [rewardAddress.toHexString(), rtAddress.toHexString(), rtAmount.toString()]);
     }
   }
 }
