@@ -10,6 +10,12 @@ The entities `Deposit` and `Withdraw` which stores the `amountUSD` for the token
 above mentioned vault. Since, the amountUSD is used to calculate various financial metrics, hence
 entity `FinancialsDailySnapshot` will also is affected.
 
+
+Logs from the Price Library
+```
+[SushiSwapRouter] tokenAddress: 0x798d1be841a82a273720ce31c822c61a67a601c3, Price: 17.517436 Block: 12639535, data_source: bDIGG
+```
+
 - Vault Link [Badger - Digg](https://app.badger.com/vault/badger-digg?chain=ethereum)
 - Digg Token [Etherscan](https://etherscan.io/address/0x798D1bE841a82a273720CE31c822C61a67a601C3)
 - Vault Etherscan [View](https://etherscan.io/address/0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a)
