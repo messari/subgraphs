@@ -68,10 +68,10 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 ///////////////////////////
 
 export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
-  // Number of days since Unix epoch
+  // Number of hours since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
-  // Create unique id for the day
+  // Create unique id for the hour
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
 
   if (!usageMetrics) {
