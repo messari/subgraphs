@@ -1,41 +1,38 @@
 # Yield Yak Subgraph
 
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Vaults:
 
-`Insert Calculation`
+`Deposits in vaults + deposits in yyJOE + deposits in yyPTP`
 
-<Add notes to consider if any - delete if none>
+Ignores staked YAK. Ignores YY DEX aggregator.
 
 ### Total Revenue USD
 
 Sum across all Vaults:
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
-
+`Harvested yield`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Vaults:
 
-`Insert Calculation`
+`Harvested yield * Protocol fee share`
 
-<Add notes to consider if any - delete if none>
+Fees are usually between 5-10% of the reward tokens. Fees are variable and change with network conditions to optimize rewards.
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Vaults
 
-`Insert Calculation`
+`Harvested yield * (1 - Protocol fee share)`
 
-<Add notes to consider if any - delete if none>
+Fees are usually between 5-10% of the reward tokens. Fees are variable and change with network conditions to optimize rewards.
 
 ### Total Unique Users
 
