@@ -48,12 +48,12 @@ export function createAsset(
 
   const pool = getOrCreateLiquidityPool(poolAddress);
 
-  let assets: string[] = [];
-  if (pool._assets) {
-    assets = pool._assets!;
-  }
+  let inputTokens: string[] = pool.inputTokens;
+  let assets: string[] = pool._assets;
+  inputTokens.push(token.id);
   assets.push(assetAddress.toHexString());
   pool._assets = assets;
+  pool.inputTokens = inputTokens;
 
   pool.save();
 }
@@ -147,4 +147,3 @@ export function createSwapHandleVolumeAndFees(
   // swap.save();
   // updateVolumeAndFees(event, trackedAmountUSD, feeUSD);
 }
-

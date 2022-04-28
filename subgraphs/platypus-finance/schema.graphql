@@ -429,7 +429,7 @@ type LiquidityPool @entity {
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
-  _assets: [Asset!]
+  _assets: [Asset!]!
 }
 
 #################################
