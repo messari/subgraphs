@@ -32,13 +32,13 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 }
 
 export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
-  let pool = LiquidityPool.load(poolAddress.toString());
+  let pool = LiquidityPool.load(poolAddress.toHexString());
   // fetch info if null
   if (!pool) {
-    pool = new LiquidityPool(poolAddress.toString());
+    pool = new LiquidityPool(poolAddress.toHexString());
     pool.protocol = getOrCreateDexAmm().id;
 
-    let poolParam = new LiquidityPoolParamsHelper(poolAddress.toString());
+    let poolParam = new LiquidityPoolParamsHelper(poolAddress.toHexString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
     poolParam.SlippageParamsK = BigDecimal.fromString("0.00002e18");
@@ -191,8 +191,7 @@ export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddress: Add
 
   if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
     log.debug("UPDATE THE PRICE!", []);
-    let tokenPrice = getUsdPrice(tokenAddress, BigInt.fromI32(1));
-    token.lastPriceUSD = tokenPrice;
+    token.lastPriceUSD = BigDecimal.fromString("1");
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }

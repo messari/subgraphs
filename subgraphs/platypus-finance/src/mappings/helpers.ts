@@ -1,7 +1,6 @@
 import { log } from "@graphprotocol/graph-ts";
 import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import { Asset, Deposit, DexAmmProtocol, LiquidityPool, Token, Withdraw } from "../../generated/schema";
-import { SushiSwapRouterAvax as SushiSwapRouterContract } from "../../generated/Pool/SushiSwapRouterAvax";
 import {
   getOrCreateDexAmm,
   getOrCreateLiquidityPool,
@@ -75,7 +74,7 @@ export function createDeposit(
   let inputToken = getOrCreateToken(inputTokenAddress);
 
   // fetch price in USD
-  let amountInUSD: BigDecimal = getPriceFromSushiSwapRouter(inputTokenAddress, amount);
+  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputTokenAddress);
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
@@ -110,7 +109,7 @@ export function createWithdraw(
   let inputToken = getOrCreateToken(inputTokenAddress);
 
   // fetch price in USD
-  let amountInUSD: BigDecimal = getPriceFromSushiSwapRouter(inputTokenAddress, amount);
+  let amountInUSD: BigDecimal = getOrFetchTokenUsdPrice(event, inputTokenAddress);
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
   withdraw.protocol = protocol.id;
@@ -149,35 +148,3 @@ export function createSwapHandleVolumeAndFees(
   // updateVolumeAndFees(event, trackedAmountUSD, feeUSD);
 }
 
-export function getPriceFromSushiSwapRouter(tokenAddress: Address, amount: BigInt): BigDecimal {
-  log.warning("getPriceFromSushiSwapRouter {}", [tokenAddress.toHexString()]);
-
-  const routerAddressesV2: Address = Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506");
-  const WAVAX_ADDRESS: Address = Address.fromString("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");
-  const USDC_ADDRESS: Address = Address.fromString("0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e");
-
-  const path: Address[] = [tokenAddress, WAVAX_ADDRESS, USDC_ADDRESS];
-  const amountIn = BigInt.fromString("1000000");
-
-  const path_string: string = path.map<string>(x => x.toHexString()).join("-");
-  log.warning("sushiswap amountIn:{} path:{}", [amountIn.toString(), path_string]);
-
-  const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressesV2);
-  let amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
-
-  if (amountOutArray.reverted) {
-    log.warning("getPriceFromSushiSwapRouter isReverted: {}", [amountOutArray.reverted.toString()]);
-    return BigDecimal.zero();
-  }
-
-  let amountOut = amountOutArray.value[amountOutArray.value.length - 1];
-  let feeBips = BigInt.fromI32(30); // .3% per swap fees
-
-  let amountOutBigDecimal = amountOut
-    .times(amount)
-    .times(BigInt.fromI32(10000))
-    .div(BigInt.fromI32(10000).minus(feeBips.times(BigInt.fromI32(2))))
-    .toBigDecimal();
-
-  return amountOutBigDecimal;
-}
