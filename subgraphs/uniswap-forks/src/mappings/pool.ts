@@ -37,14 +37,14 @@ export function handleSync(event: Sync): void {
 
 export function handleMint(event: Mint): void {
   createDeposit(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.params.sender.toHexString(), UsageType.DEPOSIT);
+  updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
   updateFinancials(event);
   updatePoolMetrics(event);
 }
 
 export function handleBurn(event: Burn): void {
   createWithdraw(event, event.params.amount0, event.params.amount1);
-  updateUsageMetrics(event, event.transaction.from.toHexString(), UsageType.WITHDRAW);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
   updateFinancials(event);
   updatePoolMetrics(event);
 }
@@ -61,5 +61,5 @@ export function handleSwap(event: Swap): void {
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.transaction.from.toHexString(), UsageType.SWAP);
+  updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
 }
