@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -268,7 +268,7 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { # of hours since Unix epoch time } "
   id: ID!
 
   " Protocol this snapshot is associated with "
@@ -487,7 +487,7 @@ type LiquidityPoolDailySnapshot @entity {
 }
 
 type LiquidityPoolHourlySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "

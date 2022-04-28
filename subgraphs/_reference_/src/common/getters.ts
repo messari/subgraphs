@@ -22,6 +22,11 @@ import {
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
   RewardTokenType,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+  PROTOCOL_SCHEMA_VERSION,
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -59,13 +64,13 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
 
 export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
+  let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let dayId = id.toString();
   // Create unique id for the day
-  let usageMetrics = UsageMetricsDailySnapshot.load(id);
+  let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(id);
+    usageMetrics = new UsageMetricsDailySnapshot(dayId);
     usageMetrics.protocol = FACTORY_ADDRESS;
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
@@ -85,16 +90,14 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 }
 export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-
-  let dayId = day.toString();
   let hourId = hour.toString();
+
   // Create unique id for the day
-  let usageMetrics = UsageMetricsHourlySnapshot.load(dayId.concat("-").concat(hourId));
+  let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsHourlySnapshot(dayId.concat("-").concat(hourId));
+    usageMetrics = new UsageMetricsHourlySnapshot(hourId);
     usageMetrics.protocol = FACTORY_ADDRESS;
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
@@ -114,13 +117,13 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
 }
 
 export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
-  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
-  let id = dayID.toString();
+  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let dayId = day.toString();
   let poolMetrics = LiquidityPoolDailySnapshot.load(
     event.address
       .toHexString()
       .concat("-")
-      .concat(id)
+      .concat(dayId)
   );
 
   if (!poolMetrics) {
@@ -128,7 +131,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
       event.address
         .toHexString()
         .concat("-")
-        .concat(id)
+        .concat(dayId)
     );
     poolMetrics.protocol = FACTORY_ADDRESS;
     poolMetrics.pool = event.address.toHexString();
@@ -150,16 +153,12 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
 }
 
 export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
-  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-  let dayId = day.toString();
   let hourId = hour.toString();
   let poolMetrics = LiquidityPoolHourlySnapshot.load(
     event.address
       .toHexString()
-      .concat("-")
-      .concat(dayId)
       .concat("-")
       .concat(hourId)
   );
@@ -168,8 +167,6 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolMetrics = new LiquidityPoolHourlySnapshot(
       event.address
         .toHexString()
-        .concat("-")
-        .concat(dayId)
         .concat("-")
         .concat(hourId)
     );
@@ -231,11 +228,11 @@ export function getOrCreateDex(): DexAmmProtocol {
 
   if (!protocol) {
     protocol = new DexAmmProtocol(FACTORY_ADDRESS);
-    protocol.name = "Uniswap v2";
-    protocol.slug = "uniswap-v2";
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.0.1";
-    protocol.methodologyVersion = "1.0.0";
+    protocol.name = PROTOCOL_NAME
+    protocol.slug = PROTOCOL_SLUG
+    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION
+    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION
+    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

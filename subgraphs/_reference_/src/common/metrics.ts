@@ -25,9 +25,9 @@ export function updateFinancials(event: ethereum.Event): void {
 
 // Update usage metrics entities
 export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, usageType: string): void {
-  let from = fromAddress.toHexString()
-  
-  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event)
+  let from = fromAddress.toHexString();
+
+  let usageMetricsDaily = getOrCreateUsageMetricDailySnapshot(event);
   let usageMetricsHourly = getOrCreateUsageMetricHourlySnapshot(event);
 
   let protocol = getOrCreateDex();
@@ -55,10 +55,10 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   // Number of days since Unix epoch
   let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-  
+
   let dayId = day.toString();
   let hourId = hour.toString();
-  
+
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = from.concat("-").concat(dayId);
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
@@ -68,11 +68,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
     dailyActiveAccount.save();
   }
 
-  let hourlyActiveAccountId = from
-    .concat("-")
-    .concat(dayId)
-    .concat("-")
-    .concat(hourId);
+  let hourlyActiveAccountId = from.concat("-").concat(hourId);
   let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
@@ -93,7 +89,6 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   usageMetricsHourly.save();
   protocol.save();
 }
-
 
 // Update Pool Snapshots entities
 export function updatePoolMetrics(event: ethereum.Event): void {
