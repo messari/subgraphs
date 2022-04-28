@@ -115,6 +115,8 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouterAvax
+          file: ./abis/Prices/SushiSwap/RouterAvax.json
         - name: SushiSwapRouter
           file: ./abis/Prices/SushiSwap/Router.json
         - name: SushiSwapFactory
@@ -194,6 +196,8 @@ dataSources:
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
+        - name: SushiSwapRouterAvax
+          file: ./abis/Prices/SushiSwap/RouterAvax.json          
         - name: SushiSwapRouter
           file: ./abis/Prices/SushiSwap/Router.json
         - name: SushiSwapFactory

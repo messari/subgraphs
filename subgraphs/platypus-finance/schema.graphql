@@ -47,7 +47,8 @@ type Token @entity {
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
 
-  _assets: Asset! @derivedFrom(field: "token")
+  " Optional field to track the outputToken for this token "
+  _asset: Asset
 }
 
 enum RewardTokenType {
@@ -428,7 +429,7 @@ type LiquidityPool @entity {
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
-  _assets: [Asset!]! @derivedFrom(field: "pool")
+  _assets: [Asset!]
 }
 
 #################################
@@ -754,7 +755,7 @@ type LiquidityPoolParamsHelper @entity {
 }
 
 type Asset @entity {
-  " { Reward token type }-{ Smart contract address of the output token } "
+  " { Smart contract address of the output token } "
   id: ID!
 
   " Reference to the pool associated with the token"

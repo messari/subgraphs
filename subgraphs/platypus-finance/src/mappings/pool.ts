@@ -12,7 +12,7 @@ import {
   HaircutRateUpdated,
   AssetAdded,
 } from "../../generated/Pool/Pool";
-import { createDeposit } from "./helpers";
+import { createDeposit, createAsset } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
   // log.debug(
@@ -58,6 +58,13 @@ export function handleSwap(event: Swap): void {
 }
 
 export function handleAssetAdded(event: AssetAdded): void {
+  createAsset(
+    event,
+    event.address,
+    event.params.token,
+    event.params.asset,
+  );
+
   // A new LP token is added to this pool
   // Initialize Asset Contract with Address
   // Initialize Asset Address to Oracle

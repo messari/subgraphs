@@ -74,16 +74,22 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
   let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
   const routerAddresses = constants.SUSHISWAP_ROUTER_ADDRESS_MAP.get(network)!;
-
   let routerAddressV2 = routerAddresses.get("routerV2");
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
+  const path_string: string = path.map<string>(x => x.toHexString()).join("-");
+
+  log.warning("sushiswap amountIn:{} path:{}", [amountIn.toString(), path_string]);
+
   if (routerAddressV2) {
     const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressV2);
-    amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
 
-    log.warning("sushiswap r2:{} revert:{}", [routerAddressV2.toHexString(), amountOutArray.reverted.toString()]);
+    amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);
+    log.warning("sushiswap r2:{} revert:{}", [
+      routerAddressV2.toHexString(),
+      amountOutArray.reverted.toString()
+    ]);
 
     if (amountOutArray.reverted) {
       return new CustomPriceType();
