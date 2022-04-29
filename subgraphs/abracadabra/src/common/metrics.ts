@@ -33,32 +33,37 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): vo
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
 
+  let cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(feesUSD);
+
+  let cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus((feesUSD.times(ABRA_USER_REVENUE_SHARE)));
+
+  let cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus((feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE)));
+
   // // Update the block number and timestamp to that of the last transaction of that day
   financialsDailySnapshots.blockNumber = event.block.number;
   financialsDailySnapshots.timestamp = event.block.timestamp;
+
   financialsDailySnapshots.dailyTotalRevenueUSD = financialsDailySnapshots.dailyTotalRevenueUSD.plus(feesUSD); // feesUSD comes from logAccrue which is accounted in MIM
-  financialsDailySnapshots.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(feesUSD);
+  financialsDailySnapshots.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
+
   financialsDailySnapshots.dailySupplySideRevenueUSD = financialsDailySnapshots.dailySupplySideRevenueUSD.plus(
     feesUSD.times(ABRA_USER_REVENUE_SHARE),
   );
-  financialsDailySnapshots.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    (feesUSD.times(ABRA_USER_REVENUE_SHARE)),
-  );
+  financialsDailySnapshots.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
+
   financialsDailySnapshots.dailyProtocolSideRevenueUSD = financialsDailySnapshots.dailyProtocolSideRevenueUSD.plus(
     feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE),
   );
-  financialsDailySnapshots.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE),
-  );
+  financialsDailySnapshots.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(feesUSD);
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    (feesUSD.times(ABRA_USER_REVENUE_SHARE)),
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    feesUSD.times(ABRA_PROTOCOL_REVENUE_SHARE),
-  );
+  protocol.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
+
+  protocol.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
+
+  protocol.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
+
   financialsDailySnapshots.save();
+  protocol.save()
 }
 
 export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Address): void {
