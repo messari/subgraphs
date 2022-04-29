@@ -473,7 +473,7 @@ type LiquidityPoolDailySnapshot @entity {
   inputTokens: [Token!]!
 
   " Tokens that is minted to track ownership of position in protocol "
-  outputTokens: [Token!]!
+  outputTokens: [Token!]
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
@@ -534,7 +534,7 @@ type LiquidityPoolHourlySnapshot @entity {
   inputTokens: [Token!]!
 
   " Tokens that is minted to track ownership of position in protocol "
-  outputTokens: [Token!]!
+  outputTokens: [Token!]
 
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!

@@ -12,7 +12,7 @@ import {
   _LiquidityPoolParamsHelper,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
-import { Network, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY } from "../common/constants";
+import { Network, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
