@@ -139,8 +139,6 @@ export const DEGENBOX_ADDRESS_ARBITRUM = ZERO_ADDRESS;
 export const DEGENBOX_ADDRESS_FANTOM = "0x74A0BcA2eeEdf8883cb91E37e9ff49430f20a616".toLowerCase();
 export const DEGENBOX_ADDRESS_BSC = ZERO_ADDRESS;
 
-
-
 export const ABRA_ACCOUNTS = [
   // same on all chains
   "0xfddfe525054efaad204600d00ca86adb1cc2ea8a".toLowerCase(),
@@ -184,5 +182,3 @@ export const FTM_NETWORK = "fantom";
 export const ARB_NETWORK = "arbitrum-one";
 export const BSC_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";
-
-
