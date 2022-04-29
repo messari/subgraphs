@@ -13,8 +13,8 @@ import {
   SECONDS_PER_DAY,
   BLOCKS_PER_YEAR,
   EMISSION_START_BLOCK,
-  BLOCKS_PER_DAY, 
-  BIGINT_ONE
+  BLOCKS_PER_DAY,
+  BIGINT_ONE,
 } from "./constants";
 import { CErc20, Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/CToken/CErc20";
 import { JumpRateModelV2 } from "../../generated/templates/CToken/JumpRateModelV2";
@@ -727,7 +727,6 @@ export function updateInterestRates(event: ethereum.Event): void {
       .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
       .times(BIGDECIMAL_HUNDRED);
   }
-  // TODO: update InterestRate entity with rates_deposit and rates_borrow
 
   borrowerInterestRate.save();
   lenderInterestRate.save();

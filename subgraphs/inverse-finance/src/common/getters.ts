@@ -99,7 +99,6 @@ export function getUnderlyingTokenPricePerAmount(cToken: Address): BigDecimal {
   //return price of 1 underlying token
   let underlyingPrice = getUnderlyingTokenPrice(cToken);
   let decimals = getOrCreateUnderlyingToken(cToken).decimals;
-  //let denominator = new BigDecimal(BigInt.fromI64(10^decimals))
   let denominator = decimalsToBigDecimal(decimals);
   return underlyingPrice.div(denominator);
 }
@@ -132,6 +131,7 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
 
+    // metrics/markets - derived and don't need to be initialized
     //protocol.usageMetrics
     //protocol.financialMetrics
     //protocol.markets
@@ -174,8 +174,8 @@ export function getOrCreateMarket(marketId: string, event: ethereum.Event): Mark
     market.rates = [
       prefixID(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE),
       prefixID(marketId, InterestRateSide.BORROWER, InterestRateType.VARIABLE),
-    ]; //TODO: use InterestRate entity
-    //inverse finance does not have stable borrow rate
+    ];
+    //inverse finance does not have stable borrow rate - default to null
     //market.stableBorrowRate
 
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -193,7 +193,7 @@ export function getOrCreateMarket(marketId: string, event: ethereum.Event): Mark
     market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
     market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
-    //market.snapshots
+    //market.snapshots - derived and don't need to be initialized
     //market.deposits
     //market.withdraws
     //market.borrows
