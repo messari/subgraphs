@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/Pool/YearnLensContract";
+import { YearnLensContract } from "../../../generated/UniswapV2Factory/YearnLensContract";
 
 export function getYearnLensContract(network: string): YearnLensContract {
   return YearnLensContract.bind(Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)));
@@ -19,5 +19,5 @@ export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string):
     .readValue<BigInt>(yearnLensContract.try_getPriceUsdcRecommended(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
 }

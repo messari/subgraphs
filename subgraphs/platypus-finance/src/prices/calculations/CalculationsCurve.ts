@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/Pool/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/UniswapV2Factory/CalculationsCurve";
 
 export function getCalculationsCurveContract(network: string): CalculationsCurveContract {
   return CalculationsCurveContract.bind(constants.CURVE_CALCULATIONS_ADDRESS_MAP.get(network)!);
@@ -19,5 +19,5 @@ export function getTokenPriceFromCalculationCurve(tokenAddr: Address, network: s
     .readValue<BigInt>(calculationCurveContract.try_getCurvePriceUsdc(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
 }
