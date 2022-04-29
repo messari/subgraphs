@@ -367,7 +367,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputTokens: [Token!]
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -396,13 +396,13 @@ type LiquidityPool @entity {
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
+  outputTokensSupply: [BigInt!]
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
+  outputTokensPriceUSD: [BigDecimal!]
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
+  stakedOutputTokenAmounts: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -469,6 +469,12 @@ type LiquidityPoolDailySnapshot @entity {
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
+
+  " Tokens that is minted to track ownership of position in protocol "
+  outputTokens: [Token!]!
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -476,13 +482,13 @@ type LiquidityPoolDailySnapshot @entity {
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
+  outputTokenSupply: [BigInt!]
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
+  outputTokenPriceUSD: [BigDecimal!]
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
+  stakedOutputTokenAmount: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -524,6 +530,13 @@ type LiquidityPoolHourlySnapshot @entity {
   " All historical trade volume occurred in this pool, in USD "
   cumulativeVolumeUSD: BigDecimal!
 
+  " Tokens that need to be deposited to take a position in protocol. e.g. WETH and USDC to deposit into the WETH-USDC pool. Array to account for multi-asset pools like Curve and Balancer "
+  inputTokens: [Token!]!
+
+  " Tokens that is minted to track ownership of position in protocol "
+  outputTokens: [Token!]!
+
+
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -531,13 +544,13 @@ type LiquidityPoolHourlySnapshot @entity {
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
+  outputTokensSupply: [BigInt!]
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
+  outputTokensPriceUSD: [BigDecimal!]
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
+  stakedOutputTokenAmounts: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
