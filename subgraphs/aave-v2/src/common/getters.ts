@@ -20,10 +20,3 @@ export function getOrCreateToken(tokenAddress: Address, underlyingAsset: string 
   }
   return token;
 }
-<<<<<<< aave-v2
-=======
-
-export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
-  return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
-}
->>>>>>> master

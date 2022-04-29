@@ -1,8 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-<<<<<<< aave-v2
 import { SECONDS_PER_DAY } from "../constants";
-=======
->>>>>>> master
 
 export let minute = BigInt.fromI32(60);
 export let hour = BigInt.fromI32(3600);
@@ -48,13 +45,10 @@ export function getDayCloseTime(timestamp: BigInt): BigInt {
   return getDayOpenTime(timestamp).plus(day).minus(one);
 }
 
-<<<<<<< aave-v2
 export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
   return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
 }
 
-=======
->>>>>>> master
 // helpers
 
 export function getOpenTime(timestamp: BigInt, interval: BigInt): BigInt {

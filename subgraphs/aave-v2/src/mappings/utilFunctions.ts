@@ -48,11 +48,7 @@ import { VariableDebtToken as VToken } from '../../generated/templates/LendingPo
 
 import { IPriceOracleGetter } from '../../generated/templates/LendingPool/IPriceOracleGetter';
 
-<<<<<<< aave-v2
 import { getOrCreateToken } from '../common/getters';
-=======
-import { getDaysSinceEpoch, getOrCreateToken } from '../common/getters';
->>>>>>> master
 
 import { AToken } from '../../generated/templates/AToken/AToken';
 
@@ -65,16 +61,11 @@ import {
   fetchTokenName,
   fetchTokenSymbol
 } from '../common/tokens';
-<<<<<<< aave-v2
 
 import { emissionsPerDay } from '../common/rewards';
 
 import { getDaysSinceEpoch } from '../common/utils/datetime';
 
-=======
-import { emissionsPerDay } from '../common/rewards';
-
->>>>>>> master
 export function initMarket(
   blockNumber: BigInt,
   timestamp: BigInt,
