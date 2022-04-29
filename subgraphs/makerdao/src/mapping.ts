@@ -1,4 +1,4 @@
-import { BigInt, Address, Bytes, log, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, Address, Bytes, log, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vat, LogNote } from "../generated/Vat/Vat";
 import { Borrow, Deposit, Liquidate, Market, Repay, Withdraw, _Ilk } from "../generated/schema";
 import {
@@ -8,9 +8,9 @@ import {
   RAD,
   BIGDECIMAL_ONE_HUNDRED,
   WAD,
-  VOW_ADDRESS_TOPIC,
-  POT_ADDRESS_TOPIC,
   BIGDECIMAL_ZERO,
+  MCD_VOW_ADDRESS,
+  MCD_POT_ADDRESS
 } from "./common/constants";
 import {
   getMarket,
@@ -52,7 +52,7 @@ export function handleCage(event: GemLogNote): void {
 }
 
 export function handleEvent(
-  event: LogNote,
+  event: ethereum.Event,
   market: Market,
   eventType: string,
   amountCollateral: BigInt,
@@ -78,7 +78,7 @@ export function handleEvent(
     depositEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     usageMetricsHourlySnapshot.hourlyDepositCount += 1;
     usageMetricsDailySnapshot.dailyDepositCount += 1;
-
+    
     borrowEvent.hash = event.transaction.hash.toHexString();
     borrowEvent.logIndex = event.logIndex.toI32();
     borrowEvent.protocol = protocol.id;
@@ -267,7 +267,8 @@ export function handleGrab(event: LogNote): void {
 
   marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(totalLiqudationUSD);
   marketDailySnapshot.cumulativeLiquidateUSD = cumulativeLiquidateUSD;
-
+  
+  financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(totalLiqudationUSD);
   financialsDailySnapshot.cumulativeLiquidateUSD =
     financialsDailySnapshot.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
   financialsDailySnapshot.dailyProtocolSideRevenueUSD =
@@ -298,15 +299,17 @@ export function handleSuck(event: LogNote): void {
   let rad = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
   updateTotalBorrowUSD(event); // add debt
   if (
-    event.params.arg1.toHexString().toLowerCase() == VOW_ADDRESS_TOPIC && // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
-    event.params.arg2.toHexString().toLowerCase() == POT_ADDRESS_TOPIC
+    event.params.arg1.toHexString().substring(26).toLowerCase() == MCD_VOW_ADDRESS &&
+    event.params.arg2.toHexString().substring(26).toLowerCase() == MCD_POT_ADDRESS  // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
   ) {
     let FinancialsDailySnapshot = getOrCreateFinancials(event);
     let protocol = getOrCreateLendingProtocol();
     log.debug("supplySideRevenueUSD = {}", [rad.toString()]);
+    let cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(rad);
     FinancialsDailySnapshot.dailySupplySideRevenueUSD = FinancialsDailySnapshot.dailySupplySideRevenueUSD.plus(rad);
+    FinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD = cumulativeSupplySideRevenueUSD;
     FinancialsDailySnapshot.dailyTotalRevenueUSD = FinancialsDailySnapshot.dailyTotalRevenueUSD.plus(rad);
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(rad);
+    protocol.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(rad);
     FinancialsDailySnapshot.save();
     protocol.save();

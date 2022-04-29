@@ -152,6 +152,8 @@ export const MCD_CAT_ADDRESS = "0x78F2c2AF65126834c51822F56Be0d7469D7A523E".toLo
 export const MCD_CAT_V2_ADDRESS = "0xa5679C04fc3d9d8b0AaB1F0ab83555b301cA70Ea".toLowerCase();
 export const MCD_VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
 export const MCD_VOW_ADDRESS = "0xa950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
+export const MCD_POT_ADDRESS = "0x197e90f9fad81970ba7976f33cbd77088e5d7cf7".toLowerCase();
+
 export const ILK_REGISTRY_1_ADDRESS = "0x8b4ce5DCbb01e0e1f0521cd8dCfb31B308E52c24".toLowerCase();
 export const ILK_REGISTRY_1_STARTBLOCK = BigInt.fromI32(10744721);
 export const ILK_REGISTRY_2_ADDRESS = "0x5a464C28D19848f44199D003BeF5ecc87d090F87".toLowerCase();
@@ -161,5 +163,3 @@ export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
 export const ADDRESS_LENGTH = 20;
 
-export const VOW_ADDRESS_TOPIC = "0x000000000000000000000000a950524441892a31ebddf91d3ceefa04bf454466".toLowerCase();
-export const POT_ADDRESS_TOPIC = "0x000000000000000000000000197e90f9fad81970ba7976f33cbd77088e5d7cf7".toLowerCase();
