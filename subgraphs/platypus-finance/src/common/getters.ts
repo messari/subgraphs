@@ -9,7 +9,7 @@ import {
   FinancialsDailySnapshot,
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
-  LiquidityPoolParamsHelper,
+  _LiquidityPoolParamsHelper,
   Deposit,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -38,7 +38,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     pool = new LiquidityPool(poolAddress.toHexString());
     pool.protocol = getOrCreateDexAmm().id;
 
-    let poolParam = new LiquidityPoolParamsHelper(poolAddress.toHexString());
+    let poolParam = new _LiquidityPoolParamsHelper(poolAddress.toHexString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
     poolParam.SlippageParamsK = BigDecimal.fromString("0.00002e18");

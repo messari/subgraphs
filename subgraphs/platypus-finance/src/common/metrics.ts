@@ -190,9 +190,9 @@ function updateHourlyPoolMetrics(event: ethereum.Event, pool: LiquidityPool): vo
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot.outputTokenSupply = pool.outputTokenSupply;
-  snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  snapshot.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  snapshot.outputTokensSupply = pool.outputTokensSupply;
+  snapshot.outputTokenPricesUSD = pool.outputTokenPricesUSD;
+  snapshot.stakedOutputTokenAmounts = pool.stakedOutputTokenAmounts;
   snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
@@ -213,9 +213,9 @@ function updateDailyPoolMetrics(event: ethereum.Event, pool: LiquidityPool): voi
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot.outputTokenSupply = pool.outputTokenSupply;
-  snapshot.outputTokenPriceUSD = pool.outputTokenPriceUSD;
-  snapshot.stakedOutputTokenAmount = pool.stakedOutputTokenAmount;
+  snapshot.outputTokensSupply = pool.outputTokensSupply;
+  snapshot.outputTokenPricesUSD = pool.outputTokenPricesUSD;
+  snapshot.stakedOutputTokenAmounts = pool.stakedOutputTokenAmounts;
   snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
