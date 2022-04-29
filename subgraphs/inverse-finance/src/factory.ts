@@ -11,7 +11,7 @@ import {
   DistributedBorrowerComp,
   DistributedSupplierComp,
 } from "../generated/Factory/Factory";
-import { MANTISSA_DECIMALS, BIGDECIMAL_ONE, FACTORY_ADDRESS, BIGINT_ZERO } from './common/constants';
+import { MANTISSA_DECIMALS, BIGDECIMAL_ONE, FACTORY_ADDRESS, BIGINT_ZERO, BIGDECIMAL_HUNDRED } from './common/constants';
 import { getOrCreateToken, getOrCreateUnderlyingToken, getOrCreateMarket, getOrCreateProtocol } from "./common/getters";
 import { Market } from "../generated/schema";
 import { updateMarketEmission } from "./common/helpers";
@@ -75,7 +75,8 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   if (market != null) {
     let ltvFactor = event.params.newCollateralFactorMantissa
       .toBigDecimal()
-      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
+      .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
+      .times(BIGDECIMAL_HUNDRED);
     market.maximumLTV = ltvFactor;
     market.liquidationThreshold = ltvFactor;
     market.save();
@@ -101,7 +102,8 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
       let liquidationPenalty = event.params.newLiquidationIncentiveMantissa
         .toBigDecimal()
         .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
-        .minus(BIGDECIMAL_ONE);
+        .minus(BIGDECIMAL_ONE)
+        .times(BIGDECIMAL_HUNDRED);
       market.liquidationPenalty = liquidationPenalty;
 
       market.save();

@@ -3,6 +3,7 @@ import {
   INT_ONE,
   BIGINT_ZERO,
   BIGDECIMAL_ZERO,
+  BIGDECIMAL_HUNDRED,
   FACTORY_ADDRESS,
   XINV_ADDRESS,
   MANTISSA_DECIMALS,
@@ -694,11 +695,9 @@ export function updateInterestRates(event: ethereum.Event): void {
   let lenderInterestRate = getOrCreateInterestRate(marketId, InterestRateSide.LENDER, InterestRateType.VARIABLE);
   if (borrowerInterestRate == null) {
     log.error("Borrower InterestRate for market {} does not exist.", [marketId]);
-    return;
   }
   if (lenderInterestRate == null) {
     log.error("Lender InterestRate for market {} does not exist.", [marketId]);
-    return;
   }
 
   let tokenContract = CErc20.bind(event.address);
@@ -713,7 +712,8 @@ export function updateInterestRates(event: ethereum.Event): void {
     borrowerInterestRate.rate = tryBorrowRate.value
       .toBigDecimal()
       .times(BLOCKS_PER_YEAR)
-      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
+      .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
+      .times(BIGDECIMAL_HUNDRED);
   }
   if (tryDepositRate.reverted) {
     log.warning("Failed to get supplyRatePerBlock() for Market {} at tx hash {}", [
@@ -724,7 +724,8 @@ export function updateInterestRates(event: ethereum.Event): void {
     lenderInterestRate.rate = tryDepositRate.value
       .toBigDecimal()
       .times(BLOCKS_PER_YEAR)
-      .div(decimalsToBigDecimal(MANTISSA_DECIMALS));
+      .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
+      .times(BIGDECIMAL_HUNDRED);
   }
   // TODO: update InterestRate entity with rates_deposit and rates_borrow
 
