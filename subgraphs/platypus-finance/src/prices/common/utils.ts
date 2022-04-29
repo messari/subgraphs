@@ -1,5 +1,5 @@
 import * as constants from "./constants";
-import { _ERC20 } from "../../../generated/UniswapV2Factory/_ERC20";
+import { _ERC20 } from "../../../generated/Pool/_ERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T): T {
