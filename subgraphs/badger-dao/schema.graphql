@@ -1,5 +1,5 @@
 # Subgraph Schema: Yield Aggregator
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -251,7 +251,7 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { # of hours since Unix epoch time } "
   id: ID!
 
   " Protocol this snapshot is associated with "
@@ -444,7 +444,7 @@ type VaultDailySnapshot @entity {
 }
 
 type VaultHourlySnapshot @entity {
-  " { Smart contract address of the vault }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { Smart contract address of the vault }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
@@ -605,9 +605,15 @@ type Account @entity {
   id: ID!
 }
 
-# Helper entity for calculating daily/hourly active users
+# Helper entity for calculating daily active users
 type ActiveAccount @entity {
-  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
+  " { Address of the account }-{ Days since Unix epoch } "
+  id: ID!
+}
+
+# Helper entity for calculating hourly active users
+type HourlyActiveAccount @entity {
+  " { Address of the account }-{ Hours since Unix epoch } "
   id: ID!
 }
 

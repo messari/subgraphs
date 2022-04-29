@@ -1,5 +1,5 @@
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount, Vault } from "../../generated/schema";
+import { Account, ActiveAccount, HourlyActiveAccount, Vault } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 import {
   getOrCreateFinancialsDailySnapshot,
@@ -9,7 +9,7 @@ import {
   getOrCreateVaultHourlySnapshot,
 } from "../entities/Metrics";
 import { getOrCreateProtocol } from "../entities/Protocol";
-import { getDay } from "../utils/numbers";
+import { getDay, getHour } from "../utils/numbers";
 
 function updateUsageMetrics(call: ethereum.Call, isDeposit: bool): void {
   let dailyMetrics = getOrCreateUsageMetricDailySnapshot(call.block);
@@ -43,16 +43,27 @@ function updateUsageMetrics(call: ethereum.Call, isDeposit: bool): void {
     protocol.save();
   }
 
-  let activeAccountId = call.transaction.from
+  let dayActiveAccountId = call.transaction.from
     .toHexString()
     .concat("-")
     .concat(getDay(call.block.timestamp).toString());
-  let activeAccount = ActiveAccount.load(activeAccountId);
+  let activeAccount = ActiveAccount.load(dayActiveAccountId);
   if (!activeAccount) {
-    activeAccount = new ActiveAccount(activeAccountId);
+    activeAccount = new ActiveAccount(dayActiveAccountId);
     activeAccount.save();
 
     dailyMetrics.dailyActiveUsers += 1;
+  }
+
+  let hourActiveAccountId = call.transaction.from
+    .toHexString()
+    .concat("-")
+    .concat(getHour(call.block.timestamp).toString());
+  let hourlyActiveAccount = HourlyActiveAccount.load(hourActiveAccountId);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new HourlyActiveAccount(hourActiveAccountId);
+    hourlyActiveAccount.save();
+
     hourlyMetrics.hourlyActiveUsers += 1;
   }
 

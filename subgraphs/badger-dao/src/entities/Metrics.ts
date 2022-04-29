@@ -36,9 +36,8 @@ export function getOrCreateUsageMetricDailySnapshot(
 }
 
 export function getOrCreateHourlyDailySnapshot(block: ethereum.Block): UsageMetricsHourlySnapshot {
-  let day = getDay(block.timestamp).toString();
   let hour = getHour(block.timestamp).toString();
-  let id = day.concat("-").concat(hour);
+  let id = hour.toString();
 
   let snapshot = UsageMetricsHourlySnapshot.load(id);
 
@@ -124,13 +123,10 @@ export function getOrCreateVaultHourlySnapshot(
   block: ethereum.Block,
 ): VaultHourlySnapshot {
   let day = getDay(block.timestamp).toString();
-  let hour = getHour(block.timestamp).toString();
   const id = vault
     .toHex()
     .concat("-")
-    .concat(day.toString())
-    .concat("-")
-    .concat(hour.toString());
+    .concat(day.toString());
   let snapshot = VaultHourlySnapshot.load(id);
 
   if (snapshot) {
