@@ -23,7 +23,7 @@ import {
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
 
-export function getOrCreateToken(tokenAddress: Address): Token {
+export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
   // fetch info if null
   if (!token) {
@@ -31,6 +31,8 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.name = fetchTokenName(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress);
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
   return token;
@@ -184,7 +186,7 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
 }
 
 export function updatePricesForToken(event: ethereum.Event, tokenAddress: Address): void {
-  let token = getOrCreateToken(tokenAddress);
+  let token = getOrCreateToken(event, tokenAddress);
 
   if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
     log.debug("UPDATE THE PRICE!", []);

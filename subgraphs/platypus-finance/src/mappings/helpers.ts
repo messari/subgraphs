@@ -3,7 +3,7 @@ import { Asset, Deposit, Withdraw } from "../../generated/schema";
 import { TransactionType } from "../common/constants";
 import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, updatePricesForToken } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
-import { tokenAmountToUSDAmount } from "../common/utils/numbers"
+import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 
 export function createAsset(
   event: ethereum.Event,
@@ -19,7 +19,7 @@ export function createAsset(
   asset.timestamp = event.block.timestamp;
   asset.save();
 
-  const token = getOrCreateToken(tokenAddress);
+  const token = getOrCreateToken(event, tokenAddress);
   token._asset = assetAddress.toHexString();
   token.save();
 
@@ -53,7 +53,7 @@ export function createDeposit(
 
   let protocol = getOrCreateDexAmm();
   let pool = getOrCreateLiquidityPool(event.address);
-  let inputToken = getOrCreateToken(inputTokenAddress);
+  let inputToken = getOrCreateToken(event, inputTokenAddress);
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
@@ -88,7 +88,7 @@ export function createWithdraw(
 
   let protocol = getOrCreateDexAmm();
   let pool = getOrCreateLiquidityPool(event.address);
-  let inputToken = getOrCreateToken(inputTokenAddress);
+  let inputToken = getOrCreateToken(event, inputTokenAddress);
 
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.logIndex.toI32();
