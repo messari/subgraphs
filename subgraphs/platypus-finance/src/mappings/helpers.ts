@@ -1,6 +1,5 @@
-import { log } from "@graphprotocol/graph-ts";
-import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
-import { Asset, Deposit, DexAmmProtocol, LiquidityPool, Token, Withdraw } from "../../generated/schema";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { Asset, Deposit, Withdraw } from "../../generated/schema";
 import { TransactionType } from "../common/constants";
 import {
   getOrCreateDexAmm,

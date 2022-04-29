@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   Account,
   ActiveAccount,
@@ -18,7 +18,6 @@ import {
   getOrCreateToken,
 } from "../common/getters";
 import { getDays, getHours } from "../common/utils/datetime";
-import { BIGINT_TEN } from "../prices/common/constants";
 import { BIGDECIMAL_ZERO, TransactionType } from "./constants";
 import { bigIntToBigDecimal } from "./utils/numbers";
 

@@ -10,13 +10,10 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   _LiquidityPoolParamsHelper,
-  Deposit,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
-import { BIGDECIMAL_ZERO, Network, INT_ZERO, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY } from "../common/constants";
-import { getDays, getHours } from "./utils/datetime";
+import { Network, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
-import { getUsdPrice, getUsdPricePerToken } from "../prices";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -56,7 +53,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     let _pools: string[] = protocol.pools;
     _pools.push(pool.id);
     protocol.pools = _pools;
-    protocol.save()
+    protocol.save();
   }
   return pool;
 }
@@ -79,15 +76,8 @@ export function getOrCreateDailyUsageMetricSnapshot(event: ethereum.Event): Usag
 }
 
 export function getOrCreateHourlyUsageMetricSnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
-  var utcSeconds = event.block.timestamp.toI64();
-
-  // Number of days since Unix epoch
-  let days: i64 = utcSeconds / SECONDS_PER_DAY;
-  // Number of hours in day
-  let hours: i64 = new Date(utcSeconds * 1000).getUTCHours();
-
-  // " { # of days since Unix epoch time }-{ HH: hour of the day } "
-  let id: string = days.toString().concat("-").concat(hours.toString());
+  // " { # of hours since Unix epoch time } "
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   // Create unique id for the day
   let usageMetrics = UsageMetricsHourlySnapshot.load(id.toString());
@@ -124,14 +114,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
 }
 
 export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
-  var timestamp = event.block.timestamp.toI64();
-  // Number of days since Unix epoch
-  let days: i64 = getDays(timestamp);
-  // Number of hours in day
-  let hours: i64 = getHours(timestamp);
-  // " { # of days since Unix epoch time }-{ HH: hour of the day } "
-
-  let id: string = days.toString().concat("-").concat(hours.toString());
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   let poolAddress = event.address.toHexString();
 
