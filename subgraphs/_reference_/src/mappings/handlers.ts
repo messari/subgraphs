@@ -3,28 +3,19 @@ import { Mint, Burn, Swap } from "../../generated/templates/Pair/Pair";
 import { PairCreated } from "../../generated/templates/Pair/Factory";
 import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees, createLiquidityPool } from "./helpers";
 import { updateFinancials, updateUsageMetrics, updatePoolMetrics } from "../common/metrics";
-import { getOrCreateDexAmm } from "../common/getters";
 import { getRewardsPerDay, RewardIntervalType } from "../common/rewards";
+import { BIGDECIMAL_ONE, UsageType } from "../common/constants";
 
 // To improve readability and consistency, it is recommended that you put all
 // handlers in this file, and create helper functions to handle specific events
 
 export function handleNewPair(event: PairCreated): void {
-  // let protocol = getOrCreateDexAmm();
-  // // create the tokens and tokentracker
-  // let token0 = getOrCreateToken(event.params.token0);
-  // let token1 = getOrCreateToken(event.params.token1);
-  // let LPtoken = getOrCreateToken(event.params.pair);
-  // let tokenTracker0 = getOrCreateTokenTracker(event.params.token0);
-  // let tokenTracker1 = getOrCreateTokenTracker(event.params.token1);
-  // tokenTracker0.derivedETH = findEthPerToken(tokenTracker0);
-  // tokenTracker1.derivedETH = findEthPerToken(tokenTracker1);
-  // createLiquidityPool(event, protocol, event.params.pair, token0, token1, LPtoken);
+  createLiquidityPool(event, event.params.pair, event.params.token0, event.params.token1);
 }
 
 export function handleMint(event: Mint): void {
   createDeposit(event, event.params.amount0, event.params.amount1, event.params.sender);
-  updateUsageMetrics(event, event.params.sender);
+  updateUsageMetrics(event, event.params.sender, UsageType.DEPOSIT);
   updateFinancials(event);
   updatePoolMetrics(event);
 
@@ -32,12 +23,12 @@ export function handleMint(event: Mint): void {
 
 export function handleBurn(event: Burn): void {
   createWithdraw(event, event.params.amount0, event.params.amount1, event.params.sender, event.params.to);
-  updateUsageMetrics(event, event.transaction.from);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
   updateFinancials(event);
   updatePoolMetrics(event);
 
   // INT_ONE and BLOCK for reward amount and interval type are arbitrary since uniswap does not have reward emissions
-  getRewardsPerDay(event.block.timestamp, event.block.number, INT_ONE, RewardIntervalType.BLOCK)
+  getRewardsPerDay(event.block.timestamp, event.block.number, BIGDECIMAL_ONE, RewardIntervalType.BLOCK)
 }
 
 export function handleSwap(event: Swap): void {
@@ -52,5 +43,5 @@ export function handleSwap(event: Swap): void {
   );
   updateFinancials(event);
   updatePoolMetrics(event);
-  updateUsageMetrics(event, event.params.sender);
+  updateUsageMetrics(event, event.params.sender, UsageType.SWAP);
 }
