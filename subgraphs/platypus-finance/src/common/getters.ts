@@ -175,7 +175,7 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
   return protocol;
 }
 
-export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddress: Address): BigDecimal {
+export function updatePricesForToken(event: ethereum.Event, tokenAddress: Address): void {
   let token = getOrCreateToken(tokenAddress);
 
   if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
@@ -184,5 +184,4 @@ export function getOrFetchTokenUsdPrice(event: ethereum.Event, tokenAddress: Add
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
-  return token.lastPriceUSD!;
 }

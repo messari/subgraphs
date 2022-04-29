@@ -1,13 +1,9 @@
 import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { Asset, Deposit, Withdraw } from "../../generated/schema";
 import { TransactionType } from "../common/constants";
-import {
-  getOrCreateDexAmm,
-  getOrCreateLiquidityPool,
-  getOrCreateToken,
-  getOrFetchTokenUsdPrice,
-} from "../common/getters";
+import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, updatePricesForToken } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
+import { tokenAmountToUSDAmount } from "../common/utils/numbers"
 
 export function createAsset(
   event: ethereum.Event,
@@ -59,8 +55,6 @@ export function createDeposit(
   let pool = getOrCreateLiquidityPool(event.address);
   let inputToken = getOrCreateToken(inputTokenAddress);
 
-  // fetch price in USD
-
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.logIndex.toI32();
   deposit.protocol = protocol.id;
@@ -74,8 +68,8 @@ export function createDeposit(
   deposit.outputToken = inputToken._asset;
   deposit.outputTokenAmount = liquidity;
 
-  deposit.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
-
+  updatePricesForToken(event, inputTokenAddress);
+  deposit.amountUSD = tokenAmountToUSDAmount(inputToken, amount);
   deposit.save();
   updateBalancesInPool<Deposit>(event, deposit, TransactionType.DEPOSIT);
   updateProtocolTVL(event);
@@ -109,8 +103,8 @@ export function createWithdraw(
   withdraw.outputToken = inputToken._asset;
   withdraw.outputTokenAmount = liquidity;
 
-  withdraw.amountUSD = getOrFetchTokenUsdPrice(event, inputTokenAddress);
-
+  updatePricesForToken(event, inputTokenAddress);
+  withdraw.amountUSD = tokenAmountToUSDAmount(inputToken, amount);
   withdraw.save();
   updateBalancesInPool<Withdraw>(event, withdraw, TransactionType.WITHDRAW);
   updateProtocolTVL(event);

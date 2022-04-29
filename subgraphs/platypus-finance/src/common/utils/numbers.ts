@@ -1,4 +1,15 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Token } from "../../../generated/schema";
+
+export function tokenAmountToUSDAmount(token: Token, amount: BigInt): BigDecimal {
+  return token.lastPriceUSD!.times(
+    amount.divDecimal(
+      BigInt.fromI32(10)
+        .pow(token.decimals as u8)
+        .toBigDecimal(),
+    ),
+  );
+}
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
