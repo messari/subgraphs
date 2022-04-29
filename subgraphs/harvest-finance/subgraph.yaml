@@ -7,19 +7,32 @@ dataSources:
     network: mainnet
     source:
       address: "0xFE09e53A81Fe2808bc493ea64319109B5bAa573e"
-      abi: fWETHContract
+      abi: Vault
       startBlock: 11086824
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Upgraded
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
       abis:
-        - name: fWETHContract
-          file: ./abis/fWETHContract.json
+        - name: Vault
+          file: ./abis/Vault.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Strategy
+          file: ./abis/Vault.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
