@@ -6,7 +6,7 @@
 
 Sum across all Pools: 
 
-`Liquidity Pool TVL`
+`Sum balances of coins held in a pool`
 
 ### Total Revenue USD
 
