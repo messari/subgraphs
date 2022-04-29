@@ -132,7 +132,6 @@ export function handleLogBorrow(event: LogBorrow): void {
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, "BORROW", getMIMAddress(dataSource.network()), event.params.amount, event);
-  updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
 }
@@ -224,7 +223,6 @@ export function handleLogRepay(event: LogRepay): void {
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, "REPAY", getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
-  updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
 }
@@ -238,7 +236,6 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
   market.inputTokenPriceUSD = priceUSD;
   market.totalValueLockedUSD = tvlUSD;
   market.save();
-  updateTVL(event);
   updateTokenPrice(token.id, priceUSD, event);
 }
 

@@ -45,6 +45,11 @@ import {
   BIGDECIMAL_ONE,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  DEGENBOX_ADDRESS_MAINNET,
+  DEGENBOX_ADDRESS_AVALANCHE,
+  DEGENBOX_ADDRESS_ARBITRUM,
+  DEGENBOX_ADDRESS_FANTOM,
+  DEGENBOX_ADDRESS_BSC,
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -252,6 +257,21 @@ export function getBentoBoxAddress(network: string): string {
     return BENTOBOX_ADDRESS_FANTOM;
   } else if (network == BSC_NETWORK) {
     return BENTOBOX_ADDRESS_BSC;
+  }
+  return "";
+}
+
+export function getDegenBoxAddress(network: string): string {
+  if (network == ETH_NETWORK) {
+    return DEGENBOX_ADDRESS_MAINNET;
+  } else if (network == AVALANCHE_NETWORK) {
+    return DEGENBOX_ADDRESS_AVALANCHE;
+  } else if (network == ARB_NETWORK) {
+    return DEGENBOX_ADDRESS_ARBITRUM;
+  } else if (network == FTM_NETWORK) {
+    return DEGENBOX_ADDRESS_FANTOM;
+  } else if (network == BSC_NETWORK) {
+    return DEGENBOX_ADDRESS_BSC;
   }
   return "";
 }

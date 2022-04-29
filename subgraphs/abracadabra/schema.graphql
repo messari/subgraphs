@@ -276,6 +276,7 @@ type LendingProtocol implements Protocol @entity {
   markets: [Market!]! @derivedFrom(field: "protocol")
 
   marketIDList: [String!]!
+  
 }
 
 ###############################
