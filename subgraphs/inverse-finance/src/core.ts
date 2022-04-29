@@ -34,7 +34,7 @@ export function handleMint(event: Mint): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  aggregateAllMarkets(event)
+  aggregateAllMarkets(event);
 }
 
 export function handleRedeem(event: Redeem): void {
@@ -44,7 +44,7 @@ export function handleRedeem(event: Redeem): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  aggregateAllMarkets(event)
+  aggregateAllMarkets(event);
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -54,7 +54,7 @@ export function handleBorrow(event: Borrow): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  aggregateAllMarkets(event)
+  aggregateAllMarkets(event);
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
@@ -64,7 +64,7 @@ export function handleRepayBorrow(event: RepayBorrow): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  aggregateAllMarkets(event)
+  aggregateAllMarkets(event);
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
@@ -74,7 +74,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  aggregateAllMarkets(event)
+  aggregateAllMarkets(event);
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
