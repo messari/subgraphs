@@ -187,6 +187,8 @@ function updateHourlyPoolMetrics(event: ethereum.Event, pool: LiquidityPool): vo
   snapshot.timestamp = event.block.timestamp;
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
+  snapshot.inputTokens = pool.inputTokens;
+  snapshot.outputTokens = pool.outputTokens!;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
   snapshot.outputTokensSupply = pool.outputTokensSupply;
@@ -210,6 +212,8 @@ function updateDailyPoolMetrics(event: ethereum.Event, pool: LiquidityPool): voi
   snapshot.timestamp = event.block.timestamp;
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
+  snapshot.inputTokens = pool.inputTokens;
+  snapshot.outputTokens = pool.outputTokens!;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
   snapshot.outputTokensSupply = pool.outputTokensSupply;
