@@ -8,21 +8,18 @@ import { ERC20 } from "../../generated/CP/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
 import { createERC20Instance, createNewDVMEvent } from "./factory_helpers.test";
 
-export function createDVM(addressDVM: string): DVM {
-  let dVm = Address.fromString(addressDVM);
-  let version = ethereum.Value.fromString("DVM 1.0.2");
-
-  createMockedFunction(dVm, "version", "version():(string)").returns([version]);
-
-  let dvm = DVM.bind(dVm);
-  return dvm;
-}
-
 export function createBuySharesEvent(
   to: string,
-  increaseShares: i64,
-  totalShares: i64
+  increaseShares: string,
+  totalShares: string
 ): BuyShares {
+  let newDVMevent = createNewDVMEvent(
+    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
+    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
+    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
+    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
+  );
+
   let newBuySharesEvent = changetype<BuyShares>(newMockEvent());
   newBuySharesEvent.parameters = new Array();
 
@@ -33,12 +30,12 @@ export function createBuySharesEvent(
 
   let increaseSharess = new ethereum.EventParam(
     "increaseShares",
-    ethereum.Value.fromString(increaseShares.toString())
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromString(increaseShares))
   );
 
   let totalSharess = new ethereum.EventParam(
     "totalShares",
-    ethereum.Value.fromString(totalShares.toString())
+    ethereum.Value.fromUnsignedBigInt(BigInt.fromString(totalShares))
   );
 
   newBuySharesEvent.parameters.push(too);

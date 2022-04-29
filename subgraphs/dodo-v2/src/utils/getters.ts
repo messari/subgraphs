@@ -116,7 +116,6 @@ export function getOrCreatePool(
   let dodoLp = getOrCreateRewardToken(Address.fromString(DODOLpToken_ADDRESS));
   let vdodo = getOrCreateRewardToken(Address.fromString(vDODOToken_ADDRESS));
   let lpToken = getOrCreateToken(poolAddress);
-  setPriceLP(timestamp, blockNumber, poolAddress);
 
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toHex());
@@ -298,6 +297,7 @@ export function getLiquidityPoolHourlySnapshot(
       event.block.timestamp
     );
 
+    setPriceLP(event.block.timestamp, event.block.number, event.address);
     poolMetrics.protocol = getProtocolFromPool(event.address);
     poolMetrics.pool = pool.id;
     poolMetrics.blockNumber = event.block.number;
