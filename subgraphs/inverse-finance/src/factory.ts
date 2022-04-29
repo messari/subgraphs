@@ -33,6 +33,7 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleTransferSeizePaused(event: ActionPaused): void {
+  // TransferSeizePaused applies to all markets
   if (event.params.action == "Transfer") {
     // reset market.isActive based on whether 'Transfer' is paused
     // 'Transfer' pause pauses all markets
@@ -89,6 +90,7 @@ export function handleNewCloseFactor(event: NewCloseFactor): void {
 }
 
 export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
+  // NewLiquidationIncentive applies to all markets
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
   let marketAddrs = factoryContract.getAllMarkets();
   for (let i = 0; i < marketAddrs.length; i++) {

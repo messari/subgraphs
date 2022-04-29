@@ -11,16 +11,15 @@ import {
 } from "../generated/templates/CToken/CErc20";
 import {
   updateDeposit,
-  createWithdraw,
+  updateWithdraw,
   updateBorrow,
-  createRepay,
+  updateRepay,
   updateLiquidate,
   updateUsageMetrics,
   updateMarket,
   updateMarketMetrics,
-  updateFinancials,
   updateRevenue,
-  updateProtocol,
+  aggregateAllMarkets,
   updateInterestRates,
 } from "./common/helpers";
 
@@ -35,19 +34,17 @@ export function handleMint(event: Mint): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  updateFinancials(event);
-  updateProtocol(event);
+  aggregateAllMarkets(event)
 }
 
 export function handleRedeem(event: Redeem): void {
   let user = event.params.redeemer;
-  createWithdraw(event);
+  updateWithdraw(event);
   updateMarket(event);
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  updateFinancials(event);
-  updateProtocol(event);
+  aggregateAllMarkets(event)
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -57,19 +54,17 @@ export function handleBorrow(event: Borrow): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  updateFinancials(event);
-  updateProtocol(event);
+  aggregateAllMarkets(event)
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
   let user = event.params.payer;
-  createRepay(event);
+  updateRepay(event);
   updateMarket(event);
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  updateFinancials(event);
-  updateProtocol(event);
+  aggregateAllMarkets(event)
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
@@ -79,8 +74,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   updateInterestRates(event);
   updateUsageMetrics(event, user);
   updateMarketMetrics(event);
-  updateFinancials(event);
-  updateProtocol(event);
+  aggregateAllMarkets(event)
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
