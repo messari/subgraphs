@@ -12,8 +12,16 @@ import {
   _LiquidityPoolParamsHelper,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
-import { Network, PROTOCOL_ADMIN, ProtocolType, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../common/constants";
+import {
+  Network,
+  PROTOCOL_ADMIN,
+  ProtocolType,
+  BIGDECIMAL_ZERO,
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+} from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
+import { getUsdPrice } from "../prices";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -180,7 +188,11 @@ export function updatePricesForToken(event: ethereum.Event, tokenAddress: Addres
 
   if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
     log.debug("UPDATE THE PRICE!", []);
-    token.lastPriceUSD = BigDecimal.fromString("1");
+
+    token.lastPriceUSD = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
+    if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
+      token.lastPriceUSD = BigDecimal.fromString("1");
+    }
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
