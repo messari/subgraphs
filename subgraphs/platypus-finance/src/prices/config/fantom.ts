@@ -115,3 +115,6 @@ WHITELIST_TOKENS.set(
   "CRV",
   Address.fromString("0x1E4F97b9f9F913c46F1632781732927B9019C68b")
 );
+
+export const BASE_TOKEN = "FTM"
+export const WRAPPED_BASE_TOKEN = "WFTM"

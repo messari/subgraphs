@@ -10,7 +10,9 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/Pool/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
-  if (tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!) {
+  if (
+    tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get(constants.NETWORK_BASE_TOKEN_MAP.get(network)![0])!
+  ) {
     return false;
   }
 
@@ -35,8 +37,10 @@ export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): 
 }
 
 export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
-  let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
+  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(constants.NETWORK_BASE_TOKEN_MAP.get(network)![0])!;
+  let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(
+    constants.NETWORK_BASE_TOKEN_MAP.get(network)![1],
+  )!;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {

@@ -9,7 +9,11 @@ import {
 import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/Pool/SushiSwapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
-  if (tokenAddress.equals(constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!)) {
+  if (
+    tokenAddress.equals(
+      constants.WHITELIST_TOKENS_MAP.get(network)!.get(constants.NETWORK_BASE_TOKEN_MAP.get(network)![0])!,
+    )
+  ) {
     return false;
   }
 
@@ -36,7 +40,7 @@ export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): 
 
 export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
   let wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
-  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
+  let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(constants.NETWORK_BASE_TOKEN_MAP.get(network)![0])!;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {

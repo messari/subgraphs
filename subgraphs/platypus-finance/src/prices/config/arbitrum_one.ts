@@ -103,3 +103,6 @@ WHITELIST_TOKENS.set(
   "CRV",
   Address.fromString("0x11cdb42b0eb46d95f990bedd4695a6e3fa034978")
 );
+
+export const BASE_TOKEN = "ETH"
+export const WRAPPED_BASE_TOKEN = "WETH"

@@ -54,3 +54,6 @@ WHITELIST_TOKENS.set("USDC", Address.fromString("0xb97ef9ef8734c71904d8002f8b6bc
 WHITELIST_TOKENS.set("CRV", Address.fromString("0x249848beca43ac405b8102ec90dd5f22ca513c06"));
 WHITELIST_TOKENS.set("LINK", Address.fromString("0x5947bb275c521040051d82396192181b413227a3"));
 WHITELIST_TOKENS.set("WAVAX", Address.fromString("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"));
+
+export const BASE_TOKEN = "AVAX"
+export const WRAPPED_BASE_TOKEN = "WAVAX"
