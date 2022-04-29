@@ -4,23 +4,25 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ///// Schema Enums /////
 ////////////////////////
 
-// The enum values are derived from Coingecko slugs (converted to uppercase
-// and replaced hyphens with underscores for Postgres enum compatibility)
+// The network names corresponding to the Network enum in the schema.
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -29,6 +31,28 @@ export namespace ProtocolType {
   export const YIELD = "YIELD";
   export const BRIDGE = "BRIDGE";
   export const GENERIC = "GENERIC";
+}
+
+// The network names corresponding to the ones in `dataSource.network()`
+// They should mainly be used for the ease of comparison.
+// Note that they cannot be used as enums since they are lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
 }
 
 export namespace RewardTokenType {
@@ -44,6 +68,25 @@ export namespace LendingType {
 export namespace RiskType {
   export const GLOBAL = "GLOBAL";
   export const ISOLATED = "ISOLATED";
+}
+
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED_TERM = "FIXED_TERM";
+}
+
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
+export namespace TransactionType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+  export const BORROW = "BORROW";
+  export const REPAY = "REPAY";
+  export const LIQUIDATE = "LIQUIDATE";
 }
 
 //////////////////////////////
@@ -79,18 +122,23 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_ONEHUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 
 export const INT_ZERO = 0 as i32;
+export const INT_NEGATIVE_ONE = -1 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
+export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+export const BIGDECIMAL_ONEHUNDRED = new BigDecimal(BIGINT_ONEHUNDRED);
 
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
@@ -98,25 +146,24 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 ///// Date/Time /////
 /////////////////////
 
+export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
-export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
-export const BLOCKS_PER_DAY = BigDecimal.fromString("6570"); // blocks every 13.15 seconds
-export const BLOCKS_PER_YEAR = BLOCKS_PER_DAY.times(DAYS_PER_YEAR);
+export const DAYS_PER_YEAR = BigInt.fromI32(365);
+export const MS_PER_YEAR = DAYS_PER_YEAR.toBigDecimal().times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const NETWORK_ETHEREUM = Network.ETHEREUM;
+export const NETWORK_ETHEREUM = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_NAME = "Compound v2";
 export const PROTOCOL_SLUG = "compound-v2";
-export const SUBGRAPH_VERSION = "1.4.16";
-export const SCHEMA_VERSION = "1.1.0";
+export const SUBGRAPH_VERSION = "1.5.2";
+export const SCHEMA_VERSION = "1.2.1";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const COMPOUND_DECIMALS = 8;
 export const INITIAL_EXCHANGE_RATE = BigDecimal.fromString(".02");

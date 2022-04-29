@@ -1,4 +1,5 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(

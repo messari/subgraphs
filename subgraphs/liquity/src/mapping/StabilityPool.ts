@@ -3,8 +3,8 @@ import {
   StabilityPoolETHBalanceUpdated,
   StabilityPoolLUSDBalanceUpdated,
 } from "../../generated/StabilityPool/StabilityPool";
-import { getCurrentETHPrice } from "../entities/price";
-import { updateUSDLockedStabilityPool } from "../entities/protocol";
+import { getCurrentETHPrice } from "../entities/token";
+import { updateProtocolUSDLockedStabilityPool } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
 /**
@@ -21,7 +21,7 @@ export function handleStabilityPoolETHBalanceUpdated(
   const totalValueLocked = bigIntToBigDecimal(totalETHLocked)
     .times(getCurrentETHPrice())
     .plus(bigIntToBigDecimal(totalLUSDLocked));
-  updateUSDLockedStabilityPool(event, totalValueLocked);
+  updateProtocolUSDLockedStabilityPool(event, totalValueLocked);
 }
 
 /**
@@ -38,5 +38,5 @@ export function handleStabilityPoolLUSDBalanceUpdated(
   const totalValueLocked = bigIntToBigDecimal(totalETHLocked)
     .times(getCurrentETHPrice())
     .plus(bigIntToBigDecimal(totalLUSDLocked));
-  updateUSDLockedStabilityPool(event, totalValueLocked);
+  updateProtocolUSDLockedStabilityPool(event, totalValueLocked);
 }

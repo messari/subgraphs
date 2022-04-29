@@ -1,29 +1,70 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { BigInt, BigDecimal, Address, store, ethereum } from "@graphprotocol/graph-ts";
-import { DexAmmProtocol, LiquidityPool, Token } from "../../generated/schema";
+import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
+import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
-import { FACTORY_ADDRESS } from "../common/constants";
+import { BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_ZERO, FACTORY_ADDRESS, LiquidityPoolFeeType, LP_FEE_TO_ON, PROTOCOL_FEE_TO_ON, TRADING_FEE } from "../common/constants";
+import { getOrCreateDex, getOrCreateToken } from "../common/getters";
 
 export let factoryContract = FactoryContract.bind(Address.fromString(FACTORY_ADDRESS));
 
 // Create a liquidity pool from PairCreated contract call
-export function createLiquidityPool(
-  event: ethereum.Event,
-  protocol: DexAmmProtocol,
-  poolAddress: Address,
-  token0: Token,
-  token1: Token,
-  LPtoken: Token,
-): void {
-  // let pool = new LiquidityPool(poolAddress.toHexString());
-  // pool.protocol = protocol.id;
-  // pool.inputTokens = [token0.id, token1.id];
-  // pool.outputToken = LPtoken.id;
-  // ...
-  // pool.save();
-  // // create the tracked contract based on the template
-  // PairTemplate.create(poolAddress);
+export function createLiquidityPool(event: ethereum.Event, poolAddress: Address, token0Address: Address, token1Address: Address): void {
+  
+  let protocol = getOrCreateDex();
+
+  // create the tokens and tokentracker
+  let token0 = getOrCreateToken(token0Address);
+  let token1 = getOrCreateToken(token1Address);
+  let LPtoken = getOrCreateToken(poolAddress);
+
+  let pool = new LiquidityPool(poolAddress.toHexString());
+
+  pool.protocol = protocol.id;
+  pool.inputTokens = [token0.id, token1.id];
+  pool.outputToken = LPtoken.id;
+  pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+  pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)]
+  pool.outputTokenSupply = BIGINT_ZERO;
+  pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  pool.stakedOutputTokenAmount = BIGINT_ZERO;
+  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
+  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  pool.fees = createPoolFees(poolAddress.toHexString());
+  pool.createdTimestamp = event.block.timestamp;
+  pool.createdBlockNumber = event.block.number;
+  pool.name = protocol.name + " " + LPtoken.symbol;
+  pool.symbol = LPtoken.symbol;
+
+  // create the tracked contract based on the template
+  PairTemplate.create(poolAddress);
+
+  pool.save();
+  token0.save();
+  token1.save();
+  LPtoken.save();
+}
+
+function createPoolFees(poolAddress: string): string[] {
+  let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
+  let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
+  let poolTradingFee = new LiquidityPoolFee(poolAddress.concat("-trading-fee"));
+
+  poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
+  poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
+  poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
+
+  poolLpFee.feePercentage = LP_FEE_TO_ON;
+  poolProtocolFee.feePercentage = PROTOCOL_FEE_TO_ON;
+  poolTradingFee.feePercentage = TRADING_FEE;
+
+  poolLpFee.save();
+  poolProtocolFee.save();
+  poolTradingFee.save();
+
+  return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
 
 // Generate the deposit entity and update deposit account for the according pool.
