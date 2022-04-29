@@ -8,11 +8,15 @@
 
 import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
+<<<<<<< aave-v2
 import {
     Network,
     BIGINT_TEN_TO_EIGHTEENTH,
     SECONDS_PER_DAY
 } from "./constants";
+=======
+import { Network } from "./constants";
+>>>>>>> master
 import {
   BIGDECIMAL_ZERO,
   INT_FOUR,

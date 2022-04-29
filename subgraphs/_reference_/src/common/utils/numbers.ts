@@ -42,8 +42,11 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
 }
 
 // Ray is 27 decimal Wad is 18 decimal
+<<<<<<< aave-v2
 // These functions were made for the AAVE subgraph. Visit the following link to verify that AAVE's definition for RAY units match what are needed for your protocol
 // https://docs.aave.com/developers/v/2.0/glossary
+=======
+>>>>>>> master
 
 export function rayToWad(a: BigInt): BigInt {
   const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
