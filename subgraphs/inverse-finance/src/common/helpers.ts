@@ -441,36 +441,6 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   usageHourlyMetrics.save();
 }
 
-/* // Update FinancialsDailySnapshots entity
-export function updateFinancials(event: ethereum.Event): void {
-  let days: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
-
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-
-  let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
-  let marketAddrs = factoryContract.getAllMarkets();
-  // iterate over AllMarkets
-  for (let i = 0; i < marketAddrs.length; i++) {
-    let marketId = marketAddrs[i].toHexString();
-    let market = Market.load(marketId);
-
-    if (market != null) {
-      financialMetrics.cumulativeBorrowUSD = financialMetrics.cumulativeBorrowUSD.plus(market.cumulativeBorrowUSD);
-      financialMetrics.totalDepositBalanceUSD = financialMetrics.totalDepositBalanceUSD.plus(
-        market.totalDepositBalanceUSD,
-      );
-      financialMetrics.totalBorrowBalanceUSD = financialMetrics.totalBorrowBalanceUSD.plus(
-        market.totalBorrowBalanceUSD,
-      );
-    }
-  }
-  // Update the block number and timestamp to that of the last transaction of that day
-  financialMetrics.blockNumber = event.block.number;
-  financialMetrics.timestamp = event.block.timestamp;
-
-  financialMetrics.save();
-} */
-
 export function updateRevenue(
   event: ethereum.Event,
   newProtocolRevenueUSD: BigDecimal = BIGDECIMAL_ZERO,
@@ -672,47 +642,6 @@ export function aggregateAllMarkets(event: ethereum.Event): void {
   financialMetrics.save()
 
 }
-
-/* // Update LendindProtocol entity info
-export function updateProtocol(event: ethereum.Event): void {
-  let days: string = (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
-
-  let protocol = getOrCreateProtocol();
-  if (protocol == null) {
-    log.error("LendingProtocol entity is empty {}; something went wrong", [""]);
-    return;
-  }
-
-  let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
-  let marketAddrs = factoryContract.getAllMarkets();
-
-  // sum over AllMarkets
-  let totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-  let totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-  let mintedTokens: string[] = [];
-  let mintedTokenSupplies: BigInt[] = [];
-  for (let i = 0; i < marketAddrs.length; i++) {
-    let marketId = marketAddrs[i].toHexString();
-    let market = Market.load(marketId);
-
-    if (market != null) {
-      totalDepositBalanceUSD = totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
-      totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
-    }
-
-    let tokenContract = CErc20.bind(event.address);
-    mintedTokens.push(marketId);
-    mintedTokenSupplies.push(tokenContract.totalSupply());
-  }
-
-  protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
-  protocol.totalValueLockedUSD = totalDepositBalanceUSD;
-  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  protocol.mintedTokens = mintedTokens;
-  protocol.mintedTokenSupplies = mintedTokenSupplies;
-
-  protocol.save();
-} */
 
 export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt, event: ethereum.Event): void {
   let market = getOrCreateMarket(marketId, event);
