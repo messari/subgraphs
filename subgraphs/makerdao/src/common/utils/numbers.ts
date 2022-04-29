@@ -56,7 +56,10 @@ export function bigDecimalExponential(rate: BigDecimal, exponent: BigDecimal): B
   // binomial expansion to obtain (1 + x)^n : (1 + rate)^exponent
   //1 + n *x + (n/2*(n-1))*x**2+(n/6*(n-1)*(n-2))*x**3+(n/12*(n-1)*(n-2)*(n-3))*x**4
   let firstTerm = exponent.times(rate);
-  let secondTerm = exponent.div(BIGDECIMAL_TWO).times(exponent.minus(BIGDECIMAL_ONE)).times(rate.times(rate));
+  let secondTerm = exponent
+    .div(BIGDECIMAL_TWO)
+    .times(exponent.minus(BIGDECIMAL_ONE))
+    .times(rate.times(rate));
   let thirdTerm = exponent
     .div(BIGDECIMAL_SIX)
     .times(exponent.minus(BIGDECIMAL_TWO))
@@ -64,8 +67,16 @@ export function bigDecimalExponential(rate: BigDecimal, exponent: BigDecimal): B
   let fourthTerm = exponent
     .div(BIGDECIMAL_TWELVE)
     .times(exponent.minus(BIGDECIMAL_THREE))
-    .times(rate.times(rate).times(rate).times(rate));
-  return firstTerm.plus(secondTerm).plus(thirdTerm).plus(fourthTerm);
+    .times(
+      rate
+        .times(rate)
+        .times(rate)
+        .times(rate),
+    );
+  return firstTerm
+    .plus(secondTerm)
+    .plus(thirdTerm)
+    .plus(fourthTerm);
 }
 
 export function bytesToUnsignedBigInt(value: Bytes, bigEndian: boolean = true): BigInt {

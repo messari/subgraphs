@@ -162,4 +162,3 @@ export const ILK_REGISTRY_2_STARTBLOCK = BigInt.fromI32(12251871);
 export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
 export const ADDRESS_LENGTH = 20;
-

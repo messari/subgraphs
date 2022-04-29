@@ -1,12 +1,17 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { getMarketFromIlk } from "../../common/getters";
 import { bigIntToBigDecimal } from "../../common/utils/numbers";
-import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ONE, MCD_CAT_ADDRESS, MCD_CAT_V2_ADDRESS, DEFAULT_DECIMALS } from "../../common/constants";
+import {
+  BIGDECIMAL_ONE_HUNDRED,
+  BIGDECIMAL_ONE,
+  MCD_CAT_ADDRESS,
+  MCD_CAT_V2_ADDRESS,
+  DEFAULT_DECIMALS,
+} from "../../common/constants";
 import { LogNote } from "./../../../generated/Cat/Cat";
 import { LogNote as LogNoteV2 } from "./../../../generated/Cat_v2/Cat";
 import { Cat } from "../../../generated/templates/Cat/Cat";
 import { File2 } from "../../../generated/Dog/Dog";
-
 
 export function handleFile(event: LogNote): void {
   let ilk = event.params.arg1;

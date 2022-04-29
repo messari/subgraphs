@@ -1,4 +1,5 @@
 # MakerDAO Lending Protocol Subgraph
+
 ## Calculation Methodology v0.0.1
 
 ### Total Value Locked (TVL) USD
@@ -33,10 +34,7 @@ Sum across all Markets:
 
 ### Protocol-Side Revenue USD
 
-
 ### Protocol-Side Revenue USD
->>>>>>> origin/master
-Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Markets:
 

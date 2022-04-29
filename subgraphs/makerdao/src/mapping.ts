@@ -10,7 +10,7 @@ import {
   WAD,
   BIGDECIMAL_ZERO,
   MCD_VOW_ADDRESS,
-  MCD_POT_ADDRESS
+  MCD_POT_ADDRESS,
 } from "./common/constants";
 import {
   getMarket,
@@ -78,7 +78,7 @@ export function handleEvent(
     depositEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     usageMetricsHourlySnapshot.hourlyDepositCount += 1;
     usageMetricsDailySnapshot.dailyDepositCount += 1;
-    
+
     borrowEvent.hash = event.transaction.hash.toHexString();
     borrowEvent.logIndex = event.logIndex.toI32();
     borrowEvent.protocol = protocol.id;
@@ -256,6 +256,7 @@ export function handleGrab(event: LogNote): void {
   let inputTokenBalance = market.inputTokenBalance.minus(absValBigInt(dink));
   let outputTokenSupply = market.outputTokenSupply.minus(absValBigInt(dart));
 
+  let protocolCumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
   market.inputTokenBalance = inputTokenBalance;
   market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, WAD).times(collateralTokenUSD);
   market.outputTokenSupply = outputTokenSupply;
@@ -267,15 +268,15 @@ export function handleGrab(event: LogNote): void {
 
   marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(totalLiqudationUSD);
   marketDailySnapshot.cumulativeLiquidateUSD = cumulativeLiquidateUSD;
-  
+
   financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(totalLiqudationUSD);
-  financialsDailySnapshot.cumulativeLiquidateUSD =
-    financialsDailySnapshot.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
-  financialsDailySnapshot.dailyProtocolSideRevenueUSD =
-    financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(liquidationProfit);
+  financialsDailySnapshot.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
+  financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    liquidationProfit,
+  );
   financialsDailySnapshot.dailyTotalRevenueUSD = financialsDailySnapshot.dailyTotalRevenueUSD.plus(liquidationProfit);
 
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
+  protocol.cumulativeLiquidateUSD = cumulativeLiquidateUSD;
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(liquidationProfit);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(liquidationProfit);
 
@@ -299,8 +300,14 @@ export function handleSuck(event: LogNote): void {
   let rad = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
   updateTotalBorrowUSD(event); // add debt
   if (
-    event.params.arg1.toHexString().substring(26).toLowerCase() == MCD_VOW_ADDRESS &&
-    event.params.arg2.toHexString().substring(26).toLowerCase() == MCD_POT_ADDRESS  // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
+    event.params.arg1
+      .toHexString()
+      .substring(26)
+      .toLowerCase() == MCD_VOW_ADDRESS &&
+    event.params.arg2
+      .toHexString()
+      .substring(26)
+      .toLowerCase() == MCD_POT_ADDRESS // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
   ) {
     let FinancialsDailySnapshot = getOrCreateFinancials(event);
     let protocol = getOrCreateLendingProtocol();
@@ -329,8 +336,9 @@ export function handleFold(event: LogNote): void {
   let cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(feesAccrued);
 
   market.debtMultiplier = market.debtMultiplier.plus(dRate);
-  financialsDailySnapshot.dailyProtocolSideRevenueUSD =
-    financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(feesAccrued);
+  financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    feesAccrued,
+  );
   financialsDailySnapshot.dailyTotalRevenueUSD = financialsDailySnapshot.dailyTotalRevenueUSD.plus(feesAccrued);
   financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
   financialsDailySnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
