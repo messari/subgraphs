@@ -32,3 +32,8 @@ export function timestampToHH(timestamp: i64): BigInt {
   let hours = secondsPastMidnight / SECONDS_PER_HOUR;
   return BigInt.fromI32(hours);
 }
+
+export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
+  let intStr = x.toString().split(".")[0]
+  return BigInt.fromString(intStr)
+}

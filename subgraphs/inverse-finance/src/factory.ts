@@ -11,7 +11,7 @@ import {
   DistributedBorrowerComp,
   DistributedSupplierComp,
 } from "../generated/Factory/Factory";
-import { MANTISSA_DECIMALS, BIGDECIMAL_ONE, FACTORY_ADDRESS } from "./common/constants";
+import { MANTISSA_DECIMALS, BIGDECIMAL_ONE, FACTORY_ADDRESS, BIGINT_ZERO } from './common/constants';
 import { getOrCreateToken, getOrCreateUnderlyingToken, getOrCreateMarket, getOrCreateProtocol } from "./common/getters";
 import { Market } from "../generated/schema";
 import { updateMarketEmission } from "./common/helpers";
@@ -113,12 +113,20 @@ export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): v
 
 export function handleDistributedBorrowerComp(event: DistributedBorrowerComp): void {
   let marketId = event.params.cToken.toHexString();
-  let newEmissionAmount = event.params.compDelta;
-  updateMarketEmission(marketId, newEmissionAmount, event);
+  // market.rewardTokens = [
+  //    prefixID(INV_ADDRESS, RewardTokenType.DEPOSIT),
+  //    prefixID(INV_ADDRESS, RewardTokenType.BORROW),
+  //  ]
+  let newEmissionsAmount = [BIGINT_ZERO, event.params.compDelta];
+  updateMarketEmission(marketId, newEmissionsAmount, event);
 }
 
 export function handleDistributedSupplierComp(event: DistributedSupplierComp): void {
   let marketId = event.params.cToken.toHexString();
-  let newEmissionAmount = event.params.compDelta;
-  updateMarketEmission(marketId, newEmissionAmount, event);
+  // market.rewardTokens = [
+  //    prefixID(INV_ADDRESS, RewardTokenType.DEPOSIT),
+  //    prefixID(INV_ADDRESS, RewardTokenType.BORROW),
+  //  ]
+  let newEmissionsAmount = [event.params.compDelta, BIGINT_ZERO];
+  updateMarketEmission(marketId, newEmissionsAmount, event);
 }

@@ -10,7 +10,10 @@ import {
   InterestRateType,
   SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
-  BLOCKS_PER_YEAR
+  BLOCKS_PER_YEAR,
+  EMISSION_START_BLOCK,
+  BLOCKS_PER_DAY, 
+  BIGINT_ONE
 } from "./constants";
 import { CErc20, Mint, Redeem, Borrow, RepayBorrow, LiquidateBorrow } from "../../generated/templates/CToken/CErc20";
 import { JumpRateModelV2 } from "../../generated/templates/CToken/JumpRateModelV2";
@@ -23,9 +26,7 @@ import {
   Borrow as BorrowSC,
   Repay,
   Liquidate,
-  UsageMetricsDailySnapshot,
-  MarketDailySnapshot,
-  FinancialsDailySnapshot
+  _HelperStore,
 } from "../../generated/schema";
 import { Factory } from "../../generated/Factory/Factory";
 import { log, ethereum, BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts";
@@ -34,16 +35,15 @@ import {
   getOrCreateInterestRate,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-  getOrCreateMarketDailySnapshot, getOrCreateMarketHourlySnapshot,
+  getOrCreateMarketDailySnapshot,
+  getOrCreateMarketHourlySnapshot,
   getOrCreateProtocol,
-  getOrCreateToken,
   getOrCreateUnderlyingToken,
   getOrCreateFinancialsDailySnapshot,
   getOrCreateMarket,
   getUnderlyingTokenPrice,
 } from "./getters";
-import { decimalsToBigDecimal } from "./utils";
-
+import { decimalsToBigDecimal, BigDecimalTruncateToBigInt } from "./utils";
 
 // Create Account entity for participating account
 // return 1 if account is new, 0 if account already exists
@@ -119,8 +119,8 @@ export function updateDeposit(event: Mint): void {
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
   marketDaily.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-  marketDaily.blockNumber = event.block.number
-  marketDaily.timestamp = event.block.timestamp
+  marketDaily.blockNumber = event.block.number;
+  marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
 
   // update MarketHourlySnapshot
@@ -129,8 +129,8 @@ export function updateDeposit(event: Mint): void {
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
   marketHourly.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
-  marketHourly.blockNumber = event.block.number
-  marketHourly.timestamp = event.block.timestamp
+  marketHourly.blockNumber = event.block.number;
+  marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
 
   // update FinancialsDailySnapshot
@@ -150,7 +150,7 @@ export function updateDeposit(event: Mint): void {
   let usageHourlyMetrics = getOrCreateUsageMetricsHourlySnapshot(event);
   usageHourlyMetrics.hourlyDepositCount += 1;
   usageHourlyMetrics.hourlyTransactionCount += 1;
-  usageHourlyMetrics.save();  
+  usageHourlyMetrics.save();
 }
 
 export function updateWithdraw(event: Redeem): void {
@@ -235,8 +235,8 @@ export function updateBorrow(event: Borrow): void {
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
   marketDaily.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
-  marketDaily.blockNumber = event.block.number
-  marketDaily.timestamp = event.block.timestamp
+  marketDaily.blockNumber = event.block.number;
+  marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
 
   // update MarketHourlySnapshot
@@ -245,8 +245,8 @@ export function updateBorrow(event: Borrow): void {
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
   marketHourly.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
-  marketHourly.blockNumber = event.block.number
-  marketHourly.timestamp = event.block.timestamp
+  marketHourly.blockNumber = event.block.number;
+  marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
 
   // update FinancialsDailySnapshot
@@ -355,8 +355,8 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
   marketDaily.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  marketDaily.blockNumber = event.block.number
-  marketDaily.timestamp = event.block.timestamp
+  marketDaily.blockNumber = event.block.number;
+  marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
 
   // update MarketHourlySnapshot
@@ -365,8 +365,8 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
   marketHourly.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  marketHourly.blockNumber = event.block.number
-  marketHourly.timestamp = event.block.timestamp
+  marketHourly.blockNumber = event.block.number;
+  marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
 
   // update FinancialsDailySnapshot
@@ -375,23 +375,23 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   financialMetrics.dailyLiquidateUSD = financialMetrics.dailyLiquidateUSD.plus(liquidateAmountUSD);
   financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-  financialMetrics.blockNumber = event.block.number
-  financialMetrics.timestamp = event.block.timestamp
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
   financialMetrics.save();
 
   // update usage metric
   let usageDailyMetrics = getOrCreateUsageMetricsDailySnapshot(event);
   usageDailyMetrics.dailyLiquidateCount += 1;
   usageDailyMetrics.dailyTransactionCount += 1;
-  usageDailyMetrics.blockNumber = event.block.number
-  usageDailyMetrics.timestamp = event.block.timestamp
+  usageDailyMetrics.blockNumber = event.block.number;
+  usageDailyMetrics.timestamp = event.block.timestamp;
   usageDailyMetrics.save();
 
   let usageHourlyMetrics = getOrCreateUsageMetricsHourlySnapshot(event);
   usageHourlyMetrics.hourlyLiquidateCount += 1;
   usageHourlyMetrics.hourlyTransactionCount += 1;
-  usageHourlyMetrics.blockNumber = event.block.number
-  usageHourlyMetrics.timestamp = event.block.timestamp    
+  usageHourlyMetrics.blockNumber = event.block.number;
+  usageHourlyMetrics.timestamp = event.block.timestamp;
   usageHourlyMetrics.save();
 }
 
@@ -459,13 +459,15 @@ export function updateRevenue(
   financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
     newProtocolRevenueUSD,
   );
-  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(financialMetrics.dailyProtocolSideRevenueUSD);
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailyTotalRevenueUSD.minus(
+    financialMetrics.dailyProtocolSideRevenueUSD,
+  );
 
-  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD
-  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD
-  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD
-  financialMetrics.blockNumber = event.block.number
-  financialMetrics.timestamp = event.block.timestamp
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
 
   financialMetrics.save();
 }
@@ -493,7 +495,7 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketDaily.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketDaily.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
 
-  marketDaily.exchangeRate = market.exchangeRate
+  marketDaily.exchangeRate = market.exchangeRate;
 
   // Update the block number and timestamp to that of the last transaction of that day
   marketDaily.blockNumber = event.block.number;
@@ -519,14 +521,13 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketHourly.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketHourly.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
 
-  marketHourly.exchangeRate = market.exchangeRate
+  marketHourly.exchangeRate = market.exchangeRate;
 
   // Update the block number and timestamp to that of the last transaction of that day
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
 
   marketHourly.save();
-
 }
 
 // Update Market entity
@@ -552,7 +553,7 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
 
     market.totalDepositBalanceUSD = inputTokenBalance.toBigDecimal().times(pricePerUnderlyingToken);
     market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-    //market.exchangeRate = 
+    //market.exchangeRate =
 
     // Needs to use try_totalBorrows() as some market doesn't have totalBorows & default to BIGDECIMAL_ZERO
     let tryTotalBorrows = tokenContract.try_totalBorrows();
@@ -562,9 +563,7 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
         event.transaction.hash.toHexString(),
       ]);
     } else {
-      market.totalBorrowBalanceUSD = tryTotalBorrows.value
-                                          .toBigDecimal()
-                                          .times(pricePerUnderlyingToken);
+      market.totalBorrowBalanceUSD = tryTotalBorrows.value.toBigDecimal().times(pricePerUnderlyingToken);
     }
 
     let tryExchangeRate = tokenContract.try_exchangeRateCurrent();
@@ -572,11 +571,9 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
       log.warning("Failed to get exchangeRate for market {} at tx hash {}; Not updating Market.exchangeRate", [
         marketId,
         event.transaction.hash.toHexString(),
-      ])      
+      ]);
     } else {
-      market.exchangeRate = tryExchangeRate.value
-                              .toBigDecimal()
-                              .div(decimalsToBigDecimal(MANTISSA_DECIMALS))
+      market.exchangeRate = tryExchangeRate.value.toBigDecimal().div(decimalsToBigDecimal(MANTISSA_DECIMALS));
     }
 
     //
@@ -587,17 +584,15 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     //market.rewardTokenEmissionsUSD
 
     market.save();
-
   } else {
     log.warning("Market {} does not exist", [marketId]);
   }
 }
 
-// Iterate all markets & update aggregated quantities 
+// Iterate all markets & update aggregated quantities
 //    - LendindProtocol
 //    - FinancialsDailySnapshot
 export function aggregateAllMarkets(event: ethereum.Event): void {
-
   let factoryContract = Factory.bind(Address.fromString(FACTORY_ADDRESS));
   let marketAddrs = factoryContract.getAllMarkets();
 
@@ -632,18 +627,17 @@ export function aggregateAllMarkets(event: ethereum.Event): void {
   protocol.mintedTokenSupplies = mintedTokenSupplies;
   protocol.save();
 
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event)
-  financialMetrics.totalDepositBalanceUSD = totalDepositBalanceUSD
-  financialMetrics.totalValueLockedUSD = totalDepositBalanceUSD
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  financialMetrics.totalDepositBalanceUSD = totalDepositBalanceUSD;
+  financialMetrics.totalValueLockedUSD = totalDepositBalanceUSD;
   financialMetrics.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
   financialMetrics.mintedTokenSupplies = mintedTokenSupplies;
-  financialMetrics.blockNumber = event.block.number
-  financialMetrics.timestamp = event.block.timestamp  
-  financialMetrics.save()
-
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
+  financialMetrics.save();
 }
 
-export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt, event: ethereum.Event): void {
+export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt[], event: ethereum.Event): void {
   let market = getOrCreateMarket(marketId, event);
   if (market == null) {
     log.error("Market {} does not exist.", [marketId]);
@@ -651,12 +645,44 @@ export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt
   }
 
   let pricePerToken = getUnderlyingTokenPricePerAmount(Address.fromString(XINV_ADDRESS));
-  // We use mark-to-market accounting here
-  let emissionAmount = market.rewardTokenEmissionsAmount![0].plus(newEmissionAmount);
-  let emissionUSD = emissionAmount.toBigDecimal().times(pricePerToken);
-  market.rewardTokenEmissionsAmount = [emissionAmount];
-  market.rewardTokenEmissionsUSD = [emissionUSD];
+
+  // Retrieve & store last block number to calculate deltaBlocks & approximate normalized daily emissions
+  // This is not exactly how inverse-finance actually calculate emissions (COMP), but a reasonable approximation
+  // The contract uses deltaIndex & multiplies it with the borrow/deposit amount (comptroller.sol Line 1107-1150)
+  // The deltaIndex is tied to deltaBlocks (comptroller.sol Line 1084-1105) & compSpeed
+  let lastBlockNumbers = [EMISSION_START_BLOCK, EMISSION_START_BLOCK]; // Creation of factory
+  let lastBlockStore = _HelperStore.load("lastBlockNumber");
+  if (lastBlockStore != null && lastBlockStore.valueBigIntArray.length > 0) {
+    lastBlockNumbers = lastBlockStore.valueBigIntArray;
+  } else {
+    lastBlockStore = new _HelperStore("lastBlockNumber");
+    lastBlockStore.valueBigIntArray = lastBlockNumbers;
+    lastBlockStore.save();
+  }
+
+  let deltaBlocks: BigInt;
+  for (let i = 0; i < newEmissionAmount.length; i++) {
+    if (newEmissionAmount[i] != BIGINT_ZERO) {
+      let lastBlockNumber = lastBlockNumbers[i];
+      assert(
+        lastBlockNumber >= EMISSION_START_BLOCK,
+        "last block number should be larger than " + EMISSION_START_BLOCK.toString(),
+      );
+      deltaBlocks = event.block.number.minus(lastBlockNumber).plus(BIGINT_ONE);
+      let dailyEmissionsAmount = newEmissionAmount[i]
+        .toBigDecimal()
+        .div(deltaBlocks.toBigDecimal())
+        .times(BLOCKS_PER_DAY);
+      let dailyEmissionsUSD = dailyEmissionsAmount.times(pricePerToken);
+      market.rewardTokenEmissionsAmount![i] = BigDecimalTruncateToBigInt(dailyEmissionsAmount);
+      market.rewardTokenEmissionsUSD![i] = dailyEmissionsUSD;
+
+      lastBlockStore.valueBigIntArray[i] = event.block.number;
+    }
+  }
+
   market.save();
+  lastBlockStore.save();
 }
 
 // Update InterestRate entity
