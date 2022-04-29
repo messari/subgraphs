@@ -4,6 +4,7 @@ import { schema as yieldSchema } from "./yield/schema";
 import { schema as lendingSchema } from "./lending/schema";
 
 export const schema = (type: string, version: string): Schema => {
+  console.log('ROUTING TO SCHEMA ', type, version)
   switch (type) {
     case ProtocolType.EXCHANGE:
       return dexSchema(version);

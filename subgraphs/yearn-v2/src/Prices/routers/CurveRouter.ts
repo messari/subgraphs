@@ -1,14 +1,16 @@
-import * as utils from "../common/utils";
-import { getPriceUsdc } from "./SushiSwapRouter";
-import * as constants from "../common/constants";
-import { CustomPriceType } from "../common/types";
 import {
+  BigInt,
   Address,
   BigDecimal,
-  BigInt,
   dataSource,
+  log,
 } from "@graphprotocol/graph-ts";
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
+import { CustomPriceType } from "../common/types";
+import { getPriceUsdc as getPriceUsdcSushi } from "./SushiSwapRouter";
 import { CurveRegistry as CurveRegistryContract } from "../../../generated/Registry_v1/CurveRegistry";
+import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/Registry_v1/CurvePoolRegistry";
 
 export function getCurvePriceUsdc(
   curveLpTokenAddress: Address,
@@ -37,7 +39,31 @@ export function getCurvePriceUsdc(
       ).toBigDecimal()
     );
 
-  return CustomPriceType.initialize(price);
+  return CustomPriceType.initialize(price, 6);
+}
+
+export function getPoolFromLpToken(
+  lpAddress: Address,
+  curveRegistry: CurveRegistryContract,
+  network: string
+): Address {
+  let poolAddress = utils.readValue<Address>(
+    curveRegistry.try_get_pool_from_lp_token(lpAddress),
+    constants.ZERO_ADDRESS
+  );
+
+  if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
+    const curvePoolRegistry = CurvePoolRegistryContract.bind(
+      constants.CURVE_POOL_REGISTRY_ADDRESS_MAP.get(network)!
+    );
+
+    poolAddress = utils.readValue<Address>(
+      curvePoolRegistry.try_get_pool_from_lp_token(lpAddress),
+      constants.ZERO_ADDRESS
+    );
+  }
+
+  return poolAddress;
 }
 
 export function getBasePrice(
@@ -45,16 +71,18 @@ export function getBasePrice(
   curveRegistry: CurveRegistryContract,
   network: string
 ): CustomPriceType {
-  const poolAddress = curveRegistry.try_get_pool_from_lp_token(
-    curveLpTokenAddress
+  const poolAddress = getPoolFromLpToken(
+    curveLpTokenAddress,
+    curveRegistry,
+    network
   );
 
-  if (poolAddress.reverted) {
+  if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();
   }
 
   let underlyingCoinAddress = getUnderlyingCoinFromPool(
-    poolAddress.value,
+    poolAddress,
     curveRegistry,
     network
   );
@@ -86,9 +114,8 @@ export function getUnderlyingCoinFromPool(
   }
 
   //? Look for preferred coins (basic coins)
-
   let coinAddress: Address;
-  for (let coinIdx = 0; coinIdx < 8; coinIdx++) {
+  for (let coinIdx = 0; coinIdx < coins.length; coinIdx++) {
     coinAddress = coins[coinIdx];
 
     if (coinAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
@@ -124,7 +151,7 @@ export function getPriceUsdcRecommended(
   tokenAddress: Address,
   network: string
 ): CustomPriceType {
-  return getPriceUsdc(tokenAddress, network);
+  return getPriceUsdcSushi(tokenAddress, network);
 }
 
 export function isBasicToken(tokenAddress: Address, network: string): bool {
@@ -138,7 +165,7 @@ export function isBasicToken(tokenAddress: Address, network: string): bool {
       basicTokenName
     );
 
-    if (tokenAddress.toHex() == basicTokenAddress!.toHex()) {
+    if (basicTokenAddress && tokenAddress.toHex() == basicTokenAddress.toHex()) {
       return true;
     }
   }

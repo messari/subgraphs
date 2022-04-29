@@ -9,7 +9,7 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove } from "../entities/trove";
-import { getCurrentETHPrice } from "../entities/price";
+import { getCurrentETHPrice } from "../entities/token";
 import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
