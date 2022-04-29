@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -271,7 +271,7 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { # of hours since Unix epoch time } "
   id: ID!
 
   " Protocol this snapshot is associated with "
@@ -399,7 +399,7 @@ type LiquidityPool @entity {
   outputTokensSupply: [BigInt!]
 
   " Price per share of output token in USD "
-  outputTokensPriceUSD: [BigDecimal!]
+  outputTokenPricesUSD: [BigDecimal!]
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmounts: [BigInt!]
@@ -482,13 +482,13 @@ type LiquidityPoolDailySnapshot @entity {
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: [BigInt!]
+  outputTokensSupply: [BigInt!]
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: [BigDecimal!]
+  outputTokenPricesUSD: [BigDecimal!]
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: [BigInt!]
+  stakedOutputTokenAmounts: [BigInt!]
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigInt!]
@@ -498,7 +498,7 @@ type LiquidityPoolDailySnapshot @entity {
 }
 
 type LiquidityPoolHourlySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
@@ -536,7 +536,6 @@ type LiquidityPoolHourlySnapshot @entity {
   " Tokens that is minted to track ownership of position in protocol "
   outputTokens: [Token!]!
 
-
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -547,7 +546,7 @@ type LiquidityPoolHourlySnapshot @entity {
   outputTokensSupply: [BigInt!]
 
   " Price per share of output token in USD "
-  outputTokensPriceUSD: [BigDecimal!]
+  outputTokenPricesUSD: [BigDecimal!]
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   stakedOutputTokenAmounts: [BigInt!]
@@ -745,8 +744,36 @@ type ActiveAccount @entity {
   id: ID!
 }
 
+###########################
+##### Helper Entities #####
+###########################
 
-type LiquidityPoolParamsHelper @entity {
+# Helper entities are additional entities created to help with mapping.
+# They are usually used to store internal states that would simplify
+# the mapping logic. All helper entities should be prefixed with an
+# underscore to differentiate them from the common schema.
+
+type _CircularBuffer @entity {
+    " 'CIRCULAR_BUFFER' "
+    id: ID!
+
+    " Array of sorted block numbers sorted continuously "
+    blocks: [Int!]!
+
+    " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+    windowStartIndex: Int!
+
+    " The next index in the blocks array that will be replaced with the newest block "
+    nextIndex: Int!
+
+    " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+    bufferSize: Int!
+
+    " The current calculated number of blocks per day based on calculated block speed "
+    blocksPerDay: BigDecimal!
+}
+
+type _LiquidityPoolParamsHelper @entity {
   " Smart contract address of the pool "
   id: ID!
 
