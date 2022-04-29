@@ -10,7 +10,7 @@ export namespace Protocol {
 }
 
 // Choose which protocol you are indexing. The deployed network will already be determined
-let PROTOCOL_NAME_TEMP = Protocol.UNISWAPV2;
+let PROTOCOL_NAME_TEMP = Protocol.APESWAP;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,6 +36,7 @@ let WHITELIST_TOKENS_TEMP: string[]; // A tokens whose amounts should contribute
 let STABLE_COINS_TEMP: string[]; // A list of stable coins
 let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token] oracle pools
 let UNTRACKED_PAIRS_TEMP: string[]; // rebass tokens, dont count in tracked volume
+let UNTRACKED_TOKENS_TEMP: string[];
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +92,11 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11", // DAI/wETH created block 10042267
     "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852", // USDT/wETH created block 10093341
   ];
-  UNTRACKED_PAIRS_TEMP = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
+
+  UNTRACKED_PAIRS_TEMP = [
+    "0xc7283b66eb1eb5fb86327f08e1b5816b0720212b", // TRIBE - Leads to drastic errors in price calculation
+  ];
+  UNTRACKED_TOKENS_TEMP = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.MATIC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.MATIC;
@@ -197,4 +202,5 @@ export namespace NetworkConfigs {
   export const STABLE_COINS = STABLE_COINS_TEMP;
   export const STABLE_ORACLE_POOLS = STABLE_ORACLE_POOLS_TEMP;
   export const UNTRACKED_PAIRS = UNTRACKED_PAIRS_TEMP;
+  export const UNTRACKED_TOKENS = UNTRACKED_TOKENS_TEMP;
 }

@@ -79,7 +79,8 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
+  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.truncate(0).toString())];
+
   pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
   masterChefPool.valueBigInt = event.block.number;
