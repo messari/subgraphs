@@ -15,7 +15,7 @@ import {
   createERC20Instance,
   createNewDPPEvent
 } from "./helpers/factory_helpers.test";
-import { createDODOSwapEvent } from "./helpers/helpers_DVM.test";
+import { createDODOSwapEvent } from "./helpers/helpers_DPP.test";
 
 test("Can handle a DODOSwap Event", () => {
   let newDPPevent = createNewDPPEvent(

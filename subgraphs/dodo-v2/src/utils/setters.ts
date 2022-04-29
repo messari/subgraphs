@@ -211,74 +211,74 @@ export function createWithdraw(
   poolAdd: Address,
   shareAmount: BigInt
 ): void {
-  let withdraw = new Withdraw(
-    event.transaction.hash
-      .toHexString()
-      .concat("-")
-      .concat(event.logIndex.toHexString())
-  );
-  let pool = getOrCreatePool(
-    poolAdd,
-    poolAdd,
-    poolAdd,
-    event.block.number,
-    event.block.timestamp
-  );
+  // let withdraw = new Withdraw(
+  //   event.transaction.hash
+  //     .toHexString()
+  //     .concat("-")
+  //     .concat(event.logIndex.toHexString())
+  // );
+  // let pool = getOrCreatePool(
+  //   poolAdd,
+  //   poolAdd,
+  //   poolAdd,
+  //   event.block.number,
+  //   event.block.timestamp
+  // );
+  // //
+  // let priorBalance = pool.inputTokenBalances;
+  // let tokens = pool.inputTokens;
+  // let token1 = ERC20.bind(Address.fromString(tokens[0]));
+  // let token2 = ERC20.bind(Address.fromString(tokens[1]));
   //
-  let priorBalance = pool.inputTokenBalances;
-  let tokens = pool.inputTokens;
-  let token1 = ERC20.bind(Address.fromString(tokens[0]));
-  let token2 = ERC20.bind(Address.fromString(tokens[1]));
-
-  let tokenBal1 = token1.try_balanceOf(poolAdd);
-  if (tokenBal1.reverted) {
-    return;
-  }
-
-  let tokenBal2 = token2.try_balanceOf(poolAdd);
-  if (tokenBal2.reverted) {
-    return;
-  }
-
-  let difToken1 = priorBalance[0] - tokenBal1.value;
-  let difToken2 = priorBalance[1] - tokenBal2.value;
-
-  let priceUSDtoken1 = BigDecimal.fromString("0");
-  let priceUSDtoken2 = BigDecimal.fromString("0");
-
-  let tokenAdd1 = Address.fromString(tokens[0]);
-  let tokenAdd2 = Address.fromString(tokens[1]);
-
-  if (difToken1 > BigInt.fromI32(0)) {
-    priceUSDtoken1 = getUSDprice(tokenAdd1, difToken1);
-  }
-
-  if (difToken2 > BigInt.fromI32(0)) {
-    priceUSDtoken2 = getUSDprice(tokenAdd2, difToken2);
-  }
-
-  let usdTotal = priceUSDtoken1 + priceUSDtoken2;
-
-  let lpToken = getOrCreateToken(poolAdd);
-
-  withdraw.hash = event.transaction.hash.toHexString();
-  withdraw.logIndex = event.logIndex.toI32();
-  withdraw.protocol = pool.protocol;
-  withdraw.to = poolAdd.toHexString();
-  withdraw.from = to.toHexString();
-  withdraw.blockNumber = event.block.number;
-  withdraw.timestamp = event.block.timestamp;
-  withdraw.inputTokens = tokens;
-  withdraw.outputToken = lpToken.id;
-  withdraw.inputTokenAmounts = [difToken1, difToken2];
-  withdraw.outputTokenAmount = shareAmount;
-  withdraw.amountUSD = usdTotal;
-  withdraw.pool = pool.id;
-
-  pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
-
-  withdraw.save();
-  pool.save();
+  // let tokenBal1 = token1.try_balanceOf(poolAdd);
+  // if (tokenBal1.reverted) {
+  //   return;
+  // }
+  //
+  // let tokenBal2 = token2.try_balanceOf(poolAdd);
+  // if (tokenBal2.reverted) {
+  //   return;
+  // }
+  //
+  // let difToken1 = priorBalance[0] - tokenBal1.value;
+  // let difToken2 = priorBalance[1] - tokenBal2.value;
+  //
+  // let priceUSDtoken1 = BigDecimal.fromString("0");
+  // let priceUSDtoken2 = BigDecimal.fromString("0");
+  //
+  // let tokenAdd1 = Address.fromString(tokens[0]);
+  // let tokenAdd2 = Address.fromString(tokens[1]);
+  //
+  // if (difToken1 > BigInt.fromI32(0)) {
+  //   priceUSDtoken1 = getUSDprice(tokenAdd1, difToken1);
+  // }
+  //
+  // if (difToken2 > BigInt.fromI32(0)) {
+  //   priceUSDtoken2 = getUSDprice(tokenAdd2, difToken2);
+  // }
+  //
+  // let usdTotal = priceUSDtoken1 + priceUSDtoken2;
+  //
+  // let lpToken = getOrCreateToken(poolAdd);
+  //
+  // withdraw.hash = event.transaction.hash.toHexString();
+  // withdraw.logIndex = event.logIndex.toI32();
+  // withdraw.protocol = pool.protocol;
+  // withdraw.to = poolAdd.toHexString();
+  // withdraw.from = to.toHexString();
+  // withdraw.blockNumber = event.block.number;
+  // withdraw.timestamp = event.block.timestamp;
+  // withdraw.inputTokens = tokens;
+  // withdraw.outputToken = lpToken.id;
+  // withdraw.inputTokenAmounts = [difToken1, difToken2];
+  // withdraw.outputTokenAmount = shareAmount;
+  // withdraw.amountUSD = usdTotal;
+  // withdraw.pool = pool.id;
+  //
+  // pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
+  //
+  // withdraw.save();
+  // pool.save();
 }
 
 export function createSwap(
