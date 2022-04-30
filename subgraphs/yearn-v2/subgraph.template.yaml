@@ -212,7 +212,8 @@ dataSources:
           handler: handleStrategyReported_v1
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
-
+        
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -226,6 +227,7 @@ dataSources:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
+      {{/callHandlersEnabled}}
   {{/manualVaults}}
 
 templates:
@@ -305,7 +307,7 @@ templates:
           handler: handleStrategyReported_v1
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
-
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -319,6 +321,7 @@ templates:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
+      {{/callHandlersEnabled}}
   
   - name: Strategy
     kind: ethereum/contract

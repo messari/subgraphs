@@ -42,8 +42,15 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export const VAULT_VERSION_0_3_0 = '0.3.0'
+export const VAULT_VERSION_0_3_2 = '0.3.2'
+export const VAULT_VERSION_0_3_3 = '0.3.3'
+export const VAULT_VERSION_0_3_5 = '0.3.5'
+export const VAULT_VERSION_LATEST = '0.4.3'
+
 export const MAX_BPS = BigInt.fromI32(10000);
-export const SECONDS_PER_YEAR = BigInt.fromI32(31556952);
+export const SECONDS_PER_YEAR = BigInt.fromI32(31557600);
+export const SECONDS_PER_YEAR_EXACT = BigInt.fromI32(31556952);
 
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;

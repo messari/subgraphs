@@ -11,6 +11,7 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
+  getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
@@ -68,6 +69,7 @@ export function _Withdraw(
 ): void {
   const vaultAddress = Address.fromString(vault.id);
   const vaultContract = VaultContract.bind(vaultAddress);
+  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
@@ -78,6 +80,8 @@ export function _Withdraw(
     .times(vault.inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimalsBaseTen);
+
+  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
 
   vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
@@ -99,7 +103,7 @@ export function _Withdraw(
     .div(inputTokenPrice.decimalsBaseTen);
 
   createWithdrawTransaction(
-    to, 
+    to,
     vaultAddress,
     transaction,
     block,
@@ -117,6 +121,7 @@ export function _Withdraw(
 
   metricsDailySnapshot.save();
   metricsHourlySnapshot.save();
+  protocol.save();
 
   log.info(
     "[Withdrawn] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",
