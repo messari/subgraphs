@@ -5,15 +5,10 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/UniswapV2Factory/YearnLensContract";
 
 export function getYearnLensContract(network: string): YearnLensContract {
-  return YearnLensContract.bind(
-    Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network))
-  );
+  return YearnLensContract.bind(Address.fromString(constants.YEARN_LENS_CONTRACT_ADDRESS.get(network)));
 }
 
-export function getTokenPriceFromYearnLens(
-  tokenAddr: Address,
-  network: string
-): CustomPriceType {
+export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string): CustomPriceType {
   const yearnLensContract = getYearnLensContract(network);
 
   if (!yearnLensContract) {
@@ -21,11 +16,8 @@ export function getTokenPriceFromYearnLens(
   }
 
   let tokenPrice: BigDecimal = utils
-    .readValue<BigInt>(
-      yearnLensContract.try_getPriceUsdcRecommended(tokenAddr),
-      constants.BIGINT_ZERO
-    )
+    .readValue<BigInt>(yearnLensContract.try_getPriceUsdcRecommended(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
 }
