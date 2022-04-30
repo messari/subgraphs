@@ -205,7 +205,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity = new LendingProtocol(VAT_ADDRESS);
   LendingProtocolEntity.name = "MakerDao";
   LendingProtocolEntity.slug = "makerdao";
-  LendingProtocolEntity.schemaVersion = "1.1.0";
+  LendingProtocolEntity.schemaVersion = "1.2.1";
   LendingProtocolEntity.subgraphVersion = "1.0.0";
   LendingProtocolEntity.methodologyVersion = "0.0.1";
   LendingProtocolEntity.network = Network.MAINNET;
