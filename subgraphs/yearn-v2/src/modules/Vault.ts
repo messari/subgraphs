@@ -2,9 +2,9 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { enumToPrefix } from "../common/strings";
 import { getOrCreateToken } from "../common/initializers";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Vault as VaultTemplate } from "../../generated/templates";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 
 export function _NewVault(
@@ -42,7 +42,7 @@ export function _NewVault(
     vault.createdTimestamp = block.timestamp;
 
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    vault. = constants.BIGDECIMAL_ZERO;
 
     const managementFeeId =
       enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +

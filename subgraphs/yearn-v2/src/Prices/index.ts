@@ -23,34 +23,25 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
-  let decimals = constants.BIGINT_TEN.pow(
-    BigInt.fromI32(6).toI32() as u8
-  ).toBigDecimal();
 
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
-    log.info("[YearnLensOracle] tokenAddress: {}, Price: {}", [
+    log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(decimals).toString(),
+      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString()
     ]);
-    return CustomPriceType.initialize(
-      yearnLensPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return yearnLensPrice;
   }
 
   // 2. ChainLink Feed Registry
   let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
   if (!chainLinkPrice.reverted) {
-    log.info("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
+    log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(decimals).toString(),
+      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString()
     ]);
-    return CustomPriceType.initialize(
-      chainLinkPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return chainLinkPrice;
   }
 
   // 3. CalculationsCurve
@@ -59,14 +50,13 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     network
   );
   if (!calculationsCurvePrice.reverted) {
-    log.info("[CalculationsCurve] tokenAddress: {}, Price: {}", [
+    log.warning("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.div(decimals).toString(),
+      calculationsCurvePrice.usdPrice
+        .div(calculationsCurvePrice.decimalsBaseTen)
+        .toString()
     ]);
-    return CustomPriceType.initialize(
-      calculationsCurvePrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return calculationsCurvePrice;
   }
 
   // 4. CalculationsSushiSwap
@@ -75,47 +65,43 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     network
   );
   if (!calculationsSushiSwapPrice.reverted) {
-    log.info("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
+    log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.div(decimals).toString(),
+      calculationsSushiSwapPrice.usdPrice
+        .div(calculationsSushiSwapPrice.decimalsBaseTen)
+        .toString()
     ]);
-    return CustomPriceType.initialize(
-      calculationsSushiSwapPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return calculationsSushiSwapPrice;
   }
 
   // 5. Curve Router
   let curvePrice = getCurvePriceUsdc(tokenAddr, network);
   if (!curvePrice.reverted) {
-    log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
+    log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      curvePrice.usdPrice.div(decimals).toString(),
+      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString()
     ]);
-    return CustomPriceType.initialize(curvePrice.usdPrice, BigInt.fromI32(6));
+    return curvePrice;
   }
 
   // 6. Uniswap Router
   let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
   if (!uniswapPrice.reverted) {
-    log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
+    log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(decimals).toString(),
+      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString()
     ]);
-    return CustomPriceType.initialize(uniswapPrice.usdPrice, BigInt.fromI32(6));
+    return uniswapPrice;
   }
 
   // 7. SushiSwap Router
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
-    log.info("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
+    log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(decimals).toString(),
+      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString()
     ]);
-    return CustomPriceType.initialize(
-      sushiswapPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return sushiswapPrice;
   }
 
   log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
@@ -125,16 +111,14 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   return new CustomPriceType();
 }
 
-export function getUsdPrice(tokenAddr: Address, amount: BigInt): BigDecimal {
+export function getUsdPrice(
+  tokenAddr: Address,
+  amount: BigDecimal
+): BigDecimal {
   let tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
-    return tokenPrice.usdPrice
-      .times(amount.toBigDecimal())
-      .div(tokenPrice.decimals.toBigDecimal())
-      .div(
-        constants.BIGINT_TEN.pow(BigInt.fromI32(6).toI32() as u8).toBigDecimal()
-      );
+    return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
   }
 
   return constants.BIGDECIMAL_ZERO;

@@ -5,9 +5,6 @@ Reference/
 **/.DS_Store
 .vscode/
 
-# alternate placement for generated files
-types/
-
 ############################
 ##### Default Template #####
 ############################

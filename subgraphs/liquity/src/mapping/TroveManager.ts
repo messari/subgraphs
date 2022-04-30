@@ -1,6 +1,7 @@
 import {
   Liquidation,
   Redemption,
+  TroveLiquidated,
   TroveUpdated,
 } from "../../generated/TroveManager/TroveManager";
 import {
@@ -11,13 +12,14 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove } from "../entities/trove";
-import { getCurrentETHPrice } from "../entities/price";
+import { getCurrentETHPrice } from "../entities/token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { BIGINT_ZERO } from "../utils/constants";
 import { _Trove } from "../../generated/schema";
 import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
+  incrementProtocolLiquidateCount,
 } from "../entities/protocol";
 
 enum TroveManagerOperation {
@@ -81,10 +83,41 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     case TroveManagerOperation.redeemCollateral:
       redeemCollateral(event, trove);
       break;
+    case TroveManagerOperation.liquidateInNormalMode:
+    case TroveManagerOperation.liquidateInRecoveryMode:
+      incrementProtocolLiquidateCount(event);
+      break;
   }
   trove.collateral = event.params._coll;
   trove.debt = event.params._debt;
   trove.save();
+}
+
+/**
+ * Emitted for each trove liquidated during batch liquidation flow, right before TroveUpdated event
+ * Used to check for applied rewards, since no event is emitted for this during liquidation
+ *
+ * @param event TroveLiquidated event
+ */
+export function handleTroveLiquidated(event: TroveLiquidated): void {
+  const trove = getOrCreateTrove(event.params._borrower);
+
+  const borrower = event.params._borrower;
+  const newCollateral = event.params._coll;
+  const newDebt = event.params._debt;
+  // Apply pending rewards if necessary
+  const collateralRewardETH = newCollateral.minus(trove.collateral);
+  if (collateralRewardETH.gt(BIGINT_ZERO)) {
+    const collateralRewardUSD = bigIntToBigDecimal(collateralRewardETH).times(
+      getCurrentETHPrice()
+    );
+    createDeposit(event, collateralRewardETH, collateralRewardUSD, borrower);
+  }
+  const borrowAmountLUSD = newDebt.minus(trove.debt);
+  if (borrowAmountLUSD.gt(BIGINT_ZERO)) {
+    const borrowAmountUSD = bigIntToBigDecimal(borrowAmountLUSD);
+    createBorrow(event, borrowAmountLUSD, borrowAmountUSD, borrower);
+  }
 }
 
 // Treat applyPendingRewards as deposit + borrow
