@@ -1,0 +1,7 @@
+{
+  "network": "matic",
+  "address": "0xCf083Be4164828f00cAE704EC15a36D711491284",
+  "startBlock": 15298800,
+  "masterChefStartBlock": 15550194,
+  "masterChefV2StartBlock": 15797921
+}

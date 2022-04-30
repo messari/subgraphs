@@ -52,14 +52,15 @@ export function calculateManagementFee(
   strategyStore: _Strategy,
   lastReport: BigInt,
   delegatedAssets: BigInt,
-  inputTokenDecimals: BigInt
+  inputTokenDecimals: BigInt,
+  totalDebt: BigInt
 ): BigDecimal {
   let managementFee = utils.readValue<BigInt>(
     vaultContract.try_managementFee(),
     constants.DEFAULT_MANAGEMENT_FEE
   );
 
-  return strategyStore.totalDebt
+  return totalDebt
     .minus(delegatedAssets)
     .times(lastReport.minus(strategyStore.lastReport))
     .times(managementFee)
@@ -104,7 +105,8 @@ export function strategyReported(
   strategyAddress: Address,
   gain: BigInt,
   debtAdded: BigInt,
-  debtPaid: BigInt
+  debtPaid: BigInt,
+  totalDebt: BigInt
 ): void {
   if (gain == constants.BIGINT_ZERO) {
     return;
@@ -145,7 +147,8 @@ export function strategyReported(
     strategyStore,
     lastReport,
     delegatedAssets,
-    inputTokenDecimals
+    inputTokenDecimals,
+    totalDebt
   );
 
   const performanceFee = calculatePerformanceFee(
@@ -170,7 +173,7 @@ export function strategyReported(
   let gainUSD = inputTokenPrice.usdPrice
     .times(gain.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+    .div(inputTokenPrice.decimalsBaseTen);
 
   let outputTokenPriceUsd = getPriceOfOutputTokens(
     Address.fromString(vaultStore!.id),
@@ -198,9 +201,7 @@ export function strategyReported(
   vaultStore!.outputTokenSupply = totalSupply;
   vaultStore!.save();
 
-  strategyStore.totalDebt = strategyStore.totalDebt
-    .plus(debtAdded)
-    .minus(debtPaid);
+  strategyStore.totalDebt = totalDebt
   strategyStore.lastReport = lastReport;
   strategyStore.save();
 

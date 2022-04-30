@@ -32,7 +32,6 @@ export function updateFinancials(event: ethereum.Event, feesUSD: BigDecimal): vo
   // totalValueLockedUSD is handled in updateTVL()
   let financialsDailySnapshots = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
-
   let cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(feesUSD);
   let cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
     feesUSD.times(ABRA_USER_REVENUE_SHARE),
@@ -213,7 +212,6 @@ export function updateTVL(event: ethereum.Event): void {
   financialsDailySnapshot.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
-
   protocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
   protocol.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
 
