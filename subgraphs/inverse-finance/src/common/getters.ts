@@ -112,7 +112,7 @@ export function getOrCreateProtocol(): LendingProtocol {
     protocol.slug = "inverse-finance-v1";
     protocol.schemaVersion = "1.2.1";
     protocol.subgraphVersion = "1.2.1";
-    protocol.methodologyVersion = "1.2.1";
+    protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.ETHEREUM;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;

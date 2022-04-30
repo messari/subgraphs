@@ -610,7 +610,7 @@ export function aggregateAllMarkets(event: ethereum.Event): void {
       totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
     }
 
-    let tokenContract = CErc20.bind(event.address);
+    let tokenContract = CErc20.bind(marketAddrs[i]);
     mintedTokens.push(marketId);
     mintedTokenSupplies.push(tokenContract.totalSupply());
   }
