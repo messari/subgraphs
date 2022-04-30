@@ -134,10 +134,13 @@ function updateHourlyUsageMetrics(
   switch (transactionType) {
     case TransactionType.DEPOSIT:
       snapshot.hourlyDepositCount += 1;
+      break;
     case TransactionType.WITHDRAW:
       snapshot.hourlyWithdrawCount += 1;
+      break;
     case TransactionType.SWAP:
       snapshot.hourlySwapCount += 1;
+      break;
   }
   snapshot.save();
 }
@@ -160,10 +163,13 @@ function updateDailyUsageMetrcs(
   switch (transactionType) {
     case TransactionType.DEPOSIT:
       snapshot.dailyDepositCount += 1;
+      break;
     case TransactionType.WITHDRAW:
       snapshot.dailyWithdrawCount += 1;
+      break;
     case TransactionType.SWAP:
       snapshot.dailySwapCount += 1;
+      break;
   }
   snapshot.save();
 }
