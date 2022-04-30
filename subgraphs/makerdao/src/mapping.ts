@@ -213,6 +213,8 @@ export function handleFrob(event: LogNote): void {
   financialsDailySnapshot.cumulativeDepositUSD = cumulativeDepositUSD;
   financialsDailySnapshot.cumulativeBorrowUSD = cumulativeBorrowUSD;
 
+  financialsDailySnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD; // update here as liqudiations don't happen everyday
+
   protocol.cumulativeDepositUSD = cumulativeDepositUSD;
   protocol.cumulativeBorrowUSD = cumulativeBorrowUSD;
 
