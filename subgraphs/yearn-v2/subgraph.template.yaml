@@ -23,6 +23,10 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -88,6 +92,10 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -155,6 +163,10 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -251,6 +263,10 @@ templates:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -345,6 +361,10 @@ templates:
           file: ./abis/Ethereum/Strategies/_strategy_.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
