@@ -86,6 +86,10 @@ export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 
+// vault addresses
+export const YIELD_VAULT_ADDRESS = "0x9245efB59f6491Ed1652c2DD8a4880cBFADc3ffA"; // RariPoolController.sol
+export const YIELD_MANAGER_ADDRESS = "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6";
+
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
@@ -127,11 +131,11 @@ export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942";
+export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // TODO: should the deployer be the "factory" address
 export const PROTOCOL_NAME = "Earn";
 export const PROTOCOL_SLUG = "earn";
 export const SCHEMA_VERSION = "1.2.1";
-export const SUBGRAPH_VERSION = "1.0.0";
+export const SUBGRAPH_VERSION = "1.0.1";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.YIELD;

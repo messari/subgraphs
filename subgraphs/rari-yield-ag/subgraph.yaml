@@ -8,7 +8,7 @@ dataSources:
     network: mainnet
     source:
       address: "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6"
-      abi: ./abis/yield-pool/RariYieldFundManager.json
+      abi: RariYieldFundManager
       startBlock: 11094078
     mapping:
       kind: ethereum/events
@@ -22,6 +22,8 @@ dataSources:
         - name: RariYieldFundManager
           file: ./abis/yield-pool/RariYieldFundManager.json
       eventHandlers:
-        - event: Deposit(string,address,address,uint256,uint256)
+        - event: Deposit(indexed string,indexed address,indexed address,uint256,uint256,uint256)
           handler: handleYieldDeposit
-  - kind: # TODO
+        - event: Withdrawal(indexed string,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleYieldWithdrawal
+  # - kind: # TODO
