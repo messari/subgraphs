@@ -554,7 +554,6 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
 
     market.totalDepositBalanceUSD = inputTokenBalance.toBigDecimal().times(pricePerUnderlyingToken);
     market.totalValueLockedUSD = market.totalDepositBalanceUSD;
-    //market.exchangeRate =
 
     // Needs to use try_totalBorrows() as some market doesn't have totalBorows & default to BIGDECIMAL_ZERO
     let tryTotalBorrows = tokenContract.try_totalBorrows();
@@ -661,6 +660,8 @@ export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt
     lastBlockStore.save();
   }
 
+  let rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount!;
+  let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD!;
   let deltaBlocks: BigInt;
   for (let i = 0; i < newEmissionAmount.length; i++) {
     if (newEmissionAmount[i] != BIGINT_ZERO) {
@@ -675,14 +676,23 @@ export function updateMarketEmission(marketId: string, newEmissionAmount: BigInt
         .div(deltaBlocks.toBigDecimal())
         .times(BLOCKS_PER_DAY);
       let dailyEmissionsUSD = dailyEmissionsAmount.times(pricePerToken);
-      market.rewardTokenEmissionsAmount![i] = BigDecimalTruncateToBigInt(dailyEmissionsAmount);
-      market.rewardTokenEmissionsUSD![i] = dailyEmissionsUSD;
+      rewardTokenEmissionsAmount[i] = BigDecimalTruncateToBigInt(dailyEmissionsAmount);
+      log.info("Market {} emissions {} ({}) at tx hash {}", [
+        marketId,
+        dailyEmissionsAmount.toString(),
+        BigDecimalTruncateToBigInt(dailyEmissionsAmount).toString(),
+        event.transaction.hash.toHexString(),
+      ]);
+      rewardTokenEmissionsUSD[i] = dailyEmissionsUSD;
 
-      lastBlockStore.valueBigIntArray[i] = event.block.number;
+      lastBlockNumbers[i] = event.block.number;
     }
   }
-
+  market.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+  market.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
   market.save();
+
+  lastBlockStore.valueBigIntArray = lastBlockNumbers;
   lastBlockStore.save();
 }
 

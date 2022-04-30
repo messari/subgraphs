@@ -5,18 +5,19 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////////
 
 export namespace Network {
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
   export const BSC = "BSC";
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const ETHEREUM = "MAINNET";
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
-  export const POLYGON = "POLYGON";
+  export const POLYGON = "MATIC";
   export const XDAI = "XDAI";
 }
 
