@@ -114,6 +114,22 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketHourlySnapshot.save();
 }
 
+export function updateFinancialMetrics(event: ethereum.Event): void {
+   // add cumulative values here just to make sure they're tracked daily
+   // insert into vat.frob which is called on all deposits/withdrawals
+  let protocol = getOrCreateLendingProtocol();
+  let financialsDailySnapshot = getOrCreateFinancials(event);
+  financialsDailySnapshot.blockNumber = event.block.number;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  financialsDailySnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  financialsDailySnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialsDailySnapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialsDailySnapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialsDailySnapshot.save()
+}
+
 export function updateTVL(event: ethereum.Event): void {
   // new user count handled in updateUsageMetrics
   // totalBorrowUSD handled updateTotalBorrowUSD

@@ -25,7 +25,7 @@ import {
 import { createMarket } from "./common/setters";
 import { bigIntToBigDecimal, bytesToSignedInt, absValBigInt, absValBigDecimal } from "./common/utils/numbers";
 import { getOrCreateFinancials } from "./common/getters";
-import { updateTVL, updateMarketMetrics, updateUsageMetrics, updateTotalBorrowUSD } from "./common/metrics";
+import { updateTVL, updateMarketMetrics, updateUsageMetrics, updateTotalBorrowUSD, updateFinancialMetrics } from "./common/metrics";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { createEntityID } from "./common/utils/strings";
 import { GemJoin as GemJoinDataSource } from "../generated/templates";
@@ -231,6 +231,7 @@ export function handleFrob(event: LogNote): void {
   updateTotalBorrowUSD(event); // protocol debt: add dart * rate to protocol debt
   updateMarketMetrics(ilk, event);
   updateTVL(event);
+  updateFinancialMetrics(event);
 }
 
 // Liquidate a Vault
@@ -327,11 +328,13 @@ export function handleSuck(event: LogNote): void {
     let protocol = getOrCreateLendingProtocol();
     log.debug("supplySideRevenueUSD = {}", [rad.toString()]);
     let cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(rad);
+    let cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(rad);
     FinancialsDailySnapshot.dailySupplySideRevenueUSD = FinancialsDailySnapshot.dailySupplySideRevenueUSD.plus(rad);
     FinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD = cumulativeSupplySideRevenueUSD;
     FinancialsDailySnapshot.dailyTotalRevenueUSD = FinancialsDailySnapshot.dailyTotalRevenueUSD.plus(rad);
+    FinancialsDailySnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
     protocol.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(rad);
+    protocol.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD
     FinancialsDailySnapshot.save();
     protocol.save();
   }
@@ -353,8 +356,8 @@ export function handleFold(event: LogNote): void {
   financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
     feesAccrued,
   );
-  financialsDailySnapshot.dailyTotalRevenueUSD = financialsDailySnapshot.dailyTotalRevenueUSD.plus(feesAccrued);
   financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
+  financialsDailySnapshot.dailyTotalRevenueUSD = financialsDailySnapshot.dailyTotalRevenueUSD.plus(feesAccrued);
   financialsDailySnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
