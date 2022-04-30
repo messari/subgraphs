@@ -5,7 +5,9 @@ import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE_HUNDRED, MCD_SPOT_ADDRESS, DEFAULT_DECI
 import { bigIntToBigDecimal, bytesToUnsignedBigInt } from "../../common/utils/numbers";
 import { Spot } from "../../../generated/templates/Spot/Spot";
 import { updateTokenPrice } from "../../common/prices/prices";
-import { updateTVL } from "../../common/metrics";
+import { updateFinancialMetrics } from "../../common/metrics";
+
+// update max LTV value, liquidation threshold for all markets
 
 export function handleFile(event: LogNote): void {
   let what = event.params.arg2.toString();
@@ -24,6 +26,7 @@ export function handleFile(event: LogNote): void {
   }
 }
 
+// update token price for all markets
 export function handlePoke(event: Poke): void {
   let ilk = event.params.ilk;
   let market = getMarketFromIlk(ilk);
@@ -32,5 +35,5 @@ export function handlePoke(event: Poke): void {
   market.inputTokenPriceUSD = priceUSD;
   market.save();
   updateTokenPrice(tokenAddress, priceUSD, event);
-  updateTVL(event);
+  updateFinancialMetrics(event);
 }

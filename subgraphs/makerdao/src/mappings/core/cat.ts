@@ -13,6 +13,8 @@ import { LogNote as LogNoteV2 } from "./../../../generated/Cat_v2/Cat";
 import { Cat } from "../../../generated/templates/Cat/Cat";
 import { File2 } from "../../../generated/Dog/Dog";
 
+// set liquidation penalties for all 3 liquidation contracts
+
 export function handleFile(event: LogNote): void {
   let ilk = event.params.arg1;
   let what = event.params.arg2.toString();

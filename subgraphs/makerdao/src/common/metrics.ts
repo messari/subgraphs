@@ -8,6 +8,7 @@ import {
   RAD,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
+  WAD,
 } from "./constants";
 import {
   getOrCreateMarketDailySnapshot,
@@ -17,6 +18,7 @@ import {
   getOrCreateLendingProtocol,
   getMarket,
   getOrCreateMarketHourlySnapshot,
+  getOrCreateToken,
 } from "./getters";
 import { getMarketFromIlk } from "../common/getters";
 import { Vat } from "../../generated/Vat/Vat";
@@ -114,13 +116,17 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   marketHourlySnapshot.save();
 }
 
-export function updateFinancialMetrics(event: ethereum.Event): void {
+export function updateFinancialsDailySnapshot(event: ethereum.Event): void {
    // add cumulative values here just to make sure they're tracked daily
    // insert into vat.frob which is called on all deposits/withdrawals
   let protocol = getOrCreateLendingProtocol();
   let financialsDailySnapshot = getOrCreateFinancials(event);
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialsDailySnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+  financialsDailySnapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+  financialsDailySnapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
   financialsDailySnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
   financialsDailySnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
   financialsDailySnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
@@ -130,40 +136,36 @@ export function updateFinancialMetrics(event: ethereum.Event): void {
   financialsDailySnapshot.save()
 }
 
-export function updateTVL(event: ethereum.Event): void {
+export function updateTVL(): void {
   // new user count handled in updateUsageMetrics
   // totalBorrowUSD handled updateTotalBorrowUSD
   let protocol = getOrCreateLendingProtocol();
-  let financialsDailySnapshot = getOrCreateFinancials(event);
   let marketIDList = protocol.marketIDList;
   let protocolTotalValueLockedUSD = BIGDECIMAL_ZERO;
   let protocolMintedTokenSupply = BIGINT_ZERO;
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
+    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance,WAD).times(inputToken.lastPriceUSD); // prices are always up to date via the spot contract
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);
-    protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(market.totalValueLockedUSD);
+    protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(marketTVLusd);
   }
-  financialsDailySnapshot.mintedTokenSupplies = [protocolMintedTokenSupply];
-  financialsDailySnapshot.totalValueLockedUSD = protocolTotalValueLockedUSD;
-  financialsDailySnapshot.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
-  financialsDailySnapshot.blockNumber = event.block.number;
-  financialsDailySnapshot.timestamp = event.block.timestamp;
   protocol.mintedTokenSupplies = [protocolMintedTokenSupply];
   protocol.totalValueLockedUSD = protocolTotalValueLockedUSD;
   protocol.totalDepositBalanceUSD = protocolTotalValueLockedUSD;
 
-  financialsDailySnapshot.save();
   protocol.save();
 }
 
-export function updateTotalBorrowUSD(event: ethereum.Event): void {
+export function updateFinancialMetrics(event: ethereum.Event): void {
+  updateTVL()
+  updateFinancialsDailySnapshot(event);
+}
+
+export function updateTotalBorrowUSD(): void {
   // Called in handleFold, handleSuck, handleHeal, handleFrob
-  let FinancialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
-  let totalBorrowBalanceUSD = bigIntToBigDecimal(Vat.bind(Address.fromString(VAT_ADDRESS)).debt(), RAD);
-  FinancialsDailySnapshot.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
-  FinancialsDailySnapshot.save();
+  protocol.totalBorrowBalanceUSD = bigIntToBigDecimal(Vat.bind(Address.fromString(VAT_ADDRESS)).debt(), RAD);
   protocol.save();
 }
