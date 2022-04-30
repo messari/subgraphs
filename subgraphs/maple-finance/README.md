@@ -1,10 +1,35 @@
 # Maple Finance Subgraph
 
+## Development
+
+TODO: remove this section for handoff
+
+### Installing dependencies
+
+```bash
+yarn global add @graphprotocol/graph-cli
+yarn
+```
+
+### Run codegen
+
+```bash
+graph codegen
+```
+
+### Deploy changes
+
+```bash
+graph deploy --product hosted-service papercliplabs/messari-maple-finance --deploy-key <DEPLOY_KEY>
+```
+
+Note: the DEPLOY_KEY can be found on the graph page if logged in, otherwise ask @spennyp
+
 ## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools: 
+Sum across all Pools:
 
 `Current Borrow Loans + Remaining Cash Available to Borrow as Loan`
 
@@ -17,6 +42,7 @@ Sum across all Pools:
 Note: Establish fee is taken on NEW LOANS. e.g. if you borrow $500k, repay the $500k and take out another $1m, you pay fees across the $1.5m
 
 ### Protocol-Side Revenue USD
+
 Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
@@ -26,6 +52,7 @@ Sum across all Pools:
 Note that Establishment Fees is split between Protocol and Delegate 50/50 but full Establishment Fees to be included Protocol-side Revenue
 
 ### Supply-Side Revenue USD
+
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
@@ -34,7 +61,7 @@ Sum across all Pools
 
 ### Total Unique Users
 
-Count of  Unique Addresses which have interacted with the protocol via any transaction
+Count of Unique Addresses which have interacted with the protocol via any transaction
 
 `Deposits`
 
@@ -46,10 +73,10 @@ Count of  Unique Addresses which have interacted with the protocol via any trans
 
 `Liquidations`
 
-###  Reward Token Emissions Amount
+### Reward Token Emissions Amount
 
 To be added
 
-###  Protocol Controlled Value
+### Protocol Controlled Value
 
 To be added
