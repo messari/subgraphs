@@ -301,12 +301,24 @@ export function handleHeal(event: LogNote): void {
 export function handleSuck(event: LogNote): void {
   let rad = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
   updateTotalBorrowUSD(event); // add debt
+  log.debug("handleSuck arg1 = {}, arg2 = {}, vow = {}, pot = {} ", [
+    "0x"+event.params.arg1
+      .toHexString()
+      .substring(26)
+      .toLowerCase(),
+      "0x"+event.params.arg2
+      .toHexString()
+      .substring(26)
+      .toLowerCase(),
+    MCD_VOW_ADDRESS,
+    MCD_POT_ADDRESS,
+  ]);
   if (
-    event.params.arg1
+    "0x"+event.params.arg1
       .toHexString()
       .substring(26)
       .toLowerCase() == MCD_VOW_ADDRESS &&
-    event.params.arg2
+    "0x"+event.params.arg2
       .toHexString()
       .substring(26)
       .toLowerCase() == MCD_POT_ADDRESS // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
