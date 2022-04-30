@@ -183,7 +183,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.name = "MakerDao";
   LendingProtocolEntity.slug = "makerdao";
   LendingProtocolEntity.schemaVersion = "1.1.0";
-  LendingProtocolEntity.subgraphVersion = "0.0.6";
+  LendingProtocolEntity.subgraphVersion = "1.0.0";
   LendingProtocolEntity.methodologyVersion = "0.0.1";
   LendingProtocolEntity.network = Network.MAINNET;
   LendingProtocolEntity.type = ProtocolType.LENDING;
