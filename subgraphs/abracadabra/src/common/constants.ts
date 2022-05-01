@@ -7,20 +7,20 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -60,6 +60,15 @@ export namespace RiskType {
   export const ISOLATED = "ISOLATED";
 }
 
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED_TERM = "FIXED_TERM";
+}
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROW = "BORROWER";
+}
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -107,6 +116,7 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 ///// Date/Time /////
 /////////////////////
 
+export const SECONDS_PER_HOUR = 60 * 60; // 360
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_YEAR = new BigDecimal(BigInt.fromI32(60 * 60 * 24 * 365));
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
@@ -117,19 +127,29 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Protocol Specific /////
 /////////////////////////////
 
-export const BENTOBOX_ADDRESS = "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966".toLowerCase();
+export const BENTOBOX_ADDRESS_MAINNET = "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966".toLowerCase();
+export const BENTOBOX_ADDRESS_AVALANCHE = "0xf4F46382C2bE1603Dc817551Ff9A7b333Ed1D18f".toLowerCase();
+export const BENTOBOX_ADDRESS_ARBITRUM = "0x74c764D41B77DBbb4fe771daB1939B00b146894A".toLowerCase();
+export const BENTOBOX_ADDRESS_FANTOM = "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966".toLowerCase();
+export const BENTOBOX_ADDRESS_BSC = "0x090185f2135308BaD17527004364eBcC2D37e5F6".toLowerCase();
 
 export const ABRA_ACCOUNTS = [
+  // same on all chains
   "0xfddfe525054efaad204600d00ca86adb1cc2ea8a".toLowerCase(),
   "0xb4EfdA6DAf5ef75D08869A0f9C0213278fb43b6C".toLowerCase(),
 ];
 
-export const MIM = "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3".toLowerCase();
+export const MIM_MAINNET = "0x99D8a9C45b2ecA8864373A26D1459e3Dff1e17F3".toLowerCase();
+export const MIM_AVALANCHE = "0x130966628846bfd36ff31a822705796e8cb8c18d".toLowerCase();
+export const MIM_ARBITRUM = "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a".toLowerCase();
+export const MIM_FANTOM = "0x82f0b8b456c1a451378467398982d4834b6829c1".toLowerCase();
+export const MIM_BSC = "0xfe19f0b51438fd612f6fd59c1dbb3ea319f433ba".toLowerCase();
 
-export const MIM_PRICE_ORACLE = "0x7A364e8770418566e3eb2001A96116E6138Eb32F".toLowerCase();
-export const SPELL = "0x090185f2135308BaD17527004364eBcC2D37e5F6".toLowerCase();
-export const STAKED_SPELL = "0x26FA3fFFB6EfE8c1E69103aCb4044C26B9A106a9".toLowerCase();
-export const TREASURY_ADDRESS = "0x5a7c5505f3cfb9a0d9a8493ec41bf27ee48c406d".toLowerCase();
+export const STAKED_SPELL_MAINNET = "0x26FA3fFFB6EfE8c1E69103aCb4044C26B9A106a9".toLowerCase();
+export const STAKED_SPELL_AVALANCHE = "0x3Ee97d514BBef95a2f110e6B9b73824719030f7a".toLowerCase();
+export const STAKED_SPELL_ARBITRUM = "0xF7428FFCb2581A2804998eFbB036A43255c8A8D3".toLowerCase();
+export const STAKED_SPELL_FANTOM = "0xbB29D2A58d880Af8AA5859e30470134dEAf84F2B".toLowerCase();
+
 export const YV_USDT_MARKET = "0x551a7cff4de931f32893c928bbc3d25bf1fc5147".toLowerCase();
 export const YV_WETH_MARKET = "0x6Ff9061bB8f97d948942cEF376d98b51fA38B91f".toLowerCase();
 export const YV_YFI_MARKET = "0xffbf4892822e0d552cff317f65e1ee7b5d3d9ae6".toLowerCase();
@@ -148,3 +168,11 @@ export const HIGH_RISK_LIQUIDATION_PENALTY = 112500;
 
 export const ABRA_USER_REVENUE_SHARE = BigDecimal.fromString("0.75");
 export const ABRA_PROTOCOL_REVENUE_SHARE = BigDecimal.fromString("0.25");
+
+export const CHAINLINK_ORACLE_DECIMALS = 8 as i32;
+
+export const ETH_NETWORK = "mainnet";
+export const FTM_NETWORK = "fantom";
+export const ARB_NETWORK = "arbitrum-one";
+export const BSC_NETWORK = "bsc";
+export const AVALANCHE_NETWORK = "avalanche";

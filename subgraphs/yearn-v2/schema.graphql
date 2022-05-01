@@ -250,7 +250,7 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { # of hours since Unix epoch time } "
   id: ID!
 
   " Protocol this snapshot is associated with "
@@ -362,6 +362,9 @@ type Vault @entity {
   " Total supply of output token "
   outputTokenSupply: BigInt!
 
+  " Vault last reported harvest timestamp "
+  lastReport: BigInt!
+
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
@@ -437,7 +440,7 @@ type VaultDailySnapshot @entity {
 }
 
 type VaultHourlySnapshot @entity {
-  " { Smart contract address of the vault }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { Smart contract address of the vault }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
