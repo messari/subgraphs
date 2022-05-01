@@ -524,8 +524,6 @@ type Deposit implements Event @entity {
   " { Transaction hash }-{ Log index } "
   id: ID!
 
-  currencyCode: String
-
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
@@ -566,8 +564,6 @@ type Withdraw implements Event @entity {
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
-
-  currencyCode: String
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
