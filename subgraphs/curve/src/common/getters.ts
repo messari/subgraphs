@@ -24,13 +24,13 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
   // fetch info if null
   if (!token) {
-    if (tokenAddress.toHexString().toLowerCase() == ETH_ADDRESS.toLowerCase()){
+    if (tokenAddress.toHexString().toLowerCase() == ETH_ADDRESS.toLowerCase()) {
       token = new Token(tokenAddress.toHexString());
       token.symbol = "ETH";
       token.name = "Ethereum";
       token.decimals = 18;
       token.save();
-    } else{
+    } else {
       token = new Token(tokenAddress.toHexString());
       token.symbol = fetchTokenSymbol(tokenAddress);
       token.name = fetchTokenName(tokenAddress);

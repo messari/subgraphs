@@ -355,7 +355,7 @@ type LiquidityPool @entity {
   protocol: DexAmmProtocol!
 
   " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
-  name: String
+  name: String!
 
   " Symbol of liquidity pool (e.g. 3CRV) "
   symbol: String
@@ -364,7 +364,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -427,7 +427,9 @@ type LiquidityPool @entity {
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
   ##### Added #####
-  assetType: BigInt!
+  assetType: Int!
+
+  isV2: Boolean!
 }
 
 #################################

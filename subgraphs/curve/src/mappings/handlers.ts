@@ -7,10 +7,6 @@ import { AddressModified, NewAddressIdentifier } from "../../generated/AddressPr
 // To improve readability and consistency, it is recommended that you put all
 // handlers in this file, and create helper functions to handle specific events
 
-export function handleAddressModified(event: AddressModified): void {
+export function handleAddressModified(event: AddressModified): void {}
 
-}
-
-export function handleNewAddressIdentifier(event: NewAddressIdentifier): void {
-  
-}
+export function handleNewAddressIdentifier(event: NewAddressIdentifier): void {}

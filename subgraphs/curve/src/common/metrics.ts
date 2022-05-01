@@ -1,7 +1,14 @@
 import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot } from "../../generated/schema";
 import { REGISTRY_ADDRESS, SECONDS_PER_DAY } from "./constants";
-import { getOrCreateDexAmm, getOrCreatePoolDailySnapshot, getOrCreatePoolHourlySnapshot, getOrCreateFinancialsDailySnapshot, getOrCreateUsageMetricHourlySnapshot, getOrCreateUsageMetricDailySnapshot } from "./getters";
+import {
+  getOrCreateDexAmm,
+  getOrCreatePoolDailySnapshot,
+  getOrCreatePoolHourlySnapshot,
+  getOrCreateFinancialsDailySnapshot,
+  getOrCreateUsageMetricHourlySnapshot,
+  getOrCreateUsageMetricDailySnapshot,
+} from "./getters";
 
 // These are meant more as boilerplates that'll be filled out depending on the
 // subgraph, and will be different from subgraph to subgraph, hence left

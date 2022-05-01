@@ -14,8 +14,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - PoolAdded
-        - PoolRemoved
+        - LiquidityPool
       abis:
         - name: MainRegistry
           file: ./abis/MainRegistry.json
@@ -43,6 +42,10 @@ dataSources:
           file: ./abis/Prices/Uniswap/Router.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapFactoryV3
+          file: ./abis/Prices/Uniswap/FactoryV3.json
+        - name: Quoter
+          file: ./abis/Prices/Uniswap/Quoter.json
         - name: UniswapPair
           file: ./abis/Prices/Uniswap/Pair.json
         # SushiSwap Contracts
@@ -60,12 +63,16 @@ dataSources:
           file: ./abis/Prices/Atoken.json
         - name: YearnTokenV1
           file: ./abis/Prices/YearnTokenV1.json
+        - name: RedeemableKeep3r
+          file: ./abis/Prices/RedeemableKeep3r.json
+        - name: ChainlinkAggregator
+          file: ./abis/Prices/ChainlinkAggregator.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
       file: ./src/mappings/registry.ts
   - kind: ethereum
-    name: firstRegistry
+    name: FirstRegistry
     network: mainnet
     source:
       address: "0x7D86446dDb609eD0F5f8684AcF30380a356b2B4c"
@@ -76,8 +83,7 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - PoolAdded
-        - PoolRemoved
+        - LiquidityPool
       abis:
         - name: MainRegistry
           file: ./abis/MainRegistry.json
@@ -151,14 +157,726 @@ dataSources:
         - name: StableSwap
           file: ./abis/StableSwap.json
       entities:
-        - Contract
-        - ContractVersion
-        - SystemState
+        - LiquidityPool
       eventHandlers:
         - event: AddressModified(indexed uint256,address,uint256)
           handler: handleAddressModified
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
+  - name: compound
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56
+      startBlock: 9554040
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: usdt
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C
+      startBlock: 9456293
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: y
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51
+      startBlock: 9476468
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: busd
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27
+      startBlock: 9567295
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: susd
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0xA5407eAE9Ba41422680e2e00537571bcC53efBfD
+      startBlock: 9906598
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: pax
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x06364f10B501e868329afBc005b3492902d6C763
+      startBlock: 10041041
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: ren
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x93054188d876f558f4a66B2EF1d97d16eDf0895B
+      startBlock: 10151385
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: sbtc
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714
+      startBlock: 10276641
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: hbtc
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F
+      startBlock: 10732328
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: 3pool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7
+      startBlock: 10809473
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: gusd
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956
+      startBlock: 11005604
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: husd
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604
+      startBlock: 11010070
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: usdk
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb
+      startBlock: 11010305
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: usdn
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1
+      startBlock: 11010514
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: musd
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6
+      startBlock: 11011940
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: rsv
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0xC18cC39da8b11dA8c3541C598eE022258F9744da
+      startBlock: 11037531
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+  - name: tbtc 
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StableSwap
+      address: 0xC25099792E9349C7DD09759744ea681C7de2cb66
+      startBlock: 11095928
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/addressProvider.ts
+      abis:
+        - name: StableSwap
+          file: ./abis/StableSwap.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+      entities: 
+        - LiquidityPool
+      eventHandlers:
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
 templates:
   # Main pool contract
   - name: Pool

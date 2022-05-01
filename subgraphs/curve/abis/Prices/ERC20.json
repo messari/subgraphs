@@ -77,17 +77,13 @@
   },
   {
     "name": "UpdatePerformanceFee",
-    "inputs": [
-      { "type": "uint256", "name": "performanceFee", "indexed": false }
-    ],
+    "inputs": [{ "type": "uint256", "name": "performanceFee", "indexed": false }],
     "anonymous": false,
     "type": "event"
   },
   {
     "name": "UpdateManagementFee",
-    "inputs": [
-      { "type": "uint256", "name": "managementFee", "indexed": false }
-    ],
+    "inputs": [{ "type": "uint256", "name": "managementFee", "indexed": false }],
     "anonymous": false,
     "type": "event"
   },
