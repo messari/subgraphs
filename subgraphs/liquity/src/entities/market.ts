@@ -78,9 +78,8 @@ export function getOrCreateMarketHourlySnapshot(
   market: Market
 ): MarketHourlySnapshot {
   const timestamp = event.block.timestamp.toI64();
-  const day: i64 = timestamp / SECONDS_PER_DAY;
-  const hour: i64 = (timestamp % SECONDS_PER_DAY) / SECONDS_PER_HOUR;
-  const id = `${market.id}-${day}-${hour}`;
+  const hour: i64 = timestamp / SECONDS_PER_HOUR;
+  const id = `${market.id}-${hour}`;
   let marketSnapshot = MarketHourlySnapshot.load(id);
   if (!marketSnapshot) {
     marketSnapshot = new MarketHourlySnapshot(id);
