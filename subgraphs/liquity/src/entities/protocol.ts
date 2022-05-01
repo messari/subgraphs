@@ -11,6 +11,11 @@ import {
   LendingType,
   Network,
   ProtocolType,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SCHEMA_VERSION,
+  PROTOCOL_SLUG,
+  PROTOCOL_SUBGRAPH_VERSION,
   RiskType,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -23,11 +28,11 @@ export function getOrCreateLiquityProtocol(): LendingProtocol {
   let protocol = LendingProtocol.load(TROVE_MANAGER);
   if (!protocol) {
     protocol = new LendingProtocol(TROVE_MANAGER);
-    protocol.name = "Liquity";
-    protocol.slug = "liquity";
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.1.0";
-    protocol.methodologyVersion = "1.0.0";
+    protocol.name = PROTOCOL_NAME;
+    protocol.slug = PROTOCOL_SLUG;
+    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
@@ -59,9 +64,8 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   event: ethereum.Event
 ): UsageMetricsHourlySnapshot {
   const timestamp = event.block.timestamp.toI64();
-  const day = timestamp / SECONDS_PER_DAY;
-  const hour = (timestamp % SECONDS_PER_DAY) / SECONDS_PER_HOUR;
-  const id = `${day}-${hour}`;
+  const hour = timestamp / SECONDS_PER_HOUR;
+  const id = `${hour}`;
   let usageMetrics = UsageMetricsHourlySnapshot.load(id);
   if (!usageMetrics) {
     const protocol = getOrCreateLiquityProtocol();
@@ -134,8 +138,8 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
   }
   // Combine the id, user address and hour to generate a unique user id for the hour
   let hourlyActiveAccountId = `${accountId}-${day}-${hour}`;
-  let hourlyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
-  if (!dailyActiveAccount) {
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
+  if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
     hourlyActiveAccount.save();
     usageMetricsHourlySnapshot.hourlyActiveUsers += 1;
