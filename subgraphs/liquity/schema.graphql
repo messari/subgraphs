@@ -1,5 +1,5 @@
 # Subgraph Schema: Lending Protocol
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -323,7 +323,7 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { # of hours since Unix epoch time } "
   id: ID!
 
   " Protocol this snapshot is associated with "
@@ -507,7 +507,7 @@ type Market @entity {
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 
-  " Amount of input token per full share of output token. Only applies when the output token exists "
+  " Amount of input token per full share of output token. Only applies when the output token exists (note this is a ratio and not a percentage value, i.e. 1.05 instead of 105%) "
   exchangeRate: BigDecimal
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
@@ -625,7 +625,7 @@ type MarketDailySnapshot @entity {
 }
 
 type MarketHourlySnapshot @entity {
-  " { Smart contract address of the market }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { Smart contract address of the market }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
