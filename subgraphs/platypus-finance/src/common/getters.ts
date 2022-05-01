@@ -1,5 +1,5 @@
-import { log } from "@graphprotocol/graph-ts";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -57,14 +57,11 @@ export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): 
   return token;
 }
 
-export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
-  let pool = LiquidityPool.load(poolAddress.toHexString());
-  // fetch info if null
-  if (!pool) {
-    pool = new LiquidityPool(poolAddress.toHexString());
-    pool.protocol = getOrCreateDexAmm().id;
+export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _LiquidityPoolParamsHelper {
+  let poolParam = _LiquidityPoolParamsHelper.load(poolAddress.toHexString());
 
-    let poolParam = new _LiquidityPoolParamsHelper(poolAddress.toHexString());
+  if (!poolParam) {
+    poolParam = new _LiquidityPoolParamsHelper(poolAddress.toHexString());
 
     poolParam.Dev = PROTOCOL_ADMIN;
     poolParam.SlippageParamsK = BigDecimal.fromString("0.00002e18");
@@ -76,7 +73,17 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     poolParam.PriceDeviation = BigDecimal.fromString("0.02e18");
 
     poolParam.save();
-    pool.save();
+  }
+  return poolParam;
+}
+
+export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
+  let pool = LiquidityPool.load(poolAddress.toHexString());
+  // fetch info if null
+  if (!pool) {
+    pool = new LiquidityPool(poolAddress.toHexString());
+    pool.protocol = getOrCreateDexAmm().id;
+    getOrCreateLiquidityPoolParamsHelper(poolAddress);
 
     initAltPoolTemplates();
     let protocol = getOrCreateDexAmm();
@@ -126,16 +133,31 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolAddress = event.address.toHexString();
   let poolDailyMetrics = LiquidityPoolDailySnapshot.load(poolAddress.concat("-").concat(id.toString()));
+  let pool = getOrCreateLiquidityPool(Address.fromString(poolAddress));
 
   if (!poolDailyMetrics) {
     poolDailyMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
     poolDailyMetrics.protocol = PROTOCOL_ADMIN;
-    poolDailyMetrics.pool = poolAddress;
+    poolDailyMetrics.pool = pool.id;
     poolDailyMetrics.rewardTokenEmissionsAmount = [];
     poolDailyMetrics.rewardTokenEmissionsUSD = [];
+    poolDailyMetrics.inputTokens = pool.inputTokens;
+    poolDailyMetrics.inputTokenBalances = pool.inputTokenBalances;
+    poolDailyMetrics.blockNumber = event.block.number;
+    poolDailyMetrics.timestamp = event.block.timestamp;
 
     poolDailyMetrics.blockNumber = event.block.number;
     poolDailyMetrics.timestamp = event.block.timestamp;
+
+    let dailyVolumeByTokenUSD: BigDecimal[] = [];
+    let dailyVolumeByTokenAmount: BigInt[] = [];
+    // log.debug(poolDailyMetrics.inputTokens.length)
+    for (let i = 0; i < poolDailyMetrics.inputTokens.length; i++) {
+      dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+      dailyVolumeByTokenAmount.push(BigInt.fromString("0"));
+    }
+    poolDailyMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
+    poolDailyMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
 
     poolDailyMetrics.save();
   }
@@ -147,18 +169,29 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
   let poolAddress = event.address.toHexString();
+  let pool = getOrCreateLiquidityPool(Address.fromString(poolAddress));
 
   let poolHourlyMetrics = LiquidityPoolHourlySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
   if (!poolHourlyMetrics) {
     poolHourlyMetrics = new LiquidityPoolHourlySnapshot(poolAddress.concat("-").concat(id.toString()));
     poolHourlyMetrics.protocol = PROTOCOL_ADMIN;
-    poolHourlyMetrics.pool = poolAddress;
+    poolHourlyMetrics.pool = pool.id;
     poolHourlyMetrics.rewardTokenEmissionsAmount = [];
     poolHourlyMetrics.rewardTokenEmissionsUSD = [];
-
+    poolHourlyMetrics.inputTokens = pool.inputTokens;
+    poolHourlyMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolHourlyMetrics.blockNumber = event.block.number;
     poolHourlyMetrics.timestamp = event.block.timestamp;
+
+    let hourlyVolumeByTokenUSD: BigDecimal[] = [];
+    let hourlyVolumeByTokenAmount: BigInt[] = [];
+    for (let i = 0; i < pool.inputTokens.length; i++) {
+      hourlyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+      hourlyVolumeByTokenAmount.push(BigInt.fromString("0"));
+    }
+    poolHourlyMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
+    poolHourlyMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
 
     poolHourlyMetrics.save();
   }

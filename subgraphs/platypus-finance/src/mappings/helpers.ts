@@ -115,23 +115,42 @@ export function createWithdraw(
 }
 
 // Handle swaps data and update entities volumes and fees
-export function createSwapHandleVolumeAndFees(
+export function createSwap(
   event: ethereum.Event,
-  to: Address,
   sender: Address,
-  amount0In: BigInt,
-  amount1In: BigInt,
-  amount0Out: BigInt,
-  amount1Out: BigInt,
-): void {
-  // let swap = new SwapEvent(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
-  // // update swap event
-  // swap.hash = event.transaction.hash.toHexString();
-  // swap.logIndex = event.logIndex.toI32();
-  // swap.protocol = FACTORY_ADDRESS;
-  // ..
-  // swap.save();
-  // updateVolumeAndFees(event, trackedAmountUSD, feeUSD);
+  inputTokenAddress: Address,
+  outputTokenAddress: Address,
+  inputTokenAmount: BigInt,
+  actualOutputTokenAmount: BigInt,
+  to: Address,
+): Swap {
+  let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
+
+  let protocol = getOrCreateDexAmm();
+  let pool = getOrCreateLiquidityPool(event.address);
+  let inputToken = getOrCreateToken(event, inputTokenAddress);
+  let outputToken = getOrCreateToken(event, outputTokenAddress);
+
+  let amountInUsd = tokenAmountToUSDAmount(inputToken, inputTokenAmount);
+  let amountOutUsd = tokenAmountToUSDAmount(outputToken, actualOutputTokenAmount);
+
+  swap.hash = event.transaction.hash.toHexString();
+  swap.logIndex = event.logIndex.toI32();
+  swap.protocol = protocol.id;
+  swap.to = to.toHexString();
+  swap.pool = pool.id;
+  swap.from = sender.toHexString();
+  swap.blockNumber = event.block.number;
+  swap.timestamp = event.block.timestamp;
+  swap.tokenIn = inputToken.id;
+  swap.amountIn = inputTokenAmount;
+  swap.amountInUSD = amountInUsd;
+  swap.tokenOut = outputToken.id;
+  swap.amountOut = actualOutputTokenAmount;
+  swap.amountOutUSD = amountOutUsd;
+
+  swap.save();
+  return swap;
 }
 
 // T extends is a work-around for not having union types in assemblyscript
