@@ -1,15 +1,15 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/_networkConfig";
-import { MasterChef } from "../../generated/MasterChef/MasterChef";
-import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
-import { LiquidityPool } from "../../generated/schema";
-import { BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "./constants";
-import { getOrCreateToken } from "./getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
-import { getRewardsPerDay } from "./rewards";
+import { NetworkConfigs } from "../../../config/_networkConfig";
+import { MasterChefApeswap } from "../../../generated/MasterChef/MasterChefApeswap";
+import { MasterChefV2Apeswap } from "../../../generated/MasterChefV2/MasterChefV2Apeswap";
+import { LiquidityPool } from "../../../generated/schema";
+import { BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../constants";
+import { getOrCreateToken } from "../getters";
+import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../price/price";
+import { getRewardsPerDay } from "../rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
-  let poolContract = MasterChefV2.bind(event.address);
+  let poolContract = MasterChefV2Apeswap.bind(event.address);
 
   let lpTokenAddress = ZERO_ADDRESS;
   let getlpAddress = poolContract.try_lpToken(pid);
@@ -74,8 +74,8 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
 }
 
 export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
-  let poolContract = MasterChef.bind(event.address);
-  let getPoolInfo = poolContract.try_getPoolInfo(pid);
+  let poolContract = MasterChefApeswap.bind(event.address);
+  let getPoolInfo = poolContract.try_poolInfo(pid);
 
   let lpTokenAddress = ZERO_ADDRESS;
   let poolAllocPoint: BigInt = BIGINT_ZERO;

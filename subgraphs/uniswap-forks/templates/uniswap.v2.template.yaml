@@ -21,9 +21,6 @@ dataSources:
         - LiquidityPool
         - LiquidityPoolFee
         - Protocol
-        - _PricesUSD
-        - _TokenTracker
-        - _WindowTracker
       abis:
         - name: Factory
           file: ./abis/uniswap-v2/factory.json

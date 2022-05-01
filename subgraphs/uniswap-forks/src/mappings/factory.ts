@@ -1,4 +1,4 @@
-// import { log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
 import { PairCreated } from "../../generated/Factory/Factory";
 import { createLiquidityPool } from "../common/creators";
 

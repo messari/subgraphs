@@ -16,9 +16,9 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/apeswap/Factory.json
+          file: ./abis/sushiswap/Factory.json
         - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
+          file: ./abis/sushiswap/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
@@ -35,9 +35,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - _CircularBuffer
-        - RewardToken
+      entities: []
       abis:
         - name: MasterChefSushiswap
           file: ./abis/sushiswap/MasterChefSushiswap.json
@@ -52,7 +50,7 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./src/mappings/masterChef/apeswap.ts
+      file: ./src/mappings/masterChef/sushiswap.ts
 
   - kind: ethereum
     name: MasterChefV2
@@ -65,9 +63,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: 
-        - _CircularBuffer
-        - RewardToken
+      entities: []
       abis:
         - name: MasterChefV2Sushiswap
           file: ./abis/sushiswap/MasterChefV2Sushiswap.json
@@ -82,8 +78,8 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/masterChef/apeswap.ts
- 
+      file: ./src/mappings/masterChef/sushiswap.ts
+    
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -98,11 +94,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/apeswap/Pair.json
+          file: ./abis/sushiswap/Pair.json
         - name: Factory
-          file: ./abis/apeswap/Factory.json
+          file: ./abis/sushiswap/Factory.json
         - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
+          file: ./abis/sushiswap/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

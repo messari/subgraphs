@@ -7,10 +7,11 @@ import { toBytesArray } from "../src/common/utils/utils";
 export namespace Protocol {
   export const APESWAP = "Apeswap";
   export const UNISWAPV2 = "Uniswap V2";
+  export const SUSHISWAP = "Sushiswap";
 }
 
 // Choose which protocol you are indexing. The deployed network will already be determined
-let PROTOCOL_NAME_TEMP = Protocol.UNISWAPV2;
+let PROTOCOL_NAME_TEMP = Protocol.SUSHISWAP;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,15 +163,68 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xdDb3Bd8645775F59496c821E4F55A7eA6A6dc299", // GNANA
   ];
   STABLE_COINS_TEMP = [
+    "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+    "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT
+    "0x0000000000085d4780b73119b644ae5ecd22b376", // TUSD
+    "0x956f47f50a910163d8bf957cf5846d573e7f87ca", // FEI
+    "0x4dd28568d05f09b02220b09c2cb307bfd837cb95",
+  ];
+  STABLE_ORACLE_POOLS_TEMP = [
+    "0x51e6d27fa57373d8d4c256231241053a70cb1d93", // BUSD/WBNB created block 4857769
+    "0xf3010261b58b2874639ca2e860e9005e3be5de0b", // DAI/WBNB created block 481116
+    "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
+  ];
+} else if (PROTOCOL_NAME_TEMP == Protocol.SUSHISWAP && dataSource.network() == Network.MAINNET.toLowerCase()) {
+  PROTOCOL_SLUG_TEMP = "Sushiswap";
+  NETWORK_TEMP = Network.MAINNET;
+
+  FACTORY_ADDRESS_TEMP = "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac";
+  FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
+
+  TRADING_FEE_TEMP = BigDecimal.fromString("3");
+  PROTOCOL_FEE_TO_ON_TEMP = BigDecimal.fromString("0.5");
+  LP_FEE_TO_ON_TEMP = BigDecimal.fromString("2.5");
+  PROTOCOL_FEE_TO_OFF_TEMP = BigDecimal.fromString("0.0");
+  LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("3");
+  FEE_ON_OFF_TEMP = FeeSwitch.ON;
+
+  REWARD_INTERVAL_TYPE_TEMP = RewardIntervalType.TIMESTAMP;
+
+  NATIVE_TOKEN_TEMP = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+  REWARD_TOKENS_TEMP = ["0x6b3595068778dd592e39a122f4f5a5cf09c90fe2"];
+  WHITELIST_TOKENS_TEMP = [
+    "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH
+    "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
+    "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT
+    "0x0000000000085d4780b73119b644ae5ecd22b376", // TUSD
+    "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643", // cDAI
+    "0x39aa39c021dfbae8fac545936693ac917d5e7563", // cUSDC
+    "0x86fadb80d8d2cff3c3680819e4da99c10232ba0f", // EBASE
+    "0x57ab1ec28d129707052df4df418d58a2d46d5f51", // sUSD
+    "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2", // MKR
+    "0xc00e94cb662c3520282e6f5717214004a7f26888", // COMP
+    "0x514910771af9ca656af840dff83e8264ecf986ca", //LINK
+    "0x960b236a07cf122663c4303350609a66a7b288c0", //ANT
+    "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f", //SNX
+    "0x0bc529c00c6401aef6d220be8c6ea1667f6ad93e", //YFI
+    "0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8", // yCurv
+    "0x853d955acef822db058eb8505911ed77f175b99e", // FRAX
+    "0xa47c8bf37f92abed4a126bda807a7b7498661acd", // WUST
+    "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984", // UNI
+    "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", // WBTC
+  ];
+  STABLE_COINS_TEMP = [
     "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
     "0x55d398326f99059ff775485246999027b3197955", // USDT
     "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
     "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3", // DAI
   ];
   STABLE_ORACLE_POOLS_TEMP = [
-    "0x51e6d27fa57373d8d4c256231241053a70cb1d93", // BUSD/WBNB created block 4857769
-    "0xf3010261b58b2874639ca2e860e9005e3be5de0b", // DAI/WBNB created block 481116
-    "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
+    "0x397FF1542f962076d0BFE58eA045FfA2d347ACa0", // USDC/wETH
+    "0x06da0fd433C1A5d7a4faa01111c044910A184553", // USDT/wETH
+    "0xC3D03e4F041Fd4cD388c549Ee2A29a9E5075882f", // DAI/wETH
   ];
 }
 
