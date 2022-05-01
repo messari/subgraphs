@@ -105,11 +105,16 @@ export function _Deposit(
     .times(vault.inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimalsBaseTen);
-  
-  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
 
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    inputTokenPrice.usdPrice
+      .times(depositAmount.toBigDecimal())
+      .div(inputTokenDecimals.toBigDecimal())
+      .div(inputTokenPrice.decimalsBaseTen)
+  );
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,

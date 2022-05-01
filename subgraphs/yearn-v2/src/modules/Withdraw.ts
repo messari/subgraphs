@@ -76,15 +76,20 @@ export function _Withdraw(
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
   let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
 
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+
   vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimalsBaseTen);
 
-  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
-
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    inputTokenPrice.usdPrice
+      .times(withdrawAmount.toBigDecimal())
+      .div(inputTokenDecimals.toBigDecimal())
+      .div(inputTokenPrice.decimalsBaseTen)
+  );
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
