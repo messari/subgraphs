@@ -289,13 +289,13 @@ export function handleStrategyReported_v1(
   const strategyAddress = event.params.strategy;
 
   strategyReported(
-    event,
-    vaultAddress,
-    strategyAddress,
     event.params.gain,
     event.params.debtAdded,
     event.params.debtPaid,
-    event.params.totalDebt
+    event.params.totalDebt,
+    event,
+    vaultAddress,
+    strategyAddress
   );
 }
 
@@ -306,13 +306,13 @@ export function handleStrategyReported_v2(
   const strategyAddress = event.params.strategy;
 
   strategyReported(
-    event,
-    vaultAddress,
-    strategyAddress,
     event.params.gain,
     event.params.debtAdded,
     constants.BIGINT_ZERO,
-    event.params.totalDebt
+    event.params.totalDebt,
+    event,
+    vaultAddress,
+    strategyAddress
   );
 }
 

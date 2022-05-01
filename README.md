@@ -23,6 +23,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 - Go over the documents in the `docs` folder. That should answer lots of questions you may have.
 - Implement the mappings, deploy and test your data using either Hosted Service or The Graph Studio.
 - For metrics calculation (e.g. revenue, fees, TVL), please refer to the `README.md` in the protocol's subgraph folder for methodology. There is also a broader explanation of how different fields are defined in the schema in `docs/Schema.md`. Feel free to reach out to me if anything isn't clear.
+- We've built a handy debugging/validation dashboard for you to quickly visualize the data in your subgraph. It's deployed to [subgraphs.xyz](https://subgraphs.xyz/) and the source code is under `dashboard` if you want to spin it up locally.
 - Verify your subgraph against other sources and include specific links to these sources in the README. Below are some common sources:
   - Project's official analytics dashboard
   - [DeFi Llama](https://defillama.com/) (for TVL)
@@ -68,7 +69,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Protocol |  Status | Versions † | Deployments |
 | ------- |  :------: | --- | --- |
 | **DEX AMM** |    | |
-| [Apeswap](https://apeswap.finance/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
+| [Apeswap](https://apeswap.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
 | Balancer v2 | 🔨 | | |
 | Bancor v2 | 🔨 | | |
 | Bancor v3 | | | |
@@ -79,9 +80,9 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Saddle Finance | 🔨 | | |
 | Sushiswap | 🔨 | | |
 | [Uniswap v2](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) |
-| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](https://messari.io/asset-images/51809842-fb42-470e-ab2d-1095334a5a4d/16.png?v=2)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](https://messari.io/asset-images/a288b358-f3d3-4ecd-aa30-c45c84f666ee/16.png?v=2)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
+| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
 | **Lending Protocols** |    | |
-| Aave v2 | 🔨 | | |
+| Aave v2 | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
 | Aave v3 |  | | |
 | [Bastion Protocol](https://bastionprotocol.com/) | 🔨 | | |
 | Benqi | 🔨 | | |
@@ -94,7 +95,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Moonwell Finance | 🔨 | | |
 | TrueFi |   | | |
 | **CDPs** |    | |
-| [Abracadabra](https://abracadabra.money/) | 🛠 | 1.1.0 / 0.0.6 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money) |
+| [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
 | Alchemix |   | | |
 | Inverse Finance | 🔨 | | |
 | [Liquity](https://www.liquity.org/) | 🛠 | 1.1.0 / 1.0.0 / 1.0.0 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
