@@ -1,10 +1,16 @@
 // helper functions for ./mappings.ts
 
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { RARI_DEPLOYER } from "../common/utils/constants";
+import {
+  BIGDECIMAL_ZERO,
+  DEFAULT_DECIMALS,
+  RARI_DEPLOYER,
+  YIELD_VAULT_MANAGER_ADDRESS,
+} from "../common/utils/constants";
 import { Deposit, Withdraw } from "../../generated/schema";
-import { getOrCreateToken } from "../common/getters";
+import { getOrCreateToken, getOrCreateVault } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
+import { RariYieldFundManager } from "../../generated/RariYieldFundManager/RariYieldFundManager";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -15,7 +21,7 @@ export function createDeposit(
   amount: BigInt,
   amountUSD: BigInt,
   asset: string,
-  vault: string,
+  vaultAddress: string,
 ): void {
   // create id
   let hash = event.transaction.hash;
@@ -39,9 +45,20 @@ export function createDeposit(
   deposit.asset = token.id;
   deposit.amount = amount;
   deposit.amountUSD = amountUSD.toBigDecimal().div(exponentToBigDecimal(token.decimals));
-  deposit.vault = vault;
+  deposit.vault = vaultAddress;
 
   deposit.save();
+
+  // load in vault contract
+  let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
+
+  // update vault
+  let vault = getOrCreateVault(event, vaultAddress);
+  let tryVaultTVL = contract.try_getFundBalance();
+  vault.totalValueLockedUSD = tryVaultTVL.reverted
+    ? BIGDECIMAL_ZERO
+    : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  vault.save();
 }
 
 export function createWithdraw(
@@ -49,7 +66,7 @@ export function createWithdraw(
   amount: BigInt,
   amountUSD: BigInt,
   asset: string,
-  vault: string,
+  vaultAddress: string,
 ): void {
   // create id
   let hash = event.transaction.hash;
@@ -73,9 +90,20 @@ export function createWithdraw(
   withdraw.asset = token.id;
   withdraw.amount = amount;
   withdraw.amountUSD = amountUSD.toBigDecimal().div(exponentToBigDecimal(token.decimals));
-  withdraw.vault = vault;
+  withdraw.vault = vaultAddress;
 
   withdraw.save();
+
+  // load in vault contract
+  let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
+
+  // update vault
+  let vault = getOrCreateVault(event, vaultAddress);
+  let tryVaultTVL = contract.try_getFundBalance();
+  vault.totalValueLockedUSD = tryVaultTVL.reverted
+    ? BIGDECIMAL_ZERO
+    : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  vault.save();
 }
 
 /////////////////////////
