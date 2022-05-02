@@ -244,8 +244,10 @@ export function handlePoolSwap(
   hourlySnapshot.save();
   incrementProtocolSwapCount(event);
   addProtocolUSDVolume(event, volumeUSD);
-  const supplySideRevenueUSD = volumeUSD.times(getSupplySideFee(pool.id));
-  const protocolRevenueUSD = volumeUSD.times(getProtocolFee(pool.id));
+  const supplySideRevenueUSD = swap.amountInUSD.times(
+    getSupplySideFee(pool.id)
+  );
+  const protocolRevenueUSD = swap.amountInUSD.times(getProtocolFee(pool.id));
   addProtocolUSDRevenue(event, supplySideRevenueUSD, protocolRevenueUSD);
 }
 
