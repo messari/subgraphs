@@ -13,7 +13,7 @@ import {
   LiquidityPoolFeeType,
 } from "../common/constants";
 import { BIGDECIMAL_ZERO, BIGINT_TEN } from "../prices/common/constants";
-import { getTokenPriceForAssetType } from "../prices";
+//import { getTokenPriceForAssetType } from "../prices";
 import { getLpTokenPriceUSD } from "../prices/curve/lppricing";
 
 /*
@@ -77,6 +77,7 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
         inputTokensBalances.push(coinBalance);
         inputTokensBalancesDecimalized.push(bigIntToBigDecimal(coinBalance, token.decimals));
         sum = sum.plus(bigIntToBigDecimal(coinBalance, token.decimals));
+        /*
         let tokenPriceUSD = getTokenPriceForAssetType(
           Address.fromString(token.id),
           liquidityPool,
@@ -92,6 +93,7 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
           liquidityPool.totalValueLockedUSD.toString(),
         ]);
         token.save();
+        */
       }
     }
     let inputTokenWeights = liquidityPool.inputTokenWeights;
@@ -104,9 +106,9 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
     liquidityPool.inputTokenBalances = inputTokensBalances;
 
     liquidityPool.outputToken = lpToken.id;
-    let lpTokenPrice = getLpTokenPriceUSD(liquidityPool);
+    //let lpTokenPrice = getLpTokenPriceUSD(liquidityPool);
     liquidityPool.outputTokenSupply = ERC20.bind(Address.fromString(lpToken.id)).totalSupply();
-    liquidityPool.outputTokenPriceUSD = lpTokenPrice;
+    //liquidityPool.outputTokenPriceUSD = lpTokenPrice;
 
     // handle fees
     let fees = registryContract.get_fees(address);
