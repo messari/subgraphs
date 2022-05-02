@@ -25,7 +25,13 @@ import {
 import { createMarket } from "./common/setters";
 import { bigIntToBigDecimal, bytesToSignedInt, absValBigInt, absValBigDecimal } from "./common/utils/numbers";
 import { getOrCreateFinancials } from "./common/getters";
-import { updateMarketMetrics, updateUsageMetrics, updateTotalBorrowUSD, updateFinancialMetrics, updateFinancialsDailySnapshot } from "./common/metrics";
+import {
+  updateMarketMetrics,
+  updateUsageMetrics,
+  updateTotalBorrowUSD,
+  updateFinancialMetrics,
+  updateFinancialsDailySnapshot,
+} from "./common/metrics";
 import { GemJoin } from "../generated/Vat/GemJoin";
 import { createEntityID } from "./common/utils/strings";
 import { GemJoin as GemJoinDataSource } from "../generated/templates";
@@ -204,10 +210,10 @@ export function handleFrob(event: LogNote): void {
   protocol.cumulativeDepositUSD = ΔcollateralUSD.gt(BIGDECIMAL_ZERO)
     ? protocol.cumulativeDepositUSD.plus(ΔcollateralUSD)
     : protocol.cumulativeDepositUSD;
-  protocol.cumulativeBorrowUSD =  ΔdebtUSD.gt(BIGDECIMAL_ZERO)
+  protocol.cumulativeBorrowUSD = ΔdebtUSD.gt(BIGDECIMAL_ZERO)
     ? protocol.cumulativeBorrowUSD.plus(ΔdebtUSD)
     : protocol.cumulativeBorrowUSD;
-  
+
   if (dart.gt(BIGINT_ZERO)) {
     handleEvent(event, market, "DEPOSIT", dink, ΔcollateralUSD, dart);
   } else if (dart.lt(BIGINT_ZERO)) {
@@ -262,7 +268,7 @@ export function handleGrab(event: LogNote): void {
   );
   financialsDailySnapshot.dailyTotalRevenueUSD = financialsDailySnapshot.dailyTotalRevenueUSD.plus(liquidationProfit);
 
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(totalLiqudationUSD);;
+  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(liquidationProfit);
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(liquidationProfit);
 
@@ -286,26 +292,32 @@ export function handleHeal(event: LogNote): void {
 export function handleSuck(event: LogNote): void {
   let rad = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.arg3), RAD);
   log.debug("handleSuck arg1 = {}, arg2 = {}, vow = {}, pot = {} ", [
-    "0x"+event.params.arg1
-      .toHexString()
-      .substring(26)
-      .toLowerCase(),
-      "0x"+event.params.arg2
-      .toHexString()
-      .substring(26)
-      .toLowerCase(),
+    "0x" +
+      event.params.arg1
+        .toHexString()
+        .substring(26)
+        .toLowerCase(),
+    "0x" +
+      event.params.arg2
+        .toHexString()
+        .substring(26)
+        .toLowerCase(),
     MCD_VOW_ADDRESS,
     MCD_POT_ADDRESS,
   ]);
   if (
-    "0x"+event.params.arg1
-      .toHexString()
-      .substring(26)
-      .toLowerCase() == MCD_VOW_ADDRESS &&
-    "0x"+event.params.arg2
-      .toHexString()
-      .substring(26)
-      .toLowerCase() == MCD_POT_ADDRESS // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
+    "0x" +
+      event.params.arg1
+        .toHexString()
+        .substring(26)
+        .toLowerCase() ==
+      MCD_VOW_ADDRESS &&
+    "0x" +
+      event.params.arg2
+        .toHexString()
+        .substring(26)
+        .toLowerCase() ==
+      MCD_POT_ADDRESS // Dai reallocated from Vow address to Dai stakes in Pot for supply side revenue
   ) {
     let FinancialsDailySnapshot = getOrCreateFinancials(event);
     let protocol = getOrCreateLendingProtocol();
@@ -316,7 +328,6 @@ export function handleSuck(event: LogNote): void {
     protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(rad);
     FinancialsDailySnapshot.save();
     protocol.save();
-    
   }
   updateTotalBorrowUSD(); // add debt
   updateFinancialsDailySnapshot(event);

@@ -43,7 +43,7 @@ dataSources:
         - Vault
       eventHandlers:
         ### Administration ### 0x65fae35e00000000000000000000000000000000000000000000000000000000
-        # function rely(usr address)
+        # function rely(address usr)
         - event: LogNote(indexed bytes4,indexed bytes32,indexed bytes32,indexed bytes32,bytes)
           topic0: '0x65fae35e00000000000000000000000000000000000000000000000000000000'
           handler: handleRely

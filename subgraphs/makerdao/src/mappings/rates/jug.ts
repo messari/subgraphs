@@ -5,6 +5,7 @@ import { bigIntToBigDecimal, bigDecimalExponential, round } from "./../../common
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ONE_HUNDRED,
+  COLLATERAL_FILE_SIGNATURE,
   MCD_JUG_ADDRESS,
   RAY,
   SECONDS_PER_YEAR_BIGDECIMAL,
@@ -14,7 +15,7 @@ import { Jug } from "../../../generated/templates/Jug/Jug";
 // Updates the stable borrow rate for the market
 export function handleFile(event: LogNote): void {
   let signature = event.params.sig.toHexString();
-  if (signature == "0x1a0b287e") {
+  if (signature == COLLATERAL_FILE_SIGNATURE) {
     let ilk = event.params.arg1;
     let what = event.params.arg2.toString();
     if (what == "duty") {

@@ -27,6 +27,11 @@ import {
   Network,
   InterestRateSide,
   InterestRateType,
+  PROTOCOL_SCHEMA_VERSION,
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
 } from "../common/constants";
 import { DsProxy } from "../../generated/templates/DsProxy/DsProxy";
 
@@ -104,7 +109,7 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
     marketMetrics.inputTokenBalance = market.inputTokenBalance;
-    marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD
+    marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
     marketMetrics.outputTokenSupply = market.outputTokenSupply;
     marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
     marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
@@ -138,7 +143,7 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddr
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
     marketMetrics.inputTokenBalance = market.inputTokenBalance;
-    marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD
+    marketMetrics.inputTokenPriceUSD = market.inputTokenPriceUSD;
     marketMetrics.outputTokenSupply = market.outputTokenSupply;
     marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
     marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
@@ -203,11 +208,11 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     return LendingProtocolEntity;
   }
   LendingProtocolEntity = new LendingProtocol(VAT_ADDRESS);
-  LendingProtocolEntity.name = "MakerDao";
-  LendingProtocolEntity.slug = "makerdao";
-  LendingProtocolEntity.schemaVersion = "1.2.1";
-  LendingProtocolEntity.subgraphVersion = "1.0.0";
-  LendingProtocolEntity.methodologyVersion = "1.0.0";
+  LendingProtocolEntity.name = PROTOCOL_NAME;
+  LendingProtocolEntity.slug = PROTOCOL_SLUG;
+  LendingProtocolEntity.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+  LendingProtocolEntity.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+  LendingProtocolEntity.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
   LendingProtocolEntity.network = Network.MAINNET;
   LendingProtocolEntity.type = ProtocolType.LENDING;
   LendingProtocolEntity.cumulativeUniqueUsers = 0;

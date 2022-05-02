@@ -1,5 +1,15 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+////////////////////
+///// Versions /////
+////////////////////
+
+export const PROTOCOL_NAME = "MakerDao";
+export const PROTOCOL_SLUG = "makerdao";
+export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////
@@ -7,20 +17,20 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const MAINNET = "MAINNET";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
 export namespace ProtocolType {
@@ -162,3 +172,5 @@ export const ILK_REGISTRY_2_STARTBLOCK = BigInt.fromI32(12251871);
 export const DAI = "0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase();
 export const VAT_ADDRESS = "0x35d1b3f3d7966a1dfe207aa4514c12a259a0492b".toLowerCase();
 export const ADDRESS_LENGTH = 20;
+
+export const COLLATERAL_FILE_SIGNATURE = "0x1a0b287e";

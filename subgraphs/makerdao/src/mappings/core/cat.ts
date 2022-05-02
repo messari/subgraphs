@@ -7,6 +7,7 @@ import {
   MCD_CAT_ADDRESS,
   MCD_CAT_V2_ADDRESS,
   DEFAULT_DECIMALS,
+  COLLATERAL_FILE_SIGNATURE,
 } from "../../common/constants";
 import { LogNote } from "./../../../generated/Cat/Cat";
 import { LogNote as LogNoteV2 } from "./../../../generated/Cat_v2/Cat";
@@ -19,7 +20,7 @@ export function handleFile(event: LogNote): void {
   let ilk = event.params.arg1;
   let what = event.params.arg2.toString();
   let signature = event.params.sig.toHexString();
-  if (signature == "0x1a0b287e") {
+  if (signature == COLLATERAL_FILE_SIGNATURE) {
     if (what == "chop") {
       let market = getMarketFromIlk(ilk);
       let catContract = Cat.bind(Address.fromString(MCD_CAT_ADDRESS));
@@ -35,7 +36,7 @@ export function handleFileV2(event: LogNoteV2): void {
   let ilk = event.params.arg1;
   let what = event.params.arg2.toString();
   let signature = event.params.sig.toHexString();
-  if (signature == "0x1a0b287e") {
+  if (signature == COLLATERAL_FILE_SIGNATURE) {
     if (what == "chop") {
       let market = getMarketFromIlk(ilk);
       let catContract = Cat.bind(Address.fromString(MCD_CAT_V2_ADDRESS));

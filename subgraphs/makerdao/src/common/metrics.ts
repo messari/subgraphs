@@ -117,8 +117,8 @@ export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
 }
 
 export function updateFinancialsDailySnapshot(event: ethereum.Event): void {
-   // add cumulative values here just to make sure they're tracked daily
-   // insert into vat.frob which is called on all deposits/withdrawals
+  // add cumulative values here just to make sure they're tracked daily
+  // insert into vat.frob which is called on all deposits/withdrawals
   let protocol = getOrCreateLendingProtocol();
   let financialsDailySnapshot = getOrCreateFinancials(event);
   financialsDailySnapshot.blockNumber = event.block.number;
@@ -133,7 +133,7 @@ export function updateFinancialsDailySnapshot(event: ethereum.Event): void {
   financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
   financialsDailySnapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialsDailySnapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  financialsDailySnapshot.save()
+  financialsDailySnapshot.save();
 }
 
 export function updateTVL(): void {
@@ -147,7 +147,7 @@ export function updateTVL(): void {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
     let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance,WAD).times(inputToken.lastPriceUSD); // prices are always up to date via the spot contract
+    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance, WAD).times(inputToken.lastPriceUSD); // prices are always up to date via the spot contract
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(marketTVLusd);
   }
@@ -159,7 +159,7 @@ export function updateTVL(): void {
 }
 
 export function updateFinancialMetrics(event: ethereum.Event): void {
-  updateTVL()
+  updateTVL();
   updateFinancialsDailySnapshot(event);
 }
 
