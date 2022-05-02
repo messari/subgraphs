@@ -1,4 +1,5 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -6,6 +7,16 @@ export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDec
       .pow(decimals as u8)
       .toBigDecimal(),
   );
+}
+
+// returns 10^exp
+export function exponentToBigDecimal(exp: i32): BigDecimal {
+  let bd = BigDecimal.fromString("1");
+  const ten = BigDecimal.fromString("10");
+  for (let i = 0; i < exp; i++) {
+    bd = bd.times(ten);
+  }
+  return bd;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {
@@ -28,4 +39,16 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
   }
 
   return sorted[mid - 1];
+}
+
+// Ray is 27 decimal Wad is 18 decimal
+
+export function rayToWad(a: BigInt): BigInt {
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
+  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+}
+
+export function wadToRay(a: BigInt): BigInt {
+  const result = a.times(BigInt.fromI32(10).pow(9));
+  return result;
 }

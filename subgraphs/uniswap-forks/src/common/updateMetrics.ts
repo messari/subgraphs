@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Account,
@@ -10,6 +11,10 @@ import {
   _HelperStore,
   _TokenWhitelist,
 } from "../../generated/schema";
+=======
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Account, ActiveAccount, DexAmmProtocol, LiquidityPool, Token, _HelperStore, _TokenWhitelist } from "../../generated/schema";
+>>>>>>> masterMessari
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
@@ -23,6 +28,7 @@ import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
+<<<<<<< HEAD
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_TWO,
@@ -36,6 +42,9 @@ import {
   SECONDS_PER_HOUR,
   UsageType,
 } from "./constants";
+=======
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_TWO, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
+>>>>>>> masterMessari
 import { convertTokenToDecimal } from "./utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
 import { NetworkConfigs } from "../../config/_networkConfig";

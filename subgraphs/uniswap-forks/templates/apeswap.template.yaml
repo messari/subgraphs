@@ -28,19 +28,37 @@ dataSources:
     name: MasterChef
     network: {{network}}
     source:
+<<<<<<< HEAD
       address: "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9"
       abi: MasterChef
+=======
+      address: "{{masterChefAddress}}"
+      abi: MasterChefSushiswap
+>>>>>>> masterMessari
       startBlock: {{masterChefStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
+<<<<<<< HEAD
       entities: []
       abis:
         - name: MasterChef
           file: ./abis/apeswap/MasterChef.json
         - name: TokenABI
           file: ./abis/apeswap/IERC20.json
+=======
+      entities:
+        - _CircularBuffer
+        - RewardToken
+      abis:
+        - name: MasterChefSushiswap
+          file: ./abis/sushiswap/MasterChefSushiswap.json
+        - name: MasterChefApeswap
+          file: ./abis/apeswap/MasterChefApeswap.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+>>>>>>> masterMessari
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
@@ -48,25 +66,47 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
+<<<<<<< HEAD
       file: ./src/mappings/masterChef.ts
+=======
+      file: ./src/mappings/masterChef/apeswap.ts
+>>>>>>> masterMessari
 
   - kind: ethereum
     name: MasterChefV2
     network: {{network}}
     source:
+<<<<<<< HEAD
       address: "0x54aff400858Dcac39797a81894D9920f16972D1D"
       abi: MasterChefV2
+=======
+      address: "{{masterChefV2Address}}"
+      abi: MasterChefV2Sushiswap
+>>>>>>> masterMessari
       startBlock: {{masterChefV2StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
+<<<<<<< HEAD
       entities: []
       abis:
         - name: MasterChefV2
           file: ./abis/apeswap/MasterChefV2.json
         - name: TokenABI
           file: ./abis/apeswap/IERC20.json
+=======
+      entities: 
+        - _CircularBuffer
+        - RewardToken
+      abis:
+        - name: MasterChefV2Sushiswap
+          file: ./abis/sushiswap/MasterChefV2Sushiswap.json
+        - name: MasterChefV2Apeswap
+          file: ./abis/apeswap/MasterChefV2Apeswap.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+>>>>>>> masterMessari
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
           handler: handleDepositV2
@@ -74,8 +114,13 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
+<<<<<<< HEAD
       file: ./src/mappings/masterChef.ts
     
+=======
+      file: ./src/mappings/masterChef/apeswap.ts
+ 
+>>>>>>> masterMessari
 templates:
   - kind: ethereum/contract
     name: Pair

@@ -1,7 +1,12 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../config/_networkConfig";
+<<<<<<< HEAD
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
 import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
+=======
+import { MasterChefApeswap } from "../../../generated/MasterChef/MasterChefApeswap";
+import { MasterChefV2Apeswap } from "../../../generated/MasterChefV2/MasterChefV2Apeswap";
+>>>>>>> masterMessari
 import { LiquidityPool, _HelperStore } from "../../../generated/schema";
 import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../constants";
 import { getOrCreateToken } from "../getters";
@@ -10,7 +15,11 @@ import { getRewardsPerDay } from "../rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
   let masterChefPool = _HelperStore.load(pid.toString());
+<<<<<<< HEAD
   let poolContract = MasterChefV2.bind(event.address);
+=======
+  let poolContract = MasterChefV2Apeswap.bind(event.address);
+>>>>>>> masterMessari
 
   // Create entity to track masterchef pool mappings
   if (!masterChefPool) {
@@ -93,7 +102,11 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
 
 export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
   let masterChefPool = _HelperStore.load(pid.toString());
+<<<<<<< HEAD
   let poolContract = MasterChef.bind(event.address);
+=======
+  let poolContract = MasterChefApeswap.bind(event.address);
+>>>>>>> masterMessari
 
   // Create entity to track masterchef pool mappings
   if (!masterChefPool) {
@@ -156,7 +169,10 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     totalAllocPoint = getTotalAllocPoint.value;
   }
 
+<<<<<<< HEAD
   log.warning("HELLO", []);
+=======
+>>>>>>> masterMessari
   log.warning("multiplier: " + multiplier.toString(), []);
   log.warning("rewardTokenPerBlock: " + rewardTokenPerBlock.toString(), []);
   log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);
