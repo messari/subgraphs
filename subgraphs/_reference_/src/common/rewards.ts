@@ -8,7 +8,11 @@
 
 import { log, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { _CircularBuffer } from "../../generated/schema";
-import { Network } from "./constants";
+import {
+    Network,
+    BIGINT_TEN_TO_EIGHTEENTH,
+    SECONDS_PER_DAY
+} from "./constants";
 import {
   BIGDECIMAL_ZERO,
   INT_FOUR,
@@ -265,3 +269,9 @@ function getStartingBlockRate(): BigDecimal {
     return BIGDECIMAL_ZERO;
   }
 }
+
+export function emissionsPerDay(rewardRatePerSecond: BigInt): BigInt {
+    // Take the reward rate per second, divide out the decimals and get the emissions per day
+    const BIGINT_SECONDS_PER_DAY = BigInt.fromI32(<i32>SECONDS_PER_DAY);
+    return rewardRatePerSecond.times(BIGINT_SECONDS_PER_DAY).div(BIGINT_TEN_TO_EIGHTEENTH);
+  }

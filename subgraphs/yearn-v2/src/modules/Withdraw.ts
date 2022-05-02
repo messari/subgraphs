@@ -11,6 +11,7 @@ import {
   BigDecimal,
 } from "@graphprotocol/graph-ts";
 import {
+  getOrCreateYieldAggregator,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
 } from "../common/initializers";
@@ -68,19 +69,27 @@ export function _Withdraw(
 ): void {
   const vaultAddress = Address.fromString(vault.id);
   const vaultContract = VaultContract.bind(vaultAddress);
+  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
   let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
 
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+
   vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
+    inputTokenPrice.usdPrice
+      .times(withdrawAmount.toBigDecimal())
+      .div(inputTokenDecimals.toBigDecimal())
+      .div(inputTokenPrice.decimalsBaseTen)
+  );
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
@@ -99,7 +108,7 @@ export function _Withdraw(
     .div(inputTokenPrice.decimalsBaseTen);
 
   createWithdrawTransaction(
-    to, 
+    to,
     vaultAddress,
     transaction,
     block,
@@ -117,6 +126,7 @@ export function _Withdraw(
 
   metricsDailySnapshot.save();
   metricsHourlySnapshot.save();
+  protocol.save();
 
   log.info(
     "[Withdrawn] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",

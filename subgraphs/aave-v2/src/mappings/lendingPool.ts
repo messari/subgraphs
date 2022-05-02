@@ -42,7 +42,9 @@ import { BIGDECIMAL_ZERO, BIGINT_ZERO } from '../common/constants';
 
 import { bigIntToBigDecimal, rayToWad } from '../common/utils/numbers';
 
-import { getDaysSinceEpoch, getOrCreateToken } from '../common/getters';
+import { getOrCreateToken } from '../common/getters';
+
+import { getDaysSinceEpoch } from '../common/utils/datetime';
 
 export function getTokenBalanceIndex(market: Market, asset: string): number {
   // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the corresponding values to the same index when added
