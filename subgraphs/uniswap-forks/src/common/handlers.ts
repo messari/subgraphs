@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import { ethereum, BigInt, Address, Bytes, log } from "@graphprotocol/graph-ts";
-import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer } from "./getters";
-=======
 import { ethereum, BigInt } from "@graphprotocol/graph-ts";
 import { getLiquidityPool, getOrCreateTransfer } from "./getters";
->>>>>>> masterMessari
 import { TransferType } from "./constants";
 
 // Handle data from transfer event for mints. Used to populate deposit entity in the mint event.

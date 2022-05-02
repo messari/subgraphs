@@ -1,8 +1,5 @@
 {
   "extends": "@graphprotocol/graph-ts/types/tsconfig.base.json",
-<<<<<<<< HEAD:subgraphs/uniswap-forks/tsconfig.json
-  "include": ["src", "config/_networkConfig.ts"]
-========
   "include": ["src", "tests"]
->>>>>>>> masterMessari:subgraphs/aave-v2/tsconfig.json
 }
+

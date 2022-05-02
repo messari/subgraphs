@@ -1,145 +1,41 @@
 specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Factory
-<<<<<<< HEAD
-    network: bsc
-    source:
-      address: "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6"
-      abi: Factory
-      startBlock: 4855900
-=======
     network: mainnet
     source:
-      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
+      address: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
       abi: Factory
-      startBlock: 10794229
->>>>>>> masterMessari
+      startBlock: 10000834
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
       abis:
         - name: Factory
-<<<<<<< HEAD
-          file: ./abis/apeswap/Factory.json
+          file: ./abis/uniswap-v2/factory.json
         - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
-=======
-          file: ./abis/sushiswap/Factory.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
->>>>>>> masterMessari
+          file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/factory.ts
-
-  - kind: ethereum
-    name: MasterChef
-<<<<<<< HEAD
-    network: bsc
-    source:
-      address: "0x5c8D727b265DBAfaba67E050f2f739cAeEB4A6F9"
-      abi: MasterChef
-      startBlock: 4855342
-=======
-    network: mainnet
-    source:
-      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
-      abi: MasterChefSushiswap
-      startBlock: 10794230
->>>>>>> masterMessari
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-<<<<<<< HEAD
-        - name: MasterChef
-          file: ./abis/apeswap/MasterChef.json
-        - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
-=======
-        - name: MasterChefSushiswap
-          file: ./abis/sushiswap/MasterChefSushiswap.json
-        - name: MasterChefApeswap
-          file: ./abis/apeswap/MasterChefApeswap.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
->>>>>>> masterMessari
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdraw
-<<<<<<< HEAD
-      file: ./src/mappings/masterChef.ts
-
-  - kind: ethereum
-    name: MasterChefV2
-    network: bsc
-    source:
-      address: "0x54aff400858Dcac39797a81894D9920f16972D1D"
-      abi: MasterChefV2
-      startBlock: 4855362
-=======
-      file: ./src/mappings/masterChef/sushiswap.ts
-
-  - kind: ethereum
-    name: MasterChefV2
-    network: mainnet
-    source:
-      address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d"
-      abi: MasterChefV2Sushiswap
-      startBlock: 12428169
->>>>>>> masterMessari
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-<<<<<<< HEAD
-        - name: MasterChefV2
-          file: ./abis/apeswap/MasterChefV2.json
-        - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
-=======
-        - name: MasterChefV2Sushiswap
-          file: ./abis/sushiswap/MasterChefV2Sushiswap.json
-        - name: MasterChefV2Apeswap
-          file: ./abis/apeswap/MasterChefV2Apeswap.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
->>>>>>> masterMessari
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositV2
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawV2
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawV2
-<<<<<<< HEAD
-      file: ./src/mappings/masterChef.ts
-=======
-      file: ./src/mappings/masterChef/sushiswap.ts
->>>>>>> masterMessari
-    
+      ##callHandlers:
+        ##- function: setFeeTo(address)
+          ##handler: handleFeeTo
 templates:
   - kind: ethereum/contract
     name: Pair
-<<<<<<< HEAD
-    network: bsc
-=======
     network: mainnet
->>>>>>> masterMessari
     source:
       abi: Pair
     mapping:
@@ -147,22 +43,33 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities: []
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
       abis:
         - name: Pair
-<<<<<<< HEAD
-          file: ./abis/apeswap/Pair.json
+          file: ./abis/uniswap-v2/pair.json
         - name: Factory
-          file: ./abis/apeswap/Factory.json
+          file: ./abis/uniswap-v2/factory.json
         - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
-=======
-          file: ./abis/sushiswap/Pair.json
-        - name: Factory
-          file: ./abis/sushiswap/Factory.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
->>>>>>> masterMessari
+          file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { log } from "@graphprotocol/graph-ts";
-=======
 // import { log } from "@graphprotocol/graph-ts";
->>>>>>> masterMessari
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../config/_networkConfig";
 import { TokenABI } from "../../generated/Factory/TokenABI";
@@ -35,10 +31,6 @@ import {
   PROTOCOL_SUBGRAPH_VERSION,
   PROTOCOL_METHODOLOGY_VERSION,
 } from "./constants";
-<<<<<<< HEAD
-
-=======
->>>>>>> masterMessari
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
 

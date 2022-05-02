@@ -1,12 +1,7 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../config/_networkConfig";
-<<<<<<< HEAD
-import { MasterChef } from "../../generated/MasterChef/MasterChef";
-import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
-=======
 import { MasterChefSushiswap } from "../../../generated/MasterChef/MasterChefSushiswap";
 import { MasterChefV2Sushiswap } from "../../../generated/MasterChefV2/MasterChefV2Sushiswap";
->>>>>>> masterMessari
 import { LiquidityPool, _HelperStore } from "../../../generated/schema";
 import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../constants";
 import { getOrCreateToken } from "../getters";
@@ -15,11 +10,7 @@ import { getRewardsPerDay } from "../rewards";
 
 export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
   let masterChefPool = _HelperStore.load(pid.toString());
-<<<<<<< HEAD
-  let poolContract = MasterChefV2.bind(event.address);
-=======
   let poolContract = MasterChefV2Sushiswap.bind(event.address);
->>>>>>> masterMessari
 
   // Create entity to track masterchef pool mappings
   if (!masterChefPool) {
@@ -54,17 +45,10 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
   }
 
   // Get necessary values from the master chef contract to calculate rewards
-<<<<<<< HEAD
-  let getRewardTokenPerSecond = poolContract.try_bananaPerSecond();
-  let rewardTokenPerSecond: BigInt = BIGINT_ZERO;
-  if (!getRewardTokenPerSecond.reverted) {
-    rewardTokenPerSecond = getRewardTokenPerSecond.value;
-=======
   let getRewardTokenPerBlock = poolContract.try_sushiPerBlock();
   let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
   if (!getRewardTokenPerBlock.reverted) {
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
->>>>>>> masterMessari
   }
 
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
@@ -84,11 +68,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
 
   // Calculate Reward Emission per sec
   // let time = event.block.timestamp.minus(lastRewardTime);
-<<<<<<< HEAD
-  let rewardTokenRate = rewardTokenPerSecond.times(poolAllocPoint).div(totalAllocPoint);
-=======
   let rewardTokenRate = rewardTokenPerBlock.times(poolAllocPoint).div(totalAllocPoint);
->>>>>>> masterMessari
 
   // Get the estimated rewards emitted for the upcoming day for this pool
   let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
@@ -113,20 +93,12 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
 
 export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {
   let masterChefPool = _HelperStore.load(pid.toString());
-<<<<<<< HEAD
-  let poolContract = MasterChef.bind(event.address);
-=======
   let poolContract = MasterChefSushiswap.bind(event.address);
->>>>>>> masterMessari
 
   // Create entity to track masterchef pool mappings
   if (!masterChefPool) {
     masterChefPool = new _HelperStore(pid.toString());
-<<<<<<< HEAD
-    let poolInfo = poolContract.try_getPoolInfo(pid);
-=======
     let poolInfo = poolContract.try_poolInfo(pid);
->>>>>>> masterMessari
     let lpTokenAddress = ZERO_ADDRESS;
     if (!poolInfo.reverted) {
       lpTokenAddress = poolInfo.value.value1.toHexString();
@@ -156,11 +128,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   }
 
   // Get necessary values from the master chef contract to calculate rewards
-<<<<<<< HEAD
-  let getPoolInfo = poolContract.try_getPoolInfo(pid);
-=======
   let getPoolInfo = poolContract.try_poolInfo(pid);
->>>>>>> masterMessari
   let poolAllocPoint: BigInt = BIGINT_ZERO;
   let lastRewardBlock: BigInt = BIGINT_ZERO;
   if (!getPoolInfo.reverted) {
@@ -169,11 +137,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     lastRewardBlock = poolInfo.value2;
   }
 
-<<<<<<< HEAD
-  let getRewardTokenPerBlock = poolContract.try_cakePerBlock();
-=======
   let getRewardTokenPerBlock = poolContract.try_sushiPerBlock();
->>>>>>> masterMessari
   let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
   if (!getRewardTokenPerBlock.reverted) {
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
@@ -192,10 +156,6 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     totalAllocPoint = getTotalAllocPoint.value;
   }
 
-<<<<<<< HEAD
-  log.warning("HELLO", []);
-=======
->>>>>>> masterMessari
   log.warning("multiplier: " + multiplier.toString(), []);
   log.warning("rewardTokenPerBlock: " + rewardTokenPerBlock.toString(), []);
   log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);

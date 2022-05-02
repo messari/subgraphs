@@ -1,18 +1,9 @@
 // import { log } from "@graphprotocol/graph-ts";
-<<<<<<< HEAD
-import { ethereum, log } from "@graphprotocol/graph-ts";
-import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../generated/MasterChef/MasterChef";
-import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2, LogPoolAddition } from "../../generated/MasterChef/MasterChefV2";
-import { _HelperStore } from "../../../generated/schema";
-import { UsageType } from "../../common/constants";
-import { handleReward, handleRewardV2 } from "../../common/masterChef/apeswap";
-=======
 import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../../generated/MasterChef/MasterChefApeswap";
 import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2 } from "../../../generated/MasterChefV2/MasterChefV2Apeswap";
 import { _HelperStore } from "../../../generated/schema";
 import { UsageType } from "../../common/constants";
 import { handleReward, handleRewardV2 } from "../../common/masterChef/sushiswap";
->>>>>>> masterMessari
 
 export function handleDeposit(event: DepositEvent): void {
   handleReward(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);

@@ -7,18 +7,11 @@ import { toBytesArray } from "../src/common/utils/utils";
 export namespace Protocol {
   export const APESWAP = "Apeswap";
   export const UNISWAPV2 = "Uniswap V2";
-<<<<<<< HEAD
-}
-
-// Choose which protocol you are indexing. The deployed network will already be determined
-let PROTOCOL_NAME_TEMP = Protocol.APESWAP;
-=======
   export const SUSHISWAP = "Sushiswap";
 }
 
 // Choose which protocol you are indexing. The deployed network will already be determined
-let PROTOCOL_NAME_TEMP = Protocol.SUSHISWAP;
->>>>>>> masterMessari
+let PROTOCOL_NAME_TEMP = Protocol.UNISWAPV2;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -44,10 +37,6 @@ let WHITELIST_TOKENS_TEMP: string[]; // A tokens whose amounts should contribute
 let STABLE_COINS_TEMP: string[]; // A list of stable coins
 let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token] oracle pools
 let UNTRACKED_PAIRS_TEMP: string[]; // rebass tokens, dont count in tracked volume
-<<<<<<< HEAD
-let UNTRACKED_TOKENS_TEMP: string[];
-=======
->>>>>>> masterMessari
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,15 +92,7 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xa478c2975ab1ea89e8196811f51a7b7ade33eb11", // DAI/wETH created block 10042267
     "0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852", // USDT/wETH created block 10093341
   ];
-<<<<<<< HEAD
-
-  UNTRACKED_PAIRS_TEMP = [
-    "0xc7283b66eb1eb5fb86327f08e1b5816b0720212b", // TRIBE - Leads to drastic errors in price calculation
-  ];
-  UNTRACKED_TOKENS_TEMP = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
-=======
   UNTRACKED_PAIRS_TEMP = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
->>>>>>> masterMessari
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.MATIC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.MATIC;
@@ -182,8 +163,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xdDb3Bd8645775F59496c821E4F55A7eA6A6dc299", // GNANA
   ];
   STABLE_COINS_TEMP = [
-<<<<<<< HEAD
-=======
     "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
     "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT
@@ -237,22 +216,15 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", // WBTC
   ];
   STABLE_COINS_TEMP = [
->>>>>>> masterMessari
     "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
     "0x55d398326f99059ff775485246999027b3197955", // USDT
     "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d", // USDC
     "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3", // DAI
   ];
   STABLE_ORACLE_POOLS_TEMP = [
-<<<<<<< HEAD
-    "0x51e6d27fa57373d8d4c256231241053a70cb1d93", // BUSD/WBNB created block 4857769
-    "0xf3010261b58b2874639ca2e860e9005e3be5de0b", // DAI/WBNB created block 481116
-    "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
-=======
     "0x397FF1542f962076d0BFE58eA045FfA2d347ACa0", // USDC/wETH
     "0x06da0fd433C1A5d7a4faa01111c044910A184553", // USDT/wETH
     "0xC3D03e4F041Fd4cD388c549Ee2A29a9E5075882f", // DAI/wETH
->>>>>>> masterMessari
   ];
 }
 
@@ -279,8 +251,4 @@ export namespace NetworkConfigs {
   export const STABLE_COINS = STABLE_COINS_TEMP;
   export const STABLE_ORACLE_POOLS = STABLE_ORACLE_POOLS_TEMP;
   export const UNTRACKED_PAIRS = UNTRACKED_PAIRS_TEMP;
-<<<<<<< HEAD
-  export const UNTRACKED_TOKENS = UNTRACKED_TOKENS_TEMP;
-=======
->>>>>>> masterMessari
 }

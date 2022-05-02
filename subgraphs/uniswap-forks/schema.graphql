@@ -743,11 +743,7 @@ type _Transfer @entity {
   liquidity: BigInt
 }
 
-<<<<<<< HEAD
-"  Used to keep track of the price of Ether/TVL in USD, pool deposit count, total unique users, and pool id mappings for masterChef "
-=======
 "  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
->>>>>>> masterMessari
 type _HelperStore @entity {
   id: ID!
 
@@ -757,10 +753,6 @@ type _HelperStore @entity {
   " number of deposits, number of unique users "
   valueInt: Int
 
-<<<<<<< HEAD
-  " used to store block numbers "
-=======
->>>>>>> masterMessari
   valueBigInt: BigInt
 
   " Contains the address mapping for MasterChef pool id "
