@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -86,10 +86,6 @@ export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 
-// vault addresses
-export const YIELD_VAULT_ADDRESS = "0x9245efB59f6491Ed1652c2DD8a4880cBFADc3ffA"; // RariPoolController.sol
-export const YIELD_MANAGER_ADDRESS = "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6";
-
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
@@ -127,6 +123,49 @@ export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 
+//////////////////////////////////
+//// Rari Yield Pool Soecific ////
+//////////////////////////////////
+
+// Note: Deposit/Withdrawal events return the currency as an indexed string
+// so we need to create a mapping between the 'currencyCode' to Token
+
+export const YIELD_TOKEN_MAPPING = new Map<string, string>();
+YIELD_TOKEN_MAPPING.set(
+  "0xa5e92f3efb6826155f1f728e162af9d7cda33a574a1153b58f03ea01cc37e568",
+  "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+); // DAI
+YIELD_TOKEN_MAPPING.set(
+  "0xd6aca1be9729c13d677335161321649cccae6a591554772516700f986f942eaa",
+  "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+); // USDC
+YIELD_TOKEN_MAPPING.set(
+  "0x8b1a1d9c2b109e527c9134b25b1a1833b16b6594f92daa9f6d9b7a6024bce9d0",
+  "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+); // USDT
+YIELD_TOKEN_MAPPING.set(
+  "0xa1b8d8f7e538bb573797c963eeeed40d0bcb9f28c56104417d0da1b372ae3051",
+  "0x0000000000085d4780B73119b644AE5ecd22b376",
+); // TUSD
+YIELD_TOKEN_MAPPING.set(
+  "0x54c512ac779647672b8d02e2fe2dc10f79bbf19f719d887221696215fd24e9f1",
+  "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+); //BUSD
+YIELD_TOKEN_MAPPING.set(
+  "0x87ef9bf44f9ed3d4aeadafb38d9bc9470e7aac44fdcb9f7ffb957b862954cf2c",
+  "0x57Ab1ec28D129707052df4dF418D58a2D46d5f51",
+); // sUSD
+YIELD_TOKEN_MAPPING.set(
+  "0x33d80a03b5585b94e68b56bdea4f57fd2e459401902cb2f61772e1b630afb4b2",
+  "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
+); // mUSD
+
+export const YIELD_VAULT_ADDRESS = "0x9245efB59f6491Ed1652c2DD8a4880cBFADc3ffA"; // RariPoolController.sol
+
+export const YIELD_VAULT_NAME = "Rari Yield Pool";
+export const YIELD_VAULT_SYMBOL = "RYPT"; // RYPT = rari yield pool token ie, R(X)PT
+export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae";
+
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
@@ -135,9 +174,7 @@ export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // TO
 export const PROTOCOL_NAME = "Earn";
 export const PROTOCOL_SLUG = "earn";
 export const SCHEMA_VERSION = "1.2.1";
-export const SUBGRAPH_VERSION = "1.0.5";
+export const SUBGRAPH_VERSION = "1.0.6";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.YIELD;
-
-// TODO: create currecny code mapping

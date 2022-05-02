@@ -21,6 +21,12 @@ dataSources:
       abis:
         - name: RariYieldFundManager
           file: ./abis/yield-pool/RariYieldFundManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
         - event: Deposit(indexed string,indexed address,indexed address,uint256,uint256,uint256)
           handler: handleYieldDeposit
