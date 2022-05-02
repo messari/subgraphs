@@ -5,23 +5,40 @@
     "codegen": "graph codegen",
     "build": "graph build",
 
-    "prepare:apeswap-bsc": "mustache config/apeswap/bsc.json templates/apeswap.template.yaml > subgraph.yaml",
-    "prepare:apeswap-matic": "mustache config/apeswap/polygon.json templates/apeswap.template.yaml > subgraph.yaml",
-    "prepare:sushiswap-mainnet": "mustache config/sushiswap/mainnet.json templates/sushiswap.template.yaml > subgraph.yaml",
-    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json templates/uniswap.v2.template.yaml > subgraph.yaml",
+    "prepare:apeswap-bsc": "mustache config/apeswap/bsc.json templates/apeswap/apeswap.template.yaml > subgraph.yaml",
+    "prepare:apeswap-matic": "mustache config/apeswap/matic.json templates/apeswap/apeswap.template.yaml > subgraph.yaml",
+    "prepare:sushiswap-bsc": "mustache config/sushiswap/bsc.json templates/uniswap.v2/uniswap.v2.template.yaml > subgraph.yaml",
+    "prepare:sushiswap-fantom": "mustache config/sushiswap/fantom.json templates/sushiswap/sushiswap.alt.template.yaml > subgraph.yaml",
+    "prepare:sushiswap-mainnet": "mustache config/sushiswap/mainnet.json templates/sushiswap/sushiswap.mainnet.template.yaml > subgraph.yaml",
+    "prepare:sushiswap-matic": "mustache config/sushiswap/matic.json templates/sushiswap/sushiswap.alt.template.yaml > subgraph.yaml",
+    "prepare:sushiswap-xdai": "mustache config/sushiswap/xdai.json templates/sushiswap/sushiswap.alt.template.yaml > subgraph.yaml",
+    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json templates/uniswap.v2/uniswap.v2.template.yaml > subgraph.yaml",
 
     "deploy-uniswap-v2-mainnet": "yarn prepare:uniswap-v2-mainnet && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/uniswap-v2",
     "deploy-apeswap-bsc": "yarn prepare:apeswap-bsc && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/apeswap-bsc",
     "deploy-apeswap-matic": "yarn prepare:apeswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/apeswap-matic",
-    "deploy-sushiswap-mainnet": "yarn prepare:apeswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/sushiswap-mainnet",
+    "deploy-sushiswap-bsc": "yarn prepare:sushiswap-bsc && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/sushiswap-bsc",
+    "deploy-sushiswap-fantom": "yarn prepare:sushiswap-fantom && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/sushiswap-fantom",
+    "deploy-sushiswap-mainnet": "yarn prepare:sushiswap-mainnet && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/sushiswap-mainnet",
+    "deploy-sushiswap-matic": "yarn prepare:sushiswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/sushiswap-matic",
+    "deploy-sushiswap-xdai": "yarn prepare:sushiswap-xdai && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/sushiswap-xdai",
 
     "deploy-uniswap-v2-mainnet-messari": "yarn prepare:uniswap-v2-mainnet && yarn codegen && yarn build && graph deploy --product hosted-service messari/uniswap-v2",
     "deploy-apeswap-bsc-messari": "yarn prepare:apeswap-bsc && yarn codegen && yarn build && graph deploy --product hosted-service messari/apeswap-bsc",
-    "deploy-apeswap-matic-messari": "yarn prepare:apeswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service messari/apeswap-polygon",
+    "deploy-apeswap-matic-messari": "yarn prepare:apeswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service messari/apeswap-matic",
+    "deploy-sushiswap-bsc-messari": "yarn prepare:sushiswap-bsc && yarn codegen && yarn build && graph deploy  --product hosted-service messari/sushiswap-bsc",
+    "deploy-sushiswap-fantom-messari": "yarn prepare:sushiswap-fantom && yarn codegen && yarn build && graph deploy  --product hosted-service messari/sushiswap-fantom",
+    "deploy-sushiswap-mainnet-messari": "yarn prepare:sushiswap-mainnet && yarn codegen && yarn build && graph deploy  --product hosted-service messari/sushiswap-mainnet",
+    "deploy-sushiswap-matic-messari": "yarn prepare:sushiswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service messari/sushiswap-matic",
+    "deploy-sushiswap-xdai-messari": "yarn prepare:sushiswap-xdai && yarn codegen && yarn build && graph deploy  --product hosted-service messari/sushiswap-xdai",
 
-    "deploy-ALL-steegecs": "yarn deploy-uniswap-v2-mainnet && yarn deploy-apeswap-bsc && yarn deploy-apeswap-matic",
-    "deploy-ALL-messari": "yarn deploy-uniswap-v2-mainnet-messari && yarn deploy-apeswap-bsc-messari && yarn deploy-apeswap-matic-messari"
-     
+    "deploy-all-apeswap-steegecs": "yarn deploy-uniswap-v2-mainnet",
+    "deploy-all-uniswap-v2-steegecs": "yarn deploy-apeswap-bsc && yarn deploy-apeswap-matic",
+    "deploy-all-sushiswap-steegecs": "yarn deploy-sushiswap-bsc && yarn deploy-sushiswap-fantom && yarn deploy-sushiswap-mainnet && yarn deploy-sushiswap-matic && yarn deploy-sushiswap-xdai",
+
+    "deploy-all-apeswap-messari": "yarn deploy-uniswap-v2-mainnet-messari",
+    "deploy-all-uniswap-v2-messari": "yarn deploy-apeswap-bsc-messari && yarn deploy-apeswap-matic-messari",
+    "deploy-all-sushiswap-messari": "yarn deploy-sushiswap-bsc-messari && yarn deploy-sushiswap-fantom-messari && yarn deploy-sushiswap-mainnet-messari && yarn deploy-sushiswap-matic-messari && yarn deploy-sushiswap-xdai-messari"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",

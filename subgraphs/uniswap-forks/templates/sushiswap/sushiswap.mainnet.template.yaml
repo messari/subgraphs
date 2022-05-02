@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: {{network}}
+    network: mainnet
     source:
-      address: "{{address}}"
+      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
       abi: Factory
-      startBlock: {{startBlock}}
+      startBlock: 10794229
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -26,11 +26,11 @@ dataSources:
 
   - kind: ethereum
     name: MasterChef
-    network: {{network}}
+    network: mainnet
     source:
-      address: "{{masterChefAddress}}"
+      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
       abi: MasterChefSushiswap
-      startBlock: {{masterChefStartBlock}}
+      startBlock: 10794230
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -39,8 +39,6 @@ dataSources:
       abis:
         - name: MasterChefSushiswap
           file: ./abis/sushiswap/MasterChefSushiswap.json
-        - name: MasterChefApeswap
-          file: ./abis/apeswap/MasterChefApeswap.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
       eventHandlers:
@@ -50,15 +48,15 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./src/mappings/masterChef/sushiswap.ts
+      file: ./src/mappings/masterChef/sushiswap/reward.ts
 
   - kind: ethereum
     name: MasterChefV2
-    network: {{network}}
+    network: mainnet
     source:
-      address: "{{masterChefV2Address}}"
+      address: "0xef0881ec094552b2e128cf945ef17a6752b4ec5d"
       abi: MasterChefV2Sushiswap
-      startBlock: {{masterChefV2StartBlock}}
+      startBlock: 12428169
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -67,8 +65,6 @@ dataSources:
       abis:
         - name: MasterChefV2Sushiswap
           file: ./abis/sushiswap/MasterChefV2Sushiswap.json
-        - name: MasterChefV2Apeswap
-          file: ./abis/apeswap/MasterChefV2Apeswap.json
         - name: TokenABI
           file: ./abis/sushiswap/ERC20.json
       eventHandlers:
@@ -78,12 +74,12 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/masterChef/sushiswap.ts
+      file: ./src/mappings/masterChef/sushiswap/rewardV2.ts
     
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: {{network}}
+    network: mainnet
     source:
       abi: Pair
     mapping:
