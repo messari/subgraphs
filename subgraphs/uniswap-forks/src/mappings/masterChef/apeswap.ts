@@ -2,9 +2,9 @@
 import { ethereum, log } from "@graphprotocol/graph-ts";
 import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../generated/MasterChef/MasterChef";
 import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2, LogPoolAddition } from "../../generated/MasterChef/MasterChefV2";
-import { _HelperStore } from "../../generated/schema";
-import { UsageType } from "../common/constants";
-import { handleReward, handleRewardV2 } from "../common/masterChef";
+import { _HelperStore } from "../../../generated/schema";
+import { UsageType } from "../../common/constants";
+import { handleReward, handleRewardV2 } from "../../common/masterChef/apeswap";
 
 export function handleDeposit(event: DepositEvent): void {
   handleReward(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
