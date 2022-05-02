@@ -1,0 +1,3602 @@
+{
+  "datasources": [
+    {
+      "name": "x359a27bB39f3B2E180bf4eFBcE1CE6De18F41b89",
+      "address": "0x359a27bB39f3B2E180bf4eFBcE1CE6De18F41b89",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 13080621
+    },
+    {
+      "name": "xCCc6a774042ec206D359eC1E722FebBC2f72F0E1",
+      "address": "0xCCc6a774042ec206D359eC1E722FebBC2f72F0E1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 13038994
+    },
+    {
+      "name": "xd10C18eA051e42074fD1A9F8f7daD852148dAd58",
+      "address": "0xd10C18eA051e42074fD1A9F8f7daD852148dAd58",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12892515
+    },
+    {
+      "name": "x0D729Cc75C87a8C18b331a16d4189944cD8e4Ba0",
+      "address": "0x0D729Cc75C87a8C18b331a16d4189944cD8e4Ba0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12892446
+    },
+    {
+      "name": "x51b8d771eAD0911337033ff2Abb74E30fC54c4EC",
+      "address": "0x51b8d771eAD0911337033ff2Abb74E30fC54c4EC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12892337
+    },
+    {
+      "name": "xeC6cCE7B9262048f656539330754216cC9481321",
+      "address": "0xeC6cCE7B9262048f656539330754216cC9481321",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12891240
+    },
+    {
+      "name": "x1A34712e734E1A8C084D50e0EdE9FDE2568b1B6C",
+      "address": "0x1A34712e734E1A8C084D50e0EdE9FDE2568b1B6C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12891220
+    },
+    {
+      "name": "xDEf94a13fF31FB6363f1e03bF18fe0F59Db83BBC",
+      "address": "0xDEf94a13fF31FB6363f1e03bF18fe0F59Db83BBC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812575
+    },
+    {
+      "name": "x5219558ee591b030E075892acc41334A1694fd8A",
+      "address": "0x5219558ee591b030E075892acc41334A1694fd8A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812476
+    },
+    {
+      "name": "x302d1596BB53fa64229bA5BdAA198f3c42Cd34e3",
+      "address": "0x302d1596BB53fa64229bA5BdAA198f3c42Cd34e3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812415
+    },
+    {
+      "name": "xDc48D11e449343B2D9d75FACCcef361DF34739B1",
+      "address": "0xDc48D11e449343B2D9d75FACCcef361DF34739B1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812383
+    },
+    {
+      "name": "x832893747a3788e5e1aBEBE544C85b9dA631625c",
+      "address": "0x832893747a3788e5e1aBEBE544C85b9dA631625c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812295
+    },
+    {
+      "name": "x921A0e014A8a268e9c0DE402Ea9c28121C79cb15",
+      "address": "0x921A0e014A8a268e9c0DE402Ea9c28121C79cb15",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812227
+    },
+    {
+      "name": "x377DeD7fDD91a94bc360831DcE398ebEdB82cabA",
+      "address": "0x377DeD7fDD91a94bc360831DcE398ebEdB82cabA",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12812138
+    },
+    {
+      "name": "x77B15CF785F7a3bf8952Bb37CAB1d6B7BA69E232",
+      "address": "0x77B15CF785F7a3bf8952Bb37CAB1d6B7BA69E232",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12808558
+    },
+    {
+      "name": "x3Ec7d66042609B04628CB6d8F92f831dFdAe33d4",
+      "address": "0x3Ec7d66042609B04628CB6d8F92f831dFdAe33d4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12807454
+    },
+    {
+      "name": "xCB3Ce54f941F0c5e146a9d7164b14a3e9642658e",
+      "address": "0xCB3Ce54f941F0c5e146a9d7164b14a3e9642658e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12807287
+    },
+    {
+      "name": "xcb6693Ef17738c561340e228994bcbb7EF3C3E24",
+      "address": "0xcb6693Ef17738c561340e228994bcbb7EF3C3E24",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12806826
+    },
+    {
+      "name": "xafF218949a8b9e5c491c0C64ad24E1CFaD07f631",
+      "address": "0xafF218949a8b9e5c491c0C64ad24E1CFaD07f631",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12806747
+    },
+    {
+      "name": "x842109089f4cD7962138932A6Ef0863a59927964",
+      "address": "0x842109089f4cD7962138932A6Ef0863a59927964",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12806614
+    },
+    {
+      "name": "x5a135CcCf86F0F9b9227B294cD6c92dE06589FB3",
+      "address": "0x5a135CcCf86F0F9b9227B294cD6c92dE06589FB3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12719752
+    },
+    {
+      "name": "xcd8C19F6858eaa5B5130cCB1b5665C8C675A667d",
+      "address": "0xcd8C19F6858eaa5B5130cCB1b5665C8C675A667d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12698836
+    },
+    {
+      "name": "x9114FD77213ebaCa6B74D9E81d26f421F1f14c61",
+      "address": "0x9114FD77213ebaCa6B74D9E81d26f421F1f14c61",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12676514
+    },
+    {
+      "name": "xCc35dc6e9B7fc57d834ef62AD89DD4032c6174Ee",
+      "address": "0xCc35dc6e9B7fc57d834ef62AD89DD4032c6174Ee",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12643219
+    },
+    {
+      "name": "x7A1a50ad50f297F01E354074AF384E5B4001090D",
+      "address": "0x7A1a50ad50f297F01E354074AF384E5B4001090D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12643138
+    },
+    {
+      "name": "xf7a06BcCD2d36C23587DbB6436DF8816D93EAb71",
+      "address": "0xf7a06BcCD2d36C23587DbB6436DF8816D93EAb71",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12257905
+    },
+    {
+      "name": "x1018bDeaC1b8637b885df8980d6e70a659A14916",
+      "address": "0x1018bDeaC1b8637b885df8980d6e70a659A14916",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12257135
+    },
+    {
+      "name": "x5f1e08D31D22bfE9aa414a48de583A998e10C8e2",
+      "address": "0x5f1e08D31D22bfE9aa414a48de583A998e10C8e2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12256430
+    },
+    {
+      "name": "x6F742f950aa105eE26b45467106d4ccD19B12275",
+      "address": "0x6F742f950aa105eE26b45467106d4ccD19B12275",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12174629
+    },
+    {
+      "name": "xb58d38F6D71CDFbC7ACE55E094e2c0E1aB6CCF52",
+      "address": "0xb58d38F6D71CDFbC7ACE55E094e2c0E1aB6CCF52",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 12140144
+    },
+    {
+      "name": "x45b38A633073A3336c47D9506344B6D3d5BFCBd7",
+      "address": "0x45b38A633073A3336c47D9506344B6D3d5BFCBd7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11975242
+    },
+    {
+      "name": "xD8551156d3f67b2c77358536dF74e58b461Ae738",
+      "address": "0xD8551156d3f67b2c77358536dF74e58b461Ae738",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11975061
+    },
+    {
+      "name": "x14E3F75375543be5D6E1c0f6fFEa01B1120D0cBA",
+      "address": "0x14E3F75375543be5D6E1c0f6fFEa01B1120D0cBA",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11935925
+    },
+    {
+      "name": "x55949D0d66a5D9eE9Cd15600c0108347aD57bde2",
+      "address": "0x55949D0d66a5D9eE9Cd15600c0108347aD57bde2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11846919
+    },
+    {
+      "name": "xf0Ddf8e875C88D0b8fE4FB2F3Ae6d07EA5CD1B3A",
+      "address": "0xf0Ddf8e875C88D0b8fE4FB2F3Ae6d07EA5CD1B3A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11846418
+    },
+    {
+      "name": "x02Bf621777371A974D3EbC040fF8a0C41Dfc85b6",
+      "address": "0x02Bf621777371A974D3EbC040fF8a0C41Dfc85b6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11846287
+    },
+    {
+      "name": "x714e06410B4960D3C1FC033bCd53ad9EB2d1f874",
+      "address": "0x714e06410B4960D3C1FC033bCd53ad9EB2d1f874",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11724749
+    },
+    {
+      "name": "x38D54902c23D3bEE6543F2Ab7c2Ba8a831F237c0",
+      "address": "0x38D54902c23D3bEE6543F2Ab7c2Ba8a831F237c0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11473580
+    },
+    {
+      "name": "xF16f83464C5173Da05d4fc2752A4A530001C8AAE",
+      "address": "0xF16f83464C5173Da05d4fc2752A4A530001C8AAE",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11473297
+    },
+    {
+      "name": "x76b52BBeA7A468b42F646B7E9B956dd15Cfc5fAf",
+      "address": "0x76b52BBeA7A468b42F646B7E9B956dd15Cfc5fAf",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11473261
+    },
+    {
+      "name": "xa158589712Bd5ce4C40ffC0a48eF49d43bDE3Bf3",
+      "address": "0xa158589712Bd5ce4C40ffC0a48eF49d43bDE3Bf3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11472875
+    },
+    {
+      "name": "x5664d1020C4a59574DF66088813C4F5ED2EB6E2E",
+      "address": "0x5664d1020C4a59574DF66088813C4F5ED2EB6E2E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11471296
+    },
+    {
+      "name": "xD409169306f201ba9872Ce7cB3d263C3704e568E",
+      "address": "0xD409169306f201ba9872Ce7cB3d263C3704e568E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11380284
+    },
+    {
+      "name": "x9f637540149f922145c06e1aa3f38dcDc32Aff5C",
+      "address": "0x9f637540149f922145c06e1aa3f38dcDc32Aff5C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11373769
+    },
+    {
+      "name": "xC64D9F6e0E060a68967e7b5F330d6208168BD47D",
+      "address": "0xC64D9F6e0E060a68967e7b5F330d6208168BD47D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11347454
+    },
+    {
+      "name": "x38F6b5099a427A88f80F6EF089B7ee517527aED5",
+      "address": "0x38F6b5099a427A88f80F6EF089B7ee517527aED5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11342657
+    },
+    {
+      "name": "x9e5cA9eF65F3F2eBAcADC99bf7d6c75937C567f7",
+      "address": "0x9e5cA9eF65F3F2eBAcADC99bf7d6c75937C567f7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11333686
+    },
+    {
+      "name": "x6882F0DB112488e235096D02d296d9D9aa6f844D",
+      "address": "0x6882F0DB112488e235096D02d296d9D9aa6f844D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11333646
+    },
+    {
+      "name": "x2d7F473AE9e917A9190E6a6BA42F4Aaf1b70006c",
+      "address": "0x2d7F473AE9e917A9190E6a6BA42F4Aaf1b70006c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11131136
+    },
+    {
+      "name": "x2CE5463E160147DB74C804161FD2B838145468ED",
+      "address": "0x2CE5463E160147DB74C804161FD2B838145468ED",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11130787
+    },
+    {
+      "name": "xA7E122eAad2e81BF36b2641d78FD47967c656226",
+      "address": "0xA7E122eAad2e81BF36b2641d78FD47967c656226",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11130663
+    },
+    {
+      "name": "x9E5D0E209A55DE88B890d7DB9f427A066144A7C4",
+      "address": "0x9E5D0E209A55DE88B890d7DB9f427A066144A7C4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11016192
+    },
+    {
+      "name": "x22EDe03f1115666CF05a4bAfafaEe8F43D42cD56",
+      "address": "0x22EDe03f1115666CF05a4bAfafaEe8F43D42cD56",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 11005862
+    },
+    {
+      "name": "x0B1BD40d04ff233DD4D6D3374B6F6C2Ea1f024c3",
+      "address": "0x0B1BD40d04ff233DD4D6D3374B6F6C2Ea1f024c3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10868244
+    },
+    {
+      "name": "x2855917F094f902c1F6Ae3A6e849E95cf61495DC",
+      "address": "0x2855917F094f902c1F6Ae3A6e849E95cf61495DC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10868068
+    },
+    {
+      "name": "xcad07469876c54fcd12a4f597f25287c1dc8A3d6",
+      "address": "0xcad07469876c54fcd12a4f597f25287c1dc8A3d6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10867993
+    },
+    {
+      "name": "x607783b00B0b150e779626E35cDB10cb555AF76C",
+      "address": "0x607783b00B0b150e779626E35cDB10cb555AF76C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10866763
+    },
+    {
+      "name": "xE7Eb93c2B2dfeAd391d7A2435FA58f2e292e72bf",
+      "address": "0xE7Eb93c2B2dfeAd391d7A2435FA58f2e292e72bf",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10866734
+    },
+    {
+      "name": "x2C31A23B4eb8Da2cde6F13d29Be05A4EF055C4A6",
+      "address": "0x2C31A23B4eb8Da2cde6F13d29Be05A4EF055C4A6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10866509
+    },
+    {
+      "name": "xd475dDb954d9F187Cc3647EF47Dc15B899B85C00",
+      "address": "0xd475dDb954d9F187Cc3647EF47Dc15B899B85C00",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10866257
+    },
+    {
+      "name": "xA91e1374f211Cbf37bd5Fae42CE37Fffea1Ef99e",
+      "address": "0xA91e1374f211Cbf37bd5Fae42CE37Fffea1Ef99e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10865337
+    },
+    {
+      "name": "xD828F65f055d9454C2B67476dB66327B0f2D65Ac",
+      "address": "0xD828F65f055d9454C2B67476dB66327B0f2D65Ac",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10865209
+    },
+    {
+      "name": "xA1bFdA7485bd76aca5D0755330F7F392DFA7BAd9",
+      "address": "0xA1bFdA7485bd76aca5D0755330F7F392DFA7BAd9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10865103
+    },
+    {
+      "name": "xF42F4113217dB26f65Ef0FE1eA9d782425400DB3",
+      "address": "0xF42F4113217dB26f65Ef0FE1eA9d782425400DB3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10865047
+    },
+    {
+      "name": "xB804617035A017e73Cd1AD26a3aF672cC4bF575e",
+      "address": "0xB804617035A017e73Cd1AD26a3aF672cC4bF575e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10773295
+    },
+    {
+      "name": "x2FAf9384Be36087aD8Cf82b033c9EabB8698186F",
+      "address": "0x2FAf9384Be36087aD8Cf82b033c9EabB8698186F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10773258
+    },
+    {
+      "name": "x0817cA2186A596281C290af3c29224505E2c738C",
+      "address": "0x0817cA2186A596281C290af3c29224505E2c738C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10773109
+    },
+    {
+      "name": "xB00D5EB2aAA4713440C451c38eDe3E2451c20104",
+      "address": "0xB00D5EB2aAA4713440C451c38eDe3E2451c20104",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10772896
+    },
+    {
+      "name": "x9D681f2cfB3af3279b040069ba08f526F5334a8e",
+      "address": "0x9D681f2cfB3af3279b040069ba08f526F5334a8e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10732959
+    },
+    {
+      "name": "x8eb1b4e726B15341C3be0eebDf13BFFc05E57787",
+      "address": "0x8eb1b4e726B15341C3be0eebDf13BFFc05E57787",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10727494
+    },
+    {
+      "name": "x8bBfA331484dC47E6F951b0acA7F5d1a1AB6730c",
+      "address": "0x8bBfA331484dC47E6F951b0acA7F5d1a1AB6730c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10727224
+    },
+    {
+      "name": "xe16198613295E6bD339703043D05C33C3b24B333",
+      "address": "0xe16198613295E6bD339703043D05C33C3b24B333",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10727059
+    },
+    {
+      "name": "x28a92325Dbb43EE1955389C9507D350Fd043DF75",
+      "address": "0x28a92325Dbb43EE1955389C9507D350Fd043DF75",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10661794
+    },
+    {
+      "name": "x291cf692552bca17f75C40B6B89d74E9c4cB60D9",
+      "address": "0x291cf692552bca17f75C40B6B89d74E9c4cB60D9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10643977
+    },
+    {
+      "name": "x0B572e6D0CC3c3803AEb4eEDECe81f71d357Ec96",
+      "address": "0x0B572e6D0CC3c3803AEb4eEDECe81f71d357Ec96",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10642636
+    },
+    {
+      "name": "xa49E753c3217acCCBbE339Bf72671B2a8B2E6821",
+      "address": "0xa49E753c3217acCCBbE339Bf72671B2a8B2E6821",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10621992
+    },
+    {
+      "name": "x480345F79D6C26fb8D6C12F1A9bF9Af6663CEC48",
+      "address": "0x480345F79D6C26fb8D6C12F1A9bF9Af6663CEC48",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10601610
+    },
+    {
+      "name": "xA84722a0d7361C74584716eBB8FF66f0e24C0057",
+      "address": "0xA84722a0d7361C74584716eBB8FF66f0e24C0057",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10557823
+    },
+    {
+      "name": "x47c5c66BE853CC973b64c9487303d69eB146328f",
+      "address": "0x47c5c66BE853CC973b64c9487303d69eB146328f",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10556865
+    },
+    {
+      "name": "x23bD5CD8e62369e80EB30F6D182AD4331048a246",
+      "address": "0x23bD5CD8e62369e80EB30F6D182AD4331048a246",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10555896
+    },
+    {
+      "name": "x5C5B83bf3B6b8f0BaD8DE8421b84A7cf0F865e2b",
+      "address": "0x5C5B83bf3B6b8f0BaD8DE8421b84A7cf0F865e2b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10469738
+    },
+    {
+      "name": "x88565bfD112Fd516306A93D6ddF7d760b6C87E61",
+      "address": "0x88565bfD112Fd516306A93D6ddF7d760b6C87E61",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10469085
+    },
+    {
+      "name": "xe801d9913d495942d5aFD2f5eAEf338aDd39981B",
+      "address": "0xe801d9913d495942d5aFD2f5eAEf338aDd39981B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10468818
+    },
+    {
+      "name": "x4E2c03Dd35D765ef704379fD0f192B4B8DE650A5",
+      "address": "0x4E2c03Dd35D765ef704379fD0f192B4B8DE650A5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10468573
+    },
+    {
+      "name": "xA5eAaD5783748c5D1eEae9927f47e0A63c7EE7bB",
+      "address": "0xA5eAaD5783748c5D1eEae9927f47e0A63c7EE7bB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10468316
+    },
+    {
+      "name": "x8Baec13682C722069F693dE435743a82e5a6d62E",
+      "address": "0x8Baec13682C722069F693dE435743a82e5a6d62E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10468134
+    },
+    {
+      "name": "x519756fDd1F9A506AFb5C3aF6D34E131C8D06C5e",
+      "address": "0x519756fDd1F9A506AFb5C3aF6D34E131C8D06C5e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10467916
+    },
+    {
+      "name": "xC2E683F04F1304cA71263a0d324bbf78Aa632A9A",
+      "address": "0xC2E683F04F1304cA71263a0d324bbf78Aa632A9A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10467265
+    },
+    {
+      "name": "x4211729aC97690533a36e533f40d8E42E25F8c23",
+      "address": "0x4211729aC97690533a36e533f40d8E42E25F8c23",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10383590
+    },
+    {
+      "name": "x779Cd89462b1C05c45b1CD33F6a20373B1d76ab8",
+      "address": "0x779Cd89462b1C05c45b1CD33F6a20373B1d76ab8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10033424
+    },
+    {
+      "name": "xfe443769eD242c9333C44f8187075Ca12A961b33",
+      "address": "0xfe443769eD242c9333C44f8187075Ca12A961b33",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10033415
+    },
+    {
+      "name": "x8d807a3A6a785E5169B8cF84e8399563f63F6313",
+      "address": "0x8d807a3A6a785E5169B8cF84e8399563f63F6313",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 10033287
+    },
+    {
+      "name": "x252a9cFdb981F7e676466bA6687BA4Ba2cb45805",
+      "address": "0x252a9cFdb981F7e676466bA6687BA4Ba2cb45805",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9789275
+    },
+    {
+      "name": "x6819127C2ee3743c99a7fc015Af8f1E9C492537C",
+      "address": "0x6819127C2ee3743c99a7fc015Af8f1E9C492537C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9789212
+    },
+    {
+      "name": "xC6141aE687a0a33E6014315021CFE7e0D1235597",
+      "address": "0xC6141aE687a0a33E6014315021CFE7e0D1235597",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9788833
+    },
+    {
+      "name": "x1A7F12E489B13836c039fe2C2128D6C26dd3E970",
+      "address": "0x1A7F12E489B13836c039fe2C2128D6C26dd3E970",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9788672
+    },
+    {
+      "name": "xf1B08496BEfE7488efD694C7308E029BF7EAdCaD",
+      "address": "0xf1B08496BEfE7488efD694C7308E029BF7EAdCaD",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9788303
+    },
+    {
+      "name": "xd416b63b644A12A42DeDF1Ab28B30255601A6B2a",
+      "address": "0xd416b63b644A12A42DeDF1Ab28B30255601A6B2a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9788171
+    },
+    {
+      "name": "x1A3dC6554a4b7EE2FDa0fb9e8544D99Cb1371098",
+      "address": "0x1A3dC6554a4b7EE2FDa0fb9e8544D99Cb1371098",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9787917
+    },
+    {
+      "name": "x3E1613cB07918B444997BE4f601AF1F35A50376A",
+      "address": "0x3E1613cB07918B444997BE4f601AF1F35A50376A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9787334
+    },
+    {
+      "name": "x8E422988f2099eeBd03E5e97d8d15C84cA8cB828",
+      "address": "0x8E422988f2099eeBd03E5e97d8d15C84cA8cB828",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9786993
+    },
+    {
+      "name": "x8131e744214902EbD2215c4b9654b8c542C686f9",
+      "address": "0x8131e744214902EbD2215c4b9654b8c542C686f9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9784747
+    },
+    {
+      "name": "x4611799A374307C357b07d36Ee7648F3B42983CB",
+      "address": "0x4611799A374307C357b07d36Ee7648F3B42983CB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9343219
+    },
+    {
+      "name": "x03D4847864DAF569ae308D4777A119062129E819",
+      "address": "0x03D4847864DAF569ae308D4777A119062129E819",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9342996
+    },
+    {
+      "name": "xb7f0311D59de5920a71AD6D04ED49Ea189E52D4A",
+      "address": "0xb7f0311D59de5920a71AD6D04ED49Ea189E52D4A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9342416
+    },
+    {
+      "name": "x86f70733c53E5b1E0bE1800910E5eD659bdB6C30",
+      "address": "0x86f70733c53E5b1E0bE1800910E5eD659bdB6C30",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 9342284
+    },
+    {
+      "name": "x99dbA70334053C00e3F45096fC09A9b4f63db5D1",
+      "address": "0x99dbA70334053C00e3F45096fC09A9b4f63db5D1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8925227
+    },
+    {
+      "name": "x48552FbC886aD7D705367252FCA5EE3CDB3b9280",
+      "address": "0x48552FbC886aD7D705367252FCA5EE3CDB3b9280",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8902826
+    },
+    {
+      "name": "xb000D29Dc9De315eCFCC6232F25fa8d2156817f7",
+      "address": "0xb000D29Dc9De315eCFCC6232F25fa8d2156817f7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8622593
+    },
+    {
+      "name": "x63a1A49D8abFAeaAF9E64666eA00A4784F9E85bF",
+      "address": "0x63a1A49D8abFAeaAF9E64666eA00A4784F9E85bF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8444061
+    },
+    {
+      "name": "xdA91e834D9614B4D3BC109aBfbedFF7021719C36",
+      "address": "0xdA91e834D9614B4D3BC109aBfbedFF7021719C36",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8443522
+    },
+    {
+      "name": "xc0c11965a7e7c3b2b6D5c2607Ab4492B00C05051",
+      "address": "0xc0c11965a7e7c3b2b6D5c2607Ab4492B00C05051",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8443275
+    },
+    {
+      "name": "x26d9234B8409df2f2967D6AF06A268b87909f5a0",
+      "address": "0x26d9234B8409df2f2967D6AF06A268b87909f5a0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8443084
+    },
+    {
+      "name": "xA220FCD3580CEa2616f31CC4252E0D6c0B632aFe",
+      "address": "0xA220FCD3580CEa2616f31CC4252E0D6c0B632aFe",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8442783
+    },
+    {
+      "name": "x4f9d79d6900e68090e1589e88C06b99ED5Ae5572",
+      "address": "0x4f9d79d6900e68090e1589e88C06b99ED5Ae5572",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8441580
+    },
+    {
+      "name": "x440d69bd8a4770AbC18bBB7d0d190f579Fa53C76",
+      "address": "0x440d69bd8a4770AbC18bBB7d0d190f579Fa53C76",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8010686
+    },
+    {
+      "name": "xb91473EeF6e9a58AdE3c88c140D3F4bb527821a8",
+      "address": "0xb91473EeF6e9a58AdE3c88c140D3F4bb527821a8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8009559
+    },
+    {
+      "name": "x85F932e5A89317C21B54D078a4Df5cbd502a53Aa",
+      "address": "0x85F932e5A89317C21B54D078a4Df5cbd502a53Aa",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8009389
+    },
+    {
+      "name": "x0BBcaD9077B03B3de52aC77e82C64BDB0F08eC00",
+      "address": "0x0BBcaD9077B03B3de52aC77e82C64BDB0F08eC00",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8008892
+    },
+    {
+      "name": "xBdB93b47ED45Ea178C289d5Fe4eC7489b7a668AF",
+      "address": "0xBdB93b47ED45Ea178C289d5Fe4eC7489b7a668AF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8005465
+    },
+    {
+      "name": "x205504839513d6410f85B9f8C5B29cAd10Fc34A3",
+      "address": "0x205504839513d6410f85B9f8C5B29cAd10Fc34A3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8005340
+    },
+    {
+      "name": "xcD1ed5e39178d2E4f9Ac11B424f243AE7e220C8E",
+      "address": "0xcD1ed5e39178d2E4f9Ac11B424f243AE7e220C8E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8005215
+    },
+    {
+      "name": "x48dC5fb39e05e9E06069AEd3d7fA58532bEc1498",
+      "address": "0x48dC5fb39e05e9E06069AEd3d7fA58532bEc1498",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8004880
+    },
+    {
+      "name": "xc3a8e1acD34E6AE424b8579497FbBDbfeD4E14a8",
+      "address": "0xc3a8e1acD34E6AE424b8579497FbBDbfeD4E14a8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8004767
+    },
+    {
+      "name": "xecC449da8723321941AB793F8440723f68c8fE4C",
+      "address": "0xecC449da8723321941AB793F8440723f68c8fE4C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8004476
+    },
+    {
+      "name": "x2385de633b8f0DB36Fe3647F8Fd656508BA8195f",
+      "address": "0x2385de633b8f0DB36Fe3647F8Fd656508BA8195f",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8004394
+    },
+    {
+      "name": "x304f1185a3568110b6298e07fD40968400fEfD8D",
+      "address": "0x304f1185a3568110b6298e07fD40968400fEfD8D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8004232
+    },
+    {
+      "name": "x4d60F81559bd73565fBd5cA35D31CEb43d6cBcf3",
+      "address": "0x4d60F81559bd73565fBd5cA35D31CEb43d6cBcf3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 8004130
+    },
+    {
+      "name": "x19707F26050Dfe7eb3C1b36E49276A088cE98752",
+      "address": "0x19707F26050Dfe7eb3C1b36E49276A088cE98752",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7961767
+    },
+    {
+      "name": "xE946d5abCD7aef872c0662d61f6c92D87Bb68504",
+      "address": "0xE946d5abCD7aef872c0662d61f6c92D87Bb68504",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7811558
+    },
+    {
+      "name": "x9F94B323B9802C776Cab9680355E3eAb6f5ADc3C",
+      "address": "0x9F94B323B9802C776Cab9680355E3eAb6f5ADc3C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7754180
+    },
+    {
+      "name": "x9D6Db77690cE222687DD1c79FF0BeCcFeaE15aC9",
+      "address": "0x9D6Db77690cE222687DD1c79FF0BeCcFeaE15aC9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7752550
+    },
+    {
+      "name": "xC8a12C45871dE1c10Cc3ECC36a2fFf694a48651d",
+      "address": "0xC8a12C45871dE1c10Cc3ECC36a2fFf694a48651d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7556965
+    },
+    {
+      "name": "xC4b7cF6329b78ed0B2D15c2b31e498871EEB51b0",
+      "address": "0xC4b7cF6329b78ed0B2D15c2b31e498871EEB51b0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7556959
+    },
+    {
+      "name": "x6Cca7c9a279b423D1cB232a7e96aC488Da09f592",
+      "address": "0x6Cca7c9a279b423D1cB232a7e96aC488Da09f592",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7556956
+    },
+    {
+      "name": "x31fe1Bd8ca7eA36d4771CE9dd0d086767390E904",
+      "address": "0x31fe1Bd8ca7eA36d4771CE9dd0d086767390E904",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7556951
+    },
+    {
+      "name": "x13286BbE38425d7BCBD269d67a6792c947D3e37F",
+      "address": "0x13286BbE38425d7BCBD269d67a6792c947D3e37F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7553601
+    },
+    {
+      "name": "x1AfE0E716EF531C8580B16b3CDA157B9Ab4D60C5",
+      "address": "0x1AfE0E716EF531C8580B16b3CDA157B9Ab4D60C5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7553552
+    },
+    {
+      "name": "x56665c1D44A068a8ffAC4Dac6222B6210EDE7d90",
+      "address": "0x56665c1D44A068a8ffAC4Dac6222B6210EDE7d90",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7553500
+    },
+    {
+      "name": "xaEF5799ea18c0c6E6234783f5b94FEA2de42d8C2",
+      "address": "0xaEF5799ea18c0c6E6234783f5b94FEA2de42d8C2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7543344
+    },
+    {
+      "name": "xC2206f055CECd32dBA5E8ab5E3b5eC62dbEf0f73",
+      "address": "0xC2206f055CECd32dBA5E8ab5E3b5eC62dbEf0f73",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331917
+    },
+    {
+      "name": "x969BC610C2237B2131595C1ED0e96233Fc5e1832",
+      "address": "0x969BC610C2237B2131595C1ED0e96233Fc5e1832",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331726
+    },
+    {
+      "name": "xfF2d8F27A71A50e8A5bD26706f10133a7291Cc58",
+      "address": "0xfF2d8F27A71A50e8A5bD26706f10133a7291Cc58",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331629
+    },
+    {
+      "name": "xD312070210376f46ff735E00f03558800B8F64Af",
+      "address": "0xD312070210376f46ff735E00f03558800B8F64Af",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331454
+    },
+    {
+      "name": "x259724e24C2FBe90e7585aC117C36afd6c57588c",
+      "address": "0x259724e24C2FBe90e7585aC117C36afd6c57588c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331373
+    },
+    {
+      "name": "x344E1A50E70dbF2c74f8EF5cB1426086b46D7B1b",
+      "address": "0x344E1A50E70dbF2c74f8EF5cB1426086b46D7B1b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331244
+    },
+    {
+      "name": "x985da3723E194c004678803fB5e620224e513dEa",
+      "address": "0x985da3723E194c004678803fB5e620224e513dEa",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7331157
+    },
+    {
+      "name": "x02CFe646ce0c18d64F1b9F94896d4Da55b3eA631",
+      "address": "0x02CFe646ce0c18d64F1b9F94896d4Da55b3eA631",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7330930
+    },
+    {
+      "name": "xB2a24c7C1080A4aCE06f30173E16410F8D88DC4F",
+      "address": "0xB2a24c7C1080A4aCE06f30173E16410F8D88DC4F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7330077
+    },
+    {
+      "name": "xFCD2050E213cC54db2c9c99632AC870574FbC261",
+      "address": "0xFCD2050E213cC54db2c9c99632AC870574FbC261",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7329914
+    },
+    {
+      "name": "xF45fFABA4F800f7a6F5eA784f28f41AdDF3911a7",
+      "address": "0xF45fFABA4F800f7a6F5eA784f28f41AdDF3911a7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7329711
+    },
+    {
+      "name": "x6e574d538FF42325847A5F5dEB2Dbf716c432175",
+      "address": "0x6e574d538FF42325847A5F5dEB2Dbf716c432175",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7329515
+    },
+    {
+      "name": "x1a30141051258Abd414854C31eAb0a2D0a658cb0",
+      "address": "0x1a30141051258Abd414854C31eAb0a2D0a658cb0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7329316
+    },
+    {
+      "name": "x96ed1fb75741347643Afb6ba803F62266e0a3475",
+      "address": "0x96ed1fb75741347643Afb6ba803F62266e0a3475",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7329069
+    },
+    {
+      "name": "x942F08674169fBb4373b42025377Dd9A4bDaBe47",
+      "address": "0x942F08674169fBb4373b42025377Dd9A4bDaBe47",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7326405
+    },
+    {
+      "name": "x1E041E7b99aD7F1c09158EeA68DC472f9523790B",
+      "address": "0x1E041E7b99aD7F1c09158EeA68DC472f9523790B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7325647
+    },
+    {
+      "name": "xCCEE4A9218a88C7C735813dCf23D4ECc14209042",
+      "address": "0xCCEE4A9218a88C7C735813dCf23D4ECc14209042",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7325487
+    },
+    {
+      "name": "xF72A7728627FF5caa6080532228a418b27b21AaB",
+      "address": "0xF72A7728627FF5caa6080532228a418b27b21AaB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7325216
+    },
+    {
+      "name": "x01435466f844Fa957b48C41ea1d429b9BFAbd97d",
+      "address": "0x01435466f844Fa957b48C41ea1d429b9BFAbd97d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7324692
+    },
+    {
+      "name": "x37958d91606D155d4C11Af638773653Bd8D690DA",
+      "address": "0x37958d91606D155d4C11Af638773653Bd8D690DA",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7109962
+    },
+    {
+      "name": "xFebBa6cdaA250108C7678bAC01D6E5cf81532799",
+      "address": "0xFebBa6cdaA250108C7678bAC01D6E5cf81532799",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7075545
+    },
+    {
+      "name": "xaa5E49824CFF7ED2fB2759BD2f87FF11fccbdeBe",
+      "address": "0xaa5E49824CFF7ED2fB2759BD2f87FF11fccbdeBe",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7030588
+    },
+    {
+      "name": "x3021f41b770035d972ddf86cDa09c6EA87F5ea3d",
+      "address": "0x3021f41b770035d972ddf86cDa09c6EA87F5ea3d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7023992
+    },
+    {
+      "name": "x517f63325Ac6502C730fB66d5C456baaf72Dc1a9",
+      "address": "0x517f63325Ac6502C730fB66d5C456baaf72Dc1a9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 7023671
+    },
+    {
+      "name": "x1B8DE14ABAb751fEd2358C069597e1aD5EC0e29b",
+      "address": "0x1B8DE14ABAb751fEd2358C069597e1aD5EC0e29b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6945540
+    },
+    {
+      "name": "xd069942536210e79042E5cE7641B71fcE0140628",
+      "address": "0xd069942536210e79042E5cE7641B71fcE0140628",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6945534
+    },
+    {
+      "name": "xE7bA0F8b053d31C52374007452b5828866745f5a",
+      "address": "0xE7bA0F8b053d31C52374007452b5828866745f5a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6810873
+    },
+    {
+      "name": "x123F4921E3b112911A7A203D6613da7093c5fF8d",
+      "address": "0x123F4921E3b112911A7A203D6613da7093c5fF8d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6810864
+    },
+    {
+      "name": "x8c571111fc30F921774F3CaA3E1a20E464173C9d",
+      "address": "0x8c571111fc30F921774F3CaA3E1a20E464173C9d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6810396
+    },
+    {
+      "name": "xA5ad811c4B2Bd8161090e97C946e1A2003989599",
+      "address": "0xA5ad811c4B2Bd8161090e97C946e1A2003989599",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6810391
+    },
+    {
+      "name": "x2623d3523F0779127C40519475e361F216D6a14E",
+      "address": "0x2623d3523F0779127C40519475e361F216D6a14E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6808161
+    },
+    {
+      "name": "x3A91a592A06390ca7884c4D9dd4CBA2B4B7F36D1",
+      "address": "0x3A91a592A06390ca7884c4D9dd4CBA2B4B7F36D1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6766096
+    },
+    {
+      "name": "x0eaC97A78a93B75549D49145dF41DbE9CD520874",
+      "address": "0x0eaC97A78a93B75549D49145dF41DbE9CD520874",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6765535
+    },
+    {
+      "name": "xeB503Ef43FB6650f4C62D1323082B0583B984Ca2",
+      "address": "0xeB503Ef43FB6650f4C62D1323082B0583B984Ca2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6736976
+    },
+    {
+      "name": "x9E38ea57c6f5F77407286F061E5364ef762ADA28",
+      "address": "0x9E38ea57c6f5F77407286F061E5364ef762ADA28",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6736915
+    },
+    {
+      "name": "x7478a0A07976D66cB8F84a5181FBcE84b18C844a",
+      "address": "0x7478a0A07976D66cB8F84a5181FBcE84b18C844a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6736848
+    },
+    {
+      "name": "xd323d1980a29C2cd350466371142bA0BD7D5b8CC",
+      "address": "0xd323d1980a29C2cd350466371142bA0BD7D5b8CC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6724357
+    },
+    {
+      "name": "x07B0E11D80Ccf75CB390c9Be6c27f329c119095A",
+      "address": "0x07B0E11D80Ccf75CB390c9Be6c27f329c119095A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6721902
+    },
+    {
+      "name": "x330cC45c8f60FEF7F9D271a7512542B3d201A48D",
+      "address": "0x330cC45c8f60FEF7F9D271a7512542B3d201A48D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6682906
+    },
+    {
+      "name": "x144574DFD520cb102005b1d395c72E6c5Dc42E32",
+      "address": "0x144574DFD520cb102005b1d395c72E6c5Dc42E32",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6592549
+    },
+    {
+      "name": "x80370DF7a633b9968f4B0C6523e2B2B731264691",
+      "address": "0x80370DF7a633b9968f4B0C6523e2B2B731264691",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6481829
+    },
+    {
+      "name": "x0C28742A434c241A0205A87322d9F0d333663937",
+      "address": "0x0C28742A434c241A0205A87322d9F0d333663937",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6385879
+    },
+    {
+      "name": "x90a97C7a1ff2ea06f1A656EaFca0b5cbC43297B9",
+      "address": "0x90a97C7a1ff2ea06f1A656EaFca0b5cbC43297B9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6385875
+    },
+    {
+      "name": "xf2A9073ac86bc245f5FB9dA2484C05ACC1430c5C",
+      "address": "0xf2A9073ac86bc245f5FB9dA2484C05ACC1430c5C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6379714
+    },
+    {
+      "name": "x904A9b8747f43cd65Dc8d7B6A33C73EcBAcF6168",
+      "address": "0x904A9b8747f43cd65Dc8d7B6A33C73EcBAcF6168",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6204480
+    },
+    {
+      "name": "x796BE5344E7076f363c7B6cb76Df11C9b1e91156",
+      "address": "0x796BE5344E7076f363c7B6cb76Df11C9b1e91156",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6379630
+    },
+    {
+      "name": "x788D737b256fecAb64fAb77e9f27495e25b73dB3",
+      "address": "0x788D737b256fecAb64fAb77e9f27495e25b73dB3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6169481
+    },
+    {
+      "name": "xff6Cda38382a615bf1B2Ba3fcF22DdcDea405d80",
+      "address": "0xff6Cda38382a615bf1B2Ba3fcF22DdcDea405d80",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6169477
+    },
+    {
+      "name": "x8Fa0A2cbC7CF70C5DF92Ca0908D89a8f5E4aaE7b",
+      "address": "0x8Fa0A2cbC7CF70C5DF92Ca0908D89a8f5E4aaE7b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6167341
+    },
+    {
+      "name": "xDb53f20C666D27BAD03aBA8C0f57639ecab235DB",
+      "address": "0xDb53f20C666D27BAD03aBA8C0f57639ecab235DB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6135943
+    },
+    {
+      "name": "x7103f6399bC401C57Ad2c4305C03D9e6645628B6",
+      "address": "0x7103f6399bC401C57Ad2c4305C03D9e6645628B6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6130096
+    },
+    {
+      "name": "x450C5582DB7827ccd79440F3ec0DCc09FAd23CB3",
+      "address": "0x450C5582DB7827ccd79440F3ec0DCc09FAd23CB3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6129960
+    },
+    {
+      "name": "xE04d693E454EBa8E9799E48fc0fd9ADcA3b4aB4F",
+      "address": "0xE04d693E454EBa8E9799E48fc0fd9ADcA3b4aB4F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 6129659
+    },
+    {
+      "name": "x56454e27580caEAFFAA3EC25102218CD8d87fEB2",
+      "address": "0x56454e27580caEAFFAA3EC25102218CD8d87fEB2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5972691
+    },
+    {
+      "name": "xf6cCf601bd024612aAF85440153c2df0524E4607",
+      "address": "0xf6cCf601bd024612aAF85440153c2df0524E4607",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5602552
+    },
+    {
+      "name": "xa17946282a8fD1e1C0F2E484393F318D14C6A72F",
+      "address": "0xa17946282a8fD1e1C0F2E484393F318D14C6A72F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5599523
+    },
+    {
+      "name": "xeeD4385af3C876E51CA3AB76AD2cFCa1422AC747",
+      "address": "0xeeD4385af3C876E51CA3AB76AD2cFCa1422AC747",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5593107
+    },
+    {
+      "name": "xf9Dd606743D169E3D5Be68F8C0d4c361765C949D",
+      "address": "0xf9Dd606743D169E3D5Be68F8C0d4c361765C949D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5593077
+    },
+    {
+      "name": "x4fD1CF1E437dbFad5dFfE1DD5e16bF96A24C382c",
+      "address": "0x4fD1CF1E437dbFad5dFfE1DD5e16bF96A24C382c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5593072
+    },
+    {
+      "name": "xe28Ad9Fa07fDA82abab2E0C86c64A19D452b160E",
+      "address": "0xe28Ad9Fa07fDA82abab2E0C86c64A19D452b160E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5593067
+    },
+    {
+      "name": "xCbC3aBE18086A84bA21DC4059e155C070FC6B673",
+      "address": "0xCbC3aBE18086A84bA21DC4059e155C070FC6B673",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5593061
+    },
+    {
+      "name": "x964555644E067c560A4C144360507E80c1104784",
+      "address": "0x964555644E067c560A4C144360507E80c1104784",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5593056
+    },
+    {
+      "name": "x213bF32Ed7d000ccFE60872EaAa2Df5B331F058B",
+      "address": "0x213bF32Ed7d000ccFE60872EaAa2Df5B331F058B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4477735
+    },
+    {
+      "name": "x88dcF090E3445C5B8360637E7aacef0248DaD2E1",
+      "address": "0x88dcF090E3445C5B8360637E7aacef0248DaD2E1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5416810
+    },
+    {
+      "name": "x0e3E8297F745A98262288C60a42F65e9F9aF2444",
+      "address": "0x0e3E8297F745A98262288C60a42F65e9F9aF2444",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5416747
+    },
+    {
+      "name": "xA85591eC02eF3c4057E671ed9057c34E24C3c872",
+      "address": "0xA85591eC02eF3c4057E671ed9057c34E24C3c872",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5416425
+    },
+    {
+      "name": "x0aBD79f5144a70bFA3E3Aeed183f9e1A4d80A34F",
+      "address": "0x0aBD79f5144a70bFA3E3Aeed183f9e1A4d80A34F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5414722
+    },
+    {
+      "name": "x35886426A37cA6BdDb94F256553749c49b44Bf25",
+      "address": "0x35886426A37cA6BdDb94F256553749c49b44Bf25",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403429
+    },
+    {
+      "name": "x9cdBd99D1392489d472BD672b2023739667e7215",
+      "address": "0x9cdBd99D1392489d472BD672b2023739667e7215",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403138
+    },
+    {
+      "name": "x0f7F48d4b66bF5a53d4f21fA6Ffca45f70Cef770",
+      "address": "0x0f7F48d4b66bF5a53d4f21fA6Ffca45f70Cef770",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403134
+    },
+    {
+      "name": "x3769ceDB9dcD3D012a24f89ff8e28e6B74243D17",
+      "address": "0x3769ceDB9dcD3D012a24f89ff8e28e6B74243D17",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403125
+    },
+    {
+      "name": "xA914FEb3C4B580fF6933CEa4f39988Cd10Aa2985",
+      "address": "0xA914FEb3C4B580fF6933CEa4f39988Cd10Aa2985",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403121
+    },
+    {
+      "name": "xb634a71a54d3382Ff6896eB22244B4a4e54C0a82",
+      "address": "0xb634a71a54d3382Ff6896eB22244B4a4e54C0a82",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403113
+    },
+    {
+      "name": "xf5Ac502C3662c07489662dE5f0e127799D715E1E",
+      "address": "0xf5Ac502C3662c07489662dE5f0e127799D715E1E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403109
+    },
+    {
+      "name": "x957Ca4a4aA7CDc866cf430bb140753F04e273bC0",
+      "address": "0x957Ca4a4aA7CDc866cf430bb140753F04e273bC0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5403102
+    },
+    {
+      "name": "x1713c6a19E4C02C401325c9a6db2A5827A783c15",
+      "address": "0x1713c6a19E4C02C401325c9a6db2A5827A783c15",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5349512
+    },
+    {
+      "name": "xba5509472B7125fFc9c4421ff757cb013b543D5d",
+      "address": "0xba5509472B7125fFc9c4421ff757cb013b543D5d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5349243
+    },
+    {
+      "name": "x86dbC2C301dD243d2B9FFC74880E7Ec35A9B4E2b",
+      "address": "0x86dbC2C301dD243d2B9FFC74880E7Ec35A9B4E2b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5349105
+    },
+    {
+      "name": "x372d5A1612F0B50619DE321814Ba5F63f9680823",
+      "address": "0x372d5A1612F0B50619DE321814Ba5F63f9680823",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5348611
+    },
+    {
+      "name": "x13e13C0b949Ca9A65471D82324dD41ccc7C96BBb",
+      "address": "0x13e13C0b949Ca9A65471D82324dD41ccc7C96BBb",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5348206
+    },
+    {
+      "name": "x8240861857A0BB2C59CE50197eB6cE80E8F446Bd",
+      "address": "0x8240861857A0BB2C59CE50197eB6cE80E8F446Bd",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5347506
+    },
+    {
+      "name": "xAB17D37c7a05A0edf62d89E891c3333EFe5E2876",
+      "address": "0xAB17D37c7a05A0edf62d89E891c3333EFe5E2876",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5342929
+    },
+    {
+      "name": "x0835269bb6943779765937ebEF17e5dC37d68775",
+      "address": "0x0835269bb6943779765937ebEF17e5dC37d68775",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 5238234
+    },
+    {
+      "name": "xb3B7414CFD0C31747e982B5104325A57025eC78A",
+      "address": "0xb3B7414CFD0C31747e982B5104325A57025eC78A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4960506
+    },
+    {
+      "name": "x15c74Dae3afd158C24759FddA8a27e644C9368eF",
+      "address": "0x15c74Dae3afd158C24759FddA8a27e644C9368eF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4960319
+    },
+    {
+      "name": "x7E534F582C79e5c1368185bed8faBB0343E127Ef",
+      "address": "0x7E534F582C79e5c1368185bed8faBB0343E127Ef",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4949790
+    },
+    {
+      "name": "xb9977F7a1780feFFc0388bC5EB0C7661cd8e5185",
+      "address": "0xb9977F7a1780feFFc0388bC5EB0C7661cd8e5185",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4949724
+    },
+    {
+      "name": "x4f0fbA90E25995291E2e848dC1a556B3F59D83cF",
+      "address": "0x4f0fbA90E25995291E2e848dC1a556B3F59D83cF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4949481
+    },
+    {
+      "name": "x4dcEA1238Ac823Bb3018A96fC374C360A23e29cc",
+      "address": "0x4dcEA1238Ac823Bb3018A96fC374C360A23e29cc",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4886334
+    },
+    {
+      "name": "xfcbC7dF02448b6CE83498AEC2162Da95d105A026",
+      "address": "0xfcbC7dF02448b6CE83498AEC2162Da95d105A026",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4886007
+    },
+    {
+      "name": "x6DBF865f19cd0AACA9550bdDD3b92f4f4E239468",
+      "address": "0x6DBF865f19cd0AACA9550bdDD3b92f4f4E239468",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4666162
+    },
+    {
+      "name": "x75912BF4454e7f7EA21B83BD1313974b69d8C63a",
+      "address": "0x75912BF4454e7f7EA21B83BD1313974b69d8C63a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4616334
+    },
+    {
+      "name": "x69d8EbE4A431D51ef6720b7e4aEd213615d2e614",
+      "address": "0x69d8EbE4A431D51ef6720b7e4aEd213615d2e614",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4616048
+    },
+    {
+      "name": "x9CFe241015D21c3D8290a1b59205E5d0c2F7f421",
+      "address": "0x9CFe241015D21c3D8290a1b59205E5d0c2F7f421",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4529953
+    },
+    {
+      "name": "x56E2492A926E419C6711e257b6be5E4491220b92",
+      "address": "0x56E2492A926E419C6711e257b6be5E4491220b92",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4526067
+    },
+    {
+      "name": "x0B3f8eFa73B40AB006b99867D9abFc76dCf699C4",
+      "address": "0x0B3f8eFa73B40AB006b99867D9abFc76dCf699C4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4518678
+    },
+    {
+      "name": "x459f0Df3D59554dcd82A26C0373789D7ED3e0C53",
+      "address": "0x459f0Df3D59554dcd82A26C0373789D7ED3e0C53",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4479870
+    },
+    {
+      "name": "xF7A0D4E27F1A7663A10851710f0285afEf3467F7",
+      "address": "0xF7A0D4E27F1A7663A10851710f0285afEf3467F7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4479847
+    },
+    {
+      "name": "x1498d43FC704DEC72fD86B5f535Da65603aA466A",
+      "address": "0x1498d43FC704DEC72fD86B5f535Da65603aA466A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4438501
+    },
+    {
+      "name": "x28Cd1849acbE189805BBc06f2E192b81189cE3E5",
+      "address": "0x28Cd1849acbE189805BBc06f2E192b81189cE3E5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4438495
+    },
+    {
+      "name": "x07f11f5903Af3Bb24E27Af0f794Ef120726E76BB",
+      "address": "0x07f11f5903Af3Bb24E27Af0f794Ef120726E76BB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4438476
+    },
+    {
+      "name": "xbF5bFFbf7D94D3B29aBE6eb20089b8a9E3D229f7",
+      "address": "0xbF5bFFbf7D94D3B29aBE6eb20089b8a9E3D229f7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4436785
+    },
+    {
+      "name": "x46CE405ee945B2D2cC494c62105D8284fb04B8Ba",
+      "address": "0x46CE405ee945B2D2cC494c62105D8284fb04B8Ba",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4431403
+    },
+    {
+      "name": "x048db6C50fFd46DF3bBD8332BB65c062F8D961a8",
+      "address": "0x048db6C50fFd46DF3bBD8332BB65c062F8D961a8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4431377
+    },
+    {
+      "name": "xDdddDfEb2dB092a84f27893a040b2BfedE8BE074",
+      "address": "0xDdddDfEb2dB092a84f27893a040b2BfedE8BE074",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4012321
+    },
+    {
+      "name": "xAcA969fb39FF5d572a219838411F218DE96615Fb",
+      "address": "0xAcA969fb39FF5d572a219838411F218DE96615Fb",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 4008573
+    },
+    {
+      "name": "x23576f938a7923E3f4e419831b35489Adb0494e4",
+      "address": "0x23576f938a7923E3f4e419831b35489Adb0494e4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3978266
+    },
+    {
+      "name": "x92984CE5878Ce56f65218cBC1957c99b2573Ec3B",
+      "address": "0x92984CE5878Ce56f65218cBC1957c99b2573Ec3B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3920317
+    },
+    {
+      "name": "x51132860F3c6947aeb3cB8139121F4D5Ff6AA6d4",
+      "address": "0x51132860F3c6947aeb3cB8139121F4D5Ff6AA6d4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3920274
+    },
+    {
+      "name": "xE40Dd09cBe02419d2Be363f55200c72bcA617404",
+      "address": "0xE40Dd09cBe02419d2Be363f55200c72bcA617404",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3920254
+    },
+    {
+      "name": "xAB4f4a38bc4F74116259174835f67035e973B885",
+      "address": "0xAB4f4a38bc4F74116259174835f67035e973B885",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3920158
+    },
+    {
+      "name": "xDd1C67481A12C8314aA834D6c96A6530ccfb9dA9",
+      "address": "0xDd1C67481A12C8314aA834D6c96A6530ccfb9dA9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3920106
+    },
+    {
+      "name": "x19D579dfA6a41C9215f1a55B810D59F254F6A8fC",
+      "address": "0x19D579dfA6a41C9215f1a55B810D59F254F6A8fC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3915921
+    },
+    {
+      "name": "x16a97496D7F7b8E2D38a0788d0a811bb08FAA484",
+      "address": "0x16a97496D7F7b8E2D38a0788d0a811bb08FAA484",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3915917
+    },
+    {
+      "name": "xFf40Eb068d35bB24f1e43CDB38fd342e2aA58af7",
+      "address": "0xFf40Eb068d35bB24f1e43CDB38fd342e2aA58af7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3920046
+    },
+    {
+      "name": "x32e4F703d6eB770f4e1fD8AbC4daE35f1a420291",
+      "address": "0x32e4F703d6eB770f4e1fD8AbC4daE35f1a420291",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3919934
+    },
+    {
+      "name": "x5f02327Fc088f8Db5fa8F5A9992Aebdc33450d1F",
+      "address": "0x5f02327Fc088f8Db5fa8F5A9992Aebdc33450d1F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3919931
+    },
+    {
+      "name": "xf8571832675F27a26E7d152394fC07246Bd33b91",
+      "address": "0xf8571832675F27a26E7d152394fC07246Bd33b91",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3915161
+    },
+    {
+      "name": "xbb0841e1b782E001aF08cDD5097A7a09162B9ec6",
+      "address": "0xbb0841e1b782E001aF08cDD5097A7a09162B9ec6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3915077
+    },
+    {
+      "name": "xe84BC4114f38D7259D04cE53DF8aaA784dd6680d",
+      "address": "0xe84BC4114f38D7259D04cE53DF8aaA784dd6680d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3915073
+    },
+    {
+      "name": "x0f12DC66F750d95fe7612dC757D7f352521bB61D",
+      "address": "0x0f12DC66F750d95fe7612dC757D7f352521bB61D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3887550
+    },
+    {
+      "name": "x117A18E4f7514Ba89e5a1BDF92E2202EdAeD90E1",
+      "address": "0x117A18E4f7514Ba89e5a1BDF92E2202EdAeD90E1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3887213
+    },
+    {
+      "name": "x19d6C1acd4DdA69b54BBe5dA8c45D8261A0E47FB",
+      "address": "0x19d6C1acd4DdA69b54BBe5dA8c45D8261A0E47FB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3873249
+    },
+    {
+      "name": "x11303d1552C95f96CaD65A3c0797f20d043e1AB5",
+      "address": "0x11303d1552C95f96CaD65A3c0797f20d043e1AB5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3873245
+    },
+    {
+      "name": "xE8917E088FFaF180b061f6EAAc061bcf20f0Ab70",
+      "address": "0xE8917E088FFaF180b061f6EAAc061bcf20f0Ab70",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3873241
+    },
+    {
+      "name": "x87099fDE786144b554Af66Fb8cbE3130c8cb6470",
+      "address": "0x87099fDE786144b554Af66Fb8cbE3130c8cb6470",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3754208
+    },
+    {
+      "name": "x1933133cFab7Fd8908E776e63095aC58c0fAEaE3",
+      "address": "0x1933133cFab7Fd8908E776e63095aC58c0fAEaE3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3752961
+    },
+    {
+      "name": "xb9D554fee84Fa97fEee3525a162602860aE554c5",
+      "address": "0xb9D554fee84Fa97fEee3525a162602860aE554c5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3752900
+    },
+    {
+      "name": "x211654525dC64A7f74F6361D6F3Dc0710108ae43",
+      "address": "0x211654525dC64A7f74F6361D6F3Dc0710108ae43",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3674296
+    },
+    {
+      "name": "x9EE89F3a3Dfd596bb6F53696E2ed1D09C738f8c8",
+      "address": "0x9EE89F3a3Dfd596bb6F53696E2ed1D09C738f8c8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3674291
+    },
+    {
+      "name": "x1B53500677cB1B042b12081a8661a6f08781D58c",
+      "address": "0x1B53500677cB1B042b12081a8661a6f08781D58c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3674283
+    },
+    {
+      "name": "x142b4e2c9234aFC3dC07e12d24493a4Ef26c537C",
+      "address": "0x142b4e2c9234aFC3dC07e12d24493a4Ef26c537C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3674264
+    },
+    {
+      "name": "x3ca2cfd8E17C40ac6F4Aa6c1A4b1723F0Bf59dD8",
+      "address": "0x3ca2cfd8E17C40ac6F4Aa6c1A4b1723F0Bf59dD8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3674259
+    },
+    {
+      "name": "xb940DA8b71791c1F42cc612d1af427878ec1A369",
+      "address": "0xb940DA8b71791c1F42cc612d1af427878ec1A369",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3674256
+    },
+    {
+      "name": "xFbDc6e63CF250E2843ffAef75717993b3D7CA89E",
+      "address": "0xFbDc6e63CF250E2843ffAef75717993b3D7CA89E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3628698
+    },
+    {
+      "name": "x150f6526De9b55E126870A118D47DC4Fd0F8Ac48",
+      "address": "0x150f6526De9b55E126870A118D47DC4Fd0F8Ac48",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3583911
+    },
+    {
+      "name": "x4d94796EEe7694E5c60cd850eF47D9E536D3Ad8b",
+      "address": "0x4d94796EEe7694E5c60cd850eF47D9E536D3Ad8b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3583879
+    },
+    {
+      "name": "xCFD132761c41f66A188A478a282121b0Fb6d99bF",
+      "address": "0xCFD132761c41f66A188A478a282121b0Fb6d99bF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3583648
+    },
+    {
+      "name": "x3E63F20Cdd82A9Fec2Bbe48ca820589AFCb85194",
+      "address": "0x3E63F20Cdd82A9Fec2Bbe48ca820589AFCb85194",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3583605
+    },
+    {
+      "name": "x0280988155EdB58210Fe30be5d429C0f1B91BcE6",
+      "address": "0x0280988155EdB58210Fe30be5d429C0f1B91BcE6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3582631
+    },
+    {
+      "name": "xD3F113CFC44A5E28a6683A2D0424d3ea6CCc2aC0",
+      "address": "0xD3F113CFC44A5E28a6683A2D0424d3ea6CCc2aC0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3582606
+    },
+    {
+      "name": "x68E7DD061b068eA476E979215e3C08a235BD0CeE",
+      "address": "0x68E7DD061b068eA476E979215e3C08a235BD0CeE",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3582504
+    },
+    {
+      "name": "x38056B8AD79256cECf7a2Ab6103A9c00AbE61214",
+      "address": "0x38056B8AD79256cECf7a2Ab6103A9c00AbE61214",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3582488
+    },
+    {
+      "name": "x14d35e27D1381C73AA748f39eCa82c6E6f759392",
+      "address": "0x14d35e27D1381C73AA748f39eCa82c6E6f759392",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3581032
+    },
+    {
+      "name": "x4647247005A15594D16a226867812F509C4557ED",
+      "address": "0x4647247005A15594D16a226867812F509C4557ED",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3580990
+    },
+    {
+      "name": "x8B414448de8B609e96bd63Dcf2A8aDbd5ddf7fdd",
+      "address": "0x8B414448de8B609e96bd63Dcf2A8aDbd5ddf7fdd",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3574217
+    },
+    {
+      "name": "x67F8190A37aA1F3516713F849bdF3B7b9E3dF3a0",
+      "address": "0x67F8190A37aA1F3516713F849bdF3B7b9E3dF3a0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3560874
+    },
+    {
+      "name": "xa13ADB03619835E6e59ED0eD440bE765017D8715",
+      "address": "0xa13ADB03619835E6e59ED0eD440bE765017D8715",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3560719
+    },
+    {
+      "name": "x8a39f38b783857fd128A8bC3354f981160D750A7",
+      "address": "0x8a39f38b783857fd128A8bC3354f981160D750A7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3560050
+    },
+    {
+      "name": "xB6Bf27B1b3E0ce30A91533F2Fc251aFbda53E187",
+      "address": "0xB6Bf27B1b3E0ce30A91533F2Fc251aFbda53E187",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3560018
+    },
+    {
+      "name": "xFB503e8CC1657aDEb1A7ed40A0D7aE77ECeCaAfd",
+      "address": "0xFB503e8CC1657aDEb1A7ed40A0D7aE77ECeCaAfd",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3559977
+    },
+    {
+      "name": "x7873238A924C6f00bE150b8CfDc3C233a8D5758B",
+      "address": "0x7873238A924C6f00bE150b8CfDc3C233a8D5758B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3501569
+    },
+    {
+      "name": "x73d835325637FAF11Ae1838428510D9566E1a465",
+      "address": "0x73d835325637FAF11Ae1838428510D9566E1a465",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3501418
+    },
+    {
+      "name": "x942B94A79fBe8Ae12594ee4510619B5209D4a6D4",
+      "address": "0x942B94A79fBe8Ae12594ee4510619B5209D4a6D4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3499458
+    },
+    {
+      "name": "x2eC16d231f4001153dD84Da477455D0BcB7d5c71",
+      "address": "0x2eC16d231f4001153dD84Da477455D0BcB7d5c71",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3498384
+    },
+    {
+      "name": "x1fEb96Ef9B166859280B6992d4d6c4cdC5b694f6",
+      "address": "0x1fEb96Ef9B166859280B6992d4d6c4cdC5b694f6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3476539
+    },
+    {
+      "name": "x816D5441C47d6d8fa62b28b6CB32aE7e72fB0E7a",
+      "address": "0x816D5441C47d6d8fa62b28b6CB32aE7e72fB0E7a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3461705
+    },
+    {
+      "name": "x81514F9533753137E9F8842fe4BDefFFa3E3Dced",
+      "address": "0x81514F9533753137E9F8842fe4BDefFFa3E3Dced",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3456293
+    },
+    {
+      "name": "x316AD32f61eb06d537D1b545C5d4c5c2168Baf6a",
+      "address": "0x316AD32f61eb06d537D1b545C5d4c5c2168Baf6a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3428584
+    },
+    {
+      "name": "x99D6aCaCA55ffcA5fE47755D17865d394E59c891",
+      "address": "0x99D6aCaCA55ffcA5fE47755D17865d394E59c891",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3420905
+    },
+    {
+      "name": "x8DbDD4A46ABE939a98b5876702bFF56EA4Cd33Ad",
+      "address": "0x8DbDD4A46ABE939a98b5876702bFF56EA4Cd33Ad",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3410796
+    },
+    {
+      "name": "xb7e864cB98896b8E348d31Bda03C3524dc709041",
+      "address": "0xb7e864cB98896b8E348d31Bda03C3524dc709041",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3410770
+    },
+    {
+      "name": "x7d2dA0917500AFb3df94a09e24a34790A386B208",
+      "address": "0x7d2dA0917500AFb3df94a09e24a34790A386B208",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3408628
+    },
+    {
+      "name": "x3129FB69d734AeBeeeF7E40D33b5093f4284767c",
+      "address": "0x3129FB69d734AeBeeeF7E40D33b5093f4284767c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3399644
+    },
+    {
+      "name": "x7257F259c17226C5B09048308403757a6680f2C1",
+      "address": "0x7257F259c17226C5B09048308403757a6680f2C1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3352222
+    },
+    {
+      "name": "xA1801f4FFD40b192A13A54614E66d3625d5C422e",
+      "address": "0xA1801f4FFD40b192A13A54614E66d3625d5C422e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3352191
+    },
+    {
+      "name": "x481480FCEECA146743D75bFDa581946efBc74261",
+      "address": "0x481480FCEECA146743D75bFDa581946efBc74261",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3301375
+    },
+    {
+      "name": "xc8410344FDa4F4A348492a19b099B389494ED668",
+      "address": "0xc8410344FDa4F4A348492a19b099B389494ED668",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3301366
+    },
+    {
+      "name": "x755c78D3bC25e297e8E010A2D1FCf49Cc43ADa21",
+      "address": "0x755c78D3bC25e297e8E010A2D1FCf49Cc43ADa21",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3256682
+    },
+    {
+      "name": "x5bD57DFC6Bc4FC322da4a4A4dA9a0a05482644C2",
+      "address": "0x5bD57DFC6Bc4FC322da4a4A4dA9a0a05482644C2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3256606
+    },
+    {
+      "name": "x4084F32A91F4D8636Ca08386EFE70c6E302F1d84",
+      "address": "0x4084F32A91F4D8636Ca08386EFE70c6E302F1d84",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3251698
+    },
+    {
+      "name": "x698bceeE246934FbFFDbe222CC4444Ae7585C3cb",
+      "address": "0x698bceeE246934FbFFDbe222CC4444Ae7585C3cb",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3245514
+    },
+    {
+      "name": "x8dc3cf91D0118121b5F152556E8E33804c1Ae1CD",
+      "address": "0x8dc3cf91D0118121b5F152556E8E33804c1Ae1CD",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3245361
+    },
+    {
+      "name": "x976C480A2838EB668C502F9087765eD93E3CF892",
+      "address": "0x976C480A2838EB668C502F9087765eD93E3CF892",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3243800
+    },
+    {
+      "name": "x7D2d076000611E44740d636843384412399e31b9",
+      "address": "0x7D2d076000611E44740d636843384412399e31b9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3237454
+    },
+    {
+      "name": "x9669Fe1ea0d8883661289461b90a10B71Ae400Ee",
+      "address": "0x9669Fe1ea0d8883661289461b90a10B71Ae400Ee",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3234234
+    },
+    {
+      "name": "x5adcc735654Bfa472e8c47a639b08292913eD773",
+      "address": "0x5adcc735654Bfa472e8c47a639b08292913eD773",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3165911
+    },
+    {
+      "name": "x8E2DCd0F79C024c02A8d88A9c8C366E64bD8feA9",
+      "address": "0x8E2DCd0F79C024c02A8d88A9c8C366E64bD8feA9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3165878
+    },
+    {
+      "name": "xC6eBfB1199fCa2841ac8A30c5Ac2D28Ced2ee204",
+      "address": "0xC6eBfB1199fCa2841ac8A30c5Ac2D28Ced2ee204",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3165106
+    },
+    {
+      "name": "x8FFeAc711b0F7dff69228eb40f33034b5fB822A2",
+      "address": "0x8FFeAc711b0F7dff69228eb40f33034b5fB822A2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3165043
+    },
+    {
+      "name": "x622bE93c63Fa148EC78fdb508Ac1AF1BA8BC0Dd4",
+      "address": "0x622bE93c63Fa148EC78fdb508Ac1AF1BA8BC0Dd4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3157736
+    },
+    {
+      "name": "x4934D7C4F22829432BE73bB29E7882B39F5E5C31",
+      "address": "0x4934D7C4F22829432BE73bB29E7882B39F5E5C31",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3157694
+    },
+    {
+      "name": "x87Cb748dCc4E22c0e6928b0BE738d958FEe4F304",
+      "address": "0x87Cb748dCc4E22c0e6928b0BE738d958FEe4F304",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3157656
+    },
+    {
+      "name": "x9d2935dcb0225cD79169cB71F45157cfFC6cDD42",
+      "address": "0x9d2935dcb0225cD79169cB71F45157cfFC6cDD42",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3157634
+    },
+    {
+      "name": "xecd3C537399D9DC65786a5ACcce94e48BD4988fF",
+      "address": "0xecd3C537399D9DC65786a5ACcce94e48BD4988fF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3043482
+    },
+    {
+      "name": "x6296043F1cE18a94eE61A9d6dA99281197d73a00",
+      "address": "0x6296043F1cE18a94eE61A9d6dA99281197d73a00",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3041928
+    },
+    {
+      "name": "x07d392a242a4E62919C316fF8EEe210e4034ed20",
+      "address": "0x07d392a242a4E62919C316fF8EEe210e4034ed20",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3041911
+    },
+    {
+      "name": "x5Be841f804Be8f9825c85e728f9b7c8EE55da507",
+      "address": "0x5Be841f804Be8f9825c85e728f9b7c8EE55da507",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3041896
+    },
+    {
+      "name": "x54ee73D619D332E360bB3895Ee1647E18dCD21F7",
+      "address": "0x54ee73D619D332E360bB3895Ee1647E18dCD21F7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3041879
+    },
+    {
+      "name": "x972CCEF781feB87450D52d929685B162E9d305C4",
+      "address": "0x972CCEF781feB87450D52d929685B162E9d305C4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021683
+    },
+    {
+      "name": "x16aeb10777f1315fc28084fe35a45F377c161cD3",
+      "address": "0x16aeb10777f1315fc28084fe35a45F377c161cD3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021668
+    },
+    {
+      "name": "xCb3257195A3Cec8f97d2375B7AA4939ce3e125E9",
+      "address": "0xCb3257195A3Cec8f97d2375B7AA4939ce3e125E9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021648
+    },
+    {
+      "name": "x90148b6A79253c67131DdDf58EcB39B11663E40c",
+      "address": "0x90148b6A79253c67131DdDf58EcB39B11663E40c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021633
+    },
+    {
+      "name": "x3b2464afCDCCAca302357736df4B1d552e239fee",
+      "address": "0x3b2464afCDCCAca302357736df4B1d552e239fee",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021431
+    },
+    {
+      "name": "x1227a55a86ACa0331e450BA6A3750054Da35347D",
+      "address": "0x1227a55a86ACa0331e450BA6A3750054Da35347D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021359
+    },
+    {
+      "name": "xdD65Bb46A7C4a9ccB8d3Dd7caA40D75e0622e445",
+      "address": "0xdD65Bb46A7C4a9ccB8d3Dd7caA40D75e0622e445",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021323
+    },
+    {
+      "name": "xF3B07e79E1F18315006642E9E5c1484d2C97A9E4",
+      "address": "0xF3B07e79E1F18315006642E9E5c1484d2C97A9E4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021316
+    },
+    {
+      "name": "x45AF056a757D6649c24D74c2E4fE449682F6A2dB",
+      "address": "0x45AF056a757D6649c24D74c2E4fE449682F6A2dB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 3021301
+    },
+    {
+      "name": "x0C4684086914D5B1525bf16c62a0FF8010AB991A",
+      "address": "0x0C4684086914D5B1525bf16c62a0FF8010AB991A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2982764
+    },
+    {
+      "name": "xC5D0efF84fF61A8A6b6CcF6852506AFb51fe803F",
+      "address": "0xC5D0efF84fF61A8A6b6CcF6852506AFb51fe803F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2982498
+    },
+    {
+      "name": "x3683B47E3FE0A37e624Fb82D60D593042b1920f1",
+      "address": "0x3683B47E3FE0A37e624Fb82D60D593042b1920f1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2973080
+    },
+    {
+      "name": "x59280E53ac2202563Ad3Dd6FfdC5Ee954C540501",
+      "address": "0x59280E53ac2202563Ad3Dd6FfdC5Ee954C540501",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2973078
+    },
+    {
+      "name": "x093Dcad3a5257457746de4c614F983b23B982602",
+      "address": "0x093Dcad3a5257457746de4c614F983b23B982602",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2971459
+    },
+    {
+      "name": "xF3072d053EAcFAB3adcA9edde5913610566D82D6",
+      "address": "0xF3072d053EAcFAB3adcA9edde5913610566D82D6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2971446
+    },
+    {
+      "name": "xE8326E606793bf60a7A9Ee13AAEe1C06b3D4e491",
+      "address": "0xE8326E606793bf60a7A9Ee13AAEe1C06b3D4e491",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2952151
+    },
+    {
+      "name": "x0e3AAE51740325E41351103Ad4A0594900100b43",
+      "address": "0x0e3AAE51740325E41351103Ad4A0594900100b43",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2952148
+    },
+    {
+      "name": "xF32309A6C21C1C27b0a6b87E607B9862d67Be21f",
+      "address": "0xF32309A6C21C1C27b0a6b87E607B9862d67Be21f",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2942804
+    },
+    {
+      "name": "x468EBa06c845205Fb79098EF3b95c0b319DC0541",
+      "address": "0x468EBa06c845205Fb79098EF3b95c0b319DC0541",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2942688
+    },
+    {
+      "name": "x2D5c943ee961b7DC605CA192a19Fd0Fe9258aC5F",
+      "address": "0x2D5c943ee961b7DC605CA192a19Fd0Fe9258aC5F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2935580
+    },
+    {
+      "name": "x6d0B40B7b1e5f68132E7faD3a4A6Bc06F165f560",
+      "address": "0x6d0B40B7b1e5f68132E7faD3a4A6Bc06F165f560",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2897971
+    },
+    {
+      "name": "x1154831d66afe2e825c0B400A0780B9756CC3240",
+      "address": "0x1154831d66afe2e825c0B400A0780B9756CC3240",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2788530
+    },
+    {
+      "name": "xA4d9aE5F2338e561182F030751654c2F4c00DE8F",
+      "address": "0xA4d9aE5F2338e561182F030751654c2F4c00DE8F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2788508
+    },
+    {
+      "name": "xE0A322B728275ACeD0323c9264b41184a75762f2",
+      "address": "0xE0A322B728275ACeD0323c9264b41184a75762f2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2788497
+    },
+    {
+      "name": "xD3C3d0F3c745295c3cf727e3dA0c33f6296C16b1",
+      "address": "0xD3C3d0F3c745295c3cf727e3dA0c33f6296C16b1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2788471
+    },
+    {
+      "name": "x08337a1549166dCc463279B68f0028b2f0515B0B",
+      "address": "0x08337a1549166dCc463279B68f0028b2f0515B0B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2778976
+    },
+    {
+      "name": "x551E9E18b2D292C3189f47ac129a5179db6eBC30",
+      "address": "0x551E9E18b2D292C3189f47ac129a5179db6eBC30",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2749816
+    },
+    {
+      "name": "x1026733BBC59EDb627bf194b49f913A7A466466f",
+      "address": "0x1026733BBC59EDb627bf194b49f913A7A466466f",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2712396
+    },
+    {
+      "name": "x92752C1d6912A12cd9Cf71093b8812c29E8Ef7F4",
+      "address": "0x92752C1d6912A12cd9Cf71093b8812c29E8Ef7F4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2712303
+    },
+    {
+      "name": "xCA400EbC7632A1a9346851A72Fd41A7Ef234077C",
+      "address": "0xCA400EbC7632A1a9346851A72Fd41A7Ef234077C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2712261
+    },
+    {
+      "name": "x3335faf35C489A0872Bb6e4ADb274074b778c59A",
+      "address": "0x3335faf35C489A0872Bb6e4ADb274074b778c59A",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2712177
+    },
+    {
+      "name": "x3d964716c98e732F84542FE38bDC3d21D1c7a9B1",
+      "address": "0x3d964716c98e732F84542FE38bDC3d21D1c7a9B1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2711824
+    },
+    {
+      "name": "x75Cc908305b385ec1ff3646Bf84718780F95f20B",
+      "address": "0x75Cc908305b385ec1ff3646Bf84718780F95f20B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2711790
+    },
+    {
+      "name": "xf6A7B70641bC02eBE9e57F347AC8Aa7197872e94",
+      "address": "0xf6A7B70641bC02eBE9e57F347AC8Aa7197872e94",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2711343
+    },
+    {
+      "name": "x964A0c4f0C03a3d307dF4266e3A73a33FC804dbF",
+      "address": "0x964A0c4f0C03a3d307dF4266e3A73a33FC804dbF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2625963
+    },
+    {
+      "name": "xeD8c2af5c9F7A0fa5AAa0D8F8E78DDCa28eef3D6",
+      "address": "0xeD8c2af5c9F7A0fa5AAa0D8F8E78DDCa28eef3D6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2625787
+    },
+    {
+      "name": "x85D6F430f30B24F5e933cB3F5E52487dEF8F4e75",
+      "address": "0x85D6F430f30B24F5e933cB3F5E52487dEF8F4e75",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2562871
+    },
+    {
+      "name": "x77c26728465277510c4E33820a4D3b686F44Ab7E",
+      "address": "0x77c26728465277510c4E33820a4D3b686F44Ab7E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2562864
+    },
+    {
+      "name": "x5EA465E27F76B084F864addC47F04df8012B376a",
+      "address": "0x5EA465E27F76B084F864addC47F04df8012B376a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2562859
+    },
+    {
+      "name": "xB5B9CE35E6b3d5f8C800F19be5d8a76D9901f6B5",
+      "address": "0xB5B9CE35E6b3d5f8C800F19be5d8a76D9901f6B5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2562618
+    },
+    {
+      "name": "xD3D10b328c6cEe9FD599B11ea1272Fe829409bba",
+      "address": "0xD3D10b328c6cEe9FD599B11ea1272Fe829409bba",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2559279
+    },
+    {
+      "name": "xB18BfB17859C6B90dC0E374fe763A8AfCe25d80c",
+      "address": "0xB18BfB17859C6B90dC0E374fe763A8AfCe25d80c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2559245
+    },
+    {
+      "name": "x0d33E9982B3418064FCCe9115d04c63b2D0ad101",
+      "address": "0x0d33E9982B3418064FCCe9115d04c63b2D0ad101",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2551054
+    },
+    {
+      "name": "x2f153095049C112dF748c2D2dd8Ede0fA92F6CB7",
+      "address": "0x2f153095049C112dF748c2D2dd8Ede0fA92F6CB7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2550271
+    },
+    {
+      "name": "xfAeD69427E2444263b4C62c630a872A289a54865",
+      "address": "0xfAeD69427E2444263b4C62c630a872A289a54865",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2357836
+    },
+    {
+      "name": "x7832928758afD045cE857aFe5b6320466b5c05ed",
+      "address": "0x7832928758afD045cE857aFe5b6320466b5c05ed",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2347506
+    },
+    {
+      "name": "x7be1a6637D753B16e5FF4E00F917Bb921617d805",
+      "address": "0x7be1a6637D753B16e5FF4E00F917Bb921617d805",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2346239
+    },
+    {
+      "name": "xE285a5Cb85297a10fB65EB8FEdbf3900eC242dB8",
+      "address": "0xE285a5Cb85297a10fB65EB8FEdbf3900eC242dB8",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2284825
+    },
+    {
+      "name": "x6094637C7A1B98Ee136fA1AaFaBd59E7b0B514be",
+      "address": "0x6094637C7A1B98Ee136fA1AaFaBd59E7b0B514be",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2278759
+    },
+    {
+      "name": "x7175a0271375283bD3DD363018A4db9eD73639E4",
+      "address": "0x7175a0271375283bD3DD363018A4db9eD73639E4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2278728
+    },
+    {
+      "name": "xb74dE62EEf4EBb0d02e60BAf280F3C58080ec3C4",
+      "address": "0xb74dE62EEf4EBb0d02e60BAf280F3C58080ec3C4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2278711
+    },
+    {
+      "name": "x5Da33bCD38FbC3e9632F9F6a198F4f0eF13746b6",
+      "address": "0x5Da33bCD38FbC3e9632F9F6a198F4f0eF13746b6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2278678
+    },
+    {
+      "name": "x779A387e67aF939A6E8E9cF664f69590763f9b06",
+      "address": "0x779A387e67aF939A6E8E9cF664f69590763f9b06",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2278666
+    },
+    {
+      "name": "x258Ed410926b57dc45915A479F4cefA130e5378B",
+      "address": "0x258Ed410926b57dc45915A479F4cefA130e5378B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2273879
+    },
+    {
+      "name": "x1f257A6E8e4873cc32ae4E69d8436Fe70C663fb7",
+      "address": "0x1f257A6E8e4873cc32ae4E69d8436Fe70C663fb7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2273781
+    },
+    {
+      "name": "xc0c50aB019d256Ec32023aFdca6868C022977da2",
+      "address": "0xc0c50aB019d256Ec32023aFdca6868C022977da2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2273762
+    },
+    {
+      "name": "x5F349aF20f87ec815301979fC9C434e2333641bF",
+      "address": "0x5F349aF20f87ec815301979fC9C434e2333641bF",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2273481
+    },
+    {
+      "name": "x998DB5870F83Fc6a1908125E3d7B85D58C9fA806",
+      "address": "0x998DB5870F83Fc6a1908125E3d7B85D58C9fA806",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2249239
+    },
+    {
+      "name": "x1fc1f7A0943c589EDFf4A3650E40C0821B41901d",
+      "address": "0x1fc1f7A0943c589EDFf4A3650E40C0821B41901d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2248493
+    },
+    {
+      "name": "x58887009A412Ad52a4FB746D0846585346d83BC0",
+      "address": "0x58887009A412Ad52a4FB746D0846585346d83BC0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2248353
+    },
+    {
+      "name": "xb34fE8A87DFEbD5Ab0a03DB73F2d49b903E63DB6",
+      "address": "0xb34fE8A87DFEbD5Ab0a03DB73F2d49b903E63DB6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2226894
+    },
+    {
+      "name": "x8c325C11e06619Ba0825010feD6D565b4FddC887",
+      "address": "0x8c325C11e06619Ba0825010feD6D565b4FddC887",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2211877
+    },
+    {
+      "name": "xf1854dCe74e2e354ce6Acb5dAAa77A93690820D4",
+      "address": "0xf1854dCe74e2e354ce6Acb5dAAa77A93690820D4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2211839
+    },
+    {
+      "name": "xB9C5AE872E946bB2b39f1CFBEb2749830cCf20fa",
+      "address": "0xB9C5AE872E946bB2b39f1CFBEb2749830cCf20fa",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2211821
+    },
+    {
+      "name": "xe867eC0fa1969380960fE544F2A8d5758A26E254",
+      "address": "0xe867eC0fa1969380960fE544F2A8d5758A26E254",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2210845
+    },
+    {
+      "name": "xbd8B2bC5CaAb6843365084b529905964d0626248",
+      "address": "0xbd8B2bC5CaAb6843365084b529905964d0626248",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2177386
+    },
+    {
+      "name": "x562ACEA3c03dBDDc25e2F24bb2685D17Bdb4e62f",
+      "address": "0x562ACEA3c03dBDDc25e2F24bb2685D17Bdb4e62f",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2151994
+    },
+    {
+      "name": "xf487044eD85F2d47A8eAD6b86c834976B8c31736",
+      "address": "0xf487044eD85F2d47A8eAD6b86c834976B8c31736",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2151891
+    },
+    {
+      "name": "xb667121B4D4b6ea5DE4bb61bd3a02E53529BfcCA",
+      "address": "0xb667121B4D4b6ea5DE4bb61bd3a02E53529BfcCA",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2149532
+    },
+    {
+      "name": "x39F7fCB3aF11B0a274514C581d468739e75f64EC",
+      "address": "0x39F7fCB3aF11B0a274514C581d468739e75f64EC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2149512
+    },
+    {
+      "name": "xC1F14E9D2b7B88B62e33772b3D14BC6d360d7Cdb",
+      "address": "0xC1F14E9D2b7B88B62e33772b3D14BC6d360d7Cdb",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2144408
+    },
+    {
+      "name": "x8d9153c1976769E2C8774f88648E75C897D1e4B0",
+      "address": "0x8d9153c1976769E2C8774f88648E75C897D1e4B0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2139315
+    },
+    {
+      "name": "x7867C7a94eF30E26ae855af5d271fB9E52f26c36",
+      "address": "0x7867C7a94eF30E26ae855af5d271fB9E52f26c36",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2123043
+    },
+    {
+      "name": "x9B3365CF1927c29Fa6C1d9bbD214A6bf7b893a06",
+      "address": "0x9B3365CF1927c29Fa6C1d9bbD214A6bf7b893a06",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2123034
+    },
+    {
+      "name": "x2cFB60bD96B5215437c3e9D2cAB218fcE29F096C",
+      "address": "0x2cFB60bD96B5215437c3e9D2cAB218fcE29F096C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2062806
+    },
+    {
+      "name": "xbFBbEB1Bde34C53533A38cFBb07c37fFA06502a5",
+      "address": "0xbFBbEB1Bde34C53533A38cFBb07c37fFA06502a5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2062802
+    },
+    {
+      "name": "xe97e85a8cc54980e0370faA196DAE25E43b2aef0",
+      "address": "0xe97e85a8cc54980e0370faA196DAE25E43b2aef0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2027322
+    },
+    {
+      "name": "x8DF0790E9b9f06AdD676b53136Bd9734e4916D59",
+      "address": "0x8DF0790E9b9f06AdD676b53136Bd9734e4916D59",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2026680
+    },
+    {
+      "name": "x86D919752822Fcf060307201808e8f206Ad10324",
+      "address": "0x86D919752822Fcf060307201808e8f206Ad10324",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2009923
+    },
+    {
+      "name": "xb2dA66e3245d47b67Ea0d98B8789C614e2e3A76D",
+      "address": "0xb2dA66e3245d47b67Ea0d98B8789C614e2e3A76D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 2008721
+    },
+    {
+      "name": "x7924612c49084b71eaA383C3aeB8A7e7EEb1A63e",
+      "address": "0x7924612c49084b71eaA383C3aeB8A7e7EEb1A63e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1690330
+    },
+    {
+      "name": "xC92fAc369925f6f6e88384c2A6f3678977dC6213",
+      "address": "0xC92fAc369925f6f6e88384c2A6f3678977dC6213",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1690160
+    },
+    {
+      "name": "x81dBdb246Fa1bB98a85C59eAF9face97403b6C19",
+      "address": "0x81dBdb246Fa1bB98a85C59eAF9face97403b6C19",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1690032
+    },
+    {
+      "name": "x4e42c97EFae0777643938262f43c247b702Ad7c6",
+      "address": "0x4e42c97EFae0777643938262f43c247b702Ad7c6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1655590
+    },
+    {
+      "name": "x43C1d15C34D73eb6dFD2bf39BC53C0a0b5724b17",
+      "address": "0x43C1d15C34D73eb6dFD2bf39BC53C0a0b5724b17",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1655588
+    },
+    {
+      "name": "xF0c2d1D6A3D7Fb3d1Ddc2468fCF1d3B1AB648DaC",
+      "address": "0xF0c2d1D6A3D7Fb3d1Ddc2468fCF1d3B1AB648DaC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1655585
+    },
+    {
+      "name": "xB42cD0bea11ad9eC610F2bd5826463Bb93396538",
+      "address": "0xB42cD0bea11ad9eC610F2bd5826463Bb93396538",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1654864
+    },
+    {
+      "name": "x9968f0c68B9D812C226F3d6eb3cd3c958979E1af",
+      "address": "0x9968f0c68B9D812C226F3d6eb3cd3c958979E1af",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1608214
+    },
+    {
+      "name": "x0cAAA919FEeb50029f99b288e43a73c66178C976",
+      "address": "0x0cAAA919FEeb50029f99b288e43a73c66178C976",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1608184
+    },
+    {
+      "name": "x57A6E0CEF1E32BeE5407BDcaB57dE10eEb383aA6",
+      "address": "0x57A6E0CEF1E32BeE5407BDcaB57dE10eEb383aA6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1592028
+    },
+    {
+      "name": "x0Bd7cdDB6B76eeAA8AAaEC124e7Ffe0d26496D3e",
+      "address": "0x0Bd7cdDB6B76eeAA8AAaEC124e7Ffe0d26496D3e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1548220
+    },
+    {
+      "name": "xc474e6cAE8b7c7E43b3c69125A7226A4A08a4229",
+      "address": "0xc474e6cAE8b7c7E43b3c69125A7226A4A08a4229",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1547996
+    },
+    {
+      "name": "x3b23E8a535B2a9e4C73f617c1c5A36299b3C57B2",
+      "address": "0x3b23E8a535B2a9e4C73f617c1c5A36299b3C57B2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1521818
+    },
+    {
+      "name": "x9550593eA20359A4EfeB914C1FFf2d123EC9C091",
+      "address": "0x9550593eA20359A4EfeB914C1FFf2d123EC9C091",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1521812
+    },
+    {
+      "name": "xF947758148e056Cd8096eFD07f536B59f3247206",
+      "address": "0xF947758148e056Cd8096eFD07f536B59f3247206",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1520602
+    },
+    {
+      "name": "xDf98Af02258E7F32A4fEb77c159A42Bd64D204d3",
+      "address": "0xDf98Af02258E7F32A4fEb77c159A42Bd64D204d3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1476231
+    },
+    {
+      "name": "xfdd8B1444B3A929979d84E2255Ab52cb9F7B5a4C",
+      "address": "0xfdd8B1444B3A929979d84E2255Ab52cb9F7B5a4C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1475902
+    },
+    {
+      "name": "x1AD92f75C2740efD143ED666f8dE3eD963b22AD3",
+      "address": "0x1AD92f75C2740efD143ED666f8dE3eD963b22AD3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1099669
+    },
+    {
+      "name": "x72E332cc6bf00EC48861C51df104770EDf7890B6",
+      "address": "0x72E332cc6bf00EC48861C51df104770EDf7890B6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1099740
+    },
+    {
+      "name": "x0345f2b85d238a963965Ef8163ccB93efF81Ff5E",
+      "address": "0x0345f2b85d238a963965Ef8163ccB93efF81Ff5E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1099520
+    },
+    {
+      "name": "x2409E04F96E71Fc931E18196509F130dFE0959a6",
+      "address": "0x2409E04F96E71Fc931E18196509F130dFE0959a6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1099894
+    },
+    {
+      "name": "xC53DC280dc14F24B21370919d757cF7b296BFd31",
+      "address": "0xC53DC280dc14F24B21370919d757cF7b296BFd31",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1100025
+    },
+    {
+      "name": "xaf985c13836b753445487c99448dA38Bd7774A17",
+      "address": "0xaf985c13836b753445487c99448dA38Bd7774A17",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1099986
+    },
+    {
+      "name": "xfDffdf6Dc4FB30BeDE8af0f78D42c5468F37324B",
+      "address": "0xfDffdf6Dc4FB30BeDE8af0f78D42c5468F37324B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 989166
+    },
+    {
+      "name": "x4DD36b27e038E5c479d8BEC440c8f4eE89B6dF5D",
+      "address": "0x4DD36b27e038E5c479d8BEC440c8f4eE89B6dF5D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1030559
+    },
+    {
+      "name": "x89a806347b0814a265Dc17aFc343866b2214dD0F",
+      "address": "0x89a806347b0814a265Dc17aFc343866b2214dD0F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 989386
+    },
+    {
+      "name": "x212dF67Bf1243eE57686883C9222637136bb65E4",
+      "address": "0x212dF67Bf1243eE57686883C9222637136bb65E4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 989432
+    },
+    {
+      "name": "x3a8D3FBaB8b87473b9B2D78393200B099fA98497",
+      "address": "0x3a8D3FBaB8b87473b9B2D78393200B099fA98497",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 997784
+    },
+    {
+      "name": "xa019F49464FCD206d080060CBbCB1A089441a732",
+      "address": "0xa019F49464FCD206d080060CBbCB1A089441a732",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 997786
+    },
+    {
+      "name": "x9C36eca9309f0CeB5818da889E47D3c3E2ba9F32",
+      "address": "0x9C36eca9309f0CeB5818da889E47D3c3E2ba9F32",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 997788
+    },
+    {
+      "name": "xec2258cC4B75aD0a013C7346c07f7470AEa7F0e4",
+      "address": "0xec2258cC4B75aD0a013C7346c07f7470AEa7F0e4",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 997790
+    },
+    {
+      "name": "xC82ad2Eab7EE0B9226aE884255ca9c1cB33D9E2C",
+      "address": "0xC82ad2Eab7EE0B9226aE884255ca9c1cB33D9E2C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1005158
+    },
+    {
+      "name": "xeec2d8bD006e189A0e53819C670b9c08Ee098EB0",
+      "address": "0xeec2d8bD006e189A0e53819C670b9c08Ee098EB0",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 618518
+    },
+    {
+      "name": "x829a96AFAcB3f39f740b39fDF575658f88B153f1",
+      "address": "0x829a96AFAcB3f39f740b39fDF575658f88B153f1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 864704
+    },
+    {
+      "name": "xA75AF2E0ea2BBDa6Dc6921B4Ee3bb051309d28C9",
+      "address": "0xA75AF2E0ea2BBDa6Dc6921B4Ee3bb051309d28C9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 646862
+    },
+    {
+      "name": "x1E3808e065280E5D773e7D1e9D1f8421C4543b27",
+      "address": "0x1E3808e065280E5D773e7D1e9D1f8421C4543b27",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 757374
+    },
+    {
+      "name": "x855f76F69826b41D663dA8587C199e5Ff4C55325",
+      "address": "0x855f76F69826b41D663dA8587C199e5Ff4C55325",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 757449
+    },
+    {
+      "name": "x37A83906a69d6236DBcB4d8257D8f62d1f3BBcD5",
+      "address": "0x37A83906a69d6236DBcB4d8257D8f62d1f3BBcD5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 883582
+    },
+    {
+      "name": "x0b4a63943e96463b432ec79E7287E63d830BEC51",
+      "address": "0x0b4a63943e96463b432ec79E7287E63d830BEC51",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 883586
+    },
+    {
+      "name": "x4a79206B5e1aF8ff4e62183f2f2ff2B4Efb0A9B9",
+      "address": "0x4a79206B5e1aF8ff4e62183f2f2ff2B4Efb0A9B9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 891878
+    },
+    {
+      "name": "xDEfC4b949EA970533FE6F5A75248d4Da534F8873",
+      "address": "0xDEfC4b949EA970533FE6F5A75248d4Da534F8873",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 883588
+    },
+    {
+      "name": "x6BbeA2dbA0Ea15F17C92F84765ae1c3Ab651dF58",
+      "address": "0x6BbeA2dbA0Ea15F17C92F84765ae1c3Ab651dF58",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 733991
+    },
+    {
+      "name": "xfE0521F000d20f0bb9bB2cBa51dC9066468671f9",
+      "address": "0xfE0521F000d20f0bb9bB2cBa51dC9066468671f9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 733992
+    },
+    {
+      "name": "x141bE6e009a0D9a5c0d4e557c0636e97B3de2a7B",
+      "address": "0x141bE6e009a0D9a5c0d4e557c0636e97B3de2a7B",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 701099
+    },
+    {
+      "name": "x485240Fd6e73EC6afd32A7C64707F7AAc11EE151",
+      "address": "0x485240Fd6e73EC6afd32A7C64707F7AAc11EE151",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 707881
+    },
+    {
+      "name": "x882b1F5C8f5438e1C47Ef464A6199C70f20cCeDa",
+      "address": "0x882b1F5C8f5438e1C47Ef464A6199C70f20cCeDa",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1008335
+    },
+    {
+      "name": "xd661a38708E6544F2D32e302e6E893A97Be7314c",
+      "address": "0xd661a38708E6544F2D32e302e6E893A97Be7314c",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 707879
+    },
+    {
+      "name": "x50F91f231F8eEca4ff6e0D4f2dABe7d22228D34d",
+      "address": "0x50F91f231F8eEca4ff6e0D4f2dABe7d22228D34d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 734003
+    },
+    {
+      "name": "xD8399D3db7da1E1Db132DE4E5D3cCF8620dfa2e6",
+      "address": "0xD8399D3db7da1E1Db132DE4E5D3cCF8620dfa2e6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1113929
+    },
+    {
+      "name": "x411b1F257E84394A60C7Fb8fbdA9C53A0C441057",
+      "address": "0x411b1F257E84394A60C7Fb8fbdA9C53A0C441057",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1113930
+    },
+    {
+      "name": "x18DF163393c6DA3285C2888461b8fD736272E245",
+      "address": "0x18DF163393c6DA3285C2888461b8fD736272E245",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1124233
+    },
+    {
+      "name": "xded4e24C158b973D4cD309b19295954DD0ad5A23",
+      "address": "0xded4e24C158b973D4cD309b19295954DD0ad5A23",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1151941
+    },
+    {
+      "name": "x4CAceCe41645Ae3A78655cdC33320beD00f72437",
+      "address": "0x4CAceCe41645Ae3A78655cdC33320beD00f72437",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1151943
+    },
+    {
+      "name": "x579cF87201C82B21ba9ae29678B812E07fccf14C",
+      "address": "0x579cF87201C82B21ba9ae29678B812E07fccf14C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1153912
+    },
+    {
+      "name": "xbD42169E094CD8b95513cB3640e9D37418258E17",
+      "address": "0xbD42169E094CD8b95513cB3640e9D37418258E17",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1154305
+    },
+    {
+      "name": "x6b128f920813dF43Ac91D83ed8A79b08C99a41db",
+      "address": "0x6b128f920813dF43Ac91D83ed8A79b08C99a41db",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1154306
+    },
+    {
+      "name": "x7346502437C9F09AB040855f756EdeA2A2aC0912",
+      "address": "0x7346502437C9F09AB040855f756EdeA2A2aC0912",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1171822
+    },
+    {
+      "name": "x069E889D729D4D96Dae10C86a4D1F629ad81adEf",
+      "address": "0x069E889D729D4D96Dae10C86a4D1F629ad81adEf",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1171877
+    },
+    {
+      "name": "xFfbE3f2b1fF3f595e3059CCa8a7FcD3eB4D71949",
+      "address": "0xFfbE3f2b1fF3f595e3059CCa8a7FcD3eB4D71949",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1171888
+    },
+    {
+      "name": "x104a9f8C3a1f3bF0814105E1fD457CD7775979cE",
+      "address": "0x104a9f8C3a1f3bF0814105E1fD457CD7775979cE",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1171902
+    },
+    {
+      "name": "x1Ad3bE171A6be9f6b9a60C30c5373185bD9c0B6e",
+      "address": "0x1Ad3bE171A6be9f6b9a60C30c5373185bD9c0B6e",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1161175
+    },
+    {
+      "name": "x2eE33e53eBD75222c7c62F1e9FEB0bc9766136ba",
+      "address": "0x2eE33e53eBD75222c7c62F1e9FEB0bc9766136ba",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1212921
+    },
+    {
+      "name": "xf752325D33f748115660B8661ab7DE10cfd1997C",
+      "address": "0xf752325D33f748115660B8661ab7DE10cfd1997C",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1212922
+    },
+    {
+      "name": "x197e2AE97a783b9a7958eafd01e2467B875989d7",
+      "address": "0x197e2AE97a783b9a7958eafd01e2467B875989d7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1212924
+    },
+    {
+      "name": "x2521597A67DbA56932358F0a67f196BA0cD33053",
+      "address": "0x2521597A67DbA56932358F0a67f196BA0cD33053",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145411
+    },
+    {
+      "name": "x6d76d0a8AD4F2325C6f4286DD3a40c1cd3B817dE",
+      "address": "0x6d76d0a8AD4F2325C6f4286DD3a40c1cd3B817dE",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1124234
+    },
+    {
+      "name": "xaa22703AF4a6575fEB316f078bdc584A94FdE108",
+      "address": "0xaa22703AF4a6575fEB316f078bdc584A94FdE108",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1124235
+    },
+    {
+      "name": "x1a7d36D12e12ABfA91e8da437bDa4c86657163e5",
+      "address": "0x1a7d36D12e12ABfA91e8da437bDa4c86657163e5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 707880
+    },
+    {
+      "name": "x06404FC9C69F8333DC24D4C856E2c8Db7983EB8a",
+      "address": "0x06404FC9C69F8333DC24D4C856E2c8Db7983EB8a",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145406
+    },
+    {
+      "name": "x00508fD84E2aCA19B8aF38C2c59171971D97495b",
+      "address": "0x00508fD84E2aCA19B8aF38C2c59171971D97495b",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 843115
+    },
+    {
+      "name": "xA544b965C2a05b97C44f3126cec916332aFb3175",
+      "address": "0xA544b965C2a05b97C44f3126cec916332aFb3175",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145410
+    },
+    {
+      "name": "x06Fd3eceE685cA5717c814dc7a790641E98aD9c7",
+      "address": "0x06Fd3eceE685cA5717c814dc7a790641E98aD9c7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 842602
+    },
+    {
+      "name": "x69293F1f9F4ad45ef9295f94ccaED0C045466214",
+      "address": "0x69293F1f9F4ad45ef9295f94ccaED0C045466214",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 883584
+    },
+    {
+      "name": "x007A0f7C4CAe14415dbCAC83da92d4c01f7601ED",
+      "address": "0x007A0f7C4CAe14415dbCAC83da92d4c01f7601ED",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 748080
+    },
+    {
+      "name": "x8054fABa5fC1b8523A0c2fb54845C2Ec3326B347",
+      "address": "0x8054fABa5fC1b8523A0c2fb54845C2Ec3326B347",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 748081
+    },
+    {
+      "name": "xb373a54f7F773a99feBe49F2C5dB11756574f0CE",
+      "address": "0xb373a54f7F773a99feBe49F2C5dB11756574f0CE",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145423
+    },
+    {
+      "name": "xe51d794d7822e5A78bA681A69294a31BF2117b94",
+      "address": "0xe51d794d7822e5A78bA681A69294a31BF2117b94",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145421
+    },
+    {
+      "name": "x206D15CB7DA413C0E662f284e00f907f51999a40",
+      "address": "0x206D15CB7DA413C0E662f284e00f907f51999a40",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145413
+    },
+    {
+      "name": "x9800F6189EE6849361d8bF4c0cD7a75a3074550d",
+      "address": "0x9800F6189EE6849361d8bF4c0cD7a75a3074550d",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1113928
+    },
+    {
+      "name": "x303DfF9550a1E959A7E6731809A587acc195fD21",
+      "address": "0x303DfF9550a1E959A7E6731809A587acc195fD21",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 707882
+    },
+    {
+      "name": "x7A43D565837274eA2f6E6d95F4020871669C13C9",
+      "address": "0x7A43D565837274eA2f6E6d95F4020871669C13C9",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1369619
+    },
+    {
+      "name": "x976EEea238514fd13A4aB3E4cB45EfA17F9426A7",
+      "address": "0x976EEea238514fd13A4aB3E4cB45EfA17F9426A7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1369859
+    },
+    {
+      "name": "x8D325d788140c391Fcb55A45E19bB4c66Ef87529",
+      "address": "0x8D325d788140c391Fcb55A45E19bB4c66Ef87529",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1369960
+    },
+    {
+      "name": "x908698B561eA14f153dDD1Ee02f99EBE0A4cea0f",
+      "address": "0x908698B561eA14f153dDD1Ee02f99EBE0A4cea0f",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1400932
+    },
+    {
+      "name": "xFC47515433eE291E692958a2D15F99896FAFC0BC",
+      "address": "0xFC47515433eE291E692958a2D15F99896FAFC0BC",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1400934
+    },
+    {
+      "name": "x8C3C86bEA8eD5ACbCE4944deF6731291Eb193C26",
+      "address": "0x8C3C86bEA8eD5ACbCE4944deF6731291Eb193C26",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1400936
+    },
+    {
+      "name": "xfb5Aa7660fDe5013996FD72a193ACCF00212Af32",
+      "address": "0xfb5Aa7660fDe5013996FD72a193ACCF00212Af32",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1404673
+    },
+    {
+      "name": "xA004785b6a53dd1f523d5519b5EFDC619B6b92c5",
+      "address": "0xA004785b6a53dd1f523d5519b5EFDC619B6b92c5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1404676
+    },
+    {
+      "name": "xFD1F86448b56942C32B954092F2fDBCE91E37Bf6",
+      "address": "0xFD1F86448b56942C32B954092F2fDBCE91E37Bf6",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1404678
+    },
+    {
+      "name": "x90E24A2dfd80F02D01c7B630E8e3199C8A0388D3",
+      "address": "0x90E24A2dfd80F02D01c7B630E8e3199C8A0388D3",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1413019
+    },
+    {
+      "name": "x165FA1023429E266Cd767845E8dE419Ce3abd379",
+      "address": "0x165FA1023429E266Cd767845E8dE419Ce3abd379",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1413017
+    },
+    {
+      "name": "xBD9f16EeE869808bF22823427D1f4a1E7A440E8D",
+      "address": "0xBD9f16EeE869808bF22823427D1f4a1E7A440E8D",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1413014
+    },
+    {
+      "name": "x8Bf6402AfcfE11519947829Af44770Fa44A01949",
+      "address": "0x8Bf6402AfcfE11519947829Af44770Fa44A01949",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1413011
+    },
+    {
+      "name": "x8F871D05d7AfB9dAffA5Df13A91c74e870e6c31E",
+      "address": "0x8F871D05d7AfB9dAffA5Df13A91c74e870e6c31E",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1413014
+    },
+    {
+      "name": "x20afdEf84D1E87D9BfD8086F7269183E12C712E2",
+      "address": "0x20afdEf84D1E87D9BfD8086F7269183E12C712E2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1150431
+    },
+    {
+      "name": "xaa21128578043C10c5C50BFF1011879c5188dDB2",
+      "address": "0xaa21128578043C10c5C50BFF1011879c5188dDB2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1150433
+    },
+    {
+      "name": "xC2387b6AB5B75aacD6A4A94e44f8402f1E8AFdc2",
+      "address": "0xC2387b6AB5B75aacD6A4A94e44f8402f1E8AFdc2",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1150434
+    },
+    {
+      "name": "xBA78660BCa43b5a692c632c2A02ff329701DcbF1",
+      "address": "0xBA78660BCa43b5a692c632c2A02ff329701DcbF1",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1150436
+    },
+    {
+      "name": "x0bc2Fb2d9Ba486cBF9e6192f982023f72E80f96F",
+      "address": "0x0bc2Fb2d9Ba486cBF9e6192f982023f72E80f96F",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145417
+    },
+    {
+      "name": "x1817fE376740b53CAe73224B7F0a57F23DD4C9b5",
+      "address": "0x1817fE376740b53CAe73224B7F0a57F23DD4C9b5",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1145419
+    },
+    {
+      "name": "xF0BDE208A05CC0a056B5FAE1a78212Adf7A4AFfe",
+      "address": "0xF0BDE208A05CC0a056B5FAE1a78212Adf7A4AFfe",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 804966
+    },
+    {
+      "name": "xaa9e134D3f9C802f099c53A0C0195373e34d92F7",
+      "address": "0xaa9e134D3f9C802f099c53A0C0195373e34d92F7",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 842070
+    },
+    {
+      "name": "xC0787Fd12249451763be576cf73621f3aF61ebBD",
+      "address": "0xC0787Fd12249451763be576cf73621f3aF61ebBD",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 842601
+    },
+    {
+      "name": "x43801E030AFbdFD9A30dA3E5321DD6B609083BCB",
+      "address": "0x43801E030AFbdFD9A30dA3E5321DD6B609083BCB",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 843112
+    },
+    {
+      "name": "xca0803B898F64E3a990998a79Ad874c1880bA346",
+      "address": "0xca0803B898F64E3a990998a79Ad874c1880bA346",
+      "isDexStrategyV4": true,
+      "abi": "DexStrategyV4",
+      "startBlock": 1113467
+    }
+  ]
+}
