@@ -1,9 +1,9 @@
 import {
+  log,
+  BigInt,
   Address,
   BigDecimal,
-  BigInt,
   dataSource,
-  log,
 } from "@graphprotocol/graph-ts";
 
 import * as constants from "./common/constants";

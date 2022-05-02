@@ -23,6 +23,10 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -88,6 +92,10 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -155,6 +163,10 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -212,7 +224,8 @@ dataSources:
           handler: handleStrategyReported_v1
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
-
+        
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -226,6 +239,7 @@ dataSources:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
+      {{/callHandlersEnabled}}
   {{/manualVaults}}
 
 templates:
@@ -249,6 +263,10 @@ templates:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -305,7 +323,7 @@ templates:
           handler: handleStrategyReported_v1
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
-
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -319,6 +337,7 @@ templates:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
+      {{/callHandlersEnabled}}
   
   - name: Strategy
     kind: ethereum/contract
@@ -342,6 +361,10 @@ templates:
           file: ./abis/Ethereum/Strategies/_strategy_.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
