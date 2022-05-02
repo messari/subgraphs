@@ -207,7 +207,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity.name = "Abracadabra Money";
   LendingProtocolEntity.slug = "abracadabra";
   LendingProtocolEntity.schemaVersion = "1.2.1";
-  LendingProtocolEntity.subgraphVersion = "1.0.0";
+  LendingProtocolEntity.subgraphVersion = "1.0.1";
   LendingProtocolEntity.methodologyVersion = "1.0.0";
   if (dataSource.network() == ARB_NETWORK) {
     LendingProtocolEntity.network = Network.ARBITRUM_ONE;
