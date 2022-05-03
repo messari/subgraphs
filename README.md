@@ -69,11 +69,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Protocol |  Status | Versions † | Deployments |
 | ------- |  :------: | --- | --- |
 | **DEX AMM** |    | |
-<<<<<<< HEAD
-| [Apeswap](https://apeswap.finance/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
-=======
-| [Apeswap](https://apeswap.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
->>>>>>> masterMessari
+| [Apeswap](https://apeswap.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
 | Balancer v2 | 🔨 | | |
 | Bancor v2 | 🔨 | | |
 | Bancor v3 | | | |
@@ -83,14 +79,14 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Platypus Finance | 🔨 | | |
 | Saddle Finance | 🔨 | | |
 | Sushiswap | 🔨 | | |
-| [Uniswap v2](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) |
-| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/polygon.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
+| [Uniswap v2](https://uniswap.org/) | 🛠 | 1.2.1 / 1.1.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) |
+| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
 | **Lending Protocols** |    | |
 | Aave v2 | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
 | Aave v3 |  | | |
 | [Bastion Protocol](https://bastionprotocol.com/) | 🔨 | | |
 | Benqi | 🔨 | | |
-| [Compound](https://compound.finance/) | 🛠 | 1.0.1 / 1.0.0 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
+| [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.2 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
 | CREAM | 🔨 | | |
 | Geist | 🔨 | | |
 | Hundred Finance | 🔨 | | |
@@ -99,26 +95,16 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Moonwell Finance | 🔨 | | |
 | TrueFi |   | | |
 | **CDPs** |    | |
-<<<<<<< HEAD
-| [Abracadabra](https://abracadabra.money/) | 🛠 | 1.1.0 / 0.0.6 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money) |
-| Alchemix |   | | |
-| Inverse Finance |   | | |
-=======
 | [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
 | Alchemix |   | | |
 | Inverse Finance | 🔨 | | |
->>>>>>> masterMessari
-| [Liquity](https://www.liquity.org/) | 🛠 | 1.1.0 / 1.0.0 / 1.0.0 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
-| MakerDAO | 🔨 | | |
+| [Liquity](https://www.liquity.org/) | 🛠 | 1.2.1 / 1.1.1 / 1.0.0 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
+| [MakerDAO](https://makerdao.com/en/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![MakerDAO Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/makerdao-ethereum?selected=playground) |
 | QiDAO |   | | |
 | **Yield Aggregators** |     | |
 | Autofarm |  | | |
 | Badger DAO | 🔨 | | |
-<<<<<<< HEAD
-| Beefy Finance | 🔨 | | |
-=======
 | Beefy Finance | | | |
->>>>>>> masterMessari
 | [Belt Finance](https://belt.fi/landing) | 🛠 | 1.1.0 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
 | Convex Finance | 🔨  | | |
 | Harvest Finance | 🔨  | | |
@@ -127,11 +113,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Rari Aggregator | 🔨 | | |
 | Reaper Farm | 🔨  | | |
 | [Stake DAO](https://stakedao.org/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao)|
-<<<<<<< HEAD
-| [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Tokemac](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak)|
-=======
 | [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak) |
->>>>>>> masterMessari
 | Vesper Finance | 🔨 | | |
 | Yield Yak | 🔨 | | |
 | [Yearn v2](https://yearn.fi/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![Yearn](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) |
