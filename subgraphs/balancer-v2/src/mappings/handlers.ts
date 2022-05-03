@@ -91,11 +91,13 @@ export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
       let tokenAddress = event.params.tokens[i];
       let formattedAmount = scaleDown(tokenFee, tokenAddress);
       let price = fetchPrice(tokenAddress);
-      pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price));
-      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(formattedAmount.times(price));
-      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-        formattedAmount.times(price),
-      );
+      if (price.gt(BIGDECIMAL_ZERO)) {
+        pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price));
+        protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(formattedAmount.times(price));
+        protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+          formattedAmount.times(price),
+        );
+      }
     }
   }
 

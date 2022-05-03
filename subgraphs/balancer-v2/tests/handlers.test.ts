@@ -78,13 +78,15 @@ test("Handle pool balance change because of deposit", () => {
  * Amounts inspired from https://etherscan.io/tx/0x792c49770ded77cb7bd2b1e9b2348431e2ec4b34fd93bbd0a17f854277566bfc
  */
 test("Handle swap and updates base asset usd price value", () => {
+  const protocol = getOrCreateDex();
+  protocol.network = "MAINNET";
+  protocol.save();
   let amountIn = BigInt.fromString("6807327166843002652");
   let amountOut = BigInt.fromString("20490320269");
 
   let pool = LiquidityPool.load(usdcWethPoolId.toHexString());
   if (pool == null) throw new Error("Pool is not defined");
   let newAmounts = [pool.inputTokenBalances[0].minus(amountOut), pool.inputTokenBalances[1].plus(amountIn)];
-
   const swap = createNewSwapEvent(
     usdcWethPoolId,
     Address.fromString(weth.id),
@@ -233,7 +235,9 @@ test("Pool with weth and weight: Weth is the in token", () => {
 
   handlePoolRegister(registerPoolEvent);
   handleTokensRegister(tokensRegisterEvent);
-
+  const protocol = getOrCreateDex();
+  protocol.network = "MAINNET";
+  protocol.save();
   const depositAmounts = [BigInt.fromString("549825169257350888063"), BigInt.fromString("311117203184081567")];
 
   const deposit = createNewPoolBalanceChangeEvent(

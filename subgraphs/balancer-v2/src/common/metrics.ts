@@ -1,13 +1,13 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {Address, BigDecimal, BigInt, dataSource, ethereum} from "@graphprotocol/graph-ts";
 import {
   getOrCreateDex,
   getOrCreateFinancials,
   getOrCreateDailyUsageMetricSnapshot,
   updatePoolDailySnapshot,
   updatePoolHourlySnapshot,
-  getOrCreateHourlyUsageMetricSnapshot,
+  getOrCreateHourlyUsageMetricSnapshot, getOrCreateToken,
 } from "./getters";
-import { BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
+import {BIGDECIMAL_ONE, BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR} from "./constants";
 import {
   Account,
   DailyActiveAccount,
@@ -149,9 +149,10 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(liquidityChange);
   const swap = Swap.load(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString()));
   if (swap) {
-    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(BigDecimal.fromString("2"));
+    let divisor = swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO) ? BigDecimal.fromString("2") : BIGDECIMAL_ONE
+    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(divisor);
     let fee = LiquidityPoolFee.load(pool.fees[0]);
-    if (fee) {
+    if (fee && swap.tokenIn != pool.outputToken && swap.tokenOut != pool.outputToken) {
       let feesCollector = ProtocolFeesCollector.bind(FEE_COLLECTOR_ADDRESS);
       let protocolSwapPercentage = scaleDown(feesCollector.getSwapFeePercentage(), null);
       let supplySidePercentage = BigDecimal.fromString("1").minus(protocolSwapPercentage);
@@ -201,7 +202,7 @@ export function updateTokenPrice(
   tokenBIndex: i32,
   blockNumber: BigInt,
 ): void {
-  let hasWeights = !!pool.inputTokenWeights.length;
+  let hasWeights = pool.inputTokenWeights.length > 0;
 
   let weightTokenB: BigDecimal | null = null;
   let weightTokenA: BigDecimal | null = null;
@@ -218,11 +219,10 @@ export function updateTokenPrice(
   const tokenInfo = calculatePrice(tokenA, tokenAmountIn, weightTokenA, tokenB, tokenAmountOut, weightTokenB);
 
   if (tokenInfo) {
-    let token = Token.load(tokenInfo.address.toHexString());
-    if (!token) token = new Token(tokenInfo.address.toHexString());
+    const token = getOrCreateToken(tokenInfo.address);
     const index = tokenInfo.address == tokenB ? tokenBIndex : tokenAIndex;
     const currentBalance = scaleDown(pool.inputTokenBalances[index], Address.fromString(pool.inputTokens[index]));
-    // We check if current balance multiplied by the price is over 40k USD, if not,
+    // We check if current balance multiplied by the price is over 10k USD, if not,
     // it means that the pool does have too much liquidity, so we fetch the price from
     // external source
     if (currentBalance.times(tokenInfo.price).gt(BigDecimal.fromString("40000"))) {
@@ -267,6 +267,8 @@ export function fetchPrice(tokenAddress: Address): BigDecimal {
   let tokenPrice: BigDecimal | null = null;
   if (token) tokenPrice = token.lastPriceUSD;
   if (tokenPrice) return tokenPrice;
+
+  if (getOrCreateDex().network != "MAINNET") return BIGDECIMAL_ZERO
 
   let price = getUsdPricePerToken(tokenAddress);
   if (!price.reverted) return price.usdPrice.div(price.decimals.toBigDecimal());
