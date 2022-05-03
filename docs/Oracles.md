@@ -1,5 +1,8 @@
 # Price Oracle
 
+We have implemented a drop-in price oracle library to help you resolve USD prices on different chains. You can see it [here](
+../subgraphs/_reference_/src/prices/README.md).
+
 In general, prices (in USD) can be fetched from the following places:
 
 - Chainlink Oracle

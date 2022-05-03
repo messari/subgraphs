@@ -1,0 +1,31 @@
+{
+  "name": "apeswap",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+
+    "prepare:apeswap-bsc": "mustache config/apeswap/bsc.json templates/apeswap.template.yaml > subgraph.yaml",
+    "prepare:apeswap-matic": "mustache config/apeswap/polygon.json templates/apeswap.template.yaml > subgraph.yaml",
+    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json templates/uniswap.v2.template.yaml > subgraph.yaml",
+
+    "deploy-uniswap-v2-mainnet": "yarn prepare:uniswap-v2-mainnet && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/uniswap-v2",
+    "deploy-apeswap-bsc": "yarn prepare:apeswap-bsc && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/apeswap-bsc",
+    "deploy-apeswap-matic": "yarn prepare:apeswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/apeswap-matic",
+
+    "deploy-uniswap-v2-mainnet-messari": "yarn prepare:uniswap-v2-mainnet && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/uniswap-v2",
+    "deploy-apeswap-bsc-messari": "yarn prepare:apeswap-bsc && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/apeswap-bsc",
+    "deploy-apeswap-matic-messari": "yarn prepare:apeswap-matic && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/apeswap-matic",
+
+    "deploy-ALL-steegecs": "yarn deploy-uniswap-v2-mainnet && yarn deploy-apeswap-bsc && yarn deploy-apeswap-matic",
+    "deploy-ALL-messari": "yarn deploy-uniswap-v2-mainnet-messari && yarn deploy-apeswap-bsc-messari && yarn deploy-apeswap-matic-messari"
+     
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.28.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "mustache": "^3.1.0"
+  }
+}
