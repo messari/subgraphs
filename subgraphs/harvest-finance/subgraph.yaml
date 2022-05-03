@@ -3,12 +3,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: fWETHContract
+    name: ControllerListener
     network: mainnet
     source:
-      address: "0xFE09e53A81Fe2808bc493ea64319109B5bAa573e"
-      abi: Vault
-      startBlock: 11086824
+      address: "0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C"
+      startBlock: 10770087
+      abi: ControllerContract
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -27,23 +27,16 @@ dataSources:
         - _Strategy
         - _User
       abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: Strategy
-          file: ./abis/Vault.json
-      eventHandlers:
-        - event: Deposit(indexed address,uint256)
-          handler: handleDeposit
-        - event: Invest(uint256)
-          handler: handleInvest
-        - event: StrategyAnnounced(address,uint256)
-          handler: handleStrategyAnnounced
-        - event: StrategyChanged(address,address)
-          handler: handleStrategyChanged
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: Withdraw(indexed address,uint256)
-          handler: handleWithdraw
-      file: ./src/mapping.ts
+        - name: ControllerContract
+          file: ./abis/contracts_manual/Controller.json
+        - name: ERC20DetailedContract
+          file: ./abis/@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol/ERC20Detailed.json
+        - name: VaultContract
+          file: ./abis/contracts/base/Vault.sol/Vault.json
+      #eventHandlers:
+        #- event: SharePriceChangeLog(indexed address,indexed address,uint256,uint256,uint256)
+        #  handler: handleSharePriceChangeLog
+      callHandlers:
+        - function: addVaultAndStrategy(address,address)
+          handler: handleAddVaultAndStrategy
+      file: ./src/ControllerListener.ts

@@ -1,0 +1,184 @@
+[
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint256[2]",
+        "name": "amounts",
+        "type": "uint256[2]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "min_mint_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "add_liquidity",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "uint256[2]",
+        "name": "amounts",
+        "type": "uint256[2]"
+      },
+      {
+        "internalType": "bool",
+        "name": "deposit",
+        "type": "bool"
+      }
+    ],
+    "name": "calc_token_amount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_token_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int128",
+        "name": "i",
+        "type": "int128"
+      }
+    ],
+    "name": "calc_withdraw_one_coin",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "int128",
+        "name": "from",
+        "type": "int128"
+      },
+      {
+        "internalType": "int128",
+        "name": "to",
+        "type": "int128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_from_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_min_to_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "exchange",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "get_virtual_price",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256[2]",
+        "name": "amounts",
+        "type": "uint256[2]"
+      }
+    ],
+    "name": "remove_liquidity",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint256[2]",
+        "name": "amounts",
+        "type": "uint256[2]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "max_burn_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "remove_liquidity_imbalance",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_token_amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "int128",
+        "name": "i",
+        "type": "int128"
+      },
+      {
+        "internalType": "uint256",
+        "name": "min_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "remove_liquidity_one_coin",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

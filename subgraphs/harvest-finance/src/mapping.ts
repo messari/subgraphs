@@ -16,7 +16,7 @@ import { getOrCreateDeposit } from './entities/Transaction'
 export function handleDeposit(event: DepositEvent): void {
 
   const vaultAddress = Address.fromString('0xFE09e53A81Fe2808bc493ea64319109B5bAa573e');
-  const tokenAddress = WETH_ADDRESS;
+  //const tokenAddress = WETH_ADDRESS;
 
   let vault = getOrCreateVault(vaultAddress, event.block);
 
@@ -29,6 +29,7 @@ export function handleDeposit(event: DepositEvent): void {
 
 
   deposit.amount = amount;
+  deposit.vault = vault;
   deposit.save();
   
 }

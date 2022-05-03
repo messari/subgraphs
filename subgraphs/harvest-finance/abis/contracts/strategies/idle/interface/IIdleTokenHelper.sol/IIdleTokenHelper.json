@@ -1,0 +1,70 @@
+[
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "idleYieldToken",
+        "type": "address"
+      }
+    ],
+    "name": "getMintingPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "mintingPrice",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "idleYieldToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      }
+    ],
+    "name": "getRedeemPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "redeemPrice",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "idleYieldToken",
+        "type": "address"
+      }
+    ],
+    "name": "getRedeemPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "redeemPrice",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
