@@ -8,16 +8,6 @@ import { ERC20 } from "../../generated/CP/ERC20";
 import { DSP } from "../../generated/DSP/DSP";
 import { createERC20Instance, createNewDSPEvent } from "./factory_helpers.test";
 
-export function createDSP(addressDSP: string): DSP {
-  let dVm = Address.fromString(addressDSP);
-  let version = ethereum.Value.fromString("DSP 1.0.2");
-
-  createMockedFunction(dVm, "version", "version():(string)").returns([version]);
-
-  let dvm = DSP.bind(dVm);
-  return dvm;
-}
-
 export function createBuySharesEvent(
   to: string,
   increaseShares: string,
