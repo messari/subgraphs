@@ -14,8 +14,14 @@ import {
 } from "../../generated/Pool/Pool";
 import { TransactionType } from "../common/constants";
 import { getOrCreateLiquidityPoolParamsHelper } from "../common/getters";
-import { updateFinancials, updatePoolMetrics, updateSwapMetrics, updateUsageMetrics } from "../common/metrics";
-import { createDeposit, createAsset, createWithdraw, createSwap } from "./helpers";
+import {
+  updateFeeMetrics,
+  updateFinancials,
+  updatePoolMetrics,
+  updateSwapMetrics,
+  updateUsageMetrics,
+} from "../common/metrics";
+import { createDeposit, createAsset, createWithdraw, createSwap, updatePoolSnapshotsTokensSize } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
   // Steps to implement
@@ -72,13 +78,12 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleSwap(event: Swap): void {
   // Steps to implement
-  // 1.Create Swap - Done
+  // 1. Create Swap - Done
   // 2. Update Fee Metrics
-  // 3. Update Swap Metrics
+  // 3. Update Swap Volume Metrics - Done
   // 4. Update Usage Metrics - Done
-  // 5. Update Pool Metrics
 
-  // Create Swap, Update Swap Volumes
+  // Create Swap
   log.debug("handling swap", []);
   let swap = createSwap(
     event,
@@ -89,8 +94,10 @@ export function handleSwap(event: Swap): void {
     event.params.toAmount,
     event.params.to,
   );
-  log.debug("swap created {}", [swap.hash])
-  // Update Swap Metrics
+  log.debug("swap created {}", [swap.hash]);
+  // Update Fee Metrics
+  updateFeeMetrics(event, event.address, swap);
+  // Update Swap Volume Metrics
   updateSwapMetrics(event, swap);
   // Update Usage Metrics
   updateUsageMetrics(event, event.params.sender, TransactionType.SWAP);
@@ -98,7 +105,8 @@ export function handleSwap(event: Swap): void {
 
 export function handleAssetAdded(event: AssetAdded): void {
   createAsset(event, event.address, event.params.token, event.params.asset);
-
+  updatePoolMetrics(event);
+  updatePoolSnapshotsTokensSize(event);
   // A new LP token is added to this pool
   // Initialize Asset Contract with Address
   // Initialize Asset Address to Oracle
@@ -123,6 +131,10 @@ export function handleSlippageParamsUpdated(event: SlippageParamsUpdated): void 
 }
 export function handleOracleUpdated(event: OracleUpdated): void {
   // Get LiquidtiyPoolParamsHelper
+  log.debug("event to update oracle from {} to {}", [
+    event.params.previousOracle.toHexString(),
+    event.params.newOracle.toHexString(),
+  ]);
   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
   // Update LiquidityPoolParamsHelper
   liquidityPoolParams.Oracle = event.params.newOracle.toHexString();

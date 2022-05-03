@@ -231,6 +231,8 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("2");
   } else if (network == Network.XDAI.toLowerCase()) {
     return BigDecimal.fromString("5");
+  } else if (network == Network.AVALANCHE.toLowerCase()) {
+    return BigDecimal.fromString("1");
   }
   // Blocks are mined as needed
   // else if (network == Network.AVALANCHE.toLowerCase()) return BigDecimal.fromString("2.5")

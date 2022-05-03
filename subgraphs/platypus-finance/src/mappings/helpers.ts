@@ -2,7 +2,14 @@ import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
-import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, updatePricesForToken } from "../common/getters";
+import {
+  getOrCreateDexAmm,
+  getOrCreateLiquidityPool,
+  getOrCreateLiquidityPoolDailySnapshot,
+  getOrCreateLiquidityPoolHourlySnapshot,
+  getOrCreateToken,
+  updatePricesForToken,
+} from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 
@@ -176,4 +183,21 @@ export function updateBalancesInPool<T extends Deposit>(
 
   pool.inputTokenBalances = balances;
   pool.save();
+}
+
+export function updatePoolSnapshotsTokensSize(event: ethereum.Event): void {
+  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event);
+  let hourlyVolumeByTokenAmount = hourlySnapshot.hourlyVolumeByTokenAmount;
+  let hourlyVolumeByTokenUSD = hourlySnapshot.hourlyVolumeByTokenUSD;
+  hourlyVolumeByTokenAmount.push(BigInt.fromString("0"));
+  hourlyVolumeByTokenUSD.push(BigDecimal.fromString("0"));
+
+  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event);
+  let dailyVolumeByTokenAmount = dailySnapshot.dailyVolumeByTokenAmount;
+  let dailyVolumeByTokenUSD = dailySnapshot.dailyVolumeByTokenUSD;
+  dailyVolumeByTokenAmount.push(BigInt.fromString("0"));
+  dailyVolumeByTokenUSD.push(BigDecimal.fromString("0"));
+
+  hourlySnapshot.save();
+  dailySnapshot.save();
 }
