@@ -76,8 +76,6 @@ test("Can handle a DODOSwap Event", () => {
     "-" +
     "1";
 
-  log.info("Swap ID is:", [swapID]);
-
   assert.fieldEquals(
     "Swap",
     swapID,

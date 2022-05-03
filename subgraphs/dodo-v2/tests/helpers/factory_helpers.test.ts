@@ -93,6 +93,22 @@ export function createNewDSPEvent(
   creator: string,
   dsp: string
 ): NewDSP {
+  let tokenb = createERC20Instance(
+    baseToken,
+    "Input Base Token Name",
+    "IBTN",
+    18
+  );
+
+  let tokenq = createERC20Instance(
+    quoteToken,
+    "Input Quote Token Name",
+    "IQTN",
+    18
+  );
+
+  let lpToken = createERC20Instance(dsp, "LP Token", "LPT", 18);
+
   let dVm = Address.fromString(dsp);
   let version = ethereum.Value.fromString("DSP 1.0.1");
 
@@ -135,6 +151,22 @@ export function createNewDPPEvent(
   creator: string,
   dpp: string
 ): NewDPP {
+  let tokenb = createERC20Instance(
+    baseToken,
+    "Input Base Token Name",
+    "IBTN",
+    18
+  );
+
+  let tokenq = createERC20Instance(
+    quoteToken,
+    "Input Quote Token Name",
+    "IQTN",
+    18
+  );
+
+  let lpToken = createERC20Instance(dpp, "LP Token", "LPT", 18);
+
   let dVm = Address.fromString(dpp);
   let version = ethereum.Value.fromString("DPP 1.0.0");
 
@@ -177,6 +209,22 @@ export function createNewCPEvent(
   creator: string,
   cp: string
 ): NewCP {
+  let tokenb = createERC20Instance(
+    baseToken,
+    "Input Base Token Name",
+    "IBTN",
+    18
+  );
+
+  let tokenq = createERC20Instance(
+    quoteToken,
+    "Input Quote Token Name",
+    "IQTN",
+    18
+  );
+
+  let lpToken = createERC20Instance(cp, "LP Token", "LPT", 18);
+
   let dVm = Address.fromString(cp);
   let version = ethereum.Value.fromString("CP 1.0.0");
 
