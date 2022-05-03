@@ -31,6 +31,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
+  YIELD_TOKEN_MAPPING,
   YIELD_VAULT_NAME,
   YIELD_VAULT_SYMBOL,
   ZERO_ADDRESS,
@@ -229,10 +230,22 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
     vault.protocol = RARI_DEPLOYER;
     vault.name = YIELD_VAULT_NAME;
     vault.symbol = YIELD_VAULT_SYMBOL;
-    //   vault.inputToken = TODO
+
+    // populate input tokens
+    let inputTokens: Array<string> = [];
+    let tokens = YIELD_TOKEN_MAPPING.values();
+    for (let i = 0; i < tokens.length; i++) {
+      let token = getOrCreateToken(tokens[i]);
+      inputTokens.push(token.id);
+    }
+    vault.inputToken = inputTokens;
+
     let poolToken = getOrCreateToken(RARI_YIELD_POOL_TOKEN);
     vault.outputToken = poolToken.id;
     vault.depositLimit = BIGINT_ZERO;
+
+    // create fees for pool
+    
     //   vault.fees = TODO
     vault.createdTimestamp = event.block.timestamp;
     vault.createdBlockNumber = event.block.number;

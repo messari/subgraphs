@@ -333,7 +333,7 @@ type Vault @entity {
   symbol: String
 
   " Token that need to be deposited to take a position in protocol "
-  inputToken: Token!
+  inputToken: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
