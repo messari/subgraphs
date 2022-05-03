@@ -1,7 +1,7 @@
 import * as constants from "../common/constants";
 import { VaultFee } from "../../generated/schema";
 import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
-import { _ERC20 as ERC20Contract } from "../../generated/Registry_v1/_ERC20";
+import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
 
 export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
