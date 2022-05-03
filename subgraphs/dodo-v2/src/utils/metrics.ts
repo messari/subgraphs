@@ -88,7 +88,7 @@ export function updateUsageMetrics(
   isD: bool,
   isW: bool
 ): void {
-  // // Number of days since Unix epoch
+  // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let usageMetricsDaily = getOrCreateDailyUsageSnapshot(event);
   let usageMetricsHourly = getOrCreateHourlyUsageSnapshot(event);
@@ -201,9 +201,6 @@ export function updatePoolMetrics(
   let usdValueOfTransaction: BigDecimal = BigDecimal.fromString("0");
 
   usdValueOfTransaction = getUSDprice(tokenAdds[0], amount[0]);
-  log.info("this is the USD value returned: {} ", [
-    usdValueOfTransaction.toString()
-  ]);
 
   let usdValueOfToken1 = getUSDprice(tokenAdds[0], tokenBal1.value);
   let usdValueOfToken2 = getUSDprice(tokenAdds[1], tokenBal2.value);
@@ -256,7 +253,7 @@ export function updateFees(
   }
 
   let fr = feeRate.value;
-  let usdValOfFees = usdValOfTrade * BigDecimal.fromString("fr");
+  let usdValOfFees = usdValOfTrade * bigIntToBigDecimal(fr);
 
   poolFee.pool = pool.id;
   poolFee.feePercentage = BigDecimal.fromString("0");

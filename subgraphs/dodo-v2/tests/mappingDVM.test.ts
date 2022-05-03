@@ -6,6 +6,7 @@ import {
   log,
   createMockedFunction
 } from "matchstick-as/assembly/index";
+
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { BuyShares, SellShares, DODOSwap } from "../generated/DVM/DVM";
 import {
@@ -33,6 +34,12 @@ test("Can handle a BuyShares Event", () => {
   );
 
   handleBuyShares(bsEvent);
+  assert.fieldEquals(
+    "LiquidityPool",
+    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+    "outputTokenSupply",
+    "1000000000000000000"
+  );
 });
 
 test("Can handle a SellShares Event", () => {
@@ -44,6 +51,13 @@ test("Can handle a SellShares Event", () => {
   );
 
   handleSellShares(ssEvent);
+
+  assert.fieldEquals(
+    "LiquidityPool",
+    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+    "outputTokenSupply",
+    "0"
+  );
 });
 
 test("Can handle a DODOSwap Event", () => {
@@ -56,5 +70,18 @@ test("Can handle a DODOSwap Event", () => {
     "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
   );
 
-  // handleDODOSwap(swapEvent);
+  handleDODOSwap(swapEvent);
+  let swapID =
+    "0xed3706c06c19a02844ba17d6d0e141063b9d33c54bdce5843b972cedd1ec4d90" +
+    "-" +
+    "1";
+
+  log.info("Swap ID is:", [swapID]);
+
+  assert.fieldEquals(
+    "Swap",
+    swapID,
+    "from",
+    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4"
+  );
 });
