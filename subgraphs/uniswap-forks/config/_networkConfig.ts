@@ -38,12 +38,9 @@ let STABLE_COINS_TEMP: string[]; // A list of stable coins
 let STABLE_ORACLE_POOLS_TEMP: string[]; // A list of [stable coin / native token] oracle pools
 let UNTRACKED_PAIRS_TEMP: string[]; // rebass tokens, dont count in tracked volume
 
-log.warning("HELLO", []);
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.MAINNET.toLowerCase()) {
-  log.warning("HELLO1", []);
   PROTOCOL_SLUG_TEMP = "uniswap-v2";
   NETWORK_TEMP = Network.MAINNET;
 
@@ -97,7 +94,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
   ];
   UNTRACKED_PAIRS_TEMP = ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.MATIC.toLowerCase()) {
-  log.warning("HELLO2", []);
 
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.MATIC;
@@ -137,7 +133,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0x019011032a7ac3a87ee885b6c08467ac46ad11cd", // WMATIC/USDC
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.BSC.toLowerCase()) {
-  log.warning("HELLO3", []);
 
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.BSC;
@@ -183,7 +178,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.APESWAP && dataSource.network() == Network.BSC.toLowerCase()) {
-  log.warning("HELLO4", []);
 
   PROTOCOL_SLUG_TEMP = "apeswap";
   NETWORK_TEMP = Network.BSC;
@@ -229,7 +223,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.SUSHISWAP && dataSource.network() == Network.BSC.toLowerCase()) {
-  log.warning("HELLO5", []);
 
   PROTOCOL_SLUG_TEMP = "Sushiswap";
   NETWORK_TEMP = Network.BSC;
@@ -269,7 +262,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xe6cf29055e747e95c058f64423d984546540ede5", // DAI/wETH
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.SUSHISWAP && dataSource.network() == Network.FANTOM.toLowerCase()) {
-  log.warning("HELLO6", []);
 
   PROTOCOL_SLUG_TEMP = "Sushiswap";
   NETWORK_TEMP = Network.FANTOM;
@@ -322,7 +314,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xC3D03e4F041Fd4cD388c549Ee2A29a9E5075882f", // DAI/wETH
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.SUSHISWAP && dataSource.network() == Network.MAINNET.toLowerCase()) {
-  log.warning("HELLO7", []);
 
   PROTOCOL_SLUG_TEMP = "Sushiswap";
   NETWORK_TEMP = Network.MAINNET;
@@ -375,7 +366,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xC3D03e4F041Fd4cD388c549Ee2A29a9E5075882f", // DAI/wETH
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.SUSHISWAP && dataSource.network() == Network.MATIC.toLowerCase()) {
-  log.warning("HELLO8", []);
 
   PROTOCOL_SLUG_TEMP = "Sushiswap";
   NETWORK_TEMP = Network.MATIC;
@@ -428,7 +418,6 @@ if (PROTOCOL_NAME_TEMP == Protocol.UNISWAPV2 && dataSource.network() == Network.
     "0xC3D03e4F041Fd4cD388c549Ee2A29a9E5075882f", // DAI/wETH
   ];
 } else if (PROTOCOL_NAME_TEMP == Protocol.SUSHISWAP && dataSource.network() == Network.XDAI.toLowerCase()) {
-  log.warning("HELLO9", []);
 
   PROTOCOL_SLUG_TEMP = "Sushiswap";
   NETWORK_TEMP = Network.XDAI;
