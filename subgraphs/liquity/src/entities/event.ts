@@ -19,11 +19,17 @@ import {
   ZERO_ADDRESS,
 } from "../utils/constants";
 import {
-  addUSDVolume,
   getOrCreateLiquityProtocol,
+  incrementProtocolRepayCount,
+  incrementProtocolWithdrawCount,
   updateUsageMetrics,
 } from "./protocol";
-import { getOrCreateMarket } from "./market";
+import {
+  addMarketBorrowVolume,
+  addMarketDepositVolume,
+  addMarketLiquidateVolume,
+  getOrCreateMarket,
+} from "./market";
 import { getETHToken, getLUSDToken } from "./token";
 import { prefixID } from "../utils/strings";
 
@@ -55,6 +61,7 @@ export function createDeposit(
   deposit.amountUSD = amountUSD;
   deposit.save();
   updateUsageMetrics(event, sender);
+  addMarketDepositVolume(event, amountUSD);
 }
 
 export function createWithdraw(
@@ -85,6 +92,7 @@ export function createWithdraw(
   withdraw.amountUSD = amountUSD;
   withdraw.save();
   updateUsageMetrics(event, recipient);
+  incrementProtocolWithdrawCount(event);
 }
 
 export function createBorrow(
@@ -115,7 +123,7 @@ export function createBorrow(
   borrow.amountUSD = amountUSD;
   borrow.save();
   updateUsageMetrics(event, recipient);
-  addUSDVolume(event, amountUSD);
+  addMarketBorrowVolume(event, amountUSD);
 }
 
 export function createRepay(
@@ -146,6 +154,7 @@ export function createRepay(
   repay.amountUSD = amountUSD;
   repay.save();
   updateUsageMetrics(event, sender);
+  incrementProtocolRepayCount(event);
 }
 
 export function createLiquidate(
@@ -178,4 +187,5 @@ export function createLiquidate(
   liquidate.profitUSD = profitUSD;
   liquidate.save();
   updateUsageMetrics(event, liquidator);
+  addMarketLiquidateVolume(event, amountLiquidatedUSD);
 }
