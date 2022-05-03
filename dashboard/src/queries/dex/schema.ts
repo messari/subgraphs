@@ -17,26 +17,6 @@ export const schema = (version: string): Schema => {
   }
 };
 
-export const dexPoolFields = {
-  id: "ID!",
-  name: "String!",
-  slug: "String!",
-  schemaVersion: "String!",
-  subgraphVersion: "String!",
-  methodologyVersion: "String!",
-  network: "Network!",
-  type: "ProtocolType!",
-  totalValueLockedUSD: "BigDecimal!",
-  protocolControlledValueUSD: "BigDecimal",
-  cumulativeVolumeUSD: "BigDecimal!",
-  cumulativeSupplySideRevenueUSD: "BigDecimal!",
-  cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-  cumulativeTotalRevenueUSD: "BigDecimal!",
-  cumulativeUniqueUsers: "Int!"
-};
-
-
-
 export const schema100 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "poolDailySnapshots"];
 
@@ -117,19 +97,19 @@ export const schema100 = (): Schema => {
           name
           symbol
         }
-        withdraws(first: 500, id: $poolId) {
+        withdraws(first: 500, where: {pool: $poolId}) {
           amountUSD
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, id: $poolId) {
+        deposits(first: 500, where: {pool: $poolId}) {
           timestamp
           blockNumber
           from
           amountUSD
         }
-        swaps(first: 500, id: $poolId) {
+        swaps(first: 500, where: {pool: $poolId}) {
           timestamp
           from
           amountIn
@@ -149,8 +129,20 @@ export const schema100 = (): Schema => {
     rewardTokens: "[RewardToken!]"
   };
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+  };
+
   const events = ["withdraws","deposits","swaps"];
-  return { entities, entitiesData, query, poolData ,events};
+  return { entities, entitiesData, query, poolData ,events, protocolFields};
 };
 
 export const schema110 = (): Schema => {
@@ -233,19 +225,19 @@ export const schema110 = (): Schema => {
           name
           symbol
         }
-        withdraws(first: 500, id: $poolId) {
+        withdraws(first: 500, where: {pool: $poolId}) {
           amountUSD
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, id: $poolId) {
+        deposits(first: 500, where: {pool: $poolId}) {
           timestamp
           blockNumber
           from
           amountUSD
         }
-        swaps(first: 500, id: $poolId) {
+        swaps(first: 500, where: {pool: $poolId}) {
           timestamp
           from
           amountIn
@@ -267,7 +259,21 @@ export const schema110 = (): Schema => {
 
   const events = ["withdraws","deposits","swaps"];
 
-  return { entities, entitiesData, query, poolData ,events};
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalVolumeUSD: "BigDecimal!"
+  };
+
+  return { entities, entitiesData, query, poolData ,events, protocolFields};
 };
 
 export const schema120 = (): Schema => {
@@ -433,6 +439,24 @@ export const schema120 = (): Schema => {
     }
   }`;
 
-  return { entities, entitiesData, query, poolData ,events};
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    protocolControlledValueUSD: "BigDecimal",
+    cumulativeVolumeUSD: "BigDecimal!",
+    cumulativeSupplySideRevenueUSD: "BigDecimal!",
+    cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+    cumulativeTotalRevenueUSD: "BigDecimal!",
+    cumulativeUniqueUsers: "Int!"
+  };
+
+  return { entities, entitiesData, query, poolData, events, protocolFields};
 };
  

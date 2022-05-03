@@ -68,6 +68,7 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
     poolData,
     query: graphQuery,
     events,
+    protocolFields
   } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
   const queryMain = gql`
     ${graphQuery}
@@ -155,7 +156,7 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
 
                   {/* PROTOCOL TAB */}
                   
-                  {ProtocolTab(data, entities, entitiesData, setWarning)}
+                  {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning)}
 
                 </TabPanel>
                 <TabPanel value="2">
@@ -172,14 +173,14 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
                   {poolDropDown(poolId, setPoolId, data.markets, PoolNames)}
                   {
                     events.map((eventName)=>{
-                      let eventError = null;
-                      if (!poolId && data[eventName].length > 0) {
-                        eventError = <h3 style={{color: "red"}}>A pool has not been selected, there should not be events</h3>
-                      }
-                      if (poolId && data[eventName].length === 0) {
-                        eventError = <h3 style={{color: "red"}}>No {eventName} on pool {poolId}</h3>
-                      }
-                      return <React.Fragment>{eventError}{TableEvents(eventName, data[eventName])}</React.Fragment>;
+                      // let eventError = null;
+                      // if (!poolId && data[eventName].length > 0) {
+                      //   eventError = <h3 style={{color: "red"}}>A pool has not been selected, there should not be events</h3>
+                      // }
+                      // if (poolId && data[eventName].length === 0) {
+                      //   eventError = <h3 style={{color: "red"}}>No {eventName} on pool {poolId}</h3>
+                      // }
+                      return <React.Fragment>{TableEvents(eventName, data[eventName])}</React.Fragment>;
                     })
                   }
                 </TabPanel>

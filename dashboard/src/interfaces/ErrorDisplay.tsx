@@ -17,7 +17,7 @@ import { Versions } from "../constants";
       // Default error message
       errorTotalCount += 1;
       errorDisplayCount += 1;
-      errorMsgs.push(<li>NetworkError - Queried URL {subgraphToQuery.url} - Reload this app</li>);
+      errorMsgs.push(<li>NetworkError - Queried URL {subgraphToQuery.url} - Try reloading</li>);
     }
     if (errorObject.graphQLErrors.length > 0) {
       errorTotalCount += errorObject.graphQLErrors.length;

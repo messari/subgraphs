@@ -17,7 +17,7 @@ export const schema = (version: string): Schema => {
   }
 };
 
-export const YieldVaultPoolFields = {
+export const poolFields = {
   id: "ID!",
   name: "String!",
   slug: "String!",
@@ -114,14 +114,14 @@ export const schema100 = (): Schema => {
           symbol
           depositLimit
         }
-        withdraws(first: 500, id: $poolId) {
+        withdraws(first: 500, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, id: $poolId) {
+        deposits(first: 500, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -141,9 +141,21 @@ export const schema100 = (): Schema => {
     rewardTokens: "[RewardToken!]"
   };
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalUniqueUsers: "Int!"
+  };
+
   const events = ["withdraws","deposits"]
   
-  return { entities, entitiesData, query, poolData,events };
+  return { entities, entitiesData, query, poolData, events, protocolFields};
 };
 
 export const schema110 = (): Schema => {
@@ -230,14 +242,14 @@ export const schema110 = (): Schema => {
           symbol
           depositLimit
         }
-        withdraws(first: 500, id: $poolId) {
+        withdraws(first: 500, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, id: $poolId) {
+        deposits(first: 500, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -258,8 +270,22 @@ export const schema110 = (): Schema => {
     rewardTokens: "[RewardToken!]"
   };
 
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalVolumeUSD: "BigDecimal!",
+  };
 
-  return { entities, entitiesData, query, poolData ,events};
+
+  return { entities, entitiesData, query, poolData ,events, protocolFields};
 };
 
 export const schema120 = (): Schema => {
@@ -416,5 +442,23 @@ export const schema120 = (): Schema => {
         rewardTokenEmissionsUSD
       }
     }`
-  return { entities, entitiesData, query, poolData ,events};
+
+    const protocolFields = {
+      id: "ID!",
+      name: "String!",
+      slug: "String!",
+      schemaVersion: "String!",
+      subgraphVersion: "String!",
+      methodologyVersion: "String!",
+      network: "Network!",
+      type: "ProtocolType!",
+      totalValueLockedUSD: "BigDecimal!",
+      protocolControlledValueUSD: "BigDecimal",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      cumulativeUniqueUsers: "Int!"
+    };
+
+  return { entities, entitiesData, query, poolData , events, protocolFields};
 };

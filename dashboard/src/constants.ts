@@ -29,6 +29,7 @@ export interface Schema {
   query: string;
   poolData: {[x: string]: string};
   events: string[];
+  protocolFields: {[x: string]: string};
 }
 export const ProtocolsToQuery: {[name: string]: {URL: string, deploymentId: string}} = {
   "Aave-v2": {

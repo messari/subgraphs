@@ -1,17 +1,13 @@
-import { ApolloError } from "@apollo/client";
 import { Grid } from "@mui/material";
-import { GraphQLError } from "graphql";
 import { Chart } from "../../chartComponents/Chart";
 import { TableChart } from "../../chartComponents/TableChart";
-import { dexPoolFields } from "../../queries/dex/schema";
-import { lendingProtocolPoolFields } from "../../queries/lending/schema";
-import { YieldVaultPoolFields } from "../../queries/yield/schema";
 import SchemaTable from "../SchemaTable";
 
 function ProtocolTab(
   data: any,
   entities: string[],
   entitiesData: {[x: string]: {[x: string]: string}},
+  protocolFields: {[x: string]: string},
   setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>
 ) {
 
@@ -105,18 +101,9 @@ function ProtocolTab(
         </>)
       })
     }</Grid></>)
-  })
+  });
 
-  const schemaDisplayObj: {[x: string]: any} = {};
-  if (data.protocols[0].type === "LENDING") {
-    schemaDisplayObj.LendingProtocol = lendingProtocolPoolFields;
-  } else if (data.protocols[0].type === "EXCHANGE") {
-    schemaDisplayObj.DexAmmProtocol = dexPoolFields;
-  } else if (data.protocols[0].type === "YIELD") {
-    schemaDisplayObj.YieldAggregator = YieldVaultPoolFields;
-  }
-
-  const protocolSchema = SchemaTable(schemaDisplayObj, []);
+  const protocolSchema = SchemaTable({[data.protocols[0].type]: protocolFields}, []);
 
   if (issues.length > 0) {
     setWarning(issues);

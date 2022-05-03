@@ -14,7 +14,7 @@ function SchemaTable(entitiesData: {[x: string]: {[x: string]: string}}, exclude
     });
     return (
         <div style={{flexDirection: "row"}}>
-            <h3>{entityName}</h3>
+            <h3>{entityName} PROTOCOL:</h3>
             <ul style={{padding: "0"}}>
                 {entityFields}
             </ul>

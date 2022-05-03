@@ -139,6 +139,7 @@ async function FetchProtocolMetadata(setMetadata: React.Dispatch<React.SetStateA
             selectSubgraph(urlTextField);
           }}>Show Graphs</Button>
       </Box>
+      <h2 style={{textAlign: "center"}}>Deployed Subgraphs</h2>
       {RenderAll}
     </div>
   );
