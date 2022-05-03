@@ -49,7 +49,7 @@ The following tests are done to compare performance difference with the addition
   - Block Difference - 16,361
   - Seconds between start and end - 5,149
   - Blocks per second - 3.17751
-  
+
 * Checkpoint 2 - 9:57:08 AM April 22 2022
   - End block - 10,355,912
   - Block Difference - 148,045
@@ -175,44 +175,44 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 - Start time - 2:11:00 PM May 3 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - May 3 2022
-  - End block - 
-  - Block Difference - 
-  - Seconds between start and end - 
-  - Blocks per second - 
+* Checkpoint 1  -4:20:07 PM May 3 2022
+  - End block - 10,880,063
+  - Block Difference - 879,229
+  - Seconds between start and end - 7747
+  - Blocks per second - 113.493
 
 #### Immutables - Added Immutables
 
 - Start time - 2:10:00 PM May 3 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - May 3 2022
-  - End block - 
-  - Block Difference - 
-  - Seconds between start and end - 
-  - Blocks per second - 
+* Checkpoint 1 - 4:21:15 PM May 3 2022
+  - End block - 10,868,153
+  - Block Difference - 867,319
+  - Seconds between start and end - 7875
+  - Blocks per second - 110.136
 
 #### Bytes - Added Byte IDs
 
 - Start time - 2:13:31 PM May 3 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - May 3 2022
-  - End block - 
-  - Block Difference - 
-  - Seconds between start and end - 
-  - Blocks per second - 
+* Checkpoint 1 - 4:21:04 May 3 2022
+  - End block - 10,223,544
+  - Block Difference - 222,710
+  - Seconds between start and end - 7653
+  - Blocks per second - 29.101
 
 #### Both - Added Immutables and Byte IDs
 
 - Start time - 2:12:33 PM May 3 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - May 3 2022
-  - End block - 
-  - Block Difference - 
-  - Seconds between start and end - 
-  - Blocks per second - 
+* Checkpoint 1 - 4:23:12 PM May 3 2022
+  - End block - 10,193,832
+  - Block Difference - 192,998
+  - Seconds between start and end - 7839
+  - Blocks per second - 24.62
 
 ### Results
 
