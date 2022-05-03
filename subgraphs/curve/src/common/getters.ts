@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -8,6 +8,7 @@ import {
   FinancialsDailySnapshot,
   LiquidityPoolHourlySnapshot,
   LiquidityPoolDailySnapshot,
+  LiquidityPool,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -15,10 +16,13 @@ import {
   Network,
   ProtocolType,
   SECONDS_PER_DAY,
-  REGISTRY_ADDRESS,
+  CURVE_REGISTRY_V2_MAINNET,
   BIGINT_ZERO,
   ETH_ADDRESS,
 } from "../common/constants";
+import { StableSwap } from "../../generated/templates/Pool/StableSwap";
+import { CurvePoolCoin256 } from "../../generated/templates/Pool/CurvePoolCoin256";
+import { CurvePoolCoin128 } from "../../generated/templates/Pool/CurvePoolCoin128";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -50,7 +54,7 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(id.toString());
-    usageMetrics.protocol = REGISTRY_ADDRESS;
+    usageMetrics.protocol = CURVE_REGISTRY_V2_MAINNET;
 
     usageMetrics.hourlyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -73,7 +77,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-    usageMetrics.protocol = REGISTRY_ADDRESS;
+    usageMetrics.protocol = CURVE_REGISTRY_V2_MAINNET;
 
     usageMetrics.dailyActiveUsers = 0;
     usageMetrics.cumulativeUniqueUsers = 0;
@@ -94,7 +98,7 @@ export function getOrCreatePoolHourlySnapshot(event: ethereum.Event): LiquidityP
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolHourlySnapshot(poolAddress.concat("-").concat(id.toString()));
-    poolMetrics.protocol = REGISTRY_ADDRESS;
+    poolMetrics.protocol = CURVE_REGISTRY_V2_MAINNET;
     poolMetrics.pool = poolAddress;
     poolMetrics.rewardTokenEmissionsAmount = [];
     poolMetrics.rewardTokenEmissionsUSD = [];
@@ -112,7 +116,7 @@ export function getOrCreatePoolDailySnapshot(event: ethereum.Event): LiquidityPo
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
-    poolMetrics.protocol = REGISTRY_ADDRESS;
+    poolMetrics.protocol = CURVE_REGISTRY_V2_MAINNET;
     poolMetrics.pool = poolAddress;
     poolMetrics.rewardTokenEmissionsAmount = [];
     poolMetrics.rewardTokenEmissionsUSD = [];
@@ -131,7 +135,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
-    financialMetrics.protocol = REGISTRY_ADDRESS;
+    financialMetrics.protocol = CURVE_REGISTRY_V2_MAINNET;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.protocolControlledValueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
@@ -154,10 +158,10 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 ///////////////////////////
 
 export function getOrCreateDexAmm(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(REGISTRY_ADDRESS);
+  let protocol = DexAmmProtocol.load(CURVE_REGISTRY_V2_MAINNET);
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(REGISTRY_ADDRESS);
+    protocol = new DexAmmProtocol(CURVE_REGISTRY_V2_MAINNET);
     protocol.name = "Curve";
     protocol.slug = "curve";
     protocol.schemaVersion = "1.2.0";

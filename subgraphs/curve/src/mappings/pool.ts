@@ -1,3 +1,4 @@
+import { Address, ethereum, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   AddLiquidity,
   RemoveLiquidity,
@@ -7,8 +8,13 @@ import {
   TokenExchangeUnderlying,
   NewFee,
 } from "../../generated/templates/Pool/StableSwap";
+import { ZERO_ADDRESS } from "../common/constants";
+import { getOrCreatePool } from "./registry";
 
-export function handleAddLiquidity(event: AddLiquidity): void {}
+export function handleAddLiquidity(event: AddLiquidity): void {
+  let pool = getOrCreatePool(event.address, Address.fromString(ZERO_ADDRESS),event);
+  
+}
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {}
 

@@ -9,12 +9,15 @@ import {
   ASSET_TYPES,
   BIGDECIMAL_HUNDRED,
   BIGINT_CRV_LP_TOKEN_DECIMALS,
+  BIGINT_ZERO,
   DEFAULT_DECIMALS,
   LiquidityPoolFeeType,
+  POOL_LP_TOKEN_MAP,
 } from "../common/constants";
 import { BIGDECIMAL_ZERO, BIGINT_TEN } from "../prices/common/constants";
 //import { getTokenPriceForAssetType } from "../prices";
-import { getLpTokenPriceUSD } from "../prices/curve/lppricing";
+//import { getLpTokenPriceUSD } from "../prices/curve/lppricing";
+import { setPoolAssetType, setPoolBalances, setPoolCoins, setPoolFees, setPoolLPToken, setPoolName, setPoolTokenWeights } from "../common/setters";
 
 /*
 import { AddressProvider } from "../../generated/AddressProvider/AddressProvider"
@@ -29,46 +32,21 @@ export function getCurveRegistryAddress(network:string): Address {
 }
 */
 
-export function getPoolAssetType(poolAddress: Address, registryAddress: Address): i32 {
-  log.warning("assetType pool = {}", [poolAddress.toHexString()]);
-  let registryContract = MainRegistry.bind(registryAddress);
-  let assetTypeCall = registryContract.try_get_pool_asset_type(poolAddress);
-  if (!assetTypeCall.reverted) {
-    log.warning("assetType pool = {}, type = {}", [poolAddress.toHexString(), assetTypeCall.value.toString()]);
-    return assetTypeCall.value.toI32();
-  }
-  return ASSET_TYPES!.get(poolAddress.toHexString().toLowerCase())!;
-}
 
 export function getOrCreatePool(address: Address, registryAddress: Address, event: ethereum.Event): LiquidityPool {
   let liquidityPool = LiquidityPool.load(address.toHexString());
   log.debug("tx = {}", [event.transaction.hash.toHexString()]);
   if (liquidityPool == null) {
     liquidityPool = new LiquidityPool(address.toHexString());
-    let registryContract = MainRegistry.bind(registryAddress);
-    let coinCount = registryContract.get_n_coins(address); // coinCount[0] = coins, coinCount[1] = underlying_coins
-    let coins = registryContract.get_coins(address);
-    let coinBalances = registryContract.get_balances(address);
-    //let stableSwapContract = StableSwap.bind(address);
-    let lpToken = getOrCreateToken(registryContract.get_lp_token(address));
-
-    liquidityPool.assetType = getPoolAssetType(address, registryAddress);
     liquidityPool.protocol = getOrCreateDexAmm().id;
+    setPoolCoins(liquidityPool); // saves coins to liquidity input tokens list
+    setPoolBalances(liquidityPool); // set input token balances
+    setPoolLPToken(liquidityPool, registryAddress); // saves lpToken to liquidity output token
+    setPoolTokenWeights(liquidityPool);
+    setPoolName(liquidityPool, registryAddress);
+    setPoolAssetType(liquidityPool, registryAddress);
 
-    let poolNameCall = registryContract.try_get_pool_name(address);
-    if (!poolNameCall.reverted) {
-      liquidityPool.name = poolNameCall.value;
-    } else {
-      liquidityPool.name = lpToken.name;
-    }
-    liquidityPool.symbol = lpToken.symbol;
-
-    let inputTokens = liquidityPool.inputTokens;
-    let inputTokensBalances = liquidityPool.inputTokenBalances;
-    let inputTokensBalancesDecimalized = new Array() as BigDecimal[];
-    liquidityPool.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    let sum = BIGDECIMAL_ZERO;
-    for (let i = 0; i < coinCount[0].toI32(); ++i) {
+    /*for (let i = 0; i < coinCount[0].toI32(); ++i) {
       let tokenAddress = coins![i];
       let coinBalance = coinBalances![i];
       if (tokenAddress && coinBalance) {
@@ -77,7 +55,7 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
         inputTokensBalances.push(coinBalance);
         inputTokensBalancesDecimalized.push(bigIntToBigDecimal(coinBalance, token.decimals));
         sum = sum.plus(bigIntToBigDecimal(coinBalance, token.decimals));
-        /*
+        
         let tokenPriceUSD = getTokenPriceForAssetType(
           Address.fromString(token.id),
           liquidityPool,
@@ -93,51 +71,25 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
           liquidityPool.totalValueLockedUSD.toString(),
         ]);
         token.save();
-        */
+        
       }
-    }
-    let inputTokenWeights = liquidityPool.inputTokenWeights;
-    for (let i = 0; i < inputTokensBalancesDecimalized.length; ++i) {
-      let tokenWeight = divBigDecimal(BIGDECIMAL_HUNDRED.times(inputTokensBalancesDecimalized[i]), sum);
-      inputTokenWeights.push(tokenWeight);
-    }
-    liquidityPool.inputTokenWeights = inputTokenWeights;
-    liquidityPool.inputTokens = inputTokens;
-    liquidityPool.inputTokenBalances = inputTokensBalances;
+    }*/
 
-    liquidityPool.outputToken = lpToken.id;
-    //let lpTokenPrice = getLpTokenPriceUSD(liquidityPool);
-    liquidityPool.outputTokenSupply = ERC20.bind(Address.fromString(lpToken.id)).totalSupply();
     //liquidityPool.outputTokenPriceUSD = lpTokenPrice;
 
     // handle fees
-    let fees = registryContract.get_fees(address);
-    let totalFee = bigIntToBigDecimal(fees[0], 8);
-    let adminFee = bigIntToBigDecimal(fees[1], 8);
+    setPoolFees(liquidityPool, registryAddress,event);
 
-    let tradingFee = new LiquidityPoolFee(LiquidityPoolFeeType.FIXED_TRADING_FEE + "-" + address.toHexString());
-    tradingFee.feePercentage = totalFee;
-    tradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
-    tradingFee.save();
-
-    let protocolFee = new LiquidityPoolFee(LiquidityPoolFeeType.FIXED_PROTOCOL_FEE + "-" + address.toHexString());
-    protocolFee.feePercentage = adminFee.times(totalFee);
-    protocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-    protocolFee.save();
-
-    let lpFee = new LiquidityPoolFee(LiquidityPoolFeeType.FIXED_LP_FEE + "-" + address.toHexString());
-    lpFee.feePercentage = totalFee.minus(adminFee.times(totalFee));
-    lpFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
-    lpFee.save();
-
-    liquidityPool.fees = [tradingFee.id, protocolFee.id, lpFee.id];
-
-    liquidityPool.createdBlockNumber = event.block.number;
-    liquidityPool.createdTimestamp = event.block.timestamp;
-
+    liquidityPool.rewardTokens = [];
+    liquidityPool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    liquidityPool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
+    liquidityPool.stakedOutputTokenAmount = BIGINT_ZERO;
+    
+    liquidityPool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     liquidityPool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     liquidityPool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    lpToken.save();
+    liquidityPool.createdBlockNumber = event.block.number;
+    liquidityPool.createdTimestamp = event.block.timestamp;
     liquidityPool.save();
   }
   return liquidityPool;

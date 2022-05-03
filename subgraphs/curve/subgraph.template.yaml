@@ -67,6 +67,10 @@ dataSources:
           file: ./abis/Prices/RedeemableKeep3r.json
         - name: ChainlinkAggregator
           file: ./abis/Prices/ChainlinkAggregator.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePoolCoin256
+          file: ./abis/CurvePoolCoin128.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -128,6 +132,10 @@ dataSources:
           file: ./abis/Prices/Atoken.json
         - name: YearnTokenV1
           file: ./abis/Prices/YearnTokenV1.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePoolCoin256
+          file: ./abis/CurvePoolCoin128.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -156,6 +164,10 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: StableSwap
           file: ./abis/StableSwap.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePoolCoin256
+          file: ./abis/CurvePoolCoin128.json
       entities:
         - LiquidityPool
       eventHandlers:
@@ -169,13 +181,13 @@ dataSources:
     network: mainnet
     source:
       abi: StableSwap
-      address: {{address}}
+      address: '{{address}}'
       startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/addressProvider.ts
+      file: ./src/mappings/pool.ts
       abis:
         - name: StableSwap
           file: ./abis/StableSwap.json
@@ -189,6 +201,10 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePoolCoin256
+          file: ./abis/CurvePoolCoin128.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -233,6 +249,10 @@ templates:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePoolCoin256
+          file: ./abis/CurvePoolCoin128.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity

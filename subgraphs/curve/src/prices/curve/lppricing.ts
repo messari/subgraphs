@@ -1,3 +1,4 @@
+/*
 import { Address, BigDecimal, BigInt, ByteArray, dataSource, log } from "@graphprotocol/graph-ts";
 import { MainRegistry } from "../../../generated/MainRegistry/MainRegistry";
 import { LiquidityPool } from "../../../generated/schema";
@@ -156,3 +157,4 @@ export function getLpTokenPriceUSD(pool: LiquidityPool): BigDecimal {
       return vPrice.times(getLpUnderlyingTokenValueInOtherToken(lpTokenAddress, USDT_ADDRESS)); //quoteInSpecifiedToken(USDT_ADDRESS, pool.lpToken).times(exponentToBigDecimal(BigInt.fromI32(12))))
   }
 }
+*/
