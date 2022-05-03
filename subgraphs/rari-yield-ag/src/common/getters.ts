@@ -29,6 +29,7 @@ import {
   RewardTokenType,
   SCHEMA_VERSION,
   SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
   YIELD_VAULT_NAME,
   YIELD_VAULT_SYMBOL,
@@ -42,59 +43,53 @@ import { exponentToBigDecimal } from "./utils/utils";
 //   //// Snapshots ////
 //   ///////////////////
 
-//   export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
-//     // Number of days since Unix epoch
-//     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
-//     // Create unique id for the day
-//     let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
 
-//     if (!usageMetrics) {
-//       usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-//       usageMetrics.protocol = COMPTROLLER_ADDRESS;
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+    usageMetrics.protocol = RARI_DEPLOYER;
 
-//       usageMetrics.dailyActiveUsers = 0;
-//       usageMetrics.cumulativeUniqueUsers = 0;
-//       usageMetrics.dailyTransactionCount = 0;
-//       usageMetrics.dailyDepositCount = 0;
-//       usageMetrics.dailyWithdrawCount = 0;
-//       usageMetrics.dailyBorrowCount = 0;
-//       usageMetrics.dailyRepayCount = 0;
-//       usageMetrics.dailyLiquidateCount = 0;
-//       usageMetrics.blockNumber = event.block.number;
-//       usageMetrics.timestamp = event.block.timestamp;
-//       usageMetrics.save();
-//     }
+    usageMetrics.dailyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.dailyTransactionCount = 0;
+    usageMetrics.dailyDepositCount = 0;
+    usageMetrics.dailyWithdrawCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.save();
+  }
 
-//     return usageMetrics;
-//   }
+  return usageMetrics;
+}
 
-//   export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
-//     // Number of days since Unix epoch
-//     let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
+  // Number of days since Unix epoch
+  let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
-//     // Create unique id for the day
-//     let usageMetrics = UsageMetricsHourlySnapshot.load(hour.toString());
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsHourlySnapshot.load(hour.toString());
 
-//     if (!usageMetrics) {
-//       usageMetrics = new UsageMetricsHourlySnapshot(hour.toString());
-//       usageMetrics.protocol = COMPTROLLER_ADDRESS;
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsHourlySnapshot(hour.toString());
+    usageMetrics.protocol = RARI_DEPLOYER;
 
-//       usageMetrics.hourlyActiveUsers = 0;
-//       usageMetrics.cumulativeUniqueUsers = 0;
-//       usageMetrics.hourlyTransactionCount = 0;
-//       usageMetrics.hourlyDepositCount = 0;
-//       usageMetrics.hourlyWithdrawCount = 0;
-//       usageMetrics.hourlyBorrowCount = 0;
-//       usageMetrics.hourlyRepayCount = 0;
-//       usageMetrics.hourlyLiquidateCount = 0;
-//       usageMetrics.blockNumber = event.block.number;
-//       usageMetrics.timestamp = event.block.timestamp;
-//       usageMetrics.save();
-//     }
+    usageMetrics.hourlyActiveUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.hourlyTransactionCount = 0;
+    usageMetrics.hourlyDepositCount = 0;
+    usageMetrics.hourlyWithdrawCount = 0;
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+    usageMetrics.save();
+  }
 
-//     return usageMetrics;
-//   }
+  return usageMetrics;
+}
 
 //   export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDailySnapshot {
 //     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;

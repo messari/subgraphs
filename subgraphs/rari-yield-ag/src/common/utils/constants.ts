@@ -76,6 +76,11 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
+export namespace TransactionType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -117,6 +122,7 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 ///// Date/Time /////
 /////////////////////
 
+export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
