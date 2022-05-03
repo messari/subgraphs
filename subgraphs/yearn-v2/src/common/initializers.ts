@@ -15,7 +15,7 @@ import { enumToPrefix } from "./strings";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
-import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
+import { _ERC20 as ERC20Contract } from "../../generated/Registry_v1/_ERC20";
 
 export function getOrCreateStrategy(
   vaultAddress: Address,
