@@ -129,13 +129,14 @@ Usage should be generally thought of in terms of external user interactions, tha
 Here are some more detailed guidelines:
 
 **Considered Usage**
+
 - DEXes: Swapping Tokens using Liquidity Pools, Adding LP, Removing LP, Creating Pools
 - Lending: Depositing Tokens into Pools, Withdrawing Tokens from Pools, Borrowing Tokens from Pools, Repaying Borrowed Balances, Liquidating Positions, Creating Pools
 - Yield: Depositing Tokens into a Vault, Withdrawing Tokens from a Vault, Harvesting Yields from Vaults, Creating Vaults
 - General: Staking/harvesting actions ARE considered usage
 
-
 **NOT considered Usage**
+
 - Protocol internal actions are NOT considered usage (e.g. governance actions, contract deployments/upgrades).
 - Protocol token (e.g. UNI token, AAVE token) transfers/swaps are NOT considered usage.
 - Pool token (e.g. cTokens, yTokens) transfers are NOT considered usage.

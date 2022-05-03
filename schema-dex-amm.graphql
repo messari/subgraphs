@@ -389,7 +389,7 @@ type LiquidityPool @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
@@ -467,7 +467,7 @@ type LiquidityPoolDailySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
@@ -522,7 +522,7 @@ type LiquidityPoolHourlySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
