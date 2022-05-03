@@ -4,15 +4,14 @@ import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
 import { getOrCreateProtocol } from "./Protocol";
 
 export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt, block: ethereum.Block): Deposit {
-  const id: string = "deposit-"
-    .concat(hash.toHex())
+  const id: string = hash.toHex()
     .concat("-")
     .concat(logIndex.toHex());
 
   let deposit = Deposit.load(id);
 
   if (deposit) {
-    return deposit;
+    return deposit as Deposit;
   }
 
   deposit = new Deposit(id);
@@ -30,9 +29,10 @@ export function getOrCreateDeposit(hash: Bytes, logIndex: BigInt, block: ethereu
   deposit.amountUSD = BIGDECIMAL_ZERO;
   deposit.save();
 
-  return deposit;
+  return deposit as Deposit;
 }
 
+/*
 export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt, block: ethereum.Block): Withdraw {
   const id: string = "withdraw-"
     .concat(hash.toHex())
@@ -62,3 +62,4 @@ export function getOrCreateWithdraw(hash: Bytes, logIndex: BigInt, block: ethere
 
   return withdraw;
 }
+*/
