@@ -1,13 +1,13 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 // import { Strategy } from "../../generated/ControllerListener/Strategy";
-import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
+//import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
 import { Vault } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
 import { createFeeType } from "./Strategy";
-import { VaultListener } from "../../generated/ControllerListener/VaultListener";
+import { VaultListener } from '../../generated/templates'
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -45,7 +45,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   //protocol._vaultIds = vaultIds;
 
 
-  VaultListener.create(vault_addr)
+  VaultListener.create(id)
 
   protocol.save();
 

@@ -6,7 +6,7 @@ import {
   StrategyChanged as StrategyChangedEvent,
   Transfer as TransferEvent,
   Withdraw as WithdrawEvent
-} from "../generated/ControllerListener/Vault"
+} from "../generated/ControllerListener/VaultContract"
 import { getOrCreateToken } from './entities/Token'
 import { Vault } from "../generated/schema";
 import { WETH_ADDRESS } from './constant'
@@ -29,7 +29,7 @@ export function handleDeposit(event: DepositEvent): void {
 
 
   deposit.amount = amount;
-  deposit.vault = vault;
+  deposit.vault = vault.id;
   deposit.save();
   
 }

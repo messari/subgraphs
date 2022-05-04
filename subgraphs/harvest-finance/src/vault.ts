@@ -1,5 +1,5 @@
 import { Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { Deposit, Vault as VaultContract, Withdraw } from "../../generated/ControllerListener/Vault";
+import { Deposit, Vault as VaultContract, Withdraw } from "../../generated/ControllerListener/VaultContract";
 import { Vault, _Strategy } from "../../generated/schema";
 import { BIGINT_ZERO } from "../constant";
 import { getOrCreateProtocol } from "../entities/Protocol";

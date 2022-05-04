@@ -33,6 +33,12 @@ dataSources:
           file: ./abis/@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol/ERC20Detailed.json
         - name: VaultContract
           file: ./abis/contracts/base/Vault.sol/Vault.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Strategy
+          file: ./abis/Vault.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       #eventHandlers:
         #- event: SharePriceChangeLog(indexed address,indexed address,uint256,uint256,uint256)
         #  handler: handleSharePriceChangeLog
@@ -51,7 +57,6 @@ templates:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        entities:
         - Token
         - RewardToken
         - YieldAggregator
@@ -70,14 +75,14 @@ templates:
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
-        - event: StrategyAnnounced(address,uint256)
-          handler: handleStrategyAnnounced
-        - event: StrategyChanged(address,address)
-          handler: handleStrategyChanged
-        - event: Withdraw(indexed address,uint256)
-          handler: handleWithdraw
-      callHandlers:
-        - function: doHardWork()
-          handler: handleDoHardWorkCall
+        #- event: StrategyAnnounced(address,uint256)
+        #  handler: handleStrategyAnnounced
+        #- event: StrategyChanged(address,address)
+        #  handler: handleStrategyChanged
+        #- event: Withdraw(indexed address,uint256)
+        #  handler: handleWithdraw
+      #callHandlers:
+        #- function: doHardWork()
+        #  handler: handleDoHardWorkCall
       file: ./src/VaultListener.ts
 
