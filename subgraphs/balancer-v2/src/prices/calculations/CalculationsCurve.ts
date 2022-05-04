@@ -19,5 +19,5 @@ export function getTokenPriceFromCalculationCurve(tokenAddr: Address, network: s
     .readValue<BigInt>(calculationCurveContract.try_getCurvePriceUsdc(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
 }

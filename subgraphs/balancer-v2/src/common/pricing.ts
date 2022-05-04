@@ -1,6 +1,8 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { BASE_ASSETS, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
+import { BASE_ASSETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
 import { Token } from "../../generated/schema";
+import { getOrCreateDex } from "./getters";
+import { getUsdPrice } from "../prices";
 
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
@@ -87,3 +89,18 @@ export function calculatePrice(
 
   return null;
 }
+
+/**
+ * @param tokenAddress address of token to fetch price from
+ * @returns Previously stored price, otherwise fetch it from oracle
+ */
+export function fetchPrice(tokenAddress: Address): BigDecimal {
+  let token = Token.load(tokenAddress.toHexString());
+  let tokenPrice: BigDecimal | null = null;
+  if (token) tokenPrice = token.lastPriceUSD;
+  if (tokenPrice) return tokenPrice;
+
+  if (getOrCreateDex().network == "MATIC") return BIGDECIMAL_ZERO
+
+  return getUsdPrice(tokenAddress, BIGDECIMAL_ONE);
+  }

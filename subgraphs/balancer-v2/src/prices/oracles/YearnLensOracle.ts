@@ -19,5 +19,5 @@ export function getTokenPriceFromYearnLens(tokenAddr: Address, network: string):
     .readValue<BigInt>(yearnLensContract.try_getPriceUsdcRecommended(tokenAddr), constants.BIGINT_ZERO)
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, constants.DEFAULT_USDC_DECIMALS);
 }

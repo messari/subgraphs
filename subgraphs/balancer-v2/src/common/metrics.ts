@@ -21,7 +21,7 @@ import {
 import { calculatePrice, isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
 import { ProtocolFeesCollector } from "../../generated/Vault/ProtocolFeesCollector";
-import { getUsdPricePerToken } from "../prices";
+import {getUsdPrice, getUsdPricePerToken} from "../prices";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -233,44 +233,19 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network != "MAINNET") return;
+  if (getOrCreateDex().network == "MATIC") return;
 
   if (!isUSDStable(tokenA)) {
-    const tokenPrice = new Token(tokenA.toHexString());
-    const price = getUsdPricePerToken(tokenA);
-    tokenPrice.lastPriceUSD = price.usdPrice;
-    if (!price.reverted) {
-      tokenPrice.lastPriceUSD = price.usdPrice.div(price.decimals.toBigDecimal());
-    }
-    tokenPrice.lastPriceBlockNumber = blockNumber;
-    tokenPrice.save();
+    const token = getOrCreateToken(tokenA);
+    token.lastPriceUSD = getUsdPrice(tokenA, BIGDECIMAL_ONE);
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
   }
 
   if (!isUSDStable(tokenB)) {
-    const tokenPrice = new Token(tokenB.toHexString());
-    const price = getUsdPricePerToken(tokenB);
-    tokenPrice.lastPriceUSD = price.usdPrice;
-    if (!price.reverted) {
-      tokenPrice.lastPriceUSD = price.usdPrice.div(price.decimals.toBigDecimal());
-    }
-    tokenPrice.lastPriceBlockNumber = blockNumber;
-    tokenPrice.save();
+    const token = getOrCreateToken(tokenB);
+    token.lastPriceUSD = getUsdPrice(tokenB, BIGDECIMAL_ONE)
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
   }
-}
-
-/**
- * @param tokenAddress address of token to fetch price from
- * @returns Previously stored price, otherwise fetch it from oracle
- */
-export function fetchPrice(tokenAddress: Address): BigDecimal {
-  let token = Token.load(tokenAddress.toHexString());
-  let tokenPrice: BigDecimal | null = null;
-  if (token) tokenPrice = token.lastPriceUSD;
-  if (tokenPrice) return tokenPrice;
-
-  if (getOrCreateDex().network != "MAINNET") return BIGDECIMAL_ZERO
-
-  let price = getUsdPricePerToken(tokenAddress);
-  if (!price.reverted) return price.usdPrice.div(price.decimals.toBigDecimal());
-  return price.usdPrice;
 }

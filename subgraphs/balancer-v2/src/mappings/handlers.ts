@@ -8,16 +8,15 @@ import {
   getOrCreateHourlyUsageMetricSnapshot,
   getOrCreateDailyUsageMetricSnapshot,
 } from "../common/getters";
-import { Deposit, LiquidityPool, LiquidityPoolFee, Withdraw } from "../../generated/schema";
+import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import {
-  fetchPrice,
   updateFinancials,
   updatePoolMetrics,
   updateTokenPrice,
   updateUsageMetrics,
 } from "../common/metrics";
-import { isUSDStable, valueInUSD } from "../common/pricing";
+import { isUSDStable, valueInUSD, fetchPrice } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";
 import { updateWeight } from "../common/weight";

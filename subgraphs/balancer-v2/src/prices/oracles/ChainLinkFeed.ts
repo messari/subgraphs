@@ -17,8 +17,13 @@ export function getTokenPriceFromChainLink(tokenAddr: Address, network: string):
   let result = chainLinkContract.try_latestRoundData(tokenAddr, constants.CHAIN_LINK_USD_ADDRESS);
 
   if (!result.reverted) {
-    // value1 is the price of the token
-    return CustomPriceType.initialize(result.value.value1.toBigDecimal());
+    let decimals = chainLinkContract.try_decimals(tokenAddr, constants.CHAIN_LINK_USD_ADDRESS);
+
+    if (decimals.reverted) {
+      new CustomPriceType();
+    }
+
+    return CustomPriceType.initialize(result.value.value1.toBigDecimal(), decimals.value);
   }
 
   return new CustomPriceType();

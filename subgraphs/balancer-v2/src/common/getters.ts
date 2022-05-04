@@ -33,7 +33,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.slug = "balancer-v2";
     protocol.schemaVersion = "1.2.0";
     protocol.subgraphVersion = "1.2.0";
-    protocol.methodologyVersion = "1.2.0";
+    protocol.methodologyVersion = "1.0.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     let network = hyphenToUnderscore(dataSource.network())
     protocol.network = network.toUpperCase();

@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Vault
-    network: matic
+    network: mainnet
     source:
       address: "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
       abi: Vault
-      startBlock: 15832990
+      startBlock: 12272146
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -76,7 +76,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: WeightedPool
-    network: matic
+    network: mainnet
     source:
       abi: WeightedPool
     mapping:

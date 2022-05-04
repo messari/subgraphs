@@ -3,13 +3,13 @@ import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
-  SushiSwapPair as SushiSwapPairContract,
   SushiSwapPair__getReservesResult,
+  SushiSwapPair as SushiSwapPairContract,
 } from "../../../generated/Vault/SushiSwapPair";
 import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/Vault/SushiSwapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
-  if (tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!) {
+  if (tokenAddress.equals(constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!)) {
     return false;
   }
 
@@ -35,8 +35,8 @@ export function getPriceFromRouterUsdc(tokenAddress: Address, network: string): 
 }
 
 export function getPriceFromRouter(token0Address: Address, token1Address: Address, network: string): CustomPriceType {
+  let wethAddress = constants.SUSHISWAP_WETH_ADDRESS.get(network)!;
   let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
-  let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
 
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
@@ -95,7 +95,7 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal);
+    return CustomPriceType.initialize(amountOutBigDecimal, constants.DEFAULT_USDC_DECIMALS);
   }
 
   return new CustomPriceType();
@@ -111,20 +111,13 @@ export function getLpTokenPriceUsdc(tokenAddress: Address, network: string): Cus
     return new CustomPriceType();
   }
 
-  let pairDecimals: number;
-  let pairDecimalsCall = sushiswapPair.try_decimals();
-
-  if (pairDecimalsCall.reverted) {
-    pairDecimals = constants.DEFAULT_DECIMALS.toI32() as u8;
-  } else {
-    pairDecimals = pairDecimalsCall.value;
-  }
+  let pairDecimals = utils.readValue<i32>(sushiswapPair.try_decimals(), constants.DEFAULT_DECIMALS.toI32() as u8);
 
   let pricePerLpTokenUsdc = totalLiquidity.usdPrice
     .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
     .div(totalSupply.toBigDecimal());
 
-  return CustomPriceType.initialize(pricePerLpTokenUsdc);
+  return CustomPriceType.initialize(pricePerLpTokenUsdc, constants.DEFAULT_USDC_DECIMALS);
 }
 
 export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: string): CustomPriceType {
@@ -159,20 +152,19 @@ export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: str
   let reserve1 = reserves.value1;
 
   if (reserve0.notEqual(constants.BIGINT_ZERO) || reserve1.notEqual(constants.BIGINT_ZERO)) {
-    let totalLiquidity = reserve0
-      .div(constants.BIGINT_TEN)
-      .pow(token0Decimals.toI32() as u8)
+    let liquidity0 = reserve0
+      .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
       .toBigDecimal()
-      .times(token0Price.usdPrice)
-      .plus(
-        reserve1
-          .div(constants.BIGINT_TEN)
-          .pow(token1Decimals.toI32() as u8)
-          .toBigDecimal()
-          .times(token1Price.usdPrice),
-      );
+      .times(token0Price.usdPrice);
 
-    return CustomPriceType.initialize(totalLiquidity);
+    let liquidity1 = reserve1
+      .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
+      .toBigDecimal()
+      .times(token1Price.usdPrice);
+
+    let totalLiquidity = liquidity0.plus(liquidity1);
+
+    return CustomPriceType.initialize(totalLiquidity, constants.DEFAULT_USDC_DECIMALS);
   }
   return new CustomPriceType();
 }
