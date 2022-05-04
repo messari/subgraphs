@@ -1,13 +1,14 @@
-import {Address, BigDecimal, BigInt, dataSource, ethereum} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateDex,
   getOrCreateFinancials,
   getOrCreateDailyUsageMetricSnapshot,
   updatePoolDailySnapshot,
   updatePoolHourlySnapshot,
-  getOrCreateHourlyUsageMetricSnapshot, getOrCreateToken,
+  getOrCreateHourlyUsageMetricSnapshot,
+  getOrCreateToken,
 } from "./getters";
-import {BIGDECIMAL_ONE, BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR} from "./constants";
+import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, FEE_COLLECTOR_ADDRESS, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 import {
   Account,
   DailyActiveAccount,
@@ -21,7 +22,7 @@ import {
 import { calculatePrice, isUSDStable, valueInUSD } from "./pricing";
 import { scaleDown } from "./tokens";
 import { ProtocolFeesCollector } from "../../generated/Vault/ProtocolFeesCollector";
-import {getUsdPrice, getUsdPricePerToken} from "../prices";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -149,8 +150,11 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(liquidityChange);
   const swap = Swap.load(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toHexString()));
   if (swap) {
-    let divisor = swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO) ? BigDecimal.fromString("2") : BIGDECIMAL_ONE
-    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(divisor);
+    let divisor =
+      swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO)
+        ? BigDecimal.fromString("2")
+        : BIGDECIMAL_ONE;
+    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(divisor);
     let fee = LiquidityPoolFee.load(pool.fees[0]);
     if (fee && swap.tokenIn != pool.outputToken && swap.tokenOut != pool.outputToken) {
       let feesCollector = ProtocolFeesCollector.bind(FEE_COLLECTOR_ADDRESS);
@@ -244,7 +248,7 @@ export function updateTokenPrice(
 
   if (!isUSDStable(tokenB)) {
     const token = getOrCreateToken(tokenB);
-    token.lastPriceUSD = getUsdPrice(tokenB, BIGDECIMAL_ONE)
+    token.lastPriceUSD = getUsdPrice(tokenB, BIGDECIMAL_ONE);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
   }

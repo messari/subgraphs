@@ -19,7 +19,8 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   LiquidityPoolFeeType,
-  SECONDS_PER_HOUR, BIGDECIMAL_ONE,
+  SECONDS_PER_HOUR,
+  BIGDECIMAL_ONE,
 } from "./constants";
 import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
@@ -35,7 +36,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.subgraphVersion = "1.2.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    let network = hyphenToUnderscore(dataSource.network())
+    let network = hyphenToUnderscore(dataSource.network());
     protocol.network = network.toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.save();
@@ -97,7 +98,7 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   pool.createdBlockNumber = blockInfo.number;
   pool.createdTimestamp = blockInfo.timestamp;
-  pool.inputTokenWeights = []
+  pool.inputTokenWeights = [];
   pool.outputToken = outputToken.id;
   pool.save();
 
@@ -233,8 +234,11 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
         newTokensUSD[i] = newTokensUSD[i].minus(swap.amountOutUSD);
       }
     }
-    let divisor = swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO) ? BigDecimal.fromString("2") : BIGDECIMAL_ONE
-    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(divisor);
+    let divisor =
+      swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO)
+        ? BigDecimal.fromString("2")
+        : BIGDECIMAL_ONE;
+    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(divisor);
     snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(swapValue);
     snapshot.dailyVolumeByTokenAmount = newTokensAmount;
     snapshot.dailyVolumeByTokenUSD = newTokensUSD;
@@ -287,8 +291,11 @@ export function updatePoolHourlySnapshot(event: ethereum.Event, pool: LiquidityP
         newTokensUSD[i] = newTokensUSD[i].minus(swap.amountOutUSD);
       }
     }
-    let divisor = swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO) ? BigDecimal.fromString("2") : BIGDECIMAL_ONE
-    let swapValue = (swap.amountInUSD.plus(swap.amountOutUSD)).div(divisor);
+    let divisor =
+      swap.amountInUSD.gt(BIGDECIMAL_ZERO) && swap.amountOutUSD.gt(BIGDECIMAL_ZERO)
+        ? BigDecimal.fromString("2")
+        : BIGDECIMAL_ONE;
+    let swapValue = swap.amountInUSD.plus(swap.amountOutUSD).div(divisor);
     snapshot.hourlyVolumeUSD = snapshot.hourlyVolumeUSD.plus(swapValue);
     snapshot.hourlyVolumeByTokenAmount = newTokensAmount;
     snapshot.hourlyVolumeByTokenUSD = newTokensUSD;

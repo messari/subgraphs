@@ -1,4 +1,3 @@
-import * as constants from "./constants";
 import { ERC20 } from "../../../generated/Vault/ERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 

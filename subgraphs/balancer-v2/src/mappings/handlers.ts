@@ -10,12 +10,7 @@ import {
 } from "../common/getters";
 import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
-import {
-  updateFinancials,
-  updatePoolMetrics,
-  updateTokenPrice,
-  updateUsageMetrics,
-} from "../common/metrics";
+import { updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics } from "../common/metrics";
 import { isUSDStable, valueInUSD, fetchPrice } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";

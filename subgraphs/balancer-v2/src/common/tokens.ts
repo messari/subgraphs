@@ -1,6 +1,5 @@
 import { ERC20 } from "../../generated/Vault/ERC20";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Token } from "../../generated/schema";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
   let contract = ERC20.bind(tokenAddress);
