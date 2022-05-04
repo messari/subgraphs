@@ -17,9 +17,9 @@ import {
   getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateToken,
 } from "../common/getters";
-import { getDays, getHours } from "../common/utils/datetime";
-import { BIGDECIMAL_ZERO, TransactionType } from "./constants";
-import { bigIntToBigDecimal } from "./utils/numbers";
+import { getDays } from "../common/utils/datetime";
+import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, SECONDS_PER_HOUR, TransactionType } from "./constants";
+import { bigIntToBigDecimal, exponentToBigDecimal, tokenAmountToUSDAmount } from "./utils/numbers";
 
 export function updateProtocolTVL(event: ethereum.Event): void {
   let protocol = getOrCreateDexAmm();
@@ -188,12 +188,12 @@ function updateHourlyPoolMetrics(event: ethereum.Event, pool: LiquidityPool): vo
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   snapshot.inputTokens = pool.inputTokens;
-  snapshot.outputTokens = pool.outputTokens;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot.outputTokensSupply = pool.outputTokensSupply;
-  snapshot.outputTokenPricesUSD = pool.outputTokenPricesUSD;
-  snapshot.stakedOutputTokenAmounts = pool.stakedOutputTokenAmounts;
+  snapshot._outputTokens = pool._outputTokens;
+  snapshot._outputTokensSupply = pool._outputTokensSupply;
+  snapshot._outputTokenPricesUSD = pool._outputTokenPricesUSD;
+  snapshot._stakedOutputTokenAmounts = pool._stakedOutputTokenAmounts;
   snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
@@ -213,12 +213,12 @@ function updateDailyPoolMetrics(event: ethereum.Event, pool: LiquidityPool): voi
   snapshot.totalValueLockedUSD = pool.totalValueLockedUSD;
   snapshot.cumulativeVolumeUSD = pool.cumulativeVolumeUSD;
   snapshot.inputTokens = pool.inputTokens;
-  snapshot.outputTokens = pool.outputTokens;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot.outputTokensSupply = pool.outputTokensSupply;
-  snapshot.outputTokenPricesUSD = pool.outputTokenPricesUSD;
-  snapshot.stakedOutputTokenAmounts = pool.stakedOutputTokenAmounts;
+  snapshot._outputTokens = pool._outputTokens;
+  snapshot._outputTokensSupply = pool._outputTokensSupply;
+  snapshot._outputTokenPricesUSD = pool._outputTokenPricesUSD;
+  snapshot._stakedOutputTokenAmounts = pool._stakedOutputTokenAmounts;
   snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 

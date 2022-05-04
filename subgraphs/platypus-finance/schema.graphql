@@ -431,7 +431,10 @@ type LiquidityPool @entity {
 
   _assets: [Asset!]!
   _outputTokens: [Token!]
-  _outputTokenAmounts: [BigInt!]!
+  _outputTokensSupply: [BigInt!]
+  _outputTokenAmounts: [BigInt!]
+  _outputTokenPricesUSD: [BigDecimal!]
+  _stakedOutputTokenAmounts: [BigInt!]
 }
 
 #################################
@@ -477,9 +480,6 @@ type LiquidityPoolDailySnapshot @entity {
   " Tokens that is minted to track ownership of position in protocol "
   outputToken: Token!
 
-  _outputTokens: [Token!]
-  _outputTokenAmounts: [BigInt!]!
-
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -500,6 +500,12 @@ type LiquidityPoolDailySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  _outputTokens: [Token!]
+  _outputTokensSupply: [BigInt!]
+  _outputTokenAmounts: [BigInt!]
+  _outputTokenPricesUSD: [BigDecimal!]
+  _stakedOutputTokenAmounts: [BigInt!]
 }
 
 type LiquidityPoolHourlySnapshot @entity {
@@ -541,9 +547,6 @@ type LiquidityPoolHourlySnapshot @entity {
   " Tokens that is minted to track ownership of position in protocol "
   outputToken: Token!
 
-  _outputTokens: [Token!]
-  _outputTokenAmounts: [BigInt!]!
-
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
@@ -564,6 +567,12 @@ type LiquidityPoolHourlySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  _outputTokens: [Token!]
+  _outputTokensSupply: [BigInt!]
+  _outputTokenAmounts: [BigInt!]
+  _outputTokenPricesUSD: [BigDecimal!]
+  _stakedOutputTokenAmounts: [BigInt!]
 }
 
 ##################################
