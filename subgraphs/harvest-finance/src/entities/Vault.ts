@@ -1,13 +1,14 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 // import { Strategy } from "../../generated/ControllerListener/Strategy";
-//import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
-import { Vault } from "../../generated/schema";
+import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
+import { Vault, Token } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
 import { createFeeType } from "./Strategy";
-import { VaultListener } from '../../generated/templates'
+import { getOrCreateToken } from "./Token";
+import { VaultListener } from '../../generated/templates';
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -45,7 +46,21 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   //protocol._vaultIds = vaultIds;
 
 
-  VaultListener.create(id)
+  let vault_contract = VaultContract.bind(id);
+  let underlying_addr_call = vault_contract.try_underlying();
+
+  if (underlying_addr_call.reverted) {
+    // this is a Uniswap vault
+  } else {
+    let underlying_token = getOrCreateToken(<Address> underlying_addr_call.value);
+    let f_token = getOrCreateToken(id);
+
+    vault.inputToken = underlying_token.id;
+    vault.outputToken = f_token.id;
+    vault.save();
+  }
+
+  VaultListener.create(id);
 
   protocol.save();
 
