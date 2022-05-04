@@ -229,7 +229,7 @@ export function updateTokenPrice(
     // We check if current balance multiplied by the price is over 10k USD, if not,
     // it means that the pool does have too much liquidity, so we fetch the price from
     // external source
-    if (currentBalance.times(tokenInfo.price).gt(BigDecimal.fromString("40000"))) {
+    if (currentBalance.times(tokenInfo.price).gt(BigDecimal.fromString("10000"))) {
       token.lastPriceUSD = tokenInfo.price;
       token.lastPriceBlockNumber = blockNumber;
       token.save();
