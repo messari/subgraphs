@@ -8,6 +8,15 @@ export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
+/////////////////////
+///// Protocols /////
+/////////////////////
+export namespace Protocol {
+  export const APESWAP = "Apeswap";
+  export const UNISWAP_V2 = "Uniswap V2";
+  export const SUSHISWAP = "Sushiswap";
+}
+
 ////////////////////////
 ///// Schema Enums /////
 ////////////////////////

@@ -9,12 +9,12 @@ import { NetworkConfigs } from "../../../config/_networkConfig";
 export function updateNativeTokenPriceInUSD(): Token {
   let nativeAmount = BIGDECIMAL_ZERO;
   let stableAmount = BIGDECIMAL_ZERO;
-  let nativeToken = getOrCreateToken(NetworkConfigs.NATIVE_TOKEN);
+  let nativeToken = getOrCreateToken(NetworkConfigs.REFERENCE_TOKEN);
   // fetch average price of NATIVE_TOKEN_ADDRESS from STABLE_ORACLES
   for (let i = 0; i < NetworkConfigs.STABLE_ORACLE_POOLS.length; i++) {
     let pool = _LiquidityPoolAmount.load(NetworkConfigs.STABLE_ORACLE_POOLS[i]);
     if (!pool) continue;
-    if (pool.inputTokens[0] == NetworkConfigs.NATIVE_TOKEN) {
+    if (pool.inputTokens[0] == NetworkConfigs.REFERENCE_TOKEN) {
       if (pool.inputTokenBalances[1] > stableAmount) {
         nativeAmount = pool.inputTokenBalances[0];
         stableAmount = pool.inputTokenBalances[1];
@@ -36,7 +36,7 @@ export function updateNativeTokenPriceInUSD(): Token {
  **/
 
 export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDecimal {
-  if (token.id == NetworkConfigs.NATIVE_TOKEN) {
+  if (token.id == NetworkConfigs.REFERENCE_TOKEN) {
     return nativeToken.lastPriceUSD!;
   }
   let tokenWhitelist = getOrCreateTokenWhitelist(token.id);
