@@ -359,7 +359,7 @@ type Vault @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the pool "
-  inputTokenBalance: BigInt!
+  inputTokenBalance: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt
@@ -414,7 +414,7 @@ type VaultDailySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the pool "
-  inputTokenBalance: BigInt!
+  inputTokenBalance: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
@@ -455,7 +455,7 @@ type VaultHourlySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the pool "
-  inputTokenBalance: BigInt!
+  inputTokenBalance: [BigInt!]!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!

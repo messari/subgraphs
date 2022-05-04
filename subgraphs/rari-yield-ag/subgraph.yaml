@@ -32,7 +32,4 @@ dataSources:
           handler: handleYieldDeposit
         - event: Withdrawal(indexed string,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleYieldWithdrawal
-      callHandlers:
-        - function: setWithdrawalFeeRate(uint256)
-          handler: handleSetWithdrawalFeeRateYield
   # - kind: # TODO

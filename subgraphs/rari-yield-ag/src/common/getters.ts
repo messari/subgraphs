@@ -1,23 +1,22 @@
 // // get or create snapshots and metrics
 import {
   FinancialsDailySnapshot,
-  RewardToken,
   Token,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
   Vault,
+  VaultDailySnapshot,
+  VaultFee,
+  VaultHourlySnapshot,
   YieldAggregator,
 } from "../../generated/schema";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DEFAULT_DECIMALS,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
-  InterestRateSide,
-  InterestRateType,
   INT_ZERO,
   METHODOLOGY_VERSION,
   PROTOCOL_NAME,
@@ -26,23 +25,23 @@ import {
   PROTOCOL_TYPE,
   RARI_DEPLOYER,
   RARI_YIELD_POOL_TOKEN,
-  RewardTokenType,
   SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
+  VaultFeeType,
+  YIELD_PERFORMANCE_FEE,
   YIELD_TOKEN_MAPPING,
   YIELD_VAULT_NAME,
   YIELD_VAULT_SYMBOL,
-  ZERO_ADDRESS,
+  YIELD_WITHDRAWAL_FEE,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { exponentToBigDecimal } from "./utils/utils";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-//   ///////////////////
-//   //// Snapshots ////
-//   ///////////////////
+///////////////////
+//// Snapshots ////
+///////////////////
 
 export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
@@ -92,112 +91,76 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
   return usageMetrics;
 }
 
-//   export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDailySnapshot {
-//     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-//     let marketAddress = event.address.toHexString();
-//     let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
+// get vault daily snapshot with default values
+export function getOrCreateVaultDailySnapshot(event: ethereum.Event, vaultAddress: string): VaultDailySnapshot {
+  let days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let id = vaultAddress + "-" + days.toString();
+  let vaultMetrics = VaultDailySnapshot.load(id);
 
-//     if (!marketMetrics) {
-//       marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
-//       marketMetrics.protocol = COMPTROLLER_ADDRESS;
-//       marketMetrics.market = marketAddress;
-//       marketMetrics.blockNumber = event.block.timestamp;
-//       marketMetrics.timestamp = event.block.timestamp;
-//       marketMetrics.rates = [];
-//       marketMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.inputTokenBalance = BIGINT_ZERO;
-//       marketMetrics.inputTokenPriceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.outputTokenSupply = BIGINT_ZERO;
-//       marketMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.exchangeRate = BIGDECIMAL_ZERO;
-//       marketMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-//       marketMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  if (!vaultMetrics) {
+    vaultMetrics = new VaultDailySnapshot(id);
+    vaultMetrics.protocol = RARI_DEPLOYER;
+    vaultMetrics.vault = vaultAddress;
+    vaultMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.inputTokenBalance = [];
+    vaultMetrics.outputTokenSupply = BIGINT_ZERO;
+    vaultMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.blockNumber = event.block.number;
+    vaultMetrics.timestamp = event.block.timestamp;
+    vaultMetrics.save();
+  }
 
-//       marketMetrics.save();
-//     }
+  return vaultMetrics;
+}
 
-//     return marketMetrics;
-//   }
+export function getOrCreateVaultHourlySnapshot(event: ethereum.Event, vaultAddress: string): VaultHourlySnapshot {
+  let hours: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  let id = vaultAddress + "-" + hours.toString();
+  let vaultMetrics = VaultHourlySnapshot.load(id);
 
-//   export function getOrCreateMarketHourlySnapshot(event: ethereum.Event): MarketHourlySnapshot {
-//     let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-//     let marketAddress = event.address.toHexString();
-//     let id = marketAddress + "-" + hour.toString();
-//     let marketMetrics = MarketHourlySnapshot.load(id);
+  if (!vaultMetrics) {
+    vaultMetrics = new VaultHourlySnapshot(id);
+    vaultMetrics.protocol = RARI_DEPLOYER;
+    vaultMetrics.vault = vaultAddress;
+    vaultMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.inputTokenBalance = [];
+    vaultMetrics.outputTokenSupply = BIGINT_ZERO;
+    vaultMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    vaultMetrics.blockNumber = event.block.number;
+    vaultMetrics.timestamp = event.block.timestamp;
+    vaultMetrics.save();
+  }
 
-//     if (!marketMetrics) {
-//       marketMetrics = new MarketHourlySnapshot(id);
-//       marketMetrics.protocol = COMPTROLLER_ADDRESS;
-//       marketMetrics.market = marketAddress;
-//       marketMetrics.blockNumber = event.block.timestamp;
-//       marketMetrics.timestamp = event.block.timestamp;
-//       marketMetrics.rates = [];
-//       marketMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.hourlyDepositUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.hourlyBorrowUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.inputTokenBalance = BIGINT_ZERO;
-//       marketMetrics.inputTokenPriceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.outputTokenSupply = BIGINT_ZERO;
-//       marketMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-//       marketMetrics.exchangeRate = BIGDECIMAL_ZERO;
-//       marketMetrics.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
-//       marketMetrics.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  return vaultMetrics;
+}
 
-//       marketMetrics.save();
-//     }
+export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
+  // Number of days since Unix epoch
+  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
-//     return marketMetrics;
-//   }
+  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
-//   export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
-//     // Number of days since Unix epoch
-//     let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(id.toString());
+    financialMetrics.protocol = RARI_DEPLOYER;
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
 
-//     let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+    financialMetrics.save();
+  }
+  return financialMetrics;
+}
 
-//     if (!financialMetrics) {
-//       financialMetrics = new FinancialsDailySnapshot(id.toString());
-//       financialMetrics.protocol = COMPTROLLER_ADDRESS;
-//       financialMetrics.blockNumber = event.block.number;
-//       financialMetrics.timestamp = event.block.timestamp;
-//       financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
-//       financialMetrics.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-
-//       financialMetrics.save();
-//     }
-//     return financialMetrics;
-//   }
-
-/////////////////////////////////////
-///// Yield Aggregator Specific /////
-/////////////////////////////////////
+////////////////////////////////////
+//// Yield Aggregator Specific /////
+////////////////////////////////////
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
   let protocol = YieldAggregator.load(RARI_DEPLOYER);
@@ -233,44 +196,43 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
 
     // populate input tokens
     let inputTokens: Array<string> = [];
+    let inputTokenBalances: Array<BigInt> = [];
     let tokens = YIELD_TOKEN_MAPPING.values();
     for (let i = 0; i < tokens.length; i++) {
       let token = getOrCreateToken(tokens[i]);
       inputTokens.push(token.id);
+      inputTokenBalances.push(BIGINT_ZERO);
     }
     vault.inputToken = inputTokens;
+    vault.inputTokenBalance = inputTokenBalances;
 
     let poolToken = getOrCreateToken(RARI_YIELD_POOL_TOKEN);
     vault.outputToken = poolToken.id;
     vault.depositLimit = BIGINT_ZERO;
 
     // create fees for pool
-    
+    let fees: Array<string> = [];
+    let withdrawalFee = getOrCreateVaultFee(VaultFeeType.WITHDRAWAL_FEE, vaultAddress);
+    withdrawalFee.feePercentage = YIELD_WITHDRAWAL_FEE;
+    withdrawalFee.save();
+    fees.push(withdrawalFee.id);
+    let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress);
+    performanceFee.feePercentage = YIELD_PERFORMANCE_FEE;
+    performanceFee.save();
+    fees.push(performanceFee.id);
+    vault.fees = fees;
+
     //   vault.fees = TODO
     vault.createdTimestamp = event.block.timestamp;
     vault.createdBlockNumber = event.block.number;
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    vault.inputTokenBalance = BIGINT_ZERO;
     vault.outputTokenSupply = BIGINT_ZERO;
-    vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    vault.outputTokenPriceUSD = BIGDECIMAL_ZERO; // TODO: can find by dividing TVL by outputTokenSupply
 
     vault.save();
   }
   return vault;
 }
-
-//   export function getOrCreateCToken(tokenAddress: Address, cTokenContract: CTokenNew): Token {
-//     let cToken = Token.load(tokenAddress.toHexString());
-
-//     if (cToken == null) {
-//       cToken = new Token(tokenAddress.toHexString());
-//       cToken.name = cTokenContract.name();
-//       cToken.symbol = cTokenContract.symbol();
-//       cToken.decimals = cTokenContract.decimals();
-//       cToken.save();
-//     }
-//     return cToken;
-//   }
 
 export function getOrCreateToken(tokenAddress: string): Token {
   let token = Token.load(tokenAddress);
@@ -294,27 +256,13 @@ export function getOrCreateToken(tokenAddress: string): Token {
   return token;
 }
 
-//   export function getOrCreateRewardToken(type: string): RewardToken {
-//     let id = type + "-" + COMP_ADDRESS;
-//     let rewardToken = RewardToken.load(id);
-//     if (rewardToken == null) {
-//       rewardToken = new RewardToken(id);
-//       rewardToken.token = getOrCreateToken(COMP_ADDRESS).id;
-//       rewardToken.type = type;
-//       rewardToken.save();
-//     }
-//     return rewardToken;
-//   }
-
-//   export function getOrCreateRate(rateSide: string, rateType: string, marketId: string): InterestRate {
-//     let id = rateSide + "-" + rateType + "-" + marketId;
-//     let rate = InterestRate.load(id);
-//     if (rate == null) {
-//       rate = new InterestRate(id);
-//       rate.rate = BIGDECIMAL_ZERO;
-//       rate.side = rateSide;
-//       rate.type = rateType;
-//       rate.save();
-//     }
-//     return rate;
-//   }
+export function getOrCreateVaultFee(type: string, vault: string): VaultFee {
+  let id = type + "-" + vault;
+  let vaultFee = VaultFee.load(id);
+  if (vaultFee == null) {
+    vaultFee = new VaultFee(id);
+    vaultFee.feePercentage = BIGDECIMAL_ZERO;
+    vaultFee.feeType = type;
+  }
+  return vaultFee;
+}

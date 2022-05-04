@@ -1,53 +1,38 @@
 // // update snapshots and metrics
 import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
-import { getOrCreateUsageDailySnapshot, getOrCreateUsageHourlySnapshot, getOrCreateYieldAggregator } from "./getters";
+import {
+  getOrCreateFinancials,
+  getOrCreateUsageDailySnapshot,
+  getOrCreateUsageHourlySnapshot,
+  getOrCreateVault,
+  getOrCreateVaultDailySnapshot,
+  getOrCreateVaultHourlySnapshot,
+  getOrCreateYieldAggregator,
+} from "./getters";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./utils/constants";
 
-// ///////////////////////////
-// //// Snapshot Entities ////
-// ///////////////////////////
+///////////////////////////
+//// Snapshot Entities ////
+///////////////////////////
 
-// // updates a given FinancialDailySnapshot Entity
-// export function updateFinancials(event: ethereum.Event): void {
-//   // number of days since unix epoch
-//   let financialMetrics = getOrCreateFinancials(event);
-//   let protocol = getOrCreateLendingProtcol();
+// updates a given FinancialDailySnapshot Entity
+export function updateFinancials(event: ethereum.Event): void {
+  // number of days since unix epoch
+  let financialMetrics = getOrCreateFinancials(event);
+  let protocol = getOrCreateYieldAggregator();
 
-//   // update value/volume vars
-//   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-//   financialMetrics.totalVolumeUSD = protocol.totalVolumeUSD;
-//   financialMetrics.totalDepositUSD = protocol.totalDepositUSD;
-//   financialMetrics.totalBorrowUSD = protocol.totalBorrowUSD;
+  financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
-//   if (event.block.number > financialMetrics.blockNumber) {
-//     // get block difference to catch any blocks that have no transactions (unlikely, but needs to be accounted)
-//     let blockDiff = event.block.number.minus(financialMetrics.blockNumber).toBigDecimal();
+  // update the block number and timestamp
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
 
-//     // only add to revenues if the financialMetrics has not seen this block number
-//     for (let i = 0; i < protocol._marketIds.length; i++) {
-//       let market = getOrCreateMarket(event, event.address);
-
-//       financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(
-//         market._supplySideRevenueUSDPerBlock.times(blockDiff),
-//       );
-//       financialMetrics.protocolSideRevenueUSD = financialMetrics.protocolSideRevenueUSD.plus(
-//         market._protocolSideRevenueUSDPerBlock.times(blockDiff),
-//       );
-
-//       // fees are just the totalRevenue (to be changed: https://github.com/messari/subgraphs/pull/47)
-//       financialMetrics.totalRevenueUSD = financialMetrics.totalRevenueUSD.plus(
-//         market._totalRevenueUSDPerBlock.times(blockDiff),
-//       );
-//     }
-//   }
-
-//   // update the block number and timestamp
-//   financialMetrics.blockNumber = event.block.number;
-//   financialMetrics.timestamp = event.block.timestamp;
-
-//   financialMetrics.save();
-// }
+  financialMetrics.save();
+}
 
 // update a given UsageMetricDailySnapshot
 export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
@@ -105,34 +90,39 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
   dailyMetrics.save();
 }
 
-// // update a given MarketDailySnapshot
-// export function updateMarketMetrics(event: ethereum.Event): void {
-//   // Number of days since Unix epoch
-//   let marketMetrics = getOrCreateMarketDailySnapshot(event);
-//   let market = getOrCreateMarket(event, event.address);
+// update vault daily metrics
+export function updateVaultDailyMetrics(event: ethereum.Event, vaultAddress: string): void {
+  let vaultMetrics = getOrCreateVaultDailySnapshot(event, vaultAddress);
+  let vault = getOrCreateVault(event, vaultAddress);
 
-//   // update to latest block/timestamp
-//   marketMetrics.blockNumber = event.block.number;
-//   marketMetrics.timestamp = event.block.timestamp;
+  vaultMetrics.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultMetrics.inputTokenBalance = vault.inputTokenBalance;
+  vaultMetrics.outputTokenSupply = vault.outputTokenSupply!;
+  vaultMetrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
 
-//   // update other vars
-//   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
-//   marketMetrics.inputTokenBalances = market.inputTokenBalances;
-//   let inputTokenPrices = marketMetrics.inputTokenPricesUSD;
-//   inputTokenPrices[0] = market.inputTokenPricesUSD[0];
-//   marketMetrics.inputTokenPricesUSD = inputTokenPrices;
-//   marketMetrics.outputTokenSupply = market.outputTokenSupply;
-//   marketMetrics.outputTokenPriceUSD = market.outputTokenPriceUSD;
-//   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-//   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+  // update block and timestamp
+  vaultMetrics.blockNumber = event.block.number;
+  vaultMetrics.timestamp = event.block.timestamp;
 
-//   // lending-specific vars
-//   marketMetrics.depositRate = market.depositRate;
-//   marketMetrics.stableBorrowRate = market.stableBorrowRate;
-//   marketMetrics.variableBorrowRate = market.variableBorrowRate;
+  vaultMetrics.save();
+}
 
-//   marketMetrics.save();
-// }
+// update vault hourly metrics
+export function updateVaultHourlyMetrics(event: ethereum.Event, vaultAddress: string): void {
+  let vaultMetrics = getOrCreateVaultHourlySnapshot(event, vaultAddress);
+  let vault = getOrCreateVault(event, vaultAddress);
+
+  vaultMetrics.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultMetrics.inputTokenBalance = vault.inputTokenBalance;
+  vaultMetrics.outputTokenSupply = vault.outputTokenSupply!;
+  vaultMetrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+
+  // update block and timestamp
+  vaultMetrics.blockNumber = event.block.number;
+  vaultMetrics.timestamp = event.block.timestamp;
+
+  vaultMetrics.save();
+}
 
 /////////////////
 //// Helpers ////

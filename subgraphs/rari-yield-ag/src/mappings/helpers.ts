@@ -5,6 +5,7 @@ import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   RARI_DEPLOYER,
+  RARI_YIELD_POOL_TOKEN,
   YIELD_VAULT_MANAGER_ADDRESS,
 } from "../common/utils/constants";
 import { Deposit, Withdraw } from "../../generated/schema";
@@ -20,6 +21,7 @@ export function createDeposit(
   event: ethereum.Event,
   amount: BigInt,
   amountUSD: BigInt,
+  outputTokensMinted: BigInt,
   asset: string,
   vaultAddress: string,
 ): void {
@@ -58,6 +60,18 @@ export function createDeposit(
   vault.totalValueLockedUSD = tryVaultTVL.reverted
     ? BIGDECIMAL_ZERO
     : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  vault.outputTokenSupply = vault.outputTokenSupply!.plus(outputTokensMinted);
+
+  // update outputTokenPrice
+  let outputTokenDecimals = getOrCreateToken(RARI_YIELD_POOL_TOKEN).decimals;
+  vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
+    vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
+  );
+
+  // TODO calculate fees
+
+  // TODO: get inputTokenBalances working
+
   vault.save();
 }
 
@@ -65,6 +79,7 @@ export function createWithdraw(
   event: ethereum.Event,
   amount: BigInt,
   amountUSD: BigInt,
+  outputTokensBurned: BigInt,
   asset: string,
   vaultAddress: string,
 ): void {
@@ -103,6 +118,18 @@ export function createWithdraw(
   vault.totalValueLockedUSD = tryVaultTVL.reverted
     ? BIGDECIMAL_ZERO
     : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  vault.outputTokenSupply = vault.outputTokenSupply!.minus(outputTokensBurned);
+
+  // update outputTokenPrice
+  let outputTokenDecimals = getOrCreateToken(RARI_YIELD_POOL_TOKEN).decimals;
+  vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
+    vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
+  );
+
+  // TODO calculate fees
+
+  // TODO: get inputTokenBalances working
+
   vault.save();
 }
 
