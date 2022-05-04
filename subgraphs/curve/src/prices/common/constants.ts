@@ -111,6 +111,14 @@ export const CHAIN_LINK_USD_ADDRESS = Address.fromString("0x00000000000000000000
 export const CHAIN_LINK_CONTRACT_ADDRESS = new Map<string, Address>();
 CHAIN_LINK_CONTRACT_ADDRESS.set("mainnet", Address.fromString("0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf"));
 
+export const CHAIN_LINK_MANUAL_ADDRESS = new TypedMap<string, TypedMap<string, Address>>();
+export const CHAIN_LINK_MANUAL_MAINNET = new TypedMap<string, Address>();
+CHAIN_LINK_MANUAL_MAINNET.set("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".toLowerCase(), Address.fromString("0xF79D6aFBb6dA890132F9D7c355e3015f15F3406F".toLowerCase())); // WETH for early price sourcing
+CHAIN_LINK_MANUAL_MAINNET.set("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599".toLowerCase(), Address.fromString("0xF5fff180082d6017036B771bA883025c654BC935".toLowerCase())); // WBTC for early price sourcing
+
+CHAIN_LINK_MANUAL_ADDRESS.set("mainnet",CHAIN_LINK_MANUAL_MAINNET);
+
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -196,3 +204,19 @@ FOREX_ORACLES.set(JPY_LP_TOKEN, Address.fromString("0xBcE206caE7f0ec07b545EddE33
 FOREX_ORACLES.set(GBP_LP_TOKEN, Address.fromString("0x5c0Ab2d9b5a7ed9f470386e82BB36A3613cDd4b5"));
 FOREX_ORACLES.set(AUD_LP_TOKEN, Address.fromString("0x77F9710E7d0A19669A13c055F62cd80d313dF022"));
 FOREX_ORACLES.set(CHF_LP_TOKEN, Address.fromString("0x449d117117838fFA61263B61dA6301AA2a88B13A"));
+
+export const STABLECOINS_MAINNET = new Array<string>();
+STABLECOINS_MAINNET.push("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".toLowerCase()) // USDC
+STABLECOINS_MAINNET.push("0x6b175474e89094c44da98b954eedeac495271d0f".toLowerCase()) // DAI
+STABLECOINS_MAINNET.push("0xdac17f958d2ee523a2206206994597c13d831ec7".toLowerCase()) // USDT
+STABLECOINS_MAINNET.push("0x0000000000085d4780B73119b644AE5ecd22b376".toLowerCase()) // TUSD
+
+export const STABLECOINS_FORMAT = new Array<string>();
+export const STABLECOINS_MAP = new TypedMap<string, Array<string>>();
+
+
+STABLECOINS_MAP.set("mainnet", STABLECOINS_MAINNET);
+STABLECOINS_MAP.set("bnb", STABLECOINS_FORMAT);
+STABLECOINS_MAP.set("matic", STABLECOINS_FORMAT);
+STABLECOINS_MAP.set("fantom", STABLECOINS_FORMAT);
+STABLECOINS_MAP.set("avalanche", STABLECOINS_FORMAT);

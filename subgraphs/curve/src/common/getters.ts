@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -23,6 +23,8 @@ import {
 import { StableSwap } from "../../generated/templates/Pool/StableSwap";
 import { CurvePoolCoin256 } from "../../generated/templates/Pool/CurvePoolCoin256";
 import { CurvePoolCoin128 } from "../../generated/templates/Pool/CurvePoolCoin128";
+import { getUsdPrice } from "../prices";
+import { exponentToBigInt } from "./utils/numbers";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -179,4 +181,13 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.save();
   }
   return protocol;
+}
+
+export function getTokenPrice(tokenAddr: Address, event: ethereum.Event): BigDecimal {
+  let token = getOrCreateToken(tokenAddr);
+  let priceUSD = getUsdPrice(Address.fromString(token.id),exponentToBigInt(BigInt.fromI32(token.decimals)));
+  token.lastPriceUSD = priceUSD
+  token.lastPriceBlockNumber = event.block.number;
+  token.save();
+  return priceUSD
 }

@@ -6,9 +6,10 @@ import { CurvePoolCoin128 } from "../../generated/templates/Pool/CurvePoolCoin12
 import { CurvePoolCoin256 } from "../../generated/templates/Pool/CurvePoolCoin256";
 import { StableSwap } from "../../generated/templates/Pool/StableSwap";
 import { ASSET_TYPES, BIGDECIMAL_ZERO, LiquidityPoolFeeType, POOL_LP_TOKEN_MAP } from "./constants";
-import { getOrCreateToken } from "./getters";
-import { bigIntToBigDecimal } from "./utils/numbers";
-
+import { getOrCreateToken, getTokenPrice } from "./getters";
+import { bigIntToBigDecimal, exponentToBigInt } from "./utils/numbers";
+import { CurvePoolV1 } from "../../generated/MainRegistry/CurvePoolV1"
+import { getUsdPrice } from "../prices";
 
 export function setPoolCoins128(pool: LiquidityPool): void {
     const curvePool = CurvePoolCoin128.bind(Address.fromString(pool.id))
@@ -33,10 +34,12 @@ export function setPoolCoins(pool: LiquidityPool): void {
     let i = 0
     const inputTokens = pool.inputTokens
     let coinResult = curvePool.try_coins(BigInt.fromI32(i))
+    log.warning('Pool coins call = {}, {}',[pool.name,coinResult.reverted.toString()])
+    log.warning('Call to coins 256 reverted for pool ({}: {}), attempting 128 bytes call', [pool.name, pool.id])
     if (coinResult.reverted) {
       // some pools require an int128 for coins and will revert with the
       // regular abi. e.g. 0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714
-      log.debug('Call to coins reverted for pool ({}: {}), attempting 128 bytes call', [pool.name, pool.id])
+      log.warning('Call to coins reverted for pool ({}: {}), attempting 128 bytes call', [pool.name, pool.id])
       setPoolCoins128(pool)
       return 
     }
@@ -121,14 +124,34 @@ export function setPoolName(pool:LiquidityPool, registryAddress: Address): void 
     pool.save();
     return
 }
-  
-export function setPoolBalances(pool:LiquidityPool): void{
+
+export function setPoolBalances(pool:LiquidityPool): void {
+    log.debug("setPoolBalances call for = {}", [pool.id]);
     let poolContract = StableSwap.bind(Address.fromString(pool.id));
     let inputTokens = pool.inputTokens;
     let inputTokensBalances = pool.inputTokenBalances;
+    let balanceCall = poolContract.try_balances(BigInt.fromI32(0));
+    log.debug("balance call result for first abi = {}", [balanceCall.reverted.toString()]);
+    if (!balanceCall.reverted) {
+      inputTokensBalances.push(balanceCall.value);
+      for (let i = 1; i < inputTokens.length; ++i) {
+        balanceCall = poolContract.try_balances(BigInt.fromI32(i));
+        if (!balanceCall.reverted){
+          inputTokensBalances.push(balanceCall.value);
+        }
+      }
+      pool.inputTokenBalances = inputTokensBalances;
+      pool.save();
+      return
+    }
+    let poolContractV1 = CurvePoolV1.bind(Address.fromString(pool.id));
     for (let i = 0; i < inputTokens.length; ++i) {
-        let balance = poolContract.balances(BigInt.fromI32(i));
-        inputTokensBalances.push(balance)
+        log.debug("balance call for token = {}", [i.toString()]);
+        let balance = poolContractV1.try_balances(BigInt.fromI32(i));
+        if (!balance.reverted) {
+          inputTokensBalances.push(balance.value);
+          log.debug("balance = {}", [balance.value.toString()]);
+        }
     }
     pool.inputTokenBalances = inputTokensBalances;
     pool.save();
@@ -142,11 +165,11 @@ export function setPoolFees(pool: LiquidityPool, registryAddress:Address, event:
     let totalFee = BIGDECIMAL_ZERO;
     let adminFee = BIGDECIMAL_ZERO;
     if (!feesCall.reverted) {
-      totalFee = bigIntToBigDecimal(stableSwap.fee(),8);
-      adminFee = bigIntToBigDecimal(stableSwap.admin_fee(),8);
-    } else {
       totalFee = bigIntToBigDecimal(feesCall.value[0], 8);
       adminFee = bigIntToBigDecimal(feesCall.value[1], 8);
+    } else {
+      totalFee = bigIntToBigDecimal(stableSwap.fee(),8);
+      adminFee = bigIntToBigDecimal(stableSwap.admin_fee(),8);
     }
     let tradingFee = new LiquidityPoolFee(LiquidityPoolFeeType.FIXED_TRADING_FEE + "-" + pool.id);
     tradingFee.feePercentage = totalFee;
@@ -171,3 +194,11 @@ export function setPoolFees(pool: LiquidityPool, registryAddress:Address, event:
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     pool.save();
   }
+
+
+export function setTokenPrices(pool:LiquidityPool, event: ethereum.Event): void {
+  for (let i = 0; i < pool.inputTokens.length; ++i) {
+    getTokenPrice(Address.fromString(pool.inputTokens[i]),event);
+  }
+  getTokenPrice(Address.fromString(pool.outputToken),event);
+}

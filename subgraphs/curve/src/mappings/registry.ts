@@ -17,7 +17,7 @@ import {
 import { BIGDECIMAL_ZERO, BIGINT_TEN } from "../prices/common/constants";
 //import { getTokenPriceForAssetType } from "../prices";
 //import { getLpTokenPriceUSD } from "../prices/curve/lppricing";
-import { setPoolAssetType, setPoolBalances, setPoolCoins, setPoolFees, setPoolLPToken, setPoolName, setPoolTokenWeights } from "../common/setters";
+import { setPoolAssetType, setPoolBalances, setPoolCoins, setPoolFees, setPoolLPToken, setPoolName, setPoolTokenWeights, setTokenPrices } from "../common/setters";
 
 /*
 import { AddressProvider } from "../../generated/AddressProvider/AddressProvider"
@@ -36,7 +36,7 @@ export function getCurveRegistryAddress(network:string): Address {
 export function getOrCreatePool(address: Address, registryAddress: Address, event: ethereum.Event): LiquidityPool {
   let liquidityPool = LiquidityPool.load(address.toHexString());
   log.debug("tx = {}", [event.transaction.hash.toHexString()]);
-  if (liquidityPool == null) {
+  if (!liquidityPool) {
     liquidityPool = new LiquidityPool(address.toHexString());
     liquidityPool.protocol = getOrCreateDexAmm().id;
     setPoolCoins(liquidityPool); // saves coins to liquidity input tokens list
@@ -45,7 +45,7 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
     setPoolTokenWeights(liquidityPool);
     setPoolName(liquidityPool, registryAddress);
     setPoolAssetType(liquidityPool, registryAddress);
-
+    setTokenPrices(liquidityPool,event);
     /*for (let i = 0; i < coinCount[0].toI32(); ++i) {
       let tokenAddress = coins![i];
       let coinBalance = coinBalances![i];
@@ -78,6 +78,7 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
     //liquidityPool.outputTokenPriceUSD = lpTokenPrice;
 
     // handle fees
+    log.warning("set fees call at {}",[event.transaction.hash.toHexString()]);
     setPoolFees(liquidityPool, registryAddress,event);
 
     liquidityPool.rewardTokens = [];
