@@ -24,8 +24,6 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
-        - _Strategy
-        - _User
       abis:
         - name: ControllerContract
           file: ./abis/contracts_manual/Controller.json
@@ -67,8 +65,6 @@ templates:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
-        - _Strategy
-        - _User
       abis:
         - name: VaultContract
           file: ./abis/contracts/base/Vault.sol/Vault.json
