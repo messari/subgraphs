@@ -10,6 +10,26 @@
     "type": "event"
   },
   {
+    "name": "Deposit",
+    "inputs": [
+      { "name": "recipient", "type": "address", "indexed": true },
+      { "name": "shares", "type": "uint256", "indexed": false },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
+    "name": "Withdraw",
+    "inputs": [
+      { "name": "recipient", "type": "address", "indexed": true },
+      { "name": "shares", "type": "uint256", "indexed": false },
+      { "name": "amount", "type": "uint256", "indexed": false }
+    ],
+    "anonymous": false,
+    "type": "event"
+  },
+  {
     "name": "Approval",
     "inputs": [
       { "type": "address", "name": "owner", "indexed": true },
