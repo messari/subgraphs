@@ -28,6 +28,9 @@ export function handleDeposit(event: DepositEvent): void {
   let block = event.block;
   let deposit = getOrCreateDeposit(hash, index, block);
 
+
+  deposit.from = event.params.beneficiary.toHex();
+  deposit.to = vault.inputToken;
   deposit.asset = vault.inputToken;
   deposit.amount = amount;
   deposit.vault = vault.id;
