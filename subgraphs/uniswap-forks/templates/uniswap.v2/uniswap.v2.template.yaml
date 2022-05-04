@@ -23,7 +23,7 @@ dataSources:
         - Protocol
       abis:
         - name: Factory
-          file: ./abis/uniswap-v2/factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
           file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
@@ -65,9 +65,9 @@ templates:
         - _TokenTracker
       abis:
         - name: Pair
-          file: ./abis/uniswap-v2/pair.json
+          file: ./abis/uniswap-v2/Pair.json
         - name: Factory
-          file: ./abis/uniswap-v2/factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
           file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:

@@ -1,12 +1,12 @@
 import { Network, Protocol } from "../../../src/common/constants";
 import { Network_StringMap, Protocol_Network_StringMap } from "../types";
 
-const APESWAP_REFERENCE_TOkEN: Network_StringMap = {
+const APESWAP_REFERENCE_TOKEN: Network_StringMap = {
     [Network.BSC]: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
     [Network.MATIC]: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
   }
 
-const SUSHISWAP_REFERENCE_TOkEN: Network_StringMap = {
+const SUSHISWAP_REFERENCE_TOKEN: Network_StringMap = {
     [Network.MAINNET]: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     [Network.ARBITRUM_ONE]: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
     [Network.BSC]: '0x2170Ed0880ac9A755fd29B2688956BD959F933F8',
@@ -20,12 +20,12 @@ const SUSHISWAP_REFERENCE_TOkEN: Network_StringMap = {
     [Network.MOONBEAM]: '0x30D2a9F5FDf90ACe8c17952cbb4eE48a55D916A7',
   }
   
-const UNISWAP_REFERENCE_TOkEN: Network_StringMap = {
+const UNISWAP_REFERENCE_TOKEN: Network_StringMap = {
     [Network.MAINNET]: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
 }
 
 export const _REFERENCE_TOKEN: Protocol_Network_StringMap = {
-    [Protocol.APESWAP]: APESWAP_REFERENCE_TOkEN,
-    [Protocol.SUSHISWAP]: SUSHISWAP_REFERENCE_TOkEN,
-    [Protocol.UNISWAP_V2]: UNISWAP_REFERENCE_TOkEN,
+    [Protocol.APESWAP]: APESWAP_REFERENCE_TOKEN,
+    [Protocol.SUSHISWAP]: SUSHISWAP_REFERENCE_TOKEN,
+    [Protocol.UNISWAP_V2]: UNISWAP_REFERENCE_TOKEN,
 }
