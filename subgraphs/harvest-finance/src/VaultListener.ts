@@ -6,7 +6,7 @@ import {
   StrategyChanged as StrategyChangedEvent,
   Transfer as TransferEvent,
   Withdraw as WithdrawEvent
-} from "../generated/fWETHContract/Vault"
+} from "../generated/ControllerListener/Vault"
 import { getOrCreateToken } from './entities/Token'
 import { Vault } from "../generated/schema";
 import { WETH_ADDRESS } from './constant'

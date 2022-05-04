@@ -40,3 +40,44 @@ dataSources:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy
       file: ./src/ControllerListener.ts
+templates:
+  - kind: ethereum/contract
+    name: VaultListener
+    network: mainnet
+    source:
+      abi: VaultContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        entities:
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Deposit
+        - Withdraw
+        - _Strategy
+        - _User
+      abis:
+        - name: VaultContract
+          file: ./abis/contracts/base/Vault.sol/Vault.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: StrategyAnnounced(address,uint256)
+          handler: handleStrategyAnnounced
+        - event: StrategyChanged(address,address)
+          handler: handleStrategyChanged
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+      callHandlers:
+        - function: doHardWork()
+          handler: handleDoHardWorkCall
+      file: ./src/VaultListener.ts
+

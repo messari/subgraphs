@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Strategy } from "../../generated/fWETHContract/Strategy";
-import { Vault as VaultContract } from "../../generated/fWETHContract/Vault";
+import { Strategy } from "../../generated/ControllerListener/Strategy";
+import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
 import { Vault, VaultFee } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
