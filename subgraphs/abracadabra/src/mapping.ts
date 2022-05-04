@@ -132,7 +132,6 @@ export function handleLogBorrow(event: LogBorrow): void {
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, "BORROW", getMIMAddress(dataSource.network()), event.params.amount, event);
-  updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
 }
@@ -182,12 +181,17 @@ export function handleLiquidation(event: LogRepay): void {
 
   usageHourlySnapshot.hourlyLiquidateCount += 1;
   usageDailySnapshot.dailyLiquidateCount += 1;
-  market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(collateralAmountUSD);
-  marketHourlySnapshot.cumulativeLiquidateUSD = marketHourlySnapshot.cumulativeLiquidateUSD.plus(collateralAmountUSD);
-  marketDailySnapshot.cumulativeLiquidateUSD = marketDailySnapshot.cumulativeLiquidateUSD.plus(collateralAmountUSD);
-  financialsDailySnapshot.cumulativeLiquidateUSD =
-    financialsDailySnapshot.cumulativeLiquidateUSD.plus(collateralAmountUSD);
-  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
+  let marketCumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+  marketCumulativeLiquidateUSD = marketCumulativeLiquidateUSD.plus(collateralAmountUSD);
+
+  let protocolCumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
+
+  market.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
+  marketHourlySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
+  marketDailySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
+  financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
+  financialsDailySnapshot.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
+  protocol.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
 
   liquidateEvent.save();
   usageHourlySnapshot.save();
@@ -224,7 +228,6 @@ export function handleLogRepay(event: LogRepay): void {
 
   updateTotalBorrows(event);
   updateMarketStats(market.id, "REPAY", getMIMAddress(dataSource.network()), event.params.part, event); // smart contract code subs event.params.part from totalBorrow
-  updateTVL(event);
   updateMarketMetrics(event); // must run updateMarketStats first as updateMarketMetrics uses values updated in updateMarketStats
   updateUsageMetrics(event, event.params.from, event.params.to);
 }
@@ -238,7 +241,6 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
   market.inputTokenPriceUSD = priceUSD;
   market.totalValueLockedUSD = tvlUSD;
   market.save();
-  updateTVL(event);
   updateTokenPrice(token.id, priceUSD, event);
 }
 
