@@ -12,6 +12,7 @@ import { Vault } from "../generated/schema";
 import { WETH_ADDRESS } from './constant'
 import { getOrCreateVault } from './entities/Vault'
 import { getOrCreateDeposit } from './entities/Transaction'
+import { getOrCreateToken } from './entities/Token'
 
 export function handleDeposit(event: DepositEvent): void {
 
@@ -27,7 +28,7 @@ export function handleDeposit(event: DepositEvent): void {
   let block = event.block;
   let deposit = getOrCreateDeposit(hash, index, block);
 
-
+  deposit.asset = vault.inputToken;
   deposit.amount = amount;
   deposit.vault = vault.id;
   deposit.save();
