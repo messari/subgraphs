@@ -1,0 +1,14 @@
+{
+  usageMetricsDailySnapshots {
+    id
+    timestamp
+    dailyActiveUsers
+    cumulativeUniqueUsers
+    dailyTransactionCount
+    dailyDepositCount
+    dailyWithdrawCount
+    dailyBorrowCount
+    dailyRepayCount
+    dailyLiquidateCount
+  }
+}
