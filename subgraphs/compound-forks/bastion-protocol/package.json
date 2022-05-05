@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/bastionprotocol-subgraph"
+  }
+}
