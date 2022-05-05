@@ -105,7 +105,7 @@ export function createSellSharesEvent(
   return newSellSharesEvent;
 }
 
-export function createDODOSwapEvent(
+export function createDODOSwapDVMEvent(
   fromToken: string,
   toToken: string,
   fromAmount: string,

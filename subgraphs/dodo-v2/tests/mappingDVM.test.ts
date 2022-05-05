@@ -3,13 +3,13 @@ import { test, assert } from "matchstick-as/assembly/index";
 import {
   handleBuyShares,
   handleSellShares,
-  handleDODOSwap
+  handleDODOSwapDVM
 } from "../src/mappingDVM";
 
 import {
   createBuySharesEvent,
   createSellSharesEvent,
-  createDODOSwapEvent
+  createDODOSwapDVMEvent
 } from "./helpers/helpers_DVM.test";
 
 import {
@@ -77,7 +77,7 @@ test("Can handle a SellShares Event", () => {
 });
 
 test("Can handle a DODOSwap Event", () => {
-  let swapEvent = createDODOSwapEvent(
+  let swapEvent = createDODOSwapDVMEvent(
     Token1Add,
     Token2Add,
     "1000000000000000000",
@@ -87,7 +87,7 @@ test("Can handle a DODOSwap Event", () => {
     DVMPoolAddress
   );
 
-  handleDODOSwap(swapEvent);
+  handleDODOSwapDVM(swapEvent);
   let swapID = TxHash + "-" + "1";
 
   assert.fieldEquals("Swap", swapID, "from", DVMPoolAddress.toLowerCase());

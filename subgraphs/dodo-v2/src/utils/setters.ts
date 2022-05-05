@@ -58,6 +58,7 @@ export function setUSDprice(
     bigIntToBigDecimal(amount),
     bigIntToBigDecimal(scAmount)
   );
+
   token.lastPriceUSD = pricePerToken;
   token.lastPriceBlockNumber = event.block.number;
   token.save();

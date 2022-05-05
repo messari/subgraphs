@@ -24,7 +24,7 @@ export function handleSellShares(event: SellShares): void {
   updateUsageMetrics(event, event.params.payer, false, true);
 }
 
-export function handleDODOSwap(event: DODOSwap): void {
+export function handleDODOSwapDSP(event: DODOSwap): void {
   createSwap(
     event,
     event.params.trader,

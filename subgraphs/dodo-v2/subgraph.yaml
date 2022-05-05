@@ -208,7 +208,7 @@ dataSources:
         - event: SellShares(address,address,uint256,uint256)
           handler: handleSellShares
         - event: DODOSwap(address,address,uint256,uint256,address,address)
-          handler: handleDODOSwap
+          handler: handleDODOSwapDVM
       file: ./src/mappingDVM.ts
   # blank
   - name: CP
@@ -334,6 +334,6 @@ dataSources:
         - event: SellShares(address,address,uint256,uint256)
           handler: handleSellShares
         - event: DODOSwap(address,address,uint256,uint256,address,address)
-          handler: handleDODOSwap
+          handler: handleDODOSwapDSP
       file: ./src/mappingDSP.ts
   # # blank
