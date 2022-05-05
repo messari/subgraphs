@@ -24,18 +24,22 @@ import {
   PROTOCOL_SLUG,
   PROTOCOL_TYPE,
   RARI_DEPLOYER,
+  RARI_STABLE_POOL_TOKEN,
   RARI_YIELD_POOL_TOKEN,
   SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
+  USDC_VAULT_NAME,
+  USDC_VAULT_SYMBOL,
   VaultFeeType,
   YIELD_TOKEN_MAPPING,
+  YIELD_VAULT_ADDRESS,
   YIELD_VAULT_NAME,
   YIELD_VAULT_SYMBOL,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 ///////////////////
 //// Snapshots ////
@@ -189,6 +193,21 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
   if (!vault) {
     vault = new Vault(vaultAddress);
     vault.protocol = RARI_DEPLOYER;
+
+    // add pool-specific items
+    let poolToken: Token;
+    if (vaultAddress == YIELD_VAULT_ADDRESS) {
+      vault.name = YIELD_VAULT_NAME;
+      vault.symbol = YIELD_VAULT_SYMBOL;
+      poolToken = getOrCreateToken(RARI_YIELD_POOL_TOKEN);
+    } else {
+      log.warning("CREATING VAULT: {}", [vaultAddress]);
+      vault.name = USDC_VAULT_NAME;
+      vault.symbol = USDC_VAULT_SYMBOL;
+      poolToken = getOrCreateToken(RARI_STABLE_POOL_TOKEN);
+    }
+
+    vault.protocol = RARI_DEPLOYER;
     vault.name = YIELD_VAULT_NAME;
     vault.symbol = YIELD_VAULT_SYMBOL;
 
@@ -204,15 +223,18 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
     vault.inputToken = inputTokens;
     vault.inputTokenBalance = inputTokenBalances;
 
-    let poolToken = getOrCreateToken(RARI_YIELD_POOL_TOKEN);
     vault.outputToken = poolToken.id;
     vault.depositLimit = BIGINT_ZERO;
 
     // create fees for pool
-    vault.fees = [
-      getOrCreateVaultFee(VaultFeeType.WITHDRAWAL_FEE, vaultAddress).id,
-      getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id,
-    ];
+    if (vaultAddress == YIELD_VAULT_ADDRESS) {
+      vault.fees = [
+        getOrCreateVaultFee(VaultFeeType.WITHDRAWAL_FEE, vaultAddress).id,
+        getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id,
+      ];
+    } else {
+      vault.fees = [getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id];
+    }
 
     vault._currentInterestAccruedUSD = BIGDECIMAL_ZERO;
     vault._currentFeesAccruedUSD = BIGDECIMAL_ZERO;

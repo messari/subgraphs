@@ -81,6 +81,12 @@ export namespace TransactionType {
   export const WITHDRAW = "WITHDRAW";
 }
 
+export namespace RariPool {
+  export const YIELD_POOL = "Yield Pool";
+  export const STABLE_POOL = "Stable Pool"; // USDC and DAI
+  export const ETHER_POOL = "Ether Pool";
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
@@ -129,9 +135,9 @@ export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 
-//////////////////////////////////
-//// Rari Yield Pool Soecific ////
-//////////////////////////////////
+///////////////////////////
+//// Rari Input Tokens ////
+///////////////////////////
 
 // Note: Deposit/Withdrawal events return the currency as an indexed string
 // so we need to create a mapping between the 'currencyCode' to Token
@@ -166,12 +172,27 @@ YIELD_TOKEN_MAPPING.set(
   "0xe2f2a5C287993345a840Db3B0845fbC70f5935a5",
 ); // mUSD
 
+//////////////////////////////////
+//// Rari Yield Pool Specific ////
+//////////////////////////////////
+
 export const YIELD_VAULT_ADDRESS = "0x9245efB59f6491Ed1652c2DD8a4880cBFADc3ffA"; // RariPoolController.sol
-export const YIELD_VAULT_MANAGER_ADDRESS = "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6";
+export const YIELD_VAULT_MANAGER_ADDRESS = "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6"; // RariPoolManager.sol
 
 export const YIELD_VAULT_NAME = "Rari Yield Pool";
 export const YIELD_VAULT_SYMBOL = "RYPT"; // RYPT = rari yield pool token ie, R(X)PT
 export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae";
+
+/////////////////////////////////
+//// Rari USDC Pool Specific ////
+/////////////////////////////////
+
+export const USDC_VAULT_ADDRESS = "0x66f4856f1bbd1eb09e1c8d9d646f5a3a193da569"; // RariPoolController.sol
+export const USDC_VAULT_MANAGER_ADDRESS = "0xC6BF8C8A55f77686720E0a88e2Fd1fEEF58ddf4a"; // RariPoolManager.sol
+
+export const USDC_VAULT_NAME = "Rari USDC Pool";
+export const USDC_VAULT_SYMBOL = "RSPT"; // RSPT = rari stable pool token
+export const RARI_STABLE_POOL_TOKEN = "0x016bf078ABcaCB987f0589a6d3BEAdD4316922B0";
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -180,8 +201,8 @@ export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae
 export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // TODO: should the deployer be the "factory" address
 export const PROTOCOL_NAME = "Earn";
 export const PROTOCOL_SLUG = "earn";
-export const SCHEMA_VERSION = "1.2.7";
-export const SUBGRAPH_VERSION = "1.1.2";
+export const SCHEMA_VERSION = "1.2.1";
+export const SUBGRAPH_VERSION = "1.3.2";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.YIELD;
