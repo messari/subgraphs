@@ -4,7 +4,10 @@ import { Configurations } from "./configurations/classes";
 import { AllConfigurations } from "./configurations/configurations";
 
 // Update Protocol.[] to change the protocol configuration vector.
-// Program automatically recognizes network
+// Program automatically recognizes network.
 let protocol = Protocol.APESWAP
 
-export const NetworkConfigs = new Configurations(AllConfigurations[protocol][dataSource.network()]);
+// Get specific configuration per network per protocol.
+let configurations = AllConfigurations[protocol][dataSource.network()]
+
+export const NetworkConfigs = new Configurations(configurations);
