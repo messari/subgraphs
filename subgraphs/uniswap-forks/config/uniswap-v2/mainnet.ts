@@ -1,22 +1,22 @@
 
 
 
-    PROTOCOL_SLUG_TEMP = "uniswap-v2";
-    NETWORK_TEMP = Network.MAINNET;
+  PROTOCOL_SLUG_TEMP = "uniswap-v2";
+  NETWORK_TEMP = Network.MAINNET;
   
-    FACTORY_ADDRESS_TEMP = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
-    FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
+  FACTORY_ADDRESS_TEMP = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
+  FACTORY_CONTRACT_TEMP = Factory.bind(Address.fromString(FACTORY_ADDRESS_TEMP));
   
-    TRADING_FEE_TEMP = BigDecimal.fromString("3");
-    PROTOCOL_FEE_TO_ON_TEMP = BigDecimal.fromString("0.5");
-    LP_FEE_TO_ON_TEMP = BigDecimal.fromString("2.5");
-    PROTOCOL_FEE_TO_OFF_TEMP = BigDecimal.fromString("0.0");
-    LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("3");
-    FEE_ON_OFF_TEMP = FeeSwitch.OFF;
+  TRADING_FEE_TEMP = BigDecimal.fromString("3");
+  PROTOCOL_FEE_TO_ON_TEMP = BigDecimal.fromString("0.5");
+  LP_FEE_TO_ON_TEMP = BigDecimal.fromString("2.5");
+  PROTOCOL_FEE_TO_OFF_TEMP = BigDecimal.fromString("0.0");
+  LP_FEE_TO_OFF_TEMP = BigDecimal.fromString("3");
+  FEE_ON_OFF_TEMP = FeeSwitch.OFF;
   
-    NATIVE_TOKEN_TEMP = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
-    REWARD_TOKENS_TEMP = [];
-    WHITELIST_TOKENS_TEMP = [
+  NATIVE_TOKEN_TEMP = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
+  REWARD_TOKENS_TEMP = [];
+  WHITELIST_TOKENS_TEMP = [
       "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", // WETH
       "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
@@ -37,8 +37,8 @@
       "0xa47c8bf37f92abed4a126bda807a7b7498661acd", // WUST
       "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984", // UNI
       "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", // WBTC
-    ];
-    STABLE_COINS_TEMP = [
+  ];
+  STABLE_COINS_TEMP = [
       "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
       "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT

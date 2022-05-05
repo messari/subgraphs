@@ -16,10 +16,12 @@ import { Factory } from "../generated/Factory/Factory";
 let PROTOCOL = Protocol.APESWAP;
 let NETWORK = dataSource.network().toLowerCase();
 
+
 class NetworkConfigurations {
+  NETWORK: string;
+
   PROTOCOL_NAME: string;
   PROTOCOL_SLUG: string;
-  NETWORK: string;
 
   FACTORY_ADDRESS: string
   FACTORY_CONTRACT: Factory
@@ -40,69 +42,38 @@ class NetworkConfigurations {
   STABLE_ORACLE_POOLS: string[];
   UNTRACKED_PAIRS: string[];
 
-  constructor() {
-  }
-
-  // constructor(Protocol: string, Network: string) {
-  //   this.NETWORK = Network.toUpperCase();
-
-  //   this.PROTOCOL_NAME = Protocol;
-  //   this.PROTOCOL_SLUG = _PROTOCOL_SLUG[Protocol];
-
-  //   this.FACTORY_ADDRESS = _FACTORY_ADDRESS[Protocol][Network];
-  //   this.FACTORY_CONTRACT = Factory.bind(Address.fromString(this.FACTORY_ADDRESS));
-
-  //   this.TRADING_FEE = _TRADING_FEE[Protocol][Network];
-  //   this.PROTOCOL_FEE_TO_ON = _PROTOCOL_FEE_TO_ON[Protocol][Network];
-  //   this.LP_FEE_TO_ON = _LP_FEE_TO_ON[Protocol][Network];
-  //   this.PROTOCOL_FEE_TO_OFF = _PROTOCOL_FEE_TO_OFF[Protocol][Network];
-  //   this.LP_FEE_TO_OFF = _LP_FEE_TO_OFF[Protocol][Network];
-  //   this.FEE_ON_OFF = _FEE_SWITCH[Protocol][Network];
-
-  //   this.REWARD_INTERVAL_TYPE = _REWARD_INTERVAL[Protocol][Network];
-  //   this.NATIVE_TOKEN = _REFERENCE_TOKEN[Protocol][Network];
-  //   this.REWARD_TOKENS = _REWARD_TOKEN[Protocol][Network];
-  //   this.WHITELIST_TOKENS = _WHITELISTS[Protocol][Network];
-  //   this.STABLE_COINS = _STABLE_COINS[Protocol];
-  //   this.STABLE_ORACLE_POOLS = _STABLE_POOLS[Protocol][Network];
-  //   this.UNTRACKED_PAIRS = _UNTRACKED_PAIRS[Protocol][Network];
+  // constructor() {
   // }
 
+  constructor(Protocol: string, Network: string) {
+    let configuration = configurationMap[Protocol][Network];
 
-  }
+    this.NETWORK = configuration[NETWORK];
+
+    this.PROTOCOL_NAME = configuration[PROTOCOL_NAME];
+    this.PROTOCOL_SLUG = configuration[PROTOCOL_SLUG];
+
+    this.FACTORY_ADDRESS = configuration[FACTORY_ADDRESS];
+    this.FACTORY_CONTRACT = Factory.bind(Address.fromString(this.FACTORY_ADDRESS));
+
+    this.TRADING_FEE = configuration[TRADING_FEE];
+    this.PROTOCOL_FEE_TO_ON = configuration[PROTOCOL_FEE_TO_ON];
+    this.LP_FEE_TO_ON = _LP_FEE_TO_ON[Protocol][Network];
+    this.PROTOCOL_FEE_TO_OFF = _PROTOCOL_FEE_TO_OFF[Protocol][Network];
+    this.LP_FEE_TO_OFF = _LP_FEE_TO_OFF[Protocol][Network];
+    this.FEE_ON_OFF = _FEE_SWITCH[Protocol][Network];
+
+    this.REWARD_INTERVAL_TYPE = _REWARD_INTERVAL[Protocol][Network];
+    this.NATIVE_TOKEN = _REFERENCE_TOKEN[Protocol][Network];
+    this.REWARD_TOKENS = _REWARD_TOKEN[Protocol][Network];
+    this.WHITELIST_TOKENS = _WHITELISTS[Protocol][Network];
+    this.STABLE_COINS = _STABLE_COINS[Protocol];
+    this.STABLE_ORACLE_POOLS = _STABLE_POOLS[Protocol][Network];
+    this.UNTRACKED_PAIRS = _UNTRACKED_PAIRS[Protocol][Network];
+  } 
 }
 
-let NewtworkConfigurations = new NetworkConfigurations()
-
-if (PROTOCOL == Protocol.APESWAP && dataSource.network().toUpperCase() == Network.BSC) {
-  
-} else if (PROTOCOL == Protocol.APESWAP && dataSource.network().toUpperCase() == Network.MATIC) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.ARBITRUM_ONE) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.AVALANCHE) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.BSC) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.CELO) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.FANTOM) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.FUSE) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.MAINNET) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.MATIC) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.MOONBEAM) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.MOONRIVER) {
-  
-} else if (PROTOCOL == Protocol.SUSHISWAP && dataSource.network().toUpperCase() == Network.XDAI) {
-  
-} else if (PROTOCOL == Protocol.UNISWAP_V2 && dataSource.network().toUpperCase() == Network.MAINNET) {
-  
-}
+// let NewtworkConfigurations = new NetworkConfigurations()
 
 
 
