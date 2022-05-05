@@ -7,7 +7,7 @@ import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, 
 import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken, getLiquidityPoolAmounts } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
-import { NetworkConfigs } from "../../config/_networkConfig";
+import { NetworkConfigs } from "../../config/configure";
 import { getTrackedVolumeUSD } from "./price/price";
 
 export let factoryContract = FactoryContract.bind(Address.fromString(NetworkConfigs.FACTORY_ADDRESS));

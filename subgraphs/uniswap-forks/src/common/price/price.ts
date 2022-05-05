@@ -4,7 +4,7 @@ import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateToken, getOrCreat
 import { LiquidityPool, Token, _HelperStore, _LiquidityPoolAmount } from "../../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGDECIMAL_ONE, BIGDECIMAL_TWO, BIGINT_ZERO, MINIMUM_USD_THRESHOLD_NEW_PAIRS } from "./../constants";
 import { safeDiv } from "../utils/utils";
-import { NetworkConfigs } from "../../../config/_networkConfig";
+import { NetworkConfigs } from "../../../config/configure";
 
 export function updateNativeTokenPriceInUSD(): Token {
   let nativeAmount = BIGDECIMAL_ZERO;

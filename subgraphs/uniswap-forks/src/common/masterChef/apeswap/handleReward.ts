@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../../../config/_networkConfig";
+import { NetworkConfigs } from "../../../../config/configure";
 import { MasterChefApeswap } from "../../../../generated/MasterChef/MasterChefApeswap";
 import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
 import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../constants";
