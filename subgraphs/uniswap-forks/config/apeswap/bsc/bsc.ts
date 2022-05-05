@@ -1,4 +1,5 @@
 import { BigDecimal } from '@graphprotocol/graph-ts';
+import { FeeSwitch, RewardIntervalType } from '../../../src/common/constants';
 import { ConfigurationFields } from '../../configurations/fields';
 import { FieldMap } from '../../configurations/types';
 
@@ -13,8 +14,8 @@ export const ApeswapBscConfigurations: FieldMap = {
   [ConfigurationFields.LP_FEE_TO_ON]: BigDecimal.fromString("1.5"),
   [ConfigurationFields.PROTOCOL_FEE_TO_OFF]: BigDecimal.fromString("0.0"),
   [ConfigurationFields.LP_FEE_TO_OFF]: BigDecimal.fromString("2"),
-  [ConfigurationFields.FEE_ON_OFF]: "ON",
-  [ConfigurationFields.REWARD_INTERVAL_TYPE]: "TIMESTAMP",
+  [ConfigurationFields.FEE_ON_OFF]: FeeSwitch.ON,
+  [ConfigurationFields.REWARD_INTERVAL_TYPE]: RewardIntervalType.TIMESTAMP,
   [ConfigurationFields.REFERENCE_TOKEN]: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
   [ConfigurationFields.REWARD_TOKENS]: "0x5d47bAbA0d66083C52009271faF3F50DCc01023C",  
   [ConfigurationFields.WHITELIST_TOKENS]: [

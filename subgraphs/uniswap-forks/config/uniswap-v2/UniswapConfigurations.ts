@@ -1,9 +1,9 @@
 import { Network } from "../../src/common/constants";
 import { NetworkFieldMap } from "../configurations/types";
-import { UniswapMainnetConfigurations } from "./mainnet/mainnet";
+import { UniswapV2MainnetConfigurations } from "./mainnet/mainnet";
 
 
-export const UniswapConfigurations: NetworkFieldMap = {
-    [Network.MAINNET]: UniswapMainnetConfigurations,
+export const UniswapV2Configurations: NetworkFieldMap = {
+    [Network.MAINNET]: UniswapV2MainnetConfigurations,
   }
   

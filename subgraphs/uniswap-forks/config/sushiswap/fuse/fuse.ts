@@ -1,4 +1,5 @@
 import { BigDecimal } from '@graphprotocol/graph-ts';
+import { FeeSwitch, RewardIntervalType } from '../../../src/common/constants';
 import { ConfigurationFields } from '../../configurations/fields';
 import { FieldMap } from '../../configurations/types';
 
@@ -12,8 +13,8 @@ export const SushiswapFuseConfigurations: FieldMap = {
   [ConfigurationFields.LP_FEE_TO_ON]: BigDecimal.fromString("2.5"),
   [ConfigurationFields.PROTOCOL_FEE_TO_OFF]: BigDecimal.fromString("0.0"),
   [ConfigurationFields.LP_FEE_TO_OFF]: BigDecimal.fromString("3"),
-  [ConfigurationFields.FEE_ON_OFF]: "ON",
-  [ConfigurationFields.REWARD_INTERVAL_TYPE]: "TIMESTAMP",
+  [ConfigurationFields.FEE_ON_OFF]: FeeSwitch.ON,
+  [ConfigurationFields.REWARD_INTERVAL_TYPE]: RewardIntervalType.TIMESTAMP,
   [ConfigurationFields.REFERENCE_TOKEN]: "0xa722c13135930332Eb3d749B2F0906559D2C5b99",
   [ConfigurationFields.REWARD_TOKENS]: "0x90708b20ccC1eb95a4FA7C8b18Fd2C22a0Ff9E78",  
   [ConfigurationFields.WHITELIST_TOKENS]: [

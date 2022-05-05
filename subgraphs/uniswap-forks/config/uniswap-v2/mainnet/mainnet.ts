@@ -1,9 +1,10 @@
 import { BigDecimal } from '@graphprotocol/graph-ts';
+import { FeeSwitch, RewardIntervalType } from '../../../src/common/constants';
 import { ConfigurationFields } from '../../configurations/fields';
 import { FieldMap } from '../../configurations/types';
 
 
-export const UniswapMainnetConfigurations: FieldMap = {
+export const UniswapV2MainnetConfigurations: FieldMap = {
   [ConfigurationFields.NETWORK]: "mainnet",
   [ConfigurationFields.PROTOCOL_NAME]: "Uniswap",
   [ConfigurationFields.PROTOCOL_SLUG]: "uniswap",
@@ -13,8 +14,8 @@ export const UniswapMainnetConfigurations: FieldMap = {
   [ConfigurationFields.LP_FEE_TO_ON]: BigDecimal.fromString("2.5"),
   [ConfigurationFields.PROTOCOL_FEE_TO_OFF]: BigDecimal.fromString("0.0"),
   [ConfigurationFields.LP_FEE_TO_OFF]: BigDecimal.fromString("3"),
-  [ConfigurationFields.FEE_ON_OFF]: "OFF",
-  [ConfigurationFields.REWARD_INTERVAL_TYPE]: "NONE",
+  [ConfigurationFields.FEE_ON_OFF]: FeeSwitch.OFF,
+  [ConfigurationFields.REWARD_INTERVAL_TYPE]: RewardIntervalType.NONE,
   [ConfigurationFields.REFERENCE_TOKEN]: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
   [ConfigurationFields.REWARD_TOKENS]: "",  
   [ConfigurationFields.WHITELIST_TOKENS]: [

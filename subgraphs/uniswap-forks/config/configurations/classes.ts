@@ -1,4 +1,4 @@
-import { BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 import { ConfigurationFields } from "./fields";
 import { FieldMap } from "./types";
@@ -35,7 +35,7 @@ class IConfig {
       this.protocolName = configurations[ConfigurationFields.PROTOCOL_NAME];
       this.protocolSlug = configurations[ConfigurationFields.PROTOCOL_SLUG];
       this.factoryAddress = configurations[ConfigurationFields.FACTORY_ADDRESS];
-      this.factoryContract = configurations[ConfigurationFields.FACTORY_CONTRACT];
+      this.factoryContract = Factory.bind(Address.fromString(ConfigurationFields.FACTORY_ADDRESS));
   
       this.tradingFee = configurations[ConfigurationFields.TRADING_FEE];
       this.protocolFeeToOn = configurations[ConfigurationFields.PROTOCOL_FEE_TO_ON];

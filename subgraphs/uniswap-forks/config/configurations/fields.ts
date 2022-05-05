@@ -5,7 +5,6 @@ export namespace ConfigurationFields {
     export const PROTOCOL_SLUG = "PROTOCOL_SLUG"
   
     export const FACTORY_ADDRESS  = "FACTORY_ADDRESS"
-    export const FACTORY_CONTRACT = "FACTORY_CONTRACT"
   
     export const TRADING_FEE = "TRADING_FEE"
     export const PROTOCOL_FEE_TO_ON  = "PROTOCOL_FEE_TO_ON"
