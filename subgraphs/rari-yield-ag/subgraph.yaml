@@ -32,4 +32,32 @@ dataSources:
           handler: handleYieldDeposit
         - event: Withdrawal(indexed string,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleYieldWithdrawal
-  # - kind: # TODO
+  - kind: ethereum/contract
+    name: RariUSDCFundManager
+    network: mainnet
+    source:
+      address: "0x66f4856f1bbd1eb09e1c8d9d646f5a3a193da569"
+      abi: RariStableFundManager
+      startBlock: 12371613
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/mappings.ts
+      entities:
+        - Deposit
+        - Withdraw
+      abis:
+        - name: RariStableFundManager
+          file: ./abis/stables-pool/RariStableFundManager.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed string,indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleUSDCDeposit
+        - event: Withdrawal(indexed string,indexed address,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleUSDCWithdrawal
