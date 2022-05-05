@@ -172,48 +172,50 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 
 #### Baseline - String IDs and no immutables
 
-- Start time - 2:11:00 PM May 3 2022
+- Start time - 3:45:30 PM May 4 2022
 - Start block - 10,000,834
 
-* Checkpoint 1  -4:20:07 PM May 3 2022
-  - End block - 10,880,063
-  - Block Difference - 879,229
-  - Seconds between start and end - 7747
-  - Blocks per second - 113.493
+* Checkpoint 1  -9:44:02 AM May 5 2022
+  - End block - 10,539,781
+  - Block Difference - 538,947
+  - Seconds between start and end - 64,712
+  - Blocks per second - 8.3284
 
 #### Immutables - Added Immutables
 
-- Start time - 2:10:00 PM May 3 2022
+- Start time - 3:46:15 PM May 4 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - 4:21:15 PM May 3 2022
-  - End block - 10,868,153
-  - Block Difference - 867,319
-  - Seconds between start and end - 7875
-  - Blocks per second - 110.136
+* Checkpoint 1 - 9:46:15 AM May 5 2022
+  - End block - 10,506,323
+  - Block Difference - 505,489
+  - Seconds between start and end - 64,800
+  - Blocks per second - 7.8008
 
 #### Bytes - Added Byte IDs
 
-- Start time - 2:13:31 PM May 3 2022
+- Start time - 3:49:39 PM May 4 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - 4:21:04 May 3 2022
-  - End block - 10,223,544
-  - Block Difference - 222,710
-  - Seconds between start and end - 7653
-  - Blocks per second - 29.101
+* Checkpoint 1 - 9:47:03 AM May 5 2022
+  - End block - 10,438,534
+  - Block Difference - 437,700
+  - Seconds between start and end - 64,680
+  - Blocks per second - 6.7672
 
 #### Both - Added Immutables and Byte IDs
 
-- Start time - 2:12:33 PM May 3 2022
+- Start time - 3:48:35 PM May 4 2022
 - Start block - 10,000,834
 
-* Checkpoint 1 - 4:23:12 PM May 3 2022
-  - End block - 10,193,832
-  - Block Difference - 192,998
-  - Seconds between start and end - 7839
-  - Blocks per second - 24.62
+* Checkpoint 1 - 9:48:36 AM May 5 2022
+  - End block - 10,534,297
+  - Block Difference - 533,463
+  - Seconds between start and end - 64,801
+  - Blocks per second - 8.2323
 
 ### Results
 
-- 
+- The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed. 
+- The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%). 
+- These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and acheive the desired performance improvements. 
