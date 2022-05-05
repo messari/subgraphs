@@ -169,7 +169,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
 - The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount 
 
 ### Checkpoints
-
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
 #### Baseline - String IDs and no immutables
 
 - Start time - 3:45:30 PM May 4 2022
@@ -182,6 +182,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Blocks per second - 8.3284
 
 #### Immutables - Added Immutables
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
 
 - Start time - 3:46:15 PM May 4 2022
 - Start block - 10,000,834
@@ -193,6 +194,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Blocks per second - 7.8008
 
 #### Bytes - Added Byte IDs
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 
 - Start time - 3:49:39 PM May 4 2022
 - Start block - 10,000,834
@@ -204,7 +206,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - Blocks per second - 6.7672
 
 #### Both - Added Immutables and Byte IDs
-
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
 - Start time - 3:48:35 PM May 4 2022
 - Start block - 10,000,834
 
