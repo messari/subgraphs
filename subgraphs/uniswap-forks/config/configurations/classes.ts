@@ -4,102 +4,105 @@ import { ConfigurationFields } from "./fields";
 import { FieldMap } from "./types";
 
 class IConfig {
-    NETWORK: string;
+    network: string;
   
-    PROTOCOL_NAME: string;
-    PROTOCOL_SLUG: string;
+    protocolName: string;
+    protocolSlug: string;
   
-    FACTORY_ADDRESS: string
-    FACTORY_CONTRACT: Factory
+    factoryAddress: string
+    factoryContract: Factory
   
-    TRADING_FEE: BigDecimal;
-    PROTOCOL_FEE_TO_ON: BigDecimal;
-    LP_FEE_TO_ON: BigDecimal;
-    PROTOCOL_FEE_TO_OFF: BigDecimal;
-    LP_FEE_TO_OFF: BigDecimal;
-    FEE_ON_OFF: string;
+    tradingFee: BigDecimal;
+    protocolFeeToOn: BigDecimal;
+    lpFeeToOn: BigDecimal;
+    protocolFeeToOff: BigDecimal;
+    lpFeeToOff: BigDecimal;
+    feeOnOff: string;
   
-    REWARD_INTERVAL_TYPE: string;
+    rewardIntervalType: string;
   
-    NATIVE_TOKEN: string;
-    REWARD_TOKENS: string;
-    WHITELIST_TOKENS: string[];
-    STABLE_COINS: string[];
-    STABLE_ORACLE_POOLS: string[];
-    UNTRACKED_PAIRS: string[];
+    referenceToken: string;
+    rewardToken: string;
+    whitelistTokens: string[];
+    stableCoins: string[];
+    stableOraclePools: string[];
+    untrackedPairs: string[];
   
     constructor(configurations: FieldMap) {
   
-      this.NETWORK = configurations[ConfigurationFields.NETWORK];
+      this.network = configurations[ConfigurationFields.NETWORK];
   
-      this.PROTOCOL_NAME = configurations[ConfigurationFields.PROTOCOL_NAME];
-      this.PROTOCOL_SLUG = configurations[ConfigurationFields.PROTOCOL_SLUG];
-      this.FACTORY_ADDRESS = configurations[ConfigurationFields.FACTORY_ADDRESS];
-      this.FACTORY_CONTRACT = configurations[ConfigurationFields.FACTORY_CONTRACT];
+      this.protocolName = configurations[ConfigurationFields.PROTOCOL_NAME];
+      this.protocolSlug = configurations[ConfigurationFields.PROTOCOL_SLUG];
+      this.factoryAddress = configurations[ConfigurationFields.FACTORY_ADDRESS];
+      this.factoryContract = configurations[ConfigurationFields.FACTORY_CONTRACT];
   
-      this.TRADING_FEE = configurations[ConfigurationFields.TRADING_FEE];
-      this.PROTOCOL_FEE_TO_ON = configurations[ConfigurationFields.PROTOCOL_FEE_TO_ON];
-      this.LP_FEE_TO_ON = configurations[ConfigurationFields.LP_FEE_TO_ON];
-      this.PROTOCOL_FEE_TO_OFF = configurations[ConfigurationFields.PROTOCOL_FEE_TO_OFF];
-      this.LP_FEE_TO_OFF = configurations[ConfigurationFields.LP_FEE_TO_OFF];
-      this.FEE_ON_OFF = configurations[ConfigurationFields.FEE_ON_OFF];
+      this.tradingFee = configurations[ConfigurationFields.TRADING_FEE];
+      this.protocolFeeToOn = configurations[ConfigurationFields.PROTOCOL_FEE_TO_ON];
+      this.lpFeeToOn = configurations[ConfigurationFields.LP_FEE_TO_ON];
+      this.protocolFeeToOff = configurations[ConfigurationFields.PROTOCOL_FEE_TO_OFF];
+      this.lpFeeToOff = configurations[ConfigurationFields.LP_FEE_TO_OFF];
+      this.feeOnOff = configurations[ConfigurationFields.FEE_ON_OFF];
   
-      this.REWARD_INTERVAL_TYPE = configurations[ConfigurationFields.REWARD_INTERVAL_TYPE];
-      this.NATIVE_TOKEN = configurations[ConfigurationFields.REFERENCE_TOKEN];
-      this.REWARD_TOKENS = configurations[ConfigurationFields.REWARD_TOKENS];
-      this.WHITELIST_TOKENS = configurations[ConfigurationFields.WHITELIST_TOKENS];
-      this.STABLE_COINS = configurations[ConfigurationFields.STABLE_COINS];
-      this.STABLE_ORACLE_POOLS = configurations[ConfigurationFields.STABLE_ORACLE_POOLS];
-      this.UNTRACKED_PAIRS = configurations[ConfigurationFields.UNTRACKED_PAIRS];
+      this.rewardIntervalType = configurations[ConfigurationFields.REWARD_INTERVAL_TYPE];
+      this.referenceToken = configurations[ConfigurationFields.REFERENCE_TOKEN];
+      this.rewardToken = configurations[ConfigurationFields.REWARD_TOKENS];
+      this.whitelistTokens = configurations[ConfigurationFields.WHITELIST_TOKENS];
+      this.stableCoins = configurations[ConfigurationFields.STABLE_COINS];
+      this.stableOraclePools = configurations[ConfigurationFields.STABLE_ORACLE_POOLS];
+      this.untrackedPairs = configurations[ConfigurationFields.UNTRACKED_PAIRS];
     } 
   
     getNetwork() {
-      return this.NETWORK;
+      return this.network;
     }
     getProtocolName() {
-      return this.PROTOCOL_NAME;
+      return this.protocolName;
     }
     getProtocolSlug() {
-      return this.PROTOCOL_SLUG;
+      return this.protocolSlug;
     }
     getFactoryAddress() {
-      return this.FACTORY_ADDRESS;
+      return this.factoryAddress;
     }
     getFactoryContract() { 
-      return this.FACTORY_CONTRACT;
+      return this.factoryContract;
     }
     getTradeFee() {
-      return this.TRADING_FEE;
+      return this.tradingFee;
     }
     getProtocolFeeToOn() {
-      return this.PROTOCOL_FEE_TO_ON;
+      return this.protocolFeeToOn;
     }
     getLPFeeToOn() {
-      return this.LP_FEE_TO_ON;
+      return this.lpFeeToOn;
     }
     getProtocolFeeToOff() {
-      return this.PROTOCOL_FEE_TO_OFF;
+      return this.protocolFeeToOff;
     }
     getLPFeeToOff() {
-      return this.LP_FEE_TO_OFF;
+      return this.lpFeeToOff;
     }
     getFeeOnOff() {
-      return this.FEE_ON_OFF;
+      return this.feeOnOff;
     }
     getNativeToken() {
-      return this.NATIVE_TOKEN;
+      return this.referenceToken;
     }
     getRewardTokens() {
-      return this.REWARD_TOKENS;
+      return this.rewardToken;
     }
     getWhitelistTokens() {
-      return this.WHITELIST_TOKENS;
+      return this.whitelistTokens;
     }
     getStableCoins() {
-      return this.STABLE_COINS;
+      return this.stableCoins;
     }
     getStableOraclePools() {
-      return this.STABLE_ORACLE_POOLS;
+      return this.stableOraclePools;
+    }
+    getUntrackedPairs() {
+      return this.untrackedPairs;
     }
   }
   
