@@ -1,0 +1,39 @@
+{
+  markets {
+    id
+    name
+    maximumLTV
+    liquidationThreshold
+    liquidationPenalty
+    inputToken {
+      name
+    }
+    outputToken {
+      name
+    }
+    rates {
+      rate
+      side
+      type
+    }
+    totalValueLockedUSD
+    totalDepositBalanceUSD
+    cumulativeDepositUSD
+    totalBorrowBalanceUSD
+    cumulativeBorrowUSD
+    cumulativeLiquidateUSD
+    inputTokenBalance
+    inputTokenPriceUSD
+    outputTokenSupply
+    exchangeRate
+    rewardTokens {
+      token {
+        name
+      }
+    }
+    rewardTokenEmissionsAmount
+    rewardTokenEmissionsUSD
+    _accrualBlockNumber
+    _accrualTimestamp
+  }
+}

@@ -1,153 +1,284 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { Address, ethereum } from "@graphprotocol/graph-ts"
+import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { NetworkConfigs } from "../../config/paramConfig";
+import { ERC20 } from "../../generated/Factory/ERC20";
 import {
   DexAmmProtocol,
   LiquidityPool,
-  _Account,
-  _DailyActiveAccount,
   _HelperStore,
-  _TokenTracker,
-  PoolDailySnapshot,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   _LiquidityPoolAmount,
   LiquidityPoolFee,
-} from "../../generated/schema"
-
-import { BIGDECIMAL_ZERO, HelperStoreType, Network, INT_ZERO, FACTORY_ADDRESS, ProtocolType, SECONDS_PER_DAY, DEFAULT_DECIMALS } from "../common/constants"
-
-export function getOrCreateEtherHelper(): _HelperStore {
-    let ether = _HelperStore.load(HelperStoreType.ETHER)
-    if (ether === null) {
-        ether = new _HelperStore(HelperStoreType.ETHER)
-        ether.valueDecimal = BIGDECIMAL_ZERO
-        ether.save()
-    }
-    return ether
-}
-export function getOrCreateUsersHelper(): _HelperStore {
-    let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS)
-    if (uniqueUsersTotal === null) {
-        uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-        uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO
-        uniqueUsersTotal.save()
-    }
-    return uniqueUsersTotal
-}
+  Token,
+  _TokenWhitelist,
+  LiquidityPoolHourlySnapshot,
+  LiquidityPoolDailySnapshot,
+  UsageMetricsHourlySnapshot,
+} from "../../generated/schema";
+import {
+  INT_ZERO,
+  BIGDECIMAL_ZERO,
+  ProtocolType,
+  HelperStoreType,
+  DEFAULT_DECIMALS,
+  SECONDS_PER_DAY,
+  BIGINT_ZERO,
+  SECONDS_PER_HOUR,
+  PROTOCOL_SCHEMA_VERSION,
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_METHODOLOGY_VERSION,
+} from "./constants";
 
 export function getOrCreateDex(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(FACTORY_ADDRESS)
+  let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
 
-  if (protocol === null) {
-    protocol = new DexAmmProtocol(FACTORY_ADDRESS)
-    protocol.name = "Uniswap v3"
-    protocol.slug = "uniswap-v3"
-    protocol.schemaVersion = "1.0.1"
-    protocol.subgraphVersion = "1.0.0"
-    protocol.totalUniqueUsers = INT_ZERO
-    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
-    protocol.network = Network.ETHEREUM
-    protocol.type = ProtocolType.EXCHANGE
+  if (!protocol) {
+    protocol = new DexAmmProtocol(NetworkConfigs.FACTORY_ADDRESS);
+    protocol.name = NetworkConfigs.PROTOCOL_NAME;
+    protocol.slug = NetworkConfigs.PROTOCOL_SLUG;
+    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.network = NetworkConfigs.NETWORK;
+    protocol.type = ProtocolType.EXCHANGE;
 
-    protocol.save()
+    protocol.save();
+  }
+  return protocol;
+}
 
-    // create new ether price storage object
-    let ether = getOrCreateEtherHelper()
+export function getOrCreateToken(address: string): Token {
+  let token = Token.load(address);
+  if (!token) {
+    token = new Token(address);
+    let erc20Contract = ERC20.bind(Address.fromString(address));
+    let decimals = erc20Contract.try_decimals();
+    // Using try_cause some values might be missing
+    let name = erc20Contract.try_name();
+    let symbol = erc20Contract.try_symbol();
+    // TODO: add overrides for name and symbol
+    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
+    token.name = name.reverted ? "" : name.value;
+    token.symbol = symbol.reverted ? "" : symbol.value;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
+    token.save();
+  }
+  return token as Token;
+}
 
-    // Tracks the total number of unique users of the protocol 
-    let uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS)
-    uniqueUsersTotal.valueInt = INT_ZERO
-    uniqueUsersTotal.save()
-  }  
-  return protocol
+export function getOrCreateLPToken(tokenAddress: string, token0: Token, token1: Token): Token {
+  let token = Token.load(tokenAddress);
+  // fetch info if null
+  if (token === null) {
+    token = new Token(tokenAddress);
+    token.symbol = token0.name + "/" + token1.name;
+    token.name = token0.name + "/" + token1.name + " LP";
+    token.decimals = DEFAULT_DECIMALS;
+    token.save();
+  }
+  return token;
 }
 
 export function getLiquidityPool(poolAddress: string): LiquidityPool {
-    return LiquidityPool.load(poolAddress)!
+  return LiquidityPool.load(poolAddress)!;
 }
 
 export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmount {
-    return _LiquidityPoolAmount.load(poolAddress)!
+  return _LiquidityPoolAmount.load(poolAddress)!;
 }
 
 export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
-    return LiquidityPoolFee.load(id)!
+  return LiquidityPoolFee.load(id)!;
 }
-
 
 export function getFeeTier(event: ethereum.Event): _HelperStore {
-    return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!
+  return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!;
 }
 
-export function getOrCreateTokenTracker(tokenAddress: Address): _TokenTracker {
-    let tokenTracker = _TokenTracker.load(tokenAddress.toHexString())
-    // fetch info if null
-    if (tokenTracker === null) {
+export function getOrCreateTokenWhitelist(tokenAddress: string): _TokenWhitelist {
+  let tokenTracker = _TokenWhitelist.load(tokenAddress);
+  // fetch info if null
+  if (!tokenTracker) {
+    tokenTracker = new _TokenWhitelist(tokenAddress);
 
-        tokenTracker = new _TokenTracker(tokenAddress.toHexString())
+    tokenTracker.whitelistPools = [];
+    tokenTracker.save();
+  }
 
-        tokenTracker.whitelistPools = []
-        tokenTracker.save()
-    }
-
-    return tokenTracker
+  return tokenTracker;
 }
 
-export function getOrCreateUsageMetricSnapshot(event: ethereum.Event): UsageMetricsDailySnapshot{
-    // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+  // Number of days since Unix epoch
+  let id = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let dayId = id.toString();
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsDailySnapshot.load(dayId);
 
-    // Create unique id for the day
-    let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
-  
-    if (!usageMetrics) {
-        usageMetrics = new UsageMetricsDailySnapshot(id.toString());
-        usageMetrics.protocol = FACTORY_ADDRESS;
-  
-        usageMetrics.activeUsers = 0;
-        usageMetrics.totalUniqueUsers = 0;
-        usageMetrics.dailyTransactionCount = 0;
-        usageMetrics.save()
-    }
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsDailySnapshot(dayId);
+    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
 
-    return usageMetrics
+    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
+    usageMetrics.dailyDepositCount = INT_ZERO;
+    usageMetrics.dailyWithdrawCount = INT_ZERO;
+    usageMetrics.dailySwapCount = INT_ZERO;
+
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
+}
+export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
+  // Number of days since Unix epoch
+  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
+  let hourId = hour.toString();
+
+  // Create unique id for the day
+  let usageMetrics = UsageMetricsHourlySnapshot.load(hourId);
+
+  if (!usageMetrics) {
+    usageMetrics = new UsageMetricsHourlySnapshot(hourId);
+    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+
+    usageMetrics.hourlyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.hourlyTransactionCount = INT_ZERO;
+    usageMetrics.hourlyDepositCount = INT_ZERO;
+    usageMetrics.hourlyWithdrawCount = INT_ZERO;
+    usageMetrics.hourlySwapCount = INT_ZERO;
+
+    usageMetrics.blockNumber = event.block.number;
+    usageMetrics.timestamp = event.block.timestamp;
+
+    usageMetrics.save();
+  }
+
+  return usageMetrics;
 }
 
-export function getOrCreatePoolDailySnapshot(event: ethereum.Event): PoolDailySnapshot {
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-    let poolAddress = event.address.toHexString()
-    let poolMetrics = PoolDailySnapshot.load(poolAddress.concat("-").concat(id.toString()));
-    
-    if (!poolMetrics) {
-        poolMetrics = new PoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
-        poolMetrics.protocol = FACTORY_ADDRESS;
-        poolMetrics.pool = poolAddress;
-        poolMetrics.rewardTokenEmissionsAmount = []
-        poolMetrics.rewardTokenEmissionsUSD = []
+export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
+  let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let dayId = day.toString();
+  let poolMetrics = LiquidityPoolDailySnapshot.load(
+    event.address
+      .toHexString()
+      .concat("-")
+      .concat(dayId)
+  );
 
-        poolMetrics.save()
-    }
+  if (!poolMetrics) {
+    poolMetrics = new LiquidityPoolDailySnapshot(
+      event.address
+        .toHexString()
+        .concat("-")
+        .concat(dayId)
+    );
+    poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.dailyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
-    return poolMetrics
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.save();
+  }
+
+  return poolMetrics;
 }
 
-export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
-    // Number of days since Unix epoch
-    let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
+  let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
 
-    let financialMetrics = FinancialsDailySnapshot.load(id.toString());
-  
-    if (!financialMetrics) {
-        financialMetrics = new FinancialsDailySnapshot(id.toString());
-        financialMetrics.protocol = FACTORY_ADDRESS;
-  
-        financialMetrics.feesUSD = BIGDECIMAL_ZERO
-        financialMetrics.totalVolumeUSD = BIGDECIMAL_ZERO
-        financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO
-        financialMetrics.supplySideRevenueUSD = BIGDECIMAL_ZERO
-        financialMetrics.protocolSideRevenueUSD = BIGDECIMAL_ZERO
+  let hourId = hour.toString();
+  let poolMetrics = LiquidityPoolHourlySnapshot.load(
+    event.address
+      .toHexString()
+      .concat("-")
+      .concat(hourId)
+  );
 
-        financialMetrics.save()
-    }
-    return financialMetrics
+  if (!poolMetrics) {
+    poolMetrics = new LiquidityPoolHourlySnapshot(
+      event.address
+        .toHexString()
+        .concat("-")
+        .concat(hourId)
+    );
+    poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.hourlyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.hourlyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+
+    poolMetrics.blockNumber = event.block.number;
+    poolMetrics.timestamp = event.block.timestamp;
+
+    poolMetrics.save();
+  }
+
+  return poolMetrics;
+}
+
+export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
+  // Number of days since Unix epoch
+  let dayID = event.block.timestamp.toI32() / SECONDS_PER_DAY;
+  let id = dayID.toString();
+
+  let financialMetrics = FinancialsDailySnapshot.load(id);
+
+  if (!financialMetrics) {
+    financialMetrics = new FinancialsDailySnapshot(id);
+    financialMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+
+    financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+
+    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
+
+    financialMetrics.save();
+  }
+  return financialMetrics;
+}
+
+export function getOrCreateUsersHelper(): _HelperStore {
+  let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS);
+  if (uniqueUsersTotal === null) {
+    uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS);
+    uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO;
+    uniqueUsersTotal.save();
+  }
+  return uniqueUsersTotal;
 }

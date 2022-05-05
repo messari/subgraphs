@@ -26,11 +26,13 @@ The following tests are done to compare performance difference with the addition
   - End block - 10,219,356
   - Seconds between start and end - 4,447
   - Blocks per second - 2.58556
+
 * Checkpoint 2 - 9:58:44 PM April 22 2022
   - End block - 10,309,915
   - Block Difference - 102,057
   - Seconds between start and end - 75,328
   - Blocks per second - 1.3548
+
 * Checkpoint 3 - 10:41:00 PM April 23 2022
   - End block - 10,363,003
   - Block Difference - 155,145
@@ -46,12 +48,13 @@ The following tests are done to compare performance difference with the addition
   - End block - 10,224,219
   - Block Difference - 16,361
   - Seconds between start and end - 5,149
-  - Blocks per second - 3.17751 blocks per seconds
+  - Blocks per second - 3.17751
+
 * Checkpoint 2 - 9:57:08 AM April 22 2022
   - End block - 10,355,912
   - Block Difference - 148,045
   - Seconds between start and end - 76,096
-  - Blocks per second - 1.9463 Blocks per second
+  - Blocks per second - 1.9463
 
 ### Results
 
@@ -83,20 +86,20 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - End block - 10,233,252
   - Block Difference - 25,394
   - Seconds between start and end - 12,476
-  - Blocks per second - 2.0354 blocks per seconds
+  - Blocks per second - 2.0354
 
 * Checkpoint 2 - 9:53:37 PM April 25 2022
 
   - End block - 10,284,245
   - Block Difference - 76,387
   - Seconds between start and end - 39,320
-  - Blocks per second - 1.9427 blocks per seconds
+  - Blocks per second - 1.9427
 
 * Checkpoint 3 - 9:03:45 AM April 26 2022
   - End block - 10,331,012
   - Block Difference - 123,154
   - Seconds between start and end - 79,528
-  - Blocks per second - 1.5486 blocks per seconds
+  - Blocks per second - 1.5486
 
 #### Oracle 2
 
@@ -108,20 +111,20 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - End block - 10,233,547
   - Block Difference - 25,689
   - Seconds between start and end - 12,308
-  - Blocks per second - 2.0871 blocks per seconds
+  - Blocks per second - 2.0871
 
 * Checkpoint 2 - 9:51:46 PM April 25 2022
 
   - End block - 10,287,118
   - Block Difference - 79,260
   - Seconds between start and end - 39,083
-  - Blocks per second - 2.0278 blocks per seconds
+  - Blocks per second - 2.0278
 
 * Checkpoint 2 - 9:07:27 AM April 25 2022
   - End block - 10,336,413
   - Block Difference - 128,555
   - Seconds between start and end - 79,624
-  - Blocks per second - 1.6145 blocks per seconds
+  - Blocks per second - 1.6145
 
 #### Results
 
@@ -143,7 +146,7 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - End block - 10,285,287
   - Block Difference - 284,453
   - Seconds between start and end - 62,318
-  - Blocks per second - 4.5646 Blocks per second
+  - Blocks per second - 4.5646
 
 #### Without Hourly Metrics
 
@@ -154,9 +157,67 @@ The purpose of this test is to compare the performance of 2 price oracles in the
   - End block - 10,285,442
   - Block Difference - 284,608
   - Seconds between start and end - 62,245
-  - Blocks per second - 4.5724 Blocks per second
+  - Blocks per second - 4.5724
 
 ### Results
 
 - The results after a a roughly 5 hour test across about 284,000 is a nearly identical indexing speed. This test tells me that adding hourly metrics will not severely impact the indexing speed of a subgraph.
 - An additional insight that I believe can be extracted from this test is that event and call handlers are by far the greatest bottleneck in the indexing speed using The Graph.
+
+## Bytes and Immutables Test 1.0
+- The purpose of this test is to check how much changing the id values of entities to Bytes and adding immutable entities where relavent affects indexing performance 
+- The entities which I added the immutable quality to are the RewardToken, Deposit, Withdraw, Swap, Account, and ActiveAccount 
+
+### Checkpoints
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
+#### Baseline - String IDs and no immutables
+
+- Start time - 3:45:30 PM May 4 2022
+- Start block - 10,000,834
+
+* Checkpoint 1  -9:44:02 AM May 5 2022
+  - End block - 10,539,781
+  - Block Difference - 538,947
+  - Seconds between start and end - 64,712
+  - Blocks per second - 8.3284
+
+#### Immutables - Added Immutables
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-IDs
+
+- Start time - 3:46:15 PM May 4 2022
+- Start block - 10,000,834
+
+* Checkpoint 1 - 9:46:15 AM May 5 2022
+  - End block - 10,506,323
+  - Block Difference - 505,489
+  - Seconds between start and end - 64,800
+  - Blocks per second - 7.8008
+
+#### Bytes - Added Byte IDs
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
+
+- Start time - 3:49:39 PM May 4 2022
+- Start block - 10,000,834
+
+* Checkpoint 1 - 9:47:03 AM May 5 2022
+  - End block - 10,438,534
+  - Block Difference - 437,700
+  - Seconds between start and end - 64,680
+  - Blocks per second - 6.7672
+
+#### Both - Added Immutables and Byte IDs
+https://github.com/steegecs/subgraphs/tree/steegecs/uniswap-forks-bytes
+- Start time - 3:48:35 PM May 4 2022
+- Start block - 10,000,834
+
+* Checkpoint 1 - 9:48:36 AM May 5 2022
+  - End block - 10,534,297
+  - Block Difference - 533,463
+  - Seconds between start and end - 64,801
+  - Blocks per second - 8.2323
+
+### Results
+
+- The results of this test indicate that having neither bytes as IDs or immutable entities is the fasted case. This is against our expectations. It was expected to see that adding both immutables and bytes as IDs would improve indexing speed. 
+- The results are quite strange upon analysis. Adding bytes as IDs only slows down the indexing process quite a lot (-23%) and adding immutables only slows the indexing process by a moderate amount (-6.8%). However when we combine both the addition of immutables and bytes, it only slightly slows down the indexing process (-1.2%). 
+- These results are far from the expectation of how the addition of immutables and bytes as IDs would impact the speed of indexing in isolation and combination. The results of this test warrant investation into how the graph handles immutables and bytes as IDs behind the scenes so that we can get results more in line with our expectation and acheive the desired performance improvements. 
