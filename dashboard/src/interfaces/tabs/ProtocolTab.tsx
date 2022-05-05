@@ -1,6 +1,7 @@
 import { Grid } from "@mui/material";
 import { Chart } from "../../chartComponents/Chart";
 import { TableChart } from "../../chartComponents/TableChart";
+import { ProtocolTypeEntity } from "../../constants";
 import SchemaTable from "../SchemaTable";
 
 function ProtocolTab(
@@ -8,10 +9,11 @@ function ProtocolTab(
   entities: string[],
   entitiesData: {[x: string]: {[x: string]: string}},
   protocolFields: {[x: string]: string},
-  setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>
+  setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>,
+  warning: {message: string, type: string}[]
 ) {
 
-  const issues: {message: string, type: string}[] = [];
+  const issues: {message: string, type: string}[] = warning;
 
   console.log(entitiesData)
   const excludedEntities = [
@@ -37,9 +39,9 @@ function ProtocolTab(
     // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
     const dataFieldMetrics: {[dataField: string]: {[metric: string]: number}} = {}
     // For the current entity, loop through all instances of that entity
-    currentEntityData.forEach((entityInstance: {[x: string]: any }) => {
+    for (let x = currentEntityData.length - 1; x > 0; x--) {
+      const entityInstance: {[x: string]: any } = currentEntityData[x];
       // On the entity instance, loop through all of the entity fields within it
-
       Object.keys(entityInstance).forEach((entityFieldName: string) => {
         // skip the timestamp field on each entity instance
         if (entityFieldName === 'timestamp') {
@@ -72,7 +74,7 @@ function ProtocolTab(
           });
         }
       });
-    });
+    };
 
     // For each entity field/key in the dataFields object, create a chart and tableChart component
     // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
@@ -89,7 +91,9 @@ function ProtocolTab(
         const label = entityName + '-' + field;
         if (dataFieldMetrics[field].sum === 0) {
           // Create a warning for the 0 sum of all snapshots for this field
-          issues.push({type: "SUM", message: label})
+          if (issues.filter(x => x.message === label).length === 0) {
+            issues.push({type: "SUM", message: label});
+          }        
         }
         return (<>
           <Grid key={label + '1'} id={label} item xs={8}>
@@ -103,7 +107,9 @@ function ProtocolTab(
     }</Grid></>)
   });
 
-  const protocolSchema = SchemaTable({[data.protocols[0].type]: protocolFields}, []);
+  const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type]
+  console.log(protTypeEntity, data[protTypeEntity], data)
+  const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warning);
 
   if (issues.length > 0) {
     setWarning(issues);

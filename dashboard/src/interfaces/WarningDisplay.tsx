@@ -6,8 +6,8 @@
 
     if (warningArray.length > 0) {
       warningTotalCount += warningArray.length;
-      for (let x = 0; x < 5; x++) {
-        // Take up to the first 5 query warning messages and push them to the warningMsgs array
+      for (let x = 0; x < 7; x++) {
+        // Take up to the first 7 query warning messages and push them to the warningMsgs array
         if (!warningArray[x]) {
           break;
         }

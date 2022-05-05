@@ -68,7 +68,18 @@ export const schema100 = (): Schema => {
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 500) {
+        yieldAggregators {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          network
+          type
+          totalValueLockedUSD
+          totalUniqueUsers
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -80,13 +91,13 @@ export const schema100 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        vaultDailySnapshots(first:500, where: {vault: $poolId}) {
+        vaultDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -114,14 +125,14 @@ export const schema100 = (): Schema => {
           symbol
           depositLimit
         }
-        withdraws(first: 500, where: {vault: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, where: {vault: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -197,7 +208,20 @@ export const schema110 = (): Schema => {
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 500) {
+        yieldAggregators {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          methodologyVersion
+          network
+          type
+          totalUniqueUsers
+          totalValueLockedUSD
+          totalVolumeUSD
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -208,13 +232,13 @@ export const schema110 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        vaultDailySnapshots(first:500, where: {vault: $poolId}) {
+        vaultDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -242,14 +266,14 @@ export const schema110 = (): Schema => {
           symbol
           depositLimit
         }
-        withdraws(first: 500, where: {vault: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, where: {vault: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -350,12 +374,12 @@ export const schema120 = (): Schema => {
   };
 
 
-  const finanQuery = "financialsDailySnapshots(first: 500) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDaiflySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
+  const usageDailyQuery = "usageMetricsDaiflySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
+  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
 
-  const vaultDailyQuery = "vaultDailySnapshots(first: 500, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
-  const vaultHourlyQuery = "vaultHourlySnapshots(first: 500, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultHourlySnapshots).join(',') + '}';
+  const vaultDailyQuery = "vaultDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
+  const vaultHourlyQuery = "vaultHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultHourlySnapshots).join(',') + '}';
 
 
   const events = ["withdraws","deposits"];
@@ -369,7 +393,7 @@ export const schema120 = (): Schema => {
   ];
   const eventsQuery = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 500, where: {vault: $poolId}" + options + ") { "
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}" + options + ") { "
     const fields = eventsFields.join(", ");
     return baseStr + fields + ' }'
   });
@@ -399,6 +423,22 @@ export const schema120 = (): Schema => {
         type
         schemaVersion
         subgraphVersion
+      }
+      yieldAggregators {
+        id
+        name
+        slug
+        schemaVersion
+        subgraphVersion
+        methodologyVersion
+        network
+        type
+        totalValueLockedUSD
+        protocolControlledValueUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        cumulativeUniqueUsers
       }
       vaults {
         id

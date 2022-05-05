@@ -12,11 +12,11 @@ function PoolTab(
   poolId: string,
   setPoolId: React.Dispatch<React.SetStateAction<string>>,
   poolData: {[x: string]: string},
-  parseMetaData: any,
-  setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>
+  setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>,
+  warning: {message: string, type: string}[]
 ) {
 
-    const issues: {message: string, type: string}[] = [];
+    const issues: {message: string, type: string}[] = warning;
     const excludedEntities = [
         "financialsDailySnapshots",
         "usageMetricsDailySnapshots",
@@ -65,7 +65,9 @@ function PoolTab(
           });
         });
 
-        return ( <Grid key={entityName} style={{borderTop: "black 2px solid"}} container><h2>ENTITY: {entityName} - {poolId}</h2>{          
+        return ( 
+        <Grid key={entityName} style={{borderTop: "black 2px solid"}} container>
+          <h2>ENTITY: {entityName} - {poolId}</h2>{          
           Object.keys(dataFields).map((field: string) => {
             const fieldName = field.split(' [')[0]
             const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
@@ -76,7 +78,9 @@ function PoolTab(
             const label = entityName + '-' + field;
             if (dataFieldMetrics[field].sum === 0) {
               // The error message is more to be used as data on how to handle the error. Syntax is ERRORTYPE%%ENTITY--FIELD
-              issues.push({type: "SUM", message: label});
+              if (issues.filter(x => x.message === label).length === 0) {
+                issues.push({type: "SUM", message: label});
+              }
             }
             return (<>
               <Grid key={label + '1'} id={label} item xs={8}>
@@ -94,52 +98,14 @@ function PoolTab(
       setWarning(issues);
     }
 
-    const schemaDisplayObj: {[x: string]: any} = {};
-    if (data.protocols[0].type === "LENDING") {
-      schemaDisplayObj.Market = poolData;
-    } else if (data.protocols[0].type === "EXCHANGE") {
-      schemaDisplayObj.LiquidityPool = poolData;
-    } else if (data.protocols[0].type === "YIELD") {
-      schemaDisplayObj.Vault = poolData;
-    }
-  
-    const poolSchema = SchemaTable(schemaDisplayObj, []);
+    const poolName = PoolName[data.protocols[0].type];
+    const poolNames = PoolNames[data.protocols[0].type];
+    const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
 
     return (
       <div>
         {poolSchema}
-        {poolDropDown(poolId, setPoolId, data.markets, PoolNames)}
-          {poolId
-            ?
-            <TableContainer component={Paper} sx={{justifyContent:"center", display:"flex", alignItems:"center"}}>
-              <Table sx={{ maxWidth: 800 }} aria-label="simple table">
-                <TableBody>
-
-                  {
-                    Object.keys(poolData).map((item) => {
-                      const val = String(data.protocols[0].type);
-                      const poolName = PoolName[val];
-                      const poolValues = data[poolName];
-                      let value = poolValues[item];
-                      if (value === "" || !value) {
-                        return null;
-                      }
-      
-                      return (
-                        <TableRow key={item}>
-                          <TableCell component="th" scope="row">
-                            {item}
-                          </TableCell>
-                          <TableCell align="right">{parseMetaData(value, item,poolValues)}</TableCell>
-                        </TableRow>
-                      );
-                    })
-                  }
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-          : null}
+        {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
       {poolEntityElements}
     </div>)
 }

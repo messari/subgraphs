@@ -55,7 +55,20 @@ export const schema100 = (): Schema => {
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 500) {
+        lendingProtocols {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          network
+          type
+          riskType
+          lendingType
+          totalUniqueUsers
+          totalValueLockedUSD
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -67,13 +80,13 @@ export const schema100 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        marketDailySnapshots(first:500, where: {market: $poolId}) {
+        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -104,21 +117,21 @@ export const schema100 = (): Schema => {
          variableBorrowRate
         }
          
-        withdraws(first: 500, where: {market: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        repays(first: 500, where: {market: $poolId}) {
+        repays(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        liquidates(first: 500, where: {market: $poolId}) {
+        liquidates(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -126,14 +139,14 @@ export const schema100 = (): Schema => {
           amountUSD
           profitUSD
         }
-        deposits(first: 500, where: {market: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        borrows(first: 500, where: {market: $poolId}) {
+        borrows(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -227,24 +240,41 @@ export const schema110 = (): Schema => {
           schemaVersion
           subgraphVersion
         }
+        lendingProtocols {
+          id
+          name,
+          slug,
+          schemaVersion,
+          subgraphVersion,
+          methodologyVersion,
+          network,
+          type,
+          riskType,
+          lendingType,
+          totalUniqueUsers,
+          totalValueLockedUSD,
+          totalVolumeUSD,
+          totalDepositUSD,
+          totalBorrowUSD
+        }
         markets {
           id
           name
         }
-        financialsDailySnapshots(first: 500) {
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
           supplySideRevenueUSD
           timestamp
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        marketDailySnapshots(first:500, market: $poolId) {
+        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, market: $poolId) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -274,21 +304,21 @@ export const schema110 = (): Schema => {
          variableBorrowRate
         }
         
-        withdraws(first: 500, where: {market: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        repays(first: 500, where: {market: $poolId}) {
+        repays(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        liquidates(first: 500, where: {market: $poolId}) {
+        liquidates(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -296,14 +326,14 @@ export const schema110 = (): Schema => {
           amountUSD
           profitUSD
         }
-        deposits(first: 500, where: {market: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        borrows(first: 500, where: {market: $poolId}) {
+        borrows(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -422,12 +452,12 @@ export const schema120 = (): Schema => {
     }
   };
 
-  const finanQuery = "financialsDailySnapshots(first: 500) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDailySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
+  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
+  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
 
-  const marketDailyQuery = "marketDailySnapshots(first: 500, where: {market: $poolId}) {" + Object.keys(entitiesData.marketDailySnapshots).join(',') + '}';
-  const marketHourlyQuery = "marketHourlySnapshots(first: 500, where: {market: $poolId}) {" + Object.keys(entitiesData.marketHourlySnapshots).join(',') + '}';
+  const marketDailyQuery = "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + Object.keys(entitiesData.marketDailySnapshots).join(',') + '}';
+  const marketHourlyQuery = "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + Object.keys(entitiesData.marketHourlySnapshots).join(',') + '}';
 
   const eventsFields = [
     "hash",
@@ -441,7 +471,7 @@ export const schema120 = (): Schema => {
   const events: string[] = ["withdraws","repays","liquidates","deposits","borrows"];
   const eventsQuery: any[] = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 500, where: {market: $poolId}" + options + ") { "
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { "
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
       fields += ", profitUSD"
@@ -485,6 +515,33 @@ export const schema120 = (): Schema => {
       schemaVersion
       subgraphVersion
     }
+    lendingProtocols {
+      id      
+      name
+      slug
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      network
+      type
+      lendingType
+      riskType
+      mintedTokens {
+        id
+      }
+      cumulativeUniqueUsers
+      totalValueLockedUSD
+      protocolControlledValueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      mintedTokenSupplies
+    }
     markets {
       id
       name
@@ -496,6 +553,7 @@ export const schema120 = (): Schema => {
     ${marketDailyQuery}
     ${eventsQuery}
     market(id:$poolId){
+      id
       inputToken {
         decimals
         name

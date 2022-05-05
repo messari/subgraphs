@@ -1,7 +1,7 @@
 import "./ProtocolDashboard.css";
 import { Button, CircularProgress, Grid, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography } from "@mui/material";
 import TabPanel from '@mui/lab/TabPanel';
-import { ApolloClient, gql, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
+import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 import { Box } from "@mui/system";
 
 import { Chart as ChartJS, registerables } from "chart.js";
@@ -29,11 +29,16 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
     setSubgraphToQuery({url: subgraphUrl, version: subgraphToQuery.version});
   }
   ChartJS.register(...registerables);
-
+  const link = new HttpLink({
+    uri: subgraphToQuery.url,
+        // fetchOptions: {
+    //   mode: 'no-cors',
+    // }
+  });
   const client = useMemo(
     () =>
       new ApolloClient({
-        uri: subgraphToQuery.url,
+        link,
         cache: new InMemoryCache()
       }),
     [subgraphToQuery.url],
@@ -44,7 +49,6 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
         type
         schemaVersion
         subgraphVersion
-        methodologyVersion
         name
         id
       }
@@ -140,6 +144,8 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
       if (data) {
         // Data is the entity of the data in the subgraph. It is returned as an object with each entity as a key, and each value is an array with every instance of that entity
         console.log('DATA', data)
+        const issues: {message: string, type: string}[] = warning;
+        const poolNames = PoolNames[data.protocols[0].type];
 
         return (
           <>
@@ -156,30 +162,37 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
 
                   {/* PROTOCOL TAB */}
                   
-                  {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning)}
+                  {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning, warning)}
 
                 </TabPanel>
                 <TabPanel value="2">
 
                   {/* POOL TAB */}
 
-                  {PoolTab(data, entities, entitiesData, poolId, setPoolId, poolData, parseMetaData, setWarning)}
+                  {PoolTab(data, entities, entitiesData, poolId, setPoolId, poolData, setWarning, warning)}
 
                 </TabPanel>
                 <TabPanel value="3">
                   
                   {/* EVENTS TAB */}
-
-                  {poolDropDown(poolId, setPoolId, data.markets, PoolNames)}
+                  
+                  { setWarning(issues)}
+                  {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
                   {
                     events.map((eventName)=>{
-                      // let eventError = null;
-                      // if (!poolId && data[eventName].length > 0) {
-                      //   eventError = <h3 style={{color: "red"}}>A pool has not been selected, there should not be events</h3>
-                      // }
-                      // if (poolId && data[eventName].length === 0) {
-                      //   eventError = <h3 style={{color: "red"}}>No {eventName} on pool {poolId}</h3>
-                      // }
+                      console.log(data[eventName], eventName, data[eventName].length)
+                      if (!poolId && data[eventName].length > 0) {
+                        const message = 'No pool selected, there should not be "' + eventName + '" events';
+                        if (issues.filter(x => x.message === message).length === 0) {
+                          issues.push({message, type: "NOEV"});
+                        }
+                      }
+                      if (poolId && data[eventName].length === 0) {
+                        const message = "No " + eventName + " on pool " + poolId;
+                        if (issues.filter(x => x.message === message).length === 0) {
+                          issues.push({message, type: "EVENT"});
+                        }                      
+                      }
                       return <React.Fragment>{TableEvents(eventName, data[eventName])}</React.Fragment>;
                     })
                   }
@@ -204,13 +217,14 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
   }
   if (error && !loading) {
     errorRender = ErrorDisplay(error, setSubgraphToQuery, protocolSchemaData, subgraphToQuery);
-  }  
+  }
   
   let protocolInfo = null;
   if (protocolSchemaData?.protocols.length > 0) {
     protocolInfo = (
       <div style={{padding: "6px 24px"}}>
         <h3>{protocolSchemaData.protocols[0].name} - {protocolSchemaData.protocols[0].id}</h3>
+        <p>Subgraph Query Endpoint - {subgraphToQuery.url}</p>
         <p>Type - {protocolSchemaData.protocols[0].type}</p>
         <p>Schema Version - {schemaVersion}</p>
         <p>Subgraph Version - {protocolSchemaData?.protocols[0]?.subgraphVersion}</p>
