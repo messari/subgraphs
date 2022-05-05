@@ -138,3 +138,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# WebStorm cache
+.idea
+
+# Matchstick generated file
+.bin
