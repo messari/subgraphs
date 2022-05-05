@@ -1,0 +1,8 @@
+{
+    "name":"balances",
+    "outputs":[{"type":"uint256","name":"out"}],
+    "inputs":[{"type":"int128","name":"arg0"}],
+    "constant":true,"payable":false,
+    "type":"function",
+    "gas":2250
+}

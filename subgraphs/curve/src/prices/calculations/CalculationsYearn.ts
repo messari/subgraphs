@@ -46,8 +46,10 @@ export function getTokenPriceFromCalculationYearnV1(tokenAddr: Address, network:
   let pricePerFullShare: BigDecimal = utils
     .readValue<BigInt>(calculationYearnContract.try_getPricePerFullShare(), constants.BIGINT_ZERO)
     .toBigDecimal();
+  if (utils.isStableCoin(underlyingToken, network)) {
+    return CustomPriceType.initialize(BigDecimal.fromString("1.0"));
+  }
   let underlyingPrice = getTokenPriceFromCalculationAave(underlyingToken, network);
-  getPriceUsdc(underlyingToken, network);
   let usdcDecimals = utils.getTokenDecimals(tokensMapping!.get("USDC")!);
   let decimalsAdjustment = constants.DEFAULT_DECIMALS.minus(usdcDecimals);
   let tokenPrice = pricePerFullShare

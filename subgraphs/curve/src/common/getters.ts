@@ -23,7 +23,7 @@ import {
 import { StableSwap } from "../../generated/templates/Pool/StableSwap";
 import { CurvePoolCoin256 } from "../../generated/templates/Pool/CurvePoolCoin256";
 import { CurvePoolCoin128 } from "../../generated/templates/Pool/CurvePoolCoin128";
-import { getUsdPrice } from "../prices";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
 import { exponentToBigInt } from "./utils/numbers";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -185,8 +185,8 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
 
 export function getTokenPrice(tokenAddr: Address, event: ethereum.Event): BigDecimal {
   let token = getOrCreateToken(tokenAddr);
-  let priceUSD = getUsdPrice(Address.fromString(token.id),exponentToBigInt(BigInt.fromI32(token.decimals)));
-  token.lastPriceUSD = priceUSD
+  let priceUSD = getUsdPricePerToken(tokenAddr).usdPrice;
+  token.lastPriceUSD = priceUSD;
   token.lastPriceBlockNumber = event.block.number;
   token.save();
   return priceUSD

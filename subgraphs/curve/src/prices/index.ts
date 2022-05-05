@@ -12,24 +12,32 @@ import {
   getTokenPriceFromCalculationCurve,
   getTokenPriceFromCalculationCurveReplacements,
 } from "./calculations/CalculationsCurve";
-import { getTokenPriceFromCalculationYearn } from "./calculations/CalculationsYearn";
+import { getTokenPriceFromCalculationYearn, getTokenPriceFromCalculationYearnV1 } from "./calculations/CalculationsYearn";
 import { getTokenPriceFromCalculationAave } from "./calculations/CalculationsAAVE";
+import { getTokenPriceFromCalculationCompound } from "./calculations/CalculationsCompound";
+import { isStableCoin } from "./common/utils";
+import { getOrCreateToken } from "../common/getters";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
+  log.warning('getUsdPricePerToken function',[])
   // Check if tokenAddr is a NULL Address
   if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();
   }
 
   let network = dataSource.network();
-  let decimals = constants.BIGINT_TEN.pow(BigInt.fromI32(6).toI32() as u8).toBigDecimal();
+  
+
+  if (isStableCoin(tokenAddr, network)) {
+    return CustomPriceType.initialize(BigDecimal.fromString("1"),BigInt.fromI32(getOrCreateToken(tokenAddr).decimals));
+  }
 
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
     log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(decimals).toString(),
+      yearnLensPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(yearnLensPrice.usdPrice, BigInt.fromI32(6));
   }
@@ -39,7 +47,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!chainLinkPrice.reverted) {
     log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(decimals).toString(),
+      chainLinkPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(chainLinkPrice.usdPrice, BigInt.fromI32(6));
   }
@@ -49,11 +57,9 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsCurvePrice.reverted) {
     log.warning("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.div(decimals).toString(),
+      calculationsCurvePrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(calculationsCurvePrice.usdPrice, BigInt.fromI32(6));
-  } else {
-    log.warning("[calculationsCurvePrice] tokenAddr: {}", [tokenAddr.toHexString()]);
   }
 
   // 4. CalculationsSushiSwap
@@ -61,7 +67,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsSushiSwapPrice.reverted) {
     log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.div(decimals).toString(),
+      calculationsSushiSwapPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(calculationsSushiSwapPrice.usdPrice, BigInt.fromI32(6));
   }
@@ -71,7 +77,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!curvePrice.reverted) {
     log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      curvePrice.usdPrice.div(decimals).toString(),
+      curvePrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(curvePrice.usdPrice, BigInt.fromI32(6));
   }
@@ -81,7 +87,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!uniswapPrice.reverted) {
     log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(decimals).toString(),
+      uniswapPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(uniswapPrice.usdPrice, BigInt.fromI32(6));
   }
@@ -91,7 +97,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!sushiswapPrice.reverted) {
     log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(decimals).toString(),
+      sushiswapPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(sushiswapPrice.usdPrice, BigInt.fromI32(6));
   }
@@ -101,7 +107,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsYearnPrice.reverted) {
     log.warning("[CalculationsYearn] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsYearnPrice.usdPrice.div(decimals).toString(),
+      calculationsYearnPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(calculationsYearnPrice.usdPrice, BigInt.fromI32(6));
   }
@@ -111,7 +117,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsAavePrice.reverted) {
     log.warning("[CalculationsAave] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsAavePrice.usdPrice.div(decimals).toString(),
+      calculationsAavePrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(calculationsAavePrice.usdPrice, BigInt.fromI32(6));
   }
@@ -121,10 +127,32 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!calculationsCurveReplacementPrice.reverted) {
     log.warning("[CalculationsCurveReplacement] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurveReplacementPrice.usdPrice.div(decimals).toString(),
+      calculationsCurveReplacementPrice.usdPrice.div(constants.usd_decimals).toString(),
     ]);
     return CustomPriceType.initialize(calculationsCurveReplacementPrice.usdPrice, BigInt.fromI32(6));
   }
+
+  // 10. calculationsCompound
+  let calculationsCompoundPrice = getTokenPriceFromCalculationCompound(tokenAddr, network);
+  if (!calculationsCompoundPrice.reverted) {
+    log.warning("[calculationsCompoundPrice] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      calculationsCompoundPrice.usdPrice.div(constants.usd_decimals).toString(),
+    ]);
+    return CustomPriceType.initialize(calculationsCompoundPrice.usdPrice, BigInt.fromI32(6));
+  }
+
+  // 11. calculationsYearnV1
+  let calculationsYearnV1 = getTokenPriceFromCalculationYearnV1(tokenAddr, network);
+  if (!calculationsYearnV1.reverted) {
+    log.warning("[calculationsYearnV1] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      calculationsYearnV1.usdPrice.div(constants.usd_decimals).toString(),
+    ]);
+    return CustomPriceType.initialize(calculationsYearnV1.usdPrice, BigInt.fromI32(6));
+  }
+
+  
 
   log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
 

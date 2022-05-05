@@ -79,7 +79,7 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
 
     // handle fees
     log.warning("set fees call at {}",[event.transaction.hash.toHexString()]);
-    setPoolFees(liquidityPool, registryAddress,event);
+    setPoolFees(liquidityPool, registryAddress, event);
 
     liquidityPool.rewardTokens = [];
     liquidityPool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
@@ -97,6 +97,6 @@ export function getOrCreatePool(address: Address, registryAddress: Address, even
 }
 
 export function handlePoolAdded(event: PoolAdded): void {
-  let registryAddress = dataSource.address();
+  let registryAddress = event.address;
   getOrCreatePool(event.params.pool, registryAddress, event);
 }

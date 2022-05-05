@@ -75,8 +75,6 @@ dataSources:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
-        - name: CurvePoolV1
-          file: ./abis/CurvePoolV1.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -144,8 +142,8 @@ dataSources:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
-        - name: CurvePoolV1
-          file: ./abis/CurvePoolV1.json
+        - name: CalculationsCompound
+          file: ./abis/Prices/Calculations/Compound.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -178,8 +176,44 @@ dataSources:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
-        - name: CurvePoolV1
-          file: ./abis/CurvePoolV1.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: ChainLinkManual
+          file: ./abis/Prices/ChainLinkManual.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapFactoryV3
+          file: ./abis/Prices/Uniswap/FactoryV3.json
+        - name: Quoter
+          file: ./abis/Prices/Uniswap/Quoter.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: IronBankToken
+          file: ./abis/Prices/IronBankToken.json
+        - name: Atoken
+          file: ./abis/Prices/Atoken.json
+        - name: YearnTokenV1
+          file: ./abis/Prices/YearnTokenV1.json
+        - name: RedeemableKeep3r
+          file: ./abis/Prices/RedeemableKeep3r.json
+        - name: ChainlinkAggregator
+          file: ./abis/Prices/ChainlinkAggregator.json
+        - name: CalculationsCompound
+          file: ./abis/Prices/Calculations/Compound.json
       entities:
         - LiquidityPool
       eventHandlers:
@@ -217,8 +251,48 @@ dataSources:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
-        - name: CurvePoolV1
-          file: ./abis/CurvePoolV1.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: ChainLinkManual
+          file: ./abis/Prices/ChainLinkManual.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapFactoryV3
+          file: ./abis/Prices/Uniswap/FactoryV3.json
+        - name: Quoter
+          file: ./abis/Prices/Uniswap/Quoter.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: IronBankToken
+          file: ./abis/Prices/IronBankToken.json
+        - name: Atoken
+          file: ./abis/Prices/Atoken.json
+        - name: YearnTokenV1
+          file: ./abis/Prices/YearnTokenV1.json
+        - name: RedeemableKeep3r
+          file: ./abis/Prices/RedeemableKeep3r.json
+        - name: ChainlinkAggregator
+          file: ./abis/Prices/ChainlinkAggregator.json
+        - name: CalculationsCompound
+          file: ./abis/Prices/Calculations/Compound.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -267,8 +341,48 @@ templates:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
-        - name: CurvePoolV1
-          file: ./abis/CurvePoolV1.json
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        - name: ChainLinkManual
+          file: ./abis/Prices/ChainLinkManual.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapFactoryV3
+          file: ./abis/Prices/Uniswap/FactoryV3.json
+        - name: Quoter
+          file: ./abis/Prices/Uniswap/Quoter.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        - name: IronBankToken
+          file: ./abis/Prices/IronBankToken.json
+        - name: Atoken
+          file: ./abis/Prices/Atoken.json
+        - name: YearnTokenV1
+          file: ./abis/Prices/YearnTokenV1.json
+        - name: RedeemableKeep3r
+          file: ./abis/Prices/RedeemableKeep3r.json
+        - name: ChainlinkAggregator
+          file: ./abis/Prices/ChainlinkAggregator.json
+        - name: CalculationsCompound
+          file: ./abis/Prices/Calculations/Compound.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity

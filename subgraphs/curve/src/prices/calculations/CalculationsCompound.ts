@@ -4,8 +4,18 @@ import { CustomPriceType } from "../common/types";
 import { getPriceUsdc } from "../routers/SushiSwapRouter";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { CalculationsCompound as CalculationsCompoundContract } from "../../../generated/MainRegistry/CalculationsCompound";
-import { exponentToBigInt } from "../../common/utils/numbers";
+import { bigIntToBigDecimal, exponentToBigInt } from "../../common/utils/numbers";
 import { BIGDECIMAL_ONE } from "../../common/constants";
+import { getOrCreateToken } from "../../common/getters";
+
+
+function getUnderlyingPrice(tokenAddr: Address, network: string): CustomPriceType {
+    if (utils.isStableCoin(tokenAddr,network)) {
+        return CustomPriceType.initialize(BIGDECIMAL_ONE);
+    }
+    return getPriceUsdc(tokenAddr, network);
+}
+
 
 export function getTokenPriceFromCalculationCompound(tokenAddr: Address, network: string): CustomPriceType {
     let calculationCompoundContract = CalculationsCompoundContract.bind(tokenAddr);
@@ -13,17 +23,12 @@ export function getTokenPriceFromCalculationCompound(tokenAddr: Address, network
     if (exchangeRateStored.reverted) {
         return new CustomPriceType();
     }
-    let underlyingToken = calculationCompoundContract.underlying();
-
-    let STABLECOINS = constants.STABLECOINS_MAP.get(network)!;
-    if (STABLECOINS.includes(underlyingToken.toHexString().toLowerCase())){
-        return CustomPriceType.initialize(BIGDECIMAL_ONE,BigInt.fromI32(6))
+    let underlyingTokenAddress = calculationCompoundContract.underlying();
+    let underlyingToken = getOrCreateToken(underlyingTokenAddress);
+    let underlyingPrice = getUnderlyingPrice(underlyingTokenAddress, network);
+    if (underlyingPrice.reverted){
+        return new CustomPriceType();
     }
-    /*
-    let tokenPrice: BigDecimal = utils
-        .readValue<BigInt>(calculationCurveContract.try_getCurvePriceUsdc(tokenAddr), constants.BIGINT_ZERO)
-        .toBigDecimal();
-    */
-    //return CustomPriceType.initialize(tokenPrice);
-    return new CustomPriceType();
+    let priceUSD = bigIntToBigDecimal(exchangeRateStored.value,underlyingToken.decimals + constants.exchangeRateMantissa).times(underlyingPrice.usdPrice)
+    return CustomPriceType.initialize(priceUSD,constants.BIGINT_ZERO);
 }

@@ -1,10 +1,10 @@
 [
-    {
-      "name": "coins",
-      "outputs": [{ "type": "address", "name": "" }],
-      "inputs": [{ "type": "uint256", "name": "arg0" }],
-      "stateMutability": "view",
-      "type": "function",
-      "gas": 2280
-    }
-  ]
+  {
+    "name": "coins",
+    "outputs": [{ "type": "address", "name": "" }],
+    "inputs": [{ "type": "uint256", "name": "arg0" }],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2280
+  }
+]

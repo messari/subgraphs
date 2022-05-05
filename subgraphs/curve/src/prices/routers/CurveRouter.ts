@@ -8,7 +8,9 @@ import { AddressProvider } from "../../../generated/AddressProvider/AddressProvi
 
 export function getCurveRegistryAddress(network: string): Address {
   const addressProvider = AddressProvider.bind(constants.CURVE_ADDRESS_PROVIDER_MAP.get(network)!);
-  return addressProvider.get_registry();
+  let registryAddressCall = addressProvider.try_get_registry();
+  let registryAddress = registryAddressCall.reverted ? constants.ZERO_ADDRESS : registryAddressCall.value;
+  return registryAddress
 }
 
 export function getCurvePriceUsdc(curveLpTokenAddress: Address, network: string): CustomPriceType {
