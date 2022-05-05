@@ -173,9 +173,6 @@ export const YIELD_VAULT_NAME = "Rari Yield Pool";
 export const YIELD_VAULT_SYMBOL = "RYPT"; // RYPT = rari yield pool token ie, R(X)PT
 export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae";
 
-export const YIELD_WITHDRAWAL_FEE = BigDecimal.fromString("0.5");
-export const YIELD_PERFORMANCE_FEE = BigDecimal.fromString("12.5");
-
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
@@ -183,7 +180,7 @@ export const YIELD_PERFORMANCE_FEE = BigDecimal.fromString("12.5");
 export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // TODO: should the deployer be the "factory" address
 export const PROTOCOL_NAME = "Earn";
 export const PROTOCOL_SLUG = "earn";
-export const SCHEMA_VERSION = "1.2.1";
+export const SCHEMA_VERSION = "1.2.3";
 export const SUBGRAPH_VERSION = "1.1.2";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;

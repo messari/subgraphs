@@ -30,11 +30,9 @@ import {
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
   VaultFeeType,
-  YIELD_PERFORMANCE_FEE,
   YIELD_TOKEN_MAPPING,
   YIELD_VAULT_NAME,
   YIELD_VAULT_SYMBOL,
-  YIELD_WITHDRAWAL_FEE,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
@@ -211,18 +209,13 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
     vault.depositLimit = BIGINT_ZERO;
 
     // create fees for pool
-    let fees: Array<string> = [];
-    let withdrawalFee = getOrCreateVaultFee(VaultFeeType.WITHDRAWAL_FEE, vaultAddress);
-    withdrawalFee.feePercentage = YIELD_WITHDRAWAL_FEE;
-    withdrawalFee.save();
-    fees.push(withdrawalFee.id);
-    let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress);
-    performanceFee.feePercentage = YIELD_PERFORMANCE_FEE;
-    performanceFee.save();
-    fees.push(performanceFee.id);
-    vault.fees = fees;
+    vault.fees = [
+      getOrCreateVaultFee(VaultFeeType.WITHDRAWAL_FEE, vaultAddress).id,
+      getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id,
+    ];
 
-    //   vault.fees = TODO
+    vault._currentInterestAccruedUSD = BIGDECIMAL_ZERO;
+    vault._currentFeesAccruedUSD = BIGDECIMAL_ZERO;
     vault.createdTimestamp = event.block.timestamp;
     vault.createdBlockNumber = event.block.number;
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;

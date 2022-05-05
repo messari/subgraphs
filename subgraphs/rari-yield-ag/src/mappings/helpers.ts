@@ -1,15 +1,22 @@
 // helper functions for ./mappings.ts
 
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
   RARI_DEPLOYER,
   RARI_YIELD_POOL_TOKEN,
+  VaultFeeType,
   YIELD_VAULT_MANAGER_ADDRESS,
 } from "../common/utils/constants";
-import { Deposit, Withdraw } from "../../generated/schema";
-import { getOrCreateToken, getOrCreateVault } from "../common/getters";
+import { Deposit, Vault, Withdraw } from "../../generated/schema";
+import {
+  getOrCreateFinancials,
+  getOrCreateToken,
+  getOrCreateVault,
+  getOrCreateVaultFee,
+  getOrCreateYieldAggregator,
+} from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
 import { RariYieldFundManager } from "../../generated/RariYieldFundManager/RariYieldFundManager";
 
@@ -68,7 +75,9 @@ export function createDeposit(
     vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
   );
 
-  // TODO calculate fees
+  // update fees and revenues
+  updateYieldFees(vaultAddress);
+  updateRevenues(event, vault, BIGDECIMAL_ZERO);
 
   // TODO: get inputTokenBalances working
 
@@ -79,6 +88,7 @@ export function createWithdraw(
   event: ethereum.Event,
   amount: BigInt,
   amountUSD: BigInt,
+  afterFeeUSD: BigInt,
   outputTokensBurned: BigInt,
   asset: string,
   vaultAddress: string,
@@ -126,7 +136,15 @@ export function createWithdraw(
     vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
   );
 
-  // TODO calculate fees
+  // calculate withdrawal fee
+  let withdrawalFee = amountUSD.minus(afterFeeUSD).toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  if (withdrawalFee.lt(BIGDECIMAL_ZERO)) {
+    log.warning("WITHDRAWAL: fee {}", [withdrawalFee.toString()]);
+  }
+
+  // update fees and revenues
+  updateYieldFees(vaultAddress);
+  updateRevenues(event, vault, withdrawalFee);
 
   // TODO: get inputTokenBalances working
 
@@ -137,4 +155,83 @@ export function createWithdraw(
 //// Updates Helpers ////
 /////////////////////////
 
-// TODO
+// updates yield fees if necessary
+export function updateYieldFees(vaultAddress: string): void {
+  // grab fees
+  let withdrawalFee = getOrCreateVaultFee(VaultFeeType.WITHDRAWAL_FEE, vaultAddress);
+  let perfFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress);
+
+  // get fees
+  let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
+  let tryWithdrawalFee = contract.try_getWithdrawalFeeRate();
+  if (!tryWithdrawalFee.reverted) {
+    // only update fee if it was not reverted
+    withdrawalFee.feePercentage = tryWithdrawalFee.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    withdrawalFee.save();
+  }
+
+  let tryPerfFee = contract.try_getInterestFeeRate();
+  if (!tryPerfFee.reverted) {
+    // only update fee if it was not reverted
+    perfFee.feePercentage = tryPerfFee.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    perfFee.save();
+  }
+}
+
+// updates revenues (excludes withdrawal fees)
+// extraFees are withdrawal fees in Yield pool
+export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: BigDecimal): void {
+  let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
+  let financialMetrics = getOrCreateFinancials(event);
+  let protocol = getOrCreateYieldAggregator();
+
+  // accrue fees
+  let tryInterestFeesGenerated = contract.try_getInterestFeesGenerated();
+  if (!tryInterestFeesGenerated.reverted) {
+    // calculate new fees
+    let prevFees = vault._currentFeesAccruedUSD;
+    vault._currentFeesAccruedUSD = tryInterestFeesGenerated.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    let newFees = vault._currentFeesAccruedUSD.minus(prevFees);
+    if (newFees.lt(BIGDECIMAL_ZERO)) {
+      log.warning("FEES: prev {} current {}", [prevFees.toString(), vault._currentFeesAccruedUSD.toString()]);
+    }
+
+    // update protocol and total revenue
+    financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(newFees);
+    financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newFees);
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newFees);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newFees);
+  }
+
+  // accrue interest
+  let tryInterestAccrued = contract.try_getInterestAccrued();
+  if (!tryInterestAccrued.reverted) {
+    // calculate new interest (ie, supply side revenue)
+    let prevInterest = vault._currentInterestAccruedUSD;
+    vault._currentInterestAccruedUSD = tryInterestAccrued.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    let newInterest = vault._currentInterestAccruedUSD.minus(prevInterest);
+    if (newInterest.lt(BIGDECIMAL_ZERO)) {
+      log.warning("INTEREST: prev {} current {}", [newInterest.toString(), vault._currentInterestAccruedUSD.toString()]);
+    }
+
+    // update supply and total revenue
+    financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(newInterest);
+    financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newInterest);
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newInterest);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newInterest);
+  }
+
+  // add on extra fees
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(extraFee);
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(extraFee);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(extraFee);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(extraFee);
+
+  vault.save();
+  protocol.save();
+  financialMetrics.save();
+}

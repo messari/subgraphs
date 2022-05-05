@@ -347,6 +347,12 @@ type Vault @entity {
   " Type of fees incurred to the user. Should include all fees that apply to the vault "
   fees: [VaultFee!]!
 
+  " current amount of interest accrued minus fees generated USD, used to calculate revenues "
+  _currentInterestAccruedUSD: BigDecimal!
+
+  " current amount of interest fees generated USD, used to calculate revenues "
+  _currentFeesAccruedUSD: BigDecimal!
+
   " Creation timestamp "
   createdTimestamp: BigInt!
 

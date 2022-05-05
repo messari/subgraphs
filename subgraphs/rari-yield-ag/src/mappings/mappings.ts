@@ -1,16 +1,13 @@
 // map blockchain data to entities outlined in schema.graphql
-import {
-  TransactionType,
-  YIELD_TOKEN_MAPPING,
-  YIELD_VAULT_ADDRESS,
-  ZERO_ADDRESS,
-} from "../common/utils/constants";
-import {
-  Deposit,
-  Withdrawal,
-} from "../../generated/RariYieldFundManager/RariYieldFundManager";
+import { TransactionType, YIELD_TOKEN_MAPPING, YIELD_VAULT_ADDRESS, ZERO_ADDRESS } from "../common/utils/constants";
+import { Deposit, Withdrawal } from "../../generated/RariYieldFundManager/RariYieldFundManager";
 import { createDeposit, createWithdraw } from "./helpers";
-import { updateFinancials, updateUsageMetrics, updateVaultDailyMetrics, updateVaultHourlyMetrics } from "../common/metrics";
+import {
+  updateFinancials,
+  updateUsageMetrics,
+  updateVaultDailyMetrics,
+  updateVaultHourlyMetrics,
+} from "../common/metrics";
 
 export function handleYieldDeposit(event: Deposit): void {
   // get address of asset
@@ -32,8 +29,8 @@ export function handleYieldDeposit(event: Deposit): void {
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, YIELD_VAULT_ADDRESS)
-  updateVaultHourlyMetrics(event, YIELD_VAULT_ADDRESS)
+  updateVaultDailyMetrics(event, YIELD_VAULT_ADDRESS);
+  updateVaultHourlyMetrics(event, YIELD_VAULT_ADDRESS);
 }
 
 export function handleYieldWithdrawal(event: Withdrawal): void {
@@ -50,12 +47,13 @@ export function handleYieldWithdrawal(event: Withdrawal): void {
     event,
     event.params.amount,
     event.params.amountUsd,
+    event.params.amountTransferred,
     event.params.rftBurned,
     assetAddress,
     YIELD_VAULT_ADDRESS,
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, YIELD_VAULT_ADDRESS)
-  updateVaultHourlyMetrics(event, YIELD_VAULT_ADDRESS)
+  updateVaultDailyMetrics(event, YIELD_VAULT_ADDRESS);
+  updateVaultHourlyMetrics(event, YIELD_VAULT_ADDRESS);
 }
