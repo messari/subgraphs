@@ -2,8 +2,10 @@
 
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   DEFAULT_DECIMALS,
+  INT_TWO,
   RARI_DEPLOYER,
   RARI_YIELD_POOL_TOKEN,
   VaultFeeType,
@@ -139,7 +141,7 @@ export function createWithdraw(
   // calculate withdrawal fee
   let withdrawalFee = amountUSD.minus(afterFeeUSD).toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
   if (withdrawalFee.lt(BIGDECIMAL_ZERO)) {
-    log.warning("WITHDRAWAL: fee {}", [withdrawalFee.toString()]);
+    withdrawalFee = BIGDECIMAL_ZERO;
   }
 
   // update fees and revenues
@@ -166,14 +168,14 @@ export function updateYieldFees(vaultAddress: string): void {
   let tryWithdrawalFee = contract.try_getWithdrawalFeeRate();
   if (!tryWithdrawalFee.reverted) {
     // only update fee if it was not reverted
-    withdrawalFee.feePercentage = tryWithdrawalFee.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    withdrawalFee.feePercentage = tryWithdrawalFee.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS - 2));
     withdrawalFee.save();
   }
 
   let tryPerfFee = contract.try_getInterestFeeRate();
   if (!tryPerfFee.reverted) {
     // only update fee if it was not reverted
-    perfFee.feePercentage = tryPerfFee.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    perfFee.feePercentage = tryPerfFee.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS - 2));
     perfFee.save();
   }
 }
@@ -185,47 +187,34 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
   let financialMetrics = getOrCreateFinancials(event);
   let protocol = getOrCreateYieldAggregator();
 
-  // accrue fees
-  let tryInterestFeesGenerated = contract.try_getInterestFeesGenerated();
-  if (!tryInterestFeesGenerated.reverted) {
-    // calculate new fees
-    let prevFees = vault._currentFeesAccruedUSD;
-    vault._currentFeesAccruedUSD = tryInterestFeesGenerated.value
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
-    let newFees = vault._currentFeesAccruedUSD.minus(prevFees);
-    if (newFees.lt(BIGDECIMAL_ZERO)) {
-      log.warning("FEES: prev {} current {}", [prevFees.toString(), vault._currentFeesAccruedUSD.toString()]);
-    }
-
-    // update protocol and total revenue
-    financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(newFees);
-    financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newFees);
-    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newFees);
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newFees);
-  }
-
-  // accrue interest
-  let tryInterestAccrued = contract.try_getInterestAccrued();
-  if (!tryInterestAccrued.reverted) {
-    // calculate new interest (ie, supply side revenue)
+  let tryTotalInterest = contract.try_getRawInterestAccrued();
+  if (!tryTotalInterest.reverted) {
     let prevInterest = vault._currentInterestAccruedUSD;
-    vault._currentInterestAccruedUSD = tryInterestAccrued.value
-      .toBigDecimal()
-      .div(exponentToBigDecimal(DEFAULT_DECIMALS));
-    let newInterest = vault._currentInterestAccruedUSD.minus(prevInterest);
-    if (newInterest.lt(BIGDECIMAL_ZERO)) {
-      log.warning("INTEREST: prev {} current {}", [newInterest.toString(), vault._currentInterestAccruedUSD.toString()]);
-    }
+    let updatedInterest = tryTotalInterest.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    if (prevInterest.gt(updatedInterest)) {
+      // do not calculate fees b/c old interest is greater than current
+      // this means net deposits and interests are out of whack
+      // ie, someone just deposited or withdrew a large amount of $$
+      log.warning("NEGATIVE FEES: extras: {}", [extraFee.toString()]);
+    } else {
+      let newTotalInterest = updatedInterest.minus(prevInterest);
+      let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vault.id).feePercentage!.div(
+        exponentToBigDecimal(INT_TWO),
+      );
+      let newFees = newTotalInterest.times(performanceFee);
+      let newInterest = newTotalInterest.times(BIGDECIMAL_ONE.minus(performanceFee));
 
-    // update supply and total revenue
-    financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(newInterest);
-    financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newInterest);
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newInterest);
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newInterest);
+      // add new interests
+      financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newTotalInterest);
+      financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(newFees);
+      financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(newInterest);
+      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalInterest);
+      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newFees);
+      protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newInterest);
+    }
   }
 
-  // add on extra fees
+  // add on extra fees (ie, withdrawal fees)
   financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(extraFee);
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(extraFee);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(extraFee);
