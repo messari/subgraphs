@@ -54,12 +54,12 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 // no of seconds of a day
 export const SECONDS_PER_DAY = 84600;
 
-export const PROTOCOL_ID = Address.fromString("0xE0e514c71282b6f4e823703a39374Cf58dc3eA4f");
+export const PROTOCOL_ID = Address.fromString("0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C");
 export const PROTOCOL_NAME = "Harvest Finance";
 export const PROTOCOL_SLUG = "harvest-finance";
 export const PROTOCOL_TYPE = ProtocolType.YIELD;
 export const PROTOCOL_NETWORK = Network.ETHEREUM;
-export const PROTOCOL_SCHEMA_VERSION = "1.1.0";
+export const PROTOCOL_SCHEMA_VERSION = "1.2.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
