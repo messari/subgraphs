@@ -1,4 +1,4 @@
-import { DVM, BuyShares, SellShares, DODOSwap } from "../generated/DVM/DVM";
+import { BuyShares, SellShares, DODOSwap } from "../generated/DVM/DVM";
 
 import { updateUsageMetrics, updatePoolMetrics } from "./utils/metrics";
 

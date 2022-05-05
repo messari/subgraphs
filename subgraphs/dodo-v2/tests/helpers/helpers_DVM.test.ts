@@ -4,25 +4,23 @@ import {
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { BuyShares, SellShares, DODOSwap } from "../../generated/DVM/DVM";
-import { ERC20 } from "../../generated/CP/ERC20";
-import { DVM } from "../../generated/DVM/DVM";
-import { createERC20Instance, createNewDVMEvent } from "./factory_helpers.test";
+import { createNewDVMEvent } from "./factory_helpers.test";
+
+import { TxHash } from "./constants.test";
 
 export function createBuySharesEvent(
   to: string,
   increaseShares: string,
-  totalShares: string
+  totalShares: string,
+  baseToken: string,
+  quoteToken: string,
+  dvm: string
 ): BuyShares {
-  let newDVMevent = createNewDVMEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
-  );
+  let newDVMevent = createNewDVMEvent(baseToken, quoteToken, to, dvm);
 
   let newBuySharesEvent = changetype<BuyShares>(newMockEvent());
 
-  let dvmAdd = Address.fromString("0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4");
+  let dvmAdd = Address.fromString(dvm);
 
   newBuySharesEvent.address = dvmAdd;
 
@@ -60,17 +58,15 @@ export function createSellSharesEvent(
   payer: string,
   to: string,
   decreaseShares: string,
-  totalShares: string
+  totalShares: string,
+  baseToken: string,
+  quoteToken: string,
+  dvm: string
 ): SellShares {
-  let newDVMevent = createNewDVMEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
-  );
+  let newDVMevent = createNewDVMEvent(baseToken, quoteToken, to, dvm);
 
   let newSellSharesEvent = changetype<SellShares>(newMockEvent());
-  let dvmAdd = Address.fromString("0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4");
+  let dvmAdd = Address.fromString(dvm);
 
   newSellSharesEvent.address = dvmAdd;
 
@@ -115,23 +111,18 @@ export function createDODOSwapEvent(
   fromAmount: string,
   toAmount: string,
   trader: string,
-  receiver: string
+  receiver: string,
+  dvm: string
 ): DODOSwap {
-  let newDVMevent = createNewDVMEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
-  );
+  let newDVMevent = createNewDVMEvent(fromToken, toToken, receiver, dvm);
+
   let newDODOSwapEvent = changetype<DODOSwap>(newMockEvent());
-  let dvmAdd = Address.fromString("0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4");
+  let dvmAdd = Address.fromString(dvm);
   let token1 = Address.fromString(fromToken);
   let token2 = Address.fromString(toToken);
 
   newDODOSwapEvent.address = dvmAdd;
-  newDODOSwapEvent.transaction.hash = Bytes.fromHexString(
-    "0xed3706c06c19a02844ba17d6d0e141063b9d33c54bdce5843b972cedd1ec4d90"
-  );
+  newDODOSwapEvent.transaction.hash = Bytes.fromHexString(TxHash);
   newDODOSwapEvent.logIndex = BigInt.fromString("1");
 
   createMockedFunction(token1, "balanceOf", "balanceOf(address):(uint256)")
@@ -149,8 +140,23 @@ export function createDODOSwapEvent(
       )
     ]);
 
+  createMockedFunction(token1, "balanceOf", "balanceOf(address):(uint256)")
+    .withArgs([ethereum.Value.fromAddress(Address.fromString(dvm))])
+    .returns([
+      ethereum.Value.fromUnsignedBigInt(
+        BigInt.fromString("1000000000000000000")
+      )
+    ]);
+  createMockedFunction(token2, "balanceOf", "balanceOf(address):(uint256)")
+    .withArgs([ethereum.Value.fromAddress(Address.fromString(dvm))])
+    .returns([
+      ethereum.Value.fromUnsignedBigInt(
+        BigInt.fromString("1000000000000000000")
+      )
+    ]);
+
   createMockedFunction(
-    Address.fromString(receiver),
+    Address.fromString(dvm),
     "totalSupply",
     "totalSupply():(uint256)"
   ).returns([
@@ -158,27 +164,19 @@ export function createDODOSwapEvent(
   ]);
 
   createMockedFunction(
-    Address.fromString(receiver),
+    Address.fromString(dvm),
     "_MT_FEE_RATE_MODEL_",
     "_MT_FEE_RATE_MODEL_():(address)"
-  ).returns([
-    ethereum.Value.fromAddress(
-      Address.fromString("0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd")
-    )
-  ]);
+  ).returns([ethereum.Value.fromAddress(Address.fromString(dvm))]);
 
   createMockedFunction(
-    Address.fromString("0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd"),
+    Address.fromString(dvm),
     "feeRateImpl",
     "feeRateImpl():(address)"
-  ).returns([
-    ethereum.Value.fromAddress(
-      Address.fromString("0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a")
-    )
-  ]);
+  ).returns([ethereum.Value.fromAddress(Address.fromString(dvm))]);
 
   createMockedFunction(
-    Address.fromString("0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a"),
+    Address.fromString(dvm),
     "_LP_MT_RATIO_",
     "_LP_MT_RATIO_():(uint256)"
   ).returns([
@@ -186,7 +184,7 @@ export function createDODOSwapEvent(
   ]);
 
   createMockedFunction(
-    Address.fromString("0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd"),
+    Address.fromString(dvm),
     "getFeeRate",
     "getFeeRate(address):(uint256)"
   )

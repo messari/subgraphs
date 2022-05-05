@@ -6,21 +6,22 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Bid } from "../../generated/CP/CP";
 import { ERC20 } from "../../generated/CP/ERC20";
 import { CP } from "../../generated/CP/CP";
-import { createERC20Instance, createNewCPEvent } from "./factory_helpers.test";
+import { createNewCPEvent } from "./factory_helpers.test";
+import { TxHash } from "./constants.test";
 
-//    event Bid(address to, uint256 amount, uint256 fee);
-
-export function createBidEvent(to: string, amount: string, fee: string): Bid {
-  let newDVMevent = createNewCPEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
-  );
+export function createBidEvent(
+  to: string,
+  amount: string,
+  fee: string,
+  baseToken: string,
+  quoteToken: string,
+  cp: string
+): Bid {
+  let newDVMevent = createNewCPEvent(baseToken, quoteToken, to, cp);
 
   let newBuySharesEvent = changetype<Bid>(newMockEvent());
 
-  let dvmAdd = Address.fromString("0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4");
+  let dvmAdd = Address.fromString(cp);
 
   newBuySharesEvent.address = dvmAdd;
 

@@ -7,6 +7,30 @@ import { NewCP } from "../../generated/CrowdPoolingFactory/CrowdPoolingFactory";
 import { ERC20 } from "../../generated/CP/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
 
+import {
+  Account1Add,
+  Account2Add,
+  Token1Add,
+  Token2Add,
+  Token3Add,
+  Token4Add,
+  DODOLpToken_ADDRESS,
+  vDODOToken_ADDRESS,
+  WRAPPED_ETH,
+  DAI,
+  USDC,
+  USDT,
+  DVMPoolAddress,
+  DSPPoolAddress,
+  DPPPoolAddress,
+  CPPoolAddress,
+  DVMFactory_ADDRESS,
+  CPFactory_ADDRESS,
+  DPPFactory_ADDRESS,
+  DSPFactory_ADDRESS,
+  TxHash
+} from "./constants.test";
+
 export function createERC20Instance(
   tokenAdd: string,
   namei: string,
@@ -50,14 +74,22 @@ export function createNewDVMEvent(
     18
   );
 
+  let dodo = createERC20Instance(
+    DODOLpToken_ADDRESS,
+    "DODO",
+    "vDODOToken_ADDRESS",
+    18
+  );
+  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
+
   let lpToken = createERC20Instance(dvm, "LP Token", "LPT", 18);
   let dVm = Address.fromString(dvm);
   let version = ethereum.Value.fromString("DVM 1.0.2");
 
-  createMockedFunction(dVm, "version", "version():(string)").returns([version]);
-
   let newDVMevent = changetype<NewDVM>(newMockEvent());
   newDVMevent.parameters = new Array();
+
+  createMockedFunction(dVm, "version", "version():(string)").returns([version]);
 
   let baseTokenParam = new ethereum.EventParam(
     "baseToken",
@@ -106,6 +138,14 @@ export function createNewDSPEvent(
     "IQTN",
     18
   );
+
+  let dodo = createERC20Instance(
+    DODOLpToken_ADDRESS,
+    "DODO",
+    "vDODOToken_ADDRESS",
+    18
+  );
+  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
 
   let lpToken = createERC20Instance(dsp, "LP Token", "LPT", 18);
 
@@ -165,6 +205,14 @@ export function createNewDPPEvent(
     18
   );
 
+  let dodo = createERC20Instance(
+    DODOLpToken_ADDRESS,
+    "DODO",
+    "vDODOToken_ADDRESS",
+    18
+  );
+  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
+
   let lpToken = createERC20Instance(dpp, "LP Token", "LPT", 18);
 
   let dVm = Address.fromString(dpp);
@@ -222,6 +270,14 @@ export function createNewCPEvent(
     "IQTN",
     18
   );
+
+  let dodo = createERC20Instance(
+    DODOLpToken_ADDRESS,
+    "DODO",
+    "vDODOToken_ADDRESS",
+    18
+  );
+  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
 
   let lpToken = createERC20Instance(cp, "LP Token", "LPT", 18);
 

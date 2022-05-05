@@ -6,7 +6,8 @@ import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { DODOSwap } from "../../generated/DPP/DPP";
 import { ERC20 } from "../../generated/CP/ERC20";
 import { DPP } from "../../generated/DPP/DPP";
-import { createERC20Instance, createNewDPPEvent } from "./factory_helpers.test";
+import { createNewDPPEvent } from "./factory_helpers.test";
+import { TxHash, DPPFactory_ADDRESS } from "./constants.test";
 
 export function createDODOSwapEvent(
   fromToken: string,
@@ -14,24 +15,18 @@ export function createDODOSwapEvent(
   fromAmount: string,
   toAmount: string,
   trader: string,
-  receiver: string
+  receiver: string,
+  dpp: string
 ): DODOSwap {
-  let newDVMevent = createNewDPPEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
-  );
+  let newDVMevent = createNewDPPEvent(fromToken, toToken, receiver, dpp);
 
   let newDODOSwapEvent = changetype<DODOSwap>(newMockEvent());
-  let dvmAdd = Address.fromString("0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4");
+  let dvmAdd = Address.fromString(dpp);
   let token1 = Address.fromString(fromToken);
   let token2 = Address.fromString(toToken);
 
   newDODOSwapEvent.address = dvmAdd;
-  newDODOSwapEvent.transaction.hash = Bytes.fromHexString(
-    "0xed3706c06c19a02844ba17d6d0e141063b9d33c54bdce5843b972cedd1ec4d90"
-  );
+  newDODOSwapEvent.transaction.hash = Bytes.fromHexString(TxHash);
   newDODOSwapEvent.logIndex = BigInt.fromString("1");
 
   createMockedFunction(token1, "balanceOf", "balanceOf(address):(uint256)")
@@ -50,11 +45,28 @@ export function createDODOSwapEvent(
     ]);
 
   createMockedFunction(
-    Address.fromString(receiver),
+    Address.fromString(DPPFactory_ADDRESS),
     "balanceOf",
     "balanceOf(address):(uint256)"
   )
-    .withArgs([ethereum.Value.fromAddress(Address.fromString(receiver))])
+    .withArgs([
+      ethereum.Value.fromAddress(Address.fromString(DPPFactory_ADDRESS))
+    ])
+    .returns([
+      ethereum.Value.fromUnsignedBigInt(
+        BigInt.fromString("1000000000000000000")
+      )
+    ]);
+
+  createMockedFunction(token1, "balanceOf", "balanceOf(address):(uint256)")
+    .withArgs([ethereum.Value.fromAddress(Address.fromString(dpp))])
+    .returns([
+      ethereum.Value.fromUnsignedBigInt(
+        BigInt.fromString("1000000000000000000")
+      )
+    ]);
+  createMockedFunction(token2, "balanceOf", "balanceOf(address):(uint256)")
+    .withArgs([ethereum.Value.fromAddress(Address.fromString(dpp))])
     .returns([
       ethereum.Value.fromUnsignedBigInt(
         BigInt.fromString("1000000000000000000")
@@ -62,7 +74,7 @@ export function createDODOSwapEvent(
     ]);
 
   createMockedFunction(
-    Address.fromString(receiver),
+    Address.fromString(dpp),
     "totalSupply",
     "totalSupply():(uint256)"
   ).returns([
@@ -70,27 +82,19 @@ export function createDODOSwapEvent(
   ]);
 
   createMockedFunction(
-    Address.fromString(receiver),
+    Address.fromString(dpp),
     "_MT_FEE_RATE_MODEL_",
     "_MT_FEE_RATE_MODEL_():(address)"
-  ).returns([
-    ethereum.Value.fromAddress(
-      Address.fromString("0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd")
-    )
-  ]);
+  ).returns([ethereum.Value.fromAddress(Address.fromString(dpp))]);
 
   createMockedFunction(
-    Address.fromString("0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd"),
+    Address.fromString(dpp),
     "feeRateImpl",
     "feeRateImpl():(address)"
-  ).returns([
-    ethereum.Value.fromAddress(
-      Address.fromString("0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a")
-    )
-  ]);
+  ).returns([ethereum.Value.fromAddress(Address.fromString(dpp))]);
 
   createMockedFunction(
-    Address.fromString("0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a"),
+    Address.fromString(dpp),
     "_LP_MT_RATIO_",
     "_LP_MT_RATIO_():(uint256)"
   ).returns([
@@ -98,7 +102,7 @@ export function createDODOSwapEvent(
   ]);
 
   createMockedFunction(
-    Address.fromString("0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd"),
+    Address.fromString(dpp),
     "getFeeRate",
     "getFeeRate(address):(uint256)"
   )

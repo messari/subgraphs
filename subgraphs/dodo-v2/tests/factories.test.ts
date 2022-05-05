@@ -1,5 +1,6 @@
 import { test, assert } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { logStore } from "matchstick-as/assembly/store";
 
 import {
   handleNewDVM,
@@ -16,17 +17,36 @@ import {
   createNewCPEvent
 } from "./helpers/factory_helpers.test";
 
+import {
+  Account1Add,
+  Account2Add,
+  Token1Add,
+  Token2Add,
+  Token3Add,
+  Token4Add,
+  DODOLpToken_ADDRESS,
+  vDODOToken_ADDRESS,
+  WRAPPED_ETH,
+  DAI,
+  USDC,
+  USDT,
+  DVMPoolAddress,
+  DSPPoolAddress,
+  DPPPoolAddress,
+  CPPoolAddress,
+  DVMFactory_ADDRESS,
+  CPFactory_ADDRESS,
+  DPPFactory_ADDRESS,
+  DSPFactory_ADDRESS,
+  TxHash
+} from "./helpers/constants.test";
+
 test("Creates an ERC20 Token instance", () => {
-  let name = ethereum.Value.fromString("Input Base Token Name");
-  let symbol = ethereum.Value.fromString("IBTN");
+  let name = ethereum.Value.fromString("Test Token Name");
+  let symbol = ethereum.Value.fromString("TTN");
   let decimals = ethereum.Value.fromI32(18);
 
-  let token = createERC20Instance(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "Input Base Token Name",
-    "IBTN",
-    18
-  );
+  let token = createERC20Instance(Token1Add, "Test Token Name", "TTN", 18);
   let result1 = token.try_name();
   let result2 = token.try_symbol();
   let result3 = token.try_decimals();
@@ -36,167 +56,118 @@ test("Creates an ERC20 Token instance", () => {
   assert.equals(decimals, ethereum.Value.fromI32(result3.value));
 });
 
-//Event creation helpers///////
-
 test("Can handle new DVM", () => {
   let newDVMevent = createNewDVMEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
+    Token1Add,
+    Token2Add,
+    Account1Add,
+    DVMPoolAddress
   );
 
   handleNewDVM(newDVMevent);
 
   assert.fieldEquals(
     "DexAmmProtocol",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
+    DVMFactory_ADDRESS, //purposefully set as factory address for tests
     "slug",
     "messari-dodo"
   );
 
+  let lower1 = Token1Add.toLowerCase();
+  let lower2 = Token2Add.toLowerCase();
+
+  let ary = "[" + lower1 + ", " + lower2 + "]";
+
   assert.fieldEquals(
     "LiquidityPool",
-    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+    DVMPoolAddress.toLowerCase(),
     "inputTokens",
-    "[0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd, 0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a]"
+    ary
   );
 });
 
 test("Can handle new DSP", () => {
-  let tokenb = createERC20Instance(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "Input Base Token Name",
-    "IBTN",
-    18
-  );
-
-  let tokenq = createERC20Instance(
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "Input Quote Token Name",
-    "IQTN",
-    18
-  );
-
-  let lpToken = createERC20Instance(
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4",
-    "LP Token",
-    "LPT",
-    18
-  );
-
   let newDVMevent = createNewDSPEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
+    Token1Add,
+    Token2Add,
+    Account1Add,
+    DSPPoolAddress
   );
 
   handleNewDSP(newDVMevent);
-
   assert.fieldEquals(
     "DexAmmProtocol",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
+    DSPFactory_ADDRESS,
     "slug",
     "messari-dodo"
   );
 
+  let lower1 = Token1Add.toLowerCase();
+  let lower2 = Token2Add.toLowerCase();
+
+  let ary = "[" + lower1 + ", " + lower2 + "]";
+
   assert.fieldEquals(
     "LiquidityPool",
-    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+    DSPPoolAddress.toLowerCase(),
     "inputTokens",
-    "[0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd, 0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a]"
+    ary
   );
 });
 
 test("Can handle new DPP", () => {
-  let tokenb = createERC20Instance(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "Input Base Token Name",
-    "IBTN",
-    18
-  );
-
-  let tokenq = createERC20Instance(
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "Input Quote Token Name",
-    "IQTN",
-    18
-  );
-
-  let lpToken = createERC20Instance(
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4",
-    "LP Token",
-    "LPT",
-    18
-  );
-
   let newDVMevent = createNewDPPEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
+    Token1Add,
+    Token2Add,
+    Account1Add,
+    DPPPoolAddress
   );
 
   handleNewDPP(newDVMevent);
-
   assert.fieldEquals(
     "DexAmmProtocol",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
+    DPPFactory_ADDRESS,
     "slug",
     "messari-dodo"
   );
 
+  let lower1 = Token1Add.toLowerCase();
+  let lower2 = Token2Add.toLowerCase();
+
+  let ary = "[" + lower1 + ", " + lower2 + "]";
+
   assert.fieldEquals(
     "LiquidityPool",
-    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+    DPPPoolAddress.toLowerCase(),
     "inputTokens",
-    "[0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd, 0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a]"
+    ary
   );
 });
 
 test("Can handle new CrowdPool", () => {
-  let tokenb = createERC20Instance(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "Input Base Token Name",
-    "IBTN",
-    18
-  );
-
-  let tokenq = createERC20Instance(
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "Input Quote Token Name",
-    "IQTN",
-    18
-  );
-
-  let lpToken = createERC20Instance(
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4",
-    "LP Token",
-    "LPT",
-    18
-  );
-
   let newDVMevent = createNewCPEvent(
-    "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
-    "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
-    "0x6fdDB76c93299D985f4d3FC7ac468F9A168577A4"
+    Token1Add,
+    Token2Add,
+    Account1Add,
+    CPPoolAddress
   );
-
   handleNewCP(newDVMevent);
-
   assert.fieldEquals(
     "DexAmmProtocol",
-    "0x72d220cE168C4f361dD4deE5D826a01AD8598f6C",
+    CPFactory_ADDRESS,
     "slug",
     "messari-dodo"
   );
 
+  let lower1 = Token1Add.toLowerCase();
+  let lower2 = Token2Add.toLowerCase();
+
+  let ary = "[" + lower1 + ", " + lower2 + "]";
+
   assert.fieldEquals(
     "LiquidityPool",
-    "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+    CPPoolAddress.toLowerCase(),
     "inputTokens",
-    "[0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd, 0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a]"
+    ary
   );
 });
