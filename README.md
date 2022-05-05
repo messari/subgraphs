@@ -70,7 +70,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | ------- |  :------: | --- | --- |
 | **DEX AMM** |    | |
 | [Apeswap](https://apeswap.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
-| Balancer v2 | 🔨 | | |
+| [Balancer v2](https://balancer.fi/) | 🛠 | 1.2.0 / 1.2.0 / 1.0.0 | [![Balancer V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-arbitrum) [![Balancer V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-ethereum)[![Balancer V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-polygon)|
 | Bancor v2 | 🔨 | | |
 | Bancor v3 | | | |
 | Curve | 🔨 | | |
