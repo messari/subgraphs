@@ -54,10 +54,6 @@ Count of  Unique Addresses which have interacted with the protocol via any trans
 
 To be added
 
-###  Protocol Controlled Value
-
-To be added
-  
   
 
 ## Links
