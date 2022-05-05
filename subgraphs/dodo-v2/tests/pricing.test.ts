@@ -39,50 +39,7 @@ import {
   TxHash
 } from "./helpers/constants.test";
 
-test("Accurately records the USD price of a token when it is traded for a stablecoin(18D)", () => {
-  //create stablecoin pools
-  let newDSPevent = createNewDSPEvent(DAI, USDC, Account1Add, DSPPoolAddress);
-  //create DAI/ERC20 token DVM pool
-  let newDVMevent = createNewDVMEvent(
-    DAI,
-    Token1Add,
-    Account1Add,
-    DVMPoolAddress
-  );
-  //create trades to set prices
-  let swapEventDSP = createDODOSwapDSPEvent(
-    DAI,
-    USDC,
-    "1000000000000000000",
-    "1000000000000000000",
-    Account1Add,
-    Account2Add,
-    DSPPoolAddress
-  );
-  //pay 100 DAI for 1 ERC20 token
-  let swapEventDVM = createDODOSwapDVMEvent(
-    DAI, //fromToken
-    Token1Add, //toToken
-    "100000000000000000000", //100 dai  fromAmount
-    "1000000000000000000", //1 erc20 toAmount
-    Account1Add, //trader
-    Account2Add, //receiver
-    DVMPoolAddress //pool add
-  );
-
-  //Handle that shit
-  handleNewDSP(newDSPevent);
-  handleNewDVM(newDVMevent);
-  handleDODOSwapDSP(swapEventDSP);
-  handleDODOSwapDVM(swapEventDVM);
-
-  //assert things
-  assert.fieldEquals("Token", DAI.toLowerCase(), "lastPriceUSD", "1");
-
-  assert.fieldEquals("Token", Token1Add.toLowerCase(), "lastPriceUSD", "100");
-});
-
-test("Accurately records the USD price of a token when it is traded for wETH(18D)", () => {
+export function simulateActivity(): void {
   //create stablecoin pools
   let newDSPevent = createNewDSPEvent(DAI, USDC, Account1Add, DSPPoolAddress);
   //create DAI/wETH token DVM pool
@@ -139,6 +96,18 @@ test("Accurately records the USD price of a token when it is traded for wETH(18D
   handleDODOSwapDSP(swapEventDSP);
   handleDODOSwapDVM(swapEventDVM);
   handleDODOSwapDVM(swapEventDVM1);
+}
+
+test("Accurately records the USD price of a token when it is traded for a stablecoin(18D)", () => {
+  simulateActivity();
+  //assert things
+  assert.fieldEquals("Token", DAI.toLowerCase(), "lastPriceUSD", "1");
+
+  assert.fieldEquals("Token", WRAPPED_ETH.toLowerCase(), "lastPriceUSD", "100");
+});
+
+test("Accurately records the USD price of a token when it is traded for wETH(18D)", () => {
+  simulateActivity();
 
   //assert things
   assert.fieldEquals("Token", WRAPPED_ETH.toLowerCase(), "lastPriceUSD", "100");

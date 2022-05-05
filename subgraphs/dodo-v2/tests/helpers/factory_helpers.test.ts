@@ -64,14 +64,14 @@ export function createNewDVMEvent(
     baseToken,
     "Input Base Token Name",
     "IBTN",
-    18
+    3
   );
 
   let tokenq = createERC20Instance(
     quoteToken,
     "Input Quote Token Name",
     "IQTN",
-    18
+    6
   );
 
   let dodo = createERC20Instance(
@@ -129,21 +129,21 @@ export function createNewDSPEvent(
     baseToken,
     "Input Base Token Name",
     "IBTN",
-    18
+    7
   );
 
   let tokenq = createERC20Instance(
     quoteToken,
     "Input Quote Token Name",
     "IQTN",
-    18
+    6
   );
 
   let dodo = createERC20Instance(
     DODOLpToken_ADDRESS,
     "DODO",
     "vDODOToken_ADDRESS",
-    18
+    5
   );
   let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
 

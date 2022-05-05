@@ -1,6 +1,11 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { bigIntToBigDecimal, calculateAverage, safeDiv } from "./numbers";
+import {
+  bigIntToBigDecimal,
+  calculateAverage,
+  safeDiv,
+  modulateDecimals
+} from "./numbers";
 
 import {
   Token,
@@ -52,11 +57,17 @@ export function setUSDprice(
   stableCoin: Address,
   scAmount: BigInt
 ): void {
+  //get token
   let token = getOrCreateToken(tokenAdd);
+  let sc = getOrCreateToken(stableCoin);
+
+  //retreive token decimals
+  let decT = token.decimals;
+  let decSC = sc.decimals;
 
   let pricePerToken = safeDiv(
-    bigIntToBigDecimal(scAmount),
-    bigIntToBigDecimal(amount)
+    modulateDecimals(scAmount, decSC),
+    modulateDecimals(amount, decT)
   );
 
   token.lastPriceUSD = pricePerToken;

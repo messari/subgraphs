@@ -44,3 +44,19 @@ export function safeDiv(amount0: BigDecimal, amount1: BigDecimal): BigDecimal {
     return amount0.div(amount1);
   }
 }
+
+export function modulateDecimals(
+  currentBigInt: BigInt,
+  decimals: i32
+): BigDecimal {
+  if (decimals == 18) {
+    return bigIntToBigDecimal(currentBigInt);
+  } else {
+    let decMod = 18 - decimals;
+    return currentBigInt.divDecimal(
+      BigInt.fromI32(10)
+        .pow(decMod as u8)
+        .toBigDecimal()
+    );
+  }
+}
