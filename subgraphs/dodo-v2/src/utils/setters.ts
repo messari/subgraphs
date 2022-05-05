@@ -55,8 +55,8 @@ export function setUSDprice(
   let token = getOrCreateToken(tokenAdd);
 
   let pricePerToken = safeDiv(
-    bigIntToBigDecimal(amount),
-    bigIntToBigDecimal(scAmount)
+    bigIntToBigDecimal(scAmount),
+    bigIntToBigDecimal(amount)
   );
 
   token.lastPriceUSD = pricePerToken;
@@ -73,14 +73,24 @@ export function setUSDpriceWETH(
   amount: BigInt,
   wETHamount: BigInt
 ): void {
-  let ethPricePerToken = amount.div(wETHamount);
-  let pricePerToken = getUSDprice(
-    Address.fromString(WRAPPED_ETH),
-    ethPricePerToken
-  );
-
+  //get tokens
+  let wETH = getOrCreateToken(Address.fromString(WRAPPED_ETH));
   let token = getOrCreateToken(tokenAdd);
-  token.lastPriceUSD = pricePerToken;
+
+  //get last wETH USD price which should be 100 in tests
+  let lastpriceETH = wETH.lastPriceUSD;
+
+  // //for whatever dumb reason the graph insists wETH.lastPriceUSD can be null so
+  if (!lastpriceETH) {
+    lastpriceETH = ZERO_BD;
+  }
+  // //get current USD value of the input amount of wETH(currentwETHval = 100(1 * 100))
+  let currentwETHval = bigIntToBigDecimal(wETHamount) * lastpriceETH;
+  //
+  // // get USD val per input ERC20 token(100 / 100)
+  let currentERC20val = safeDiv(currentwETHval, bigIntToBigDecimal(amount));
+
+  token.lastPriceUSD = currentERC20val;
   token.lastPriceBlockNumber = event.block.number;
   token.save();
 }

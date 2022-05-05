@@ -5,6 +5,7 @@ import { updateUsageMetrics, updatePoolMetrics } from "./utils/metrics";
 import { createSwap } from "./utils/setters";
 
 export function handleDODOSwap(event: DODOSwap): void {
+  updateUsageMetrics(event, event.params.trader, false, false);
   createSwap(
     event,
     event.params.trader,
@@ -14,7 +15,6 @@ export function handleDODOSwap(event: DODOSwap): void {
     event.params.fromAmount,
     event.params.toAmount
   );
-  updateUsageMetrics(event, event.params.trader, false, false);
   updatePoolMetrics(
     event,
     event.address,

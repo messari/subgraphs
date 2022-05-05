@@ -9,13 +9,13 @@ import {
 import { createDeposit, createWithdraw } from "./utils/setters";
 
 export function handleBid(event: Bid): void {
-  createDeposit(event, event.params.to, event.address, event.params.amount);
   updateUsageMetrics(event, event.params.to, true, false);
+  createDeposit(event, event.params.to, event.address, event.params.amount);
 }
 
 export function handleCancel(event: Cancel): void {
-  createWithdraw(event, event.params.to, event.address, event.params.amount);
   updateUsageMetrics(event, event.params.to, false, true);
+  createWithdraw(event, event.params.to, event.address, event.params.amount);
 }
 
 export function handleSettle(event: Settle): void {

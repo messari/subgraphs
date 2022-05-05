@@ -180,21 +180,15 @@ export function updatePoolMetrics(
   ) {
     setUSDprice(event, tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
   }
-
   if (
     tokenAdds[1] == Address.fromString(STABLE_COINS[0]) ||
     tokenAdds[1] == Address.fromString(STABLE_COINS[1]) ||
     tokenAdds[1] == Address.fromString(STABLE_COINS[2])
   ) {
     setUSDprice(event, tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
-  }
-
-  //check if either token is wETH and if so set current USD price through wETH
-  if (tokenAdds[0] == Address.fromString(WRAPPED_ETH)) {
+  } else if (tokenAdds[0] == Address.fromString(WRAPPED_ETH)) {
     setUSDpriceWETH(event, tokenAdds[1], trader, amount[1], amount[0]);
-  }
-
-  if (tokenAdds[1] == Address.fromString(WRAPPED_ETH)) {
+  } else if (tokenAdds[1] == Address.fromString(WRAPPED_ETH)) {
     setUSDpriceWETH(event, tokenAdds[0], trader, amount[0], amount[1]);
   }
 

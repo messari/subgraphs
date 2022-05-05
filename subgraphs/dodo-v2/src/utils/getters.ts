@@ -348,10 +348,13 @@ function getProtocolFromPool(poolAddress: Address): string {
 
 export function getUSDprice(tokenAddress: Address, amount: BigInt): BigDecimal {
   let token = getOrCreateToken(tokenAddress);
-  let lp = token.lastPriceUSD;
-  if (!lp) {
-    lp = ZERO_BD;
+  //get last price
+  let lastprice = token.lastPriceUSD;
+  //dont know why but it insists lastprice can be empty even tho there is no way it can
+  if (!lastprice) {
+    lastprice = ZERO_BD;
   }
-  let price = bigIntToBigDecimal(amount) * lp;
+  //usd price amount of tokens
+  let price = bigIntToBigDecimal(amount) * lastprice;
   return price;
 }

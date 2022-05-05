@@ -8,7 +8,9 @@
     "create-local": "graph create --node http://localhost:8020/ messari-dodo",
     "remove-local": "graph remove --node http://localhost:8020/ messari-dodo",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 messari-dodo",
-    "test": "graph test"
+    "test": "graph test",
+    "nuke": "sudo rm -r tests/.bin/ && rm -r generated && yarn codegen && yarn build",
+    "test-harder": "yarn nuke && yarn test"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.29.0",
