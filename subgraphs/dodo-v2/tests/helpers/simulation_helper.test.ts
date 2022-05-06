@@ -170,14 +170,14 @@ export function simulateActivity(): void {
     Token1Add,
     "Input Base Token Name",
     "IBTN",
-    3
+    18
   );
 
   let tokenq = createERC20Instance(
     Token2Add,
     "Input Quote Token Name",
     "IQTN",
-    6
+    18
   );
 
   let dodo = createERC20Instance(
@@ -242,8 +242,8 @@ export function simulateActivity(): void {
   let swapEventDSP = createDODOSwapDSPEvent(
     DAI,
     USDC,
-    "1000000000000000000", // 1/1 ratio
-    "1000000000000000000",
+    "1000000000000000000", // DAI
+    "1000000", //USDC w/6 Decimals
     Account1Add,
     Account2Add,
     DSPPoolAddress

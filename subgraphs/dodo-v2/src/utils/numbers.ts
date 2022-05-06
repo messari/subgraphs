@@ -52,10 +52,9 @@ export function modulateDecimals(
   if (decimals == 18) {
     return bigIntToBigDecimal(currentBigInt);
   } else {
-    let decMod = 18 - decimals;
     return currentBigInt.divDecimal(
       BigInt.fromI32(10)
-        .pow(decMod as u8)
+        .pow(decimals as u8)
         .toBigDecimal()
     );
   }

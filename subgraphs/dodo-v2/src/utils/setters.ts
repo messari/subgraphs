@@ -65,10 +65,9 @@ export function setUSDprice(
   let decT = token.decimals;
   let decSC = sc.decimals;
 
-  let pricePerToken = safeDiv(
-    modulateDecimals(scAmount, decSC),
-    modulateDecimals(amount, decT)
-  );
+  let modSC = modulateDecimals(scAmount, decSC);
+  let modT = modulateDecimals(amount, decT);
+  let pricePerToken = safeDiv(modSC, modT);
 
   token.lastPriceUSD = pricePerToken;
   token.lastPriceBlockNumber = event.block.number;
