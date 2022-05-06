@@ -4,7 +4,7 @@ import { ConfigurationFields } from '../../configurations/fields';
 import { FieldMap } from '../../configurations/types';
 
 
-export const UniswapV2MainnetConfigurations: FieldMap = {
+export var UniswapV2MainnetConfigurations: FieldMap = {
   [ConfigurationFields.NETWORK]: "mainnet",
   [ConfigurationFields.PROTOCOL_NAME]: "Uniswap",
   [ConfigurationFields.PROTOCOL_SLUG]: "uniswap",

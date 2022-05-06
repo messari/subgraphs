@@ -1,6 +1,7 @@
 {
   "name": "apeswap",
   "license": "MIT",
+  "type": "module",
 
 
   "scripts": {
@@ -20,7 +21,7 @@
     "prepare:sushiswap-moonbeam": "mustache config/sushiswap/moonbean.json templates/sushiswap/sushiswap.alt.template.yaml > subgraph.yaml",
     "prepare:sushiswap-moonriver": "mustache config/sushiswap/moonriver.json templates/sushiswap/sushiswap.alt.template.yaml > subgraph.yaml",
     "prepare:sushiswap-xdai": "mustache config/sushiswap/xdai.json templates/sushiswap/sushiswap.alt.template.yaml > subgraph.yaml",
-    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet.json templates/uniswap.v2/uniswap.v2.template.yaml > subgraph.yaml",
+    "prepare:uniswap-v2-mainnet": "mustache config/uniswap-v2/mainnet/mainnet.json config/uniswap-v2/uniswap.v2.template.yaml > subgraph.yaml",
 
     "deploy-uniswap-v2-mainnet": "yarn prepare:uniswap-v2-mainnet && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/uniswap-v2",
     "deploy-apeswap-bsc": "yarn prepare:apeswap-bsc && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/apeswap-bsc",
@@ -59,7 +60,11 @@
     "deploy-all-apeswap-messari": "yarn deploy-uniswap-v2-mainnet-messari",
     "deploy-all-uniswap-v2-messari": "yarn deploy-apeswap-bsc-messari && yarn deploy-apeswap-matic-messari",
     "deploy-all-sushiswap-messari": "yarn deploy-sushiswap-arbitrum-messari && yarn deploy-sushiswap-avalanche-messari && yarn deploy-sushiswap-bsc-messari && yarn deploy-sushiswap-celo-messari && yarn deploy-sushiswap-fantom-messari && yarn deploy-sushiswap-fuse-messari && yarn deploy-sushiswap-mainnet-messari && yarn deploy-sushiswap-matic-messari && yarn deploy-sushiswap-moonbeam-messari && yarn deploy-sushiswap-moonriver-messari && yarn deploy-sushiswap-xdai-messari",
-    "deploy": "yarn prepare:${npm_config_protocol}-${npm_config_network} && yarn codegen && yarn build && yarn deploy --product hosted-service ${npm_config_location}"
+    
+    "config": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json templates/${npm_config_protocol}/${npm_config_protocol}.v2.template.yaml > subgraph.yaml",
+    "deploy": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/${npm_config_protocol}/uniswap.v2.template.yaml > subgraph.yaml && yarn codegen && yarn build && yarn deploy --product hosted-service ${npm_config_location}/${npm_config_protocol}-${npm_config_network}",
+
+    "foo": "node --experimental-json-modules deployment/deployment.js"
 
   },
   "dependencies": {

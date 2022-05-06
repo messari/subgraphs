@@ -1,5 +1,0 @@
-{
-    "uniswap-v2": ["mainnet"],
-    "sushiwap": ["mainnet", "celo", "bsc"],
-    "spookyswap": ["fantom"],
-  }
