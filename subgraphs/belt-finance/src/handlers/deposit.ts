@@ -55,7 +55,7 @@ export function deposit(event: DepositEvent, vault: Vault): void {
 
   // updating the metrics
   updateRevenue(event, vault, event.params.strategyAddress, amountUSD);
-  updateAllMetrics(event, vault, false);
+  updateAllMetrics(event, vault, true);
 }
 
 function updateRevenue(event: ethereum.Event, vault: Vault, strategyAddress: Address, amountUSD: BigDecimal): void {
