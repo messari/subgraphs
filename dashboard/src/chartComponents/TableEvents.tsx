@@ -4,7 +4,10 @@ import { toDate } from "../App";
 
 export const TableEvents = (_datasetLabel: string, dataTable: any) => {
     if (dataTable && dataTable[0]) {
-      const tableData = dataTable.map((val:any,i:any) => { return {id:i ,date: toDate(val.timestamp),...val}})
+      const tableData: any[] = [];
+      for (let i = dataTable.length-1; i > 0; i--) {
+        tableData.push({id:i ,date: toDate(dataTable[i].timestamp),...dataTable[i]})
+      }
       const columns = Object.entries(dataTable[0]).filter(function([k, val]) {
         if(k.includes("typename")){
           return false 

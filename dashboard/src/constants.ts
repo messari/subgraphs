@@ -46,11 +46,11 @@ export const ProtocolsToQuery: {[name: string]: {[network: string]: {URL: string
   abracadabra: {
     mainnet: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money",
-      deploymentId: "QmVdxBmwUGpNPHXB5zPPy8KULWvbruR6i49SbxcsqxNstB"
+      deploymentId: "QmdPcV35TaQif8pD3Ndg1X85xBzSeZgYuBFayuRJxTeq4C"
     },
     avalanche: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-avalanche",
-      deploymentId: "QmSKi6c3wg69GHJqXjCwWfrtRpXPDe8ApaDKyFY3nT2pJJ"
+      deploymentId: "QmTzEJdARYXsxVP58yDjhT2BAR5qwcF233hYfqGVqEdi5p"
     },
     bsc: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-bsc",
@@ -58,11 +58,37 @@ export const ProtocolsToQuery: {[name: string]: {[network: string]: {URL: string
     },
     arbitrum: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-arbitrum",
-      deploymentId: "QmYwGf1bxRCFB4xPpKUouXZia5mqu82ddgr75kr2nfWdPE"
+      deploymentId: "QmPk2MpWZKf8eJ9cnxNQobSvPfXKdHgmB1YysdFuk36oEf"
     },
     fantom: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-fantom",
-      deploymentId: "QmXgDwsMhKuRM3vWpsjdPFyFLLTzJcN9XmuoxSwU4RvezM"
+      deploymentId: "QmSnfGfnusd3S7Kj5xDkyFYf8y4jkCdwZWcc8p82eFmpo5"
+    }
+  },
+  balancerV2: {
+    mainnet: {
+      URL: "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-ethereum",
+      deploymentId: "QmZUDx895H1uSDDKok5J4ktTfEbRgo3XAz1zDH7aG7q9JZ"
+    },
+    arbitrum: {
+      URL: "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-arbitrum",
+      deploymentId: "QmNiM2TPYsHbW82q5rWtguVkHEjnronwHkH4PqnwXrMah2"
+    },
+    matic: {
+      URL: "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-polygon",
+      deploymentId: "QmVvVTqrCWWMZC2Tz9J4niDYxEdJELBz5QgBq78ALmvE3J"
+    }
+  },
+  bastion: {
+    aurora: {
+      URL: "https://api.thegraph.com/subgraphs/name/messari/bastion-protocol-aurora",
+      deploymentId: "QmNMx5UfvRkQ7C9GKGtXTkckiaCTdZgsz2KZ2M4CGzC9L5"
+    }
+  },
+  moonwell: {
+    moonriver: {
+      URL: "https://api.thegraph.com/subgraphs/name/messari/moonwell-moonriver",
+      deploymentId: "QmVVhi2nSSQWPRVS5x5yrSocp1DQfsCbcBAXjDskVGW8Rc"
     }
   },
   apeswap: {

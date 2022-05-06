@@ -101,9 +101,12 @@ export const schema100 = (): Schema => {
             decimals
             name
           }
+          outputToken {
+            id
+          }
          
           rewardTokens{
-            name
+            id
           }
          name
          isActive
@@ -115,6 +118,8 @@ export const schema100 = (): Schema => {
          depositRate
          stableBorrowRate
          variableBorrowRate
+         rewardTokenEmissionsAmount
+         rewardTokenEmissionsUSD
         }
          
         withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
@@ -285,14 +290,18 @@ export const schema110 = (): Schema => {
           timestamp
         }
         market(id:$poolId){
+          id
+          name
           inputTokens{
             decimals
             name
           }
-          rewardTokens{
-            name
+          outputToken {
+            id
           }
-         name
+          rewardTokens{
+            id
+          }
          isActive
          canUseAsCollateral
          canBorrowFrom
@@ -302,6 +311,8 @@ export const schema110 = (): Schema => {
          depositRate
          stableBorrowRate
          variableBorrowRate
+         rewardTokenEmissionsAmount
+         rewardTokenEmissionsUSD
         }
         
         withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
@@ -554,16 +565,17 @@ export const schema120 = (): Schema => {
     ${eventsQuery}
     market(id:$poolId){
       id
+      name
       inputToken {
         decimals
         name
       }
-
       outputToken {
-        name
+        id
       }
-
-      name
+      rewardTokens {
+        id
+      }
       isActive
       canUseAsCollateral
       canBorrowFrom

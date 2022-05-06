@@ -103,7 +103,7 @@ export const schema100 = (): Schema => {
             name
           }
           rewardTokens {
-            name
+            id
           }
           name
           symbol
@@ -232,6 +232,8 @@ export const schema110 = (): Schema => {
           timestamp
         }
         liquidityPool(id: $poolId){
+          id
+          name
           fees{
             feePercentage
             feeType
@@ -241,12 +243,11 @@ export const schema110 = (): Schema => {
             name
           }
           outputToken {
-            name
+            id
           }
           rewardTokens {
-            name
+            id
           }
-          name
           symbol
         }
         withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}) {
@@ -454,6 +455,9 @@ export const schema120 = (): Schema => {
     ${liquidityPoolHourlyQuery}
     ${eventsQuery}
     liquidityPool(id: $poolId){
+      id
+      name
+      symbol
       fees{
         feePercentage
         feeType
@@ -463,9 +467,11 @@ export const schema120 = (): Schema => {
         name
       }
       outputToken {
-        name
+        id
       }
-      rewardTokens
+      rewardTokens {
+        id
+      }
       totalValueLockedUSD
       cumulativeVolumeUSD
       inputTokenBalances
@@ -475,8 +481,6 @@ export const schema120 = (): Schema => {
       stakedOutputTokenAmount
       rewardTokenEmissionsAmount
       rewardTokenEmissionsUSD
-      name
-      symbol
     }
   }`;
 

@@ -116,14 +116,16 @@ export const schema100 = (): Schema => {
             name
           }
           outputToken {
-            name
+            id
           }
           rewardTokens {
-            name
+            id
           }
           name
           symbol
           depositLimit
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
         }
         withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
@@ -257,11 +259,13 @@ export const schema110 = (): Schema => {
             name
           }
           outputToken {
-            name
+            id
           }
           rewardTokens {
-            name
+            id
           }
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
           name
           symbol
           depositLimit
@@ -457,9 +461,11 @@ export const schema120 = (): Schema => {
         }
 
         outputToken {
-          name
+          id
         }
-
+        rewardTokens {
+          id
+        }
         name
         isActive
         canUseAsCollateral

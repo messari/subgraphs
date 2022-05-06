@@ -32,6 +32,9 @@ function SchemaTable(
                 value = 'False';
             }
         }
+        if (!isNaN(parseFloat(value)) && (dataFields[entityField].includes('Int') || dataFields[entityField].includes('Decimal') || dataFields[entityField].includes('umber'))) {
+            value = parseFloat(value).toFixed(2);
+        }
         if (typeof(value) !== 'string' && typeof(value) !== 'number') {
             value = JSON.stringify(value);
         }
