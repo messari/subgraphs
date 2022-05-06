@@ -70,7 +70,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | ------- |  :------: | --- | --- |
 | **DEX AMM** |    | |
 | [Apeswap](https://apeswap.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
-| Balancer v2 | 🔨 | | |
+| [Balancer v2](https://balancer.fi/) | 🛠 | 1.2.0 / 1.2.0 / 1.0.0 | [![Balancer V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-ethereum) [![Balancer V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-arbitrum) [![Balancer V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-polygon)|
 | Bancor v2 | 🔨 | | |
 | Bancor v3 | | | |
 | Curve | 🔨 | | |
@@ -84,7 +84,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | **Lending Protocols** |    | |
 | Aave v2 | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
 | Aave v3 |  | | |
-| [Bastion Protocol](https://bastionprotocol.com/) | 🔨 | | |
+| [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
 | Benqi | 🔨 | | |
 | [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.2 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
 | CREAM | 🔨 | | |
@@ -92,7 +92,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Hundred Finance | 🔨 | | |
 | Maple Finance | 🔨 | | |
 | Moola Market | 🔨 | | |
-| Moonwell Finance | 🔨 | | |
+| [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
 | TrueFi |   | | |
 | **CDPs** |    | |
 | [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
