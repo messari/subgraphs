@@ -17,7 +17,6 @@ function NewClient(url: string): ApolloClient<NormalizedCacheObject> {
   return client;
 }
 
-
 async function FetchProtocolMetadata(
   setMetadata: React.Dispatch<React.SetStateAction<ApolloQueryResult<any>[]>>,
   fatalErrorDeployments: string[]
@@ -32,6 +31,9 @@ async function FetchProtocolMetadata(
         name
         id
       }
+      _meta {
+        deployment
+      }
     }
     `;
     for (let protocol of Object.keys(ProtocolsToQuery)) {
@@ -43,12 +45,14 @@ async function FetchProtocolMetadata(
         const clientQuery = clientReturned.query({query: protocolQuery});
         // Need to further research how to effective handle apollo client errors, particularly in a promise loop
         clientQuery.catch(err => {
-          console.log(err)
+          console.log('ERRRRR', ProtocolsToQuery[protocol][network].deploymentId)
           return err;
-        })
+        });
 
+        queries.push(clientQuery);
       }
     }
+    console.log(await Promise.all(queries))
     try {
       setMetadata(await Promise.all(queries));
     } catch (err) {
@@ -95,16 +99,13 @@ async function FetchProtocolMetadata(
       if (metadata.length === 0) {
         FetchProtocolMetadata(setMetadata, fatalErrorDeployments);
       }
-      
-
 
       // NEED TO CHANGE HOW DEPLOYMENT ID IS MAPPED HERE
-      const metadataArr = metadata.map((q, idx) => { 
-        return {...q.data.protocols[0], deploymentId: deploymentIdsArray[idx]}
+      const metadataArr = metadata.map((q) => { 
+        return {...q.data.protocols[0], deploymentId: q.data._meta.deployment}
       });
       
-      
-        let RenderAll = null
+        let RenderAll = null;
         
         if (subgraphStatusList?.indexingStatuses?.length > 0) {
           // const sortedStatusList = subgraphStatusList.indexingStatuses.map(
@@ -133,7 +134,8 @@ async function FetchProtocolMetadata(
               subgraphListByProtocol[currentProtocolName || idx] = [];
               }
               subgraphListByProtocol[currentProtocolName || idx].push(currentProtocolData);
-            })
+            });
+
             RenderAll = (
               Object.keys(subgraphListByProtocol).map(pro => {
                 const proObj = subgraphListByProtocol[pro]
@@ -143,9 +145,12 @@ async function FetchProtocolMetadata(
                       <div style={{display: "flex", flexDirection: "row", flexWrap: "wrap"}}>
 
                   {proObj.map(network => {
-                    console.log(network.subgraph)
+                    let color = 'black';
+                    if (network.subgraph.fatalError) {
+                      color = 'red';
+                    }
                     return (
-                      <div onClick={() => { network.URL ? selectSubgraph(network.URL): selectSubgraph("")}} style={{border: 'red 2px solid', padding: "1%", margin: "1%", width: "29%"}}>
+                      <div onClick={() => { network.URL ? selectSubgraph(network.URL): selectSubgraph("")}} style={{border: color + ' 2px solid', padding: "1%", margin: "1%", width: "29%", cursor: "pointer"}}>
                           <h3 style={{textAlign: "center"}}>{network.network}</h3>
                           <p>Entity count: {network.subgraph.entityCount}</p>
                           <p>Indexed: {network.indexed}%</p>

@@ -101,42 +101,6 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
     setTabValue(newValue);
   };
 
-  const parseMetaData = (value: any, item: string, poolValues: any) =>{
-    if (item.includes("Tokens")) {
-      return value.map((token: any, i: number) => {
-        let returnVal = token.name;
-        if (i < value.length - 1) {
-          returnVal += ", ";
-        }
-        return returnVal;
-      })
-    }
-    if (item.includes("Token")) {
-      return value.name
-    }
-
-    if (item.includes("fees")) {
-      return value.map((val: any,i:number) => {
-        let returnVal = val.feeType + "=" + val.feePercentage + "%";
-        if (i < value.length - 1) {
-          returnVal += ", ";
-        }
-        return returnVal;
-      });
-    }
-    if(item.includes("Balances")){
-      return value.map((val: any,i:number) => {
-        const balance = Number(val) / (10 ** Number(poolValues.inputTokens[i].decimals));
-        let returnVal = poolValues.inputTokens[i].name + "=" + balance;
-        if (i < value.length - 1) {
-          returnVal += ", ";
-        }
-        return returnVal;
-      });
-    }
-    return value
-  }
-
   // AllData() is what renders the tabs and all of the data within them. This is also were data is mapped to call functions for the compoenents to be rendered
   // Chart/Table components are called as functions within here, they are imported from the chartComponents directory
   const AllData = () =>
@@ -176,7 +140,7 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
                   
                   {/* EVENTS TAB */}
                   
-                  { setWarning(issues)}
+                  {setWarning(issues)}
                   {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
                   {
                     events.map((eventName)=>{
@@ -238,8 +202,10 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
     <div className="ProtocolDashboard">
       <Button style={{margin: "24px"}} onClick={() => {
         client.resetStore();
-        setSubgraphToQuery({url: "", version: ""})
-        selectSubgraph("")
+        setTabValue("1");
+        setPoolId("");
+        setSubgraphToQuery({url: "", version: ""});
+        selectSubgraph("");
       }}>RETURN TO DEPLOYMENTS</Button>
       {protocolInfo}
       {errorRender}
