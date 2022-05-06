@@ -17,26 +17,16 @@ import {
   Account2Add,
   Token1Add,
   Token2Add,
-  Token3Add,
-  Token4Add,
-  DODOLpToken_ADDRESS,
-  vDODOToken_ADDRESS,
-  WRAPPED_ETH,
-  DAI,
-  USDC,
-  USDT,
-  DVMPoolAddress,
   DSPPoolAddress,
-  DPPPoolAddress,
-  CPPoolAddress,
-  DVMFactory_ADDRESS,
-  CPFactory_ADDRESS,
-  DPPFactory_ADDRESS,
   DSPFactory_ADDRESS,
   TxHash
 } from "./helpers/constants.test";
 
+import { simulateActivity } from "./helpers/simulation_helper.test";
+
 test("Can handle a BuyShares Event", () => {
+  simulateActivity();
+
   let bsEvent = createBuySharesEvent(
     Account1Add,
     "1000000000000000000",
@@ -56,6 +46,8 @@ test("Can handle a BuyShares Event", () => {
 });
 
 test("Can handle a SellShares Event", () => {
+  simulateActivity();
+
   let ssEvent = createSellSharesEvent(
     Account1Add,
     DSPPoolAddress,
@@ -77,6 +69,8 @@ test("Can handle a SellShares Event", () => {
 });
 
 test("Can handle a DODOSwap Event", () => {
+  simulateActivity();
+
   let swapEvent = createDODOSwapDSPEvent(
     Token1Add,
     Token2Add,

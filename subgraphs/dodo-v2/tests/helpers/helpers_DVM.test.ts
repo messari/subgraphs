@@ -4,7 +4,6 @@ import {
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { BuyShares, SellShares, DODOSwap } from "../../generated/DVM/DVM";
-import { createNewDVMEvent } from "./factory_helpers.test";
 
 import { TxHash } from "./constants.test";
 
@@ -16,8 +15,6 @@ export function createBuySharesEvent(
   quoteToken: string,
   dvm: string
 ): BuyShares {
-  let newDVMevent = createNewDVMEvent(baseToken, quoteToken, to, dvm);
-
   let newBuySharesEvent = changetype<BuyShares>(newMockEvent());
 
   let dvmAdd = Address.fromString(dvm);
@@ -63,8 +60,6 @@ export function createSellSharesEvent(
   quoteToken: string,
   dvm: string
 ): SellShares {
-  let newDVMevent = createNewDVMEvent(baseToken, quoteToken, to, dvm);
-
   let newSellSharesEvent = changetype<SellShares>(newMockEvent());
   let dvmAdd = Address.fromString(dvm);
 
@@ -114,8 +109,6 @@ export function createDODOSwapDVMEvent(
   receiver: string,
   dvm: string
 ): DODOSwap {
-  let newDVMevent = createNewDVMEvent(fromToken, toToken, receiver, dvm);
-
   let newDODOSwapEvent = changetype<DODOSwap>(newMockEvent());
   let dvmAdd = Address.fromString(dvm);
   let token1 = Address.fromString(fromToken);
@@ -124,74 +117,6 @@ export function createDODOSwapDVMEvent(
   newDODOSwapEvent.address = dvmAdd;
   newDODOSwapEvent.transaction.hash = Bytes.fromHexString(TxHash);
   newDODOSwapEvent.logIndex = BigInt.fromString("1");
-
-  createMockedFunction(token1, "balanceOf", "balanceOf(address):(uint256)")
-    .withArgs([ethereum.Value.fromAddress(Address.fromString(receiver))])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(
-        BigInt.fromString("1000000000000000000")
-      )
-    ]);
-  createMockedFunction(token2, "balanceOf", "balanceOf(address):(uint256)")
-    .withArgs([ethereum.Value.fromAddress(Address.fromString(receiver))])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(
-        BigInt.fromString("1000000000000000000")
-      )
-    ]);
-
-  createMockedFunction(token1, "balanceOf", "balanceOf(address):(uint256)")
-    .withArgs([ethereum.Value.fromAddress(Address.fromString(dvm))])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(
-        BigInt.fromString("1000000000000000000")
-      )
-    ]);
-  createMockedFunction(token2, "balanceOf", "balanceOf(address):(uint256)")
-    .withArgs([ethereum.Value.fromAddress(Address.fromString(dvm))])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(
-        BigInt.fromString("1000000000000000000")
-      )
-    ]);
-
-  createMockedFunction(
-    Address.fromString(dvm),
-    "totalSupply",
-    "totalSupply():(uint256)"
-  ).returns([
-    ethereum.Value.fromUnsignedBigInt(BigInt.fromString("1000000000000000000"))
-  ]);
-
-  createMockedFunction(
-    Address.fromString(dvm),
-    "_MT_FEE_RATE_MODEL_",
-    "_MT_FEE_RATE_MODEL_():(address)"
-  ).returns([ethereum.Value.fromAddress(Address.fromString(dvm))]);
-
-  createMockedFunction(
-    Address.fromString(dvm),
-    "feeRateImpl",
-    "feeRateImpl():(address)"
-  ).returns([ethereum.Value.fromAddress(Address.fromString(dvm))]);
-
-  createMockedFunction(
-    Address.fromString(dvm),
-    "_LP_MT_RATIO_",
-    "_LP_MT_RATIO_():(uint256)"
-  ).returns([
-    ethereum.Value.fromUnsignedBigInt(BigInt.fromString("1000000000000000000"))
-  ]);
-
-  createMockedFunction(
-    Address.fromString(dvm),
-    "getFeeRate",
-    "getFeeRate(address):(uint256)"
-  )
-    .withArgs([ethereum.Value.fromAddress(Address.fromString(trader))])
-    .returns([
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromString("10000000000000000"))
-    ]);
 
   newDODOSwapEvent.parameters = new Array();
 

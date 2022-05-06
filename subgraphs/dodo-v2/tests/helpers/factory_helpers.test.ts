@@ -6,6 +6,7 @@ import { NewDPP } from "../../generated/DPPFactory/DPPFactory";
 import { NewCP } from "../../generated/CrowdPoolingFactory/CrowdPoolingFactory";
 import { ERC20 } from "../../generated/CP/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
+import { createERC20Instance } from "./simulation_helper.test";
 
 import {
   Account1Add,
@@ -31,57 +32,12 @@ import {
   TxHash
 } from "./constants.test";
 
-export function createERC20Instance(
-  tokenAdd: string,
-  namei: string,
-  symboli: string,
-  decimalsi: i32
-): ERC20 {
-  let erc20Base = Address.fromString(tokenAdd);
-  let name = ethereum.Value.fromString(namei);
-  let symbol = ethereum.Value.fromString(symboli);
-  let decimals = ethereum.Value.fromI32(decimalsi);
-
-  createMockedFunction(erc20Base, "name", "name():(string)").returns([name]);
-  createMockedFunction(erc20Base, "symbol", "symbol():(string)").returns([
-    symbol
-  ]);
-  createMockedFunction(erc20Base, "decimals", "decimals():(uint8)").returns([
-    decimals
-  ]);
-
-  let erc20 = ERC20.bind(erc20Base);
-  return erc20;
-}
-
 export function createNewDVMEvent(
   baseToken: string,
   quoteToken: string,
   creator: string,
   dvm: string
 ): NewDVM {
-  let tokenb = createERC20Instance(
-    baseToken,
-    "Input Base Token Name",
-    "IBTN",
-    3
-  );
-
-  let tokenq = createERC20Instance(
-    quoteToken,
-    "Input Quote Token Name",
-    "IQTN",
-    6
-  );
-
-  let dodo = createERC20Instance(
-    DODOLpToken_ADDRESS,
-    "DODO",
-    "vDODOToken_ADDRESS",
-    18
-  );
-  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
-
   let lpToken = createERC20Instance(dvm, "LP Token", "LPT", 18);
   let dVm = Address.fromString(dvm);
   let version = ethereum.Value.fromString("DVM 1.0.2");
@@ -125,32 +81,9 @@ export function createNewDSPEvent(
   creator: string,
   dsp: string
 ): NewDSP {
-  let tokenb = createERC20Instance(
-    baseToken,
-    "Input Base Token Name",
-    "IBTN",
-    7
-  );
-
-  let tokenq = createERC20Instance(
-    quoteToken,
-    "Input Quote Token Name",
-    "IQTN",
-    6
-  );
-
-  let dodo = createERC20Instance(
-    DODOLpToken_ADDRESS,
-    "DODO",
-    "vDODOToken_ADDRESS",
-    5
-  );
-  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
-
-  let lpToken = createERC20Instance(dsp, "LP Token", "LPT", 18);
-
   let dVm = Address.fromString(dsp);
   let version = ethereum.Value.fromString("DSP 1.0.1");
+  let lpToken = createERC20Instance(dsp, "LP Token", "LPT", 18);
 
   createMockedFunction(dVm, "version", "version():(string)").returns([version]);
 
@@ -191,32 +124,9 @@ export function createNewDPPEvent(
   creator: string,
   dpp: string
 ): NewDPP {
-  let tokenb = createERC20Instance(
-    baseToken,
-    "Input Base Token Name",
-    "IBTN",
-    18
-  );
-
-  let tokenq = createERC20Instance(
-    quoteToken,
-    "Input Quote Token Name",
-    "IQTN",
-    18
-  );
-
-  let dodo = createERC20Instance(
-    DODOLpToken_ADDRESS,
-    "DODO",
-    "vDODOToken_ADDRESS",
-    18
-  );
-  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
-
-  let lpToken = createERC20Instance(dpp, "LP Token", "LPT", 18);
-
   let dVm = Address.fromString(dpp);
   let version = ethereum.Value.fromString("DPP 1.0.0");
+  let lpToken = createERC20Instance(dpp, "LP Token", "LPT", 18);
 
   createMockedFunction(dVm, "version", "version():(string)").returns([version]);
 
@@ -257,32 +167,9 @@ export function createNewCPEvent(
   creator: string,
   cp: string
 ): NewCP {
-  let tokenb = createERC20Instance(
-    baseToken,
-    "Input Base Token Name",
-    "IBTN",
-    18
-  );
-
-  let tokenq = createERC20Instance(
-    quoteToken,
-    "Input Quote Token Name",
-    "IQTN",
-    18
-  );
-
-  let dodo = createERC20Instance(
-    DODOLpToken_ADDRESS,
-    "DODO",
-    "vDODOToken_ADDRESS",
-    18
-  );
-  let vDodo = createERC20Instance(vDODOToken_ADDRESS, "vDODO", "vDODO", 18);
-
-  let lpToken = createERC20Instance(cp, "LP Token", "LPT", 18);
-
   let dVm = Address.fromString(cp);
   let version = ethereum.Value.fromString("CP 1.0.0");
+  let lpToken = createERC20Instance(cp, "LP Token", "LPT", 18);
 
   createMockedFunction(dVm, "version", "version():(string)").returns([version]);
 

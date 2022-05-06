@@ -1,21 +1,10 @@
 import { test, assert } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { logStore } from "matchstick-as/assembly/store";
-
-import {
-  handleNewDVM,
-  handleNewCP,
-  handleNewDPP,
-  handleNewDSP
-} from "../src/mappingFactory";
 
 import {
   createERC20Instance,
-  createNewDVMEvent,
-  createNewDSPEvent,
-  createNewDPPEvent,
-  createNewCPEvent
-} from "./helpers/factory_helpers.test";
+  simulateActivity
+} from "./helpers/simulation_helper.test";
 
 import {
   Account1Add,
@@ -46,7 +35,7 @@ test("Creates an ERC20 Token instance", () => {
   let symbol = ethereum.Value.fromString("TTN");
   let decimals = ethereum.Value.fromI32(18);
 
-  let token = createERC20Instance(Token1Add, "Test Token Name", "TTN", 18);
+  let token = createERC20Instance(Token3Add, "Test Token Name", "TTN", 18);
   let result1 = token.try_name();
   let result2 = token.try_symbol();
   let result3 = token.try_decimals();
@@ -57,14 +46,7 @@ test("Creates an ERC20 Token instance", () => {
 });
 
 test("Can handle new DVM", () => {
-  let newDVMevent = createNewDVMEvent(
-    Token1Add,
-    Token2Add,
-    Account1Add,
-    DVMPoolAddress
-  );
-
-  handleNewDVM(newDVMevent);
+  simulateActivity();
 
   assert.fieldEquals(
     "DexAmmProtocol",
@@ -87,14 +69,8 @@ test("Can handle new DVM", () => {
 });
 
 test("Can handle new DSP", () => {
-  let newDVMevent = createNewDSPEvent(
-    Token1Add,
-    Token2Add,
-    Account1Add,
-    DSPPoolAddress
-  );
+  simulateActivity();
 
-  handleNewDSP(newDVMevent);
   assert.fieldEquals(
     "DexAmmProtocol",
     DSPFactory_ADDRESS,
@@ -116,14 +92,8 @@ test("Can handle new DSP", () => {
 });
 
 test("Can handle new DPP", () => {
-  let newDVMevent = createNewDPPEvent(
-    Token1Add,
-    Token2Add,
-    Account1Add,
-    DPPPoolAddress
-  );
+  simulateActivity();
 
-  handleNewDPP(newDVMevent);
   assert.fieldEquals(
     "DexAmmProtocol",
     DPPFactory_ADDRESS,
@@ -145,13 +115,8 @@ test("Can handle new DPP", () => {
 });
 
 test("Can handle new CrowdPool", () => {
-  let newDVMevent = createNewCPEvent(
-    Token1Add,
-    Token2Add,
-    Account1Add,
-    CPPoolAddress
-  );
-  handleNewCP(newDVMevent);
+  simulateActivity();
+
   assert.fieldEquals(
     "DexAmmProtocol",
     CPFactory_ADDRESS,
