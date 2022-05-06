@@ -51,6 +51,15 @@ function PoolTab(
                 dataFields[entityFieldName].push({value: Number(currentInstanceField), date: Number(entityInstance.timestamp)});
                 dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
               }
+              if (entityFieldName.includes('umulative')) {
+                if (!Object.keys(dataFieldMetrics[entityFieldName]).includes('cumulative')) {
+                  dataFieldMetrics[entityFieldName].cumulative = {prevVal: 0, hasLowered: 0}
+                }
+                if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
+                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(entityInstance.timestamp);
+                }
+                dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
+              }
             } else if (Array.isArray(currentInstanceField)) {
               currentInstanceField.forEach((val: string, arrayIndex: number) => {
                 const dataFieldKey = entityFieldName + ' [' + arrayIndex + ']';
@@ -60,6 +69,15 @@ function PoolTab(
                 } else {
                   dataFields[dataFieldKey].push({value: Number(val), date: Number(entityInstance.timestamp)});
                   dataFieldMetrics[dataFieldKey].sum += Number(val);
+                }
+                if (dataFieldKey.includes('umulative')) {
+                  if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
+                    dataFieldMetrics[dataFieldKey].cumulative = {prevVal: 0, hasLowered: 0}
+                  }
+                  if (Number(val) < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
+                  }
+                  dataFieldMetrics[dataFieldKey].cumulative.prevVal = Number(val);
                 }
               });
             }
@@ -72,16 +90,16 @@ function PoolTab(
           Object.keys(dataFields).map((field: string) => {
             const fieldName = field.split(' [')[0]
             const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
-            console.log('schemaFieldTypeString', schemaFieldTypeString)
             if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
               return null;
             }
             const label = entityName + '-' + field;
-            if (dataFieldMetrics[field].sum === 0) {
+            if (dataFieldMetrics[field].sum === 0 && issues.filter(x => x.message === label).length === 0) {
               // The error message is more to be used as data on how to handle the error. Syntax is ERRORTYPE%%ENTITY--FIELD
-              if (issues.filter(x => x.message === label).length === 0) {
-                issues.push({type: "SUM", message: label});
-              }
+              issues.push({type: "SUM", message: label});
+            }
+            if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
+              issues.push({type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered});
             }
             return (<>
               <Grid key={label + '1'} id={label} item xs={8}>
@@ -94,14 +112,22 @@ function PoolTab(
           })
         }</Grid>)
       })
-
-    if (issues.length > 0) {
-      setWarning(issues);
-    }
-
-    const poolName = PoolName[data.protocols[0].type];
-    const poolNames = PoolNames[data.protocols[0].type];
-    const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
+      
+      const poolName = PoolName[data.protocols[0].type];
+      const poolNames = PoolNames[data.protocols[0].type];
+      
+      const poolLevelTVL = parseFloat(data[poolName]?.totalValueLockedUSD)
+      if (issues.filter(x => x.message === poolName && x.type === "TVL-").length === 0 && poolLevelTVL < 1000) {
+        issues.push({type: "TVL-", message: poolName});
+      } else if (issues.filter(x => x.message === poolName && x.type === "TVL+").length === 0 && poolLevelTVL > 1000000000000) {
+        issues.push({type: "TVL+", message: poolName});
+      }
+  
+      if (issues.length > 0) {
+        setWarning(issues);
+      }
+      
+      const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
 
     return (
       <div>
