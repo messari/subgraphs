@@ -1,6 +1,8 @@
 {
   "name": "apeswap",
   "license": "MIT",
+
+
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
@@ -56,7 +58,9 @@
 
     "deploy-all-apeswap-messari": "yarn deploy-uniswap-v2-mainnet-messari",
     "deploy-all-uniswap-v2-messari": "yarn deploy-apeswap-bsc-messari && yarn deploy-apeswap-matic-messari",
-    "deploy-all-sushiswap-messari": "yarn deploy-sushiswap-arbitrum-messari && yarn deploy-sushiswap-avalanche-messari && yarn deploy-sushiswap-bsc-messari && yarn deploy-sushiswap-celo-messari && yarn deploy-sushiswap-fantom-messari && yarn deploy-sushiswap-fuse-messari && yarn deploy-sushiswap-mainnet-messari && yarn deploy-sushiswap-matic-messari && yarn deploy-sushiswap-moonbeam-messari && yarn deploy-sushiswap-moonriver-messari && yarn deploy-sushiswap-xdai-messari"
+    "deploy-all-sushiswap-messari": "yarn deploy-sushiswap-arbitrum-messari && yarn deploy-sushiswap-avalanche-messari && yarn deploy-sushiswap-bsc-messari && yarn deploy-sushiswap-celo-messari && yarn deploy-sushiswap-fantom-messari && yarn deploy-sushiswap-fuse-messari && yarn deploy-sushiswap-mainnet-messari && yarn deploy-sushiswap-matic-messari && yarn deploy-sushiswap-moonbeam-messari && yarn deploy-sushiswap-moonriver-messari && yarn deploy-sushiswap-xdai-messari",
+    "deploy": "yarn prepare:${npm_config_protocol}-${npm_config_network} && yarn codegen && yarn build && yarn deploy --product hosted-service ${npm_config_location}"
+
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",

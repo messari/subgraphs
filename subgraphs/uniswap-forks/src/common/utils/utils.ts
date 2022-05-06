@@ -4,7 +4,6 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
-  DEFAULT_DECIMALS,
   INT_ONE,
   INT_ZERO,
 } from "../constants";

@@ -137,14 +137,14 @@ export function updateTokenWhitelists(token0: Token, token1: Token, poolAddress:
   let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
   // update white listed pools
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist0.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
     let newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
   }
 
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist1.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
     let newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;

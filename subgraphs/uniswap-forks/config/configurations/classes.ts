@@ -86,7 +86,10 @@ class IConfig {
     getFeeOnOff() {
       return this.feeOnOff;
     }
-    getNativeToken() {
+    getRewardIntervalType() {
+      return this.rewardIntervalType;
+    }
+    getReferenceToken() {
       return this.referenceToken;
     }
     getRewardTokens() {

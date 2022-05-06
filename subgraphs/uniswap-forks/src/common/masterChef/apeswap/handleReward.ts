@@ -84,7 +84,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     .div(totalAllocPoint);
 
   let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.REWARD_INTERVAL_TYPE);
+  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
 
   let nativeToken = updateNativeTokenPriceInUSD();
 

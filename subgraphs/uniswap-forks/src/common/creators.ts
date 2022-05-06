@@ -10,10 +10,6 @@ import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from 
 import { NetworkConfigs } from "../../config/configure";
 import { getTrackedVolumeUSD } from "./price/price";
 
-export let factoryContract = FactoryContract.bind(Address.fromString(NetworkConfigs.FACTORY_ADDRESS));
-
-// rebass tokens, dont count in tracked volume
-
 function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
   let poolProtocolFee = new LiquidityPoolFee(poolAddress.concat("-protocol-fee"));
@@ -23,15 +19,15 @@ function createPoolFees(poolAddress: string): string[] {
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
 
-  if (NetworkConfigs.FEE_ON_OFF == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_ON;
-    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_ON;
+  if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn();
+    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOn();
   } else {
-    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_OFF;
-    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_OFF;
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
+    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
   }
 
-  poolTradingFee.feePercentage = NetworkConfigs.TRADING_FEE;
+  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee();
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -63,7 +59,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = NetworkConfigs.REWARD_TOKENS;
+  pool.rewardTokens = [NetworkConfigs.getRewardTokens()];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -122,7 +118,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 
   deposit.hash = transactionHash;
   deposit.logIndex = logIndexI32;
-  deposit.protocol = NetworkConfigs.FACTORY_ADDRESS;
+  deposit.protocol = NetworkConfigs.getFactoryAddress();
   deposit.to = pool.id;
   deposit.from = transfer.sender;
   deposit.blockNumber = event.block.number;
@@ -157,7 +153,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
 
   withdrawal.hash = transactionHash;
   withdrawal.logIndex = event.logIndex.toI32();
-  withdrawal.protocol = NetworkConfigs.FACTORY_ADDRESS;
+  withdrawal.protocol = NetworkConfigs.getFactoryAddress();
   withdrawal.to = transfer.sender;
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;

@@ -71,7 +71,7 @@ export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: Big
 
   // Get the estimated rewards emitted for the upcoming day for this pool
   let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.REWARD_INTERVAL_TYPE);
+  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
 
   let nativeToken = updateNativeTokenPriceInUSD();
 
