@@ -37,7 +37,7 @@ function ProtocolTab(
     // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
     const dataFields: {[dataField: string]: [{date: number, value: number}]} = {};
     // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
-    const dataFieldMetrics: {[dataField: string]: {[metric: string]: number}} = {}
+    const dataFieldMetrics: {[dataField: string]: {[metric: string]: any}} = {}
     // For the current entity, loop through all instances of that entity
     for (let x = currentEntityData.length - 1; x > 0; x--) {
       const entityInstance: {[x: string]: any } = currentEntityData[x];
@@ -59,6 +59,15 @@ function ProtocolTab(
             dataFields[entityFieldName].push({value: Number(currentInstanceField), date: Number(entityInstance.timestamp)});
             dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
           }
+          if (entityFieldName.includes('umulative')) {
+            if (!Object.keys(dataFieldMetrics[entityFieldName]).includes('cumulative')) {
+              dataFieldMetrics[entityFieldName].cumulative = {prevVal: 0, hasLowered: 0}
+            }
+            if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
+              dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(entityInstance.timestamp);
+            }
+            dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
+          }
         } else if (Array.isArray(currentInstanceField)) {
           // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
           // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
@@ -70,6 +79,15 @@ function ProtocolTab(
             } else {
               dataFields[dataFieldKey].push({value: Number(val), date: Number(entityInstance.timestamp)});
               dataFieldMetrics[dataFieldKey].sum += Number(val);
+            }
+            if (dataFieldKey.includes('umulative')) {
+              if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
+                dataFieldMetrics[dataFieldKey].cumulative = {prevVal: 0, hasLowered: 0}
+              }
+              if (Number(val) < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
+              }
+              dataFieldMetrics[dataFieldKey].cumulative.prevVal = Number(val);
             }
           });
         }
@@ -89,12 +107,14 @@ function ProtocolTab(
           return null;
         }
         const label = entityName + '-' + field;
-        if (dataFieldMetrics[field].sum === 0) {
+        if (issues.filter(x => x.message === label && x.type === "SUM").length === 0 && dataFieldMetrics[field].sum === 0) {
           // Create a warning for the 0 sum of all snapshots for this field
-          if (issues.filter(x => x.message === label).length === 0) {
-            issues.push({type: "SUM", message: label});
-          }        
+          issues.push({type: "SUM", message: label});
+        }        
+        if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
+          issues.push({type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered});
         }
+        
         return (<>
           <Grid key={label + '1'} id={label} item xs={8}>
             {Chart(label, dataFields[field], currentEntityData.length)}
@@ -108,7 +128,13 @@ function ProtocolTab(
   });
 
   const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type]
-  console.log(protTypeEntity, data[protTypeEntity], data)
+  const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD)
+  if (issues.filter(x => x.message === protTypeEntity && x.type === "TVL-").length === 0 && protocolLevelTVL < 1000) {
+    issues.push({type: "TVL-", message: protTypeEntity});
+  } else if (issues.filter(x => x.message === protTypeEntity && x.type === "TVL+").length === 0 && protocolLevelTVL > 1000000000000) {
+    issues.push({type: "TVL+", message: protTypeEntity});
+  }
+
   const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warning);
 
   if (issues.length > 0) {

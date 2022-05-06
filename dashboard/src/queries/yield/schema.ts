@@ -62,6 +62,12 @@ export const schema100 = (): Schema => {
 
   const query = `
   query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
@@ -204,6 +210,12 @@ export const schema110 = (): Schema => {
 
   const query = `
       query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
@@ -422,6 +434,12 @@ export const schema120 = (): Schema => {
   
   const query = `
     query Data($poolId: String){
+      _meta {
+        block {
+          number
+        }
+        deployment
+      }
       protocols {
         name
         type
@@ -455,6 +473,10 @@ export const schema120 = (): Schema => {
       ${vaultDailyQuery}
       ${eventsQuery}
       vault(id:$poolId){
+        id
+        name        
+        symbol
+        fees
         inputToken {
           decimals
           name
@@ -466,24 +488,13 @@ export const schema120 = (): Schema => {
         rewardTokens {
           id
         }
-        name
-        isActive
-        canUseAsCollateral
-        canBorrowFrom
-        maximumLTV
-        liquidationThreshold
-        liquidationPenalty
+        depositLimit
         totalValueLockedUSD
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
+        stakedOutputTokenAmount
+        pricePerShare
         inputTokenBalance
-        inputTokenPriceUSD
         outputTokenSupply
         outputTokenPriceUSD
-        exchangeRate
         rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
       }

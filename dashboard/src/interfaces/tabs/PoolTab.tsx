@@ -35,7 +35,7 @@ function PoolTab(
         }
         const dataFields: {[dataField: string]: [{date: number, value: number}]} = {};
         // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
-        const dataFieldMetrics: {[dataField: string]: {[metric: string]: number}} = {}
+        const dataFieldMetrics: {[dataField: string]: {[metric: string]: any}} = {}
         for (let x = currentEntityData.length - 1; x > 0; x--) {
           const entityInstance: {[x: string]: any } = currentEntityData[x];
           Object.keys(entityInstance).forEach((entityFieldName: string) => {

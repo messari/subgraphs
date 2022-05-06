@@ -46,6 +46,12 @@ export const schema100 = (): Schema => {
   };
   const query = `
       query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
@@ -185,6 +191,12 @@ export const schema110 = (): Schema => {
   };
   const query = `
       query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
@@ -421,6 +433,12 @@ export const schema120 = (): Schema => {
   
   let query = `
   query Data($poolId: String){
+    _meta {
+      block {
+        number
+      }
+      deployment
+    }
     protocols {
       name
       type
