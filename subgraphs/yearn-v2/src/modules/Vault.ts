@@ -42,7 +42,7 @@ export function _NewVault(
     vault.createdTimestamp = block.timestamp;
 
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    vault. = constants.BIGDECIMAL_ZERO;
+    vault.lastReport = constants.BIGINT_ZERO;
 
     const managementFeeId =
       enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +

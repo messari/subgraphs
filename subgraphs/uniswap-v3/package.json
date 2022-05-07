@@ -5,12 +5,19 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ uniswap-v3-alt",
-    "create-local": "graph create --node http://localhost:8020/ uniswap-v3-alt",
-    "remove-local": "graph remove --node http://localhost:8020/ uniswap-v3-alt",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 uniswap-v3-alt"
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:matic": "mustache config/matic.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
+    "deploy-mainnet": "yarn prepare:mainnet && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/uniswap-v3-main",
+    "deploy-matic": "yarn prepare:matic && yarn codegen && yarn build && graph deploy --product hosted-service steegecs/uniswap-v3-polygon",
+    "deploy-arbitrum": "yarn prepare:arbitrum && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/uniswap-v3-arbitrum",
+    "deploy-optimism": "yarn prepare:optimism && yarn codegen && yarn build && graph deploy  --product hosted-service steegecs/uniswap-v3-optimism",
+    "deploy-all": "yarn deploy-mainnet && yarn deploy-matic && yarn deploy-arbitrum && yarn deploy-optimism"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
-    "@graphprotocol/graph-ts": "0.24.1"
+    "@graphprotocol/graph-ts": "^0.26.0",
+    "mustache": "^4.2.0"
   }
 }

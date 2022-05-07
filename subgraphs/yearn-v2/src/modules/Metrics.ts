@@ -2,6 +2,7 @@ import {
   ActiveAccount,
 } from "../../generated/schema";
 import {
+  getOrCreateVault,
   getOrCreateAccount,
   getOrCreateYieldAggregator,
   getOrCreateVaultsDailySnapshots,
@@ -9,7 +10,6 @@ import {
   getOrCreateFinancialDailySnapshots,
   getOrCreateUsageMetricsDailySnapshot,
   getOrCreateUsageMetricsHourlySnapshot,
-  getOrCreateVault,
 } from "../common/initializers";
 import * as constants from "../common/constants";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
