@@ -22,8 +22,8 @@ import { Versions } from "../constants";
     if (errorObject.graphQLErrors.length > 0) {
       errorTotalCount += errorObject.graphQLErrors.length;
       // query errors
-      for (let x = 0; x < 5; x++) {
-        // Take up to the first 5 query error messages and push them to the errorMsgs array
+      for (let x = 0; x < 7; x++) {
+        // Take up to the first 7 query error messages and push them to the errorMsgs array
         if (!errorObject.graphQLErrors[x]) {
           break;
         }
@@ -51,7 +51,7 @@ import { Versions } from "../constants";
     }
 
     if (errorMsgs.length >= 1) {
-      return (<div style={{margin: "4px 24px", border: "yellow 3px solid", paddingTop: "6px"}}><h3>DISPLAYING {errorDisplayCount} OUT OF {errorTotalCount} ERRORS.</h3><ol>{errorMsgs}</ol></div>);
+      return (<div style={{margin: "4px 24px", border: "red 3px solid", paddingTop: "6px"}}><h3>DISPLAYING {errorDisplayCount} OUT OF {errorTotalCount} ERRORS.</h3><ol>{errorMsgs}</ol></div>);
     } else {
       return null;
     }
