@@ -67,11 +67,11 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   deposit.amount = amount;
 
   // get/update prices/rates/accrue interest/rewards for market
-  if (market._lastRateUpdateBlock < event.block.number) {
+  if (market._lastUpdateBlock < event.block.number) {
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
-    market._lastRateUpdateBlock = event.block.number;
+    market._lastUpdateBlock = event.block.number;
   }
   let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
@@ -139,11 +139,11 @@ export function createWithdraw(
   withdraw.amount = underlyingAmount;
 
   // get/update prices/rates/accrue interest/rewards for market
-  if (market._lastRateUpdateBlock < event.block.number) {
+  if (market._lastUpdateBlock < event.block.number) {
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
-    market._lastRateUpdateBlock = event.block.number;
+    market._lastUpdateBlock = event.block.number;
   }
   let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let decimalAmount = underlyingAmount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
@@ -191,11 +191,11 @@ export function createBorrow(event: ethereum.Event, borrower: Address, amount: B
   borrow.amount = amount;
 
   // get/update prices/rates/accrue interest/rewards for market
-  if (market._lastRateUpdateBlock < event.block.number) {
+  if (market._lastUpdateBlock < event.block.number) {
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
-    market._lastRateUpdateBlock = event.block.number;
+    market._lastUpdateBlock = event.block.number;
   }
   let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
@@ -251,11 +251,11 @@ export function createRepay(event: ethereum.Event, payer: Address, amount: BigIn
   repay.amount = amount;
 
   // get/update prices/rates/accrue interest/rewards for market
-  if (market._lastRateUpdateBlock < event.block.number) {
+  if (market._lastUpdateBlock < event.block.number) {
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
-    market._lastRateUpdateBlock = event.block.number;
+    market._lastUpdateBlock = event.block.number;
   }
   let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
   let decimalAmount = amount.toBigDecimal().div(exponentToBigDecimal(underlyingDecimals));
@@ -306,17 +306,17 @@ export function createLiquidate(
   liquidate.asset = liquidatedToken.toHexString();
 
   // get/update prices/rates/accrue interest/rewards for market
-  if (market._lastRateUpdateBlock < event.block.number) {
+  if (market._lastUpdateBlock < event.block.number) {
     updateMarketPrices(market, event);
     updateMarketRates(market);
     updateRewards(event, market);
-    market._lastRateUpdateBlock = event.block.number;
+    market._lastUpdateBlock = event.block.number;
   }
-  if (liquidatedMarket._lastRateUpdateBlock < event.block.number) {
+  if (liquidatedMarket._lastUpdateBlock < event.block.number) {
     updateMarketPrices(liquidatedMarket, event);
     updateMarketRates(liquidatedMarket);
     updateRewards(event, liquidatedMarket);
-    liquidatedMarket._lastRateUpdateBlock = event.block.number;
+    liquidatedMarket._lastUpdateBlock = event.block.number;
   }
 
   // calc amount/amountUSD/profitUSD
