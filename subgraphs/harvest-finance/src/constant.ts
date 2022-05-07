@@ -53,6 +53,7 @@ export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
 // no of seconds of a day
 export const SECONDS_PER_DAY = 84600;
+export const SECONDS_PER_HOUR = 3600;
 
 export const PROTOCOL_ID = Address.fromString("0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C");
 export const PROTOCOL_NAME = "Harvest Finance";
