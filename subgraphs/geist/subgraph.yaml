@@ -180,3 +180,25 @@ templates:
         - event: Withdrawn(indexed address,uint256)
           handler: handleStakeWithdrawn
       file: ./src/mappings/fee-distribution.ts
+  - kind: ethereum/contract
+    name: GToken
+    network: fantom
+    source:
+      abi: GToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - GToken
+      abis:
+        - name: GToken
+          file: ./abis/GToken.json
+        - name: LendingPool
+          file: ./abis/LendingPool.json
+      eventHandlers:
+        - event: Burn(indexed address,indexed address,uint256,uint256)
+          handler: handleGTokenBurn
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleGTokenMint
+      file: src/mappings/gToken.ts
