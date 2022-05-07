@@ -7,5 +7,13 @@
     "payable": false,
     "type": "function",
     "gas": 2310
+  },
+  {
+    "name":"underlying_coins",
+    "outputs":[{"type":"address","name":""}],
+    "inputs":[{"type":"int128","name":"arg0"}],
+    "constant":true,"payable":false,
+    "type":"function",
+    "gas":2250
   }
 ]

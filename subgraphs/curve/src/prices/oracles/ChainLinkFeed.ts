@@ -1,5 +1,5 @@
 import * as constants from "../common/constants";
-import { Address, log, BigInt } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
 import { ChainLinkContract } from "../../../generated/MainRegistry/ChainLinkContract";
 import { ChainLinkManual }  from "../../../generated/MainRegistry/ChainLinkManual";
@@ -10,10 +10,12 @@ export function getChainLinkContract(network: string): ChainLinkContract {
 }
 
 export function getChainLinkContractManualAddress(network:string,tokenAddr:Address): ChainLinkManual {
-  log.warning("Fetching chainlink manual addr",[]);
-  let mainnet_chainlink_addresses = constants.CHAIN_LINK_MANUAL_ADDRESS.get(network);
-  log.warning("Fetching chainlink manual addr",[]);
-  return ChainLinkManual.bind(mainnet_chainlink_addresses!.get(tokenAddr)!)
+  let manualAddressMap = constants.CHAIN_LINK_MANUAL_ADDRESS.get(network)!
+  if (manualAddressMap.has(tokenAddr.toHexString().toLowerCase())) {
+    log.error('getChainLinkContractManualAddress manual address found for {}', [tokenAddr.toHexString().toLowerCase()])
+    return ChainLinkManual.bind(manualAddressMap.get(tokenAddr.toHexString()));
+  }
+  return ChainLinkManual.bind(constants.ZERO_ADDRESS);
 }
 
 export function getTokenPriceFromChainLink(tokenAddr: Address, network: string): CustomPriceType {
@@ -27,13 +29,13 @@ export function getTokenPriceFromChainLink(tokenAddr: Address, network: string):
     // value1 is the price of the token
     return CustomPriceType.initialize(result.value.value1.toBigDecimal());
   }
-  if (network === "mainnet" && tokenAddr === constants.WHITELIST_TOKENS_MAINNET.get("WETH")! || tokenAddr === constants.WHITELIST_TOKENS_MAINNET.get("WBTC")!) {
-    let chainLinkContractManual = getChainLinkContractManualAddress(network,tokenAddr);
-    let resultManual = chainLinkContractManual.try_latestAnswer();
-    if (!result.reverted) {
-      // value1 is the price of the token
-      return CustomPriceType.initialize(bigIntToBigDecimal(resultManual.value,8));
-    }
+  let chainLinkContractManual = getChainLinkContractManualAddress(network,tokenAddr);
+  if (!chainLinkContractManual) {
+    return new CustomPriceType();
+  }
+  let resultManual = chainLinkContractManual.try_latestAnswer();
+  if (!result.reverted) {
+    return CustomPriceType.initialize(bigIntToBigDecimal(resultManual.value,8));
   }
   return new CustomPriceType();
 }

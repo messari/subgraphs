@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -426,10 +426,17 @@ type LiquidityPool @entity {
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
-  ##### Added #####
+  ##### Added Fields #####
+
+  "Curve Pools can have underlying tokens in them if regular pool coins are derivative tokens"
+  underlyingTokens: [Token!]!
+
   assetType: Int!
 
   isV2: Boolean!
+
+  poolType: PoolType!
+  
 }
 
 #################################
@@ -489,9 +496,6 @@ type LiquidityPoolDailySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
-
-  ##### Added Data #####
-  isActive: Boolean!
 }
 
 type LiquidityPoolHourlySnapshot @entity {
@@ -733,4 +737,15 @@ type Account @entity {
 type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
+}
+
+
+   
+enum PoolType {
+  STABLE_FACTORY
+  CRYPTO_FACTORY
+  METAPOOL_FACTORY
+  REGISTRY_V1
+  REGISTRY_V2
+  LENDING
 }

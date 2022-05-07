@@ -18,5 +18,5 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
 
 export function isStableCoin(tokenAddr: Address, network: string): bool {
   let STABLECOINS = constants.STABLECOINS_MAP.get(network)!;
-  return STABLECOINS.includes(tokenAddr.toHexString().toLowerCase());
+  return STABLECOINS.includes(tokenAddr);
 }

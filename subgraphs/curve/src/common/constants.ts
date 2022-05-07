@@ -148,6 +148,14 @@ export const CURVE_REGISTRY_MAP = new TypedMap<string, TypedMap<string, Address>
 
 export const BIGINT_CRV_LP_TOKEN_DECIMALS = BigInt.fromI32(1000000);
 
+
+export const ASSET_TYPE_MAP = new Map<i32, string>();
+ASSET_TYPE_MAP.set(0,"USDC");
+ASSET_TYPE_MAP.set(1,"WETH");
+ASSET_TYPE_MAP.set(2,"WBTC");
+ASSET_TYPE_MAP.set(4,"USDC");
+
+// 0: USD, 1: ETH, 2: BTC, 3: EUR, 4: cryptopool, 
 export const ASSET_TYPES = new Map<string, i32>();
 ASSET_TYPES.set("0x06364f10b501e868329afbc005b3492902d6c763", 0);
 ASSET_TYPES.set("0x071c661b4deefb59e2a3ddb20db036821eee8f4b", 2);
@@ -192,7 +200,7 @@ ASSET_TYPES.set("0xfd5db7463a3ab53fd211b4af195c5bccc1a03890", 3);
 ASSET_TYPES.set("0x9d0464996170c6b9e75eed71c68b99ddedf279e8", 3);
 ASSET_TYPES.set("0xc4c319e2d4d66cca4464c0c2b32c9bd23ebe784e", 1);
 ASSET_TYPES.set("0xfbdca68601f835b27790d98bbb8ec7f05fdeaa9b", 2);
-
+ASSET_TYPES.set("0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171", 4);
 
 
 export const POOL_GAUGE_MAP = new TypedMap<string, string>();
@@ -246,8 +254,37 @@ POOL_LP_TOKEN_MAP.set("0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6".toLowerCase()
 POOL_GAUGE_MAP.set("0xC18cC39da8b11dA8c3541C598eE022258F9744da".toLowerCase(),"0x4dC4A289a8E33600D8bD4cf5F6313E43a37adec7".toLowerCase());
 POOL_LP_TOKEN_MAP.set("0xC18cC39da8b11dA8c3541C598eE022258F9744da".toLowerCase(),"0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35".toLowerCase());
 
-POOL_GAUGE_MAP.set("0xC25099792E9349C7DD09759744ea681C7de2cb66".toLowerCase(),"0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd".toLowerCase());
-POOL_LP_TOKEN_MAP.set("0xC25099792E9349C7DD09759744ea681C7de2cb66".toLowerCase(),"0xC2Ee6b0334C261ED60C72f6054450b61B8f18E35".toLowerCase());
+POOL_GAUGE_MAP.set("0xC25099792E9349C7DD09759744ea681C7de2cb66".toLowerCase(),"0x6828bcF74279eE32f2723eC536c22c51Eed383C6".toLowerCase());
+POOL_LP_TOKEN_MAP.set("0xC25099792E9349C7DD09759744ea681C7de2cb66".toLowerCase(),"0x64eda51d3Ad40D56b9dFc5554E06F94e1Dd786Fd".toLowerCase());
 
 export const CURVE_POOL_FEE = BigDecimal.fromString("0.0004");
 export const CURVE_ADMIN_FEE = BigDecimal.fromString("0.5");
+
+
+// Early lending pools have no distinctive features in their ABI
+// And since we can not rely on calls to determine when one is added
+// We have to keep a manual registry
+export const LENDING_POOLS = [
+  // MAINNET
+  Address.fromString('0x83f252f036761a1e3d10daca8e16d7b21e3744d7'),
+  Address.fromString('0x06364f10b501e868329afbc005b3492902d6c763'),
+  Address.fromString('0x2dded6da1bf5dbdf597c45fcfaa3194e53ecfeaf'),
+  Address.fromString('0x45f783cce6b7ff23b2ab2d70e416cdb7d6055f51'),
+  Address.fromString('0x52ea46506b9cc5ef470c5bf89f17dc28bb35d85c'),
+  Address.fromString('0x79a8c46dea5ada233abaffd40f3a0a2b1e5a4f27'),
+  Address.fromString('0xa2b47e3d5c44877cca798226b7b8118f9bfb7a56'),
+  Address.fromString('0xa5407eae9ba41422680e2e00537571bcc53efbfd'),
+  Address.fromString('0xdebf20617708857ebe4f679508e7b7863a8a8eee'),
+  Address.fromString('0xeb16ae0052ed37f479f7fe63849198df1765a733'),
+  Address.fromString('0x8925d9d9b4569d737a48499def3f67baa5a144b9'),
+  // FANTOM
+  Address.fromString('0x4fc8d635c3cb1d0aa123859e2b2587d0ff2707b1'),
+]
+
+
+export const METAPOOL_FACTORY = 'METAPOOL_FACTORY'
+export const CRYPTO_FACTORY = 'CRYPTO_FACTORY'
+export const STABLE_FACTORY = 'STABLE_FACTORY'
+export const REGISTRY_V1 = 'REGISTRY_V1'
+export const REGISTRY_V2 = 'REGISTRY_V2'
+export const LENDING = 'LENDING'

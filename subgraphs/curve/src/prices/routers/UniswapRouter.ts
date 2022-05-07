@@ -124,7 +124,6 @@ export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: str
   ) {
     return new CustomPriceType();
   }
-
   let token0Decimals = utils.getTokenDecimals(token0Address);
   let token1Decimals = utils.getTokenDecimals(token1Address);
 
@@ -132,7 +131,7 @@ export function getLpTokenTotalLiquidityUsdc(tokenAddress: Address, network: str
     uniSwapPair.try_getReserves(),
     constants.UNISWAP_DEFAULT_RESERVE_CALL,
   );
-
+  
   let token0Price = getPriceUsdc(token0Address, network);
   let token1Price = getPriceUsdc(token1Address, network);
 

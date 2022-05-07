@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -9,6 +9,7 @@ import {
   LiquidityPoolHourlySnapshot,
   LiquidityPoolDailySnapshot,
   LiquidityPool,
+  LiquidityPoolFee,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -24,7 +25,9 @@ import { StableSwap } from "../../generated/templates/Pool/StableSwap";
 import { CurvePoolCoin256 } from "../../generated/templates/Pool/CurvePoolCoin256";
 import { CurvePoolCoin128 } from "../../generated/templates/Pool/CurvePoolCoin128";
 import { getUsdPrice, getUsdPricePerToken } from "../prices";
-import { exponentToBigInt } from "./utils/numbers";
+import { bigIntToBigDecimal, exponentToBigInt } from "./utils/numbers";
+import { WHITELIST_TOKENS_MAP } from "../prices/common/constants";
+import { LiquidityPoolFeeType } from "./constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -166,7 +169,7 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol = new DexAmmProtocol(CURVE_REGISTRY_V2_MAINNET);
     protocol.name = "Curve";
     protocol.slug = "curve";
-    protocol.schemaVersion = "1.2.0";
+    protocol.schemaVersion = "1.2.1";
     protocol.subgraphVersion = "1.0.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
@@ -190,4 +193,30 @@ export function getTokenPrice(tokenAddr: Address, event: ethereum.Event): BigDec
   token.lastPriceBlockNumber = event.block.number;
   token.save();
   return priceUSD
+}
+
+export function getPoolTVL(liquidityPool:LiquidityPool, event: ethereum.Event): BigDecimal {
+  let totalValueLockedUSD = BIGDECIMAL_ZERO;
+  let inputTokens = liquidityPool.inputTokens;
+  for (let i = 0; i < inputTokens.length; ++i) {
+    let tokenAddress = inputTokens![i];
+    let coinBalance = liquidityPool.inputTokenBalances![i];
+    if (tokenAddress && coinBalance) {
+      let token = getOrCreateToken(Address.fromString(tokenAddress));
+      let tokenPriceUSD = getTokenPrice(Address.fromString(token.id), event);
+      //log.error('tvl calc tokenPriceUSD = {}, tvl before sum = {}', [tokenPriceUSD.toString(), totalValueLockedUSD.toString()]);
+      totalValueLockedUSD = totalValueLockedUSD.plus(tokenPriceUSD.times(bigIntToBigDecimal(coinBalance, token.decimals)));
+    }
+  }
+  return totalValueLockedUSD
+}
+
+export function getPoolFee(poolID:string, feeType: string): LiquidityPoolFee {
+  let poolFee = LiquidityPoolFee.load(feeType +'-'+ poolID);
+  if (!poolFee) {
+    poolFee = new LiquidityPoolFee(feeType +'-'+ poolID);
+    poolFee.feeType = feeType;
+    poolFee.save()
+  }
+  return poolFee;
 }

@@ -28,8 +28,12 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -75,6 +79,8 @@ dataSources:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -105,8 +111,12 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -144,6 +154,8 @@ dataSources:
           file: ./abis/CurvePoolCoin256.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handlePoolAdded
@@ -172,12 +184,16 @@ dataSources:
           file: ./abis/ERC20NameBytes.json
         - name: StableSwap
           file: ./abis/StableSwap.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: ChainLinkContract
           file: ./abis/Prices/ChainLink.json
         - name: ChainLinkManual
@@ -214,6 +230,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities:
         - LiquidityPool
       eventHandlers:
@@ -246,12 +264,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -292,6 +314,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -334,12 +358,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -380,6 +408,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -422,12 +452,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -468,6 +502,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -510,12 +546,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -556,6 +596,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -598,12 +640,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -644,6 +690,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -686,12 +734,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -732,6 +784,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -774,12 +828,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -820,6 +878,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -862,12 +922,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -908,6 +972,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -950,12 +1016,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -996,6 +1066,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1038,12 +1110,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1084,6 +1160,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1126,12 +1204,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1172,6 +1254,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1214,12 +1298,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1260,6 +1348,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1302,12 +1392,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1348,6 +1442,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1390,12 +1486,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1436,6 +1536,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1478,12 +1580,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1524,6 +1630,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1566,12 +1674,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1612,6 +1724,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1654,12 +1768,16 @@ dataSources:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1700,6 +1818,8 @@ dataSources:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       entities: 
         - LiquidityPool
       eventHandlers:
@@ -1747,8 +1867,12 @@ templates:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolCoin256
           file: ./abis/CurvePoolCoin256.json
+        - name: CurvePool
+          file: ./abis/Prices/Curve/CurvePool.json
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurveRegistryV2
+          file: ./abis/Prices/Curve/RegistryV2.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         - name: YearnLensContract
@@ -1789,6 +1913,8 @@ templates:
           file: ./abis/Prices/ChainlinkAggregator.json
         - name: CalculationsCompound
           file: ./abis/Prices/Calculations/Compound.json
+        - name: CurveMetaPool
+          file: ./abis/CurveMetaPool.json
       eventHandlers:
         - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
           handler: handleAddLiquidity

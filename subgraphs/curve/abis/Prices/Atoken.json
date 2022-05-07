@@ -347,5 +347,13 @@
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
+  },
+  {
+    "constant":true,"inputs":[],
+    "name":"underlyingAssetAddress",
+    "outputs":[{"internalType":"address","name":"","type":"address"}],
+    "payable":false,
+    "stateMutability":"view",
+    "type":"function"
   }
 ]
