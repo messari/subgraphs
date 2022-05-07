@@ -2,12 +2,7 @@ import { Address } from "@graphprotocol/graph-ts";
 
 import { Token } from "../../generated/schema";
 
-import { 
-    fetchTokenSymbol, 
-    fetchTokenName, 
-    fetchTokenDecimals 
-} from "./tokens";
-
+import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());

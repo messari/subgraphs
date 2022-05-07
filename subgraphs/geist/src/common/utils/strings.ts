@@ -11,7 +11,9 @@ export function hexToNumberString(hex: string): string {
     let character = hex.substr(hex.length - 1 - i, 1);
     let digit = parseInt(character, 16) as u8;
     if (digit) {
-      hexNumber = hexNumber.plus(BigInt.fromI32(digit).times(BigInt.fromI32(16).pow(i as u8)));
+      hexNumber = hexNumber.plus(
+        BigInt.fromI32(digit).times(BigInt.fromI32(16).pow(i as u8))
+      );
     }
   }
 
