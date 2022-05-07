@@ -948,6 +948,6 @@ type Account @entity {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity {
-  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }

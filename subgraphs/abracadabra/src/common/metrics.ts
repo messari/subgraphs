@@ -163,6 +163,8 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketHourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketHourlySnapshot.outputTokenSupply = market.outputTokenSupply;
   marketHourlySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketHourlySnapshot.blockNumber = event.block.number;
+  marketHourlySnapshot.timestamp = event.block.timestamp;
 
   marketDailySnapshot.protocol = protocol.id;
   marketDailySnapshot.market = market.id;
@@ -177,9 +179,11 @@ export function updateMarketMetrics(event: ethereum.Event): void {
   marketDailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketDailySnapshot.outputTokenSupply = market.outputTokenSupply;
   marketDailySnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+  marketDailySnapshot.blockNumber = event.block.number;
+  marketDailySnapshot.timestamp = event.block.timestamp;
 
   marketHourlySnapshot.save();
-  marketHourlySnapshot.save();
+  marketDailySnapshot.save();
 }
 
 export function updateTVL(event: ethereum.Event): void {
@@ -260,6 +264,16 @@ export function updateMarketStats(
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let priceUSD = token.lastPriceUSD;
+  usageHourlySnapshot.blockNumber = event.block.number;
+  usageHourlySnapshot.timestamp = event.block.timestamp;
+  usageDailySnapshot.blockNumber = event.block.number;
+  usageDailySnapshot.timestamp = event.block.timestamp;
+  marketHourlySnapshot.blockNumber = event.block.number;
+  marketHourlySnapshot.timestamp = event.block.timestamp;
+  marketDailySnapshot.blockNumber = event.block.number;
+  marketDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.blockNumber = event.block.number;
+  financialsDailySnapshot.timestamp = event.block.timestamp;
   if (eventType == "DEPOSIT") {
     let inputTokenBalance = market.inputTokenBalance.plus(amount);
     market.inputTokenBalance = inputTokenBalance;
@@ -311,10 +325,6 @@ export function updateMarketStats(
     usageHourlySnapshot.hourlyRepayCount += 1;
     usageDailySnapshot.dailyRepayCount += 1;
   }
-  usageHourlySnapshot.blockNumber = event.block.number;
-  usageHourlySnapshot.timestamp = event.block.timestamp;
-  usageDailySnapshot.blockNumber = event.block.number;
-  usageDailySnapshot.timestamp = event.block.timestamp;
   market.inputTokenPriceUSD = getOrCreateToken(Address.fromString(market.inputToken)).lastPriceUSD;
   market.outputTokenPriceUSD =
     asset.toLowerCase() == getMIMAddress(dataSource.network()).toLowerCase()
