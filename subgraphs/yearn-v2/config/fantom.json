@@ -5,6 +5,7 @@
   "Registry_v1-StartBlock": "18302800",
 
   "registry_v2-isEnabled": false,
+  "callHandlersEnabled": true,
 
   "manualVaults": [
     {
