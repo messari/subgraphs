@@ -11,9 +11,9 @@
     "prepare:mainnet": "mustache config/mainnet.json src/common/constants.mustache > src/common/constants.ts && yarn codegen && mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
     "prepare:polygon": "mustache config/polygon.json src/common/constants.mustache > src/common/constants.ts && yarn codegen && mustache config/polygon.json subgraph.template.yaml > subgraph.yaml",
     "prepare:arbitrum": "mustache config/arbitrum.json src/common/constants.mustache > src/common/constants.ts && yarn codegen && mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ dOrgTech/balancer-v2-mainnet",
-    "deploy:polygon": "yarn prepare:polygon && graph deploy --node https://api.thegraph.com/deploy/ dOrgTech/balancer-v2-polygon",
-    "deploy:arbitrum": "yarn prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ dOrgTech/balancer-v2-arbitrum",
+    "deploy:mainnet": "yarn prepare:mainnet && graph deploy --node https://api.thegraph.com/deploy/ messari/balancer-v2-ethereum",
+    "deploy:polygon": "yarn prepare:polygon && graph deploy --node https://api.thegraph.com/deploy/ messari/balancer-v2-polygon",
+    "deploy:arbitrum": "yarn prepare:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ messari/balancer-v2-arbitrum",
     "create-local": "graph create --node http://localhost:8020/ dOrgTech/balancer-v2",
     "remove-local": "graph remove --node http://localhost:8020/ dOrgTech/balancer-v2",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dOrgTech/balancer-v2"
