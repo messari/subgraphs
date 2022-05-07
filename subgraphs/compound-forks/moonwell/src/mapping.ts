@@ -186,7 +186,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
-  setMarketRewards(marketAddress, event.block.number);
+  setMarketRewards(marketAddress, event.block.number.toI32());
 
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
@@ -214,7 +214,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.0",
+    "1.0.1",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa()
