@@ -79,6 +79,12 @@ templates:
           file: ./abis/SpookySwapGEISTFTM.json
         - name: GeistToken
           file: ./abis/GeistToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
       eventHandlers:
         - event: Deposit(indexed address,address,indexed address,uint256,indexed uint16)
           handler: handleDeposit
