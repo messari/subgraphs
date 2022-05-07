@@ -1,6 +1,7 @@
 import requests
 import json
 import time
+import os
 
 # Deployment addresses
 deployment_addresses = {
@@ -18,6 +19,7 @@ deployment_addresses = {
     "SpookySwapGEISTFTM": "0x668AE94D0870230AC007a01B471D02b2c94DDcB9",
     "LendingPoolConfiguratorProxy": "0x7a0d50E55ffcBF3E2313BB4460E86dBBF8e8c25B",
     "GToken": "0xA2D7357c069b0cBC0F2B75487fa4045208b6F919",
+    "AaveIncentivesController": "0x297FddC5c33Ef988dd03bd13e162aE084ea1fE57"
 }
 
 if __name__ == "__main__":
@@ -31,8 +33,11 @@ if __name__ == "__main__":
 
         print(f"Fetching {name}...")
 
+        current_dirname = os.path.dirname(__file__)
+
         # Write ABIs to file, make it look pretty too
-        with open(f'../abis/{name}.json', 'w', encoding='utf-8') as f:
+        filepath = os.path.join(current_dirname, "..", "abis", f"{name}.json")
+        with open(filepath, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         
         print(f"Saved {name} to '../abis/{name}.json'")

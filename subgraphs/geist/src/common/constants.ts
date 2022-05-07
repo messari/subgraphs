@@ -84,9 +84,11 @@ export namespace RewardTokenType {
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////
-export const ZERO_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000")
-
-
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000"
+export const PRICE_ORACLE_ADDRESS = '0xC466e3FeE82C6bdc2E17f2eaF2c6F1E91AD10FD3';
+export const AAVE_PROTOCOL_DATA_PROVIDER = "0xf3B0611e2E4D2cd6aB4bb3e01aDe211c3f42A8C3";
+export const TOKEN_ADDRESS_USDC = "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75";
+export const INCENTIVE_CONTROLLER_ADDRESS = "0x49c93a95dbcc9A6A4D8f77E59c038ce5020e82f8";
 
 ////////////////////////
 ///// Type Helpers /////
@@ -95,6 +97,9 @@ export const ZERO_ADDRESS = Address.fromString("0x000000000000000000000000000000
 // BigInts
 export const ZERO_BI = BigInt.fromI32(0);
 export const ONE_BI = BigInt.fromI32(1);
+
+export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
@@ -112,7 +117,10 @@ export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 // BigDecimal 0 and 1
 export const ZERO_BD = BigDecimal.fromString("0");
 export const ONE_BD = BigDecimal.fromString("1");
-export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
+
+export const BIGDECIMAL_ZERO = BigDecimal.fromString("0");
+export const BIGDECIMAL_ONE = BigDecimal.fromString("1");
+export const BIGDECIMAL_TWO = BigDecimal.fromString("2");
 
 
 export const DEFAULT_DECIMALS = 18;
@@ -133,7 +141,9 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(864
 /////////////////////////////
 
 // Set Protocol ID to the registry address
-export const PROTOCOL_ID = "0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82";
+export const PROTOCOL_ADDRESS = "0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82";
+export const REWARD_TOKEN_ADDRESS = "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d";
+
 
 // Interaction types for snapshot calculations
 export const DEPOSIT_INTERACTION = "DEPOSIT";

@@ -3,7 +3,7 @@ import {
     Mint
   } from '../../generated/templates/GToken/GToken';
   
-  import { updateOutputTokenSupply } from './utilFunctions';
+  import { updateOutputTokenSupply } from './helpers';
   
   import { log } from '@graphprotocol/graph-ts';
   

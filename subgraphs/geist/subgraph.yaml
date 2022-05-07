@@ -23,7 +23,7 @@ dataSources:
       eventHandlers:
         - event: AddressesProviderRegistered(indexed address)
           handler: handleAddressesProviderRegistered
-      file: src/mappings/address-provider-registry.ts
+      file: src/mappings/lending-pool-address-provider.ts
 
 templates:
   - kind: ethereum/contract
@@ -40,6 +40,8 @@ templates:
       abis:
         - name: LendingPoolAddressesProvider
           file: ./abis/LendingPoolAddressesProvider.json
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
       eventHandlers:
         - event: ProxyCreated(bytes32,indexed address)
           handler: handleProxyCreated
@@ -49,7 +51,7 @@ templates:
           handler: handleLendingPoolUpdated
         - event: LendingPoolConfiguratorUpdated(indexed address)
           handler: handleLendingPoolConfiguratorUpdated
-      file: src/mappings/address-provider-registry.ts
+      file: src/mappings/lending-pool-address-provider.ts
   - kind: ethereum/contract
     name: LendingPool
     network: fantom
@@ -85,6 +87,10 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
+        - name: AaveProtocolDataProvider
+          file: ./abis/AaveProtocolDataProvider.json
       eventHandlers:
         - event: Deposit(indexed address,address,indexed address,uint256,indexed uint16)
           handler: handleDeposit
@@ -134,6 +140,8 @@ templates:
           file: ./abis/GeistToken.json
         - name: GToken
           file: ./abis/GToken.json
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
       eventHandlers:
         - event: ReserveInitialized(indexed address,indexed address,address,address,address)
           handler: handleReserveInitialized
@@ -149,37 +157,7 @@ templates:
           handler: handleReserveDeactivated  
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
-      file: src/mappings/address-provider-registry.ts
-  - kind: ethereum/contract
-    name: MultiFeeDistribution
-    network: fantom
-    source:
-      abi: MultiFeeDistribution
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - FinancialsDailySnapshot
-      abis:
-        - name: MultiFeeDistribution
-          file: ./abis/MultiFeeDistribution.json
-        - name: AaveOracle
-          file: ./abis/AaveOracle.json
-        - name: SpookySwapGEISTFTM
-          file: ./abis/SpookySwapGEISTFTM.json
-        - name: GeistToken
-          file: ./abis/GeistToken.json
-        - name: GToken
-          file: ./abis/GToken.json
-      eventHandlers:
-        - event: RewardPaid(indexed address,indexed address,uint256)
-          handler: handleRewardPaid
-        - event: Staked(indexed address,uint256)
-          handler: handleStakeAdded
-        - event: Withdrawn(indexed address,uint256)
-          handler: handleStakeWithdrawn
-      file: ./src/mappings/fee-distribution.ts
+      file: src/mappings/lending-pool-configurator.ts
   - kind: ethereum/contract
     name: GToken
     network: fantom
@@ -196,6 +174,8 @@ templates:
           file: ./abis/GToken.json
         - name: LendingPool
           file: ./abis/LendingPool.json
+        - name: AaveIncentivesController
+          file: ./abis/AaveIncentivesController.json
       eventHandlers:
         - event: Burn(indexed address,indexed address,uint256,uint256)
           handler: handleGTokenBurn
