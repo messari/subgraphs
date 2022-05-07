@@ -54,20 +54,32 @@ export function getOrCreateToken(cToken: Address): Token {
 export function getOrCreateUnderlyingToken(cToken: Address): Token {
   // use default for cETH, which has no underlying
   let tokenId = ZERO_ADDRESS;
-  let name = "Ether";
-  let symbol = "ETH";
-  let decimals = 18;
+  let name = "";
+  let symbol = "";
+  let decimals = 0;
+
+  // underlying for cETH -> ETH
+  if (cToken.toHexString() == "0x697b4acaa24430f254224eb794d2a85ba1fa1fb8") {
+    name = "Ether";
+    symbol = "ETH";
+    decimals = 18;
+  }
 
   //even if the underlying token is not always a CErc20,
   // it should work for the purpose of getting name, symbol, & decimals
   let cTokenContract = CErc20.bind(cToken);
   let tryUnderlyingTokenAddr = cTokenContract.try_underlying();
   if (!tryUnderlyingTokenAddr.reverted) {
-    let tokenId = tryUnderlyingTokenAddr.value.toHexString();
-    let underlyingTokenContract = ERC20.bind(tryUnderlyingTokenAddr.value);
-    let name = underlyingTokenContract.name();
-    let symbol = underlyingTokenContract.symbol();
-    let decimals = underlyingTokenContract.decimals();
+    tokenId = tryUnderlyingTokenAddr.value.toHexString();
+    let underlyingTokenContract = CErc20.bind(tryUnderlyingTokenAddr.value);
+    name = underlyingTokenContract.name();
+    symbol = underlyingTokenContract.symbol();
+    decimals = underlyingTokenContract.decimals();
+  } else {
+    if (cToken.toHexString() != "0x697b4acaa24430f254224eb794d2a85ba1fa1fb8")
+      log.warning("Failed to get underlying for market {}", [
+        cToken.toHexString()
+      ]);
   }
 
   let token = Token.load(tokenId);
@@ -108,8 +120,8 @@ export function getOrCreateProtocol(): LendingProtocol {
 
   if (!protocol) {
     protocol = new LendingProtocol(FACTORY_ADDRESS);
-    protocol.name = "Inverse Finance v1";
-    protocol.slug = "inverse-finance-v1";
+    protocol.name = "Inverse Finance";
+    protocol.slug = "inverse-finance";
     protocol.schemaVersion = "1.2.1";
     protocol.subgraphVersion = "1.2.1";
     protocol.methodologyVersion = "1.0.0";
@@ -251,15 +263,12 @@ export function getOrCreateMarketDailySnapshot(event: ethereum.Event): MarketDai
 }
 
 export function getOrCreateMarketHourlySnapshot(event: ethereum.Event): MarketHourlySnapshot {
-  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let daysStr: string = days.toString();
-  let secondsPastMidnight = event.block.timestamp.toI64() % SECONDS_PER_DAY;
-  // HH: hour of the day
-  let hours = secondsPastMidnight / SECONDS_PER_HOUR;
+  // Hours since Unix epoch time
+  let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let hoursStr = hours.toString();
 
   let marketId = event.address.toHexString();
-  let id = prefixID(marketId, daysStr, hoursStr);
+  let id = prefixID(marketId, hoursStr);
 
   let marketMetrics = MarketHourlySnapshot.load(id);
   if (marketMetrics == null) {
@@ -323,16 +332,13 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
 
 export function getOrCreateUsageMetricsHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
-  let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let secondsPastMidnight = event.block.timestamp.toI64() % SECONDS_PER_DAY;
-  // HH: hour of the day
-  let hours = secondsPastMidnight / SECONDS_PER_HOUR;
+  let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
-  let daysHoursStr: string = days.toString() + "-" + hours.toString();
+  let hoursStr: string = hours.toString();
 
-  let usageMetrics = UsageMetricsHourlySnapshot.load(daysHoursStr);
+  let usageMetrics = UsageMetricsHourlySnapshot.load(hoursStr);
   if (usageMetrics == null) {
-    usageMetrics = new UsageMetricsHourlySnapshot(daysHoursStr);
+    usageMetrics = new UsageMetricsHourlySnapshot(hoursStr);
 
     usageMetrics.protocol = FACTORY_ADDRESS;
     usageMetrics.hourlyActiveUsers = INT_ZERO;

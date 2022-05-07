@@ -9,7 +9,6 @@ import {
   MANTISSA_DECIMALS,
   InterestRateSide,
   InterestRateType,
-  SECONDS_PER_HOUR,
   SECONDS_PER_DAY,
   BLOCKS_PER_YEAR,
   EMISSION_START_BLOCK,
@@ -401,14 +400,14 @@ export function updateLiquidate(event: LiquidateBorrow): void {
 //    - UsageMetricsHourlySnapshot
 //    - LendingProtocol.cumulativeUniqueUsers
 export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
+  // Days since Unix epoch time
   let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let secondsPastMidnight = event.block.timestamp.toI64() % SECONDS_PER_DAY;
-  // HH: hour of the day
-  let hours = secondsPastMidnight / SECONDS_PER_HOUR;
+  // Hours since Unix epoch time
+  let hours = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let accountId: string = user.toHexString();
-  let dailyActiveAccountId: string = accountId + "-" + days.toString();
-  let hourlyActiveAccountId: string = accountId + "-" + days.toString() + "-" + hours.toString();
+  let dailyActiveAccountId: string = 'daily-' + accountId + "-" + days.toString();
+  let hourlyActiveAccountId: string = 'hourly-' + accountId + "-" + "-" + hours.toString();
 
   // Account entity keeps user addresses
   let isNewUniqueUser = createAndIncrementAccount(accountId);

@@ -1,5 +1,4 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_HOUR, SECONDS_PER_DAY } from "./constants";
 
 // Converts snake case to kebab case and appends a hyphen.
 // (e.g. "TRADING_FEE" to "trading-fee-"), mainly used to create entity IDs
@@ -8,7 +7,7 @@ export function enumToPrefix(snake: string): string {
 }
 
 // Prefix an ID with a enum string in order to differentiate IDs
-// e.g. combine TRADING_FEE and 0x1234 into TRADING-FEE-0x1234
+// e.g. combine XPOOL, TRADING_FEE and 0x1234 into xpool-trading-fee-0x1234
 export function prefixID(ID: string, enumString1: string, enumString2: string | null = null): string {
   let prefix = enumToPrefix(enumString1);
   if (enumString2 != null) {
@@ -26,13 +25,7 @@ export function decimalsToBigDecimal(decimals: i32): BigDecimal {
   return bd;
 }
 
-// returns hours (24-hour format) from timestamp
-export function timestampToHH(timestamp: i64): BigInt {
-  let secondsPastMidnight = timestamp % SECONDS_PER_DAY;
-  let hours = secondsPastMidnight / SECONDS_PER_HOUR;
-  return BigInt.fromI32(hours);
-}
-
+//convert BigDecimal to BigInt by truncating the decimal places
 export function BigDecimalTruncateToBigInt(x: BigDecimal): BigInt {
   let intStr = x.toString().split(".")[0]
   return BigInt.fromString(intStr)
