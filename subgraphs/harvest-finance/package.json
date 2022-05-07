@@ -13,8 +13,8 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 ap-atul/belt"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.21.1",
-    "@graphprotocol/graph-ts": "0.20.0"
+    "@graphprotocol/graph-cli": "0.27",
+    "@graphprotocol/graph-ts": "0.24.1"
   },
   "devDependencies": {
     "graphpack": "^1.0.9"

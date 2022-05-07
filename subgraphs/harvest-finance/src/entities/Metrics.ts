@@ -1,79 +1,70 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { FinancialsDailySnapshot, UsageMetricsDailySnapshot, VaultDailySnapshot } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../constant";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Vault, UsageMetricsDailySnapshot, ActiveAccount } from "../../generated/schema";
+import { BIGINT_ZERO } from "../constant";
 import { getDay } from "../utils/numbers";
 import { getOrCreateProtocol } from "./Protocol";
+import {
+  Deposit as DepositEvent,
+  Withdraw as WithdrawEvent
+} from "../../generated/ControllerListener/VaultContract"
+import { SECONDS_PER_DAY } from "../constant";
 
-export function getOrCreateUsageMetricSnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
-  let day = getDay(block.timestamp).toString();
-  let snapshot = UsageMetricsDailySnapshot.load(day);
 
-  if (snapshot) {
-    return snapshot;
+export function depositUpdateMetrics(event: ethereum.Event, vault: Vault): void {
+  updateUsageMetricsDailySnapshotAfterDeposit(event);
+}
+
+function updateUsageMetricsDailySnapshotAfterDeposit(event: ethereum.Event): void {
+  let day: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+
+  let account_id = "daily-"
+  .concat(event.transaction.from.toHexString())
+  .concat("-")
+  .concat(day.toString());
+
+  let snapshot = getOrCreateUsageMetricsDailySnapshot(day.toString());
+
+  snapshot.dailyTransactionCount += 1;
+  snapshot.dailyDepositCount += 1;
+  snapshot.timestamp = event.block.timestamp;
+
+  let account = ActiveAccount.load(account_id);
+
+  if(!account)
+    // The account didn't already interact with the protol this day
+
+    // we create an activeAccount object for the account to not recount the same account twice
+    account = new ActiveAccount(account_id);
+    account.save();
+
+    snapshot.dailyActiveUsers += 1;
+
+  snapshot.save();
+
+}
+
+function getOrCreateUsageMetricsDailySnapshot(id: String): UsageMetricsDailySnapshot {
+
+  let snapshot = UsageMetricsDailySnapshot.load(id);
+
+  if(snapshot){
+    return snapshot as UsageMetricsDailySnapshot;
   }
 
-  snapshot = new UsageMetricsDailySnapshot(day);
+  snapshot = new UsageMetricsDailySnapshot(id);
 
   snapshot.protocol = getOrCreateProtocol().id;
-  snapshot.activeUsers = 0;
-  snapshot.totalUniqueUsers = 0;
+  snapshot.dailyActiveUsers = 0;
+  snapshot.cumulativeUniqueUsers = 0;
   snapshot.dailyTransactionCount = 0;
-  snapshot.blockNumber = block.number;
-  snapshot.timestamp = block.timestamp;
+  snapshot.dailyDepositCount = 0;
+  snapshot.dailyWithdrawCount = 0;
+  snapshot.blockNumber = BIGINT_ZERO;
+  snapshot.timestamp = BIGINT_ZERO;
+
   snapshot.save();
 
-  return snapshot;
+  return snapshot as UsageMetricsDailySnapshot;
+
 }
 
-export function getOrCreateFinancialsDailySnapshot(block: ethereum.Block): FinancialsDailySnapshot {
-  let day = getDay(block.timestamp).toString();
-  let snapshot = FinancialsDailySnapshot.load(day.toString());
-
-  if (snapshot) {
-    return snapshot;
-  }
-
-  snapshot = new FinancialsDailySnapshot(day.toString());
-
-  snapshot.protocol = getOrCreateProtocol().id;
-  snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
-  snapshot.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-  snapshot.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  snapshot.totalRevenueUSD = BIGDECIMAL_ZERO;
-  snapshot.blockNumber = block.number;
-  snapshot.timestamp = block.timestamp;
-  snapshot.save();
-
-  return snapshot;
-}
-
-export function getOrCreateVaultDailySnapshot(vault: Address, block: ethereum.Block): VaultDailySnapshot {
-  let day = getDay(block.timestamp).toString();
-  const id = vault
-    .toHex()
-    .concat("-")
-    .concat(day.toString());
-  let snapshot = VaultDailySnapshot.load(id);
-
-  if (snapshot) {
-    return snapshot;
-  }
-
-  snapshot = new VaultDailySnapshot(id);
-
-  snapshot.protocol = getOrCreateProtocol().id;
-  snapshot.vault = vault.toHex();
-  snapshot.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  snapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
-  snapshot.inputTokenBalances = [];
-  snapshot.outputTokenSupply = BIGINT_ZERO;
-  snapshot.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  snapshot.rewardTokenEmissionsAmount = [];
-  snapshot.rewardTokenEmissionsUSD = [];
-  snapshot.blockNumber = block.number;
-  snapshot.timestamp = block.timestamp;
-  snapshot.save();
-
-  return snapshot;
-}

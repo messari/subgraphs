@@ -13,6 +13,7 @@ import { WETH_ADDRESS } from './constant'
 import { getOrCreateVault } from './entities/Vault'
 import { getOrCreateDeposit } from './entities/Transaction'
 import { getOrCreateToken } from './entities/Token'
+import { depositUpdateMetrics } from './entities/Metrics'
 
 export function handleDeposit(event: DepositEvent): void {
 
@@ -35,6 +36,8 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.amount = amount;
   deposit.vault = vault.id;
   deposit.save();
+
+  depositUpdateMetrics(event, vault);
   
 }
 
