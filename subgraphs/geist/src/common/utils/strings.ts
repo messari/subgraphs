@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigInt } from "@graphprotocol/graph-ts";
 
 export function hexToNumberString(hex: string): string {
   let hexNumber = BigInt.fromI32(0);

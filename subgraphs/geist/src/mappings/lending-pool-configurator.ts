@@ -10,7 +10,7 @@ import {
   ReserveFactorChanged,
 } from "../../generated/templates/LendingPoolConfigurator/LendingPoolConfigurator";
 
-import { initMarket } from "./helpers";
+import { initializeMarket } from "./helpers";
 
 import { Market } from "../../generated/schema";
 
@@ -31,7 +31,7 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   // Attempt to load or create the market implementation
 
   GTokenTemplate.create(event.params.aToken);
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     event.params.asset.toHexString()
@@ -56,7 +56,7 @@ export function handleCollateralConfigurationChanged(
       marketAddr,
     []
   );
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     marketAddr
@@ -89,7 +89,7 @@ export function handleBorrowingEnabledOnReserve(
       marketAddr,
     []
   );
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     marketAddr
@@ -108,7 +108,7 @@ export function handleBorrowingDisabledOnReserve(
       marketAddr,
     []
   );
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     marketAddr
@@ -125,7 +125,7 @@ export function handleReserveActivated(event: ReserveActivated): void {
       marketAddr,
     []
   );
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     marketAddr
@@ -142,7 +142,7 @@ export function handleReserveDeactivated(event: ReserveDeactivated): void {
       marketAddr,
     []
   );
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     marketAddr
@@ -161,7 +161,7 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
       event.params.factor.toString(),
     []
   );
-  const market = initMarket(
+  const market = initializeMarket(
     event.block.number,
     event.block.timestamp,
     marketAddr

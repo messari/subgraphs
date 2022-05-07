@@ -34,7 +34,7 @@ export function handleProxyCreated(event: ProxyCreated): void {
   const pool = event.params.id.toString();
   const address = event.params.newAddress;
   const context = initiateContext(event.address);
-  log.info("PROXY: " + pool, []);
+  log.info("Proxy created at {}", [pool]);
   if (pool == "LENDING_POOL") {
     startIndexingLendingPool(address, context);
   } else if (pool == "LENDING_POOL_CONFIGURATOR") {
@@ -43,10 +43,9 @@ export function handleProxyCreated(event: ProxyCreated): void {
 }
 
 export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
-  log.info(
-    "HANDLING PRICE ORACLE UPDATE TO " + event.params.newAddress.toHexString(),
-    []
-  );
+  log.info("Price oracle updated to new address={}", [
+    event.params.newAddress.toHexString(),
+  ]);
   const lendingProtocol = getOrCreateProtocol(PROTOCOL_ADDRESS);
   lendingProtocol.protocolPriceOracle = event.params.newAddress.toHexString();
   lendingProtocol.save();
@@ -70,7 +69,9 @@ export function startIndexingLendingPool(
 ): void {
   // Create a template for an implementation of a Lending Pool/Market
   // This indexes for events which users act upon a lending pool within the lendingPool.ts mapping script
-  log.info("START INDEXING LENDING POOL", []);
+  log.info("Started indexing lending pool with address={}", [
+    poolAddress.toHexString(),
+  ]);
   LendingPoolTemplate.createWithContext(poolAddress, context);
 }
 
@@ -80,20 +81,23 @@ export function startIndexingLendingPoolConfigurator(
 ): void {
   // Create a template for an implementation of a Lending Pool Configurator
   // This indexes for events within the lendingPoolConfigurator.ts mapping script
-  log.info("START INDEXING LENDING POOL CONFIG", []);
+  log.info(
+    "Started indexing lending pool config with configurator address={}",
+    [configurator.toHexString()]
+  );
   LendingPoolConfiguratorTemplate.createWithContext(configurator, context);
 }
 
 function initiateContext(addrProvider: Address): DataSourceContext {
   // Add Lending Pool address, price oracle contract address, and protocol id to the context for general accessibility
   const contract = AddressProviderContract.bind(addrProvider);
-  log.info("AddrProvContract: " + addrProvider.toHexString(), []);
+  log.info("Address provider contract = {}", [addrProvider.toHexString()]);
   // Get the lending pool
   const trylendingPool = contract.try_getLendingPool();
   let lendingPool = "";
   if (!trylendingPool.reverted) {
     lendingPool = trylendingPool.value.toHexString();
-    log.info("initiateContext LP:" + lendingPool, []);
+    log.info("Initiating lending pool={}", [lendingPool]);
   }
 
   // Initialize the protocol entity
@@ -102,23 +106,20 @@ function initiateContext(addrProvider: Address): DataSourceContext {
   const tryPriceOracle = contract.try_getPriceOracle();
   if (!tryPriceOracle.reverted) {
     lendingProtocol.protocolPriceOracle = tryPriceOracle.value.toHexString();
-    log.info(
-      "initiateContext priceOracle: " + lendingProtocol.protocolPriceOracle,
-      []
-    );
+    log.info("Initializing price oracle from context {}", [
+      lendingProtocol.protocolPriceOracle,
+    ]);
   } else {
     lendingProtocol.protocolPriceOracle = PRICE_ORACLE_ADDRESS;
-    log.error(
-      "FAILED TO GET ORACLE - REVERTED TO DEFAULT HARD-CODED AT " +
-        lendingProtocol.protocolPriceOracle,
-      [""]
-    );
+    log.error("Failed to extract oracle {}", [
+      lendingProtocol.protocolPriceOracle,
+    ]);
   }
   lendingProtocol.save();
-  log.info(
-    "CREATING CONTEXT " + lendingPool + "-----" + lendingProtocol.id,
-    []
-  );
+  log.info("Creating context with lending pool={} with ID={}", [
+    lendingPool,
+    lendingProtocol.id,
+  ]);
   const context = new DataSourceContext();
   context.setString("lendingPool", lendingPool);
   context.setString("protocolId", lendingProtocol.id);
