@@ -1,6 +1,4 @@
 specVersion: 0.0.2
-description: Geist Finance Subgraph
-repository: https://github.com/dineshpinto/geist-finance-subgraph
 schema:
   file: ./schema.graphql
 dataSources:
@@ -20,11 +18,11 @@ dataSources:
       abis:
         - name: LendingPoolAddressesProviderRegistry
           file: ./abis/LendingPoolAddressesProviderRegistry.json
+        - name: LendingPoolAddressesProvider
+          file: ./abis/LendingPoolAddressesProvider.json
       eventHandlers:
         - event: AddressesProviderRegistered(indexed address)
           handler: handleAddressesProviderRegistered
-        - event: AddressesProviderUnregistered(indexed address)
-          handler: handleAddressesProviderUnregistered
       file: src/mappings/address-provider-registry.ts
 
 templates:
@@ -75,6 +73,8 @@ templates:
           file: ./abis/LendingPool.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
+        - name: GToken
+          file: ./abis/GToken.json
         - name: SpookySwapGEISTFTM
           file: ./abis/SpookySwapGEISTFTM.json
         - name: GeistToken
@@ -117,7 +117,7 @@ templates:
         - PositionSnapshot
       abis:
         - name: LendingPoolConfigurator
-          file: ./abis/LendingPoolConfigurator.json
+          file: ./abis/LendingPoolConfiguratorProxy.json
         - name: LendingPool
           file: ./abis/LendingPool.json
         - name: AaveOracle
@@ -126,6 +126,23 @@ templates:
           file: ./abis/SpookySwapGEISTFTM.json
         - name: GeistToken
           file: ./abis/GeistToken.json
+        - name: GToken
+          file: ./abis/GToken.json
+      eventHandlers:
+        - event: ReserveInitialized(indexed address,indexed address,address,address,address)
+          handler: handleReserveInitialized
+        - event: CollateralConfigurationChanged(indexed address,uint256,uint256,uint256)
+          handler: handleCollateralConfigurationChanged
+        - event: BorrowingEnabledOnReserve(indexed address,bool)
+          handler: handleBorrowingEnabledOnReserve
+        - event: BorrowingDisabledOnReserve(indexed address)
+          handler: handleBorrowingDisabledOnReserve
+        - event: ReserveActivated(indexed address)
+          handler: handleReserveActivated
+        - event: ReserveDeactivated(indexed address)
+          handler: handleReserveDeactivated  
+        - event: ReserveFactorChanged(indexed address,uint256)
+          handler: handleReserveFactorChanged
       file: src/mappings/address-provider-registry.ts
   - kind: ethereum/contract
     name: MultiFeeDistribution
@@ -147,6 +164,8 @@ templates:
           file: ./abis/SpookySwapGEISTFTM.json
         - name: GeistToken
           file: ./abis/GeistToken.json
+        - name: GToken
+          file: ./abis/GToken.json
       eventHandlers:
         - event: RewardPaid(indexed address,indexed address,uint256)
           handler: handleRewardPaid

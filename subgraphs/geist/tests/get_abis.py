@@ -5,7 +5,7 @@ import time
 # Deployment addresses
 deployment_addresses = {
     "LendingPoolAddressesProviderRegistry": "0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82",
-    "LendingPoolAddressProvider": "0x6c793c628Fe2b480c5e6FB7957dDa4b9291F9c9b",
+    "LendingPoolAddressesProvider": "0x6c793c628Fe2b480c5e6FB7957dDa4b9291F9c9b",
     "LendingPool": "0x9FAD24f572045c7869117160A571B2e50b10d068",
     "LendingPoolConfigurator": "0xb7C10e5089d3fd281F51998543510675A52B6aa8",
     "GeistToken": "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d",
@@ -17,6 +17,7 @@ deployment_addresses = {
     "TimeLock": "0x7FB9a7cBc6689C1C79e37BF8f852adA44b10EfFC",
     "SpookySwapGEISTFTM": "0x668AE94D0870230AC007a01B471D02b2c94DDcB9",
     "LendingPoolConfiguratorProxy": "0x7a0d50E55ffcBF3E2313BB4460E86dBBF8e8c25B",
+    "GToken": "0xA2D7357c069b0cBC0F2B75487fa4045208b6F919",
 }
 
 if __name__ == "__main__":
