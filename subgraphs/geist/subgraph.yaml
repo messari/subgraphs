@@ -77,8 +77,6 @@ templates:
           file: ./abis/AaveOracle.json
         - name: GToken
           file: ./abis/GToken.json
-        - name: SpookySwapGEISTFTM
-          file: ./abis/SpookySwapGEISTFTM.json
         - name: GeistToken
           file: ./abis/GeistToken.json
         - name: ERC20
@@ -134,14 +132,16 @@ templates:
           file: ./abis/LendingPool.json
         - name: AaveOracle
           file: ./abis/AaveOracle.json
-        - name: SpookySwapGEISTFTM
-          file: ./abis/SpookySwapGEISTFTM.json
         - name: GeistToken
           file: ./abis/GeistToken.json
         - name: GToken
           file: ./abis/GToken.json
         - name: AaveIncentivesController
           file: ./abis/AaveIncentivesController.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: AaveProtocolDataProvider
+          file: ./abis/AaveProtocolDataProvider.json
       eventHandlers:
         - event: ReserveInitialized(indexed address,indexed address,address,address,address)
           handler: handleReserveInitialized
