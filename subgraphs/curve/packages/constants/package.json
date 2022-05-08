@@ -1,0 +1,33 @@
+{
+  "name": "const",
+  "version": "1.0.0",
+  "description": "Constants",
+  "license": "MIT",
+  "main": "index.ts",
+  "private": true,
+  "scripts": {
+    "codegen": "true",
+    "build": "true",
+    "prepare:mainnet": "mustache ../../config/mainnet.json index.template.ts > index.ts",
+    "prepare:avalanche": "mustache ../../config/avalanche.json index.template.ts > index.ts",
+    "prepare:fantom": "mustache ../../config/fantom.json index.template.ts > index.ts",
+    "prepare:arbitrum": "mustache ../../config/arbitrum.json index.template.ts > index.ts",
+    "prepare:matic": "mustache ../../config/matic.json index.template.ts > index.ts",
+    "prepare:xdai": "mustache ../../config/xdai.json index.template.ts > index.ts",
+    "prepare:optimism": "mustache ../../config/optimism.json index.template.ts > index.ts",
+    "deploy:mainnet": "true",
+    "deploy:avalanche": "true",
+    "deploy:fantom": "true",
+    "deploy:arbitrum": "true",
+    "deploy:matic": "true",
+    "deploy:xdai": "true",
+    "deploy:optimism": "true",
+    "stage:mainnet": "true",
+    "stage:avalanche": "true",
+    "stage:fantom": "true",
+    "stage:arbitrum": "true",
+    "stage:matic": "true",
+    "stage:xdai": "true",
+    "stage:optimism": "true"
+  }
+}
