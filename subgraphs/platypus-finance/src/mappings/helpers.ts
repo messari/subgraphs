@@ -1,5 +1,6 @@
-import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
-import { Asset, Deposit, Withdraw } from "../../generated/schema";
+import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
+import { Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
+import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
 import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, updatePricesForToken } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
@@ -28,6 +29,9 @@ export function createAsset(
   let assets: string[] = pool._assets;
   let inputTokens: string[] = pool.inputTokens;
   let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
+
+  // Start Watching the Asset for updates
+  AssetTemplate.create(assetAddress);
 
   assets.push(assetAddress.toHexString());
   inputTokens.push(token.id);

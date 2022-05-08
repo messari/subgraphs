@@ -11,6 +11,8 @@ import {
   LiquidityPoolHourlySnapshot,
   _LiquidityPoolParamsHelper,
 } from "../../generated/schema";
+import { Pool as PoolTemplate } from "../../generated/templates";
+
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   Network,
@@ -19,9 +21,26 @@ import {
   BIGDECIMAL_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
+  ALT_POOLS,
 } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
+
+let altPoolsInit = false;
+
+export function initAltPoolTemplates(): void {
+  // Start watching the LiquidityPools
+  // Note: I have no idea what happens if I create a dynamic datasource
+  // that clashes with an exisiting datasource
+  if (!altPoolsInit) {
+    altPoolsInit = true;
+    ALT_POOLS.forEach(address => {
+      const poolAddress = Address.fromString(address);
+      PoolTemplate.create(poolAddress);
+      getOrCreateLiquidityPool(poolAddress);
+    });
+  }
+}
 
 export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -59,6 +78,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     poolParam.save();
     pool.save();
 
+    initAltPoolTemplates();
     let protocol = getOrCreateDexAmm();
     let _pools: string[] = protocol.pools;
     _pools.push(pool.id);

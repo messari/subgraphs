@@ -111,26 +111,6 @@ dataSources:
         # ERC20
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CurvePoolRegistry
-          file: ./abis/Prices/Curve/PoolRegistry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
         # SushiSwap Contracts
         - name: SushiSwapRouter
           file: ./abis/Prices/SushiSwap/Router.json
@@ -163,6 +143,76 @@ dataSources:
           handler: handleAssetAdded
 
 templates:
+  - kind: ethereum/contract
+    name: Pool
+    network: avalanche
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities:
+        - Protocol
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - PoolDailySnapshot
+        - Token
+      abis:
+        - name: Asset
+          file: ./abis/asset.json
+        - name: Pool
+          file: ./abis/pool.json
+        - name: SecondaryPool
+          file: ./abis/secondaryPool.json
+        - name: Router
+          file: ./abis/router.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: Deposit(indexed address,address,uint256,uint256,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,address,uint256,uint256,indexed address)
+          handler: handleWithdraw
+        - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: DevUpdated(indexed address,indexed address)
+          handler: handleDevUpdated
+        - event: SlippageParamsUpdated(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleSlippageParamsUpdated
+        - event: OracleUpdated(indexed address,indexed address)
+          handler: handleOracleUpdated
+        - event: RetentionRatioUpdated(uint256,uint256)
+          handler: handleRetentionRatioUpdated
+        - event: PriceDeviationUpdated(uint256,uint256)
+          handler: handlePriceDeviationUpdated
+        - event: HaircutRateUpdated(uint256,uint256)
+          handler: handleHaircutRateUpdated
+        - event: AssetAdded(indexed address,indexed address)
+          handler: handleAssetAdded
   - kind: ethereum/contract
     name: Asset
     network: avalanche

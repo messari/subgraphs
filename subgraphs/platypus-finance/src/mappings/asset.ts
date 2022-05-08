@@ -1,6 +1,7 @@
 // Asset is the LP token for each Token that is added to a pool
 
 import { Transfer, MaxSupplyUpdated, PoolUpdated } from "../../generated/templates/Asset/Asset";
+import { Address } from "@graphprotocol/graph-ts";
 
 export function handleTransfer(event: Transfer): void {
     // noop
