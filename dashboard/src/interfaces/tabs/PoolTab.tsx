@@ -73,6 +73,15 @@ function PoolTab(
                 }
                 dataFieldMetrics[entityFieldName].cumulative.prevVal = value;
               }
+              if (entityFieldName.includes('umulative')) {
+                if (!Object.keys(dataFieldMetrics[entityFieldName]).includes('cumulative')) {
+                  dataFieldMetrics[entityFieldName].cumulative = {prevVal: 0, hasLowered: 0}
+                }
+                if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
+                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(entityInstance.timestamp);
+                }
+                dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
+              }
             } else if (Array.isArray(currentInstanceField)) {
               currentInstanceField.forEach((val: string, arrayIndex: number) => {
                 let fieldSplitIdentifier = arrayIndex.toString();
@@ -117,6 +126,15 @@ function PoolTab(
                   }
                   dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
                 }
+                if (dataFieldKey.includes('umulative')) {
+                  if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
+                    dataFieldMetrics[dataFieldKey].cumulative = {prevVal: 0, hasLowered: 0}
+                  }
+                  if (Number(val) < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
+                  }
+                  dataFieldMetrics[dataFieldKey].cumulative.prevVal = Number(val);
+                }
               });
             }
           });
@@ -156,7 +174,7 @@ function PoolTab(
       } else if (issues.filter(x => x.message === poolName && x.type === "TVL+").length === 0 && poolLevelTVL > 1000000000000) {
         issues.push({type: "TVL+", message: poolName});
       }
-         if (issues.length > 0) {
+      if (issues.length > 0) {
         setWarning(issues);
       }
       

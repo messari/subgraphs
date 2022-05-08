@@ -75,7 +75,6 @@ async function FetchProtocolMetadata(
       // If a protocol in the ProtocolsToQuery object does not have a valid deployment id, it will return null and not be returned as a protocol on the deployments page
       Object.keys(ProtocolsToQuery[protocol]).forEach(network => {
         const currentDeployObj: {[x:string]: string} = ProtocolsToQuery[protocol][network];
-        console.log(network, protocol, currentDeployObj.deploymentId)
         currentDeployObj.name = protocol;
         currentDeployObj.network = network;
         allDeployments.push(currentDeployObj)
@@ -121,9 +120,9 @@ async function FetchProtocolMetadata(
       if (metadata.length === 0) {
         FetchProtocolMetadata(setMetadata, fatalErrorDeployments);
       }
+
       // NEED TO CHANGE HOW DEPLOYMENT ID IS MAPPED HERE
       const metadataArr = metadata.map((q) => { 
-        console.log('METADATA MAP', q.data.protocols[0], q.data._meta.deployment)
         return {...q.data.protocols[0], deploymentId: q.data._meta.deployment}
       });
       

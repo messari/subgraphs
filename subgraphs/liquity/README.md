@@ -8,7 +8,7 @@
 - Deployed addresses: https://docs.liquity.org/documentation/resources#contract-addresses
 - Existing subgraphs: https://thegraph.com/explorer/subgraph?id=2TmD7Fq3K2BQGmUXNPzrNMXb6PDNbcBWfAHa5o3gRJC8
 
-## Calculation Methodology v1.0.0
+## Calculation Methodology v1.0.1
 
 ### Total Value Locked (TVL) USD
 
