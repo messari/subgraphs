@@ -107,6 +107,7 @@ export const schema100 = (): Schema => {
           }
           outputToken {
             name
+            decimals
           }
           rewardTokens {
             id
@@ -138,6 +139,7 @@ export const schema100 = (): Schema => {
     `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[LiquidityPoolFee!]!",
@@ -256,6 +258,7 @@ export const schema110 = (): Schema => {
           }
           outputToken {
             id
+            decimals
           }
           rewardTokens {
             id
@@ -286,6 +289,7 @@ export const schema110 = (): Schema => {
       `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[LiquidityPoolFee!]!",
@@ -400,6 +404,7 @@ export const schema120 = (): Schema => {
   ];
 
   const poolData: {[x: string]: string} = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[LiquidityPoolFee!]!",
@@ -486,9 +491,13 @@ export const schema120 = (): Schema => {
       }
       outputToken {
         id
+        decimals
       }
       rewardTokens {
         id
+        token {
+          decimals
+        }
       }
       totalValueLockedUSD
       cumulativeVolumeUSD
