@@ -7,6 +7,7 @@ import {
   DAI_VAULT_MANAGER_ADDRESS,
   DEFAULT_DECIMALS,
   ETHER_VAULT_MANAGER_ADDRESS,
+  ETH_ADDRESS,
   INT_TWO,
   RARI_DEPLOYER,
   USDC_VAULT_ADDRESS,
@@ -27,6 +28,7 @@ import { exponentToBigDecimal } from "../common/utils/utils";
 import { RariYieldFundManager } from "../../generated/RariYieldFundManager/RariYieldFundManager";
 import { RariStableFundManager } from "../../generated/RariUSDCFundManager/RariStableFundManager";
 import { RariEtherFundManager } from "../../generated/RariEtherFundManager/RariEtherFundManager";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -35,7 +37,7 @@ import { RariEtherFundManager } from "../../generated/RariEtherFundManager/RariE
 export function createDeposit(
   event: ethereum.Event,
   amount: BigInt,
-  amountUSD: BigInt,
+  amountUSD: BigDecimal,
   outputTokensMinted: BigInt,
   asset: string,
   vaultAddress: string,
@@ -61,14 +63,14 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
   deposit.asset = token.id;
   deposit.amount = amount;
-  deposit.amountUSD = amountUSD.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
-  deposit.vault = vaultAddress;
+  deposit.amountUSD = amountUSD;
 
   deposit.save();
 
   // update vault TVL
-  let vault = getOrCreateVault(event, vaultAddress);
-  updateTVL(vault);
+  let vault = getOrCreateVault(event, vaultAddress, token.id);
+  deposit.vault = vault.id;
+  updateTVL(event);
 
   // update outputTokenPrice
   vault.outputTokenSupply = vault.outputTokenSupply!.plus(outputTokensMinted);
@@ -77,11 +79,10 @@ export function createDeposit(
     vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
   );
 
-  // update fees and revenues
+  // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, BIGDECIMAL_ZERO);
-
-  // TODO: get inputTokenBalances working
+  updateInputTokenBalance(vault);
 
   vault.save();
 }
@@ -89,7 +90,7 @@ export function createDeposit(
 export function createWithdraw(
   event: ethereum.Event,
   amount: BigInt,
-  amountUSD: BigInt,
+  amountUSD: BigDecimal,
   afterFeeUSD: BigInt, // used to calculate withdrawal fee - only used in Yield Pool
   outputTokensBurned: BigInt,
   asset: string,
@@ -110,20 +111,20 @@ export function createWithdraw(
   withdraw.hash = hash.toHexString();
   withdraw.logIndex = logIndex.toI32();
   withdraw.protocol = RARI_DEPLOYER;
-  withdraw.to = event.address.toHexString();
-  withdraw.from = event.transaction.from.toHexString();
+  withdraw.to = event.transaction.from.toHexString();
+  withdraw.from = event.address.toHexString();
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
   withdraw.asset = token.id;
   withdraw.amount = amount;
-  withdraw.amountUSD = amountUSD.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
-  withdraw.vault = vaultAddress;
+  withdraw.amountUSD = amountUSD;
 
   withdraw.save();
 
   // update vault TVL
-  let vault = getOrCreateVault(event, vaultAddress);
-  updateTVL(vault);
+  let vault = getOrCreateVault(event, vaultAddress, token.id);
+  withdraw.vault = vault.id;
+  updateTVL(event);
 
   // update outputTokenPrice
   vault.outputTokenSupply = vault.outputTokenSupply!.minus(outputTokensBurned);
@@ -135,17 +136,16 @@ export function createWithdraw(
   // calculate withdrawal fee
   let withdrawalFee = BIGDECIMAL_ZERO;
   if (vaultAddress == YIELD_VAULT_ADDRESS) {
-    withdrawalFee = amountUSD.minus(afterFeeUSD).toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+    withdrawalFee = amountUSD.minus(afterFeeUSD.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
     if (withdrawalFee.lt(BIGDECIMAL_ZERO)) {
       withdrawalFee = BIGDECIMAL_ZERO;
     }
   }
 
-  // update fees and revenues
+  // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, withdrawalFee);
-
-  // TODO: get inputTokenBalances working
+  updateInputTokenBalance(vault);
 
   vault.save();
 }
@@ -200,18 +200,18 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
 
   // get raw interest accrued based on vault address
   let tryTotalInterest: ethereum.CallResult<BigInt>;
-  if (vault.id == YIELD_VAULT_ADDRESS) {
+  if (vault._contractAddress == YIELD_VAULT_ADDRESS) {
     let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getRawInterestAccrued();
-  } else if (vault.id == USDC_VAULT_ADDRESS) {
+  } else if (vault._contractAddress == USDC_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getRawInterestAccrued();
-  } else if (vault.id == DAI_VAULT_ADDRESS) {
+  } else if (vault._contractAddress == DAI_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getRawInterestAccrued();
   } else {
     let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
-    tryTotalInterest = contract.try_getRawInterestAccrued(); // TODO: this is in ETH
+    tryTotalInterest = contract.try_getRawInterestAccrued();
   }
 
   if (!tryTotalInterest.reverted) {
@@ -224,9 +224,10 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
       log.warning("NEGATIVE FEES: extras: {}", [extraFee.toString()]);
     } else {
       let newTotalInterest = updatedInterest.minus(prevInterest);
-      let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vault.id).feePercentage!.div(
-        exponentToBigDecimal(INT_TWO),
-      );
+      let performanceFee = getOrCreateVaultFee(
+        VaultFeeType.PERFORMANCE_FEE,
+        vault._contractAddress,
+      ).feePercentage!.div(exponentToBigDecimal(INT_TWO));
       let newFees = newTotalInterest.times(performanceFee);
       let newInterest = newTotalInterest.times(BIGDECIMAL_ONE.minus(performanceFee));
 
@@ -251,33 +252,87 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
   financialMetrics.save();
 }
 
-export function updateTVL(vault: Vault): void {
-  let tryVaultTVL: ethereum.CallResult<BigInt>;
-  if (vault.id == YIELD_VAULT_ADDRESS) {
-    let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
-    tryVaultTVL = contract.try_getFundBalance();
-  } else if (vault.id == USDC_VAULT_ADDRESS) {
-    let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
-    tryVaultTVL = contract.try_getFundBalance();
-  } else if (vault.id == DAI_VAULT_ADDRESS) {
-    let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
-    tryVaultTVL = contract.try_getFundBalance();
-  } else {
-    //TODO get eth price etc.
-    let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
-    tryVaultTVL = contract.try_getFundBalance(); // in ETH
+export function updateTVL(event: ethereum.Event): void {
+  let protocol = getOrCreateYieldAggregator();
+  let totalValueLockedUSD = BIGDECIMAL_ZERO;
+
+  // loop through vaults and update each
+  for (let i = 0; i < protocol._vaultList.length; i++) {
+    let splitArr = protocol._vaultList[i].split("-", 2);
+    let vaultAddress = splitArr[0];
+    let tokenAddress = splitArr[1];
+    let vault = getOrCreateVault(event, vaultAddress, tokenAddress);
+    let inputToken = getOrCreateToken(vault.inputToken);
+
+    // if...else to grab TVL for correct vault
+    if (vaultAddress == YIELD_VAULT_ADDRESS) {
+      let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
+      let tryVaultTVL = contract.try_getRawFundBalance1(inputToken.symbol);
+      vault.totalValueLockedUSD = tryVaultTVL.reverted
+        ? vault.totalValueLockedUSD
+        : getUsdPrice(
+            Address.fromString(vault.inputToken),
+            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+          );
+    } else if (vaultAddress == USDC_VAULT_ADDRESS) {
+      let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
+      let tryVaultTVL = contract.try_getRawFundBalance1(inputToken.symbol);
+      vault.totalValueLockedUSD = tryVaultTVL.reverted
+        ? vault.totalValueLockedUSD
+        : getUsdPrice(
+            Address.fromString(vault.inputToken),
+            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+          );
+    } else if (vaultAddress == DAI_VAULT_ADDRESS) {
+      let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
+      let tryVaultTVL = contract.try_getRawFundBalance1(inputToken.symbol);
+      vault.totalValueLockedUSD = tryVaultTVL.reverted
+        ? vault.totalValueLockedUSD
+        : getUsdPrice(
+            Address.fromString(vault.inputToken),
+            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+          );
+    } else {
+      let ethPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS)).usdPrice;
+      let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
+      let tryVaultTVL = contract.try_getRawFundBalance(); // in ETH
+      vault.totalValueLockedUSD = tryVaultTVL.reverted
+        ? vault.totalValueLockedUSD
+        : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)).times(ethPrice);
+    }
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
+    vault.save();
   }
 
-  // get TVL and save
-  vault.totalValueLockedUSD = tryVaultTVL.reverted
-    ? BIGDECIMAL_ZERO
-    : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
-
-  vault.save();
+  protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.save();
 }
 
-export function getETHPriceUSD(): BigDecimal {
-  // TODO:
+// updates the input balance of a given pool
+export function updateInputTokenBalance(vault: Vault): void {
+  let tryFundBalance: ethereum.CallResult<BigInt>;
+  let inputToken = getOrCreateToken(vault.inputToken);
 
-  return BIGDECIMAL_ZERO;
+  if (vault._contractAddress == YIELD_VAULT_ADDRESS) {
+    let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
+    tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
+  } else if (vault._contractAddress == USDC_VAULT_ADDRESS) {
+    let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
+    tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
+  } else if (vault._contractAddress == DAI_VAULT_ADDRESS) {
+    let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
+    tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
+  } else {
+    // must be Ether vault
+    let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
+    tryFundBalance = contract.try_getRawFundBalance();
+  }
+
+  // udpate balance if not reverted
+  if (!tryFundBalance.reverted) {
+    vault.inputTokenBalance = tryFundBalance.value;
+  }
+
+  vault.save();
 }

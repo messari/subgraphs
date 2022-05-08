@@ -1,13 +1,13 @@
 // map blockchain data to entities outlined in schema.graphql
 import {
-  BIGINT_ONE,
   BIGINT_ZERO,
   DAI_VAULT_ADDRESS,
+  DEFAULT_DECIMALS,
   ETHER_VAULT_ADDRESS,
   ETH_ADDRESS,
+  TOKEN_MAPPING,
   TransactionType,
   USDC_VAULT_ADDRESS,
-  YIELD_TOKEN_MAPPING,
   YIELD_VAULT_ADDRESS,
   ZERO_ADDRESS,
 } from "../common/utils/constants";
@@ -34,7 +34,9 @@ import {
   updateVaultDailyMetrics,
   updateVaultHourlyMetrics,
 } from "../common/metrics";
-import { log } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
+import { getUsdPrice } from "../prices";
+import { exponentToBigDecimal } from "../common/utils/utils";
 
 ////////////////////////////
 //// USDC Pool Handlers ////
@@ -45,8 +47,8 @@ export function handleUSDCDeposit(event: USDCDeposit): void {
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;
-  if (YIELD_TOKEN_MAPPING.has(code)) {
-    assetAddress = YIELD_TOKEN_MAPPING.get(code);
+  if (TOKEN_MAPPING.has(code)) {
+    assetAddress = TOKEN_MAPPING.get(code);
   } else {
     assetAddress = ZERO_ADDRESS;
   }
@@ -55,23 +57,25 @@ export function handleUSDCDeposit(event: USDCDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    event.params.amountUsd,
+    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     event.params.rftMinted,
     assetAddress,
     USDC_VAULT_ADDRESS,
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, USDC_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, USDC_VAULT_ADDRESS);
+
+  let vaultId = USDC_VAULT_ADDRESS + "-" + assetAddress;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 export function handleUSDCWithdrawal(event: USDCWithdrawal): void {
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;
-  if (YIELD_TOKEN_MAPPING.has(code)) {
-    assetAddress = YIELD_TOKEN_MAPPING.get(code);
+  if (TOKEN_MAPPING.has(code)) {
+    assetAddress = TOKEN_MAPPING.get(code);
   } else {
     assetAddress = ZERO_ADDRESS;
   }
@@ -80,7 +84,7 @@ export function handleUSDCWithdrawal(event: USDCWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd,
+    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     BIGINT_ZERO,
     event.params.rftBurned,
     assetAddress,
@@ -88,8 +92,10 @@ export function handleUSDCWithdrawal(event: USDCWithdrawal): void {
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, USDC_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, USDC_VAULT_ADDRESS);
+
+  let vaultId = USDC_VAULT_ADDRESS + "-" + assetAddress;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 /////////////////////////////
@@ -100,8 +106,8 @@ export function handleYieldDeposit(event: YieldDeposit): void {
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;
-  if (YIELD_TOKEN_MAPPING.has(code)) {
-    assetAddress = YIELD_TOKEN_MAPPING.get(code);
+  if (TOKEN_MAPPING.has(code)) {
+    assetAddress = TOKEN_MAPPING.get(code);
   } else {
     assetAddress = ZERO_ADDRESS;
   }
@@ -109,23 +115,25 @@ export function handleYieldDeposit(event: YieldDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    event.params.amountUsd,
+    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     event.params.rftMinted,
     assetAddress,
     YIELD_VAULT_ADDRESS,
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, YIELD_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, YIELD_VAULT_ADDRESS);
+
+  let vaultId = YIELD_VAULT_ADDRESS + "-" + assetAddress;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 export function handleYieldWithdrawal(event: YieldWithdrawal): void {
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;
-  if (YIELD_TOKEN_MAPPING.has(code)) {
-    assetAddress = YIELD_TOKEN_MAPPING.get(code);
+  if (TOKEN_MAPPING.has(code)) {
+    assetAddress = TOKEN_MAPPING.get(code);
   } else {
     assetAddress = ZERO_ADDRESS;
   }
@@ -133,7 +141,7 @@ export function handleYieldWithdrawal(event: YieldWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd,
+    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     event.params.amountTransferred,
     event.params.rftBurned,
     assetAddress,
@@ -141,8 +149,10 @@ export function handleYieldWithdrawal(event: YieldWithdrawal): void {
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, YIELD_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, YIELD_VAULT_ADDRESS);
+
+  let vaultId = YIELD_VAULT_ADDRESS + "-" + assetAddress;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 ///////////////////////////
@@ -153,8 +163,8 @@ export function handleDAIDeposit(event: DAIDeposit): void {
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;
-  if (YIELD_TOKEN_MAPPING.has(code)) {
-    assetAddress = YIELD_TOKEN_MAPPING.get(code);
+  if (TOKEN_MAPPING.has(code)) {
+    assetAddress = TOKEN_MAPPING.get(code);
   } else {
     assetAddress = ZERO_ADDRESS;
   }
@@ -162,23 +172,25 @@ export function handleDAIDeposit(event: DAIDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    event.params.amountUsd,
+    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     event.params.rftMinted,
     assetAddress,
     DAI_VAULT_ADDRESS,
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, DAI_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, DAI_VAULT_ADDRESS);
+
+  let vaultId = DAI_VAULT_ADDRESS + "-" + assetAddress;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 export function handleDAIWithdrawal(event: DAIWithdrawal): void {
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;
-  if (YIELD_TOKEN_MAPPING.has(code)) {
-    assetAddress = YIELD_TOKEN_MAPPING.get(code);
+  if (TOKEN_MAPPING.has(code)) {
+    assetAddress = TOKEN_MAPPING.get(code);
   } else {
     assetAddress = ZERO_ADDRESS;
   }
@@ -186,7 +198,7 @@ export function handleDAIWithdrawal(event: DAIWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd,
+    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     BIGINT_ZERO,
     event.params.rftBurned,
     assetAddress,
@@ -194,8 +206,10 @@ export function handleDAIWithdrawal(event: DAIWithdrawal): void {
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, DAI_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, DAI_VAULT_ADDRESS);
+
+  let vaultId = DAI_VAULT_ADDRESS + "-" + assetAddress;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 /////////////////////////////
@@ -203,31 +217,33 @@ export function handleDAIWithdrawal(event: DAIWithdrawal): void {
 /////////////////////////////
 
 export function handleEtherDeposit(event: EtherDeposit): void {
-  // TODO: get ether price
-  let ethPrice = BIGINT_ONE;
-
   createDeposit(
     event,
     event.params.amount,
-    event.params.amount.times(ethPrice),
+    getUsdPrice(
+      Address.fromString(ETH_ADDRESS),
+      event.params.amount.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    ),
     event.params.reptMinted,
     ETH_ADDRESS, // only token in this pool
     ETHER_VAULT_ADDRESS,
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, ETHER_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, ETHER_VAULT_ADDRESS);
+
+  let vaultId = ETHER_VAULT_ADDRESS + "-" + ETH_ADDRESS;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }
 
 export function handleEtherWithdrawal(event: EtherWithdrawal): void {
-  // TODO: get eth price
-  let ethPrice = BIGINT_ONE;
-
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amount.times(ethPrice),
+    getUsdPrice(
+      Address.fromString(ETH_ADDRESS),
+      event.params.amount.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    ),
     BIGINT_ZERO,
     event.params.reptBurned,
     ETH_ADDRESS,
@@ -235,6 +251,8 @@ export function handleEtherWithdrawal(event: EtherWithdrawal): void {
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
-  updateVaultDailyMetrics(event, ETHER_VAULT_ADDRESS);
-  updateVaultHourlyMetrics(event, ETHER_VAULT_ADDRESS);
+
+  let vaultId = ETHER_VAULT_ADDRESS + "-" + ETH_ADDRESS;
+  updateVaultDailyMetrics(event, vaultId);
+  updateVaultHourlyMetrics(event, vaultId);
 }

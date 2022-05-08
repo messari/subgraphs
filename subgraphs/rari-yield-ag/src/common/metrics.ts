@@ -1,11 +1,16 @@
 // // update snapshots and metrics
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
+import {
+  Account,
+  ActiveAccount,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
+  Vault,
+} from "../../generated/schema";
 import {
   getOrCreateFinancials,
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
-  getOrCreateVault,
   getOrCreateVaultDailySnapshot,
   getOrCreateVaultHourlySnapshot,
   getOrCreateYieldAggregator,
@@ -91,14 +96,14 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 }
 
 // update vault daily metrics
-export function updateVaultDailyMetrics(event: ethereum.Event, vaultAddress: string): void {
-  let vaultMetrics = getOrCreateVaultDailySnapshot(event, vaultAddress);
-  let vault = getOrCreateVault(event, vaultAddress);
+export function updateVaultDailyMetrics(event: ethereum.Event, vaultId: string): void {
+  let vaultMetrics = getOrCreateVaultDailySnapshot(event, vaultId);
+  let vault = Vault.load(vaultId);
 
-  vaultMetrics.totalValueLockedUSD = vault.totalValueLockedUSD;
-  vaultMetrics.inputTokenBalance = vault.inputTokenBalance;
-  vaultMetrics.outputTokenSupply = vault.outputTokenSupply!;
-  vaultMetrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultMetrics.totalValueLockedUSD = vault!.totalValueLockedUSD;
+  vaultMetrics.inputTokenBalance = vault!.inputTokenBalance;
+  vaultMetrics.outputTokenSupply = vault!.outputTokenSupply!;
+  vaultMetrics.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
 
   // update block and timestamp
   vaultMetrics.blockNumber = event.block.number;
@@ -108,14 +113,14 @@ export function updateVaultDailyMetrics(event: ethereum.Event, vaultAddress: str
 }
 
 // update vault hourly metrics
-export function updateVaultHourlyMetrics(event: ethereum.Event, vaultAddress: string): void {
-  let vaultMetrics = getOrCreateVaultHourlySnapshot(event, vaultAddress);
-  let vault = getOrCreateVault(event, vaultAddress);
+export function updateVaultHourlyMetrics(event: ethereum.Event, vaultId: string): void {
+  let vaultMetrics = getOrCreateVaultHourlySnapshot(event, vaultId);
+  let vault = Vault.load(vaultId);
 
-  vaultMetrics.totalValueLockedUSD = vault.totalValueLockedUSD;
-  vaultMetrics.inputTokenBalance = vault.inputTokenBalance;
-  vaultMetrics.outputTokenSupply = vault.outputTokenSupply!;
-  vaultMetrics.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultMetrics.totalValueLockedUSD = vault!.totalValueLockedUSD;
+  vaultMetrics.inputTokenBalance = vault!.inputTokenBalance;
+  vaultMetrics.outputTokenSupply = vault!.outputTokenSupply!;
+  vaultMetrics.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
 
   // update block and timestamp
   vaultMetrics.blockNumber = event.block.number;

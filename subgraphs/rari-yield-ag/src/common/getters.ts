@@ -1,4 +1,4 @@
-// // get or create snapshots and metrics
+// get or create snapshots and metrics
 import {
   FinancialsDailySnapshot,
   Token,
@@ -41,13 +41,12 @@ import {
   USDC_VAULT_NAME,
   USDC_VAULT_SYMBOL,
   VaultFeeType,
-  YIELD_TOKEN_MAPPING,
   YIELD_VAULT_ADDRESS,
   YIELD_VAULT_NAME,
   YIELD_VAULT_SYMBOL,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 
 ///////////////////
 //// Snapshots ////
@@ -112,7 +111,7 @@ export function getOrCreateVaultDailySnapshot(event: ethereum.Event, vaultAddres
     vaultMetrics.protocol = RARI_DEPLOYER;
     vaultMetrics.vault = vaultAddress;
     vaultMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    vaultMetrics.inputTokenBalance = [];
+    vaultMetrics.inputTokenBalance = BIGINT_ZERO;
     vaultMetrics.outputTokenSupply = BIGINT_ZERO;
     vaultMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     vaultMetrics.blockNumber = event.block.number;
@@ -133,7 +132,7 @@ export function getOrCreateVaultHourlySnapshot(event: ethereum.Event, vaultAddre
     vaultMetrics.protocol = RARI_DEPLOYER;
     vaultMetrics.vault = vaultAddress;
     vaultMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    vaultMetrics.inputTokenBalance = [];
+    vaultMetrics.inputTokenBalance = BIGINT_ZERO;
     vaultMetrics.outputTokenSupply = BIGINT_ZERO;
     vaultMetrics.outputTokenPriceUSD = BIGDECIMAL_ZERO;
     vaultMetrics.blockNumber = event.block.number;
@@ -177,6 +176,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
 
   if (!protocol) {
     protocol = new YieldAggregator(RARI_DEPLOYER);
+    protocol._vaultList = [];
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
     protocol.schemaVersion = SCHEMA_VERSION;
@@ -195,44 +195,48 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   return protocol;
 }
 
-export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): Vault {
-  let vault = Vault.load(vaultAddress);
+export function getOrCreateVault(event: ethereum.Event, vaultAddress: string, inputToken: string): Vault {
+  let id = vaultAddress + "-" + inputToken;
+  let vault = Vault.load(id);
 
   if (!vault) {
-    vault = new Vault(vaultAddress);
-    vault.protocol = RARI_DEPLOYER;
+    vault = new Vault(id);
+    vault._contractAddress = vaultAddress;
+
+    // set protocol fields
+    let protocol = getOrCreateYieldAggregator();
+    vault.protocol = protocol.id;
+    let vaults = protocol._vaultList;
+    vaults.push(id);
+    protocol._vaultList = vaults;
+    protocol.save();
+
+    // get input token
+    let token = getOrCreateToken(inputToken);
 
     // add pool-specific items
     let poolToken: Token;
     if (vaultAddress == YIELD_VAULT_ADDRESS) {
-      vault.name = YIELD_VAULT_NAME;
-      vault.symbol = YIELD_VAULT_SYMBOL;
+      vault.name = YIELD_VAULT_NAME + "-" + token.name;
+      vault.symbol = YIELD_VAULT_SYMBOL + "-" + token.name;
       poolToken = getOrCreateToken(RARI_YIELD_POOL_TOKEN);
     } else if (vaultAddress == USDC_VAULT_ADDRESS) {
-      vault.name = USDC_VAULT_NAME;
-      vault.symbol = USDC_VAULT_SYMBOL;
+      vault.name = USDC_VAULT_NAME + "-" + token.name;
+      vault.symbol = USDC_VAULT_SYMBOL + "-" + token.name;
       poolToken = getOrCreateToken(RARI_STABLE_POOL_TOKEN);
     } else if (vaultAddress == DAI_VAULT_ADDRESS) {
-      vault.name = DAI_VAULT_NAME;
-      vault.symbol = DAI_VAULT_SYMBOL;
+      vault.name = DAI_VAULT_NAME + "-" + token.name;
+      vault.symbol = DAI_VAULT_SYMBOL + "-" + token.name;
       poolToken = getOrCreateToken(RARI_DAI_POOL_TOKEN);
     } else {
-      vault.name = ETHER_VAULT_NAME;
-      vault.symbol = ETHER_VAULT_SYMBOL;
+      vault.name = ETHER_VAULT_NAME + "-" + token.name;
+      vault.symbol = ETHER_VAULT_SYMBOL + "-" + token.name;
       poolToken = getOrCreateToken(RARI_ETHER_POOL_TOKEN);
     }
 
     // populate input tokens
-    let inputTokens: Array<string> = [];
-    let inputTokenBalances: Array<BigInt> = [];
-    let tokens = YIELD_TOKEN_MAPPING.values();
-    for (let i = 0; i < tokens.length; i++) {
-      let token = getOrCreateToken(tokens[i]);
-      inputTokens.push(token.id);
-      inputTokenBalances.push(BIGINT_ZERO);
-    }
-    vault.inputToken = inputTokens;
-    vault.inputTokenBalance = inputTokenBalances;
+    vault.inputToken = inputToken;
+    vault.inputTokenBalance = BIGINT_ZERO;
 
     vault.outputToken = poolToken.id;
     vault.depositLimit = BIGINT_ZERO;
@@ -253,7 +257,7 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
     vault.createdBlockNumber = event.block.number;
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
     vault.outputTokenSupply = BIGINT_ZERO;
-    vault.outputTokenPriceUSD = BIGDECIMAL_ZERO; // TODO: can find by dividing TVL by outputTokenSupply
+    vault.outputTokenPriceUSD = BIGDECIMAL_ZERO; // can find by dividing TVL by outputTokenSupply
 
     vault.save();
   }

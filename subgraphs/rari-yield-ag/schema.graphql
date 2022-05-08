@@ -157,6 +157,9 @@ type YieldAggregator implements Protocol @entity {
   " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
   id: ID!
 
+  " List of vaults "
+  _vaultList: [Vault!]!
+
   " Name of the protocol, including version. e.g. Yearn v3 "
   name: String!
 
@@ -320,8 +323,11 @@ type FinancialsDailySnapshot @entity {
 ###############################
 
 type Vault @entity {
-  " Smart contract address of the vault "
+  " { Smart contract address of the vault }-{ Smart contract address of the input token } "
   id: ID!
+
+  " Smart contract address of the vault "
+  _contractAddress: String!
 
   " The protocol this vault belongs to "
   protocol: YieldAggregator!
@@ -333,7 +339,7 @@ type Vault @entity {
   symbol: String
 
   " Token that need to be deposited to take a position in protocol "
-  inputToken: [Token!]!
+  inputToken: Token!
 
   " Token that is minted to track ownership of position in protocol "
   outputToken: Token
@@ -365,7 +371,7 @@ type Vault @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the pool "
-  inputTokenBalance: [BigInt!]!
+  inputTokenBalance: BigInt!
 
   " Total supply of output token "
   outputTokenSupply: BigInt
@@ -420,7 +426,7 @@ type VaultDailySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the pool "
-  inputTokenBalance: [BigInt!]!
+  inputTokenBalance: BigInt!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
@@ -461,7 +467,7 @@ type VaultHourlySnapshot @entity {
   totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the pool "
-  inputTokenBalance: [BigInt!]!
+  inputTokenBalance: BigInt!
 
   " Total supply of output token "
   outputTokenSupply: BigInt!
