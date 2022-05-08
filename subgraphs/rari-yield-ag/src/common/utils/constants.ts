@@ -178,10 +178,10 @@ YIELD_TOKEN_MAPPING.set(
 
 export const YIELD_VAULT_ADDRESS = "0x9245efB59f6491Ed1652c2DD8a4880cBFADc3ffA"; // RariPoolController.sol
 export const YIELD_VAULT_MANAGER_ADDRESS = "0x59FA438cD0731EBF5F4cDCaf72D4960EFd13FCe6"; // RariPoolManager.sol
+export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae";
 
 export const YIELD_VAULT_NAME = "Rari Yield Pool";
 export const YIELD_VAULT_SYMBOL = "RYPT"; // RYPT = rari yield pool token ie, R(X)PT
-export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae";
 
 /////////////////////////////////
 //// Rari USDC Pool Specific ////
@@ -189,10 +189,32 @@ export const RARI_YIELD_POOL_TOKEN = "0x3baa6B7Af0D72006d3ea770ca29100Eb848559ae
 
 export const USDC_VAULT_ADDRESS = "0x66f4856f1bbd1eb09e1c8d9d646f5a3a193da569"; // RariPoolController.sol
 export const USDC_VAULT_MANAGER_ADDRESS = "0xC6BF8C8A55f77686720E0a88e2Fd1fEEF58ddf4a"; // RariPoolManager.sol
+export const RARI_STABLE_POOL_TOKEN = "0x016bf078ABcaCB987f0589a6d3BEAdD4316922B0";
 
 export const USDC_VAULT_NAME = "Rari USDC Pool";
 export const USDC_VAULT_SYMBOL = "RSPT"; // RSPT = rari stable pool token
-export const RARI_STABLE_POOL_TOKEN = "0x016bf078ABcaCB987f0589a6d3BEAdD4316922B0";
+
+////////////////////////////////
+//// Rari DAI Pool Specific ////
+////////////////////////////////
+
+export const DAI_VAULT_ADDRESS = "0xaFD2AaDE64E6Ea690173F6DE59Fc09F5C9190d74"; // RariPoolController.sol
+export const DAI_VAULT_MANAGER_ADDRESS = "0xB465BAF04C087Ce3ed1C266F96CA43f4847D9635"; // RariPoolManager.sol
+export const RARI_DAI_POOL_TOKEN = "0x0833cfcb11A5ba89FbAF73a407831c98aD2D7648";
+
+export const DAI_VAULT_NAME = "Rari DAI Pool";
+export const DAI_VAULT_SYMBOL = "RDPT"; // RDPT = rari dai pool token
+
+//////////////////////////////////
+//// Rari Ether Pool Specific ////
+//////////////////////////////////
+
+export const ETHER_VAULT_ADDRESS = "0x3F4931A8E9D4cdf8F56e7E8A8Cfe3BeDE0E43657"; // RariPoolController.sol
+export const ETHER_VAULT_MANAGER_ADDRESS = "0xD6e194aF3d9674b62D1b30Ec676030C23961275e"; // RariPoolManager.sol
+export const RARI_ETHER_POOL_TOKEN = "0xCda4770d65B4211364Cb870aD6bE19E7Ef1D65f4";
+
+export const ETHER_VAULT_NAME = "Rari Ether Pool";
+export const ETHER_VAULT_SYMBOL = "REPT"; // REPT = rariether pool token
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -202,7 +224,7 @@ export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // TO
 export const PROTOCOL_NAME = "Earn";
 export const PROTOCOL_SLUG = "earn";
 export const SCHEMA_VERSION = "1.2.1";
-export const SUBGRAPH_VERSION = "1.3.2";
+export const SUBGRAPH_VERSION = "1.3.6";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.YIELD;

@@ -13,7 +13,12 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  DAI_VAULT_ADDRESS,
+  DAI_VAULT_NAME,
+  DAI_VAULT_SYMBOL,
   DEFAULT_DECIMALS,
+  ETHER_VAULT_NAME,
+  ETHER_VAULT_SYMBOL,
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
@@ -23,13 +28,16 @@ import {
   PROTOCOL_NETWORK,
   PROTOCOL_SLUG,
   PROTOCOL_TYPE,
+  RARI_DAI_POOL_TOKEN,
   RARI_DEPLOYER,
+  RARI_ETHER_POOL_TOKEN,
   RARI_STABLE_POOL_TOKEN,
   RARI_YIELD_POOL_TOKEN,
   SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
+  USDC_VAULT_ADDRESS,
   USDC_VAULT_NAME,
   USDC_VAULT_SYMBOL,
   VaultFeeType,
@@ -39,7 +47,7 @@ import {
   YIELD_VAULT_SYMBOL,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 ///////////////////
 //// Snapshots ////
@@ -200,16 +208,19 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string): V
       vault.name = YIELD_VAULT_NAME;
       vault.symbol = YIELD_VAULT_SYMBOL;
       poolToken = getOrCreateToken(RARI_YIELD_POOL_TOKEN);
-    } else {
-      log.warning("CREATING VAULT: {}", [vaultAddress]);
+    } else if (vaultAddress == USDC_VAULT_ADDRESS) {
       vault.name = USDC_VAULT_NAME;
       vault.symbol = USDC_VAULT_SYMBOL;
       poolToken = getOrCreateToken(RARI_STABLE_POOL_TOKEN);
+    } else if (vaultAddress == DAI_VAULT_ADDRESS) {
+      vault.name = DAI_VAULT_NAME;
+      vault.symbol = DAI_VAULT_SYMBOL;
+      poolToken = getOrCreateToken(RARI_DAI_POOL_TOKEN);
+    } else {
+      vault.name = ETHER_VAULT_NAME;
+      vault.symbol = ETHER_VAULT_SYMBOL;
+      poolToken = getOrCreateToken(RARI_ETHER_POOL_TOKEN);
     }
-
-    vault.protocol = RARI_DEPLOYER;
-    vault.name = YIELD_VAULT_NAME;
-    vault.symbol = YIELD_VAULT_SYMBOL;
 
     // populate input tokens
     let inputTokens: Array<string> = [];
