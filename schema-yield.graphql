@@ -1,5 +1,5 @@
 # Subgraph Schema: Yield Aggregator
-# Version: 1.2.1
+# Version: 1.2.2
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -320,7 +320,7 @@ type FinancialsDailySnapshot @entity {
 ###############################
 
 type Vault @entity {
-  " Smart contract address of the vault "
+  " { Smart contract address of the vault }-{ Smart contract address of the inputToken } "
   id: ID!
 
   " The protocol this vault belongs to "
