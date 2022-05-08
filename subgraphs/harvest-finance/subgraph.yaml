@@ -68,6 +68,8 @@ templates:
       abis:
         - name: VaultContract
           file: ./abis/contracts/base/Vault.sol/Vault.json
+        - name: Vault
+          file: ./abis/Vault.json
         ###########################################
         ############## Price Oracle ###############
         ###########################################

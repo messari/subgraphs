@@ -7,6 +7,7 @@ import {
   Transfer as TransferEvent,
   Withdraw as WithdrawEvent
 } from "../generated/ControllerListener/VaultContract"
+import { Vault as VaultContract } from "../generated/ControllerListener/Vault";
 import { getOrCreateToken } from './entities/Token'
 import { Vault, Token } from "../generated/schema";
 import { WETH_ADDRESS } from './constant'
@@ -38,7 +39,9 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.vault = vault.id;
   deposit.save();
 
-  vault.inputTokenBalance += amount;
+
+  let vault_contract = VaultContract.bind(vaultAddress);
+  vault.inputTokenBalance = vault_contract.underlyingBalanceWithInvestment();
   vault.save();
 
 
