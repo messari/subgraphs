@@ -62,13 +62,30 @@ export const schema100 = (): Schema => {
 
   const query = `
   query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 500) {
+        yieldAggregators {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          network
+          type
+          totalValueLockedUSD
+          totalUniqueUsers
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -80,13 +97,13 @@ export const schema100 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        vaultDailySnapshots(first:500, where: {vault: $poolId}) {
+        vaultDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -103,25 +120,30 @@ export const schema100 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
-            name
+            id
+            decimals
           }
           rewardTokens {
-            name
+            id
+            decimals
           }
           name
           symbol
           depositLimit
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
         }
-        withdraws(first: 500, where: {vault: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, where: {vault: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -132,6 +154,7 @@ export const schema100 = (): Schema => {
     `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -191,13 +214,32 @@ export const schema110 = (): Schema => {
 
   const query = `
       query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 500) {
+        yieldAggregators {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          methodologyVersion
+          network
+          type
+          totalUniqueUsers
+          totalValueLockedUSD
+          totalVolumeUSD
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -208,13 +250,13 @@ export const schema110 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        vaultDailySnapshots(first:500, where: {vault: $poolId}) {
+        vaultDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -231,25 +273,30 @@ export const schema110 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
-            name
+            id
+            decimals
           }
           rewardTokens {
-            name
+            id
+            decimals
           }
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
           name
           symbol
           depositLimit
         }
-        withdraws(first: 500, where: {vault: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 500, where: {vault: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -261,6 +308,7 @@ export const schema110 = (): Schema => {
       `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -350,12 +398,12 @@ export const schema120 = (): Schema => {
   };
 
 
-  const finanQuery = "financialsDailySnapshots(first: 500) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDaiflySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
+  const usageDailyQuery = "usageMetricsDaiflySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
+  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
 
-  const vaultDailyQuery = "vaultDailySnapshots(first: 500, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
-  const vaultHourlyQuery = "vaultHourlySnapshots(first: 500, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultHourlySnapshots).join(',') + '}';
+  const vaultDailyQuery = "vaultDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
+  const vaultHourlyQuery = "vaultHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultHourlySnapshots).join(',') + '}';
 
 
   const events = ["withdraws","deposits"];
@@ -369,12 +417,13 @@ export const schema120 = (): Schema => {
   ];
   const eventsQuery = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 500, where: {vault: $poolId}" + options + ") { "
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}" + options + ") { "
     const fields = eventsFields.join(", ");
     return baseStr + fields + ' }'
   });
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -394,11 +443,33 @@ export const schema120 = (): Schema => {
   
   const query = `
     query Data($poolId: String){
+      _meta {
+        block {
+          number
+        }
+        deployment
+      }
       protocols {
         name
         type
         schemaVersion
         subgraphVersion
+      }
+      yieldAggregators {
+        id
+        name
+        slug
+        schemaVersion
+        subgraphVersion
+        methodologyVersion
+        network
+        type
+        totalValueLockedUSD
+        protocolControlledValueUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        cumulativeUniqueUsers
       }
       vaults {
         id
@@ -411,33 +482,31 @@ export const schema120 = (): Schema => {
       ${vaultDailyQuery}
       ${eventsQuery}
       vault(id:$poolId){
+        id
+        name        
+        symbol
+        fees
         inputToken {
           decimals
           name
         }
-
         outputToken {
-          name
+          id
+          decimals
         }
-
-        name
-        isActive
-        canUseAsCollateral
-        canBorrowFrom
-        maximumLTV
-        liquidationThreshold
-        liquidationPenalty
+        rewardTokens {
+          id
+          token {
+            decimals
+          }
+        }
+        depositLimit
         totalValueLockedUSD
-        totalDepositBalanceUSD
-        cumulativeDepositUSD
-        totalBorrowBalanceUSD
-        cumulativeBorrowUSD
-        cumulativeLiquidateUSD
+        stakedOutputTokenAmount
+        pricePerShare
         inputTokenBalance
-        inputTokenPriceUSD
         outputTokenSupply
         outputTokenPriceUSD
-        exchangeRate
         rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
       }

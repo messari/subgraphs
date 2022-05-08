@@ -4,6 +4,7 @@ import { TableChart } from "../../chartComponents/TableChart";
 import { poolDropDown } from "../../utilComponents/PoolDropDown";
 import { PoolName, PoolNames, Versions } from "../../constants";
 import SchemaTable from "../SchemaTable";
+import { convertTokenDecimals } from "../ProtocolDashboard";
 
 function PoolTab(
   data: any,
@@ -12,11 +13,14 @@ function PoolTab(
   poolId: string,
   setPoolId: React.Dispatch<React.SetStateAction<string>>,
   poolData: {[x: string]: string},
-  parseMetaData: any,
-  setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>
+  setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>,
+  warning: {message: string, type: string}[]
 ) {
+  try {
+    const poolName = PoolName[data.protocols[0].type];
+    const poolNames = PoolNames[data.protocols[0].type];
 
-    const issues: {message: string, type: string}[] = [];
+    const issues: {message: string, type: string}[] = warning;
     const excludedEntities = [
         "financialsDailySnapshots",
         "usageMetricsDailySnapshots",
@@ -35,48 +39,104 @@ function PoolTab(
         }
         const dataFields: {[dataField: string]: [{date: number, value: number}]} = {};
         // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
-        const dataFieldMetrics: {[dataField: string]: {[metric: string]: number}} = {}
-        currentEntityData.forEach((entityInstance: {[x: string]: any }) => {
+        const dataFieldMetrics: {[dataField: string]: {[metric: string]: any}} = {}
+        for (let x = currentEntityData.length - 1; x > 0; x--) {
+          const entityInstance: {[x: string]: any } = currentEntityData[x];
           Object.keys(entityInstance).forEach((entityFieldName: string) => {
             if (entityFieldName === 'timestamp') {
               return;
             }
             const currentInstanceField = entityInstance[entityFieldName];
             if (!isNaN(currentInstanceField)) {
+              let value = Number(currentInstanceField);
+              if (entityFieldName === 'inputTokenBalance') {
+                const dec = data[poolName].inputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+              }
+              if (entityFieldName === 'outputTokenSupply') {
+                const dec = data[poolName].outputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+             }
               if (!dataFields[entityFieldName]) {
-                dataFields[entityFieldName] = [{value: Number(currentInstanceField), date: Number(entityInstance.timestamp)}];
-                dataFieldMetrics[entityFieldName] = {sum: Number(currentInstanceField)};
+                dataFields[entityFieldName] = [{value: value, date: Number(entityInstance.timestamp)}];
+                dataFieldMetrics[entityFieldName] = {sum: value};
               } else {
-                dataFields[entityFieldName].push({value: Number(currentInstanceField), date: Number(entityInstance.timestamp)});
-                dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
+                dataFields[entityFieldName].push({value: value, date: Number(entityInstance.timestamp)});
+                dataFieldMetrics[entityFieldName].sum += value;
+              }
+              if (entityFieldName.includes('umulative')) {
+                if (!Object.keys(dataFieldMetrics[entityFieldName]).includes('cumulative')) {
+                  dataFieldMetrics[entityFieldName].cumulative = {prevVal: 0, hasLowered: 0}
+                }
+                if (value < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
+                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(entityInstance.timestamp);
+                }
+                dataFieldMetrics[entityFieldName].cumulative.prevVal = value;
               }
             } else if (Array.isArray(currentInstanceField)) {
               currentInstanceField.forEach((val: string, arrayIndex: number) => {
-                const dataFieldKey = entityFieldName + ' [' + arrayIndex + ']';
+                let fieldSplitIdentifier = arrayIndex.toString();
+                let value: number = 0;
+                if (!isNaN(Number(val))) {
+                  value = Number(val);
+                } else if (typeof(val) === 'object') {
+                  const holdingValueKey = Object.keys(val).find(x => {
+                    return !isNaN(Number(val[x]));
+                  });
+                  if (holdingValueKey) {
+                    value = Number(val[holdingValueKey]);
+                  }
+                  if (val['type']) {
+                    fieldSplitIdentifier = val['type'];
+                  } else {
+                    const holdingValueStr = Object.keys(val).find(x => {
+                      return typeof(val[x]) === "string" && isNaN(Number(val[x]));
+                    });
+                    if (holdingValueStr) {
+                      fieldSplitIdentifier = holdingValueStr;
+                    }
+                  }
+                }
+                const dataFieldKey = entityFieldName + ' [' + fieldSplitIdentifier + ']';
+                if (entityFieldName === 'inputTokenBalances') {
+                  value = convertTokenDecimals(val, data[poolName].inputTokens[arrayIndex].decimals);
+                }
                 if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [{value: Number(val), date: Number(entityInstance.timestamp)}];
-                  dataFieldMetrics[dataFieldKey] = {sum: Number(val)};
+                  dataFields[dataFieldKey] = [{value: value, date: Number(entityInstance.timestamp)}];
+                  dataFieldMetrics[dataFieldKey] = {sum: value};
                 } else {
-                  dataFields[dataFieldKey].push({value: Number(val), date: Number(entityInstance.timestamp)});
-                  dataFieldMetrics[dataFieldKey].sum += Number(val);
+                  dataFields[dataFieldKey].push({value: value, date: Number(entityInstance.timestamp)});
+                  dataFieldMetrics[dataFieldKey].sum += value;
+                }
+                if (dataFieldKey.includes('umulative')) {
+                  if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
+                    dataFieldMetrics[dataFieldKey].cumulative = {prevVal: 0, hasLowered: 0}
+                  }
+                  if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
+                  }
+                  dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
                 }
               });
             }
           });
-        });
-
-        return ( <Grid key={entityName} style={{borderTop: "black 2px solid"}} container><h2>ENTITY: {entityName} - {poolId}</h2>{          
+        };
+       return ( 
+        <Grid key={entityName} style={{borderTop: "black 2px solid"}} container>
+          <h2>ENTITY: {entityName} - {poolId}</h2>{          
           Object.keys(dataFields).map((field: string) => {
-            const fieldName = field.split(' [')[0]
+            const fieldName = field.split(' [')[0];
             const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
-            console.log('schemaFieldTypeString', schemaFieldTypeString)
             if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
               return null;
             }
             const label = entityName + '-' + field;
-            if (dataFieldMetrics[field].sum === 0) {
+            if (dataFieldMetrics[field].sum === 0 && issues.filter(x => x.message === label).length === 0) {
               // The error message is more to be used as data on how to handle the error. Syntax is ERRORTYPE%%ENTITY--FIELD
               issues.push({type: "SUM", message: label});
+            }
+            if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
+              issues.push({type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered});
             }
             return (<>
               <Grid key={label + '1'} id={label} item xs={8}>
@@ -89,59 +149,34 @@ function PoolTab(
           })
         }</Grid>)
       })
-
-    if (issues.length > 0) {
-      setWarning(issues);
-    }
-
-    const schemaDisplayObj: {[x: string]: any} = {};
-    if (data.protocols[0].type === "LENDING") {
-      schemaDisplayObj.Market = poolData;
-    } else if (data.protocols[0].type === "EXCHANGE") {
-      schemaDisplayObj.LiquidityPool = poolData;
-    } else if (data.protocols[0].type === "YIELD") {
-      schemaDisplayObj.Vault = poolData;
-    }
-  
-    const poolSchema = SchemaTable(schemaDisplayObj, []);
-
+      
+      const poolLevelTVL = parseFloat(data[poolName]?.totalValueLockedUSD)
+      if (issues.filter(x => x.message === poolName && x.type === "TVL-").length === 0 && poolLevelTVL < 1000) {
+        issues.push({type: "TVL-", message: poolName});
+      } else if (issues.filter(x => x.message === poolName && x.type === "TVL+").length === 0 && poolLevelTVL > 1000000000000) {
+        issues.push({type: "TVL+", message: poolName});
+      }
+         if (issues.length > 0) {
+        setWarning(issues);
+      }
+      
+      const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
     return (
       <div>
+        {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
         {poolSchema}
-        {poolDropDown(poolId, setPoolId, data.markets, PoolNames)}
-          {poolId
-            ?
-            <TableContainer component={Paper} sx={{justifyContent:"center", display:"flex", alignItems:"center"}}>
-              <Table sx={{ maxWidth: 800 }} aria-label="simple table">
-                <TableBody>
+        {poolEntityElements}
+      </div>);
 
-                  {
-                    Object.keys(poolData).map((item) => {
-                      const val = String(data.protocols[0].type);
-                      const poolName = PoolName[val];
-                      const poolValues = data[poolName];
-                      let value = poolValues[item];
-                      if (value === "" || !value) {
-                        return null;
-                      }
-      
-                      return (
-                        <TableRow key={item}>
-                          <TableCell component="th" scope="row">
-                            {item}
-                          </TableCell>
-                          <TableCell align="right">{parseMetaData(value, item,poolValues)}</TableCell>
-                        </TableRow>
-                      );
-                    })
-                  }
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-          : null}
-      {poolEntityElements}
-    </div>)
+    } catch(err) {
+      if (err instanceof Error) {
+        console.log('CATCH,', Object.keys(err), Object.values(err), err)
+          return <h3>JAVASCRIPT ERROR {err.message}</h3>
+    
+        } else {
+          return <h3>JAVASCRIPT ERROR</h3>
+        }
+      }
 }
 
 export default PoolTab;

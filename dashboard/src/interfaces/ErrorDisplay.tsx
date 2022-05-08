@@ -10,6 +10,7 @@ import { Versions } from "../constants";
     protocolSchemaData: any,
     subgraphToQuery: {url: string, version: string},
   ) {
+    console.log('ERROR COMP' + Object.keys(errorObject), Object.values(errorObject))
     const errorMsgs = [];
     let errorTotalCount = 0;
     let errorDisplayCount = 0;
@@ -22,8 +23,8 @@ import { Versions } from "../constants";
     if (errorObject.graphQLErrors.length > 0) {
       errorTotalCount += errorObject.graphQLErrors.length;
       // query errors
-      for (let x = 0; x < 5; x++) {
-        // Take up to the first 5 query error messages and push them to the errorMsgs array
+      for (let x = 0; x < 7; x++) {
+        // Take up to the first 7 query error messages and push them to the errorMsgs array
         if (!errorObject.graphQLErrors[x]) {
           break;
         }
@@ -49,9 +50,17 @@ import { Versions } from "../constants";
         );
       }
     }
+    if (errorObject.message) {
+      const errorMessagesSplit = errorObject.message.split('---');
+      errorMessagesSplit.forEach(msg => {
+        errorTotalCount += 1;
+        errorDisplayCount += 1;
+        errorMsgs.push(<li>{msg}</li>);
+      });
+    }
 
     if (errorMsgs.length >= 1) {
-      return (<div style={{margin: "4px 24px", border: "yellow 3px solid", paddingTop: "6px"}}><h3>DISPLAYING {errorDisplayCount} OUT OF {errorTotalCount} ERRORS.</h3><ol>{errorMsgs}</ol></div>);
+      return (<div style={{margin: "4px 24px", border: "red 3px solid", paddingTop: "6px"}}><h3>DISPLAYING {errorDisplayCount} OUT OF {errorTotalCount} ERRORS.</h3><ol>{errorMsgs}</ol></div>);
     } else {
       return null;
     }
