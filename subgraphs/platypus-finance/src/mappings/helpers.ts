@@ -1,5 +1,5 @@
 import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
-import { Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
+import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
 import {
@@ -19,7 +19,7 @@ export function createAsset(
   tokenAddress: Address,
   assetAddress: Address,
 ): void {
-  let asset = new Asset(assetAddress.toHexString());
+  let asset = new _Asset(assetAddress.toHexString());
   asset.token = tokenAddress.toHexString();
   asset.pool = poolAddress.toHexString();
   asset.maxSupply = BigInt.zero();
