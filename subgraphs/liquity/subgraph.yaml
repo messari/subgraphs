@@ -35,8 +35,6 @@ dataSources:
         - name: TroveManager
           file: ./abis/TroveManager.json
       eventHandlers:
-        - event: Liquidation(uint256,uint256,uint256,uint256)
-          handler: handleLiquidation
         - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
         - event: Redemption(uint256,uint256,uint256,uint256)
