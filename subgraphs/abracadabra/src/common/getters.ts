@@ -51,6 +51,9 @@ import {
   DEGENBOX_ADDRESS_FANTOM,
   DEGENBOX_ADDRESS_BSC,
   RiskType,
+  schemaVersion,
+  subgraphVersion,
+  methodologyVersion,
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -215,9 +218,9 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   LendingProtocolEntity = new LendingProtocol(getBentoBoxAddress(dataSource.network()));
   LendingProtocolEntity.name = "Abracadabra Money";
   LendingProtocolEntity.slug = "abracadabra";
-  LendingProtocolEntity.schemaVersion = "1.2.1";
-  LendingProtocolEntity.subgraphVersion = "1.0.1";
-  LendingProtocolEntity.methodologyVersion = "1.0.0";
+  LendingProtocolEntity.schemaVersion = schemaVersion;
+  LendingProtocolEntity.subgraphVersion = subgraphVersion;
+  LendingProtocolEntity.methodologyVersion = methodologyVersion;
   if (dataSource.network() == ARB_NETWORK) {
     LendingProtocolEntity.network = Network.ARBITRUM_ONE;
   } else {
