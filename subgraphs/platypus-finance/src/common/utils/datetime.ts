@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY } from "../constants";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../constants";
 
 export let minute = BigInt.fromI32(60);
 export let hour = BigInt.fromI32(3600);
@@ -14,7 +14,7 @@ export function getDays(timestamp: i64): i64 {
 
 export function getHours(timestamp: i64): i64 {
   // Get Hour of the Day
-  return new Date(timestamp * 1000).getUTCHours();
+  return timestamp / SECONDS_PER_HOUR;
 }
 
 export function getMinuteOpenTime(timestamp: BigInt): BigInt {

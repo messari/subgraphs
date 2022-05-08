@@ -17,7 +17,7 @@ import {
   getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateToken,
 } from "../common/getters";
-import { getDays } from "../common/utils/datetime";
+import { getDays, getHours } from "../common/utils/datetime";
 import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, SECONDS_PER_HOUR, TransactionType } from "./constants";
 import { bigIntToBigDecimal, exponentToBigDecimal, tokenAmountToUSDAmount } from "./utils/numbers";
 
@@ -82,9 +82,8 @@ function handleHourlyAccount(
   snapshot: UsageMetricsHourlySnapshot,
 ): void {
   let timestamp = event.block.timestamp.toI64();
-  let days = getDays(timestamp);
   let hours = getHours(timestamp);
-  let hourlyAccountId = user.toHexString().concat("-").concat(days.toString()).concat("-").concat(hours.toString());
+  let hourlyAccountId = user.toHexString().concat(hours.toString());
 
   let hourlyAccount = ActiveAccount.load(hourlyAccountId);
   if (!hourlyAccount) {
