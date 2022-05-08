@@ -252,12 +252,12 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string, in
     }
 
     vault._currentInterestAccruedUSD = BIGDECIMAL_ZERO;
-    vault._currentFeesAccruedUSD = BIGDECIMAL_ZERO;
     vault.createdTimestamp = event.block.timestamp;
     vault.createdBlockNumber = event.block.number;
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
     vault.outputTokenSupply = BIGINT_ZERO;
     vault.outputTokenPriceUSD = BIGDECIMAL_ZERO; // can find by dividing TVL by outputTokenSupply
+    vault.pricePerShare = BIGDECIMAL_ZERO;
 
     vault.save();
   }

@@ -3,6 +3,7 @@ import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph
 import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   DAI_VAULT_ADDRESS,
   DAI_VAULT_MANAGER_ADDRESS,
   DEFAULT_DECIMALS,
@@ -28,7 +29,7 @@ import { exponentToBigDecimal } from "../common/utils/utils";
 import { RariYieldFundManager } from "../../generated/RariYieldFundManager/RariYieldFundManager";
 import { RariStableFundManager } from "../../generated/RariUSDCFundManager/RariStableFundManager";
 import { RariEtherFundManager } from "../../generated/RariEtherFundManager/RariEtherFundManager";
-import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { getUsdPrice } from "../prices";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -52,6 +53,8 @@ export function createDeposit(
 
   // get (or create) asset
   let token = getOrCreateToken(asset);
+  let vault = getOrCreateVault(event, vaultAddress, token.id);
+  deposit.vault = vault.id;
 
   // fill in vars
   deposit.hash = hash.toHexString();
@@ -67,22 +70,22 @@ export function createDeposit(
 
   deposit.save();
 
-  // update vault TVL
-  let vault = getOrCreateVault(event, vaultAddress, token.id);
-  deposit.vault = vault.id;
   updateTVL(event);
 
   // update outputTokenPrice
   vault.outputTokenSupply = vault.outputTokenSupply!.plus(outputTokensMinted);
-  let outputTokenDecimals = getOrCreateToken(vault.outputToken!).decimals;
-  vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
-    vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
-  );
+  vault.outputTokenPriceUSD = getOutputTokenPrice(event, vaultAddress);
 
   // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, BIGDECIMAL_ZERO);
   updateInputTokenBalance(vault);
+
+  // calculate pricePerShare
+  vault.pricePerShare = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+    .div(vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 
   vault.save();
 }
@@ -106,6 +109,8 @@ export function createWithdraw(
 
   // get (or create) token
   let token = getOrCreateToken(asset);
+  let vault = getOrCreateVault(event, vaultAddress, token.id);
+  withdraw.vault = vault.id;
 
   // populate vars,
   withdraw.hash = hash.toHexString();
@@ -121,17 +126,11 @@ export function createWithdraw(
 
   withdraw.save();
 
-  // update vault TVL
-  let vault = getOrCreateVault(event, vaultAddress, token.id);
-  withdraw.vault = vault.id;
   updateTVL(event);
 
   // update outputTokenPrice
   vault.outputTokenSupply = vault.outputTokenSupply!.minus(outputTokensBurned);
-  let outputTokenDecimals = getOrCreateToken(vault.outputToken!).decimals;
-  vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
-    vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputTokenDecimals)),
-  );
+  vault.outputTokenPriceUSD = getOutputTokenPrice(event, vaultAddress);
 
   // calculate withdrawal fee
   let withdrawalFee = BIGDECIMAL_ZERO;
@@ -146,6 +145,12 @@ export function createWithdraw(
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, withdrawalFee);
   updateInputTokenBalance(vault);
+
+  // calculate pricePerShare
+  vault.pricePerShare = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
+    .div(vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 
   vault.save();
 }
@@ -224,10 +229,9 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
       log.warning("NEGATIVE FEES: extras: {}", [extraFee.toString()]);
     } else {
       let newTotalInterest = updatedInterest.minus(prevInterest);
-      let performanceFee = getOrCreateVaultFee(
-        VaultFeeType.PERFORMANCE_FEE,
-        vault._contractAddress,
-      ).feePercentage!.div(exponentToBigDecimal(INT_TWO));
+      let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vault._contractAddress).feePercentage!.div(
+        exponentToBigDecimal(INT_TWO),
+      );
       let newFees = newTotalInterest.times(performanceFee);
       let newInterest = newTotalInterest.times(BIGDECIMAL_ONE.minus(performanceFee));
 
@@ -238,6 +242,20 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
       protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalInterest);
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newFees);
       protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newInterest);
+
+      // update interest in all vaults with the same _contractAddress
+      // prevents double counting
+      for (let i = 0; i < protocol._vaultList.length; i++) {
+        let splitArr = protocol._vaultList[i].split("-", 2);
+        let _vaultAddress = splitArr[0];
+        let tokenAddress = splitArr[1];
+        let _vault = getOrCreateVault(event, _vaultAddress, tokenAddress);
+
+        if (_vault._contractAddress == vault._contractAddress) {
+          _vault._currentInterestAccruedUSD = updatedInterest; // only updates when non-negative newInterest
+          _vault.save();
+        }
+      }
     }
   }
 
@@ -293,12 +311,14 @@ export function updateTVL(event: ethereum.Event): void {
             tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
           );
     } else {
-      let ethPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS)).usdPrice;
       let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
       let tryVaultTVL = contract.try_getRawFundBalance(); // in ETH
       vault.totalValueLockedUSD = tryVaultTVL.reverted
         ? vault.totalValueLockedUSD
-        : tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)).times(ethPrice);
+        : getUsdPrice(
+            Address.fromString(ETH_ADDRESS),
+            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+          );
     }
 
     totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
@@ -335,4 +355,31 @@ export function updateInputTokenBalance(vault: Vault): void {
   }
 
   vault.save();
+}
+
+// returns output token price in USD
+export function getOutputTokenPrice(event: ethereum.Event, vaultAddress: string): BigDecimal {
+  // loop through vaults and only grab ones with vaultAddress _contractAddress
+  let protocol = getOrCreateYieldAggregator();
+  let outputTokenSupply = BIGINT_ZERO;
+  let vaultTVL = BIGDECIMAL_ZERO;
+
+  for (let i = 0; i < protocol._vaultList.length; i++) {
+    let splitArr = protocol._vaultList[i].split("-", 2);
+    let _vaultAddress = splitArr[0];
+    let tokenAddress = splitArr[1];
+    let vault = getOrCreateVault(event, _vaultAddress, tokenAddress);
+
+    if (vault._contractAddress == vaultAddress) {
+      // add up only when we hit a vault that matches
+      outputTokenSupply = outputTokenSupply.plus(vault.outputTokenSupply!);
+      vaultTVL = vaultTVL.plus(vault.totalValueLockedUSD);
+    }
+  }
+
+  // calc outputTokenPrice in USD for vaultAddress
+  if (outputTokenSupply.equals(BIGINT_ZERO) || vaultTVL.equals(BIGDECIMAL_ZERO)) {
+    return BIGDECIMAL_ZERO;
+  }
+  return vaultTVL.div(outputTokenSupply.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 }
