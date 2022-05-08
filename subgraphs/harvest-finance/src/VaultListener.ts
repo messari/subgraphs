@@ -42,6 +42,7 @@ export function handleDeposit(event: DepositEvent): void {
 
   let vault_contract = VaultContract.bind(vaultAddress);
   vault.inputTokenBalance = vault_contract.underlyingBalanceWithInvestment();
+  vault.outputTokenSupply = vault_contract.totalSupply()
   vault.save();
 
 
