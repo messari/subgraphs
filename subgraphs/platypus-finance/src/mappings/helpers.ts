@@ -5,8 +5,6 @@ import { TransactionType } from "../common/constants";
 import {
   getOrCreateDexAmm,
   getOrCreateLiquidityPool,
-  getOrCreateLiquidityPoolDailySnapshot,
-  getOrCreateLiquidityPoolHourlySnapshot,
   getOrCreateToken,
   updatePricesForToken,
 } from "../common/getters";
@@ -185,19 +183,3 @@ export function updateBalancesInPool<T extends Deposit>(
   pool.save();
 }
 
-export function updatePoolSnapshotsTokensSize(event: ethereum.Event): void {
-  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(event);
-  let hourlyVolumeByTokenAmount = hourlySnapshot.hourlyVolumeByTokenAmount;
-  let hourlyVolumeByTokenUSD = hourlySnapshot.hourlyVolumeByTokenUSD;
-  hourlyVolumeByTokenAmount.push(BigInt.fromString("0"));
-  hourlyVolumeByTokenUSD.push(BigDecimal.fromString("0"));
-
-  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(event);
-  let dailyVolumeByTokenAmount = dailySnapshot.dailyVolumeByTokenAmount;
-  let dailyVolumeByTokenUSD = dailySnapshot.dailyVolumeByTokenUSD;
-  dailyVolumeByTokenAmount.push(BigInt.fromString("0"));
-  dailyVolumeByTokenUSD.push(BigDecimal.fromString("0"));
-
-  hourlySnapshot.save();
-  dailySnapshot.save();
-}

@@ -5,7 +5,7 @@ features:
     - grafting
 graft:
     base: QmWXbsdmq9PTnoDLuUBWPNaoZYosiecgvGz6VEzNibQVEe # Subgraph ID of base subgraph
-    block: 11244100 # Block number
+    block: 11243900 # Block number
 schema:
   file: ./schema.graphql
 dataSources:
