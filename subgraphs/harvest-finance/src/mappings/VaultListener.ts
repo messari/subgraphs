@@ -1,4 +1,4 @@
-import { BigInt, Address, log } from "@graphprotocol/graph-ts"
+import { BigInt,BigDecimal, Address, log } from "@graphprotocol/graph-ts"
 import {
   Deposit as DepositEvent,
   Invest as InvestEvent,
@@ -17,6 +17,7 @@ import { getOrCreateToken } from './../entities/Token'
 import { depositUpdateMetrics } from './../entities/Metrics'
 import * as constants from "./../constant";
 import { getUsdPricePerToken } from "./../Prices";
+import { readValue } from "../utils/contracts";
 
 export function handleDeposit(event: DepositEvent): void {
 
@@ -53,15 +54,18 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.save();
 
   let vault_contract = VaultContract.bind(vaultAddress);
-  vault.inputTokenBalance = vault_contract.underlyingBalanceWithInvestment();
-  vault.outputTokenSupply = vault_contract.totalSupply()
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(amount);
+  vault.outputTokenSupply = readValue<BigInt>(vault_contract.try_totalSupply(), constants.BIGINT_ZERO);
+
+  vault.pricePerShare = readValue<BigInt>(vault_contract.try_getPricePerFullShare(), constants.BIGINT_ZERO).toBigDecimal();
   vault.save();
 
-  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
-    .times(vault.inputTokenBalance.toBigDecimal())
+  vault.totalValueLockedUSD = (<BigDecimal> vault.pricePerShare)
+    .times(inputTokenPrice.usdPrice)
+    .times((<BigInt> vault.outputTokenSupply).toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimals.toBigDecimal());
-
 
   vault.save();
 
