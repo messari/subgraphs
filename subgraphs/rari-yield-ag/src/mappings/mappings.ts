@@ -43,7 +43,6 @@ import { exponentToBigDecimal } from "../common/utils/utils";
 ////////////////////////////
 
 export function handleUSDCDeposit(event: USDCDeposit): void {
-  log.warning("USDC Deposit {}", [event.transaction.hash.toHexString()]);
   // get address of asset
   let code = event.params.currencyCode.toHexString();
   let assetAddress: string;

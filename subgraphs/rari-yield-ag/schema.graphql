@@ -158,7 +158,7 @@ type YieldAggregator implements Protocol @entity {
   id: ID!
 
   " List of vaults "
-  _vaultList: [Vault!]!
+  _vaultList: [String!]!
 
   " Name of the protocol, including version. e.g. Yearn v3 "
   name: String!
