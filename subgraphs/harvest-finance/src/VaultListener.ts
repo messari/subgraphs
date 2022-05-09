@@ -32,27 +32,30 @@ export function handleDeposit(event: DepositEvent): void {
   let block = event.block;
   let deposit = getOrCreateDeposit(hash, index, block);
 
+
+  let inputTokenAddress = Address.fromString(vault.inputToken)
+  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  // exist because vault create it
+  let inputToken = Token.load(inputTokenAddress.toHex());
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
+
+  let depositAmountUSD = inputTokenPrice.usdPrice
+    .times(amount.toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
+    .div(inputTokenPrice.decimals.toBigDecimal());
+
   deposit.from = event.params.beneficiary.toHex();
   deposit.to = vault.inputToken;
   deposit.asset = vault.inputToken;
   deposit.amount = amount;
   deposit.vault = vault.id;
+  deposit.amountUSD = depositAmountUSD;
   deposit.save();
-
 
   let vault_contract = VaultContract.bind(vaultAddress);
   vault.inputTokenBalance = vault_contract.underlyingBalanceWithInvestment();
   vault.outputTokenSupply = vault_contract.totalSupply()
   vault.save();
-
-
-  let inputTokenAddress = Address.fromString(vault.inputToken)
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-
-  // exist because vault create it
-  let inputToken = Token.load(inputTokenAddress.toHex());
-
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
 
   vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalance.toBigDecimal())
