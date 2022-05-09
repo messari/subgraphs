@@ -1,21 +1,21 @@
 import { log, BigInt, Address } from '@graphprotocol/graph-ts'
 
 // subgraph templates
-//import { VaultListener } from '../generated/templates'
+//import { VaultListener } from '../../generated/templates'
 
 // contract imports
 import {
   AddVaultAndStrategyCall,
   SharePriceChangeLog as SharePriceChangeLogEvent
-} from "../generated/ControllerListener/ControllerContract"
-import { ERC20DetailedContract } from "../generated/ControllerListener/ERC20DetailedContract"
-import { VaultContract } from "../generated/ControllerListener/VaultContract"
+} from "../../generated/ControllerListener/ControllerContract"
+import { ERC20DetailedContract } from "../../generated/ControllerListener/ERC20DetailedContract"
+import { VaultContract } from "../../generated/ControllerListener/VaultContract"
 
 // schema imports
 
 
 // helper function imports
-import { getOrCreateVault } from './entities/Vault'
+import { getOrCreateVault } from './../entities/Vault'
 
 /*
 export function handleSharePriceChangeLog(event: SharePriceChangeLogEvent): void{

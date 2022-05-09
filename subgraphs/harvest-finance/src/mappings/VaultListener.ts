@@ -6,17 +6,17 @@ import {
   StrategyChanged as StrategyChangedEvent,
   Transfer as TransferEvent,
   Withdraw as WithdrawEvent
-} from "../generated/ControllerListener/VaultContract"
-import { Vault as VaultContract } from "../generated/ControllerListener/Vault";
-import { getOrCreateToken } from './entities/Token'
-import { Vault, Token } from "../generated/schema";
-import { WETH_ADDRESS } from './constant'
-import { getOrCreateVault } from './entities/Vault'
-import { getOrCreateDeposit } from './entities/Transaction'
-import { getOrCreateToken } from './entities/Token'
-import { depositUpdateMetrics } from './entities/Metrics'
-import * as constants from "./constant";
-import { getUsdPricePerToken } from "./Prices";
+} from "../../generated/ControllerListener/VaultContract"
+import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
+import { getOrCreateToken } from './../entities/Token'
+import { Vault, Token } from "../../generated/schema";
+import { WETH_ADDRESS } from './../constant'
+import { getOrCreateVault } from './../entities/Vault'
+import { getOrCreateDeposit } from './../entities/Transaction'
+import { getOrCreateToken } from './../entities/Token'
+import { depositUpdateMetrics } from './../entities/Metrics'
+import * as constants from "./../constant";
+import { getUsdPricePerToken } from "./../Prices";
 
 export function handleDeposit(event: DepositEvent): void {
 

@@ -43,7 +43,7 @@ dataSources:
       callHandlers:
         - function: addVaultAndStrategy(address,address)
           handler: handleAddVaultAndStrategy
-      file: ./src/ControllerListener.ts
+      file: ./src/mappings/ControllerListener.ts
 templates:
   - kind: ethereum/contract
     name: VaultListener
@@ -115,4 +115,4 @@ templates:
       #callHandlers:
         #- function: doHardWork()
         #  handler: handleDoHardWorkCall
-      file: ./src/VaultListener.ts
+      file: ./src/mappings/VaultListener.ts
