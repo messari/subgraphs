@@ -244,7 +244,7 @@ export function updateBalancesInPoolAfterSwap(event: ethereum.Event, swap: Swap)
       balances[i] = balances[i].plus(swap.amountIn);
     }
     if (pool.inputTokens[i] == swap.tokenOut) {
-      balances[i] = balances[i].minus(swap.amountIn);
+      balances[i] = balances[i].minus(swap.amountOut);
     }
   }
 
