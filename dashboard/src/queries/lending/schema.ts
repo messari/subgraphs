@@ -167,6 +167,7 @@ export const schema100 = (): Schema => {
       }
     `;
   const poolData: {[x: string]: string} = {
+    id: "ID!",
     inputTokens: "[Token!]!",
     outputToken: "Token",
     rewardTokens: "[RewardToken!]",
@@ -229,10 +230,13 @@ export const schema110 = (): Schema => {
   };
 
   const poolData: {[x: string]: string} = {
+    id: "ID!",
+    name: "String",
     inputTokens: "[Token!]!",
     outputToken: "Token",
     rewardTokens: "[RewardToken!]",
-    name: "String",
+    inputTokenBalances: "[BigInt!]!",
+    outputTokenSupply: "BigInt!",
     isActive: "Boolean!",
     variableBorrowRate: "BigDecimal!",
     depositRate: "BigDecimal!",
@@ -310,10 +314,14 @@ export const schema110 = (): Schema => {
           }
           outputToken {
             id
+            decimals
           }
           rewardTokens{
             id
+            decimals
           }
+          inputTokenBalances
+          outputTokenSupply
          isActive
          canUseAsCollateral
          canBorrowFrom
@@ -469,18 +477,25 @@ export const schema120 = (): Schema => {
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal!",
       exchangeRate: "BigDecimal",
+      rates: "[InterestRate!]!",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!"
     }
   };
 
+  const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
+  const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}"; 
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}"; 
+
+
   const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
   const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
   const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
 
-  const marketDailyQuery = "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + Object.keys(entitiesData.marketDailySnapshots).join(',') + '}';
-  const marketHourlyQuery = "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + Object.keys(entitiesData.marketHourlySnapshots).join(',') + '}';
+  const marketDailyQuery = "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketDailyFields.join(',') + '}';
+  const marketHourlyQuery = "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketHourlyFields.join(',') + '}';
 
   const eventsFields = [
     "hash",
@@ -525,6 +540,7 @@ export const schema120 = (): Schema => {
     outputTokenSupply: "BigInt!",
     outputTokenPriceUSD: "BigDecimal!",
     exchangeRate: "BigDecimal",
+    rates: "[InterestRate!]!",
     rewardTokenEmissionsAmount: "[BigInt!]",
     rewardTokenEmissionsUSD: "[BigDecimal!]"
   };
@@ -590,9 +606,17 @@ export const schema120 = (): Schema => {
       }
       outputToken {
         id
+        decimals
       }
       rewardTokens {
         id
+        token {
+          decimals
+        }
+      }
+      rates {
+        rate
+        type
       }
       isActive
       canUseAsCollateral
