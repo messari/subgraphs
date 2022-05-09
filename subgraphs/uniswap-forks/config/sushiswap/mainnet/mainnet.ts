@@ -1,23 +1,22 @@
 import { BigDecimal } from '@graphprotocol/graph-ts';
 import { FeeSwitch, RewardIntervalType } from '../../../src/common/constants';
 import { ConfigurationFields } from '../../configurations/fields';
-import { FieldMap } from '../../configurations/types';
 
-export const SushiswapMainnetConfigurations: FieldMap = {
-  [ConfigurationFields.NETWORK]: "mainnet",
-  [ConfigurationFields.PROTOCOL_NAME]: "Sushiswap",
-  [ConfigurationFields.PROTOCOL_SLUG]: "sushiswap",
-  [ConfigurationFields.FACTORY_ADDRESS]: "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac",
-  [ConfigurationFields.TRADING_FEE]: BigDecimal.fromString("3"),
-  [ConfigurationFields.PROTOCOL_FEE_TO_ON]: BigDecimal.fromString("0.5"),
-  [ConfigurationFields.LP_FEE_TO_ON]: BigDecimal.fromString("2.5"),
-  [ConfigurationFields.PROTOCOL_FEE_TO_OFF]: BigDecimal.fromString("0.0"),
-  [ConfigurationFields.LP_FEE_TO_OFF]: BigDecimal.fromString("3"),
-  [ConfigurationFields.FEE_ON_OFF]: FeeSwitch.ON,
-  [ConfigurationFields.REWARD_INTERVAL_TYPE]: RewardIntervalType.BLOCK,
-  [ConfigurationFields.REFERENCE_TOKEN]: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-  [ConfigurationFields.REWARD_TOKENS]: "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",  
-  [ConfigurationFields.WHITELIST_TOKENS]: [
+export const SushiswapMainnetConfigurations: ConfigurationFields = {
+  network: "mainnet",
+  protocolName: "Sushiswap",
+  protocolSlug: "sushiswap",
+  factoryAddress: "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac",
+  tradingFee: BigDecimal.fromString("3"),
+  protocolFeeToOn: BigDecimal.fromString("0.5"),
+  lpFeeToOn: BigDecimal.fromString("2.5"),
+  protocolFeeToOff: BigDecimal.fromString("0.0"),
+  lpFeeToOff: BigDecimal.fromString("3"),
+  feeOnOff: FeeSwitch.ON,
+  rewardIntervalType: RewardIntervalType.BLOCK,
+  referenceToken: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+  rewardToken: "0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",  
+  whitelistTokens: [
     "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
     "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
     "0x6b175474e89094c44da98b954eedeac495271d0f",
@@ -44,15 +43,15 @@ export const SushiswapMainnetConfigurations: FieldMap = {
     "0xafcE9B78D409bF74980CACF610AFB851BF02F257",
     "0x6b3595068778dd592e39a122f4f5a5cf09c90fe2"
   ],
-  [ConfigurationFields.STABLE_COINS]: [
+  stableCoins: [
     "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC
     "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI
     "0xdAC17F958D2ee523a2206206994597C13D831ec7", // USDT
   ],
-  [ConfigurationFields.STABLE_ORACLE_POOLS]: [
+  stableOraclePools: [
     "0x397ff1542f962076d0bfe58ea045ffa2d347aca0", // wETH/USDC
     "0x06da0fd433c1a5d7a4faa01111c044910a184553", // wETH/USDT
     "0xc3d03e4f041fd4cd388c549ee2a29a9e5075882f", // wETH/DAI
   ],
-  [ConfigurationFields.UNTRACKED_PAIRS]: []
+  untrackedPairs: []
 }

@@ -1,7 +1,6 @@
 import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
 import { ConfigurationFields } from "./fields";
-import { FieldMap } from "./types";
 
 class IConfig {
     network: string;
@@ -28,89 +27,89 @@ class IConfig {
     stableOraclePools: string[];
     untrackedPairs: string[];
   
-    constructor(configurations: FieldMap) {
+    constructor(configurations: ConfigurationFields) {
   
-      this.network = configurations[ConfigurationFields.NETWORK];
+      this.network = configurations.network;
   
-      this.protocolName = configurations[ConfigurationFields.PROTOCOL_NAME];
-      this.protocolSlug = configurations[ConfigurationFields.PROTOCOL_SLUG];
-      this.factoryAddress = configurations[ConfigurationFields.FACTORY_ADDRESS];
-      this.factoryContract = Factory.bind(Address.fromString(ConfigurationFields.FACTORY_ADDRESS));
+      this.protocolName = configurations.protocolName;
+      this.protocolSlug = configurations.protocolSlug;
+      this.factoryAddress = configurations.factoryAddress;
+      this.factoryContract = Factory.bind(Address.fromString(this.factoryAddress));
   
-      this.tradingFee = configurations[ConfigurationFields.TRADING_FEE];
-      this.protocolFeeToOn = configurations[ConfigurationFields.PROTOCOL_FEE_TO_ON];
-      this.lpFeeToOn = configurations[ConfigurationFields.LP_FEE_TO_ON];
-      this.protocolFeeToOff = configurations[ConfigurationFields.PROTOCOL_FEE_TO_OFF];
-      this.lpFeeToOff = configurations[ConfigurationFields.LP_FEE_TO_OFF];
-      this.feeOnOff = configurations[ConfigurationFields.FEE_ON_OFF];
+      this.tradingFee = configurations.tradingFee;
+      this.protocolFeeToOn = configurations.protocolFeeToOn;
+      this.lpFeeToOn = configurations.lpFeeToOn;
+      this.protocolFeeToOff = configurations.protocolFeeToOff;
+      this.lpFeeToOff = configurations.lpFeeToOff;
+      this.feeOnOff = configurations.feeOnOff;
   
-      this.rewardIntervalType = configurations[ConfigurationFields.REWARD_INTERVAL_TYPE];
-      this.referenceToken = configurations[ConfigurationFields.REFERENCE_TOKEN];
-      this.rewardToken = configurations[ConfigurationFields.REWARD_TOKENS];
-      this.whitelistTokens = configurations[ConfigurationFields.WHITELIST_TOKENS];
-      this.stableCoins = configurations[ConfigurationFields.STABLE_COINS];
-      this.stableOraclePools = configurations[ConfigurationFields.STABLE_ORACLE_POOLS];
-      this.untrackedPairs = configurations[ConfigurationFields.UNTRACKED_PAIRS];
+      this.rewardIntervalType = configurations.rewardIntervalType;
+      this.referenceToken = configurations.referenceToken;
+      this.rewardToken = configurations.rewardToken;
+      this.whitelistTokens = configurations.whitelistTokens;
+      this.stableCoins = configurations.stableCoins;
+      this.stableOraclePools = configurations.stableOraclePools;
+      this.untrackedPairs = configurations.untrackedPairs;
     } 
   
-    getNetwork() {
+    getNetwork(): string{
       return this.network;
     }
-    getProtocolName() {
+    getProtocolName(): string {
       return this.protocolName;
     }
-    getProtocolSlug() {
+    getProtocolSlug(): string {
       return this.protocolSlug;
     }
-    getFactoryAddress() {
+    getFactoryAddress(): string {
       return this.factoryAddress;
     }
-    getFactoryContract() { 
+    getFactoryContract(): Factory { 
       return this.factoryContract;
     }
-    getTradeFee() {
+    getTradeFee(): BigDecimal {
       return this.tradingFee;
     }
-    getProtocolFeeToOn() {
+    getProtocolFeeToOn(): BigDecimal {
       return this.protocolFeeToOn;
     }
-    getLPFeeToOn() {
+    getLPFeeToOn(): BigDecimal {
       return this.lpFeeToOn;
     }
-    getProtocolFeeToOff() {
+    getProtocolFeeToOff(): BigDecimal {
       return this.protocolFeeToOff;
     }
-    getLPFeeToOff() {
+    getLPFeeToOff(): BigDecimal {
       return this.lpFeeToOff;
     }
-    getFeeOnOff() {
+    getFeeOnOff(): string {
       return this.feeOnOff;
     }
-    getRewardIntervalType() {
+    getRewardIntervalType(): string {
       return this.rewardIntervalType;
     }
-    getReferenceToken() {
+    getReferenceToken(): string {
       return this.referenceToken;
     }
-    getRewardTokens() {
+    getRewardToken(): string {
       return this.rewardToken;
     }
-    getWhitelistTokens() {
+    getWhitelistTokens(): string[] {
       return this.whitelistTokens;
     }
-    getStableCoins() {
+    getStableCoins(): string[] {
       return this.stableCoins;
     }
-    getStableOraclePools() {
+    getStableOraclePools(): string[] {
       return this.stableOraclePools;
     }
-    getUntrackedPairs() {
+    getUntrackedPairs(): string[] {
       return this.untrackedPairs;
     }
   }
   
 export class Configurations extends IConfig {
-    constructor(configurations: FieldMap) {
+    constructor(configurations: ConfigurationFields) {
       log.warning("Generated configurations for ${Protocol}/${Network}", []);
       super(configurations);
     }

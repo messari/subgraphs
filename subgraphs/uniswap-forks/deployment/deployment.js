@@ -23,7 +23,7 @@ exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + process.ar
 //     for (const key in protocolNetworkMap) {
 //         for (const network in protocolNetworkMap[key]) {
 
-//             exec('npm run deploy --protocol=' + key + ' --network=' + protocolNetworkMap[key][network] + ' --location=' + process.argv[2],
+//             exec('npm run deploy --protocol=' + key + ' --network=' + protocolNetworkMap[key]network + ' --location=' + process.argv[2],
 //                 function (error, stdout, stderr) {
 //                     console.log('stdout: ' + stdout);
 //                     console.log('stderr: ' + stderr);
@@ -39,7 +39,7 @@ exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + process.ar
 //     } else {
 //         for (const network in protocolNetworkMap[process.argv[3]]) {
 
-//             exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + protocolNetworkMap[process.argv[3]][network] + ' --location=' + process.argv[2],
+//             exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + protocolNetworkMap[process.argv[3]]network + ' --location=' + process.argv[2],
 //                 function (error, stdout, stderr) {
 //                     console.log('stdout: ' + stdout);
 //                     console.log('stderr: ' + stderr);

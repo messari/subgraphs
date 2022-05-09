@@ -1,24 +1,26 @@
-export enum ConfigurationFields {
-    NETWORK = "NETWORK",
+import { BigDecimal } from "@graphprotocol/graph-ts";
+
+export interface ConfigurationFields {
+    network: string,
   
-    PROTOCOL_NAME = "PROTOCOL_NAME",
-    PROTOCOL_SLUG = "PROTOCOL_SLUG",
+    protocolName: string,
+    protocolSlug: string,
   
-    FACTORY_ADDRESS  = "FACTORY_ADDRESS",
+    factoryAddress: string,
   
-    TRADING_FEE = "TRADING_FEE",
-    PROTOCOL_FEE_TO_ON  = "PROTOCOL_FEE_TO_ON",
-    LP_FEE_TO_ON = "LP_FEE_TO_ON",
-    PROTOCOL_FEE_TO_OFF = "PROTOCOL_FEE_TO_OFF",
-    LP_FEE_TO_OFF = "LP_FEE_TO_OFF",
-    FEE_ON_OFF = "FEE_ON_OFF",
+    tradingFee: BigDecimal,
+    protocolFeeToOn: BigDecimal,
+    lpFeeToOn: BigDecimal,
+    protocolFeeToOff: BigDecimal,
+    lpFeeToOff: BigDecimal,
+    feeOnOff: string,
   
-    REWARD_INTERVAL_TYPE = "REWARD_INTERVAL_TYPE",
+    rewardIntervalType: string,
   
-    REFERENCE_TOKEN = "NATIVE_TOKEN",
-    REWARD_TOKENS = "REWARD_TOKENS",
-    WHITELIST_TOKENS = "WHITELIST_TOKENS",
-    STABLE_COINS = "STABLE_COINS",
-    STABLE_ORACLE_POOLS = "STABLE_ORACLE_POOLS",
-    UNTRACKED_PAIRS = "UNTRACKED_PAIRS"
+    referenceToken: string,
+    rewardToken: string,
+    whitelistTokens: string[],
+    stableCoins: string[],
+    stableOraclePools: string[],
+    untrackedPairs: string[],
   }

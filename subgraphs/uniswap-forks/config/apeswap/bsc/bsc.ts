@@ -1,24 +1,22 @@
 import { BigDecimal } from '@graphprotocol/graph-ts';
 import { FeeSwitch, RewardIntervalType } from '../../../src/common/constants';
 import { ConfigurationFields } from '../../configurations/fields';
-import { FieldMap } from '../../configurations/types';
 
-
-export const ApeswapBscConfigurations: FieldMap = {
-  [ConfigurationFields.NETWORK]: "bsc",
-  [ConfigurationFields.PROTOCOL_NAME]: "Apeswap",
-  [ConfigurationFields.PROTOCOL_SLUG]: "apeswap",
-  [ConfigurationFields.FACTORY_ADDRESS]: "0xCf083Be4164828f00cAE704EC15a36D711491284",
-  [ConfigurationFields.TRADING_FEE]: BigDecimal.fromString("2"),
-  [ConfigurationFields.PROTOCOL_FEE_TO_ON]: BigDecimal.fromString("0.5"),
-  [ConfigurationFields.LP_FEE_TO_ON]: BigDecimal.fromString("1.5"),
-  [ConfigurationFields.PROTOCOL_FEE_TO_OFF]: BigDecimal.fromString("0.0"),
-  [ConfigurationFields.LP_FEE_TO_OFF]: BigDecimal.fromString("2"),
-  [ConfigurationFields.FEE_ON_OFF]: FeeSwitch.ON,
-  [ConfigurationFields.REWARD_INTERVAL_TYPE]: RewardIntervalType.TIMESTAMP,
-  [ConfigurationFields.REFERENCE_TOKEN]: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
-  [ConfigurationFields.REWARD_TOKENS]: "0x5d47bAbA0d66083C52009271faF3F50DCc01023C",  
-  [ConfigurationFields.WHITELIST_TOKENS]: [
+export const ApeswapBscConfigurations: ConfigurationFields = {
+  network: "bsc",
+  protocolName: "Apeswap",
+  protocolSlug: "apeswap",
+  factoryAddress: "0xCf083Be4164828f00cAE704EC15a36D711491284",
+  tradingFee: BigDecimal.fromString("2"),
+  protocolFeeToOn: BigDecimal.fromString("0.5"),
+  lpFeeToOn: BigDecimal.fromString("1.5"),
+  protocolFeeToOff: BigDecimal.fromString("0.0"),
+  lpFeeToOff: BigDecimal.fromString("2"),
+  feeOnOff: FeeSwitch.ON,
+  rewardIntervalType: RewardIntervalType.TIMESTAMP,
+  referenceToken: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+  rewardToken: "0x5d47bAbA0d66083C52009271faF3F50DCc01023C",  
+  whitelistTokens: [
     "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c", // WBNB
     "0xe9e7cea3dedca5984780bafc599bd69add087d56", // BUSD
     "0x55d398326f99059ff775485246999027b3197955", // USDT
@@ -31,7 +29,7 @@ export const ApeswapBscConfigurations: FieldMap = {
     "0x603c7f932ed1fc6575303d8fb018fdcbb0f39a95", // BANANA
     "0xdDb3Bd8645775F59496c821E4F55A7eA6A6dc299", // GNANA
   ],
-  [ConfigurationFields.STABLE_COINS]: [
+  stableCoins: [
     "0x6b175474e89094c44da98b954eedeac495271d0f", // DAI
     "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", // USDC
     "0xdac17f958d2ee523a2206206994597c13d831ec7", // USDT
@@ -39,10 +37,10 @@ export const ApeswapBscConfigurations: FieldMap = {
     "0x956f47f50a910163d8bf957cf5846d573e7f87ca", // FEI
     "0x4dd28568d05f09b02220b09c2cb307bfd837cb95",
   ],
-  [ConfigurationFields.STABLE_ORACLE_POOLS]: [
+  stableOraclePools: [
     "0x51e6d27fa57373d8d4c256231241053a70cb1d93", // BUSD/WBNB created block 4857769
     "0xf3010261b58b2874639ca2e860e9005e3be5de0b", // DAI/WBNB created block 481116
     "0x20bcc3b8a0091ddac2d0bc30f68e6cbb97de59cd", // USDT/WBNB created block 648115
   ],
-  [ConfigurationFields.UNTRACKED_PAIRS]: []
+  untrackedPairs: []
 }
