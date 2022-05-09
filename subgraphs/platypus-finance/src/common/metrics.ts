@@ -194,11 +194,6 @@ function updateDailyPoolMetrics(event: ethereum.Event): void {
   snapshot.save();
 }
 
-export function updatePoolMetrics(event: ethereum.Event): void {
-  updateHourlyPoolMetrics(event);
-  updateDailyPoolMetrics(event);
-}
-
 export function calculateSwapVolume(swap: Swap): BigDecimal {
   return swap.amountInUSD.plus(swap.amountOutUSD).div(BIGDECIMAL_TWO);
 }
@@ -223,11 +218,11 @@ export function calculateSwapFeeInUsd(event: ethereum.Event, poolAddress: Addres
 
 function updateProtocolAndFinancialSwapVolume(event: ethereum.Event, swap: Swap): void {
   let protocol = getOrCreateDexAmm();
-  let swapVolumetUsd = calculateSwapVolume(swap);
-  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapVolumetUsd);
+  let swapVolumeUsd = calculateSwapVolume(swap);
+  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapVolumeUsd);
 
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(swapVolumetUsd);
+  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(swapVolumeUsd);
 
   protocol.save();
   financialMetrics.save();
@@ -245,18 +240,15 @@ export function updateBalancesInPoolAfterSwap(event: ethereum.Event, swap: Swap)
   let balances: BigInt[] = pool.inputTokenBalances;
 
   for (let i = 0; i < pool.inputTokens.length; i++) {
-    log.debug("trying to match {} with swap input token {}", [pool.inputTokens[i], swap.tokenIn]);
     if (pool.inputTokens[i] == swap.tokenIn) {
-      log.debug("match found {} with input {}", [pool.inputTokens[i], swap.tokenIn]);
       balances[i] = balances[i].plus(swap.amountIn);
     }
-    log.debug("trying to match {} with swap input token {}", [pool.inputTokens[i], swap.tokenOut]);
     if (pool.inputTokens[i] == swap.tokenOut) {
-      log.debug("match found {} with input {}", [pool.inputTokens[i], swap.tokenOut]);
       balances[i] = balances[i].minus(swap.amountIn);
     }
   }
 
+  pool.inputTokenBalances = balances;
   pool.save();
 }
 
@@ -314,6 +306,11 @@ function updateDailyPoolSwapVolume(event: ethereum.Event, swap: Swap): void {
   snapshot.save();
 }
 
+export function updatePoolMetrics(event: ethereum.Event): void {
+  updateHourlyPoolMetrics(event);
+  updateDailyPoolMetrics(event);
+
+}
 function updateSwapTradingVolumes(event: ethereum.Event, swap: Swap): void {
   updateProtocolAndFinancialSwapVolume(event, swap);
   updatePoolSwapVolume(event, swap);

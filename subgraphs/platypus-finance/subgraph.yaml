@@ -2,6 +2,10 @@ specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 features:
     - nonFatalErrors
+    - grafting
+graft:
+    base: QmWXbsdmq9PTnoDLuUBWPNaoZYosiecgvGz6VEzNibQVEe # Subgraph ID of base subgraph
+    block: 11244100 # Block number
 schema:
   file: ./schema.graphql
 dataSources:
