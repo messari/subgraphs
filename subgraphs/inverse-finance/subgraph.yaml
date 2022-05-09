@@ -24,6 +24,28 @@ dataSources:
           handler: handleOwnerChanged
 
   - kind: ethereum/contract
+    name: DOLA
+    network: mainnet
+    source:
+      address: "0x865377367054516e17014CcdED1e7d814EDC9ce4"
+      abi: DOLA
+      startBlock: 11915875
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/dola.ts
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      abis:
+        - name: DOLA
+          file: ./abis/DOLA.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+
+  - kind: ethereum/contract
     name: Factory
     network: mainnet
     source:

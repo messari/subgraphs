@@ -6,6 +6,7 @@ import {
   BIGDECIMAL_HUNDRED,
   FACTORY_ADDRESS,
   XINV_ADDRESS,
+  DOLA_ADDRESS,
   MANTISSA_DECIMALS,
   InterestRateSide,
   InterestRateType,
@@ -42,6 +43,7 @@ import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreateMarket,
   getUnderlyingTokenPrice,
+  getOrCreateToken,
 } from "./getters";
 import { decimalsToBigDecimal, BigDecimalTruncateToBigInt } from "./utils";
 
@@ -406,8 +408,8 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address): void {
   let hours = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let accountId: string = user.toHexString();
-  let dailyActiveAccountId: string = 'daily-' + accountId + "-" + days.toString();
-  let hourlyActiveAccountId: string = 'hourly-' + accountId + "-" + "-" + hours.toString();
+  let dailyActiveAccountId: string = "daily-" + accountId + "-" + days.toString();
+  let hourlyActiveAccountId: string = "hourly-" + accountId + "-" + "-" + hours.toString();
 
   // Account entity keeps user addresses
   let isNewUniqueUser = createAndIncrementAccount(accountId);
@@ -617,6 +619,14 @@ export function aggregateAllMarkets(event: ethereum.Event): void {
   let protocol = getOrCreateProtocol();
   if (protocol == null) {
     log.error("LendingProtocol entity is empty {}; something went wrong", [""]);
+  }
+
+  let dolaToken = getOrCreateToken(Address.fromString(DOLA_ADDRESS));
+  // if DOLA is one of protocol.mintedTokens, keep the supply info
+  let indexDOLA = protocol.mintedTokens!.indexOf(dolaToken.id);
+  if (indexDOLA != -1) {
+    mintedTokens = [dolaToken.id].concat(mintedTokens);
+    mintedTokenSupplies = [protocol.mintedTokenSupplies![indexDOLA]].concat(mintedTokenSupplies);
   }
 
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
