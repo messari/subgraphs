@@ -10,6 +10,10 @@ https://thegraph.com/hosted-service/subgraph/0xbe1/moonwell-subgraph
 
 https://thegraph.com/hosted-service/subgraph/0xbe1/bastionprotocol-subgraph
 
+### Benqi
+
+https://thegraph.com/hosted-service/subgraph/0xbe1/benqi-subgraph
+
 ## Quickstart
 
 Use moonwell as an example.

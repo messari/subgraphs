@@ -4,6 +4,7 @@ import { TableChart } from "../../chartComponents/TableChart";
 import { poolDropDown } from "../../utilComponents/PoolDropDown";
 import { PoolName, PoolNames, Versions } from "../../constants";
 import SchemaTable from "../SchemaTable";
+import { convertTokenDecimals } from "../ProtocolDashboard";
 
 function PoolTab(
   data: any,
@@ -15,6 +16,9 @@ function PoolTab(
   setWarning: React.Dispatch<React.SetStateAction<{message: string, type: string}[]>>,
   warning: {message: string, type: string}[]
 ) {
+  try {
+    const poolName = PoolName[data.protocols[0].type];
+    const poolNames = PoolNames[data.protocols[0].type];
 
     const issues: {message: string, type: string}[] = warning;
     const excludedEntities = [
@@ -44,12 +48,30 @@ function PoolTab(
             }
             const currentInstanceField = entityInstance[entityFieldName];
             if (!isNaN(currentInstanceField)) {
+              let value = Number(currentInstanceField);
+              if (entityFieldName === 'inputTokenBalance') {
+                const dec = data[poolName].inputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+              }
+              if (entityFieldName === 'outputTokenSupply') {
+                const dec = data[poolName].outputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+             }
               if (!dataFields[entityFieldName]) {
-                dataFields[entityFieldName] = [{value: Number(currentInstanceField), date: Number(entityInstance.timestamp)}];
-                dataFieldMetrics[entityFieldName] = {sum: Number(currentInstanceField)};
+                dataFields[entityFieldName] = [{value: value, date: Number(entityInstance.timestamp)}];
+                dataFieldMetrics[entityFieldName] = {sum: value};
               } else {
-                dataFields[entityFieldName].push({value: Number(currentInstanceField), date: Number(entityInstance.timestamp)});
-                dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
+                dataFields[entityFieldName].push({value: value, date: Number(entityInstance.timestamp)});
+                dataFieldMetrics[entityFieldName].sum += value;
+              }
+              if (entityFieldName.includes('umulative')) {
+                if (!Object.keys(dataFieldMetrics[entityFieldName]).includes('cumulative')) {
+                  dataFieldMetrics[entityFieldName].cumulative = {prevVal: 0, hasLowered: 0}
+                }
+                if (value < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
+                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(entityInstance.timestamp);
+                }
+                dataFieldMetrics[entityFieldName].cumulative.prevVal = value;
               }
               if (entityFieldName.includes('umulative')) {
                 if (!Object.keys(dataFieldMetrics[entityFieldName]).includes('cumulative')) {
@@ -62,13 +84,47 @@ function PoolTab(
               }
             } else if (Array.isArray(currentInstanceField)) {
               currentInstanceField.forEach((val: string, arrayIndex: number) => {
-                const dataFieldKey = entityFieldName + ' [' + arrayIndex + ']';
+                let fieldSplitIdentifier = arrayIndex.toString();
+                let value: number = 0;
+                if (!isNaN(Number(val))) {
+                  value = Number(val);
+                } else if (typeof(val) === 'object') {
+                  const holdingValueKey = Object.keys(val).find(x => {
+                    return !isNaN(Number(val[x]));
+                  });
+                  if (holdingValueKey) {
+                    value = Number(val[holdingValueKey]);
+                  }
+                  if (val['type']) {
+                    fieldSplitIdentifier = val['type'];
+                  } else {
+                    const holdingValueStr = Object.keys(val).find(x => {
+                      return typeof(val[x]) === "string" && isNaN(Number(val[x]));
+                    });
+                    if (holdingValueStr) {
+                      fieldSplitIdentifier = holdingValueStr;
+                    }
+                  }
+                }
+                const dataFieldKey = entityFieldName + ' [' + fieldSplitIdentifier + ']';
+                if (entityFieldName === 'inputTokenBalances') {
+                  value = convertTokenDecimals(val, data[poolName].inputTokens[arrayIndex].decimals);
+                }
                 if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [{value: Number(val), date: Number(entityInstance.timestamp)}];
-                  dataFieldMetrics[dataFieldKey] = {sum: Number(val)};
+                  dataFields[dataFieldKey] = [{value: value, date: Number(entityInstance.timestamp)}];
+                  dataFieldMetrics[dataFieldKey] = {sum: value};
                 } else {
-                  dataFields[dataFieldKey].push({value: Number(val), date: Number(entityInstance.timestamp)});
-                  dataFieldMetrics[dataFieldKey].sum += Number(val);
+                  dataFields[dataFieldKey].push({value: value, date: Number(entityInstance.timestamp)});
+                  dataFieldMetrics[dataFieldKey].sum += value;
+                }
+                if (dataFieldKey.includes('umulative')) {
+                  if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
+                    dataFieldMetrics[dataFieldKey].cumulative = {prevVal: 0, hasLowered: 0}
+                  }
+                  if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
+                  }
+                  dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
                 }
                 if (dataFieldKey.includes('umulative')) {
                   if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
@@ -83,12 +139,11 @@ function PoolTab(
             }
           });
         };
-
-        return ( 
+       return ( 
         <Grid key={entityName} style={{borderTop: "black 2px solid"}} container>
           <h2>ENTITY: {entityName} - {poolId}</h2>{          
           Object.keys(dataFields).map((field: string) => {
-            const fieldName = field.split(' [')[0]
+            const fieldName = field.split(' [')[0];
             const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
             if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
               return null;
@@ -113,28 +168,33 @@ function PoolTab(
         }</Grid>)
       })
       
-      const poolName = PoolName[data.protocols[0].type];
-      const poolNames = PoolNames[data.protocols[0].type];
-      
       const poolLevelTVL = parseFloat(data[poolName]?.totalValueLockedUSD)
       if (issues.filter(x => x.message === poolName && x.type === "TVL-").length === 0 && poolLevelTVL < 1000) {
         issues.push({type: "TVL-", message: poolName});
       } else if (issues.filter(x => x.message === poolName && x.type === "TVL+").length === 0 && poolLevelTVL > 1000000000000) {
         issues.push({type: "TVL+", message: poolName});
       }
-  
       if (issues.length > 0) {
         setWarning(issues);
       }
       
       const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
-
     return (
       <div>
-        {poolSchema}
         {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
-      {poolEntityElements}
-    </div>)
+        {poolSchema}
+        {poolEntityElements}
+      </div>);
+
+    } catch(err) {
+      if (err instanceof Error) {
+        console.log('CATCH,', Object.keys(err), Object.values(err), err)
+          return <h3>JAVASCRIPT ERROR {err.message}</h3>
+    
+        } else {
+          return <h3>JAVASCRIPT ERROR</h3>
+        }
+      }
 }
 
 export default PoolTab;
