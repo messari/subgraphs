@@ -1,7 +1,8 @@
 import { Grid } from "@mui/material";
-import { Chart } from "../../chartComponents/Chart";
-import { TableChart } from "../../chartComponents/TableChart";
+import { Chart } from "../../common/chartComponents/Chart";
+import { TableChart } from "../../common/chartComponents/TableChart";
 import { ProtocolTypeEntity } from "../../constants";
+import { convertTokenDecimals } from "../../utils";
 import SchemaTable from "../SchemaTable";
 
 function ProtocolTab(
@@ -14,8 +15,9 @@ function ProtocolTab(
 ) {
 
   try {
-    const issues: { message: string, type: string }[] = warning;
+    const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
 
+    const issues: { message: string, type: string }[] = warning;
     const excludedEntities = [
       "liquidityPoolHourlySnapshots",
       "liquidityPoolDailySnapshots",
@@ -49,7 +51,7 @@ function ProtocolTab(
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
           const currentInstanceField = entityInstance[entityFieldName];
-          if (!isNaN(currentInstanceField)) {
+          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
             // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
             // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
             if (!dataFields[entityFieldName]) {
@@ -71,32 +73,45 @@ function ProtocolTab(
           } else if (Array.isArray(currentInstanceField)) {
             // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
             // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
-            currentInstanceField.forEach((val: string, arrayIndex: number) => {
+            // currentInstanceField.forEach((val: string, arrayIndex: number) => {
+            for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
+              const val = currentInstanceField[arrayIndex];
               const dataFieldKey = entityFieldName + ' [' + arrayIndex + ']';
+              let value = Number(val);
+              try {
+                if (entityFieldName === 'mintedTokenSupplies' && data[protocolEntityName][0]?.lendingType === "CDP") {
+                  if (data[protocolEntityName][0]?.mintedTokens.length > 0) {
+                    value = convertTokenDecimals(val, data[protocolEntityName][0].mintedTokens[arrayIndex]?.decimals);
+                  }
+                } else if (entityFieldName === 'mintedTokenSupplies' && data[protocolEntityName][0]?.lendingType !== "CDP") {
+                  continue;
+                }
+              } catch (err) {
+                console.log('ERR - COULD NOT GET MINTED TOKEN DECIMALS', err)
+              }
               if (!dataFields[dataFieldKey]) {
-                dataFields[dataFieldKey] = [{ value: Number(val), date: Number(entityInstance.timestamp) }];
-                dataFieldMetrics[dataFieldKey] = { sum: Number(val) };
+                dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
+                dataFieldMetrics[dataFieldKey] = { sum: value };
               } else {
-                dataFields[dataFieldKey].push({ value: Number(val), date: Number(entityInstance.timestamp) });
-                dataFieldMetrics[dataFieldKey].sum += Number(val);
+                dataFields[dataFieldKey].push({ value: value, date: Number(entityInstance.timestamp) });
+                dataFieldMetrics[dataFieldKey].sum += value;
               }
               if (dataFieldKey.includes('umulative')) {
                 if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes('cumulative')) {
                   dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: 0 }
                 }
-                if (Number(val) < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
                   dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
                 }
-                dataFieldMetrics[dataFieldKey].cumulative.prevVal = Number(val);
+                dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
               }
-            });
+            };
           }
         });
       };
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
-      console.log(dataFields)
       return (<>
         <h2 style={{ borderTop: "black 2px solid", width: "100%" }}>ENTITY: {entityName}</h2>
         <Grid key={entityName} container>{
@@ -105,7 +120,7 @@ function ProtocolTab(
             const fieldName = field.split(' [')[0];
             const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
             if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
-              return null;
+              // return null;
             }
             const label = entityName + '-' + field;
             if (issues.filter(x => x.message === label && x.type === "SUM").length === 0 && dataFieldMetrics[field].sum === 0) {

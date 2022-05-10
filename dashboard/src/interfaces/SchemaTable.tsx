@@ -1,9 +1,17 @@
 import { Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
-import { convertTokenDecimals } from "./ProtocolDashboard";
+import { convertTokenDecimals } from "../utils";
 
-function checkValueFalsey(value: any, schemaName: string, entityField: string, issues: { message: string, type: string }[]): { message: string, type: string } | undefined {
-    if (value === null || value === '0' || value === '') {
-        const message = schemaName + "-" + entityField + " is " + value + ". Verify that this value is correct";
+function checkValueFalsey(value: any, schemaName: string, entityField: string, fieldDataType: string, issues: { message: string, type: string }[]): { message: string, type: string } | undefined {
+    const fieldDataTypeChars = fieldDataType.split("");
+    if (fieldDataTypeChars[fieldDataTypeChars.length - 1] !== "!") {
+        return undefined;
+    }
+    if (value === null || value === '0' || value?.length === 0 || value === '') {
+        let valueMsg = value;
+        if (valueMsg === '' || valueMsg?.length === 0) {
+            valueMsg = 'empty'
+        }
+        const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this value is correct";
         if (issues.filter(x => x.message === message).length === 0) {
             return ({ message, type: "VAL" });
         } else {
@@ -28,12 +36,11 @@ function SchemaTable(
     let schema = [];
     try {
         schema = Object.keys(entityData).map((entityField: string) => {
-            console.log('ENTITY FIELD', entityField)
             if (entityField === '__typename') {
                 return null;
             }
             let value = entityData[entityField];
-            const issueReturned = checkValueFalsey(value, schemaName, entityField, issues);
+            const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
             if (issueReturned) {
                 issues.push(issueReturned);
             }
@@ -49,7 +56,7 @@ function SchemaTable(
             }
             if (entityField === "outputTokenSupply") {
                 value = convertTokenDecimals(value, entityData.outputToken.decimals).toString();
-                const issueReturned = checkValueFalsey(value, schemaName, entityField, issues);
+                const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
                 if (issueReturned) {
                     issues.push(issueReturned);
                 }
@@ -57,7 +64,7 @@ function SchemaTable(
             if (entityField === 'inputTokenBalances') {
                 // if array 
                 const decimalMapped = entityData[entityField].map((val: string, idx: number) => {
-                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', issues);
+                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', dataFields[entityField], issues);
                     if (issueReturned) {
                         issues.push(issueReturned);
                     }
@@ -66,17 +73,31 @@ function SchemaTable(
                 value = '[ ' + decimalMapped.join(", ") + " ]"
             } else if (entityField === 'inputTokenBalance') {
                 value = convertTokenDecimals(value, entityData.inputToken.decimals);
-                const issueReturned = checkValueFalsey(value, schemaName, entityField, issues);
+                const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
                 if (issueReturned) {
                     issues.push(issueReturned);
                 }
+            } else if (entityField === 'mintedTokenSupplies') {
+                const decimalMapped = entityData[entityField].map((val: string, idx: number) => {
+                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', dataFields[entityField], issues);
+                    const issueReturnedToken = checkValueFalsey(entityData.mintedTokens[idx]?.decimals, schemaName, "MintedTokens [" + idx + "]", dataFields[entityField], issues);
+                    if (issueReturned) {
+                        issues.push(issueReturned);
+                    }
+                    if (issueReturnedToken || !entityData.mintedTokens || entityData.mintedTokens.length === 0) {
+                        const message = "MintedTokenSupplies could not properly convert decimals, invalid decimals property on MintedTokens [" + idx + "].";
+                        if (issues.filter((x) => x.message === message).length === 0) {
+                            issues.push({ message, type: "VAL" });
+                        }
+                        return val;
+                    }
+                    return convertTokenDecimals(val, entityData.mintedTokens[idx].decimals).toString();
+                });
+                value = '[ ' + decimalMapped.join(", ") + " ]"
             } else if (typeof (value) === 'object' || Array.isArray(value)) {
-                console.log(entityField, entityData[entityField], 2)
                 value = JSON.stringify(value);
                 value = value.split(", ").join(",").split(',').join(', ');
             }
-
-            console.log(entityField, entityData[entityField], typeof (entityData[entityField]), value)
             return (
                 <TableRow key={entityField}>
                     <TableCell component="th" scope="row" style={{ minWidth: "30vw" }}>

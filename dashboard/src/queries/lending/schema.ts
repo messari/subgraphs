@@ -166,11 +166,7 @@ export const schema100 = (): Schema => {
         }
       }
     `;
-<<<<<<< HEAD
   const poolData: { [x: string]: string } = {
-=======
-  const poolData: {[x: string]: string} = {
->>>>>>> 0fbf99267f2544e500daea4eccd42b9dc227bb38
     id: "ID!",
     inputTokens: "[Token!]!",
     outputToken: "Token",
@@ -233,11 +229,7 @@ export const schema110 = (): Schema => {
     }
   };
 
-<<<<<<< HEAD
   const poolData: { [x: string]: string } = {
-=======
-  const poolData: {[x: string]: string} = {
->>>>>>> 0fbf99267f2544e500daea4eccd42b9dc227bb38
     id: "ID!",
     name: "String",
     inputTokens: "[Token!]!",
@@ -303,11 +295,7 @@ export const schema110 = (): Schema => {
           activeUsers
           timestamp
         }
-<<<<<<< HEAD
         marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
-=======
-        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, market: $poolId) {
->>>>>>> 0fbf99267f2544e500daea4eccd42b9dc227bb38
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -499,7 +487,6 @@ export const schema120 = (): Schema => {
 
   const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
   const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
-<<<<<<< HEAD
   adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}";
   adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}";
 
@@ -508,16 +495,6 @@ export const schema120 = (): Schema => {
   const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
   const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
 
-=======
-  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}"; 
-  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}"; 
-
-
-  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
-
->>>>>>> 0fbf99267f2544e500daea4eccd42b9dc227bb38
   const marketDailyQuery = "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketDailyFields.join(',') + '}';
   const marketHourlyQuery = "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketHourlyFields.join(',') + '}';
 
@@ -597,10 +574,7 @@ export const schema120 = (): Schema => {
       riskType
       mintedTokens {
         id
-<<<<<<< HEAD
         decimals
-=======
->>>>>>> 0fbf99267f2544e500daea4eccd42b9dc227bb38
       }
       cumulativeUniqueUsers
       totalValueLockedUSD
