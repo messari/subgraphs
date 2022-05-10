@@ -21,11 +21,11 @@
     "uniswap-v2": {
       "mainnet": {
         "template": "uniswap.v2.template.yaml",
-        "steegecs": "uniswap-v2",
+        "steegecs": "steegecs/uniswap-v2",
         "messari": "messari/uniswap-v2-ethereum"
       }
     },
-    "sushiwap": {
+    "sushiswap": {
       "arbitrum": {
         "template": "sushiswap.alt.template.yaml",
         "steegecs": "steegecs/sushiswap-arbitrum",

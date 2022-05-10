@@ -1,4 +1,4 @@
-import * as protocolNetworkData from './deploymentLocations.json' assert {type: "json"}
+import * as protocolNetworkData from './deploymentConfigurations.json' assert {type: "json"}
 import { exec } from 'child_process';
 
 const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 
@@ -17,7 +17,7 @@ if (process.argv.length == 2) {
                 let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
                 console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
-                exec("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location,
+                exec("npm run deployment --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template + " --LOCATION=" + location,
                     function (error, stdout, stderr) {
                     console.log('stdout: ' + stdout);
                     console.log('stderr: ' + stderr);
@@ -42,7 +42,7 @@ if (process.argv.length == 2) {
             let location = protocolNetworkMap[protocol][network][process.argv[3]]
 
             console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
-            exec("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location,
+            exec("npm run deployment --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template + " --LOCATION=" + location,
                 function (error, stdout, stderr) {
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);
@@ -69,8 +69,7 @@ if (process.argv.length == 2) {
         let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
         console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
-        console.log("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location)
-        exec("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location,
+        exec("npm run deployment --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template + " --LOCATION=" + location,
             function (error, stdout, stderr) {
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);

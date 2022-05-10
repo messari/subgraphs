@@ -1,16 +1,16 @@
 export namespace Deploy {
-    export const APESWAP_BSC = "APESWAP_BSC";
-    export const APESWAP_MATIC = "APESWAP_MATIC";
-    export const SUSHISWAP_ARBITRUM = "SUSHISWAP_ARBITRUM";
-    export const SUSHISWAP_AVALANCHE = "SUSHISWAP_AVALANCHE";
-    export const SUSHISWAP_BSC = "SUSHISWAP_BSC";
-    export const SUSHISWAP_CELO = "SUSHISWAP_CELO";
-    export const SUSHISWAP_FANTOM = "SUSHISWAP_FANTOM";
-    export const SUSHISWAP_FUSE = "SUSHISWAP_FUSE";
-    export const SUSHISWAP_MAINNET = "SUSHISWAP_MAINNET";
-    export const SUSHISWAP_MATIC = "SUSHISWAP_MATIC";
-    export const SUSHISWAP_MOONBEAM = "SUSHISWAP_MOONBEAM";
-    export const SUSHISWAP_MOONRIVER = "SUSHISWAP_MOONRIVER";
-    export const SUSHISWAP_XDAI = "SUSHISWAP_XDAI";
-    export const UNISWAP_V2_MAINNET = "UNISWAP_V2_MAINNET";
+    export const APESWAP_BSC = 0;
+    export const APESWAP_MATIC = 1;
+    export const SUSHISWAP_ARBITRUM = 2;
+    export const SUSHISWAP_AVALANCHE = 3;
+    export const SUSHISWAP_BSC = 4;
+    export const SUSHISWAP_CELO = 5;
+    export const SUSHISWAP_FANTOM = 6;
+    export const SUSHISWAP_FUSE = 7;
+    export const SUSHISWAP_MAINNET = 8;
+    export const SUSHISWAP_MATIC = 9;
+    export const SUSHISWAP_MOONBEAM = 10;
+    export const SUSHISWAP_MOONRIVER = 11;
+    export const SUSHISWAP_XDAI = 12;
+    export const UNISWAP_V2_MAINNET = 13;
   }

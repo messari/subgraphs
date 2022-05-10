@@ -1,6 +1,5 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { BigDecimal } from "@graphprotocol/graph-ts";
 import { Factory } from "../../generated/Factory/Factory";
-import { BIGDECIMAL_ZERO } from "../../src/common/constants";
 export interface Configurations {
   getNetwork(): string;
   getProtocolName(): string;

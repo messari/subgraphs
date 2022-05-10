@@ -8,8 +8,8 @@
     "codegen": "graph codegen",
     "build": "graph build",
 
-    "config": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json templates/${npm_config_protocol}/${npm_config_protocol}.v2.template.yaml > subgraph.yaml",
-    "deploy": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/${npm_config_protocol}/uniswap.v2.template.yaml > subgraph.yaml && yarn codegen && yarn build && yarn deploy --product hosted-service ${npm_config_location}/${npm_config_protocol}-${npm_config_network}",
+    "config": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/${npm_config_protocol}/uniswap.v2.template.yaml > subgraph.yaml",
+    "deployment": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/${npm_config_protocol}/${npm_config_template} > subgraph.yaml && yarn codegen && yarn build && graph deploy --product hosted-service ${npm_config_location}",
 
     "foo": "node --experimental-json-modules deployment/deployment.js"
 
