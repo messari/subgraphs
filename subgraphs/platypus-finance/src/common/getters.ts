@@ -161,7 +161,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
 
     poolDailyMetrics.save();
   } else {
-    if (pool.inputTokens.length > poolDailyMetrics.dailyVolumeByTokenUSD.length){
+    if (pool.inputTokens.length > poolDailyMetrics.dailyVolumeByTokenUSD.length) {
       let dailyVolumeByTokenUSD: BigDecimal[] = poolDailyMetrics.dailyVolumeByTokenUSD;
       let dailyVolumeByTokenAmount: BigInt[] = poolDailyMetrics.dailyVolumeByTokenAmount;
       for (let i = poolDailyMetrics.dailyVolumeByTokenUSD.length; i < pool.inputTokens.length; i++) {
@@ -170,7 +170,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
       }
       poolDailyMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
       poolDailyMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
-      poolDailyMetrics.save();  
+      poolDailyMetrics.save();
     }
   }
 
@@ -206,8 +206,8 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolHourlyMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
 
     poolHourlyMetrics.save();
-  } else { 
-    if (pool.inputTokens.length > poolHourlyMetrics.hourlyVolumeByTokenUSD.length){
+  } else {
+    if (pool.inputTokens.length > poolHourlyMetrics.hourlyVolumeByTokenUSD.length) {
       let hourlyVolumeByTokenUSD: BigDecimal[] = poolHourlyMetrics.hourlyVolumeByTokenUSD;
       let hourlyVolumeByTokenAmount: BigInt[] = poolHourlyMetrics.hourlyVolumeByTokenAmount;
       for (let i = poolHourlyMetrics.hourlyVolumeByTokenUSD.length; i < pool.inputTokens.length; i++) {
@@ -216,7 +216,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
       }
       poolHourlyMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
       poolHourlyMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
-      poolHourlyMetrics.save();  
+      poolHourlyMetrics.save();
     }
   }
 
@@ -252,7 +252,8 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol = new DexAmmProtocol(PROTOCOL_ADMIN);
     protocol.name = "Platypus Finance";
     protocol.slug = "platypus-finance";
-    protocol.schemaVersion = "1.2.0";
+    protocol.methodologyVersion = "1.0.0";
+    protocol.schemaVersion = "1.2.1";
     protocol.subgraphVersion = "1.0.0";
     protocol.network = Network.AVALANCHE;
     protocol.type = ProtocolType.EXCHANGE;
