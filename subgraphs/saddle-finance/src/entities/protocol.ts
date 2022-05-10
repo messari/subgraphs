@@ -13,6 +13,7 @@ import {
   ActiveAccount,
 } from "../../generated/schema";
 import {
+  DEPLOYER_ADDRESS,
   ProtocolType,
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
@@ -21,14 +22,12 @@ import {
   PROTOCOL_SUBGRAPH_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  ZERO_ADDRESS,
 } from "../utils/constants";
 
 export function getOrCreateProtocol(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(ZERO_ADDRESS);
+  let protocol = DexAmmProtocol.load(DEPLOYER_ADDRESS);
   if (!protocol) {
-    // Zero address because no registry
-    protocol = new DexAmmProtocol(ZERO_ADDRESS);
+    protocol = new DexAmmProtocol(DEPLOYER_ADDRESS);
     protocol.name = PROTOCOL_NAME;
     protocol.slug = PROTOCOL_SLUG;
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;

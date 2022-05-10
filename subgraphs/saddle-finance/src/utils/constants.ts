@@ -162,6 +162,7 @@ export const ETH_NAME = "Ether";
 ///// Protocol Specific /////
 /////////////////////////////
 
+export const DEPLOYER_ADDRESS = "0x5bdb37d0ddea3a90f233c7b7f6b9394b6b2eef34";
 export const FEE_PRECISION = 10 as i32;
 
 export const BROKEN_POOLS = new Set<string>();

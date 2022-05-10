@@ -63,6 +63,10 @@ To be added
 
 Note: All pegged value asset prices are set to underlying asset price
 
+## Smart Contract Interactions
+
+![Saddle](../../docs/images/protocols/saddle.png "Saddle Finance")
+
 ## References and Useful Links
 
 - Protocol website: https://saddle.finance/
