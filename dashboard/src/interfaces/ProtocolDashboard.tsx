@@ -1,6 +1,6 @@
 import "./ProtocolDashboard.css";
-import { Button, CircularProgress, Tab, Tabs, Typography } from "@mui/material";
-import TabPanel from "@mui/lab/TabPanel";
+import { Button, CircularProgress, Grid, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, TextField, Typography } from "@mui/material";
+import TabPanel from '@mui/lab/TabPanel';
 import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 import { Box } from "@mui/system";
 
@@ -45,7 +45,7 @@ function ProtocolDashboard() {
     () =>
       new ApolloClient({
         link,
-        cache: new InMemoryCache(),
+        cache: new InMemoryCache()
       }),
     [subgraphToQuery.url],
   );
@@ -118,14 +118,9 @@ function ProtocolDashboard() {
     useMemo(() => {
       if (data) {
         // Data is the entity of the data in the subgraph. It is returned as an object with each entity as a key, and each value is an array with every instance of that entity
-        const issues: { message: string; type: string }[] = warning;
+        console.log('DATA', data)
+        const issues: { message: string, type: string }[] = warning;
         const poolNames = PoolNames[data.protocols[0].type];
-        const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
-        console.log("DATA", data, data[protocolEntityName][0]?.lendingType);
-        if (data[protocolEntityName][0]?.lendingType === "CDP") {
-          protocolFields.mintedTokens += '!';
-          protocolFields.mintedTokenSupplies += '!';
-        }
 
         return (
           <>
@@ -142,6 +137,8 @@ function ProtocolDashboard() {
                   {/* PROTOCOL TAB */}
 
                   {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning, warning)}
+
+                  {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning, warning)}
                 </TabPanel>
                 <TabPanel value="2">
                   {/* POOL TAB */}
@@ -152,23 +149,25 @@ function ProtocolDashboard() {
                   {/* EVENTS TAB */}
 
                   {setWarning(issues)}
-                  {poolDropDown(poolId, setPoolId, setWarning, data[poolNames])}
-                  {events.map((eventName) => {
-                    console.log(data[eventName], eventName, data[eventName].length);
-                    if (!poolId && data[eventName].length > 0) {
-                      const message = 'No pool selected, there should not be "' + eventName + '" events';
-                      if (issues.filter((x) => x.message === message).length === 0) {
-                        issues.push({ message, type: "NOEV" });
+                  {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
+                  {
+                    events.map((eventName) => {
+                      console.log(data[eventName], eventName, data[eventName].length)
+                      if (!poolId && data[eventName].length > 0) {
+                        const message = 'No pool selected, there should not be "' + eventName + '" events';
+                        if (issues.filter(x => x.message === message).length === 0) {
+                          issues.push({ message, type: "NOEV" });
+                        }
                       }
-                    }
-                    if (poolId && data[eventName].length === 0) {
-                      const message = "No " + eventName + " on pool " + poolId;
-                      if (issues.filter((x) => x.message === message).length === 0) {
-                        issues.push({ message, type: "EVENT" });
+                      if (poolId && data[eventName].length === 0) {
+                        const message = "No " + eventName + " on pool " + poolId;
+                        if (issues.filter(x => x.message === message).length === 0) {
+                          issues.push({ message, type: "EVENT" });
+                        }
                       }
-                    }
-                    return <React.Fragment>{TableEvents(eventName, data, eventName)}</React.Fragment>;
-                  })}
+                      return <React.Fragment>{TableEvents(eventName, data[eventName])}</React.Fragment>;
+                    })
+                  }
                 </TabPanel>
               </TabContext>
             </Typography>
@@ -196,12 +195,8 @@ function ProtocolDashboard() {
   if (protocolSchemaData?.protocols.length > 0) {
     protocolInfo = (
       <div style={{ padding: "6px 24px" }}>
-        <h3>
-          {protocolSchemaData.protocols[0].name} - {protocolSchemaData.protocols[0].id}
-        </h3>
-        <p>
-          <a href={subgraphToQuery.url}>Subgraph Query Endpoint - {subgraphToQuery.url}</a>
-        </p>
+        <h3>{protocolSchemaData.protocols[0].name} - {protocolSchemaData.protocols[0].id}</h3>
+        <p><a href={subgraphToQuery.url}>Subgraph Query Endpoint - {subgraphToQuery.url}</a></p>
         <p>Type - {protocolSchemaData.protocols[0].type}</p>
         <p>Schema Version - {schemaVersion}</p>
         <p>Subgraph Version - {protocolSchemaData?.protocols[0]?.subgraphVersion}</p>
@@ -214,14 +209,14 @@ function ProtocolDashboard() {
 
   return (
     <div className="ProtocolDashboard">
-      <Button
-        style={{ margin: "24px" }}
-        onClick={(name) => {
-          navigate(`/`);
-        }}
-      >
-        RETURN TO DEPLOYMENTS
-      </Button>
+      <Button style={{ margin: "24px" }} onClick={() => {
+        client.resetStore();
+        setTabValue("1");
+        setPoolId("");
+        setWarning([]);
+        setSubgraphToQuery({ url: "", version: "" });
+        selectSubgraph("");
+      }}>RETURN TO DEPLOYMENTS</Button>
       {protocolInfo}
       {errorRender}
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
@@ -230,6 +225,15 @@ function ProtocolDashboard() {
       {AllData()}
     </div>
   );
+}
+
+
+export function convertTokenDecimals(value: string, decimals: number): number {
+  if (isNaN(Number(value))) {
+    return 0;
+  }
+  const divisor = 10 ** decimals;
+  return (Number(value) / divisor)
 }
 
 export default ProtocolDashboard;

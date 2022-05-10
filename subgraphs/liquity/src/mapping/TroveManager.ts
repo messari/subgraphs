@@ -1,5 +1,4 @@
 import {
-  Liquidation,
   Redemption,
   TroveLiquidated,
   TroveUpdated,
@@ -14,13 +13,18 @@ import {
 import { getOrCreateTrove } from "../entities/trove";
 import { getCurrentETHPrice } from "../entities/token";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { BIGINT_ZERO } from "../utils/constants";
+import {
+  BIGDECIMAL_ONE,
+  BIGINT_ZERO,
+  LIQUIDATION_FEE,
+  LIQUIDATION_RESERVE_LUSD,
+} from "../utils/constants";
 import { _Trove } from "../../generated/schema";
 import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
-  incrementProtocolLiquidateCount,
 } from "../entities/protocol";
+import { log } from "@graphprotocol/graph-ts";
 
 enum TroveManagerOperation {
   applyPendingRewards,
@@ -35,37 +39,6 @@ export function handleRedemption(event: Redemption): void {
     getCurrentETHPrice()
   );
   addProtocolSideRevenue(event, feeAmountUSD);
-}
-
-/**
- * Emitted at end of batch liquidation flow, containing aggregate data from all liquidations
- *
- * @param event Liquidation event
- */
-export function handleLiquidation(event: Liquidation): void {
-  // Total amount of ETH from all (n) troves liquidated in current transaction
-  const amountLiquidatedETH = event.params._liquidatedColl;
-  const amountLiquidatedUSD = bigIntToBigDecimal(amountLiquidatedETH).times(
-    getCurrentETHPrice()
-  );
-  const profitUSD = bigIntToBigDecimal(event.params._collGasCompensation)
-    .times(getCurrentETHPrice())
-    .plus(bigIntToBigDecimal(event.params._LUSDGasCompensation));
-  createLiquidate(
-    event,
-    amountLiquidatedETH,
-    amountLiquidatedUSD,
-    profitUSD,
-    event.transaction.from
-  );
-  const liquidatedDebtUSD = bigIntToBigDecimal(event.params._liquidatedDebt);
-  const supplySideRevenueUSD = bigIntToBigDecimal(
-    amountLiquidatedETH.minus(event.params._collGasCompensation)
-  )
-    .times(getCurrentETHPrice())
-    .minus(liquidatedDebtUSD);
-  addSupplySideRevenue(event, supplySideRevenueUSD);
-  addProtocolSideRevenue(event, profitUSD);
 }
 
 /**
@@ -85,7 +58,7 @@ export function handleTroveUpdated(event: TroveUpdated): void {
       break;
     case TroveManagerOperation.liquidateInNormalMode:
     case TroveManagerOperation.liquidateInRecoveryMode:
-      incrementProtocolLiquidateCount(event);
+      liquidateTrove(event, trove);
       break;
   }
   trove.collateral = event.params._coll;
@@ -95,7 +68,7 @@ export function handleTroveUpdated(event: TroveUpdated): void {
 
 /**
  * Emitted for each trove liquidated during batch liquidation flow, right before TroveUpdated event
- * Used to check for applied rewards, since no event is emitted for this during liquidation
+ * Used to check for and apply pending rewards, since no event is emitted for this during liquidation
  *
  * @param event TroveLiquidated event
  */
@@ -103,10 +76,29 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
   const trove = getOrCreateTrove(event.params._borrower);
 
   const borrower = event.params._borrower;
-  const newCollateral = event.params._coll;
+  let newCollateral = event.params._coll;
   const newDebt = event.params._debt;
+  if (trove.debt.gt(newDebt)) {
+    log.critical(
+      "Tracked trove debt was less than actual debt in TroveLiquidated, actual: {}, tracked: {}",
+      [trove.debt.toString(), newDebt.toString()]
+    );
+  }
+  // Gas compensation already subtracted, only when (MCR <= ICR < TCR & SP.LUSD >= trove.debt)
+  if (trove.collateral.gt(newCollateral)) {
+    // Add gas compensation back to liquidated collateral amount
+    trove.collateral = trove.collateral
+      .divDecimal(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
+      .truncate(0).digits;
+  }
   // Apply pending rewards if necessary
-  const collateralRewardETH = newCollateral.minus(trove.collateral);
+  let collateralRewardETH = newCollateral.minus(trove.collateral);
+  if (trove.collateralSurplusChange.gt(BIGINT_ZERO)) {
+    collateralRewardETH = collateralRewardETH.plus(
+      trove.collateralSurplusChange
+    );
+    trove.collateralSurplusChange = BIGINT_ZERO;
+  }
   if (collateralRewardETH.gt(BIGINT_ZERO)) {
     const collateralRewardUSD = bigIntToBigDecimal(collateralRewardETH).times(
       getCurrentETHPrice()
@@ -118,6 +110,9 @@ export function handleTroveLiquidated(event: TroveLiquidated): void {
     const borrowAmountUSD = bigIntToBigDecimal(borrowAmountLUSD);
     createBorrow(event, borrowAmountLUSD, borrowAmountUSD, borrower);
   }
+  trove.collateral = newCollateral;
+  trove.debt = newDebt;
+  trove.save();
 }
 
 // Treat applyPendingRewards as deposit + borrow
@@ -160,4 +155,27 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
     withdrawAmountUSD,
     event.transaction.from
   );
+}
+
+function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
+  const amountLiquidatedETH = trove.collateral;
+  const amountLiquidatedUSD = bigIntToBigDecimal(amountLiquidatedETH).times(
+    getCurrentETHPrice()
+  );
+  const profitUSD = amountLiquidatedUSD
+    .times(LIQUIDATION_FEE)
+    .plus(LIQUIDATION_RESERVE_LUSD);
+  createLiquidate(
+    event,
+    amountLiquidatedETH,
+    amountLiquidatedUSD,
+    profitUSD,
+    event.transaction.from
+  );
+  const liquidatedDebtUSD = bigIntToBigDecimal(trove.debt);
+  const supplySideRevenueUSD = amountLiquidatedUSD
+    .times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
+    .minus(liquidatedDebtUSD);
+  addSupplySideRevenue(event, supplySideRevenueUSD);
+  addProtocolSideRevenue(event, profitUSD);
 }
