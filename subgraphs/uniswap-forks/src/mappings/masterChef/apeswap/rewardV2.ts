@@ -1,4 +1,4 @@
-import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2 } from "../../../generated/MasterChefV2/MasterChefV2Apeswap";
+import { Deposit as DepositEventV2, Withdraw as WithdrawEventV2, EmergencyWithdraw as EmergencyWithdrawV2 } from "../../../../generated/MasterChefV2/MasterChefV2Apeswap";
 import { _HelperStore } from "../../../../generated/schema";
 import { UsageType } from "../../../common/constants";
 import { handleRewardV2 } from "../../../common/masterChef/apeswap/handleRewardV2";

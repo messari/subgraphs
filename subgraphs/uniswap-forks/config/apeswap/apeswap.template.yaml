@@ -52,7 +52,7 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./src/mappings/masterChef/apeswap/handleReward.ts
+      file: ./src/mappings/masterChef/apeswap/reward.ts
 
   - kind: ethereum
     name: MasterChefV2
@@ -82,7 +82,7 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/masterChef/apeswap/handleRewardV2.ts
+      file: ./src/mappings/masterChef/apeswap/rewardV2.ts
  
 templates:
   - kind: ethereum/contract

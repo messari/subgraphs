@@ -8,7 +8,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
 
-    "prepare:apeswap-bsc": "mustache config/apeswap/bsc.json templates/apeswap/apeswap.template.yaml > subgraph.yaml",
+    "prepare:apeswap-bsc": "mustache config/apeswap/bsc/bsc.json config/apeswap/apeswap.template.yaml > subgraph.yaml",
     "prepare:apeswap-matic": "mustache config/apeswap/matic.json templates/apeswap/apeswap.template.yaml > subgraph.yaml",
     "prepare:sushiswap-arbitrum": "mustache config/sushiswap/arbitrum.json templates/sushiswap/sushsiswap.alt.template.yaml > subgraph.yaml",
     "prepare:sushiswap-avalanche": "mustache config/sushiswap/avalanche.json templates/uniswap.v2/uniswap.v2.template.yaml > subgraph.yaml",
