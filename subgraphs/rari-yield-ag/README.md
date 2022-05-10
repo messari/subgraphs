@@ -12,7 +12,7 @@ Sum across all Vaults:
 
 Sum across all Vaults:
 
-`Total Yield`
+`Total Interest Accrued`
 
 Note: This currently excludes Liquidations
 
@@ -22,7 +22,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Vault Revenue * Annualized Vault Performance Fee) + (Withdraw Amount * Vault Withdraw Fee)`
+`(Total Vault Revenue USD * Vault Performance Fee) + (Withdraw Amount * Withdraw Fee)`
 
 Note that different fees are applied:
 
@@ -36,7 +36,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Vault Revenue * (1-Vault annualized Performance Fee)) - (Withdraw Amount * Vault Withdraw Fee)`
+`(Total Vault Revenue USD * (1-Vault Performance Fee))`
 
 Note that this is the remaining yield after protocol fees
 
@@ -72,6 +72,6 @@ Smart contracts:
 - [Ethereum Pool](https://github.com/Rari-Capital/rari-ethereum-pool-contracts)
 - [Stables _ie_ USDC/DAI/USDT/TUSD/BUSD/mUSD Pool](https://github.com/Rari-Capital/rari-stable-pool-contracts)
 
-Deployed addresses: https://docs.rari.capital/contracts/#rari-usdc-pool
+Deployed addresses: https://docs.rari.capital/contracts
 
 Existing subgraphs: `NA`
