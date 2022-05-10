@@ -139,8 +139,8 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
     poolDailyMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(id.toString()));
     poolDailyMetrics.protocol = PROTOCOL_ADMIN;
     poolDailyMetrics.pool = pool.id;
-    poolDailyMetrics.rewardTokenEmissionsAmount = [];
-    poolDailyMetrics.rewardTokenEmissionsUSD = [];
+    poolDailyMetrics.rewardTokenEmissionsAmount = new Array<BigInt>();
+    poolDailyMetrics.rewardTokenEmissionsUSD = new Array<BigDecimal>();
     poolDailyMetrics._inputTokens = pool.inputTokens;
     poolDailyMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolDailyMetrics.blockNumber = event.block.number;
@@ -149,8 +149,8 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
     poolDailyMetrics.blockNumber = event.block.number;
     poolDailyMetrics.timestamp = event.block.timestamp;
 
-    let dailyVolumeByTokenUSD: BigDecimal[] = [];
-    let dailyVolumeByTokenAmount: BigInt[] = [];
+    let dailyVolumeByTokenUSD: BigDecimal[] = new Array<BigDecimal>();
+    let dailyVolumeByTokenAmount: BigInt[] = new Array<BigInt>();
 
     for (let i = 0; i < poolDailyMetrics._inputTokens!.length; i++) {
       dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
@@ -189,15 +189,15 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolHourlyMetrics = new LiquidityPoolHourlySnapshot(poolAddress.concat("-").concat(id.toString()));
     poolHourlyMetrics.protocol = PROTOCOL_ADMIN;
     poolHourlyMetrics.pool = pool.id;
-    poolHourlyMetrics.rewardTokenEmissionsAmount = [];
-    poolHourlyMetrics.rewardTokenEmissionsUSD = [];
+    poolHourlyMetrics.rewardTokenEmissionsAmount = new Array<BigInt>();
+    poolHourlyMetrics.rewardTokenEmissionsUSD = new Array<BigDecimal>();
     poolHourlyMetrics._inputTokens = pool.inputTokens;
     poolHourlyMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolHourlyMetrics.blockNumber = event.block.number;
     poolHourlyMetrics.timestamp = event.block.timestamp;
 
-    let hourlyVolumeByTokenUSD: BigDecimal[] = [];
-    let hourlyVolumeByTokenAmount: BigInt[] = [];
+    let hourlyVolumeByTokenUSD: BigDecimal[] = new Array<BigDecimal>();
+    let hourlyVolumeByTokenAmount: BigInt[] = new Array<BigInt>();
     for (let i = 0; i < pool.inputTokens.length; i++) {
       hourlyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
       hourlyVolumeByTokenAmount.push(BigInt.fromString("0"));
