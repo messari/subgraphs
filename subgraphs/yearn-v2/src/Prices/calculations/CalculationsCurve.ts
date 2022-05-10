@@ -8,7 +8,7 @@ export function getCalculationsCurveContract(
   network: string
 ): CalculationsCurveContract {
   return CalculationsCurveContract.bind(
-      constants.CURVE_CALCULATIONS_ADDRESS_MAP.get(network)!
+    constants.CURVE_CALCULATIONS_ADDRESS_MAP.get(network)!
   );
 }
 
@@ -22,10 +22,12 @@ export function getTokenPriceFromCalculationCurve(
     return new CustomPriceType();
   }
 
-  let tokenPrice: BigDecimal = utils.readValue<BigInt>(
-    calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
-    constants.BIGINT_ZERO
-  ).toBigDecimal();
-  
-  return CustomPriceType.initialize(tokenPrice);
+  let tokenPrice: BigDecimal = utils
+    .readValue<BigInt>(
+      calculationCurveContract.try_getCurvePriceUsdc(tokenAddr),
+      constants.BIGINT_ZERO
+    )
+    .toBigDecimal();
+
+  return CustomPriceType.initialize(tokenPrice, 6);
 }

@@ -6,7 +6,7 @@ import {
   UniswapPair__getReservesResult,
 } from "../../../generated/Registry_v1/UniswapPair";
 
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/Registry_v1/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
@@ -88,22 +88,35 @@ export function getPriceFromRouter(
   let token0Decimals = utils.getTokenDecimals(token0Address);
   let amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
 
-  const uniSwapRouter = UniswapRouterContract.bind(
-    constants.UNISWAP_CONTRACT_ADDRESSES.get(network)!
-  );
+  let routerAddressV1 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
+    network
+  )!.get("routerV1");
+  let routerAddressV2 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
+    network
+  )!.get("routerV2");
 
-  let amountOutArray = uniSwapRouter.try_getAmountsOut(amountIn, path);
+  let amountOutArray: ethereum.CallResult<BigInt[]>;
+  if (routerAddressV1) {
+    const uniswapRouterV1 = UniswapRouterContract.bind(routerAddressV1);
+    amountOutArray = uniswapRouterV1.try_getAmountsOut(amountIn, path);
+    if (amountOutArray.reverted && routerAddressV2) {
+      const uniswapRouterV2 = UniswapRouterContract.bind(routerAddressV2);
+      amountOutArray = uniswapRouterV2.try_getAmountsOut(amountIn, path);
 
-  if (!amountOutArray.reverted) {
+      if (amountOutArray.reverted) {
+        return new CustomPriceType();
+      }
+    }
+
     let amountOut = amountOutArray.value[amountOutArray.value.length - 1];
-    let feeBips = BigInt.fromI32(30); // .3% per swap
+    let feeBips = BigInt.fromI32(30); // .3% per swap fees
 
     let amountOutBigDecimal = amountOut
       .times(constants.BIGINT_TEN_THOUSAND)
       .div(constants.BIGINT_TEN_THOUSAND.minus(feeBips.times(numberOfJumps)))
       .toBigDecimal();
 
-    return CustomPriceType.initialize(amountOutBigDecimal);
+    return CustomPriceType.initialize(amountOutBigDecimal, 6);
   }
 
   return new CustomPriceType();
@@ -140,7 +153,7 @@ export function getLpTokenPriceUsdc(
     .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
     .div(totalSupply.toBigDecimal());
 
-  return CustomPriceType.initialize(pricePerLpTokenUsdc);
+  return CustomPriceType.initialize(pricePerLpTokenUsdc, 6);
 }
 
 export function getLpTokenTotalLiquidityUsdc(
@@ -187,20 +200,19 @@ export function getLpTokenTotalLiquidityUsdc(
     reserve0.notEqual(constants.BIGINT_ZERO) ||
     reserve1.notEqual(constants.BIGINT_ZERO)
   ) {
-    let totalLiquidity = reserve0
-      .div(constants.BIGINT_TEN)
-      .pow(token0Decimals.toI32() as u8)
+    let liquidity0 = reserve0
+      .div(constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8))
       .toBigDecimal()
-      .times(token0Price.usdPrice)
-      .plus(
-        reserve1
-          .div(constants.BIGINT_TEN)
-          .pow(token1Decimals.toI32() as u8)
-          .toBigDecimal()
-          .times(token1Price.usdPrice)
-      );
+      .times(token0Price.usdPrice);
 
-    return CustomPriceType.initialize(totalLiquidity);
+    let liquidity1 = reserve1
+      .div(constants.BIGINT_TEN.pow(token1Decimals.toI32() as u8))
+      .toBigDecimal()
+      .times(token1Price.usdPrice);
+
+    let totalLiquidity = liquidity0.plus(liquidity1);
+
+    return CustomPriceType.initialize(totalLiquidity, 6);
   }
   return new CustomPriceType();
 }

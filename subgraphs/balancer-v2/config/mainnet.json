@@ -1,0 +1,15 @@
+{
+  "startBlock": "12272146",
+  "network": "mainnet",
+  "vault": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+  "feeCollector": "0xce88686553686da562ce7cea497ce749da109f9f",
+  "knownAssets": {
+    "dai": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "usdc": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+    "usdt": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+    "weth": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    "wbtc": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    "wmatic": "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0",
+    "bal": "0xba100000625a3754423978a60c9317c58a424e3D"
+  }
+}

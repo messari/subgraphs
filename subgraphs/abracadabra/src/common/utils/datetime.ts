@@ -12,9 +12,7 @@ export function getMinuteOpenTime(timestamp: BigInt): BigInt {
 }
 
 export function getMinuteCloseTime(timestamp: BigInt): BigInt {
-  return getMinuteOpenTime(timestamp)
-    .plus(minute)
-    .minus(one);
+  return getMinuteOpenTime(timestamp).plus(minute).minus(one);
 }
 
 export function getTenMinuteOpenTime(timestamp: BigInt): BigInt {
@@ -34,9 +32,7 @@ export function getHourOpenTime(timestamp: BigInt): BigInt {
 }
 
 export function getHourCloseTime(timestamp: BigInt): BigInt {
-  return getHourOpenTime(timestamp)
-    .plus(hour)
-    .minus(one);
+  return getHourOpenTime(timestamp).plus(hour).minus(one);
 }
 
 export function getDayOpenTime(timestamp: BigInt): BigInt {
@@ -45,9 +41,7 @@ export function getDayOpenTime(timestamp: BigInt): BigInt {
 }
 
 export function getDayCloseTime(timestamp: BigInt): BigInt {
-  return getDayOpenTime(timestamp)
-    .plus(day)
-    .minus(one);
+  return getDayOpenTime(timestamp).plus(day).minus(one);
 }
 
 // helpers
