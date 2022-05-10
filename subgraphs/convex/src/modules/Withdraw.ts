@@ -1,7 +1,7 @@
 import {
   Token,
   Vault as VaultStore,
-  Deposit as DepositTransaction,
+  Withdraw as WithdrawTransaction,
 } from "../../generated/schema";
 import {
   log,
@@ -21,7 +21,7 @@ import * as constants from "../common/constants";
 import { ERC20 } from "../../generated/Booster/ERC20";
 import { Pool as PoolContract } from "../../generated/Booster/Pool";
 
-export function createDepositTransaction(
+export function createWithdrawTransaction(
   to: Address,
   vaultId: string,
   transaction: ethereum.Transaction,
@@ -29,47 +29,47 @@ export function createDepositTransaction(
   assetId: string,
   amount: BigInt,
   amountUSD: BigDecimal
-): DepositTransaction {
-  let transactionId = "deposit-" + transaction.hash.toHexString();
+): WithdrawTransaction {
+  let withdrawTransactionId = "withdraw-" + transaction.hash.toHexString();
 
-  let depositTransaction = DepositTransaction.load(transactionId);
+  let withdrawTransaction = WithdrawTransaction.load(withdrawTransactionId);
 
-  if (!depositTransaction) {
-    depositTransaction = new DepositTransaction(transactionId);
+  if (!withdrawTransaction) {
+    withdrawTransaction = new WithdrawTransaction(withdrawTransactionId);
 
-    depositTransaction.vault = vaultId;
-    depositTransaction.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
+    withdrawTransaction.vault = vaultId;
+    withdrawTransaction.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
-    depositTransaction.to = to.toHexString();
-    depositTransaction.from = transaction.from.toHexString();
+    withdrawTransaction.to = to.toHexString();
+    withdrawTransaction.from = transaction.from.toHexString();
 
-    depositTransaction.hash = transaction.hash.toHexString();
-    depositTransaction.logIndex = transaction.index.toI32();
+    withdrawTransaction.hash = transaction.hash.toHexString();
+    withdrawTransaction.logIndex = transaction.index.toI32();
 
-    depositTransaction.asset = assetId;
-    depositTransaction.amount = amount;
-    depositTransaction.amountUSD = amountUSD;
+    withdrawTransaction.asset = assetId;
+    withdrawTransaction.amount = amount;
+    withdrawTransaction.amountUSD = amountUSD;
 
-    depositTransaction.timestamp = utils.getTimestampInMillis(block);
-    depositTransaction.blockNumber = block.number;
+    withdrawTransaction.timestamp = utils.getTimestampInMillis(block);
+    withdrawTransaction.blockNumber = block.number;
 
-    depositTransaction.save();
+    withdrawTransaction.save();
   }
 
-  return depositTransaction;
+  return withdrawTransaction;
 }
 
-export function _Deposit(
+export function _Withdraw(
   to: Address,
   poolId: BigInt,
-  depositAmount: BigInt,
+  withdrawAmount: BigInt,
   block: ethereum.Block,
   transaction: ethereum.Transaction
 ): void {
   const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
     .concat("-")
     .concat(poolId.toString());
-  
+
   const vault = VaultStore.load(vaultId);
   if (!vault) return;
 
@@ -80,16 +80,16 @@ export function _Deposit(
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
   let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
 
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+
   vault.totalValueLockedUSD = inputTokenPrice.usdPrice
     .times(vault.inputTokenBalance.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
     inputTokenPrice.usdPrice
-      .times(depositAmount.toBigDecimal())
+      .times(withdrawAmount.toBigDecimal())
       .div(inputTokenDecimals.toBigDecimal())
       .div(inputTokenPrice.decimalsBaseTen)
   );
@@ -103,39 +103,42 @@ export function _Deposit(
     constants.BIGINT_ZERO
   );
   vault.pricePerShare = utils
-    .readValue<BigInt>(poolContract.try_get_virtual_price(), constants.BIGINT_ZERO)
+    .readValue<BigInt>(
+      poolContract.try_get_virtual_price(),
+      constants.BIGINT_ZERO
+    )
     .toBigDecimal();
 
-  let depositAmountUSD = inputTokenPrice.usdPrice
-    .times(depositAmount.toBigDecimal())
+  let withdrawAmountUSD = inputTokenPrice.usdPrice
+    .times(withdrawAmount.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimalsBaseTen);
 
-  createDepositTransaction(
+  createWithdrawTransaction(
     to,
     vaultId,
     transaction,
     block,
     vault.inputToken,
-    depositAmount,
-    depositAmountUSD
+    withdrawAmount,
+    withdrawAmountUSD
   );
 
-  // Update hourly and daily deposit transaction count
+  // Update hourly and daily withdraw transaction count
   const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
   const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
 
-  metricsDailySnapshot.dailyDepositCount += 1;
-  metricsHourlySnapshot.hourlyDepositCount += 1;
+  metricsDailySnapshot.dailyWithdrawCount += 1;
+  metricsHourlySnapshot.hourlyWithdrawCount += 1;
 
   metricsDailySnapshot.save();
   metricsHourlySnapshot.save();
   protocol.save();
   vault.save();
 
-  log.info("[Deposit] TxHash: {}, vaultAddress: {} _depositAmount: {}", [
+  log.info("[Withdrawn] TxHash: {}, vaultAddress: {}, _withdrawAmount: {}", [
     transaction.hash.toHexString(),
     vault.id,
-    depositAmount.toString(),
+    withdrawAmount.toString(),
   ]);
 }

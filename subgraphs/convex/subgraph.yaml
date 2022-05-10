@@ -23,49 +23,25 @@ dataSources:
         - Platform
       abis:
         - name: Booster
-          file: ./abis/Booster.json
-        - name: CurveRegistry
-          file: ./abis/CurveRegistry.json
-        - name: CurveToken
-          file: ./abis/CurveToken.json
+          file: ./abis/Ethereum/Booster.json
         - name: ERC20
-          file: ./abis/ERC20.json
-        - name: Factory
-          file: ./abis/UniswapV2Factory.json
-        - name: Pair
-          file: ./abis/UniswapV2Pair.json
-        - name: FactoryV3
-          file: ./abis/UniswapV3Factory.json
-        - name: Quoter
-          file: ./abis/UniswapV3Quoter.json
-        - name: ChainlinkAggregator
-          file: ./abis/CLAggregator.json
-        - name: CurvePool
-          file: ./abis/CurvePool.json
-        - name: ExtraRewardStashV30
-          file: ./abis/ExtraRewardStashV30.json
-        - name: ExtraRewardStashV32
-          file: ./abis/ExtraRewardStashV32.json
-        - name: ExtraRewardStashV2
-          file: ./abis/ExtraRewardStashV2.json
-        - name: ExtraRewardStashV1
-          file: ./abis/ExtraRewardStashV1.json
-        - name: VirtualBalanceRewardPool
-          file: ./abis/VirtualBalanceRewardPool.json
+          file: ./abis/Ethereum/ERC20.json
+        - name: Pool
+          file: ./abis/Ethereum/Pool.json
         - name: BaseRewardPool
-          file: ./abis/BaseRewardPool.json
-        - name: RedeemableKeep3r
-          file: ./abis/RedeemableKeep3r.json
+          file: ./abis/Ethereum/BaseRewardPool.json
         
         ###########################################
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -98,12 +74,10 @@ dataSources:
       callHandlers:
         - function: addPool(address,address,uint256)
           handler: handleAddPool
-        - function: shutdownPool(uint256)
-          handler: handleShutdownPool
         - function: earmarkRewards(uint256)
           handler: handleEarmarkRewards
-        - function: earmarkFees()
-          handler: handleEarmarkFees
+        - function: setFees(uint256,uint256,uint256,uint256)
+          handler: handleSetFees
       file: ./src/mappings/boosterMappings.ts
 templates:
   - name: PoolCrvRewards
@@ -120,43 +94,12 @@ templates:
         - PoolRewards
       abis:
         - name: BaseRewardPool
-          file: ./abis/BaseRewardPool.json
-        
-        ###########################################
-        ############## Price Oracle ###############
-        ###########################################
-        # ERC20
+          file: ./abis/Ethereum/BaseRewardPool.json
         - name: ERC20
-          file: ./abis/Prices/ERC20.json
-        # Curve Contracts
-        - name: CurveRegistry
-          file: ./abis/Prices/Curve/Registry.json
-        - name: CalculationsCurve
-          file: ./abis/Prices/Calculations/Curve.json
-        # YearnLens Contracts
-        - name: YearnLensContract
-          file: ./abis/Prices/YearnLens.json
-        # ChainLink Contracts
-        - name: ChainLinkContract
-          file: ./abis/Prices/ChainLink.json
-        # Uniswap Contracts
-        - name: UniswapRouter
-          file: ./abis/Prices/Uniswap/Router.json
-        - name: UniswapFactory
-          file: ./abis/Prices/Uniswap/Factory.json
-        - name: UniswapPair
-          file: ./abis/Prices/Uniswap/Pair.json
-        # SushiSwap Contracts
-        - name: SushiSwapRouter
-          file: ./abis/Prices/SushiSwap/Router.json
-        - name: SushiSwapFactory
-          file: ./abis/Prices/SushiSwap/Factory.json
-        - name: SushiSwapPair
-          file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
+          file: ./abis/Ethereum/ERC20.json
       callHandlers:
-        - function: queueNewRewards(uint256)
-          handler: handleNewRewardsQueued
+        - function: addExtraReward(address)
+          handler: handleAddExtraReward
+        - function: clearExtraRewards()
+          handler: handleClearExtraRewards
       file: ./src/mappings/rewardMappings.ts
-

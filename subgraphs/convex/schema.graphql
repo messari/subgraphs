@@ -215,7 +215,7 @@ type YieldAggregator implements Protocol @entity {
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
 
-  _vaultIds: [String!]
+  _poolCount: BigInt!
 }
 
 ###############################
@@ -377,6 +377,17 @@ type Vault @entity {
   rewardTokenEmissionsAmount: [BigInt!]
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Gauge address of the pool "
+  _gauge: String!
+  " LP Token Address of the pool"
+  _lpToken: String!
+  " stash version of the pool "
+  _stashVersion: BigInt!
+  " Pool Address of the pool"
+  _pool: String!
+  " CRV Rewards Address of the pool"
+  _crvRewards: String!
 
   ##### Snapshots #####
   " Vault daily snapshots "
@@ -602,4 +613,16 @@ type Account @entity {
 type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
+}
+
+# Helper entity for fetching RewardPool from rewardToken
+type RewardTokenInfo @entity {
+  " { Pool ID }-{ RewardToken } "
+  id: ID!
+
+  " Base reward Pool Address "
+  rewardTokenPool: String!
+
+  " Historical Extra Rewards of the pool "
+  _previousExtraHistoricalRewards: BigInt!
 }
