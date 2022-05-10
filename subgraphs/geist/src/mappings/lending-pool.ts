@@ -469,7 +469,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
     log.info("Liquidation hash={}, amount={} USD, liquidation penalty={}", [
       hash,
-      amountUSD.toString() + market.liquidationPenalty.toString(),
+      amountUSD.toString(),
+      market.liquidationPenalty.toString(),
     ]);
     liquidate.profitUSD = amountUSD
       .times(market.liquidationPenalty)
