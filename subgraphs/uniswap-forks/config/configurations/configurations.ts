@@ -33,7 +33,7 @@ configurationsMap.set(Deploy.SUSHISWAP_MOONRIVER, new SushiswapMoonriverConfigur
 configurationsMap.set(Deploy.SUSHISWAP_XDAI, new SushiswapXdaiConfigurations())
 configurationsMap.set(Deploy.UNISWAP_V2_MAINNET, new UniswapV2MainnetConfigurations())
 
-export function getNetworkConfigurations(deploy: string): Configurations | void {
+export function getNetworkConfigurations(deploy: string): Configurations {
     log.warning("Loading configurations for: " + deploy, []);
     if (deploy == Deploy.UNISWAP_V2_MAINNET) {
         return new UniswapV2MainnetConfigurations();
@@ -65,5 +65,6 @@ export function getNetworkConfigurations(deploy: string): Configurations | void 
         return new SushiswapXdaiConfigurations();
     } else {
         log.critical("No configurations found for deployment: " + deploy, []);
+        return new SushiswapArbitrumConfigurations();
     }
 }

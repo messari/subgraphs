@@ -1,70 +1,84 @@
 import * as protocolNetworkData from './deploymentLocations.json' assert {type: "json"}
 import { exec } from 'child_process';
 
+const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 
+const configurations = JSON.parse(JSON.stringify(protocolNetworkData))['default']['configurations'] 
 
-const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']; // req.body = [Object: null prototype] { title: 'product' }
+if (process.argv.length == 2) {
+    console.log('Error: please at least specify hosted service account to deploy all subgraphs (i.e. messari, steegecs, etc.)')
+} else if (process.argv.length == 3) {
+    if (!process.argv[4] in configurations['deployment']['locations']) {
+        console.log('Error: please specify a deployment location only to deploy all subgraphs (i.e. steegecs, messari, etc.)')
+    } else {
+        for (const protocol in protocolNetworkMap) {
+            for (const network in protocolNetworkMap[protocol]) {
 
-console.log('//////////' + process.argv[3]) // prints ['path/node', 'path/foo.js', 'bar']
+                let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
+                let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + process.argv[4] + ' --location=' + process.argv[2],
-    function (error, stdout, stderr) {
-        console.log('stdout: ' + stdout);
-        console.log('stderr: ' + stderr);
-        if (error !== null) {
-            console.log('exec error: ' + error);
+                console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
+                exec("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location,
+                    function (error, stdout, stderr) {
+                    console.log('stdout: ' + stdout);
+                    console.log('stderr: ' + stderr);
+                    if (error !== null) {
+                        console.log('exec error: ' + error);
+                    } 
+                });
+            }
         }
-    });
+    }
+} else if (process.argv.length == 4) {
+    if (!process.argv[2] in protocolNetworkMap) {
+        console.log('Error: please specify a valid protocol as 1st argument (i.e. uniswap-v2, sushiswap, etc.)')
+        console.log('To deploy all networks of a specified protocol, pass 2 arguements (protocol/location)')
+    } else if (!process.argv[3] in configurations['deployment']['locations']) {
+        console.log('Error: please specify a deployment location as 2nd argument (i.e. steegecs, messari, etc.)')
+        console.log('To deploy all networks of a specified protocol, pass 2 arguements (protocol/location)')
+    } else {
+        let protocol = process.argv[2]
+        for (const network in protocolNetworkMap[process.argv[2]]) {
+            let template = protocolNetworkMap[protocol][network]['template']
+            let location = protocolNetworkMap[protocol][network][process.argv[3]]
 
+            console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
+            exec("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location,
+                function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                }
+            });
+        }
+    }
+ } else if (process.argv.length == 5) {
+    if (!process.argv[2] in protocolNetworkMap) {
+        console.log('Error: please specify a valid protocol as 1st argument (i.e. uniswap-v2, sushiswap, etc.)')
+        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
+    } else if (!process.argv[3] in protocolNetworkMap[process.argv[2]]) {
+        console.log('Error: please specify a valid network as 2nd argument (i.e. mainnet, ropsten, etc.)')
+        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
+    } else if (!process.argv[4] in configurations['deployment']['locations']) {
+        console.log('Error: please specify a deployment location as 3rd argument (i.e. steegecs, messari, etc.)')
+        console.log('To deploy a protocol to a specific network, pass 3 arguements (protocol/network/location)')
+    } else {
+        let protocol = process.argv[2]
+        let network = process.argv[3]
+        let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
+        let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-
-// if (process.argv.length == 2) {
-//     console.log('Error: please specify hosted service account (i.e. messari, steegecs, etc.)')
-// } else if (process.argv.length == 3) {
-//     for (const key in protocolNetworkMap) {
-//         for (const network in protocolNetworkMap[key]) {
-
-//             exec('npm run deploy --protocol=' + key + ' --network=' + protocolNetworkMap[key]network + ' --location=' + process.argv[2],
-//                 function (error, stdout, stderr) {
-//                     console.log('stdout: ' + stdout);
-//                     console.log('stderr: ' + stderr);
-//                     if (error !== null) {
-//                         console.log('exec error: ' + error);
-//                     }
-//                 });
-//         }
-//     }
-// } else if (process.argv.length == 4) {
-//     if (!process.argv[3] in protocolNetworkMap) {
-//         console.log('Error: please specify a valid protocol (i.e. uniswap-v2, sushiswap, etc.)')
-//     } else {
-//         for (const network in protocolNetworkMap[process.argv[3]]) {
-
-//             exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + protocolNetworkMap[process.argv[3]]network + ' --location=' + process.argv[2],
-//                 function (error, stdout, stderr) {
-//                     console.log('stdout: ' + stdout);
-//                     console.log('stderr: ' + stderr);
-//                     if (error !== null) {
-//                         console.log('exec error: ' + error);
-//                     }
-//                 });
-//         }
-//     }
-//  } else if (process.argv.length == 5) {
-//     if (!protocolNetworkMap.has(process.argv[3])) {
-//         console.log('Error: please specify a valid protocol (i.e. uniswap-v2, sushiswap, etc.)')
-//     } else if (!protocolNetworkMap[process.argv[3]].has(process.argv[4])) {
-//         console.log('Error: please specify a valid network (i.e. mainnet, ropsten, etc.)')
-//     } else {
-
-//     exec('npm run deploy --protocol=' + process.argv[3] + ' --network=' + process.argv[4] + ' --location=' + process.argv[2],
-//          function (error, stdout, stderr) {
-//             console.log('stdout: ' + stdout);
-//             console.log('stderr: ' + stderr);
-//             if (error !== null) {
-//                 console.log('exec error: ' + error);
-//             }
-//         });
-//     }
-// } else {
-//     console.log('Error: Too many arguments')
-// }
+        console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
+        console.log("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location)
+        exec("npm run deploy --protocol=" + protocol + " --network=" + network + " --template=" + template + " --location=" + location,
+            function (error, stdout, stderr) {
+                console.log('stdout: ' + stdout);
+                console.log('stderr: ' + stderr);
+                if (error !== null) {
+                    console.log('exec error: ' + error);
+                } 
+            });
+        }
+} else {
+    console.log('Error: Too many arguments')
+}
