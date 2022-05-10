@@ -110,8 +110,8 @@ templates:
         #  handler: handleStrategyAnnounced
         #- event: StrategyChanged(address,address)
         #  handler: handleStrategyChanged
-        #- event: Withdraw(indexed address,uint256)
-        #  handler: handleWithdraw
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
       callHandlers:
         - function: doHardWork()
           handler: handleDoHardWorkCall

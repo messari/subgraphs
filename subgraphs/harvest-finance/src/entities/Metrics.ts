@@ -20,7 +20,7 @@ function updateUsageMetricsSnapshotsAfterDeposit(event: ethereum.Event): void {
   updateUsageMetricsSnapshotsAfterDeposit_hourly(day, event);
 }
 
-function updateUsageMetricsSnapshotsAfterDeposit_daily(day: i64, event: ethereum.Event): void {
+function updateUsageMetricsSnapshots_daily(day: i64, event: ethereum.Event): UsageMetricsDailySnapshot {
   // DAILY SNAPSHOT
   let account_id = "daily-"
   .concat(event.transaction.from.toHexString())
@@ -30,7 +30,6 @@ function updateUsageMetricsSnapshotsAfterDeposit_daily(day: i64, event: ethereum
   let snapshot = getOrCreateUsageMetricsDailySnapshot(day.toString());
 
   snapshot.dailyTransactionCount += 1;
-  snapshot.dailyDepositCount += 1;
   snapshot.timestamp = event.block.timestamp;
 
   let account = ActiveAccount.load(account_id);
@@ -45,9 +44,25 @@ function updateUsageMetricsSnapshotsAfterDeposit_daily(day: i64, event: ethereum
     snapshot.dailyActiveUsers += 1;
 
   snapshot.save();
+
+  return snapshot;
 }
 
-function updateUsageMetricsSnapshotsAfterDeposit_hourly(day: i64, event: ethereum.Event): void {
+function updateUsageMetricsSnapshotsAfterDeposit_daily(day: i64, event: ethereum.Event): void {
+  let snapshot = updateUsageMetricsSnapshots_daily(day, event);
+
+  snapshot.dailyDepositCount += 1;
+  snapshot.save();
+}
+
+function updateUsageMetricsSnapshotsAfterWithdraw_daily(day: i64, event: ethereum.Event): void {
+  let snapshot = updateUsageMetricsSnapshots_daily(day, event);
+
+  snapshot.dailyWithdrawCount += 1;
+  snapshot.save();
+}
+
+function updateUsageMetricsSnapshots_hourly(day: i64, event: ethereum.Event): UsageMetricsHourlySnapshot {
   // hourly SNAPSHOT
 
   let hour = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
@@ -61,7 +76,7 @@ function updateUsageMetricsSnapshotsAfterDeposit_hourly(day: i64, event: ethereu
   let snapshot = getOrCreateUsageMetricsHourlySnapshot(day.toString().concat('-').concat(hour.toString()));
 
   snapshot.hourlyTransactionCount += 1;
-  snapshot.hourlyDepositCount += 1;
+  
   snapshot.timestamp = event.block.timestamp;
 
   let account = ActiveAccount.load(account_id);
@@ -75,6 +90,20 @@ function updateUsageMetricsSnapshotsAfterDeposit_hourly(day: i64, event: ethereu
 
     snapshot.hourlyActiveUsers += 1;
 
+  snapshot.save();
+
+  return snapshot;
+}
+
+function updateUsageMetricsSnapshotsAfterDeposit_hourly(day: i64, event: ethereum.Event): void {
+  let snapshot = updateUsageMetricsSnapshots_hourly(day, event);
+  snapshot.hourlyDepositCount += 1;
+  snapshot.save();
+}
+
+function updateUsageMetricsSnapshotsAfterWithdraw_hourly(day: i64, event: ethereum.Event): void {
+  let snapshot = updateUsageMetricsSnapshots_hourly(day, event);
+  snapshot.hourlyWithdrawCount += 1;
   snapshot.save();
 }
 
@@ -128,3 +157,12 @@ function getOrCreateUsageMetricsHourlySnapshot(id: String): UsageMetricsHourlySn
 
 }
 
+export function withdrawUpdateMetrics(event: ethereum.Event, vault: Vault): void {
+  updateUsageMetricsSnapshotsAfterWithdraw(event);
+}
+
+function updateUsageMetricsSnapshotsAfterWithdraw(event: ethereum.Event): void {
+  let day: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  updateUsageMetricsSnapshotsAfterWithdraw_daily(day, event);
+  updateUsageMetricsSnapshotsAfterWithdraw_hourly(day, event);
+}
