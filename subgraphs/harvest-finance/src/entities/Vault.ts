@@ -8,6 +8,8 @@ import { getOrCreateToken } from "./Token";
 import { VaultListener } from '../../generated/templates';
 import * as constants from "./../constant";
 import { getUsdPricePerToken } from "./../Prices";
+import { updateVaultSnapshots } from './Metrics'
+
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -28,6 +30,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.inputTokenBalance = constants.BIGINT_ZERO;
   vault.outputTokenSupply = constants.BIGINT_ZERO;
   vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+  vault.pricePerShare = constants.BIGDECIMAL_ZERO;
   vault.rewardTokenEmissionsAmount = [];
   vault.rewardTokenEmissionsUSD = [];
   vault.createdTimestamp = block.timestamp;
@@ -66,7 +69,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   return vault as Vault;
 }
 
-export function updateVaultPrices(vault: Vault): void{
+export function updateVaultPrices(event: ethereum.Event, vault: Vault): void{
 
   let vaultAddress = Address.fromString(vault.id);
   let vault_contract = VaultContract.bind(vaultAddress);
@@ -89,4 +92,6 @@ export function updateVaultPrices(vault: Vault): void{
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimals.toBigDecimal());
   vault.save()
+
+  updateVaultSnapshots(event, vault);
 }

@@ -24,6 +24,9 @@ dataSources:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - ActiveAccount
+        - UsageMetricsHourlySnapshot
+        - UsageMetricsDailySnapshot
       abis:
         - name: ControllerContract
           file: ./abis/contracts_manual/Controller.json
@@ -65,6 +68,9 @@ templates:
         - VaultDailySnapshot
         - Deposit
         - Withdraw
+        - ActiveAccount
+        - UsageMetricsHourlySnapshot
+        - UsageMetricsDailySnapshot
       abis:
         - name: VaultContract
           file: ./abis/contracts/base/Vault.sol/Vault.json

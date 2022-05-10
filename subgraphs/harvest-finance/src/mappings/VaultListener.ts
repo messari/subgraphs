@@ -55,7 +55,7 @@ export function handleDeposit(event: DepositEvent): void {
   
   vault.inputTokenBalance = vault.inputTokenBalance.plus(amount);
   
-  updateVaultPrices(vault);
+  updateVaultPrices(event, vault);
 
   vault.save();
 
@@ -99,7 +99,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
   
   vault.inputTokenBalance = vault.inputTokenBalance.minus(amount);
   
-  updateVaultPrices(vault);
+  updateVaultPrices(event, vault);
 
   withdrawUpdateMetrics(event, vault);
   
@@ -109,7 +109,7 @@ export function handleDoHardWorkCall(call: DoHardWorkCall): void {
   const vaultAddress = call.to;
 
   let vault = getOrCreateVault(vaultAddress, call.block);
-  updateVaultPrices(vault);
+  //updateVaultPrices(call, vault);
 
 }
 
