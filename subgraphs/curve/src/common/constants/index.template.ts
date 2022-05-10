@@ -193,3 +193,21 @@ export const LENDING = 'LENDING'
 
 export const CURVE_POOL_FEE = BigDecimal.fromString("0.0004");
 export const CURVE_ADMIN_FEE = BigDecimal.fromString("0.5");
+
+export const CURVE_REGISTRY_V1_AVAX = Address.fromString("0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6")
+export const TRYCRYPTO2_POOL_AVAX_GAUGE = Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351")
+
+export const CATCHUP_POOLS = [{{# catchup_pools }}Address.fromString("{{ . }}"), {{/ catchup_pools }}]
+export const CATCHUP_LP_TOKENS = [{{# catchup_lp_tokens }}Address.fromString("{{ . }}"), {{/ catchup_lp_tokens }}]
+export const CATCHUP_GAUGES = [{{# catchup_gauges }}Address.fromString("{{ . }}"), {{/ catchup_gauges }}]
+export const CATCHUP_START_BLOCKS = [{{# catchup_start_blocks }}BigInt.fromI32({{ . }}), {{/ catchup_start_blocks }}]
+export const CATCHUP_START_TIMES = [{{# catchup_start_times }}BigInt.fromI32({{ . }}), {{/ catchup_start_times }}]
+export const CATCHUP_POOL_TYPES = [{{# catchup_pool_types }}"{{ . }}", {{/ catchup_pool_types }}]
+export const CATCHUP_REGISTRIES = [{{# catchup_registries }}Address.fromString("{{ . }}"), {{/ catchup_registries }}]
+
+export const ASSET_TYPES = new Map<string, i32>()
+{{# catchup_asset_types }}
+ASSET_TYPES.set("{{asset}}".toLowerCase(), {{asset_type}})
+{{/ catchup_asset_types }}
+
+//export const CATCHUP_ASSET_TYPES = [{{# catchup_asset_types }}"{{ . }}", {{/ catchup_asset_types }}]

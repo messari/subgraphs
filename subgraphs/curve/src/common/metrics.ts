@@ -1,7 +1,8 @@
-import { BigDecimal, Address, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { PoolAdded } from "../../generated/AddressProvider/MainRegistry";
 import { Account, ActiveAccount, LiquidityPool, UsageMetricsDailySnapshot } from "../../generated/schema";
-import { getLpTokenPriceUSD } from "../services/snapshots";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
+import { getLpTokenPriceUSD, getPoolAssetPrice } from "../services/snapshots";
+import { BIGDECIMAL_ONE, BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO, LiquidityPoolFeeType, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "./constants";
 import {
   getOrCreateDexAmm,
   getOrCreatePoolDailySnapshot,
@@ -9,8 +10,11 @@ import {
   getOrCreateFinancialsDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
   getOrCreateUsageMetricDailySnapshot,
+  getPoolFee,
+  getOrCreateToken,
 } from "./getters";
 import { setPoolBalances, setPoolOutputTokenSupply, setPoolTokenWeights, setPoolTVL, setProtocolTVL } from "./setters";
+import { bigIntToBigDecimal } from "./utils/numbers";
 
 // These are meant more as boilerplates that'll be filled out depending on the
 // subgraph, and will be different from subgraph to subgraph, hence left
@@ -79,7 +83,7 @@ export function updateUsageMetrics(event: ethereum.Event, action: string = ''): 
   if (!hourlyActiveAccount) {
     hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
     hourlyActiveAccount.save();
-    usageDailyMetrics.dailyActiveUsers += 1;
+    usageHourlyMetrics.hourlyActiveUsers += 1;
   }
 
   // Combine the id and the user address to generate a unique user id for the day
@@ -145,16 +149,91 @@ export function updatePoolMetrics(poolAddress:string, event: ethereum.Event): vo
   poolMetricsDaily.blockNumber = event.block.number;
   poolMetricsDaily.timestamp = event.block.timestamp;
 
-  poolMetricsDaily.save();
   poolMetricsHourly.save();
+  poolMetricsDaily.save();
 }
 
 export function updatePool(liquidityPool:LiquidityPool, event: ethereum.Event): void {
-    liquidityPool.outputTokenPriceUSD = getLpTokenPriceUSD(liquidityPool,event.block.number);
+    liquidityPool.outputTokenPriceUSD = getLpTokenPriceUSD(liquidityPool,event.block.timestamp);
     setPoolBalances(liquidityPool)
     setPoolTokenWeights(liquidityPool)
     setPoolOutputTokenSupply(liquidityPool)
-    setProtocolTVL(event.block.number); // updates the protocol totalValueLockedUSD, along with the pool's tvl being updated
+    setPoolTVL(liquidityPool,event.block.timestamp)
+    setProtocolTVL(); // updates the protocol totalValueLockedUSD, along with the pool's tvl being updated
     liquidityPool.save();
 }
 
+// get trader fees and lp fees:
+// trader fees: in line 658 of tricrypto2 contract: dy -= self._fee(xp) * dy / 10**10
+// while the contract uses self._fee(xp): calculating xp is a bit more complex. we approximate
+// by just using the feeFraction. This means, dy (without fees subtracted is):
+// tokenOutUSD / (1-feeFraction)
+// so fee: outWithoutFees - outWithFees
+// tricrypto2 contract mainnet: 0xD51a44d3FaE010294C616388b506AcdA1bfAAE46
+export function updateProtocolRevenueV2(liquidityPool:LiquidityPool, volumeUSD: BigDecimal, event: ethereum.Event): void {
+  let protocol = getOrCreateDexAmm();
+  let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
+
+  let LpFee = getPoolFee(liquidityPool.id,LiquidityPoolFeeType.DYNAMIC_LP_FEE).feePercentage!.div(BIGDECIMAL_ONE_HUNDRED);
+  let protocolFee = getPoolFee(liquidityPool.id,LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE).feePercentage!.div(BIGDECIMAL_ONE_HUNDRED);
+  let totalFee = getPoolFee(liquidityPool.id,LiquidityPoolFeeType.DYNAMIC_TRADING_FEE).feePercentage!.div(BIGDECIMAL_ONE_HUNDRED);
+
+  let supplySideRevenue = (volumeUSD.div(BIGDECIMAL_ONE.minus(LpFee))).minus(volumeUSD);
+  let protocolRevenue = (volumeUSD.div(BIGDECIMAL_ONE.minus(protocolFee))).minus(volumeUSD)
+  let totalRevenueUSD = (volumeUSD.div(BIGDECIMAL_ONE.minus(totalFee))).minus(volumeUSD)
+
+  financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  financialSnapshot.dailyProtocolSideRevenueUSD = financialSnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+  financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+
+  financialSnapshot.save();
+  protocol.save();
+}
+
+
+export function updateProtocolRevenue(liquidityPool:LiquidityPool, volumeUSD: BigDecimal, event: ethereum.Event): void {
+  if (liquidityPool.isV2){
+    updateProtocolRevenueV2(liquidityPool, volumeUSD, event)
+    return 
+  }
+  let protocol = getOrCreateDexAmm();
+  let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
+  let LpFee = getPoolFee(liquidityPool.id,LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage!.div(BIGDECIMAL_ONE_HUNDRED);
+  let protocolFee = getPoolFee(liquidityPool.id,LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage!.div(BIGDECIMAL_ONE_HUNDRED);
+  let totalFee = getPoolFee(liquidityPool.id,LiquidityPoolFeeType.FIXED_TRADING_FEE).feePercentage!.div(BIGDECIMAL_ONE_HUNDRED);
+
+  let supplySideRevenue = LpFee.times(volumeUSD);
+  let protocolRevenue = protocolFee.times(volumeUSD);
+  let totalRevenueUSD = totalFee.times(volumeUSD);
+
+  financialSnapshot.dailySupplySideRevenueUSD = financialSnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  financialSnapshot.dailyProtocolSideRevenueUSD = financialSnapshot.dailyProtocolSideRevenueUSD.plus(protocolRevenue);
+  financialSnapshot.dailyTotalRevenueUSD = financialSnapshot.dailyTotalRevenueUSD.plus(totalRevenueUSD);
+
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolRevenue);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
+
+  financialSnapshot.save();
+  protocol.save();
+}
+
+export function calculateLiquidityFeesUSD(pool:LiquidityPool, fees: BigInt[], event: ethereum.Event): BigDecimal {
+  let feeSum = BIGDECIMAL_ZERO;
+  for (let i=0; i<fees.length; i++) {
+    let token = getOrCreateToken(Address.fromString(pool.inputTokens[i]));
+    feeSum = feeSum.plus(bigIntToBigDecimal(fees[i], token.decimals));
+  }
+  let poolAssetPrice = getPoolAssetPrice(pool,event.block.timestamp)
+  let totalFeesUSD = feeSum.times(poolAssetPrice);
+  return totalFeesUSD
+}
+
+export function handleLiquidityFees(pool:LiquidityPool, fees: BigInt[], event: ethereum.Event): void {
+  const totalFeesUSD = calculateLiquidityFeesUSD(pool, fees, event);
+  updateProtocolRevenue(pool,totalFeesUSD,event);
+}

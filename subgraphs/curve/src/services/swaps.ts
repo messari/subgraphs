@@ -1,20 +1,19 @@
 import { Address, BigDecimal, BigInt, Bytes, log, ethereum } from '@graphprotocol/graph-ts'
 import { LiquidityPool, Swap } from '../../generated/schema'
 import {
-  getCryptoTokenSnapshot,
-  getTokenSnapshotByAssetType,
-  takePoolSnapshots,
+  getCryptoTokenPrice,
+  getPoolAssetPrice,
 } from './snapshots'
 import {
   BIG_DECIMAL_TWO,
-  BIG_INT_ONE,
   LENDING,
   STABLE_FACTORY
 } from '../common/constants/index'
 import { getBasePool, getVirtualBaseLendingPool } from './pools'
 import { exponentToBigDecimal } from '../common/utils/numbers'
 import { getOrCreateDexAmm, getOrCreateFinancialsDailySnapshot, getOrCreatePoolDailySnapshot, getOrCreatePoolHourlySnapshot, getOrCreateToken } from '../common/getters'
-import { updateFinancials, updatePool, updatePoolMetrics, updateUsageMetrics } from '../common/metrics'
+import { updateFinancials, updatePool, updatePoolMetrics, updateProtocolRevenue, updateUsageMetrics } from '../common/metrics'
+import { setPoolFeesV2 } from '../common/setters'
 
 export function handleExchange(
   buyer: Address,
@@ -33,12 +32,11 @@ export function handleExchange(
   if (!pool) {
     return
   }
-  takePoolSnapshots(timestamp)
   const soldId = sold_id.toI32()
   const boughtId = bought_id.toI32()
   let tokenSold: String, tokenBought: String
   let tokenSoldDecimals: BigInt, tokenBoughtDecimals: BigInt
-  let addTokenSoldAmt: bool = false, addTokenBoughtAmt: bool = false
+  let addTokenSoldAmt: boolean = false, addTokenBoughtAmt: boolean = false
 
   if (exchangeUnderlying && pool.poolType == LENDING) {
     const basePool = getVirtualBaseLendingPool(Address.fromString(pool.basePool))
@@ -118,12 +116,12 @@ export function handleExchange(
   const amountBought = tokens_bought.toBigDecimal().div(exponentToBigDecimal(tokenBoughtDecimals.toI32()))
   let amountBoughtUSD: BigDecimal, amountSoldUSD: BigDecimal
   if (!pool.isV2) {
-    const latestPrice = getTokenSnapshotByAssetType(pool, blockNumber)
+    const latestPrice = getPoolAssetPrice(pool, timestamp)
     amountBoughtUSD = amountBought.times(latestPrice)
     amountSoldUSD = amountSold.times(latestPrice)
   } else {
-    const latestBoughtPriceUSD = getCryptoTokenSnapshot(Address.fromString(pool.inputTokens[boughtId]), blockNumber, pool)
-    const latestSoldPriceUSD = getCryptoTokenSnapshot(Address.fromString(pool.inputTokens[soldId]), blockNumber, pool)
+    const latestBoughtPriceUSD = getCryptoTokenPrice(Address.fromString(pool.inputTokens[boughtId]), timestamp, pool)
+    const latestSoldPriceUSD = getCryptoTokenPrice(Address.fromString(pool.inputTokens[soldId]), timestamp, pool)
     amountBoughtUSD = amountBought.times(latestBoughtPriceUSD)
     amountSoldUSD = amountSold.times(latestSoldPriceUSD)
   }
@@ -193,6 +191,10 @@ export function handleExchange(
   // update any metrics here
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
+  updateProtocolRevenue(pool,volumeUSD,event);
   updateFinancials(event); // call after protocol tvl is updated
   updateUsageMetrics(event,'trade');
+  if (pool.isV2){
+    setPoolFeesV2(pool);
+  }
 }

@@ -134,7 +134,7 @@ export const INT_FOUR = 4 as i32;
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
 export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_TWO = new BigDecimal(BIGINT_TWO);
-
+export const BIGDECIMAL_ONE_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 
 /////////////////////
@@ -158,5 +158,5 @@ export const ETH_NAME = "Ether"
 ///// Protocol Specific /////
 /////////////////////////////
 
-
+export const FEE_DENOMINATOR_DECIMALS = 10;
 

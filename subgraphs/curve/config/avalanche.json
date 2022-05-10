@@ -21,7 +21,15 @@
   "transactionHash": "LENDING",
   "factoryAddress": "'0x0000000000000000000000000000000000000001'",
   "unknownMetapoolType": "STABLE_FACTORY",
-  "catchup_block": 0,
-  "importCatchupFunction": "",
-  "executeCatchupFunction": ""
+  "catchup_block": 9384780,
+  "catchup_pools" : [],
+  "catchup_lp_tokens" : [],
+  "catchup_start_blocks" : [],
+  "catchup_start_times" : [],
+  "catchup_gauges" : [],
+  "catchup_asset_types" : [],
+  "catchup_pool_types" : [],
+  "catchup_registries" : [],
+  "importCatchupFunction": "import { catchUpAvax } from './services/catchup'",
+  "executeCatchupFunction": "catchUpAvax()"
 }

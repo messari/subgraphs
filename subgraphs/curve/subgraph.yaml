@@ -46,6 +46,12 @@ dataSources:
           file: ./abis/CurveLendingPool.json
         - name: CurveLendingPoolCoin128
           file: ./abis/CurveLendingPoolCoin128.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
@@ -91,6 +97,16 @@ templates:
           file: ./abis/CurveLendingPoolCoin128.json
         - name: CurvePoolCoin128
           file: ./abis/CurvePoolCoin128.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handleMainRegistryPoolAdded
@@ -129,6 +145,16 @@ templates:
           file: ./abis/CurvePoolCoin128.json
         - name: CurvePoolV2
           file: ./abis/CurvePoolV2.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
       eventHandlers:
         - event: PlainPoolDeployed(address[4],uint256,uint256,address)
           handler: handlePlainPoolDeployed
@@ -172,6 +198,16 @@ templates:
           file: ./abis/ERC20SymbolBytes.json
         - name: ERC20NameBytes
           file: ./abis/ERC20NameBytes.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
@@ -356,6 +392,4 @@ templates:
           handler: handleRemoveLiquidityV2
         - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
           handler: handleRemoveLiquidityOneV2
-        - event: NewParameters(uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleNewParameters
       file: ./src/mappingV2.ts

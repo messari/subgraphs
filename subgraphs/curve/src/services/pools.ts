@@ -4,8 +4,9 @@ import { CurvePoolCoin128 } from '../../generated/templates/CurvePoolTemplate/Cu
 import { CurvePool } from '../../generated/templates/RegistryTemplate/CurvePool'
 import {
   ADDRESS_ZERO,
+  ASSET_TYPES,
   BIG_INT_ONE,
-  CRYPTO_FACTORY, CURVE_REGISTRY, CURVE_REGISTRY_V2, METAPOOL_FACTORY, METAPOOL_FACTORY_ADDRESS,
+  CRYPTO_FACTORY, CURVE_REGISTRY, CURVE_REGISTRY_V1, CURVE_REGISTRY_V2, METAPOOL_FACTORY, METAPOOL_FACTORY_ADDRESS,
   REGISTRY_V1,
   REGISTRY_V2,
   STABLE_FACTORY,
@@ -23,6 +24,7 @@ import { fetchTokenDecimals } from '../common/tokens'
 import { getOrCreateToken } from '../common/getters'
 import { setPoolBalances, setPoolCoins, setPoolFees, setPoolOutputTokenSupply, setPoolTokenWeights } from '../common/setters'
 import { getLpTokenPriceUSD } from './snapshots'
+import { MainRegistry } from '../../generated/AddressProvider/MainRegistry'
 
 export function createNewPool(
   poolAddress: Address,
@@ -34,7 +36,9 @@ export function createNewPool(
   isV2: boolean,
   block: BigInt,
   timestamp: BigInt,
-  basePool: Address
+  basePool: Address,
+  gaugeAddress: Address,
+  registryAddress: Address
 ): void {
   const platform = getPlatform()
   const pools = platform.poolAddresses
@@ -51,9 +55,11 @@ export function createNewPool(
   pool.createdBlockNumber = block
   pool.createdTimestamp = timestamp
   pool.poolType = poolType
-  pool.assetType = isV2 ? 4 : getAssetType(pool.name!, pool.symbol!)
+  pool.assetType = isV2 ? 4 : getAssetType(pool)
   pool.basePool = basePool.toHexString();
-  pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool,block);
+  pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool,timestamp);
+  pool.gauge = gaugeAddress.toHexString();
+  pool.registry = registryAddress.toHexString();
   setPoolCoins(pool)
   setPoolBalances(pool)
   setPoolTokenWeights(pool)
@@ -70,25 +76,43 @@ export function createNewFactoryPool(
   lpToken: Address,
   timestamp: BigInt,
   block: BigInt,
-  tx: Bytes
 ): void {
   let factoryPool: Address
   let poolType: string
   const factoryEntity = getFactory(factoryContract, version)
   const poolCount = factoryEntity.poolCount
+  let gauge = ADDRESS_ZERO;
   if (version == 1) {
     const factory = StableFactory.bind(factoryContract)
     poolType = factoryContract == Address.fromString(METAPOOL_FACTORY_ADDRESS) ? METAPOOL_FACTORY : STABLE_FACTORY
-    factoryPool = factory.pool_list(poolCount)
+    let factoryPoolCall = factory.try_pool_list(poolCount);
+    if (factoryPoolCall.reverted){
+      log.error('factoryPoolCall.reverted for factory {}', [factoryContract.toHexString()]);
+      return 
+    }
+    factoryPool = factoryPoolCall.value
+    let gaugeCall = factory.try_get_gauge(factoryPool)
+    if (!gaugeCall.reverted){
+      gauge = gaugeCall.value
+    }
     log.info('New factory pool (metapool: {}) added {} with id {}', [
       metapool.toString(),
-      factoryPool .toHexString(),
+      factoryPool.toHexString(),
       poolCount.toString(),
     ])
   } else {
     const factory = CryptoFactory.bind(factoryContract)
     poolType = CRYPTO_FACTORY
-    factoryPool = factory.pool_list(poolCount)
+    let factoryPoolCall = factory.try_pool_list(poolCount);
+    if (factoryPoolCall.reverted){
+      log.error('factoryPoolCall.reverted for factory {}', [factoryContract.toHexString()]);
+      return 
+    }
+    factoryPool = factoryPoolCall.value
+    let gaugeCall = factory.try_get_gauge(factoryPool);
+    if (!gaugeCall.reverted){
+      gauge = gaugeCall.value
+    }
     log.info('New factory pool added (v2.0) {} with id {}', [factoryPool.toHexString(), poolCount.toString()])
   }
   factoryEntity.poolCount = factoryEntity.poolCount.plus(BIG_INT_ONE)
@@ -97,14 +121,17 @@ export function createNewFactoryPool(
   let name: string, symbol: string
   if (version == 2) {
     CurvePoolTemplateV2.create(factoryPool)
-    const lpTokenContract = ERC20.bind(lpToken)
-    name = lpTokenContract.name()
-    symbol = lpTokenContract.symbol()
+    let lpTokenContract = getOrCreateToken(lpToken)
+    name = lpTokenContract.name
+    symbol = lpTokenContract.symbol
   } else {
     CurvePoolTemplate.create(factoryPool)
     const poolContract = CurvePool.bind(factoryPool)
-    name = poolContract.name()
-    symbol = poolContract.symbol()
+    let nameCall = poolContract.try_name()
+    let symbolCall = poolContract.try_symbol()
+    name = nameCall.reverted ? '' : nameCall.value
+    symbol = symbolCall.reverted ? '' : symbolCall.value
+
   }
   createNewPool(
     factoryPool,
@@ -116,7 +143,9 @@ export function createNewFactoryPool(
     version == 2,
     block,
     timestamp,
-    basePool
+    basePool,
+    gauge,
+    factoryContract
   )
 }
 
@@ -129,7 +158,9 @@ export function createNewRegistryPool(
   poolType: string,
   timestamp: BigInt,
   block: BigInt,
-  tx: Bytes
+  tx: Bytes,
+  gauge: Address,
+  registryAddress: Address
 ): void {
   if (!LiquidityPool.load(poolAddress.toHexString())) {
     log.debug('Non factory pool ({}): {}, lpToken: {}, added to registry at {}', [
@@ -143,18 +174,20 @@ export function createNewRegistryPool(
     } else {
       CurvePoolTemplateV2.create(poolAddress)
     }
-    const lpTokenContract = ERC20.bind(lpToken)
+    let lpTokenContract = getOrCreateToken(lpToken)
     createNewPool(
       poolAddress,
       lpToken,
-      lpTokenContract.name(),
-      lpTokenContract.symbol(),
+      lpTokenContract.name,
+      lpTokenContract.symbol,
       poolType,
       metapool,
       isV2,
       block,
       timestamp,
-      basePool
+      basePool,
+      gauge,
+      registryAddress
     )
   } else {
     log.debug('Pool: {} added to the registry at {} but already tracked', [poolAddress.toHexString(), tx.toHexString()])
@@ -260,7 +293,7 @@ export function getVirtualBaseLendingPool(pool: Address): BasePool {
   return basePool
 }
 
-export function getAssetType(name: string, symbol: string): i32 {
+export function getAssetTypeCrude(name: string, symbol: string): i32 {
   const description = name.toUpperCase() + '-' + symbol.toUpperCase()
   const stables = ['USD', 'DAI', 'MIM', 'TETHER']
   for (let i = 0; i < stables.length; i++) {
@@ -276,4 +309,20 @@ export function getAssetType(name: string, symbol: string): i32 {
   } else {
     return 3
   }
+}
+
+export function getAssetType(pool: LiquidityPool): i32 {
+  log.warning('getAssetType for {}', [pool.id])
+  if (ASSET_TYPES.has(pool.id.toLowerCase())) {
+    log.warning('ASSET_TYPES has asset for {}', [pool.id])
+    return ASSET_TYPES.get(pool.id.toLowerCase());
+  }
+  log.warning('ASSET_TYPES does not have asset for {}', [pool.id])
+  log.warning('Get asset type from registry {} for pool {}', [pool.registry, pool.id])
+  let registryContract = MainRegistry.bind(Address.fromString(pool.registry));
+  let assetTypeCall = registryContract.try_get_pool_asset_type(Address.fromString(pool.id));
+  if (!assetTypeCall.reverted) {
+    return assetTypeCall.value.toI32();
+  }
+  return getAssetTypeCrude(pool.name!, pool.symbol!);
 }

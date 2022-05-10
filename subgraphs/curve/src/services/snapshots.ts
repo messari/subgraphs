@@ -1,6 +1,7 @@
 import {
   LiquidityPool,
-  Token
+  Token,
+  TokenSnapshot
 } from '../../generated/schema'
 import { Address, BigDecimal, BigInt, dataSource, log } from '@graphprotocol/graph-ts'
 import {
@@ -14,20 +15,13 @@ import {
   WBTC_ADDRESS,
   SYNTH_TOKENS,
   WETH_ADDRESS,
-  BIG_DECIMAL_TWO, BIG_INT_ZERO
 } from '../common/constants/index'
 import { CurvePool } from '../../generated/templates/CurvePoolTemplate/CurvePool'
-import { getPlatform } from './platform'
 import { ChainlinkAggregator } from '../../generated/templates/CurvePoolTemplateV2/ChainlinkAggregator'
 import { CurvePoolV2 } from '../../generated/templates/RegistryTemplate/CurvePoolV2'
-import {
-  CurvePoolCoin128
-} from '../../generated/templates/RegistryTemplate/CurvePoolCoin128'
 import { getUsdRate } from '../common/pricing'
-import { exponentToBigDecimal } from '../common/utils/numbers'
-import { DAY, getIntervalFromTimestamp } from '../common/utils/datetime'
 import { getOrCreateToken } from '../common/getters'
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO } from '../common/constants'
+import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, SECONDS_PER_HOUR } from '../common/constants'
 
 export function getForexUsdRate(token: string): BigDecimal {
   // returns the amount of USD 1 unit of the foreign currency is worth
@@ -45,36 +39,50 @@ export function getForexUsdRate(token: string): BigDecimal {
   return conversionRate
 }
 
-export function getTokenPriceSnapshot(tokenAddr: Address, blockNumber: BigInt, forex: boolean): BigDecimal {
-  let token = getOrCreateToken(tokenAddr)
+export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, forex: boolean): BigDecimal {
+  let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(tokenAddr, timestamp));
+  if (tokenSnapshot){
+    return tokenSnapshot.price;
+  }
+  tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp))
   let priceUSD = BIGDECIMAL_ZERO;
   if (forex) {
     priceUSD = getForexUsdRate(tokenAddr.toHexString())
   } else {
     priceUSD = getUsdRate(tokenAddr)
   }
-  token.lastPriceUSD = priceUSD
-  token.lastPriceBlockNumber = blockNumber;
-  token.save()
+  tokenSnapshot.price = priceUSD
+  tokenSnapshot.save()
   return priceUSD
 }
 
-export function getStableCryptoTokenPrice(pool: LiquidityPool, blockNumber: BigInt): BigDecimal {
+export function getStableCryptoTokenPrice(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   // we use this for stable crypto pools where one assets may not be traded
   // outside of curve. we just try to get a price out of one of the assets traded
   // and use that
   let price = BIG_DECIMAL_ZERO
   for (let i = 0; i < pool.inputTokens.length; ++i) {
+    let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(Address.fromString(pool.inputTokens[i]), timestamp));
+    if (tokenSnapshot){
+      return tokenSnapshot.price;
+    }
+    tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(Address.fromString(pool.inputTokens[i]), timestamp))
     price = getUsdRate(Address.fromString(pool.inputTokens[i]))
     if (price != BIG_DECIMAL_ZERO) {
+      tokenSnapshot.price = price;
+      tokenSnapshot.save();
       break
     }
   }
   return price
 }
 
-export function getCryptoTokenSnapshot(tokenAddr: Address, blockNumber: BigInt, pool: LiquidityPool): BigDecimal {
-  let token = getOrCreateToken(tokenAddr)
+export function getCryptoTokenPrice(tokenAddr: Address, timestamp: BigInt, pool: LiquidityPool): BigDecimal {
+  let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(tokenAddr, timestamp));
+  if (tokenSnapshot){
+    return tokenSnapshot.price;
+  }
+  tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp))
   let price = FOREX_TOKENS.includes(tokenAddr.toHexString()) ? getForexUsdRate(tokenAddr.toHexString()) : getUsdRate(tokenAddr)
   if (price == BIG_DECIMAL_ZERO && SYNTH_TOKENS.has(tokenAddr.toHexString())) {
     log.warning('Invalid price found for {}', [tokenAddr.toHexString()])
@@ -87,57 +95,54 @@ export function getCryptoTokenSnapshot(tokenAddr: Address, blockNumber: BigInt, 
       log.warning('Price oracle reverted {}', [tokenAddr.toHexString()])
     }
   }
-  token.lastPriceUSD = price;
-  token.lastPriceBlockNumber = blockNumber;
-  token.save()
+  tokenSnapshot.price = price;
+  tokenSnapshot.save()
   return price
 }
 
-export function getTokenSnapshotByAssetType(pool: LiquidityPool, blockNumber: BigInt): BigDecimal {
+export function getPoolAssetPrice(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   if (FOREX_ORACLES.has(pool.id)) {
-    return getTokenPriceSnapshot(Address.fromString(pool.outputToken!), blockNumber, true)
+    return getTokenPriceSnapshot(Address.fromString(pool.outputToken!), timestamp, true)
   } else if (pool.assetType == 1) {
-    return getTokenPriceSnapshot(WETH_ADDRESS, blockNumber, false)
+    return getTokenPriceSnapshot(WETH_ADDRESS, timestamp, false)
   } else if (pool.assetType == 2) {
-    return getTokenPriceSnapshot(WBTC_ADDRESS, blockNumber, false)
+    return getTokenPriceSnapshot(WBTC_ADDRESS, timestamp, false)
   } else if (pool.assetType == 0) {
-    return BIGDECIMAL_ONE
+    return getTokenPriceSnapshot(USDT_ADDRESS, timestamp, false)
   } else {
-    return getStableCryptoTokenPrice(pool, blockNumber)
+    return getStableCryptoTokenPrice(pool, timestamp)
   }
 }
 
-export function getLpTokenPriceUSD(pool: LiquidityPool, blockNumber: BigInt): BigDecimal {
+export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
+  let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(Address.fromString(pool.id), timestamp));
+  if (tokenSnapshot){
+    return tokenSnapshot.price;
+  }
+  tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(Address.fromString(pool.id), timestamp))
   let curvePool = CurvePool.bind(Address.fromString(pool.id));
-  let assetPriceUSD = getTokenSnapshotByAssetType(pool, blockNumber);
+  let assetPriceUSD = getPoolAssetPrice(pool, timestamp);
   let virtualPrice = curvePool.try_get_virtual_price();
   if (virtualPrice.reverted) {
+    tokenSnapshot.price = assetPriceUSD;
+    tokenSnapshot.save();
     return assetPriceUSD
   }
-  return assetPriceUSD.times(virtualPrice.value.toBigDecimal().div(BIG_DECIMAL_1E18))
+  let price = assetPriceUSD.times(virtualPrice.value.toBigDecimal().div(BIG_DECIMAL_1E18));
+  tokenSnapshot.price = price;
+  tokenSnapshot.save();
+  return price
 }
 
-export function takePoolSnapshots(timestamp: BigInt): void {
-  const platform = getPlatform()
-  for (let i = 0; i < platform.poolAddresses.length; ++i) {
-    const poolAddress = platform.poolAddresses[i]
-    const pool = LiquidityPool.load(poolAddress)
-    if (!pool) {
-      return
-    }
-    const poolContract = CurvePoolV2.bind(Address.fromString(pool.id))
-      //if (pool.isV2) {
-        //const xcpProfitResult = poolContract.try_xcp_profit()
-        //const xcpProfitAResult = poolContract.try_xcp_profit_a()
-        //dailySnapshot.xcpProfit = xcpProfitResult.reverted ? BIG_DECIMAL_ZERO : xcpProfitResult.value.toBigDecimal()
-        //dailySnapshot.xcpProfitA = xcpProfitAResult.reverted ? BIG_DECIMAL_ZERO : xcpProfitAResult.value.toBigDecimal()
-        // dailySnapshot.baseApr = getV2PoolBaseApr(pool, dailySnapshot.xcpProfit, dailySnapshot.xcpProfitA, timestamp)
-    //  } else {
-      //   dailySnapshot.baseApr = getPoolBaseApr(pool, dailySnapshot.virtualPrice, timestamp)
-    //  }
+export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): string {
+  return tokenAddr.toHexString() + '-' + timestamp.div(BigInt.fromI32(SECONDS_PER_HOUR)).toString()
+}
 
-
-
-    pool.save()
+export function getTokenSnapshot(tokenAddr: Address, timestamp: BigInt): TokenSnapshot {
+  const tokenSnapshotID = createTokenSnapshotID(tokenAddr, timestamp)
+  let tokenSnapshot = TokenSnapshot.load(tokenSnapshotID)
+  if (!tokenSnapshot) {
+    return new TokenSnapshot(tokenSnapshotID)
   }
+  return tokenSnapshot
 }

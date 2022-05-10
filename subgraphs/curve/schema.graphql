@@ -364,7 +364,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token
+  outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -439,6 +439,10 @@ type LiquidityPool @entity {
   poolType: PoolType!
 
   isV2: Boolean!
+
+  gauge: String!
+
+  registry: String!
 
 }
 
@@ -776,4 +780,11 @@ type BasePool @entity {
   id: ID!
   coins: [String!]!
   coinDecimals: [BigInt!]!
+}
+
+type TokenSnapshot @entity {
+  " { token }-{ hourly-timestamp } "
+  id: ID!
+  price: BigDecimal!
+  timestamp: BigInt!
 }

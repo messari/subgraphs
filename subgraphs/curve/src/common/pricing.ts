@@ -27,14 +27,19 @@ export function getEthRate(token: Address): BigDecimal {
 
   if (token != WETH_ADDRESS) {
     let factory = Factory.bind(SUSHI_FACTORY_ADDRESS)
-    let address = factory.getPair(token, WETH_ADDRESS)
-
+    let addressCall = factory.try_getPair(token, WETH_ADDRESS)
+    let address = ADDRESS_ZERO;
+    if (!addressCall.reverted) {
+      address = addressCall.value
+    }
     if (address == ADDRESS_ZERO) {
       // if no pair on sushi, we try uni v2
       log.debug('No sushi pair found for {}', [token.toHexString()])
       factory = Factory.bind(UNI_FACTORY_ADDRESS)
-      address = factory.getPair(token, WETH_ADDRESS)
-
+      addressCall = factory.try_getPair(token, WETH_ADDRESS)
+      if (!addressCall.reverted) {
+        address = addressCall.value
+      }
       // if no pair on v2 either we try uni v3
       if (address == ADDRESS_ZERO) {
         log.debug('No Uni v2 pair found for {}', [token.toHexString()])
@@ -44,8 +49,11 @@ export function getEthRate(token: Address): BigDecimal {
 
     const pair = Pair.bind(address)
 
-    const reserves = pair.getReserves()
-
+    const reservesCall = pair.try_getReserves()
+    if (reservesCall.reverted){
+      return eth
+    }
+    const reserves = reservesCall.value
     if (reserves.value1 == BIG_INT_ZERO || reserves.value0 == BIG_INT_ZERO) {
       return eth
     }

@@ -3,13 +3,14 @@ import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 import { LiquidityPool, Registry } from "../../generated/schema"
 import { CurvePoolCoin128 } from "../../generated/templates/CryptoFactoryTemplate/CurvePoolCoin128";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
-import { CURVE_ADMIN_FEE, CURVE_POOL_FEE, CURVE_REGISTRY, LENDING, LENDING_POOLS } from "./constants/index";
+import { ASSET_TYPES, CURVE_ADMIN_FEE, CURVE_POOL_FEE, CURVE_REGISTRY, LENDING, LENDING_POOLS } from "./constants/index";
 import { getOrCreateDexAmm, getOrCreateToken, getPoolFee } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
-import { BIGDECIMAL_ZERO,BIGINT_ZERO, LiquidityPoolFeeType } from "./constants";
+import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO,BIGINT_ZERO, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType } from "./constants";
 import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
-import { getCryptoTokenSnapshot, getTokenSnapshotByAssetType } from "../services/snapshots";
+import { getCryptoTokenPrice, getPoolAssetPrice } from "../services/snapshots";
 import { getPlatform } from "../services/platform";
+import { CurvePoolV2 } from "../../generated/AddressProvider/CurvePoolV2";
 
 export function setPoolCoins128(pool: LiquidityPool): void {
     const curvePool = CurvePoolCoin128.bind(Address.fromString(pool.id))
@@ -102,27 +103,47 @@ export function setPoolTokenWeights(liquidityPool:LiquidityPool): void {
     liquidityPool.save();
 }
 
+export function setPoolFeesV2(pool:LiquidityPool): void {
+  let curvePool = CurvePoolV2.bind(Address.fromString(pool.id));
+  let totalFeeCall = curvePool.try_fee();
+  let adminFeeCall = curvePool.try_admin_fee();
+  let totalFee = totalFeeCall.reverted ? CURVE_POOL_FEE : bigIntToBigDecimal(totalFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
+  let adminFee = adminFeeCall.reverted ? CURVE_ADMIN_FEE : bigIntToBigDecimal(adminFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
+
+  let tradingFee = getPoolFee(pool.id,LiquidityPoolFeeType.DYNAMIC_TRADING_FEE); // v2 pools have dynamic trading fees
+  tradingFee.feePercentage = totalFee.times(BIGDECIMAL_ONE_HUNDRED);
+  tradingFee.save();
+
+  let protocolFee = getPoolFee(pool.id,LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE);
+  protocolFee.feePercentage = adminFee.times(totalFee).times(BIGDECIMAL_ONE_HUNDRED);
+  protocolFee.save();
+
+  let lpFee = getPoolFee(pool.id,LiquidityPoolFeeType.DYNAMIC_LP_FEE);
+  lpFee.feePercentage = totalFee.minus((adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
+  lpFee.save();
+}
 
 export function setPoolFees(pool: LiquidityPool): void {
     let curvePool = CurvePool.bind(Address.fromString(pool.id));
-    let totalFee = BIGDECIMAL_ZERO;
-    let adminFee = BIGDECIMAL_ZERO;
-
+    if (pool.isV2) {
+      setPoolFeesV2(pool)
+      return 
+    }
     let totalFeeCall = curvePool.try_fee();
     let adminFeeCall = curvePool.try_admin_fee();
-    totalFee = totalFeeCall.reverted ? CURVE_POOL_FEE : bigIntToBigDecimal(totalFeeCall.value, 8);
-    adminFee = adminFeeCall.reverted ? CURVE_ADMIN_FEE : bigIntToBigDecimal(adminFeeCall.value, 8);
+    let totalFee = totalFeeCall.reverted ? CURVE_POOL_FEE : bigIntToBigDecimal(totalFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
+    let adminFee = adminFeeCall.reverted ? CURVE_ADMIN_FEE : bigIntToBigDecimal(adminFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
     
     let tradingFee = getPoolFee(pool.id,LiquidityPoolFeeType.FIXED_TRADING_FEE);
-    tradingFee.feePercentage = totalFee;
+    tradingFee.feePercentage = totalFee.times(BIGDECIMAL_ONE_HUNDRED);
     tradingFee.save();
   
     let protocolFee = getPoolFee(pool.id,LiquidityPoolFeeType.FIXED_PROTOCOL_FEE);
-    protocolFee.feePercentage = adminFee.times(totalFee);
+    protocolFee.feePercentage = adminFee.times(totalFee).times(BIGDECIMAL_ONE_HUNDRED);
     protocolFee.save();
   
     let lpFee = getPoolFee(pool.id,LiquidityPoolFeeType.FIXED_LP_FEE);
-    lpFee.feePercentage = totalFee.minus((adminFee.times(totalFee)));
+    lpFee.feePercentage = totalFee.minus((adminFee.times(totalFee))).times(BIGDECIMAL_ONE_HUNDRED);
     lpFee.save();
 
     pool.fees = [tradingFee.id, protocolFee.id, lpFee.id];  
@@ -139,12 +160,12 @@ export function setPoolOutputTokenSupply(pool: LiquidityPool): void {
   pool.save();
 }
 
-export function setPoolTVL(pool: LiquidityPool, blockNumber: BigInt): BigDecimal {
+export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];
     let token = getOrCreateToken(Address.fromString(pool.inputTokens[j]))
-    const priceUSD = pool.isV2 ? getCryptoTokenSnapshot(Address.fromString(token.id), blockNumber, pool) : getTokenSnapshotByAssetType(pool,blockNumber)
+    const priceUSD = pool.isV2 ? getCryptoTokenPrice(Address.fromString(token.id), timestamp, pool) : getPoolAssetPrice(pool,timestamp)
     totalValueLockedUSD = totalValueLockedUSD.plus(bigIntToBigDecimal(balance, token.decimals).times(priceUSD))    
   }
   pool.totalValueLockedUSD = totalValueLockedUSD;
@@ -152,7 +173,7 @@ export function setPoolTVL(pool: LiquidityPool, blockNumber: BigInt): BigDecimal
   return totalValueLockedUSD;
 }
 
-export function setProtocolTVL(blockNumber: BigInt): void {
+export function setProtocolTVL(): void {
   // updates all pool TVLs along with protocol TVL
   let protocol = getOrCreateDexAmm();
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -163,8 +184,7 @@ export function setProtocolTVL(blockNumber: BigInt): void {
     if (!pool) {
       return
     }
-    let poolTVL = setPoolTVL(pool, blockNumber)
-    totalValueLockedUSD = totalValueLockedUSD.plus(poolTVL)
+    totalValueLockedUSD = totalValueLockedUSD.plus(pool.totalValueLockedUSD)
   }
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
