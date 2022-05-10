@@ -13,6 +13,9 @@ export namespace Versions {
   // Array to list out the different schema versions available
   export const SchemaVersions = [Schema100, Schema110, Schema120];
 }
+
+export const latestSchemaVersion = "1.2.1";
+
 export const PoolName: Record<string, string> = {
   EXCHANGE: "liquidityPool",
   LENDING: "market",
@@ -54,7 +57,7 @@ export const ProtocolsToQuery: {[name: string]: {[network: string]: {URL: string
     },
     bsc: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-bsc",
-      deploymentId: "QmY1zDMokAncyfBbeZg59a69qYaXi5mcBSnsZAkqsgLhBM"
+      deploymentId: "QmNqi3ZwSqNF7rkDMLiVWD8an4A8T4XTudn4dK24P9AErE"
     },
     arbitrum: {
       URL: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-arbitrum",

@@ -188,7 +188,7 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
     protocolInfo = (
       <div style={{padding: "6px 24px"}}>
         <h3>{protocolSchemaData.protocols[0].name} - {protocolSchemaData.protocols[0].id}</h3>
-        <p>Subgraph Query Endpoint - {subgraphToQuery.url}</p>
+        <p><a href={subgraphToQuery.url}>Subgraph Query Endpoint - {subgraphToQuery.url}</a></p>
         <p>Type - {protocolSchemaData.protocols[0].type}</p>
         <p>Schema Version - {schemaVersion}</p>
         <p>Subgraph Version - {protocolSchemaData?.protocols[0]?.subgraphVersion}</p>
@@ -204,6 +204,7 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
         client.resetStore();
         setTabValue("1");
         setPoolId("");
+        setWarning([]);
         setSubgraphToQuery({url: "", version: ""});
         selectSubgraph("");
       }}>RETURN TO DEPLOYMENTS</Button>
@@ -213,6 +214,15 @@ function ProtocolDashboard(subgraphUrl: string, selectSubgraph: React.Dispatch<R
       {AllData()}
     </div>
   );
+}
+
+
+export function convertTokenDecimals(value: string, decimals: number): number {
+  if (isNaN(Number(value))) {
+    return 0;
+  }
+  const divisor = 10 ** decimals;
+  return (Number(value)/divisor)
 }
 
 export default ProtocolDashboard;

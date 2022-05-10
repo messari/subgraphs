@@ -120,12 +120,15 @@ export const schema100 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
             id
+            decimals
           }
           rewardTokens {
             id
+            decimals
           }
           name
           symbol
@@ -151,6 +154,7 @@ export const schema100 = (): Schema => {
     `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -269,12 +273,15 @@ export const schema110 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
             id
+            decimals
           }
           rewardTokens {
             id
+            decimals
           }
           rewardTokenEmissionsAmount
           rewardTokenEmissionsUSD
@@ -301,6 +308,7 @@ export const schema110 = (): Schema => {
       `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -415,6 +423,7 @@ export const schema120 = (): Schema => {
   });
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -481,12 +490,15 @@ export const schema120 = (): Schema => {
           decimals
           name
         }
-
         outputToken {
           id
+          decimals
         }
         rewardTokens {
           id
+          token {
+            decimals
+          }
         }
         depositLimit
         totalValueLockedUSD
