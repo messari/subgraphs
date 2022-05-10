@@ -22,6 +22,7 @@ import {
   getOrCreateToken,
   getOrCreateVault,
   getOrCreateVaultFee,
+  getOrCreateVaultInterest,
   getOrCreateYieldAggregator,
 } from "../common/getters";
 import { exponentToBigDecimal } from "../common/utils/utils";
@@ -201,16 +202,17 @@ export function updateYieldFees(vaultAddress: string): void {
 export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: BigDecimal): void {
   let financialMetrics = getOrCreateFinancials(event);
   let protocol = getOrCreateYieldAggregator();
+  let vaultInterest = getOrCreateVaultInterest(vault._vaultInterest, event.block.number);
 
   // get raw interest accrued based on vault address
   let tryTotalInterest: ethereum.CallResult<BigInt>;
-  if (vault._contractAddress == YIELD_VAULT_ADDRESS) {
+  if (vault._vaultInterest == YIELD_VAULT_ADDRESS) {
     let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getInterestAccrued();
-  } else if (vault._contractAddress == USDC_VAULT_ADDRESS) {
+  } else if (vault._vaultInterest == USDC_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getInterestAccrued();
-  } else if (vault._contractAddress == DAI_VAULT_ADDRESS) {
+  } else if (vault._vaultInterest == DAI_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getInterestAccrued();
   } else {
@@ -220,16 +222,21 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
   }
 
   if (!tryTotalInterest.reverted) {
-    let prevInterest = vault._currentInterestAccruedUSD;
+    let prevInterest = vaultInterest.interestAccruedUSD;
     let updatedInterest = tryTotalInterest.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
     if (prevInterest.gt(updatedInterest)) {
       // do not calculate fees b/c old interest is greater than current
       // this means net deposits and interests are out of whack
       // ie, someone just deposited or withdrew a large amount of $$
-      log.warning("NEGATIVE FEES: extras: {}", [extraFee.toString()]);
+      log.warning("updateRevenues() not updated because no new interest for vault {}", [vaultInterest.id]);
     } else {
+      // set new interest in vaultInterest
+      vaultInterest.interestAccruedUSD = updatedInterest;
+      vaultInterest.lastBlockNumber = event.block.number;
+      vaultInterest.save();
+
       let newTotalInterest = updatedInterest.minus(prevInterest);
-      let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vault._contractAddress).feePercentage!.div(
+      let performanceFee = getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vault._vaultInterest).feePercentage!.div(
         exponentToBigDecimal(INT_TWO),
       );
       let newFees = newTotalInterest.times(performanceFee);
@@ -249,20 +256,6 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
       protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(newTotalInterest);
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(newFees);
       protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(newInterest);
-
-      // update interest in all vaults with the same _contractAddress
-      // prevents double counting
-      for (let i = 0; i < protocol._vaultList.length; i++) {
-        let splitArr = protocol._vaultList[i].split("-", 2);
-        let _vaultAddress = splitArr[0];
-        let tokenAddress = splitArr[1];
-        let _vault = getOrCreateVault(event, _vaultAddress, tokenAddress);
-
-        if (_vault._contractAddress == vault._contractAddress) {
-          _vault._currentInterestAccruedUSD = updatedInterest; // only updates when non-negative newInterest
-          _vault.save();
-        }
-      }
     }
   }
 
@@ -341,13 +334,13 @@ export function updateInputTokenBalance(vault: Vault): void {
   let tryFundBalance: ethereum.CallResult<BigInt>;
   let inputToken = getOrCreateToken(vault.inputToken);
 
-  if (vault._contractAddress == YIELD_VAULT_ADDRESS) {
+  if (vault._vaultInterest == YIELD_VAULT_ADDRESS) {
     let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
     tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
-  } else if (vault._contractAddress == USDC_VAULT_ADDRESS) {
+  } else if (vault._vaultInterest == USDC_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
     tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
-  } else if (vault._contractAddress == DAI_VAULT_ADDRESS) {
+  } else if (vault._vaultInterest == DAI_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
     tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
   } else {

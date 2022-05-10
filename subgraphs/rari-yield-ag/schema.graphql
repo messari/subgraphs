@@ -327,7 +327,7 @@ type Vault @entity {
   id: ID!
 
   " Smart contract address of the vault "
-  _contractAddress: String!
+  _vaultInterest: _VaultInterest!
 
   " The protocol this vault belongs to "
   protocol: YieldAggregator!
@@ -352,9 +352,6 @@ type Vault @entity {
 
   " Type of fees incurred to the user. Should include all fees that apply to the vault "
   fees: [VaultFee!]!
-
-  " current amount of interest accrued (including fees), used to calculate revenues "
-  _currentInterestAccruedUSD: BigDecimal!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -616,4 +613,16 @@ type Account @entity {
 type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
+}
+
+# Helper entity to store interest accrued to calcualte revenues
+type _VaultInterest @entity {
+  " Contract address of the vault "
+  id: ID!
+
+  " most recent interest 'accrued' update "
+  interestAccruedUSD: BigDecimal!
+
+  " last block interest was updated "
+  lastBlockNumber: BigInt!
 }

@@ -9,6 +9,7 @@ import {
   VaultFee,
   VaultHourlySnapshot,
   YieldAggregator,
+  _VaultInterest,
 } from "../../generated/schema";
 import {
   BIGDECIMAL_ZERO,
@@ -46,7 +47,7 @@ import {
   YIELD_VAULT_SYMBOL,
 } from "./utils/constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "./utils/tokens";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 ///////////////////
 //// Snapshots ////
@@ -201,7 +202,7 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string, in
 
   if (!vault) {
     vault = new Vault(id);
-    vault._contractAddress = vaultAddress;
+    vault._vaultInterest = getOrCreateVaultInterest(vaultAddress, event.block.number).id;
 
     // set protocol fields
     let protocol = getOrCreateYieldAggregator();
@@ -251,7 +252,6 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string, in
       vault.fees = [getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id];
     }
 
-    vault._currentInterestAccruedUSD = BIGDECIMAL_ZERO;
     vault.createdTimestamp = event.block.timestamp;
     vault.createdBlockNumber = event.block.number;
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -293,6 +293,18 @@ export function getOrCreateVaultFee(type: string, vault: string): VaultFee {
     vaultFee = new VaultFee(id);
     vaultFee.feePercentage = BIGDECIMAL_ZERO;
     vaultFee.feeType = type;
+    vaultFee.save();
   }
   return vaultFee;
+}
+
+export function getOrCreateVaultInterest(vaultAddress: string, blockNumber: BigInt): _VaultInterest {
+  let vaultHelper = _VaultInterest.load(vaultAddress);
+  if (vaultHelper == null) {
+    vaultHelper = new _VaultInterest(vaultAddress);
+    vaultHelper.interestAccruedUSD = BIGDECIMAL_ZERO;
+    vaultHelper.lastBlockNumber = blockNumber;
+    vaultHelper.save();
+  }
+  return vaultHelper;
 }
