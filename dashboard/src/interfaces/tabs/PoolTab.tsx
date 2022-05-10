@@ -4,7 +4,7 @@ import { TableChart } from "../../common/chartComponents/TableChart";
 import { poolDropDown } from "../../common/utilComponents/PoolDropDown";
 import { PoolName, PoolNames, Versions } from "../../constants";
 import SchemaTable from "../SchemaTable";
-import { convertTokenDecimals } from "../ProtocolDashboard";
+import { convertTokenDecimals } from "../../utils/index";
 
 function PoolTab(
   data: any,
@@ -47,13 +47,17 @@ function PoolTab(
             return;
           }
           const currentInstanceField = entityInstance[entityFieldName];
-          if (!isNaN(currentInstanceField)) {
+          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
             let value = Number(currentInstanceField);
             if (entityFieldName === 'inputTokenBalance') {
               const dec = data[poolName].inputToken.decimals;
               value = convertTokenDecimals(currentInstanceField, dec);
             }
             if (entityFieldName === 'outputTokenSupply') {
+              const dec = data[poolName].outputToken.decimals;
+              value = convertTokenDecimals(currentInstanceField, dec);
+            }
+            if (entityFieldName === 'stakedOutputTokenAmount') {
               const dec = data[poolName].outputToken.decimals;
               value = convertTokenDecimals(currentInstanceField, dec);
             }
@@ -107,8 +111,37 @@ function PoolTab(
                 }
               }
               const dataFieldKey = entityFieldName + ' [' + fieldSplitIdentifier + ']';
-              if (entityFieldName === 'inputTokenBalances') {
-                value = convertTokenDecimals(val, data[poolName].inputTokens[arrayIndex].decimals);
+              try {
+                if (entityFieldName === 'inputTokenBalances') {
+                  value = convertTokenDecimals(val, data[poolName].inputTokens[arrayIndex].decimals);
+                }
+                if (entityFieldName === 'rewardTokenEmissionsAmount') {
+                  const currentRewardToken = data[poolName].rewardTokens[arrayIndex];
+                  if (currentRewardToken.decimals) {
+                    value = convertTokenDecimals(val, currentRewardToken?.decimals);
+                  } else if (currentRewardToken?.token?.decimals) {
+                    value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
+                  } else {
+                    value = convertTokenDecimals(val, 18);
+                    issues.push({ type: "DEC", message: poolName + '-' + entityFieldName + '-' + arrayIndex });
+                  }
+                }
+                if (entityFieldName === 'rewardTokenEmissionsUSD') {
+                  //Convert emissions amount in USD to APY/APR
+                  // total reward emission USD / total staked USD * 100 = reward APR
+                  if (entityInstance?.stakedOutputTokenAmount) {
+                    value = Number(val) / (entityInstance.outputTokenPriceUSD * entityInstance.stakedOutputTokenAmount) * 100 * 365;
+                  } else if (entityInstance?.totalDepositBalanceUSD) {
+                    value = Number(val) / entityInstance.totalDepositBalanceUSD * 100 * 365;
+                  } else {
+                    value = Number(val) / entityInstance.totalValueLockedUSD * 100 * 365;
+                  }
+
+                }
+              } catch (err) {
+                if (err instanceof Error) {
+                  issues.push({ type: "DEC", message: poolName + '-' + entityFieldName + '-' + arrayIndex })
+                }
               }
               if (!dataFields[dataFieldKey]) {
                 dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
@@ -181,7 +214,7 @@ function PoolTab(
     const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
     return (
       <div>
-        {poolDropDown(poolId, setPoolId, data[poolNames], PoolNames)}
+        {poolDropDown(poolId, setPoolId, setWarning, data[poolNames])}
         {poolSchema}
         {poolEntityElements}
       </div>);
