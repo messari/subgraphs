@@ -46,7 +46,7 @@ export function createDeposit(
   // create id
   let hash = event.transaction.hash;
   let logIndex = event.transaction.index;
-  let id = hash.toHexString() + "-" + logIndex.toString();
+  let id = "deposit-" + hash.toHexString() + "-" + logIndex.toString();
 
   // create Deposit
   let deposit = new Deposit(id);
@@ -102,7 +102,7 @@ export function createWithdraw(
   // create id
   let hash = event.transaction.hash;
   let logIndex = event.transaction.index;
-  let id = hash.toHexString() + "-" + logIndex.toString();
+  let id = "withdraw-" + hash.toHexString() + "-" + logIndex.toString();
 
   // create Deposit
   let withdraw = new Withdraw(id);
