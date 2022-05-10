@@ -34,7 +34,7 @@ import {
   updateVaultDailyMetrics,
   updateVaultHourlyMetrics,
 } from "../common/metrics";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { getUsdPrice } from "../prices";
 import { exponentToBigDecimal } from "../common/utils/utils";
 

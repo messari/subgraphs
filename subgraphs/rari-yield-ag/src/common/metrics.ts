@@ -104,6 +104,7 @@ export function updateVaultDailyMetrics(event: ethereum.Event, vaultId: string):
   vaultMetrics.inputTokenBalance = vault!.inputTokenBalance;
   vaultMetrics.outputTokenSupply = vault!.outputTokenSupply!;
   vaultMetrics.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
+  vaultMetrics.pricePerShare = vault!.pricePerShare;
 
   // update block and timestamp
   vaultMetrics.blockNumber = event.block.number;
@@ -121,6 +122,7 @@ export function updateVaultHourlyMetrics(event: ethereum.Event, vaultId: string)
   vaultMetrics.inputTokenBalance = vault!.inputTokenBalance;
   vaultMetrics.outputTokenSupply = vault!.outputTokenSupply!;
   vaultMetrics.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
+  vaultMetrics.pricePerShare = vault!.pricePerShare;
 
   // update block and timestamp
   vaultMetrics.blockNumber = event.block.number;

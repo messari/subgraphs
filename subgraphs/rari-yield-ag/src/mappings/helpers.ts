@@ -218,7 +218,6 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
   } else {
     let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
     tryTotalInterest = contract.try_getInterestAccrued();
-    log.warning("ETHEREUM interest: ${}", [tryTotalInterest.value.toString()]);
   }
 
   if (!tryTotalInterest.reverted) {
@@ -241,13 +240,6 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
       );
       let newFees = newTotalInterest.times(performanceFee);
       let newInterest = newTotalInterest.times(BIGDECIMAL_ONE.minus(performanceFee));
-
-      // TODO - remove
-      log.warning("Previous Interest ${} New Interest ${} for vault {}", [
-        prevInterest.toString(),
-        newInterest.toString(),
-        vault.name!.toString(),
-      ]);
 
       // add new interests
       financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(newTotalInterest);
