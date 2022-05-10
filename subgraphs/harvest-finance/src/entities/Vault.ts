@@ -1,12 +1,13 @@
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
 import { Vault, Token } from "../../generated/schema";
-import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, VaultFeeType } from "../constant";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
 import { getOrCreateToken } from "./Token";
 import { VaultListener } from '../../generated/templates';
+import * as constants from "./../constant";
+import { getUsdPricePerToken } from "./../Prices";
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -22,18 +23,18 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.inputToken = "";
   vault.outputToken = "";
   vault.rewardTokens = [];
-  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  //vault.totalVolumeUSD = BIGDECIMAL_ZERO;
-  vault.inputTokenBalance = BIGINT_ZERO;
-  vault.outputTokenSupply = BIGINT_ZERO;
-  vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  //vault.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
+  vault.inputTokenBalance = constants.BIGINT_ZERO;
+  vault.outputTokenSupply = constants.BIGINT_ZERO;
+  vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
   vault.rewardTokenEmissionsAmount = [];
   vault.rewardTokenEmissionsUSD = [];
   vault.createdTimestamp = block.timestamp;
   vault.createdBlockNumber = block.number;
   vault.name = "";
   vault.symbol = "";
-  vault.depositLimit = BIGINT_ZERO;
+  vault.depositLimit = constants.BIGINT_ZERO;
   vault.fees = [];
   vault.save();
 
@@ -65,43 +66,27 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   return vault as Vault;
 }
 
-/*
-export function updateVaultFees(vault: Vault, strategyAddress: Address): void {
-  const strategyContract = Strategy.bind(strategyAddress);
-  let numer = readValue<BigInt>(strategyContract.try_withdrawFeeNumer(), BIGINT_ZERO);
-  let denom = readValue<BigInt>(strategyContract.try_withdrawFeeDenom(), BIGINT_ZERO);
+export function updateVaultPrices(vault: Vault): void{
 
-  let feePercentage = denom.isZero()
-    ? BIGDECIMAL_ZERO
-    : numer
-        .toBigDecimal()
-        .times(BIGDECIMAL_HUNDRED)
-        .div(denom.toBigDecimal());
+  let vaultAddress = Address.fromString(vault.id);
+  let vault_contract = VaultContract.bind(vaultAddress);
 
-  let withdrawFeeId = enumToPrefix(VaultFeeType.WITHDRAWAL_FEE)
-    .concat(strategyAddress.toHex().toLowerCase())
-    .concat("-")
-    .concat(vault.id);
+  let inputTokenAddress = Address.fromString(vault.inputToken)
+  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  // exist because vault create it
+  let inputToken = Token.load(inputTokenAddress.toHex());
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
 
-  createFeeType(withdrawFeeId, VaultFeeType.WITHDRAWAL_FEE, feePercentage);
+  vault.outputTokenSupply = readValue<BigInt>(vault_contract.try_totalSupply(), constants.BIGINT_ZERO);
 
-  let vaultContract = VaultContract.bind(Address.fromString(vault.id));
-  numer = readValue<BigInt>(vaultContract.try_entranceFeeNumer(), BIGINT_ZERO);
-  denom = readValue<BigInt>(vaultContract.try_entranceFeeDenom(), BIGINT_ZERO);
+  vault.pricePerShare = readValue<BigInt>(vault_contract.try_getPricePerFullShare(), constants.BIGINT_ZERO).toBigDecimal();
+  vault.save();
 
-  feePercentage = denom.isZero()
-    ? BIGDECIMAL_ZERO
-    : numer
-        .toBigDecimal()
-        .times(BIGDECIMAL_HUNDRED)
-        .div(denom.toBigDecimal());
-
-  let depositFeeId = enumToPrefix(VaultFeeType.DEPOSIT_FEE)
-    .concat(strategyAddress.toHex().toLowerCase())
-    .concat("-")
-    .concat(vault.id);
-
-  createFeeType(depositFeeId, VaultFeeType.DEPOSIT_FEE, feePercentage);
+  vault.totalValueLockedUSD = (<BigDecimal> vault.pricePerShare)
+    .times(inputTokenPrice.usdPrice)
+    .times((<BigInt> vault.outputTokenSupply).toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
+    .div(inputTokenDecimals.toBigDecimal())
+    .div(inputTokenPrice.decimals.toBigDecimal());
+  vault.save()
 }
-
-*/

@@ -112,7 +112,7 @@ templates:
         #  handler: handleStrategyChanged
         #- event: Withdraw(indexed address,uint256)
         #  handler: handleWithdraw
-      #callHandlers:
-        #- function: doHardWork()
-        #  handler: handleDoHardWorkCall
+      callHandlers:
+        - function: doHardWork()
+          handler: handleDoHardWorkCall
       file: ./src/mappings/VaultListener.ts
