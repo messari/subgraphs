@@ -1,4 +1,4 @@
-# Rari Capital Yield Aggregator
+# Rari Capital Yield Aggregator v1
 
 ## Calculation Methodology v1.0.0
 
