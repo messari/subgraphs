@@ -60,6 +60,7 @@ export function handleDeposit(event: DepositEvent): void {
   vault.save();
 
   depositUpdateMetrics(event, vault);
+  //calculateProtocolTotalValueLockedUSD(event);
   
 }
 
@@ -110,6 +111,17 @@ export function handleDoHardWorkCall(call: DoHardWorkCall): void {
 
   let vault = getOrCreateVault(vaultAddress, call.block);
   //updateVaultPrices(call, vault);
+
+}
+
+
+export function handleStrategyChanged(event: StrategyChangedEvent): void {
+  const vaultAddress = event.address;
+  const new_strategy_address = event.params.newStrategy;
+
+  // this will automaticly update vault and vaultFee
+  let vault = getOrCreateVault(vaultAddress, event.block);
+  updateVaultPrices(event, vault);
 
 }
 
