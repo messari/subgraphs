@@ -18,6 +18,7 @@
 
 
 **Deployment Instructions:**
+
 '''
 # Deploys uniswap-v2 to mainnet in my hosted service.
 npm run deploy uniswap-v2 mainnet steegecs
@@ -25,6 +26,5 @@ npm run deploy uniswap-v2 mainnet steegecs
 npm run deploy uniswap-v2 steegecs
 # Deploys protocols and networks in my hosted service.
 npm run deploy steege
-```
 
-- Add/update configuraptions to the deployment/deploymentConfigurations.json file in order to add or update deployments.
+```
