@@ -1,7 +1,7 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/ControllerListener/ERC20";
 import { RewardToken, Token } from "../../generated/schema";
-import { DEFAULT_DECIMALS, RewardTokenType } from "../constant";
+import * as constants from "../constant";
 import { readValue } from "../utils/contracts";
 
 export function getOrCreateToken(id: Address): Token {
@@ -16,7 +16,7 @@ export function getOrCreateToken(id: Address): Token {
   let erc20Contract = ERC20.bind(id);
   token.name = readValue<string>(erc20Contract.try_name(), "");
   token.symbol = readValue<string>(erc20Contract.try_symbol(), "");
-  token.decimals = readValue<i32>(erc20Contract.try_decimals(), DEFAULT_DECIMALS);
+  token.decimals = (readValue<BigInt>(erc20Contract.try_decimals(), constants.BIGINT_ZERO)).toI32();
   token.save();
 
   return token as Token;
@@ -34,7 +34,7 @@ export function getOrCreateReward(id: Address): RewardToken {
   let erc20Contract = ERC20.bind(id);
   token.name = readValue<string>(erc20Contract.try_name(), "");
   token.symbol = readValue<string>(erc20Contract.try_symbol(), "");
-  token.decimals = readValue<i32>(erc20Contract.try_decimals(), DEFAULT_DECIMALS);
+  token.decimals = (readValue<BigInt>(erc20Contract.try_decimals(), constants.BIGINT_ZERO)).toI32();
   token.type = RewardTokenType.DEPOSIT;
   token.save();
 

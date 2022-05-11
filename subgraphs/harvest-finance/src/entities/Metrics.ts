@@ -249,8 +249,11 @@ export function updateVaultDailySnapshot(event: ethereum.Event, vault: Vault): v
 }
 
 export function updateVaultHourlySnapshot(event: ethereum.Event, vault: Vault): void {
+  let day: i64 = getDay(event.block.timestamp.toI64());
   let hour: i64 = getDay(event.block.timestamp.toI64());
   let snapshot_id = vault.id
+    .concat("-")
+    .concat(day.toString())
     .concat("-")
     .concat(hour.toString());
   let snapshot = updateOrCreateVaultHourlySnapshot(snapshot_id, event, vault);

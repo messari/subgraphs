@@ -14,21 +14,18 @@ import { VaultContract } from "../../generated/ControllerListener/VaultContract"
 // schema imports
 
 
-// helper function imports
-import { getOrCreateVault } from './../entities/Vault'
+// helper entities functions imports
+import { getOrCreateVault, updateVaultPrices } from './../entities/Vault'
 
-/*
+
+
 export function handleSharePriceChangeLog(event: SharePriceChangeLogEvent): void{
-  let transaction_hash = event.transaction.hash.toHex()
+  let vault_addr = event.params.vault;
+  let block = event.block;
+  let vault = getOrCreateVault(vault_addr, block);
 
-  let share_price_change_log = new SharePriceChangeLog(transaction_hash)
-  share_price_change_log.doHardWork = transaction_hash
-  share_price_change_log.oldSharePrice = event.params.oldSharePrice
-  share_price_change_log.newSharePrice = event.params.newSharePrice
-
-  share_price_change_log.save()
+  updateVaultPrices(event, vault);
 }
-*/
 
 
 export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
