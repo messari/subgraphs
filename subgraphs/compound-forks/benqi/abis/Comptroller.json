@@ -685,9 +685,7 @@
       { "internalType": "uint256", "name": "", "type": "uint256" }
     ],
     "name": "accountAssets",
-    "outputs": [
-      { "internalType": "contract QiToken", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract QiToken", "name": "", "type": "address" }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
@@ -705,9 +703,7 @@
     "constant": true,
     "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "name": "allMarkets",
-    "outputs": [
-      { "internalType": "contract QiToken", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract QiToken", "name": "", "type": "address" }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
@@ -869,22 +865,16 @@
   },
   {
     "constant": false,
-    "inputs": [
-      { "internalType": "address[]", "name": "qiTokens", "type": "address[]" }
-    ],
+    "inputs": [{ "internalType": "address[]", "name": "qiTokens", "type": "address[]" }],
     "name": "enterMarkets",
-    "outputs": [
-      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-    ],
+    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "constant": false,
-    "inputs": [
-      { "internalType": "address", "name": "qiTokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "qiTokenAddress", "type": "address" }],
     "name": "exitMarket",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "payable": false,
@@ -893,9 +883,7 @@
   },
   {
     "constant": true,
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
     "name": "getAccountLiquidity",
     "outputs": [
       { "internalType": "uint256", "name": "", "type": "uint256" },
@@ -910,22 +898,16 @@
     "constant": true,
     "inputs": [],
     "name": "getAllMarkets",
-    "outputs": [
-      { "internalType": "contract QiToken[]", "name": "", "type": "address[]" }
-    ],
+    "outputs": [{ "internalType": "contract QiToken[]", "name": "", "type": "address[]" }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
   },
   {
     "constant": true,
-    "inputs": [
-      { "internalType": "address", "name": "account", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
     "name": "getAssetsIn",
-    "outputs": [
-      { "internalType": "contract QiToken[]", "name": "", "type": "address[]" }
-    ],
+    "outputs": [{ "internalType": "contract QiToken[]", "name": "", "type": "address[]" }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
@@ -1133,9 +1115,7 @@
     "constant": true,
     "inputs": [],
     "name": "oracle",
-    "outputs": [
-      { "internalType": "contract PriceOracle", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract PriceOracle", "name": "", "type": "address" }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
@@ -1379,9 +1359,7 @@
   },
   {
     "constant": false,
-    "inputs": [
-      { "internalType": "address", "name": "newQiAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newQiAddress", "type": "address" }],
     "name": "setQiAddress",
     "outputs": [],
     "payable": false,
