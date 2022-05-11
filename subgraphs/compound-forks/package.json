@@ -1,9 +1,12 @@
 {
-  "name": "compound-fork-subgraph",
+  "name": "compound-forks",
   "license": "MIT",
-  "repository": "https://github.com/messari/subgraphs/blob/master/subgraphs/compound-forks",
   "scripts": {
     "format": "npx prettier --write ."
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "^0.29.2",
+    "@graphprotocol/graph-ts": "^0.26.0"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.26.0",
