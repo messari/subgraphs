@@ -1,9 +1,9 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import {
   getOrCreateToken,
   getOrCreateYieldAggregator,
 } from "../common/initializers";
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
 import {
   SetVaultCall,
   SetStrategyCall,
@@ -57,7 +57,7 @@ export function handleSetVault(call: SetVaultCall): void {
   protocol._vaultIds.push(vaultAddress.toHexString());
   protocol.save();
 
-  log.warning("[SetVault]\n - TxHash: {}, VaultId: {}, StrategyId: {}", [
+  log.warning("[SetVault] - TxHash: {}, VaultId: {}, StrategyId: {}", [
     call.transaction.hash.toHexString(),
     call.inputs._vault.toHexString(),
     strategyAddress,
@@ -85,7 +85,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
       newStrategyAddress
     );
 
-    log.warning("[SetStrategy]\n TxHash: {}, VaultId: {}, Strategy: {}", [
+    log.warning("[SetStrategy] TxHash: {}, VaultId: {}, Strategy: {}", [
       call.transaction.hash.toHexString(),
       vaultAddress.toHexString(),
       newStrategyAddress.toHexString(),
@@ -96,7 +96,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
 export function handleRevokeStrategy(call: RevokeStrategyCall): void {
   store.remove("_Strategy", call.inputs._strategy.toHexString());
 
-  log.warning("[RevokeStrategy]\n TxHash: {}, StrategyId: {}", [
+  log.warning("[RevokeStrategy] TxHash: {}, StrategyId: {}", [
     call.transaction.hash.toHexString(),
     call.inputs._strategy.toHexString(),
   ]);

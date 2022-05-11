@@ -160,6 +160,8 @@ templates:
           file: ./abis/Ethereum/ERC20.json
         - name: Gauge
           file: ./abis/Ethereum/gauge.json
+        - name: Strategy
+          file: ./abis/Ethereum/strategy.json
         
         ###########################################
         ############## Price Oracle ###############

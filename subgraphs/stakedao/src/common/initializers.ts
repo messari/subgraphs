@@ -299,6 +299,7 @@ export function getOrCreateStrategy(
   );
 
   vault.fees = [withdrawalFeeId, performanceFeeId];
+  vault._strategy = strategyAddress;
   vault.save();
 
   StrategyTemplate.create(Address.fromString(strategyAddress));
