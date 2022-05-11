@@ -33,7 +33,5 @@
     }
     rewardTokenEmissionsAmount
     rewardTokenEmissionsUSD
-    _accrualBlockNumber
-    _accrualTimestamp
   }
 }

@@ -1,13 +1,14 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
 import { BASE_ASSETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
 import { Token } from "../../generated/schema";
-import { getOrCreateDex } from "./getters";
+import { getOrCreateDex, getOrCreateToken } from "./getters";
 import { getUsdPrice } from "../prices";
 
 export function valueInUSD(value: BigDecimal, asset: Address): BigDecimal {
   let usdValue = BIGDECIMAL_ZERO;
   let token = Token.load(asset.toHexString());
   let tokenPrice = token!.lastPriceUSD;
+  if (isUSDStable(asset)) return value;
   if (token && tokenPrice) {
     usdValue = value.times(tokenPrice);
   }
@@ -22,6 +23,7 @@ export function calculateTokenValueInUsd(
 ): BigDecimal {
   if (tokenAmount.equals(BIGDECIMAL_ZERO) || stableAmount.equals(BIGDECIMAL_ZERO)) return BIGDECIMAL_ZERO;
   if (stableWeight && tokenWeight) {
+    if (stableWeight.equals(BIGDECIMAL_ZERO) || tokenWeight.equals(BIGDECIMAL_ZERO)) return BIGDECIMAL_ZERO;
     return stableAmount.div(stableWeight).div(tokenAmount.div(tokenWeight));
   }
   return stableAmount.div(tokenAmount);
@@ -57,10 +59,12 @@ export function calculatePrice(
   if (isUSDStable(tokenOutAddress) && isUSDStable(tokenInAddress)) return null;
 
   // If one of both tokens is stable we can calculate how much the other token is worth in usd terms
-  if (isUSDStable(tokenOutAddress))
+  if (isUSDStable(tokenOutAddress)) {
     return new TokenInfo(tokenInAddress, calculateTokenValueInUsd(amountIn, amountOut, weightIn, weightOut));
-  if (isUSDStable(tokenInAddress))
+  }
+  if (isUSDStable(tokenInAddress)) {
     return new TokenInfo(tokenOutAddress, calculateTokenValueInUsd(amountOut, amountIn, weightOut, weightIn));
+  }
 
   /**
    * Base assets are known tokens that we can make sure they have a pool with a stable token
@@ -68,14 +72,8 @@ export function calculatePrice(
    * This is meant for tokens that do not share pools with stable coins (for example, COW)
    */
 
-  let tokenIn = Token.load(tokenInAddress.toHexString());
-  let tokenOut = Token.load(tokenOutAddress.toHexString());
-
-  let tokenInPrice: BigDecimal | null = null;
-  let tokenOutPrice: BigDecimal | null = null;
-
-  if (tokenIn) tokenInPrice = tokenIn.lastPriceUSD;
-  if (tokenOut) tokenOutPrice = tokenOut.lastPriceUSD;
+  let tokenInPrice = getOrCreateToken(tokenInAddress).lastPriceUSD;
+  let tokenOutPrice = getOrCreateToken(tokenOutAddress).lastPriceUSD;
 
   if (isBaseAsset(tokenInAddress) && tokenInPrice) {
     amountIn = amountIn.times(tokenInPrice);

@@ -1,0 +1,157 @@
+[
+  { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "cloneAddress",
+        "type": "address"
+      }
+    ],
+    "name": "NewClone",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "deployer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "swapAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "contract IERC20[]",
+        "name": "pooledTokens",
+        "type": "address[]"
+      }
+    ],
+    "name": "NewSwapPool",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "target", "type": "address" }
+    ],
+    "name": "clone",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "swapAddress", "type": "address" },
+      {
+        "internalType": "contract IERC20[]",
+        "name": "_pooledTokens",
+        "type": "address[]"
+      },
+      { "internalType": "uint8[]", "name": "decimals", "type": "uint8[]" },
+      { "internalType": "string", "name": "lpTokenName", "type": "string" },
+      { "internalType": "string", "name": "lpTokenSymbol", "type": "string" },
+      { "internalType": "uint256", "name": "_a", "type": "uint256" },
+      { "internalType": "uint256", "name": "_fee", "type": "uint256" },
+      { "internalType": "uint256", "name": "_adminFee", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "lpTokenTargetAddress",
+        "type": "address"
+      }
+    ],
+    "name": "deploy",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "metaSwapAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "contract IERC20[]",
+        "name": "_pooledTokens",
+        "type": "address[]"
+      },
+      { "internalType": "uint8[]", "name": "decimals", "type": "uint8[]" },
+      { "internalType": "string", "name": "lpTokenName", "type": "string" },
+      { "internalType": "string", "name": "lpTokenSymbol", "type": "string" },
+      { "internalType": "uint256", "name": "_a", "type": "uint256" },
+      { "internalType": "uint256", "name": "_fee", "type": "uint256" },
+      { "internalType": "uint256", "name": "_adminFee", "type": "uint256" },
+      {
+        "internalType": "address",
+        "name": "lpTokenTargetAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "contract ISwap",
+        "name": "baseSwap",
+        "type": "address"
+      }
+    ],
+    "name": "deployMetaSwap",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

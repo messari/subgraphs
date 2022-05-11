@@ -19,14 +19,15 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault = new Vault(id.toHex());
 
   vault.protocol = protocol.id;
-  vault.inputTokens = [];
+  vault.inputToken = "";
   vault.outputToken = "";
   vault.rewardTokens = [];
   vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  vault.totalVolumeUSD = BIGDECIMAL_ZERO;
-  vault.inputTokenBalances = [];
+  vault.inputTokenBalance = BIGINT_ZERO;
   vault.outputTokenSupply = BIGINT_ZERO;
   vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  vault.pricePerShare = BIGDECIMAL_ZERO;
+  vault.stakedOutputTokenAmount = BIGINT_ZERO;
   vault.rewardTokenEmissionsAmount = [];
   vault.rewardTokenEmissionsUSD = [];
   vault.createdTimestamp = block.timestamp;
