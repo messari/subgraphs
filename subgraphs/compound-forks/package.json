@@ -9,6 +9,6 @@
     "@graphprotocol/graph-ts": "^0.26.0"
   },
   "devDependencies": {
-    "prettier": "2.6.1"
+    "prettier": "^2.6.2"
   }
 }
