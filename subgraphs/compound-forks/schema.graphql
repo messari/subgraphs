@@ -991,5 +991,5 @@ type _Comptroller @entity {
   name: String!
 
   " price oracle for this contract "
-  _priceOracle: String!
+  priceOracle: String!
 }
