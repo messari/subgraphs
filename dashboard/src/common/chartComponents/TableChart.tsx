@@ -1,5 +1,5 @@
 import { DataGrid } from "@mui/x-data-grid";
-import { toDate } from "../App";
+import { toDate } from "../../../src/utils/index";
 
 export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: number) => {
     if (dataTable) {
