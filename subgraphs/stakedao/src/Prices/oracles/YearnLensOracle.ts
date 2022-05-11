@@ -27,5 +27,5 @@ export function getTokenPriceFromYearnLens(
     )
     .toBigDecimal();
 
-  return CustomPriceType.initialize(tokenPrice);
+  return CustomPriceType.initialize(tokenPrice, 6);
 }

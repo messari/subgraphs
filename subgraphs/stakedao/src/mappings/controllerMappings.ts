@@ -1,12 +1,15 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import {
+  getOrCreateToken,
+  getOrCreateYieldAggregator,
+} from "../common/initializers";
+import {
   SetVaultCall,
   SetStrategyCall,
   RevokeStrategyCall,
 } from "../../generated/Controller/EthereumController";
-
-import { getOrCreateStrategy } from "../modules/Strategy";
+import { getOrCreateStrategy } from "../common/initializers";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Address, log, store } from "@graphprotocol/graph-ts";
 import { Vault as VaultTemplate } from "../../generated/templates";
@@ -25,15 +28,14 @@ export function handleSetVault(call: SetVaultCall): void {
   vault.symbol = vaultContract.symbol();
   vault.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
-  const inputToken = utils.getOrCreateToken(inputTokenAddress);
-  vault.inputTokens = [inputToken.id];
-  vault.inputTokenBalances = [constants.BIGINT_ZERO];
+  const inputToken = getOrCreateToken(inputTokenAddress);
+  vault.inputToken = inputToken.id;
+  vault.inputTokenBalance = constants.BIGINT_ZERO;
 
-  const outputToken = utils.getOrCreateToken(vaultAddress);
+  const outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;
   vault.outputTokenSupply = constants.BIGINT_ZERO;
 
-  vault.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
   vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
   vault.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
@@ -47,11 +49,11 @@ export function handleSetVault(call: SetVaultCall): void {
 
   const strategyAddress = getOrCreateStrategy(
     controllerAddress,
-    vaultAddress,
+    vault,
     inputTokenAddress
   );
 
-  let protocol = utils.getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  let protocol = getOrCreateYieldAggregator();
   protocol._vaultIds.push(vaultAddress.toHexString());
   protocol.save();
 
@@ -78,7 +80,7 @@ export function handleSetStrategy(call: SetStrategyCall): void {
   if (vault) {
     getOrCreateStrategy(
       controllerAddress,
-      vaultAddress,
+      vault,
       inputTokenAddress,
       newStrategyAddress
     );

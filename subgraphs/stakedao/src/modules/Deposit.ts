@@ -1,89 +1,144 @@
 import {
+  Token,
   Vault as VaultStore,
   Deposit as DepositTransaction,
-  Token,
 } from "../../generated/schema";
-
+import {
+  log,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import {
+  getOrCreateYieldAggregator,
+  getOrCreateUsageMetricsDailySnapshot,
+  getOrCreateUsageMetricsHourlySnapshot,
+} from "../common/initializers";
 import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import { getUsdPricePerToken } from "../Prices";
-import { getPriceOfStakedTokens } from "./Price";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-
-export function _Deposit(
-  call: ethereum.Call,
-  vault: VaultStore,
-  _depositAmount: BigInt
-): void {
-  let id = "deposit-" + call.transaction.hash.toHexString();
-
-  let transaction = DepositTransaction.load(id);
-  if (transaction) {
-    return;
-  }
-
-  transaction = createDepositTransaction(id, call);
-
-  let _totalSupply = vault.outputTokenSupply;
-  let _balance = vault.inputTokenBalances[0];
-
-  // calculate shares minted as per the deposit function in vault contract address
-  let _sharesMinted = _totalSupply.isZero()
-    ? _depositAmount
-    : _depositAmount.times(_totalSupply).div(_balance);
-
-  let inputToken = Token.load(vault.inputTokens[0]);
-  let inputTokenAddress = Address.fromString(vault.inputTokens[0]);
-  let inputTokenDecimals = BigInt.fromI32(10).pow(inputToken!.decimals as u8);
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-
-  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
-    .times(vault.inputTokenBalances[0].toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal());
-
-  vault.totalVolumeUSD = vault.totalVolumeUSD.plus(
-    inputTokenPrice.usdPrice
-      .times(_depositAmount.toBigDecimal())
-      .div(inputTokenDecimals.toBigDecimal())
-      .div(inputTokenPrice.decimals.toBigDecimal())
-  );
-
-  vault.inputTokenBalances = [vault.inputTokenBalances[0].plus(_depositAmount)];
-  vault.outputTokenSupply = vault.outputTokenSupply.plus(_sharesMinted);
-
-  vault.outputTokenPriceUSD = getPriceOfStakedTokens(
-    Address.fromString(vault.id),
-    inputTokenAddress,
-    inputTokenDecimals
-  ).toBigDecimal();
-
-  // update deposit transaction
-  transaction.asset = vault.inputTokens[0];
-  transaction.amount = _depositAmount;
-  transaction.amountUSD = inputTokenPrice.usdPrice
-    .times(_depositAmount.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
-
-  transaction.save();
-  vault.save();
-}
+import { getPriceOfOutputTokens } from "./Price";
+import * as constants from "../common/constants";
+import { Vault as VaultContract } from "../../generated/Controller/Vault";
 
 export function createDepositTransaction(
-  id: string,
-  call: ethereum.Call
+  to: Address,
+  vaultAddress: Address,
+  transaction: ethereum.Transaction,
+  block: ethereum.Block,
+  assetId: string,
+  amount: BigInt,
+  amountUSD: BigDecimal
 ): DepositTransaction {
-  let transaction = new DepositTransaction(id);
+  let transactionId = "deposit-" + transaction.hash.toHexString();
 
-  transaction.logIndex = call.transaction.index.toI32();
-  transaction.to = call.to.toHexString();
-  transaction.from = call.transaction.from.toHexString();
-  transaction.hash = call.transaction.hash.toHexString();
+  let depositTransaction = DepositTransaction.load(transactionId);
 
-  transaction.timestamp = utils.getTimestampInMillis(call.block);
-  transaction.blockNumber = call.block.number;
-  transaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
-  transaction.vault = call.to.toHexString();
+  if (!depositTransaction) {
+    depositTransaction = new DepositTransaction(transactionId);
 
-  return transaction;
+    depositTransaction.vault = vaultAddress.toHexString();
+    depositTransaction.protocol = constants.ETHEREUM_PROTOCOL_ID;
+
+    depositTransaction.to = to.toHexString();
+    depositTransaction.from = transaction.from.toHexString();
+
+    depositTransaction.hash = transaction.hash.toHexString();
+    depositTransaction.logIndex = transaction.index.toI32();
+
+    depositTransaction.asset = assetId;
+    depositTransaction.amount = amount;
+    depositTransaction.amountUSD = amountUSD;
+
+    depositTransaction.timestamp = utils.getTimestampInMillis(block);
+    depositTransaction.blockNumber = block.number;
+
+    depositTransaction.save();
+  }
+
+  return depositTransaction;
+}
+
+export function _Deposit(
+  to: Address,
+  transaction: ethereum.Transaction,
+  block: ethereum.Block,
+  vault: VaultStore,
+  depositAmount: BigInt
+): void {
+  const vaultAddress = Address.fromString(vault.id);
+  const vaultContract = VaultContract.bind(vaultAddress);
+  const protocol = getOrCreateYieldAggregator();
+
+  // calculate shares minted as per the deposit function in vault contract address
+  let sharesMinted = vault.outputTokenSupply.isZero()
+    ? depositAmount
+    : depositAmount.times(vault.outputTokenSupply).div(vault.inputTokenBalance);
+
+  let inputToken = Token.load(vault.inputToken);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
+  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
+
+  let depositAmountUSD = depositAmount
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
+
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
+  vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+
+  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositAmountUSD);
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    depositAmountUSD
+  );
+
+  vault.outputTokenPriceUSD = getPriceOfOutputTokens(
+    vaultAddress,
+    inputTokenAddress,
+    inputTokenDecimals
+  );
+
+  vault.pricePerShare = utils
+    .readValue<BigInt>(
+      vaultContract.try_getPricePerFullShare(),
+      constants.BIGINT_ZERO
+    )
+    .toBigDecimal();
+
+  // Update hourly and daily deposit transaction count
+  const metricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(block);
+  const metricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(block);
+
+  metricsDailySnapshot.dailyDepositCount += 1;
+  metricsHourlySnapshot.hourlyDepositCount += 1;
+
+  metricsDailySnapshot.save();
+  metricsHourlySnapshot.save();
+  protocol.save();
+  vault.save();
+
+  createDepositTransaction(
+    to,
+    vaultAddress,
+    transaction,
+    block,
+    vault.inputToken,
+    depositAmount,
+    depositAmountUSD
+  );
+
+
+  log.info(
+    "[Deposit] TxHash: {}, vaultAddress: {}, _sharesMinted: {}, _depositAmount: {}",
+    [
+      transaction.hash.toHexString(),
+      vault.id,
+      sharesMinted.toString(),
+      depositAmount.toString(),
+    ]
+  );
 }
