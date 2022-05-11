@@ -1,4 +1,6 @@
 .PHONY: codegen
+codegen-base:
+	graph codegen $(subgraph)/subgraph.yaml -o ./generated
 codegen:
 	graph codegen $(subgraph)/subgraph.yaml -o $(subgraph)/generated
 

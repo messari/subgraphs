@@ -275,7 +275,9 @@
   {
     "inputs": [{ "internalType": "address", "name": "to", "type": "address" }],
     "name": "mint",
-    "outputs": [{ "internalType": "uint256", "name": "liquidity", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "liquidity", "type": "uint256" }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },

@@ -2,8 +2,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "address[]", "name": "admins", "type": "address[]" },
-      { "indexed": false, "internalType": "bool", "name": "status", "type": "bool" }
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "admins",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "status",
+        "type": "bool"
+      }
     ],
     "name": "AdminWhitelistUpdated",
     "type": "event"
@@ -11,8 +21,18 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": true, "internalType": "address", "name": "previousOwner", "type": "address" },
-      { "indexed": true, "internalType": "address", "name": "newOwner", "type": "address" }
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
     "name": "OwnershipTransferred",
     "type": "event"
@@ -20,14 +40,31 @@
   {
     "anonymous": false,
     "inputs": [
-      { "indexed": false, "internalType": "uint256", "name": "index", "type": "uint256" },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      },
       {
         "components": [
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "address", "name": "comptroller", "type": "address" },
-          { "internalType": "uint256", "name": "blockPosted", "type": "uint256" },
-          { "internalType": "uint256", "name": "timestampPosted", "type": "uint256" }
+          {
+            "internalType": "address",
+            "name": "comptroller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockPosted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestampPosted",
+            "type": "uint256"
+          }
         ],
         "indexed": false,
         "internalType": "struct FusePoolDirectory.FusePool",
@@ -81,14 +118,26 @@
       { "internalType": "address", "name": "creator", "type": "address" },
       { "internalType": "address", "name": "comptroller", "type": "address" },
       { "internalType": "uint256", "name": "blockPosted", "type": "uint256" },
-      { "internalType": "uint256", "name": "timestampPosted", "type": "uint256" }
+      {
+        "internalType": "uint256",
+        "name": "timestampPosted",
+        "type": "uint256"
+      }
     ],
     "stateMutability": "view",
     "type": "function"
   },
-  { "inputs": [], "name": "renounceOwnership", "outputs": [], "stateMutability": "nonpayable", "type": "function" },
   {
-    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -96,8 +145,16 @@
   },
   {
     "inputs": [
-      { "internalType": "bool", "name": "_enforceDeployerWhitelist", "type": "bool" },
-      { "internalType": "address[]", "name": "_deployerWhitelist", "type": "address[]" }
+      {
+        "internalType": "bool",
+        "name": "_enforceDeployerWhitelist",
+        "type": "bool"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_deployerWhitelist",
+        "type": "address[]"
+      }
     ],
     "name": "initialize",
     "outputs": [],
@@ -124,10 +181,18 @@
   {
     "inputs": [
       { "internalType": "string", "name": "name", "type": "string" },
-      { "internalType": "address", "name": "implementation", "type": "address" },
+      {
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      },
       { "internalType": "bool", "name": "enforceWhitelist", "type": "bool" },
       { "internalType": "uint256", "name": "closeFactor", "type": "uint256" },
-      { "internalType": "uint256", "name": "liquidationIncentive", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "liquidationIncentive",
+        "type": "uint256"
+      },
       { "internalType": "address", "name": "priceOracle", "type": "address" }
     ],
     "name": "deployPool",
@@ -146,9 +211,21 @@
         "components": [
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "address", "name": "comptroller", "type": "address" },
-          { "internalType": "uint256", "name": "blockPosted", "type": "uint256" },
-          { "internalType": "uint256", "name": "timestampPosted", "type": "uint256" }
+          {
+            "internalType": "address",
+            "name": "comptroller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockPosted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestampPosted",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct FusePoolDirectory.FusePool[]",
         "name": "",
@@ -167,9 +244,21 @@
         "components": [
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "address", "name": "comptroller", "type": "address" },
-          { "internalType": "uint256", "name": "blockPosted", "type": "uint256" },
-          { "internalType": "uint256", "name": "timestampPosted", "type": "uint256" }
+          {
+            "internalType": "address",
+            "name": "comptroller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockPosted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestampPosted",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct FusePoolDirectory.FusePool[]",
         "name": "",
@@ -180,7 +269,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
     "name": "getPoolsByAccount",
     "outputs": [
       { "internalType": "uint256[]", "name": "", "type": "uint256[]" },
@@ -188,9 +279,21 @@
         "components": [
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "address", "name": "comptroller", "type": "address" },
-          { "internalType": "uint256", "name": "blockPosted", "type": "uint256" },
-          { "internalType": "uint256", "name": "timestampPosted", "type": "uint256" }
+          {
+            "internalType": "address",
+            "name": "comptroller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockPosted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestampPosted",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct FusePoolDirectory.FusePool[]",
         "name": "",
@@ -201,14 +304,20 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" }
+    ],
     "name": "getBookmarks",
-    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
+    "outputs": [
+      { "internalType": "address[]", "name": "", "type": "address[]" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "comptroller", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "comptroller", "type": "address" }
+    ],
     "name": "bookmarkPool",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -235,7 +344,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "bool", "name": "whitelistedAdmin", "type": "bool" }],
+    "inputs": [
+      { "internalType": "bool", "name": "whitelistedAdmin", "type": "bool" }
+    ],
     "name": "getPublicPoolsByVerification",
     "outputs": [
       { "internalType": "uint256[]", "name": "", "type": "uint256[]" },
@@ -243,9 +354,21 @@
         "components": [
           { "internalType": "string", "name": "name", "type": "string" },
           { "internalType": "address", "name": "creator", "type": "address" },
-          { "internalType": "address", "name": "comptroller", "type": "address" },
-          { "internalType": "uint256", "name": "blockPosted", "type": "uint256" },
-          { "internalType": "uint256", "name": "timestampPosted", "type": "uint256" }
+          {
+            "internalType": "address",
+            "name": "comptroller",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockPosted",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "timestampPosted",
+            "type": "uint256"
+          }
         ],
         "internalType": "struct FusePoolDirectory.FusePool[]",
         "name": "",

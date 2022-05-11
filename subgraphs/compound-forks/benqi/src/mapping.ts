@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 // import from the generated at root in order to reuse methods from root
 import {
   NewPriceOracle,
@@ -15,7 +21,12 @@ import {
   AccrueInterest,
   NewReserveFactor,
 } from "../../generated/templates/CToken/CToken";
-import { LendingProtocol, Market, RewardToken, Token } from "../../generated/schema";
+import {
+  LendingProtocol,
+  Market,
+  RewardToken,
+  Token,
+} from "../../generated/schema";
 import {
   cTokenDecimals,
   Network,
@@ -91,9 +102,17 @@ export function handleMarketListed(event: MarketListed): void {
 
   let protocol = getOrCreateProtocol();
   let cTokenContract = CToken.bind(event.params.cToken);
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(cTokenContract.try_reserveFactorMantissa(), BIGINT_ZERO);
+  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
+    cTokenContract.try_reserveFactorMantissa(),
+    BIGINT_ZERO
+  );
   if (cTokenAddr == nativeCToken.address) {
-    let marketListedData = new MarketListedData(protocol, nativeToken, nativeCToken, cTokenReserveFactorMantissa);
+    let marketListedData = new MarketListedData(
+      protocol,
+      nativeToken,
+      nativeCToken,
+      cTokenReserveFactorMantissa
+    );
     _handleMarketListed(marketListedData, event);
     initMarketRewards(cTokenAddr.toHexString());
     return;
@@ -101,7 +120,10 @@ export function handleMarketListed(event: MarketListed): void {
 
   let underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
-    log.warning("[handleMarketListed] could not fetch underlying token of cToken: {}", [cTokenAddr.toHexString()]);
+    log.warning(
+      "[handleMarketListed] could not fetch underlying token of cToken: {}",
+      [cTokenAddr.toHexString()]
+    );
     return;
   }
   let underlyingTokenAddr = underlyingTokenAddrResult.value;
@@ -113,17 +135,17 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals,
+        cTokenDecimals
       ),
-      cTokenReserveFactorMantissa,
+      cTokenReserveFactorMantissa
     ),
-    event,
+    event
   );
   initMarketRewards(cTokenAddr.toHexString());
 }
@@ -132,7 +154,9 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   _handleNewCollateralFactor(event);
 }
 
-export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
+export function handleNewLiquidationIncentive(
+  event: NewLiquidationIncentive
+): void {
   let protocol = getOrCreateProtocol();
   _handleNewLiquidationIncentive(protocol, event);
 }
@@ -167,7 +191,9 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+  let oracleContract = PriceOracle.bind(
+    Address.fromString(protocol._priceOracle)
+  );
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
@@ -175,7 +201,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    SECONDS_PER_YEAR,
+    SECONDS_PER_YEAR
   );
 
   _handleAccrueInterest(updateMarketData, comptrollerAddr, event);
@@ -191,7 +217,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "1.0.0",
     "1.0.0",
     Network.AVALANCHE,
-    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_liquidationIncentiveMantissa()
   );
 
   return _getOrCreateProtocol(protocolData);
@@ -222,41 +248,72 @@ function initMarketRewards(marketID: string): void {
     AVAXToken.save();
   }
 
-  let supplyRewardToken0 = RewardToken.load(InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString()));
+  let supplyRewardToken0 = RewardToken.load(
+    InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString())
+  );
   if (!supplyRewardToken0) {
-    supplyRewardToken0 = new RewardToken(InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString()));
+    supplyRewardToken0 = new RewardToken(
+      InterestRateSide.LENDER.concat("-").concat(QiAddr.toHexString())
+    );
     supplyRewardToken0.token = QiToken.id;
     supplyRewardToken0.type = RewardTokenType.DEPOSIT;
     supplyRewardToken0.save();
   }
 
-  let supplyRewardToken1 = RewardToken.load(InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString()));
+  let supplyRewardToken1 = RewardToken.load(
+    InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString())
+  );
   if (!supplyRewardToken1) {
-    supplyRewardToken1 = new RewardToken(InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString()));
+    supplyRewardToken1 = new RewardToken(
+      InterestRateSide.LENDER.concat("-").concat(AVAXAddr.toHexString())
+    );
     supplyRewardToken1.token = AVAXToken.id;
     supplyRewardToken1.type = RewardTokenType.DEPOSIT;
     supplyRewardToken1.save();
   }
 
-  let borrowRewardToken0 = RewardToken.load(InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString()));
+  let borrowRewardToken0 = RewardToken.load(
+    InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString())
+  );
   if (!borrowRewardToken0) {
-    borrowRewardToken0 = new RewardToken(InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString()));
+    borrowRewardToken0 = new RewardToken(
+      InterestRateSide.BORROWER.concat("-").concat(QiAddr.toHexString())
+    );
     borrowRewardToken0.token = QiToken.id;
     borrowRewardToken0.type = RewardTokenType.BORROW;
     borrowRewardToken0.save();
   }
 
-  let borrowRewardToken1 = RewardToken.load(InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString()));
+  let borrowRewardToken1 = RewardToken.load(
+    InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString())
+  );
   if (!borrowRewardToken1) {
-    borrowRewardToken1 = new RewardToken(InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString()));
+    borrowRewardToken1 = new RewardToken(
+      InterestRateSide.BORROWER.concat("-").concat(AVAXAddr.toHexString())
+    );
     borrowRewardToken1.token = AVAXToken.id;
     borrowRewardToken1.type = RewardTokenType.BORROW;
     borrowRewardToken1.save();
   }
 
-  market.rewardTokens = [supplyRewardToken0.id, supplyRewardToken1.id, borrowRewardToken0.id, borrowRewardToken1.id];
-  market.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO, BIGINT_ZERO];
-  market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+  market.rewardTokens = [
+    supplyRewardToken0.id,
+    supplyRewardToken1.id,
+    borrowRewardToken0.id,
+    borrowRewardToken1.id,
+  ];
+  market.rewardTokenEmissionsAmount = [
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+  ];
+  market.rewardTokenEmissionsUSD = [
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+    BIGDECIMAL_ZERO,
+  ];
   market.save();
 }
 
@@ -270,7 +327,9 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
 
   let AVAXMarket = Market.load(qiAVAXAddr.toHexString());
   if (!AVAXMarket) {
-    log.warning("[setMarketRewards] qiAVAX market not found: {}", [qiAVAXAddr.toHexString()]);
+    log.warning("[setMarketRewards] qiAVAX market not found: {}", [
+      qiAVAXAddr.toHexString(),
+    ]);
     return;
   }
 
@@ -290,16 +349,48 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
   if (blockNumber < 14000970) {
     // before 0xb8b3dc402f7e5BfB2883D9Ab1641CEC95D88702D gets deployed
     let oldComptroller = OldComptroller.bind(oldComptrollerAddr);
-    supplyQiEmission = getRewardTokenEmission(oldComptroller.try_rewardSpeeds(0, marketAddress), 18, QiPriceUSD);
-    supplyAVAXEmission = getRewardTokenEmission(oldComptroller.try_rewardSpeeds(1, marketAddress), 18, AVAXPriceUSD);
-    borrowQiEmission = getRewardTokenEmission(oldComptroller.try_rewardSpeeds(0, marketAddress), 18, QiPriceUSD);
-    borrowAVAXEmission = getRewardTokenEmission(oldComptroller.try_rewardSpeeds(1, marketAddress), 18, AVAXPriceUSD);
+    supplyQiEmission = getRewardTokenEmission(
+      oldComptroller.try_rewardSpeeds(0, marketAddress),
+      18,
+      QiPriceUSD
+    );
+    supplyAVAXEmission = getRewardTokenEmission(
+      oldComptroller.try_rewardSpeeds(1, marketAddress),
+      18,
+      AVAXPriceUSD
+    );
+    borrowQiEmission = getRewardTokenEmission(
+      oldComptroller.try_rewardSpeeds(0, marketAddress),
+      18,
+      QiPriceUSD
+    );
+    borrowAVAXEmission = getRewardTokenEmission(
+      oldComptroller.try_rewardSpeeds(1, marketAddress),
+      18,
+      AVAXPriceUSD
+    );
   } else {
     let comptroller = Comptroller.bind(comptrollerAddr);
-    supplyQiEmission = getRewardTokenEmission(comptroller.try_supplyRewardSpeeds(0, marketAddress), 18, QiPriceUSD);
-    supplyAVAXEmission = getRewardTokenEmission(comptroller.try_supplyRewardSpeeds(1, marketAddress), 18, AVAXPriceUSD);
-    borrowQiEmission = getRewardTokenEmission(comptroller.try_borrowRewardSpeeds(0, marketAddress), 18, QiPriceUSD);
-    borrowAVAXEmission = getRewardTokenEmission(comptroller.try_borrowRewardSpeeds(1, marketAddress), 18, AVAXPriceUSD);
+    supplyQiEmission = getRewardTokenEmission(
+      comptroller.try_supplyRewardSpeeds(0, marketAddress),
+      18,
+      QiPriceUSD
+    );
+    supplyAVAXEmission = getRewardTokenEmission(
+      comptroller.try_supplyRewardSpeeds(1, marketAddress),
+      18,
+      AVAXPriceUSD
+    );
+    borrowQiEmission = getRewardTokenEmission(
+      comptroller.try_borrowRewardSpeeds(0, marketAddress),
+      18,
+      QiPriceUSD
+    );
+    borrowAVAXEmission = getRewardTokenEmission(
+      comptroller.try_borrowRewardSpeeds(1, marketAddress),
+      18,
+      AVAXPriceUSD
+    );
   }
 
   market.rewardTokenEmissionsAmount = [
@@ -320,15 +411,20 @@ function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
 function getRewardTokenEmission(
   rewardSpeedsResult: ethereum.CallResult<BigInt>,
   tokenDecimals: i32,
-  tokenPriceUSD: BigDecimal,
+  tokenPriceUSD: BigDecimal
 ): RewardTokenEmission {
   if (rewardSpeedsResult.reverted) {
     log.warning("[getRewardTokenEmission] result reverted", []);
     return new RewardTokenEmission(BIGINT_ZERO, BIGDECIMAL_ZERO);
   }
   let rewardAmountPerSecond = rewardSpeedsResult.value;
-  let rewardAmount = rewardAmountPerSecond.times(BigInt.fromI32(SECONDS_PER_YEAR));
-  let rewardUSD = rewardAmount.toBigDecimal().div(exponentToBigDecimal(tokenDecimals)).times(tokenPriceUSD);
+  let rewardAmount = rewardAmountPerSecond.times(
+    BigInt.fromI32(SECONDS_PER_YEAR)
+  );
+  let rewardUSD = rewardAmount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(tokenDecimals))
+    .times(tokenPriceUSD);
   return new RewardTokenEmission(rewardAmount, rewardUSD);
 }
 
