@@ -6,7 +6,7 @@
     "format": "npx prettier --write ."
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.28.1",
+    "@graphprotocol/graph-cli": "^0.26.0",
     "@graphprotocol/graph-ts": "0.26.0",
     "@typescript-eslint/eslint-plugin": "^5.16.0",
     "@typescript-eslint/parser": "^5.16.0",

@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: PoolRegistered(uint256,(string,address,address,uint256,uint256))
           handler: handlePoolRegistered
-      file: ./src/mappings/fusePoolDirectory.ts
+      file: ./src/mappings.ts
 templates:
   - name: Comptroller
     kind: ethereum/contract
@@ -40,7 +40,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/comptroller.ts
+      file: ./src/mappings.ts
       entities:
         - LendingProtocol
         - Market
@@ -78,7 +78,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/cToken.ts
+      file: ./src/mappings.ts
       entities:
         - Event
         - Market
@@ -87,7 +87,7 @@ templates:
         - MarketDailySnapshot
       abis:
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/fuse/CToken.json
         - name: PriceOracle
           file: ../abis/PriceOracle.json
         - name: ERC20
