@@ -984,3 +984,15 @@ type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }
+
+# Helper entity to keep track of custom Comptrollers (rari fuse v1 specific)
+type _Comptroller @entity {
+  " Smart contract address of pool's Comptroller "
+  id: ID!
+
+  " Pool name "
+  name: String!
+
+  " price oracle for this contract "
+  _priceOracle: String!
+}
