@@ -10,10 +10,6 @@ import {
 import * as constants from "./../constant";
 import { getDay, getHour } from "../utils/numbers";
 import { getOrCreateProtocol } from "./Protocol";
-import {
-  Deposit as DepositEvent,
-  Withdraw as WithdrawEvent
-} from "../../generated/ControllerListener/VaultContract"
 
 
 export function depositUpdateMetrics(event: ethereum.Event, vault: Vault): void {

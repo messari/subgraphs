@@ -1,18 +1,13 @@
-import { YieldAggregator } from "../../generated/schema";
+import { BigInt, BigDecimal, Address, log } from "@graphprotocol/graph-ts"
+import { YieldAggregator , Vault } from "../../generated/schema";
+import * as constants from "./../constant";
 import {
-  BIGDECIMAL_ZERO,
-  PROTOCOL_ID,
-  PROTOCOL_METHODOLOGY_VERSION,
-  PROTOCOL_NAME,
-  PROTOCOL_NETWORK,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SLUG,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_TYPE,
-} from "../constant";
+  Deposit as DepositEvent,
+} from "../../generated/ControllerListener/VaultContract"
+import { getOrCreateVault } from './../entities/Vault'
 
 export function getOrCreateProtocol(): YieldAggregator {
-  const id = PROTOCOL_ID.toHex();
+  const id = constants.PROTOCOL_ID.toHex();
   let protocol = YieldAggregator.load(id);
 
   if (protocol) {
@@ -21,19 +16,19 @@ export function getOrCreateProtocol(): YieldAggregator {
 
   protocol = new YieldAggregator(id);
 
-  protocol.name = PROTOCOL_NAME;
-  protocol.slug = PROTOCOL_SLUG;
-  protocol.network = PROTOCOL_NETWORK;
-  protocol.type = PROTOCOL_TYPE;
-  protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-  protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-  protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+  protocol.name = constants.PROTOCOL_NAME;
+  protocol.slug = constants.PROTOCOL_SLUG;
+  protocol.network = constants.PROTOCOL_NETWORK;
+  protocol.type = constants.PROTOCOL_TYPE;
+  protocol.schemaVersion = constants.PROTOCOL_SCHEMA_VERSION;
+  protocol.subgraphVersion = constants.PROTOCOL_SUBGRAPH_VERSION;
+  protocol.methodologyVersion = constants.PROTOCOL_METHODOLOGY_VERSION;
   protocol.cumulativeUniqueUsers = 0;
-  protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  //protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
+  protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+  //protocol.totalVolumeUSD = constants.BIGDECIMAL_ZERO;
   //protocol._vaultIds = [];
   protocol.save();
 

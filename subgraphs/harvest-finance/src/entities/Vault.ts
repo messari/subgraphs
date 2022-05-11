@@ -1,6 +1,6 @@
 import { Address, BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
-import { Vault, Token } from "../../generated/schema";
+import { Vault, Token, YieldAggregator } from "../../generated/schema";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
@@ -87,13 +87,28 @@ export function updateVaultPrices(event: ethereum.Event, vault: Vault): void{
   vault.pricePerShare = readValue<BigInt>(vault_contract.try_getPricePerFullShare(), constants.BIGINT_ZERO).toBigDecimal();
   vault.save();
 
+  let protocol = getOrCreateProtocol();
+
+  updateProtocolAndVaulTotalValueLockedUSD(protocol, vault);
+
+  updateVaultSnapshots(event, vault);
+}
+
+function updateProtocolAndVaulTotalValueLockedUSD(protocol: YieldAggregator, vault: Vault): void{
+  let protocolTotalValueLockedUSD = protocol.totalValueLockedUSD;
+
+  protocol.totalValueLockedUSD = protocolTotalValueLockedUSD.minus(vault.totalValueLockedUSD);
+
   vault.totalValueLockedUSD = (<BigDecimal> vault.pricePerShare)
     .times(inputTokenPrice.usdPrice)
     .times((<BigInt> vault.outputTokenSupply).toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
     .div(inputTokenPrice.decimals.toBigDecimal());
-  vault.save()
+  vault.save();
 
-  updateVaultSnapshots(event, vault);
+  protocolTotalValueLockedUSD = protocol.totalValueLockedUSD;
+  protocol.totalValueLockedUSD = protocolTotalValueLockedUSD.plus(vault.totalValueLockedUSD);
+  protocol.save();
+
 }
