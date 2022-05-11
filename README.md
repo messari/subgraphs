@@ -85,7 +85,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Aave v2 | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
 | Aave v3 |  | | |
 | [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
-| Benqi | 🔨 | | |
+| [Benqi](https://benqi.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [BENQI Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/benqi-avalanche) |
 | [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.3 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
 | CREAM | 🔨 | | |
 | Geist | 🔨 | | |
