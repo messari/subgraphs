@@ -374,7 +374,7 @@ type Vault @entity {
   stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigDecimal!]
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
@@ -437,7 +437,7 @@ type VaultDailySnapshot @entity {
   stakedOutputTokenAmount: BigInt!
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigDecimal!]
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
@@ -478,7 +478,7 @@ type VaultHourlySnapshot @entity {
   stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigDecimal!]
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
@@ -622,6 +622,9 @@ type RewardTokenInfo @entity {
 
   " Base reward Pool Address "
   rewardTokenPool: String!
+
+  " Timestamp of last Reward "
+  lastRewardTimestamp: BigInt!
 
   " Historical Extra Rewards of the pool "
   _previousExtraHistoricalRewards: BigInt!

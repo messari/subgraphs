@@ -21,7 +21,7 @@ export function _NewVault(
     .concat(poolId.toString());
   const vault = new VaultStore(vaultId);
 
-  const poolAddress = utils.getPoolFromLpToken(lpTokenAddress);
+  const poolAddress = utils.getPool(lpTokenAddress);
   if (poolAddress.toHex() == constants.ZERO_ADDRESS_STRING) {
     log.warning("Could not find pool for lp token {}", [
       lpTokenAddress.toHexString(),
@@ -42,12 +42,12 @@ export function _NewVault(
     vault.pricePerShare = constants.BIGDECIMAL_ZERO;
     vault._crvRewards = poolInfo.crvRewards.toHexString();
 
-    let rewardTokens = getRewardTokens(poolId, poolInfo.crvRewards);
+    let rewardTokens = getRewardTokens(poolId, block, poolInfo.crvRewards);
     vault.rewardTokens = rewardTokens;
 
-    vault.rewardTokenEmissionsAmount = new Array<BigInt>(
+    vault.rewardTokenEmissionsAmount = new Array<BigDecimal>(
       rewardTokens.length
-    ).fill(constants.BIGINT_ZERO);
+    ).fill(constants.BIGDECIMAL_ZERO);
     vault.rewardTokenEmissionsUSD = new Array<BigDecimal>(
       rewardTokens.length
     ).fill(constants.BIGDECIMAL_ZERO);

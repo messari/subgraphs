@@ -50,7 +50,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.amount = amount;
     withdrawTransaction.amountUSD = amountUSD;
 
-    withdrawTransaction.timestamp = utils.getTimestampInMillis(block);
+    withdrawTransaction.timestamp = block.timestamp;
     withdrawTransaction.blockNumber = block.number;
 
     withdrawTransaction.save();
@@ -61,18 +61,11 @@ export function createWithdrawTransaction(
 
 export function _Withdraw(
   to: Address,
-  poolId: BigInt,
+  vault: VaultStore,
   withdrawAmount: BigInt,
   block: ethereum.Block,
   transaction: ethereum.Transaction
 ): void {
-  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
-    .concat("-")
-    .concat(poolId.toString());
-
-  const vault = VaultStore.load(vaultId);
-  if (!vault) return;
-
   const protocol = getOrCreateYieldAggregator();
 
   let inputToken = Token.load(vault.inputToken);
@@ -116,7 +109,7 @@ export function _Withdraw(
 
   createWithdrawTransaction(
     to,
-    vaultId,
+    vault.id,
     transaction,
     block,
     vault.inputToken,
@@ -135,10 +128,4 @@ export function _Withdraw(
   metricsHourlySnapshot.save();
   protocol.save();
   vault.save();
-
-  log.info("[Withdrawn] TxHash: {}, vaultAddress: {}, _withdrawAmount: {}", [
-    transaction.hash.toHexString(),
-    vault.id,
-    withdrawAmount.toString(),
-  ]);
 }

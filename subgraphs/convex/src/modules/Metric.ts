@@ -12,7 +12,8 @@ import { ActiveAccount, Vault as VaultStore } from "../../generated/schema";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
 export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
-  const account = getOrCreateAccount(from.toHexString());
+  // Get Account Information
+  getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateYieldAggregator();
   const usageMetricsDaily = getOrCreateUsageMetricsDailySnapshot(block);
@@ -47,8 +48,8 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
     usageMetricsHourly.hourlyActiveUsers += 1;
   }
 
-  usageMetricsDaily.save();
   usageMetricsHourly.save();
+  usageMetricsDaily.save();
 }
 
 export function updateVaultSnapshots(
@@ -58,19 +59,12 @@ export function updateVaultSnapshots(
   const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
     .concat("-")
     .concat(poolId.toString());
-
   const vault = VaultStore.load(vaultId);
 
   if (!vault) return;
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultId,
-    block
-  );
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultId,
-    block
-  );
+  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vaultId, block);
+  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vaultId, block);
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
@@ -86,6 +80,12 @@ export function updateVaultSnapshots(
 
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
+
+  vaultDailySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  vaultHourlySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
+  
+  vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
 
   vaultDailySnapshots.blockNumber = block.number;
   vaultHourlySnapshots.blockNumber = block.number;

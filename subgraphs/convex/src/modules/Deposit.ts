@@ -50,7 +50,7 @@ export function createDepositTransaction(
     depositTransaction.amount = amount;
     depositTransaction.amountUSD = amountUSD;
 
-    depositTransaction.timestamp = utils.getTimestampInMillis(block);
+    depositTransaction.timestamp = block.timestamp;
     depositTransaction.blockNumber = block.number;
 
     depositTransaction.save();
@@ -61,18 +61,11 @@ export function createDepositTransaction(
 
 export function _Deposit(
   to: Address,
-  poolId: BigInt,
+  vault: VaultStore,
   depositAmount: BigInt,
   block: ethereum.Block,
   transaction: ethereum.Transaction
 ): void {
-  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
-    .concat("-")
-    .concat(poolId.toString());
-  
-  const vault = VaultStore.load(vaultId);
-  if (!vault) return;
-
   const protocol = getOrCreateYieldAggregator();
 
   let inputToken = Token.load(vault.inputToken);
@@ -113,7 +106,7 @@ export function _Deposit(
 
   createDepositTransaction(
     to,
-    vaultId,
+    vault.id,
     transaction,
     block,
     vault.inputToken,
@@ -132,10 +125,4 @@ export function _Deposit(
   metricsHourlySnapshot.save();
   protocol.save();
   vault.save();
-
-  log.info("[Deposit] TxHash: {}, vaultAddress: {} _depositAmount: {}", [
-    transaction.hash.toHexString(),
-    vault.id,
-    depositAmount.toString(),
-  ]);
 }

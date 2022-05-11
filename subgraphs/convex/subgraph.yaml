@@ -66,6 +66,11 @@ dataSources:
           file: ./abis/Prices/SushiSwap/Pair.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
+        # Custom Contracts
+        - name: CurvePool
+          file: ./abis/Prices/Custom/CurvePool.json
+        - name: ChainLinkAggregator
+          file: ./abis/Prices/Custom/ChainLinkAggregator.json
       eventHandlers:
         - event: Deposited(indexed address,indexed uint256,uint256)
           handler: handleDeposited

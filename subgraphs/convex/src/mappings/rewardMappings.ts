@@ -30,6 +30,7 @@ export function handleAddExtraReward(call: AddExtraRewardCall): void {
 
   getOrCreateRewardTokenInfo(
     BigInt.fromString(poolId),
+    call.block,
     newRewardTokenAddress,
     newRewardPoolAddress
   );
@@ -42,9 +43,9 @@ export function handleAddExtraReward(call: AddExtraRewardCall): void {
 
   let emissionAmount = vault.rewardTokenEmissionsAmount;
   if (emissionAmount) {
-    emissionAmount.push(constants.BIGINT_ZERO);
+    emissionAmount.push(constants.BIGDECIMAL_ZERO);
     vault.rewardTokenEmissionsAmount = emissionAmount;
-  } else vault.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
+  } else vault.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
 
   let emissionAmountUSD = vault.rewardTokenEmissionsUSD;
   if (emissionAmountUSD) {

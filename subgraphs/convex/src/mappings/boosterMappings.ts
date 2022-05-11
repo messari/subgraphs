@@ -19,13 +19,15 @@ import * as constants from "../common/constants";
 import { CustomFeesType } from "../common/types";
 import { VaultFee } from "../../generated/schema";
 import { _EarmarkRewards } from "../modules/Rewards";
+import { Vault as VaultStore } from "../../generated/schema";
 import { getOrCreateYieldAggregator } from "../common/initializer";
 
 export function handleAddPool(call: AddPoolCall): void {
-  const lpTokenAddress = call.inputs._lptoken;
   const gaugeAddress = call.inputs._gauge;
+  const lpTokenAddress = call.inputs._lptoken;
   const stashVersion = call.inputs._stashVersion;
 
+  // Update PoolId
   const protocol = getOrCreateYieldAggregator();
   const poolId = protocol._poolCount;
   protocol._poolCount = protocol._poolCount.plus(constants.BIGINT_ONE);
@@ -45,10 +47,17 @@ export function handleDeposited(event: DepositedEvent): void {
   const poolId = event.params.poolid;
   const depositAmount = event.params.amount;
 
-  _Deposit(user, poolId, depositAmount, event.block, event.transaction);
+  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
+    .concat("-")
+    .concat(poolId.toString());
+  const vault = VaultStore.load(vaultId);
+
+  if (vault) {
+    _Deposit(user, vault, depositAmount, event.block, event.transaction);
+  }
 
   updateFinancials(event.block);
-  updateUsageMetrics(event.block, event.address);
+  updateUsageMetrics(event.block, event.transaction.from);
   updateVaultSnapshots(poolId, event.block);
 
   log.info("[Deposited] poolId: {}, depositAmount: {}, TxHash: {}", [
@@ -63,10 +72,17 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
   const poolId = event.params.poolid;
   const withdrawAmount = event.params.amount;
 
-  _Withdraw(user, poolId, withdrawAmount, event.block, event.transaction);
+  const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
+    .concat("-")
+    .concat(poolId.toString());
+  const vault = VaultStore.load(vaultId);
+
+  if (vault) {
+    _Withdraw(user, vault, withdrawAmount, event.block, event.transaction);
+  }
 
   updateFinancials(event.block);
-  updateUsageMetrics(event.block, event.address);
+  updateUsageMetrics(event.block, event.transaction.from);
   updateVaultSnapshots(poolId, event.block);
 
   log.info("[Withdrawn] poolId: {}, withdrawAmount: {}, TxHash: {}", [
@@ -102,6 +118,6 @@ export function handleSetFees(call: SetFeesCall): void {
     .concat(constants.CONVEX_BOOSTER_ADDRESS.toHexString());
 
   const fees = VaultFee.load(performanceFeeId);
-  fees!.feePercentage = newFees.totalFees()
-  fees!.save()
+  fees!.feePercentage = newFees.totalFees();
+  fees!.save();
 }

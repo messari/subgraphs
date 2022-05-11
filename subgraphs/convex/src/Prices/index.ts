@@ -8,6 +8,7 @@ import {
 
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
+import { getForexUsdRate } from "./custom/ForexTokens";
 import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
@@ -23,6 +24,16 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
+
+  // CUSTOM: Forex Oracle
+  let forexPrice = getForexUsdRate(tokenAddr);
+  if (!forexPrice.reverted) {
+    log.warning("[forexPrice] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      forexPrice.usdPrice.div(forexPrice.decimalsBaseTen).toString()
+    ]);
+    return forexPrice;
+  }
 
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);

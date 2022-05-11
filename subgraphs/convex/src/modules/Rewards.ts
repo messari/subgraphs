@@ -11,8 +11,9 @@ import { getUsdPricePerToken } from "../Prices";
 import * as constants from "../common/constants";
 import { getOrCreateRewardTokenInfo } from "./Tokens";
 import { updateFinancialsAfterReport } from "./Metric";
-import { Vault as VaultStore } from "../../generated/schema";
+import { CustomPriceType } from "../Prices/common/types";
 import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
+import { RewardTokenInfo, Vault as VaultStore } from "../../generated/schema";
 
 export function getHistoricalRewards(rewardTokenPool: Address): BigInt {
   const rewardsContract = BaseRewardPool.bind(rewardTokenPool);
@@ -24,8 +25,49 @@ export function getHistoricalRewards(rewardTokenPool: Address): BigInt {
   return historicalRewards;
 }
 
+export function updateRewardTokenEmission(
+  vault: VaultStore,
+  totalRewards: BigInt,
+  rewardTokenInfo: RewardTokenInfo,
+  rewardTokenIdx: i32,
+  rewardTokenDecimals: BigDecimal,
+  latestRewardsTimestamp: BigInt,
+  rewardTokenPricePerToken: CustomPriceType
+): void {
+  const gapInDays = latestRewardsTimestamp
+    .minus(rewardTokenInfo.lastRewardTimestamp)
+    .toBigDecimal()
+    .div(constants.BIGINT_SECONDS_PER_DAY.toBigDecimal());
+
+  const rewardEmissionPerDay = totalRewards.toBigDecimal().div(gapInDays);
+
+  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
+  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+
+  rewardTokenEmissionsAmount[rewardTokenIdx] = rewardEmissionPerDay;
+  rewardTokenEmissionsUSD[rewardTokenIdx] = rewardEmissionPerDay
+    .times(rewardTokenPricePerToken.usdPrice)
+    .div(rewardTokenPricePerToken.decimalsBaseTen)
+    .div(rewardTokenDecimals);
+
+  vault.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+  vault.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+  
+  vault.save();
+
+  log.warning(
+    "[RewardTokenEmission] gapInDays: {}, rewardEmissionPerDay: {}, rewardEmissionPerDayUSD: {}",
+    [
+      gapInDays.toString(),
+      rewardEmissionPerDay.div(rewardTokenDecimals).toString(),
+      vault.rewardTokenEmissionsUSD![rewardTokenIdx].toString()
+    ]
+  );
+}
+
 export function getExtraRewardsRevenue(
   poolId: BigInt,
+  block: ethereum.Block,
   vault: VaultStore
 ): BigDecimal {
   let extraRewardsRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -47,21 +89,34 @@ export function getExtraRewardsRevenue(
 
     const rewardTokenInfoStore = getOrCreateRewardTokenInfo(
       poolId,
+      block,
       extraRewardTokenAddress
     );
     const historicalRewards = getHistoricalRewards(
       Address.fromString(rewardTokenInfoStore.rewardTokenPool)
     );
-    const totalRewards = historicalRewards
-      .minus(rewardTokenInfoStore._previousExtraHistoricalRewards)
-      .toBigDecimal();
+    const totalRewards = historicalRewards.minus(
+      rewardTokenInfoStore._previousExtraHistoricalRewards
+    );
 
     const totalRewardsUSD = totalRewards
+      .toBigDecimal()
       .times(rewardTokenPrice.usdPrice)
       .div(rewardTokenPrice.decimalsBaseTen)
       .div(rewardTokenDecimals);
     extraRewardsRevenueUSD = extraRewardsRevenueUSD.plus(totalRewardsUSD);
 
+    updateRewardTokenEmission(
+      vault,
+      totalRewards,
+      rewardTokenInfoStore,
+      rewardTokenIdx,
+      rewardTokenDecimals,
+      block.timestamp,
+      rewardTokenPrice
+    );
+
+    rewardTokenInfoStore.lastRewardTimestamp = block.timestamp;
     rewardTokenInfoStore._previousExtraHistoricalRewards = historicalRewards;
     rewardTokenInfoStore.save();
 
@@ -91,6 +146,7 @@ export function _EarmarkRewards(
   const crvRewardTokenAddress = Address.fromString(vault.rewardTokens![0]);
   const crvRewardTokenInfoStore = getOrCreateRewardTokenInfo(
     poolId,
+    block,
     crvRewardTokenAddress
   );
 
@@ -102,16 +158,15 @@ export function _EarmarkRewards(
   const historicalCvxCrvStakerRewards = getHistoricalRewards(
     Address.fromString(crvRewardTokenInfoStore.rewardTokenPool)
   );
-  const totalRewardsAfterFeesCut = historicalCvxCrvStakerRewards
-    .minus(crvRewardTokenInfoStore._previousExtraHistoricalRewards)
-    .toBigDecimal();
-  
-  crvRewardTokenInfoStore._previousExtraHistoricalRewards = historicalCvxCrvStakerRewards;
+  const totalRewardsAfterFeesCut = historicalCvxCrvStakerRewards.minus(
+    crvRewardTokenInfoStore._previousExtraHistoricalRewards
+  );
 
   const totalFeesConvex = getTotalFees();
 
   // calculate total rewards of the pool
   const totalRewards = totalRewardsAfterFeesCut
+    .toBigDecimal()
     .div(crvRewardTokenDecimals)
     .div(constants.BIGDECIMAL_ONE.minus(totalFeesConvex.totalFees()));
 
@@ -120,9 +175,21 @@ export function _EarmarkRewards(
   const callFee = totalRewards.times(totalFeesConvex.callIncentive); // incentive to users who spend gas to make calls
   const platformFee = totalRewards.times(totalFeesConvex.platformFee); // possible fee to build treasury
 
-  const extraRewardsUSD = getExtraRewardsRevenue(poolId, vault);
+  updateRewardTokenEmission(
+    vault,
+    totalRewardsAfterFeesCut,
+    crvRewardTokenInfoStore,
+    0,
+    crvRewardTokenDecimals,
+    block.timestamp,
+    crvRewardTokenPrice
+  );
+
+  const extraRewardsUSD = getExtraRewardsRevenue(poolId, block, vault);
 
   let supplySideRevenueUSD = totalRewardsAfterFeesCut
+    .toBigDecimal()
+    .div(crvRewardTokenDecimals)
     .plus(lockFee)
     .plus(extraRewardsUSD)
     .times(crvRewardTokenPrice.usdPrice)
@@ -136,6 +203,8 @@ export function _EarmarkRewards(
 
   let totalRevenueUSD = supplySideRevenueUSD.plus(protocolSideRevenueUSD);
 
+  crvRewardTokenInfoStore.lastRewardTimestamp = block.timestamp;
+  crvRewardTokenInfoStore._previousExtraHistoricalRewards = historicalCvxCrvStakerRewards;
   crvRewardTokenInfoStore.save();
   vault.save();
 

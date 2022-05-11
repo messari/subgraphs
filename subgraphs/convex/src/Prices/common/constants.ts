@@ -11,6 +11,7 @@ export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_1E18 = BIGINT_TEN.pow(18).toBigDecimal();
 
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);
 
@@ -112,7 +113,10 @@ SUSHISWAP_ROUTER_ADDRESS_FANTOM.set(
   Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506") // SUSHISWAP_ROUTER_V2_FANTOM
 );
 
-export const SUSHISWAP_ROUTER_ADDRESS_ARBITRUM_ONE = new TypedMap<string, Address>();
+export const SUSHISWAP_ROUTER_ADDRESS_ARBITRUM_ONE = new TypedMap<
+  string,
+  Address
+>();
 SUSHISWAP_ROUTER_ADDRESS_ARBITRUM_ONE.set(
   "routerV1",
   Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506") // SUSHISWAP_ROUTER_V1_ARBITRUM_ONE
@@ -173,7 +177,10 @@ UNISWAP_ROUTER_ADDRESS_MAINNET.set(
   Address.fromString("0x0000000000000000000000000000000000000000") // UNISWAP_ROUTER_V2_MAINNET
 );
 
-export const SPOOKY_SWAP_ROUTER_ADDRESS_FANTOM = new TypedMap<string, Address>();
+export const SPOOKY_SWAP_ROUTER_ADDRESS_FANTOM = new TypedMap<
+  string,
+  Address
+>();
 SPOOKY_SWAP_ROUTER_ADDRESS_FANTOM.set(
   "routerV1",
   Address.fromString("0xbe4fc72f8293f9d3512d58b969c98c3f676cb957") // SPOOKY_SWAP_ROUTER_V1_FANTOM
@@ -189,11 +196,11 @@ export const UNISWAP_ROUTER_CONTRACT_ADDRESSES = new TypedMap<
 >();
 UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
   "mainnet",
-  UNISWAP_ROUTER_ADDRESS_MAINNET// UNISWAP_ROUTER_MAINNET
+  UNISWAP_ROUTER_ADDRESS_MAINNET // UNISWAP_ROUTER_MAINNET
 );
 UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
   "fantom",
-  SPOOKY_SWAP_ROUTER_ADDRESS_FANTOM // UNISWAP FORKED SPOOKY_SWAP_FANTOM 
+  SPOOKY_SWAP_ROUTER_ADDRESS_FANTOM // UNISWAP FORKED SPOOKY_SWAP_FANTOM
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -240,7 +247,6 @@ CHAIN_LINK_CONTRACT_ADDRESS.set(
 ///////////////////////////////// HELPERS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-
 export const WHITELIST_TOKENS_LIST: string[] = [
   "WETH",
   "USDT",
@@ -254,7 +260,7 @@ export const WHITELIST_TOKENS_LIST: string[] = [
   "WFTM",
   "fBTC",
   "FRAX",
-  "CRV"
+  "CRV",
 ];
 
 export const WHITELIST_TOKENS_MAINNET = new TypedMap<string, Address>();
@@ -340,7 +346,7 @@ WHITELIST_TOKENS_FANTOM.set(
 export const WHITELIST_TOKENS_ARBITRUM_ONE = new TypedMap<string, Address>();
 WHITELIST_TOKENS_ARBITRUM_ONE.set(
   "WETH",
-  Address.fromString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1") 
+  Address.fromString("0x82af49447d8a07e3bd95bd0d56f35241523fbab1")
 );
 WHITELIST_TOKENS_ARBITRUM_ONE.set(
   "ETH",

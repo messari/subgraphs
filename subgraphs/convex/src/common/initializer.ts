@@ -3,7 +3,6 @@ import {
   Account,
   RewardToken,
   YieldAggregator,
-  RewardTokenInfo,
   VaultDailySnapshot,
   VaultHourlySnapshot,
   FinancialsDailySnapshot,
@@ -16,16 +15,16 @@ import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Booster/ERC20";
 
 export function getOrCreateYieldAggregator(): YieldAggregator {
-  const id = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
-  let protocol = YieldAggregator.load(id);
+  const protocolId = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
+  let protocol = YieldAggregator.load(protocolId);
 
   if (!protocol) {
-    protocol = new YieldAggregator(id);
-    protocol.name = "convex";
-    protocol.slug = "convex";
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.0.0";
+    protocol = new YieldAggregator(protocolId);
+    protocol.name = constants.Protocol.NAME;
+    protocol.slug = constants.Protocol.SLUG;
+    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
+    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
+    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -68,7 +67,6 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     rewardToken = new RewardToken(address.toHexString());
     const token = getOrCreateToken(address);
     rewardToken.token = token.id;
-    // rewardToken._previousExtraHistoricalRewards = constants.BIGINT_ZERO;
     rewardToken.type = constants.RewardTokenType.DEPOSIT;
 
     rewardToken.save();
@@ -77,15 +75,14 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
   return rewardToken;
 }
 
-
 export function getOrCreateUsageMetricsDailySnapshot(
   block: ethereum.Block
 ): UsageMetricsDailySnapshot {
-  let id: i64 = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
-  let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
+  let id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  let usageMetrics = UsageMetricsDailySnapshot.load(id);
 
   if (!usageMetrics) {
-    usageMetrics = new UsageMetricsDailySnapshot(id.toString());
+    usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
     usageMetrics.dailyActiveUsers = 0;
@@ -166,7 +163,7 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
+    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
     vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
@@ -199,7 +196,7 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
+    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
     vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
@@ -214,11 +211,11 @@ export function getOrCreateVaultsHourlySnapshots(
 export function getOrCreateFinancialDailySnapshots(
   block: ethereum.Block
 ): FinancialsDailySnapshot {
-  let id = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
-  let financialMetrics = FinancialsDailySnapshot.load(id.toString());
+  let id = (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString();
+  let financialMetrics = FinancialsDailySnapshot.load(id);
 
   if (!financialMetrics) {
-    financialMetrics = new FinancialsDailySnapshot(id.toString());
+    financialMetrics = new FinancialsDailySnapshot(id);
     financialMetrics.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;

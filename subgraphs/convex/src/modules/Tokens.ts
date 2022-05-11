@@ -2,11 +2,12 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { RewardTokenInfo } from "../../generated/schema";
 import { getOrCreateRewardToken } from "../common/initializer";
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { BaseRewardPool } from "../../generated/Booster/BaseRewardPool";
 
 export function getOrCreateRewardTokenInfo(
   poolId: BigInt,
+  block: ethereum.Block,
   rewardTokenAddress: Address,
   rewardTokenPool: Address | null = null
 ): RewardTokenInfo {
@@ -24,6 +25,7 @@ export function getOrCreateRewardTokenInfo(
     if (rewardTokenPool)
       rewardTokenInfo.rewardTokenPool = rewardTokenPool.toHexString();
 
+    rewardTokenInfo.lastRewardTimestamp = block.timestamp;
     rewardTokenInfo.save();
   }
 
@@ -32,6 +34,7 @@ export function getOrCreateRewardTokenInfo(
 
 export function getExtraRewardTokens(
   poolId: BigInt,
+  block: ethereum.Block,
   baseRewardPoolContract: BaseRewardPool
 ): string[] {
   let extraRewardTokens: string[] = [];
@@ -64,6 +67,7 @@ export function getExtraRewardTokens(
 
     getOrCreateRewardTokenInfo(
       poolId,
+      block,
       extraRewardTokenAddress,
       extraBaseRewardPoolAddress
     );
@@ -75,6 +79,7 @@ export function getExtraRewardTokens(
 
 export function getRewardTokens(
   poolId: BigInt,
+  block: ethereum.Block,
   baseRewardPoolAddress: Address
 ): string[] {
   const baseRewardPoolContract = BaseRewardPool.bind(baseRewardPoolAddress);
@@ -85,10 +90,15 @@ export function getRewardTokens(
   );
 
   // Create Reward Token Info for CRV Reward
-  getOrCreateRewardTokenInfo(poolId, crvRewardToken, baseRewardPoolAddress);
+  getOrCreateRewardTokenInfo(
+    poolId,
+    block,
+    crvRewardToken,
+    baseRewardPoolAddress
+  );
 
   let rewardTokens = [crvRewardToken.toHexString()];
-  rewardTokens.concat(getExtraRewardTokens(poolId, baseRewardPoolContract));
+  rewardTokens.concat(getExtraRewardTokens(poolId, block, baseRewardPoolContract));
 
   log.warning("[RewardTokens]  PoolId: {}, Tokens: [{}]", [
     poolId.toString(),
