@@ -1,6 +1,6 @@
 .PHONY: codegen
 codegen:
-	graph codegen $(subgraph)/subgraph.yaml -o $(subgraph)/generated
+	graph codegen $(subgraph)/subgraph.yaml -o ./generated
 
 .PHONY: build
 build:

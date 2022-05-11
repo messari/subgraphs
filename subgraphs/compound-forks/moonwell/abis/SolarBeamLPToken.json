@@ -306,9 +306,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "forwarder", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "forwarder", "type": "address" }],
     "name": "isTrustedForwarder",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
@@ -331,9 +329,7 @@
   {
     "inputs": [{ "internalType": "address", "name": "to", "type": "address" }],
     "name": "mint",
-    "outputs": [
-      { "internalType": "uint256", "name": "liquidity", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "liquidity", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
