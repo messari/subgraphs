@@ -39,6 +39,9 @@ export function updateRewardTokenEmission(
     .toBigDecimal()
     .div(constants.BIGINT_SECONDS_PER_DAY.toBigDecimal());
 
+  if (gapInDays == constants.BIGDECIMAL_ZERO)
+    return;
+
   const rewardEmissionPerDay = totalRewards.toBigDecimal().div(gapInDays);
 
   let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
