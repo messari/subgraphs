@@ -9,7 +9,7 @@
         - Similarly, these chains inherit the same code from uniswap. However, these chains only use the Miniswap contract for staking LP and earning rewards. It works very similar to the Masterchef contracts. 
     - BSC, Avalanche
         - These two sushiswap chains deploy in just the same way as Uniswap V2. Just with different configurations. 
-]- Apeswap
+- Apeswap
     - BSC, Matic
         - The two chains use the code from uniswap V2. Additionally, there is a Masterchef and MasterchefV2 contract. BSC only uses the Masterchef contract, while MasterchefV2 is used on the Matic chain. The masterchef contracts are slightly different for Apeswap vs. Sushiswap in the naming of certain functions. This is why they each have a separate folder for Masterchef. 
 
