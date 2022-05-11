@@ -36,7 +36,7 @@ npm run deploy steege
 - ABI's for all forks. There are folders to contain ABIs for each protocol
 ### src
 - Contains all logic for deploying all subgraphs. When the logic is not shared accross protocols, create a separate folder for each - See Masterchef. 
-### Config
+### config
 - Config folder contains folders for each protocol. In these folders, add the configurations for each network. These configurations include constants to be used in the main program, and the template with .json configurations for the subgraph.yaml file
-### Deployment
+### deployment
 - This folder contains the code and configurations for deploying according to the **Deployment Instructions** section.
