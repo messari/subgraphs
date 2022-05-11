@@ -9,6 +9,7 @@ import { VaultListener } from '../../generated/templates';
 import * as constants from "./../constant";
 import { getUsdPricePerToken } from "./../Prices";
 import { updateVaultSnapshots } from './Metrics'
+import { getOrCreateVaultFee } from './VaultFee'
 
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
@@ -62,6 +63,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
     vault.save();
   }
 
+  getOrCreateVaultFee(vault);
   VaultListener.create(id);
 
   protocol.save();

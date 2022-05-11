@@ -29,10 +29,10 @@ export function handleSharePriceChangeLog(event: SharePriceChangeLogEvent): void
 
 
 export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
-  let vault_addr = call.inputs._vault
-  let strategy_addr = call.inputs._strategy
+  let vault_addr = call.inputs._vault;
+  let strategy_addr = call.inputs._strategy;
 
-  let block = call.block
+  let block = call.block;
 
-  getOrCreateVault(vault_addr, block)
+  getOrCreateVault(vault_addr, block);
 }
