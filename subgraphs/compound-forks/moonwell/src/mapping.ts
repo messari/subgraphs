@@ -53,7 +53,6 @@ import {
   _handleRepayBorrow,
   _handleLiquidateBorrow,
   UpdateMarketData,
-  AccruePer,
   _handleAccrueInterest,
   getOrElse,
 } from "../../src/mapping";
@@ -199,7 +198,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
-    AccruePer.Timestamp,
     oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
@@ -214,7 +212,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.1",
+    "1.0.2",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa()

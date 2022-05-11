@@ -124,7 +124,6 @@ function ProtocolTab(
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
-      console.log("df", dataFields)
       return (<>
         <h2 style={{ borderTop: "black 2px solid", width: "100%" }}>ENTITY: {entityName}</h2>
         <Grid key={entityName} container>{

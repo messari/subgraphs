@@ -74,8 +74,8 @@ export function createVault(vaultAddress: Address, inputTokenAddress: Address, b
   vault.protocol = protocol.id;
 
   let inputToken = getOrCreateToken(inputTokenAddress);
-  vault.inputTokens = [inputToken.id];
-  vault.inputTokenBalances = [BIGINT_ZERO];
+  vault.inputToken = inputToken.id;
+  vault.inputTokenBalance = BIGINT_ZERO;
 
   let outputToken = getOrCreateToken(vaultAddress);
   vault.outputToken = outputToken.id;

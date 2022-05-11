@@ -46,7 +46,7 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string)
         currentData.amountOut = amountOut;
         currentData.tokenIn = currentData.tokenIn.id;
         currentData.tokenOut = currentData.tokenOut.id;
-        tableData.push({ id: i, date: toDate(currentData.timestamp), ...currentData })
+        tableData.push({ id: i, date: toDate(currentData.timestamp), ...currentData });
       }
     }
     const columns = Object.entries(dataTable[0]).filter(function ([k, val]) {
