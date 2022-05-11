@@ -1207,18 +1207,20 @@ function updateMarket(
     );
   }
 
-  let interestAccumulated = interestAccumulatedMantissa
+  let interestAccumulatedUSD = interestAccumulatedMantissa
     .toBigDecimal()
-    .div(mantissaFactorBD);
-  let protocolSideRevenueUSDDelta = interestAccumulated.times(
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor
   );
-  let supplySideRevenueUSDDelta = interestAccumulated.minus(
+  let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
     protocolSideRevenueUSDDelta
   );
 
-  market._cumulativeTotalRevenueUSD =
-    market._cumulativeTotalRevenueUSD.plus(interestAccumulated);
+  market._cumulativeTotalRevenueUSD = market._cumulativeTotalRevenueUSD.plus(
+    interestAccumulatedUSD
+  );
   market._cumulativeProtocolSideRevenueUSD =
     market._cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
   market._cumulativeSupplySideRevenueUSD =
@@ -1230,8 +1232,9 @@ function updateMarket(
     market.id,
     blockTimestamp.toI32()
   );
-  snapshot._dailyTotalRevenueUSD =
-    snapshot._dailyTotalRevenueUSD.plus(interestAccumulated);
+  snapshot._dailyTotalRevenueUSD = snapshot._dailyTotalRevenueUSD.plus(
+    interestAccumulatedUSD
+  );
   snapshot._dailyProtocolSideRevenueUSD =
     snapshot._dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
   snapshot._dailySupplySideRevenueUSD =
