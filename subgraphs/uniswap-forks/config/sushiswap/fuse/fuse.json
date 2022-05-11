@@ -1,4 +1,5 @@
 {
+  "deployment": "SUSHISWAP_FUSE",
   "network": "fuse",
   "address": "0x43eA90e2b786728520e4f930d2A71a477BF2737C",
   "startBlock": 0,

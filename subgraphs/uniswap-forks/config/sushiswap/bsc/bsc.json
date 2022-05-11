@@ -1,4 +1,5 @@
 {
+  "deployment": "SUSHISWAP_BSC",
   "network": "bsc",
   "factory": {
     "address": "0xc35dadb65012ec5796536bd9864ed8773abc74c4",

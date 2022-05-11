@@ -1,5 +1,6 @@
 import * as protocolNetworkData from './deploymentConfigurations.json' assert {type: "json"}
-import { exec } from 'child_process';
+import { execute } from './execution.js';
+
 
 const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 
 const configurations = JSON.parse(JSON.stringify(protocolNetworkData))['default']['configurations'] 
@@ -16,15 +17,7 @@ if (process.argv.length == 2) {
                 let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
                 let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-                console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
-                exec("npm run deployment --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template + " --LOCATION=" + location,
-                    function (error, stdout, stderr) {
-                    console.log('stdout: ' + stdout);
-                    console.log('stderr: ' + stderr);
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    } 
-                });
+                execute(protocol, network, template, location)
             }
         }
     }
@@ -41,15 +34,7 @@ if (process.argv.length == 2) {
             let template = protocolNetworkMap[protocol][network]['template']
             let location = protocolNetworkMap[protocol][network][process.argv[3]]
 
-            console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
-            exec("npm run deployment --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template + " --LOCATION=" + location,
-                function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error !== null) {
-                    console.log('exec error: ' + error);
-                }
-            });
+            execute(protocol, network, template, location)
         }
     }
  } else if (process.argv.length == 5) {
@@ -68,16 +53,9 @@ if (process.argv.length == 2) {
         let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
         let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-        console.log("Deploying " + protocol + " on " + network + " to " + location + "...")
-        exec("npm run deployment --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template + " --LOCATION=" + location,
-            function (error, stdout, stderr) {
-                console.log('stdout: ' + stdout);
-                console.log('stderr: ' + stderr);
-                if (error !== null) {
-                    console.log('exec error: ' + error);
-                } 
-            });
-        }
+        execute(protocol, network, template, location)
+
+    }
 } else {
     console.log('Error: Too many arguments')
 }
