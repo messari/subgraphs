@@ -429,11 +429,12 @@ export const schema120 = (): Schema => {
     const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {pool: $poolId}" + options + ") { "
     let fields = eventsFields.join(",");
     if (event === "swaps") {
-      fields += ", amountIn, amountInUSD, amountOutUSD, amountOut";
+      fields += ", amountIn, amountInUSD, amountOutUSD, amountOut, tokenIn{id, decimals}, tokenOut{id, decimals}";
     } else {
-      fields += ', amountUSD';
+      fields += ', amountUSD, inputTokens{id, decimals}, inputTokenAmounts, outputToken{id, decimals}, outputTokenAmount';
     }
-    return baseStr + fields + ' }'
+
+    return baseStr + fields + ' }';
   });
   
   let query = `

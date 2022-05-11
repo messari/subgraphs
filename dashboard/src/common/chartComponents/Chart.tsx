@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { Line } from "react-chartjs-2";
-import { toDate } from "../App";
+import { toDate } from "../../../src/utils/index";
 
 export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number) => {
     if (dataChart) {

@@ -28,9 +28,12 @@ export function getOrCreateProtocol(): YieldAggregator {
   protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
   protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
   protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
-  protocol.totalUniqueUsers = 0;
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  protocol.totalVolumeUSD = BIGDECIMAL_ZERO;
+  protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  protocol.cumulativeUniqueUsers = 0;
   protocol._vaultIds = [];
   protocol.save();
 

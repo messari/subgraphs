@@ -10,7 +10,6 @@ import { Versions } from "../constants";
     protocolSchemaData: any,
     subgraphToQuery: {url: string, version: string},
   ) {
-    console.log('ERROR COMP' + Object.keys(errorObject), Object.values(errorObject))
     const errorMsgs = [];
     let errorTotalCount = 0;
     let errorDisplayCount = 0;

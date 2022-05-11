@@ -485,7 +485,10 @@ export const schema120 = (): Schema => {
         id
         name        
         symbol
-        fees
+        fees {
+          feeType
+          feePercentage
+        }
         inputToken {
           decimals
           name
