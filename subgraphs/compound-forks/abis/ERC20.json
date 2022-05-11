@@ -284,18 +284,14 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newVault", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newVault", "type": "address" }],
     "name": "changeMPCOwner",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newVault", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newVault", "type": "address" }],
     "name": "changeVault",
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "nonpayable",
@@ -347,9 +343,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
     "name": "deposit",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",
@@ -405,16 +399,12 @@
   {
     "inputs": [],
     "name": "getAllMinters",
-    "outputs": [
-      { "internalType": "address[]", "name": "", "type": "address[]" }
-    ],
+    "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_vault", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_vault", "type": "address" }],
     "name": "initVault",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -509,27 +499,21 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_auth", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_auth", "type": "address" }],
     "name": "revokeMinter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_auth", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_auth", "type": "address" }],
     "name": "setMinter",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_vault", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_vault", "type": "address" }],
     "name": "setVault",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -628,9 +612,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
     "name": "withdraw",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "nonpayable",

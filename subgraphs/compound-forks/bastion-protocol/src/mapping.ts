@@ -16,12 +16,7 @@ import {
   NewReserveFactor,
 } from "../../generated/templates/CToken/CToken";
 import { LendingProtocol, Token } from "../../generated/schema";
-import {
-  cTokenDecimals,
-  Network,
-  BIGINT_ZERO,
-  SECONDS_PER_YEAR,
-} from "../../src/constants";
+import { cTokenDecimals, Network, BIGINT_ZERO, SECONDS_PER_YEAR } from "../../src/constants";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -67,27 +62,16 @@ export function handleMarketListed(event: MarketListed): void {
 
   let protocol = getOrCreateProtocol();
   let cTokenContract = CToken.bind(event.params.cToken);
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
-    cTokenContract.try_reserveFactorMantissa(),
-    BIGINT_ZERO
-  );
+  let cTokenReserveFactorMantissa = getOrElse<BigInt>(cTokenContract.try_reserveFactorMantissa(), BIGINT_ZERO);
   if (cTokenAddr == nativeCToken.address) {
-    let marketListedData = new MarketListedData(
-      protocol,
-      nativeToken,
-      nativeCToken,
-      cTokenReserveFactorMantissa
-    );
+    let marketListedData = new MarketListedData(protocol, nativeToken, nativeCToken, cTokenReserveFactorMantissa);
     _handleMarketListed(marketListedData, event);
     return;
   }
 
   let underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
-    log.warning(
-      "[handleMarketListed] could not fetch underlying token of cToken: {}",
-      [cTokenAddr.toHexString()]
-    );
+    log.warning("[handleMarketListed] could not fetch underlying token of cToken: {}", [cTokenAddr.toHexString()]);
     return;
   }
   let underlyingTokenAddr = underlyingTokenAddrResult.value;
@@ -99,17 +83,17 @@ export function handleMarketListed(event: MarketListed): void {
         underlyingTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
+        cTokenDecimals,
       ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
-        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
+        getOrElse<i32>(underlyingTokenContract.try_decimals(), 0),
       ),
-      cTokenReserveFactorMantissa
+      cTokenReserveFactorMantissa,
     ),
-    event
+    event,
   );
 }
 
@@ -117,9 +101,7 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   _handleNewCollateralFactor(event);
 }
 
-export function handleNewLiquidationIncentive(
-  event: NewLiquidationIncentive
-): void {
+export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
   let protocol = getOrCreateProtocol();
   _handleNewLiquidationIncentive(protocol, event);
 }
@@ -152,9 +134,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(
-    Address.fromString(protocol._priceOracle)
-  );
+  let oracleContract = PriceOracle.bind(Address.fromString(protocol._priceOracle));
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
@@ -163,7 +143,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_borrowRatePerBlock(),
     AccruePer.Timestamp,
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    SECONDS_PER_YEAR
+    SECONDS_PER_YEAR,
   );
   _handleAccrueInterest(updateMarketData, comptrollerAddr, event);
 }
@@ -178,7 +158,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "1.0.1",
     "1.0.0",
     Network.AURORA,
-    comptroller.try_liquidationIncentiveMantissa()
+    comptroller.try_liquidationIncentiveMantissa(),
   );
   return _getOrCreateProtocol(protocolData);
 }

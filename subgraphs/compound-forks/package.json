@@ -1,12 +1,18 @@
 {
   "name": "compound-fork-subgraph",
   "license": "MIT",
-  "scripts": {},
-  "dependencies": {
-    "@graphprotocol/graph-cli": "0.28.0",
-    "@graphprotocol/graph-ts": "0.26.0"
+  "repository": "https://github.com/messari/subgraphs/blob/master/subgraphs/compound-forks",
+  "scripts": {
+    "format": "npx prettier --write ."
   },
-  "devDependencies": {
-    "prettier": "^2.6.2"
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.28.1",
+    "@graphprotocol/graph-ts": "0.26.0",
+    "@typescript-eslint/eslint-plugin": "^5.16.0",
+    "@typescript-eslint/parser": "^5.16.0",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.0",
+    "typescript": "^4.6.2"
   }
 }
