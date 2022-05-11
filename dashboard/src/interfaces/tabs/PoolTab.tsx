@@ -111,38 +111,33 @@ function PoolTab(
                 }
               }
               const dataFieldKey = entityFieldName + ' [' + fieldSplitIdentifier + ']';
-              try {
-                if (entityFieldName === 'inputTokenBalances') {
-                  value = convertTokenDecimals(val, data[poolName].inputTokens[arrayIndex].decimals);
-                }
-                if (entityFieldName === 'rewardTokenEmissionsAmount') {
-                  const currentRewardToken = data[poolName].rewardTokens[arrayIndex];
-                  if (currentRewardToken.decimals) {
-                    value = convertTokenDecimals(val, currentRewardToken?.decimals);
-                  } else if (currentRewardToken?.token?.decimals) {
-                    value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
-                  } else {
-                    value = convertTokenDecimals(val, 18);
-                    issues.push({ type: "DEC", message: poolName + '-' + entityFieldName + '-' + arrayIndex });
-                  }
-                }
-                if (entityFieldName === 'rewardTokenEmissionsUSD') {
-                  //Convert emissions amount in USD to APY/APR
-                  // total reward emission USD / total staked USD * 100 = reward APR
-                  if (entityInstance?.stakedOutputTokenAmount) {
-                    value = Number(val) / (entityInstance.outputTokenPriceUSD * entityInstance.stakedOutputTokenAmount) * 100 * 365;
-                  } else if (entityInstance?.totalDepositBalanceUSD) {
-                    value = Number(val) / entityInstance.totalDepositBalanceUSD * 100 * 365;
-                  } else {
-                    value = Number(val) / entityInstance.totalValueLockedUSD * 100 * 365;
-                  }
-
-                }
-              } catch (err) {
-                if (err instanceof Error) {
-                  issues.push({ type: "DEC", message: poolName + '-' + entityFieldName + '-' + arrayIndex })
+              if (entityFieldName === 'inputTokenBalances') {
+                value = convertTokenDecimals(val, data[poolName].inputTokens[arrayIndex].decimals);
+              }
+              if (entityFieldName === 'rewardTokenEmissionsAmount') {
+                const currentRewardToken = data[poolName].rewardTokens[arrayIndex];
+                if (currentRewardToken.decimals) {
+                  value = convertTokenDecimals(val, currentRewardToken?.decimals);
+                } else if (currentRewardToken?.token?.decimals) {
+                  value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
+                } else {
+                  value = convertTokenDecimals(val, 18);
+                  issues.push({ type: "DEC", message: poolName + '-' + entityFieldName + '-' + arrayIndex });
                 }
               }
+              if (entityFieldName === 'rewardTokenEmissionsUSD') {
+                //Convert emissions amount in USD to APY/APR
+                // total reward emission USD / total staked USD * 100 = reward APR
+                if (entityInstance?.stakedOutputTokenAmount) {
+                  value = Number(val) / (entityInstance.outputTokenPriceUSD * entityInstance.stakedOutputTokenAmount) * 100 * 365;
+                } else if (entityInstance?.totalDepositBalanceUSD) {
+                  value = Number(val) / entityInstance.totalDepositBalanceUSD * 100 * 365;
+                } else {
+                  value = Number(val) / entityInstance.totalValueLockedUSD * 100 * 365;
+                }
+
+              }
+
               if (!dataFields[dataFieldKey]) {
                 dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
                 dataFieldMetrics[dataFieldKey] = { sum: value };
@@ -222,10 +217,10 @@ function PoolTab(
   } catch (err) {
     if (err instanceof Error) {
       console.log('CATCH,', Object.keys(err), Object.values(err), err)
-      return <h3>JAVASCRIPT ERROR {err.message}</h3>
+      return <h3>JAVASCRIPT ERROR - POOL TAB - {err.message}</h3>
 
     } else {
-      return <h3>JAVASCRIPT ERROR</h3>
+      return <h3>JAVASCRIPT ERROR - POOL TAB </h3>
     }
   }
 }

@@ -14,6 +14,15 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string)
     const tableData: any[] = [];
     for (let i = dataTable.length - 1; i >= 0; i--) {
       const currentData = { ...dataTable[i] };
+      if (currentData?.amountUSD) {
+        currentData.amountUSD = Number(Number(currentData.amountUSD).toFixed(2)).toLocaleString();
+      }
+      if (currentData?.amountInUSD) {
+        currentData.amountInUSD = Number(Number(currentData.amountInUSD).toFixed(2)).toLocaleString();
+      }
+      if (currentData?.amountOutUSD) {
+        currentData.amountOutUSD = Number(Number(currentData.amountOutUSD).toFixed(2)).toLocaleString();
+      }
       if (data[poolName]?.inputToken) {
         currentData.amount = convertTokenDecimals(currentData.amount, data[poolName].inputToken.decimals);
         tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData });
@@ -29,17 +38,16 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string)
         currentData.outputToken = JSON.stringify(currentData.outputToken.id);
         tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData })
       }
-      if (dataTable[i]?.tokenIn) {
-        const amountIn = convertTokenDecimals(dataTable[i].amountIn, dataTable[i].tokenIn.decimals);
-        const amountOut = convertTokenDecimals(dataTable[i].amountOut, dataTable[i].tokenOut.decimals);
-        console.log('CHECK CONVERSION', amountIn, dataTable[i].amountIn, dataTable[i].tokenIn, dataTable[i])
+      if (currentData?.tokenIn) {
+        const amountIn = convertTokenDecimals(currentData.amountIn, currentData.tokenIn.decimals);
+        const amountOut = convertTokenDecimals(currentData.amountOut, currentData.tokenOut.decimals);
+        console.log('CHECK CONVERSION', amountIn, currentData.amountIn, currentData.tokenIn, currentData)
         currentData.amountIn = amountIn;
         currentData.amountOut = amountOut;
         currentData.tokenIn = currentData.tokenIn.id;
         currentData.tokenOut = currentData.tokenOut.id;
-        tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData })
+        tableData.push({ id: i, date: toDate(currentData.timestamp), ...currentData })
       }
-
     }
     const columns = Object.entries(dataTable[0]).filter(function ([k, val]) {
       if (k.includes("typename")) {

@@ -98,12 +98,16 @@ function SchemaTable(
                 value = JSON.stringify(value);
                 value = value.split(", ").join(",").split(',').join(', ');
             }
+            console.log(value, Number(value).toLocaleString(), !isNaN(Number(value)))
+            if (!isNaN(Number(value)) && entityField.includes("USD")) {
+                value = '$' + Number(value).toLocaleString();
+            }
             return (
                 <TableRow key={entityField}>
-                    <TableCell component="th" scope="row" style={{ minWidth: "30vw" }}>
+                    <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
                         {entityField}: <b>{dataFields[entityField]}</b>
                     </TableCell>
-                    <TableCell align="right" style={{ maxWidth: "60vw" }}>
+                    <TableCell align="right" style={{ maxWidth: "60vw", padding: "2px" }}>
                         {value}
                     </TableCell>
                 </TableRow>);
@@ -111,10 +115,10 @@ function SchemaTable(
     } catch (err) {
         if (err instanceof Error) {
             console.log('CATCH,', Object.keys(err), Object.values(err), err)
-            return <h3>JAVASCRIPT ERROR {err.message}</h3>
+            return <h3>JAVASCRIPT ERROR - RENDERING SCHEMA TABLE - {err.message}</h3>
 
         } else {
-            return <h3>JAVASCRIPT ERROR</h3>
+            return <h3>JAVASCRIPT ERROR - RENDERING SCHEMA TABLE</h3>
         }
     }
 
