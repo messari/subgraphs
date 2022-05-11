@@ -18,8 +18,13 @@
 
 
 **Deployment Instructions:**
-- npm run deploy uniswap-v2 mainnet steegecs will deploy uniswap-v2 to mainnet in my hosted service.
-- npm run deploy uniswap-v2 steegecs will deploy uniswap-v2 to all networks in my hosted service.
-- npm run deploy steege will deploy all forks in my hosted service.
+'''
+# Deploys uniswap-v2 to mainnet in my hosted service.
+npm run deploy uniswap-v2 mainnet steegecs
+# Deploys uniswap-v2 to all networks in my hosted service.
+npm run deploy uniswap-v2 steegecs
+# Deploys protocols and networks in my hosted service.
+npm run deploy steege
+```
 
 - Add/update configuraptions to the deployment/deploymentConfigurations.json file in order to add or update deployments.
