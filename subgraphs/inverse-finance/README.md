@@ -92,3 +92,15 @@ Not applicable.
 ## Smart Contracts Interactions
 
 ![inverse-finance](../../docs/images/protocols/inverse-finance.png "inverse-finance")
+
+## Inverse Finance Lending Protocol
+
+## Deposit, Borrow, and Liquidate in Markets
+
+The Inverse Finance Lending Protocol is controled by a [comptroller contract](https://etherscan.io/address/0x4dCf7407AE5C07f8681e1659f626E114A7667339), which controls 11 markets represented by an Anchor ERC20 token with a corresponding underlying/input token, including anDOLA/DOLA, anETH/ETH, anWBTC/WBTC, anxShushi/xSushi, anYFI/YFI, xINV/INV (an old and new contract), anStETH/stETH, anDOLA3POOL-CRV/DOLA3POOL CRV LP Token, anINV-DOLA SLP/INV-DOLA Sushi LP Token, and anFLOKI/FLOKI (deprecated). When a user deposits underlying (input) tokens in a market, they mint the corresponding Anchor token. As a depositor, the user will receive interest and INV token emissions as reward. An depositor can also borrow underlying tokens from any of the markets. The ratio between total borrow amount and collateral amount across all markets must be below a specified collateral factor. If a borrower's loan-to-collateral ratio is above the collateral factor, a liquidator can invoke the `LiquidateBorrow` function, repay all or part of the borrower's debt, and seize the borrower's Anchor tokens (which can then be redeemed for the underlying token).
+
+## DOLA stablecoin and the Fed
+
+The Inverse DAO also manages the DOLA stablecoin. The DOLA's peg to \$1 is maintained through [the Fed contract](https://etherscan.io/address/0x5e075e40d01c82b6bf0b0ecdb4eb1d6984357ef7) and through [the stablizer](https://etherscan.io/address/0x7ec0d931affba01b77711c2cd07c76b970795cdd), an exhange allowing users to arbitrage the differential between DAI and DOLA by swapping between them. When the demand for DOLA is high (price is above \$1), the Fed contract expands (increases) the DOLA supply by minting more DOLA and anDOLA tokens; vice versa, it contracts (reduces) the DOLA supply by burning the DOLA and anDOLA tokens. During expansion, the Fed contract is the supplier of liquidity in the anDOLA/DOLA market and earns a profit (interest) from its deposit. 
+
+Besides the Anchor Fed, separate Fed contracts also supplies DOLA to the lending pools of serval lending partners, including Yearn, Bagder, 0xb1, Fuse, and Scream (Fantom). The Fed contract behaves similar to Anchor Fed, with customization to make it work with the contract of each lending partner.
