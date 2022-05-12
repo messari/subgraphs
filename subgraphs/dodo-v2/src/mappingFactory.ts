@@ -1,28 +1,16 @@
 import { getOrCreatePool } from "./utils/getters";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 
-import {
-  DVMFactory,
-  NewDVM,
-  RemoveDVM
-} from "../generated/DVMFactory/DVMFactory";
+import { DVMFactory, NewDVM } from "../generated/DVMFactory/DVMFactory";
 
 import {
   CrowdPoolingFactory,
   NewCP
 } from "../generated/CrowdPoolingFactory/CrowdPoolingFactory";
 
-import {
-  DPPFactory,
-  NewDPP,
-  RemoveDPP
-} from "../generated/DPPFactory/DPPFactory";
+import { DPPFactory, NewDPP } from "../generated/DPPFactory/DPPFactory";
 
-import {
-  DSPFactory,
-  NewDSP,
-  RemoveDSP
-} from "../generated/DSPFactory/DSPFactory";
+import { DSPFactory, NewDSP } from "../generated/DSPFactory/DSPFactory";
 
 import {
   DODOMineV3Proxy,
@@ -103,16 +91,4 @@ export function handleDepositRewardToMine(event: DepositRewardToMine): void {
   );
   pool.rewardTokenEmissionsUSD = [usdPricePerBlock];
   pool.save();
-}
-
-export function handleRemoveDVM(event: RemoveDVM): void {
-  // LiquidityPool.remove(event.params.dvm.toHex());
-}
-
-export function handleRemoveDPP(event: RemoveDPP): void {
-  // LiquidityPool.remove(event.params.dvm.toHex());
-}
-
-export function handleRemoveDSP(event: RemoveDSP): void {
-  // LiquidityPool.remove(event.params.dvm.toHex());
 }

@@ -1,24 +1,12 @@
-import {
-  BigDecimal,
-  Address,
-  ethereum,
-  BigInt,
-  log
-} from "@graphprotocol/graph-ts";
+import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
 
 import {
   _Account,
   _DailyActiveAccount,
-  UsageMetricsDailySnapshot,
-  LiquidityPool,
   LiquidityPoolFee
 } from "../../generated/schema";
 
 import {
-  DVMFactory_ADDRESS,
-  CPFactory_ADDRESS,
-  DPPFactory_ADDRESS,
-  DSPFactory_ADDRESS,
   SECONDS_PER_DAY,
   ADDRESS_ZERO,
   ZERO_BD,

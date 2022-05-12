@@ -15,7 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDVM
-        - RemoveDVM
       abis:
         - name: DVMFactory
           file: ./abis/DVMFactory.json
@@ -26,8 +25,6 @@ dataSources:
       eventHandlers:
         - event: NewDVM(address,address,address,address)
           handler: handleNewDVM
-        - event: RemoveDVM(address)
-          handler: handleRemoveDVM
       file: ./src/mappingFactory.ts
       # blank
   - kind: ethereum
@@ -64,15 +61,12 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDPP
-        - RemoveDPP
       abis:
         - name: DPPFactory
           file: ./abis/DPPFactory.json
       eventHandlers:
         - event: NewDPP(address,address,address,address)
           handler: handleNewDPP
-        - event: RemoveDPP(address)
-          handler: handleRemoveDPP
       file: ./src/mappingFactory.ts
   # blank
   - kind: ethereum
@@ -88,15 +82,12 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDSP
-        - RemoveDSP
       abis:
         - name: DSPFactory
           file: ./abis/DSPFactory.json
       eventHandlers:
         - event: NewDSP(address,address,address,address)
           handler: handleNewDSP
-        - event: RemoveDSP(address)
-          handler: handleRemoveDSP
       file: ./src/mappingFactory.ts
   # blank
   - kind: ethereum

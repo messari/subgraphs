@@ -1,6 +1,7 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { bigIntToBigDecimal, calculateAverage, safeDiv } from "./numbers";
+
+import { bigIntToBigDecimal } from "./numbers";
 
 import {
   Token,
@@ -10,10 +11,7 @@ import {
   UsageMetricsHourlySnapshot,
   FinancialsDailySnapshot,
   LiquidityPoolDailySnapshot,
-  RewardToken,
-  Deposit,
-  Withdraw,
-  Swap
+  RewardToken
 } from "../../generated/schema";
 
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";

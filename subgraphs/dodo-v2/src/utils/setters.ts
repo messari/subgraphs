@@ -1,54 +1,16 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import {
-  bigIntToBigDecimal,
-  calculateAverage,
-  safeDiv,
-  modulateDecimals
-} from "./numbers";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { bigIntToBigDecimal, safeDiv, modulateDecimals } from "./numbers";
 
-import {
-  Token,
-  DexAmmProtocol,
-  LiquidityPool,
-  UsageMetricsDailySnapshot,
-  FinancialsDailySnapshot,
-  RewardToken,
-  Deposit,
-  Withdraw,
-  Swap
-} from "../../generated/schema";
+import { Deposit, Withdraw, Swap } from "../../generated/schema";
 
 import { getOrCreatePool, getUSDprice, getOrCreateToken } from "./getters";
 
-import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
-
-import {
-  ZERO_BD,
-  ZERO_BI,
-  ONE_BI,
-  WRAPPED_ETH,
-  Network,
-  ProtocolType,
-  RewardTokenType,
-  SECONDS_PER_DAY,
-  DODOLpToken_ADDRESS,
-  vDODOToken_ADDRESS,
-  DVMFactory_ADDRESS,
-  CPFactory_ADDRESS,
-  DPPFactory_ADDRESS,
-  DSPFactory_ADDRESS,
-  STABLE_COINS
-} from "./constants";
+import { ZERO_BD } from "./constants";
 
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
 import { ERC20 } from "../../generated/DVMFactory/ERC20";
-
-import { DVM } from "../../generated/DVM/DVM";
-import { CP } from "../../generated/CP/CP";
-import { DPP } from "../../generated/DPP/DPP";
-import { DSP } from "../../generated/DSP/DSP";
 
 export function setUSDprice(
   event: ethereum.Event,
