@@ -10,6 +10,8 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   NewPriceOracle,
+  ActionPaused,
+  ActionPaused1,
 } from "../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -171,6 +173,22 @@ export function _getOrCreateProtocol(
     protocol.lendingType = LendingType.POOLED;
     protocol.riskType = RiskType.GLOBAL;
 
+    // Set quantitative data params
+    protocol.cumulativeUniqueUsers = 0;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+
+    protocol._priceOracle = "";
+    protocol._marketIDs = [];
+
+    // set liquidation incentive
     if (protocolData.liquidationIncentiveMantissaResult.reverted) {
       log.warning(
         "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
@@ -225,6 +243,12 @@ export function _handleNewCollateralFactor(event: NewCollateralFactor): void {
     .times(BIGDECIMAL_HUNDRED);
   market.maximumLTV = collateralFactor;
   market.liquidationThreshold = collateralFactor;
+
+  if (market.maximumLTV == BIGDECIMAL_ZERO) {
+    // when collateral factor is 0 the asset CANNOT be used as collateral
+    market.canUseAsCollateral = false;
+  }
+
   market.save();
 }
 
@@ -268,6 +292,29 @@ export function _handleNewPriceOracle(
 ): void {
   protocol._priceOracle = event.params.newPriceOracle.toHexString();
   protocol.save();
+}
+
+//
+//
+// event.params
+//  - cToken: Address
+//  - action: string
+//  - pauseState: boolean
+export function _handleActionPaused(event: ActionPaused1): void {
+  let marketID = event.params.cToken.toHexString();
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[handleMint] Market not found: {}", [marketID]);
+    return;
+  }
+
+  if (event.params.action == "Mint") {
+    market.isActive = event.params.pauseState;
+  } else if (event.params.action == "Borrow") {
+    market.canBorrowFrom = event.params.pauseState;
+  }
+
+  market.save();
 }
 
 //
