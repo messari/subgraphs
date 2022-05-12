@@ -8,8 +8,9 @@ import { getOrCreateToken } from "./Token";
 import { VaultListener } from '../../generated/templates';
 import * as constants from "./../constant";
 import { getUsdPricePerToken } from "./../Prices";
-import { updateVaultSnapshots } from './Metrics'
+import { updateVaultSnapshots, updateFinancialSnapshot } from './Metrics'
 import { getOrCreateVaultFee } from './VaultFee'
+import { CustomPriceType } from "../Prices/common/types";
 
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
@@ -79,8 +80,8 @@ export function updateVaultPrices(event: ethereum.Event, vault: Vault): void{
   let inputTokenAddress = Address.fromString(vault.inputToken)
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
   // exist because vault create it
-  let inputToken = Token.load(inputTokenAddress.toHex());
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
+  let inputToken = getOrCreateToken(inputTokenAddress);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken.decimals as u8);
 
   vault.outputTokenSupply = readValue<BigInt>(vault_contract.try_totalSupply(), constants.BIGINT_ZERO);
 
@@ -89,22 +90,31 @@ export function updateVaultPrices(event: ethereum.Event, vault: Vault): void{
 
   let protocol = getOrCreateProtocol();
 
-  updateProtocolAndVaulTotalValueLockedUSD(protocol, vault);
+  updateProtocolAndVaulTotalValueLockedUSD(event, protocol, vault, inputTokenDecimals, inputTokenPrice, inputToken);
 
   updateVaultSnapshots(event, vault);
+  updateFinancialSnapshot(event);
 }
 
-function updateProtocolAndVaulTotalValueLockedUSD(protocol: YieldAggregator, vault: Vault): void{
+function updateProtocolAndVaulTotalValueLockedUSD(event: ethereum.Event, protocol: YieldAggregator, vault: Vault,
+  inputTokenDecimals: BigInt, inputTokenPrice: CustomPriceType, inputToken: Token
+  ): void{
   let protocolTotalValueLockedUSD = protocol.totalValueLockedUSD;
+
+  let lastPriceUSD = (<BigDecimal> inputTokenPrice.usdPrice).div(inputTokenPrice.decimals.toBigDecimal());
+  let pricePerShare_nu = (<BigDecimal> vault.pricePerShare).div(inputTokenDecimals.toBigDecimal());
+  let supply = vault.inputTokenBalance.toBigDecimal()
+    .div(inputTokenDecimals.toBigDecimal());
+
+  inputToken.lastPriceUSD = lastPriceUSD;
+  inputToken.lastPriceBlockNumber = event.block.number;
+  inputToken.save();
 
   protocol.totalValueLockedUSD = protocolTotalValueLockedUSD.minus(vault.totalValueLockedUSD);
 
-  vault.totalValueLockedUSD = (<BigDecimal> vault.pricePerShare)
-    .times(inputTokenPrice.usdPrice)
-    .times((<BigInt> vault.outputTokenSupply).toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+  vault.totalValueLockedUSD = lastPriceUSD
+    .times(pricePerShare_nu)
+    .times(supply);
   vault.save();
 
   protocolTotalValueLockedUSD = protocol.totalValueLockedUSD;

@@ -34,3 +34,7 @@ export function getOrCreateProtocol(): YieldAggregator {
 
   return protocol as YieldAggregator;
 }
+
+export function updateProtocolCumulativeUniqueUsers(): void{
+  
+}

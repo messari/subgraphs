@@ -5,7 +5,8 @@ import {
   UsageMetricsHourlySnapshot,
   ActiveAccount,
   VaultDailySnapshot,
-  VaultHourlySnapshot
+  VaultHourlySnapshot,
+  FinancialsDailySnapshot
 } from "../../generated/schema";
 import * as constants from "./../constant";
 import { getDay, getHour } from "../utils/numbers";
@@ -259,4 +260,57 @@ export function updateVaultHourlySnapshot(event: ethereum.Event, vault: Vault): 
 export function updateVaultSnapshots(event: ethereum.Event, vault: Vault): void {
   updateVaultDailySnapshot(event, vault);
   updateVaultHourlySnapshot(event, vault);
+}
+
+export function updateFinancialSnapshot(event: ethereum.Event): void{
+  updateFinancialsDailySnapshot(event);
+}
+
+function updateFinancialsDailySnapshot(event: ethereum.Event): void{
+  let day: i64 = getDay(event.block.timestamp.toI64());
+  let snapshot_id = day.toString();
+  let snapshot = getOrCreateFinancialsDailySnapshot(snapshot_id, event);
+
+  let protocol = getOrCreateProtocol();
+  snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  snapshot.save();
+}
+
+function getOrCreateFinancialsDailySnapshot(id: String, event: ethereum.Event): FinancialsDailySnapshot {
+
+  let snapshot = FinancialsDailySnapshot.load(id);
+
+  if(snapshot){
+    return snapshot as FinancialsDailySnapshot;
+  }
+
+  let protocol = getOrCreateProtocol();
+
+  snapshot = new FinancialsDailySnapshot(id);
+
+  snapshot.protocol = getOrCreateProtocol().id;
+
+  snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+
+  //snapshot.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.dailyTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+
+  snapshot.blockNumber = constants.BIGINT_ZERO;
+
+  snapshot.timestamp = event.block.timestamp;
+
+  snapshot.save();
+
+  return snapshot as FinancialsDailySnapshot;
 }
