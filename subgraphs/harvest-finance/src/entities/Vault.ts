@@ -64,7 +64,12 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
     vault.save();
   }
 
-  getOrCreateVaultFee(vault, block);
+  let vaultFee = getOrCreateVaultFee(vault, block);
+  let fees = vault.fees;
+  fees.push(vaultFee.id);
+  vault.fees = fees;
+  vault.save();
+
   VaultListener.create(id);
 
   protocol.save();
