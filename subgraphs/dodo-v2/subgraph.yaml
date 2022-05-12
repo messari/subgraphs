@@ -19,22 +19,8 @@ dataSources:
       abis:
         - name: DVMFactory
           file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
         - name: ERC20
           file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
         - name: FeeRateModel
           file: ./abis/FeeRateModel.json
       eventHandlers:
@@ -58,26 +44,8 @@ dataSources:
       entities:
         - NewCP
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
         - name: CrowdPoolingFactory
           file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewCP(address,address,address,address)
           handler: handleNewCP
@@ -98,26 +66,8 @@ dataSources:
         - NewDPP
         - RemoveDPP
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
         - name: DPPFactory
           file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewDPP(address,address,address,address)
           handler: handleNewDPP
@@ -140,26 +90,8 @@ dataSources:
         - NewDSP
         - RemoveDSP
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
         - name: DSPFactory
           file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: NewDSP(address,address,address,address)
           handler: handleNewDSP
@@ -205,26 +137,8 @@ dataSources:
         - SellShares
         - DODOSwap
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
         - name: DVM
           file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: BuyShares(address,uint256,uint256)
           handler: handleBuyShares
@@ -249,26 +163,8 @@ dataSources:
         - Cancel
         - Settle
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
         - name: CP
           file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: Bid(address,uint256,uint256)
           handler: handleBid
@@ -291,26 +187,8 @@ dataSources:
       entities:
         - DODOSwap
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
         - name: DPP
           file: ./abis/DPP.json
-        - name: DSP
-          file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: DODOSwap(address,address,uint256,uint256,address,address)
           handler: handleDODOSwap
@@ -331,26 +209,8 @@ dataSources:
         - SellShares
         - DODOSwap
       abis:
-        - name: DVMFactory
-          file: ./abis/DVMFactory.json
-        - name: CrowdPoolingFactory
-          file: ./abis/CrowdPoolingFactory.json
-        - name: DPPFactory
-          file: ./abis/DPPFactory.json
-        - name: DSPFactory
-          file: ./abis/DSPFactory.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: DVM
-          file: ./abis/DVM.json
-        - name: CP
-          file: ./abis/CP.json
-        - name: DPP
-          file: ./abis/DPP.json
         - name: DSP
           file: ./abis/DSP.json
-        - name: FeeRateModel
-          file: ./abis/FeeRateModel.json
       eventHandlers:
         - event: BuyShares(address,uint256,uint256)
           handler: handleBuyShares

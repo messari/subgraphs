@@ -43,12 +43,12 @@ import {
 
 import { setUSDprice, setUSDpriceTokenToToken, setPriceLP } from "./setters";
 
-import { ERC20 } from "../../generated/CP/ERC20";
+import { ERC20 } from "../../generated/DVMFactory/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
 import { CP } from "../../generated/CP/CP";
 import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
-import { FeeRateModel } from "../../generated/CP/FeeRateModel";
+import { FeeRateModel } from "../../generated/DVMFactory/FeeRateModel";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(

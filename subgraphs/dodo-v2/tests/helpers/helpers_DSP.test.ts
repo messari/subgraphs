@@ -4,9 +4,6 @@ import {
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { BuyShares, SellShares, DODOSwap } from "../../generated/DSP/DSP";
-import { ERC20 } from "../../generated/CP/ERC20";
-import { DSP } from "../../generated/DSP/DSP";
-
 import { TxHash } from "./constants.test";
 
 export function createBuySharesEvent(

@@ -39,7 +39,7 @@ import {
 
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
-import { ERC20 } from "../../generated/CP/ERC20";
+import { ERC20 } from "../../generated/DVMFactory/ERC20";
 
 import { DVM } from "../../generated/DVM/DVM";
 import { CP } from "../../generated/CP/CP";

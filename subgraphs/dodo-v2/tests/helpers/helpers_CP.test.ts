@@ -4,8 +4,6 @@ import {
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Bid } from "../../generated/CP/CP";
-import { ERC20 } from "../../generated/CP/ERC20";
-import { CP } from "../../generated/CP/CP";
 import { TxHash } from "./constants.test";
 
 export function createBidEvent(

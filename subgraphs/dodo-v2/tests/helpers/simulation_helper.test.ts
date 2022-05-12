@@ -10,7 +10,7 @@ import { createDODOSwapDSPEvent } from "./helpers_DSP.test";
 
 import { createDODOSwapDVMEvent } from "./helpers_DVM.test";
 
-import { ERC20 } from "../../generated/CP/ERC20";
+import { ERC20 } from "../../generated/DVMFactory/ERC20";
 import {
   handleNewDVM,
   handleNewCP,

@@ -4,8 +4,6 @@ import {
 } from "matchstick-as/assembly/index";
 import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 import { DODOSwap } from "../../generated/DPP/DPP";
-import { ERC20 } from "../../generated/CP/ERC20";
-import { DPP } from "../../generated/DPP/DPP";
 import { TxHash, DPPFactory_ADDRESS } from "./constants.test";
 
 export function createDODOSwapEvent(

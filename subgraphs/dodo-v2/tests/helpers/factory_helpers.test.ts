@@ -4,8 +4,6 @@ import { NewDVM } from "../../generated/DVMFactory/DVMFactory";
 import { NewDSP } from "../../generated/DSPFactory/DSPFactory";
 import { NewDPP } from "../../generated/DPPFactory/DPPFactory";
 import { NewCP } from "../../generated/CrowdPoolingFactory/CrowdPoolingFactory";
-import { ERC20 } from "../../generated/CP/ERC20";
-import { DVM } from "../../generated/DVM/DVM";
 import { createERC20Instance } from "./simulation_helper.test";
 
 import {

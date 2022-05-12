@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { ERC20 } from "../../generated/CP/ERC20";
+import { ERC20 } from "../../generated/DVMFactory/ERC20";
 import { Address } from "@graphprotocol/graph-ts";
 
 export function fetchTokenSymbol(tokenAddress: Address): string {
