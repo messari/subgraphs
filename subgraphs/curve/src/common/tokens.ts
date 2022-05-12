@@ -1,5 +1,5 @@
 /* eslint-disable prefer-const */
-import { ERC20 } from '../../generated/templates/CurvePoolTemplate/ERC20'
+import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 
 import { ERC20SymbolBytes } from "../../generated/templates/CurvePoolTemplate/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/templates/CurvePoolTemplate/ERC20NameBytes";

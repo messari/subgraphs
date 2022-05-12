@@ -120,7 +120,7 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
@@ -151,13 +151,13 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 
 ///// Misc /////
 ////////////////
 
-export const ETH_SYMBOL = "ETH"
-export const ETH_NAME = "Ether"
+export const ETH_SYMBOL = "ETH";
+export const ETH_NAME = "Ether";
 
 /////////////////////////////
 ///// Protocol Specific /////
 /////////////////////////////
 
 export const FEE_DENOMINATOR_DECIMALS = 10;
-export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52")
+export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52");
 export const CRV_POOL_START_BLOCK = 10928474;

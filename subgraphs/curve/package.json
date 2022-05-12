@@ -3,6 +3,7 @@
   "license": "UNLICENSED",
   "version": "1.0.0",
   "scripts": {
+    "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
     "codegen": "graph codegen",
     "build": "graph build",
     "build:mainnet": "yarn prepare:mainnet && graph build",
@@ -38,6 +39,7 @@
     "@graphprotocol/graph-cli": "0.27.0",
     "@graphprotocol/graph-ts": "0.26.0",
     "@magic/format": "^0.0.40",
-    "mustache": "^4.2.0"
+    "mustache": "^4.2.0",
+    "prettier": "^2.6.2"
   }
 }

@@ -1,17 +1,15 @@
 [
   {
-    "name":"base_pool",
-    "outputs":[
+    "name": "base_pool",
+    "outputs": [
       {
-        "type":"address",
-        "name":""
+        "type": "address",
+        "name": ""
       }
     ],
-    "inputs":[
-
-    ],
-    "stateMutability":"view",
-    "type":"function",
-    "gas":2321
+    "inputs": [],
+    "stateMutability": "view",
+    "type": "function",
+    "gas": 2321
   }
 ]

@@ -20,11 +20,11 @@ export function exponentToBigDecimal(exp: i32): BigDecimal {
 }
 
 export function exponentToBigInt(exp: i32): BigInt {
-  let bd = BigInt.fromString('1')
+  let bd = BigInt.fromString("1");
   for (let i = 0; i < exp; i++) {
-    bd = bd.times(BigInt.fromString('10'))
+    bd = bd.times(BigInt.fromString("10"));
   }
-  return bd
+  return bd;
 }
 
 export function calculateAverage(prices: BigDecimal[]): BigDecimal {

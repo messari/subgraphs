@@ -5,10 +5,9 @@ import {
   BIG_INT_ZERO,
   EARLY_V2_POOLS,
   LENDING,
-  METAPOOL_FACTORY,
-  LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY
+  LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY, METAPOOL_FACTORY
 } from './common/constants/index'
-import { BigInt, ethereum } from '@graphprotocol/graph-ts/index'
+import { BigInt } from '@graphprotocol/graph-ts/index'
 import { Factory, LiquidityPool, Registry } from '../generated/schema'
 import {
   CryptoFactoryTemplate,
@@ -17,12 +16,11 @@ import {
   RegistryTemplate,
   StableFactoryTemplate,
 } from '../generated/templates'
-import { Address, Bytes, log, BigDecimal } from '@graphprotocol/graph-ts'
+import { Address, Bytes, log } from '@graphprotocol/graph-ts'
 import { MainRegistry, PoolAdded, Set_liquidity_gaugesCall } from '../generated/AddressProvider/MainRegistry'
 import { createNewFactoryPool, createNewPool } from './services/pools'
 import { createNewRegistryPool } from './services/pools'
 import { MetaPool } from '../generated/templates/RegistryTemplate/MetaPool'
-import { ERC20 } from '../generated/templates/CurvePoolTemplate/ERC20'
 import { CurveLendingPool } from '../generated/templates/RegistryTemplate/CurveLendingPool'
 import { TokenExchange, TokenExchangeUnderlying } from '../generated/templates/CurvePoolTemplate/CurvePool'
 import { handleExchange } from './services/swaps'
@@ -31,10 +29,10 @@ import { getFactory } from './services/factory'
 import { getPlatform } from './services/platform'
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityImbalance, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
 import { NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
-import { getLiquidityPool, getOrCreateDexAmm, getOrCreateFinancialsDailySnapshot, getOrCreateToken, getPoolFee } from './common/getters'
-import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, ZERO_ADDRESS } from './common/constants'
+import { getLiquidityPool, getOrCreateToken, getPoolFee } from './common/getters'
+import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType } from './common/constants'
 import { bigIntToBigDecimal } from './common/utils/numbers'
-import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, updateProtocolRevenue, updateUsageMetrics } from './common/metrics'
+import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, updateUsageMetrics } from './common/metrics'
 import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
 import { setGaugeData } from './services/gauges/helpers'
 {{{ importExistingMetaPools }}}

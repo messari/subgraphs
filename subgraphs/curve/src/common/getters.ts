@@ -103,7 +103,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
   return usageMetrics;
 }
 
-export function getOrCreatePoolHourlySnapshot(poolAddress:string, event: ethereum.Event): LiquidityPoolHourlySnapshot {
+export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolHourlySnapshot {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolMetrics = LiquidityPoolHourlySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
@@ -115,7 +115,7 @@ export function getOrCreatePoolHourlySnapshot(poolAddress:string, event: ethereu
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
     let hourlyVolumeByTokenAmount: BigInt[] = [];
     let hourlyVolumeByTokenUSD: BigDecimal[] = [];
-    for (let i=0; i<=getLiquidityPool(poolAddress).inputTokens.length; i++) {
+    for (let i = 0; i <= getLiquidityPool(poolAddress).inputTokens.length; i++) {
       hourlyVolumeByTokenAmount.push(BIGINT_ZERO);
       hourlyVolumeByTokenUSD.push(BIG_DECIMAL_ZERO);
     }
@@ -135,7 +135,7 @@ export function getOrCreatePoolHourlySnapshot(poolAddress:string, event: ethereu
   return poolMetrics;
 }
 
-export function getOrCreatePoolDailySnapshot(poolAddress:string, event: ethereum.Event): LiquidityPoolDailySnapshot {
+export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolDailySnapshot {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolMetrics = LiquidityPoolDailySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
@@ -148,7 +148,7 @@ export function getOrCreatePoolDailySnapshot(poolAddress:string, event: ethereum
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
     let dailyVolumeByTokenAmount: BigInt[] = [];
     let dailyVolumeByTokenUSD: BigDecimal[] = [];
-    for (let i=0; i<=pool.inputTokens.length; i++) {
+    for (let i = 0; i <= pool.inputTokens.length; i++) {
       dailyVolumeByTokenAmount.push(BIGINT_ZERO);
       dailyVolumeByTokenUSD.push(BIG_DECIMAL_ZERO);
     }
@@ -250,12 +250,12 @@ export function getPoolTVL(liquidityPool:LiquidityPool, event: ethereum.Event): 
   return totalValueLockedUSD
 }
 */
-export function getPoolFee(poolID:string, feeType: string): LiquidityPoolFee {
-  let poolFee = LiquidityPoolFee.load(feeType +'-'+ poolID);
+export function getPoolFee(poolID: string, feeType: string): LiquidityPoolFee {
+  let poolFee = LiquidityPoolFee.load(feeType + "-" + poolID);
   if (!poolFee) {
-    poolFee = new LiquidityPoolFee(feeType +'-'+ poolID);
+    poolFee = new LiquidityPoolFee(feeType + "-" + poolID);
     poolFee.feeType = feeType;
-    poolFee.save()
+    poolFee.save();
   }
   return poolFee;
 }
@@ -263,18 +263,18 @@ export function getPoolFee(poolID:string, feeType: string): LiquidityPoolFee {
 export function getPoolFromGauge(gauge: Address): string {
   let gaugePool = GaugePool.load(gauge.toHexString());
   if (!gaugePool) {
-    return ZERO_ADDRESS
+    return ZERO_ADDRESS;
   }
   return gaugePool.pool;
 }
 
 export function getOrCreateRewardToken(tokenAddr: Address): RewardToken {
-  const rewardTokenId = RewardTokenType.DEPOSIT + '-' + tokenAddr.toHexString()
+  const rewardTokenId = RewardTokenType.DEPOSIT + "-" + tokenAddr.toHexString();
   let rewardToken = RewardToken.load(rewardTokenId);
   if (!rewardToken) {
     rewardToken = new RewardToken(rewardTokenId);
     rewardToken.type = RewardTokenType.DEPOSIT;
-    rewardToken.token = getOrCreateToken(tokenAddr).id
+    rewardToken.token = getOrCreateToken(tokenAddr).id;
     rewardToken.save();
   }
   return rewardToken;

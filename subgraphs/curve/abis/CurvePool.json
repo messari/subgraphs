@@ -516,12 +516,12 @@
     "gas": 3408
   },
   {
-    "name":"NewFee",
-    "inputs":[
-      {"type":"uint256","name":"fee","indexed":false},
-      {"type":"uint256","name":"admin_fee","indexed":false}
+    "name": "NewFee",
+    "inputs": [
+      { "type": "uint256", "name": "fee", "indexed": false },
+      { "type": "uint256", "name": "admin_fee", "indexed": false }
     ],
-    "anonymous":false,
-    "type":"event"
+    "anonymous": false,
+    "type": "event"
   }
 ]
