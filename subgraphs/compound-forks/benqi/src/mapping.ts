@@ -53,7 +53,6 @@ import {
   _handleRepayBorrow,
   _handleLiquidateBorrow,
   UpdateMarketData,
-  AccruePer,
   _handleAccrueInterest,
   getOrElse,
 } from "../../src/mapping";
@@ -201,7 +200,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
-    AccruePer.Timestamp,
     oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
