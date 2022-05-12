@@ -1,6 +1,5 @@
 import * as protocolNetworkData from './deploymentConfigurations.json' assert {type: "json"}
-import { execute } from './execution.js';
-
+import {runCommands, scripts} from './execution.js'
 
 const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 
 const configurations = JSON.parse(JSON.stringify(protocolNetworkData))['default']['configurations'] 
@@ -17,7 +16,7 @@ if (process.argv.length == 2) {
                 let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
                 let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-                execute(protocol, network, template, location)
+                runCommands(scripts(protocol, network, template, location), function() {});
             }
         }
     }
@@ -34,7 +33,7 @@ if (process.argv.length == 2) {
             let template = protocolNetworkMap[protocol][network]['template']
             let location = protocolNetworkMap[protocol][network][process.argv[3]]
 
-            execute(protocol, network, template, location)
+            runCommands(scripts(protocol, network, template, location), function() {});
         }
     }
  } else if (process.argv.length == 5) {
@@ -53,8 +52,7 @@ if (process.argv.length == 2) {
         let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
         let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-        execute(protocol, network, template, location)
-
+        runCommands(scripts(protocol, network, template, location), function() {});
     }
 } else {
     console.log('Error: Too many arguments')
