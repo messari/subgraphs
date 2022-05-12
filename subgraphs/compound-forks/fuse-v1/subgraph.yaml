@@ -97,19 +97,23 @@ templates:
         # - name: EthBalance
         #   file: ./abis/EthBalance.json
       eventHandlers:
-        - event: NewFuseFee(uint256,uint256)
-          handler: handleNewFuseFee
-        - event: NewAdminFee(uint256,uint256)
-          handler: handleNewAdminFee
+        - event: Mint(address,uint256,uint256)
+          handler: handleMint
+        - event: Redeem(address,uint256,uint256)
+          handler: handleRedeem
         - event: Borrow(address,uint256,uint256,uint256)
           handler: handleBorrow
         - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleBorrow
-        - event: NewComptroller(address,address)
-          handler: handleNewComptroller
-        - event: Mint(address,uint256,uint256)
-          handler: handleMint
+          handler: handleRepayBorrow
         - event: LiquidateBorrow(address,address,uint256,address,uint256)
           handler: handleLiquidateBorrow
         - event: AccrueInterest(uint256,uint256,uint256,uint256)
           handler: handleAccrueInterest
+        - event: NewReserveFactor(uint256,uint256)
+          handler: handleNewReserveFactor
+        - event: NewFuseFee(uint256,uint256)
+          handler: handleNewFuseFee
+        - event: NewAdminFee(uint256,uint256)
+          handler: handleNewAdminFee
+        - event: NewComptroller(address,address)
+          handler: handleNewComptroller

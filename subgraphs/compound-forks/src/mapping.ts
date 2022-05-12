@@ -47,6 +47,7 @@ import {
   cTokenDecimals,
   cTokenDecimalsBD,
   exponentToBigDecimal,
+  INITIAL_EXCHANGE_RATE,
   InterestRateSide,
   InterestRateType,
   LendingType,
@@ -366,6 +367,7 @@ export function _handleMarketListed(
   );
   supplyInterestRate.side = InterestRateSide.LENDER;
   supplyInterestRate.type = InterestRateType.VARIABLE;
+  supplyInterestRate.rate = BIGDECIMAL_ZERO;
   supplyInterestRate.save();
   let borrowInterestRate = new InterestRate(
     InterestRateSide.BORROWER.concat("-")
@@ -375,6 +377,7 @@ export function _handleMarketListed(
   );
   borrowInterestRate.side = InterestRateSide.BORROWER;
   borrowInterestRate.type = InterestRateType.VARIABLE;
+  borrowInterestRate.rate = BIGDECIMAL_ZERO;
   borrowInterestRate.save();
   market.rates = [supplyInterestRate.id, borrowInterestRate.id];
 
@@ -388,6 +391,25 @@ export function _handleMarketListed(
 
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
+
+  // add zero fields
+  market.maximumLTV = BIGDECIMAL_ZERO;
+  market.liquidationThreshold = BIGDECIMAL_ZERO;
+  market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+  market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+  market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+  market.inputTokenBalance = BIGINT_ZERO;
+  market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.outputTokenSupply = BIGINT_ZERO;
+  market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  market.exchangeRate = INITIAL_EXCHANGE_RATE;
+  market._cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  market._cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  market._cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
   market.save();
 
   //
