@@ -72,7 +72,7 @@ export function handleRewardAdded(event: RewardAdded): void {
 
   const rewardEarned = event.params.reward.toBigDecimal();
 
-  let rewardTokenAddress = Address.fromString(vault!._rewardTokensIds[0]);
+  let rewardTokenAddress = Address.fromString(vault._rewardTokensIds[0]);
   let rewardTokenPrice = getUsdPricePerToken(rewardTokenAddress);
   let rewardTokenDecimals = constants.BIGINT_TEN.pow(
     utils.getTokenDecimals(rewardTokenAddress).toI32() as u8

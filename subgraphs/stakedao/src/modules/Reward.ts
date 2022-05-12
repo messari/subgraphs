@@ -42,7 +42,7 @@ export function updateRewardTokenEmission(
   vault.save();
   
   log.warning(
-    "[RewardTokenEmission] rewardEmissionRatePerDay: {}, rewardEmissionPerDay: {}, rewardEmissionPerDayUSD: {}",
+    "[RewardTokenEmission] rewardEmissionRatePerDay: {}, rewardTokenEmissionsUSD: {}",
     [
       rewardEmissionRatePerDay.toString(),
       vault.rewardTokenEmissionsUSD![rewardTokenIdx].toString()
