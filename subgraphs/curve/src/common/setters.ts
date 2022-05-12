@@ -1,16 +1,16 @@
-import { Address, ethereum, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, log, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 import { LiquidityPool, Registry } from "../../generated/schema"
 import { CurvePoolCoin128 } from "../../generated/templates/CryptoFactoryTemplate/CurvePoolCoin128";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
-import { ASSET_TYPES, CURVE_ADMIN_FEE, CURVE_POOL_FEE, CURVE_REGISTRY, LENDING, LENDING_POOLS } from "./constants/index";
-import { getOrCreateDexAmm, getOrCreateToken, getPoolFee } from "./getters";
+import { ADDRESS_ZERO, ASSET_TYPES, CRYPTO_FACTORY, CURVE_ADMIN_FEE, CURVE_POOL_FEE, CURVE_REGISTRY, CURVE_TOKEN, LENDING, LENDING_POOLS } from "./constants/index";
+import { getOrCreateDexAmm, getOrCreateRewardToken, getOrCreateToken, getPoolFee } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
-import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO,BIGINT_ZERO, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType } from "./constants";
-import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
+import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO,BIGINT_ZERO, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, ZERO_ADDRESS, Network, CRV_TOKEN } from "./constants";
 import { getCryptoTokenPrice, getPoolAssetPrice } from "../services/snapshots";
 import { getPlatform } from "../services/platform";
 import { CurvePoolV2 } from "../../generated/AddressProvider/CurvePoolV2";
+
 
 export function setPoolCoins128(pool: LiquidityPool): void {
     const curvePool = CurvePoolCoin128.bind(Address.fromString(pool.id))
@@ -189,3 +189,20 @@ export function setProtocolTVL(): void {
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
 }
+
+
+
+/*
+export function setGaugeType(pool: LiquidityPool): void {
+  
+  if (dataSource.network() == Network.MAINNET.toLowerCase() && pool.poolType == CRYPTO_FACTORY){
+    pool.gaugeType = 5;
+    return
+  }
+  let gaugeContract = Gauge.bind(Address.fromString(pool.gauge))
+  let controllerCall = gaugeContract.try_controller();
+  if (!controllerCall.reverted){
+    pool.gaugeType = 0;
+    pool.save()
+  }
+}*/

@@ -25,6 +25,15 @@ import { getOrCreateToken } from '../common/getters'
 import { setPoolBalances, setPoolCoins, setPoolFees, setPoolOutputTokenSupply, setPoolTokenWeights } from '../common/setters'
 import { getLpTokenPriceUSD } from './snapshots'
 import { MainRegistry } from '../../generated/AddressProvider/MainRegistry'
+import { setGaugeData } from './gauges/helpers'
+
+export function checkIfPoolExists(poolId: string): boolean {
+  let pool = LiquidityPool.load(poolId)
+  if (!pool) {
+    return false
+  }
+  return true
+}
 
 export function createNewPool(
   poolAddress: Address,
@@ -55,16 +64,17 @@ export function createNewPool(
   pool.createdBlockNumber = block
   pool.createdTimestamp = timestamp
   pool.poolType = poolType
+  pool.registry = registryAddress.toHexString();
   pool.assetType = isV2 ? 4 : getAssetType(pool)
   pool.basePool = basePool.toHexString();
   pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool,timestamp);
   pool.gauge = gaugeAddress.toHexString();
-  pool.registry = registryAddress.toHexString();
   setPoolCoins(pool)
   setPoolBalances(pool)
   setPoolTokenWeights(pool)
   setPoolFees(pool)
   setPoolOutputTokenSupply(pool)
+  setGaugeData(pool)
   pool.save()
 }
 
@@ -162,7 +172,7 @@ export function createNewRegistryPool(
   gauge: Address,
   registryAddress: Address
 ): void {
-  if (!LiquidityPool.load(poolAddress.toHexString())) {
+  if (!checkIfPoolExists(poolAddress.toHexString())) {
     log.debug('Non factory pool ({}): {}, lpToken: {}, added to registry at {}', [
       isV2 ? 'v2' : 'v1',
       poolAddress.toHexString(),
@@ -312,13 +322,10 @@ export function getAssetTypeCrude(name: string, symbol: string): i32 {
 }
 
 export function getAssetType(pool: LiquidityPool): i32 {
-  log.warning('getAssetType for {}', [pool.id])
   if (ASSET_TYPES.has(pool.id.toLowerCase())) {
     log.warning('ASSET_TYPES has asset for {}', [pool.id])
     return ASSET_TYPES.get(pool.id.toLowerCase());
   }
-  log.warning('ASSET_TYPES does not have asset for {}', [pool.id])
-  log.warning('Get asset type from registry {} for pool {}', [pool.registry, pool.id])
   let registryContract = MainRegistry.bind(Address.fromString(pool.registry));
   let assetTypeCall = registryContract.try_get_pool_asset_type(Address.fromString(pool.id));
   if (!assetTypeCall.reverted) {

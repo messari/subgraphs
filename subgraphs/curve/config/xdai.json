@@ -31,5 +31,7 @@
   "catchup_pool_types" : [],
   "catchup_registries" : [],
   "importCatchupFunction": "",
-  "executeCatchupFunction": ""
+  "executeCatchupFunction": "",
+  "gaugeController" : false,
+  "curveToken" : "0x712b3d230F3C1c19db860d80619288b1F0BDd0Bd"
 }

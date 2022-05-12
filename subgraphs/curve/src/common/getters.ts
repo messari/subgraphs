@@ -10,6 +10,8 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPool,
   LiquidityPoolFee,
+  GaugePool,
+  RewardToken,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -19,6 +21,8 @@ import {
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   ETH_ADDRESS,
+  ZERO_ADDRESS,
+  RewardTokenType,
 } from "../common/constants";
 import { bigIntToBigDecimal, exponentToBigInt } from "./utils/numbers";
 import { LiquidityPoolFeeType } from "./constants";
@@ -254,4 +258,32 @@ export function getPoolFee(poolID:string, feeType: string): LiquidityPoolFee {
     poolFee.save()
   }
   return poolFee;
+}
+
+export function getPoolFromGauge(gauge: Address): string {
+  let gaugePool = GaugePool.load(gauge.toHexString());
+  if (!gaugePool) {
+    return ZERO_ADDRESS
+  }
+  return gaugePool.pool;
+}
+
+export function getOrCreateRewardToken(tokenAddr: Address): RewardToken {
+  const rewardTokenId = RewardTokenType.DEPOSIT + '-' + tokenAddr.toHexString()
+  let rewardToken = RewardToken.load(rewardTokenId);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(rewardTokenId);
+    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.token = getOrCreateToken(tokenAddr).id
+    rewardToken.save();
+  }
+  return rewardToken;
+}
+
+export function getRewardtoken(rewardTokenId: string): RewardToken {
+  let rewardToken = RewardToken.load(rewardTokenId);
+  if (!rewardToken) {
+    return new RewardToken(rewardTokenId);
+  }
+  return rewardToken;
 }

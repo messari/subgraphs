@@ -1,5 +1,5 @@
 import { log } from '@graphprotocol/graph-ts/index'
-import { CryptoRegistry, PoolAdded } from '../generated/AddressProvider/CryptoRegistry'
+import { Batch_set_liquidity_gaugesCall, CryptoRegistry, PoolAdded, Set_liquidity_gaugesCall } from '../generated/AddressProvider/CryptoRegistry'
 import { ADDRESS_ZERO, REGISTRY_V2 } from './common/constants/index'
 import { TokenExchange } from '../generated/templates/RegistryTemplate/CurvePoolV2'
 import { createNewFactoryPool, createNewRegistryPool } from './services/pools'
@@ -10,6 +10,9 @@ import { CryptoPoolDeployed } from '../generated/templates/CryptoFactoryTemplate
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
 import { updateFinancials, updatePool, updatePoolMetrics, updateUsageMetrics } from './common/metrics'
 import { getLiquidityPool } from './common/getters'
+import { LiquidityPool } from '../generated/schema'
+import { setGaugeData } from './services/gauges/helpers'
+import { LiquidityGaugeDeployed } from '../generated/templates/CryptoFactoryTemplate/CryptoFactory'
 
 export function handleCryptoPoolAdded(event: PoolAdded): void {
   log.debug('New V2 factory crypto pool {} deployed at {}', [
@@ -112,4 +115,48 @@ export function handleRemoveLiquidityOneV2(event: RemoveLiquidityOne): void {
   updateUsageMetrics(event,'withdraw');
 }
 
+export function handleSetLiquidityGauges(call: Set_liquidity_gaugesCall): void {
+  let pool = LiquidityPool.load(call.inputs._pool.toHexString())
+  if (!pool) {
+    return
+  }
+  let gauge = call.inputs._liquidity_gauges[0]
+  if(gauge.equals(ADDRESS_ZERO)) {
+    return
+  }
+  pool.gauge = gauge.toHexString()
+  pool.save();
+  setGaugeData(pool)
+}
 
+export function handleBatchSetLiquidityGauges(call: Batch_set_liquidity_gaugesCall): void {
+  const poolAddresses = call.inputs._pools
+  for (let i = 0; i < poolAddresses.length; i++) {
+    let poolAddress = poolAddresses[i]
+    if (poolAddress.equals(ADDRESS_ZERO)) {
+      break
+    }
+    let pool = LiquidityPool.load(poolAddress.toHexString())
+    if (pool && !pool.gauge) {
+      let gauge = call.inputs._liquidity_gauges[i]
+      if (!gauge.equals(ADDRESS_ZERO)) {
+        pool.gauge = gauge.toHexString()
+        pool.save()
+        setGaugeData(pool)
+      }
+    }
+  }
+}
+
+export function handleLiquidityGaugeDeployed(event: LiquidityGaugeDeployed): void {
+  let pool = LiquidityPool.load(event.params.pool.toHexString())
+  if (!pool) {
+    return
+  }
+  if (pool.gauge){
+    return // already set
+  }
+  pool.gauge = event.params.gauge.toHexString()
+  pool.save();
+  setGaugeData(pool)
+}

@@ -18,7 +18,7 @@ import {
   StableFactoryTemplate,
 } from '../generated/templates'
 import { Address, Bytes, log, BigDecimal } from '@graphprotocol/graph-ts'
-import { MainRegistry, PoolAdded } from '../generated/AddressProvider/MainRegistry'
+import { MainRegistry, PoolAdded, Set_liquidity_gaugesCall } from '../generated/AddressProvider/MainRegistry'
 import { createNewFactoryPool, createNewPool } from './services/pools'
 import { createNewRegistryPool } from './services/pools'
 import { MetaPool } from '../generated/templates/RegistryTemplate/MetaPool'
@@ -26,7 +26,7 @@ import { ERC20 } from '../generated/templates/CurvePoolTemplate/ERC20'
 import { CurveLendingPool } from '../generated/templates/RegistryTemplate/CurveLendingPool'
 import { TokenExchange, TokenExchangeUnderlying } from '../generated/templates/CurvePoolTemplate/CurvePool'
 import { handleExchange } from './services/swaps'
-import { MetaPoolDeployed, PlainPoolDeployed } from '../generated/AddressProvider/StableFactory'
+import { LiquidityGaugeDeployed, MetaPoolDeployed, PlainPoolDeployed } from '../generated/AddressProvider/StableFactory'
 import { getFactory } from './services/factory'
 import { getPlatform } from './services/platform'
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityImbalance, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
@@ -35,8 +35,8 @@ import { getLiquidityPool, getOrCreateDexAmm, getOrCreateFinancialsDailySnapshot
 import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, ZERO_ADDRESS } from './common/constants'
 import { bigIntToBigDecimal } from './common/utils/numbers'
 import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, updateProtocolRevenue, updateUsageMetrics } from './common/metrics'
-import { getPoolAssetPrice } from './services/snapshots'
 import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
+import { setGaugeData } from './services/gauges/helpers'
 {{{ importExistingMetaPools }}}
 {{{ importCatchupFunction }}}
 
@@ -173,7 +173,7 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
   const testMetaPoolResult = testMetaPool.try_base_pool()
   const unknownMetapool = UNKNOWN_METAPOOLS.has(pool.toHexString())
   if (!testMetaPoolResult.reverted || unknownMetapool) {
-    log.info('New meta pool {} added from registry at {}', [pool.toHexString(), event.transaction.hash.toHexString()])
+    log.info('New meta pool {} added from registry {} at {}', [pool.toHexString(), registryAddress.toHexString(), event.transaction.hash.toHexString()])
     const basePool = unknownMetapool ? UNKNOWN_METAPOOLS.get(pool.toHexString()) : testMetaPoolResult.value
     let basePoolGauge = ADDRESS_ZERO;
     let gaugeCall = mainRegistry.try_get_gauges(basePool)
@@ -382,4 +382,34 @@ export function handleAddExistingMetaPools({{ addExistingMetaPoolsCallParams }})
     ])
   }
   factory.save()
+}
+
+export function handleSetLiquidityGauges(call: Set_liquidity_gaugesCall): void {
+  let pool = LiquidityPool.load(call.inputs._pool.toHexString())
+  if (!pool) {
+    return
+  }
+  if (pool.gauge){
+    return // already set
+  }
+  let gauge = call.inputs._liquidity_gauges[0]
+  if(gauge.equals(ADDRESS_ZERO)) {
+    return
+  }
+  pool.gauge = gauge.toHexString()
+  pool.save();
+  setGaugeData(pool)
+}
+
+export function handleLiquidityGaugeDeployed(event: LiquidityGaugeDeployed): void {
+  let pool = LiquidityPool.load(event.params.pool.toHexString())
+  if (!pool) {
+    return
+  }
+  if (pool.gauge){
+    return // already set
+  }
+  pool.gauge = event.params.gauge.toHexString()
+  pool.save();
+  setGaugeData(pool)
 }

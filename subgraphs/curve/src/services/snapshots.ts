@@ -3,7 +3,7 @@ import {
   Token,
   TokenSnapshot
 } from '../../generated/schema'
-import { Address, BigDecimal, BigInt, dataSource, log } from '@graphprotocol/graph-ts'
+import { Address, BigDecimal, BigInt, log } from '@graphprotocol/graph-ts'
 import {
   BIG_DECIMAL_1E18,
   BIG_DECIMAL_1E8,
@@ -22,6 +22,27 @@ import { CurvePoolV2 } from '../../generated/templates/RegistryTemplate/CurvePoo
 import { getUsdRate } from '../common/pricing'
 import { getOrCreateToken } from '../common/getters'
 import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, SECONDS_PER_HOUR } from '../common/constants'
+import { RedeemableKeep3r } from '../../generated/templates/CurvePoolTemplateV2/RedeemableKeep3r'
+import { BIG_DECIMAL_1E6, RKP3R_ADDRESS } from '../common/constants/index'
+import { getBalancerLpPriceUSD, isBalancerToken } from '../common/prices/balancer'
+
+function isKp3rToken(tokenAddr: Address): boolean {
+  if (tokenAddr.equals(RKP3R_ADDRESS)) {
+    return true
+  }
+  return false
+}
+
+function getRKp3rPrice(): BigDecimal {
+  const RKp3rContract = RedeemableKeep3r.bind(RKP3R_ADDRESS)
+  const discount = RKp3rContract.discount()
+  const priceResult = RKp3rContract.try_price()
+  if (priceResult.reverted) {
+    return BIG_DECIMAL_ZERO
+  }
+  return priceResult.value.times(discount).div(BigInt.fromI32(100)).toBigDecimal().div(BIG_DECIMAL_1E6)
+}
+
 
 export function getForexUsdRate(token: string): BigDecimal {
   // returns the amount of USD 1 unit of the foreign currency is worth
@@ -40,6 +61,12 @@ export function getForexUsdRate(token: string): BigDecimal {
 }
 
 export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, forex: boolean): BigDecimal {
+  if (isKp3rToken(tokenAddr)) {
+    return getRKp3rPrice()
+  }
+  if (isBalancerToken(tokenAddr)) {
+    return getBalancerLpPriceUSD(tokenAddr, timestamp)
+  }
   let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(tokenAddr, timestamp));
   if (tokenSnapshot){
     return tokenSnapshot.price;
@@ -136,13 +163,4 @@ export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigD
 
 export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): string {
   return tokenAddr.toHexString() + '-' + timestamp.div(BigInt.fromI32(SECONDS_PER_HOUR)).toString()
-}
-
-export function getTokenSnapshot(tokenAddr: Address, timestamp: BigInt): TokenSnapshot {
-  const tokenSnapshotID = createTokenSnapshotID(tokenAddr, timestamp)
-  let tokenSnapshot = TokenSnapshot.load(tokenSnapshotID)
-  if (!tokenSnapshot) {
-    return new TokenSnapshot(tokenSnapshotID)
-  }
-  return tokenSnapshot
 }

@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -159,4 +159,5 @@ export const ETH_NAME = "Ether"
 /////////////////////////////
 
 export const FEE_DENOMINATOR_DECIMALS = 10;
-
+export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52")
+export const CRV_POOL_START_BLOCK = 10928474;

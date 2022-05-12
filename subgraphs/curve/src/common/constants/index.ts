@@ -2,11 +2,13 @@ import { Address, BigDecimal, BigInt } from '@graphprotocol/graph-ts'
 
 export const CURVE_PLATFORM_ID = 'Curve'
 
+export const BIG_DECIMAL_1E6 = BigDecimal.fromString('1e6')
 export const BIG_DECIMAL_1E8 = BigDecimal.fromString('1e8')
 export const BIG_DECIMAL_1E18 = BigDecimal.fromString('1e18')
 export const BIG_DECIMAL_ZERO = BigDecimal.fromString('0')
 export const BIG_DECIMAL_ONE = BigDecimal.fromString('1')
 export const BIG_DECIMAL_TWO = BigDecimal.fromString('2')
+
 
 export const BIG_INT_ZERO = BigInt.fromString('0')
 export const BIG_INT_ONE = BigInt.fromString('1')
@@ -28,6 +30,8 @@ export const USDT_ADDRESS = Address.fromString(USDT_TOKEN)
 export const WBTC_ADDRESS = Address.fromString(WBTC_TOKEN)
 export const FXS_TOKEN = '0x3432b6a60d23ca0dfca7761b7ab56459d9c964d0'
 export const CVXFXS_TOKEN = '0xfeef77d3f69374f66429c91d732a244f074bdf74'
+export const RKP3R_TOKEN = '0xEdB67Ee1B171c4eC66E6c10EC43EDBbA20FaE8e9'
+export const RKP3R_ADDRESS = Address.fromString(RKP3R_TOKEN)
 
 // for Forex and EUR pool, map lp token to Chainlink price feed
 export const EURT_LP_TOKEN = '0xfd5db7463a3ab53fd211b4af195c5bccc1a03890'
@@ -226,3 +230,6 @@ ASSET_TYPES.set("0xc25099792e9349c7dd09759744ea681c7de2cb66".toLowerCase(), 2)
 ASSET_TYPES.set("0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171".toLowerCase(), 4)
 
 //export const CATCHUP_ASSET_TYPES = ["[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", ]
+export const GAUGE_CONTROLLER = Address.fromString("0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB")
+
+export const CURVE_TOKEN = Address.fromString("0xD533a949740bb3306d119CC777fa900bA034cd52")

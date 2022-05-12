@@ -1,26 +1,127 @@
-import { Address, BigInt, Bytes, log } from '@graphprotocol/graph-ts/index'
-import { BasePool, LiquidityPool } from '../../generated/schema'
-import { CurvePoolCoin128 } from '../../generated/templates/CurvePoolTemplate/CurvePoolCoin128'
-import { CurvePool } from '../../generated/templates/RegistryTemplate/CurvePool'
+import { Address, BigDecimal, BigInt, dataSource, log } from '@graphprotocol/graph-ts/index'
+import { LiquidityPool, RewardToken } from '../../generated/schema'
 import {
-  ADDRESS_ZERO,
-  BIG_INT_ONE,
-  CRYPTO_FACTORY, CURVE_REGISTRY, CURVE_REGISTRY_V2, METAPOOL_FACTORY, METAPOOL_FACTORY_ADDRESS,
-  REGISTRY_V1,
-  REGISTRY_V2,
-  STABLE_FACTORY,
-  UNKNOWN_METAPOOLS
+  CURVE_TOKEN,
+  GAUGE_CONTROLLER
 } from '../common/constants/index'
-import { CurvePoolTemplate, CurvePoolTemplateV2 } from '../../generated/templates'
-import { CurveLendingPool } from '../../generated/templates/CurvePoolTemplate/CurveLendingPool'
-import { CurveLendingPoolCoin128 } from '../../generated/templates/CurvePoolTemplate/CurveLendingPoolCoin128'
-import { ERC20 } from '../../generated/templates/CurvePoolTemplate/ERC20'
-import { getPlatform } from './platform'
-import { StableFactory } from '../../generated/AddressProvider/StableFactory'
-import { getFactory } from './factory'
-import { CryptoFactory } from '../../generated/templates/CryptoRegistryTemplate/CryptoFactory'
-import { fetchTokenDecimals } from '../common/tokens'
-import { getOrCreateToken } from '../common/getters'
-import { setPoolBalances, setPoolCoins, setPoolFees, setPoolOutputTokenSupply, setPoolTokenWeights } from '../common/setters'
-import { getLpTokenPriceUSD } from './snapshots'
+import { getPoolFromGauge, getLiquidityPool, getRewardtoken } from '../common/getters'
+import { getTokenPriceSnapshot } from './snapshots'
+import { Deposit, Gauge, Withdraw } from '../../generated/templates/CurveGauge/Gauge'
+import { GaugeV2 } from '../../generated/templates/CurveGauge/GaugeV2'
+import { BIGDECIMAL_ZERO, DEFAULT_DECIMALS, Network, SECONDS_PER_DAY, ZERO_ADDRESS } from '../common/constants'
+import { GaugeController } from '../../generated/templates/CurveGauge/GaugeController'
+import { bigIntToBigDecimal, exponentToBigInt } from '../common/utils/numbers'
+import { getCrvInflationRate, getCrvInflationRateUSD, getRewardTokenIndex, isGaugeKilled } from './gauges/helpers'
+import { CurveRewards } from '../../generated/templates/CurveGauge/CurveRewards'
+import { GaugeV3 } from '../../generated/templates/CurveGauge/GaugeV3'
 
+export function handleDeposit(event: Deposit): void {
+  let poolId = getPoolFromGauge(event.address)
+  log.error('handleDeposit for pool {}', [poolId])
+  let pool = getLiquidityPool(poolId)
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.plus(event.params.value)
+  pool.save()
+  handleRewards(pool, event.block.number, event.block.timestamp)
+}
+
+export function handleWithdraw(event: Withdraw): void {
+  let poolId = getPoolFromGauge(event.address)
+  log.error('handleWithdraw for pool {}', [poolId])
+  let pool = getLiquidityPool(poolId)
+  pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.minus(event.params.value)
+  pool.save()
+  handleRewards(pool, event.block.number, event.block.timestamp)
+}
+
+export function handleRewards(pool:LiquidityPool, blockNumber:BigInt, timestamp:BigInt): void {
+  for (let i = 0; i < pool.rewardTokens.length; i++) {
+    let rewardTokenId = pool.rewardTokens[i]
+    let rewardToken = getRewardtoken(rewardTokenId)
+    if (Address.fromString(rewardToken.token) == CURVE_TOKEN){
+      calculateGaugeV1Emissions(pool,blockNumber,timestamp,i)
+    } else if (pool.rewardContract){
+      calculateGaugeV2Emissions(pool,timestamp,i)
+    } else  if (!pool.rewardContract && pool.rewardTokens.length > 1){
+      calculateGaugeV3Emissions(pool,timestamp,i)
+    }
+  }
+}
+
+
+export function calculateGaugeV1Emissions(pool: LiquidityPool, blockNumber:BigInt, timestamp: BigInt, rewardTokenIndex: i32): void {
+  log.error('calculateGaugeV1Emissions for pool: {}', [pool.id]);
+  if (dataSource.network() != Network.MAINNET.toLowerCase()){
+    log.warning('No crv rewards on {}',[dataSource.network()])
+    return
+  }
+  if (pool.gauge == ZERO_ADDRESS){
+    log.error('No gauge for pool: {}', [pool.id])
+    return
+  }
+  const gaugeController = GaugeController.bind(GAUGE_CONTROLLER)
+  let relativeWeightCall = gaugeController.try_gauge_relative_weight(Address.fromString(pool.gauge));
+  if (!relativeWeightCall.reverted) {
+    let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
+    let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
+    let tokensEmitted = getCrvInflationRate(timestamp);
+    const emissionsRate = (tokensEmitted.times(relativeWeightCall.value)).div(exponentToBigInt(DEFAULT_DECIMALS))
+    const inflationRateUSD = getCrvInflationRateUSD(tokensEmitted,blockNumber,timestamp);
+    rewardTokenEmissionsAmount[rewardTokenIndex] = emissionsRate; 
+    rewardTokenEmissionsUSD[rewardTokenIndex] = inflationRateUSD;
+    pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+    pool.save()
+  } else {
+    log.error('Failed to get gauge inflation rate or relative weight for pool {}', [pool.id])
+  }
+}
+
+export function calculateGaugeV2Emissions(pool: LiquidityPool, timestamp: BigInt, rewardTokenIndex: i32): void {
+  // pools of SNX rewards contract type only have one reward token (on top of CRV reward token)
+  if (!pool.rewardContract){
+    return
+  }
+  const curveRewards = CurveRewards.bind(Address.fromString(pool.rewardContract!));
+  let emissionRateCall = curveRewards.try_rewardRate();
+  if (!emissionRateCall.reverted) {
+    log.error('calculateGaugeV2Emissions for pool: {}', [pool.id]);
+    log.error('calculateGaugeV2Emissions: pool {} has reward token len {} for v2 emissions', [pool.id,pool.rewardTokens.length.toString()])
+    let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount
+    let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD
+    if (pool.rewardTokens.length > 1){
+      const rewardToken = getRewardtoken(pool.rewardTokens[rewardTokenIndex])
+      log.error('calculateGaugeV2Emissions for pool: {}, reward token id {}, reward token {}', [pool.id,rewardToken.id,rewardToken.token]);
+      const rewardTokenPrice = getTokenPriceSnapshot(Address.fromString(rewardToken.token),timestamp,false);
+      log.error('calculateGaugeV2Emissions for pool: {}, reward token {} price {}', [pool.id,rewardToken.token,rewardTokenPrice.toString()]);
+      const emissionRate = emissionRateCall.value.times(BigInt.fromI32(SECONDS_PER_DAY));
+      const emissionRateUSD = bigIntToBigDecimal(emissionRate,DEFAULT_DECIMALS).times(rewardTokenPrice);
+      rewardTokenEmissionsAmount[rewardTokenIndex] = emissionRate;
+      rewardTokenEmissionsUSD[rewardTokenIndex] = emissionRateUSD;
+      pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+      pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+      pool.save();
+    }
+  }
+}
+
+export function calculateGaugeV3Emissions(pool: LiquidityPool, timestamp: BigInt, rewardTokenIndex: i32): void {
+  // if there is no reward contract, but the pool has more than one reward token (with the first being the CRV reward token),
+  // then we can insinuate that the pool is v3 type
+  log.warning('calculateGaugeV3Emissions for pool: {}', [pool.id]);
+  log.error('calculateGaugeV3Emissions: pool {} has reward token len {}',[pool.id,pool.rewardTokens.length.toString()])
+  let gaugeV3 = GaugeV3.bind(Address.fromString(pool.gauge))
+  let rewardToken = getRewardtoken(pool.rewardTokens[rewardTokenIndex])
+  let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount
+  let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD
+  let rewardDataCall = gaugeV3.try_reward_data(Address.fromString(rewardToken.token));
+  if (!rewardDataCall.reverted) {
+    let rewardTokenPrice = getTokenPriceSnapshot(Address.fromString(rewardToken.token),timestamp,false);
+    const emissionRate = rewardDataCall.value.value3.times(BigInt.fromI32(SECONDS_PER_DAY));
+    const emissionRateUSD = bigIntToBigDecimal(emissionRate,DEFAULT_DECIMALS).times(rewardTokenPrice);
+    rewardTokenEmissionsAmount[rewardTokenIndex] = emissionRate;
+    rewardTokenEmissionsUSD[rewardTokenIndex] = emissionRateUSD;
+    pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
+    pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+    pool.save()
+  }
+}

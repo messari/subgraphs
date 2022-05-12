@@ -367,7 +367,7 @@ type LiquidityPool @entity {
   outputToken: Token!
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-  rewardTokens: [RewardToken!]
+  rewardTokens: [RewardToken!]!
 
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
@@ -393,19 +393,19 @@ type LiquidityPool @entity {
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal
+  outputTokenPriceUSD: BigDecimal!
   
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt
+  stakedOutputTokenAmount: BigInt!
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]!
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
+  rewardTokenEmissionsUSD: [BigDecimal!]!
 
   ##### Snapshots #####
 
@@ -444,6 +444,9 @@ type LiquidityPool @entity {
 
   registry: String!
 
+  gaugeType: String!
+
+  rewardContract: String
 }
 
 #################################
@@ -499,10 +502,10 @@ type LiquidityPoolDailySnapshot @entity {
   stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]!
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
+  rewardTokenEmissionsUSD: [BigDecimal!]!
 }
 
 type LiquidityPoolHourlySnapshot @entity {
@@ -554,10 +557,10 @@ type LiquidityPoolHourlySnapshot @entity {
   stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsAmount: [BigInt!]
+  rewardTokenEmissionsAmount: [BigInt!]!
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-  rewardTokenEmissionsUSD: [BigDecimal!]
+  rewardTokenEmissionsUSD: [BigDecimal!]!
 }
 
 ##################################
@@ -746,9 +749,14 @@ type ActiveAccount @entity {
   id: ID!
 }
 
-##################################
-##### Added Data #####
-##################################
+###########################
+##### Helper Entities #####
+###########################
+
+# Helper entities are additional entities created to help with mapping.
+# They are usually used to store internal states that would simplify
+# the mapping logic. All helper entities should be prefixed with an
+# underscore to differentiate them from the common schema.
 
 enum PoolType {
   STABLE_FACTORY
@@ -787,4 +795,9 @@ type TokenSnapshot @entity {
   id: ID!
   price: BigDecimal!
   timestamp: BigInt!
+}
+
+type GaugePool @entity {
+  id: ID!
+  pool: String!
 }

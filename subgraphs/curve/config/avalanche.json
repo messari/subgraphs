@@ -31,5 +31,7 @@
   "catchup_pool_types" : [],
   "catchup_registries" : [],
   "importCatchupFunction": "import { catchUpAvax } from './services/catchup'",
-  "executeCatchupFunction": "catchUpAvax()"
+  "executeCatchupFunction": "catchUpAvax()",
+  "gaugeController" : false,
+  "curveToken" : "0x249848BeCA43aC405b8102Ec90Dd5F22CA513c06"
 }
