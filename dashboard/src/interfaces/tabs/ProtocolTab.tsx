@@ -1,6 +1,7 @@
 import { Grid } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
+import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 import { ProtocolTypeEntity } from "../../constants";
 import { convertTokenDecimals } from "../../utils";
 import SchemaTable from "../SchemaTable";
@@ -41,7 +42,7 @@ function ProtocolTab(
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {}
       // For the current entity, loop through all instances of that entity
-      for (let x = currentEntityData.length - 1; x > 0; x--) {
+      for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const entityInstance: { [x: string]: any } = currentEntityData[x];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
@@ -124,10 +125,15 @@ function ProtocolTab(
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
-      return (<>
-        <h2 style={{ borderTop: "black 2px solid", width: "100%" }}>ENTITY: {entityName}</h2>
-        <Grid key={entityName} container>{
-          Object.keys(dataFields).map((field: string) => {
+      return (
+        <Grid key={entityName} style={{ borderTop: "black 2px solid", width: "100%" }} >
+          <Grid container>
+            <h2 id={entityName} >ENTITY: {entityName}</h2>
+            <div style={{ marginLeft: "40px" }}>
+              <ScrollToElement label={entityName} elementId={entityName} poolId="" tab="protocol" />
+            </div>
+          </Grid>
+          {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(' [')[0];
             if (entitiesData[entityName][fieldName]) {
@@ -144,17 +150,23 @@ function ProtocolTab(
             if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
               issues.push({ type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered });
             }
-
-            return (<>
-              <Grid key={label + '1'} id={label} item xs={8}>
-                {Chart(label, dataFields[field], currentEntityData.length)}
-              </Grid>
-              <Grid key={label + '2'} item xs={4} marginY={4}>
-                {TableChart(label, dataFields[field], currentEntityData.length)}
-              </Grid>
-            </>)
+            const elementId = label.split(' ').join('%20');
+            return (
+              <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
+                <div style={{ marginLeft: "40px" }}>
+                  <ScrollToElement label={label} elementId={elementId} poolId="" tab="protocol" />
+                </div>
+                <Grid container>
+                  <Grid key={label + '1'} item xs={8}>
+                    {Chart(label, dataFields[field], currentEntityData.length)}
+                  </Grid>
+                  <Grid key={label + '2'} item xs={4} marginY={4}>
+                    {TableChart(label, dataFields[field], currentEntityData.length)}
+                  </Grid>
+                </Grid>
+              </div>)
           })
-        }</Grid></>)
+          }</Grid>)
     });
 
     const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type];
@@ -165,7 +177,7 @@ function ProtocolTab(
       issues.push({ type: "TVL+", message: protTypeEntity });
     }
 
-    const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warning);
+    const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warning, '', 'protocol');
 
     if (issues.length > 0) {
       setWarning(issues);

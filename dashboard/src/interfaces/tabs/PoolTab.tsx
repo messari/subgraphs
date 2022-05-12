@@ -1,21 +1,38 @@
 import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import { poolDropDown } from "../../common/utilComponents/PoolDropDown";
+import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import { PoolName, PoolNames, Versions } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import { convertTokenDecimals } from "../../utils/index";
+import { StackedChart } from "../../common/chartComponents/StackedChart";
+import { useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 
-function PoolTab(
-  data: any,
-  entities: string[],
-  entitiesData: { [x: string]: { [x: string]: string } },
-  poolId: string,
-  setPoolId: React.Dispatch<React.SetStateAction<string>>,
-  poolData: { [x: string]: string },
-  setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>,
-  warning: { message: string, type: string }[]
+interface PoolTabProps {
+  data: any;
+  entities: string[];
+  entitiesData: { [x: string]: { [x: string]: string } };
+  poolId: string;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  poolData: { [x: string]: string };
+  setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>;
+  warning: { message: string, type: string }[];
+}
+
+function PoolTab({
+  data,
+  entities,
+  entitiesData,
+  poolId,
+  setPoolId,
+  poolData,
+  setWarning,
+  warning }:
+  PoolTabProps
 ) {
+
   try {
     const poolName = PoolName[data.protocols[0].type];
     const poolNames = PoolNames[data.protocols[0].type];
@@ -26,6 +43,7 @@ function PoolTab(
       "usageMetricsDailySnapshots",
       "usageMetricsHourlySnapshots"
     ]
+
     const poolEntityElements = entities.map((entityName: string) => {
       if (!poolId) {
         return null;
@@ -40,7 +58,7 @@ function PoolTab(
       const dataFields: { [dataField: string]: [{ date: number, value: number }] } = {};
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {}
-      for (let x = currentEntityData.length - 1; x > 0; x--) {
+      for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const entityInstance: { [x: string]: any } = currentEntityData[x];
         Object.keys(entityInstance).forEach((entityFieldName: string) => {
           if (entityFieldName === 'timestamp') {
@@ -168,35 +186,47 @@ function PoolTab(
         });
       };
       return (
-        <Grid key={entityName} style={{ borderTop: "black 2px solid" }} container>
-          <h2>ENTITY: {entityName} - {poolId}</h2>{
-            Object.keys(dataFields).map((field: string) => {
-              const fieldName = field.split(' [')[0];
-              const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
-              if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
-                return null;
-              }
-              const label = entityName + '-' + field;
-              if (dataFieldMetrics[field].sum === 0 && issues.filter(x => x.message === label).length === 0) {
-                // The error message is more to be used as data on how to handle the error. Syntax is ERRORTYPE%%ENTITY--FIELD
-                issues.push({ type: "SUM", message: label });
-              }
-              if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
-                issues.push({ type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered });
-              }
-              return (<>
-                <Grid key={label + '1'} id={label} item xs={8}>
-                  {Chart(label, dataFields[field], currentEntityData.length)}
+        <Grid key={entityName} style={{ borderTop: "black 2px solid" }} >
+          <Grid container>
+            <h2 id={entityName} >ENTITY: {entityName}</h2>
+            <div style={{ marginLeft: "40px" }}>
+              <ScrollToElement label={entityName} elementId={entityName} poolId={poolId} tab="pool" />
+            </div>
+          </Grid>
+          {Object.keys(dataFields).map((field: string) => {
+            const fieldName = field.split(' [')[0];
+            const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
+            if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
+              return null;
+            }
+            const label = entityName + '-' + field;
+            if (dataFieldMetrics[field].sum === 0 && issues.filter(x => x.message === label).length === 0) {
+              // The error message is more to be used as data on how to handle the error. Syntax is ERRORTYPE%%ENTITY--FIELD
+              issues.push({ type: "SUM", message: label });
+            }
+            if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
+              issues.push({ type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered });
+            }
+            const elementId = label.split(' ').join('%20');
+            return (
+              <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
+                <div style={{ marginLeft: "40px" }}>
+                  <ScrollToElement label={label} elementId={elementId} poolId={poolId} tab="pool" />
+                </div>
+                <Grid container>
+                  <Grid key={label + '1'} item xs={8}>
+                    {Chart(label, dataFields[field], currentEntityData.length)}
+                  </Grid>
+                  <Grid key={label + '2'} item xs={4} marginY={4}>
+                    {TableChart(label, dataFields[field], currentEntityData.length)}
+                  </Grid>
                 </Grid>
-                <Grid key={label + '2'} item xs={4} marginY={4}>
-                  {TableChart(label, dataFields[field], currentEntityData.length)}
-                </Grid>
-              </>)
-            })
+              </div>)
+          })
           }</Grid>)
     })
 
-    const poolLevelTVL = parseFloat(data[poolName]?.totalValueLockedUSD)
+    const poolLevelTVL = parseFloat(data[poolName]?.totalValueLockedUSD);
     if (issues.filter(x => x.message === poolName && x.type === "TVL-").length === 0 && poolLevelTVL < 1000) {
       issues.push({ type: "TVL-", message: poolName });
     } else if (issues.filter(x => x.message === poolName && x.type === "TVL+").length === 0 && poolLevelTVL > 1000000000000) {
@@ -206,10 +236,12 @@ function PoolTab(
       setWarning(issues);
     }
 
-    const poolSchema = SchemaTable(data[poolName], poolName, setWarning, poolData, warning);
+    const entityData = data[poolName];
+    const poolSchema = SchemaTable(entityData, poolName, setWarning, poolData, warning, poolId, 'pool');
+
     return (
       <div>
-        {poolDropDown(poolId, setPoolId, setWarning, data[poolNames])}
+        <PoolDropDown poolId={poolId} setPoolId={(x) => setPoolId(x)} setWarning={(x) => setWarning(x)} markets={data[poolNames]} />
         {poolSchema}
         {poolEntityElements}
       </div>);
