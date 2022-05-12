@@ -5,7 +5,7 @@ import { VaultFee, Vault } from "../../generated/schema";
 import * as constants from "../constant";
 
 
-export function getOrCreateVaultFee(vault: Vault): VaultFee {
+export function getOrCreateVaultFee(vault: Vault, block: ethereum.Block): VaultFee {
 	let managementFee = constants.VaultFeeType.MANAGEMENT_FEE;
 
 
@@ -27,7 +27,8 @@ export function getOrCreateVaultFee(vault: Vault): VaultFee {
 	let vaultFee_id = managementFee
 		.concat("-")
 		.concat(vault.id)
-		.concat("-");
+		.concat("-")
+		.concat(block.number.toString());
 
 	let vaultFee = VaultFee.load(vaultFee_id);
 
