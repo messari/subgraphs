@@ -49,13 +49,9 @@ export function modulateDecimals(
   currentBigInt: BigInt,
   decimals: i32
 ): BigDecimal {
-  if (decimals == 18) {
-    return bigIntToBigDecimal(currentBigInt);
-  } else {
-    return currentBigInt.divDecimal(
-      BigInt.fromI32(10)
-        .pow(decimals as u8)
-        .toBigDecimal()
-    );
-  }
+  return currentBigInt.divDecimal(
+    BigInt.fromI32(10)
+      .pow(decimals as u8)
+      .toBigDecimal()
+  );
 }

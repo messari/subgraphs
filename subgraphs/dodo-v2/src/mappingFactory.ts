@@ -1,4 +1,5 @@
 import { getOrCreatePool } from "./utils/getters";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
   DVMFactory,
@@ -22,6 +23,17 @@ import {
   NewDSP,
   RemoveDSP
 } from "../generated/DSPFactory/DSPFactory";
+
+import {
+  DODOMineV3Proxy,
+  DepositRewardToMine
+} from "../generated/DODOMineV3Proxy/DODOMineV3Proxy";
+
+import { DODOMine } from "../generated/DODOMineV3Proxy/DODOMine";
+
+import { getUSDprice } from "./utils/getters";
+
+import { DODOLpToken_ADDRESS, ZERO_BI } from "./utils/constants";
 
 export function handleNewDVM(event: NewDVM): void {
   getOrCreatePool(
@@ -61,6 +73,36 @@ export function handleNewDSP(event: NewDSP): void {
     event.block.timestamp,
     event.block.number
   );
+}
+
+// event DepositRewardToMine(address mine, address rewardToken, uint256 amount);
+// event CreateMineV3(address account, address mineV3);export function handleNewMineV3(event: NewDSP): void {
+export function handleDepositRewardToMine(event: DepositRewardToMine): void {
+  let mineAdd = event.params.mine;
+  let dmContract = DODOMine.bind(mineAdd);
+  let ddpb = dmContract.try_dodoPerBlock();
+  let dd = ZERO_BI;
+  if (ddpb.reverted) {
+    dd = ZERO_BI;
+  } else {
+    dd = ddpb.value;
+  }
+  let poolAdd = event.params.rewardToken;
+  let pool = getOrCreatePool(
+    poolAdd,
+    poolAdd,
+    poolAdd,
+    event.block.timestamp,
+    event.block.number
+  );
+  pool.stakedOutputTokenAmount += event.params.amount;
+  pool.rewardTokenEmissionsAmount = [dd];
+  let usdPricePerBlock = getUSDprice(
+    Address.fromString(DODOLpToken_ADDRESS),
+    dd
+  );
+  pool.rewardTokenEmissionsUSD = [usdPricePerBlock];
+  pool.save();
 }
 
 export function handleRemoveDVM(event: RemoveDVM): void {

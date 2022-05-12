@@ -76,33 +76,40 @@ export function setUSDprice(
 
 /////////////////////////////////////////////////
 
-export function setUSDpriceWETH(
+export function setUSDpriceTokenToToken(
   event: ethereum.Event,
-  tokenAdd: Address,
-  trader: Address,
-  amount: BigInt,
-  wETHamount: BigInt
+  priceTokenAdd: Address,
+  settingTokenAdd: Address,
+  amountOfPriceToken: BigInt,
+  amountOfSetToken: BigInt
 ): void {
   //get tokens
-  let wETH = getOrCreateToken(Address.fromString(WRAPPED_ETH));
-  let token = getOrCreateToken(tokenAdd);
+  let priceToken = getOrCreateToken(priceTokenAdd);
+  let settingtoken = getOrCreateToken(settingTokenAdd);
 
-  //get last wETH USD price which should be 100 in tests
-  let lastpriceETH = wETH.lastPriceUSD;
+  //retreive token decimals
+  let decPT = priceToken.decimals;
+  let decST = settingtoken.decimals;
 
-  // //for whatever dumb reason the graph insists wETH.lastPriceUSD can be null so
-  if (!lastpriceETH) {
-    lastpriceETH = ZERO_BD;
+  //get last priceToken USD price which should be 100 in tests
+  let lastprice = priceToken.lastPriceUSD;
+
+  // //for whatever dumb reason the graph insists priceToken.lastPriceUSD can be null so
+  if (!lastprice) {
+    lastprice = ZERO_BD;
   }
-  // //get current USD value of the input amount of wETH(currentwETHval = 100(1 * 100))
-  let currentwETHval = bigIntToBigDecimal(wETHamount) * lastpriceETH;
+  // //get current USD value of the input amount of priceToken(currentwETHval = 100(1 * 100))
+  let currentPriceval = modulateDecimals(amountOfPriceToken, decPT) * lastprice;
   //
   // // get USD val per input ERC20 token(100 / 100)
-  let currentERC20val = safeDiv(currentwETHval, bigIntToBigDecimal(amount));
+  let currentSeetingTokenval = safeDiv(
+    currentPriceval,
+    modulateDecimals(amountOfSetToken, decST)
+  );
 
-  token.lastPriceUSD = currentERC20val;
-  token.lastPriceBlockNumber = event.block.number;
-  token.save();
+  settingtoken.lastPriceUSD = currentSeetingTokenval;
+  settingtoken.lastPriceBlockNumber = event.block.number;
+  settingtoken.save();
 }
 
 /////////////////////////////////////////////////

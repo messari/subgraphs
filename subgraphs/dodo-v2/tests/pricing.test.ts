@@ -13,7 +13,7 @@ test("Accurately records the USD price of a token when it is traded for a stable
   assert.fieldEquals("Token", WRAPPED_ETH.toLowerCase(), "lastPriceUSD", "100");
 });
 
-test("Accurately records the USD price of a token when it is traded for wETH(Decimal Invariant)", () => {
+test("Accurately records the USD price of a token when it is traded for a token that has a USD price(Decimal Invariant)", () => {
   //run the simulations!!!!
   simulateActivity();
   //assert things

@@ -170,14 +170,14 @@ export function simulateActivity(): void {
     Token1Add,
     "Input Base Token Name",
     "IBTN",
-    18
+    7
   );
 
   let tokenq = createERC20Instance(
     Token2Add,
     "Input Quote Token Name",
     "IQTN",
-    18
+    3
   );
 
   let dodo = createERC20Instance(
@@ -264,7 +264,7 @@ export function simulateActivity(): void {
     WRAPPED_ETH, //fromToken
     Token1Add, //toToken
     "1000000000000000000", //1 wETH fromAmount
-    "100000000000000000000", // 100 ERC20 toAmount
+    "1000000000", // 100 ERC20 toAmount
     Account1Add, //trader
     Account2Add, //receiver
     DVMPoolAddress //pool add
@@ -275,7 +275,7 @@ export function simulateActivity(): void {
     WRAPPED_ETH, //fromToken
     Token2Add, //toToken
     "1000000000000000000", //1 wETH fromAmount
-    "100000000000000000000", // 100 ERC20 toAmount
+    "100000", // 100 ERC20 toAmount
     Account1Add, //trader
     Account2Add, //receiver
     DVMPoolAddress //pool add

@@ -37,10 +37,11 @@ import {
   getOrCreateHourlyUsageSnapshot,
   getOrCreateFinancials,
   getOrCreatePool,
+  getOrCreateToken,
   getUSDprice
 } from "./getters";
 
-import { setUSDprice, setUSDpriceWETH, setPriceLP } from "./setters";
+import { setUSDprice, setUSDpriceTokenToToken, setPriceLP } from "./setters";
 
 import { ERC20 } from "../../generated/CP/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
@@ -152,6 +153,10 @@ export function updatePoolMetrics(
 
   let token1 = ERC20.bind(tokenAdds[0]);
   let token2 = ERC20.bind(tokenAdds[1]);
+
+  let t1 = getOrCreateToken(tokenAdds[0]);
+  let t2 = getOrCreateToken(tokenAdds[1]);
+
   let lpToken = ERC20.bind(Address.fromString(pool.outputToken));
 
   let poolInstance = DVM.bind(poolAdd);
@@ -186,10 +191,23 @@ export function updatePoolMetrics(
     tokenAdds[1] == Address.fromString(STABLE_COINS[2])
   ) {
     setUSDprice(event, tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
-  } else if (tokenAdds[0] == Address.fromString(WRAPPED_ETH)) {
-    setUSDpriceWETH(event, tokenAdds[1], trader, amount[1], amount[0]);
-  } else if (tokenAdds[1] == Address.fromString(WRAPPED_ETH)) {
-    setUSDpriceWETH(event, tokenAdds[0], trader, amount[0], amount[1]);
+  }
+  if (t1.lastPriceUSD > BigDecimal.fromString("0")) {
+    setUSDpriceTokenToToken(
+      event,
+      tokenAdds[0],
+      tokenAdds[1],
+      amount[0],
+      amount[1]
+    );
+  } else if (t2.lastPriceUSD > BigDecimal.fromString("0")) {
+    setUSDpriceTokenToToken(
+      event,
+      tokenAdds[1],
+      tokenAdds[0],
+      amount[1],
+      amount[0]
+    );
   }
 
   let usdValueOfTransaction: BigDecimal = BigDecimal.fromString("0");
