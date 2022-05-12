@@ -24,7 +24,6 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_TWO,
   BIGINT_ZERO,
-  ZERO_ADDRESS,
   SchemaNetwork,
   ProtocolType,
   RewardTokenType,
@@ -35,11 +34,9 @@ import {
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
   REWARD_TOKEN_ADDRESS,
-  PRICE_ORACLE_ADDRESS,
-  AAVE_PROTOCOL_DATA_PROVIDER,
-  TOKEN_ADDRESS_USDC,
-  INCENTIVE_CONTROLLER_ADDRESS,
 } from "../common/constants";
+
+import * as addresses from "../common/addresses";
 
 import {
   fetchTokenDecimals,
@@ -58,6 +55,8 @@ import { bigIntToBigDecimal, rayToWad } from "../common/utils/numbers";
 import { GToken } from "../../generated/templates/GToken/GToken";
 
 import { LendingPool } from "../../generated/templates/LendingPool/LendingPool";
+
+import { SpookySwapGEISTFTM } from "../../generated/templates/LendingPool/SpookySwapGEISTFTM";
 
 import { AaveOracle } from "../../generated/templates/LendingPool/AaveOracle";
 
@@ -95,11 +94,11 @@ export function initializeMarket(
     market.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     market.supplySideRevenueUSD = BIGDECIMAL_ZERO;
     market.reserveFactor = BIGINT_ZERO;
-    market.outputToken = ZERO_ADDRESS;
+    market.outputToken = addresses.ZERO_ADDRESS.toHexString();
     market.inputTokens = inputTokens;
     market.inputTokenBalances = inputTokenBalances;
-    market.sToken = ZERO_ADDRESS;
-    market.vToken = ZERO_ADDRESS;
+    market.sToken = addresses.ZERO_ADDRESS.toHexString();
+    market.vToken = addresses.ZERO_ADDRESS.toHexString();
     market.rewardTokens = [];
     market.rewardTokenEmissionsAmount = [];
     market.rewardTokenEmissionsUSD = [];
@@ -155,7 +154,7 @@ export function initializeMarket(
   market.rewardTokenEmissionsAmount = getCurrentRewardEmissions(market);
   market.rewardTokenEmissionsUSD = getCurrentRewardEmissionsUSD(market);
 
-  const currentPriceUSD = getAssetPriceInUSD(Address.fromString(market.id));
+  const currentPriceUSD = getAssetPriceInUSDC(Address.fromString(market.id));
   market.outputTokenPriceUSD = currentPriceUSD;
   market.inputTokenPricesUSD = [currentPriceUSD];
   market.save();
@@ -169,7 +168,7 @@ export function getCurrentRewardEmissions(market: Market): BigInt[] {
 
   // Use the Aave protocol data provider to extract emission rate
   const dataProviderContract = AaveProtocolDataProvider.bind(
-    Address.fromString(AAVE_PROTOCOL_DATA_PROVIDER)
+    addresses.AAVE_PROTOCOL_DATA_PROVIDER
   );
 
   const reserve_data = dataProviderContract.try_getReserveData(
@@ -291,7 +290,7 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
     lendingProtocol.totalDepositUSD = BIGDECIMAL_ZERO;
     lendingProtocol.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.protocolPriceOracle = PRICE_ORACLE_ADDRESS;
+    lendingProtocol.protocolPriceOracle = addresses.PRICE_ORACLE_ADDRESS.toHexString();
     lendingProtocol.lendingType = LENDING_TYPE;
     lendingProtocol.riskType = RISK_TYPE;
     lendingProtocol.save();
@@ -324,7 +323,7 @@ export function initializeIncentivesController(market: Market): Address {
       "Failed to get incentives controller for market ID={}, gToken={}",
       [market.id, gToken._address.toHexString()]
     );
-    return Address.fromString(INCENTIVE_CONTROLLER_ADDRESS);
+    return addresses.INCENTIVE_CONTROLLER_ADDRESS;
   }
 }
 
@@ -488,29 +487,95 @@ export function getPriceOracle(): AaveOracle {
   return AaveOracle.bind(Address.fromString(priceOracle));
 }
 
-export function getAssetPriceInUSD(tokenAddress: Address): BigDecimal {
+export function getAssetPriceInUSDC(tokenAddress: Address): BigDecimal {
   const oracle = getPriceOracle();
   // The GEIST oracle returns prices in USD, however this only works for specific tokens
   // for other tokens, this must be converted.
 
-  let assetPriceInUSDC: BigDecimal = BIGDECIMAL_ZERO;
-  const tryAssetPriceInEth = oracle.try_getAssetPrice(tokenAddress);
+  let assetPrice: BigDecimal = BIGDECIMAL_ZERO;
+  let tryPriceUSDC = oracle.try_getAssetPrice(addresses.TOKEN_ADDRESS_USDC);
+  let priceUSDC: BigDecimal = BIGDECIMAL_ZERO;
 
-  const tryPriceUSDCInEth = oracle.try_getAssetPrice(
-    Address.fromString(TOKEN_ADDRESS_USDC)
-  );
-  if (!tryAssetPriceInEth.reverted && !tryPriceUSDCInEth.reverted) {
-    const assetPriceInEth = tryAssetPriceInEth.value;
-    const priceUSDCInEth = tryPriceUSDCInEth.value;
-    assetPriceInUSDC = new BigDecimal(assetPriceInEth).div(
-      new BigDecimal(priceUSDCInEth)
-    );
+  if (!tryPriceUSDC.reverted) {
+    priceUSDC = new BigDecimal(tryPriceUSDC.value);
   } else {
-    log.error("Unable to get USD price for token address={}", [
-      tokenAddress.toHexString(),
-    ]);
+    log.error(
+      "Unable to get price of USDC from oracle. Setting assetPrice={}",
+      [assetPrice.toString()]
+    );
+    return assetPrice;
   }
-  log.info("Price for token address={} is {} USD", [
+
+  if (tokenAddress == addresses.TOKEN_ADDRESS_GEIST) {
+    /* 
+      For the GEIST token, the price is derived from the
+      ratio of FTM-GEIST reserves on SpookySwap multiplied by
+      the price of WFTM from the oracle
+    */
+    let geistFtmLP = SpookySwapGEISTFTM.bind(addresses.GEIST_FTM_LP_ADDRESS);
+
+    let reserves = geistFtmLP.try_getReserves();
+
+    if (reserves.reverted) {
+      log.error("Unable to get reserves for GEIST-FTM, setting assetPrice={}", [
+        assetPrice.toString(),
+      ]);
+      return assetPrice;
+    }
+    let reserveFTM = reserves.value.value0;
+    let reserveGEIST = reserves.value.value1;
+
+    let priceGEISTinFTM = reserveFTM.div(reserveGEIST);
+    let priceFTMinUSD = oracle.getAssetPrice(addresses.TOKEN_ADDRESS_WFTM);
+    assetPrice = bigIntToBigDecimal(priceGEISTinFTM.times(priceFTMinUSD), 18);
+
+    // log.info(
+    //     "SpookySwap LP: reserveFTM={}, reserveGEIST={}, priceGEISTinFTM={}, priceFTMinUSD={}, priceGEISTinUSD={}",
+    //     [
+    //         reserveFTM.toString(),
+    //         reserveGEIST.toString(),
+    //         priceGEISTinFTM.toString(),
+    //         priceFTMinUSD.toString(),
+    //         assetPrice.toString()
+    //     ]
+    // )
+  } else {
+    // For other tokens get price from oracle
+    // Map prices of gTokens to non-gTokens to get price from oracle
+    // TODO: Maybe a dict would be a cleaner mapping
+    if (tokenAddress == addresses.TOKEN_ADDRESS_gWBTC) {
+      tokenAddress = addresses.TOKEN_ADDRESS_BTC;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gfUSDT) {
+      tokenAddress = addresses.TOKEN_ADDRESS_fUSDT;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gUSDC) {
+      tokenAddress = addresses.TOKEN_ADDRESS_USDC;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gDAI) {
+      tokenAddress = addresses.TOKEN_ADDRESS_DAI;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gMIM) {
+      tokenAddress = addresses.TOKEN_ADDRESS_MIM;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gLINK) {
+      tokenAddress = addresses.TOKEN_ADDRESS_LINK;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gCRV) {
+      tokenAddress = addresses.TOKEN_ADDRESS_CRV;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gETH) {
+      tokenAddress = addresses.TOKEN_ADDRESS_ETH;
+    } else if (tokenAddress == addresses.TOKEN_ADDRESS_gFTM) {
+      tokenAddress = addresses.TOKEN_ADDRESS_WFTM;
+    }
+
+    const tryAssetPriceInUSD = oracle.try_getAssetPrice(tokenAddress);
+
+    if (!tryAssetPriceInUSD.reverted) {
+      assetPrice = new BigDecimal(tryAssetPriceInUSD.value);
+    } else {
+      log.error("Unable to get USD price for token address={}", [
+        tokenAddress.toHexString(),
+      ]);
+    }
+  }
+
+  let assetPriceInUSDC = assetPrice.div(priceUSDC);
+  log.info("Price for token address={} is {} USDC", [
     tokenAddress.toHexString(),
     assetPriceInUSDC.toString(),
   ]);
@@ -550,7 +615,7 @@ export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
     RewardTokenType.DEPOSIT
   );
   // In the reward emissions arrays index 0 is for the deposit reward, index 1 for the borrow reward
-  const rewardPriceInUSDC = getAssetPriceInUSD(rewardTokenAddr);
+  const rewardPriceInUSDC = getAssetPriceInUSDC(rewardTokenAddr);
   rewardEmissionsUSD[0] = tokenAmountInUSD(
     rewardPriceInUSDC,
     rewardToken.decimals,
@@ -590,7 +655,7 @@ export function calculateRevenues(market: Market, token: Token): void {
   // Pull S and V debt tokens to get the amount currently borrowed as stable debt or variable debt
 
   const dataProviderContract = AaveProtocolDataProvider.bind(
-    Address.fromString(AAVE_PROTOCOL_DATA_PROVIDER)
+    addresses.AAVE_PROTOCOL_DATA_PROVIDER
   );
 
   const reserve_data = dataProviderContract.try_getReserveData(

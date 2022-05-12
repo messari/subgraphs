@@ -77,18 +77,6 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
-//////////////////////////////
-///// Ethereum Addresses /////
-//////////////////////////////
-export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const PRICE_ORACLE_ADDRESS =
-  "0xC466e3FeE82C6bdc2E17f2eaF2c6F1E91AD10FD3";
-export const AAVE_PROTOCOL_DATA_PROVIDER =
-  "0xf3B0611e2E4D2cd6aB4bb3e01aDe211c3f42A8C3";
-export const TOKEN_ADDRESS_USDC = "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75";
-export const INCENTIVE_CONTROLLER_ADDRESS =
-  "0x297FddC5c33Ef988dd03bd13e162aE084ea1fE57";
-
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
@@ -144,6 +132,8 @@ export const MS_PER_YEAR = DAYS_PER_YEAR.times(
 export const PROTOCOL_ADDRESS = "0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82";
 export const REWARD_TOKEN_ADDRESS =
   "0xd8321AA83Fb0a4ECd6348D4577431310A6E0814d";
+export const PRICE_ORACLE_ADDRESS =
+  "0xC466e3FeE82C6bdc2E17f2eaF2c6F1E91AD10FD3";
 
 // Interaction types for snapshot calculations
 export const DEPOSIT_INTERACTION = "DEPOSIT";

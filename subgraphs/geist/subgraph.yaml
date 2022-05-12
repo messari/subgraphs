@@ -6,7 +6,7 @@ dataSources:
     name: LendingPoolAddressesProviderRegistry
     network: fantom
     source:
-      address: '0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82'
+      address: "0x4CF8E50A5ac16731FA2D8D9591E195A285eCaA82"
       abi: LendingPoolAddressesProviderRegistry
       startBlock: 18399357
     mapping:
@@ -89,6 +89,8 @@ templates:
           file: ./abis/AaveIncentivesController.json
         - name: AaveProtocolDataProvider
           file: ./abis/AaveProtocolDataProvider.json
+        - name: SpookySwapGEISTFTM
+          file: ./abis/SpookySwapGEISTFTM.json
       eventHandlers:
         - event: Deposit(indexed address,address,indexed address,uint256,indexed uint16)
           handler: handleDeposit
@@ -142,6 +144,8 @@ templates:
           file: ./abis/ERC20.json
         - name: AaveProtocolDataProvider
           file: ./abis/AaveProtocolDataProvider.json
+        - name: SpookySwapGEISTFTM
+          file: ./abis/SpookySwapGEISTFTM.json
       eventHandlers:
         - event: ReserveInitialized(indexed address,indexed address,address,address,address)
           handler: handleReserveInitialized
@@ -154,7 +158,7 @@ templates:
         - event: ReserveActivated(indexed address)
           handler: handleReserveActivated
         - event: ReserveDeactivated(indexed address)
-          handler: handleReserveDeactivated  
+          handler: handleReserveDeactivated
         - event: ReserveFactorChanged(indexed address,uint256)
           handler: handleReserveFactorChanged
       file: src/mappings/lending-pool-configurator.ts
