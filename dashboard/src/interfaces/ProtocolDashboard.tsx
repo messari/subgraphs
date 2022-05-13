@@ -11,13 +11,14 @@ import { schema } from "../queries/schema";
 import { PoolNames, ProtocolTypeEntity, SubgraphBaseUrl } from "../constants";
 import { TabContext } from "@mui/lab";
 import { TableEvents } from "../common/chartComponents/TableEvents";
-import { poolDropDown } from "../common/utilComponents/PoolDropDown";
+import { PoolDropDown } from "../common/utilComponents/PoolDropDown";
 import ProtocolTab from "./tabs/ProtocolTab";
 import PoolTab from "./tabs/PoolTab";
 import ErrorDisplay from "./ErrorDisplay";
 import WarningDisplay from "./WarningDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
+import { isValidHttpUrl, parseSubgraphName } from "../utils";
 
 export const toDate = (timestamp: number) => {
   return moment.unix(timestamp).format("YYYY-MM-DD");
@@ -25,14 +26,22 @@ export const toDate = (timestamp: number) => {
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
-  const subgraphName = searchParams.get("subgraph");
+  const subgraphParam = searchParams.get("subgraph");
+  const tabString = searchParams.get("tab") || "";
+  const poolIdString = searchParams.get("poolId") || "";
+  const scrollToView = searchParams.get("view") || "";
   const navigate = useNavigate();
 
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
-  const [poolId, setPoolId] = useState<string>("");
+  const [poolId, setPoolId] = useState<string>(poolIdString);
   const [warning, setWarning] = useState<{ message: string; type: string }[]>([]);
-  if (!subgraphToQuery.url && subgraphName) {
-    setSubgraphToQuery({ url: `${SubgraphBaseUrl}${subgraphName}`, version: subgraphToQuery.version });
+  if (!subgraphToQuery.url && subgraphParam) {
+    let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
+    const parseCheck = isValidHttpUrl(subgraphParam);
+    if (parseCheck) {
+      queryURL = subgraphParam;
+    }
+    setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
   }
   ChartJS.register(...registerables);
   const link = new HttpLink({
@@ -65,8 +74,7 @@ function ProtocolDashboard() {
   const {
     data: protocolSchemaData,
     loading: protocolSchemaQueryLoading,
-    error: protocolSchemaQueryError,
-    refetch: protocolSchemaQueryRefetch,
+    error: protocolSchemaQueryError
   } = useQuery(query, { client });
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
@@ -89,7 +97,15 @@ function ProtocolDashboard() {
   `;
 
   const [getData, { data, loading, error, refetch }] = useLazyQuery(queryMain, { variables: { poolId }, client });
-  const [tabValue, setTabValue] = useState("1");
+
+  let tabNum = "1";
+  if (tabString.toUpperCase() === "POOL" || tabString.toUpperCase() === "MARKET") {
+    tabNum = "2";
+  } else if (tabString.toUpperCase() === "EVENTS") {
+    tabNum = "3";
+  }
+
+  const [tabValue, setTabValue] = useState(tabNum);
 
   // Error logging in case the full data request throws an error
   useEffect(() => {
@@ -101,14 +117,25 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
-
     if (protocolSchemaData) {
       getData();
     }
   }, [subgraphToQuery.url, refetch, protocolSchemaData]);
 
+
+  useEffect(() => {
+    document.getElementById(scrollToView)?.scrollIntoView();
+  })
+
   const handleTabChange = (event: any, newValue: string) => {
     setWarning([]);
+    let tabName = "protocol";
+    if (newValue === "2") {
+      tabName = "pool";
+    } else if (newValue === "3") {
+      tabName = "events";
+    }
+    navigate('?subgraph=' + subgraphParam + '&poolId=' + poolId + '&tab=' + tabName);
     setTabValue(newValue);
   };
 
@@ -145,16 +172,23 @@ function ProtocolDashboard() {
                 </TabPanel>
                 <TabPanel value="2">
                   {/* POOL TAB */}
-
-                  {PoolTab(data, entities, entitiesData, poolId, setPoolId, poolData, setWarning, warning)}
+                  <PoolTab
+                    data={data}
+                    entities={entities}
+                    entitiesData={entitiesData}
+                    poolId={poolId}
+                    setPoolId={(x) => setPoolId(x)}
+                    poolData={poolData}
+                    setWarning={(x) => setWarning(x)}
+                    warning={warning}
+                  />
                 </TabPanel>
                 <TabPanel value="3">
                   {/* EVENTS TAB */}
 
                   {setWarning(issues)}
-                  {poolDropDown(poolId, setPoolId, setWarning, data[poolNames])}
+                  <PoolDropDown poolId={poolId} setPoolId={(x) => setPoolId(x)} setWarning={(x) => setWarning(x)} markets={data[poolNames]} />
                   {events.map((eventName) => {
-                    console.log(data[eventName], eventName, data[eventName].length);
                     if (!poolId && data[eventName].length > 0) {
                       const message = 'No pool selected, there should not be "' + eventName + '" events';
                       if (issues.filter((x) => x.message === message).length === 0) {
@@ -167,7 +201,7 @@ function ProtocolDashboard() {
                         issues.push({ message, type: "EVENT" });
                       }
                     }
-                    return <React.Fragment>{TableEvents(eventName, data, eventName)}</React.Fragment>;
+                    return <React.Fragment>{TableEvents(eventName, data, eventName, poolId)}</React.Fragment>;
                   })}
                 </TabPanel>
               </TabContext>
@@ -182,9 +216,7 @@ function ProtocolDashboard() {
   let errorRender = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
   // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
-  if (warning && !loading) {
-    errorRender = WarningDisplay(warning);
-  }
+
   if (protocolSchemaQueryError && !loading) {
     errorRender = ErrorDisplay(protocolSchemaQueryError, setSubgraphToQuery, protocolSchemaData, subgraphToQuery);
   }
@@ -224,6 +256,7 @@ function ProtocolDashboard() {
       </Button>
       {protocolInfo}
       {errorRender}
+      <WarningDisplay warningArray={warning} />
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
         <CircularProgress sx={{ margin: 6 }} size={50} />
       ) : null}

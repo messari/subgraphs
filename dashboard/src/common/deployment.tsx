@@ -27,8 +27,7 @@ export const Deployment = ({ networkName, deployment, status }: DeploymentProps)
   }
 
   const navigateToSubgraph = (url: string) => () => {
-    const subgraphName = parseSubgraphName(url);
-    navigate(`graphs?subgraph=${subgraphName}`);
+    navigate(`graphs?subgraph=${url}`);
   };
 
   let color = "black";

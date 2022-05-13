@@ -1,16 +1,32 @@
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React from "react";
+import { MenuItem, Select, SelectChangeEvent, Autocomplete, TextField } from "@mui/material";
+import React, { useState } from "react";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { ComboBoxInput } from "./ComboBoxInput";
 
-export const poolDropDown = (
-  poolId: string,
-  setPoolId: React.Dispatch<React.SetStateAction<string>>,
-  setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>,
-  markets: [],
-) => {
+interface PoolDropDownProps {
+  poolId: string;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>;
+  markets: [];
+}
+
+export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDropDownProps) => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const scrollToView = searchParams.get("view") || "";
+  const options = markets.map((market: any) => {
+    return market.id + '-' + market.name;
+  });
+  const pool = markets.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
+  let inputTextValue = "Select a pool";
+  if (poolId) {
+    inputTextValue = poolId + '-' + pool.name;
+  }
+  const [textInput, setTextInput] = useState<string>(inputTextValue);
   return (
     <>
       <h3 style={{ marginLeft: "16px" }}>Select a pool</h3>
-      <Select
+      {/* <Select
         fullWidth
         sx={{ maxWidth: 1000, margin: 2 }}
         labelId="demo-simple-select-filled-label"
@@ -33,6 +49,23 @@ export const poolDropDown = (
             )
           })
         }
-      </Select>
+      </Select> */}
+      <Autocomplete
+        options={options}
+        inputValue={textInput}
+        sx={{ maxWidth: 1000, margin: 2 }}
+        onChange={(event: React.SyntheticEvent) => {
+          setWarning([]);
+          const targEle = (event?.target as HTMLLIElement);
+          setTextInput(targEle.innerText);
+          searchParams.delete('view');
+          if (targEle.innerText) {
+            setPoolId(targEle.innerText?.split("-")[0]);
+            navigate('?subgraph=' + searchParams.get('subgraph') + '&tab=' + searchParams.get('tab') + '&poolId=' + targEle.innerText?.split("-")[0]);
+          }
+        }}
+        renderInput={
+          (params) => <ComboBoxInput params={params} setTextInput={setTextInput} />}
+      />
     </>)
 }
