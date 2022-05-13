@@ -1,90 +1,132 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import {
-  VaultFee,
-  _Strategy,
+  Token,
   Vault as VaultStore,
 } from "../../generated/schema";
-import { BigInt, Address, BigDecimal } from "@graphprotocol/graph-ts";
-import { Strategy as StrategyTemplate } from "../../generated/templates";
-import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
-import { EthereumController as ControllerContract } from "../../generated/Controller/EthereumController";
+import {
+  log,
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import {
+  getOrCreateYieldAggregator,
+  getOrCreateFinancialDailySnapshots,
+} from "../common/initializers";
+import * as utils from "../common/utils";
+import { getUsdPricePerToken } from "../Prices";
+import * as constants from "../common/constants";
+import { Strategy as StrategyContract } from "../../generated/templates/Strategy/Strategy";
 
-export function createFeeType(
-  feeId: string,
-  feeType: string,
-  feePercentage: BigInt
+export function _StrategyHarvested(
+  strategyAddress: Address,
+  vault: VaultStore,
+  wantEarned: BigInt,
+  block: ethereum.Block,
+  transaction: ethereum.Transaction
 ): void {
-  const fees = new VaultFee(feeId);
+  const strategyContract = StrategyContract.bind(strategyAddress);
 
-  fees.feeType = feeType;
-  fees.feePercentage = feePercentage
+  let inputToken = Token.load(vault.inputToken);
+  let inputTokenAddress = Address.fromString(vault.inputToken);
+  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
+
+  // load performance fee and get the fees percentage
+  let performanceFee = utils
+    .readValue<BigInt>(
+      strategyContract.try_performanceFee(),
+      constants.BIGINT_ZERO
+    )
+    .toBigDecimal();
+
+  let supplySideWantEarned = wantEarned
     .toBigDecimal()
-    .div(BigDecimal.fromString("100"));
+    .times(
+      constants.BIGDECIMAL_ONE.minus(performanceFee.div(constants.DENOMINATOR))
+    );
+  const supplySideWantEarnedUSD = supplySideWantEarned
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
 
-  fees.save();
+  let protocolSideWantEarned = wantEarned
+    .toBigDecimal()
+    .times(performanceFee)
+    .div(constants.BIGDECIMAL_HUNDRED);
+  const protocolSideWantEarnedUSD = protocolSideWantEarned
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
+
+  const totalRevenueUSD = supplySideWantEarnedUSD
+    .plus(protocolSideWantEarnedUSD);
+  
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(wantEarned);
+  vault.save();
+
+  updateFinancialsAfterReport(
+    block,
+    totalRevenueUSD,
+    supplySideWantEarnedUSD,
+    protocolSideWantEarnedUSD
+  );
+
+  log.warning(
+    "[Harvested] vault: {}, Strategy: {}, supplySideWantEarned: {}, protocolSideWantEarned: {}, inputToken: {}, totalRevenueUSD: {}, TxHash: {}",
+    [
+      vault.id,
+      strategyAddress.toHexString(),
+      supplySideWantEarned.toString(),
+      protocolSideWantEarned.toString(),
+      inputTokenAddress.toHexString(),
+      totalRevenueUSD.toString(),
+      transaction.hash.toHexString(),
+    ]
+  );
 }
 
-export function getOrCreateStrategy(
-  controllerAddress: Address,
-  vaultAddress: Address,
-  _inputAddress: Address,
-  _strategyAddress: Address | null = null
-): string {
-  let strategyAddress: string;
-  const controller = ControllerContract.bind(controllerAddress);
+export function updateFinancialsAfterReport(
+  block: ethereum.Block,
+  totalRevenueUSD: BigDecimal,
+  supplySideRevenueUSD: BigDecimal,
+  protocolSideRevenueUSD: BigDecimal
+): void {
+  const financialMetrics = getOrCreateFinancialDailySnapshots(block);
+  const protocol = getOrCreateYieldAggregator();
 
-  if (!_strategyAddress) {
-    strategyAddress = utils
-      .readValue<Address>(
-        controller.try_strategies(_inputAddress),
-        constants.ZERO_ADDRESS
-      )
-      .toHexString();
-  } else {
-    strategyAddress = _strategyAddress.toHexString();
-  }
+  // TotalRevenueUSD Metrics
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
+    totalRevenueUSD
+  );
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+    totalRevenueUSD
+  );
+  financialMetrics.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
 
-  if (strategyAddress != constants.ZERO_ADDRESS_STRING) {
-    const strategy = new _Strategy(strategyAddress);
-    const vault = VaultStore.load(vaultAddress.toHexString());
-    const strategyContract = StrategyContract.bind(
-      Address.fromString(strategyAddress)
-    );
+  // SupplySideRevenueUSD Metrics
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD
+  );
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    supplySideRevenueUSD
+  );
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
 
-    strategy.vaultAddress = vaultAddress;
-    strategy.inputToken = _inputAddress;
-    strategy.save();
+  // ProtocolSideRevenueUSD Metrics
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD
+  );
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD
+  );
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
 
-    const withdrawalFeeId = "withdrawal-fee-" + vaultAddress.toHexString();
-    
-    let withdrawalFee = utils.readValue<BigInt>(
-      strategyContract.try_withdrawalFee(),
-      constants.DEFAULT_WITHDRAWAL_FEE
-    );
-    createFeeType(
-      withdrawalFeeId,
-      constants.VaultFeeType.WITHDRAWAL_FEE,
-      withdrawalFee,
-    );
-
-    const performanceFeeId = "performance-fee-" + vaultAddress.toHexString();
-    
-    let performanceFee = utils.readValue<BigInt>(
-      strategyContract.try_performanceFee(),
-      constants.DEFAULT_PERFORMANCE_FEE
-    );
-    createFeeType(
-      performanceFeeId,
-      constants.VaultFeeType.PERFORMANCE_FEE,
-      performanceFee,
-    );
-
-    vault!.fees = [withdrawalFeeId, performanceFeeId];
-    vault!.save();
-
-    StrategyTemplate.create(Address.fromString(strategyAddress));
-  }
-
-  return strategyAddress;
+  financialMetrics.save();
+  protocol.save();
 }

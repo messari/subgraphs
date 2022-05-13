@@ -1,0 +1,24 @@
+{
+  "chain": "arbitrum-one",
+  "miniChef": {
+    "address": "0x2069043d7556B1207a505eb459D18d908DF29b55",
+    "startBlock": 3087159
+  },
+  "pools": [
+    {
+      "name": "arbUSD",
+      "address": "0xBea9F78090bDB9e662d8CB301A00ad09A5b756e9",
+      "startBlock": 3073795
+    },
+    {
+      "name": "FRAX",
+      "address": "0xfeEa4D1BacB0519E8f952460A70719944fe56Ee0",
+      "startBlock": 4006435
+    },
+    {
+      "name": "USDs",
+      "address": "0x5dD186f8809147F96D3ffC4508F3C82694E58c9c",
+      "startBlock": 5401331
+    }
+  ]
+}

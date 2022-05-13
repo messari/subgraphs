@@ -38,7 +38,6 @@ import {
   _handleRepayBorrow,
   _handleLiquidateBorrow,
   UpdateMarketData,
-  AccruePer,
   _handleAccrueInterest,
   getOrElse,
 } from "../../src/mapping";
@@ -161,7 +160,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
-    AccruePer.Timestamp,
     oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
@@ -175,7 +173,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Bastion Protocol",
     "bastion-protocol",
     "1.2.1",
-    "1.0.0",
+    "1.0.2",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa()

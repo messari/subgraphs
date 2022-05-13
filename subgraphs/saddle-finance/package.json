@@ -1,0 +1,25 @@
+{
+  "name": "saddle-finance",
+  "license": "MIT",
+  "scripts": {
+    "format": "npx prettier --write .",
+    "prepare-arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-fantom": "mustache config/fantom.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare-optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ saddle-finance",
+    "create-local": "graph create --node http://localhost:8020/ saddle-finance",
+    "remove-local": "graph remove --node http://localhost:8020/ saddle-finance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 saddle-finance"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.29.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0",
+    "prettier": "^2.6.2"
+  }
+}

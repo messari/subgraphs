@@ -21,7 +21,7 @@ export const schema = (version: string): Schema => {
 
 export const schema100 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots"];
-  
+
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
@@ -49,13 +49,32 @@ export const schema100 = (): Schema => {
 
   const query = `
       {
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 500) {
+        lendingProtocols {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          network
+          type
+          riskType
+          lendingType
+          totalUniqueUsers
+          totalValueLockedUSD
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -67,13 +86,13 @@ export const schema100 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        marketDailySnapshots(first:500, where: {market: $poolId}) {
+        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -88,9 +107,12 @@ export const schema100 = (): Schema => {
             decimals
             name
           }
+          outputToken {
+            id
+          }
          
           rewardTokens{
-            name
+            id
           }
          name
          isActive
@@ -102,23 +124,25 @@ export const schema100 = (): Schema => {
          depositRate
          stableBorrowRate
          variableBorrowRate
+         rewardTokenEmissionsAmount
+         rewardTokenEmissionsUSD
         }
          
-        withdraws(first: 500, where: {market: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        repays(first: 500, where: {market: $poolId}) {
+        repays(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        liquidates(first: 500, where: {market: $poolId}) {
+        liquidates(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -126,14 +150,14 @@ export const schema100 = (): Schema => {
           amountUSD
           profitUSD
         }
-        deposits(first: 500, where: {market: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        borrows(first: 500, where: {market: $poolId}) {
+        borrows(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -142,7 +166,8 @@ export const schema100 = (): Schema => {
         }
       }
     `;
-  const poolData: {[x: string]: string} = {
+  const poolData: { [x: string]: string } = {
+    id: "ID!",
     inputTokens: "[Token!]!",
     outputToken: "Token",
     rewardTokens: "[RewardToken!]",
@@ -172,13 +197,13 @@ export const schema100 = (): Schema => {
     totalValueLockedUSD: "BigDecimal!",
   };
 
-  const events = ["withdraws","repays","liquidates","deposits","borrows"]
-  return { entities, entitiesData, query, poolData, events, protocolFields};
+  const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"]
+  return { entities, entitiesData, query, poolData, events, protocolFields };
 };
 
 export const schema110 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots"];
-  
+
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
@@ -204,11 +229,14 @@ export const schema110 = (): Schema => {
     }
   };
 
-  const poolData: {[x: string]: string} = {
+  const poolData: { [x: string]: string } = {
+    id: "ID!",
+    name: "String",
     inputTokens: "[Token!]!",
     outputToken: "Token",
     rewardTokens: "[RewardToken!]",
-    name: "String",
+    inputTokenBalances: "[BigInt!]!",
+    outputTokenSupply: "BigInt!",
     isActive: "Boolean!",
     variableBorrowRate: "BigDecimal!",
     depositRate: "BigDecimal!",
@@ -221,30 +249,53 @@ export const schema110 = (): Schema => {
   };
   const query = `
       query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
         }
+        lendingProtocols {
+          id
+          name,
+          slug,
+          schemaVersion,
+          subgraphVersion,
+          methodologyVersion,
+          network,
+          type,
+          riskType,
+          lendingType,
+          totalUniqueUsers,
+          totalValueLockedUSD,
+          totalVolumeUSD,
+          totalDepositUSD,
+          totalBorrowUSD
+        }
         markets {
           id
           name
         }
-        financialsDailySnapshots(first: 500) {
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
           supplySideRevenueUSD
           timestamp
         }
-        usageMetricsDailySnapshots(first: 500) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        marketDailySnapshots(first:500, market: $poolId) {
+        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -255,14 +306,22 @@ export const schema110 = (): Schema => {
           timestamp
         }
         market(id:$poolId){
+          id
+          name
           inputTokens{
             decimals
             name
           }
-          rewardTokens{
-            name
+          outputToken {
+            id
+            decimals
           }
-         name
+          rewardTokens{
+            id
+            decimals
+          }
+          inputTokenBalances
+          outputTokenSupply
          isActive
          canUseAsCollateral
          canBorrowFrom
@@ -272,23 +331,25 @@ export const schema110 = (): Schema => {
          depositRate
          stableBorrowRate
          variableBorrowRate
+         rewardTokenEmissionsAmount
+         rewardTokenEmissionsUSD
         }
         
-        withdraws(first: 500, where: {market: $poolId}) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        repays(first: 500, where: {market: $poolId}) {
+        repays(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        liquidates(first: 500, where: {market: $poolId}) {
+        liquidates(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -296,14 +357,14 @@ export const schema110 = (): Schema => {
           amountUSD
           profitUSD
         }
-        deposits(first: 500, where: {market: $poolId}) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
           amount
           amountUSD
         }
-        borrows(first: 500, where: {market: $poolId}) {
+        borrows(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           timestamp
           blockNumber
           from
@@ -313,28 +374,28 @@ export const schema110 = (): Schema => {
       }
       `;
 
-      const protocolFields = {
-        id: "ID!",
-        name: "String!",
-        slug: "String!",
-        schemaVersion: "String!",
-        subgraphVersion: "String!",
-        methodologyVersion: "String!",
-        network: "Network!",
-        type: "ProtocolType!",
-        riskType: "RiskType",
-        lendingType: "LendingType",
-        totalUniqueUsers: "Int!",
-        totalValueLockedUSD: "BigDecimal!",
-        totalVolumeUSD: "BigDecimal!",
-        totalDepositUSD: "BigDecimal!",
-        totalBorrowUSD: "BigDecimal!"
-      };
-      
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    riskType: "RiskType",
+    lendingType: "LendingType",
+    totalUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalVolumeUSD: "BigDecimal!",
+    totalDepositUSD: "BigDecimal!",
+    totalBorrowUSD: "BigDecimal!"
+  };
 
-      const events = ["withdraws","repays","liquidates","deposits","borrows"];
-      return { entities, entitiesData, query, poolData, events, protocolFields};
-    };
+
+  const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
+  return { entities, entitiesData, query, poolData, events, protocolFields };
+};
 
 export const schema120 = (): Schema => {
   const entities = [
@@ -354,7 +415,7 @@ export const schema120 = (): Schema => {
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailyProtocolSideRevenueUSD: "BigDecimal!",
       cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-      dailyTotalRevenueUSD: "BigDecimal!", 
+      dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       dailyLiquidateUSD: "BigDecimal!",
       cumulativeLiquidateUSD: "BigDecimal!",
@@ -385,6 +446,7 @@ export const schema120 = (): Schema => {
       inputTokenPriceUSD: "BigDecimal!",
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal!",
+      rates: "[InterestRate!]!",
       exchangeRate: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
@@ -416,18 +478,25 @@ export const schema120 = (): Schema => {
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal!",
       exchangeRate: "BigDecimal",
+      rates: "[InterestRate!]!",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!"
     }
   };
 
-  const finanQuery = "financialsDailySnapshots(first: 500) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDailySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 500) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+  const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
+  const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}";
 
-  const marketDailyQuery = "marketDailySnapshots(first: 500, where: {market: $poolId}) {" + Object.keys(entitiesData.marketDailySnapshots).join(',') + '}';
-  const marketHourlyQuery = "marketHourlySnapshots(first: 500, where: {market: $poolId}) {" + Object.keys(entitiesData.marketHourlySnapshots).join(',') + '}';
+
+  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
+  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
+  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+
+  const marketDailyQuery = "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketDailyFields.join(',') + '}';
+  const marketHourlyQuery = "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketHourlyFields.join(',') + '}';
 
   const eventsFields = [
     "hash",
@@ -438,18 +507,18 @@ export const schema120 = (): Schema => {
     "amountUSD"
   ];
 
-  const events: string[] = ["withdraws","repays","liquidates","deposits","borrows"];
+  const events: string[] = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
   const eventsQuery: any[] = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 500, where: {market: $poolId}" + options + ") { "
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { "
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
       fields += ", profitUSD"
     }
     return baseStr + fields + ' }'
   });
-  
-  const poolData: {[x: string]: string} = {
+
+  const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
     inputToken: "Token!",
@@ -472,18 +541,53 @@ export const schema120 = (): Schema => {
     outputTokenSupply: "BigInt!",
     outputTokenPriceUSD: "BigDecimal!",
     exchangeRate: "BigDecimal",
+    rates: "[InterestRate!]!",
     rewardTokenEmissionsAmount: "[BigInt!]",
     rewardTokenEmissionsUSD: "[BigDecimal!]"
   };
 
   const query = `
   query Data($poolId: String){
+    _meta {
+      block {
+        number
+      }
+      deployment
+    }
     protocols {
       id
       name
       type
       schemaVersion
       subgraphVersion
+    }
+    lendingProtocols {
+      id      
+      name
+      slug
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      network
+      type
+      lendingType
+      riskType
+      mintedTokens {
+        id
+        decimals
+      }
+      cumulativeUniqueUsers
+      totalValueLockedUSD
+      protocolControlledValueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      mintedTokenSupplies
     }
     markets {
       id
@@ -496,16 +600,26 @@ export const schema120 = (): Schema => {
     ${marketDailyQuery}
     ${eventsQuery}
     market(id:$poolId){
+      id
+      name
       inputToken {
         decimals
         name
       }
-
       outputToken {
-        name
+        id
+        decimals
       }
-
-      name
+      rewardTokens {
+        id
+        token {
+          decimals
+        }
+      }
+      rates {
+        rate
+        type
+      }
       isActive
       canUseAsCollateral
       canBorrowFrom
@@ -552,8 +666,8 @@ export const schema120 = (): Schema => {
     cumulativeBorrowUSD: "BigDecimal!",
     cumulativeLiquidateUSD: "BigDecimal!",
     mintedTokenSupplies: "[BigInt!]"
-  };  
+  };
 
-  return { entities, entitiesData, query, poolData ,events, protocolFields};
+  return { entities, entitiesData, query, poolData, events, protocolFields };
 };
 
