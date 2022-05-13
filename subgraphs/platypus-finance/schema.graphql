@@ -829,4 +829,5 @@ type _Asset @entity {
   " Timestamp of this event "
   timestamp: BigInt!
 
+  _index: BigInt!
 }

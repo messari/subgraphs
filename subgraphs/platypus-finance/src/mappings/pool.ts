@@ -21,7 +21,7 @@ import {
   updateSwapMetrics,
   updateUsageMetrics,
 } from "../common/metrics";
-import { createDeposit, createAsset, createWithdraw, createSwap} from "./helpers";
+import { createDeposit, createAsset, createWithdraw, createSwap } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
   // Steps to implement
@@ -106,9 +106,6 @@ export function handleSwap(event: Swap): void {
 export function handleAssetAdded(event: AssetAdded): void {
   createAsset(event, event.address, event.params.token, event.params.asset);
   updatePoolMetrics(event);
-  // A new LP token is added to this pool
-  // Initialize Asset Contract with Address
-  // Initialize Asset Address to Oracle
 }
 
 export function handleDevUpdated(event: DevUpdated): void {

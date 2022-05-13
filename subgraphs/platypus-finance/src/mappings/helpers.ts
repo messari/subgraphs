@@ -2,12 +2,7 @@ import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
-import {
-  getOrCreateDexAmm,
-  getOrCreateLiquidityPool,
-  getOrCreateToken,
-  updatePricesForToken,
-} from "../common/getters";
+import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, updatePricesForToken } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 
@@ -23,11 +18,9 @@ export function createAsset(
   asset.maxSupply = BigInt.zero();
   asset.blockNumber = event.block.number;
   asset.timestamp = event.block.timestamp;
-  asset.save();
 
   const token = getOrCreateToken(event, tokenAddress);
   token._asset = assetAddress.toHexString();
-  token.save();
 
   const pool = getOrCreateLiquidityPool(poolAddress);
 
@@ -38,14 +31,18 @@ export function createAsset(
   // Start Watching the Asset for updates
   AssetTemplate.create(assetAddress);
 
-  assets.push(assetAddress.toHexString());
-  inputTokens.push(token.id);
-  inputTokenBalances.push(BigInt.zero());
+  asset._index = BigInt.fromI32(assets.length);
+
+  inputTokens[assets.length] = token.id;
+  inputTokenBalances[assets.length] = BigInt.zero();
+  assets[assets.length] = assetAddress.toHexString();
 
   pool._assets = assets;
   pool.inputTokens = inputTokens;
   pool.inputTokenBalances = inputTokenBalances;
 
+  asset.save();
+  token.save();
   pool.save();
 }
 
@@ -167,19 +164,16 @@ export function updateBalancesInPool<T extends Deposit>(
   let pool = getOrCreateLiquidityPool(Address.fromString(transaction.pool));
   let balances: BigInt[] = pool.inputTokenBalances;
 
-  for (let j = 0; j < transaction.inputTokens.length; j++) {
-    for (let i = 0; i < pool.inputTokens.length; i++) {
-      if (pool.inputTokens[i] == transaction.inputTokens[j]) {
-        if (transactionType == TransactionType.DEPOSIT) {
-          balances[i] = balances[i].plus(transaction.inputTokenAmounts[j]);
-        } else if (transactionType == TransactionType.WITHDRAW) {
-          balances[i] = balances[i].minus(transaction.inputTokenAmounts[j]);
-        }
-      }
-    }
+  // There is always only one element in tx.inputTokens
+  let token = getOrCreateToken(event, Address.fromString(transaction.inputTokens[0]));
+  let _asset_index = _Asset.load(token._asset!)!._index.toI32();
+
+  if (transactionType == TransactionType.DEPOSIT) {
+    balances[_asset_index] = balances[_asset_index].plus(transaction.inputTokenAmounts[0]);
+  } else if (transactionType == TransactionType.WITHDRAW) {
+    balances[_asset_index] = balances[_asset_index].minus(transaction.inputTokenAmounts[0]);
   }
 
   pool.inputTokenBalances = balances;
   pool.save();
 }
-
