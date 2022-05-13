@@ -70,14 +70,16 @@ The subgraph is live on The Graph Hosted Service [here](https://thegraph.com/hos
 
 ## Install and Build Commands
 
-1. 
-1. Generate and build subgraph
+1. Get all dependencies
+```shell
+npm install
+```
+2. Generate and build subgraph
 
 ```shell
 graph codegen && graph build
 ```
-
-2. Authenticated deploy to The Graph hosted service
+3. Authenticated deploy to The Graph hosted service
 
 ```shell
 graph deploy --product hosted-service dineshpinto/geist-finance
