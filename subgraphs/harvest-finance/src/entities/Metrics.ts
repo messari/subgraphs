@@ -262,18 +262,23 @@ export function updateVaultSnapshots(event: ethereum.Event, vault: Vault): void 
   updateVaultHourlySnapshot(event, vault);
 }
 
-export function updateFinancialSnapshot(event: ethereum.Event): void{
-  updateFinancialsDailySnapshot(event);
+export function updateFinancialSnapshot(event: ethereum.Event): FinancialsDailySnapshot{
+  return updateFinancialsDailySnapshot(event);
 }
 
-function updateFinancialsDailySnapshot(event: ethereum.Event): void{
+function updateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot{
   let day: i64 = getDay(event.block.timestamp.toI64());
   let snapshot_id = day.toString();
   let snapshot = getOrCreateFinancialsDailySnapshot(snapshot_id, event);
 
   let protocol = getOrCreateProtocol();
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  snapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  snapshot.blockNumber = event.block.number;
+  snapshot.timestamp = event.block.timestamp;
   snapshot.save();
+  return snapshot;
 }
 
 function getOrCreateFinancialsDailySnapshot(id: String, event: ethereum.Event): FinancialsDailySnapshot {
@@ -306,7 +311,7 @@ function getOrCreateFinancialsDailySnapshot(id: String, event: ethereum.Event): 
 
   snapshot.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
 
-  snapshot.blockNumber = constants.BIGINT_ZERO;
+  snapshot.blockNumber = event.block.number;
 
   snapshot.timestamp = event.block.timestamp;
 
