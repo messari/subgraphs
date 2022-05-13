@@ -1,22 +1,16 @@
 {
-  "name": "harvest-finance",
+  "name": "harvest",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "rm -rf generated && graph codegen",
-    "build": "rm -rf build && graph build",
-    "test": "rm -rf tests/.bin && graph test",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ nandyba/testharvest",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "eslint \"src/**/*.ts\" --fix",
-    "create-local": "graph create --node http://localhost:8020/ nandyba/testharvest",
-    "remove-local": "graph remove --node http://localhost:8020/ nandyba/testharvest",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nandyba/testharvest"
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ nandyba/harvest",
+    "create-local": "graph create --node http://localhost:8020/ nandyba/harvest",
+    "remove-local": "graph remove --node http://localhost:8020/ nandyba/harvest",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 nandyba/harvest"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.27",
+    "@graphprotocol/graph-cli": "0.27.2",
     "@graphprotocol/graph-ts": "0.24.1"
-  },
-  "devDependencies": {
-    "graphpack": "^1.0.9"
   }
 }
