@@ -10,7 +10,7 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dineshpinto/geist-finance-subgraph"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-cli": "^0.26.1",
     "@graphprotocol/graph-ts": "0.25.0"
   }
 }
