@@ -534,10 +534,7 @@ type Market @entity {
   createdBlockNumber: BigInt!
 
   " Most recent block height seen for rate updates "
-  _lastRateUpdateBlock: BigInt!
-
-  " Most recent block height seen for revenue updates "
-  _lastRevenueUpdateBlock: BigInt!
+  _lastUpdateBlock: BigInt!
 
   ##### Snapshots #####
 
