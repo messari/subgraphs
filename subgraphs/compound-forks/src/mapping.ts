@@ -64,11 +64,6 @@ enum EventType {
   Liquidate,
 }
 
-export enum AccruePer {
-  Block,
-  Timestamp,
-}
-
 export class ProtocolData {
   comptrollerAddr: Address;
   name: string;
@@ -137,7 +132,6 @@ export class UpdateMarketData {
   totalBorrowsResult: ethereum.CallResult<BigInt>;
   supplyRateResult: ethereum.CallResult<BigInt>;
   borrowRateResult: ethereum.CallResult<BigInt>;
-  accruePer: AccruePer;
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>;
   unitPerYear: i32;
   constructor(
@@ -146,7 +140,6 @@ export class UpdateMarketData {
     totalBorrowsResult: ethereum.CallResult<BigInt>,
     supplyRateResult: ethereum.CallResult<BigInt>,
     borrowRateResult: ethereum.CallResult<BigInt>,
-    accruePer: AccruePer,
     getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
     unitPerYear: i32
   ) {
@@ -155,7 +148,6 @@ export class UpdateMarketData {
     this.totalBorrowsResult = totalBorrowsResult;
     this.supplyRateResult = supplyRateResult;
     this.borrowRateResult = borrowRateResult;
-    this.accruePer = accruePer;
     this.getUnderlyingPriceResult = getUnderlyingPriceResult;
     this.unitPerYear = unitPerYear;
   }
@@ -767,22 +759,10 @@ export function _handleAccrueInterest(
     return;
   }
 
-  if (
-    updateMarketData.accruePer == AccruePer.Timestamp &&
-    market._accrualTimestamp.ge(event.block.timestamp)
-  ) {
-    return;
-  }
-  if (
-    updateMarketData.accruePer == AccruePer.Block &&
-    market._accrualBlockNumber.ge(event.block.number)
-  ) {
-    return;
-  }
-
   updateMarket(
     updateMarketData,
     marketID,
+    event.params.interestAccumulated,
     event.block.number,
     event.block.timestamp
   );
@@ -813,8 +793,9 @@ function snapshotMarket(
   //
   // daily snapshot
   //
-  let dailySnapshot = new MarketDailySnapshot(
-    getMarketDailySnapshotID(marketID, blockTimestamp.toI32())
+  let dailySnapshot = getOrCreateMarketDailySnapshot(
+    marketID,
+    blockTimestamp.toI32()
   );
   dailySnapshot.protocol = market.protocol;
   dailySnapshot.market = marketID;
@@ -841,8 +822,9 @@ function snapshotMarket(
   //
   // hourly snapshot
   //
-  let hourlySnapshot = new MarketHourlySnapshot(
-    getMarketHourlySnapshotID(marketID, blockTimestamp.toI32())
+  let hourlySnapshot = getOrCreateMarketHourlySnapshot(
+    marketID,
+    blockTimestamp.toI32()
   );
   hourlySnapshot.protocol = market.protocol;
   hourlySnapshot.market = marketID;
@@ -919,28 +901,31 @@ function snapshotFinancials(
       continue;
     }
 
-    let marketDailySnapshot = MarketDailySnapshot.load(
-      getMarketDailySnapshotID(market.id, blockTimestamp.toI32())
+    let marketDailySnapshotID = getMarketDailySnapshotID(
+      market.id,
+      blockTimestamp.toI32()
     );
-
-    if (marketDailySnapshot) {
-      dailyDepositUSD = dailyDepositUSD.plus(
-        marketDailySnapshot.dailyDepositUSD
-      );
-      dailyBorrowUSD = dailyBorrowUSD.plus(marketDailySnapshot.dailyBorrowUSD);
-      dailyLiquidateUSD = dailyLiquidateUSD.plus(
-        marketDailySnapshot.dailyLiquidateUSD
-      );
-      dailyTotalRevenueUSD = dailyTotalRevenueUSD.plus(
-        marketDailySnapshot._dailyTotalRevenueUSD
-      );
-      dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD.plus(
-        marketDailySnapshot._dailyProtocolSideRevenueUSD
-      );
-      dailySupplySideRevenueUSD = dailySupplySideRevenueUSD.plus(
-        marketDailySnapshot._dailySupplySideRevenueUSD
-      );
+    let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
+    if (!marketDailySnapshot) {
+      log.warning("[snapshotFinancials] MarketDailySnapshot not found: {}", [
+        marketDailySnapshotID,
+      ]);
+      continue;
     }
+    dailyDepositUSD = dailyDepositUSD.plus(marketDailySnapshot.dailyDepositUSD);
+    dailyBorrowUSD = dailyBorrowUSD.plus(marketDailySnapshot.dailyBorrowUSD);
+    dailyLiquidateUSD = dailyLiquidateUSD.plus(
+      marketDailySnapshot.dailyLiquidateUSD
+    );
+    dailyTotalRevenueUSD = dailyTotalRevenueUSD.plus(
+      marketDailySnapshot._dailyTotalRevenueUSD
+    );
+    dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD.plus(
+      marketDailySnapshot._dailyProtocolSideRevenueUSD
+    );
+    dailySupplySideRevenueUSD = dailySupplySideRevenueUSD.plus(
+      marketDailySnapshot._dailySupplySideRevenueUSD
+    );
   }
 
   snapshot.dailyDepositUSD = dailyDepositUSD;
@@ -1074,55 +1059,52 @@ function updateMarketSnapshots(
   amountUSD: BigDecimal,
   eventType: EventType
 ): void {
-  let marketHourlySnapshot = MarketHourlySnapshot.load(
-    getMarketHourlySnapshotID(marketID, timestamp)
+  let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(
+    marketID,
+    timestamp
   );
-  if (marketHourlySnapshot) {
-    switch (eventType) {
-      case EventType.Deposit:
-        marketHourlySnapshot.hourlyDepositUSD =
-          marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
-        break;
-      case EventType.Borrow:
-        marketHourlySnapshot.hourlyBorrowUSD =
-          marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
-        break;
-      case EventType.Liquidate:
-        marketHourlySnapshot.hourlyLiquidateUSD =
-          marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
-        break;
-      default:
-        break;
-    }
-    marketHourlySnapshot.save();
+  switch (eventType) {
+    case EventType.Deposit:
+      marketHourlySnapshot.hourlyDepositUSD =
+        marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
+      break;
+    case EventType.Borrow:
+      marketHourlySnapshot.hourlyBorrowUSD =
+        marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
+      break;
+    case EventType.Liquidate:
+      marketHourlySnapshot.hourlyLiquidateUSD =
+        marketHourlySnapshot.hourlyLiquidateUSD.plus(amountUSD);
+      break;
+    default:
+      break;
   }
-  let marketDailySnapshot = MarketDailySnapshot.load(
-    getMarketDailySnapshotID(marketID, timestamp)
-  );
-  if (marketDailySnapshot) {
-    switch (eventType) {
-      case EventType.Deposit:
-        marketDailySnapshot.dailyDepositUSD =
-          marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
-        break;
-      case EventType.Borrow:
-        marketDailySnapshot.dailyBorrowUSD =
-          marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
-        break;
-      case EventType.Liquidate:
-        marketDailySnapshot.dailyLiquidateUSD =
-          marketDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
-        break;
-      default:
-        break;
-    }
-    marketDailySnapshot.save();
+  marketHourlySnapshot.save();
+
+  let marketDailySnapshot = getOrCreateMarketDailySnapshot(marketID, timestamp);
+  switch (eventType) {
+    case EventType.Deposit:
+      marketDailySnapshot.dailyDepositUSD =
+        marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
+      break;
+    case EventType.Borrow:
+      marketDailySnapshot.dailyBorrowUSD =
+        marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
+      break;
+    case EventType.Liquidate:
+      marketDailySnapshot.dailyLiquidateUSD =
+        marketDailySnapshot.dailyLiquidateUSD.plus(amountUSD);
+      break;
+    default:
+      break;
   }
+  marketDailySnapshot.save();
 }
 
 function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
+  interestAccumulatedMantissa: BigInt,
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
@@ -1186,17 +1168,15 @@ function updateMarket(
     );
   }
 
-  let totalBorrowUSD = BIGDECIMAL_ZERO;
   if (updateMarketData.totalBorrowsResult.reverted) {
     log.warning("[updateMarket] Failed to get totalBorrows of Market {}", [
       marketID,
     ]);
   } else {
-    totalBorrowUSD = updateMarketData.totalBorrowsResult.value
+    market.totalBorrowBalanceUSD = updateMarketData.totalBorrowsResult.value
       .toBigDecimal()
       .div(exponentToBigDecimal(underlyingToken.decimals))
       .times(underlyingTokenPriceUSD);
-    market.totalBorrowBalanceUSD = totalBorrowUSD;
   }
 
   if (updateMarketData.supplyRateResult.reverted) {
@@ -1213,7 +1193,6 @@ function updateMarket(
     );
   }
 
-  let borrowRatePerUnit = BIGDECIMAL_ZERO;
   if (updateMarketData.borrowRateResult.reverted) {
     log.warning("[updateMarket] Failed to get borrowRate of Market {}", [
       marketID,
@@ -1226,43 +1205,36 @@ function updateMarket(
         updateMarketData.unitPerYear
       )
     );
-
-    borrowRatePerUnit = updateMarketData.borrowRateResult.value
-      .toBigDecimal()
-      .div(mantissaFactorBD);
   }
 
-  let totalRevenueUSDPerUnit = totalBorrowUSD.times(borrowRatePerUnit);
-  let delta =
-    updateMarketData.accruePer == AccruePer.Block
-      ? blockNumber.minus(market._accrualBlockNumber)
-      : blockTimestamp.minus(market._accrualTimestamp);
-  let totalRevenueUSDDelta = totalRevenueUSDPerUnit.times(
-    new BigDecimal(delta)
-  );
-  let protocolSideRevenueUSDDelta = totalRevenueUSDDelta.times(
+  let interestAccumulatedUSD = interestAccumulatedMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor
   );
-  let supplySideRevenueUSDDelta = totalRevenueUSDDelta.minus(
+  let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
     protocolSideRevenueUSDDelta
   );
 
-  market._cumulativeTotalRevenueUSD =
-    market._cumulativeTotalRevenueUSD.plus(totalRevenueUSDDelta);
+  market._cumulativeTotalRevenueUSD = market._cumulativeTotalRevenueUSD.plus(
+    interestAccumulatedUSD
+  );
   market._cumulativeProtocolSideRevenueUSD =
     market._cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
   market._cumulativeSupplySideRevenueUSD =
     market._cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
-  market._accrualTimestamp = blockTimestamp;
-  market._accrualBlockNumber = blockNumber;
   market.save();
 
   // update daily fields in snapshot
-  let snapshot = new MarketDailySnapshot(
-    getMarketDailySnapshotID(market.id, blockTimestamp.toI32())
+  let snapshot = getOrCreateMarketDailySnapshot(
+    market.id,
+    blockTimestamp.toI32()
   );
-  snapshot._dailyTotalRevenueUSD =
-    snapshot._dailyTotalRevenueUSD.plus(totalRevenueUSDDelta);
+  snapshot._dailyTotalRevenueUSD = snapshot._dailyTotalRevenueUSD.plus(
+    interestAccumulatedUSD
+  );
   snapshot._dailyProtocolSideRevenueUSD =
     snapshot._dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
   snapshot._dailySupplySideRevenueUSD =
@@ -1384,6 +1356,30 @@ function setInterestRate(
   }
   market.rates = [supplyInterestRateID, borrowInterestRateID];
   market.save();
+}
+
+function getOrCreateMarketDailySnapshot(
+  marketID: string,
+  blockTimestamp: i32
+): MarketDailySnapshot {
+  let snapshotID = getMarketDailySnapshotID(marketID, blockTimestamp);
+  let snapshot = MarketDailySnapshot.load(snapshotID);
+  if (!snapshot) {
+    snapshot = new MarketDailySnapshot(snapshotID);
+  }
+  return snapshot;
+}
+
+function getOrCreateMarketHourlySnapshot(
+  marketID: string,
+  blockTimestamp: i32
+): MarketHourlySnapshot {
+  let snapshotID = getMarketHourlySnapshotID(marketID, blockTimestamp);
+  let snapshot = MarketHourlySnapshot.load(snapshotID);
+  if (!snapshot) {
+    snapshot = new MarketHourlySnapshot(snapshotID);
+  }
+  return snapshot;
 }
 
 function getTokenPriceUSD(

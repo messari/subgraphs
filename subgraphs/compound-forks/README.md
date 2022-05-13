@@ -10,6 +10,10 @@ https://thegraph.com/hosted-service/subgraph/0xbe1/moonwell-subgraph
 
 https://thegraph.com/hosted-service/subgraph/0xbe1/bastionprotocol-subgraph
 
+### Benqi
+
+https://thegraph.com/hosted-service/subgraph/0xbe1/benqi-subgraph
+
 ## Quickstart
 
 Use moonwell as an example.
@@ -29,7 +33,7 @@ subgraph=moonwell make codegen
 subgraph=moonwell make build
 
 # deploy moonwell
-subgraph-name=0xbe1/moonwell-subgraph subgraph=moonwell make deploy
+make deploy subgraph-name=0xbe1/moonwell-subgraph subgraph=moonwell
 ```
 
 ## Project Layout

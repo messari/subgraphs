@@ -32,10 +32,16 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
     protocol.slug = "balancer-v2";
+    protocol.subgraphVersion = "1.2.1";
     protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.2.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeUniqueUsers = 0;
     let network = hyphenToUnderscore(dataSource.network());
     protocol.network = network.toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
