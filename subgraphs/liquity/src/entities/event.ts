@@ -20,6 +20,7 @@ import {
 } from "../utils/constants";
 import {
   getOrCreateLiquityProtocol,
+  incrementProtocolLiquidateCount,
   incrementProtocolRepayCount,
   incrementProtocolWithdrawCount,
   updateUsageMetrics,
@@ -188,4 +189,5 @@ export function createLiquidate(
   liquidate.save();
   updateUsageMetrics(event, liquidator);
   addMarketLiquidateVolume(event, amountLiquidatedUSD);
+  incrementProtocolLiquidateCount(event);
 }

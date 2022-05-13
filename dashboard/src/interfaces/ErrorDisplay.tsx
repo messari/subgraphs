@@ -49,6 +49,14 @@ import { Versions } from "../constants";
         );
       }
     }
+    if (errorObject.message) {
+      const errorMessagesSplit = errorObject.message.split('---');
+      errorMessagesSplit.forEach(msg => {
+        errorTotalCount += 1;
+        errorDisplayCount += 1;
+        errorMsgs.push(<li>{msg}</li>);
+      });
+    }
 
     if (errorMsgs.length >= 1) {
       return (<div style={{margin: "4px 24px", border: "red 3px solid", paddingTop: "6px"}}><h3>DISPLAYING {errorDisplayCount} OUT OF {errorTotalCount} ERRORS.</h3><ol>{errorMsgs}</ol></div>);
