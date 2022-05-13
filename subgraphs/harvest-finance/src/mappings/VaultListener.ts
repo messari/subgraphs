@@ -1,14 +1,12 @@
-import { BigInt,BigDecimal, Address, log } from "@graphprotocol/graph-ts"
+import { BigInt,BigDecimal, Address, log, ethereum } from "@graphprotocol/graph-ts"
 import {
   Deposit as DepositEvent,
   Invest as InvestEvent,
   StrategyAnnounced as StrategyAnnouncedEvent,
   StrategyChanged as StrategyChangedEvent,
-  Transfer as TransferEvent,
   Withdraw as WithdrawEvent,
   DoHardWorkCall
 } from "../../generated/ControllerListener/VaultContract"
-import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
 import { getOrCreateToken } from './../entities/Token'
 import { Vault, Token } from "../../generated/schema";
 import { WETH_ADDRESS } from './../constant'
@@ -18,6 +16,8 @@ import { getOrCreateToken } from './../entities/Token'
 import { depositUpdateMetrics, withdrawUpdateMetrics } from './../entities/Metrics'
 import * as constants from "./../constant";
 import { getUsdPricePerToken } from "./../Prices";
+import { StrategyListener } from '../../generated/templates';
+import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
 
 export function handleDeposit(event: DepositEvent): void {
 
@@ -109,8 +109,14 @@ export function handleWithdraw(event: WithdrawEvent): void {
 export function handleDoHardWorkCall(call: DoHardWorkCall): void {
   const vaultAddress = call.to;
 
+  let vault_contract = VaultContract.bind(vaultAddress);
+  let strategy_addr = vault_contract.strategy();
+
   let vault = getOrCreateVault(vaultAddress, call.block);
   //updateVaultPrices(call, vault);
+
+  StrategyListener.create(strategy_addr);
+  log.info('New strategy registered', []);
 
 }
 
@@ -118,10 +124,23 @@ export function handleDoHardWorkCall(call: DoHardWorkCall): void {
 export function handleStrategyChanged(event: StrategyChangedEvent): void {
   const vaultAddress = event.address;
   const new_strategy_address = event.params.newStrategy;
-
   // this will automaticly update vault and vaultFee
   let vault = getOrCreateVault(vaultAddress, event.block);
   updateVaultPrices(event, vault);
 
+
+  StrategyListener.create(new_strategy_address);
+  log.info('New strategy registered', []);
 }
 
+export function handleStrategyAnnounced(event: StrategyAnnouncedEvent): void {
+  const vaultAddress = event.address;
+  const new_strategy_address = event.params.newStrategy;
+  // this will automaticly update vault and vaultFee
+  let vault = getOrCreateVault(vaultAddress, event.block);
+  updateVaultPrices(event, vault);
+
+
+  StrategyListener.create(new_strategy_address);
+  log.info('New strategy registered', []);
+}

@@ -1,7 +1,7 @@
 import { log, BigInt, Address } from '@graphprotocol/graph-ts'
 
 // subgraph templates
-//import { VaultListener } from '../../generated/templates'
+import { StrategyListener } from '../../generated/templates';
 
 // contract imports
 import {
@@ -35,4 +35,7 @@ export function handleAddVaultAndStrategy(call: AddVaultAndStrategyCall): void {
   let block = call.block;
 
   getOrCreateVault(vault_addr, block);
+
+  StrategyListener.create(strategy_addr);
+  log.info('New strategy registered', []);
 }
