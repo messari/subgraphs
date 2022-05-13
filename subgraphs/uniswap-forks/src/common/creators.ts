@@ -1,18 +1,13 @@
-import { log } from "@graphprotocol/graph-ts";
+// import { log } from "@graphprotocol/graph-ts";
 import { BigInt, Address, store, ethereum } from "@graphprotocol/graph-ts";
 import { Account, _HelperStore, _TokenWhitelist, _LiquidityPoolAmount, LiquidityPool, LiquidityPoolFee, Deposit, Withdraw, Swap as SwapEvent } from "../../generated/schema";
-import { Factory as FactoryContract } from "../../generated/templates/Pair/Factory";
 import { Pair as PairTemplate } from "../../generated/templates";
 import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, FeeSwitch, BIGDECIMAL_TWO, BIGDECIMAL_ONE } from "./constants";
 import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken, getLiquidityPoolAmounts } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
-import { NetworkConfigs } from "../../config/_networkConfig";
+import { NetworkConfigs } from "../../config/configure";
 import { getTrackedVolumeUSD } from "./price/price";
-
-export let factoryContract = FactoryContract.bind(Address.fromString(NetworkConfigs.FACTORY_ADDRESS));
-
-// rebass tokens, dont count in tracked volume
 
 function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
@@ -23,15 +18,15 @@ function createPoolFees(poolAddress: string): string[] {
   poolProtocolFee.feeType = LiquidityPoolFeeType.FIXED_PROTOCOL_FEE;
   poolTradingFee.feeType = LiquidityPoolFeeType.FIXED_TRADING_FEE;
 
-  if (NetworkConfigs.FEE_ON_OFF == FeeSwitch.ON) {
-    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_ON;
-    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_ON;
+  if (NetworkConfigs.getFeeOnOff() == FeeSwitch.ON) {
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOn();
+    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOn();
   } else {
-    poolLpFee.feePercentage = NetworkConfigs.LP_FEE_TO_OFF;
-    poolProtocolFee.feePercentage = NetworkConfigs.PROTOCOL_FEE_TO_OFF;
+    poolLpFee.feePercentage = NetworkConfigs.getLPFeeToOff();
+    poolProtocolFee.feePercentage = NetworkConfigs.getProtocolFeeToOff();
   }
 
-  poolTradingFee.feePercentage = NetworkConfigs.TRADING_FEE;
+  poolTradingFee.feePercentage = NetworkConfigs.getTradeFee();
 
   poolLpFee.save();
   poolProtocolFee.save();
@@ -63,7 +58,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.inputTokenWeights = [BIGDECIMAL_ONE.div(BIGDECIMAL_TWO), BIGDECIMAL_ONE.div(BIGDECIMAL_TWO)];
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = NetworkConfigs.REWARD_TOKENS;
+  pool.rewardTokens = [NetworkConfigs.getRewardToken()];
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
@@ -122,9 +117,9 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
 
   deposit.hash = transactionHash;
   deposit.logIndex = logIndexI32;
-  deposit.protocol = NetworkConfigs.FACTORY_ADDRESS;
+  deposit.protocol = NetworkConfigs.getFactoryAddress();
   deposit.to = pool.id;
-  deposit.from = transfer.sender;
+  deposit.from = transfer.sender!;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[INT_ZERO], pool.inputTokens[INT_ONE]];
@@ -132,6 +127,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
   deposit.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
+  deposit.pool = pool.id
 
   updateDepositHelper(event.address);
 
@@ -157,8 +153,8 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
 
   withdrawal.hash = transactionHash;
   withdrawal.logIndex = event.logIndex.toI32();
-  withdrawal.protocol = NetworkConfigs.FACTORY_ADDRESS;
-  withdrawal.to = transfer.sender;
+  withdrawal.protocol = NetworkConfigs.getFactoryAddress();
+  withdrawal.to = transfer.sender!;
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
@@ -167,6 +163,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
   withdrawal.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
+  withdrawal.pool = pool.id;
 
   store.remove("_Transfer", transfer.id);
 
