@@ -32,8 +32,8 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
     protocol.slug = "balancer-v2";
+    protocol.subgraphVersion = "1.2.1";
     protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.2.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;

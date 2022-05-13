@@ -120,12 +120,15 @@ export const schema100 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
             id
+            decimals
           }
           rewardTokens {
             id
+            decimals
           }
           name
           symbol
@@ -151,6 +154,7 @@ export const schema100 = (): Schema => {
     `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -269,12 +273,15 @@ export const schema110 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
             id
+            decimals
           }
           rewardTokens {
             id
+            decimals
           }
           rewardTokenEmissionsAmount
           rewardTokenEmissionsUSD
@@ -301,6 +308,7 @@ export const schema110 = (): Schema => {
       `;
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -391,7 +399,7 @@ export const schema120 = (): Schema => {
 
 
   const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDaiflySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
+  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
   const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
 
   const vaultDailyQuery = "vaultDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
@@ -415,6 +423,7 @@ export const schema120 = (): Schema => {
   });
 
   const poolData = {
+    id: "ID!",
     name: "String",
     symbol: "String",
     fees: "[VaultFee!]!",
@@ -476,17 +485,23 @@ export const schema120 = (): Schema => {
         id
         name        
         symbol
-        fees
+        fees {
+          feeType
+          feePercentage
+        }
         inputToken {
           decimals
           name
         }
-
         outputToken {
           id
+          decimals
         }
         rewardTokens {
           id
+          token {
+            decimals
+          }
         }
         depositLimit
         totalValueLockedUSD
