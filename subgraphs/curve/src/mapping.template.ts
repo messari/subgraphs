@@ -30,7 +30,7 @@ import { getPlatform } from './services/platform'
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityImbalance, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
 import { NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
 import { getLiquidityPool, getOrCreateToken, getPoolFee } from './common/getters'
-import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType } from './common/constants'
+import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, ZERO_ADDRESS } from './common/constants'
 import { bigIntToBigDecimal } from './common/utils/numbers'
 import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, updateUsageMetrics } from './common/metrics'
 import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
@@ -384,14 +384,8 @@ export function handleAddExistingMetaPools({{ addExistingMetaPoolsCallParams }})
 
 export function handleSetLiquidityGauges(call: Set_liquidity_gaugesCall): void {
   let pool = LiquidityPool.load(call.inputs._pool.toHexString())
-  if (!pool) {
-    return
-  }
-  if (pool.gauge){
-    return // already set
-  }
   let gauge = call.inputs._liquidity_gauges[0]
-  if(gauge.equals(ADDRESS_ZERO)) {
+  if (!pool || gauge.equals(ADDRESS_ZERO) || (pool.gauge && pool.gauge!=ZERO_ADDRESS)) {
     return
   }
   pool.gauge = gauge.toHexString()
@@ -401,11 +395,8 @@ export function handleSetLiquidityGauges(call: Set_liquidity_gaugesCall): void {
 
 export function handleLiquidityGaugeDeployed(event: LiquidityGaugeDeployed): void {
   let pool = LiquidityPool.load(event.params.pool.toHexString())
-  if (!pool) {
+  if (!pool || (pool.gauge && pool.gauge!=ZERO_ADDRESS)) {
     return
-  }
-  if (pool.gauge){
-    return // already set
   }
   pool.gauge = event.params.gauge.toHexString()
   pool.save();

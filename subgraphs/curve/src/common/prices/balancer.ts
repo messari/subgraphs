@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { getOrCreateToken } from "../getters";
 import { BalancerPoolToken } from "../../../generated/templates/CurveGauge/BalancerPoolToken";
 import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, DEFAULT_DECIMALS } from "../constants";
@@ -24,6 +24,8 @@ function getUnderlyingTokenPrice(tokenAddr: Address, timestamp: BigInt): BigDeci
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
   let priceUSD = getUsdRate(tokenAddr);
+  tokenSnapshot.price = priceUSD;
+  tokenSnapshot.save();
   return priceUSD;
 }
 
@@ -31,6 +33,7 @@ export function isBalancerToken(tokenAddr: Address): boolean {
   let bptContract = BalancerPoolToken.bind(tokenAddr);
   const colorCall = bptContract.try_getColor();
   if (!colorCall.reverted) {
+    log.error("Balancer token found {}", [tokenAddr.toHexString()]);
     return true;
   }
   return false;
