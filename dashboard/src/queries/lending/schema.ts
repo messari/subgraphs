@@ -21,7 +21,7 @@ export const schema = (version: string): Schema => {
 
 export const schema100 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots"];
-  
+
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
@@ -166,7 +166,7 @@ export const schema100 = (): Schema => {
         }
       }
     `;
-  const poolData: {[x: string]: string} = {
+  const poolData: { [x: string]: string } = {
     id: "ID!",
     inputTokens: "[Token!]!",
     outputToken: "Token",
@@ -197,13 +197,13 @@ export const schema100 = (): Schema => {
     totalValueLockedUSD: "BigDecimal!",
   };
 
-  const events = ["withdraws","repays","liquidates","deposits","borrows"]
-  return { entities, entitiesData, query, poolData, events, protocolFields};
+  const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"]
+  return { entities, entitiesData, query, poolData, events, protocolFields };
 };
 
 export const schema110 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots"];
-  
+
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
@@ -229,7 +229,7 @@ export const schema110 = (): Schema => {
     }
   };
 
-  const poolData: {[x: string]: string} = {
+  const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
     inputTokens: "[Token!]!",
@@ -295,7 +295,7 @@ export const schema110 = (): Schema => {
           activeUsers
           timestamp
         }
-        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, market: $poolId) {
+        marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -374,28 +374,28 @@ export const schema110 = (): Schema => {
       }
       `;
 
-      const protocolFields = {
-        id: "ID!",
-        name: "String!",
-        slug: "String!",
-        schemaVersion: "String!",
-        subgraphVersion: "String!",
-        methodologyVersion: "String!",
-        network: "Network!",
-        type: "ProtocolType!",
-        riskType: "RiskType",
-        lendingType: "LendingType",
-        totalUniqueUsers: "Int!",
-        totalValueLockedUSD: "BigDecimal!",
-        totalVolumeUSD: "BigDecimal!",
-        totalDepositUSD: "BigDecimal!",
-        totalBorrowUSD: "BigDecimal!"
-      };
-      
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    riskType: "RiskType",
+    lendingType: "LendingType",
+    totalUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalVolumeUSD: "BigDecimal!",
+    totalDepositUSD: "BigDecimal!",
+    totalBorrowUSD: "BigDecimal!"
+  };
 
-      const events = ["withdraws","repays","liquidates","deposits","borrows"];
-      return { entities, entitiesData, query, poolData, events, protocolFields};
-    };
+
+  const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
+  return { entities, entitiesData, query, poolData, events, protocolFields };
+};
 
 export const schema120 = (): Schema => {
   const entities = [
@@ -415,7 +415,7 @@ export const schema120 = (): Schema => {
       cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailyProtocolSideRevenueUSD: "BigDecimal!",
       cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-      dailyTotalRevenueUSD: "BigDecimal!", 
+      dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
       dailyLiquidateUSD: "BigDecimal!",
       cumulativeLiquidateUSD: "BigDecimal!",
@@ -446,6 +446,7 @@ export const schema120 = (): Schema => {
       inputTokenPriceUSD: "BigDecimal!",
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal!",
+      rates: "[InterestRate!]!",
       exchangeRate: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
@@ -486,8 +487,8 @@ export const schema120 = (): Schema => {
 
   const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
   const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
-  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}"; 
-  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}"; 
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}";
 
 
   const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
@@ -506,7 +507,7 @@ export const schema120 = (): Schema => {
     "amountUSD"
   ];
 
-  const events: string[] = ["withdraws","repays","liquidates","deposits","borrows"];
+  const events: string[] = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
   const eventsQuery: any[] = events.map((event) => {
     let options = "";
     const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { "
@@ -516,8 +517,8 @@ export const schema120 = (): Schema => {
     }
     return baseStr + fields + ' }'
   });
-  
-  const poolData: {[x: string]: string} = {
+
+  const poolData: { [x: string]: string } = {
     id: "ID!",
     name: "String",
     inputToken: "Token!",
@@ -573,6 +574,7 @@ export const schema120 = (): Schema => {
       riskType
       mintedTokens {
         id
+        decimals
       }
       cumulativeUniqueUsers
       totalValueLockedUSD
@@ -664,8 +666,8 @@ export const schema120 = (): Schema => {
     cumulativeBorrowUSD: "BigDecimal!",
     cumulativeLiquidateUSD: "BigDecimal!",
     mintedTokenSupplies: "[BigInt!]"
-  };  
+  };
 
-  return { entities, entitiesData, query, poolData ,events, protocolFields};
+  return { entities, entitiesData, query, poolData, events, protocolFields };
 };
 

@@ -18,7 +18,7 @@ mockMethod(usdcWethPoolAddress, "totalSupply", [], [], "uint256", [ethereum.Valu
 
 export const weth = new Token("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
 mockMethod(Address.fromString(weth.id), "decimals", [], [], "uint8", [ethereum.Value.fromI32(18)], false);
-mockMethod(Address.fromString(weth.id), "name", [], [], "string", [ethereum.Value.fromString("name")], false);
+mockMethod(Address.fromString(weth.id), "name", [], [], "string", [ethereum.Value.fromString("weth")], false);
 mockMethod(Address.fromString(weth.id), "symbol", [], [], "string", [ethereum.Value.fromString("symbol")], false);
 weth.save();
 

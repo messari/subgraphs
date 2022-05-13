@@ -1,4 +1,4 @@
-import { test, assert, createMockedFunction } from "matchstick-as";
+import { test, assert } from "matchstick-as";
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   createNewPoolBalanceChangeEvent,
