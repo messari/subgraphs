@@ -47,7 +47,7 @@ import {
   cTokenDecimals,
   cTokenDecimalsBD,
   exponentToBigDecimal,
-  INITIAL_EXCHANGE_RATE,
+  initialExchangeRate,
   InterestRateSide,
   InterestRateType,
   LendingType,
@@ -269,10 +269,10 @@ export function _handleNewLiquidationIncentive(
   protocol.save();
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol.markets[i]);
+    let market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[handleNewLiquidationIncentive] Market not found: {}", [
-        protocol.markets[i],
+        protocol._marketIDs[i],
       ]);
       // best effort
       continue;
@@ -405,7 +405,7 @@ export function _handleMarketListed(
   market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.exchangeRate = INITIAL_EXCHANGE_RATE;
+  market.exchangeRate = initialExchangeRate;
   market._cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   market._cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   market._cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -886,6 +886,9 @@ function snapshotMarket(
   dailySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
+  dailySnapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+  dailySnapshot._dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  dailySnapshot._dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   dailySnapshot.save();
 
   //

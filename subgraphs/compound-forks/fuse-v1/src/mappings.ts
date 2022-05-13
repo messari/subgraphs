@@ -1,5 +1,5 @@
 // fuse v1 handlers
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -18,10 +18,14 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
+  _handleActionPaused,
 } from "../../src/mapping";
 
 import { PoolRegistered } from "../generated/FusePoolDirectory/FusePoolDirectory";
 import {
+  ETH_ADDRESS,
+  ETH_NAME,
+  ETH_SYMBOL,
   FACTORY_CONTRACT,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
@@ -41,15 +45,17 @@ import {
 import {
   AccrueInterest,
   Borrow,
-  CToken,
   LiquidateBorrow,
   Mint,
-  NewAdminFee,
   NewComptroller,
-  NewFuseFee,
   NewReserveFactor,
   Redeem,
   RepayBorrow,
+} from "../../generated/templates/CToken/CToken";
+import {
+  NewAdminFee,
+  NewFuseFee,
+  CToken,
 } from "../generated/templates/CToken/CToken";
 import {
   Comptroller as ComptrollerTemplate,
@@ -58,7 +64,34 @@ import {
 import { LendingProtocol } from "../../generated/schema";
 import { ERC20 } from "../generated/templates/Comptroller/ERC20";
 import { FusePoolDirectory } from "../generated/FusePoolDirectory/FusePoolDirectory";
-import { BIGINT_ZERO } from "../../src/constants";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  DAYS_PER_YEAR,
+  exponentToBigDecimal,
+  InterestRateSide,
+  mantissaFactor,
+  mantissaFactorBD,
+  RewardTokenType,
+  SECONDS_PER_DAY,
+} from "../../src/constants";
+import { InterestRate, Market, Token } from "../generated/schema";
+import {
+  getOrCreateCircularBuffer,
+  getRewardsPerDay,
+  RewardIntervalType,
+} from "./rewards";
+import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
+
+////////////////////
+//// Fuse Enums ////
+////////////////////
+
+export namespace RariFee {
+  export const FUSE_FEE = "FUSE_FEE";
+  export const ADMIN_FEE = "ADMIN_FEE";
+}
 
 /////////////////////////////////
 //// Pool Directory Handlers ////
@@ -95,6 +128,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 // Source: https://docs.rari.capital/fuse
 
 // add a new market
+// TODO: add fuse/admin fees
 export function handleMarketListed(event: MarketListed): void {
   let protocol = LendingProtocol.load(event.address.toHexString());
   if (!protocol) {
@@ -120,13 +154,25 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_underlying(),
     Address.fromString(ZERO_ADDRESS)
   );
-  let underlyingContract = ERC20.bind(underlyingAddress);
-  let underlyingToken = new TokenData( // TODO: handle ETH
-    underlyingAddress,
-    getOrElse(underlyingContract.try_name(), "UNKNOWN"),
-    getOrElse(underlyingContract.try_symbol(), "UNKOWN"),
-    getOrElse(underlyingContract.try_decimals(), -1)
-  );
+
+  let underlyingToken: TokenData;
+  if (underlyingAddress == Address.fromString(ZERO_ADDRESS)) {
+    // this is ETH
+    underlyingToken = new TokenData(
+      Address.fromString(ETH_ADDRESS),
+      ETH_NAME,
+      ETH_SYMBOL,
+      mantissaFactor
+    );
+  } else {
+    let underlyingContract = ERC20.bind(underlyingAddress);
+    underlyingToken = new TokenData(
+      underlyingAddress,
+      getOrElse(underlyingContract.try_name(), "UNKNOWN"),
+      getOrElse(underlyingContract.try_symbol(), "UNKOWN"),
+      getOrElse(underlyingContract.try_decimals(), -1)
+    );
+  }
 
   // populatet market data
   let marketData = new MarketListedData(
@@ -137,52 +183,300 @@ export function handleMarketListed(event: MarketListed): void {
   );
 
   _handleMarketListed(marketData, event);
+
+  // fuse-specific: add fuseFees and adminFees
+
+  // get fuse fee - rari collects this
+  // let tryFuseFee = cTokenContract.try_fuseFeeMantissa();
+
+  // let fuseFeeId =
+  //   InterestRateSide.BORROWER +
+  //   "-" +
+  //   RariFee.FUSE_FEE +
+  //   "-" +
+  //   event.params.cToken.toHexString();
+  // let fuseFee = new InterestRate(fuseFeeId);
+  // fuseFee.rate = tryFuseFee.reverted
+  //   ? BIGDECIMAL_ZERO
+  //   : tryFuseFee.value
+  //       .toBigDecimal()
+  //       .div(mantissaFactorBD)
+  //       .times(BIGDECIMAL_HUNDRED);
+  // fuseFee.side = InterestRateSide.BORROWER;
+  // fuseFee.type = RariFee.FUSE_FEE;
+  // fuseFee.save();
+
+  // // get admin fee - pool owners (admin) collect this
+  // let tryAdminFee = cTokenContract.try_adminFeeMantissa();
+  // let adminFeeId =
+  //   InterestRateSide.BORROWER +
+  //   "-" +
+  //   RariFee.ADMIN_FEE +
+  //   "-" +
+  //   event.params.cToken.toHexString();
+  // let adminFee = new InterestRate(adminFeeId);
+  // adminFee.rate = tryAdminFee.reverted
+  //   ? BIGDECIMAL_ZERO
+  //   : tryAdminFee.value
+  //       .toBigDecimal()
+  //       .div(mantissaFactorBD)
+  //       .times(BIGDECIMAL_HUNDRED);
+  // adminFee.side = InterestRateSide.BORROWER;
+  // adminFee.type = RariFee.ADMIN_FEE;
+  // adminFee.save();
+
+  // let market = Market.load(event.params.cToken.toHexString());
+  // if (!market) {
+  //   // seemingly impossible, but want to
+  //   return;
+  // }
+  // let marketRates = market.rates;
+  // marketRates.push(fuseFee.id);
+  // marketRates.push(adminFee.id);
+  // market.rates = marketRates;
+  // market.save();
 }
 
+// update a given markets collateral factor
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  log.warning("new collateral factor", []);
+  _handleNewCollateralFactor(event);
 }
 
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  log.warning("new liq incentive", []);
+  let protocol = LendingProtocol.load(event.address.toHexString());
+  if (!protocol) {
+    // best effort
+    log.warning("[handleMarketListed] Comptroller not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+  _handleNewLiquidationIncentive(protocol, event);
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  log.warning("new price oracle", []);
+  let protocol = LendingProtocol.load(event.address.toHexString());
+  if (!protocol) {
+    // best effort
+    log.warning("[handleMarketListed] Comptroller not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
+
+  _handleNewPriceOracle(protocol, event);
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
-  log.warning("Action paused", []);
+  _handleActionPaused(event);
 }
 
 /////////////////////////
 //// CToken Handlers ////
 /////////////////////////
 
-export function handleMint(event: Mint): void {}
+export function handleMint(event: Mint): void {
+  // get comptroller address
+  let trollerAddr: Address;
+  if (
+    (trollerAddr = getComptrollerAddress(event)) ==
+    Address.fromString(ZERO_ADDRESS)
+  ) {
+    return;
+  }
 
-export function handleRedeem(event: Redeem): void {}
-
-export function handleBorrow(event: Borrow): void {}
-
-export function handleRepayBorrow(event: RepayBorrow): void {}
-
-export function handleLiquidateBorrow(event: LiquidateBorrow): void {}
-
-export function handleAccrueInterest(event: AccrueInterest): void {}
-
-export function handleNewFuseFee(event: NewFuseFee): void {
-  log.warning("new fuse fee", []);
+  _handleMint(trollerAddr, event);
 }
 
-export function handleNewAdminFee(event: NewAdminFee): void {}
+export function handleRedeem(event: Redeem): void {
+  // get comptroller address
+  let trollerAddr: Address;
+  if (
+    (trollerAddr = getComptrollerAddress(event)) ==
+    Address.fromString(ZERO_ADDRESS)
+  ) {
+    return;
+  }
 
-export function handleNewReserveFactor(event: NewReserveFactor): void {}
+  _handleRedeem(trollerAddr, event);
+}
 
-export function handleNewComptroller(event: NewComptroller): void {}
+export function handleBorrow(event: Borrow): void {
+  // get comptroller address
+  let trollerAddr: Address;
+  if (
+    (trollerAddr = getComptrollerAddress(event)) ==
+    Address.fromString(ZERO_ADDRESS)
+  ) {
+    return;
+  }
+
+  _handleBorrow(trollerAddr, event);
+}
+
+export function handleRepayBorrow(event: RepayBorrow): void {
+  // get comptroller address
+  let trollerAddr: Address;
+  if (
+    (trollerAddr = getComptrollerAddress(event)) ==
+    Address.fromString(ZERO_ADDRESS)
+  ) {
+    return;
+  }
+
+  _handleRepayBorrow(trollerAddr, event);
+}
+
+export function handleLiquidateBorrow(event: LiquidateBorrow): void {
+  // get comptroller address
+  let trollerAddr: Address;
+  if (
+    (trollerAddr = getComptrollerAddress(event)) ==
+    Address.fromString(ZERO_ADDRESS)
+  ) {
+    return;
+  }
+
+  _handleLiquidateBorrow(trollerAddr, event);
+}
+
+export function handleAccrueInterest(event: AccrueInterest): void {
+  // get comptroller address
+  let trollerAddr: Address;
+  if (
+    (trollerAddr = getComptrollerAddress(event)) ==
+    Address.fromString(ZERO_ADDRESS)
+  ) {
+    return;
+  }
+
+  let marketAddress = event.address;
+
+  let cTokenContract = CToken.bind(marketAddress);
+  let protocol = LendingProtocol.load(trollerAddr.toHexString());
+  let oracleContract = PriceOracle.bind(
+    Address.fromString(protocol!._priceOracle)
+  );
+  let updateMarketData = new UpdateMarketData(
+    cTokenContract.try_totalSupply(),
+    cTokenContract.try_exchangeRateStored(),
+    cTokenContract.try_totalBorrows(),
+    cTokenContract.try_supplyRatePerBlock(),
+    cTokenContract.try_borrowRatePerBlock(),
+    oracleContract.try_getUnderlyingPrice(marketAddress),
+    4 * 60 * 24 * DAYS_PER_YEAR
+  );
+
+  _handleAccrueInterest(updateMarketData, trollerAddr, event);
+}
+
+export function handleNewFuseFee(event: NewFuseFee): void {
+  // calculate fee
+  let fuseFeeDecimal = event.params.newFuseFeeMantissa
+    .toBigDecimal()
+    .div(mantissaFactorBD)
+    .times(BIGDECIMAL_HUNDRED);
+
+  let fuseFeeId =
+    InterestRateSide.BORROWER +
+    "-" +
+    RariFee.FUSE_FEE +
+    "-" +
+    event.address.toHexString();
+  let fuseFee = InterestRate.load(fuseFeeId);
+
+  // create fee and add to market if non-existant
+  if (!fuseFee) {
+    fuseFee = new InterestRate(fuseFeeId);
+    fuseFee.rate = fuseFeeDecimal;
+    fuseFee.side = InterestRateSide.BORROWER;
+    fuseFee.type = RariFee.FUSE_FEE;
+    fuseFee.save();
+
+    let market = Market.load(event.address.toHexString());
+    if (!market) {
+      // best effort
+      return;
+    }
+    let rates = market.rates;
+    rates.push(fuseFee.id);
+    market.save();
+
+    return;
+  }
+
+  fuseFee.rate = fuseFeeDecimal;
+  fuseFee.save();
+}
+
+export function handleNewAdminFee(event: NewAdminFee): void {
+  // calculate fee
+  let adminFeeDecimal = event.params.newAdminFeeMantissa
+    .toBigDecimal()
+    .div(mantissaFactorBD)
+    .times(BIGDECIMAL_HUNDRED);
+
+  let adminFeeId =
+    InterestRateSide.BORROWER +
+    "-" +
+    RariFee.ADMIN_FEE +
+    "-" +
+    event.address.toHexString();
+  let adminFee = InterestRate.load(adminFeeId);
+
+  // create fee and add to market if non-existant
+  if (!adminFee) {
+    adminFee = new InterestRate(adminFeeId);
+    adminFee.rate = adminFeeDecimal;
+    adminFee.side = InterestRateSide.BORROWER;
+    adminFee.type = RariFee.ADMIN_FEE;
+    adminFee.save();
+
+    let market = Market.load(event.address.toHexString());
+    if (!market) {
+      // best effort
+      return;
+    }
+    let rates = market.rates;
+    rates.push(adminFee.id);
+    market.save();
+
+    return;
+  }
+
+  adminFee.rate = adminFeeDecimal;
+  adminFee.save();
+}
+
+export function handleNewReserveFactor(event: NewReserveFactor): void {
+  _handleNewReserveFactor(event);
+}
+
+// TODO: is this necessary, not much we can do, excpet delete old lendingProtocol and move to new lendingProtocol..
+export function handleNewComptroller(event: NewComptroller): void {
+  log.error("WOAH: NEW COMPTROLLER at transaction: {}", [
+    event.transaction.hash.toHexString(),
+  ]);
+}
 
 /////////////////
 //// Helpers ////
 /////////////////
+
+function getComptrollerAddress(event: ethereum.Event): Address {
+  let cTokenContract = CToken.bind(event.address);
+  let tryComptroller = cTokenContract.try_comptroller();
+
+  if (tryComptroller.reverted) {
+    // comptroller does not exist
+    log.warning(
+      "[handleTransaction] Comptroller not found for transaction: {}",
+      [event.transaction.hash.toHexString()]
+    );
+    return Address.fromString(ZERO_ADDRESS);
+  }
+
+  return tryComptroller.value;
+}
