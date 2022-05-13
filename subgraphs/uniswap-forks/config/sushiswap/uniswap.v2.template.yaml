@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
+      address: "{{factory.address}}"
       abi: Factory
-      startBlock: 10000834
+      startBlock: {{factory.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -21,12 +21,9 @@ dataSources:
         - LiquidityPool
         - LiquidityPoolFee
         - Protocol
-        - _PricesUSD
-        - _TokenTracker
-        - _WindowTracker
       abis:
         - name: Factory
-          file: ./abis/uniswap-v2/factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
           file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
@@ -38,7 +35,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: mainnet
+    network: {{network}}
     source:
       abi: Pair
     mapping:
@@ -68,9 +65,9 @@ templates:
         - _TokenTracker
       abis:
         - name: Pair
-          file: ./abis/uniswap-v2/pair.json
+          file: ./abis/uniswap-v2/Pair.json
         - name: Factory
-          file: ./abis/uniswap-v2/factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
           file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
