@@ -1,7 +1,13 @@
 import { toDate } from "../utils";
 
+interface WarningProps {
+  warningArray: {
+    message: string;
+    type: String;
+  }[]
+}
 // The warning display function takes the warning object passed in and creates the elements/messages to be rendered
-function WarningDisplay(warningArray: { message: string; type: string }[]) {
+export const WarningDisplay = ({ warningArray }: WarningProps) => {
   const warningMsgs = [];
   let warningTotalCount = 0;
   let warningDisplayCount = 0;

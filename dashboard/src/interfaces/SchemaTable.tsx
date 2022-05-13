@@ -1,7 +1,12 @@
-import { Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import { StackedChart } from "../common/chartComponents/StackedChart";
+import ScrollToElement from "../common/utilComponents/ScrollToElement";
 import { convertTokenDecimals } from "../utils";
 
 function checkValueFalsey(value: any, schemaName: string, entityField: string, fieldDataType: string, issues: { message: string, type: string }[]): { message: string, type: string } | undefined {
+    if (!fieldDataType) {
+        return undefined;
+    }
     const fieldDataTypeChars = fieldDataType.split("");
     if (fieldDataTypeChars[fieldDataTypeChars.length - 1] !== "!") {
         return undefined;
@@ -25,7 +30,9 @@ function SchemaTable(
     schemaName: string,
     setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>,
     dataFields: { [x: string]: string },
-    warning: { message: string, type: string }[]
+    warning: { message: string, type: string }[],
+    poolId: string,
+    tabName: string
 ) {
 
     const issues: { message: string, type: string }[] = warning;
@@ -51,9 +58,9 @@ function SchemaTable(
                     value = 'False';
                 }
             }
-            if (!isNaN(parseFloat(value)) && !Array.isArray(value) && (dataFields[entityField].includes('Int') || dataFields[entityField].includes('Decimal') || dataFields[entityField].includes('umber'))) {
-                value = parseFloat(value).toFixed(2);
-            }
+            // if (!isNaN(parseFloat(value)) && !Array.isArray(value) && (dataFields[entityField].includes('Int') || dataFields[entityField].includes('Decimal') || dataFields[entityField].includes('umber'))) {
+            //     value = parseFloat(value).toFixed(2);
+            // }
             if (entityField === "outputTokenSupply") {
                 value = convertTokenDecimals(value, entityData.outputToken.decimals).toString();
                 const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
@@ -98,12 +105,27 @@ function SchemaTable(
                 value = JSON.stringify(value);
                 value = value.split(", ").join(",").split(',').join(', ');
             }
+            if (!isNaN(Number(value)) && entityField.includes("USD")) {
+                value = '$' + Number(value).toLocaleString();
+            }
+
+            if (entityField === "inputTokenWeights") {
+                // return null;
+                value = StackedChart(
+                    entityData.inputTokens[0].name,
+                    entityData.inputTokens[1].name,
+                    Number(entityData.inputTokenWeights[0]),
+                    Number(entityData.inputTokenWeights[1]),
+                    entityData.name
+                )
+            }
+
             return (
                 <TableRow key={entityField}>
-                    <TableCell component="th" scope="row" style={{ minWidth: "30vw" }}>
+                    <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
                         {entityField}: <b>{dataFields[entityField]}</b>
                     </TableCell>
-                    <TableCell align="right" style={{ maxWidth: "60vw" }}>
+                    <TableCell align="right" style={{ maxWidth: "60vw", padding: "2px" }}>
                         {value}
                     </TableCell>
                 </TableRow>);
@@ -111,10 +133,10 @@ function SchemaTable(
     } catch (err) {
         if (err instanceof Error) {
             console.log('CATCH,', Object.keys(err), Object.values(err), err)
-            return <h3>JAVASCRIPT ERROR {err.message}</h3>
+            return <h3>JAVASCRIPT ERROR - RENDERING SCHEMA TABLE - {err.message}</h3>
 
         } else {
-            return <h3>JAVASCRIPT ERROR</h3>
+            return <h3>JAVASCRIPT ERROR - RENDERING SCHEMA TABLE</h3>
         }
     }
 
@@ -123,7 +145,10 @@ function SchemaTable(
     }
 
     return (<>
-        <h3 style={{ textAlign: "center" }}>{schemaName}:</h3>
+        <div style={{ width: "100%", textAlign: "center" }}>
+            <ScrollToElement label={schemaName} elementId={schemaName} poolId={poolId} tab={tabName} />
+        </div>
+        <h3 id={schemaName} style={{ textAlign: "center" }}>{schemaName}:</h3>
         <TableContainer component={Paper} sx={{ justifyContent: "center", display: "flex", alignItems: "center" }}>
             <Table sx={{ maxWidth: 800 }} aria-label="simple table">
                 <TableBody>

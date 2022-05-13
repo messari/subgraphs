@@ -1,6 +1,7 @@
 import { Grid } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
+import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 import { ProtocolTypeEntity } from "../../constants";
 import { convertTokenDecimals } from "../../utils";
 import SchemaTable from "../SchemaTable";
@@ -41,9 +42,21 @@ function ProtocolTab(
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {}
       // For the current entity, loop through all instances of that entity
-      for (let x = currentEntityData.length - 1; x > 0; x--) {
+      for (let x = currentEntityData.length - 1; x >= 0; x--) {
         const entityInstance: { [x: string]: any } = currentEntityData[x];
         // On the entity instance, loop through all of the entity fields within it
+        // create the base yield field for DEXs
+        if (data.protocols[0].type === "EXCHANGE" && entityInstance.dailySupplySideRevenueUSD && entityInstance.totalValueLockedUSD) {
+          const value = (entityInstance.dailySupplySideRevenueUSD / entityInstance.totalValueLockedUSD) * 100;
+          if (!dataFields.baseYield) {
+            dataFields.baseYield = [{ value, date: Number(entityInstance.timestamp) }];
+            dataFieldMetrics.baseYield = { sum: value };
+          } else {
+            dataFields.baseYield.push({ value, date: Number(entityInstance.timestamp) });
+            dataFieldMetrics.baseYield.sum += value;
+          }
+        }
+        // entityInstance.dailySupplySideRevenue / totalValueLockedUSD * 100 
         Object.keys(entityInstance).forEach((entityFieldName: string) => {
           // skip the timestamp field on each entity instance
           if (entityFieldName === 'timestamp') {
@@ -87,7 +100,7 @@ function ProtocolTab(
                   continue;
                 }
               } catch (err) {
-                console.log('ERR - COULD NOT GET MINTED TOKEN DECIMALS', err)
+                console.error('ERR - COULD NOT GET MINTED TOKEN DECIMALS', err)
               }
               if (!dataFields[dataFieldKey]) {
                 dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
@@ -112,46 +125,59 @@ function ProtocolTab(
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
-      return (<>
-        <h2 style={{ borderTop: "black 2px solid", width: "100%" }}>ENTITY: {entityName}</h2>
-        <Grid key={entityName} container>{
-          Object.keys(dataFields).map((field: string) => {
+      return (
+        <Grid key={entityName} style={{ borderTop: "black 2px solid", width: "100%" }} >
+          <Grid container>
+            <h2 id={entityName} >ENTITY: {entityName}</h2>
+            <div style={{ marginLeft: "40px" }}>
+              <ScrollToElement label={entityName} elementId={entityName} poolId="" tab="protocol" />
+            </div>
+          </Grid>
+          {Object.keys(dataFields).map((field: string) => {
             // The following checks if the field is required or can be null
             const fieldName = field.split(' [')[0];
-            const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
-            if (schemaFieldTypeString[schemaFieldTypeString.length - 1] !== '!') {
-              // return null;
+            if (entitiesData[entityName][fieldName]) {
+              const schemaFieldTypeString = entitiesData[entityName][fieldName]?.split("");
+              if (schemaFieldTypeString[schemaFieldTypeString?.length - 1] !== '!') {
+                // return null;
+              }
             }
             const label = entityName + '-' + field;
-            if (issues.filter(x => x.message === label && x.type === "SUM").length === 0 && dataFieldMetrics[field].sum === 0) {
+            if (issues.filter(x => x.message === label && x.type === "SUM").length === 0 && dataFieldMetrics[field]?.sum === 0) {
               // Create a warning for the 0 sum of all snapshots for this field
               issues.push({ type: "SUM", message: label });
             }
             if (issues.filter(x => x.message === label && x.type === "CUMULATIVE").length === 0 && dataFieldMetrics[field]?.cumulative?.hasLowered > 0) {
               issues.push({ type: "CUMULATIVE", message: label + '++' + dataFieldMetrics[field].cumulative.hasLowered });
             }
-
-            return (<>
-              <Grid key={label + '1'} id={label} item xs={8}>
-                {Chart(label, dataFields[field], currentEntityData.length)}
-              </Grid>
-              <Grid key={label + '2'} item xs={4} marginY={4}>
-                {TableChart(label, dataFields[field], currentEntityData.length)}
-              </Grid>
-            </>)
+            const elementId = label.split(' ').join('%20');
+            return (
+              <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
+                <div style={{ marginLeft: "40px" }}>
+                  <ScrollToElement label={label} elementId={elementId} poolId="" tab="protocol" />
+                </div>
+                <Grid container>
+                  <Grid key={label + '1'} item xs={8}>
+                    {Chart(label, dataFields[field], currentEntityData.length)}
+                  </Grid>
+                  <Grid key={label + '2'} item xs={4} marginY={4}>
+                    {TableChart(label, dataFields[field], currentEntityData.length)}
+                  </Grid>
+                </Grid>
+              </div>)
           })
-        }</Grid></>)
+          }</Grid>)
     });
 
-    const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type]
-    const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD)
+    const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type];
+    const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD);
     if (issues.filter(x => x.message === protTypeEntity && x.type === "TVL-").length === 0 && protocolLevelTVL < 1000) {
       issues.push({ type: "TVL-", message: protTypeEntity });
     } else if (issues.filter(x => x.message === protTypeEntity && x.type === "TVL+").length === 0 && protocolLevelTVL > 1000000000000) {
       issues.push({ type: "TVL+", message: protTypeEntity });
     }
 
-    const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warning);
+    const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warning, '', 'protocol');
 
     if (issues.length > 0) {
       setWarning(issues);
@@ -163,10 +189,10 @@ function ProtocolTab(
   } catch (err) {
     if (err instanceof Error) {
       console.log('CATCH,', Object.keys(err), Object.values(err), err)
-      return <h3>JAVASCRIPT ERROR {err.message}</h3>
+      return <h3>JAVASCRIPT ERROR - PROTOCOL TAB - {err.message}</h3>
 
     } else {
-      return <h3>JAVASCRIPT ERROR</h3>
+      return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>
     }
   }
 }

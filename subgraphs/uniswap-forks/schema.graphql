@@ -56,7 +56,7 @@ enum RewardTokenType {
   BORROW
 }
 
-type RewardToken @entity {
+type RewardToken @entity (immutable: true) {
   " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
@@ -579,7 +579,7 @@ interface Event {
   timestamp: BigInt!
 }
 
-type Deposit implements Event @entity {
+type Deposit implements Event @entity (immutable: true) {
   " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -623,7 +623,7 @@ type Deposit implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Withdraw implements Event @entity {
+type Withdraw implements Event @entity (immutable: true) {
   " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
@@ -667,7 +667,7 @@ type Withdraw implements Event @entity {
   pool: LiquidityPool!
 }
 
-type Swap implements Event @entity {
+type Swap implements Event @entity (immutable: true) {
   " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
@@ -736,9 +736,9 @@ type _Transfer @entity {
 
   timestamp: BigInt!
 
-  sender: ID!
+  sender: ID
 
-  type: ID!
+  type: ID
 
   liquidity: BigInt
 }
@@ -752,6 +752,8 @@ type _HelperStore @entity {
 
   " number of deposits, number of unique users "
   valueInt: Int
+
+  valueBigInt: BigInt
 
   " Contains the address mapping for MasterChef pool id "
   valueString: String
