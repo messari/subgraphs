@@ -44,7 +44,7 @@ export namespace Protocol {
   export const NAME = "Stake DAO";
   export const SLUG = "stake-dao";
   export const SCHEMA_VERSION = "1.2.1";
-  export const SUBGRAPH_VERSION = "1.1.0";
+  export const SUBGRAPH_VERSION = "1.1.1";
   export const NETWORK = Network.MAINNET;
   export const TYPE = ProtocolType.YIELD;
 }

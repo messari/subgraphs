@@ -333,8 +333,6 @@ templates:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: RewardPaid(indexed address,indexed address,uint256)
-          handler: handleRewardPaid
         - event: RewardAdded(uint256)
           handler: handleRewardAdded
       callHandlers:
