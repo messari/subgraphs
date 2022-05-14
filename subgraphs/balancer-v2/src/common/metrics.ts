@@ -43,11 +43,12 @@ export function updateFinancials(event: ethereum.Event): void {
       totalRevenueGeneratedFee = totalRevenueGeneratedFee.plus(pool._sideRevenueGeneratedFee);
       totalProtocolGeneratedFee = totalProtocolGeneratedFee.plus(pool._protocolGeneratedFee);
       totalFeesUsd = totalFeesUsd.plus(pool._totalSwapFee);
-    }
-
-    let dailySnapshot = LiquidityPoolDailySnapshot.load(dex._poolIds[i]);
-    if (dailySnapshot) {
-      dailyVolumeUsd = dailyVolumeUsd.plus(dailySnapshot.dailyVolumeUSD);
+      // Number of days since Unix epoch
+      const daysSinceEpoch: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+      let dailySnapshot = LiquidityPoolDailySnapshot.load(pool.id.concat("-").concat(daysSinceEpoch.toString()));
+      if (dailySnapshot) {
+        dailyVolumeUsd = dailyVolumeUsd.plus(dailySnapshot.dailyVolumeUSD);
+      }
     }
   }
 
@@ -185,9 +186,10 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
     protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapValue);
   }
   pool.totalValueLockedUSD = newPoolLiquidity;
-  pool.outputTokenPriceUSD = newPoolLiquidity.div(
-    scaleDown(pool.outputTokenSupply, Address.fromString(pool.outputToken)),
-  );
+  const outputTokenSupply = scaleDown(pool.outputTokenSupply, Address.fromString(pool.outputToken));
+  if (outputTokenSupply.gt(BIGDECIMAL_ZERO)) {
+    pool.outputTokenPriceUSD = newPoolLiquidity.div(outputTokenSupply);
+  }
 
   financials.save();
   protocol.save();
@@ -244,7 +246,7 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network == "MATIC") return;
+  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "ARBITRUM_ONE") return;
 
   if (!isUSDStable(tokenIn)) {
     const token = getOrCreateToken(tokenIn);

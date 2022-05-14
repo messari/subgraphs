@@ -236,8 +236,8 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
       }
 
       if (Address.fromString(swap.tokenOut) == Address.fromString(pool.inputTokens[i])) {
-        newTokensAmount[i] = newTokensAmount[i].minus(swap.amountOut);
-        newTokensUSD[i] = newTokensUSD[i].minus(swap.amountOutUSD);
+        newTokensAmount[i] = newTokensAmount[i].plus(swap.amountOut);
+        newTokensUSD[i] = newTokensUSD[i].plus(swap.amountOutUSD);
       }
     }
     let divisor =
