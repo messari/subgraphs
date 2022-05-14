@@ -24,10 +24,11 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     let poolLockedValue = BIGDECIMAL_ZERO;
     let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]));
 
-    for (let i = 0; i < pool.inputTokens.length; i++) {
-      let token = getOrCreateToken(event, Address.fromString(pool.inputTokens[i]));
-      let _asset_index = _Asset.load(token._asset!)!._index.toI32();
-      let usdValue = bigIntToBigDecimal(pool.inputTokenBalances[_asset_index], token.decimals);
+    for (let i = 0; i < pool._assets.length; i++) {
+      let _asset = _Asset.load(pool._assets[i])!;
+      let _index = _asset._index.toI32();
+      let token = getOrCreateToken(event, Address.fromString(_asset.token));
+      let usdValue = bigIntToBigDecimal(pool.inputTokenBalances[_index], token.decimals);
       poolLockedValue = poolLockedValue.plus(usdValue);
     }
 
@@ -240,14 +241,18 @@ export function updateBalancesInPoolAfterSwap(event: ethereum.Event, swap: Swap)
   let pool = getOrCreateLiquidityPool(event.address);
   let balances: BigInt[] = pool.inputTokenBalances;
 
-  let tokenIn = getOrCreateToken(event, Address.fromString(swap.tokenIn));
-  let tokenOut = getOrCreateToken(event, Address.fromString(swap.tokenOut));
+  for (let i = 0; i < pool._assets.length; i++) {
+    let _asset = _Asset.load(pool._assets[i])!;
+    let _index = _asset._index.toI32();
+    let token = _asset.token;
 
-  let _assetIn_index = _Asset.load(tokenIn._asset!)!._index.toI32();
-  let _assetOut_index = _Asset.load(tokenOut._asset!)!._index.toI32();
-
-  balances[_assetIn_index] = balances[_assetIn_index].plus(swap.amountIn);
-  balances[_assetOut_index] = balances[_assetOut_index].minus(swap.amountOut);
+    if (token == swap.tokenIn) {
+      balances[_index] = balances[_index].plus(swap.amountIn);
+    }
+    if (token == swap.tokenOut) {
+      balances[_index] = balances[_index].minus(swap.amountOut);
+    }
+  }
 
   pool.inputTokenBalances = balances;
   pool.save();
@@ -259,17 +264,20 @@ function updateHourlyPoolSwapVolume(event: ethereum.Event, swap: Swap): void {
   let hourlyVolumeByTokenUSD: BigDecimal[] = snapshot.hourlyVolumeByTokenUSD;
   let hourlyVolumeByTokenAmount: BigInt[] = snapshot.hourlyVolumeByTokenAmount;
 
-  let tokenIn = getOrCreateToken(event, Address.fromString(swap.tokenIn));
-  let tokenOut = getOrCreateToken(event, Address.fromString(swap.tokenOut));
+  for (let i = 0; i < snapshot._assets!.length; i++) {
+    let _asset = _Asset.load(snapshot._assets![i])!;
+    let _index = _asset._index.toI32();
+    let token = _asset.token;
 
-  let _assetIn_index = _Asset.load(tokenIn._asset!)!._index.toI32();
-  let _assetOut_index = _Asset.load(tokenOut._asset!)!._index.toI32();
-
-  hourlyVolumeByTokenUSD[_assetIn_index] = hourlyVolumeByTokenUSD[_assetIn_index].plus(swap.amountInUSD);
-  hourlyVolumeByTokenAmount[_assetIn_index] = hourlyVolumeByTokenAmount[_assetIn_index].plus(swap.amountIn);
-
-  hourlyVolumeByTokenUSD[_assetOut_index] = hourlyVolumeByTokenUSD[_assetOut_index].plus(swap.amountOutUSD);
-  hourlyVolumeByTokenAmount[_assetOut_index] = hourlyVolumeByTokenAmount[_assetOut_index].plus(swap.amountOut);
+    if (token == swap.tokenIn) {
+      hourlyVolumeByTokenUSD[_index] = hourlyVolumeByTokenUSD[_index].plus(swap.amountInUSD);
+      hourlyVolumeByTokenAmount[_index] = hourlyVolumeByTokenAmount[_index].plus(swap.amountIn);
+    }
+    if (token == swap.tokenOut) {
+      hourlyVolumeByTokenUSD[_index] = hourlyVolumeByTokenUSD[_index].plus(swap.amountOutUSD);
+      hourlyVolumeByTokenAmount[_index] = hourlyVolumeByTokenAmount[_index].plus(swap.amountOut);
+    }
+  }
 
   snapshot.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
   snapshot.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
@@ -283,18 +291,23 @@ function updateDailyPoolSwapVolume(event: ethereum.Event, swap: Swap): void {
 
   let dailyVolumeByTokenUSD: BigDecimal[] = snapshot.dailyVolumeByTokenUSD;
   let dailyVolumeByTokenAmount: BigInt[] = snapshot.dailyVolumeByTokenAmount;
-  let tokenIn = getOrCreateToken(event, Address.fromString(swap.tokenIn));
-  let tokenOut = getOrCreateToken(event, Address.fromString(swap.tokenOut));
 
-  let _assetIn_index = _Asset.load(tokenIn._asset!)!._index.toI32();
-  let _assetOut_index = _Asset.load(tokenOut._asset!)!._index.toI32();
+  for (let i = 0; i < snapshot._assets!.length; i++) {
+    let _asset = _Asset.load(snapshot._assets![i])!;
+    let _index = _asset._index.toI32();
+    let token = _asset.token;
 
-  dailyVolumeByTokenUSD[_assetIn_index] = dailyVolumeByTokenUSD[_assetIn_index].plus(swap.amountInUSD);
-  dailyVolumeByTokenAmount[_assetIn_index] = dailyVolumeByTokenAmount[_assetIn_index].plus(swap.amountIn);
+    if (token == swap.tokenIn) {
+      dailyVolumeByTokenUSD[_index] = dailyVolumeByTokenUSD[_index].plus(swap.amountInUSD);
+      dailyVolumeByTokenAmount[_index] = dailyVolumeByTokenAmount[_index].plus(swap.amountIn);
+    }
+    if (token == swap.tokenOut) {
+      dailyVolumeByTokenUSD[_index] = dailyVolumeByTokenUSD[_index].plus(swap.amountOutUSD);
+      dailyVolumeByTokenAmount[_index] = dailyVolumeByTokenAmount[_index].plus(swap.amountOut);
+    }
+  }
 
-  dailyVolumeByTokenUSD[_assetOut_index] = dailyVolumeByTokenUSD[_assetOut_index].plus(swap.amountOutUSD);
-  dailyVolumeByTokenAmount[_assetOut_index] = dailyVolumeByTokenAmount[_assetOut_index].plus(swap.amountOut);
-
+  
   snapshot.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
   snapshot.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
   snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(calculateSwapVolume(swap));

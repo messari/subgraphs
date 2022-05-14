@@ -495,6 +495,7 @@ type LiquidityPoolDailySnapshot @entity {
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  _assets: [_Asset!]
   _inputTokens: [Token!]
   _outputTokens: [Token!]
   _outputTokensSupply: [BigInt!]
@@ -557,6 +558,7 @@ type LiquidityPoolHourlySnapshot @entity {
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
 
+  _assets: [_Asset!]
   _inputTokens: [Token!]
   _outputTokens: [Token!]
   _outputTokensSupply: [BigInt!]

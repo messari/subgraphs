@@ -20,7 +20,7 @@ export function createAsset(
   asset.timestamp = event.block.timestamp;
 
   const token = getOrCreateToken(event, tokenAddress);
-  token._asset = assetAddress.toHexString();
+  // token._asset = assetAddress.toHexString();
 
   const pool = getOrCreateLiquidityPool(poolAddress);
 
@@ -32,16 +32,16 @@ export function createAsset(
   AssetTemplate.create(assetAddress);
 
   asset._index = BigInt.fromI32(assets.length);
+  asset.save();
 
-  inputTokens[assets.length] = token.id;
-  inputTokenBalances[assets.length] = BigInt.zero();
-  assets[assets.length] = assetAddress.toHexString();
+  inputTokens[asset._index.toI32()] = token.id;
+  inputTokenBalances[asset._index.toI32()] = BigInt.zero();
+  assets[asset._index.toI32()] = assetAddress.toHexString();
 
   pool._assets = assets;
   pool.inputTokens = inputTokens;
   pool.inputTokenBalances = inputTokenBalances;
 
-  asset.save();
   token.save();
   pool.save();
 }
@@ -165,13 +165,18 @@ export function updateBalancesInPool<T extends Deposit>(
   let balances: BigInt[] = pool.inputTokenBalances;
 
   // There is always only one element in tx.inputTokens
-  let token = getOrCreateToken(event, Address.fromString(transaction.inputTokens[0]));
-  let _asset_index = _Asset.load(token._asset!)!._index.toI32();
+  for (let i = 0; i < pool._assets.length; i++) {
+    let _asset = _Asset.load(pool._assets[i])!;
+    let _index = _asset._index.toI32();
+    let token = _asset.token;
 
-  if (transactionType == TransactionType.DEPOSIT) {
-    balances[_asset_index] = balances[_asset_index].plus(transaction.inputTokenAmounts[0]);
-  } else if (transactionType == TransactionType.WITHDRAW) {
-    balances[_asset_index] = balances[_asset_index].minus(transaction.inputTokenAmounts[0]);
+    if (token == transaction.inputTokens[0]) {
+      if (transactionType == TransactionType.DEPOSIT) {
+        balances[_index] = balances[_index].plus(transaction.inputTokenAmounts[0]);
+      } else if (transactionType == TransactionType.WITHDRAW) {
+        balances[_index] = balances[_index].minus(transaction.inputTokenAmounts[0]);
+      }
+    }
   }
 
   pool.inputTokenBalances = balances;
