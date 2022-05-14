@@ -1,3 +1,4 @@
+import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { BigInt, log } from "@graphprotocol/graph-ts";
 import {
@@ -28,7 +29,6 @@ import {
 } from "../../generated/Registry_v1/Vault";
 import { _Deposit } from "../modules/Deposit";
 import { _Withdraw } from "../modules/Withdraw";
-import { enumToPrefix } from "../common/strings";
 import { strategyReported } from "../modules/Strategy";
 import { getOrCreateStrategy, getOrCreateVault } from "../common/initializers";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
@@ -88,7 +88,14 @@ export function handleDeposit(call: DepositCall): void {
   if (vault) {
     let sharesMinted = call.outputs.value0;
 
-    _Deposit(call.to, call.transaction, call.block, vault, sharesMinted, null);
+    _Deposit(
+      call.to,
+      call.transaction,
+      call.block,
+      vault,
+      sharesMinted,
+      constants.MAX_UINT256
+    );
   }
   updateFinancials(call.block);
   updateUsageMetrics(call.block, call.from);
@@ -160,13 +167,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   const vault = getOrCreateVault(vaultAddress, call.block);
 
   if (vault) {
-    let vaultContract = VaultContract.bind(call.to);
     let withdrawAmount = call.outputs.value0;
-    let totalAssets = vaultContract.totalAssets();
-    let totalSupply = vaultContract.totalSupply();
-    let sharesBurnt = totalAssets.equals(constants.BIGINT_ZERO)
-      ? withdrawAmount
-      : withdrawAmount.times(totalSupply).div(totalAssets);
 
     _Withdraw(
       call.to,
@@ -174,7 +175,7 @@ export function handleWithdraw(call: WithdrawCall): void {
       call.block,
       vault,
       withdrawAmount,
-      sharesBurnt
+      constants.MAX_UINT256
     );
   }
   updateFinancials(call.block);
@@ -236,7 +237,7 @@ export function handleUpdatePerformanceFee(
 
   if (vault) {
     let performanceFeeId =
-      enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) + vaultAddress;
+      utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) + vaultAddress;
     const performanceFee = VaultFeeStore.load(performanceFeeId);
 
     if (!performanceFee) {
@@ -263,7 +264,7 @@ export function handleUpdateManagementFee(
 
   if (vault) {
     let performanceFeeId =
-      enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) + vaultAddress;
+      utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) + vaultAddress;
     const performanceFee = VaultFeeStore.load(performanceFeeId);
 
     if (!performanceFee) {

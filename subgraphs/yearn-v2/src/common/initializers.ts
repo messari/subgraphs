@@ -11,7 +11,6 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
-import { enumToPrefix } from "./strings";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
@@ -53,11 +52,11 @@ export function getOrCreateYieldAggregator(id: string): YieldAggregator {
 
   if (!protocol) {
     protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-    protocol.name = "Yearn v2";
-    protocol.slug = "yearn-v2";
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.0.0";
+    protocol.name = constants.Protocol.NAME;
+    protocol.slug = constants.Protocol.SLUG;
+    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
+    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
+    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
@@ -281,7 +280,7 @@ export function getOrCreateVault(
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
     const managementFeeId =
-      enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
+      utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
       vaultAddress.toHexString();
     let managementFee = utils.readValue<BigInt>(
       vaultContract.try_managementFee(),
@@ -294,7 +293,7 @@ export function getOrCreateVault(
     );
 
     const performanceFeeId =
-      enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
+      utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
       vaultAddress.toHexString();
     let performanceFee = utils.readValue<BigInt>(
       vaultContract.try_performanceFee(),

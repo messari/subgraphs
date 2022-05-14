@@ -1,6 +1,5 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
 // See below for a complete list:
@@ -42,18 +41,25 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
-export const VAULT_VERSION_0_3_0 = '0.3.0'
-export const VAULT_VERSION_0_3_2 = '0.3.2'
-export const VAULT_VERSION_0_3_3 = '0.3.3'
-export const VAULT_VERSION_0_3_5 = '0.3.5'
-export const VAULT_VERSION_LATEST = '0.4.3'
+export namespace Protocol {
+  export const NAME = "Yearn v2";
+  export const SLUG = "yearn-v2";
+  export const SCHEMA_VERSION = "1.2.1";
+  export const SUBGRAPH_VERSION = "1.1.0";
+  export const METHODOLOGY_VERSION = "1.0.0";
+}
+
+export const VAULT_VERSION_0_3_0 = "0.3.0";
+export const VAULT_VERSION_0_3_2 = "0.3.2";
+export const VAULT_VERSION_0_3_3 = "0.3.3";
+export const VAULT_VERSION_0_3_5 = "0.3.5";
+export const VAULT_VERSION_LATEST = "0.4.3";
 
 export const MAX_BPS = BigInt.fromI32(10000);
-export const SECONDS_PER_YEAR = BigInt.fromI32(31557600);
-export const SECONDS_PER_YEAR_EXACT = BigInt.fromI32(31556952);
-
 export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
+export const SECONDS_PER_YEAR = BigInt.fromI32(31557600);
+export const SECONDS_PER_YEAR_EXACT = BigInt.fromI32(31556952);
 
 export const DEFAULT_MANAGEMENT_FEE = BigInt.fromI32(200);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(2000);
@@ -77,3 +83,7 @@ export const ZERO_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
+
+export const MAX_UINT256 = BigInt.fromI32(
+  115792089237316195423570985008687907853269984665640564039457584007913129639935
+);

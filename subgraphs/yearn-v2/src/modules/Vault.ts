@@ -1,6 +1,5 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { enumToPrefix } from "../common/strings";
 import { getOrCreateToken } from "../common/initializers";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Vault as VaultTemplate } from "../../generated/templates";
@@ -45,7 +44,7 @@ export function _NewVault(
     vault.lastReport = constants.BIGINT_ZERO;
 
     const managementFeeId =
-      enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
+      utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
       vaultAddress.toHexString();
     let managementFee = utils.readValue<BigInt>(
       vaultContract.try_managementFee(),
@@ -58,7 +57,7 @@ export function _NewVault(
     );
 
     const performanceFeeId =
-      enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
+      utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
       vaultAddress.toHexString();
     let performanceFee = utils.readValue<BigInt>(
       vaultContract.try_performanceFee(),

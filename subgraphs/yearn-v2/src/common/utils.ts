@@ -3,6 +3,14 @@ import { VaultFee } from "../../generated/schema";
 import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
 
+export function enumToPrefix(snake: string): string {
+  return snake.toLowerCase().replace("_", "-") + "-";
+}
+
+export function prefixID(enumString: string, ID: string): string {
+  return enumToPrefix(enumString) + ID;
+}
+
 export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
 }

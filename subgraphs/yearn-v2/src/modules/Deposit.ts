@@ -86,51 +86,49 @@ export function _Deposit(
   block: ethereum.Block,
   vault: VaultStore,
   sharesMinted: BigInt,
-  depositAmount: BigInt | null = null
+  depositAmount: BigInt
 ): void {
   const vaultAddress = Address.fromString(vault.id);
   const vaultContract = VaultContract.bind(vaultAddress);
   const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
-  if (!depositAmount) {
+  if (depositAmount.equals(constants.MAX_UINT256)) {
+    log.warning("[calculateAmountDeposited] transaction: {}", [
+      transaction.hash.toHexString(),
+    ]);
+
     depositAmount = calculateAmountDeposited(vaultAddress, sharesMinted);
   }
 
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
 
-  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
-    .times(vault.inputTokenBalance.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
+  let depositAmountUSD = depositAmount
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
+  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositAmountUSD);
+  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
+  
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
-
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    inputTokenPrice.usdPrice
-      .times(depositAmount.toBigDecimal())
-      .div(inputTokenDecimals.toBigDecimal())
-      .div(inputTokenPrice.decimalsBaseTen)
-  );
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
     inputTokenAddress,
-    inputTokenDecimals.toBigDecimal()
+    inputTokenDecimals
   );
 
   vault.pricePerShare = utils
     .readValue<BigInt>(vaultContract.try_pricePerShare(), constants.BIGINT_ZERO)
     .toBigDecimal();
   vault.save();
-
-  let depositAmountUSD = inputTokenPrice.usdPrice
-    .times(depositAmount.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimalsBaseTen);
 
   createDepositTransaction(
     to,

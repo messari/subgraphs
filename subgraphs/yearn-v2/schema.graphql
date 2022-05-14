@@ -1,5 +1,5 @@
 # Subgraph Schema: Yield Aggregator
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -601,7 +601,7 @@ type Account @entity {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity {
-  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
 
