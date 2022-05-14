@@ -31,13 +31,11 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
-    block.timestamp.toI64() / constants.SECONDS_PER_DAY
-  )
-    .toString()
+  let dailyActiveAccountId = "daily"
     .concat("-")
-    .concat(from.toHexString());
-
+    .concat(from.toHexString())
+    .concat("-")
+    .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
 
   if (!dailyActiveAccount) {
@@ -45,6 +43,19 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address): void {
     dailyActiveAccount.save();
 
     usageMetricsDaily.dailyActiveUsers += 1;
+  }
+
+  let hourlyActiveAccountId = "hourly"
+    .concat("-")
+    .concat(from.toHexString())
+    .concat("-")
+    .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
+  let hourlyActiveAccount = ActiveAccount.load(hourlyActiveAccountId);
+
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyActiveAccountId);
+    hourlyActiveAccount.save();
+
     usageMetricsHourly.hourlyActiveUsers += 1;
   }
 
@@ -81,9 +92,11 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
 
-  vaultDailySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
-  vaultHourlySnapshots.rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount;
-  
+  vaultDailySnapshots.rewardTokenEmissionsAmount =
+    vault.rewardTokenEmissionsAmount;
+  vaultHourlySnapshots.rewardTokenEmissionsAmount =
+    vault.rewardTokenEmissionsAmount;
+
   vaultDailySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
   vaultHourlySnapshots.rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
 

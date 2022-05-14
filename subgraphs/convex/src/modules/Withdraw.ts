@@ -71,21 +71,21 @@ export function _Withdraw(
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
 
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-
-  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
-    .times(vault.inputTokenBalance.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
+  let withdrawAmountUSD = withdrawAmount
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    inputTokenPrice.usdPrice
-      .times(withdrawAmount.toBigDecimal())
-      .div(inputTokenDecimals.toBigDecimal())
-      .div(inputTokenPrice.decimalsBaseTen)
+  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(
+    withdrawAmountUSD
   );
+  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
@@ -101,11 +101,6 @@ export function _Withdraw(
       constants.BIGINT_ZERO
     )
     .toBigDecimal();
-
-  let withdrawAmountUSD = inputTokenPrice.usdPrice
-    .times(withdrawAmount.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimalsBaseTen);
 
   createWithdrawTransaction(
     to,

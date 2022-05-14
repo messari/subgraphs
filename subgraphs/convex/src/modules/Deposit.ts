@@ -71,21 +71,19 @@ export function _Deposit(
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
   let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
-  let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken!.decimals as u8);
+  let inputTokenDecimals = constants.BIGINT_TEN.pow(
+    inputToken!.decimals as u8
+  ).toBigDecimal();
 
-  vault.totalValueLockedUSD = inputTokenPrice.usdPrice
-    .times(vault.inputTokenBalance.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
+  let depositAmountUSD = depositAmount
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
+  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositAmountUSD);
+  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    inputTokenPrice.usdPrice
-      .times(depositAmount.toBigDecimal())
-      .div(inputTokenDecimals.toBigDecimal())
-      .div(inputTokenPrice.decimalsBaseTen)
-  );
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
@@ -96,13 +94,11 @@ export function _Deposit(
     constants.BIGINT_ZERO
   );
   vault.pricePerShare = utils
-    .readValue<BigInt>(poolContract.try_get_virtual_price(), constants.BIGINT_ZERO)
+    .readValue<BigInt>(
+      poolContract.try_get_virtual_price(),
+      constants.BIGINT_ZERO
+    )
     .toBigDecimal();
-
-  let depositAmountUSD = inputTokenPrice.usdPrice
-    .times(depositAmount.toBigDecimal())
-    .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimalsBaseTen);
 
   createDepositTransaction(
     to,
