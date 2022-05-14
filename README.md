@@ -102,7 +102,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | **CDPs** |    | |
 | [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-ethereum) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
 | Alchemix |   | | |
-| Inverse Finance | 🔨 | | |
+| [Inverse Finance](https://www.inverse.finance/) | 🛠 | 1.2.1 / 1.2.1 / 1.0.0  | [![Inverse Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/inverse-finance-ethereum)|
 | [Liquity](https://www.liquity.org/) | 🛠 | 1.2.1 / 1.1.2 / 1.0.1 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
 | [MakerDAO](https://makerdao.com/en/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![MakerDAO Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/makerdao-ethereum?selected=playground) |
 | QiDAO |   | | |
@@ -111,7 +111,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Autofarm |  | | |
 | Badger DAO | 🔨 | | |
 | Beefy Finance | | | |
-| [Belt Finance](https://belt.fi/landing) | 🛠 | 1.1.0 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
+| [Belt Finance](https://belt.fi/landing) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
 | Convex Finance | 🔨  | | |
 | [Gamma Strategy](https://www.gamma.xyz/) | 🔨  | | |
 | Harvest Finance | 🔨  | | |
@@ -119,7 +119,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Pancakebunny |  | | |
 | Rari Aggregator | 🔨 | | |
 | Reaper Farm | 🔨  | | |
-| [Stake DAO](https://stakedao.org/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum)|
+| [Stake DAO](https://stakedao.org/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum)|
 | [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak-ethereum) |
 | Vesper Finance | 🔨 | | |
 | Yield Yak | 🔨 | | |
