@@ -44,7 +44,7 @@ export function handleRewards(pool: LiquidityPool, blockNumber: BigInt, timestam
 export function calculateGaugeV1Emissions(
   pool: LiquidityPool,
   blockNumber: BigInt,
-  timestamp: BigInt,
+  timestamp: BigInt, // @ts-ignore
   rewardTokenIndex: i32,
 ): void {
   if (dataSource.network() != Network.MAINNET.toLowerCase()) {
@@ -71,6 +71,7 @@ export function calculateGaugeV1Emissions(
   }
 }
 
+// @ts-ignore
 export function calculateGaugeV2Emissions(pool: LiquidityPool, timestamp: BigInt, rewardTokenIndex: i32): void {
   // pools of SNX rewards contract type only have one reward token (on top of CRV reward token)
   if (!pool.rewardContract) {
@@ -95,6 +96,7 @@ export function calculateGaugeV2Emissions(pool: LiquidityPool, timestamp: BigInt
   }
 }
 
+// @ts-ignore
 export function calculateGaugeV3Emissions(pool: LiquidityPool, timestamp: BigInt, rewardTokenIndex: i32): void {
   // if there is no reward contract, but the pool has more than one reward token (with the first being the CRV reward token),
   // then we can insinuate that the pool is v3 type

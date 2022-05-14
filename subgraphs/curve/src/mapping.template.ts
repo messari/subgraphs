@@ -7,7 +7,7 @@ import {
   LENDING,
   LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY, METAPOOL_FACTORY
 } from './common/constants/index'
-import { BigInt } from '@graphprotocol/graph-ts/index'
+import { BigInt, dataSource } from '@graphprotocol/graph-ts/index'
 import { Factory, LiquidityPool, Registry } from '../generated/schema'
 import {
   CryptoFactoryTemplate,
@@ -30,11 +30,12 @@ import { getPlatform } from './services/platform'
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityImbalance, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
 import { NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
 import { getLiquidityPool, getOrCreateToken, getPoolFee } from './common/getters'
-import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, ZERO_ADDRESS } from './common/constants'
+import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, Network, ZERO_ADDRESS } from './common/constants'
 import { bigIntToBigDecimal } from './common/utils/numbers'
 import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, updateUsageMetrics } from './common/metrics'
 import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
 import { setGaugeData } from './services/gauges/helpers'
+import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
 {{{ importExistingMetaPools }}}
 {{{ importCatchupFunction }}}
 
@@ -95,8 +96,14 @@ export function handleAddressModified(event: AddressModified): void {
 
 export function getLpToken(pool: Address, registryAddress: Address): Address {
   const registry = MainRegistry.bind(registryAddress)
-  const lpTokenResult = registry.try_get_lp_token(pool)
+  let lpTokenResult = registry.try_get_lp_token(pool)
   if (lpTokenResult.reverted) {
+    if(dataSource.network()== Network.AVALANCHE.toLowerCase()){
+      lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
+      if (!lpTokenResult.reverted) {
+        return lpTokenResult.value
+      }
+    }
     log.warning('getLpToken reverted: {}', [pool.toHexString()])
   }
   return lpTokenResult.reverted ? pool : lpTokenResult.value
@@ -360,7 +367,7 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 // When metapools are added with this function to the regitsry, there is no
 // event emitted. So we need a call handler. But this is only (so far) a mainnet
 // problem - and only mainnet can handle call triggers. Hence why we need to hack
-// around with mustache to avoid issues
+// around with mustache to avoid issues 
 export function handleAddExistingMetaPools({{ addExistingMetaPoolsCallParams }}): void {
 
   const pools = {{ poolAssignedValue }}

@@ -15,6 +15,12 @@
   "callHandler": "",
   "function1": "",
   "handler1": "",
+  "function2": "",
+  "handler2": "",
+  "function3": "",
+  "handler3": "",
+  "function4": "",
+  "handler4": "",
   "addExistingMetaPoolsCallParams": "",
   "poolAssignedValue": "[ADDRESS_ZERO]",
   "importExistingMetaPools": "",
@@ -33,5 +39,7 @@
   "importCatchupFunction": "import { catchUpAvax } from './services/catchup'",
   "executeCatchupFunction": "catchUpAvax()",
   "gaugeController": false,
-  "curveToken": "0x249848BeCA43aC405b8102Ec90Dd5F22CA513c06"
+  "curveToken": "0x249848BeCA43aC405b8102Ec90Dd5F22CA513c06",
+  "abiName": "",
+  "abiPath": ""
 }

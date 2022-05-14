@@ -68,6 +68,8 @@ dataSources:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
@@ -139,12 +141,14 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handleMainRegistryPoolAdded
-      callHandlers:
-        - function: set_liquidity_gauges(address,address[10])
-          handler: handleSetLiquidityGauges
+      {{ callHandler }}
+        {{ function2 }}
+          {{ handler2 }}
       file: ./src/mapping.ts
   - name: StableFactoryTemplate
     kind: ethereum/contract
@@ -206,6 +210,8 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: PlainPoolDeployed(address[4],uint256,uint256,address)
           handler: handlePlainPoolDeployed
@@ -279,9 +285,16 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
+      {{ callHandler }}
+        {{ function3 }}
+          {{ handler3 }}
+        {{ function4 }}
+          {{ handler4 }}
       callHandlers:
         - function: set_liquidity_gauges(address,address[10])
           handler: handleSetLiquidityGauges
@@ -355,6 +368,8 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
@@ -436,6 +451,8 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleCryptoPoolDeployed
@@ -507,6 +524,8 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchangeV2
@@ -578,6 +597,8 @@ templates:
           file: ./abis/RedeemableKeep3r.json
         - name: BalancerPoolToken
           file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit

@@ -27,13 +27,13 @@
     "prepare:matic": "mustache ./config/matic.json subgraph.template.yaml > subgraph.yaml && mustache ./config/matic.json src/mapping.template.ts > src/mapping.ts && mustache ./config/matic.json src/common/constants/index.template.ts > src/common/constants/index.ts",
     "prepare:xdai": "mustache ./config/xdai.json subgraph.template.yaml > subgraph.yaml && mustache ./config/xdai.json src/mapping.template.ts > src/mapping.ts && mustache ./config/xdai.json src/common/constants/index.template.ts > src/common/constants/index.ts",
     "prepare:optimism": "mustache ./config/optimism.json subgraph.template.yaml > subgraph.yaml && mustache ./config/optimism.json src/mapping.template.ts > src/mapping.ts && mustache ./config/optimism.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "deploy:mainnet": "yarn prepare:mainnet && yarn build:mainnet && yarn thegraph:deploy:mainnet",
-    "deploy:avalanche": "yarn prepare:avalanche && yarn build:avalanche && yarn thegraph:deploy:avalanche",
-    "deploy:fantom": "yarn prepare:fantom && yarn build:fantom && yarn thegraph:deploy:fantom",
-    "deploy:arbitrum": "yarn prepare:arbitrum && yarn build:arbitrum && yarn thegraph:deploy:arbitrum",
-    "deploy:matic": "yarn prepare:matic && yarn build:matic && yarn thegraph:deploy:matic",
-    "deploy:xdai": "yarn prepare:xdai && yarn build:xdai && yarn thegraph:deploy:xdai",
-    "deploy:optimism": "yarn prepare:optimism && yarn build:optimism && yarn thegraph:deploy:optimism"
+    "deploy:mainnet": "yarn prepare:mainnet && yarn codegen && graph build && yarn thegraph:deploy:mainnet",
+    "deploy:avalanche": "yarn prepare:avalanche && yarn codegen && graph build && yarn thegraph:deploy:avalanche",
+    "deploy:fantom": "yarn prepare:fantom && yarn codegen && graph build && yarn thegraph:deploy:fantom",
+    "deploy:arbitrum": "yarn prepare:arbitrum && yarn codegen && graph build && yarn thegraph:deploy:arbitrum",
+    "deploy:matic": "yarn prepare:matic && yarn codegen && graph build && yarn thegraph:deploy:matic",
+    "deploy:xdai": "yarn prepare:xdai && yarn codegen && graph build && yarn thegraph:deploy:xdai",
+    "deploy:optimism": "yarn prepare:optimism && yarn codegen && graph build && yarn thegraph:deploy:optimism"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",

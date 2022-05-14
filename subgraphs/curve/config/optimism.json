@@ -15,6 +15,12 @@
   "callHandler": "",
   "function1": "",
   "handler1": "",
+  "function2": "",
+  "handler2": "",
+  "function3": "",
+  "handler3": "",
+  "function4": "",
+  "handler4": "",
   "addExistingMetaPoolsCallParams": "",
   "poolAssignedValue": "[ADDRESS_ZERO]",
   "importExistingMetaPools": "",
@@ -33,5 +39,7 @@
   "importCatchupFunction": "",
   "executeCatchupFunction": "",
   "gaugeController": false,
-  "curveToken": "0x0000000000000000000000000000000000000000"
+  "curveToken": "0x0000000000000000000000000000000000000000",
+  "abiName": "",
+  "abiPath": ""
 }

@@ -12,7 +12,7 @@ import {
   STABLE_FACTORY,
   METAPOOL_FACTORY,
 } from "./common/constants/index";
-import { BigInt } from "@graphprotocol/graph-ts/index";
+import { BigInt, dataSource } from "@graphprotocol/graph-ts/index";
 import { Factory, LiquidityPool, Registry } from "../generated/schema";
 import {
   CryptoFactoryTemplate,
@@ -48,6 +48,7 @@ import {
   BIGDECIMAL_ONE_HUNDRED,
   FEE_DENOMINATOR_DECIMALS,
   LiquidityPoolFeeType,
+  Network,
   ZERO_ADDRESS,
 } from "./common/constants";
 import { bigIntToBigDecimal } from "./common/utils/numbers";
@@ -60,15 +61,13 @@ import {
 } from "./common/metrics";
 import { StableFactory } from "../generated/templates/CryptoFactoryTemplate/StableFactory";
 import { setGaugeData } from "./services/gauges/helpers";
-import { Add_existing_metapoolsCall } from "../generated/templates/CryptoFactoryTemplate/StableFactory";
-import { catchUpRegistryMainnet } from "./services/catchup";
+import { CurvePoolAvax } from "../generated/templates/CurvePoolTemplate/CurvePoolAvax";
 
 export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt): void {
   const platform = getPlatform();
   if (!platform.catchup && block > CATCHUP_BLOCK) {
     platform.catchup = true;
     platform.save();
-    catchUpRegistryMainnet();
   }
   if (providedId == BIG_INT_ZERO) {
     let mainRegistry = Registry.load(addedAddress.toHexString());
@@ -119,8 +118,14 @@ export function handleAddressModified(event: AddressModified): void {
 
 export function getLpToken(pool: Address, registryAddress: Address): Address {
   const registry = MainRegistry.bind(registryAddress);
-  const lpTokenResult = registry.try_get_lp_token(pool);
+  let lpTokenResult = registry.try_get_lp_token(pool);
   if (lpTokenResult.reverted) {
+    if (dataSource.network() == Network.AVALANCHE.toLowerCase()) {
+      lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
+      if (!lpTokenResult.reverted) {
+        return lpTokenResult.value;
+      }
+    }
     log.warning("getLpToken reverted: {}", [pool.toHexString()]);
   }
   return lpTokenResult.reverted ? pool : lpTokenResult.value;
@@ -230,7 +235,7 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
       EARLY_V2_POOLS.includes(pool) ? true : false,
       // on mainnet the unknown metapools are legacy metapools deployed before the
       // contract was added to the address indexer
-      UNKNOWN_METAPOOLS.has(pool.toHexString()) ? METAPOOL_FACTORY : STABLE_FACTORY,
+      UNKNOWN_METAPOOLS.has(pool.toHexString()) ? STABLE_FACTORY : STABLE_FACTORY,
       event.block.timestamp,
       event.block.number,
       event.transaction.hash,
@@ -388,9 +393,9 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 // event emitted. So we need a call handler. But this is only (so far) a mainnet
 // problem - and only mainnet can handle call triggers. Hence why we need to hack
 // around with mustache to avoid issues
-export function handleAddExistingMetaPools(call: Add_existing_metapoolsCall): void {
-  const pools = call.inputs._pools;
-  const factory = Factory.load(call.to.toHexString());
+export function handleAddExistingMetaPools(): void {
+  const pools = [ADDRESS_ZERO];
+  const factory = Factory.load("0x0000000000000000000000000000000000000001");
   if (!factory) {
     return;
   }
@@ -402,7 +407,7 @@ export function handleAddExistingMetaPools(call: Add_existing_metapoolsCall): vo
     log.info("Existing meta pool {} added to factory contract ({}) at {}", [
       pools[i].toHexString(),
       i.toString(),
-      call.transaction.hash.toHexString(),
+      LENDING,
     ]);
   }
   factory.save();

@@ -15,6 +15,12 @@
   "callHandler": "callHandlers:",
   "function1": "- function: add_existing_metapools(address[10])",
   "handler1": "handler: handleAddExistingMetaPools",
+  "function2": "- function: set_liquidity_gauges(address,address[10])",
+  "handler2": "handler: handleSetLiquidityGauges",
+  "function3": "- function: set_liquidity_gauges(address,address[10])",
+  "handler3": "handler: handleSetLiquidityGauges",
+  "function4": "- function: batch_set_liquidity_gauges(address[10],address[10])",
+  "handler4": "handler: handleBatchSetLiquidityGauges",
   "addExistingMetaPoolsCallParams": "call: Add_existing_metapoolsCall",
   "poolAssignedValue": "call.inputs._pools",
   "importExistingMetaPools": "import { Add_existing_metapoolsCall } from '../generated/templates/CryptoFactoryTemplate/StableFactory'",
@@ -153,5 +159,7 @@
   "importCatchupFunction": "import { catchUpRegistryMainnet } from './services/catchup'",
   "executeCatchupFunction": "catchUpRegistryMainnet()",
   "gaugeController": true,
-  "curveToken": "0xD533a949740bb3306d119CC777fa900bA034cd52"
+  "curveToken": "0xD533a949740bb3306d119CC777fa900bA034cd52",
+  "abiName": "",
+  "abiPath": ""
 }
