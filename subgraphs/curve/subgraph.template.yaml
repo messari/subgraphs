@@ -291,15 +291,10 @@ templates:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
       {{ callHandler }}
+        {{ function2 }}
+          {{ handler2 }}
         {{ function3 }}
           {{ handler3 }}
-        {{ function4 }}
-          {{ handler4 }}
-      callHandlers:
-        - function: set_liquidity_gauges(address,address[10])
-          handler: handleSetLiquidityGauges
-        - function: batch_set_liquidity_gauges(address[10],address[10])
-          handler: handleBatchSetLiquidityGauges
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplate
     kind: ethereum/contract
