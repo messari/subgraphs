@@ -15,25 +15,32 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - Liquidation
-        - _Price
+        - _Trove
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
         - LendingProtocol
         - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
         - Token
         - UsageMetricsDailySnapshot
-        - DailyActiveAccount
+        - UsageMetricsHourlySnapshot
+        - ActiveAccount
         - Account
         - FinancialsDailySnapshot
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
       eventHandlers:
-        - event: Liquidation(uint256,uint256,uint256,uint256)
-          handler: handleLiquidation
         - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
           handler: handleTroveUpdated
         - event: Redemption(uint256,uint256,uint256,uint256)
           handler: handleRedemption
+        - event: TroveLiquidated(indexed address,uint256,uint256,uint8)
+          handler: handleTroveLiquidated
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
@@ -50,15 +57,17 @@ dataSources:
         - FinancialsDailySnapshot
         - LendingProtocol
         - _Trove
-        - _Price
         - Deposit
         - Withdraw
         - Borrow
         - Repay
         - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
         - Token
-        - DailyActiveAccount
+        - ActiveAccount
         - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
         - Account
       abis:
         - name: BorrowerOperations
@@ -82,7 +91,7 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       entities:
-        - _Price
+        - Token
       abis:
         - name: PriceFeed
           file: ./abis/PriceFeed.json
@@ -105,7 +114,7 @@ dataSources:
         - LendingProtocol
         - Token
         - MarketDailySnapshot
-        - _Price
+        - MarketHourlySnapshot
         - FinancialsDailySnapshot
       abis:
         - name: ActivePool
@@ -133,10 +142,10 @@ dataSources:
         - LendingProtocol
         - Market
         - Token
-        - DailyActiveAccount
+        - ActiveAccount
         - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
         - Account
-        - _Price
       abis:
         - name: CollSurplusPool
           file: ./abis/CollSurplusPool.json
@@ -156,7 +165,6 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - _Price
         - LendingProtocol
         - Token
         - FinancialsDailySnapshot

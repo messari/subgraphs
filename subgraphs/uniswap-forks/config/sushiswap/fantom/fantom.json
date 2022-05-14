@@ -1,0 +1,8 @@
+{
+  "deployment": "SUSHISWAP_FANTOM",
+  "network": "fantom",
+  "address": "0xc35dadb65012ec5796536bd9864ed8773abc74c4",
+  "startBlock": 2457879,
+  "miniChefAddress": "0xf731202A3cf7EfA9368C2d7bD613926f7A144dB5",
+  "miniChefStartBlock": 28771200
+}

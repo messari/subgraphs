@@ -1,4 +1,5 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGDECIMAL_ONE, BIGINT_TWO, BIGINT_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -38,4 +39,18 @@ export function calculateMedian(prices: BigDecimal[]): BigDecimal {
   }
 
   return sorted[mid - 1];
+}
+
+// Ray is 27 decimal Wad is 18 decimal
+// These functions were made for the AAVE subgraph. Visit the following link to verify that AAVE's definition for RAY units match what are needed for your protocol
+// https://docs.aave.com/developers/v/2.0/glossary
+
+export function rayToWad(a: BigInt): BigInt {
+  const halfRatio = BigInt.fromI32(10).pow(9).div(BigInt.fromI32(2));
+  return halfRatio.plus(a).div(BigInt.fromI32(10).pow(9));
+}
+
+export function wadToRay(a: BigInt): BigInt {
+  const result = a.times(BigInt.fromI32(10).pow(9));
+  return result;
 }

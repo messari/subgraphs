@@ -1,0 +1,12 @@
+{
+  "name": "compound-forks",
+  "license": "MIT",
+  "scripts": {},
+  "dependencies": {
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.28.0",
+    "prettier": "^2.6.2"
+  }
+}

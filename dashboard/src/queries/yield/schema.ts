@@ -1,38 +1,91 @@
 import { Schema, Versions } from "../../constants";
 
 export const schema = (version: string): Schema => {
-  switch (version) {
+  // The version group uses the first two digits  of the schema version and defaults to that schema.
+  const versionGroupArr = version.split('.');
+  versionGroupArr.pop();
+  const versionGroup = versionGroupArr.join('.') + '.0';
+  switch (versionGroup) {
     case Versions.Schema100:
       return schema100();
     case Versions.Schema110:
       return schema110();
+    case Versions.Schema120:
+      return schema120();
     default:
-      return schema100();
+      return schema120();
   }
 };
+
+export const poolFields = {
+  id: "ID!",
+  name: "String!",
+  slug: "String!",
+  schemaVersion: "String!",
+  subgraphVersion: "String!",
+  methodologyVersion: "String!",
+  network: "Network!",
+  type: "ProtocolType!",
+  totalValueLockedUSD: "BigDecimal!",
+  protocolControlledValueUSD: "BigDecimal",
+  cumulativeSupplySideRevenueUSD: "BigDecimal!",
+  cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+  cumulativeTotalRevenueUSD: "BigDecimal!",
+  cumulativeUniqueUsers: "Int!"
+};
+
 export const schema100 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "vaultDailySnapshots"];
-  const entitiesData = [
-    ["totalValueLockedUSD", "totalVolumeUSD", "protocolSideRevenueUSD", "supplySideRevenueUSD", "feesUSD"],
-    ["totalUniqueUsers", "dailyTransactionCount", "activeUsers"],
-    [
-      "totalVolumeUSD",
-      "inputTokenBalances",
-      "outputTokenSupply",
-      "outputTokenPriceUSD",
-      "rewardTokenEmissionsAmount",
-      "rewardTokenEmissionsUSD",
-    ],
-  ];
+  const entitiesData = {
+    // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
+    financialsDailySnapshots: {
+      totalValueLockedUSD: "BigDecimal!",
+      totalVolumeUSD: "BigDecimal!",
+      protocolSideRevenueUSD: "BigDecimal!",
+      supplySideRevenueUSD: "BigDecimal!",
+      feesUSD: "BigDecimal"
+    },
+    usageMetricsDailySnapshots: {
+      totalUniqueUsers: "Int!",
+      dailyTransactionCount: "Int!",
+      activeUsers: "Int!"
+    },
+    vaultDailySnapshots: {
+      totalVolumeUSD: "BigDecimal!",
+      inputTokenBalances: "[BigInt!]!",
+      outputTokenSupply: "BigInt!",
+      outputTokenPriceUSD: "BigDecimal",
+      rewardTokenEmissionsAmount: "[BigInt!]",
+      rewardTokenEmissionsUSD: "[BigDecimal!]",
+    }
+  };
+
   const query = `
   query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 1000) {
+        yieldAggregators {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          network
+          type
+          totalValueLockedUSD
+          totalUniqueUsers
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -44,13 +97,13 @@ export const schema100 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 1000) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        vaultDailySnapshots(first:1000, where: {vault: $poolId}) {
+        vaultDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -67,25 +120,30 @@ export const schema100 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
-            name
+            id
+            decimals
           }
           rewardTokens {
-            name
+            id
+            decimals
           }
           name
           symbol
           depositLimit
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
         }
-        withdraws(first: 1000, id: $poolId) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 1000, id: $poolId) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -94,38 +152,94 @@ export const schema100 = (): Schema => {
         }
       }
     `;
-  const poolData = ["name", "symbol", "fees", "depositLimit", "inputTokens", "outputToken", "rewardTokens"];
+
+  const poolData = {
+    id: "ID!",
+    name: "String",
+    symbol: "String",
+    fees: "[VaultFee!]!",
+    depositLimit: "BigInt!",
+    inputTokens: "Token!",
+    outputToken: "Token",
+    rewardTokens: "[RewardToken!]"
+  };
+
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalUniqueUsers: "Int!"
+  };
+
   const events = ["withdraws","deposits"]
   
-  return { entities, entitiesData, query, poolData,events };
+  return { entities, entitiesData, query, poolData, events, protocolFields};
 };
 
 export const schema110 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "vaultDailySnapshots"];
-  const entitiesData = [
-    ["totalValueLockedUSD", "totalVolumeUSD", "protocolSideRevenueUSD", "supplySideRevenueUSD", "totalRevenueUSD"],
-    ["totalUniqueUsers", "dailyTransactionCount", "activeUsers"],
-    [
-      "totalValueLockedUSD",
-      "totalVolumeUSD",
-      "inputTokenBalances",
-      "outputTokenSupply",
-      "outputTokenPriceUSD",
-      "rewardTokenEmissionsAmount",
-      "rewardTokenEmissionsUSD",
-    ],
-  ];
-  const events = ["withdraws","deposits"]
+  
+  const entitiesData = {
+    // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
+    financialsDailySnapshots: {
+      totalValueLockedUSD: "BigDecimal!",
+      totalVolumeUSD: "BigDecimal!",
+      protocolSideRevenueUSD: "BigDecimal!",
+      supplySideRevenueUSD: "BigDecimal!",
+      totalRevenueUSD: "BigDecimal"
+    },
+    usageMetricsDailySnapshots: {
+      totalUniqueUsers: "Int!",
+      dailyTransactionCount: "Int!",
+      activeUsers: "Int!"
+    },
+    vaultDailySnapshots: {
+      totalValueLockedUSD: "BigDecimal!",
+      totalVolumeUSD: "BigDecimal!",
+      inputTokenBalances: "[BigInt!]!",
+      outputTokenSupply: "BigInt!",
+      outputTokenPriceUSD: "BigDecimal",
+      rewardTokenEmissionsAmount: "[BigInt!]",
+      rewardTokenEmissionsUSD: "[BigDecimal!]",
+      timestamp: "BigInt!"
+    }
+  };
+
+  const events = ["withdraws","deposits"];
 
   const query = `
       query Data($poolId: String){
+        _meta {
+          block {
+            number
+          }
+          deployment
+        }
         protocols {
           name
           type
           schemaVersion
           subgraphVersion
         }
-        financialsDailySnapshots(first: 1000) {
+        yieldAggregators {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          methodologyVersion
+          network
+          type
+          totalUniqueUsers
+          totalValueLockedUSD
+          totalVolumeUSD
+        }
+        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
           totalVolumeUSD
           protocolSideRevenueUSD
@@ -136,13 +250,13 @@ export const schema110 = (): Schema => {
           id
           name
         }
-        usageMetricsDailySnapshots(first: 1000) {
+        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
           dailyTransactionCount
           activeUsers
           timestamp
         }
-        vaultDailySnapshots(first:1000, where: {vault: $poolId}) {
+        vaultDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
           outputTokenSupply
@@ -159,25 +273,30 @@ export const schema110 = (): Schema => {
           }
           inputTokens {
             name
+            decimals
           }
           outputToken {
-            name
+            id
+            decimals
           }
           rewardTokens {
-            name
+            id
+            decimals
           }
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
           name
           symbol
           depositLimit
         }
-        withdraws(first: 1000, id: $poolId) {
+        withdraws(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           amountUSD
           amount
           blockNumber
           from
           timestamp
         }
-        deposits(first: 1000, id: $poolId) {
+        deposits(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {
           timestamp
           blockNumber
           from
@@ -187,7 +306,231 @@ export const schema110 = (): Schema => {
 
       }
       `;
-  const poolData = ["name", "symbol", "fees", "depositLimit", "inputTokens", "outputToken", "rewardTokens"];
 
-  return { entities, entitiesData, query, poolData ,events};
+  const poolData = {
+    id: "ID!",
+    name: "String",
+    symbol: "String",
+    fees: "[VaultFee!]!",
+    depositLimit: "BigInt!",
+    inputTokens: "Token!",
+    outputToken: "Token",
+    rewardTokens: "[RewardToken!]"
+  };
+
+  const protocolFields = {
+    id: "ID!",
+    name: "String!",
+    slug: "String!",
+    schemaVersion: "String!",
+    subgraphVersion: "String!",
+    methodologyVersion: "String!",
+    network: "Network!",
+    type: "ProtocolType!",
+    totalUniqueUsers: "Int!",
+    totalValueLockedUSD: "BigDecimal!",
+    totalVolumeUSD: "BigDecimal!",
+  };
+
+
+  return { entities, entitiesData, query, poolData ,events, protocolFields};
+};
+
+export const schema120 = (): Schema => {
+  const entities = [
+    "financialsDailySnapshots",
+    "usageMetricsDailySnapshots",
+    "vaultDailySnapshots",
+    "usageMetricsHourlySnapshots",
+    "vaultHourlySnapshots"
+  ];
+  const entitiesData = {
+    // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
+    financialsDailySnapshots: {
+      totalValueLockedUSD: "BigDecimal!",
+      protocolControlledValueUSD: "BigDecimal",
+      dailySupplySideRevenueUSD: "BigDecimal!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      dailyProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      dailyTotalRevenueUSD: "BigDecimal!", 
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      timestamp: "BigInt!"
+    },
+    usageMetricsDailySnapshots: {
+      dailyActiveUsers: "Int!",
+      cumulativeUniqueUsers: "Int!",
+      dailyTransactionCount: "Int!",
+      dailyDepositCount: "Int!",
+      dailyWithdrawCount: "Int!",
+      timestamp: "BigInt!"
+    },
+    vaultDailySnapshots: {
+      totalValueLockedUSD: "BigDecimal!",
+      inputTokenBalance: "BigInt!",
+      outputTokenSupply: "BigInt!",
+      outputTokenPriceUSD: "BigDecimal",
+      pricePerShare: "BigDecimal",
+      stakedOutputTokenAmount: "BigInt",
+      rewardTokenEmissionsAmount: "[BigInt!]",
+      rewardTokenEmissionsUSD: "[BigDecimal!]",
+      timestamp: "BigInt!"
+    },
+    usageMetricsHourlySnapshots: {
+      hourlyActiveUsers: "Int!",
+      cumulativeUniqueUsers: "Int!",
+      hourlyTransactionCount: "Int!",
+      hourlyDepositCount: "Int!",
+      hourlyWithdrawCount: "Int!",
+      timestamp: "BigInt!"
+    },
+    vaultHourlySnapshots: {
+      totalValueLockedUSD: "BigDecimal!",
+      inputTokenBalance: "BigInt!",
+      outputTokenSupply: "BigInt!",
+      outputTokenPriceUSD: "BigDecimal",
+      pricePerShare: "BigDecimal",
+      stakedOutputTokenAmount: "BigInt",
+      rewardTokenEmissionsAmount: "[BigInt!]",
+      rewardTokenEmissionsUSD: "[BigDecimal!]",
+      timestamp: "BigInt!"
+    }
+  };
+
+
+  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
+  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
+  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+
+  const vaultDailyQuery = "vaultDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
+  const vaultHourlyQuery = "vaultHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultHourlySnapshots).join(',') + '}';
+
+
+  const events = ["withdraws","deposits"];
+  const eventsFields = [
+    "hash",
+    "to",
+    "from",
+    "timestamp",
+    "amount",
+    "amountUSD"
+  ];
+  const eventsQuery = events.map((event) => {
+    let options = "";
+    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}" + options + ") { "
+    const fields = eventsFields.join(", ");
+    return baseStr + fields + ' }'
+  });
+
+  const poolData = {
+    id: "ID!",
+    name: "String",
+    symbol: "String",
+    fees: "[VaultFee!]!",
+    depositLimit: "BigInt!",
+    inputToken: "Token!",
+    outputToken: "Token",
+    rewardTokens: "[RewardToken!]",
+    totalValueLockedUSD: "BigDecimal!",
+    inputTokenBalance: "BigInt!",
+    outputTokenSupply: "BigInt",
+    outputTokenPriceUSD: "BigDecimal",
+    rewardTokenEmissionsAmount: "[BigInt!]",
+    rewardTokenEmissionsUSD: "[BigDecimal!]",
+    stakedOutputTokenAmount: "BigInt",
+    pricePerShare: "BigDecimal"
+  };
+  
+  const query = `
+    query Data($poolId: String){
+      _meta {
+        block {
+          number
+        }
+        deployment
+      }
+      protocols {
+        name
+        type
+        schemaVersion
+        subgraphVersion
+      }
+      yieldAggregators {
+        id
+        name
+        slug
+        schemaVersion
+        subgraphVersion
+        methodologyVersion
+        network
+        type
+        totalValueLockedUSD
+        protocolControlledValueUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        cumulativeUniqueUsers
+      }
+      vaults {
+        id
+        name
+      }
+      ${finanQuery}
+      ${usageHourlyQuery}
+      ${usageDailyQuery}
+      ${vaultHourlyQuery}
+      ${vaultDailyQuery}
+      ${eventsQuery}
+      vault(id:$poolId){
+        id
+        name        
+        symbol
+        fees {
+          feeType
+          feePercentage
+        }
+        inputToken {
+          decimals
+          name
+        }
+        outputToken {
+          id
+          decimals
+        }
+        rewardTokens {
+          id
+          token {
+            decimals
+          }
+        }
+        depositLimit
+        totalValueLockedUSD
+        stakedOutputTokenAmount
+        pricePerShare
+        inputTokenBalance
+        outputTokenSupply
+        outputTokenPriceUSD
+        rewardTokenEmissionsAmount
+        rewardTokenEmissionsUSD
+      }
+    }`
+
+    const protocolFields = {
+      id: "ID!",
+      name: "String!",
+      slug: "String!",
+      schemaVersion: "String!",
+      subgraphVersion: "String!",
+      methodologyVersion: "String!",
+      network: "Network!",
+      type: "ProtocolType!",
+      totalValueLockedUSD: "BigDecimal!",
+      protocolControlledValueUSD: "BigDecimal",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      cumulativeUniqueUsers: "Int!"
+    };
+
+  return { entities, entitiesData, query, poolData , events, protocolFields};
 };
