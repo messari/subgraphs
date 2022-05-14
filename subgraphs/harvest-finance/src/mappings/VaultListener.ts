@@ -42,7 +42,7 @@ export function handleDeposit(event: DepositEvent): void {
   let depositAmountUSD = inputTokenPrice.usdPrice
     .times(amount.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+    .div(constants.BIGINT_TEN.pow(inputTokenPrice.decimals as u8).toBigDecimal());
 
   deposit.from = event.params.beneficiary.toHex();
   deposit.to = vault.inputToken;
@@ -87,7 +87,7 @@ export function handleWithdraw(event: WithdrawEvent): void {
   let withdrawAmountUSD = inputTokenPrice.usdPrice
     .times(amount.toBigDecimal())
     .div(inputTokenDecimals.toBigDecimal())
-    .div(inputTokenPrice.decimals.toBigDecimal());
+    .div(constants.BIGINT_TEN.pow(inputTokenPrice.decimals as u8).toBigDecimal());
 
   withdraw.from = event.params.beneficiary.toHex();
   withdraw.to = vault.inputToken;

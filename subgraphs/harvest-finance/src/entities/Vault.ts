@@ -7,7 +7,7 @@ import { getOrCreateProtocol } from "./Protocol";
 import { getOrCreateToken } from "./Token";
 import { VaultListener } from '../../generated/templates';
 import * as constants from "./../constant";
-import { getUsdPricePerToken } from "./../Prices";
+import { getUsdPrice } from "./../Prices";
 import { updateVaultSnapshots, updateFinancialSnapshot } from './Metrics'
 import { getOrCreateVaultFee } from './VaultFee'
 import { CustomPriceType } from "../Prices/common/types";
@@ -83,7 +83,6 @@ export function updateVaultPrices(event: ethereum.Event, vault: Vault): void{
   let vault_contract = VaultContract.bind(vaultAddress);
 
   let inputTokenAddress = Address.fromString(vault.inputToken)
-  let inputTokenPrice = getUsdPricePerToken(inputTokenAddress);
   // exist because vault create it
   let inputToken = getOrCreateToken(inputTokenAddress);
   let inputTokenDecimals = constants.BIGINT_TEN.pow(inputToken.decimals as u8);
@@ -95,18 +94,18 @@ export function updateVaultPrices(event: ethereum.Event, vault: Vault): void{
 
   let protocol = getOrCreateProtocol();
 
-  updateProtocolAndVaulTotalValueLockedUSD(event, protocol, vault, inputTokenDecimals, inputTokenPrice, inputToken);
+  updateProtocolAndVaulTotalValueLockedUSD(event, protocol, vault, inputTokenDecimals, inputTokenAddress, inputToken);
 
   updateVaultSnapshots(event, vault);
   updateFinancialSnapshot(event);
 }
 
 function updateProtocolAndVaulTotalValueLockedUSD(event: ethereum.Event, protocol: YieldAggregator, vault: Vault,
-  inputTokenDecimals: BigInt, inputTokenPrice: CustomPriceType, inputToken: Token
+  inputTokenDecimals: BigInt, inputTokenAddress: Address, inputToken: Token
   ): void{
   let protocolTotalValueLockedUSD = protocol.totalValueLockedUSD;
 
-  let lastPriceUSD = (<BigDecimal> inputTokenPrice.usdPrice).div(inputTokenPrice.decimals.toBigDecimal());
+  let lastPriceUSD = getUsdPrice(inputTokenAddress, BigDecimal.fromString("1"));
   let pricePerShare_nu = (<BigDecimal> vault.pricePerShare).div(inputTokenDecimals.toBigDecimal());
   let supply = vault.inputTokenBalance.toBigDecimal()
     .div(inputTokenDecimals.toBigDecimal());

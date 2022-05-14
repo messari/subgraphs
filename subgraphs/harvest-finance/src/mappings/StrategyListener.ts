@@ -32,8 +32,8 @@ function handleProfit(event: ethereum.Event, profit_amount: BigInt, fee_amount: 
   //let vault = getOrCreateVault(vault_addr.toHex());
   let rewardToken_addr = strategy_contract.try_rewardToken().value;
 
-  let profit_USD = getUsdPrice(rewardToken_addr, profit_amount);
-  let fee_USD = getUsdPrice(rewardToken_addr, fee_amount);
+  let profit_USD = getUsdPrice(rewardToken_addr, profit_amount.toBigDecimal());
+  let fee_USD = getUsdPrice(rewardToken_addr, fee_amount.toBigDecimal());
 
   log.info('profit_amount: {} - id este: {} $', [
       profit_amount.toString(), profit_USD.toString()

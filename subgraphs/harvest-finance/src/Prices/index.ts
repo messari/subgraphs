@@ -1,16 +1,10 @@
-import {
-  Address,
-  BigDecimal,
-  BigInt,
-  dataSource,
-  log,
-} from "@graphprotocol/graph-ts";
-
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
 import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
+import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
+import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
@@ -22,105 +16,87 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
-  let decimals = constants.BIGINT_TEN.pow(
-    BigInt.fromI32(6).toI32() as u8
-  ).toBigDecimal();
 
-  // 1. ChainLink Feed Registry
+  // 1. Yearn Lens Oracle
+  let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
+  if (!yearnLensPrice.reverted) {
+    log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString(),
+    ]);
+    return yearnLensPrice;
+  }
+
+  // 2. ChainLink Feed Registry
   let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
   if (!chainLinkPrice.reverted) {
-    log.info("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
+    log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(decimals).toString(),
+      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString(),
     ]);
-    return CustomPriceType.initialize(
-      chainLinkPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return chainLinkPrice;
   }
 
-  // 2. CalculationsCurve
-  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
-    tokenAddr,
-    network
-  );
+  // 3. CalculationsCurve
+  let calculationsCurvePrice = getTokenPriceFromCalculationCurve(tokenAddr, network);
   if (!calculationsCurvePrice.reverted) {
-    log.info("[CalculationsCurve] tokenAddress: {}, Price: {}", [
+    log.warning("[CalculationsCurve] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsCurvePrice.usdPrice.div(decimals).toString(),
+      calculationsCurvePrice.usdPrice.div(calculationsCurvePrice.decimalsBaseTen).toString(),
     ]);
-    return CustomPriceType.initialize(
-      calculationsCurvePrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return calculationsCurvePrice;
   }
 
-  // 3. CalculationsSushiSwap
-  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
-    tokenAddr,
-    network
-  );
+  // 4. CalculationsSushiSwap
+  let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(tokenAddr, network);
   if (!calculationsSushiSwapPrice.reverted) {
-    log.info("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
+    log.warning("[CalculationsSushiSwap] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      calculationsSushiSwapPrice.usdPrice.div(decimals).toString(),
+      calculationsSushiSwapPrice.usdPrice.div(calculationsSushiSwapPrice.decimalsBaseTen).toString(),
     ]);
-    return CustomPriceType.initialize(
-      calculationsSushiSwapPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return calculationsSushiSwapPrice;
   }
 
-  // 4. Curve Router
+  // 5. Curve Router
   let curvePrice = getCurvePriceUsdc(tokenAddr, network);
   if (!curvePrice.reverted) {
-    log.info("[CurveRouter] tokenAddress: {}, Price: {}", [
+    log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      curvePrice.usdPrice.div(decimals).toString(),
+      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString(),
     ]);
-    return CustomPriceType.initialize(curvePrice.usdPrice, BigInt.fromI32(6));
+    return curvePrice;
   }
 
-  // 5. Uniswap Router
+  // 6. Uniswap Router
   let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
   if (!uniswapPrice.reverted) {
-    log.info("[UniswapRouter] tokenAddress: {}, Price: {}", [
+    log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(decimals).toString(),
+      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString(),
     ]);
-    return CustomPriceType.initialize(uniswapPrice.usdPrice, BigInt.fromI32(6));
+    return uniswapPrice;
   }
 
-  // 6. SushiSwap Router
+  // 7. SushiSwap Router
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
-    log.info("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
+    log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(decimals).toString(),
+      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
     ]);
-    return CustomPriceType.initialize(
-      sushiswapPrice.usdPrice,
-      BigInt.fromI32(6)
-    );
+    return sushiswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
-    tokenAddr.toHexString(),
-  ]);
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
 
   return new CustomPriceType();
 }
 
-export function getUsdPrice(tokenAddr: Address, amount: BigInt): BigDecimal {
+export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal {
   let tokenPrice = getUsdPricePerToken(tokenAddr);
 
   if (!tokenPrice.reverted) {
-    return tokenPrice.usdPrice
-      .times(amount.toBigDecimal())
-      .div(tokenPrice.decimals.toBigDecimal())
-      .div(
-        constants.BIGINT_TEN.pow(BigInt.fromI32(6).toI32() as u8).toBigDecimal()
-      );
+    return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
   }
 
   return constants.BIGDECIMAL_ZERO;
