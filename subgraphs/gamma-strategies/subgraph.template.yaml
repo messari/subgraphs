@@ -1,0 +1,105 @@
+specVersion: 0.0.4
+{{#features}}
+features:
+  - grafting
+graft:
+  base: {{base}}
+  block: {{block}}
+{{/features}}
+schema:
+  file: ./schema.graphql
+dataSources:
+  {{#hypervisorOrphan}}
+  - name: {{name}}
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Hypervisor
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  {{/hypervisorOrphan}}
+  {{#hypeRegistry}}
+  - name: {{name}}
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: HypeRegistry
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Vault
+      abis:
+        - name: HypeRegistry
+          file: ./abis/HypeRegistry.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+      eventHandlers:
+        - event: HypeAdded(address,uint256)
+          handler: handleHypeAdded
+  {{/hypeRegistry}}
+templates:
+  - name: Hypervisor
+    kind: ethereum/contract
+    network: {{network}}
+    source:
+      abi: Hypervisor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+

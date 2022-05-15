@@ -1,0 +1,435 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - name: TCR-ETH
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x8cd73cb1e1fa35628e36b8c543c5f825cd4e77f1"
+      abi: Hypervisor
+      startBlock: 13328071
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: HEX-ETH
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x0D3FBebfdD96940952618598a5F012De7240C552"
+      abi: Hypervisor
+      startBlock: 12763072
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: AXS-ETH
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x0624Eb9691D99178d0d2Bd76c72f1dBB4DB05286"
+      abi: Hypervisor
+      startBlock: 12764007
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: APW-ETH-3000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x55eED13aB07F8b5538eFf301551492a1D776dA7b"
+      abi: Hypervisor
+      startBlock: 13463550
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: FLOAT-ETH-3000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x85CBeD523459b7f6F81C11e710DF969703a8A70C"
+      abi: Hypervisor
+      startBlock: 13507015
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: CVX-ETH-10000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x34b95494c3C2732Aa82E1e56be57074Fee7a2B28"
+      abi: Hypervisor
+      startBlock: 13603680
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: FEI-USDC-500
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x704eCeCABe7855996CeDE5CeFa660Eccd3c01dBE"
+      abi: Hypervisor
+      startBlock: 13642121
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: GRO-ETH-3000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x85a5326F08c44eC673e4bFc666b737f7f3Dc6b37"
+      abi: Hypervisor
+      startBlock: 13642283
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: BPRO-ETH-10000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x46B7602e4DAD6F71dAe532588110e2711682ACA3"
+      abi: Hypervisor
+      startBlock: 13642187
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: BABL-ETH 3000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0xF19F91d7889668A533F14d076aDc187be781a458"
+      abi: Hypervisor
+      startBlock: 13691975
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: ETH-BABL2-3000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x5e6c481de496554b66657dd1ca1f70c61cf11660"
+      abi: Hypervisor
+      startBlock: 13934335
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: FLOAT-ETH2-3000
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0xc86b1e7fa86834cac1468937cdd53ba3ccbc1153"
+      abi: Hypervisor
+      startBlock: 13615043
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+  - name: HypeRegistry
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      address: "0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946"
+      abi: HypeRegistry
+      startBlock: 13659998
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Vault
+      abis:
+        - name: HypeRegistry
+          file: ./abis/HypeRegistry.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+      eventHandlers:
+        - event: HypeAdded(address,uint256)
+          handler: handleHypeAdded
+templates:
+  - name: Hypervisor
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Hypervisor
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/handlers.ts
+      entities:
+        - Account
+        - Deposit
+        - Withdraw
+        - Vault
+      abis:
+        - name: Hypervisor
+          file: ./abis/Hypervisor.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleWithdraw
+
