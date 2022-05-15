@@ -1,6 +1,5 @@
 import { Address, BigDecimal, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
 import { PoolV3 } from "../generated/vaUSDC_prod_RL4/PoolV3";
-import { PoolV2 } from "../generated/vLINK_prod_RL3/PoolV2";
 import { Controller } from "../generated/vaUSDC_prod_RL4/Controller";
 import { StrategyV3 } from "../generated/vaUSDC_prod_RL4/StrategyV3";
 import { PriceRouter } from "../generated/vaUSDC_prod_RL4/PriceRouter";

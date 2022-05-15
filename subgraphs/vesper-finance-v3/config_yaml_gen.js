@@ -15,7 +15,7 @@ const genFunc = () => {
       address: e.address,
     })),
     pools: _.filter(pools, (e) => {
-      return e.chainId === 1 && ["prod", "orbit"].indexOf(e.stage) > -1;
+      return e.chainId === 1 && ["prod", "orbit"].indexOf(e.stage) > -1 && e.version > 2;
     }).map((e) => {
       let version = 0;
 
