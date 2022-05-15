@@ -16,10 +16,10 @@ import {
   TransferCall,
   DepositCall,
   WithdrawCall,
-} from "../generated/poolV3_vaUSDC/PoolV3";
-import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
-import { PoolRewards } from "../generated/poolV3_vaUSDC/PoolRewards";
-import { PoolRewardsOld } from "../generated/poolV3_vaUSDC/PoolRewardsOld";
+} from "../generated/vaUSDC_prod_RL4/PoolV3";
+import { Erc20Token } from "../generated/vaUSDC_prod_RL4/Erc20Token";
+import { PoolRewards } from "../generated/vaUSDC_prod_RL4/PoolRewards";
+import { PoolRewardsOld } from "../generated/vaUSDC_prod_RL4/PoolRewardsOld";
 import { toUsd } from "./peer";
 import { getDay, getHour } from "./utils";
 

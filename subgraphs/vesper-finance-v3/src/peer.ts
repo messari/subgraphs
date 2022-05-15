@@ -1,9 +1,9 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { PoolV3 } from "../generated/poolV3_vaUSDC/PoolV3";
-import { Controller } from "../generated/poolV3_vaUSDC/Controller";
-import { StrategyV3 } from "../generated/poolV3_vaUSDC/StrategyV3";
-import { PriceRouter } from "../generated/poolV3_vaUSDC/PriceRouter";
-import { Erc20Token } from "../generated/poolV3_vaUSDC/Erc20Token";
+import { PoolV3 } from "../generated/vaUSDC_prod_RL4/PoolV3";
+import { Controller } from "../generated/vaUSDC_prod_RL4/Controller";
+import { StrategyV3 } from "../generated/vaUSDC_prod_RL4/StrategyV3";
+import { PriceRouter } from "../generated/vaUSDC_prod_RL4/PriceRouter";
+import { Erc20Token } from "../generated/vaUSDC_prod_RL4/Erc20Token";
 import {
   ROUTER_ADDRESS,
   USDC_ADDRESS,

@@ -6,7 +6,7 @@ schema:
 dataSources:
 {{#pools}}
   - kind: ethereum/contract
-    name: 'poolV{{version}}_{{name}}'
+    name: '{{name}}'
     network: mainnet
     source:
       address: '{{address}}'

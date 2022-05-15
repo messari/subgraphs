@@ -5,7 +5,7 @@ import {
   DepositCall,
   WithdrawCall,
   UpdatePoolRewardsCall,
-} from "../../generated/poolV3_vaUSDC/PoolV3";
+} from "../../generated/vaUSDC_prod_RL4/PoolV3";
 import {
   hasStrategy,
   calculateRevenue,
@@ -22,7 +22,7 @@ import {
   updateVaultRewardEmission,
 } from "../entities";
 import { updateAllSnapshots } from "../snapshots";
-import { Erc20Token } from "../../generated/poolV3_vaUSDC/Erc20Token";
+import { Erc20Token } from "../../generated/vaUSDC_prod_RL4/Erc20Token";
 
 // See handleWithdrawFee for explanation.
 export function handleWithdrawV3(call: WithdrawCall): void {
@@ -34,6 +34,13 @@ export function handleWithdrawV3(call: WithdrawCall): void {
   let poolAddress = dataSource.address();
   let poolAddressHex = poolAddress.toHexString();
   let poolV3 = PoolV3.bind(poolAddress);
+  const strategies_call = poolV3.try_getStrategies();
+
+  if (strategies_call.reverted) {
+    log.error('Pool : {} getStrategies failed', [poolAddressHex]);
+    return;
+  }
+
   if (
     call.to.equals(ZERO_ADDRESS) ||
     hasStrategy(poolV3.getStrategies(), call.to)
@@ -59,6 +66,13 @@ export function handleTransferV3(call: TransferCall): void {
     poolAddressHex,
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
+  const strategies_call = poolV3.try_getStrategies();
+
+  if (strategies_call.reverted) {
+    log.error('Pool : {} getStrategies failed', [poolAddressHex]);
+    return;
+  }
+  
   if (
     call.from.equals(ZERO_ADDRESS) ||
     hasStrategy(poolV3.getStrategies(), call.from)
@@ -110,6 +124,13 @@ export function handleDepositV3(call: DepositCall): void {
     poolAddressHex,
   ]);
   let poolV3 = PoolV3.bind(poolAddress);
+  const strategies_call = poolV3.try_getStrategies();
+
+  if (strategies_call.reverted) {
+    log.error('Pool : {} getStrategies failed', [poolAddressHex]);
+    return;
+  }
+  
   if (
     call.from.equals(ZERO_ADDRESS) ||
     hasStrategy(poolV3.getStrategies(), call.from)
