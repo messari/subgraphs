@@ -178,13 +178,16 @@ export function handleDeposit(event: Deposit): void {
   );
 
   // Update total value locked on the market level
-  updateTVL(hash, token, market, protocol, deposit.amount, false);
+  updateTVL(hash, token, market, protocol, deposit.amount, amountUSD, false);
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
-  updateFinancialsDailySnapshot(event);
+  let financial = updateFinancialsDailySnapshot(event);
+  financial.totalVolumeUSD = financial.totalVolumeUSD.plus(amountUSD);
+  financial.save();
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
   deposit.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   deposit.save();
@@ -251,13 +254,17 @@ export function handleWithdraw(event: Withdraw): void {
   );
 
   // Update total value locked on the market level
-  updateTVL(hash, token, market, protocol, withdraw.amount, true);
+  updateTVL(hash, token, market, protocol, withdraw.amount, amountUSD, true);
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
-  updateFinancialsDailySnapshot(event);
+  let financial = updateFinancialsDailySnapshot(event);
+  financial.totalVolumeUSD = financial.totalVolumeUSD.plus(amountUSD);
+  financial.save();
+
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
   withdraw.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   withdraw.save();
@@ -320,17 +327,17 @@ export function handleBorrow(event: Borrow): void {
   );
 
   // Update total value locked on the market level
-  updateTVL(hash, token, market, protocol, borrow.amount, true);
-  // Calculate the revenues and fees as a result of the borrow
-  calculateRevenues(market, token);
+  updateTVL(hash, token, market, protocol, borrow.amount, amountUSD, true);
   market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
+
+  // Calculate the revenues and fees as a result of the borrow
+  calculateRevenues(market, token);
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
-  const financial = updateFinancialsDailySnapshot(event);
-  // Add the borrow amount in USD to total volume on the daily financial snapshot ('total loan origination')
+  let financial = updateFinancialsDailySnapshot(event);
   financial.totalVolumeUSD = financial.totalVolumeUSD.plus(amountUSD);
   financial.save();
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
@@ -392,14 +399,17 @@ export function handleRepay(event: Repay): void {
   );
 
   // Update total value locked on the market level
-  updateTVL(hash, token, market, protocol, repay.amount, false);
-  calculateRevenues(market, token);
+  updateTVL(hash, token, market, protocol, repay.amount, amountUSD, false);
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
+
+  calculateRevenues(market, token);
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
-  updateFinancialsDailySnapshot(event);
+  let financial = updateFinancialsDailySnapshot(event);
+  financial.totalVolumeUSD = financial.totalVolumeUSD.plus(amountUSD);
   // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
   repay.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   repay.save();
@@ -457,14 +467,16 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   );
 
   // Update total value locked on the market level
-  updateTVL(hash, token, market, protocol, liquidate.amount, false);
+  updateTVL(hash, token, market, protocol, liquidate.amount, amountUSD, false);
   calculateRevenues(market, token);
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
   updateMetricsDailySnapshot(event);
-  updateFinancialsDailySnapshot(event);
+  let financial = updateFinancialsDailySnapshot(event);
+  financial.totalVolumeUSD = financial.totalVolumeUSD.plus(amountUSD);
 
   if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {
     log.info("Liquidation hash={}, amount={} USD, liquidation penalty={}", [

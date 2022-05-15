@@ -743,6 +743,7 @@ export function updateTVL(
   market: Market,
   protocol: LendingProtocol,
   amountInTokens: BigInt,
+  amountUSD: BigDecimal,
   toSubtract: bool
 ): void {
   // Update the total value locked in a market and the protocol overall after transactions
@@ -800,5 +801,6 @@ export function updateTVL(
     market.totalValueLockedUSD
   );
   protocol.totalDepositUSD = protocol.totalValueLockedUSD;
+  protocol.totalVolumeUSD = amountUSD;
   protocol.save();
 }
