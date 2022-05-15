@@ -16,12 +16,22 @@ const genFunc = () => {
     })),
     pools: _.filter(pools, (e) => {
       return e.chainId === 1 && ["prod", "orbit"].indexOf(e.stage) > -1;
-    }).map((e) => ({
-      name: `${e.name}_${e.stage}_RL${e.riskLevel}`,
-      address: e.address,
-      version: e.version < 3 ? 2 : 3,
-      birthblock: e.birthblock,
-    })),
+    }).map((e) => {
+      let version = 0;
+
+      if (!e.version) {
+        version = 2;
+      } else {
+        version = e.version < 3 ? 2 : 3;
+      }
+
+      return {
+        name: `${e.name}_${e.stage}_RL${e.riskLevel}`,
+        address: e.address,
+        version,
+        birthblock: e.birthblock,
+      };
+    }),
   };
 
   console.info("Template context :", context);

@@ -1,5 +1,6 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
 import { PoolV3 } from "../generated/vaUSDC_prod_RL4/PoolV3";
+import { PoolV2 } from "../generated/vLINK_prod_RL3/PoolV2";
 import { Controller } from "../generated/vaUSDC_prod_RL4/Controller";
 import { StrategyV3 } from "../generated/vaUSDC_prod_RL4/StrategyV3";
 import { PriceRouter } from "../generated/vaUSDC_prod_RL4/PriceRouter";
@@ -9,6 +10,7 @@ import {
   USDC_ADDRESS,
   WETH_ADDRESS,
   CONTROLLER_ADDRESS_HEX,
+  ZERO_ADDRESS,
 } from "./constant";
 
 export function getDecimalDivisor(decimals: i32): BigDecimal {
@@ -100,6 +102,21 @@ export function hasStrategy(addresses: Address[], toFound: Address): bool {
     toFound.toHexString(),
   ]);
   return false;
+}
+
+export function isStrategy(poolAddress: Address, ctxAddress: Address): bool {
+  if (poolAddress.equals(ZERO_ADDRESS) || ctxAddress.equals(ZERO_ADDRESS)) {
+    return false;
+  }
+
+  const poolV3 = PoolV3.bind(poolAddress);
+  const strategies_call = poolV3.try_getStrategies();
+
+  if (strategies_call.reverted) {
+    return false;
+  } else {
+    return hasStrategy(strategies_call.value, ctxAddress);
+  }
 }
 
 export function getShareToTokenRateV3(pool: PoolV3): BigDecimal {

@@ -929,7 +929,7 @@ dataSources:
     network: mainnet
     source:
       address: '0x0a27E910Aee974D05000e05eab8a4b8Ebd93D40C'
-      abi: PoolV3
+      abi: PoolV2
       startBlock: 12144811
     mapping:
       kind: ethereum/events
@@ -953,12 +953,12 @@ dataSources:
           file: ./abis/controller.json
         - name: Erc20Token
           file: ./abis/erc-20.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV2
+          file: ./abis/pool-v2.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV3
-          file: ./abis/strategy-v3.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
         - name: PriceRouter
           file: ./abis/uniswap.json
         - name: PoolRewards
@@ -967,15 +967,15 @@ dataSources:
           file: ./abis/pool-rewards-old.json
       callHandlers:
         - function: withdraw(uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawV2
         - function: deposit(uint256)
-          handler: handleDepositV3
+          handler: handleDepositV2
   - kind: ethereum/contract
     name: 'vVSP_prod_RL3'
     network: mainnet
     source:
       address: '0xbA4cFE5741b357FA371b506e5db0774aBFeCf8Fc'
-      abi: PoolV3
+      abi: PoolV2
       startBlock: 11868095
     mapping:
       kind: ethereum/events
@@ -999,12 +999,12 @@ dataSources:
           file: ./abis/controller.json
         - name: Erc20Token
           file: ./abis/erc-20.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV2
+          file: ./abis/pool-v2.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV3
-          file: ./abis/strategy-v3.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
         - name: PriceRouter
           file: ./abis/uniswap.json
         - name: PoolRewards
@@ -1013,15 +1013,15 @@ dataSources:
           file: ./abis/pool-rewards-old.json
       callHandlers:
         - function: withdraw(uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawV2
         - function: deposit(uint256)
-          handler: handleDepositV3
+          handler: handleDepositV2
   - kind: ethereum/contract
     name: 'vDAI_prod_RL3'
     network: mainnet
     source:
       address: '0xcA0c34A3F35520B9490C1d58b35A19AB64014D80'
-      abi: PoolV3
+      abi: PoolV2
       startBlock: 11594191
     mapping:
       kind: ethereum/events
@@ -1045,12 +1045,12 @@ dataSources:
           file: ./abis/controller.json
         - name: Erc20Token
           file: ./abis/erc-20.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV2
+          file: ./abis/pool-v2.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV3
-          file: ./abis/strategy-v3.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
         - name: PriceRouter
           file: ./abis/uniswap.json
         - name: PoolRewards
@@ -1059,15 +1059,15 @@ dataSources:
           file: ./abis/pool-rewards-old.json
       callHandlers:
         - function: withdraw(uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawV2
         - function: deposit(uint256)
-          handler: handleDepositV3
+          handler: handleDepositV2
   - kind: ethereum/contract
     name: 'vUSDC_prod_RL3'
     network: mainnet
     source:
       address: '0x0C49066C0808Ee8c673553B7cbd99BCC9ABf113d'
-      abi: PoolV3
+      abi: PoolV2
       startBlock: 11475256
     mapping:
       kind: ethereum/events
@@ -1091,12 +1091,12 @@ dataSources:
           file: ./abis/controller.json
         - name: Erc20Token
           file: ./abis/erc-20.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV2
+          file: ./abis/pool-v2.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV3
-          file: ./abis/strategy-v3.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
         - name: PriceRouter
           file: ./abis/uniswap.json
         - name: PoolRewards
@@ -1105,15 +1105,15 @@ dataSources:
           file: ./abis/pool-rewards-old.json
       callHandlers:
         - function: withdraw(uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawV2
         - function: deposit(uint256)
-          handler: handleDepositV3
+          handler: handleDepositV2
   - kind: ethereum/contract
     name: 'vWBTC_prod_RL3'
     network: mainnet
     source:
       address: '0x4B2e76EbBc9f2923d83F5FBDe695D8733db1a17B'
-      abi: PoolV3
+      abi: PoolV2
       startBlock: 11475198
     mapping:
       kind: ethereum/events
@@ -1137,12 +1137,12 @@ dataSources:
           file: ./abis/controller.json
         - name: Erc20Token
           file: ./abis/erc-20.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV2
+          file: ./abis/pool-v2.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV3
-          file: ./abis/strategy-v3.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
         - name: PriceRouter
           file: ./abis/uniswap.json
         - name: PoolRewards
@@ -1151,15 +1151,15 @@ dataSources:
           file: ./abis/pool-rewards-old.json
       callHandlers:
         - function: withdraw(uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawV2
         - function: deposit(uint256)
-          handler: handleDepositV3
+          handler: handleDepositV2
   - kind: ethereum/contract
     name: 'vETH_prod_RL3'
     network: mainnet
     source:
       address: '0x103cc17C2B1586e5Cd9BaD308690bCd0BBe54D5e'
-      abi: PoolV3
+      abi: PoolV2
       startBlock: 11475126
     mapping:
       kind: ethereum/events
@@ -1183,12 +1183,12 @@ dataSources:
           file: ./abis/controller.json
         - name: Erc20Token
           file: ./abis/erc-20.json
-        - name: PoolV3
-          file: ./abis/pool-v3.json
+        - name: PoolV2
+          file: ./abis/pool-v2.json
         - name: AddressList
           file: ./abis/address-list.json
-        - name: StrategyV3
-          file: ./abis/strategy-v3.json
+        - name: StrategyV2
+          file: ./abis/strategy-v2.json
         - name: PriceRouter
           file: ./abis/uniswap.json
         - name: PoolRewards
@@ -1197,6 +1197,6 @@ dataSources:
           file: ./abis/pool-rewards-old.json
       callHandlers:
         - function: withdraw(uint256)
-          handler: handleWithdrawV3
+          handler: handleWithdrawV2
         - function: deposit(uint256)
-          handler: handleDepositV3
+          handler: handleDepositV2
