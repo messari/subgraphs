@@ -34,6 +34,7 @@ import {
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
   REWARD_TOKEN_ADDRESS,
+  PROTOCOL_METHODOLOGY_VERSION
 } from "../common/constants";
 
 import * as addresses from "../common/addresses";
@@ -279,14 +280,16 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
   if (!lendingProtocol) {
     lendingProtocol = new LendingProtocol(protocolId);
     lendingProtocol.totalUniqueUsers = 0;
-    lendingProtocol.network = SchemaNetwork.ETHEREUM;
+    lendingProtocol.network = SchemaNetwork.FANTOM;
     lendingProtocol.type = ProtocolType.LENDING;
     lendingProtocol.subgraphVersion = SUBGRAPH_VERSION;
     lendingProtocol.schemaVersion = SCHEMA_VERSION;
     lendingProtocol.name = PROTOCOL_NAME;
     lendingProtocol.slug = PROTOCOL_SLUG;
+    lendingProtocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     lendingProtocol.totalRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalVolumeUSD = BIGDECIMAL_ZERO;
     lendingProtocol.totalDepositUSD = BIGDECIMAL_ZERO;
     lendingProtocol.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
     lendingProtocol.supplySideRevenueUSD = BIGDECIMAL_ZERO;
@@ -458,12 +461,12 @@ export function updateFinancialsDailySnapshot(
   if (!financialsDailySnapshot) {
     financialsDailySnapshot = new FinancialsDailySnapshot(daysSinceEpoch);
     financialsDailySnapshot.protocol = protocol.id;
-    financialsDailySnapshot.totalVolumeUSD = BIGDECIMAL_ZERO;
   }
   log.info(
     "Created (or updated) FinancialsDailySnapshot with ID={}, tx hash={}",
     [financialsDailySnapshot.id, event.transaction.hash.toHexString()]
   );
+  financialsDailySnapshot.totalVolumeUSD = protocol.totalVolumeUSD;
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsDailySnapshot.totalDepositUSD = protocol.totalDepositUSD;
   financialsDailySnapshot.protocolSideRevenueUSD =

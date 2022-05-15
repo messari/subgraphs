@@ -145,8 +145,10 @@ export const STAKE_INTERACTION = "STAKE";
 export const UNSTAKE_INTERACTION = "UNSTAKE";
 export const LIQUIDATION_INTERACTION = "LIQUIDATION";
 
-export const SUBGRAPH_VERSION = "0.0.8";
-export const SCHEMA_VERSION = "0.0.8";
+// Version and general info about protocol
+export const SUBGRAPH_VERSION = "1.1.0";
+export const SCHEMA_VERSION = "1.1.0";
+export const PROTOCOL_METHODOLOGY_VERSION = "1.1.0"
 export const PROTOCOL_NAME = "Geist-Finance";
 export const PROTOCOL_SLUG = "geist-finance";
 export const LENDING_TYPE = "POOLED";
