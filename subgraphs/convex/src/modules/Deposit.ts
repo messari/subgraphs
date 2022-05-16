@@ -81,9 +81,16 @@ export function _Deposit(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositAmountUSD);
-  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
+  
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    depositAmountUSD
+  );
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);

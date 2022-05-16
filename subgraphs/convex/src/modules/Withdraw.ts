@@ -81,11 +81,16 @@ export function _Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(
+  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
+
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
     withdrawAmountUSD
   );
-  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
