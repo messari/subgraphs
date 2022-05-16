@@ -60,8 +60,10 @@ function updateUsageMetricsSnapshotsAfterDeposit_daily(day: i64, event: ethereum
 
 function updateUsageMetricsSnapshotsAfterWithdraw_daily(day: i64, event: ethereum.Event): void {
   let snapshot = updateUsageMetricsSnapshots_daily(day, event);
+  let protocol = getOrCreateProtocol();
 
   snapshot.dailyWithdrawCount += 1;
+  snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   snapshot.save();
 }
 

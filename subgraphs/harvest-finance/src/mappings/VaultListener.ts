@@ -6,14 +6,15 @@ import {
   StrategyChanged as StrategyChangedEvent,
   Withdraw as WithdrawEvent,
   DoHardWorkCall
-} from "../../generated/ControllerListener/VaultContract"
-import { getOrCreateToken } from './../entities/Token'
-import { Vault, Token } from "../../generated/schema";
-import { WETH_ADDRESS } from './../constant'
-import { getOrCreateVault, updateVaultPrices } from './../entities/Vault'
-import { getOrCreateDeposit, getOrCreateWithdraw } from './../entities/Transaction'
-import { getOrCreateToken } from './../entities/Token'
-import { depositUpdateMetrics, withdrawUpdateMetrics } from './../entities/Metrics'
+} from "../../generated/ControllerListener/VaultContract";
+import { getOrCreateToken } from './../entities/Token';
+import { getOrCreateProtocol } from './../entities/Protocol';
+import { Vault, Token, Account } from "../../generated/schema";
+import { WETH_ADDRESS } from './../constant';
+import { getOrCreateVault, updateVaultPrices } from './../entities/Vault';
+import { getOrCreateDeposit, getOrCreateWithdraw } from './../entities/Transaction';
+import { getOrCreateToken } from './../entities/Token';
+import { depositUpdateMetrics, withdrawUpdateMetrics } from './../entities/Metrics';
 import * as constants from "./../constant";
 import { getUsdPricePerToken } from "./../Prices";
 import { StrategyListener } from '../../generated/templates';
@@ -51,6 +52,17 @@ export function handleDeposit(event: DepositEvent): void {
   deposit.vault = vault.id;
   deposit.amountUSD = depositAmountUSD;
   deposit.save();
+
+  let protocol = getOrCreateProtocol();
+  let accountId = deposit.from;
+  let account = Account.load(accountId);
+  if (!account) {
+    account = new Account(accountId);
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
 
   
   vault.inputTokenBalance = vault.inputTokenBalance.plus(amount);
@@ -96,6 +108,18 @@ export function handleWithdraw(event: WithdrawEvent): void {
   withdraw.vault = vault.id;
   withdraw.amountUSD = withdrawAmountUSD;
   withdraw.save();
+
+
+  let protocol = getOrCreateProtocol();
+  let accountId = withdraw.from;
+  let account = Account.load(accountId);
+  if (!account) {
+    account = new Account(accountId);
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
 
   
   vault.inputTokenBalance = vault.inputTokenBalance.minus(amount);
