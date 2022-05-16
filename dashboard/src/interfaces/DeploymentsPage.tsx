@@ -56,47 +56,35 @@ function DeploymentsPage() {
   // const [metadata, setMetadata] = useState<ApolloQueryResult<any>[]>([]);
   // const allDeployments: { [x: string]: string }[] = [];
 
-  const deploymentIdsArray: string[] = [];
-  Object.keys(ProtocolsToQuery).forEach((protocol) => {
-    // If a protocol in the ProtocolsToQuery object does not have a valid deployment id, it will return null and not be returned as a protocol on the deployments page
-    Object.keys(ProtocolsToQuery[protocol]).forEach((network) => {
-      const currentDeployObj: { [x: string]: string } = ProtocolsToQuery[protocol][network];
-      deploymentIdsArray.push(currentDeployObj.deploymentId);
-      // currentDeployObj.name = protocol;
-      // currentDeployObj.network = network;
-      // allDeployments.push(currentDeployObj);
-      // deploymentIdsArray.push(currentDeployObj.deploymentId);
-    });
-  });
-  const link = new HttpLink({
-    uri: "https://api.thegraph.com/index-node/graphql",
-  });
-  const client = useMemo(
-    () =>
-      new ApolloClient({
-        link,
-        cache: new InMemoryCache(),
-      }),
-    [],
-  );
+  // const deploymentIdsArray: string[] = [];
+  // Object.keys(ProtocolsToQuery).forEach((protocol) => {
+  // If a protocol in the ProtocolsToQuery object does not have a valid deployment id, it will return null and not be returned as a protocol on the deployments page
+  // Object.keys(ProtocolsToQuery[protocol]).forEach((network) => {
+  //   const currentDeployObj: { [x: string]: string } = ProtocolsToQuery[protocol][network];
+  //   deploymentIdsArray.push(currentDeployObj.deploymentId);
+  // currentDeployObj.name = protocol;
+  // currentDeployObj.network = network;
+  // allDeployments.push(currentDeployObj);
+  // deploymentIdsArray.push(currentDeployObj.deploymentId);
+  //   });
+  // });
+  // const link = new HttpLink({
+  //   uri: "https://api.thegraph.com/index-node/graphql",
+  // });
+  // const client = useMemo(
+  //   () =>
+  //     new ApolloClient({
+  //       link,
+  //       cache: new InMemoryCache(),
+  //     }),
+  //   [],
+  // );
 
-  const { data: subgraphStatusList, error } = useQuery(SubgraphStatusQuery, {
-    variables: { deploymentIds: deploymentIdsArray },
-    client,
-  });
-  const subgraphStatusMap = useMemo<Record<string, SubgraphStatus>>(() => {
-    if (!subgraphStatusList) return {};
-    return subgraphStatusList.indexingStatuses.reduce(
-      (acc: Record<string, SubgraphStatus>, status: SubgraphStatus) => ({
-        ...acc,
-        [status.subgraph]: {
-          ...status,
-          network: status.chains[0]?.network ?? "",
-        },
-      }),
-      {},
-    );
-  }, [subgraphStatusList]);
+  // const { data: subgraphStatusList, error } = useQuery(SubgraphStatusQuery, {
+  //   variables: { deploymentIds: deploymentIdsArray },
+  //   client,
+  // });
+
   //
   // const fatalErrorDeployments: string[] = [];
   // const deploymentErrorMsgs: string[] = [];
@@ -209,7 +197,6 @@ function DeploymentsPage() {
         <SubgraphDeployments
           key={key}
           protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }}
-          statusMap={subgraphStatusMap}
         />
       ))}
     </div>

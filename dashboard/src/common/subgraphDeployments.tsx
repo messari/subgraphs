@@ -5,12 +5,11 @@ import { Deployment } from "./deployment";
 interface SubgraphDeploymentsProps {
   protocol: {
     name: string;
-    deploymentMap: Record<string, DeploymentConfig>;
+    deploymentMap: { [network: string]: string; };
   };
-  statusMap: Record<string, SubgraphStatus>;
 }
 
-export const SubgraphDeployments = ({ protocol: { name, deploymentMap }, statusMap }: SubgraphDeploymentsProps) => {
+export const SubgraphDeployments = ({ protocol: { name, deploymentMap } }: SubgraphDeploymentsProps) => {
   const deployments = useMemo(
     () =>
       Object.entries(deploymentMap).map(([network, deployment]) => ({
@@ -30,7 +29,6 @@ export const SubgraphDeployments = ({ protocol: { name, deploymentMap }, statusM
             key={network}
             networkName={network}
             deployment={deployment}
-            status={statusMap[deployment.deploymentId]}
           />
         ))}
       </div>

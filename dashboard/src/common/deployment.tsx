@@ -2,28 +2,53 @@ import React, { useMemo } from "react";
 import { latestSchemaVersion } from "../constants";
 import { DeploymentConfig, SubgraphStatus } from "../types";
 import { useNavigate } from "react-router";
-import { useQuery } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, useQuery } from "@apollo/client";
 import { NewClient, parseSubgraphName } from "../utils";
 import { ProtocolQuery } from "../queries/protocolQuery";
+import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
+import { useEffect } from "react";
 
 interface DeploymentProps {
   networkName: string;
-  deployment: DeploymentConfig;
-  status: SubgraphStatus;
+  deployment: string;
 }
 
-export const Deployment = ({ networkName, deployment, status }: DeploymentProps) => {
+export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
   const navigate = useNavigate();
-  const client = useMemo(() => NewClient(deployment.URL), [deployment.URL]);
+
+  const link = new HttpLink({
+    uri: "https://api.thegraph.com/index-node/graphql",
+  });
+  const clientIndexing = useMemo(
+    () =>
+      new ApolloClient({
+        link,
+        cache: new InMemoryCache(),
+      }),
+    [],
+  );
+
+  const subgraphName = deployment?.split('name/')[1];
+
+  const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery, {
+    variables: { subgraphName },
+    client: clientIndexing,
+  });
+
+  const client = useMemo(() => NewClient(deployment), [deployment]);
   const { data, error } = useQuery(ProtocolQuery, {
     client,
   });
 
   const protocol = useMemo(() => data?.protocols[0], [data]);
-  // Probably still want to render if we couldn't fetch the status.
-  if (!protocol || !status) return null;
-  if (error) {
-    return <>Error state</>;
+  // Probably still want to render if we couldn't fetch the status.indexingStatusesForSubgraphName[0].
+
+  useEffect(() => {
+    console.log('DEPLOYMENT ERR', error, errorIndexing, status, data?.protocols[0]?.name, subgraphName)
+  })
+
+  if (!status) {
+    return null;
   }
 
   const navigateToSubgraph = (url: string) => () => {
@@ -31,25 +56,28 @@ export const Deployment = ({ networkName, deployment, status }: DeploymentProps)
   };
 
   let color = "black";
-  if (status.fatalError) {
+  if (status.indexingStatusesForSubgraphName[0].fatalError) {
     color = "red";
   }
-  if (status.synced && protocol.schemaVersion === latestSchemaVersion) {
+  if (status.indexingStatusesForSubgraphName[0].synced && protocol?.schemaVersion === latestSchemaVersion) {
     color = "green";
   }
 
+  console.log(status)
+
   let indexed = 0;
-  if (status.synced) {
+  if (status.indexingStatusesForSubgraphName[0].synced) {
     indexed = 100;
   } else {
     indexed = parseFloat(
-      ((status.chains[0].latestBlock.number / status.chains[0].chainHeadBlock.number) * 100).toFixed(2),
+      ((status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number / status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number) * 100).toFixed(2),
     );
   }
 
+
   return (
     <div
-      onClick={navigateToSubgraph(deployment.URL)}
+      onClick={navigateToSubgraph(deployment)}
       style={{
         border: color + " 2px solid",
         padding: "1%",
@@ -59,30 +87,30 @@ export const Deployment = ({ networkName, deployment, status }: DeploymentProps)
       }}
     >
       <h3 style={{ textAlign: "center", color }}>{networkName}</h3>
-      <p>Entity count: {status.entityCount}</p>
+      <p>Entity count: {status.indexingStatusesForSubgraphName[0].entityCount}</p>
       <p style={{ color }}>Indexed: {indexed}%</p>
       <p>
-        {status.fatalError ? (
+        {status.indexingStatusesForSubgraphName[0].fatalError ? (
           <>
             <span style={{ color: "red" }}>
-              Fatal Error - Execution Stopped at block {status.fatalError.block.number}
+              Fatal Error - Execution Stopped at block {status.indexingStatusesForSubgraphName[0].fatalError.block.number}
             </span>{" "}
             -{" "}
             <span>
-              <b>"{status.fatalError.message.substring(0, 30)}..."</b>
+              <b>"{status.indexingStatusesForSubgraphName[0].fatalError.message.substring(0, 30)}..."</b>
             </span>
           </>
         ) : (
-          <span>Latest Block: {status.chains[0].latestBlock.number}</span>
+          <span>Latest Block: {status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number}</span>
         )}
       </p>
       <p>
-        Network: {status.chains[0].network} - Current chain block: {status.chains[0].chainHeadBlock.number}
+        Network: {status.indexingStatusesForSubgraphName[0].chains[0].network} - Current chain block: {status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number}
       </p>
       <p>
-        Schema version: {protocol.schemaVersion || "0.0.0"} - Subgraph version: {protocol.subgraphVersion || "0.0.0"}
+        Schema version: {protocol?.schemaVersion || "N/A"} - Subgraph version: {protocol?.subgraphVersion || "N/A"}
       </p>
-      <p>Non fatal error count: {status.nonFatalErrors.length}</p>
+      <p>Non fatal error count: {status.indexingStatusesForSubgraphName[0].nonFatalErrors.length}</p>
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
     Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import { toDate } from '../../utils';
 
 ChartJS.register(
     CategoryScale,
@@ -19,7 +20,19 @@ ChartJS.register(
     Legend
 );
 
-export function StackedChart(token1: string, token2: string, tokenWeight1: number, tokenWeight2: number, poolTitle: string) {
+export function StackedChart(tokens: any[], tokenWeightsArray: any[], poolTitle: string) {
+    const dates: string[] = [];
+
+    const tokenWeightsValues = tokenWeightsArray.map(x => {
+        const currentTokenValues = x.map((weight: { [x: string]: any }) => {
+            if (dates.length < x.length) {
+                dates.push(toDate(weight.date));
+            }
+            return Number(weight.value);
+        });
+        return currentTokenValues
+    });
+
     const options = {
         plugins: {
             title: {
@@ -27,7 +40,7 @@ export function StackedChart(token1: string, token2: string, tokenWeight1: numbe
                 text: poolTitle,
             },
         },
-        responsive: false,
+        responsive: true,
         scales: {
             x: {
                 stacked: true,
@@ -37,21 +50,14 @@ export function StackedChart(token1: string, token2: string, tokenWeight1: numbe
             },
         },
     };
-    const labels = ['Token Weights'];
+    const colorList = ['red', 'blue', 'yellow', 'lime']
+    const labels = dates;
+    const datasets = tokenWeightsValues.map((valArr: any[], idx: number) => {
+        return { data: valArr, label: tokens[idx].name || "Token [" + idx + ']', backgroundColor: colorList[idx] }
+    })
     const data = {
         labels,
-        datasets: [
-            {
-                label: token1 || "Token [0]",
-                data: [tokenWeight1],
-                backgroundColor: 'rgb(255, 99, 132)',
-            },
-            {
-                label: token2 || "Token [1]",
-                data: [tokenWeight2],
-                backgroundColor: 'rgb(75, 192, 192)',
-            },
-        ],
+        datasets,
     };
     const element = <><Bar options={options} data={data} /></>
     return element;
