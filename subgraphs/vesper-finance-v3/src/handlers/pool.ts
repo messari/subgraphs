@@ -5,7 +5,6 @@ import {
   WithdrawCall,
 } from "../../generated/vaUSDC_prod_RL4/PoolV3";
 import { isStrategy, calculateRevenue, getDecimalDivisor } from "../peer";
-import { ZERO_ADDRESS } from "../constant";
 
 import {
   getOrCreateVault,
