@@ -1,16 +1,24 @@
-import { Address, BigDecimal, dataSource, ethereum } from "@graphprotocol/graph-ts";
-import { Vault, VaultFee } from "../../generated/schema";
-import { Hypervisor as HypervisorContract } from "../../generated/templates/Hypervisor/Hypervisor";
+import {
+  Address,
+  BigDecimal,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
+import { Vault, VaultFee } from "../../../generated/schema";
+import { Hypervisor as HypervisorContract } from "../../../generated/templates/Hypervisor/Hypervisor";
 import {
   BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
   REGISTRY_ADDRESS,
   VaultFeeType,
-} from "../common/constants";
-import { getOrCreateToken } from "../common/getters";
+} from "../../common/constants";
+import { getOrCreateToken } from "../../common/getters";
 
-export function getOrCreateVault(vaultAddress: Address, block: ethereum.Block): Vault {
-  let vaultId = vaultAddress.toHexString();
+export function getOrCreateVault(
+  vaultAddress: Address,
+  block: ethereum.Block
+): Vault {
+  let vaultId = vaultAddress.toHex();
   let vault = Vault.load(vaultId);
   if (!vault) {
     let hypeContract = HypervisorContract.bind(vaultAddress);
@@ -51,9 +59,9 @@ export function getOrCreateVault(vaultAddress: Address, block: ethereum.Block): 
 export function createVaultFee(
   feeType: string,
   feePercentage: BigDecimal,
-  vaultAddress: string
+  vaultId: string
 ): VaultFee {
-  let vaultFee = new VaultFee(feeType + "-" + vaultAddress);
+  let vaultFee = new VaultFee(feeType.concat("-").concat(vaultId));
   vaultFee.feePercentage = feePercentage;
   vaultFee.feeType = feeType;
   vaultFee.save();
