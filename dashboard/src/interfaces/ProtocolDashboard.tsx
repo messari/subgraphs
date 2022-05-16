@@ -111,7 +111,7 @@ function ProtocolDashboard() {
   useEffect(() => {
     console.log("--------------------Error Start-------------------------");
     console.log(error, error ? Object.values(error) : null);
-    console.log(protocolSchemaQueryError);
+    console.log(protocolSchemaQueryError ? Object.values(protocolSchemaQueryError) : null);
     console.log("--------------------Error End---------------------------");
   }, [error]);
 
@@ -213,15 +213,15 @@ function ProtocolDashboard() {
     }, [data, tabValue]);
 
   // errorRender is the element to be rendered to display the error
-  let errorRender = null;
+  let errorDisplayProps = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
   // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
 
   if (protocolSchemaQueryError && !loading) {
-    errorRender = ErrorDisplay(protocolSchemaQueryError, setSubgraphToQuery, protocolSchemaData, subgraphToQuery);
+    errorDisplayProps = protocolSchemaQueryError;
   }
   if (error && !loading) {
-    errorRender = ErrorDisplay(error, setSubgraphToQuery, protocolSchemaData, subgraphToQuery);
+    errorDisplayProps = error;
   }
 
   let protocolInfo = null;
@@ -255,7 +255,12 @@ function ProtocolDashboard() {
         RETURN TO DEPLOYMENTS
       </Button>
       {protocolInfo}
-      {errorRender}
+      <ErrorDisplay
+        errorObject={errorDisplayProps}
+        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
+        protocolSchemaData={protocolSchemaData}
+        subgraphToQuery={subgraphToQuery}
+      />
       <WarningDisplay warningArray={warning} />
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
         <CircularProgress sx={{ margin: 6 }} size={50} />

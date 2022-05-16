@@ -3,12 +3,11 @@ import { StackedChart } from "../common/chartComponents/StackedChart";
 import ScrollToElement from "../common/utilComponents/ScrollToElement";
 import { convertTokenDecimals } from "../utils";
 
-function checkValueFalsey(value: any, schemaName: string, entityField: string, fieldDataType: string, issues: { message: string, type: string }[]): { message: string, type: string } | undefined {
-    if (!fieldDataType) {
+function checkValueFalsey(value: any, schemaName: string, entityField: string, fieldDataType: string[], issues: { message: string, type: string }[]): { message: string, type: string } | undefined {
+    if (!fieldDataType || fieldDataType.length === 0) {
         return undefined;
     }
-    const fieldDataTypeChars = fieldDataType.split("");
-    if (fieldDataTypeChars[fieldDataTypeChars.length - 1] !== "!") {
+    if (fieldDataType[fieldDataType.length - 1] !== "!") {
         return undefined;
     }
     if (value === null || value === '0' || value?.length === 0 || value === '') {
@@ -46,10 +45,23 @@ function SchemaTable(
             if (entityField === '__typename') {
                 return null;
             }
+            let dataType = dataFields[entityField];
             let value = entityData[entityField];
-            const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
+            const fieldDataTypeChars = dataFields[entityField].split("");
+            const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
             if (issueReturned) {
                 issues.push(issueReturned);
+            }
+            if (!value && fieldDataTypeChars[fieldDataTypeChars.length - 1] !== "!") {
+                return (
+                    <TableRow key={entityField}>
+                        <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
+                            {entityField}: <b>{dataType}</b>
+                        </TableCell>
+                        <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
+                            {value}
+                        </TableCell>
+                    </TableRow>);
             }
             if (typeof (value) === 'boolean') {
                 if (value) {
@@ -58,36 +70,64 @@ function SchemaTable(
                     value = 'False';
                 }
             }
-            // if (!isNaN(parseFloat(value)) && !Array.isArray(value) && (dataFields[entityField].includes('Int') || dataFields[entityField].includes('Decimal') || dataFields[entityField].includes('umber'))) {
-            //     value = parseFloat(value).toFixed(2);
-            // }
-            if (entityField === "outputTokenSupply") {
+
+            if (entityField === "outputTokenSupply" || entityField === "outputTokenPriceUSD" || entityField === "stakedOutputTokenAmount") {
                 value = convertTokenDecimals(value, entityData.outputToken.decimals).toString();
-                const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
+                const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
                 if (issueReturned) {
                     issues.push(issueReturned);
                 }
+                dataType += ' [' + entityData.outputToken.name + ']';
             }
             if (entityField === 'inputTokenBalances') {
-                // if array 
-                const decimalMapped = entityData[entityField].map((val: string, idx: number) => {
-                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', dataFields[entityField], issues);
+                const tokenNames: string[] = [];
+                const decimalMapped = value.map((val: string, idx: number) => {
+                    tokenNames.push(entityData.inputTokens[idx].name || 'TOKEN [' + idx + ']');
+                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', fieldDataTypeChars, issues);
                     if (issueReturned) {
                         issues.push(issueReturned);
                     }
                     return convertTokenDecimals(val, entityData.inputTokens[idx].decimals).toString();
                 });
-                value = '[ ' + decimalMapped.join(", ") + " ]"
+                dataType += ' [' + tokenNames.join(',') + ']';
+                value = '[ ' + decimalMapped.join(", ") + " ]";
             } else if (entityField === 'inputTokenBalance') {
                 value = convertTokenDecimals(value, entityData.inputToken.decimals);
-                const issueReturned = checkValueFalsey(value, schemaName, entityField, dataFields[entityField], issues);
+                dataType += ' [' + entityData.inputToken.name + ']';
+                const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
                 if (issueReturned) {
                     issues.push(issueReturned);
                 }
+            } else if (entityField === 'inputTokenPriceUSD') {
+                dataType += ' [' + entityData.inputToken.name + ']';
+            } else if (entityField.toUpperCase().includes('REWARDTOKENEMISSIONS')) {
+                const tokenNames: string[] = [];
+                const decimalMapped = value.map((val: string, idx: number) => {
+                    let decimals = 18;
+                    if (entityData?.rewardTokens[idx]?.token?.decimals) {
+                        decimals = entityData?.rewardTokens[idx]?.token?.decimals;
+                        tokenNames.push(entityData.rewardTokens[idx]?.token?.name || 'TOKEN [' + idx + ']');
+                    } else if (entityData?.rewardTokens[idx]?.decimals) {
+                        decimals = entityData?.rewardTokens[idx]?.decimals;
+                        tokenNames.push(entityData.rewardTokens[idx]?.name || 'TOKEN [' + idx + ']');
+                    }
+                    return convertTokenDecimals(val, decimals).toString();
+                });
+                dataType += ' [' + tokenNames.join(',') + ']';
+                if (entityField === 'rewardTokenEmissionsAmount') {
+                    value = '[ ' + decimalMapped.join(", ") + " ]";
+                } else if (entityField === 'rewardTokenEmissionsUSD') {
+                    value = value.map((val: string) => {
+                        return '$' + Number(Number(val).toFixed(2)).toLocaleString();
+                    })
+                    // value = JSON.stringify(value);
+                    // value = value.split(", ").join(",").split(',').join(', ').split('"').join('');
+                    value = '[' + value.join(', ') + ']';
+                }
             } else if (entityField === 'mintedTokenSupplies') {
                 const decimalMapped = entityData[entityField].map((val: string, idx: number) => {
-                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', dataFields[entityField], issues);
-                    const issueReturnedToken = checkValueFalsey(entityData.mintedTokens[idx]?.decimals, schemaName, "MintedTokens [" + idx + "]", dataFields[entityField], issues);
+                    const issueReturned = checkValueFalsey(val, schemaName, entityField + ' [' + idx + ']', fieldDataTypeChars, issues);
+                    const issueReturnedToken = checkValueFalsey(entityData.mintedTokens[idx]?.decimals, schemaName, "MintedTokens [" + idx + "]", fieldDataTypeChars, issues);
                     if (issueReturned) {
                         issues.push(issueReturned);
                     }
@@ -101,31 +141,45 @@ function SchemaTable(
                     return convertTokenDecimals(val, entityData.mintedTokens[idx].decimals).toString();
                 });
                 value = '[ ' + decimalMapped.join(", ") + " ]"
-            } else if (typeof (value) === 'object' || Array.isArray(value)) {
+            } else if (typeof (value) === 'object' && !Array.isArray(value)) {
+                if (entityField === "inputToken" || entityField === 'outputToken') {
+                    value = { id: value.id, name: value.name, symbol: value.symbol, decimals: value.decimals }
+                } else if (entityField.toUpperCase().includes("INPUTTOKEN")) {
+                    dataType += ' [' + entityData.inputToken.name + ']';
+                }
                 value = JSON.stringify(value);
-                value = value.split(", ").join(",").split(',').join(', ');
+                value = value.split(", ").join(",").split(',').join(', ').split('"').join('');
+            } else if (Array.isArray(value)) {
+                if (entityField === "inputTokens") {
+                    value = value.map((val: { [x: string]: string }) => {
+                        return { id: val.id, name: val.name, symbol: val.symbol, decimals: val.decimals }
+                    });
+                } else if (entityField === "rewardTokens") {
+                    value = value.map((val: { [x: string]: any }) => {
+                        if (val?.token) {
+                            return { id: val.id, name: val.token?.name, symbol: val.token?.symbol, decimals: val.token?.decimals }
+                        } else {
+                            return { id: val.id, name: val.name, symbol: val.symbol, decimals: val.decimals }
+                        }
+                    });
+                } else if (entityField.toUpperCase().includes("INPUTTOKEN")) {
+                    const tokenNames = value.map((val, idx) => { return entityData.inputTokens[idx].name || 'TOKEN [' + idx + ']' });
+                    dataType += ' [' + tokenNames.join(',') + ']';
+                }
+                value = JSON.stringify(value);
+                value = value.split(", ").join(",").split(',').join(', ').split('"').join('');
             }
             if (!isNaN(Number(value)) && entityField.includes("USD")) {
+                value = Number(value).toFixed(2);
                 value = '$' + Number(value).toLocaleString();
-            }
-
-            if (entityField === "inputTokenWeights") {
-                // return null;
-                value = StackedChart(
-                    entityData.inputTokens[0].name,
-                    entityData.inputTokens[1].name,
-                    Number(entityData.inputTokenWeights[0]),
-                    Number(entityData.inputTokenWeights[1]),
-                    entityData.name
-                )
             }
 
             return (
                 <TableRow key={entityField}>
                     <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-                        {entityField}: <b>{dataFields[entityField]}</b>
+                        {entityField}: <b>{dataType}</b>
                     </TableCell>
-                    <TableCell align="right" style={{ maxWidth: "60vw", padding: "2px" }}>
+                    <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
                         {value}
                     </TableCell>
                 </TableRow>);

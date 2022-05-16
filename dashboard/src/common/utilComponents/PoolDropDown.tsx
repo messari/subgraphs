@@ -13,14 +13,13 @@ interface PoolDropDownProps {
 export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDropDownProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const scrollToView = searchParams.get("view") || "";
   const options = markets.map((market: any) => {
-    return market.id + '-' + market.name;
+    return market.id + ' / ' + market.name;
   });
   const pool = markets.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
   let inputTextValue = "Select a pool";
   if (poolId) {
-    inputTextValue = poolId + '-' + pool.name;
+    inputTextValue = poolId + ' / ' + pool.name;
   }
   const [textInput, setTextInput] = useState<string>(inputTextValue);
   return (
@@ -44,7 +43,7 @@ export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDro
           markets.map((market: any) => {
             return (
               <MenuItem value={market.id}>
-                <em>{market.id} - {market.name}</em>
+                <em>{market.id} / {market.name}</em>
               </MenuItem>
             )
           })
@@ -60,8 +59,8 @@ export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDro
           setTextInput(targEle.innerText);
           searchParams.delete('view');
           if (targEle.innerText) {
-            setPoolId(targEle.innerText?.split("-")[0]);
-            navigate('?subgraph=' + searchParams.get('subgraph') + '&tab=' + searchParams.get('tab') + '&poolId=' + targEle.innerText?.split("-")[0]);
+            setPoolId(targEle.innerText?.split(" / ")[0]);
+            navigate('?subgraph=' + searchParams.get('subgraph') + '&tab=' + searchParams.get('tab') + '&poolId=' + targEle.innerText?.split(" / ")[0]);
           }
         }}
         renderInput={
