@@ -1,5 +1,5 @@
 import { BigInt } from "@graphprotocol/graph-ts";
-import { SECONDS_PER_DAY } from "../constants";
+import { SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../constants";
 
 export let minute = BigInt.fromI32(60);
 export let hour = BigInt.fromI32(3600);
@@ -47,6 +47,10 @@ export function getDayCloseTime(timestamp: BigInt): BigInt {
 
 export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
   return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
+}
+
+export function getHoursSinceEpoch(secondsSinceEpoch: number): string {
+  return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_HOUR)).toString();
 }
 
 // helpers

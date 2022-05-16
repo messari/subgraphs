@@ -1,11 +1,14 @@
 /* eslint-disable prefer-const */
-import {  log } from "@graphprotocol/graph-ts"
+import { log } from "@graphprotocol/graph-ts"
 import { HypeAdded } from "../../generated/HypeRegistry/HypeRegistry"
 import { Deposit, Withdraw } from "../../generated/templates/Hypervisor/Hypervisor";
 import { Hypervisor as HypervisorContract } from "../../generated/templates/Hypervisor/Hypervisor"
 import { Hypervisor as HypervisorTemplate } from "../../generated/templates"
 import { getOrCreateYieldAggregator } from "../common/getters"
-import { getOrCreateVault } from "./helpers"
+import { createDeposit, createWithdraw } from "./helpers/events";
+import { updateUsageMetrics } from "./helpers/usageMetrics"
+import { getOrCreateVault } from "./helpers/vaults"
+import { UsageType } from "../common/constants";
 
 
 export function handleHypeAdded(event: HypeAdded): void {
@@ -27,9 +30,27 @@ export function handleHypeAdded(event: HypeAdded): void {
 
 
 export function handleDeposit(event: Deposit): void {
+    // Create deposit event
+    createDeposit(event)
+
+    // Update vault: TVL, token balances
     let vault = getOrCreateVault(event.address, event.block)
+
+    // Update usage metrics
+    updateUsageMetrics(event.params.to, UsageType.DEPOSIT, event)
+
+    // Update Financials
 }
 
 export function handleWithdraw(event: Withdraw): void {
+    // Create withdraw event
+    createWithdraw(event)
+
+    // Update vault: TVL, token balances
     let vault = getOrCreateVault(event.address, event.block)
+
+    // Update usage metrics
+    updateUsageMetrics(event.params.to, UsageType.WITHDRAW, event)
+
+    // Update Financials
 }

@@ -10,24 +10,22 @@ import {
   UsageMetricsDailySnapshot,
   FinancialsDailySnapshot,
   UsageMetricsHourlySnapshot,
-  RewardToken,
   YieldAggregator,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
-  Network,
   INT_ZERO,
   ProtocolType,
   SECONDS_PER_DAY,
   BIGINT_ZERO,
   SECONDS_PER_HOUR,
-  RewardTokenType,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SUBGRAPH_VERSION,
   PROTOCOL_METHODOLOGY_VERSION,
+  REGISTRY_ADDRESS,
 } from "../common/constants";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -45,21 +43,6 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-// export function getOrCreateRewardToken(address: Address): RewardToken {
-//   let rewardToken = RewardToken.load(address.toHexString());
-//   if (rewardToken == null) {
-//     let token = getOrCreateToken(address);
-//     rewardToken = new RewardToken(address.toHexString());
-//     rewardToken.token = token.id;
-//     rewardToken.type = RewardTokenType.DEPOSIT;
-//     rewardToken.save();
-
-//     return rewardToken as RewardToken;
-//   }
-//   return rewardToken as RewardToken;
-// }
-
-
 export function getOrCreateUsageMetricDailySnapshot(
   event: ethereum.Event
 ): UsageMetricsDailySnapshot {
@@ -71,7 +54,7 @@ export function getOrCreateUsageMetricDailySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
-    // usageMetrics.protocol = FACTORY_ADDRESS;
+    usageMetrics.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -100,7 +83,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    // usageMetrics.protocol = FACTORY_ADDRESS;
+    usageMetrics.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -156,7 +139,7 @@ export function getOrCreateYieldAggregator(
 ): YieldAggregator {
   let registryId = registryAddress.toHexString();
   let protocol = YieldAggregator.load(registryId);
-  
+
   if (!protocol) {
     protocol = new YieldAggregator(registryId);
     protocol.name = PROTOCOL_NAME;
