@@ -32,22 +32,30 @@ function handleProfit(event: ethereum.Event, profit_amount: BigInt, fee_amount: 
   //let vault = getOrCreateVault(vault_addr.toHex());
   let rewardToken_addr = strategy_contract.try_rewardToken().value;
 
-  let profit_USD = getUsdPrice(rewardToken_addr, profit_amount.toBigDecimal());
-  let fee_USD = getUsdPrice(rewardToken_addr, fee_amount.toBigDecimal());
+  if(rewardToken_addr){
+    let rewardToken = getOrCreateToken(rewardToken_addr);
+    let profit = profit_amount.div(constants.BIGINT_TEN.pow(rewardToken.decimals as u8));
+    let fee = fee_amount.div(constants.BIGINT_TEN.pow(rewardToken.decimals as u8));
 
-  log.info('profit_amount: {} - id este: {} $', [
-      profit_amount.toString(), profit_USD.toString()
-    ]);
+    let profit_USD = getUsdPrice(rewardToken_addr, profit.toBigDecimal());
+    let fee_USD = getUsdPrice(rewardToken_addr, fee.toBigDecimal());
 
-  log.info('fee_amount: {} - id este: {} $', [
-      fee_amount.toString(), fee_USD.toString()
-    ]);
+    log.info('profit_amount: {} - id este: {} $', [
+        profit_amount.toString(), profit_USD.toString()
+      ]);
 
-  let protocol = getOrCreateProtocol();
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(fee_USD);
-  protocol.save();
+    log.info('fee_amount: {} - id este: {} $', [
+        fee_amount.toString(), fee_USD.toString()
+      ]);
 
-  let snapshot = updateFinancialSnapshot(event);
-  snapshot.dailyProtocolSideRevenueUSD = snapshot.dailyProtocolSideRevenueUSD.plus(fee_USD);
-  snapshot.save();
+    let protocol = getOrCreateProtocol();
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(fee_USD);
+    protocol.save();
+
+    let snapshot = updateFinancialSnapshot(event);
+    snapshot.dailyProtocolSideRevenueUSD = snapshot.dailyProtocolSideRevenueUSD.plus(fee_USD);
+    snapshot.save();
+  }
+
+  
 }
