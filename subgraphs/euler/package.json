@@ -1,0 +1,21 @@
+{
+  "name": "@euler-xyz/euler-subgraph",
+  "license": "MIT",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "prepare:local": "mustache config/local.json subgraph.template.yaml > subgraph.yaml && mustache config/local.json src/common/constants.template.ts > src/common/constants.ts",
+    "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml && mustache config/mainnet.json src/common/constants.template.ts > src/common/constants.ts",
+    "prepare:ropsten": "mustache config/ropsten.json subgraph.template.yaml > subgraph.yaml && mustache config/ropsten.json src/common/constants.template.ts > src/common/constants.ts",
+    "deploy:local": "yarn run codegen && graph create --node http://localhost:8020 euler/mainnet && graph deploy euler/mainnet ./subgraph.yaml --ipfs http://localhost:5001 --node http://localhost:8020",
+    "deploy:mainnet": "yarn run codegen && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://thegraph.com/hosted-service/subgraph/hboisselle/messari-euler",
+    "deploy:ropsten": "yarn run codegen && graph deploy --node https://api.thegraph.com/deploy/ --ipfs TODO"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.26.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0"
+  }
+}
