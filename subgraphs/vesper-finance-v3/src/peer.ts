@@ -11,6 +11,7 @@ import {
   CONTROLLER_ADDRESS_HEX,
   ZERO_ADDRESS,
 } from "./constant";
+import { getUsdPrice } from "./prices";
 
 export function getDecimalDivisor(decimals: i32): BigDecimal {
   return BigDecimal.fromString("1".concat("0".repeat(decimals)));
@@ -139,18 +140,10 @@ export class Revenue {
     let tokenDecimals = Erc20Token.bind(tokenAddress).decimals();
     let protocolRevenue = _protocolRevenue.times(shareToTokenRate);
     this.protocolRevenue = protocolRevenue;
-    this.protocolRevenueUsd = toUsd(
-      protocolRevenue,
-      tokenDecimals,
-      tokenAddress
-    );
+    this.protocolRevenueUsd = getUsdPrice(tokenAddress, protocolRevenue);
     let supplySideRevenue = _supplySideRevenue.times(shareToTokenRate);
     this.supplySideRevenue = supplySideRevenue;
-    this.supplySideRevenueUsd = toUsd(
-      supplySideRevenue,
-      tokenDecimals,
-      tokenAddress
-    );
+    this.supplySideRevenueUsd = getUsdPrice(tokenAddress, supplySideRevenue);
   }
 }
 

@@ -20,8 +20,8 @@ import {
 import { Erc20Token } from "../generated/vaUSDC_prod_RL4/Erc20Token";
 import { PoolRewards } from "../generated/vaUSDC_prod_RL4/PoolRewards";
 import { PoolRewardsOld } from "../generated/vaUSDC_prod_RL4/PoolRewardsOld";
-import { toUsd } from "./peer";
 import { getDay, getHour } from "./utils";
+import { getUsdPrice } from "./prices";
 
 interface getOrCreateResponse<T> {
   object: T;
@@ -108,10 +108,9 @@ export function updateVaultTokens(vault: Vault): void {
   vault.inputTokenBalance = newTVL;
 
   if (newTVL) {
-    vault.totalValueLockedUSD = toUsd(
-      newTVL.toBigDecimal(),
-      token.decimals(),
-      tokenAddress
+    vault.totalValueLockedUSD = getUsdPrice(
+      tokenAddress,
+      newTVL.toBigDecimal()
     );
 
     aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD
@@ -180,7 +179,7 @@ export function updateVaultRewardEmission(vaultAddress: Address): void {
       const token = Erc20Token.bind(rtAddress);
 
       amounts.push(rtAmount);
-      usds.push(toUsd(rtAmount.toBigDecimal(), token.decimals(), rtAddress));
+      usds.push(getUsdPrice(rtAddress, rtAmount.toBigDecimal()));
 
       log.info("Vault reward - {}, {}, {}", [
         rewardAddress.toHexString(),
@@ -197,7 +196,7 @@ export function updateVaultRewardEmission(vaultAddress: Address): void {
       const token = Erc20Token.bind(rtAddress);
 
       amounts.push(rtAmount);
-      usds.push(toUsd(rtAmount.toBigDecimal(), token.decimals(), rtAddress));
+      usds.push(getUsdPrice(rtAddress, rtAmount.toBigDecimal()));
 
       log.info("Vault reward - {}, {}, {}", [
         rewardAddress.toHexString(),
@@ -264,10 +263,9 @@ export function getOrCreateTransfer(
     deposit.timestamp = call.block.timestamp;
     deposit.asset = getOrCreateToken(poolv3.token()).id;
     deposit.amount = call.inputs.amount;
-    deposit.amountUSD = toUsd(
-      call.inputs.amount.toBigDecimal(),
-      token.decimals,
-      Address.fromString(token.id)
+    deposit.amountUSD = getUsdPrice(
+      Address.fromString(token.id),
+      call.inputs.amount.toBigDecimal()
     );
 
     deposit.save();
@@ -302,10 +300,9 @@ export function getOrCreateDeposit(
     deposit.timestamp = call.block.timestamp;
     deposit.asset = getOrCreateToken(poolv3.token()).id;
     deposit.amount = call.inputs._amount;
-    deposit.amountUSD = toUsd(
-      call.inputs._amount.toBigDecimal(),
-      token.decimals,
-      Address.fromString(token.id)
+    deposit.amountUSD = getUsdPrice(
+      Address.fromString(token.id),
+      call.inputs._amount.toBigDecimal()
     );
 
     deposit.save();
@@ -339,11 +336,7 @@ export function getOrCreateWithdraw(
     withdraw.timestamp = call.block.timestamp;
     withdraw.asset = getOrCreateToken(poolv3.token()).id;
     withdraw.amount = call.inputs._shares;
-    withdraw.amountUSD = toUsd(
-      call.inputs._shares.toBigDecimal(),
-      token.decimals,
-      Address.fromString(token.id)
-    );
+    withdraw.amountUSD = getUsdPrice(Address.fromString(token.id), call.inputs._shares.toBigDecimal());
 
     withdraw.save();
   }
@@ -360,11 +353,7 @@ export function updateVaultSupply(vault: Vault): void {
 
   if (!supply_call.reverted) {
     vault.outputTokenSupply = supply_call.value;
-    vault.outputTokenPriceUSD = toUsd(
-      supply_call.value.toBigDecimal(),
-      token.decimals(),
-      tokenAddress
-    );
+    vault.outputTokenPriceUSD = getUsdPrice(tokenAddress, supply_call.value.toBigDecimal());
 
     vault.save();
   }
