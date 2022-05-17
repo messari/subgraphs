@@ -180,11 +180,6 @@ function DeploymentsPage() {
         <Button
           style={{ border: "black 0.2px solid", marginTop: "10px" }}
           onClick={() => {
-            // if (!isValidHttpUrl(urlText)) {
-            //   // If the provided URL is not a valid Http URL, set a manual error
-            //   return;
-            // }
-
             navigate(`graphs?subgraph=${urlText}`);
           }}
         >

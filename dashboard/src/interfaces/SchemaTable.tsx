@@ -143,7 +143,7 @@ function SchemaTable(
                 value = '[ ' + decimalMapped.join(", ") + " ]"
             } else if (typeof (value) === 'object' && !Array.isArray(value)) {
                 if (entityField === "inputToken" || entityField === 'outputToken') {
-                    value = { id: value.id, name: value.name, symbol: value.symbol, decimals: value.decimals }
+                    value = { id: value.id || 'N/A', name: value.name || 'N/A', symbol: value.symbol || 'N/A', decimals: value.decimals || 0 }
                 } else if (entityField.toUpperCase().includes("INPUTTOKEN")) {
                     dataType += ' [' + entityData.inputToken.name + ']';
                 }
@@ -152,14 +152,14 @@ function SchemaTable(
             } else if (Array.isArray(value)) {
                 if (entityField === "inputTokens") {
                     value = value.map((val: { [x: string]: string }) => {
-                        return { id: val.id, name: val.name, symbol: val.symbol, decimals: val.decimals }
+                        return { id: val.id || 'N/A', name: val.name || 'N/A', symbol: val.symbol || 'N/A', decimals: val.decimals || 0 }
                     });
                 } else if (entityField === "rewardTokens") {
                     value = value.map((val: { [x: string]: any }) => {
                         if (val?.token) {
-                            return { id: val.id, name: val.token?.name, symbol: val.token?.symbol, decimals: val.token?.decimals }
+                            return { id: val.id || 'N/A', name: val.token?.name || 'N/A', symbol: val.token?.symbol || 'N/A', decimals: val.token?.decimals || 0 }
                         } else {
-                            return { id: val.id, name: val.name, symbol: val.symbol, decimals: val.decimals }
+                            return { id: val.id || 'N/A', name: val.name || 'N/A', symbol: val.symbol || 'N/A', decimals: val.decimals || 0 }
                         }
                     });
                 } else if (entityField.toUpperCase().includes("INPUTTOKEN")) {
