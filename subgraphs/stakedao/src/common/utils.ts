@@ -76,13 +76,15 @@ export function updateProtocolTotalValueLockedUSD(): void {
   const protocol = getOrCreateYieldAggregator();
   const vaultIds = protocol._vaultIds;
 
+  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
   for (let vaultIdx = 0; vaultIdx < vaultIds.length; vaultIdx++) {
     const vault = VaultStore.load(vaultIds[vaultIdx]);
 
-    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+    totalValueLockedUSD.plus(
       vault!.totalValueLockedUSD
     );
   }
 
+  protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
 }
