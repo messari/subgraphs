@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
-import { ZERO_BD } from "./constants";
+import { ZERO_BD } from "../constants/constant";
 
 export function bigIntToBigDecimal(
   quantity: BigInt,

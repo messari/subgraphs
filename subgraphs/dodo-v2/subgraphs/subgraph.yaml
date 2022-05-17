@@ -1,0 +1,363 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: DVMFactory
+    network: bsc
+    source:
+      address: "0x790b4a80fb1094589a3c0efc8740aa9b0c1733fb"
+      abi: DVMFactory
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewDVM
+        - RemoveDVM
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: NewDVM(address,address,address,address)
+          handler: handleNewDVM
+        - event: RemoveDVM(address)
+          handler: handleRemoveDVM
+      file:
+        ../src/mappings/mappingFactory.ts
+        # blank
+  - kind: ethereum
+    name: CrowdPoolingFactory
+    network: bsc
+    source:
+      address: "0x778df5b12170e8af8df94356bfc864e57ce185dc"
+      abi: CrowdPoolingFactory
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewCP
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: NewCP(address,address,address,address)
+          handler: handleNewCP
+      file: ../src/mappings/mappingFactory.ts
+      # blank
+  - kind: ethereum
+    name: DPPFactory
+    network: bsc
+    source:
+      address: "0x9b64c81ba54ea51e1f6b7fefb3cff8aa6f1e2a09"
+      abi: DPPFactory
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewDPP
+        - RemoveDPP
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: NewDPP(address,address,address,address)
+          handler: handleNewDPP
+        - event: RemoveDPP(address)
+          handler: handleRemoveDPP
+      file: ../src/mappings/mappingFactory.ts
+    # blank
+  - kind: ethereum
+    name: DSPFactory
+    network: bsc
+    source:
+      address: "0x0fb9815938ad069bf90e14fe6c596c514bede767"
+      abi: DSPFactory
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewDSP
+        - RemoveDSP
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: NewDSP(address,address,address,address)
+          handler: handleNewDSP
+        - event: RemoveDSP(address)
+          handler: handleRemoveDSP
+      file: ../src/mappings/mappingFactory.ts
+    # blank
+  - kind: ethereum
+    name: DODOMineV3Proxy
+    network: bsc
+    source:
+      address: "0xe5e9b0Cab984b58b7e7AE17707d633295d5a4C4d"
+      abi: DODOMineV3Proxy
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DepositRewardToMine
+      abis:
+        - name: DODOMineV3Proxy
+          file: ./abis/DODOMineV3Proxy.json
+        - name: DODOMine
+          file: ./abis/DODOMine.json
+      eventHandlers:
+        - event: DepositRewardToMine(address,address,uint256)
+          handler: handleDepositRewardToMine
+      file: ../src/mappings/mappingFactory.ts
+    # blank
+  - name: DVM
+    kind: ethereum/contract
+    network: bsc
+    source:
+      abi: DVM
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BuyShares
+        - SellShares
+        - DODOSwap
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: BuyShares(address,uint256,uint256)
+          handler: handleBuyShares
+        - event: SellShares(address,address,uint256,uint256)
+          handler: handleSellShares
+        - event: DODOSwap(address,address,uint256,uint256,address,address)
+          handler: handleDODOSwapDVM
+      file: ../src/mappings/mappingDVM.ts
+    # blank
+  - name: CP
+    kind: ethereum/contract
+    network: bsc
+    source:
+      abi: CP
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Bid
+        - Cancel
+        - Settle
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: Bid(address,uint256,uint256)
+          handler: handleBid
+        - event: Cancel(address,uint256)
+          handler: handleCancel
+        - event: Settle()
+          handler: handleSettle
+      file: ../src/mappings/mappingCP.ts
+    # blank
+  - name: DPP
+    kind: ethereum/contract
+    network: bsc
+    source:
+      abi: DPP
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - DODOSwap
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: DODOSwap(address,address,uint256,uint256,address,address)
+          handler: handleDODOSwap
+      file: ../src/mappings/mappingDPP.ts
+    # # blank
+  - name: DSP
+    kind: ethereum/contract
+    network: bsc
+    source:
+      abi: DSP
+      startBlock: 4323290
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - BuyShares
+        - SellShares
+        - DODOSwap
+      abis:
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+      eventHandlers:
+        - event: BuyShares(address,uint256,uint256)
+          handler: handleBuyShares
+        - event: SellShares(address,address,uint256,uint256)
+          handler: handleSellShares
+        - event: DODOSwap(address,address,uint256,uint256,address,address)
+          handler: handleDODOSwapDSP
+      file: ../src/mappings/mappingDSP.ts
+    # # blank

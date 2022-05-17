@@ -34,7 +34,6 @@ import {
   Token4Add,
   DODOLpToken_ADDRESS,
   vDODOToken_ADDRESS,
-  WRAPPED_ETH,
   DAI,
   USDC,
   USDT,

@@ -1,0 +1,15 @@
+{
+  "startBlock": "10970196",
+  "network": "mainnet",
+  "dvmFactory": "0x72d220ce168c4f361dd4dee5d826a01ad8598f6c",
+  "cpFactory": "0xe8c9a78725d0451fa19878d5f8a3dc0d55fecf25",
+  "dppFactory": "0x5336ede8f971339f6c0e304c66ba16f1296a2fbe",
+  "dspFactory": "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4",
+  "mineproxy": "0x0d9685D4037580F68D9F77B08971f17E1000bBdc",
+  "dodo": "0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd",
+  "vdodo": "0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a",
+  "feeModelI": "0x5e84190a270333aCe5B9202a3F4ceBf11b81bB01",
+  "dai": "0x6b175474e89094c44da98b954eedeac495271d0f",
+  "usdc": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "usdt": "0xdac17f958d2ee523a2206206994597c13d831ec7"
+}

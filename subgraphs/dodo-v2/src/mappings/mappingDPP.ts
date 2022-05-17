@@ -1,8 +1,8 @@
-import { DPP, DODOSwap } from "../generated/DPP/DPP";
+import { DPP, DODOSwap } from "../../generated/DPP/DPP";
 
-import { updateUsageMetrics, updatePoolMetrics } from "./utils/metrics";
+import { updateUsageMetrics, updatePoolMetrics } from "../utils/metrics";
 
-import { createSwap } from "./utils/setters";
+import { createSwap } from "../utils/setters";
 
 export function handleDODOSwap(event: DODOSwap): void {
   updateUsageMetrics(event, event.params.trader, false, false);

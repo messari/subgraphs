@@ -20,7 +20,6 @@ import {
   ZERO_BD,
   ZERO_BI,
   ONE_BI,
-  WRAPPED_ETH,
   Network,
   ProtocolType,
   RewardTokenType,
@@ -33,7 +32,7 @@ import {
   DPPFactory_ADDRESS,
   DSPFactory_ADDRESS,
   STABLE_COINS
-} from "./constants";
+} from "../constants/constant";
 
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
@@ -74,17 +73,28 @@ export function getOrCreateToken(tokenAddress: Address): Token {
   return token;
 }
 
-export function getOrCreateDexAmm(factoryAddress: Address): DexAmmProtocol {
-  let proto = getProtocolFromPool(factoryAddress);
+export function getOrCreateDexAmm(poolAdd: Address): DexAmmProtocol {
+  let proto = getProtocolFromPool(poolAdd);
   let protocol = DexAmmProtocol.load(proto);
+
+  let name = "";
 
   if (!protocol) {
     protocol = new DexAmmProtocol(proto);
-    protocol.name = "DODO V2";
+    if (proto == DVMFactory_ADDRESS) {
+      name = "DODO V2 - DVM Factory";
+    } else if (proto == CPFactory_ADDRESS) {
+      name = "DODO V2 - CrowdPool Factory";
+    } else if (proto == DPPFactory_ADDRESS) {
+      name = "DODO V2 - DPP Factory";
+    } else if (proto == DSPFactory_ADDRESS) {
+      name = "DODO V2 - DSP Factory";
+    }
+    protocol.name = name;
     protocol.slug = "messari-dodo";
-    protocol.schemaVersion = "1.0.0";
-    protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.2.0";
+    protocol.schemaVersion = "1.2.0";
+    protocol.subgraphVersion = "0.2.1";
+    protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = ZERO_BD;

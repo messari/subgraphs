@@ -1,4 +1,10 @@
-import { BigDecimal, Address, ethereum, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  Address,
+  ethereum,
+  BigInt,
+  log
+} from "@graphprotocol/graph-ts";
 
 import {
   _Account,
@@ -10,10 +16,11 @@ import {
   SECONDS_PER_DAY,
   ADDRESS_ZERO,
   ZERO_BD,
+  ZERO_BI,
   ONE_BI,
   STABLE_COINS,
-  WRAPPED_ETH
-} from "./constants";
+  FEE_MODEL_INSTANCE
+} from "../constants/constant";
 
 import { bigIntToBigDecimal } from "./numbers";
 
@@ -33,8 +40,6 @@ import { setUSDprice, setUSDpriceTokenToToken, setPriceLP } from "./setters";
 
 import { ERC20 } from "../../generated/DVMFactory/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
-import { CP } from "../../generated/CP/CP";
-import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
 import { FeeRateModel } from "../../generated/DVMFactory/FeeRateModel";
 
@@ -46,6 +51,7 @@ export function updateFinancials(
   feesArray: BigDecimal[]
 ): void {
   let financialMetrics = getOrCreateFinancials(event);
+
   let protocol = getOrCreateDexAmm(event.address);
 
   let usdValFees = feesArray[0];
@@ -55,20 +61,23 @@ export function updateFinancials(
   let usdValMT = usdValFees - usdValLP;
 
   financialMetrics.protocol = protocol.id;
-  let previousVL = financialMetrics.totalValueLockedUSD;
-  financialMetrics.totalValueLockedUSD = previousVL + usdTVL;
-  let tVolume = financialMetrics.cumulativeVolumeUSD;
-  financialMetrics.cumulativeVolumeUSD = tVolume + usdTVolume;
 
-  let previouspsr = financialMetrics.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD = previouspsr + usdValLP;
-  let previousssr = financialMetrics.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD = previousssr + usdValMT;
+  protocol.totalValueLockedUSD += usdTVL;
+  protocol.protocolControlledValueUSD += usdTVL;
+  protocol.cumulativeSupplySideRevenueUSD += usdValLP;
+  protocol.cumulativeProtocolSideRevenueUSD += usdValMT;
+  protocol.cumulativeTotalRevenueUSD += usdValLP + usdValMT;
+  protocol.cumulativeVolumeUSD += usdTVolume;
 
+  financialMetrics.cumulativeVolumeUSD += usdTVolume;
+  financialMetrics.totalValueLockedUSD += usdTVL;
+  financialMetrics.cumulativeSupplySideRevenueUSD += usdValLP;
+  financialMetrics.cumulativeProtocolSideRevenueUSD += usdValMT;
   financialMetrics.blockNumber = event.block.number;
   financialMetrics.timestamp = event.block.timestamp;
 
   financialMetrics.save();
+  protocol.save();
 }
 
 export function updateUsageMetrics(
@@ -210,9 +219,10 @@ export function updatePoolMetrics(
     BigInt.fromString("1000000000000000000")
   );
 
-  let tvUSD = pool.cumulativeVolumeUSD.plus(usdValueOfTransaction);
+  pool.cumulativeVolumeUSD += usdValueOfTransaction;
+  pool.totalValueLockedUSD = usdValofPool;
   poolMetrics.totalValueLockedUSD = usdValofPool;
-  poolMetrics.cumulativeVolumeUSD = tvUSD;
+  poolMetrics.cumulativeVolumeUSD += usdValueOfTransaction;
   poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
   poolMetrics.outputTokenSupply = lpSupply.value;
   poolMetrics.outputTokenPriceUSD = lpTokenUSD;
@@ -222,7 +232,7 @@ export function updatePoolMetrics(
   poolMetrics.timestamp = event.block.timestamp;
 
   let feesArray = updateFees(event, poolAdd, usdValueOfTransaction, trader);
-  updateFinancials(event, usdValofPool, tvUSD, feesArray);
+  updateFinancials(event, usdValofPool, usdValueOfTransaction, feesArray);
   setPriceLP(event.block.timestamp, event.block.number, poolAdd);
   poolMetrics.save();
   pool.save();
@@ -239,20 +249,25 @@ export function updateFees(
   let poolFee = new LiquidityPoolFee(id.toString());
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
   let poolInstance = DSP.bind(poolAdd);
+  let lpmtr = BigDecimal.fromString(".25");
 
-  let feeMcontract = poolInstance._MT_FEE_RATE_MODEL_();
-  let feeMInstance = FeeRateModel.bind(feeMcontract);
-  let feeImpAdd = feeMInstance.feeRateImpl();
+  let feeMInstance = FeeRateModel.bind(Address.fromString(FEE_MODEL_INSTANCE));
+
+  let callResult1 = feeMInstance.try_feeRateImpl();
+  if (callResult1.reverted) {
+    log.info("feeRateImpl reverted", []);
+  }
+  let feeImpAdd = callResult1.value;
+
   let feeImpInstance = FeeRateModel.bind(feeImpAdd);
-  let lpMTRatio = feeImpInstance._LP_MT_RATIO_();
-  let lpmtr = BigDecimal.fromString(lpMTRatio.toString());
 
-  let feeRate = feeMInstance.try_getFeeRate(trader);
-  if (feeRate.reverted) {
-    return [BigDecimal.fromString("0"), BigDecimal.fromString("0")];
+  let callResult = feeImpInstance.try_getFeeRate(poolAdd, trader);
+  if (callResult.reverted) {
+    log.info("getFeeRate reverted", []);
   }
 
-  let fr = feeRate.value;
+  let fr = callResult.value;
+
   let usdValOfFees = usdValOfTrade * bigIntToBigDecimal(fr);
 
   poolFee.pool = pool.id;
@@ -260,5 +275,6 @@ export function updateFees(
   poolFee.feeType = "TIERED_TRADING_FEE";
   poolFee.usdValueOfFee = usdValOfFees;
   poolFee.lpMTRatio = lpmtr;
+
   return [usdValOfFees, lpmtr];
 }

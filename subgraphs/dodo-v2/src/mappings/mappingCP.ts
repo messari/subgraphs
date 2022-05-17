@@ -1,12 +1,12 @@
-import { CP, Bid, Cancel, Settle } from "../generated/CP/CP";
+import { CP, Bid, Cancel, Settle } from "../../generated/CP/CP";
 
 import {
   updateFinancials,
   updateUsageMetrics,
   updatePoolMetrics
-} from "./utils/metrics";
+} from "../utils/metrics";
 
-import { createDeposit, createWithdraw } from "./utils/setters";
+import { createDeposit, createWithdraw } from "../utils/setters";
 
 export function handleBid(event: Bid): void {
   updateUsageMetrics(event, event.params.to, true, false);

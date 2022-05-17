@@ -2,19 +2,23 @@
   "name": "messari-dodo",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "graph codegen",
-    "build": "graph build",
-    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ messari-dodo",
+    "codegen": "graph codegen subgraphs/subgraph.yaml",
+    "build:mainnet": "yarn prepare:mainnet && yarn codegen && graph build subgraphs/subgraph.yaml",
+    "build:bsc": "yarn prepare:bsc && yarn codegen && graph build subgraphs/subgraph.yaml",
+    "prepare:mainnet": "mustache subgraphs/config/mainnet.json src/constants/constants.mustache > src/constants/constant.ts && mustache subgraphs/config/mainnet.json subgraphs/subgraph.template.yaml > subgraphs/subgraph.yaml",
+    "prepare:bsc": "mustache subgraphs/config/bsc.json src/constants/constants.mustache > src/constants/constant.ts && mustache subgraphs/config/bsc.json subgraphs/subgraph.template.yaml > subgraphs/subgraph.yaml",
     "create-local": "graph create --node http://localhost:8020/ messari-dodo",
     "remove-local": "graph remove --node http://localhost:8020/ messari-dodo",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 messari-dodo",
     "test": "graph test",
-    "nuke": "sudo rm -r tests/.bin/ && rm -r generated && yarn codegen && yarn build",
+    "nuke": "sudo rm -r tests/.bin/ && rm -r generated && rm -r subgraphs/subgraph.yaml",
     "test-harder": "yarn nuke && yarn test"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.29.0",
     "@graphprotocol/graph-ts": "0.26.0",
-    "matchstick-as": "^0.4.2"
+    "handlebars": "^4.7.7",
+    "matchstick-as": "^0.4.2",
+    "mustache": "^4.2.0"
   }
 }

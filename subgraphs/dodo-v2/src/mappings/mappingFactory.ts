@@ -1,27 +1,27 @@
-import { getOrCreatePool } from "./utils/getters";
+import { getOrCreatePool } from "../utils/getters";
 import { Address } from "@graphprotocol/graph-ts";
 
-import { DVMFactory, NewDVM } from "../generated/DVMFactory/DVMFactory";
+import { DVMFactory, NewDVM } from "../../generated/DVMFactory/DVMFactory";
 
 import {
   CrowdPoolingFactory,
   NewCP
-} from "../generated/CrowdPoolingFactory/CrowdPoolingFactory";
+} from "../../generated/CrowdPoolingFactory/CrowdPoolingFactory";
 
-import { DPPFactory, NewDPP } from "../generated/DPPFactory/DPPFactory";
+import { DPPFactory, NewDPP } from "../../generated/DPPFactory/DPPFactory";
 
-import { DSPFactory, NewDSP } from "../generated/DSPFactory/DSPFactory";
+import { DSPFactory, NewDSP } from "../../generated/DSPFactory/DSPFactory";
 
 import {
   DODOMineV3Proxy,
   DepositRewardToMine
-} from "../generated/DODOMineV3Proxy/DODOMineV3Proxy";
+} from "../../generated/DODOMineV3Proxy/DODOMineV3Proxy";
 
-import { DODOMine } from "../generated/DODOMineV3Proxy/DODOMine";
+import { DODOMine } from "../../generated/DODOMineV3Proxy/DODOMine";
 
-import { getUSDprice } from "./utils/getters";
+import { getUSDprice } from "../utils/getters";
 
-import { DODOLpToken_ADDRESS, ZERO_BI } from "./utils/constants";
+import { DODOLpToken_ADDRESS, ZERO_BI } from "../constants/constant";
 
 export function handleNewDVM(event: NewDVM): void {
   getOrCreatePool(

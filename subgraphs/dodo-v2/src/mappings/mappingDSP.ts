@@ -1,8 +1,8 @@
-import { BuyShares, SellShares, DODOSwap } from "../generated/DVM/DVM";
+import { DSP, BuyShares, SellShares, DODOSwap } from "../../generated/DSP/DSP";
 
-import { updateUsageMetrics, updatePoolMetrics } from "./utils/metrics";
+import { updateUsageMetrics, updatePoolMetrics } from "../utils/metrics";
 
-import { createDeposit, createWithdraw, createSwap } from "./utils/setters";
+import { createDeposit, createWithdraw, createSwap } from "../utils/setters";
 
 export function handleBuyShares(event: BuyShares): void {
   updateUsageMetrics(event, event.params.to, true, false);
@@ -24,7 +24,7 @@ export function handleSellShares(event: SellShares): void {
   );
 }
 
-export function handleDODOSwapDVM(event: DODOSwap): void {
+export function handleDODOSwapDSP(event: DODOSwap): void {
   updateUsageMetrics(event, event.params.trader, false, false);
   createSwap(
     event,

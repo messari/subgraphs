@@ -6,7 +6,7 @@ import { Deposit, Withdraw, Swap } from "../../generated/schema";
 
 import { getOrCreatePool, getUSDprice, getOrCreateToken } from "./getters";
 
-import { ZERO_BD } from "./constants";
+import { ZERO_BD } from "../constants/constant";
 
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 

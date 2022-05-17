@@ -162,7 +162,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "trader",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
         "type": "address"
       }
     ],
