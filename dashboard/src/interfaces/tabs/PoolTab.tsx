@@ -148,9 +148,10 @@ function PoolTab({
                 if (holdingValueKey) {
                   value = Number(val[holdingValueKey]);
                 }
-                if (val['type']) {
-                  fieldSplitIdentifier = val['type'];
-                } else {
+                if (val['side']) {
+                  fieldSplitIdentifier = val['side'];
+                } 
+                 else {
                   const holdingValueStr = Object.keys(val).find(x => {
                     return typeof (val[x]) === "string" && isNaN(Number(val[x]));
                   });
