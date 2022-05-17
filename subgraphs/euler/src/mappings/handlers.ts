@@ -319,6 +319,8 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     token.lastPriceBlockNumber = block.number;
     token.save();
 
+    market.name = token.name;
+    
     if (market.outputToken) {
       const eToken = getOrCreateToken(<Address>Address.fromHexString(market.outputToken!));
       eToken.lastPriceUSD = market.outputTokenPriceUSD;
