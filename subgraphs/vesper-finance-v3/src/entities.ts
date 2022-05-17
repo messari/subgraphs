@@ -22,6 +22,7 @@ import { PoolRewards } from "../generated/vaUSDC_prod_RL4/PoolRewards";
 import { PoolRewardsOld } from "../generated/vaUSDC_prod_RL4/PoolRewardsOld";
 import { getDay, getHour } from "./utils";
 import { getUsdPrice } from "./prices";
+import { getDecimalDivisor } from "./peer";
 
 interface getOrCreateResponse<T> {
   object: T;
@@ -110,7 +111,7 @@ export function updateVaultTokens(vault: Vault): void {
   if (newTVL) {
     vault.totalValueLockedUSD = getUsdPrice(
       tokenAddress,
-      newTVL.toBigDecimal()
+      newTVL.toBigDecimal().div(getDecimalDivisor(token.decimals()))
     );
 
     aggregator.totalValueLockedUSD = aggregator.totalValueLockedUSD
@@ -179,7 +180,7 @@ export function updateVaultRewardEmission(vaultAddress: Address): void {
       const token = Erc20Token.bind(rtAddress);
 
       amounts.push(rtAmount);
-      usds.push(getUsdPrice(rtAddress, rtAmount.toBigDecimal()));
+      usds.push(getUsdPrice(rtAddress, rtAmount.toBigDecimal().div(getDecimalDivisor(token.decimals()))));
 
       log.info("Vault reward - {}, {}, {}", [
         rewardAddress.toHexString(),
@@ -196,7 +197,7 @@ export function updateVaultRewardEmission(vaultAddress: Address): void {
       const token = Erc20Token.bind(rtAddress);
 
       amounts.push(rtAmount);
-      usds.push(getUsdPrice(rtAddress, rtAmount.toBigDecimal()));
+      usds.push(getUsdPrice(rtAddress, rtAmount.toBigDecimal().div(getDecimalDivisor(token.decimals()))));
 
       log.info("Vault reward - {}, {}, {}", [
         rewardAddress.toHexString(),
@@ -265,7 +266,7 @@ export function getOrCreateTransfer(
     deposit.amount = call.inputs.amount;
     deposit.amountUSD = getUsdPrice(
       Address.fromString(token.id),
-      call.inputs.amount.toBigDecimal()
+      call.inputs.amount.toBigDecimal().div(getDecimalDivisor(token.decimals))
     );
 
     deposit.save();
@@ -302,7 +303,7 @@ export function getOrCreateDeposit(
     deposit.amount = call.inputs._amount;
     deposit.amountUSD = getUsdPrice(
       Address.fromString(token.id),
-      call.inputs._amount.toBigDecimal()
+      call.inputs._amount.toBigDecimal().div(getDecimalDivisor(token.decimals))
     );
 
     deposit.save();
@@ -336,7 +337,7 @@ export function getOrCreateWithdraw(
     withdraw.timestamp = call.block.timestamp;
     withdraw.asset = getOrCreateToken(poolv3.token()).id;
     withdraw.amount = call.inputs._shares;
-    withdraw.amountUSD = getUsdPrice(Address.fromString(token.id), call.inputs._shares.toBigDecimal());
+    withdraw.amountUSD = getUsdPrice(Address.fromString(token.id), call.inputs._shares.toBigDecimal().div(getDecimalDivisor(token.decimals)));
 
     withdraw.save();
   }
@@ -353,7 +354,7 @@ export function updateVaultSupply(vault: Vault): void {
 
   if (!supply_call.reverted) {
     vault.outputTokenSupply = supply_call.value;
-    vault.outputTokenPriceUSD = getUsdPrice(tokenAddress, supply_call.value.toBigDecimal());
+    vault.outputTokenPriceUSD = getUsdPrice(tokenAddress, supply_call.value.toBigDecimal().div(getDecimalDivisor(token.decimals())));
 
     vault.save();
   }

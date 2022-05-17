@@ -140,10 +140,10 @@ export class Revenue {
     let tokenDecimals = Erc20Token.bind(tokenAddress).decimals();
     let protocolRevenue = _protocolRevenue.times(shareToTokenRate);
     this.protocolRevenue = protocolRevenue;
-    this.protocolRevenueUsd = getUsdPrice(tokenAddress, protocolRevenue);
+    this.protocolRevenueUsd = getUsdPrice(tokenAddress, protocolRevenue.div(getDecimalDivisor(tokenDecimals)));
     let supplySideRevenue = _supplySideRevenue.times(shareToTokenRate);
     this.supplySideRevenue = supplySideRevenue;
-    this.supplySideRevenueUsd = getUsdPrice(tokenAddress, supplySideRevenue);
+    this.supplySideRevenueUsd = getUsdPrice(tokenAddress, supplySideRevenue.div(getDecimalDivisor(tokenDecimals)));
   }
 }
 
