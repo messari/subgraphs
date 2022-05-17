@@ -103,14 +103,15 @@ export function getOrCreateFinancialsDailySnapshot(
 
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  object.blockNumber = call.block.number;
+  object.timestamp = call.block.timestamp;
+
   object.dailyProtocolSideRevenueUSD = object.dailyProtocolSideRevenueUSD.plus(
     protocolRevenueUsd
   );
   object.dailySupplySideRevenueUSD = object.dailySupplySideRevenueUSD.plus(
     supplySideRevenueUsd
   );
-  object.blockNumber = call.block.number;
-  object.timestamp = call.block.timestamp;
 
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
     supplySideRevenueUsd
@@ -126,7 +127,7 @@ export function getOrCreateFinancialsDailySnapshot(
 
   object.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   object.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-  object.dailyTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  object.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD; 
   
   object.save();
 
