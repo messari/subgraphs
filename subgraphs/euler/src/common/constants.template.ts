@@ -160,9 +160,9 @@ export const USDC_SYMBOL = "USDC";
 ///// Euler Specific /////
 //////////////////////////
 
-export const CONFIG_FACTOR_SCALE = new BigDecimal(BigInt.fromI32(<i32>4e9));
+export const CONFIG_FACTOR_SCALE = new BigDecimal(BigInt.fromI32(4).times(BigInt.fromI32(10).pow(9)));
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
-export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromString("10").pow(27);
+export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);
 export const UNISWAP_Q192 = BigDecimal.fromString(
   BigInt.fromI32(2)
     .pow(192)
