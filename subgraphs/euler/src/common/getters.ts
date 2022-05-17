@@ -239,7 +239,8 @@ export function getOrCreateMarket(id: string): Market {
   let market = Market.load(id);
   if (!market) {
     market = new Market(id);
-    market.protocol = getOrCreateLendingProtocol().id;
+    const protocol = getOrCreateLendingProtocol();
+    market.protocol = protocol.id;
     market.isActive = true;
     market.canUseAsCollateral = true;
     market.canBorrowFrom = true;
@@ -249,6 +250,8 @@ export function getOrCreateMarket(id: string): Market {
     market.inputToken = id;
     market.rates = [];
     market.save();
+    protocol.markets.push(market.id);
+    protocol.save();
   }
   return market;
 }
@@ -277,7 +280,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-
+    protocol.markets = [];
     protocol.save();
   }
   return protocol;
