@@ -17,7 +17,6 @@ import {
   Liquidate,
   InterestRate,
   _MarketUtilities,
-  _User,
 } from "../../generated/schema";
 import { getAssetSymbol, getAssetName, getAssetDecimals } from "./tokens";
 import {
