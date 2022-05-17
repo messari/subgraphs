@@ -11,6 +11,8 @@ import {
   FinancialsDailySnapshot,
   UsageMetricsHourlySnapshot,
   YieldAggregator,
+  VaultDailySnapshot,
+  VaultHourlySnapshot,
 } from "../../generated/schema";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
 import {
@@ -27,6 +29,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   REGISTRY_ADDRESS,
 } from "../common/constants";
+import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -111,7 +114,7 @@ export function getOrCreateFinancialsDailySnapshot(
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id);
-    // financialMetrics.protocol = FACTORY_ADDRESS;
+    financialMetrics.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
 
@@ -130,9 +133,67 @@ export function getOrCreateFinancialsDailySnapshot(
   return financialMetrics;
 }
 
-///////////////////////////
+export function getOrCreateVaultDailySnapshot(
+  event: ethereum.Event
+): VaultDailySnapshot {
+  const snapshotId = event.address
+    .toHex()
+    .concat("-")
+    .concat(getDaysSinceEpoch(event.block.timestamp.toI32()));
+
+  let snapshot = VaultDailySnapshot.load(snapshotId);
+  if (!snapshot) {
+    snapshot = new VaultDailySnapshot(snapshotId);
+    snapshot.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    snapshot.vault = event.address.toHex();
+    snapshot.totalValueLockedUSD = BigDecimal.zero();
+    snapshot.inputTokenBalance = BIGINT_ZERO;
+    snapshot.outputTokenSupply = BIGINT_ZERO;
+    snapshot.outputTokenPriceUSD = BigDecimal.zero();
+    snapshot.pricePerShare = BigDecimal.zero();
+    // snapshot.stakedOutputTokenAmount = BIGINT_ZERO
+    // snapshot.rewardTokenEmissionsAmount = []
+    // snapshot.rewardTokenEmissionsUSD = []
+    snapshot.blockNumber = event.block.number;
+    snapshot.timestamp = event.block.timestamp;
+    snapshot.save();
+  }
+
+  return snapshot;
+}
+
+export function getOrCreateVaultHourlySnapshot(
+  event: ethereum.Event
+): VaultHourlySnapshot {
+  const snapshotId = event.address
+    .toHex()
+    .concat("-")
+    .concat(getHoursSinceEpoch(event.block.timestamp.toI32()));
+
+  let snapshot = VaultHourlySnapshot.load(snapshotId);
+  if (!snapshot) {
+    snapshot = new VaultHourlySnapshot(snapshotId);
+    snapshot.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    snapshot.vault = event.address.toHex();
+    snapshot.totalValueLockedUSD = BigDecimal.zero();
+    snapshot.inputTokenBalance = BIGINT_ZERO;
+    snapshot.outputTokenSupply = BIGINT_ZERO;
+    snapshot.outputTokenPriceUSD = BigDecimal.zero();
+    snapshot.pricePerShare = BigDecimal.zero();
+    // snapshot.stakedOutputTokenAmount = BIGINT_ZERO
+    // snapshot.rewardTokenEmissionsAmount = []
+    // snapshot.rewardTokenEmissionsUSD = []
+    snapshot.blockNumber = event.block.number;
+    snapshot.timestamp = event.block.timestamp;
+    snapshot.save();
+  }
+
+  return snapshot;
+}
+
+//////////////////////////
 ///// Yield Specific /////
-///////////////////////////
+//////////////////////////
 
 export function getOrCreateYieldAggregator(
   registryAddress: Address
