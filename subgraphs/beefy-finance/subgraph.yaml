@@ -49,6 +49,8 @@ templates:
           handler: handleNewStratCandidate
         - event: UpgradeStrat(address)
           handler: handleUpgradeStrat
+        - event: Transfer(address,address,uint256)
+          handler: handleTransfer
   #- name: Strategy
   #  kind: ethereum/contract
   #  network: matic

@@ -5,13 +5,13 @@ import {
   VaultsRegistered,
   VaultsRetireStatusUpdated,
 } from "../../generated/BeefiVaultRegistryMATIC/BeefiVaultRegistryMATIC";
-import { ExampleEntity, Vault } from "../../generated/schema";
-import { createVault } from "../helpers/create";
+import { Vault } from "../../generated/schema";
+import { createVault } from "../mappings/vault";
 
 const maticChainId = "137";
 
 export function handleOwnershipTransferred(event: OwnershipTransferred): void {
-  // Entities can be loaded from the store using a string ID; this ID
+  /* // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
   let entity = ExampleEntity.load(event.transaction.from.toHex());
 
@@ -32,14 +32,12 @@ export function handleOwnershipTransferred(event: OwnershipTransferred): void {
   entity.newOwner = event.params.newOwner;
 
   // Entities can be written to the store with `.save()`
-  entity.save();
-
+  entity.save(); */
   // Note: If a handler doesn't require existing field values, it is faster
   // _not_ to load the entity from the store. Instead, create it fresh with
   // `new Entity(...)`, set the fields that should be updated and save the
   // entity back to the store. Fields that were not set or unset remain
   // unchanged, allowing for partial updates to be applied.
-
   // It is also possible to access smart contracts from mappings. For
   // example, the contract that has emitted the event can be connected to
   // with:
@@ -62,11 +60,10 @@ export function handleVaultsRegistered(event: VaultsRegistered): void {
   const vaults = event.params.vaults;
 
   for (let i = 0; i < vaults.length; i++) {
-    let vault = Vault.load(maticChainId + vaults[i].toString());
+    let vault = Vault.load(maticChainId + vaults[i].toHexString());
 
     if (!vault) {
-      vault = createVault(maticChainId + vaults[i].toString(), event.block);
-      vault.save();
+      createVault(maticChainId + vaults[i].toHexString(), event.block);
     }
   }
 }
