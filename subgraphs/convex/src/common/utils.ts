@@ -1,4 +1,10 @@
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+  log,
+} from "@graphprotocol/graph-ts";
 import { PoolInfoType } from "./types";
 import * as constants from "../common/constants";
 import { VaultFee } from "../../generated/schema";
@@ -103,11 +109,11 @@ export function updateProtocolTotalValueLockedUSD(): void {
     const vaultId = constants.CONVEX_BOOSTER_ADDRESS.toHexString()
       .concat("-")
       .concat(poolIdx.toString());
-    
+
     const vault = VaultStore.load(vaultId);
     if (!vault) continue;
 
-    totalValueLockedUSD.plus(vault.totalValueLockedUSD);
+    totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
   }
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;
