@@ -43,6 +43,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.slug = constants.Protocol.SLUG;
     protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
     protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
+    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.Protocol.TYPE;
 
