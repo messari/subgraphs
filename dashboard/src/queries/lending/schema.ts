@@ -309,16 +309,22 @@ export const schema110 = (): Schema => {
           id
           name
           inputTokens{
+            id
             decimals
             name
+            symbol
           }
           outputToken {
             id
             decimals
+            name
+            symbol
           }
           rewardTokens{
             id
             decimals
+            name
+            symbol
           }
           inputTokenBalances
           outputTokenSupply
@@ -603,17 +609,24 @@ export const schema120 = (): Schema => {
       id
       name
       inputToken {
+        id
         decimals
         name
+        symbol
       }
       outputToken {
         id
         decimals
+        name
+        symbol
       }
       rewardTokens {
         id
         token {
+          id
           decimals
+          name
+          symbol
         }
       }
       rates {

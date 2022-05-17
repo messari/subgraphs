@@ -1,15 +1,5 @@
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import {
-  Account,
-  ActiveAccount,
-  DexAmmProtocol,
-  LiquidityPool,
-  Token,
-  UsageMetricsDailySnapshot,
-  UsageMetricsHourlySnapshot,
-  _HelperStore,
-  _TokenWhitelist,
-} from "../../generated/schema";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Account, ActiveAccount, DexAmmProtocol, LiquidityPool, Token, _HelperStore, _TokenWhitelist } from "../../generated/schema";
 import {
   getLiquidityPool,
   getLiquidityPoolAmounts,
@@ -23,22 +13,10 @@ import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
 } from "./getters";
-import {
-  BIGDECIMAL_HUNDRED,
-  BIGDECIMAL_TWO,
-  BIGDECIMAL_ZERO,
-  BIGINT_ZERO,
-  DEFAULT_DECIMALS,
-  INT_ONE,
-  INT_TWO,
-  INT_ZERO,
-  SECONDS_PER_DAY,
-  SECONDS_PER_HOUR,
-  UsageType,
-} from "./constants";
+import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_TWO, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
-import { NetworkConfigs } from "../../config/_networkConfig";
+import { NetworkConfigs } from "../../config/configure";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -159,14 +137,14 @@ export function updateTokenWhitelists(token0: Token, token1: Token, poolAddress:
   let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
   // update white listed pools
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist0.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
     let newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
   }
 
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist1.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
     let newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;

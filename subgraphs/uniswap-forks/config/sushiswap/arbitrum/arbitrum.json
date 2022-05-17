@@ -1,0 +1,9 @@
+{
+  "deployment": "SUSHISWAP_ARBITRUM",
+  "protocol": "Sushiswap",
+  "network": "arbitrum-one",
+  "address": "0xc35dadb65012ec5796536bd9864ed8773abc74c4",
+  "startBlock": 70,
+  "miniChefAddress": "0xF4d73326C13a4Fc5FD7A064217e12780e9Bd62c3",
+  "miniChefStartBlock": 226981
+}
