@@ -25,6 +25,7 @@ import {
 import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
+import { LinearPool } from "../../generated/Vault/LinearPool";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -68,9 +69,9 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   let outputToken = getOrCreateToken(address);
   let protocol = getOrCreateDex();
 
-  let wwPoolInstance = WeightedPool.bind(address);
+  let poolInstance = WeightedPool.bind(address);
   let swapFees: BigInt = BigInt.fromI32(0);
-  let swapFeesCall = wwPoolInstance.try_getSwapFeePercentage();
+  let swapFeesCall = poolInstance.try_getSwapFeePercentage();
   if (!swapFeesCall.reverted) {
     WeightedPoolTemplate.create(address);
     swapFees = swapFeesCall.value;
@@ -81,6 +82,8 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
       swapFees = swapFeesCall.value;
     }
   }
+
+  pool._hasVirtualSupply = !LinearPool.bind(address).try_getVirtualSupply().reverted;
 
   let feeInDecimals = scaleDown(swapFees, null);
 

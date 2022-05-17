@@ -1,4 +1,4 @@
-import { Address, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { BASE_ASSETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, USD_STABLE_ASSETS } from "./constants";
 import { Token } from "../../generated/schema";
 import { getOrCreateDex, getOrCreateToken } from "./getters";

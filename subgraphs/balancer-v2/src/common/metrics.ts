@@ -20,7 +20,7 @@ import {
   _HourlyActiveAccount,
 } from "../../generated/schema";
 import { calculatePrice, isUSDStable, TokenInfo, valueInUSD } from "./pricing";
-import { scaleDown } from "./tokens";
+import { hasVirtualSupply, scaleDown } from "./tokens";
 import { ProtocolFeesCollector } from "../../generated/Vault/ProtocolFeesCollector";
 import { getUsdPrice } from "../prices";
 
@@ -129,6 +129,8 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
       newPoolLiquidity = newPoolLiquidity.plus(currentTokenBalance);
       continue;
     }
+
+    if (pool.outputToken == pool.inputTokens[i] && pool._hasVirtualSupply) continue;
 
     const token = Token.load(currentToken.toHexString());
     let tokenPrice: BigDecimal | null = token!.lastPriceUSD;
