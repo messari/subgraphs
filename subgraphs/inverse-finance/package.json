@@ -1,0 +1,16 @@
+{
+  "name": "inverse-finance",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ tnkrxyz/inverse-finance",
+    "create-local": "graph create --node http://localhost:8020/ tnkrxyz/inverse-finance",
+    "remove-local": "graph remove --node http://localhost:8020/ tnkrxyz/inverse-finance",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 tnkrxyz/inverse-finance"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.27.0",
+    "@graphprotocol/graph-ts": "0.24.1"
+  }
+}

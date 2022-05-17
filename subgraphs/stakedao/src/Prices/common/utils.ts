@@ -1,6 +1,6 @@
 import * as constants from "./constants";
-import { ERC20 } from "../../../generated/Controller/ERC20";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { PriceOracleERC20 } from "../../../generated/Controller/PriceOracleERC20";
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
@@ -10,7 +10,7 @@ export function readValue<T>(
 }
 
 export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = ERC20.bind(tokenAddr);
+  const token = PriceOracleERC20.bind(tokenAddr);
 
   let decimals = readValue<BigInt>(
     token.try_decimals(),

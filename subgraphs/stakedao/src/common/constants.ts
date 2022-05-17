@@ -1,22 +1,25 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 
+// The network names corresponding to the Network enum in the schema.
+// They also correspond to the ones in `dataSource.network()` after converting to lower case.
+// See below for a complete list:
+// https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
-
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
   export const LENDING = "LENDING";
@@ -37,33 +40,38 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export namespace Protocol {
+  export const NAME = "Stake DAO";
+  export const SLUG = "stake-dao";
+  export const SCHEMA_VERSION = "1.2.1";
+  export const SUBGRAPH_VERSION = "1.1.0";
+  export const NETWORK = Network.MAINNET;
+  export const TYPE = ProtocolType.YIELD;
+}
+
+export const SECONDS_PER_HOUR = 60 * 60;
 export const SECONDS_PER_DAY = 60 * 60 * 24;
-export const BIGINT_ONE = BigInt.fromI32(1);
 export const DEFAULT_PERFORMANCE_FEE = BigInt.fromI32(1500);
 export const DEFAULT_WITHDRAWAL_FEE = BigInt.fromI32(50);
 
-export const ZERO_ADDRESS_STRING = ("0x0");
 export const BIGINT_ZERO = BigInt.fromI32(0);
-export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
+export const BIGINT_SECONDS_PER_DAY = BigInt.fromI32(SECONDS_PER_DAY);
+
+export const DENOMINATOR = BigDecimal.fromString("10000");
+export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export const BIGDECIMAL_HUNDRED = BigDecimal.fromString("100");
 
 export const ETHEREUM_PROTOCOL_ID =
   "0x29D3782825432255041Db2EAfCB7174f5273f08A";
-export const ETH_MAINNET_CALCULATIONS_SUSHI_ADDRESS =
-  "0x8263e161A855B644f582d9C164C66aABEe53f927";
+
+export const USDC_DECIMALS = 6;
+export const DEFAULT_DECIMALS = BigInt.fromI32(18);
+export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const ZERO_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
-
-// Yearn registry contract
-export const USDC_DECIMALS = 6;
-export const DEFAULT_DECIMALS = BigInt.fromI32(18);
-export const USDC_DENOMINATOR = BigInt.fromString("1000000");
-export const DEFAULT_DECIMALS_BIGINT = BigInt.fromString("1000000000000000000");
-export const MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
-export const DAYS_PER_YEAR = BigInt.fromI32(365);
-export const MS_PER_DAY = BigInt.fromI32(24 * 60 * 60 * 1000);
-export const MS_PER_YEAR = DAYS_PER_YEAR.times(
-  BigInt.fromI32(24 * 60 * 60 * 1000)
-);
+export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";

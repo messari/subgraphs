@@ -1,0 +1,8 @@
+{
+  "deployment": "SUSHISWAP_MATIC",
+  "network": "matic",
+  "address": "0xc35dadb65012ec5796536bd9864ed8773abc74c4",
+  "startBlock": 11333218,
+  "miniChefAddress": "0x0769fd68dFb93167989C6f7254cd0D766Fb2841F",
+  "miniChefStartBlock": 13911377
+}
