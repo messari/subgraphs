@@ -54,7 +54,11 @@ export function handleSetVault(call: SetVaultCall): void {
   );
 
   let protocol = getOrCreateYieldAggregator();
-  protocol._vaultIds.push(vaultAddress.toHexString());
+  
+  let vaultIds = protocol._vaultIds;
+  vaultIds.push(vaultAddress.toHexString())
+  
+  protocol._vaultIds = vaultIds;
   protocol.save();
 
   log.warning("[SetVault] - TxHash: {}, VaultId: {}, StrategyId: {}", [

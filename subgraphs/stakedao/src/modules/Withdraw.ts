@@ -113,12 +113,11 @@ export function _Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(
-    withdrawAmountUSD
-  );
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    withdrawAmountUSD
-  );
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
@@ -134,6 +133,7 @@ export function _Withdraw(
     .toBigDecimal();
 
   const protocolSideWithdrawalAmountUSD = protocolSideWithdrawalAmount
+    .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
@@ -148,6 +148,8 @@ export function _Withdraw(
   metricsHourlySnapshot.save();
   protocol.save();
   vault.save();
+
+  utils.updateProtocolTotalValueLockedUSD();
 
   createWithdrawTransaction(
     to,
@@ -168,7 +170,7 @@ export function _Withdraw(
       vault.id,
       sharesBurnt.toString(),
       supplySideWithdrawalAmount.toString(),
-      protocolSideWithdrawalAmount.toString()
+      protocolSideWithdrawalAmount.toString(),
     ]
   );
 }

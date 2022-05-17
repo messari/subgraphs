@@ -1,7 +1,21 @@
 import * as constants from "./constants";
 import { VaultFee, Vault as VaultStore } from "../../generated/schema";
 import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  BigInt,
+  Address,
+  ethereum,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
+import { getOrCreateYieldAggregator } from "./initializers";
+
+export function enumToPrefix(snake: string): string {
+  return snake.toLowerCase().replace("_", "-") + "-";
+}
+
+export function prefixID(enumString: string, ID: string): string {
+  return enumToPrefix(enumString) + ID;
+}
 
 export function getTimestampInMillis(block: ethereum.Block): BigInt {
   return block.timestamp.times(BigInt.fromI32(1000));
@@ -12,6 +26,17 @@ export function readValue<T>(
   defaultValue: T
 ): T {
   return callResult.reverted ? defaultValue : callResult.value;
+}
+
+export function getTokenDecimals(tokenAddr: Address): BigInt {
+  const token = ERC20Contract.bind(tokenAddr);
+
+  let decimals = readValue<BigInt>(
+    token.try_decimals(),
+    constants.DEFAULT_DECIMALS
+  );
+
+  return decimals;
 }
 
 export function createFeeType(
@@ -27,17 +52,6 @@ export function createFeeType(
     .div(constants.BIGDECIMAL_HUNDRED);
 
   fees.save();
-}
-
-export function getTokenDecimals(tokenAddr: Address): BigInt {
-  const token = ERC20Contract.bind(tokenAddr);
-
-  let decimals = readValue<BigInt>(
-    token.try_decimals(),
-    constants.DEFAULT_DECIMALS
-  );
-
-  return decimals;
 }
 
 export function getFeePercentage(
@@ -58,10 +72,17 @@ export function getFeePercentage(
   return feesPercentage;
 }
 
-export function enumToPrefix(snake: string): string {
-  return snake.toLowerCase().replace("_", "-") + "-";
-}
+export function updateProtocolTotalValueLockedUSD(): void {
+  const protocol = getOrCreateYieldAggregator();
+  const vaultIds = protocol._vaultIds;
 
-export function prefixID(enumString: string, ID: string): string {
-  return enumToPrefix(enumString) + ID;
+  for (let vaultIdx = 0; vaultIdx < vaultIds.length; vaultIdx++) {
+    const vault = VaultStore.load(vaultIds[vaultIdx]);
+
+    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+      vault!.totalValueLockedUSD
+    );
+  }
+
+  protocol.save();
 }
