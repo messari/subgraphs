@@ -31,7 +31,7 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
     let token = getOrCreateToken(address);
     rewardToken = new RewardToken(id);
 
-    rewardToken.token = token.id
+    rewardToken.token = token.id;
     rewardToken.type = RewardTokenType.DEPOSIT;
 
     rewardToken.save();
@@ -44,7 +44,7 @@ export function createRewardTokens(): RewardToken {
   const rewardToken = getOrCreateRewardToken(address);
 
   // Values if TOKE token is not deployed yet
-  const token = getOrCreateToken(Address.fromString(rewardToken.token))
+  const token = getOrCreateToken(Address.fromString(rewardToken.token));
   if (token.name === "") {
     token.name = TOKE_NAME;
     token.symbol = TOKE_SYMBOL;

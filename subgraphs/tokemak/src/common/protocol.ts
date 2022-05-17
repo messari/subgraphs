@@ -23,7 +23,7 @@ export function getOrCreateProtocol(): YieldAggregator {
 
     protocol._vaultIds = [];
 
-    protocol.save()
+    protocol.save();
   }
   return protocol;
 }

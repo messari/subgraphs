@@ -6,77 +6,65 @@ import { YieldAggregator, Vault as VaultStore, VaultHourlySnapshot, VaultDailySn
 import { Vault as VaultTemplate } from "../../generated/templates";
 import { readValue } from "./utils";
 
-
 export function createVault(vaultAddress: Address, timestamp: BigInt, blocknumber: BigInt): VaultStore {
-    const vault = new VaultStore(vaultAddress.toHexString());
-    const vaultContract = VaultContract.bind(Address.fromString(vault.id));
-    vault.protocol = PROTOCOL_ID
-    vault.name =readValue<string>(vaultContract.try_name(), "");
-    vault.symbol = readValue<string>(vaultContract.try_symbol(), "");
-    const inputToken = getOrCreateToken(vaultContract.underlyer());
-    vault.inputToken = inputToken.id;
-    vault.inputTokenBalance = BIGINT_ZERO;
+  const vault = new VaultStore(vaultAddress.toHexString());
+  const vaultContract = VaultContract.bind(Address.fromString(vault.id));
+  vault.protocol = PROTOCOL_ID;
+  vault.name = readValue<string>(vaultContract.try_name(), "");
+  vault.symbol = readValue<string>(vaultContract.try_symbol(), "");
+  const inputToken = getOrCreateToken(vaultContract.underlyer());
+  vault.inputToken = inputToken.id;
+  vault.inputTokenBalance = BIGINT_ZERO;
 
-    const outputToken = getOrCreateToken(Address.fromString(vault.id));
-    vault.outputToken = outputToken.id;
-    vault.outputTokenSupply = BIGINT_ZERO;
+  const outputToken = getOrCreateToken(Address.fromString(vault.id));
+  vault.outputToken = outputToken.id;
+  vault.outputTokenSupply = BIGINT_ZERO;
 
-    vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-    vault.pricePerShare = BIGDECIMAL_ZERO;
-    vault.depositLimit = BIGINT_ZERO;
+  vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+  vault.pricePerShare = BIGDECIMAL_ZERO;
+  vault.depositLimit = BIGINT_ZERO;
 
-    vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    vault.createdBlockNumber = blocknumber;
-    vault.createdTimestamp = timestamp;
-  
-    
-    const rewardToken = createRewardTokens();
-  
-    vault.rewardTokens = [rewardToken.id];
-  
-    vault.fees = [];
-    vault.save();
-  
-    let protocol = YieldAggregator.load(PROTOCOL_ID);
-    if (protocol) {
-      let vaultIds = protocol._vaultIds;
-      if(vaultIds){
-        vaultIds.push(vault.id);
-        protocol._vaultIds = vaultIds;
-        protocol.save();
-      }
+  vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  vault.createdBlockNumber = blocknumber;
+  vault.createdTimestamp = timestamp;
+
+  const rewardToken = createRewardTokens();
+
+  vault.rewardTokens = [rewardToken.id];
+
+  vault.fees = [];
+  vault.save();
+
+  let protocol = YieldAggregator.load(PROTOCOL_ID);
+  if (protocol) {
+    let vaultIds = protocol._vaultIds;
+    if (vaultIds) {
+      vaultIds.push(vault.id);
+      protocol._vaultIds = vaultIds;
+      protocol.save();
     }
-  
-    VaultTemplate.create(vaultAddress);
-    return vault;
-  }
-    
-  export function getOrCreateVault(vaultAddress: Address, blockNumber: BigInt, timestamp: BigInt): VaultStore {
-    // Note that the NewVault event are also emitted when endorseVault and newRelease
-    // are called. So we only create it when necessary.
-    let vault = VaultStore.load(vaultAddress.toHexString());
-    if (!vault) {
-      vault = createVault(vaultAddress, blockNumber, timestamp);
-    }
-  
-    return vault;
   }
 
-  
-export function updateVaultSnapshots(
-  vaultAddress: Address,
-  block: ethereum.Block
-): void {
-  let vault = getOrCreateVault(vaultAddress, block.number,block.timestamp);
+  VaultTemplate.create(vaultAddress);
+  return vault;
+}
 
-  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
-    vaultAddress,
-    block
-  );
-  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(
-    vaultAddress,
-    block
-  );
+export function getOrCreateVault(vaultAddress: Address, blockNumber: BigInt, timestamp: BigInt): VaultStore {
+  // Note that the NewVault event are also emitted when endorseVault and newRelease
+  // are called. So we only create it when necessary.
+  let vault = VaultStore.load(vaultAddress.toHexString());
+  if (!vault) {
+    vault = createVault(vaultAddress, blockNumber, timestamp);
+  }
+
+  return vault;
+}
+
+export function updateVaultSnapshots(vaultAddress: Address, block: ethereum.Block): void {
+  let vault = getOrCreateVault(vaultAddress, block.number, block.timestamp);
+
+  const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(vaultAddress, block);
+  const vaultHourlySnapshots = getOrCreateVaultsHourlySnapshots(vaultAddress, block);
 
   vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
@@ -103,15 +91,8 @@ export function updateVaultSnapshots(
   vaultHourlySnapshots.save();
 }
 
-  
-
-export function getOrCreateVaultsDailySnapshots(
-  vaultAddress: Address,
-  block: ethereum.Block
-): VaultDailySnapshot {
-  let id: string = vaultAddress
-    .toHexString()
-    .concat((block.timestamp.toI64() / SECONDS_PER_DAY).toString());
+export function getOrCreateVaultsDailySnapshots(vaultAddress: Address, block: ethereum.Block): VaultDailySnapshot {
+  let id: string = vaultAddress.toHexString().concat((block.timestamp.toI64() / SECONDS_PER_DAY).toString());
   let vaultSnapshots = VaultDailySnapshot.load(id);
 
   if (!vaultSnapshots) {
@@ -137,10 +118,7 @@ export function getOrCreateVaultsDailySnapshots(
   return vaultSnapshots;
 }
 
-export function getOrCreateVaultsHourlySnapshots(
-  vaultAddress: Address,
-  block: ethereum.Block
-): VaultHourlySnapshot {
+export function getOrCreateVaultsHourlySnapshots(vaultAddress: Address, block: ethereum.Block): VaultHourlySnapshot {
   let id: string = vaultAddress
     .toHexString()
     .concat((block.timestamp.toI64() / SECONDS_PER_DAY).toString())

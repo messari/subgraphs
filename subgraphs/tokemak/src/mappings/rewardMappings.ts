@@ -12,12 +12,12 @@ export function handleClaim(event: Claimed): void {
   const protocol = getOrCreateProtocol();
   const token = getOrCreateToken(Address.fromString(TOKE_ADDRESS));
 
-  const decimals = BIGINT_TEN.pow(u8(token.decimals))
+  const decimals = BIGINT_TEN.pow(u8(token.decimals));
   const amountUSD = getUsdPrice(Address.fromString(token.id), new BigDecimal(event.params.amount.div(decimals)));
 
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(amountUSD);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(amountUSD);
   financialMetrics.save();
-  protocol.save()
+  protocol.save();
   updateUsageMetrics(event.block, event.params.recipient);
 }

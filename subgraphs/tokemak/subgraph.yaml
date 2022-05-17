@@ -45,7 +45,7 @@ dataSources:
           file: ./abis/Rewards.json
         - name: ERC20
           file: ./abis/ERC20Detailed.json
-        
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -125,7 +125,7 @@ templates:
         - name: Vault
           file: ./abis/Vault.json
         - name: ERC20
-          file: ./abis/ERC20Detailed.json                
+          file: ./abis/ERC20Detailed.json
         ###########################################
         ############## Price Oracle ###############
         ###########################################

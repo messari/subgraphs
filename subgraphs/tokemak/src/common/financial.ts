@@ -19,8 +19,7 @@ export function getOrCreateFinancialMetrics(timestamp: BigInt, blockNumber: BigI
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeProtocolSideRevenueUSD =
-      BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
 
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -38,12 +37,9 @@ export function updateFinancials(blockNumber: BigInt, timestamp: BigInt): void {
   const protocol = getOrCreateProtocol();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD =
-    protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD =
-    protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
   financialMetrics.blockNumber = blockNumber;
   financialMetrics.timestamp = timestamp;

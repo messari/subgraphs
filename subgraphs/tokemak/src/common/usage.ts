@@ -5,7 +5,7 @@ import { getOrCreateProtocol } from "./protocol";
 import * as constants from "./constants";
 import { getOrCreateAccount } from "./account";
 
-export function updateUsageMetrics(block: ethereum.Block, from: Address, callType:string = ''): void {
+export function updateUsageMetrics(block: ethereum.Block, from: Address, callType: string = ""): void {
   const account = getOrCreateAccount(from.toHexString());
 
   const protocol = getOrCreateProtocol();
@@ -24,9 +24,7 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address, callTyp
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
 
-  let dailyActiveAccountId = (
-    block.timestamp.toI64() / constants.SECONDS_PER_DAY
-  )
+  let dailyActiveAccountId = (block.timestamp.toI64() / constants.SECONDS_PER_DAY)
     .toString()
     .concat("-")
     .concat(from.toHexString());
@@ -41,23 +39,19 @@ export function updateUsageMetrics(block: ethereum.Block, from: Address, callTyp
     usageMetricsHourly.hourlyActiveUsers += 1;
   }
 
-  if(callType === constants.CallType.DEPOSIT){
-    usageMetricsDaily.dailyDepositCount += 1
-    usageMetricsHourly.hourlyDepositCount += 1
-  }else if(callType === constants.CallType.WITHDRAW){
-    usageMetricsDaily.dailyWithdrawCount += 1
-    usageMetricsHourly.hourlyWithdrawCount += 1
+  if (callType === constants.CallType.DEPOSIT) {
+    usageMetricsDaily.dailyDepositCount += 1;
+    usageMetricsHourly.hourlyDepositCount += 1;
+  } else if (callType === constants.CallType.WITHDRAW) {
+    usageMetricsDaily.dailyWithdrawCount += 1;
+    usageMetricsHourly.hourlyWithdrawCount += 1;
   }
 
   usageMetricsDaily.save();
   usageMetricsHourly.save();
 }
 
-
-
-export function getOrCreateUsageMetricsDailySnapshot(
-  block: ethereum.Block
-): UsageMetricsDailySnapshot {
+export function getOrCreateUsageMetricsDailySnapshot(block: ethereum.Block): UsageMetricsDailySnapshot {
   let id: i64 = block.timestamp.toI64() / constants.SECONDS_PER_DAY;
   let usageMetrics = UsageMetricsDailySnapshot.load(id.toString());
 
@@ -80,9 +74,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
   return usageMetrics;
 }
 
-export function getOrCreateUsageMetricsHourlySnapshot(
-  block: ethereum.Block
-): UsageMetricsHourlySnapshot {
+export function getOrCreateUsageMetricsHourlySnapshot(block: ethereum.Block): UsageMetricsHourlySnapshot {
   let metricsID: string = (block.timestamp.toI64() / constants.SECONDS_PER_DAY)
     .toString()
     .concat("-")
