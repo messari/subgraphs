@@ -556,13 +556,6 @@ type Market @entity {
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 
   ### Add-Ons ###
-
-  " Some protocols accrue by block number, such as Compound. This usually happens when the blockchain has stable block time, such as Ethereum "
-  _accrualBlockNumber: BigInt!
-
-  " Some protocols accrue by timestamp, such as Moonwell. This usually happens when the blockchain has vastly different block time, such as Moonriver "
-  _accrualTimestamp: BigInt!
-
   _cumulativeSupplySideRevenueUSD: BigDecimal!
 
   _cumulativeProtocolSideRevenueUSD: BigDecimal!
