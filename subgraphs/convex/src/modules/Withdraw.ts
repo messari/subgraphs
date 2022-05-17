@@ -88,10 +88,6 @@ export function _Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    withdrawAmountUSD
-  );
-
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
   const outputTokenContract = ERC20.bind(Address.fromString(vault.outputToken));
@@ -128,4 +124,6 @@ export function _Withdraw(
   metricsHourlySnapshot.save();
   protocol.save();
   vault.save();
+
+  utils.updateProtocolTotalValueLockedUSD();
 }

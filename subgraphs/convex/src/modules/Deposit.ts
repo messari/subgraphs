@@ -87,10 +87,6 @@ export function _Deposit(
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
-  
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    depositAmountUSD
-  );
 
   const poolAddress = Address.fromString(vault._pool);
   const poolContract = PoolContract.bind(poolAddress);
@@ -128,4 +124,6 @@ export function _Deposit(
   metricsHourlySnapshot.save();
   protocol.save();
   vault.save();
+
+  utils.updateProtocolTotalValueLockedUSD();
 }
