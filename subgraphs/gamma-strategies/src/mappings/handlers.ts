@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 import { log } from "@graphprotocol/graph-ts"
 import { HypeAdded } from "../../generated/HypeRegistry/HypeRegistry"
-import { Deposit, Withdraw } from "../../generated/templates/Hypervisor/Hypervisor";
+import { Deposit, Withdraw, Rebalance } from "../../generated/templates/Hypervisor/Hypervisor";
 import { Hypervisor as HypervisorContract } from "../../generated/templates/Hypervisor/Hypervisor"
 import { Hypervisor as HypervisorTemplate } from "../../generated/templates"
 import { getOrCreateYieldAggregator } from "../common/getters"
@@ -9,6 +9,7 @@ import { createDeposit, createWithdraw } from "./helpers/events";
 import { updateUsageMetrics } from "./helpers/usageMetrics"
 import { getOrCreateVault } from "./helpers/vaults"
 import { UsageType } from "../common/constants";
+import { updateRevenue, updateTvl } from "./helpers/financials";
 
 
 export function handleHypeAdded(event: HypeAdded): void {
@@ -28,18 +29,20 @@ export function handleHypeAdded(event: HypeAdded): void {
 
 }
 
-
 export function handleDeposit(event: Deposit): void {
     // Create deposit event
     createDeposit(event)
 
     // Update vault: TVL, token balances
     let vault = getOrCreateVault(event.address, event.block)
+    vault.outputTokenSupply += event.params.shares
+    vault.save()
 
     // Update usage metrics
     updateUsageMetrics(event.params.to, UsageType.DEPOSIT, event)
 
-    // Update Financials
+    // Update TVL
+    updateTvl(event)
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -48,9 +51,19 @@ export function handleWithdraw(event: Withdraw): void {
 
     // Update vault: TVL, token balances
     let vault = getOrCreateVault(event.address, event.block)
+    vault.outputTokenSupply -= event.params.shares
+    vault.save()
 
     // Update usage metrics
     updateUsageMetrics(event.params.to, UsageType.WITHDRAW, event)
 
-    // Update Financials
+    // Update TVL
+    updateTvl(event)
+}
+
+export function handleRebalance(event: Rebalance): void {
+    // Update revenue
+    updateRevenue(event)
+    // Update TVL
+    updateTvl(event)
 }

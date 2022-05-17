@@ -608,3 +608,19 @@ type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
+
+# Keeps track of underlying tokens for hypervisor vaults
+type _UnderlyingToken @entity {
+  " Vault address "
+  id: ID!
+  " token0 of vault "
+  token0: Token!
+  " Last amount of underlying token0 "
+  lastAmount0: BigInt!
+  " token1 of vault "
+  token1: Token!
+  " Last amount of underlying token0 "
+  lastAmount1: BigInt!
+  " Last block number when amounts were updated "
+  lastAmountBlockNumber: BigInt!
+}

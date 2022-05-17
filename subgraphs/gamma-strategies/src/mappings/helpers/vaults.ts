@@ -4,7 +4,7 @@ import {
   dataSource,
   ethereum,
 } from "@graphprotocol/graph-ts";
-import { Vault, VaultFee } from "../../../generated/schema";
+import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
 import { Hypervisor as HypervisorContract } from "../../../generated/templates/Hypervisor/Hypervisor";
 import {
   BIGINT_ZERO,
@@ -24,14 +24,15 @@ export function getOrCreateVault(
     let hypeContract = HypervisorContract.bind(vaultAddress);
 
     // Create relevant tokens
-    let outputToken = getOrCreateToken(vaultAddress);
+    getOrCreateUnderlyingToken(vaultAddress)
+    getOrCreateToken(vaultAddress);
 
     vault = new Vault(vaultId);
     vault.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
     vault.name = hypeContract.name();
     vault.symbol = hypeContract.symbol();
-    vault.inputToken = "";
-    vault.outputToken = outputToken.id;
+    vault.inputToken = vaultId;
+    vault.outputToken = vaultId;
     // vault.rewardTokens = [];
     vault.depositLimit = BIGINT_ZERO;
     vault.createdTimestamp = block.timestamp;
@@ -54,6 +55,31 @@ export function getOrCreateVault(
     vault.save();
   }
   return vault;
+}
+
+export function getOrCreateUnderlyingToken(vaultAddress: Address): _UnderlyingToken {
+  const vaultId = vaultAddress.toHex()
+  let underlyingToken = _UnderlyingToken.load(vaultId)
+  if (!underlyingToken) {
+
+    const hypeContract = HypervisorContract.bind(vaultAddress);
+
+    const token0Address = hypeContract.token0()
+    const token1Address = hypeContract.token1()
+    const totalAmounts = hypeContract.getTotalAmounts()
+
+    getOrCreateToken(token0Address)
+    getOrCreateToken(token1Address)
+
+    underlyingToken = new _UnderlyingToken(vaultId)
+    underlyingToken.token0 = token0Address.toHex()
+    underlyingToken.lastAmount0 = totalAmounts.value0
+    underlyingToken.token1 = token1Address.toHex()
+    underlyingToken.lastAmount1 = totalAmounts.value1
+    underlyingToken.lastAmountBlockNumber = BIGINT_ZERO
+    underlyingToken.save()
+  }
+  return underlyingToken
 }
 
 export function createVaultFee(
