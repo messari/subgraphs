@@ -53,7 +53,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
 ): UsageMetricsHourlySnapshot {
   const day = getDay(call.block.timestamp);
   const hour = getHour(call.block.timestamp);
-  const id = `${day}-${hour}`;
+  const id = `${hour}`;
   const protocol = getOrCreateYieldAggregator();
   let object = UsageMetricsHourlySnapshot.load(id);
 
@@ -175,7 +175,7 @@ export function getOrCreateVaultHourlySnapshot(
 ): VaultHourlySnapshot {
   const day = getDay(call.block.timestamp);
   const hour = getHour(call.block.timestamp);
-  const id = `${vaultAddress.toHexString()}-${day}-${hour}`;
+  const id = `${vaultAddress.toHexString()}-${hour}`;
   const protocol = getOrCreateYieldAggregator();
   const vault = getOrCreateVault(
     vaultAddress,

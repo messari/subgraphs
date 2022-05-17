@@ -36,7 +36,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     yAggr = new YieldAggregator(CONTROLLER_ADDRESS_HEX);
     yAggr.name = "Vesper Finance V3";
     yAggr.slug = "vesper-finance-v3";
-    yAggr.schemaVersion = "1.2.0";
+    yAggr.schemaVersion = "1.2.1";
     yAggr.subgraphVersion = "1.0.0";
     yAggr.methodologyVersion = "1.0.0";
     yAggr.network = "MAINNET";
@@ -216,11 +216,11 @@ export function getOrCreateAccount(
   address: Address,
   timestamp: BigInt
 ): Account {
-  let activeId = `${address.toHexString()}-${getDay(timestamp)}-${getHour(
-    timestamp
-  )}`;
+  let activeDailyId = `daily-${address.toHexString()}-${getDay(timestamp)}`;
+  let activeHourlyId = `hourly-${address.toHexString()}-${getHour(timestamp)}`;
   let object = Account.load(address.toHexString());
-  let dailyObject = ActiveAccount.load(activeId);
+  let dailyObject = ActiveAccount.load(activeDailyId);
+  let hourlyObject = ActiveAccount.load(activeHourlyId);
 
   if (!object) {
     const yAggr = getOrCreateYieldAggregator();
@@ -232,9 +232,15 @@ export function getOrCreateAccount(
   }
 
   if (!dailyObject) {
-    dailyObject = new ActiveAccount(activeId);
+    dailyObject = new ActiveAccount(activeDailyId);
     dailyObject.save();
   }
+
+  if (!hourlyObject) {
+    hourlyObject = new ActiveAccount(activeHourlyId);
+    hourlyObject.save();
+  }
+
   return object;
 }
 
