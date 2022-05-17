@@ -10,6 +10,7 @@ import { getDay, getHour } from "./utils";
 import { getOrCreateYieldAggregator, getOrCreateVault } from "./entities";
 
 export function getOrCreateUsageMetricsDailySnapshot(
+  eventId: number,
   call: ethereum.Call
 ): UsageMetricsDailySnapshot {
   const day = getDay(call.block.timestamp);
@@ -22,6 +23,8 @@ export function getOrCreateUsageMetricsDailySnapshot(
     object.protocol = protocol.id;
     object.dailyActiveUsers = 1;
     object.dailyTransactionCount = 1;
+    object.dailyDepositCount = 1;
+    object.dailyWithdrawCount = 1;
   } else {
     object.dailyActiveUsers += 1;
     object.dailyTransactionCount += 1;
@@ -30,13 +33,22 @@ export function getOrCreateUsageMetricsDailySnapshot(
   object.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
-  // TODO: dailyDepositCount, dailyWithdrawCount
+  
+  if (eventId === 1) {
+    object.dailyWithdrawCount += 1;
+  }
+
+  if (eventId === 2) {
+    object.dailyDepositCount += 1;
+  }
+
   object.save();
 
   return object;
 }
 
 export function getOrCreateUsageMetricsHourlySnapshot(
+  eventId: number,
   call: ethereum.Call
 ): UsageMetricsHourlySnapshot {
   const day = getDay(call.block.timestamp);
@@ -51,6 +63,8 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     object.protocol = protocol.id;
     object.hourlyActiveUsers = 1;
     object.hourlyTransactionCount = 1;
+    object.hourlyDepositCount = 1;
+    object.hourlyWithdrawCount = 1;
   } else {
     object.hourlyActiveUsers += 1;
     object.hourlyTransactionCount += 1;
@@ -59,7 +73,15 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   object.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
-  //TODO: hourlyDepositCount hourlyWithdrawCount
+  
+  if (eventId === 1) {
+    object.hourlyWithdrawCount += 1;
+  }
+
+  if (eventId === 2) {
+    object.hourlyDepositCount += 1;
+  }
+  
   object.save();
 
   return object;
@@ -183,13 +205,14 @@ export function getOrCreateVaultHourlySnapshot(
 }
 
 export function updateAllSnapshots(
+  eventId: number,
   call: ethereum.Call,
   vaultAddress: Address,
   protocolRevenueUsd: BigDecimal = BigDecimal.zero(),
   supplySideRevenueUsd: BigDecimal = BigDecimal.zero()
 ): void {
-  getOrCreateUsageMetricsDailySnapshot(call);
-  getOrCreateUsageMetricsHourlySnapshot(call);
+  getOrCreateUsageMetricsDailySnapshot(eventId, call);
+  getOrCreateUsageMetricsHourlySnapshot(eventId, call);
   getOrCreateFinancialsDailySnapshot(
     call,
     protocolRevenueUsd,

@@ -30,7 +30,7 @@ export function handleWithdrawV3(call: WithdrawCall): void {
 
   updateVaultRewardEmission(dataSource.address());
   getOrCreateWithdraw(call, dataSource.address());
-  updateAllSnapshots(call, dataSource.address());
+  updateAllSnapshots(1, call, dataSource.address());
 }
 
 export function handleDepositV3(call: DepositCall): void {
@@ -70,6 +70,7 @@ export function handleDepositV3(call: DepositCall): void {
   );
 
   updateAllSnapshots(
+    2,
     call,
     dataSource.address(),
     revenue.protocolRevenueUsd,
