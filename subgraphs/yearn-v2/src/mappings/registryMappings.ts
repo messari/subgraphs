@@ -33,7 +33,7 @@ export function handleNewExperimentalVault(event: NewExperimentalVault): void {
   let protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
   let vaultIds = protocol._vaultIds;
 
-  vaultIds!.push(vaultAddress.toHexString());
+  vaultIds.push(vaultAddress.toHexString());
   protocol._vaultIds = vaultIds;
   protocol.save();
 

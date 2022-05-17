@@ -339,12 +339,15 @@ templates:
           handler: handleDepositWithAmount
         - function: deposit(uint256,address)
           handler: handleDepositWithAmountAndRecipient
+
         - function: withdraw()
           handler: handleWithdraw
         - function: withdraw(uint256)
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
+        - function: withdraw(uint256,address,uint256)
+          handler: handleWithdrawWithSharesAndRecipientAndLoss
       {{/callHandlersEnabled}}
   
   - name: Strategy

@@ -17,6 +17,7 @@ import {
   WithdrawCall,
   Withdraw1Call,
   Withdraw2Call,
+  Withdraw3Call,
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
   StrategyAdded as StrategyAddedV1Event,
@@ -87,14 +88,6 @@ export function handleDeposit(call: DepositCall): void {
   if (vault) {
     let sharesMinted = call.outputs.value0;
 
-    log.warning(
-      "[H_Deposit] vaultAddress: {}, sharesMinted: {}",
-      [
-        vault.id,
-        sharesMinted.toString(),
-      ]
-    );
-
     _Deposit(
       call.to,
       call.transaction,
@@ -107,26 +100,15 @@ export function handleDeposit(call: DepositCall): void {
   updateFinancials(call.block);
   updateUsageMetrics(call.block, call.from);
   updateVaultSnapshots(vaultAddress, call.block);
-
-
 }
 
 export function handleDepositWithAmount(call: Deposit1Call): void {
   const vaultAddress = call.to;
   const vault = getOrCreateVault(vaultAddress, call.block);
-  
+
   if (vault) {
     let sharesMinted = call.outputs.value0;
     let depositAmount = call.inputs._amount;
-
-    log.warning(
-      "[H_DepositWAmount] vaultAddress: {}, sharesMinted: {}, depositAmount: {}",
-      [
-        vault.id,
-        sharesMinted.toString(),
-        depositAmount.toString(),
-      ]
-    );
 
     _Deposit(
       call.to,
@@ -146,28 +128,9 @@ export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
   const vaultAddress = call.to;
   const vault = getOrCreateVault(vaultAddress, call.block);
 
-  log.warning(
-    "[DepositWithAmountAndRecipient] vault: {}, shares: {}, deposit: {}, TxnHash: {}",
-    [
-      vaultAddress.toHexString(),
-      call.outputs.value0.toString(),
-      call.inputs._amount.toString(),
-      call.transaction.hash.toHexString(),
-    ]
-  );
-
   if (vault) {
     let sharesMinted = call.outputs.value0;
     let depositAmount = call.inputs._amount;
-
-    log.warning(
-      "[H_DepositWAmountWRec] vaultAddress: {}, sharesMinted: {}, depositAmount: {}",
-      [
-        vault.id,
-        sharesMinted.toString(),
-        depositAmount.toString(),
-      ]
-    );
 
     _Deposit(
       call.to,
@@ -190,14 +153,6 @@ export function handleWithdraw(call: WithdrawCall): void {
   if (vault) {
     let withdrawAmount = call.outputs.value0;
 
-    log.warning(
-      "[H_Withdraw] vaultAddress: {}, withdrawAmount: {}",
-      [
-        vault.id,
-        withdrawAmount.toString()
-      ]
-    );
-
     _Withdraw(
       call.to,
       call.transaction,
@@ -219,15 +174,6 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
   if (vault) {
     const sharesBurnt = call.inputs._shares;
     const withdrawAmount = call.outputs.value0;
-
-    log.warning(
-      "[H_WithdrawWShares] vaultAddress: {}, sharesBurnt: {}, withdrawAmount: {}",
-      [
-        vault.id,
-        sharesBurnt.toString(),
-        withdrawAmount.toString()
-      ]
-    );
 
     _Withdraw(
       call.to,
@@ -253,14 +199,29 @@ export function handleWithdrawWithSharesAndRecipient(
     const sharesBurnt = call.inputs._shares;
     const withdrawAmount = call.outputs.value0;
 
-    log.warning(
-      "[H_WithdrawWSharesAndRec] vaultAddress: {}, sharesBurnt: {}, withdrawAmount: {}",
-      [
-        vault.id,
-        sharesBurnt.toString(),
-        withdrawAmount.toString()
-      ]
+    _Withdraw(
+      call.to,
+      call.transaction,
+      call.block,
+      vault,
+      withdrawAmount,
+      constants.MAX_UINT256
     );
+  }
+  updateFinancials(call.block);
+  updateUsageMetrics(call.block, call.from);
+  updateVaultSnapshots(vaultAddress, call.block);
+}
+
+export function handleWithdrawWithSharesAndRecipientAndLoss(
+  call: Withdraw3Call
+): void {
+  const vaultAddress = call.to;
+  const vault = getOrCreateVault(vaultAddress, call.block);
+
+  if (vault) {
+    const sharesBurnt = call.inputs.maxShares;
+    const withdrawAmount = call.outputs.value0;
 
     _Withdraw(
       call.to,

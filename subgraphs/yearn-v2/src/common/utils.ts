@@ -58,8 +58,10 @@ export function updateProtocolTotalValueLockedUSD(): void {
   for (let vaultIdx = 0; vaultIdx < vaultIds.length; vaultIdx++) {
     const vault = VaultStore.load(vaultIds[vaultIdx]);
 
+    if (!vault) continue;
+
     totalValueLockedUSD = totalValueLockedUSD.plus(
-      vault!.totalValueLockedUSD
+      vault.totalValueLockedUSD
     );
   }
 
