@@ -50,11 +50,21 @@ function handleProfit(event: ethereum.Event, profit_amount: BigInt, fee_amount: 
 
     let protocol = getOrCreateProtocol();
     protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(fee_USD);
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(profit_USD);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD
+      .plus(protocol.cumulativeSupplySideRevenueUSD);
     protocol.save();
 
     let snapshot = updateFinancialSnapshot(event);
+    snapshot.dailySupplySideRevenueUSD = snapshot.dailySupplySideRevenueUSD.plus(profit_USD);
     snapshot.dailyProtocolSideRevenueUSD = snapshot.dailyProtocolSideRevenueUSD.plus(fee_USD);
+    snapshot.dailyTotalRevenueUSD = snapshot.dailyTotalRevenueUSD.plus(profit_USD).plus(fee_USD);
+    snapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+    snapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+    snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
     snapshot.save();
+
+
   }
 
   

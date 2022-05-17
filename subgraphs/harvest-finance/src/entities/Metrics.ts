@@ -53,8 +53,10 @@ function updateUsageMetricsSnapshots_daily(day: i64, event: ethereum.Event): Usa
 
 function updateUsageMetricsSnapshotsAfterDeposit_daily(day: i64, event: ethereum.Event): void {
   let snapshot = updateUsageMetricsSnapshots_daily(day, event);
+  let protocol = getOrCreateProtocol();
 
   snapshot.dailyDepositCount += 1;
+  snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   snapshot.save();
 }
 
@@ -102,13 +104,19 @@ function updateUsageMetricsSnapshots_hourly(day: i64, event: ethereum.Event): Us
 
 function updateUsageMetricsSnapshotsAfterDeposit_hourly(day: i64, event: ethereum.Event): void {
   let snapshot = updateUsageMetricsSnapshots_hourly(day, event);
+  let protocol = getOrCreateProtocol();
+
   snapshot.hourlyDepositCount += 1;
+  snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   snapshot.save();
 }
 
 function updateUsageMetricsSnapshotsAfterWithdraw_hourly(day: i64, event: ethereum.Event): void {
   let snapshot = updateUsageMetricsSnapshots_hourly(day, event);
+  let protocol = getOrCreateProtocol();
+  
   snapshot.hourlyWithdrawCount += 1;
+  snapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   snapshot.save();
 }
 
@@ -275,8 +283,9 @@ function updateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySn
 
   let protocol = getOrCreateProtocol();
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  snapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   snapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
   snapshot.save();
