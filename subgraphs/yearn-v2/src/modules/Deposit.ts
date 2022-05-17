@@ -93,10 +93,6 @@ export function _Deposit(
   const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
   if (depositAmount.equals(constants.MAX_UINT256)) {
-    log.warning("[calculateAmountDeposited] transaction: {}", [
-      transaction.hash.toHexString(),
-    ]);
-
     depositAmount = calculateAmountDeposited(vaultAddress, sharesMinted);
   }
 
@@ -113,11 +109,14 @@ export function _Deposit(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositAmountUSD);
-  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
-  
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
@@ -152,6 +151,7 @@ export function _Deposit(
 
   protocol.save();
 
+  utils.updateProtocolTotalValueLockedUSD();
   log.info(
     "[Deposit] TxHash: {}, vaultAddress: {}, _sharesMinted: {}, _depositAmount: {}",
     [

@@ -1,5 +1,7 @@
 import * as constants from "../common/constants";
 import { VaultFee } from "../../generated/schema";
+import { getOrCreateYieldAggregator } from "./initializers";
+import { Vault as VaultStore } from "../../generated/schema";
 import { BigInt, Address, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
 
@@ -46,4 +48,21 @@ export function createFeeType(
     .div(constants.BIGDECIMAL_HUNDRED);
 
   fees.save();
+}
+
+export function updateProtocolTotalValueLockedUSD(): void {
+  const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
+  const vaultIds = protocol._vaultIds;
+
+  let totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  for (let vaultIdx = 0; vaultIdx < vaultIds.length; vaultIdx++) {
+    const vault = VaultStore.load(vaultIds[vaultIdx]);
+
+    totalValueLockedUSD = totalValueLockedUSD.plus(
+      vault!.totalValueLockedUSD
+    );
+  }
+
+  protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.save();
 }

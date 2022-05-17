@@ -49,11 +49,14 @@ export namespace Protocol {
   export const METHODOLOGY_VERSION = "1.0.0";
 }
 
-export const VAULT_VERSION_0_3_0 = "0.3.0";
-export const VAULT_VERSION_0_3_2 = "0.3.2";
-export const VAULT_VERSION_0_3_3 = "0.3.3";
-export const VAULT_VERSION_0_3_5 = "0.3.5";
-export const VAULT_VERSION_LATEST = "0.4.3";
+export namespace VaultVersions {
+  export const v0_3_0 = "0.3.0";
+  export const v0_3_1 = "0.3.1";
+  export const v0_3_2 = "0.3.2";
+  export const v0_3_3 = "0.3.3";
+  export const v0_3_5 = "0.3.5";
+  export const v0_4_3 = "0.4.3";
+}
 
 export const MAX_BPS = BigInt.fromI32(10000);
 export const SECONDS_PER_HOUR = 60 * 60;

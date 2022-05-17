@@ -17,7 +17,6 @@ import {
   WithdrawCall,
   Withdraw1Call,
   Withdraw2Call,
-  Vault as VaultContract,
   Deposit as DepositEvent,
   Withdraw as WithdrawEvent,
   StrategyAdded as StrategyAddedV1Event,
@@ -30,8 +29,8 @@ import {
 import { _Deposit } from "../modules/Deposit";
 import { _Withdraw } from "../modules/Withdraw";
 import { strategyReported } from "../modules/Strategy";
-import { getOrCreateStrategy, getOrCreateVault } from "../common/initializers";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
+import { getOrCreateStrategy, getOrCreateVault } from "../common/initializers";
 
 export function handleStrategyAdded_v1(event: StrategyAddedV1Event): void {
   const vaultAddress = event.address;
@@ -88,6 +87,14 @@ export function handleDeposit(call: DepositCall): void {
   if (vault) {
     let sharesMinted = call.outputs.value0;
 
+    log.warning(
+      "[H_Deposit] vaultAddress: {}, sharesMinted: {}",
+      [
+        vault.id,
+        sharesMinted.toString(),
+      ]
+    );
+
     _Deposit(
       call.to,
       call.transaction,
@@ -100,21 +107,26 @@ export function handleDeposit(call: DepositCall): void {
   updateFinancials(call.block);
   updateUsageMetrics(call.block, call.from);
   updateVaultSnapshots(vaultAddress, call.block);
+
+
 }
 
 export function handleDepositWithAmount(call: Deposit1Call): void {
   const vaultAddress = call.to;
   const vault = getOrCreateVault(vaultAddress, call.block);
-
-  log.warning("[DepositWithAmount] vault: {}, shares: {}, deposit: {}", [
-    vaultAddress.toHexString(),
-    call.outputs.value0.toString(),
-    call.inputs._amount.toString(),
-  ]);
-
+  
   if (vault) {
     let sharesMinted = call.outputs.value0;
     let depositAmount = call.inputs._amount;
+
+    log.warning(
+      "[H_DepositWAmount] vaultAddress: {}, sharesMinted: {}, depositAmount: {}",
+      [
+        vault.id,
+        sharesMinted.toString(),
+        depositAmount.toString(),
+      ]
+    );
 
     _Deposit(
       call.to,
@@ -122,7 +134,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
       call.block,
       vault,
       sharesMinted,
-      depositAmount
+      constants.MAX_UINT256
     );
   }
   updateFinancials(call.block);
@@ -148,13 +160,22 @@ export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
     let sharesMinted = call.outputs.value0;
     let depositAmount = call.inputs._amount;
 
+    log.warning(
+      "[H_DepositWAmountWRec] vaultAddress: {}, sharesMinted: {}, depositAmount: {}",
+      [
+        vault.id,
+        sharesMinted.toString(),
+        depositAmount.toString(),
+      ]
+    );
+
     _Deposit(
       call.to,
       call.transaction,
       call.block,
       vault,
       sharesMinted,
-      depositAmount
+      constants.MAX_UINT256
     );
   }
   updateFinancials(call.block);
@@ -168,6 +189,14 @@ export function handleWithdraw(call: WithdrawCall): void {
 
   if (vault) {
     let withdrawAmount = call.outputs.value0;
+
+    log.warning(
+      "[H_Withdraw] vaultAddress: {}, withdrawAmount: {}",
+      [
+        vault.id,
+        withdrawAmount.toString()
+      ]
+    );
 
     _Withdraw(
       call.to,
@@ -191,13 +220,22 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
     const sharesBurnt = call.inputs._shares;
     const withdrawAmount = call.outputs.value0;
 
+    log.warning(
+      "[H_WithdrawWShares] vaultAddress: {}, sharesBurnt: {}, withdrawAmount: {}",
+      [
+        vault.id,
+        sharesBurnt.toString(),
+        withdrawAmount.toString()
+      ]
+    );
+
     _Withdraw(
       call.to,
       call.transaction,
       call.block,
       vault,
       withdrawAmount,
-      sharesBurnt
+      constants.MAX_UINT256
     );
   }
   updateFinancials(call.block);
@@ -215,13 +253,22 @@ export function handleWithdrawWithSharesAndRecipient(
     const sharesBurnt = call.inputs._shares;
     const withdrawAmount = call.outputs.value0;
 
+    log.warning(
+      "[H_WithdrawWSharesAndRec] vaultAddress: {}, sharesBurnt: {}, withdrawAmount: {}",
+      [
+        vault.id,
+        sharesBurnt.toString(),
+        withdrawAmount.toString()
+      ]
+    );
+
     _Withdraw(
       call.to,
       call.transaction,
       call.block,
       vault,
       withdrawAmount,
-      sharesBurnt
+      constants.MAX_UINT256
     );
   }
   updateFinancials(call.block);

@@ -92,10 +92,6 @@ export function _Withdraw(
   const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
   if (sharesBurnt.equals(constants.MAX_UINT256)) {
-    log.warning("[CalculateSharesBurnt] transaction: {}", [
-      transaction.hash.toHexString(),
-    ]);
-
     sharesBurnt = calculateSharesBurnt(vaultAddress, withdrawAmount);
   }
 
@@ -112,13 +108,14 @@ export function _Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(
-    withdrawAmountUSD
-  );
-  protocol.totalValueLockedUSD = vault.totalValueLockedUSD;
-
   vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
@@ -152,6 +149,7 @@ export function _Withdraw(
   metricsHourlySnapshot.save();
   protocol.save();
 
+  utils.updateProtocolTotalValueLockedUSD();
   log.info(
     "[Withdrawn] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",
     [
