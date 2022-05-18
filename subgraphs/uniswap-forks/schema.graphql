@@ -736,9 +736,9 @@ type _Transfer @entity {
 
   timestamp: BigInt!
 
-  sender: ID!
+  sender: ID
 
-  type: ID!
+  type: ID
 
   liquidity: BigInt
 }

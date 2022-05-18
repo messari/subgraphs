@@ -5,17 +5,6 @@ import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
-export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
-
-/////////////////////
-///// Protocols /////
-/////////////////////
-export namespace Protocol {
-  export const APESWAP = "Apeswap";
-  export const UNISWAP_V2 = "Uniswap V2";
-  export const SUSHISWAP = "Sushiswap";
-}
 
 ////////////////////////
 ///// Schema Enums /////
@@ -25,7 +14,6 @@ export namespace Protocol {
 // They are mainly intended for convenience on the data consumer side.
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
-
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
@@ -135,4 +123,4 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("50000");
+export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("100000");

@@ -6,8 +6,8 @@ import { BIGDECIMAL_ZERO, INT_ZERO, INT_ONE, BIGINT_ZERO, LiquidityPoolFeeType, 
 import { getLiquidityPool, getOrCreateDex, getOrCreateTransfer, getOrCreateToken, getOrCreateLPToken, getLiquidityPoolAmounts } from "./getters";
 import { convertTokenToDecimal } from "./utils/utils";
 import { updateDepositHelper, updateTokenWhitelists, updateVolumeAndFees } from "./updateMetrics";
-import { NetworkConfigs } from "../../config/configure";
-import { getTrackedVolumeUSD } from "./price/price";
+import { NetworkConfigs } from "../../configurations/configure";
+import { getTrackedVolumeUSD } from "../price/price";
 
 function createPoolFees(poolAddress: string): string[] {
   let poolLpFee = new LiquidityPoolFee(poolAddress.concat("-lp-fee"));
@@ -119,7 +119,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.logIndex = logIndexI32;
   deposit.protocol = NetworkConfigs.getFactoryAddress();
   deposit.to = pool.id;
-  deposit.from = transfer.sender;
+  deposit.from = transfer.sender!;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
   deposit.inputTokens = [pool.inputTokens[INT_ZERO], pool.inputTokens[INT_ONE]];
@@ -127,6 +127,7 @@ export function createDeposit(event: ethereum.Event, amount0: BigInt, amount1: B
   deposit.inputTokenAmounts = [amount0, amount1];
   deposit.outputTokenAmount = transfer.liquidity;
   deposit.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
+  deposit.pool = pool.id;
 
   updateDepositHelper(event.address);
 
@@ -153,7 +154,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.hash = transactionHash;
   withdrawal.logIndex = event.logIndex.toI32();
   withdrawal.protocol = NetworkConfigs.getFactoryAddress();
-  withdrawal.to = transfer.sender;
+  withdrawal.to = transfer.sender!;
   withdrawal.from = pool.id;
   withdrawal.blockNumber = event.block.number;
   withdrawal.timestamp = event.block.timestamp;
@@ -162,6 +163,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   withdrawal.inputTokenAmounts = [amount0, amount1];
   withdrawal.outputTokenAmount = transfer.liquidity;
   withdrawal.amountUSD = token0.lastPriceUSD!.times(token0Amount).plus(token1.lastPriceUSD!.times(token1Amount));
+  withdrawal.pool = pool.id;
 
   store.remove("_Transfer", transfer.id);
 
