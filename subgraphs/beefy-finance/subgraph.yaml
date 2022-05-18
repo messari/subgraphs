@@ -26,7 +26,7 @@ dataSources:
           handler: handleVaultsRegistered
         - event: VaultsRetireStatusUpdated(address[],bool)
           handler: handleVaultsRetireStatusUpdated
-      file: ./src/mappings/mapping.ts
+      file: ./src/mappings/registry.ts
 templates:
   - name: Vault
     kind: ethereum/contract
