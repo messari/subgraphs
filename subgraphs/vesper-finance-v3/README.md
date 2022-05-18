@@ -62,3 +62,6 @@ https://github.com/vesperfi/vesper-subgraph
 - Protocol documentation: https://docs.vesper.finance
 - Deployed addresses: https://github.com/vesperfi/metadata
 - Existing subgraphs: https://github.com/vesperfi/vesper-subgraph
+
+## Note
+As vesper doesn't have a pool register. We are using their published npm package called `vesper-meta`. This package provides list of pools and controllers. We are indexing all version 3 and above pools along with the orbit pools for mainnet.
