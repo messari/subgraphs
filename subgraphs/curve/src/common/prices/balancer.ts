@@ -3,31 +3,10 @@ import { getOrCreateToken } from "../getters";
 import { BalancerPoolToken } from "../../../generated/templates/CurveGauge/BalancerPoolToken";
 import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, DEFAULT_DECIMALS } from "../constants";
 import { USDT_TOKEN } from "../constants/index";
+import { bigIntToBigDecimal } from "../utils/numbers";
+import { getUnderlyingTokenPrice } from "./underlying";
 import { TokenSnapshot } from "../../../generated/schema";
 import { createTokenSnapshotID } from "../../services/snapshots";
-import { getUsdRate } from "../pricing";
-import { bigIntToBigDecimal } from "../utils/numbers";
-
-function getUnderlyingBalance(tokenAddr: Address, bptContract: BalancerPoolToken): BigDecimal {
-  const token = getOrCreateToken(tokenAddr);
-  const balanceCall = bptContract.try_getBalance(tokenAddr);
-  if (balanceCall.reverted) {
-    return BIGDECIMAL_ZERO;
-  }
-  return bigIntToBigDecimal(balanceCall.value, token.decimals);
-}
-
-function getUnderlyingTokenPrice(tokenAddr: Address, timestamp: BigInt): BigDecimal {
-  let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(tokenAddr, timestamp));
-  if (tokenSnapshot) {
-    return tokenSnapshot.price;
-  }
-  tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
-  let priceUSD = getUsdRate(tokenAddr);
-  tokenSnapshot.price = priceUSD;
-  tokenSnapshot.save();
-  return priceUSD;
-}
 
 export function isBalancerToken(tokenAddr: Address): boolean {
   let bptContract = BalancerPoolToken.bind(tokenAddr);
@@ -38,7 +17,21 @@ export function isBalancerToken(tokenAddr: Address): boolean {
   return false;
 }
 
+function getUnderlyingBalance(tokenAddr: Address, bptContract: BalancerPoolToken): BigDecimal {
+  const token = getOrCreateToken(tokenAddr);
+  const balanceCall = bptContract.try_getBalance(tokenAddr);
+  if (balanceCall.reverted) {
+    return BIGDECIMAL_ZERO;
+  }
+  return bigIntToBigDecimal(balanceCall.value, token.decimals);
+}
+
 export function getBalancerLpPriceUSD(tokenAddr: Address, timestamp: BigInt): BigDecimal {
+  let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(tokenAddr, timestamp));
+  if (tokenSnapshot) {
+    return tokenSnapshot.price;
+  }
+  tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
   let bptContract = BalancerPoolToken.bind(tokenAddr);
   const underlyingTokensCall = bptContract.try_getCurrentTokens();
   const lpTotalSupplyCall = bptContract.try_totalSupply();
@@ -57,5 +50,7 @@ export function getBalancerLpPriceUSD(tokenAddr: Address, timestamp: BigInt): Bi
         : getUnderlyingTokenPrice(underlyingToken, timestamp);
     poolTVL = poolTVL.plus(priceUSD.times(underlyingBalance));
   }
-  return poolTVL.div(lpTotalSupply);
+  const priceUSD = poolTVL.div(lpTotalSupply);
+  tokenSnapshot.price = priceUSD
+  return priceUSD
 }

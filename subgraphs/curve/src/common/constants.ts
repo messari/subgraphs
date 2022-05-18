@@ -124,11 +124,11 @@ export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString("10").pow(18);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
-
-export const INT_NEGATIVE_ONE = -1 as i32;
-export const INT_ZERO = 0 as i32;
-export const INT_ONE = 1 as i32;
-export const INT_TWO = 2 as i32;
+//@ts-ignore
+export const INT_NEGATIVE_ONE = -1 as i32; //@ts-ignore
+export const INT_ZERO = 0 as i32; //@ts-ignore
+export const INT_ONE = 1 as i32; //@ts-ignore
+export const INT_TWO = 2 as i32; //@ts-ignore
 export const INT_FOUR = 4 as i32;
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
@@ -146,6 +146,8 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
+export const SNAPSHOT_SECONDS = SECONDS_PER_DAY
+
 
 ////////////////
 ///// Misc /////
@@ -161,3 +163,4 @@ export const ETH_NAME = "Ether";
 export const FEE_DENOMINATOR_DECIMALS = 10;
 export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52");
 export const CRV_POOL_START_BLOCK = 10928474;
+

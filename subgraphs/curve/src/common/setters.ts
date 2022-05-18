@@ -36,7 +36,7 @@ export function setPoolCoins(pool: LiquidityPool): void {
   if (coinResult.reverted) {
     // some pools require an int128 for coins and will revert with the
     // regular abi. e.g. 0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714
-    log.warning("Call to coins reverted for pool ({}: {}), attempting 128 bytes call", [pool.name!, pool.id]);
+    //log.warning("Call to coins reverted for pool ({}: {}), attempting 128 bytes call", [pool.name!, pool.id]);
     setPoolCoins128(pool);
     return;
   }

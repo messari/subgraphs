@@ -16,10 +16,13 @@ import { CurvePool } from "../../generated/templates/CurvePoolTemplate/CurvePool
 import { ChainlinkAggregator } from "../../generated/templates/CurvePoolTemplateV2/ChainlinkAggregator";
 import { CurvePoolV2 } from "../../generated/templates/RegistryTemplate/CurvePoolV2";
 import { getUsdRate } from "../common/pricing";
-import { BIGDECIMAL_ZERO, SECONDS_PER_HOUR } from "../common/constants";
+import { BIGDECIMAL_ZERO, SNAPSHOT_SECONDS } from "../common/constants";
 import { RedeemableKeep3r } from "../../generated/templates/CurvePoolTemplateV2/RedeemableKeep3r";
 import { BIG_DECIMAL_1E6, RKP3R_ADDRESS } from "../common/constants/index";
 import { getBalancerLpPriceUSD, isBalancerToken } from "../common/prices/balancer";
+import { getCtokenPriceUSD, isCtoken } from "../common/prices/compound";
+import { getIearnPriceUSD, getYearnTokenV2PriceUSD, isIearnToken, isYearnTokenV2 } from "../common/prices/yearn";
+import { getAtokenPriceUSD, isAtoken } from "../common/prices/aave";
 
 function isKp3rToken(tokenAddr: Address): boolean {
   if (tokenAddr.equals(RKP3R_ADDRESS)) {
@@ -55,15 +58,27 @@ export function getForexUsdRate(token: string): BigDecimal {
 }
 
 export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, forex: boolean): BigDecimal {
-  if (isKp3rToken(tokenAddr)) {
-    return getRKp3rPrice();
-  }
-  if (isBalancerToken(tokenAddr)) {
-    return getBalancerLpPriceUSD(tokenAddr, timestamp);
-  }
   let tokenSnapshot = TokenSnapshot.load(createTokenSnapshotID(tokenAddr, timestamp));
   if (tokenSnapshot) {
     return tokenSnapshot.price;
+  }
+  if (isKp3rToken(tokenAddr)) { // kp3r token
+    return getRKp3rPrice();
+  }
+  if (isBalancerToken(tokenAddr)) { // balancer
+    return getBalancerLpPriceUSD(tokenAddr, timestamp);
+  }
+  if (isCtoken(tokenAddr)) { // ctoken
+    return getCtokenPriceUSD(tokenAddr, timestamp);
+  }
+  if (isIearnToken(tokenAddr)) { // yearn v1
+    return getIearnPriceUSD(tokenAddr, timestamp);
+  }
+  if (isAtoken(tokenAddr)) { // aave
+    return getAtokenPriceUSD(tokenAddr, timestamp);
+  }
+  if (isYearnTokenV2(tokenAddr)) {
+    return getYearnTokenV2PriceUSD(tokenAddr, timestamp);
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
   let priceUSD = BIGDECIMAL_ZERO;
@@ -158,5 +173,5 @@ export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigD
 }
 
 export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): string {
-  return tokenAddr.toHexString() + "-" + timestamp.div(BigInt.fromI32(SECONDS_PER_HOUR)).toString();
+  return tokenAddr.toHexString() + "-" + timestamp.div(BigInt.fromI32(SNAPSHOT_SECONDS)).toString();
 }

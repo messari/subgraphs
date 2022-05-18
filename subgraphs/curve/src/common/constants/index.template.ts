@@ -218,3 +218,5 @@ ASSET_TYPES.set("{{asset}}".toLowerCase(), {{asset_type}})
 export const GAUGE_CONTROLLER = Address.fromString("0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB")
 
 export const CURVE_TOKEN = Address.fromString("{{curveToken}}")
+
+export const CTOKEN_DECIMALS = 8;

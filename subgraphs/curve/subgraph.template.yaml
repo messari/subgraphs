@@ -70,6 +70,14 @@ dataSources:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
@@ -143,6 +151,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handleMainRegistryPoolAdded
@@ -212,6 +228,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: PlainPoolDeployed(address[4],uint256,uint256,address)
           handler: handlePlainPoolDeployed
@@ -287,6 +311,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
@@ -365,6 +397,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
@@ -448,6 +488,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleCryptoPoolDeployed
@@ -521,6 +569,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchangeV2
@@ -594,6 +650,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit

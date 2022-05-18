@@ -4,10 +4,10 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: AddressProvider
-    network: xdai
+    network: avalanche
     source:
       address: "0x0000000022d53366457f9d5e68ec105046fc4383"
-      startBlock: 20755000
+      startBlock: 5209504
       abi: AddressProvider
     mapping:
       kind: ethereum/events
@@ -70,6 +70,14 @@ dataSources:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
@@ -80,7 +88,7 @@ dataSources:
 templates:
   - name: RegistryTemplate
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: MainRegistry
     mapping:
@@ -143,6 +151,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handleMainRegistryPoolAdded
@@ -152,7 +168,7 @@ templates:
       file: ./src/mapping.ts
   - name: StableFactoryTemplate
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: StableFactory
     mapping:
@@ -212,6 +228,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: PlainPoolDeployed(address[4],uint256,uint256,address)
           handler: handlePlainPoolDeployed
@@ -225,7 +249,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoRegistryTemplate
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: CryptoRegistry
     mapping:
@@ -287,6 +311,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
@@ -295,15 +327,10 @@ templates:
           
         
           
-      callHandlers:
-        - function: set_liquidity_gauges(address,address[10])
-          handler: handleSetLiquidityGauges
-        - function: batch_set_liquidity_gauges(address[10],address[10])
-          handler: handleBatchSetLiquidityGauges
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplate
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: CurvePool
     mapping:
@@ -370,6 +397,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
@@ -388,7 +423,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoFactoryTemplate
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: CryptoFactory
     mapping:
@@ -453,6 +488,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleCryptoPoolDeployed
@@ -461,7 +504,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplateV2
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: CurvePoolV2
     mapping:
@@ -526,6 +569,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchangeV2
@@ -538,7 +589,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurveGauge
     kind: ethereum/contract
-    network: xdai
+    network: avalanche
     source:
       abi: Gauge
     mapping:
@@ -599,6 +650,14 @@ templates:
           file: ./abis/prices/BalancerPoolToken.json
         - name: CurvePoolAvax
           file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
