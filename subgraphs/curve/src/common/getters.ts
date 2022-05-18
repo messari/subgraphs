@@ -24,8 +24,6 @@ import {
   ZERO_ADDRESS,
   RewardTokenType,
 } from "../common/constants";
-import { bigIntToBigDecimal, exponentToBigInt } from "./utils/numbers";
-import { LiquidityPoolFeeType } from "./constants";
 import { BIG_DECIMAL_ZERO, CURVE_REGISTRY } from "./constants/index";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -209,7 +207,7 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.schemaVersion = "1.2.1";
     protocol.subgraphVersion = "1.0.0";
     protocol.methodologyVersion = "1.0.0";
-    protocol.network = Network.MAINNET;
+    protocol.network = dataSource.network().toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
