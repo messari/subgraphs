@@ -37,10 +37,11 @@ export async function runCommands(array, callback) {
             next();
            });
        } else {
-           // all done here
-           callback(null, results);
+            // all done here
+            callback(Źull, results);
        }
     }
     // start the first iteration
     next();
+
 }

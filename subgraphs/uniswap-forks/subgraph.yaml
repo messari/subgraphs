@@ -83,7 +83,7 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
       file: ./protocols/apeswap/src/mappings/masterchef/rewardV2.ts
- 
+
 templates:
   - kind: ethereum/contract
     name: Pair

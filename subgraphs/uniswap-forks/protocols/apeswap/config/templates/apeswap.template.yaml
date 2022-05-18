@@ -52,11 +52,7 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-<<<<<<<< HEAD:subgraphs/uniswap-forks/protocols/apeswap/config/templates/apeswap.template.yaml
       file: ./protocols/apeswap/src/mappings/masterchef/reward.ts
-========
-      file: ./src/mappings/masterChef/apeswap/reward.ts
->>>>>>>> masterMessari:subgraphs/uniswap-forks/config/apeswap/apeswap.template.yaml
 
   - kind: ethereum
     name: MasterChefV2
@@ -86,12 +82,8 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-<<<<<<<< HEAD:subgraphs/uniswap-forks/protocols/apeswap/config/templates/apeswap.template.yaml
       file: ./protocols/apeswap/src/mappings/masterchef/rewardV2.ts
-========
-      file: ./src/mappings/masterChef/apeswap/rewardV2.ts
->>>>>>>> masterMessari:subgraphs/uniswap-forks/config/apeswap/apeswap.template.yaml
- 
+
 templates:
   - kind: ethereum/contract
     name: Pair
