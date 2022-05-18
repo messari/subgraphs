@@ -9,7 +9,7 @@ import { Hypervisor as HypervisorContract } from "../../../generated/templates/H
 import {
   BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
-  REGISTRY_ADDRESS,
+  REGISTRY_ADDRESS_MAP,
   VaultFeeType,
 } from "../../common/constants";
 import { getOrCreateToken } from "../../common/getters";
@@ -28,7 +28,7 @@ export function getOrCreateVault(
     getOrCreateToken(vaultAddress);
 
     vault = new Vault(vaultId);
-    vault.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    vault.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
     vault.name = hypeContract.name();
     vault.symbol = hypeContract.symbol();
     vault.inputToken = vaultId;

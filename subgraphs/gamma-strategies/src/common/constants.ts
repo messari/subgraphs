@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 
 ////////////////////
 ///// Versions /////
@@ -163,5 +163,5 @@ export const ETH_NAME = "Ether";
 
 export const PROTOCOL_PERFORMANCE_FEE = BigDecimal.fromString("10"); // Hardcoded in contracts
 
-export const REGISTRY_ADDRESS = new TypedMap<string, string>();
-REGISTRY_ADDRESS.set("mainnet", "0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946");
+export const REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
+REGISTRY_ADDRESS_MAP.set("mainnet", Address.fromString("0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946"));

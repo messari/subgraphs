@@ -1,6 +1,6 @@
 import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount } from "../../../generated/schema";
-import { REGISTRY_ADDRESS, UsageType } from "../../common/constants";
+import { REGISTRY_ADDRESS_MAP, UsageType } from "../../common/constants";
 import {
   getOrCreateUsageMetricDailySnapshot,
   getOrCreateUsageMetricHourlySnapshot,
@@ -27,7 +27,7 @@ export function updateUsageMetrics(
 
   // Update entities
   let protocol = getOrCreateYieldAggregator(
-    Address.fromString(REGISTRY_ADDRESS.mustGet(dataSource.network()))
+    REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
   let dailyUsageSnapshot = getOrCreateUsageMetricDailySnapshot(event);
   let hourlyUsageSnapshot = getOrCreateUsageMetricHourlySnapshot(event);

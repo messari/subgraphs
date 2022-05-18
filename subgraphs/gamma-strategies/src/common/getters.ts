@@ -27,7 +27,7 @@ import {
   PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SUBGRAPH_VERSION,
   PROTOCOL_METHODOLOGY_VERSION,
-  REGISTRY_ADDRESS,
+  REGISTRY_ADDRESS_MAP,
 } from "../common/constants";
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./utils/datetime";
 
@@ -57,7 +57,7 @@ export function getOrCreateUsageMetricDailySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
-    usageMetrics.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    usageMetrics.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -86,7 +86,7 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    usageMetrics.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    usageMetrics.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -113,17 +113,18 @@ export function getOrCreateFinancialsDailySnapshot(
   let financialMetrics = FinancialsDailySnapshot.load(id);
 
   if (!financialMetrics) {
+    let protocol = getOrCreateYieldAggregator(REGISTRY_ADDRESS_MAP.get(dataSource.network())!)
     financialMetrics = new FinancialsDailySnapshot(id);
-    financialMetrics.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    financialMetrics.protocol = protocol.id;
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
 
-    financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
     financialMetrics.blockNumber = event.block.number;
     financialMetrics.timestamp = event.block.timestamp;
@@ -144,7 +145,7 @@ export function getOrCreateVaultDailySnapshot(
   let snapshot = VaultDailySnapshot.load(snapshotId);
   if (!snapshot) {
     snapshot = new VaultDailySnapshot(snapshotId);
-    snapshot.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
     snapshot.vault = event.address.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
     snapshot.inputTokenBalance = BIGINT_ZERO;
@@ -173,7 +174,7 @@ export function getOrCreateVaultHourlySnapshot(
   let snapshot = VaultHourlySnapshot.load(snapshotId);
   if (!snapshot) {
     snapshot = new VaultHourlySnapshot(snapshotId);
-    snapshot.protocol = REGISTRY_ADDRESS.mustGet(dataSource.network());
+    snapshot.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
     snapshot.vault = event.address.toHex();
     snapshot.totalValueLockedUSD = BigDecimal.zero();
     snapshot.inputTokenBalance = BIGINT_ZERO;
