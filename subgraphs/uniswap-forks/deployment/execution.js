@@ -18,30 +18,67 @@ export function scripts(protocol, network, template, location) {
  * @param {string[]} array - Protocol that is being deployed
  * @param {string} callback 
 */
+// export async function runCommands(array, callback) {
+
+//     var index = 0;
+//     var results = [];
+
+//     function next() {
+//         if (index < array.length) {
+//             exec(array[index++], function(error, stdout, stderr) {
+//             console.log('stdout: ' + stdout);
+//             console.log('stderr: ' + stderr);
+//             if (error !== null) {
+//                 console.log('exec error: ' + error);
+//             } 
+//             if (error) return callback(error);
+//             // do the next iteration
+//             results.push(stdout);
+//             next();
+//            });
+//        } else {
+//             setTimeout(() => { console.log("Time!"); }, 50000);
+//             // all done here
+//             callback(null, results);
+//        }
+//     }
+//     // start the first iteration
+//     next();
+// }
+
+/**
+ * @param {string[]} array - Protocol that is being deployed
+ * @param {string} callback 
+*/
 export async function runCommands(array, callback) {
 
-    var index = 0;
-    var results = [];
+    function run (callback) {
+        setTimeout(function () {
+            var index = 0;
+            var results = [];
 
-    function next() {
-        if (index < array.length) {
-            exec(array[index++], function(error, stdout, stderr) {
-            console.log('stdout: ' + stdout);
-            console.log('stderr: ' + stderr);
-            if (error !== null) {
-                console.log('exec error: ' + error);
-            } 
-            if (error) return callback(error);
-            // do the next iteration
-            results.push(stdout);
+            function next() {
+                if (index < array.length) {
+                    exec(array[index++], function(error, stdout, stderr) {
+                    console.log('stdout: ' + stdout);
+                    console.log('stderr: ' + stderr);
+                    if (error !== null) {
+                        console.log('exec error: ' + error);
+                    } 
+                    if (error) return callback(error);
+                    // do the next iteration
+                    results.push(stdout);
+                    next();
+                });
+                } else {
+                    // all done here
+                    callback(null, results);
+                }
+            }
+            // start the first iteration
             next();
-           });
-       } else {
-            // all done here
-            callback(Źull, results);
-       }
+        }, 50000);
     }
-    // start the first iteration
-    next();
 
+    run(callback)
 }
