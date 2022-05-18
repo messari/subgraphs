@@ -10,8 +10,6 @@ import moment from "moment";
 import { schema } from "../queries/schema";
 import { PoolNames, ProtocolTypeEntity, SubgraphBaseUrl } from "../constants";
 import { TabContext } from "@mui/lab";
-import { TableEvents } from "../common/chartComponents/TableEvents";
-import { PoolDropDown } from "../common/utilComponents/PoolDropDown";
 import ProtocolTab from "./tabs/ProtocolTab";
 import PoolTab from "./tabs/PoolTab";
 import ErrorDisplay from "./ErrorDisplay";
@@ -19,6 +17,9 @@ import WarningDisplay from "./WarningDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
 import { isValidHttpUrl, parseSubgraphName } from "../utils";
+import EventsTab from "./tabs/EventsTab";
+import AllDataTabs from "./AllDataTabs";
+import ProtocolInfo from "./ProtocolInfo";
 
 export const toDate = (timestamp: number) => {
   return moment.unix(timestamp).format("YYYY-MM-DD");
@@ -35,20 +36,10 @@ function ProtocolDashboard() {
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
   const [poolId, setPoolId] = useState<string>(poolIdString);
   const [warning, setWarning] = useState<{ message: string; type: string }[]>([]);
-  if (!subgraphToQuery.url && subgraphParam) {
-    let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
-    const parseCheck = isValidHttpUrl(subgraphParam);
-    if (parseCheck) {
-      queryURL = subgraphParam;
-    }
-    setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
-  }
+
   ChartJS.register(...registerables);
   const link = new HttpLink({
-    uri: subgraphToQuery.url,
-    // fetchOptions: {
-    //   mode: 'no-cors',
-    // }
+    uri: subgraphToQuery.url
   });
   const client = useMemo(
     () =>
@@ -122,10 +113,20 @@ function ProtocolDashboard() {
     }
   }, [subgraphToQuery.url, refetch, protocolSchemaData]);
 
+  useEffect(() => {
+    if (!subgraphToQuery.url && subgraphParam) {
+      let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
+      const parseCheck = isValidHttpUrl(subgraphParam);
+      if (parseCheck) {
+        queryURL = subgraphParam;
+      }
+      setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
+    }
+  }, [subgraphToQuery.url, subgraphParam]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
-  })
+  }, [scrollToView])
 
   const handleTabChange = (event: any, newValue: string) => {
     setWarning([]);
@@ -135,82 +136,14 @@ function ProtocolDashboard() {
     } else if (newValue === "3") {
       tabName = "events";
     }
-    navigate('?subgraph=' + subgraphParam + '&poolId=' + poolId + '&tab=' + tabName);
+    navigate(`?subgraph=${subgraphParam}&poolId=${poolId}&tab=${tabName}`);
     setTabValue(newValue);
   };
 
   // AllData() is what renders the tabs and all of the data within them. This is also were data is mapped to call functions for the compoenents to be rendered
   // Chart/Table components are called as functions within here, they are imported from the chartComponents directory
-  const AllData = () =>
-    useMemo(() => {
-      if (data) {
-        // Data is the entity of the data in the subgraph. It is returned as an object with each entity as a key, and each value is an array with every instance of that entity
-        const issues: { message: string; type: string }[] = warning;
-        const poolNames = PoolNames[data.protocols[0].type];
-        const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
-        console.log("DATA", data, data[protocolEntityName][0]?.lendingType);
-        if (data[protocolEntityName][0]?.lendingType === "CDP") {
-          protocolFields.mintedTokens += '!';
-          protocolFields.mintedTokenSupplies += '!';
-        }
 
-        return (
-          <>
-            <Typography>
-              <TabContext value={tabValue}>
-                <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-                  <Tabs centered value={tabValue} onChange={handleTabChange}>
-                    <Tab label="Protocol" value="1" />
-                    <Tab label="Pool" value="2" />
-                    <Tab label="Events" value="3" />
-                  </Tabs>
-                </Box>
-                <TabPanel value="1">
-                  {/* PROTOCOL TAB */}
 
-                  {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning, warning)}
-                </TabPanel>
-                <TabPanel value="2">
-                  {/* POOL TAB */}
-                  <PoolTab
-                    data={data}
-                    entities={entities}
-                    entitiesData={entitiesData}
-                    poolId={poolId}
-                    setPoolId={(x) => setPoolId(x)}
-                    poolData={poolData}
-                    setWarning={(x) => setWarning(x)}
-                    warning={warning}
-                  />
-                </TabPanel>
-                <TabPanel value="3">
-                  {/* EVENTS TAB */}
-
-                  {setWarning(issues)}
-                  <PoolDropDown poolId={poolId} setPoolId={(x) => setPoolId(x)} setWarning={(x) => setWarning(x)} markets={data[poolNames]} />
-                  {events.map((eventName) => {
-                    if (!poolId && data[eventName].length > 0) {
-                      const message = 'No pool selected, there should not be "' + eventName + '" events';
-                      if (issues.filter((x) => x.message === message).length === 0) {
-                        issues.push({ message, type: "NOEV" });
-                      }
-                    }
-                    if (poolId && data[eventName].length === 0) {
-                      const message = "No " + eventName + " on pool " + poolId;
-                      if (issues.filter((x) => x.message === message).length === 0) {
-                        issues.push({ message, type: "EVENT" });
-                      }
-                    }
-                    return <React.Fragment>{TableEvents(eventName, data, eventName, poolId)}</React.Fragment>;
-                  })}
-                </TabPanel>
-              </TabContext>
-            </Typography>
-          </>
-        );
-      }
-      return null;
-    }, [data, tabValue]);
 
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
@@ -226,22 +159,26 @@ function ProtocolDashboard() {
 
   let protocolInfo = null;
   if (protocolSchemaData?.protocols.length > 0) {
-    protocolInfo = (
-      <div style={{ padding: "6px 24px" }}>
-        <h3>
-          {protocolSchemaData.protocols[0].name} - {protocolSchemaData.protocols[0].id}
-        </h3>
-        <p>
-          <a href={subgraphToQuery.url}>Subgraph Query Endpoint - {subgraphToQuery.url}</a>
-        </p>
-        <p>Type - {protocolSchemaData.protocols[0].type}</p>
-        <p>Schema Version - {schemaVersion}</p>
-        <p>Subgraph Version - {protocolSchemaData?.protocols[0]?.subgraphVersion}</p>
-        {protocolSchemaData?.protocols[0]?.methodologyVersion ? (
-          <p>Methodology Version - {protocolSchemaData.protocols[0].methodologyVersion}</p>
-        ) : null}
-      </div>
-    );
+    protocolInfo = <ProtocolInfo protocolSchemaData={protocolSchemaData} subgraphToQueryURL={subgraphToQuery.url} schemaVersion={schemaVersion} />
+  }
+
+  let allDataTabs = null;
+  if (data) {
+    allDataTabs = <AllDataTabs
+      data={data}
+      entities={entities}
+      entitiesData={entitiesData}
+      tabValue={tabValue}
+      protocolFields={protocolFields}
+      issues={warning}
+      poolNames={PoolNames[data.protocols[0].type]}
+      poolId={poolId}
+      poolData={poolData}
+      events={events}
+      setWarning={(x) => setWarning(x)}
+      setPoolId={(x) => setPoolId(x)}
+      handleTabChange={(x, y) => handleTabChange(x, y)}
+    />
   }
 
   return (
@@ -265,7 +202,7 @@ function ProtocolDashboard() {
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
         <CircularProgress sx={{ margin: 6 }} size={50} />
       ) : null}
-      {AllData()}
+      {allDataTabs}
     </div>
   );
 }

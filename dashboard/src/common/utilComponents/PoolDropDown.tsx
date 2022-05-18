@@ -13,9 +13,11 @@ interface PoolDropDownProps {
 export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDropDownProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  // Create the array of pool selections in the drop down
   const options = markets.map((market: any) => {
     return market.id + ' / ' + market.name;
   });
+  // Get the array entry for the current selected pool
   const pool = markets.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
   let inputTextValue = "Select a pool";
   if (poolId) {
@@ -25,42 +27,19 @@ export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDro
   return (
     <>
       <h3 style={{ marginLeft: "16px" }}>Select a pool</h3>
-      {/* <Select
-        fullWidth
-        sx={{ maxWidth: 1000, margin: 2 }}
-        labelId="demo-simple-select-filled-label"
-        id="demo-simple-select-filled"
-        value={poolId}
-        onChange={(event: SelectChangeEvent) => {
-          setWarning([]);
-          setPoolId(event.target.value)
-        }}
-      >
-        <MenuItem value="">
-          <em>No Pool Selected</em>
-        </MenuItem>
-        {
-          markets.map((market: any) => {
-            return (
-              <MenuItem value={market.id}>
-                <em>{market.id} / {market.name}</em>
-              </MenuItem>
-            )
-          })
-        }
-      </Select> */}
       <Autocomplete
         options={options}
         inputValue={textInput}
         sx={{ maxWidth: 1000, margin: 2 }}
         onChange={(event: React.SyntheticEvent) => {
+          // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
           setWarning([]);
           const targEle = (event?.target as HTMLLIElement);
           setTextInput(targEle.innerText);
           searchParams.delete('view');
           if (targEle.innerText) {
             setPoolId(targEle.innerText?.split(" / ")[0]);
-            navigate('?subgraph=' + searchParams.get('subgraph') + '&tab=' + searchParams.get('tab') + '&poolId=' + targEle.innerText?.split(" / ")[0]);
+            navigate(`?subgraph=${searchParams.get('subgraph')}&tab=${searchParams.get('tab')}&poolId=${targEle.innerText?.split(" / ")[0]}`);
           }
         }}
         renderInput={

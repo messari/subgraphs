@@ -9,6 +9,7 @@ interface SubgraphDeploymentsProps {
   };
 }
 
+// This component is the container for all different subgraphs of a protocol (the container for the different networks)
 export const SubgraphDeployments = ({ protocol: { name, deploymentMap } }: SubgraphDeploymentsProps) => {
   const deployments = useMemo(
     () =>
@@ -24,7 +25,6 @@ export const SubgraphDeployments = ({ protocol: { name, deploymentMap } }: Subgr
       <h2 style={{ textAlign: "center" }}>{name}</h2>
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         {deployments.map(({ network, deployment }) => (
-          // <span key={network}>{network}</span>
           <Deployment
             key={network}
             networkName={network}
