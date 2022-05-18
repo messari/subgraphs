@@ -40,12 +40,12 @@ function handleProfit(event: ethereum.Event, profit_amount: BigInt, fee_amount: 
     let profit_USD = getUsdPrice(rewardToken_addr, profit.toBigDecimal());
     let fee_USD = getUsdPrice(rewardToken_addr, fee.toBigDecimal());
 
-    log.info('profit_amount: {} - id este: {} $', [
-        profit_amount.toString(), profit_USD.toString()
+    log.info('profit_amount: {} - id este: {} $ - transaction hash : {}', [
+        profit_amount.toString(), profit_USD.toString(), event.transaction.hash.toHexString()
       ]);
 
-    log.info('fee_amount: {} - id este: {} $', [
-        fee_amount.toString(), fee_USD.toString()
+    log.info('fee_amount: {} - id este: {} $ - transaction hash : {}', [
+        fee_amount.toString(), fee_USD.toString(), event.transaction.hash.toHexString()
       ]);
 
     let protocol = getOrCreateProtocol();
