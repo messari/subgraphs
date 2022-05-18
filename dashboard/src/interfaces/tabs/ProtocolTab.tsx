@@ -16,6 +16,7 @@ function ProtocolTab(
 ) {
 
   try {
+    const list: { [x: string]: any } = {};
     const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
 
     const issues: { message: string, type: string }[] = warning;
@@ -46,14 +47,14 @@ function ProtocolTab(
         const entityInstance: { [x: string]: any } = currentEntityData[x];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
-        if (data.protocols[0].type === "EXCHANGE" && entityInstance.dailySupplySideRevenueUSD && entityInstance.totalValueLockedUSD) {
+        if (entityInstance.dailySupplySideRevenueUSD && entityInstance.totalValueLockedUSD) {
           const value = (entityInstance.dailySupplySideRevenueUSD / entityInstance.totalValueLockedUSD) * 100;
-          if (!dataFields.baseYield) {
-            dataFields.baseYield = [{ value, date: Number(entityInstance.timestamp) }];
-            dataFieldMetrics.baseYield = { sum: value };
+          if (!dataFields.capitalEfficiency) {
+            dataFields.capitalEfficiency = [{ value, date: Number(entityInstance.timestamp) }];
+            dataFieldMetrics.capitalEfficiency = { sum: value };
           } else {
-            dataFields.baseYield.push({ value, date: Number(entityInstance.timestamp) });
-            dataFieldMetrics.baseYield.sum += value;
+            dataFields.capitalEfficiency.push({ value, date: Number(entityInstance.timestamp) });
+            dataFieldMetrics.capitalEfficiency.sum += value;
           }
         }
         // entityInstance.dailySupplySideRevenue / totalValueLockedUSD * 100 
@@ -122,6 +123,48 @@ function ProtocolTab(
           }
         });
       };
+
+      list[entityName] = {};
+      for (let x = 0; x < Object.keys(entitiesData[entityName]).length; x++) {
+        const entityField = Object.keys(entitiesData[entityName])[x];
+        if (entityField === 'timestamp') {
+          continue
+        }
+        const renderedField = dataFields[entityField];
+        if (renderedField) {
+          list[entityName][entityField] = "Included";
+        } else {
+          const extrapolatedFields = Object.keys(dataFields).filter((df: string) => {
+            return df.includes(entityField);
+          });
+          if (extrapolatedFields?.length > 0) {
+            list[entityName][entityField] = "Array Included";
+          } else {
+            const req = '!' === entitiesData[entityName][entityField].split("")[entitiesData[entityName][entityField].split("").length - 1]
+            if (req) {
+              list[entityName][entityField] = 'MISSING AND REQUIRED';
+            } else {
+              list[entityName][entityField] = 'NOT REQUIRED';
+            }
+          }
+        }
+      }
+      console.log('LIST', list)
+
+      if (dataFields.protocolControlledValueUSD) {
+        const capitalEfficiency = dataFields.capitalEfficiency;
+        delete dataFields.capitalEfficiency;
+        dataFields.capitalEfficiency = capitalEfficiency;
+      }
+
+      if (dataFields.protocolControlledValueUSD) {
+        const protocolControlledValueUSD = dataFields.protocolControlledValueUSD;
+        delete dataFields.protocolControlledValueUSD;
+        dataFields.protocolControlledValueUSD = protocolControlledValueUSD;
+      }
+
+
+      console.log('DATAFIELDSOBJ-PROTOCOL', dataFields)
 
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data

@@ -11,11 +11,13 @@ export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: n
         width: 150,
       },
     ];
-    const tableData = dataTable.map((val: any, i: any) => ({
-      id: i,
-      date: toDate(val.date),
-      value: val.value.toLocaleString(),
-    }));
+    const tableData = dataTable.map((val: any, i: any) => {
+      return {
+        id: i,
+        date: toDate(val.date),
+        value: val.value.toLocaleString(),
+      }
+    });
     return (
       <DataGrid
         initialState={{

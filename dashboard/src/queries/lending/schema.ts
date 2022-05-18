@@ -309,16 +309,22 @@ export const schema110 = (): Schema => {
           id
           name
           inputTokens{
+            id
             decimals
             name
+            symbol
           }
           outputToken {
             id
             decimals
+            name
+            symbol
           }
           rewardTokens{
             id
             decimals
+            name
+            symbol
           }
           inputTokenBalances
           outputTokenSupply
@@ -408,17 +414,23 @@ export const schema120 = (): Schema => {
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
-      totalValueLockedUSD: "BigDecimal!",
-      protocolControlledValueUSD: "BigDecimal",
-      mintedTokenSupplies: "[BigInt!]",
       dailySupplySideRevenueUSD: "BigDecimal!",
-      cumulativeSupplySideRevenueUSD: "BigDecimal!",
       dailyProtocolSideRevenueUSD: "BigDecimal!",
-      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
       dailyTotalRevenueUSD: "BigDecimal!",
-      cumulativeTotalRevenueUSD: "BigDecimal!",
+      dailyBorrowUSD: "BigDecimal!",
+      dailyDepositUSD: "BigDecimal!",
       dailyLiquidateUSD: "BigDecimal!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      cumulativeBorrowUSD: "BigDecimal!",
+      cumulativeDepositUSD: "BigDecimal!",
       cumulativeLiquidateUSD: "BigDecimal!",
+      totalDepositBalanceUSD: "BigDecimal!",
+      totalBorrowBalanceUSD: "BigDecimal!",
+      totalValueLockedUSD: "BigDecimal!",
+      mintedTokenSupplies: "[BigInt!]",
+      protocolControlledValueUSD: "BigDecimal",
       timestamp: "BigInt!"
     },
     usageMetricsDailySnapshots: {
@@ -603,17 +615,24 @@ export const schema120 = (): Schema => {
       id
       name
       inputToken {
+        id
         decimals
         name
+        symbol
       }
       outputToken {
         id
         decimals
+        name
+        symbol
       }
       rewardTokens {
         id
         token {
+          id
           decimals
+          name
+          symbol
         }
       }
       rates {
