@@ -49,6 +49,11 @@ templates:
           handler: handleNewStratCandidate
         - event: UpgradeStrat(address)
           handler: handleUpgradeStrat
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: want()
+          handler: handleWant
   - name: Strategy
     kind: ethereum/contract
     network: matic

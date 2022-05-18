@@ -1,6 +1,3 @@
-import { ethers } from "ethers";
-const strategyABI = require("../../abis/BeefyStrategy.json");
-const vaultABI = require("../../abis/BeefyVault.json");
 import { Strategy } from "../../generated/schema";
 import {
   Deposit,
@@ -10,19 +7,16 @@ import {
 import { getStrategyOrCreate, getVaultOrCreate } from "../utils/getters";
 import { getAddressFromId } from "../utils/helpers";
 
-const NETWORK_PREFIX = "MATIC";
+const NETWORK_SUFFIX = "-137";
 
 export async function createStrategy(strategyAddress: string, block: any) {
-  const strategy = new Strategy(NETWORK_PREFIX + strategyAddress);
+  const strategy = new Strategy(strategyAddress + NETWORK_SUFFIX);
 
   strategy.protocol = "Assign BeefyFinance"; //type YieldAggregator
   strategy.createdTimestamp = block.timestamp;
   strategy.createdBlockNumber = block.number;
 
-  const strategyContract = new ethers.Contract(strategyAddress, strategyABI);
-  strategy.vault = NETWORK_PREFIX + (await strategyContract.vault());
-
-  await updateBalance(strategy);
+  strategy.vault = ;
 
   strategy.save();
 }
@@ -30,7 +24,7 @@ export async function createStrategy(strategyAddress: string, block: any) {
 export async function handleDeposit(event: Deposit): Promise<void> {
   const strategy = getStrategyOrCreate(
     event.address.toHexString(),
-    NETWORK_PREFIX
+    NETWORK_SUFFIX
   );
 
   await updateBalance(strategy);
@@ -40,7 +34,7 @@ export async function handleDeposit(event: Deposit): Promise<void> {
 export async function handleWithdraw(event: Withdraw): Promise<void> {
   const strategy = getStrategyOrCreate(
     event.address.toHexString(),
-    NETWORK_PREFIX
+    NETWORK_SUFFIX
   );
 
   await updateBalance(strategy);
@@ -49,7 +43,7 @@ export async function handleWithdraw(event: Withdraw): Promise<void> {
 export async function handleStratHarvest(event: StratHarvest): Promise<void> {
   const strategy = getStrategyOrCreate(
     event.address.toHexString(),
-    NETWORK_PREFIX
+    NETWORK_SUFFIX
   );
 
   await updateBalance(strategy);

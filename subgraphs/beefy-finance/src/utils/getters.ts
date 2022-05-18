@@ -25,19 +25,20 @@ export function getVaultOrCreate(
   const vaultId = vaultAddress + networkSuffix;
   let vault = Vault.load(vaultId);
   if (vault == null) {
-    vault = new Vault(vaultId);
+    vault = new Vault(vaultId); //no!!! use createVault instead
   }
   return vault;
 }
 
 export function getStrategyOrCreate(
   strategyAddress: string,
-  networkSuffix: string
+  networkSuffix: string,
+  vault?: Vault
 ): Strategy {
   const strategyId = strategyAddress + networkSuffix;
   let strategy = Strategy.load(strategyId);
   if (strategy == null) {
-    strategy = new Strategy(strategyId);
+    strategy = createStrategy(strategyId);
   }
   return strategy;
 }

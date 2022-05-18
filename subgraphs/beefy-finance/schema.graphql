@@ -352,8 +352,7 @@ type Vault @entity {
   depositLimit: BigInt!
 
   " Type of fees incurred to the user. Should include all fees that apply to the vault "
-  fees: [VaultFee!]!
-
+  fees: [VaultFee!] #!
   " Creation timestamp "
   createdTimestamp: BigInt!
 
@@ -363,8 +362,7 @@ type Vault @entity {
   ##### Quantitative Data #####
 
   " Current TVL (Total Value Locked) of this pool in USD "
-  totalValueLockedUSD: BigDecimal!
-
+  totalValueLockedUSD: BigDecimal #!
   " Amount of input token in the pool "
   inputTokenBalance: BigInt!
 
