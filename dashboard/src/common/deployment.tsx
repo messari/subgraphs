@@ -65,8 +65,6 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
     color = "green";
   }
 
-  console.log(status)
-
   let indexed = 0;
   if (status.indexingStatusesForSubgraphName[0].synced) {
     indexed = 100;

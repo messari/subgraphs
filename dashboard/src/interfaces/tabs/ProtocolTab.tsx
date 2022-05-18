@@ -163,6 +163,9 @@ function ProtocolTab(
         dataFields.protocolControlledValueUSD = protocolControlledValueUSD;
       }
 
+
+      console.log('DATAFIELDSOBJ-PROTOCOL', dataFields)
+
       // For each entity field/key in the dataFields object, create a chart and tableChart component
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
       return (

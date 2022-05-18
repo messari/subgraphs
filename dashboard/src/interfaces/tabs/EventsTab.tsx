@@ -42,6 +42,7 @@ function EventsTab({
                 if (issues.filter((x) => x.message === message).length === 0) {
                     issues.push({ message, type: "EVENT" });
                 }
+                return <div style={{ marginLeft: "40px", borderTop: "black 2px solid" }}><h3>{message}</h3></div>
             }
             return <React.Fragment>{TableEvents(eventName, data, eventName, poolId)}</React.Fragment>;
         })}

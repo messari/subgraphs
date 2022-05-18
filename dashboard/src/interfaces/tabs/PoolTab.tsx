@@ -274,7 +274,6 @@ function PoolTab({
         };
       };
 
-      console.log(dataFields)
       list[entityName] = {};
       // Code to determine what fields were expected/what were present
       for (let x = 0; x < Object.keys(entitiesData[entityName]).length; x++) {
@@ -349,6 +348,8 @@ function PoolTab({
         delete dataFields.baseYield;
         dataFields.baseYield = baseYield;
       }
+
+      console.log('DATAFIELDSOBJ-POOL', dataFields)
 
       return (
         <Grid key={entityName} style={{ borderTop: "black 2px solid" }} >

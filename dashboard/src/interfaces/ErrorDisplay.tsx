@@ -46,7 +46,7 @@ function ErrorDisplay({ errorObject, setSubgraphToQuery, protocolSchemaData, sub
     }
     if (errorObject.graphQLErrors.length <= 5) {
       // If there are less or eq to 5 query errors, reccomend comparing the subgraph schema to the common schema for discrepancies
-      errorMsgs.push(<h3>The fields were expected in schema version {version} but are not present in this subgraph. Verify that your schema has all of the fields that are in the common {protocolSchemaData?.protocols[0].type} {protocolSchemaData?.protocols[0].version} schema.</h3>);
+      errorMsgs.push(<h3>Required schema fields are missing from this subgraph. Verify that your schema has all of the fields that are in the common {protocolSchemaData?.protocols[0].type} {protocolSchemaData?.protocols[0].version} schema.</h3>);
     } else {
       // If there are more than 5 query errors, it is possible the schemaVersion on the protocol entity was not updated. Allow the user to select querying on a different schema version
       errorMsgs.push(

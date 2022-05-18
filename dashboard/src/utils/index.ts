@@ -2,7 +2,7 @@ import moment from "moment";
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
 
 export const toDate = (timestamp: number) => {
-  return moment.unix(timestamp).format("YYYY-MM-DD");
+  return moment.utc(timestamp * 1000).format("YYYY-MM-DD");
 };
 
 export function isValidHttpUrl(s: string) {
