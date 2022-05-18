@@ -9,6 +9,7 @@ import {
 } from "../../generated/ControllerListener/VaultContract";
 import { getOrCreateToken } from './../entities/Token';
 import { getOrCreateProtocol } from './../entities/Protocol';
+import { getOrCreateVaultFee } from './../entities/VaultFee';
 import { Vault, Token, Account } from "../../generated/schema";
 import { WETH_ADDRESS } from './../constant';
 import { getOrCreateVault, updateVaultPrices } from './../entities/Vault';
@@ -150,6 +151,10 @@ export function handleStrategyChanged(event: StrategyChangedEvent): void {
   const new_strategy_address = event.params.newStrategy;
   // this will automaticly update vault and vaultFee
   let vault = getOrCreateVault(vaultAddress, event.block);
+  let vaultFee = getOrCreateVaultFee(vault, event.block); // to update vault fee;
+  vault.fees = [vaultFee.id];
+  vault.save();
+
   updateVaultPrices(event, vault);
 
 

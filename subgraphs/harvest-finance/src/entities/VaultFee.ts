@@ -26,9 +26,7 @@ export function getOrCreateVaultFee(vault: Vault, block: ethereum.Block): VaultF
 
 	let vaultFee_id = managementFee
 		.concat("-")
-		.concat(vault.id)
-		.concat("-")
-		.concat(block.number.toString());
+		.concat(vault.id);
 
 	let vaultFee = VaultFee.load(vaultFee_id);
 
