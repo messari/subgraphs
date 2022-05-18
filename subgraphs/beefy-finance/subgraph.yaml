@@ -3,39 +3,79 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: CAKEBNB
-    network: bsc
+    name: BeefiVaultRegistryMATIC
+    network: matic
     source:
-      address: "0xDE238C509bcCBCd91B90dE40dF3e25B43A131311"
-      abi: CAKEBNB
+      address: "0x62b9c7762129404351C70cD007a58BBFf311B751"
+      abi: BeefiVaultRegistryMATIC
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - ChargedFees
-        - Deposit
         - OwnershipTransferred
-        - Paused
-        - StratHarvest
-        - Unpaused
-        - Withdraw
+        - VaultsRegistered
+        - VaultsRetireStatusUpdated
       abis:
-        - name: CAKEBNB
-          file: ./abis/CAKEBNB.json
+        - name: BeefiVaultRegistryMATIC
+          file: ./abis/BeefiVaultRegistryMATIC.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: VaultsRegistered(address[])
+          handler: handleVaultsRegistered
+        - event: VaultsRetireStatusUpdated(address[],bool)
+          handler: handleVaultsRetireStatusUpdated
+      file: ./src/mappings/registry.ts
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vault.ts
+      entities:
+        - Vault
+        # other entities?
+      abis:
+        - name: Vault
+          file: ./abis/BeefyVault.json
+      eventHandlers:
+        - event: NewStratCandidate(address)
+          handler: handleNewStratCandidate
+        - event: UpgradeStrat(address)
+          handler: handleUpgradeStrat
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDeposit
+        - function: want()
+          handler: handleWant
+  - name: Strategy
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/strategy.ts
+      entities:
+        - Strategy
+        #- Other entities?
+      abis:
+        - name: Strategy
+          file: ./abis/BeefyStrategy.json
       eventHandlers:
         - event: ChargedFees(uint256,uint256,uint256)
           handler: handleChargedFees
         - event: Deposit(uint256)
           handler: handleDeposit
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
         - event: StratHarvest(indexed address,uint256,uint256)
           handler: handleStratHarvest
-        - event: Unpaused(address)
-          handler: handleUnpaused
         - event: Withdraw(uint256)
           handler: handleWithdraw
-      file: ./src/mapping.ts
