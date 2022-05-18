@@ -624,3 +624,41 @@ type _UnderlyingToken @entity {
   " Last block number when amounts were updated "
   lastAmountBlockNumber: BigInt!
 }
+
+# Track rebalance events that are the source of revenue
+type _Rebalance implements Event @entity {
+  " { Transaction hash }-{ Log index } "
+  id: ID!
+
+  " Transaction hash of the transaction that emitted this event "
+  hash: String!
+
+  " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+  logIndex: Int!
+
+  " The protocol this transaction belongs to "
+  protocol: YieldAggregator!
+
+  " Market that tokens are deposited into "
+  to: String!
+
+  " Address that deposited tokens "
+  from: String!
+
+  " Block number of this event "
+  blockNumber: BigInt!
+
+  " Timestamp of this event "
+  timestamp: BigInt!
+
+  " total fees collected in token0 "
+  fees0: BigInt!
+
+  " total fees collected in token1 "
+  fees1: BigInt!
+
+  " total fees collected in USD "
+  feesUSD: BigDecimal!
+
+  vault: Vault!
+}
