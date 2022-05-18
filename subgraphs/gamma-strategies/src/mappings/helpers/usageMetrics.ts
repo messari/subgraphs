@@ -11,6 +11,8 @@ import {
   getHoursSinceEpoch,
 } from "../../common/utils/datetime";
 
+
+//  Update usage related fields and entities
 export function updateUsageMetrics(
   accountAddress: Address,
   eventType: string,

@@ -22,7 +22,7 @@ import {
 import { getDualTokenUSD } from "./pricing";
 import { bigIntToBigDecimal } from "../../common/utils/numbers";
 
-/* Update TVL related fields in all entities */
+// Update TVL related fields in all entities
 export function updateTvl(event: ethereum.Event): void {
   let underlyingToken = getOrCreateUnderlyingToken(event.address);
 
@@ -35,6 +35,7 @@ export function updateTvl(event: ethereum.Event): void {
     underlyingToken.save();
   }
 
+  // Track existing TVL for cumulative calculations
   let vault = getOrCreateVault(event.address, event.block);
   let oldTvl = vault.totalValueLockedUSD;
 
@@ -89,6 +90,7 @@ export function updateTvl(event: ethereum.Event): void {
   financialsDailySnapshot.save();
 }
 
+// Update revenue related fields, Only changes when rebalance is called.
 export function updateRevenue(event: Rebalance): void {
   let underlyingToken = getOrCreateUnderlyingToken(event.address);
 
@@ -102,6 +104,7 @@ export function updateRevenue(event: Rebalance): void {
   );
 
   const SupplySideShare = BIGDECIMAL_HUNDRED.minus(PROTOCOL_PERFORMANCE_FEE);
+  
   let eventSupplySideRevenueUSD = eventTotalRevenueUSD
     .times(SupplySideShare)
     .div(BIGDECIMAL_HUNDRED);

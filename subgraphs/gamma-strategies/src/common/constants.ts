@@ -164,4 +164,23 @@ export const ETH_NAME = "Ether";
 export const PROTOCOL_PERFORMANCE_FEE = BigDecimal.fromString("10"); // Hardcoded in contracts
 
 export const REGISTRY_ADDRESS_MAP = new TypedMap<string, Address>();
-REGISTRY_ADDRESS_MAP.set("mainnet", Address.fromString("0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946"));
+REGISTRY_ADDRESS_MAP.set(
+  "mainnet",
+  Address.fromString("0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946")
+);
+
+export namespace PriceSource {
+  export const YEARN = "YEARN";
+  export const CHAINLINK = "CHAINLINK";
+  export const CURVE_CALC = "CURVE_CALC";
+  export const SUSHISWAP_CALC = "SUSHISWAP_CALC";
+  export const CURVE_ROUTER = "CURVE_ROUTER";
+  export const UNISWAP_ROUTER = "UNISWAP_ROUTER";
+  export const SUSHISWAP_ROUTER = "SUSHISWAP_ROUTER";
+}
+
+export const TOKEN_PRICE_SOURCE_SKIPS = new TypedMap<Address, Array<string>>();
+TOKEN_PRICE_SOURCE_SKIPS.set(
+  Address.fromString("0x77fba179c79de5b7653f68b5039af940ada60ce0"),
+  [PriceSource.YEARN]
+);
