@@ -49,29 +49,28 @@ templates:
           handler: handleNewStratCandidate
         - event: UpgradeStrat(address)
           handler: handleUpgradeStrat
-        - event: Transfer(address,address,uint256)
-          handler: handleTransfer
-  #- name: Strategy
-  #  kind: ethereum/contract
-  #  network: matic
-  #  source:
-  #    abi: #Strategy
-  #  mapping:
-  #    kind: ethereum/events
-  #    apiVersion: 0.0.6
-  #    language: wasm/assemblyscript
-  #    file: #./src/mappings/strategy.ts
-  #    entities:
-  #      #- Exchange
-  #    abis:
-  #      #- name: Exchange
-  #      #  file: ./abis/exchange.json
-  #    eventHandlers:
-  #      - event: ChargedFees(uint256,uint256,uint256)
-  #        handler: handleChargedFees
-  #      - event: Deposit(uint256)
-  #        handler: handleDeposit
-  #      - event: StratHarvest(address,uint256,uint256)
-  #        handler: handleStratHarvest
-  #      - event: Withdraw(uint256)
-  #        handler: handleWithdraw
+  - name: Strategy
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: Strategy
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/strategy.ts
+      entities:
+        - Strategy
+        #- Other entities?
+      abis:
+        - name: Strategy
+          file: ./abis/BeefyStrategy.json
+      eventHandlers:
+        - event: ChargedFees(uint256,uint256,uint256)
+          handler: handleChargedFees
+        - event: Deposit(uint256)
+          handler: handleDeposit
+        - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvest
+        - event: Withdraw(uint256)
+          handler: handleWithdraw
