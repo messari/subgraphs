@@ -1,4 +1,4 @@
-import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import { Address, dataSource } from "@graphprotocol/graph-ts";
 import { Deposit, Withdraw, _Rebalance } from "../../../generated/schema";
 import {
   Deposit as DepositEvent,
@@ -6,13 +6,15 @@ import {
   Rebalance as RebalanceEvent,
 } from "../../../generated/templates/Hypervisor/Hypervisor";
 import { BIGINT_ZERO, REGISTRY_ADDRESS_MAP } from "../../common/constants";
-import { getOrCreateFinancialsDailySnapshot } from "../../common/getters";
 import { getDualTokenUSD } from "./pricing";
-import { getOrCreateUnderlyingToken, getOrCreateVault } from "./vaults";
+import { getOrCreateUnderlyingToken } from "./vaults";
 
+
+// Create deposit entity corresponding to hypervisor deposit events
 export function createDeposit(event: DepositEvent): void {
   const vaultId = event.address.toHex();
 
+  // { Transaction hash }-{ Log index }
   let deposit = new Deposit(
     event.transaction.hash
       .toHex()
@@ -28,9 +30,10 @@ export function createDeposit(event: DepositEvent): void {
   deposit.timestamp = event.block.timestamp;
   deposit.asset = vaultId;
   deposit.amount = BIGINT_ZERO;
+  deposit.vault = event.address.toHex();
 
+  // Get underlying tokens to calculate USD value
   let underlyingToken = getOrCreateUnderlyingToken(event.address);
-
   deposit.amountUSD = getDualTokenUSD(
     Address.fromString(underlyingToken.token0),
     Address.fromString(underlyingToken.token1),
@@ -39,14 +42,14 @@ export function createDeposit(event: DepositEvent): void {
     event.block.number
   );
 
-  deposit.vault = event.params.to.toHex();
   deposit.save();
 }
 
-// Generate the withdraw entity
+// Create withdraw entity corresponding to hypervisor withdraw events
 export function createWithdraw(event: WithdrawEvent): void {
   const vaultId = event.address.toHex();
 
+  // { Transaction hash }-{ Log index }
   let withdrawal = new Withdraw(
     event.transaction.hash
       .toHex()
@@ -62,9 +65,10 @@ export function createWithdraw(event: WithdrawEvent): void {
   withdrawal.timestamp = event.block.timestamp;
   withdrawal.asset = vaultId;
   withdrawal.amount = BIGINT_ZERO;
+  withdrawal.vault = event.address.toHex();
 
+  // Get underlying tokens to calculate USD value
   let underlyingToken = getOrCreateUnderlyingToken(event.address);
-
   withdrawal.amountUSD = getDualTokenUSD(
     Address.fromString(underlyingToken.token0),
     Address.fromString(underlyingToken.token1),
@@ -73,13 +77,14 @@ export function createWithdraw(event: WithdrawEvent): void {
     event.block.number
   );
 
-  withdrawal.vault = event.params.to.toHex();
   withdrawal.save();
 }
 
+// Create rebalance entity corresponding to hypervisor rebalance events
 export function createRebalance(event: RebalanceEvent): void {
   const vaultId = event.address.toHex();
 
+  // { Transaction hash }-{ Log index }
   let rebalance = new _Rebalance(
     event.transaction.hash
       .toHex()
@@ -95,9 +100,10 @@ export function createRebalance(event: RebalanceEvent): void {
   rebalance.timestamp = event.block.timestamp;
   rebalance.fees0 = event.params.feeAmount0;
   rebalance.fees1 = event.params.feeAmount1;
+  rebalance.vault = event.address.toHex();
 
+  // Get underlying tokens to calculate USD value
   let underlyingToken = getOrCreateUnderlyingToken(event.address);
-
   rebalance.feesUSD = getDualTokenUSD(
     Address.fromString(underlyingToken.token0),
     Address.fromString(underlyingToken.token1),
@@ -105,7 +111,6 @@ export function createRebalance(event: RebalanceEvent): void {
     event.params.feeAmount1,
     event.block.number
   );
-  rebalance.vault = event.address.toHex();
-
+  
   rebalance.save();
 }
