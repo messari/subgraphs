@@ -1,5 +1,7 @@
 import { Address, BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vault as VaultContract } from "../../generated/ControllerListener/Vault";
+import { UniswapPair as UniswapPairContract } from "../../generated/ControllerListener/UniswapPair";
+import { ERC20} from "../../generated/ControllerListener/ERC20";
 import { Vault, Token, YieldAggregator } from "../../generated/schema";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
@@ -52,16 +54,37 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
 
   let vault_contract = VaultContract.bind(id);
   let underlying_addr_call = vault_contract.try_underlying();
+  let symbol = vault_contract.symbol();
 
-  if (underlying_addr_call.reverted) {
-    // this is a Uniswap vault
-  } else {
+  if (!underlying_addr_call.reverted) {
     let underlying_token = getOrCreateToken(<Address> underlying_addr_call.value);
     let f_token = getOrCreateToken(id);
 
     vault.inputToken = underlying_token.id;
     vault.outputToken = f_token.id;
     vault.save();
+    
+    if(symbol == 'fUNI-V2'){
+      let pair_contract = UniswapPairContract.bind(<Address> underlying_addr_call.value);
+      let token0_addr = pair_contract.token0();
+      let token1_addr = pair_contract.token1();
+
+      let token0_contract = ERC20.bind(token0_addr);
+      let token0_symbol = token0_contract.symbol();
+
+      let token1_contract = ERC20.bind(token1_addr);
+      let token1_symbol = token1_contract.symbol();
+
+      underlying_token.name = underlying_token.name + ' ' + token0_symbol + '-' + token1_symbol;
+      f_token.name = f_token.name + ' ' + token0_symbol + '-' + token1_symbol;
+
+      underlying_token.save();
+      f_token.save();
+
+    }
+
+    vault.name = protocol.name + ' - ' + underlying_token.name;
+
   }
 
   let vaultFee = getOrCreateVaultFee(vault, block);
