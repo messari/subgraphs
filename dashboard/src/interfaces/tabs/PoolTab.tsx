@@ -7,11 +7,8 @@ import { PoolName, PoolNames, Versions } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import { convertTokenDecimals } from "../../utils/index";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
-<<<<<<< HEAD
 import { useEffect, useMemo, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-=======
->>>>>>> 92380a8a5d69dbf1bb0061cc45f5e079a5886193
 import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 import { MultTableChart } from "../../common/chartComponents/MultTableChart";
 
@@ -198,13 +195,8 @@ function PoolTab({
               }
             });
             continue;
-<<<<<<< HEAD
           } 
           else if (Array.isArray(currentInstanceField)) {
-=======
-          } else if (Array.isArray(currentInstanceField)) {
-            // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
->>>>>>> 92380a8a5d69dbf1bb0061cc45f5e079a5886193
             currentInstanceField.forEach((val: string, arrayIndex: number) => {
               // Determine the name/label/id of each element to be separated out of the array
               let fieldSplitIdentifier = arrayIndex.toString();
