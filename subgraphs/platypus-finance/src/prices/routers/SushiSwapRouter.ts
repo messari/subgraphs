@@ -79,7 +79,10 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
-  log.warning("[Sushiswap Router]Calling: AmountIn: {} using path: {}!", [amountIn.toString(), path.toString()]);
+  log.warning("[Sushiswap Router]Calling: AmountIn: {} using path: {}!", [
+    amountIn.toString(),
+    path.map<string>(item => item.toHexString()).toString(),
+  ]);
 
   if (routerAddressV1) {
     const sushiSwapRouterV1 = SushiSwapRouterContract.bind(routerAddressV1);

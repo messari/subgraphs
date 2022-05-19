@@ -288,7 +288,7 @@ export function updatePricesForToken(event: ethereum.Event, tokenAddress: Addres
     }
     log.warning("Updating price = {} for token: {} at block: {}!", [
       token.lastPriceUSD!.toString(),
-      tokenAddress.toString(),
+      tokenAddress.toHexString(),
       event.block.number.toString(),
     ]);
     token.lastPriceBlockNumber = event.block.number;

@@ -1,13 +1,7 @@
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
-import { getCurvePriceUsdc } from "./routers/CurveRouter";
-import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
-import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
-import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
 import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
-import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
-import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   // Check if tokenAddr is a NULL Address
