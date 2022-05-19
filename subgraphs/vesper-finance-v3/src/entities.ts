@@ -379,9 +379,7 @@ export function updateVaultSupply(vault: Vault): void {
   }
 
   if (!shareprice_call.reverted) {
-    vault.pricePerShare = shareprice_call.value
-      .toBigDecimal()
-      .div(getDecimalDivisor(token.decimals()));
+    vault.pricePerShare = shareprice_call.value.toBigDecimal();
     vault.outputTokenPriceUSD = getUsdPrice(
       tokenAddress,
       shareprice_call.value
