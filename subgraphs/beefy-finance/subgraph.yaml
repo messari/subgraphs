@@ -8,6 +8,7 @@ dataSources:
     source:
       address: "0x62b9c7762129404351C70cD007a58BBFf311B751"
       abi: BeefiVaultRegistryMATIC
+      startBlock: 22519957
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -27,16 +28,18 @@ dataSources:
         - event: VaultsRetireStatusUpdated(address[],bool)
           handler: handleVaultsRetireStatusUpdated
       file: ./src/mappings/registry.ts
-  - kind: ethereum
-    name: ExampleVault
+  - name: ExampleVault
+    kind: ethereum/contract
     network: matic
     source:
       address: "0x72B5Cf05770C9a6A99FB8652825884ee36a4BfdA"
       abi: BeefyVault
+      startBlock: 20596159
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
+      file: ./src/mappings/vault.ts
       entities:
         - Vault
         - Token
@@ -54,9 +57,6 @@ dataSources:
       callHandlers:
         - function: deposit(uint256)
           handler: handleDepositCall
-        - function: want()
-          handler: handleWant
-      file: ./src/mappings/vault.ts
 templates:
   - name: BeefyVault
     kind: ethereum/contract
@@ -85,8 +85,6 @@ templates:
       callHandlers:
         - function: deposit(uint256)
           handler: handleDepositCall
-        - function: want()
-          handler: handleWant
   - name: Strategy
     kind: ethereum/contract
     network: matic
