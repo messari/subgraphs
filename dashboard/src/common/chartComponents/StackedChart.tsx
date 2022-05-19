@@ -59,6 +59,6 @@ export function StackedChart(tokens: any[], tokenWeightsArray: any[], poolTitle:
         labels,
         datasets,
     };
-    const element = <><Bar options={options} data={data} /></>
+    const element = <Bar options={options} data={data} />
     return element;
 }

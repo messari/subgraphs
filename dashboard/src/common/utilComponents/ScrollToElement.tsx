@@ -8,6 +8,7 @@ interface ScrollToElementProps {
     label: string;
 }
 
+// This component is a button that creates a copiable link that autoscrolls to the provided element
 function ScrollToElement({ poolId, elementId, tab, label }: ScrollToElementProps) {
     const [searchParams] = useSearchParams();
     const subgraphName = searchParams.get("subgraph");
