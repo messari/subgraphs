@@ -1,7 +1,7 @@
 {
   "configurations": {
     "deployment": {
-      "locations": ["steegecs", "messari"],
+      "locations": ["steegecs", "messari", "sevenshi"],
       "service": "graph deploy --product hosted-service "
     }
   },
@@ -80,6 +80,14 @@
         "template": "sushiswap.alt.template.yaml",
         "steegecs": "steegecs/sushiswap-xdai",
         "messari": "messari/sushiswap-xdai"
+      }
+    },
+    "ubeswap": {
+      "celo": {
+        "template": "ubeswap-subgraph.yaml",
+        "steegecs": "steegecs/ubeswap-celo",
+        "sevenshi": "sevenshi/ubeswap_celo",
+        "messari": "messari/ubeswap-celo"
       }
     }
   }
