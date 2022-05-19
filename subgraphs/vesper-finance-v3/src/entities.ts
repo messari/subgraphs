@@ -374,8 +374,6 @@ export function updateVaultSupply(vault: Vault): void {
 
   if (!supply_call.reverted) {
     vault.outputTokenSupply = supply_call.value;
-
-    vault.save();
   }
 
   if (!shareprice_call.reverted) {
@@ -386,9 +384,9 @@ export function updateVaultSupply(vault: Vault): void {
         .toBigDecimal()
         .div(getDecimalDivisor(token.decimals()))
     );
-
-    vault.save();
   }
+  
+  vault.save();
 }
 
 export function getOrCreateVault(
