@@ -1,4 +1,4 @@
-import { Strategy } from "../../generated/schema";
+/* import { Strategy } from "../../generated/schema";
 import {
   Deposit,
   StratHarvest,
@@ -74,4 +74,4 @@ export async function updateBalance(strategy: Strategy): Promise<void> {
 
   strategy.save();
   vault.save();
-}
+} */

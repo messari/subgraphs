@@ -10,7 +10,7 @@ dataSources:
       abi: BeefiVaultRegistryMATIC
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - OwnershipTransferred
@@ -27,23 +27,25 @@ dataSources:
         - event: VaultsRetireStatusUpdated(address[],bool)
           handler: handleVaultsRetireStatusUpdated
       file: ./src/mappings/registry.ts
-templates:
-  - name: Vault
-    kind: ethereum/contract
+  - kind: ethereum
+    name: ExampleVault
     network: matic
     source:
-      abi: Vault
+      address: "0x72B5Cf05770C9a6A99FB8652825884ee36a4BfdA"
+      abi: BeefyVault
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/vault.ts
       entities:
         - Vault
+        - Token
         # other entities?
       abis:
-        - name: Vault
+        - name: BeefyVault
           file: ./abis/BeefyVault.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: NewStratCandidate(address)
           handler: handleNewStratCandidate
@@ -51,7 +53,38 @@ templates:
           handler: handleUpgradeStrat
       callHandlers:
         - function: deposit(uint256)
-          handler: handleDeposit
+          handler: handleDepositCall
+        - function: want()
+          handler: handleWant
+      file: ./src/mappings/vault.ts
+templates:
+  - name: BeefyVault
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: BeefyVault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vault.ts
+      entities:
+        - Vault
+        - Token
+        # other entities?
+      abis:
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+      eventHandlers:
+        - event: NewStratCandidate(address)
+          handler: handleNewStratCandidate
+        - event: UpgradeStrat(address)
+          handler: handleUpgradeStrat
+      callHandlers:
+        - function: deposit(uint256)
+          handler: handleDepositCall
         - function: want()
           handler: handleWant
   - name: Strategy

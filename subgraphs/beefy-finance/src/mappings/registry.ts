@@ -6,7 +6,7 @@ import {
   VaultsRetireStatusUpdated,
 } from "../../generated/BeefiVaultRegistryMATIC/BeefiVaultRegistryMATIC";
 import { Vault } from "../../generated/schema";
-import { createVault } from "./vault";
+import { getVaultOrCreate } from "../utils/getters";
 
 const maticSuffix = "-137";
 
@@ -19,7 +19,7 @@ export function handleVaultsRegistered(event: VaultsRegistered): void {
     let vault = Vault.load(vaults[i].toHexString() + maticSuffix);
 
     if (!vault) {
-      createVault(vaults[i].toHexString(), event.block);
+      getVaultOrCreate(vaults[i], maticSuffix);
     }
   }
 }

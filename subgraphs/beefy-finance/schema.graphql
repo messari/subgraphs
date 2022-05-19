@@ -560,7 +560,7 @@ interface Event {
 }
 
 type Deposit implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+  " { Transaction hash }-{ Log index }-{ Network Id } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -598,7 +598,7 @@ type Deposit implements Event @entity {
 }
 
 type Withdraw implements Event @entity {
-  " { Transaction hash }-{ Log index }"
+  " { Transaction hash }-{ Log index }-{ network ID"
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
