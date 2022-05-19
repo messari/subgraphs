@@ -11,7 +11,9 @@ export function scripts(protocol, network, template, location) {
     let prepareConstants = "npm run prepare:constants --PROTOCOL=" + protocol + " --NETWORK=" + network
     let prepareBuild = "graph codegen && graph build"
     let deployment = "npm run deploy:subgraph --LOCATION=" + location
-    return [prepareYaml, prepareConstants, prepareBuild, deployment]
+    let removeConfig = "rm -rf configurations/configure.ts"
+    let removeSubgraphYaml = "rm -rf subgraph.yaml"
+    return [removeConfig, removeSubgraphYaml, prepareYaml, prepareConstants, prepareBuild, deployment]
 }
 
 /**
@@ -37,7 +39,6 @@ export async function runCommands(array, callback) {
             next();
            });
        } else {
-            setTimeout(() => { console.log("Time!"); }, 50000);
             // all done here
             callback(null, results);
        }

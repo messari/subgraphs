@@ -4,6 +4,8 @@ import {runCommands, scripts} from './execution.js'
 const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 
 const configurations = JSON.parse(JSON.stringify(protocolNetworkData))['default']['configurations'] 
 
+let allScripts = []
+
 if (process.argv.length == 2) {
     console.log('Error: please at least specify hosted service account to deploy all subgraphs (i.e. messari, steegecs, etc.)')
 } else if (process.argv.length == 3) {
@@ -16,9 +18,10 @@ if (process.argv.length == 2) {
                 let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
                 let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-                runCommands(scripts(protocol, network, template, location), function() {});
+                allScripts.push.apply(allScripts, scripts(protocol, network, template, location))
             }
-        }
+        } runCommands(allScripts, function() {});
+
     }
 } else if (process.argv.length == 4) {
     if (!process.argv[2] in protocolNetworkMap) {
@@ -33,8 +36,8 @@ if (process.argv.length == 2) {
             let template = protocolNetworkMap[protocol][network]['template']
             let location = protocolNetworkMap[protocol][network][process.argv[3]]
 
-            runCommands(scripts(protocol, network, template, location), function() {});
-        }
+            allScripts.push.apply(allScripts, scripts(protocol, network, template, location))
+        } runCommands(allScripts, function() {});
     }
  } else if (process.argv.length == 5) {
     if (!process.argv[2] in protocolNetworkMap) {
@@ -52,8 +55,9 @@ if (process.argv.length == 2) {
         let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
         let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-        runCommands(scripts(protocol, network, template, location), function() {});
-    }
+        allScripts.push.apply(allScripts, scripts(protocol, network, template, location))
+        runCommands(allScripts, function() {});
+    } 
 } else {
     console.log('Error: Too many arguments')
 }
