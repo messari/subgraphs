@@ -41,34 +41,37 @@ export class UbeswapCeloConfigurations implements Configurations {
     return RewardIntervalType.TIMESTAMP;
   }
   getReferenceToken(): string {
-    return "0x122013fd7dF1C6F636a5bb8f03108E876548b455";
+    return "0x471ece3750da237f93b8e339c536989b8978a438";
   }
   getRewardToken(): string {
-    return "0x29dFce9c22003A4999930382Fd00f9Fd6133Acd1";
+    return "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec";
   }
   getWhitelistTokens(): string[] {
     return [
-      "0x471ece3750da237f93b8e339c536989b8978a438",
-      "0x765de816845861e75a25fca122bb6898b8b1282a",
-      "0xef4229c8c3250c675f21bcefa42f58efbff6002a",
-      "0x88eec49252c8cbc039dcdb394c0c2ba2f1637ea0",
-      "0x90ca507a5d4458a4c6c6249d186b6dcb02a5bccd",
-      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73",
-      "0xbaab46e28388d2779e6e31fd00cf0e5ad95e327b"
+      "0x471ece3750da237f93b8e339c536989b8978a438",//celo
+      "0x765de816845861e75a25fca122bb6898b8b1282a",// cusd
+      "0xe273ad7ee11dcfaa87383ad5977ee1504ac07568",//mCEUR
+      "0xd629eb00deced2a080b7ec630ef6ac117e614f1b",//wbtc
+      "0x122013fd7df1c6f636a5bb8f03108e876548b455",//weth
+      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73",//cEUR
+      "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec",// ube
+      "0x918146359264c492bd6934071c6bd31c854edbc3",// mcUSD
+      "0x2a3684e9dc20b857375ea04235f2f7edbe818fa7",// USDC
     ];
   }
   getStableCoins(): string[] {
     return [
-      "0xef4229c8c3250C675F21BCefa42f58EfbfF6002a", // USDC
-      "0x90Ca507a5D4458a4C6C6249d186b6dCb02a5BCCd", // DAI
-      "0x88eeC49252c8cbc039DCdB394c0c2BA2f1637EA0", // USDT
+      "0x2a3684e9dc20b857375ea04235f2f7edbe818fa7", // USDC
+      "0x765de816845861e75a25fca122bb6898b8b1282a", // cusd
+      "0x918146359264c492bd6934071c6bd31c854edbc3", // mcUSD
+      
     ];
   }
   getStableOraclePools(): string[] {
     return [
-      "0x93887e0fa9f6c375b2765a6fe885593f16f077f9", // wETH/USDC
-      "0xc77398cfb7b0f7ab42bafc02abc20a69ce8cef7f", // wETH/USDT
-      "0xccd9d850ef40f19566cd8df950765e9a1a0b9ef2", // wETH/DAI
+      "0x1e593f1fe7b61c53874b54ec0c59fd0d5eb8621e", // CELO/CUSD
+      "0x684da04524b1a6baf99566d722de94ce989ea722", // USDC/CELO
+      "0xb460f9ae1fea4f77107146c1960bb1c978118816", // CELO/mCUSD
     ];
   }
   getUntrackedPairs(): string[] {
