@@ -101,6 +101,9 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
   let lpFee = getPoolFee(pool.id, LiquidityPoolFeeType.DYNAMIC_LP_FEE);
   lpFee.feePercentage = totalFee.minus(adminFee.times(totalFee)).times(BIGDECIMAL_ONE_HUNDRED);
   lpFee.save();
+
+  pool.fees = [tradingFee.id, protocolFee.id, lpFee.id];
+  pool.save();
 }
 
 export function setPoolFees(pool: LiquidityPool): void {
