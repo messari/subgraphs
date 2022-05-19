@@ -31,18 +31,18 @@ export function createAsset(
   // Start Watching the Asset for updates
   AssetTemplate.create(assetAddress);
 
-  asset._index = BigInt.fromI32(assets.length);
+  let _index = assets.length
+  asset._index = BigInt.fromI32(_index);
   asset.save();
 
-  inputTokens[asset._index.toI32()] = token.id;
-  inputTokenBalances[asset._index.toI32()] = BigInt.zero();
-  assets[asset._index.toI32()] = assetAddress.toHexString();
+  inputTokens.push(token.id);
+  inputTokenBalances.push(BigInt.zero());
+  assets.push(assetAddress.toHexString());
 
   pool._assets = assets;
   pool.inputTokens = inputTokens;
   pool.inputTokenBalances = inputTokenBalances;
 
-  token.save();
   pool.save();
 }
 

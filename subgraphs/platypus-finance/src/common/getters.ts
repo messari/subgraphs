@@ -167,16 +167,9 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
       let dailyVolumeByTokenUSD: BigDecimal[] = poolDailyMetrics.dailyVolumeByTokenUSD;
       let dailyVolumeByTokenAmount: BigInt[] = poolDailyMetrics.dailyVolumeByTokenAmount;
 
-      for (let i = 0; i < pool._assets.length; i++) {
-        let _asset = _Asset.load(pool._assets[i])!;
-        let _index = _asset._index.toI32();
-
-        if (!dailyVolumeByTokenUSD[_index]) {
-          dailyVolumeByTokenUSD[_index] = BIGDECIMAL_ZERO;
-        }
-        if (!dailyVolumeByTokenAmount[_index]) {
-          dailyVolumeByTokenAmount[_index] = BigInt.fromString("0");
-        }
+      for (let i = poolDailyMetrics.dailyVolumeByTokenUSD.length; i < pool.inputTokens.length; i++) {
+        dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+        dailyVolumeByTokenAmount.push(BigInt.fromString("0"));
       }
 
       poolDailyMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
@@ -224,16 +217,9 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
       let hourlyVolumeByTokenUSD: BigDecimal[] = poolHourlyMetrics.hourlyVolumeByTokenUSD;
       let hourlyVolumeByTokenAmount: BigInt[] = poolHourlyMetrics.hourlyVolumeByTokenAmount;
 
-      for (let i = 0; i < pool.inputTokens.length; i++) {
-        let _asset = _Asset.load(pool._assets[i])!;
-        let _index = _asset._index.toI32();
-
-        if (!hourlyVolumeByTokenUSD[_index]) {
-          hourlyVolumeByTokenUSD[_index] = BIGDECIMAL_ZERO;
-        }
-        if (!hourlyVolumeByTokenAmount[_index]) {
-          hourlyVolumeByTokenAmount[_index] = BigInt.fromString("0");
-        }
+      for (let i = poolHourlyMetrics.hourlyVolumeByTokenUSD.length; i < pool.inputTokens.length; i++) {
+        hourlyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
+        hourlyVolumeByTokenAmount.push(BigInt.fromString("0"));
       }
 
       poolHourlyMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
