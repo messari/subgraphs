@@ -164,6 +164,7 @@ export function getOrCreateVaultDailySnapshot(
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
   object.pricePerShare = vault.pricePerShare;
+  object.outputTokenSupply = vault.outputTokenSupply;
 
   object.save();
 
@@ -200,6 +201,7 @@ export function getOrCreateVaultHourlySnapshot(
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
   object.pricePerShare = vault.pricePerShare;
+  object.outputTokenSupply = vault.outputTokenSupply;
 
   object.save();
 

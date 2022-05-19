@@ -21,7 +21,7 @@ import { Erc20Token } from "../generated/vaUSDC_prod_RL4/Erc20Token";
 import { PoolRewards } from "../generated/vaUSDC_prod_RL4/PoolRewards";
 import { PoolRewardsOld } from "../generated/vaUSDC_prod_RL4/PoolRewardsOld";
 import { getDay, getHour } from "./utils";
-import { getUsdPrice } from "./prices";
+import { getUsdPrice, getUsdPricePerToken } from "./prices";
 import { getDecimalDivisor } from "./peer";
 
 interface getOrCreateResponse<T> {
@@ -357,10 +357,19 @@ export function updateVaultSupply(vault: Vault): void {
   const tokenAddress = poolv3.token();
   const supply_call = poolv3.try_totalSupply();
   const token = Erc20Token.bind(tokenAddress);
+  const shareprice_call = poolv3.try_pricePerShare();
 
   if (!supply_call.reverted) {
+    const tokenPrice = getUsdPricePerToken(tokenAddress);
+    
     vault.outputTokenSupply = supply_call.value;
-    vault.outputTokenPriceUSD = getUsdPrice(tokenAddress, supply_call.value.toBigDecimal().div(getDecimalDivisor(token.decimals())));
+    vault.outputTokenPriceUSD = tokenPrice.usdPrice.div(tokenPrice.decimalsBaseTen);
+
+    vault.save();
+  }
+
+  if (!shareprice_call.reverted) {
+    vault.pricePerShare = shareprice_call.value.toBigDecimal();
 
     vault.save();
   }

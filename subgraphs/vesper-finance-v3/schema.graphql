@@ -362,7 +362,7 @@ type Vault @entity {
   inputTokenBalance: BigInt!
 
   " Total supply of output token "
-  outputTokenSupply: BigInt
+  outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
