@@ -46,12 +46,12 @@ export function handleDepositV3(call: DepositCall): void {
     return;
   }
 
-  updateVaultRewardEmission(dataSource.address());
   getOrCreateVault(
     dataSource.address(),
     call.block.number,
     call.block.timestamp
   );
+  updateVaultRewardEmission(dataSource.address());
   getOrCreateDeposit(call, dataSource.address());
 
   const token = Erc20Token.bind(poolV3.token());
