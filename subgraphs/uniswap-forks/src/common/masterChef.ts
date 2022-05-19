@@ -1,7 +1,7 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../config/_networkConfig";
 import { MasterChef } from "../../generated/MasterChef/MasterChef";
-import { MasterChefV2 } from "../../generated/MasterChef/MasterChefV2";
+import { MasterChefV2 } from "../../generated/MasterChefV2/MasterChefV2";
 import { LiquidityPool } from "../../generated/schema";
 import { BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "./constants";
 import { getOrCreateToken } from "./getters";
