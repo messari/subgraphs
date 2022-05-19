@@ -1,16 +1,23 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Claimed } from "../../generated/Rewards/Rewards";
-import { TOKE_ADDRESS } from "../common/constants";
+import { BIGINT_TEN, TOKE_ADDRESS } from "../common/constants";
 import { getOrCreateFinancialMetrics } from "../common/financial";
+import { getOrCreateProtocol } from "../common/protocol";
 import { getOrCreateToken } from "../common/tokens";
 import { updateUsageMetrics } from "../common/usage";
-import { normalizedUsdcPrice, usdcPrice } from "../price/usdcOracle";
+import { getUsdPrice } from "../prices";
 
 export function handleClaim(event: Claimed): void {
-  let financialMetrics = getOrCreateFinancialMetrics(event.block.timestamp);
+  let financialMetrics = getOrCreateFinancialMetrics(event.block.timestamp, event.block.number);
+  const protocol = getOrCreateProtocol();
   const token = getOrCreateToken(Address.fromString(TOKE_ADDRESS));
-  const amountUSD = normalizedUsdcPrice(usdcPrice(token, event.params.amount));
-  financialMetrics.supplySideRevenueUSD = financialMetrics.supplySideRevenueUSD.plus(amountUSD);
+
+  const decimals = BIGINT_TEN.pow(u8(token.decimals));
+  const amountUSD = getUsdPrice(Address.fromString(token.id), new BigDecimal(event.params.amount.div(decimals)));
+
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(amountUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(amountUSD);
   financialMetrics.save();
-  updateUsageMetrics(event.block.number, event.block.timestamp, event.params.recipient);
+  protocol.save();
+  updateUsageMetrics(event.block, event.params.recipient);
 }
