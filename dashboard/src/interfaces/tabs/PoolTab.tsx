@@ -1,12 +1,16 @@
 import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
+import { MultChart } from "../../common/chartComponents/MultChart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import { PoolName, PoolNames, Versions } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import { convertTokenDecimals } from "../../utils/index";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
+import { useEffect, useMemo, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import ScrollToElement from "../../common/utilComponents/ScrollToElement";
+import { MultTableChart } from "../../common/chartComponents/MultTableChart";
 
 interface PoolTabProps {
   data: any;
@@ -87,6 +91,8 @@ function PoolTab({
 
       // currentEntityData holds the data on this entity
       const currentEntityData = data[entityName];
+      
+     
       if (currentEntityData.length === 0) {
         return <Grid key={entityName} style={{ borderTop: "black 2px solid" }}><h2>ENTITY: {entityName}</h2><h3 style={{ color: "red" }}>{entityName} HAS NO INSTANCES.</h3></Grid>
       }
@@ -189,8 +195,8 @@ function PoolTab({
               }
             });
             continue;
-          } else if (Array.isArray(currentInstanceField)) {
-            // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
+          } 
+          else if (Array.isArray(currentInstanceField)) {
             currentInstanceField.forEach((val: string, arrayIndex: number) => {
               // Determine the name/label/id of each element to be separated out of the array
               let fieldSplitIdentifier = arrayIndex.toString();
@@ -204,9 +210,10 @@ function PoolTab({
                 if (holdingValueKey) {
                   value = Number(val[holdingValueKey]);
                 }
-                if (val['type']) {
-                  fieldSplitIdentifier = val['type'];
-                } else {
+                if (val['side'] && val['type']) {
+                  fieldSplitIdentifier = val['type'] +'_'+ val['side'];
+                } 
+                 else {
                   const holdingValueStr = Object.keys(val).find(x => {
                     return typeof (val[x]) === "string" && isNaN(Number(val[x]));
                   });
@@ -341,6 +348,37 @@ function PoolTab({
             </div>)
         })
       }
+      const dataRatesFields:{[label: string]:  any[] } = {}; 
+      Object.keys(dataFields).forEach((field: string) => {
+        // consolidate tokenweight fields
+        if (field.toUpperCase().includes("RATES")) {
+            const fieldName = field.match(/\[(.+?)\]/)![0].replace("[","").replace("]","");
+            if (!dataRatesFields[fieldName]) {
+              dataRatesFields[fieldName] = [];
+            }
+            dataRatesFields[fieldName].push(dataFields[field]);
+            delete dataFields[field];
+          }
+        }
+      )
+      const RatesComponent = () => {
+        return (
+          <div id={entityName + '- RATES'} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
+            <div style={{ marginLeft: "40px" }}>
+              <ScrollToElement label={entityName + '- RATES'} elementId={entityName + '- RATES'} poolId={poolId} tab="pool" />
+            </div>
+            
+            <Grid container>
+              <Grid key={entityName + '- RATES1'} item xs={8}>
+                {MultChart(dataRatesFields)}
+              </Grid>
+              <Grid key={entityName + '- RATES2'} item xs={4} marginY={4}>
+                {MultTableChart(dataRatesFields)}
+              </Grid>
+            </Grid>
+          </div>)
+      }
+
 
       // Move baseYield chart to bottom (above token weights)
       if (dataFields.baseYield) {
@@ -428,6 +466,7 @@ function PoolTab({
           })
           }
           {tokenWeightComponent}
+          <div><RatesComponent/> </div> 
         </Grid>)
     })
 

@@ -13,4 +13,5 @@ export namespace Deploy {
     export const SUSHISWAP_MOONRIVER = 11;
     export const SUSHISWAP_XDAI = 12;
     export const UNISWAP_V2_MAINNET = 13;
-  }
+    export const UBESWAP_CELO = 14;
+  } 

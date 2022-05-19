@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: celo
+    network: {{network}}
     source:
-      address: "0x62d5b84be28a183abb507e125b384122d2c25fae"
+      address: "{{address}}"
       abi: Factory
-      startBlock: 5272596
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -26,7 +26,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: celo
+    network: {{network}}
     source:
       abi: Pair
     mapping:
