@@ -23,7 +23,6 @@ dataSources:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
-
   - kind: ethereum
     name: MasterChef
     network: mainnet
@@ -74,8 +73,7 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/masterChef/sushiswap/rewardV2.ts
-    
+      file: ./src/mappings/masterChef/sushiswap/rewardV2.ts   
 templates:
   - kind: ethereum/contract
     name: Pair

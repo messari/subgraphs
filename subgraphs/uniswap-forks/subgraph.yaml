@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: bsc
+    network: matic
     source:
-      address: "0x0841BD0B734E4F5853f0dD8d7Ea041c241fb0Da6"
+      address: "0xCf083Be4164828f00cAE704EC15a36D711491284"
       abi: Factory
-      startBlock: 4855900
+      startBlock: 15298800
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -23,14 +23,13 @@ dataSources:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
-
   - kind: ethereum
     name: MasterChef
-    network: bsc
+    network: matic
     source:
       address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
       abi: MasterChefSushiswap
-      startBlock: 4855342
+      startBlock: 15550194
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -53,14 +52,13 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
       file: ./protocols/apeswap/src/mappings/masterchef/reward.ts
-
   - kind: ethereum
     name: MasterChefV2
-    network: bsc
+    network: matic
     source:
       address: "0x54aff400858Dcac39797a81894D9920f16972D1D"
       abi: MasterChefV2Sushiswap
-      startBlock: 4855362
+      startBlock: 15797921
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -83,11 +81,10 @@ dataSources:
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
       file: ./protocols/apeswap/src/mappings/masterchef/rewardV2.ts
-
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: bsc
+    network: matic
     source:
       abi: Pair
     mapping:
@@ -113,4 +110,4 @@ templates:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
         - event: Sync(uint112,uint112)
-          handler: handleSync handleSync
+          handler: handleSync

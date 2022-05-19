@@ -57,7 +57,7 @@
         "messari": "messari/sushiswap-fuse"
       },
       "mainnet": {
-        "template": "uniswap.mainnet.template.yaml",
+        "template": "uniswap.v2.template.yaml",
         "steegecs": "steegecs/sushiswap-mainnet",
         "messari": "messari/sushiswap-ethereum"
       },

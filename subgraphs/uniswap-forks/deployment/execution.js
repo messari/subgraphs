@@ -18,67 +18,79 @@ export function scripts(protocol, network, template, location) {
  * @param {string[]} array - Protocol that is being deployed
  * @param {string} callback 
 */
-// export async function runCommands(array, callback) {
+export async function runCommands(array, callback) {
 
-//     var index = 0;
-//     var results = [];
+    var index = 0;
+    var results = [];
 
-//     function next() {
-//         if (index < array.length) {
-//             exec(array[index++], function(error, stdout, stderr) {
-//             console.log('stdout: ' + stdout);
-//             console.log('stderr: ' + stderr);
-//             if (error !== null) {
-//                 console.log('exec error: ' + error);
-//             } 
-//             if (error) return callback(error);
-//             // do the next iteration
-//             results.push(stdout);
-//             next();
-//            });
-//        } else {
-//             setTimeout(() => { console.log("Time!"); }, 50000);
-//             // all done here
-//             callback(null, results);
-//        }
-//     }
-//     // start the first iteration
-//     next();
+    function next() {
+        if (index < array.length) {
+            exec(array[index++], function(error, stdout, stderr) {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            if (error !== null) {
+                console.log('exec error: ' + error);
+            } 
+            if (error) return callback(error);
+            // do the next iteration
+            results.push(stdout);
+            next();
+           });
+       } else {
+            setTimeout(() => { console.log("Time!"); }, 50000);
+            // all done here
+            callback(null, results);
+       }
+    }
+    // start the first iteration
+    next();
+}
+
+// export async function runCommands(array) {
+//     exec(array[0] + ' && ' + array[1] + ' && ' + array[2] + ' && ' + array[3] + ' && rm configurations/configure.ts && rm subgraph.yaml', function(error, stdout, stderr) {
+//         console.log('stdout: ' + stdout);
+//         console.log('stderr: ' + stderr);
+
+//         if (error !== null) {
+//             console.log('exec error: ' + error);
+//         }
+//     }); 
 // }
 
 /**
  * @param {string[]} array - Protocol that is being deployed
  * @param {string} callback 
 */
-export async function runCommands(array, callback) {
+// export async function runCommands(array, callback) {
+//     function run (callback) {
+//         setTimeout(function () {
+//             var index = 0;
+//             var results = [];
 
-    function run (callback) {
-        setTimeout(function () {
-            var index = 0;
-            var results = [];
+//             function next() {
+//                 if (index < array.length) {
+//                     exec(array[index++], function(error, stdout, stderr) {
+//                     console.log('stdout: ' + stdout);
+//                     console.log('stderr: ' + stderr);
+//                     if (error !== null) {
+//                         console.log('exec error: ' + error);
+//                     } 
+//                     if (error) return callback(error);
+//                     // do the next iteration
+//                     results.push(stdout);
+//                     next();
+//                 });
+//                 } else {
+//                     setTimeout(() => { console.log("Time!"); }, 5000);
 
-            function next() {
-                if (index < array.length) {
-                    exec(array[index++], function(error, stdout, stderr) {
-                    console.log('stdout: ' + stdout);
-                    console.log('stderr: ' + stderr);
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    } 
-                    if (error) return callback(error);
-                    // do the next iteration
-                    results.push(stdout);
-                    next();
-                });
-                } else {
-                    // all done here
-                    callback(null, results);
-                }
-            }
-            // start the first iteration
-            next();
-        }, 50000);
-    }
+//                     // all done here
+//                     callback(null, results);
+//                 }
+//             }
+//             // start the first iteration
+//             next();
+//         }, 100000);
+//     }
 
-    run(callback)
-}
+//     run(callback)
+// }
