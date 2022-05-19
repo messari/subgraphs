@@ -24,7 +24,7 @@ import {
   getOrCreateBorrow,
   getOrCreateLendingProtocol,
   getOrCreateLiquidate,
-  getOrCreateMarketUtilities,
+  getOrCreateMarketUtility,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -48,7 +48,7 @@ import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, 
 
 export function handleAssetStatus(event: AssetStatus): void {
   const tokenAddress = event.params.underlying.toHexString();
-  let marketUtilities = getOrCreateMarketUtilities(tokenAddress);
+  let marketUtility = getOrCreateMarketUtility(tokenAddress);
   let token = getOrCreateToken(event.params.underlying);
   let twapPriceWETH = BIGINT_ZERO;
 
@@ -61,21 +61,22 @@ export function handleAssetStatus(event: AssetStatus): void {
   const market = getOrCreateMarket(tokenAddress);
 
   token.lastPriceUSD = twapPrice;
-  marketUtilities.twapPrice = twapPrice;
-  marketUtilities.interestAccumulator = event.params.interestAccumulator;
+  marketUtility.twapPrice = twapPrice;
+  marketUtility.interestAccumulator = event.params.interestAccumulator;
   market.totalDepositBalanceUSD = amountToUsd(
     event.params.totalBalances,
-    marketUtilities.twap,
-    marketUtilities.twapPrice,
+    marketUtility.twap,
+    marketUtility.twapPrice,
   );
   market.totalBorrowBalanceUSD = amountToUsd(
     event.params.totalBorrows,
-    marketUtilities.twap,
-    marketUtilities.twapPrice,
+    marketUtility.twap,
+    marketUtility.twapPrice,
   );
   
   market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD); // TODO: Validate this calculation
 
+  marketUtility.save();
   token.save();
   market.save();
   /**
@@ -100,8 +101,8 @@ export function handleBorrow(event: Borrow): void {
   borrow.from = accountAddress.toHexString();
   borrow.to = marketId;
   borrow.amount = event.params.amount;
-  const marketUtilities = getOrCreateMarketUtilities(marketId);
-  borrow.amountUSD = amountToUsd(borrow.amount, marketUtilities.twap, marketUtilities.twapPrice);
+  const marketUtility = getOrCreateMarketUtility(marketId);
+  borrow.amountUSD = amountToUsd(borrow.amount, marketUtility.twap, marketUtility.twapPrice);
   borrow.save();
 
   if (borrow.amountUSD) {
@@ -127,8 +128,8 @@ export function handleDeposit(event: Deposit): void {
   deposit.from = accountAddress.toHexString();
   deposit.to = marketId;
   deposit.amount = event.params.amount;
-  const marketUtilities = getOrCreateMarketUtilities(marketId);
-  deposit.amountUSD = amountToUsd(deposit.amount, marketUtilities.twap, marketUtilities.twapPrice);
+  const marketUtility = getOrCreateMarketUtility(marketId);
+  deposit.amountUSD = amountToUsd(deposit.amount, marketUtility.twap, marketUtility.twapPrice);
   deposit.save();
 
   const market = getOrCreateMarket(marketId);
@@ -155,8 +156,8 @@ export function handleRepay(event: Repay): void {
   repay.from = accountAddress.toHexString();
   repay.to = marketId;
   repay.amount = event.params.amount;
-  const marketUtilities = getOrCreateMarketUtilities(marketId);
-  repay.amountUSD = amountToUsd(repay.amount, marketUtilities.twap, marketUtilities.twapPrice);
+  const marketUtility = getOrCreateMarketUtility(marketId);
+  repay.amountUSD = amountToUsd(repay.amount, marketUtility.twap, marketUtility.twapPrice);
 
   repay.save();
   market.save();
@@ -176,8 +177,8 @@ export function handleWithdraw(event: Withdraw): void {
   withdraw.from = accountAddress.toHexString();
   withdraw.to = marketId;
   withdraw.amount = event.params.amount;
-  const marketUtilities = getOrCreateMarketUtilities(marketId);
-  withdraw.amountUSD = amountToUsd(withdraw.amount, marketUtilities.twap, marketUtilities.twapPrice);
+  const marketUtility = getOrCreateMarketUtility(marketId);
+  withdraw.amountUSD = amountToUsd(withdraw.amount, marketUtility.twap, marketUtility.twapPrice);
 
   withdraw.save();
   market.save();
@@ -195,9 +196,9 @@ export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
 }
 
 export function handleGovSetReserveFee(event: GovSetReserveFee): void {
-  const marketUtilities = getOrCreateMarketUtilities(event.params.underlying.toHexString());
-  marketUtilities.reserveFee = event.params.newReserveFee;
-  marketUtilities.save();
+  const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
+  marketUtility.reserveFee = event.params.newReserveFee;
+  marketUtility.save();
 }
 
 export function handleLiquidation(event: Liquidation): void {
@@ -214,18 +215,18 @@ export function handleLiquidation(event: Liquidation): void {
   liquidation.amount = event.params.repay; // TODO: Validate whether these should be denominated in underlying or dToken. This is currently in underlying
 
   if (collateralToken.lastPriceUSD) {
-    const collateralMarketUtilities = getOrCreateMarketUtilities(collateralTokenId);
+    const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
     liquidation.amountUSD = amountToUsd(
       event.params.repay,
-      collateralMarketUtilities.twap,
-      collateralMarketUtilities.twapPrice,
+      collateralMarketUtility.twap,
+      collateralMarketUtility.twapPrice,
     );
     const collateralMarket = getOrCreateMarket(collateralTokenId);
     collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
 
     if (seizedToken.lastPriceUSD) {
-      const seizedMarketUtilities = getOrCreateMarketUtilities(seizedTokenId);
-      const yieldUSD = amountToUsd(event.params._yield, seizedMarketUtilities.twap, seizedMarketUtilities.twapPrice);
+      const seizedMarketUtility = getOrCreateMarketUtility(seizedTokenId);
+      const yieldUSD = amountToUsd(event.params._yield, seizedMarketUtility.twap, seizedMarketUtility.twapPrice);
       liquidation.profitUSD = yieldUSD.minus(liquidation.amountUSD!);
     }
   }
@@ -328,17 +329,17 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
       eToken.save();
     }
 
-    const marketUtilities = getOrCreateMarketUtilities(eulerViewMarket.underlying.toHexString());
-    marketUtilities.twap = eulerViewMarket.twap;
-    marketUtilities.twapPeriod = eulerViewMarket.twapPeriod;
+    const marketUtility = getOrCreateMarketUtility(eulerViewMarket.underlying.toHexString());
+    marketUtility.twap = eulerViewMarket.twap;
+    marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
 
     protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
       market.totalBorrowBalanceUSD
-        .times(marketUtilities.interestAccumulator.minus(INITIAL_INTEREST_ACCUMULATOR).toBigDecimal())
+        .times(marketUtility.interestAccumulator.minus(INITIAL_INTEREST_ACCUMULATOR).toBigDecimal())
         .div(INITIAL_INTEREST_ACCUMULATOR.toBigDecimal()),
     );
 
-    const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(marketUtilities.reserveBalance);
+    const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
     // Ignore case where there was a balance conversion happening at current block, in which case new balance is smaller than old.
     if (reserveBalanceDiff.gt(BIGINT_ZERO)) {
       const marketRevenueDiffUsd = reserveBalanceDiff
@@ -352,7 +353,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
       protocol.cumulativeSupplySideRevenueUSD
     );
 
-    marketUtilities.reserveBalance = eulerViewMarket.reserveBalance;
+    marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
     /**
    *  ##### Quantitative Data #####
 
@@ -362,7 +363,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
     rewardTokenEmissionsUSD: [BigDecimal!]
    */
-    marketUtilities.save();
+    marketUtility.save();
     market.save();
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);

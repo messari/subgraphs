@@ -16,7 +16,7 @@ import {
   Repay,
   Liquidate,
   InterestRate,
-  _MarketUtilities,
+  _MarketUtility,
 } from "../../generated/schema";
 import { getAssetSymbol, getAssetName, getAssetDecimals } from "./tokens";
 import {
@@ -383,10 +383,10 @@ export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
   return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
 }
 
-export function getOrCreateMarketUtilities(id: string): _MarketUtilities {
-  let entity = _MarketUtilities.load(id);
+export function getOrCreateMarketUtility(id: string): _MarketUtility {
+  let entity = _MarketUtility.load(id);
   if (!entity) {
-    entity = new _MarketUtilities(id);
+    entity = new _MarketUtility(id);
     entity.market = id;
     entity.reserveFee = BIGINT_ZERO;
     entity.twapPrice = BIGDECIMAL_ZERO;
@@ -395,5 +395,5 @@ export function getOrCreateMarketUtilities(id: string): _MarketUtilities {
     entity.interestAccumulator = INITIAL_INTEREST_ACCUMULATOR;
     entity.save();
   }
-  return entity as _MarketUtilities;
+  return entity as _MarketUtility;
 }

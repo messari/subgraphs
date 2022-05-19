@@ -958,7 +958,7 @@ type ActiveAccount @entity {
 ##### Helper entities #####
 ##########################################
 
-type _MarketUtilities @entity {
+type _MarketUtility @entity {
   " { Address of underlying token (== market id) } "
   id: ID!
 
