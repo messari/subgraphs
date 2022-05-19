@@ -41,6 +41,8 @@ import {
   USDC_SYMBOL,
   INITIAL_INTEREST_ACCUMULATOR,
   TransactionType,
+  EULER_GENERAL_VIEW_V2_ADDRESS,
+  VIEW_V2_START_BLOCK_NUMBER,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
@@ -372,7 +374,10 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 }
 
 export function handleBlockUpdates(block: ethereum.Block): void {
-  const eulerGeneralView = EulerGeneralView.bind(Address.fromString(EULER_GENERAL_VIEW_ADDRESS));
+  const viewAddress = block.number.gt(VIEW_V2_START_BLOCK_NUMBER)
+    ? EULER_GENERAL_VIEW_V2_ADDRESS
+    : EULER_GENERAL_VIEW_ADDRESS;
+  const eulerGeneralView = EulerGeneralView.bind(Address.fromString(viewAddress));
   const protocol = getOrCreateLendingProtocol();
 
   const markets = protocol.markets;
