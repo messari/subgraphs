@@ -148,17 +148,24 @@ export const PROTOCOL_ADMIN = "0x416a7989a964C9ED60257B064Efc3a30FE6bF2eE";
 
 // Main USD Pool
 export const POOL_PROXY = "0x66357dCaCe80431aee0A7507e2E361B7e2402370";
-export const ALT_POOLS = [
-  // Main USD Pool
-  "0xe0D166DE15665bC4B7185B2e35E847E51316E126",
+
+class poolDetails {
+  name: string;
+  symbol: string;
+  address: string;
+}
+
+export const ALT_POOLS: poolDetails[] = [
   // Alt Pool UST:
-  "0xe0D166DE15665bC4B7185B2e35E847E51316E126",
+  { name: "Alt Pool UST", symbol: "UST-USDC Pool", address: "0xe0D166DE15665bC4B7185B2e35E847E51316E126" },
   // Alt Pool Frax:
-  "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824",
+  { name: "Alt Pool Frax", symbol: "Frax-USDC Pool", address: "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824" },
   // Alt Pool MIM:
-  "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7",
+  { name: "Alt Pool MIM", symbol: "MIM-USDC Pool", address: "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7" },
+  // Alt Pool YUSD
+  { name: "Alt Pool YUSD", symbol: "YUSD-USDC Pool", address: "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83" },
   // Alt Pool sAVAX:
-  "0x4658EA7e9960D6158a261104aAA160cC953bb6ba",
+  { name: "Alt Pool sAVAX", symbol: "sAVAX-AVAX Pool", address: "0x4658EA7e9960D6158a261104aAA160cC953bb6ba" },
 ];
 
 export enum TransactionType {

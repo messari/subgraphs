@@ -35,10 +35,10 @@ export function initAltPoolTemplates(): void {
   // that clashes with an exisiting datasource
   if (!altPoolsInit) {
     altPoolsInit = true;
-    ALT_POOLS.forEach(address => {
-      const poolAddress = Address.fromString(address);
+    ALT_POOLS.forEach(poolDetails => {
+      const poolAddress = Address.fromString(poolDetails.address);
       PoolTemplate.create(poolAddress);
-      getOrCreateLiquidityPool(poolAddress);
+      getOrCreateLiquidityPool(poolAddress, poolDetails.name, poolDetails.symbol);
     });
   }
 }
@@ -78,11 +78,18 @@ export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _Liq
   return poolParam;
 }
 
-export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
+export function getOrCreateLiquidityPool(
+  poolAddress: Address,
+  name: string = "Main Pool",
+  symbol: string = "Main Pool",
+): LiquidityPool {
   let pool = LiquidityPool.load(poolAddress.toHexString());
   // fetch info if null
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toHexString());
+    pool.name = name;
+    pool.symbol = symbol;
+
     pool.protocol = getOrCreateDexAmm().id;
     getOrCreateLiquidityPoolParamsHelper(poolAddress);
 
