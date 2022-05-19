@@ -18,7 +18,7 @@ if (process.argv.length == 2) {
                 let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
                 let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-                allScripts.push.apply(allScripts, scripts(protocol, network, template, location))
+                allScripts.push(scripts(protocol, network, template, location))
             }
         } runCommands(allScripts, function() {});
 
@@ -36,7 +36,7 @@ if (process.argv.length == 2) {
             let template = protocolNetworkMap[protocol][network]['template']
             let location = protocolNetworkMap[protocol][network][process.argv[3]]
 
-            allScripts.push.apply(allScripts, scripts(protocol, network, template, location))
+            allScripts.push(scripts(protocol, network, template, location))
         } runCommands(allScripts, function() {});
     }
  } else if (process.argv.length == 5) {
@@ -55,7 +55,7 @@ if (process.argv.length == 2) {
         let template = protocolNetworkMap[process.argv[2]][process.argv[3]]['template']
         let location = protocolNetworkMap[process.argv[2]][process.argv[3]][process.argv[4]]
 
-        allScripts.push.apply(allScripts, scripts(protocol, network, template, location))
+        allScripts.push(scripts(protocol, network, template, location))
         runCommands(allScripts, function() {});
     } 
 } else {

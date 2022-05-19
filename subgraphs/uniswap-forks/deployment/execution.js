@@ -7,12 +7,12 @@ import { exec } from 'child_process';
  * @param {string} location - Location in the subgraph will be deployed to {e.g. messari/uniswap-v2-ethereum}
 */
 export function scripts(protocol, network, template, location) {
+    let removeConfig = "rm -rf configurations/configure.ts"
+    let removeSubgraphYaml = "rm -rf subgraph.yaml"
     let prepareYaml = "npm run prepare:yaml --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template
     let prepareConstants = "npm run prepare:constants --PROTOCOL=" + protocol + " --NETWORK=" + network
     let prepareBuild = "graph codegen && graph build"
     let deployment = "npm run deploy:subgraph --LOCATION=" + location
-    let removeConfig = "rm -rf configurations/configure.ts"
-    let removeSubgraphYaml = "rm -rf subgraph.yaml"
     return [removeConfig, removeSubgraphYaml, prepareYaml, prepareConstants, prepareBuild, deployment]
 }
 
@@ -23,17 +23,22 @@ export function scripts(protocol, network, template, location) {
 export async function runCommands(array, callback) {
 
     var index = 0;
+    var index2 = 0;
     var results = [];
 
     function next() {
         if (index < array.length) {
-            exec(array[index++], function(error, stdout, stderr) {
+            exec(array[index][index2++], function(error, stdout, stderr) {
             console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
             if (error !== null) {
                 console.log('exec error: ' + error);
-            } 
-            if (error) return callback(error);
+                index++;
+                index2 = 0;
+            } else if (index2 == 6) {
+                index++;
+                index2 = 0;
+            }
             // do the next iteration
             results.push(stdout);
             next();
@@ -46,52 +51,3 @@ export async function runCommands(array, callback) {
     // start the first iteration
     next();
 }
-
-// export async function runCommands(array) {
-//     exec(array[0] + ' && ' + array[1] + ' && ' + array[2] + ' && ' + array[3] + ' && rm configurations/configure.ts && rm subgraph.yaml', function(error, stdout, stderr) {
-//         console.log('stdout: ' + stdout);
-//         console.log('stderr: ' + stderr);
-
-//         if (error !== null) {
-//             console.log('exec error: ' + error);
-//         }
-//     }); 
-// }
-
-/**
- * @param {string[]} array - Protocol that is being deployed
- * @param {string} callback 
-*/
-// export async function runCommands(array, callback) {
-//     function run (callback) {
-//         setTimeout(function () {
-//             var index = 0;
-//             var results = [];
-
-//             function next() {
-//                 if (index < array.length) {
-//                     exec(array[index++], function(error, stdout, stderr) {
-//                     console.log('stdout: ' + stdout);
-//                     console.log('stderr: ' + stderr);
-//                     if (error !== null) {
-//                         console.log('exec error: ' + error);
-//                     } 
-//                     if (error) return callback(error);
-//                     // do the next iteration
-//                     results.push(stdout);
-//                     next();
-//                 });
-//                 } else {
-//                     setTimeout(() => { console.log("Time!"); }, 5000);
-
-//                     // all done here
-//                     callback(null, results);
-//                 }
-//             }
-//             // start the first iteration
-//             next();
-//         }, 100000);
-//     }
-
-//     run(callback)
-// }

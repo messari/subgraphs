@@ -1,57 +1,41 @@
 specVersion: 0.0.2
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Factory
-    network: xdai
+    network: mainnet
     source:
-      address: "0xc35dadb65012ec5796536bd9864ed8773abc74c4"
+      address: "0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac"
       abi: Factory
-      startBlock: 0
+      startBlock: 10794229
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities: []
+      file: ./src/mappings/factory.ts
+      entities:
+        - Token
+        - DexAmmProtocol
+        - LiquidityPool
+        - LiquidityPoolFee
+        - Protocol
       abis:
         - name: Factory
-          file: ./abis/sushiswap/Factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/factory.ts
-  - kind: ethereum
-    name: MiniChef
-    network: xdai
-    source:
-      address: "0xdDCbf776dF3dE60163066A5ddDF2277cB445E0F3"
-      abi: MiniChefSushiswap
-      startBlock: 0
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: MiniChefSushiswap
-          file: ./abis/sushiswap/MiniChefSushiswap.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositMini
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawMini
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawMini
-      file: ./src/mappings/masterChef/sushiswap/rewardMini.ts
+      ##callHandlers:
+        ##- function: setFeeTo(address)
+          ##handler: handleFeeTo
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: xdai
+    network: mainnet
     source:
       abi: Pair
     mapping:
@@ -59,14 +43,33 @@ templates:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       file: ./src/mappings/pool.ts
-      entities: []
+      entities:
+        - LiqudityPool
+        - Token
+        - Deposit
+        - Withdraw
+        - Swap
+        - LiquidityPool
+        - LiquidityPoolFee
+        - DexAmmProtocol
+        - Token
+        - _Transaction
+        - _Mint
+        - _Burn
+        - _PricesUSD
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - _Account
+        - _DailyActiveAccount
+        - PoolDailySnapshot
+        - _TokenTracker
       abis:
         - name: Pair
-          file: ./abis/sushiswap/Pair.json
+          file: ./abis/uniswap-v2/Pair.json
         - name: Factory
-          file: ./abis/sushiswap/Factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
