@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, log, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   SushiSwapPair__getReservesResult,
   SushiSwapPair as SushiSwapPairContract,
@@ -79,9 +79,12 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
+  log.warning("[Sushiswap Router]Calling: AmountIn: {} using path: {}!", [amountIn.toString(), path.toString()]);
+
   if (routerAddressV1) {
     const sushiSwapRouterV1 = SushiSwapRouterContract.bind(routerAddressV1);
     amountOutArray = sushiSwapRouterV1.try_getAmountsOut(amountIn, path);
+
     if (amountOutArray.reverted && routerAddressV2) {
       const sushiSwapRouterV2 = SushiSwapRouterContract.bind(routerAddressV2);
       amountOutArray = sushiSwapRouterV2.try_getAmountsOut(amountIn, path);

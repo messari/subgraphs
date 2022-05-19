@@ -282,12 +282,15 @@ export function updatePricesForToken(event: ethereum.Event, tokenAddress: Addres
   let token = getOrCreateToken(event, tokenAddress);
 
   if (!token.lastPriceUSD || !token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
-    log.debug("UPDATE THE PRICE!", []);
-
     token.lastPriceUSD = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
     if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
       token.lastPriceUSD = BigDecimal.fromString("1");
     }
+    log.warning("Updating price = {} for token: {} at block: {}!", [
+      token.lastPriceUSD!.toString(),
+      tokenAddress.toString(),
+      event.block.number.toString(),
+    ]);
     token.lastPriceBlockNumber = event.block.number;
     token.save();
   }
