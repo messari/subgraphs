@@ -1,0 +1,82 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Factory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/sushiswap/Factory.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/factory.ts
+
+  - kind: ethereum
+    name: MiniChef
+    network: {{network}}
+    source:
+      address: "{{miniChefAddress}}"
+      abi: MiniChefSushiswap
+      startBlock: {{miniChefStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MiniChefSushiswap
+          file: ./abis/sushiswap/MiniChefSushiswap.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleDepositMini
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleWithdrawMini
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleEmergencyWithdrawMini
+      file: ./src/mappings/masterChef/sushiswap/rewardMini.ts
+
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: []
+      abis:
+        - name: Pair
+          file: ./abis/sushiswap/Pair.json
+        - name: Factory
+          file: ./abis/sushiswap/Factory.json
+        - name: TokenABI
+          file: ./abis/sushiswap/ERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync

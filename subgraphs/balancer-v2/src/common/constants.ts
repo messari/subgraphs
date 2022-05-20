@@ -89,13 +89,13 @@ export const SECONDS_PER_HOUR = 60 * 60;
 
 export let VAULT_ADDRESS = Address.fromString("0xBA12222222228d8Ba445958a75a0704d566BF2C8");
 export let FEE_COLLECTOR_ADDRESS = Address.fromString("0xce88686553686da562ce7cea497ce749da109f9f");
-export let WETH: Address = Address.fromString("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
-export let WMATIC: Address = Address.fromString("0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0");
-export let WBTC: Address = Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599");
-export let USDC: Address = Address.fromString("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48");
-export let USDT: Address = Address.fromString("0xdAC17F958D2ee523a2206206994597C13D831ec7");
-export let BAL: Address = Address.fromString("0xba100000625a3754423978a60c9317c58a424e3D");
-export let DAI: Address = Address.fromString("0x6B175474E89094C44Da98b954EedeAC495271d0F");
+export let WETH: Address = Address.fromString("0x82aF49447D8a07e3bd95BD0d56f35241523fBab1");
+export let WMATIC: Address = Address.fromString("0x0000000000000000000000000000000000000000");
+export let WBTC: Address = Address.fromString("0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f");
+export let USDC: Address = Address.fromString("0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8");
+export let USDT: Address = Address.fromString("0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9");
+export let BAL: Address = Address.fromString("0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8");
+export let DAI: Address = Address.fromString("0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1");
 
 export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT];
 export let BASE_ASSETS: Address[] = [WETH, WMATIC, WBTC, BAL];

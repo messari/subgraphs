@@ -70,52 +70,59 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | ------- |  :------: | --- | --- |
 | **DEX AMM** |    | |
 | [Apeswap](https://apeswap.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Apeswap BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-bsc) [![Apeswap Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/apeswap-polygon) |
-| Balancer v2 | 🔨 | | |
+| [Balancer v2](https://balancer.fi/) | 🛠 | 1.2.1 / 1.2.0 / 1.0.0 | [![Balancer V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-ethereum) [![Balancer V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-arbitrum) [![Balancer V2 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/balancer-v2-polygon)|
 | Bancor v2 | 🔨 | | |
 | Bancor v3 | | | |
 | Curve | 🔨 | | |
 | DODO v2 | 🔨 | | |
 | Ellipsis Finance |  | | |
 | Platypus Finance | 🔨 | | |
-| Saddle Finance | 🔨 | | |
+| [Saddle Finance](https://saddle.finance/#/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Saddle Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-ethereum) [![Saddle Finance Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-arbitrum) [![Saddle Finance Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-fantom) [![Saddle Finance Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/saddle-finance-optimism) |
 | Sushiswap | 🔨 | | |
-| [Uniswap v2](https://uniswap.org/) | 🛠 | 1.2.1 / 1.1.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2) |
-| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3) [![Uniswap V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
+| [Uniswap v2](https://uniswap.org/) | 🛠 | 1.2.1 / 1.1.1 / 1.0.0 | [![Uniswap V2](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v2-ethereum) |
+| [Uniswap v3](https://uniswap.org/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Uniswap V3](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-ethereum) [![Uniswap V3 Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-polygon) [![Uniswap V3 Optimism](./docs/images/chains/optimism.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-optimism) [![Uniswap V3 Arbtitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/uniswap-v3-arbitrum)|
 | **Lending Protocols** |    | |
-| Aave v2 | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
+| [Aave v2](https://aave.com/) | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
 | Aave v3 |  | | |
-| [Bastion Protocol](https://bastionprotocol.com/) | 🔨 | | |
-| Benqi | 🔨 | | |
-| [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.2 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
+| [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
+| [BENQI](https://benqi.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![BENQI Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/benqi-avalanche) |
+| [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.3 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
 | CREAM | 🔨 | | |
+| dForce | 🔨 | | |
+| Euler Finance | 🔨 | | |
 | Geist | 🔨 | | |
 | Hundred Finance | 🔨 | | |
 | Maple Finance | 🔨 | | |
 | Moola Market | 🔨 | | |
-| Moonwell Finance | 🔨 | | |
+| [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
+| Notional Finance | 🔨 | | |
+| [Rari Fuse](https://app.rari.capital/fuse) | 🔨 | | |
 | TrueFi |   | | |
+| Yeti Finance |  | | |
 | **CDPs** |    | |
-| [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
+| [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-ethereum) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |
 | Alchemix |   | | |
-| Inverse Finance | 🔨 | | |
-| [Liquity](https://www.liquity.org/) | 🛠 | 1.2.1 / 1.1.1 / 1.0.0 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
+| [Inverse Finance](https://www.inverse.finance/) | 🛠 | 1.2.1 / 1.2.1 / 1.0.0  | [![Inverse Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/inverse-finance-ethereum)|
+| [Liquity](https://www.liquity.org/) | 🛠 | 1.2.1 / 1.1.2 / 1.0.1 | [![Liquity Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/liquity-ethereum) |
 | [MakerDAO](https://makerdao.com/en/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![MakerDAO Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/makerdao-ethereum?selected=playground) |
 | QiDAO |   | | |
 | **Yield Aggregators** |     | |
+| [Arrakis Finance](https://www.arrakis.finance/) |  | | |
 | Autofarm |  | | |
 | Badger DAO | 🔨 | | |
 | Beefy Finance | | | |
-| [Belt Finance](https://belt.fi/landing) | 🛠 | 1.1.0 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
+| [Belt Finance](https://belt.fi/landing) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
 | Convex Finance | 🔨  | | |
+| [Gamma Strategy](https://www.gamma.xyz/) | 🔨  | | |
 | Harvest Finance | 🔨  | | |
 | Liquid Driver | 🔨  | | |
-| Pancakebunny | 🔨 | | |
+| Pancakebunny |  | | |
 | Rari Aggregator | 🔨 | | |
 | Reaper Farm | 🔨  | | |
-| [Stake DAO](https://stakedao.org/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao)|
-| [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak) |
+| [Stake DAO](https://stakedao.org/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum)|
+| [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.0.0 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak-ethereum) |
 | Vesper Finance | 🔨 | | |
 | Yield Yak | 🔨 | | |
-| [Yearn v2](https://yearn.fi/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![Yearn](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) |
+| [Yearn v2](https://yearn.fi/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
 
 † Versions are schema version, subgraph version, methodology version respectively
