@@ -51,7 +51,7 @@ export function getOrCreateFirstDeposit(vault: Vault): Deposit {
 
     deposit.hash = zeroAddress;
     deposit.logIndex = 0;
-    deposit.protocol = getBeefyFinanceOrCreate(vault.id.split("-")[1]).id;
+    deposit.protocol = getBeefyFinanceOrCreate("-" + vault.id.split("-")[1]).id;
     deposit.blockNumber = new BigInt(0);
     deposit.timestamp = new BigInt(0);
     deposit.asset = zeroAddress;

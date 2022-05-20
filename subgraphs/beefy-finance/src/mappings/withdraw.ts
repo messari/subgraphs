@@ -53,7 +53,9 @@ export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
 
     withdraw.hash = zeroAddress;
     withdraw.logIndex = 0;
-    withdraw.protocol = getBeefyFinanceOrCreate(vault.id.split("-")[1]).id;
+    withdraw.protocol = getBeefyFinanceOrCreate(
+      "-" + vault.id.split("-")[1]
+    ).id;
 
     //withdraw.to = zeroAddress;
     //withdraw.from = zeroAddress;
