@@ -11,7 +11,6 @@ import {
   getHoursSinceEpoch,
 } from "../../common/utils/datetime";
 
-
 //  Update usage related fields and entities
 export function updateUsageMetrics(
   accountAddress: Address,
@@ -34,7 +33,7 @@ export function updateUsageMetrics(
   let dailyUsageSnapshot = getOrCreateUsageMetricDailySnapshot(event);
   let hourlyUsageSnapshot = getOrCreateUsageMetricHourlySnapshot(event);
 
-  let cumulativeUniqueUsers = protocol.cumulativeUniqueUsers
+  let cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   if (isNewAccount) {
     cumulativeUniqueUsers += 1;
   }
@@ -69,12 +68,15 @@ export function updateUsageMetrics(
   hourlyUsageSnapshot.hourlyTransactionCount += 1;
   hourlyUsageSnapshot.cumulativeUniqueUsers = cumulativeUniqueUsers;
 
-  protocol.save()
-  dailyUsageSnapshot.save()
-  hourlyUsageSnapshot.save()
+  protocol.save();
+  dailyUsageSnapshot.save();
+  hourlyUsageSnapshot.save();
 }
 
-export function createAccount(accountAddress: Address, timestamp: i32): boolean {
+export function createAccount(
+  accountAddress: Address,
+  timestamp: i32
+): boolean {
   let isNewAccount = false;
   let accountId = accountAddress.toHex();
 

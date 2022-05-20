@@ -1,8 +1,4 @@
-import {
-  Address,
-  dataSource,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Rebalance } from "../../../generated/templates/Hypervisor/Hypervisor";
 import { Hypervisor as HypervisorContract } from "../../../generated/templates/Hypervisor/Hypervisor";
 import { getOrCreateUnderlyingToken, getOrCreateVault } from "./vaults";
@@ -52,13 +48,14 @@ export function updateTvl(event: ethereum.Event): void {
   let vaultTokenSupply = vault.outputTokenSupply!;
   let outputTokenPriceUSD = vault.outputTokenPriceUSD;
   if (vaultTokenSupply > BIGINT_ZERO) {
-    let outputTokenSupplyDecimals = bigIntToBigDecimal(vaultTokenSupply, outputToken.decimals)
+    let outputTokenSupplyDecimals = bigIntToBigDecimal(
+      vaultTokenSupply,
+      outputToken.decimals
+    );
     outputTokenPriceUSD = newTvl.div(outputTokenSupplyDecimals);
   }
 
   // Update entities
-  let vaultDailySnapshot = getOrCreateVaultDailySnapshot(event);
-  let vaultHourlySnapshot = getOrCreateVaultHourlySnapshot(event);
   let protocol = getOrCreateYieldAggregator(
     REGISTRY_ADDRESS_MAP.get(dataSource.network())!
   );
@@ -67,16 +64,6 @@ export function updateTvl(event: ethereum.Event): void {
   vault.totalValueLockedUSD = newTvl;
   vault.outputTokenPriceUSD = outputTokenPriceUSD;
 
-  vaultDailySnapshot.totalValueLockedUSD = newTvl;
-  vaultDailySnapshot.outputTokenPriceUSD = outputTokenPriceUSD;
-  vaultDailySnapshot.blockNumber = event.block.number;
-  vaultDailySnapshot.timestamp = event.block.timestamp;
-
-  vaultHourlySnapshot.totalValueLockedUSD = newTvl;
-  vaultHourlySnapshot.outputTokenPriceUSD = outputTokenPriceUSD;
-  vaultHourlySnapshot.blockNumber = event.block.number;
-  vaultHourlySnapshot.timestamp = event.block.timestamp;
-
   protocol.totalValueLockedUSD += newTvl.minus(oldTvl);
 
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
@@ -84,8 +71,6 @@ export function updateTvl(event: ethereum.Event): void {
   financialsDailySnapshot.timestamp = event.block.timestamp;
 
   vault.save();
-  vaultDailySnapshot.save();
-  vaultHourlySnapshot.save();
   protocol.save();
   financialsDailySnapshot.save();
 }
@@ -104,7 +89,7 @@ export function updateRevenue(event: Rebalance): void {
   );
 
   const SupplySideShare = BIGDECIMAL_HUNDRED.minus(PROTOCOL_PERFORMANCE_FEE);
-  
+
   let eventSupplySideRevenueUSD = eventTotalRevenueUSD
     .times(SupplySideShare)
     .div(BIGDECIMAL_HUNDRED);
@@ -143,4 +128,3 @@ export function updateRevenue(event: Rebalance): void {
   protocol.save();
   financialsDailySnapshot.save();
 }
-

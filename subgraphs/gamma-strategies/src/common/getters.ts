@@ -57,7 +57,9 @@ export function getOrCreateUsageMetricDailySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
-    usageMetrics.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
+    usageMetrics.protocol = REGISTRY_ADDRESS_MAP.get(
+      dataSource.network()
+    )!.toHex();
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -86,7 +88,9 @@ export function getOrCreateUsageMetricHourlySnapshot(
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    usageMetrics.protocol = REGISTRY_ADDRESS_MAP.get(dataSource.network())!.toHex();
+    usageMetrics.protocol = REGISTRY_ADDRESS_MAP.get(
+      dataSource.network()
+    )!.toHex();
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -113,18 +117,24 @@ export function getOrCreateFinancialsDailySnapshot(
   let financialMetrics = FinancialsDailySnapshot.load(id);
 
   if (!financialMetrics) {
-    let protocol = getOrCreateYieldAggregator(REGISTRY_ADDRESS_MAP.get(dataSource.network())!)
+    let protocol = getOrCreateYieldAggregator(
+      REGISTRY_ADDRESS_MAP.get(dataSource.network())!
+    );
     financialMetrics = new FinancialsDailySnapshot(id);
     financialMetrics.protocol = protocol.id;
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    financialMetrics.protocolControlledValueUSD = null
 
-    financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+    financialMetrics.cumulativeSupplySideRevenueUSD =
+      protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+    financialMetrics.cumulativeProtocolSideRevenueUSD =
+      protocol.cumulativeProtocolSideRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-    financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+    financialMetrics.cumulativeTotalRevenueUSD =
+      protocol.cumulativeTotalRevenueUSD;
 
     financialMetrics.blockNumber = event.block.number;
     financialMetrics.timestamp = event.block.timestamp;
@@ -151,10 +161,10 @@ export function getOrCreateVaultDailySnapshot(
     snapshot.inputTokenBalance = BIGINT_ZERO;
     snapshot.outputTokenSupply = BIGINT_ZERO;
     snapshot.outputTokenPriceUSD = BigDecimal.zero();
-    snapshot.pricePerShare = BigDecimal.zero();
-    // snapshot.stakedOutputTokenAmount = BIGINT_ZERO
-    // snapshot.rewardTokenEmissionsAmount = []
-    // snapshot.rewardTokenEmissionsUSD = []
+    snapshot.pricePerShare = null;
+    snapshot.stakedOutputTokenAmount = null;
+    snapshot.rewardTokenEmissionsAmount = null;
+    snapshot.rewardTokenEmissionsUSD = null;
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
     snapshot.save();
@@ -180,10 +190,10 @@ export function getOrCreateVaultHourlySnapshot(
     snapshot.inputTokenBalance = BIGINT_ZERO;
     snapshot.outputTokenSupply = BIGINT_ZERO;
     snapshot.outputTokenPriceUSD = BigDecimal.zero();
-    snapshot.pricePerShare = BigDecimal.zero();
-    // snapshot.stakedOutputTokenAmount = BIGINT_ZERO
-    // snapshot.rewardTokenEmissionsAmount = []
-    // snapshot.rewardTokenEmissionsUSD = []
+    snapshot.pricePerShare = null;
+    snapshot.stakedOutputTokenAmount = null;
+    snapshot.rewardTokenEmissionsAmount = null;
+    snapshot.rewardTokenEmissionsUSD = null;
     snapshot.blockNumber = event.block.number;
     snapshot.timestamp = event.block.timestamp;
     snapshot.save();
@@ -209,10 +219,10 @@ export function getOrCreateYieldAggregator(
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
     protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
-    protocol.network = dataSource.network().toUpperCase();
+    protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.YIELD;
     protocol.totalValueLockedUSD = BigDecimal.zero();
-    protocol.protocolControlledValueUSD = BigDecimal.zero();
+    protocol.protocolControlledValueUSD = null;
     protocol.cumulativeSupplySideRevenueUSD = BigDecimal.zero();
     protocol.cumulativeProtocolSideRevenueUSD = BigDecimal.zero();
     protocol.cumulativeTotalRevenueUSD = BigDecimal.zero();

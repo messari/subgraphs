@@ -15,7 +15,7 @@ import {
   createWithdraw,
 } from "./helpers/events";
 import { updateUsageMetrics } from "./helpers/usageMetrics";
-import { getOrCreateVault } from "./helpers/vaults";
+import { getOrCreateVault, updateVaultSnapshots } from "./helpers/vaults";
 import { UsageType } from "../common/constants";
 import { updateRevenue, updateTvl } from "./helpers/financials";
 
@@ -42,11 +42,13 @@ export function handleDeposit(event: Deposit): void {
 
   // Update vault token supply
   let vault = getOrCreateVault(event.address, event.block);
+  vault.inputTokenBalance += event.params.shares;
   vault.outputTokenSupply += event.params.shares;
   vault.save();
 
   updateUsageMetrics(event.params.to, UsageType.DEPOSIT, event);
   updateTvl(event);
+  updateVaultSnapshots(event);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -55,11 +57,13 @@ export function handleWithdraw(event: Withdraw): void {
 
   // Update vault token supply
   let vault = getOrCreateVault(event.address, event.block);
+  vault.inputTokenBalance -= event.params.shares;
   vault.outputTokenSupply -= event.params.shares;
   vault.save();
 
   updateUsageMetrics(event.params.to, UsageType.WITHDRAW, event);
   updateTvl(event);
+  updateVaultSnapshots(event);
 }
 
 export function handleRebalance(event: Rebalance): void {

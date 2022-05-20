@@ -168,6 +168,18 @@ REGISTRY_ADDRESS_MAP.set(
   "mainnet",
   Address.fromString("0x31ccdb5bd6322483bebd0787e1dabd1bf1f14946")
 );
+REGISTRY_ADDRESS_MAP.set(
+  "arbitrum-one",
+  Address.fromString("0xAad4760477750E251E1cc9bC35D33571CdF5e0e6")
+);
+REGISTRY_ADDRESS_MAP.set(
+  "optimism",
+  Address.fromString("0xF5BFA20F4A77933fEE0C7bB7F39E7642A070d599")
+);
+REGISTRY_ADDRESS_MAP.set(
+  "matic",
+  Address.fromString("0x0Ac4C7b794f3D7e7bF1093A4f179bA792CF15055")
+);
 
 export namespace PriceSource {
   export const YEARN = "YEARN";

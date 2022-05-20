@@ -9,7 +9,6 @@ import { BIGINT_ZERO, REGISTRY_ADDRESS_MAP } from "../../common/constants";
 import { getDualTokenUSD } from "./pricing";
 import { getOrCreateUnderlyingToken } from "./vaults";
 
-
 // Create deposit entity corresponding to hypervisor deposit events
 export function createDeposit(event: DepositEvent): void {
   const vaultId = event.address.toHex();
@@ -111,6 +110,6 @@ export function createRebalance(event: RebalanceEvent): void {
     event.params.feeAmount1,
     event.block.number
   );
-  
+
   rebalance.save();
 }

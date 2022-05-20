@@ -7,12 +7,42 @@ import {
 import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
 import { Hypervisor as HypervisorContract } from "../../../generated/templates/Hypervisor/Hypervisor";
 import {
+  BIGINT_MAX,
   BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
   REGISTRY_ADDRESS_MAP,
   VaultFeeType,
 } from "../../common/constants";
-import { getOrCreateToken } from "../../common/getters";
+import {
+  getOrCreateToken,
+  getOrCreateVaultDailySnapshot,
+  getOrCreateVaultHourlySnapshot,
+} from "../../common/getters";
+
+// Update daily and hourly snapshots from vault entity
+export function updateVaultSnapshots(event: ethereum.Event): void {
+  let vault = getOrCreateVault(event.address, event.block);
+
+  let dailySnapshot = getOrCreateVaultDailySnapshot(event);
+  let hourlySnapshot = getOrCreateVaultHourlySnapshot(event);
+
+  dailySnapshot.inputTokenBalance = vault.inputTokenBalance;
+  dailySnapshot.outputTokenSupply = vault.outputTokenSupply!;
+  dailySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  dailySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD!;
+  dailySnapshot.blockNumber = event.block.number;
+  dailySnapshot.timestamp = event.block.timestamp;
+
+  hourlySnapshot.inputTokenBalance = vault.inputTokenBalance;
+  hourlySnapshot.outputTokenSupply = vault.outputTokenSupply!;
+  hourlySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  hourlySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD!;
+  hourlySnapshot.blockNumber = event.block.number;
+  hourlySnapshot.timestamp = event.block.timestamp;
+
+  dailySnapshot.save();
+  hourlySnapshot.save();
+}
 
 export function getOrCreateVault(
   vaultAddress: Address,
@@ -24,7 +54,7 @@ export function getOrCreateVault(
     let hypeContract = HypervisorContract.bind(vaultAddress);
 
     // Create relevant tokens
-    getOrCreateUnderlyingToken(vaultAddress)
+    getOrCreateUnderlyingToken(vaultAddress);
     getOrCreateToken(vaultAddress);
 
     vault = new Vault(vaultId);
@@ -33,18 +63,18 @@ export function getOrCreateVault(
     vault.symbol = hypeContract.symbol();
     vault.inputToken = vaultId;
     vault.outputToken = vaultId;
-    // vault.rewardTokens = [];
-    vault.depositLimit = BIGINT_ZERO;
+    vault.rewardTokens = null;
+    vault.depositLimit = BIGINT_MAX;
     vault.createdTimestamp = block.timestamp;
     vault.createdBlockNumber = block.number;
     vault.totalValueLockedUSD = BigDecimal.zero();
     vault.inputTokenBalance = BIGINT_ZERO;
     vault.outputTokenSupply = hypeContract.totalSupply();
     vault.outputTokenPriceUSD = BigDecimal.zero();
-    vault.pricePerShare = BigDecimal.zero();
-    // vault.stakedOutputTokenAmount = BIGINT_ZERO;
-    // vault.rewardTokenEmissionsAmount = [];
-    // vault.rewardTokenEmissionsUSD = [];
+    vault.pricePerShare = null;
+    vault.stakedOutputTokenAmount = null;
+    vault.rewardTokenEmissionsAmount = null;
+    vault.rewardTokenEmissionsUSD = null;
 
     let vaultPerformanceFee = createVaultFee(
       VaultFeeType.PERFORMANCE_FEE,
@@ -57,29 +87,30 @@ export function getOrCreateVault(
   return vault;
 }
 
-export function getOrCreateUnderlyingToken(vaultAddress: Address): _UnderlyingToken {
-  const vaultId = vaultAddress.toHex()
-  let underlyingToken = _UnderlyingToken.load(vaultId)
+export function getOrCreateUnderlyingToken(
+  vaultAddress: Address
+): _UnderlyingToken {
+  const vaultId = vaultAddress.toHex();
+  let underlyingToken = _UnderlyingToken.load(vaultId);
   if (!underlyingToken) {
-
     const hypeContract = HypervisorContract.bind(vaultAddress);
 
-    const token0Address = hypeContract.token0()
-    const token1Address = hypeContract.token1()
-    const totalAmounts = hypeContract.getTotalAmounts()
+    const token0Address = hypeContract.token0();
+    const token1Address = hypeContract.token1();
+    const totalAmounts = hypeContract.getTotalAmounts();
 
-    getOrCreateToken(token0Address)
-    getOrCreateToken(token1Address)
+    getOrCreateToken(token0Address);
+    getOrCreateToken(token1Address);
 
-    underlyingToken = new _UnderlyingToken(vaultId)
-    underlyingToken.token0 = token0Address.toHex()
-    underlyingToken.lastAmount0 = totalAmounts.value0
-    underlyingToken.token1 = token1Address.toHex()
-    underlyingToken.lastAmount1 = totalAmounts.value1
-    underlyingToken.lastAmountBlockNumber = BIGINT_ZERO
-    underlyingToken.save()
+    underlyingToken = new _UnderlyingToken(vaultId);
+    underlyingToken.token0 = token0Address.toHex();
+    underlyingToken.lastAmount0 = totalAmounts.value0;
+    underlyingToken.token1 = token1Address.toHex();
+    underlyingToken.lastAmount1 = totalAmounts.value1;
+    underlyingToken.lastAmountBlockNumber = BIGINT_ZERO;
+    underlyingToken.save();
   }
-  return underlyingToken
+  return underlyingToken;
 }
 
 export function createVaultFee(

@@ -1,5 +1,9 @@
 # Gamma Strategies Subgraph
 
+### Vault Input Token, Pirce per share
+Gamma Strategies vaults work with two input tokens that corresponds to the underlying Uniswap v3 pool. To track this using our standardised schema, the `inputToken` is set as the `outputToken` of the vault.  The `_UnderlyingToken` entity tracks the actual two tokens used.
+Due to the above, the pricePerShare has been set to null in this subgraph.
+
 ### Total Value Locked (TVL) USD
 
 Sum across all Vaults: 
@@ -30,7 +34,7 @@ Sum across all Vaults
 
 ### Total Unique Users
 
-Count of  Unique Addresses which have interacted with the protocol via any transaction
+Count of  Unique Addresses which have interacted with the protocol vaults via the following functions:
 
 `Deposit`
 

@@ -11,23 +11,20 @@
 
     "prepare:arbitrum": "mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
     "build:arbitrum": "yarn prepare:arbitrum && graph build",
-    "thegraph:deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
+    "thegraph:deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory2",
     "deploy:arbitrum": "yarn prepare:arbitrum && yarn thegraph:deploy:arbitrum",
 
     "prepare:optimism": "mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
     "build:optimism": "yarn prepare:optimism && graph build",
-    "thegraph:deploy:optimism": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
+    "thegraph:deploy:optimism": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory3",
     "deploy:optimism": "yarn prepare:optimism && yarn thegraph:deploy:optimism",
 
     "prepare:polygon": "mustache config/polygon.json subgraph.template.yaml > subgraph.yaml",
     "build:polygon": "yarn prepare:polygon && graph build",
-    "thegraph:deploy:polygon": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",
+    "thegraph:deploy:polygon": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory4",
     "deploy:polygon": "yarn prepare:polygon && yarn thegraph:deploy:polygon",
 
-    "prepare:test": "mustache config/test.json subgraph.template.yaml > subgraph.yaml",
-    "build:test": "yarn prepare:test && graph build",
-    "thegraph:deploy:test": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory2",
-    "deploy:test": "yarn prepare:test && yarn thegraph:deploy:test",
+    "deploy:all": "yarn deploy:mainnet && yarn deploy:arbitrum && yarn deploy:optimism && yarn deploy:polygon",
     
     "build": "graph build",
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ l0c4t0r/laboratory",

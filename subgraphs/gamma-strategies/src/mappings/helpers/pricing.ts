@@ -36,7 +36,7 @@ export function updateTokenPrice(
   if (blockNumber > token.lastPriceBlockNumber!) {
     let priceSourceSkips = TOKEN_PRICE_SOURCE_SKIPS.get(tokenAddress);
     if (priceSourceSkips === null) {
-      priceSourceSkips = []
+      priceSourceSkips = [];
     }
     let fetchPrice = getUsdPricePerToken(tokenAddress, priceSourceSkips);
     token.lastPriceUSD = fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen);
