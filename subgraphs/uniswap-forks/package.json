@@ -13,10 +13,7 @@
     "prepare:build": "yarn codegen && yarn build",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
 
-    "deploy": "node --experimental-json-modules deployment/deployment.js",
-    "prepare:spookyswap-ftm": "mustache config/spookyswap/ftm.json templates/spookyswap.template.yaml > subgraph.yaml",
-    "deploy-spookyswap-ftm": "yarn prepare:spookyswap-ftm && yarn codegen && yarn build && graph deploy --product hosted-service dhruvjain1122/spookyswap_messari",
-    "deploy-spookyswap-ftm-local": "yarn prepare:spookyswap-ftm && yarn codegen && yarn build && graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 spookyswap_messari"
+    "deploy": "node --experimental-json-modules deployment/deployment.js"
 
   },
   "dependencies": {

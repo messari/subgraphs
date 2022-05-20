@@ -81,6 +81,13 @@
         "steegecs": "steegecs/sushiswap-xdai",
         "messari": "messari/sushiswap-xdai"
       }
+    },
+    "spookyswap": {
+      "fantom": {
+        "template": "spookyswap.template.yaml",
+        "test": "dhruvjain1122/spookyswap_messari",
+        "messari": "messari/spookyswap"
+      }
     }
   }
 }

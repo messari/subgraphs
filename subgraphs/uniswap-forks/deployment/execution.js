@@ -11,7 +11,7 @@ export function scripts(protocol, network, template, location) {
     let prepareConstants = 'npm run prepare:constants --PROTOCOL=' + protocol + ' --NETWORK=' + network
     let prepareBuild = 'yarn codegen && yarn build'
     let deployment = 'npm run deploy:subgraph --LOCATION=' + location
-    return [prepareYaml, prepareConstants, prepareBuild, deployment]
+    return [prepareBuild, deployment]
 }
 
 /**

@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: fantom
+    network: {{network}}
     source:
-      address: "0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3"
+      address: "{{address}}"
       abi: Factory
-      startBlock: 3795376
+      startBlock: {{startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -26,11 +26,11 @@ dataSources:
 
   - kind: ethereum
     name: MasterChef
-    network: fantom
+    network: {{network}}
     source:
-      address: "0x2b2929e785374c651a81a63878ab22742656dcdd"
+      address: "{{masterChefAddress}}"
       abi: MasterChefSpookyswap
-      startBlock: 4267037
+      startBlock: {{masterChefStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -54,11 +54,11 @@ dataSources:
 
   - kind: ethereum
     name: MasterChefV2
-    network: fantom
+    network: {{network}}
     source:
-      address: "0x18b4f774fdc7bf685daeef66c2990b1ddd9ea6ad"
+      address: "{{masterChefV2Address}}"
       abi: MasterChefV2Spookyswap
-      startBlock: 34757343
+      startBlock: {{masterChefV2StartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -83,7 +83,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: fantom
+    network: {{network}}
     source:
       abi: Pair
     mapping:

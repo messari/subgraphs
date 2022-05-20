@@ -12,6 +12,7 @@ import { SushiswapMaticConfigurations } from "../sushiswap/matic/matic";
 import { SushiswapMoonbeamConfigurations } from "../sushiswap/moonbeam/moonbeam";
 import { SushiswapMoonriverConfigurations } from "../sushiswap/moonriver/moonriver";
 import { SushiswapXdaiConfigurations } from "../sushiswap/xdai/xdai";
+import { SpookyswapFantomConfigurations } from "../spookyswap/fantom/fantom";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -46,7 +47,10 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
             return new SushiswapXdaiConfigurations();
         } case Deploy.UNISWAP_V2_MAINNET: {
             return new UniswapV2MainnetConfigurations();
-        } default: {
+        } case Deploy.SPOOKYSWAP_FANTOM: {
+            return new SpookyswapFantomConfigurations();
+        }
+         default: {
             log.critical("No configurations found for deployment protocol/network", []);
             return new SushiswapArbitrumConfigurations();
         }
