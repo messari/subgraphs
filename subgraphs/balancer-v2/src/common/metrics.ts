@@ -20,7 +20,7 @@ import {
   _HourlyActiveAccount,
 } from "../../generated/schema";
 import { calculatePrice, isUSDStable, TokenInfo, valueInUSD } from "./pricing";
-import { scaleDown } from "./tokens";
+import { hasVirtualSupply, scaleDown } from "./tokens";
 import { ProtocolFeesCollector } from "../../generated/Vault/ProtocolFeesCollector";
 import { getUsdPrice } from "../prices";
 
@@ -43,11 +43,12 @@ export function updateFinancials(event: ethereum.Event): void {
       totalRevenueGeneratedFee = totalRevenueGeneratedFee.plus(pool._sideRevenueGeneratedFee);
       totalProtocolGeneratedFee = totalProtocolGeneratedFee.plus(pool._protocolGeneratedFee);
       totalFeesUsd = totalFeesUsd.plus(pool._totalSwapFee);
-    }
-
-    let dailySnapshot = LiquidityPoolDailySnapshot.load(dex._poolIds[i]);
-    if (dailySnapshot) {
-      dailyVolumeUsd = dailyVolumeUsd.plus(dailySnapshot.dailyVolumeUSD);
+      // Number of days since Unix epoch
+      const daysSinceEpoch: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+      let dailySnapshot = LiquidityPoolDailySnapshot.load(pool.id.concat("-").concat(daysSinceEpoch.toString()));
+      if (dailySnapshot) {
+        dailyVolumeUsd = dailyVolumeUsd.plus(dailySnapshot.dailyVolumeUSD);
+      }
     }
   }
 
@@ -129,6 +130,8 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
       continue;
     }
 
+    if (pool.outputToken == pool.inputTokens[i] && pool._hasVirtualSupply) continue;
+
     const token = Token.load(currentToken.toHexString());
     let tokenPrice: BigDecimal | null = token!.lastPriceUSD;
     if (!token || !tokenPrice) {
@@ -185,9 +188,10 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
     protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapValue);
   }
   pool.totalValueLockedUSD = newPoolLiquidity;
-  pool.outputTokenPriceUSD = newPoolLiquidity.div(
-    scaleDown(pool.outputTokenSupply, Address.fromString(pool.outputToken)),
-  );
+  const outputTokenSupply = scaleDown(pool.outputTokenSupply, Address.fromString(pool.outputToken));
+  if (outputTokenSupply.gt(BIGDECIMAL_ZERO)) {
+    pool.outputTokenPriceUSD = newPoolLiquidity.div(outputTokenSupply);
+  }
 
   financials.save();
   protocol.save();
@@ -244,7 +248,7 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network == "MATIC") return;
+  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "ARBITRUM_ONE") return;
 
   if (!isUSDStable(tokenIn)) {
     const token = getOrCreateToken(tokenIn);
