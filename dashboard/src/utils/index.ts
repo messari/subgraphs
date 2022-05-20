@@ -36,8 +36,7 @@ export function convertTokenDecimals(value: string, decimals: number): number {
 
 export const parseSubgraphName = (url: string) => {
   const result = new RegExp(/\/name\/(.*)/g).exec(url);
-  if (isValidHttpUrl(url)) {
-    return null;
-  }
   return result ? result[1] : "";
 };
+
+export const toPercent = (cur: number, total: number): number => parseFloat(((cur / total) * 100).toFixed(2));

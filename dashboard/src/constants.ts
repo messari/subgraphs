@@ -59,7 +59,7 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-ethereum",
     arbitrum: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-arbitrum",
     fantom: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-fantom",
-    optimism: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-optimism"
+    optimism: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-optimism",
   },
   bastion: {
     aurora: "https://api.thegraph.com/subgraphs/name/messari/bastion-protocol-aurora",
@@ -72,7 +72,7 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
     bsc: "https://api.thegraph.com/subgraphs/name/messari/apeswap-bsc",
   },
   BENQI: {
-    avalanche: "https://api.thegraph.com/subgraphs/name/messari/benqi-avalanche"
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/benqi-avalanche",
   },
   uniswapV2: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/uniswap-v2-ethereum",
@@ -104,6 +104,6 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
   yearnV2: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-ethereum",
     arbitrum: "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-arbitrum",
-    fantom: "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-fantom"
-  }
+    fantom: "https://api.thegraph.com/subgraphs/name/messari/yearn-v2-fantom",
+  },
 };
