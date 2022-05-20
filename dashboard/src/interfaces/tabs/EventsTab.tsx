@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { TableEvents } from "../../common/chartComponents/TableEvents";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import IssuesDisplay from "../IssuesDisplay";
+import { Box, Typography } from "@mui/material";
 
 interface EventsTabProps {
   data: any;
@@ -47,9 +48,9 @@ function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProp
             issues.push({ message, type: "EVENT", level, fieldName: eventName });
           }
           return (
-            <div style={{ marginLeft: "40px", borderTop: "black 2px solid" }}>
-              <h2>{message}</h2>
-            </div>
+            <Box my={3}>
+              <Typography variant="h4">{message}</Typography>
+            </Box>
           );
         }
         return <React.Fragment>{TableEvents(eventName, data, eventName, poolId)}</React.Fragment>;

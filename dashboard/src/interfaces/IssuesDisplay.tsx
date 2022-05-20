@@ -1,4 +1,22 @@
 import { toDate } from "../utils";
+import { styled } from "../styled";
+import { Typography } from "@mui/material";
+
+const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: rgb(28, 28, 28);
+  border: 2px solid ${({ theme, $hasCritical }) => ($hasCritical ? theme.palette.error.main : theme.palette.warning.main)};
+  margin-bottom: ${({ theme }) => theme.spacing(2)};
+  
+  & > * {
+    padding: ${({ theme }) => theme.spacing(2)};
+  }
+  
+  & >:nth-of-type(odd):not(:first-child) {
+    background: rgba(0, 0, 0, 0.5);
+  }
+`;
 
 const messagesByLevel = (
   issuesArray: { message: string; type: string; level: string; fieldName: string }[],
@@ -54,13 +72,14 @@ export const IssuesDisplay = ({ issuesArray }: IssuesProps) => {
   const warningMsgs = messagesByLevel(warningIssues);
 
   const issuesDisplayCount = criticalMsgs.length + errorMsgs.length + warningMsgs.length;
+  const hasCritical = criticalMsgs.length > 0;
 
   let criticalElement = null;
-  if (criticalMsgs.length > 0) {
+  if (hasCritical) {
     criticalElement = (
-      <div style={{ borderBottom: "black 2px solid" }}>
-        <h3>Critical:</h3>
-        <ol>{criticalMsgs}</ol>
+      <div>
+        <Typography variant="h6">Critical:</Typography>
+        <ol><Typography variant="body1">{criticalMsgs}</Typography></ol>
       </div>
     );
   }
@@ -68,9 +87,9 @@ export const IssuesDisplay = ({ issuesArray }: IssuesProps) => {
   let errorElement = null;
   if (errorMsgs.length > 0) {
     errorElement = (
-      <div style={{ borderBottom: "black 2px solid" }}>
-        <h3>Error:</h3>
-        <ol>{errorMsgs}</ol>
+      <div>
+        <Typography variant="h6">Error:</Typography>
+        <ol><Typography variant="body1">{errorMsgs}</Typography></ol>
       </div>
     );
   }
@@ -78,29 +97,21 @@ export const IssuesDisplay = ({ issuesArray }: IssuesProps) => {
   let warningElement = null;
   if (warningMsgs.length > 0) {
     warningElement = (
-      <div style={{ borderBottom: "black 2px solid" }}>
-        <h3>Warning:</h3>
-        <ol>{warningMsgs}</ol>
+      <div>
+        <Typography variant="h6">Warning:</Typography>
+        <ol><Typography variant="body1">{warningMsgs}</Typography></ol>
       </div>
     );
   }
 
   if (issuesDisplayCount > 0) {
     return (
-      <div
-        style={{
-          margin: "4px 24px",
-          border: "yellow 3px solid",
-          paddingLeft: "8px",
-          maxHeight: "230px",
-          overflow: "scroll",
-        }}
-      >
-        <h3>DISPLAYING {issuesDisplayCount} Issues.</h3>
+      <IssuesContainer $hasCritical={hasCritical}>
+        <Typography variant="h6">DISPLAYING {issuesDisplayCount} Issues.</Typography>
         {criticalElement}
         {errorElement}
         {warningElement}
-      </div>
+      </IssuesContainer>
     );
   } else {
     return null;

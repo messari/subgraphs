@@ -2,13 +2,12 @@ import { Box, Grid, Typography } from "@mui/material";
 import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 import { ProtocolTypeEntity } from "../../constants";
 import { convertTokenDecimals } from "../../utils";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect } from "react";
-import {CopyLinkToClipboard} from "../../common/utilComponents/CopyLinkToClipboard";
+import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
 interface ProtocolTabProps {
   data: any;
@@ -191,9 +190,11 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
       // If the sum of all values for a chart is 0, display a warning that the entity is not properly collecting data
       return (
         <Grid key={entityName}>
-          <Box display="flex" alignItems="center" gap={4} my={3}>
+          <Box my={3}>
             <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
-              <Typography variant="h4" id={entityName}>{entityName}</Typography>
+              <Typography variant="h4" id={entityName}>
+                {entityName}
+              </Typography>
             </CopyLinkToClipboard>
           </Box>
           {Object.keys(dataFields).map((field: string) => {
@@ -238,16 +239,16 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
             const elementId = label.split(" ").join("%20");
             return (
               <div id={elementId}>
-                <Box display="flex" alignItems="center" gap={4}>
+                <Box mt={3} mb={1}>
                   <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
-                    <Typography variant="body1">{field}</Typography>
+                    <Typography variant="h6">{field}</Typography>
                   </CopyLinkToClipboard>
                 </Box>
-                <Grid container>
-                  <Grid key={label + "1"} item xs={8}>
+                <Grid container justifyContent="space-between">
+                  <Grid key={label + "1"} item xs={7.5}>
                     {Chart(label, dataFields[field], currentEntityData.length)}
                   </Grid>
-                  <Grid key={label + "2"} item xs={4} marginY={4}>
+                  <Grid key={label + "2"} item xs={4}>
                     {TableChart(label, dataFields[field], currentEntityData.length)}
                   </Grid>
                 </Grid>
@@ -294,8 +295,6 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
         setIssues={(x) => setIssues(x)}
         dataFields={protocolFields}
         issuesProps={issuesState}
-        poolId=""
-        tabName="protocol"
       />
       {protocolData}
     </>

@@ -1,5 +1,5 @@
 import { TabContext, TabPanel } from "@mui/lab";
-import { Box, Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
 import React from "react";
 import { ProtocolTypeEntity } from "../constants";
 import EventsTab from "./tabs/EventsTab";
@@ -49,40 +49,38 @@ function AllDataTabs({
 
   return (
     <>
-        <TabContext value={tabValue}>
-          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <StyledTabs centered value={tabValue} onChange={handleTabChange}>
-              <Tab label="Protocol" value="1" />
-              <Tab label="Pool" value="2" />
-              <Tab label="Events" value="3" />
-            </StyledTabs>
-          </Box>
-          <TabPanel value="1">
-            {/* PROTOCOL TAB */}
-            <ProtocolTab data={data} entities={entities} entitiesData={entitiesData} protocolFields={protocolFields} />
-          </TabPanel>
-          <TabPanel value="2">
-            {/* POOL TAB */}
-            <PoolTab
-              data={data}
-              entities={entities}
-              entitiesData={entitiesData}
-              poolId={poolId}
-              setPoolId={(x) => setPoolId(x)}
-              poolData={poolData}
-            />
-          </TabPanel>
-          <TabPanel value="3">
-            {/* EVENTS TAB */}
-            <EventsTab
-              data={data}
-              events={events}
-              poolId={poolId}
-              setPoolId={(x) => setPoolId(x)}
-              poolNames={poolNames}
-            />
-          </TabPanel>
-        </TabContext>
+      <TabContext value={tabValue}>
+        <StyledTabs value={tabValue} onChange={handleTabChange}>
+          <Tab label="Protocol" value="1" />
+          <Tab label="Pool" value="2" />
+          <Tab label="Events" value="3" />
+        </StyledTabs>
+        <TabPanel value="1">
+          {/* PROTOCOL TAB */}
+          <ProtocolTab data={data} entities={entities} entitiesData={entitiesData} protocolFields={protocolFields} />
+        </TabPanel>
+        <TabPanel value="2">
+          {/* POOL TAB */}
+          <PoolTab
+            data={data}
+            entities={entities}
+            entitiesData={entitiesData}
+            poolId={poolId}
+            setPoolId={(x) => setPoolId(x)}
+            poolData={poolData}
+          />
+        </TabPanel>
+        <TabPanel value="3">
+          {/* EVENTS TAB */}
+          <EventsTab
+            data={data}
+            events={events}
+            poolId={poolId}
+            setPoolId={(x) => setPoolId(x)}
+            poolNames={poolNames}
+          />
+        </TabPanel>
+      </TabContext>
     </>
   );
 }

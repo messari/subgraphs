@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { convertTokenDecimals, toDate } from "../../../src/utils/index";
 import { PoolName } from "../../constants";
-import ScrollToElement from "../utilComponents/ScrollToElement";
+import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 
 export const TableEvents = (_datasetLabel: string, data: any, eventName: string, poolId: string) => {
   const dataTable = data[eventName];
@@ -74,26 +74,23 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
     columns.push({ field: "date", headerName: "date", width: 250 });
 
     return (
-      <div id={eventName}>
-        <div style={{ marginLeft: "40px", borderTop: "black 2px solid" }}>
-          <ScrollToElement elementId={eventName} tab="events" poolId={poolId} label={eventName} />
-        </div>
-        <Box height={750} margin={6}>
+      <Box height={750} py={6} id={eventName}>
+        <CopyLinkToClipboard link={window.location.href} scrollId={eventName}>
           <Typography fontSize={20}>
             <b>{_datasetLabel.toUpperCase()}</b>
           </Typography>
-          <DataGrid
-            pageSize={10}
-            initialState={{
-              sorting: {
-                sortModel: [{ field: "timestamp", sort: "desc" }],
-              },
-            }}
-            rows={tableData}
-            columns={columns}
-          />
-        </Box>
-      </div>
+        </CopyLinkToClipboard>
+        <DataGrid
+          pageSize={10}
+          initialState={{
+            sorting: {
+              sortModel: [{ field: "timestamp", sort: "desc" }],
+            },
+          }}
+          rows={tableData}
+          columns={columns}
+        />
+      </Box>
     );
   }
   return null;

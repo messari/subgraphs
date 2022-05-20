@@ -1,10 +1,8 @@
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import { useEffect } from "react";
-import { JsxElement } from "typescript";
-import { StackedChart } from "../common/chartComponents/StackedChart";
-import ScrollToElement from "../common/utilComponents/ScrollToElement";
 import { percentageFieldList } from "../constants";
 import { convertTokenDecimals } from "../utils";
+import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
 
 function checkValueFalsey(
   value: any,
@@ -41,19 +39,9 @@ interface SchemaTableProps {
   >;
   dataFields: { [x: string]: string };
   issuesProps: { message: string; type: string; level: string; fieldName: string }[];
-  poolId: string;
-  tabName: string;
 }
 
-function SchemaTable({
-  entityData,
-  schemaName,
-  setIssues,
-  dataFields,
-  issuesProps,
-  poolId,
-  tabName,
-}: SchemaTableProps) {
+function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProps }: SchemaTableProps) {
   const issues = issuesProps;
 
   let schema: (JSX.Element | null)[] = [];
@@ -302,23 +290,13 @@ function SchemaTable({
     setIssues(issues);
   }, [issuesProps]);
 
-  let tableHeader = null;
-  if (poolId && entityData) {
-    tableHeader = (
-      <>
-        <div style={{ width: "100%", textAlign: "center" }}>
-          <ScrollToElement label={schemaName} elementId={schemaName} poolId={poolId} tab={tabName} />
-        </div>
-        <h3 id={schemaName} style={{ textAlign: "center" }}>
-          {schemaName}:
-        </h3>
-      </>
-    );
-  }
-
   return (
     <>
-      {tableHeader}
+      <Box my={3}>
+        <CopyLinkToClipboard link={window.location.href}>
+          <Typography variant="h4">{schemaName} schema</Typography>
+        </CopyLinkToClipboard>
+      </Box>
       <TableContainer component={Paper} sx={{ justifyContent: "center", display: "flex", alignItems: "center" }}>
         <Table sx={{ maxWidth: 800 }} aria-label="simple table">
           <TableBody>{schema}</TableBody>

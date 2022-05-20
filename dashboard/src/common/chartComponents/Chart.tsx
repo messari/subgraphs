@@ -37,7 +37,7 @@ export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number)
       datasets: datasets,
     };
     return (
-      <Box margin={5} padding={2} sx={{ border: 1 }}>
+      <Box padding={2} sx={{ border: 1 }}>
         <Line
           data={chartData}
           options={{

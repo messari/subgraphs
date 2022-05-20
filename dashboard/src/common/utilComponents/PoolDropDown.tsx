@@ -1,4 +1,4 @@
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ComboBoxInput } from "./ComboBoxInput";
@@ -28,11 +28,11 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
   const [textInput, setTextInput] = useState<string>(inputTextValue);
   return (
     <>
-      <h3 style={{ marginLeft: "16px" }}>Select a pool</h3>
+      <Typography variant="h6">Select a pool</Typography>
       <Autocomplete
         options={options}
         inputValue={textInput}
-        sx={{ maxWidth: 1000, margin: 2 }}
+        sx={{ maxWidth: 1000, my: 2 }}
         onChange={(event: React.SyntheticEvent) => {
           // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
           // setIssues([]);

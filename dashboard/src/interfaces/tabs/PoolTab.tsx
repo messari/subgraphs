@@ -1,15 +1,14 @@
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableRow } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
-import { PoolName, PoolNames, Versions } from "../../constants";
+import { PoolName, PoolNames } from "../../constants";
 import SchemaTable from "../SchemaTable";
-import { convertTokenDecimals } from "../../utils/index";
+import { convertTokenDecimals } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
-import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
-import { isUnparsedSource } from "typescript";
+import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
@@ -80,10 +79,12 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
       const currentEntityData = data[entityName];
       if (currentEntityData.length === 0) {
         return (
-          <Grid key={entityName} style={{ borderTop: "black 2px solid" }}>
-            <h2>ENTITY: {entityName}</h2>
-            <h3 style={{ color: "red" }}>{entityName} HAS NO INSTANCES.</h3>
-          </Grid>
+          <Box key={entityName}>
+            <Typography variant="h4">ENTITY: {entityName}</Typography>
+            <Typography variant="body1" style={{ color: "red" }}>
+              {entityName} HAS NO INSTANCES.
+            </Typography>
+          </Box>
         );
       }
       const dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
@@ -428,17 +429,19 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
           delete rewardChart[reward];
         });
         const table = (
-          <Grid key={elementId + "Table"} item xs={4} marginY={4}>
+          <Grid key={elementId + "Table"} item xs={4}>
             {TableChart("REWARD-APR", tableVals, currentEntityData.length)}
           </Grid>
         );
         rewardAPRElement = (
-          <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
-            <div style={{ marginLeft: "40px" }}>
-              <ScrollToElement label={elementId} elementId={elementId} poolId={poolId} tab="pool" />
-            </div>
-            <Grid container>
-              <Grid key={elementId + "Chart"} item xs={8}>
+          <div id={elementId}>
+            <Box mt={3} mb={1}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                <Typography variant="h6">{elementId}</Typography>
+              </CopyLinkToClipboard>
+            </Box>
+            <Grid container justifyContent="space-between">
+              <Grid key={elementId + "Chart"} item xs={7.5}>
                 {Chart("REWARD-APR", rewardChart, amountOfInstances)}
               </Grid>
               {table}
@@ -470,17 +473,19 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
           }
         });
         const table = (
-          <Grid key={elementId + "Table"} item xs={4} marginY={4}>
+          <Grid key={elementId + "Table"} item xs={4}>
             {TableChart("RATES", tableVals, currentEntityData.length)}
           </Grid>
         );
         ratesElement = (
-          <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
-            <div style={{ marginLeft: "40px" }}>
-              <ScrollToElement label={elementId} elementId={elementId} poolId={poolId} tab="pool" />
-            </div>
-            <Grid container>
-              <Grid key={elementId + "Chart"} item xs={8}>
+          <div id={elementId}>
+            <Box mt={3} mb={1}>
+              <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                <Typography variant="h6">{elementId}</Typography>
+              </CopyLinkToClipboard>
+            </Box>
+            <Grid container justifyContent="space-between">
+              <Grid key={elementId + "Chart"} item xs={7.5}>
                 {Chart("RATES", ratesChart, amountOfInstances)}
               </Grid>
               {table}
@@ -494,18 +499,12 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         tokenWeightComponent = Object.keys(tokenWeightData).map((tokenWeightFieldName) => {
           const currentTokenWeightArray = tokenWeightData[tokenWeightFieldName];
           return (
-            <div
-              id={entityName + "-" + tokenWeightFieldName}
-              style={{ borderTop: "2px black solid", borderWidth: "80%" }}
-            >
-              <div style={{ marginLeft: "40px" }}>
-                <ScrollToElement
-                  label={entityName + "-" + tokenWeightFieldName}
-                  elementId={entityName + "-" + tokenWeightFieldName}
-                  poolId={poolId}
-                  tab="pool"
-                />
-              </div>
+            <div id={entityName + "-" + tokenWeightFieldName}>
+              <Box mt={3} mb={1}>
+                <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
+                  <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
+                </CopyLinkToClipboard>
+              </Box>
               <Grid container>
                 {StackedChart(data[poolKeySingular].inputTokens, currentTokenWeightArray, tokenWeightFieldName)}
               </Grid>
@@ -522,13 +521,12 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
       }
 
       return (
-        <Grid key={entityName} style={{ borderTop: "black 2px solid" }}>
-          <Grid container>
-            <h2 id={entityName}>ENTITY: {entityName}</h2>
-            <div style={{ marginLeft: "40px" }}>
-              <ScrollToElement label={entityName} elementId={entityName} poolId={poolId} tab="pool" />
-            </div>
-          </Grid>
+        <Grid key={entityName}>
+          <Box my={3}>
+            <CopyLinkToClipboard link={window.location.href} scrollId={entityName}>
+              <Typography variant="h4">{entityName}</Typography>
+            </CopyLinkToClipboard>
+          </Box>
           {Object.keys(dataFields).map((field: string) => {
             const fieldName = field.split(" [")[0];
             // const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
@@ -589,16 +587,18 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             const linkToElementId = elementId.split(" ").join("%20");
             if (dataFieldMetrics[field]?.invalidData) {
               return (
-                <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
-                  <div style={{ marginLeft: "40px" }}>
-                    <ScrollToElement label={label} elementId={linkToElementId} poolId={poolId} tab="pool" />
-                  </div>
+                <div id={linkToElementId}>
+                  <Box mt={3} mb={1}>
+                    <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
+                      <Typography variant="h6">{label}</Typography>
+                    </CopyLinkToClipboard>
+                  </Box>
                   <Grid container>
-                    <h2>
+                    <Typography variant="body1" color="textSecondary">
                       {entityName}-{field} timeseries has invalid data. Cannot use{" "}
                       {dataFieldMetrics[field]?.invalidData} data types to plot chart. Evaluate how this data is
                       collected.
-                    </h2>
+                    </Typography>
                   </Grid>
                 </div>
               );
@@ -640,15 +640,17 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             }
 
             return (
-              <div id={elementId} style={{ borderTop: "2px black solid", borderWidth: "80%" }}>
-                <div style={{ marginLeft: "40px" }}>
-                  <ScrollToElement label={label} elementId={linkToElementId} poolId={poolId} tab="pool" />
-                </div>
-                <Grid container>
-                  <Grid key={elementId + "1"} item xs={8}>
+              <div id={linkToElementId}>
+                <Box mt={3} mb={1}>
+                  <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
+                    <Typography variant="h6">{label}</Typography>
+                  </CopyLinkToClipboard>
+                </Box>
+                <Grid container justifyContent="space-between">
+                  <Grid key={elementId + "1"} item xs={7.5}>
                     {Chart(label, dataFields[field], currentEntityData.length)}
                   </Grid>
-                  <Grid key={elementId + "2"} item xs={4} marginY={4}>
+                  <Grid key={elementId + "2"} item xs={4}>
                     {TableChart(label, dataFields[field], currentEntityData.length)}
                   </Grid>
                 </Grid>
@@ -702,8 +704,6 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         setIssues={(x) => setIssues(x)}
         dataFields={poolData}
         issuesProps={issuesState}
-        poolId={poolId}
-        tabName="pool"
       />
       {poolEntityElements}
     </div>
