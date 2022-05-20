@@ -19,10 +19,9 @@ import { StableFactory } from "../../generated/AddressProvider/StableFactory";
 import { getFactory } from "./factory";
 import { CryptoFactory } from "../../generated/templates/CryptoRegistryTemplate/CryptoFactory";
 import { fetchTokenDecimals } from "../common/tokens";
-import { getOrCreateToken } from "../common/getters";
+import { getOrCreateToken, getPoolCoins } from "../common/getters";
 import {
   setPoolBalances,
-  setPoolCoins,
   setPoolFees,
   setPoolOutputTokenSupply,
   setPoolTVL,
@@ -31,7 +30,6 @@ import {
 import { getLpTokenPriceUSD } from "./snapshots";
 import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
 import { setGaugeData } from "./gauges/helpers";
-import { updatePoolMetrics } from "../common/metrics";
 
 export function checkIfPoolExists(poolId: string): boolean {
   let pool = LiquidityPool.load(poolId);
@@ -75,7 +73,9 @@ export function createNewPool(
   pool.basePool = basePool.toHexString();
   pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp);
   pool.gauge = gaugeAddress.toHexString();
-  setPoolCoins(pool);
+  const inputTokens = getPoolCoins(pool);
+  pool.coins = inputTokens;
+  pool.inputTokens = inputTokens.sort();
   setPoolBalances(pool);
   setPoolTVL(pool, timestamp);
   setPoolFees(pool);
@@ -85,7 +85,7 @@ export function createNewPool(
   setProtocolTVL();
 }
 
-export function createNewFactoryPool(
+export function createNewFactoryPool( // @ts-ignore
   version: i32,
   factoryContract: Address,
   metapool: boolean,
@@ -311,7 +311,7 @@ export function getVirtualBaseLendingPool(pool: Address): BasePool {
   }
   return basePool;
 }
-
+// @ts-ignore
 export function getAssetTypeCrude(name: string, symbol: string): i32 {
   const description = name.toUpperCase() + "-" + symbol.toUpperCase();
   const stables = ["USD", "DAI", "MIM", "TETHER"];
@@ -329,7 +329,7 @@ export function getAssetTypeCrude(name: string, symbol: string): i32 {
     return 3;
   }
 }
-
+// @ts-ignore
 export function getAssetType(pool: LiquidityPool): i32 {
   if (ASSET_TYPES.has(pool.id.toLowerCase())) {
     return ASSET_TYPES.get(pool.id.toLowerCase());

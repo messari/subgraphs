@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum, BigInt, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -25,6 +25,8 @@ import {
   RewardTokenType,
 } from "../common/constants";
 import { BIG_DECIMAL_ZERO, CURVE_REGISTRY } from "./constants/index";
+import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
+import { CurvePoolCoin128 } from "../../generated/templates/CurvePoolTemplate/CurvePoolCoin128";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
   let token = Token.load(tokenAddress.toHexString());
@@ -56,7 +58,7 @@ export function getLiquidityPool(poolId: string): LiquidityPool {
 }
 
 export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
-  // Number of days since Unix epoch
+  // @ts-ignore // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
@@ -79,7 +81,7 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
 }
 
 export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
-  // Number of days since Unix epoch
+  // @ts-ignore // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   // Create unique id for the day
@@ -102,6 +104,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 }
 
 export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolHourlySnapshot {
+  // @ts-ignore
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolMetrics = LiquidityPoolHourlySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
@@ -134,6 +137,7 @@ export function getOrCreatePoolHourlySnapshot(poolAddress: string, event: ethere
 }
 
 export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereum.Event): LiquidityPoolDailySnapshot {
+  // @ts-ignore
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let poolMetrics = LiquidityPoolDailySnapshot.load(poolAddress.concat("-").concat(id.toString()));
 
@@ -167,7 +171,7 @@ export function getOrCreatePoolDailySnapshot(poolAddress: string, event: ethereu
 }
 
 export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): FinancialsDailySnapshot {
-  // Number of days since Unix epoch
+  // @ts-ignore // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
@@ -221,33 +225,41 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
   return protocol;
 }
 
-/*
-export function getTokenPrice(tokenAddr: Address, event: ethereum.Event): BigDecimal {
-  let token = getOrCreateToken(tokenAddr);
-  let priceUSD = getUsdPricePerToken(tokenAddr).usdPrice;
-  token.lastPriceUSD = priceUSD;
-  token.lastPriceBlockNumber = event.block.number;
-  token.save();
-  return priceUSD
-}
-*/
-/*
-export function getPoolTVL(liquidityPool:LiquidityPool, event: ethereum.Event): BigDecimal {
-  let totalValueLockedUSD = BIGDECIMAL_ZERO;
-  let inputTokens = liquidityPool.inputTokens;
-  for (let i = 0; i < inputTokens.length; ++i) {
-    let tokenAddress = inputTokens![i];
-    let coinBalance = liquidityPool.inputTokenBalances![i];
-    if (tokenAddress && coinBalance) {
-      let token = getOrCreateToken(Address.fromString(tokenAddress));
-      let tokenPriceUSD = getTokenPrice(Address.fromString(token.id), event);
-      //log.error('tvl calc tokenPriceUSD = {}, tvl before sum = {}', [tokenPriceUSD.toString(), totalValueLockedUSD.toString()]);
-      totalValueLockedUSD = totalValueLockedUSD.plus(tokenPriceUSD.times(bigIntToBigDecimal(coinBalance, token.decimals)));
-    }
+export function getPoolCoins128(pool: LiquidityPool): string[] {
+  const curvePool = CurvePoolCoin128.bind(Address.fromString(pool.id));
+  let i = 0;
+  const inputTokens = pool.inputTokens;
+  let coinResult = curvePool.try_coins(BigInt.fromI32(i));
+  if (coinResult.reverted) {
+    log.warning("Call to int128 coins failed for {} ({})", [pool.name!, pool.id]);
   }
-  return totalValueLockedUSD
+  while (!coinResult.reverted) {
+    inputTokens.push(getOrCreateToken(coinResult.value).id);
+    i += 1;
+    coinResult = curvePool.try_coins(BigInt.fromI32(i));
+  }
+  return inputTokens;
 }
-*/
+
+export function getPoolCoins(pool: LiquidityPool): string[] {
+  const curvePool = CurvePool.bind(Address.fromString(pool.id));
+  let i = 0;
+  const inputTokens = pool.inputTokens;
+  let coinResult = curvePool.try_coins(BigInt.fromI32(i));
+  if (coinResult.reverted) {
+    // some pools require an int128 for coins and will revert with the
+    // regular abi. e.g. 0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714
+    //log.warning("Call to coins reverted for pool ({}: {}), attempting 128 bytes call", [pool.name!, pool.id]);
+    return getPoolCoins128(pool)
+  }
+  while (!coinResult.reverted) {
+    inputTokens.push(getOrCreateToken(coinResult.value).id);
+    i += 1;
+    coinResult = curvePool.try_coins(BigInt.fromI32(i));
+  }
+  return inputTokens;
+}
+
 export function getPoolFee(poolID: string, feeType: string): LiquidityPoolFee {
   let poolFee = LiquidityPoolFee.load(feeType + "-" + poolID);
   if (!poolFee) {

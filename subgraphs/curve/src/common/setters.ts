@@ -1,7 +1,6 @@
 import { Address, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
 import { LiquidityPool } from "../../generated/schema";
-import { CurvePoolCoin128 } from "../../generated/templates/CryptoFactoryTemplate/CurvePoolCoin128";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
 import { CURVE_ADMIN_FEE, CURVE_POOL_FEE } from "./constants/index";
 import { getOrCreateDexAmm, getOrCreateToken, getPoolFee } from "./getters";
@@ -10,44 +9,6 @@ import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO, FEE_DENOMINATOR_DECIMALS, Liqu
 import { getCryptoTokenPrice, getPoolAssetPrice } from "../services/snapshots";
 import { getPlatform } from "../services/platform";
 import { CurvePoolV2 } from "../../generated/AddressProvider/CurvePoolV2";
-
-export function setPoolCoins128(pool: LiquidityPool): void {
-  const curvePool = CurvePoolCoin128.bind(Address.fromString(pool.id));
-  let i = 0;
-  const inputTokens = pool.inputTokens;
-  let coinResult = curvePool.try_coins(BigInt.fromI32(i));
-  if (coinResult.reverted) {
-    log.warning("Call to int128 coins failed for {} ({})", [pool.name!, pool.id]);
-  }
-  while (!coinResult.reverted) {
-    inputTokens.push(getOrCreateToken(coinResult.value).id);
-    i += 1;
-    coinResult = curvePool.try_coins(BigInt.fromI32(i));
-  }
-  pool.inputTokens = inputTokens;
-  pool.save();
-}
-
-export function setPoolCoins(pool: LiquidityPool): void {
-  const curvePool = CurvePool.bind(Address.fromString(pool.id));
-  let i = 0;
-  const inputTokens = pool.inputTokens;
-  let coinResult = curvePool.try_coins(BigInt.fromI32(i));
-  if (coinResult.reverted) {
-    // some pools require an int128 for coins and will revert with the
-    // regular abi. e.g. 0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714
-    //log.warning("Call to coins reverted for pool ({}: {}), attempting 128 bytes call", [pool.name!, pool.id]);
-    setPoolCoins128(pool);
-    return;
-  }
-  while (!coinResult.reverted) {
-    inputTokens.push(getOrCreateToken(coinResult.value).id);
-    i += 1;
-    coinResult = curvePool.try_coins(BigInt.fromI32(i));
-  }
-  pool.inputTokens = inputTokens;
-  pool.save();
-}
 
 export function setPoolBalances(pool: LiquidityPool): void {
   let poolContract = CurvePool.bind(Address.fromString(pool.id));

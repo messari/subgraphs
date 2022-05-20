@@ -447,6 +447,8 @@ type LiquidityPool @entity {
   gaugeType: String!
 
   rewardContract: String
+
+  coins: [String!]!
 }
 
 #################################
