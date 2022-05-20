@@ -13,4 +13,9 @@ export namespace Deploy {
     export const SUSHISWAP_MOONRIVER = 11;
     export const SUSHISWAP_XDAI = 12;
     export const UNISWAP_V2_MAINNET = 13;
+    export const SPIRITSWAP_FANTOM = 14;
+    export const TRADER_JOE_AVALANCHE = 15;
+    export const QUICKSWAP_MATIC = 16;
+    export const TRISOLARIS_AURORA = 17;
+    export const SOLARBEAM_MOONRIVER = 18;
   }

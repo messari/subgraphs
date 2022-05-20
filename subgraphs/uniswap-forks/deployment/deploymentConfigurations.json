@@ -25,6 +25,27 @@
         "messari": "messari/uniswap-v2-ethereum"
       }
     },
+    "quickswap": {
+      "matic": {
+        "template": "quickswap.template.yaml",
+        "steegecs": "steegecs/quickswap-matic",
+        "messari": "messari/quickswap-matic"
+      }
+    },
+    "solarbeam": {
+      "moonriver": {
+        "template": "solarbeam.template.yaml",
+        "steegecs": "steegecs/solarbeam-moonriver",
+        "messari": "messari/solarbeam-moonriver"
+      }
+    },
+    "spiritswap": {
+      "fantom": {
+        "template": "spiritswap.template.yaml",
+        "steegecs": "steegecs/spiritswap-fantom",
+        "messari": "messari/spiritswap-fantom"
+      }
+    },
     "sushiswap": {
       "arbitrum": {
         "template": "sushiswap.alt.template.yaml",
@@ -80,6 +101,20 @@
         "template": "sushiswap.alt.template.yaml",
         "steegecs": "steegecs/sushiswap-xdai",
         "messari": "messari/sushiswap-xdai"
+      }
+    },
+    "trader-joe": {
+      "avalanche": {
+        "template": "trader.joe.template.yaml",
+        "steegecs": "steegecs/trader-joe-avalanche",
+        "messari": "messari/trade-joe-avalanche"
+      }
+    },
+    "trisolaris": {
+      "aurora": {
+        "template": "trisolaris.template.yaml",
+        "steegecs": "steegecs/trisolaris-aurora",
+        "messari": "messari/trisolaris-aurora"
       }
     }
   }
