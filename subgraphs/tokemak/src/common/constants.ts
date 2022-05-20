@@ -5,20 +5,20 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////////
 
 export namespace Network {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
-  export const BSC = "BINANCE_SMART_CHAIN";
+  export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CRONOS = "CRONOS";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
-  export const HARMONY = "HARMONY_SHARD_0";
+  export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
-  export const XDAI = "XDAI";
+  export const NEAR_MAINNET = "NEAR_MAINNET";
+  export const OPTIMISM = "OPTIMISM";
+  export const MATIC = "MATIC"; // aka Polygon
+  export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 export namespace ProtocolType {
   export const EXCHANGE = "EXCHANGE";
@@ -33,6 +33,10 @@ export namespace VaultFeeType {
   export const PERFORMANCE_FEE = "PERFORMANCE_FEE";
   export const DEPOSIT_FEE = "DEPOSIT_FEE";
   export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
+}
+export namespace CallType {
+  export const DEPOSIT = "DEPOSIT";
+  export const WITHDRAW = "WITHDRAW";
 }
 
 export namespace RewardTokenType {
@@ -56,10 +60,13 @@ export let BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
 export let BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export let BIGDECIMAL_ONE = new BigDecimal(BIGINT_ONE);
 export let BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
+
 export let MAX_UINT = BigInt.fromI32(2).times(BigInt.fromI32(255));
 export let DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const SECONDS_PER_DAY = 60 * 60 * 24;
+export const SECONDS_PER_HOUR = 60 * 60;
 export let MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export let MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
