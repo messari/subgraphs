@@ -58,10 +58,10 @@ export function handleDeposit(event: Deposit): void {
 
   const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
 
-  if (vault.deposits[0] === "MockDeposit") {
+  if (vault.deposits[0] == "MockDeposit") {
     vault.deposits = [deposit.id];
   } else {
-    vault.deposits.push(deposit.id);
+    vault.deposits = vault.deposits.concat([deposit.id]);
   }
 
   vault.save();
@@ -75,10 +75,10 @@ export function handleWithdraw(event: Withdraw): void {
 
   const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
 
-  if (vault.withdraws[0] === "MockWithdraw") {
+  if (vault.withdraws[0] == "MockWithdraw") {
     vault.withdraws = [withdraw.id];
   } else {
-    vault.withdraws.push(withdraw.id);
+    vault.withdraws = vault.withdraws.concat([withdraw.id]);
   }
 
   vault.save();
