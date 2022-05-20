@@ -27,10 +27,13 @@ export function NewClient(url: string): ApolloClient<NormalizedCacheObject> {
 }
 
 export function convertTokenDecimals(value: string, decimals: number): number {
-  if (isNaN(Number(value))) {
+  if (isNaN(Number(value)) || !decimals) {
     return 0;
   }
   const divisor = 10 ** decimals;
+  if (!(Number(value) / divisor)) {
+    return 0;
+  }
   return Number(value) / divisor;
 }
 

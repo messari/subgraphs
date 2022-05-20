@@ -19,7 +19,8 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
         currentData.amountOutUSD = Number(Number(currentData.amountOutUSD).toFixed(2)).toLocaleString();
       }
       if (data[poolName]?.inputToken) {
-        currentData.amount = convertTokenDecimals(currentData.amount, data[poolName].inputToken.decimals);
+        const convertedAmt = convertTokenDecimals(currentData.amount, data[poolName].inputToken.decimals);
+        currentData.amount = convertedAmt;
         tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData });
       }
       if (currentData?.amountUSD) {
@@ -33,15 +34,22 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
           const inputTokensDecimal = currentData.inputTokenAmounts.map((amt: string, idx: number) => {
             return convertTokenDecimals(amt, currentData.inputTokens[idx].decimals);
           });
-          const outputTokenDecimal = convertTokenDecimals(currentData.outputTokenAmount, currentData.outputToken.decimals);
+          const outputTokenDecimal = convertTokenDecimals(
+            currentData.outputTokenAmount,
+            currentData.outputToken.decimals,
+          );
           currentData.inputTokenAmounts = inputTokensDecimal;
           currentData.outputTokenAmount = outputTokenDecimal;
-          currentData.inputTokens = currentData.inputTokens.map((tok: any) => { return tok.id }).join(', ');
+          currentData.inputTokens = currentData.inputTokens
+            .map((tok: any) => {
+              return tok.id;
+            })
+            .join(", ");
           currentData.outputToken = JSON.stringify(currentData.outputToken.id);
         } else if (currentData.amount) {
           currentData.amount = convertTokenDecimals(currentData.amount, data[poolName].inputTokens[0].decimals);
         }
-        tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData })
+        tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData });
       }
       if (currentData?.tokenIn) {
         const amountIn = convertTokenDecimals(currentData.amountIn, currentData.tokenIn.decimals);
@@ -53,15 +61,17 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
         tableData.push({ id: i, date: toDate(currentData.timestamp), ...currentData });
       }
     }
-    const columns = Object.entries(dataTable[0]).filter(function ([k, val]) {
-      if (k.includes("typename")) {
-        return false
-      }
-      return true;
-    }).map(([k, val]) => {
-      return { field: k, headerName: k, width: 250 }
-    })
-    columns.push({ field: 'date', headerName: 'date', width: 250 })
+    const columns = Object.entries(dataTable[0])
+      .filter(function ([k, val]) {
+        if (k.includes("typename")) {
+          return false;
+        }
+        return true;
+      })
+      .map(([k, val]) => {
+        return { field: k, headerName: k, width: 250 };
+      });
+    columns.push({ field: "date", headerName: "date", width: 250 });
 
     return (
       <div id={eventName}>
@@ -69,7 +79,9 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
           <ScrollToElement elementId={eventName} tab="events" poolId={poolId} label={eventName} />
         </div>
         <Box height={750} margin={6}>
-          <Typography fontSize={20}><b>{_datasetLabel.toUpperCase()}</b></Typography>
+          <Typography fontSize={20}>
+            <b>{_datasetLabel.toUpperCase()}</b>
+          </Typography>
           <DataGrid
             pageSize={10}
             initialState={{

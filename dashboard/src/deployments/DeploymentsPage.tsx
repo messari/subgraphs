@@ -17,7 +17,7 @@ function DeploymentsPage() {
     <DeploymentsContextProvider>
       <DeploymentsLayout>
         <SearchInput
-          onSearch={(val) => navigate(`graphs?subgraph=${val}`)}
+          onSearch={(val) => navigate(`graphs?subgraph=${val}&tab=protocol`)}
           placeholder="Subgraph query name ie. messari/balancer-v2-ethereum"
         >
           Load Subgraph
