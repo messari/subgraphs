@@ -6,8 +6,6 @@ import EventsTab from "./tabs/EventsTab";
 import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
-import WarningDisplay from "./WarningDisplay";
-import { ProtocolWarning } from "../graphs/types";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -53,11 +51,11 @@ function AllDataTabs({
     <>
         <TabContext value={tabValue}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-            <Tabs centered value={tabValue} onChange={handleTabChange}>
+            <StyledTabs centered value={tabValue} onChange={handleTabChange}>
               <Tab label="Protocol" value="1" />
               <Tab label="Pool" value="2" />
               <Tab label="Events" value="3" />
-            </Tabs>
+            </StyledTabs>
           </Box>
           <TabPanel value="1">
             {/* PROTOCOL TAB */}

@@ -128,7 +128,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
       );
 
   const navigateToSubgraph = (url: string) => () => {
-    navigate(`graphs?subgraph=${url}`);
+    navigate(`graphs?subgraph=${url}&tab=protocol`);
   };
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
