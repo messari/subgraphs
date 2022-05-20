@@ -1,29 +1,16 @@
-import "./ProtocolDashboard.css";
-import { Button, CircularProgress, Tab, Tabs, Typography } from "@mui/material";
-import TabPanel from "@mui/lab/TabPanel";
+import { CircularProgress } from "@mui/material";
 import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
-import { Box } from "@mui/system";
 
 import { Chart as ChartJS, registerables } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
-import moment from "moment";
 import { schema } from "../queries/schema";
-import { PoolNames, ProtocolTypeEntity, SubgraphBaseUrl } from "../constants";
-import { TabContext } from "@mui/lab";
-import ProtocolTab from "./tabs/ProtocolTab";
-import PoolTab from "./tabs/PoolTab";
+import { PoolNames, SubgraphBaseUrl } from "../constants";
 import ErrorDisplay from "./ErrorDisplay";
-import WarningDisplay from "./WarningDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
-import { isValidHttpUrl, parseSubgraphName } from "../utils";
-import EventsTab from "./tabs/EventsTab";
+import { isValidHttpUrl } from "../utils";
 import AllDataTabs from "./AllDataTabs";
-import ProtocolInfo from "./ProtocolInfo";
-
-export const toDate = (timestamp: number) => {
-  return moment.unix(timestamp).format("YYYY-MM-DD");
-};
+import { DashboardHeader } from "../graphs/DashboardHeader";
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
@@ -35,20 +22,16 @@ function ProtocolDashboard() {
 
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
   const [poolId, setPoolId] = useState<string>(poolIdString);
-  const [warning, setWarning] = useState<{ message: string; type: string }[]>([]);
 
   ChartJS.register(...registerables);
-  const link = new HttpLink({
-    uri: subgraphToQuery.url
-  });
-  const client = useMemo(
-    () =>
-      new ApolloClient({
-        link,
-        cache: new InMemoryCache(),
+  const client = useMemo(() => {
+    return new ApolloClient({
+      link: new HttpLink({
+        uri: subgraphToQuery.url,
       }),
-    [subgraphToQuery.url],
-  );
+      cache: new InMemoryCache(),
+    });
+  }, [subgraphToQuery.url]);
   const query = gql`
     {
       protocols {
@@ -57,6 +40,7 @@ function ProtocolDashboard() {
         subgraphVersion
         name
         id
+        network
       }
     }
   `;
@@ -65,7 +49,7 @@ function ProtocolDashboard() {
   const {
     data: protocolSchemaData,
     loading: protocolSchemaQueryLoading,
-    error: protocolSchemaQueryError
+    error: protocolSchemaQueryError,
   } = useQuery(query, { client });
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
@@ -87,7 +71,7 @@ function ProtocolDashboard() {
     ${graphQuery}
   `;
 
-  const [getData, { data, loading, error, refetch }] = useLazyQuery(queryMain, { variables: { poolId }, client });
+  const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId }, client });
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOL" || tabString.toUpperCase() === "MARKET") {
@@ -111,7 +95,7 @@ function ProtocolDashboard() {
     if (protocolSchemaData) {
       getData();
     }
-  }, [subgraphToQuery.url, refetch, protocolSchemaData]);
+  }, [protocolSchemaData, getData]);
 
   useEffect(() => {
     if (!subgraphToQuery.url && subgraphParam) {
@@ -122,14 +106,13 @@ function ProtocolDashboard() {
       }
       setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
     }
-  }, [subgraphToQuery.url, subgraphParam]);
+  }, [subgraphToQuery.url, subgraphParam, subgraphToQuery.version]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
-  }, [scrollToView])
+  }, []);
 
   const handleTabChange = (event: any, newValue: string) => {
-    setWarning([]);
     let tabName = "protocol";
     if (newValue === "2") {
       tabName = "pool";
@@ -143,8 +126,6 @@ function ProtocolDashboard() {
   // AllData() is what renders the tabs and all of the data within them. This is also were data is mapped to call functions for the compoenents to be rendered
   // Chart/Table components are called as functions within here, they are imported from the chartComponents directory
 
-
-
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
@@ -157,52 +138,37 @@ function ProtocolDashboard() {
     errorDisplayProps = error;
   }
 
-  let protocolInfo = null;
-  if (protocolSchemaData?.protocols.length > 0) {
-    protocolInfo = <ProtocolInfo protocolSchemaData={protocolSchemaData} subgraphToQueryURL={subgraphToQuery.url} schemaVersion={schemaVersion} />
-  }
-
-  let allDataTabs = null;
-  if (data) {
-    allDataTabs = <AllDataTabs
-      data={data}
-      entities={entities}
-      entitiesData={entitiesData}
-      tabValue={tabValue}
-      protocolFields={protocolFields}
-      issues={warning}
-      poolNames={PoolNames[data.protocols[0].type]}
-      poolId={poolId}
-      poolData={poolData}
-      events={events}
-      setWarning={(x) => setWarning(x)}
-      setPoolId={(x) => setPoolId(x)}
-      handleTabChange={(x, y) => handleTabChange(x, y)}
-    />
-  }
-
   return (
     <div className="ProtocolDashboard">
-      <Button
-        style={{ margin: "24px" }}
-        onClick={(name) => {
-          navigate(`/`);
-        }}
-      >
-        RETURN TO DEPLOYMENTS
-      </Button>
-      {protocolInfo}
+      <DashboardHeader
+        protocolSchemaData={protocolSchemaData}
+        subgraphToQueryURL={subgraphToQuery.url}
+        schemaVersion={schemaVersion}
+      />
+      {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
+        <CircularProgress sx={{ margin: 6 }} size={50} />
+      ) : null}
       <ErrorDisplay
         errorObject={errorDisplayProps}
         setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
         protocolSchemaData={protocolSchemaData}
         subgraphToQuery={subgraphToQuery}
       />
-      <WarningDisplay warningArray={warning} />
-      {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
-        <CircularProgress sx={{ margin: 6 }} size={50} />
-      ) : null}
-      {allDataTabs}
+      {!!data && (
+        <AllDataTabs
+          data={data}
+          entities={entities}
+          entitiesData={entitiesData}
+          tabValue={tabValue}
+          protocolFields={protocolFields}
+          poolNames={PoolNames[data.protocols[0].type]}
+          poolId={poolId}
+          poolData={poolData}
+          events={events}
+          setPoolId={(x) => setPoolId(x)}
+          handleTabChange={(x, y) => handleTabChange(x, y)}
+        />
+      )}
     </div>
   );
 }
