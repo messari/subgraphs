@@ -6,7 +6,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { schema } from "../queries/schema";
 import { PoolNames, SubgraphBaseUrl } from "../constants";
 import ErrorDisplay from "./ErrorDisplay";
-import WarningDisplay from "./WarningDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
 import { isValidHttpUrl } from "../utils";
@@ -23,7 +22,6 @@ function ProtocolDashboard() {
 
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
   const [poolId, setPoolId] = useState<string>(poolIdString);
-  const [warning, setWarning] = useState<{ message: string; type: string }[]>([]);
 
   ChartJS.register(...registerables);
   const client = useMemo(() => {
@@ -112,10 +110,9 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
-  }, [scrollToView]);
+  }, []);
 
   const handleTabChange = (event: any, newValue: string) => {
-    setWarning([]);
     let tabName = "protocol";
     if (newValue === "2") {
       tabName = "pool";
@@ -164,15 +161,12 @@ function ProtocolDashboard() {
           entitiesData={entitiesData}
           tabValue={tabValue}
           protocolFields={protocolFields}
-          issues={warning}
           poolNames={PoolNames[data.protocols[0].type]}
           poolId={poolId}
           poolData={poolData}
           events={events}
-          setWarning={(x) => setWarning(x)}
           setPoolId={(x) => setPoolId(x)}
           handleTabChange={(x, y) => handleTabChange(x, y)}
-          warnings={warning}
         />
       )}
     </div>

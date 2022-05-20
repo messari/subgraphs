@@ -2,9 +2,9 @@ import { Schema, Versions } from "../../constants";
 
 export const schema = (version: string): Schema => {
   // The version group uses the first two digits  of the schema version and defaults to that schema.
-  const versionGroupArr = version.split('.');
+  const versionGroupArr = version.split(".");
   versionGroupArr.pop();
-  const versionGroup = versionGroupArr.join('.') + '.0';
+  const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
     case Versions.Schema100:
       return schema100();
@@ -17,8 +17,6 @@ export const schema = (version: string): Schema => {
   }
 };
 
-
-
 export const schema100 = (): Schema => {
   const entities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "marketDailySnapshots"];
 
@@ -29,12 +27,12 @@ export const schema100 = (): Schema => {
       totalVolumeUSD: "BigDecimal!",
       protocolSideRevenueUSD: "BigDecimal!",
       supplySideRevenueUSD: "BigDecimal!",
-      feesUSD: "BigDecimal"
+      feesUSD: "BigDecimal",
     },
     usageMetricsDailySnapshots: {
       totalUniqueUsers: "Int!",
       dailyTransactionCount: "Int!",
-      activeUsers: "Int!"
+      activeUsers: "Int!",
     },
     marketDailySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -43,8 +41,8 @@ export const schema100 = (): Schema => {
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal!",
       rewardTokenEmissionsAmount: "[BigInt!]!",
-      rewardTokenEmissionsUSD: "[BigDecimal!]!"
-    }
+      rewardTokenEmissionsUSD: "[BigDecimal!]!",
+    },
   };
 
   const query = `
@@ -197,7 +195,7 @@ export const schema100 = (): Schema => {
     totalValueLockedUSD: "BigDecimal!",
   };
 
-  const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"]
+  const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
   return { entities, entitiesData, query, poolData, events, protocolFields };
 };
 
@@ -211,12 +209,12 @@ export const schema110 = (): Schema => {
       totalVolumeUSD: "BigDecimal!",
       protocolSideRevenueUSD: "BigDecimal!",
       supplySideRevenueUSD: "BigDecimal!",
-      totalRevenueUSD: "BigDecimal"
+      totalRevenueUSD: "BigDecimal",
     },
     usageMetricsDailySnapshots: {
       totalUniqueUsers: "Int!",
       dailyTransactionCount: "Int!",
-      activeUsers: "Int!"
+      activeUsers: "Int!",
     },
     marketDailySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -225,8 +223,8 @@ export const schema110 = (): Schema => {
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal!",
       rewardTokenEmissionsAmount: "[BigInt!]!",
-      rewardTokenEmissionsUSD: "[BigDecimal!]!"
-    }
+      rewardTokenEmissionsUSD: "[BigDecimal!]!",
+    },
   };
 
   const poolData: { [x: string]: string } = {
@@ -395,9 +393,8 @@ export const schema110 = (): Schema => {
     totalValueLockedUSD: "BigDecimal!",
     totalVolumeUSD: "BigDecimal!",
     totalDepositUSD: "BigDecimal!",
-    totalBorrowUSD: "BigDecimal!"
+    totalBorrowUSD: "BigDecimal!",
   };
-
 
   const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
   return { entities, entitiesData, query, poolData, events, protocolFields };
@@ -409,7 +406,7 @@ export const schema120 = (): Schema => {
     "usageMetricsDailySnapshots",
     "marketDailySnapshots",
     "usageMetricsHourlySnapshots",
-    "marketHourlySnapshots"
+    "marketHourlySnapshots",
   ];
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
@@ -431,7 +428,7 @@ export const schema120 = (): Schema => {
       totalValueLockedUSD: "BigDecimal!",
       mintedTokenSupplies: "[BigInt!]",
       protocolControlledValueUSD: "BigDecimal",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       dailyActiveUsers: "Int!",
@@ -442,7 +439,7 @@ export const schema120 = (): Schema => {
       dailyBorrowCount: "Int!",
       dailyRepayCount: "Int!",
       dailyLiquidateCount: "Int!",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     marketDailySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -462,7 +459,7 @@ export const schema120 = (): Schema => {
       exchangeRate: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       hourlyActiveUsers: "Int!",
@@ -473,7 +470,7 @@ export const schema120 = (): Schema => {
       hourlyBorrowCount: "Int!",
       hourlyRepayCount: "Int!",
       hourlyLiquidateCount: "Int!",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     marketHourlySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -493,41 +490,49 @@ export const schema120 = (): Schema => {
       rates: "[InterestRate!]!",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
-      timestamp: "BigInt!"
-    }
+      timestamp: "BigInt!",
+    },
   };
 
   const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
   const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
-  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}";
-  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}";
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf("rates")] = "rates{side,rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf("rates")] = "rates{side,rate,type}";
 
+  const finanQuery =
+    "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.financialsDailySnapshots).join(",") +
+    "}";
+  const usageDailyQuery =
+    "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsDailySnapshots).join(",") +
+    "}";
+  const usageHourlyQuery =
+    "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsHourlySnapshots).join(",") +
+    "}";
 
-  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
+  const marketDailyQuery =
+    "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" +
+    adjustedMarketDailyFields.join(",") +
+    "}";
+  const marketHourlyQuery =
+    "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" +
+    adjustedMarketHourlyFields.join(",") +
+    "}";
 
-  const marketDailyQuery = "marketDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketDailyFields.join(',') + '}';
-  const marketHourlyQuery = "marketHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {" + adjustedMarketHourlyFields.join(',') + '}';
-
-  const eventsFields = [
-    "hash",
-    "to",
-    "from",
-    "timestamp",
-    "amount",
-    "amountUSD"
-  ];
+  const eventsFields = ["hash", "to", "from", "timestamp", "amount", "amountUSD"];
 
   const events: string[] = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
   const eventsQuery: any[] = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { "
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}" + options + ") { ";
     let fields = eventsFields.join(", ");
     if (event === "liquidates") {
-      fields += ", profitUSD"
+      fields += ", profitUSD";
     }
-    return baseStr + fields + ' }'
+    return baseStr + fields + " }";
   });
 
   const poolData: { [x: string]: string } = {
@@ -555,7 +560,7 @@ export const schema120 = (): Schema => {
     exchangeRate: "BigDecimal",
     rates: "[InterestRate!]!",
     rewardTokenEmissionsAmount: "[BigInt!]",
-    rewardTokenEmissionsUSD: "[BigDecimal!]"
+    rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
   const query = `
@@ -636,6 +641,8 @@ export const schema120 = (): Schema => {
         }
       }
       rates {
+        id
+        side
         rate
         type
       }
@@ -684,9 +691,8 @@ export const schema120 = (): Schema => {
     totalBorrowBalanceUSD: "BigDecimal!",
     cumulativeBorrowUSD: "BigDecimal!",
     cumulativeLiquidateUSD: "BigDecimal!",
-    mintedTokenSupplies: "[BigInt!]"
+    mintedTokenSupplies: "[BigInt!]",
   };
 
   return { entities, entitiesData, query, poolData, events, protocolFields };
 };
-

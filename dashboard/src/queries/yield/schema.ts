@@ -2,9 +2,9 @@ import { Schema, Versions } from "../../constants";
 
 export const schema = (version: string): Schema => {
   // The version group uses the first two digits  of the schema version and defaults to that schema.
-  const versionGroupArr = version.split('.');
+  const versionGroupArr = version.split(".");
   versionGroupArr.pop();
-  const versionGroup = versionGroupArr.join('.') + '.0';
+  const versionGroup = versionGroupArr.join(".") + ".0";
   switch (versionGroup) {
     case Versions.Schema100:
       return schema100();
@@ -31,7 +31,7 @@ export const poolFields = {
   cumulativeSupplySideRevenueUSD: "BigDecimal!",
   cumulativeProtocolSideRevenueUSD: "BigDecimal!",
   cumulativeTotalRevenueUSD: "BigDecimal!",
-  cumulativeUniqueUsers: "Int!"
+  cumulativeUniqueUsers: "Int!",
 };
 
 export const schema100 = (): Schema => {
@@ -43,12 +43,12 @@ export const schema100 = (): Schema => {
       totalVolumeUSD: "BigDecimal!",
       protocolSideRevenueUSD: "BigDecimal!",
       supplySideRevenueUSD: "BigDecimal!",
-      feesUSD: "BigDecimal"
+      feesUSD: "BigDecimal",
     },
     usageMetricsDailySnapshots: {
       totalUniqueUsers: "Int!",
       dailyTransactionCount: "Int!",
-      activeUsers: "Int!"
+      activeUsers: "Int!",
     },
     vaultDailySnapshots: {
       totalVolumeUSD: "BigDecimal!",
@@ -57,7 +57,7 @@ export const schema100 = (): Schema => {
       outputTokenPriceUSD: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
-    }
+    },
   };
 
   const query = `
@@ -161,7 +161,7 @@ export const schema100 = (): Schema => {
     depositLimit: "BigInt!",
     inputTokens: "Token!",
     outputToken: "Token",
-    rewardTokens: "[RewardToken!]"
+    rewardTokens: "[RewardToken!]",
   };
 
   const protocolFields = {
@@ -173,10 +173,10 @@ export const schema100 = (): Schema => {
     network: "Network!",
     type: "ProtocolType!",
     totalValueLockedUSD: "BigDecimal!",
-    totalUniqueUsers: "Int!"
+    totalUniqueUsers: "Int!",
   };
 
-  const events = ["withdraws", "deposits"]
+  const events = ["withdraws", "deposits"];
 
   return { entities, entitiesData, query, poolData, events, protocolFields };
 };
@@ -191,12 +191,12 @@ export const schema110 = (): Schema => {
       totalVolumeUSD: "BigDecimal!",
       protocolSideRevenueUSD: "BigDecimal!",
       supplySideRevenueUSD: "BigDecimal!",
-      totalRevenueUSD: "BigDecimal"
+      totalRevenueUSD: "BigDecimal",
     },
     usageMetricsDailySnapshots: {
       totalUniqueUsers: "Int!",
       dailyTransactionCount: "Int!",
-      activeUsers: "Int!"
+      activeUsers: "Int!",
     },
     vaultDailySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -206,8 +206,8 @@ export const schema110 = (): Schema => {
       outputTokenPriceUSD: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
-      timestamp: "BigInt!"
-    }
+      timestamp: "BigInt!",
+    },
   };
 
   const events = ["withdraws", "deposits"];
@@ -315,7 +315,7 @@ export const schema110 = (): Schema => {
     depositLimit: "BigInt!",
     inputTokens: "Token!",
     outputToken: "Token",
-    rewardTokens: "[RewardToken!]"
+    rewardTokens: "[RewardToken!]",
   };
 
   const protocolFields = {
@@ -332,7 +332,6 @@ export const schema110 = (): Schema => {
     totalVolumeUSD: "BigDecimal!",
   };
 
-
   return { entities, entitiesData, query, poolData, events, protocolFields };
 };
 
@@ -342,7 +341,7 @@ export const schema120 = (): Schema => {
     "usageMetricsDailySnapshots",
     "vaultDailySnapshots",
     "usageMetricsHourlySnapshots",
-    "vaultHourlySnapshots"
+    "vaultHourlySnapshots",
   ];
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
@@ -355,7 +354,7 @@ export const schema120 = (): Schema => {
       cumulativeProtocolSideRevenueUSD: "BigDecimal!",
       dailyTotalRevenueUSD: "BigDecimal!",
       cumulativeTotalRevenueUSD: "BigDecimal!",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
       dailyActiveUsers: "Int!",
@@ -363,7 +362,7 @@ export const schema120 = (): Schema => {
       dailyTransactionCount: "Int!",
       dailyDepositCount: "Int!",
       dailyWithdrawCount: "Int!",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     vaultDailySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -374,7 +373,7 @@ export const schema120 = (): Schema => {
       stakedOutputTokenAmount: "BigInt",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
       hourlyActiveUsers: "Int!",
@@ -382,7 +381,7 @@ export const schema120 = (): Schema => {
       hourlyTransactionCount: "Int!",
       hourlyDepositCount: "Int!",
       hourlyWithdrawCount: "Int!",
-      timestamp: "BigInt!"
+      timestamp: "BigInt!",
     },
     vaultHourlySnapshots: {
       totalValueLockedUSD: "BigDecimal!",
@@ -393,33 +392,40 @@ export const schema120 = (): Schema => {
       stakedOutputTokenAmount: "BigInt",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
-      timestamp: "BigInt!"
-    }
+      timestamp: "BigInt!",
+    },
   };
 
+  const finanQuery =
+    "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.financialsDailySnapshots).join(",") +
+    "}";
+  const usageDailyQuery =
+    "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsDailySnapshots).join(",") +
+    "}";
+  const usageHourlyQuery =
+    "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
+    Object.keys(entitiesData.usageMetricsHourlySnapshots).join(",") +
+    "}";
 
-  const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
-  const usageDailyQuery = "usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsDailySnapshots).join(',') + '}';
-  const usageHourlyQuery = "usageMetricsHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.usageMetricsHourlySnapshots).join(',') + '}';
-
-  const vaultDailyQuery = "vaultDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultDailySnapshots).join(',') + '}';
-  const vaultHourlyQuery = "vaultHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" + Object.keys(entitiesData.vaultHourlySnapshots).join(',') + '}';
-
+  const vaultDailyQuery =
+    "vaultDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" +
+    Object.keys(entitiesData.vaultDailySnapshots).join(",") +
+    "}";
+  const vaultHourlyQuery =
+    "vaultHourlySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}) {" +
+    Object.keys(entitiesData.vaultHourlySnapshots).join(",") +
+    "}";
 
   const events = ["withdraws", "deposits"];
-  const eventsFields = [
-    "hash",
-    "to",
-    "from",
-    "timestamp",
-    "amount",
-    "amountUSD"
-  ];
+  const eventsFields = ["hash", "to", "from", "timestamp", "amount", "amountUSD"];
   const eventsQuery = events.map((event) => {
     let options = "";
-    const baseStr = event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}" + options + ") { "
+    const baseStr =
+      event + "(first: 1000, orderBy: timestamp, orderDirection: desc, where: {vault: $poolId}" + options + ") { ";
     const fields = eventsFields.join(", ");
-    return baseStr + fields + ' }'
+    return baseStr + fields + " }";
   });
 
   const poolData = {
@@ -438,7 +444,7 @@ export const schema120 = (): Schema => {
     rewardTokenEmissionsAmount: "[BigInt!]",
     rewardTokenEmissionsUSD: "[BigDecimal!]",
     stakedOutputTokenAmount: "BigInt",
-    pricePerShare: "BigDecimal"
+    pricePerShare: "BigDecimal",
   };
 
   const query = `
@@ -520,7 +526,7 @@ export const schema120 = (): Schema => {
         rewardTokenEmissionsAmount
         rewardTokenEmissionsUSD
       }
-    }`
+    }`;
 
   const protocolFields = {
     id: "ID!",
@@ -536,7 +542,7 @@ export const schema120 = (): Schema => {
     cumulativeSupplySideRevenueUSD: "BigDecimal!",
     cumulativeProtocolSideRevenueUSD: "BigDecimal!",
     cumulativeTotalRevenueUSD: "BigDecimal!",
-    cumulativeUniqueUsers: "Int!"
+    cumulativeUniqueUsers: "Int!",
   };
 
   return { entities, entitiesData, query, poolData, events, protocolFields };

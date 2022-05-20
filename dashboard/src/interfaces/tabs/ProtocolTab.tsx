@@ -1,10 +1,13 @@
-import {Box, Grid, Typography} from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
+import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import ScrollToElement from "../../common/utilComponents/ScrollToElement";
 import { ProtocolTypeEntity } from "../../constants";
 import { convertTokenDecimals } from "../../utils";
 import SchemaTable from "../SchemaTable";
+import IssuesDisplay from "../IssuesDisplay";
+import { useEffect } from "react";
 import {CopyLinkToClipboard} from "../../common/utilComponents/CopyLinkToClipboard";
 
 interface ProtocolTabProps {
@@ -12,25 +15,25 @@ interface ProtocolTabProps {
   entities: string[];
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
-  setWarning: React.Dispatch<React.SetStateAction<{ message: string; type: string }[]>>;
-  warnings: { message: string; type: string }[];
 }
 
-function ProtocolTab({ data, entities, entitiesData, protocolFields, setWarning, warnings }: ProtocolTabProps) {
-  try {
-    const list: { [x: string]: any } = {};
-    const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
+// This component is for each individual subgraph
+function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolTabProps) {
+  const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
+  const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
+  const list: { [x: string]: any } = {};
+  const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
 
-    const issues: { message: string; type: string }[] = warnings;
-    const excludedEntities = [
-      "liquidityPoolHourlySnapshots",
-      "liquidityPoolDailySnapshots",
-      "marketHourlySnapshots",
-      "marketDailySnapshots",
-      "vaultHourlySnapshots",
-      "vaultDailySnapshots",
-    ];
-    const protocolData = entities.map((entityName: string) => {
+  const excludedEntities = [
+    "liquidityPoolHourlySnapshots",
+    "liquidityPoolDailySnapshots",
+    "marketHourlySnapshots",
+    "marketDailySnapshots",
+    "vaultHourlySnapshots",
+    "vaultDailySnapshots",
+  ];
+  const protocolData = entities.map((entityName: string) => {
+    try {
       // Exclude the following entities because they are not on the protocol tab
       if (excludedEntities.includes(entityName)) {
         return null;
@@ -208,15 +211,28 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields, setWarning,
               dataFieldMetrics[field]?.sum === 0
             ) {
               // Create a warning for the 0 sum of all snapshots for this field
-              issues.push({ type: "SUM", message: label });
+
+              const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
+                return fieldName.toUpperCase().includes(fieldSchema.toUpperCase());
+              });
+              let level = "warning";
+              if (schemaField) {
+                const fieldChars = entitiesData[entityName][schemaField].split("");
+                if (fieldChars[fieldChars.length - 1] === "!") {
+                  level = "critical";
+                }
+              }
+              issues.push({ type: "SUM", message: "", fieldName: label, level });
             }
             if (
-              issues.filter((x) => x.message === label && x.type === "CUMULATIVE").length === 0 &&
+              issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
               dataFieldMetrics[field]?.cumulative?.hasLowered > 0
             ) {
               issues.push({
                 type: "CUMULATIVE",
-                message: label + "++" + dataFieldMetrics[field].cumulative.hasLowered,
+                message: `${label}++${dataFieldMetrics[field].cumulative.hasLowered}`,
+                level: "error",
+                fieldName: label,
               });
             }
             const elementId = label.split(" ").join("%20");
@@ -240,41 +256,50 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields, setWarning,
           })}
         </Grid>
       );
-    });
-
-    const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type];
-    const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD);
-    if (
-      issues.filter((x) => x.message === protTypeEntity && x.type === "TVL-").length === 0 &&
-      protocolLevelTVL < 1000
-    ) {
-      issues.push({ type: "TVL-", message: protTypeEntity });
-    } else if (
-      issues.filter((x) => x.message === protTypeEntity && x.type === "TVL+").length === 0 &&
-      protocolLevelTVL > 1_000_000_000_000
-    ) {
-      issues.push({ type: "TVL+", message: protTypeEntity });
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log("CATCH,", Object.keys(err), Object.values(err), err);
+        return <h3>JAVASCRIPT ERROR - PROTOCOL TAB - {err.message}</h3>;
+      } else {
+        return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>;
+      }
     }
+  });
 
-    const protocolSchema = SchemaTable(data[protTypeEntity][0], protTypeEntity, setWarning, protocolFields, warnings);
-
-    if (issues.length > 0) {
-      setWarning(issues);
-    }
-    return (
-      <>
-        {protocolSchema}
-        {protocolData}
-      </>
-    );
-  } catch (err) {
-    if (err instanceof Error) {
-      console.log("CATCH,", Object.keys(err), Object.values(err), err);
-      return <h3>JAVASCRIPT ERROR - PROTOCOL TAB - {err.message}</h3>;
-    } else {
-      return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>;
-    }
+  const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type];
+  const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD);
+  if (
+    issues.filter((x) => x.fieldName === protTypeEntity && x.type === "TVL-").length === 0 &&
+    protocolLevelTVL < 1000
+  ) {
+    issues.push({ type: "TVL-", message: "", level: "critical", fieldName: protTypeEntity });
+  } else if (
+    issues.filter((x) => x.fieldName === protTypeEntity && x.type === "TVL+").length === 0 &&
+    protocolLevelTVL > 1_000_000_000_000
+  ) {
+    issues.push({ type: "TVL+", message: "", level: "critical", fieldName: protTypeEntity });
   }
+
+  useEffect(() => {
+    console.log("PROTOCOL ISSUES TO SET", issues, issuesState);
+    setIssues(issues);
+  }, [issuesState]);
+
+  return (
+    <>
+      <IssuesDisplay issuesArray={issuesState} />
+      <SchemaTable
+        entityData={data[protTypeEntity][0]}
+        schemaName={protTypeEntity}
+        setIssues={(x) => setIssues(x)}
+        dataFields={protocolFields}
+        issuesProps={issuesState}
+        poolId=""
+        tabName="protocol"
+      />
+      {protocolData}
+    </>
+  );
 }
 
 export default ProtocolTab;
