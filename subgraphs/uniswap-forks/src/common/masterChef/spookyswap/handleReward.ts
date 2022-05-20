@@ -53,13 +53,13 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     lastRewardBlock = poolInfo.value2;
   }
 
-  let getRewardTokenPerBlock = poolContract.try_booPerSecond();
-  let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
-  if (!getRewardTokenPerBlock.reverted) {
-    rewardTokenPerBlock = getRewardTokenPerBlock.value;
+  let getRewardTokenPerSecond = poolContract.try_booPerSecond();
+  let rewardTokenPerSecond: BigInt = BIGINT_ZERO;
+  if (!getRewardTokenPerSecond.reverted) {
+    rewardTokenPerSecond = getRewardTokenPerSecond.value;
   }
 
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
+  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.timestamp);
 
   let multiplier: BigInt = BIGINT_ONE;
   if (!getMultiplier.reverted) {
@@ -73,13 +73,12 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   }
 
   log.warning("multiplier: " + multiplier.toString(), []);
-  log.warning("rewardTokenPerBlock: " + rewardTokenPerBlock.toString(), []);
+  log.warning("rewardTokenPerSecond: " + rewardTokenPerSecond.toString(), []);
   log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);
   log.warning("totalAllocPoint: " + totalAllocPoint.toString(), []);
 
   // Calculate Reward Emission per Block
-  let rewardTokenRate = multiplier
-    .times(rewardTokenPerBlock)
+  let rewardTokenRate = rewardTokenPerSecond
     .times(poolAllocPoint)
     .div(totalAllocPoint);
 

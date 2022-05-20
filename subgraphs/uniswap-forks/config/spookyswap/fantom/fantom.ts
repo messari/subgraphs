@@ -23,10 +23,10 @@ export class SpookyswapFantomConfigurations implements Configurations {
     return BigDecimal.fromString("2");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("1.5");
+    return BigDecimal.fromString("0.3");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("1.7");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");
@@ -38,7 +38,7 @@ export class SpookyswapFantomConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.BLOCK;
+    return RewardIntervalType.TIMESTAMP;
   }
   getReferenceToken(): string {
     return "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
