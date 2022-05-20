@@ -2,94 +2,39 @@ specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: ethereum
-    name: BeefiVaultRegistryMATIC
-    network: matic
-    source:
-      address: "0x62b9c7762129404351C70cD007a58BBFf311B751"
-      abi: BeefiVaultRegistryMATIC
-      startBlock: 22519957
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - OwnershipTransferred
-        - VaultsRegistered
-        - VaultsRetireStatusUpdated
-      abis:
-        - name: BeefiVaultRegistryMATIC
-          file: ./abis/BeefiVaultRegistryMATIC.json
-      eventHandlers:
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: VaultsRegistered(address[])
-          handler: handleVaultsRegistered
-        - event: VaultsRetireStatusUpdated(address[],bool)
-          handler: handleVaultsRetireStatusUpdated
-      file: ./src/mappings/registry.ts
-  - name: ExampleVault
+  # - kind: ethereum/contract
+  #   name: ExampleVault
+  #   network: matic
+  #   source:
+  #     address: "0x72B5Cf05770C9a6A99FB8652825884ee36a4BfdA"
+  #     abi: BeefyVault
+  #     startBlock: 20596159
+  #   mapping:
+  #     kind: ethereum/events
+  #     apiVersion: 0.0.6
+  #     language: wasm/assemblyscript
+  #     file: ./src/mappings/vault.ts
+  #     entities:
+  #       - Vault
+  #       - Token
+  #       # other entities?
+  #     abis:
+  #       - name: BeefyVault
+  #         file: ./abis/BeefyVault.json
+  #       - name: ERC20
+  #         file: ./abis/ERC20.json
+  #     eventHandlers:
+  #       - event: NewStratCandidate(address)
+  #         handler: handleNewStratCandidate
+  #       - event: UpgradeStrat(address)
+  #         handler: handleUpgradeStrat
+  - name: ExampleStrategy
     kind: ethereum/contract
     network: matic
     source:
-      address: "0x72B5Cf05770C9a6A99FB8652825884ee36a4BfdA"
-      abi: BeefyVault
-      startBlock: 20596159
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/vault.ts
-      entities:
-        - Vault
-        - Token
-        # other entities?
-      abis:
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        - event: NewStratCandidate(address)
-          handler: handleNewStratCandidate
-        - event: UpgradeStrat(address)
-          handler: handleUpgradeStrat
-      callHandlers:
-        - function: deposit(uint256)
-          handler: handleDepositCall
-templates:
-  - name: BeefyVault
-    kind: ethereum/contract
-    network: matic
-    source:
-      abi: BeefyVault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      file: ./src/mappings/vault.ts
-      entities:
-        - Vault
-        - Token
-        # other entities?
-      abis:
-        - name: BeefyVault
-          file: ./abis/BeefyVault.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-      eventHandlers:
-        - event: NewStratCandidate(address)
-          handler: handleNewStratCandidate
-        - event: UpgradeStrat(address)
-          handler: handleUpgradeStrat
-      callHandlers:
-        - function: deposit(uint256)
-          handler: handleDepositCall
-  - name: Strategy
-    kind: ethereum/contract
-    network: matic
-    source:
-      abi: Strategy
+      address: "0xD771f9711b863c0d1CE007fd6b613a69b16CFA41"
+      abi: BeefyStrategy
+      startBlock: 20596164
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -97,16 +42,100 @@ templates:
       file: ./src/mappings/strategy.ts
       entities:
         - Strategy
-        #- Other entities?
+        - Token
+        - Deposit
+        - Withdraw
+        - YieldAggregator
       abis:
-        - name: Strategy
+        - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
-        - event: ChargedFees(uint256,uint256,uint256)
-          handler: handleChargedFees
+        # - event: ChargedFees(uint256,uint256,uint256)
+        #   handler: handleChargedFees
         - event: Deposit(uint256)
           handler: handleDeposit
-        - event: StratHarvest(indexed address,uint256,uint256)
-          handler: handleStratHarvest
+        # - event: StratHarvest(indexed address,uint256,uint256)
+        #   handler: handleStratHarvest
         - event: Withdraw(uint256)
           handler: handleWithdraw
+    #   - kind: ethereum
+#     name: BeefiVaultRegistryMATIC
+#     network: matic
+#     source:
+#       address: "0x62b9c7762129404351C70cD007a58BBFf311B751"
+#       abi: BeefiVaultRegistryMATIC
+#       startBlock: 22519957
+#     mapping:
+#       kind: ethereum/events
+#       apiVersion: 0.0.6
+#       language: wasm/assemblyscript
+#       entities:
+#         - OwnershipTransferred
+#         - VaultsRegistered
+#         - VaultsRetireStatusUpdated
+#       abis:
+#         - name: BeefiVaultRegistryMATIC
+#           file: ./abis/BeefiVaultRegistryMATIC.json
+#       eventHandlers:
+#         - event: OwnershipTransferred(indexed address,indexed address)
+#           handler: handleOwnershipTransferred
+#         - event: VaultsRegistered(address[])
+#           handler: handleVaultsRegistered
+#         - event: VaultsRetireStatusUpdated(address[],bool)
+#           handler: handleVaultsRetireStatusUpdated
+#       file: ./src/mappings/registry.ts
+# templates:
+#   - name: BeefyVault
+#     kind: ethereum/contract
+#     network: matic
+#     source:
+#       abi: BeefyVault
+#     mapping:
+#       kind: ethereum/events
+#       apiVersion: 0.0.6
+#       language: wasm/assemblyscript
+#       file: ./src/mappings/vault.ts
+#       entities:
+#         - Vault
+#         - Token
+#         # other entities?
+#       abis:
+#         - name: BeefyVault
+#           file: ./abis/BeefyVault.json
+#         - name: ERC20
+#           file: ./abis/ERC20.json
+#       eventHandlers:
+#         - event: NewStratCandidate(address)
+#           handler: handleNewStratCandidate
+#         - event: UpgradeStrat(address)
+#           handler: handleUpgradeStrat
+#       callHandlers:
+#         - function: deposit(uint256)
+#           handler: handleDepositCall
+#   - name: Strategy
+#     kind: ethereum/contract
+#     network: matic
+#     source:
+#       abi: Strategy
+#     mapping:
+#       kind: ethereum/events
+#       apiVersion: 0.0.6
+#       language: wasm/assemblyscript
+#       file: ./src/mappings/strategy.ts
+#       entities:
+#         - Strategy
+#         #- Other entities?
+#       abis:
+#         - name: Strategy
+#           file: ./abis/BeefyStrategy.json
+#       eventHandlers:
+#         - event: ChargedFees(uint256,uint256,uint256)
+#           handler: handleChargedFees
+#         - event: Deposit(uint256)
+#           handler: handleDeposit
+#         - event: StratHarvest(indexed address,uint256,uint256)
+#           handler: handleStratHarvest
+#         - event: Withdraw(uint256)
+#           handler: handleWithdraw

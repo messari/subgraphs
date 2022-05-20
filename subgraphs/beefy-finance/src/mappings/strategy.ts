@@ -1,3 +1,125 @@
+import { BigDecimal, Address } from "@graphprotocol/graph-ts";
+import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
+import { Strategy } from "../../generated/schema";
+import {
+  BeefyStrategy,
+  Deposit,
+  Deposit__Params,
+  Withdraw,
+} from "../../generated/ExampleStrategy/BeefyStrategy";
+import {
+  getBeefyFinanceOrCreate,
+  getStrategyOrCreate,
+  getVaultOrCreate,
+} from "../utils/getters";
+import { BeefyVault } from "../../generated/templates/BeefyVault/BeefyVault";
+import { getAddressFromId } from "../utils/helpers";
+import { createDeposit, getOrCreateFirstDeposit } from "./deposit";
+import { createWithdraw, getOrCreateFirstWithdraw } from "./withdraw";
+
+const NETWORK_SUFFIX: string = "-137";
+
+export function createStrategy(
+  strategyAddress: Address,
+  currentBlock: ethereum.Block
+): Strategy {
+  const strategy = new Strategy(strategyAddress.toHexString() + NETWORK_SUFFIX);
+  const strategyContract = BeefyStrategy.bind(strategyAddress);
+
+  strategy.protocol = getBeefyFinanceOrCreate().id;
+  strategy.createdTimestamp = currentBlock.timestamp;
+  strategy.createdBlockNumber = currentBlock.number;
+
+  /* const vault = getVaultOrCreate(
+    strategyContract.vault(),
+    currentBlock,
+    NETWORK_SUFFIX
+  );
+  strategy.vault = vault.id; */
+  //strategy.totalValueLockedUSD = new BigDecimal(new BigInt(0));
+  //strategy.vault = "Vault";
+  strategy.inputTokenBalance = strategyContract.balanceOf();
+  //strategy.outputTokenSupply = vault.outputTokenSupply;
+
+  strategy.deposits = [getOrCreateFirstDeposit(strategy).id];
+  strategy.withdraws = [getOrCreateFirstWithdraw(strategy).id];
+
+  strategy.save();
+  return strategy;
+}
+
+export function handleDeposit(event: Deposit): void {
+  const strategy = getStrategyOrCreate(
+    event.address,
+    event.block,
+    NETWORK_SUFFIX
+  );
+  //const strategyContract = BeefyStrategy.bind(event.address);
+  /* const vault = getVaultOrCreate(
+    getAddressFromId(strategy.vault),
+    event.block,
+    NETWORK_SUFFIX
+  ); */
+  //const vaultContract = BeefyVault.bind(getAddressFromId(strategy.vault));
+  const depositedAmount = event.params.tvl.minus(strategy.inputTokenBalance);
+
+  strategy.inputTokenBalance = event.params.tvl;
+
+  //vault.inputTokenBalance = vaultContract.balance();
+  //vault.outputTokenSupply = vaultContract.totalSupply();
+  //strategy.outputTokenSupply = vault.outputTokenSupply;
+  //vault.pricePerShare = new BigDecimal(vaultContract.getPricePerFullShare());
+
+  const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
+
+  if (strategy.deposits[0] === "MockDeposit") {
+    strategy.deposits = [deposit.id];
+  } else {
+    strategy.deposits.push(deposit.id);
+  }
+  //vault.deposits.push(deposit.id);
+
+  strategy.save();
+  //vault.save();
+}
+
+export function handleWithdraw(event: Withdraw): void {
+  const strategy = getStrategyOrCreate(
+    event.address,
+    event.block,
+    NETWORK_SUFFIX
+  );
+  //const strategyContract = BeefyStrategy.bind(event.address);
+  /* const vault = getVaultOrCreate(
+    getAddressFromId(strategy.vault),
+    event.block,
+    NETWORK_SUFFIX
+  );
+  const vaultContract = BeefyVault.bind(getAddressFromId(strategy.vault));
+   */ const withdrawnAmount = strategy.inputTokenBalance.minus(
+    event.params.tvl
+  );
+
+  strategy.inputTokenBalance = event.params.tvl;
+
+  /* vault.inputTokenBalance = vaultContract.balance();
+  vault.outputTokenSupply = vaultContract.totalSupply();
+  strategy.outputTokenSupply = vault.outputTokenSupply;
+  vault.pricePerShare = new BigDecimal(vaultContract.getPricePerFullShare());
+ */
+  const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
+
+  if (strategy.withdraws[0] === "MockWithdraw") {
+    strategy.withdraws = [withdraw.id];
+  } else {
+    strategy.withdraws.push(withdraw.id);
+  }
+  //vault.withdraws.push(withdraw.id);
+
+  strategy.save();
+  //vault.save();
+}
+
 /* import { Strategy } from "../../generated/schema";
 import {
   Deposit,
@@ -74,4 +196,5 @@ export async function updateBalance(strategy: Strategy): Promise<void> {
 
   strategy.save();
   vault.save();
-} */
+}
+ */
