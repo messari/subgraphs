@@ -155,8 +155,8 @@ export function handleSwap(event: Swap): void {
   swap.tokenOut = tokenOut.toHexString();
   swap.amountIn = event.params.amountIn;
   swap.amountOut = event.params.amountOut;
-  swap.amountInUSD = isUSDStable(tokenIn) ? amountIn : valueInUSD(amountIn, tokenIn);
-  swap.amountOutUSD = isUSDStable(tokenOut) ? amountOut : valueInUSD(amountOut, tokenOut);
+  swap.amountInUSD = valueInUSD(amountIn, tokenIn);
+  swap.amountOutUSD = valueInUSD(amountOut, tokenOut);
   swap.save();
 
   let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event);

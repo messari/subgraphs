@@ -5,8 +5,17 @@ import { log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
+
+/////////////////////
+///// Protocols /////
+/////////////////////
+export namespace Protocol {
+  export const APESWAP = "Apeswap";
+  export const UNISWAP_V2 = "Uniswap V2";
+  export const SUSHISWAP = "Sushiswap";
+}
 
 ////////////////////////
 ///// Schema Enums /////
@@ -88,12 +97,19 @@ export namespace UsageType {
   export const SWAP = "SWAP";
 }
 
+export namespace RewardIntervalType {
+  export const BLOCK = "BLOCK";
+  export const TIMESTAMP = "TIMESTAMP";
+  export const NONE = "NONE";
+}
+
 export const DEFAULT_DECIMALS = 18;
 export const USDC_DECIMALS = 6;
 export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
+export const BIGINT_FIVE = BigInt.fromI32(5);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
@@ -119,4 +135,4 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("400000");
+export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("50000");

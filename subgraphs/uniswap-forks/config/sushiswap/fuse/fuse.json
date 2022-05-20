@@ -1,0 +1,8 @@
+{
+  "deployment": "SUSHISWAP_FUSE",
+  "network": "fuse",
+  "address": "0x43eA90e2b786728520e4f930d2A71a477BF2737C",
+  "startBlock": 0,
+  "miniChefAddress": "0x182CD0C6F1FaEc0aED2eA83cd0e160c8Bd4cb063",
+  "miniChefStartBlock": 0
+}

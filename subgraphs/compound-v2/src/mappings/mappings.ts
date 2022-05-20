@@ -7,13 +7,13 @@ import {
   NewPriceOracle,
 } from "../../generated/Comptroller/Comptroller";
 import {
-  accrueInterestOnBorrow,
   createBorrow,
   createDeposit,
   createLiquidate,
   createRepay,
   createWithdraw,
-  updatePrevBlockRevenues,
+  updateRevenue,
+  updateTotalBorrowUSD,
 } from "./helpers";
 import {
   Mint as MintNew,
@@ -87,7 +87,7 @@ export function handleNewReserveFactorNew(event: NewReserveFactorNew): void {
 
 // this version of AccrueInterest has 4 parameters
 export function handleAccrueInterestNew(event: AccrueInterestNew): void {
-  accrueInterest(event, event.params.totalBorrows);
+  accrueInterest(event, event.params.interestAccumulated, event.params.totalBorrows);
 }
 
 //////////////////////////////////
@@ -126,7 +126,7 @@ export function handleNewReserveFactorOld(event: NewReserveFactorOld): void {
 
 // this version of AccrueInterest has 4 parameters
 export function handleAccrueInterestOld(event: AccrueInterestOld): void {
-  accrueInterest(event, event.params.totalBorrows);
+  accrueInterest(event, event.params.interestAccumulated, event.params.totalBorrows);
 }
 
 ////////////////////////////////////
@@ -266,18 +266,11 @@ function liquidateBorrow(
 
 function newReserveFactor(event: ethereum.Event, newReserveFactorMantissa: BigInt): void {
   let market = getOrCreateMarket(event, event.address);
-
-  // update financials in case the reserve is updated and no other compound transactions happen in that block
-  // intended for capturing accurate revenues
-  let blockDiff = event.block.number.minus(market._lastRevenueUpdateBlock);
-  updatePrevBlockRevenues(market, blockDiff, event, market.totalBorrowBalanceUSD);
-  market._lastRevenueUpdateBlock = event.block.number;
-
-  // get reserve factor
   market._reserveFactor = newReserveFactorMantissa.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
   market.save();
 }
 
-function accrueInterest(event: ethereum.Event, totalBorrows: BigInt): void {
-  accrueInterestOnBorrow(event, totalBorrows);
+function accrueInterest(event: ethereum.Event, newInterest: BigInt, newTotalBorrow: BigInt): void {
+  updateRevenue(event, newInterest);
+  updateTotalBorrowUSD(event, newTotalBorrow);
 }
