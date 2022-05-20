@@ -21,7 +21,6 @@ export function handleLpStaking(
 ): void {
   const allocPoint = poolInfo.value2;
   const totalAllocPoint = lpstakingContract.totalAllocPoint();
-  const allocRatio = allocPoint.toBigDecimal().div(totalAllocPoint.toBigDecimal());
   const rewardsPerSecond = allocPoint.times(lpstakingContract.rewardsPerSecond()).div(totalAllocPoint);
   const rewardTokenPriceUSD = getTokenPriceSnapshot(EPS_ADDRESS, timestamp);
   const rewardsPerSecondUSD = bigIntToBigDecimal(rewardsPerSecond,DEFAULT_DECIMALS).times(rewardTokenPriceUSD);
@@ -34,7 +33,7 @@ export function handleLpStaking(
   const rewardTokenIndex = rewardTokens.indexOf(rewardToken.id);
   let rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   let rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
-  rewardTokenEmissionsAmount[rewardTokenIndex] = rewardsPerSecond
+  rewardTokenEmissionsAmount[rewardTokenIndex] = rewardsPerSecond;
   rewardTokenEmissionsUSD[rewardTokenIndex] = rewardsPerSecondUSD;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
