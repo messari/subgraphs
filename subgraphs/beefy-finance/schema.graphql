@@ -1,3 +1,24 @@
+# Subgraph Schema: Yield Aggregator
+# Version: 1.2.1
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+
+enum Network {
+  ARBITRUM_ONE
+  AURORA
+  AVALANCHE
+  BSC # aka BNB Chain
+  CELO
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
+}
+
 enum ProtocolType {
   EXCHANGE
   LENDING
@@ -50,8 +71,8 @@ interface Protocol {
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
   methodologyVersion: String!
 
-  #" The blockchain network this subgraph is indexing on "
-  #network: Network!
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
 
   " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
@@ -109,8 +130,8 @@ type YieldAggregator implements Protocol @entity {
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
   methodologyVersion: String!
 
-  #" The blockchain network this subgraph is indexing on "
-  #network: Network!
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
 
   " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!

@@ -59,16 +59,18 @@ export function getStrategyOrCreate(
   return strategy;
 }
 
-export function getBeefyFinanceOrCreate(): YieldAggregator {
-  let beefy = YieldAggregator.load("BeefyFinance");
+export function getBeefyFinanceOrCreate(
+  networkSuffix: string
+): YieldAggregator {
+  let beefy = YieldAggregator.load("BeefyFinance" + networkSuffix);
   if (!beefy) {
-    beefy = new YieldAggregator("BeefyFinance");
+    beefy = new YieldAggregator("BeefyFinance" + networkSuffix);
     beefy.name = "Beefy Finance";
     beefy.slug = "beefy-finance";
     beefy.schemaVersion = "1.2.1";
     beefy.subgraphVersion = "0.0.2";
     beefy.methodologyVersion = "Abboh";
-    //beefy.network = "matic";
+    beefy.network = "MATIC";
     beefy.type = "YIELD";
     /* beefy.totalValueLockedUSD = new BigDecimal(new BigInt(0));
     beefy.protocolControlledValueUSD = new BigDecimal(new BigInt(0));
