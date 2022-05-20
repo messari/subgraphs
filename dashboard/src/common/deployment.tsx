@@ -29,7 +29,7 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
   );
 
   // Pull the subgraph name to use as the variable input for the indexing status query
-  const subgraphName = deployment?.split('name/')[1];
+  const subgraphName = deployment?.split("name/")[1];
   const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery, {
     variables: { subgraphName },
     client: clientIndexing,
@@ -43,8 +43,8 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
   const protocol = useMemo(() => data?.protocols[0], [data]);
 
   useEffect(() => {
-    console.log('DEPLOYMENT ERR?', error, errorIndexing, status, data?.protocols[0]?.name, subgraphName)
-  }, [error])
+    console.log("DEPLOYMENT ERR?", error, errorIndexing, status, data?.protocols[0]?.name, subgraphName);
+  }, [error]);
 
   if (!status) {
     return null;
@@ -70,7 +70,11 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
     indexed = 100;
   } else {
     indexed = parseFloat(
-      ((status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number / status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number) * 100).toFixed(2),
+      (
+        (status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number /
+          status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number) *
+        100
+      ).toFixed(2),
     );
   }
 
@@ -92,7 +96,8 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
         {status.indexingStatusesForSubgraphName[0].fatalError ? (
           <>
             <span style={{ color: "red" }}>
-              Fatal Error - Execution Stopped at block {status.indexingStatusesForSubgraphName[0].fatalError.block.number}
+              Fatal Error - Execution Stopped at block{" "}
+              {status.indexingStatusesForSubgraphName[0].fatalError.block.number}
             </span>{" "}
             -{" "}
             <span>
@@ -104,7 +109,8 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
         )}
       </p>
       <p>
-        Network: {status.indexingStatusesForSubgraphName[0].chains[0].network} - Current chain block: {status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number}
+        Network: {status.indexingStatusesForSubgraphName[0].chains[0].network} - Current chain block:{" "}
+        {status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number}
       </p>
       <p>
         Schema version: {protocol?.schemaVersion || "N/A"} - Subgraph version: {protocol?.subgraphVersion || "N/A"}

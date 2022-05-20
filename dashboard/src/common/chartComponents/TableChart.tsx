@@ -3,8 +3,9 @@ import { toDate } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 
 export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: number) => {
-
-  const isPercentageField = percentageFieldList.find(x => { return _datasetLabel.toUpperCase().includes(x.toUpperCase()) })
+  const isPercentageField = percentageFieldList.find((x) => {
+    return _datasetLabel.toUpperCase().includes(x.toUpperCase());
+  });
   if (dataTable) {
     const columns = [
       { field: "date", headerName: "Date", width: 150 },
@@ -14,16 +15,16 @@ export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: n
         width: 150,
       },
     ];
-    let suffix = '';
+    let suffix = "";
     if (isPercentageField) {
-      suffix = '%';
+      suffix = "%";
     }
     const tableData = dataTable.map((val: any, i: any) => {
       return {
         id: i,
         date: toDate(val.date),
         value: val.value.toLocaleString() + suffix,
-      }
+      };
     });
     return (
       <DataGrid

@@ -5,7 +5,7 @@ import { Deployment } from "./deployment";
 interface SubgraphDeploymentsProps {
   protocol: {
     name: string;
-    deploymentMap: { [network: string]: string; };
+    deploymentMap: { [network: string]: string };
   };
 }
 
@@ -25,11 +25,7 @@ export const SubgraphDeployments = ({ protocol: { name, deploymentMap } }: Subgr
       <h2 style={{ textAlign: "center" }}>{name}</h2>
       <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap" }}>
         {deployments.map(({ network, deployment }) => (
-          <Deployment
-            key={network}
-            networkName={network}
-            deployment={deployment}
-          />
+          <Deployment key={network} networkName={network} deployment={deployment} />
         ))}
       </div>
     </div>

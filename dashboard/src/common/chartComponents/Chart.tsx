@@ -6,7 +6,7 @@ import { toDate } from "../../../src/utils/index";
 export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number) => {
   if (dataChart) {
     let labels: string[] = [];
-    let datasets: { data: any, backgroundColor: string, borderColor: string, label: string }[] = [];
+    let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];
     if (Array.isArray(dataChart)) {
       labels = dataChart.map((e: any) => toDate(e.date));
       datasets = [
@@ -16,21 +16,20 @@ export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number)
           borderColor: "rgb(53, 162, 235)",
           label: datasetLabel,
         },
-      ]
-    } else if (typeof (dataChart) === 'object') {
-      const colorList = ['red', 'blue', 'yellow', 'lime', 'pink', 'black', 'orange', 'green'];
+      ];
+    } else if (typeof dataChart === "object") {
+      const colorList = ["red", "blue", "yellow", "lime", "pink", "black", "orange", "green"];
       datasets = Object.keys(dataChart).map((item: string, idx: number) => {
         if (labels.length === 0) {
           labels = dataChart[item].map((e: any) => toDate(e.date));
         }
-        return ({
+        return {
           data: dataChart[item].map((e: any) => e.value),
           backgroundColor: colorList[idx],
           borderColor: colorList[idx],
-          label: item
-        })
-      })
-
+          label: item,
+        };
+      });
     } else {
       return null;
     }

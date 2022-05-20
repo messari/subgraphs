@@ -33,7 +33,7 @@ function ProtocolDashboard() {
 
   ChartJS.register(...registerables);
   const link = new HttpLink({
-    uri: subgraphToQuery.url
+    uri: subgraphToQuery.url,
   });
   const client = useMemo(
     () =>
@@ -59,7 +59,7 @@ function ProtocolDashboard() {
   const {
     data: protocolSchemaData,
     loading: protocolSchemaQueryLoading,
-    error: protocolSchemaQueryError
+    error: protocolSchemaQueryError,
   } = useQuery(query, { client });
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
@@ -120,7 +120,7 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
-  })
+  });
 
   const handleTabChange = (event: any, newValue: string) => {
     let tabName = "protocol";
@@ -136,8 +136,6 @@ function ProtocolDashboard() {
   // AllData() is what renders the tabs and all of the data within them. This is also were data is mapped to call functions for the compoenents to be rendered
   // Chart/Table components are called as functions within here, they are imported from the chartComponents directory
 
-
-
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
@@ -152,24 +150,32 @@ function ProtocolDashboard() {
 
   let protocolInfo = null;
   if (protocolSchemaData?.protocols.length > 0) {
-    protocolInfo = <ProtocolInfo protocolSchemaData={protocolSchemaData} subgraphToQueryURL={subgraphToQuery.url} schemaVersion={schemaVersion} />
+    protocolInfo = (
+      <ProtocolInfo
+        protocolSchemaData={protocolSchemaData}
+        subgraphToQueryURL={subgraphToQuery.url}
+        schemaVersion={schemaVersion}
+      />
+    );
   }
 
   let allDataTabs = null;
   if (data) {
-    allDataTabs = <AllDataTabs
-      data={data}
-      entities={entities}
-      entitiesData={entitiesData}
-      tabValue={tabValue}
-      protocolFields={protocolFields}
-      poolNames={PoolNames[data.protocols[0].type]}
-      poolId={poolId}
-      poolData={poolData}
-      events={events}
-      setPoolId={(x) => setPoolId(x)}
-      handleTabChange={(x, y) => handleTabChange(x, y)}
-    />
+    allDataTabs = (
+      <AllDataTabs
+        data={data}
+        entities={entities}
+        entitiesData={entitiesData}
+        tabValue={tabValue}
+        protocolFields={protocolFields}
+        poolNames={PoolNames[data.protocols[0].type]}
+        poolId={poolId}
+        poolData={poolData}
+        events={events}
+        setPoolId={(x) => setPoolId(x)}
+        handleTabChange={(x, y) => handleTabChange(x, y)}
+      />
+    );
   }
 
   return (

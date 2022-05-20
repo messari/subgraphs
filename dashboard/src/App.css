@@ -3,7 +3,13 @@
   /* background-color: #ccd9f5; */
 }
 
-p,h1, h2, h3, h4, h5, h6 {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin: 4px;
   padding-left: 3px;
 }

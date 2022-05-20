@@ -4,7 +4,6 @@ import { ProtocolsToQuery } from "../constants";
 import { SubgraphDeployments } from "../common/subgraphDeployments";
 import { useNavigate } from "react-router";
 
-
 function DeploymentsPage() {
   const [urlText, setUrlText] = useState<string>("");
   const navigate = useNavigate();
@@ -30,10 +29,7 @@ function DeploymentsPage() {
       </Box>
       <h2 style={{ textAlign: "center" }}>Deployed Subgraphs</h2>
       {Object.keys(ProtocolsToQuery).map((key) => (
-        <SubgraphDeployments
-          key={key}
-          protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }}
-        />
+        <SubgraphDeployments key={key} protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }} />
       ))}
     </div>
   );
