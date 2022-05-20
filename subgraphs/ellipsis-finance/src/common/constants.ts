@@ -172,27 +172,27 @@ export const BBTC_ADDRESS = Address.fromString("0x7130d2A12B9BCbFAe4f2634d864A1E
 export const SIDECHAIN_SUBSTITUTES = new Map<string, Address>();
 
 export const TRICRYPTO_LP_TOKEN = Address.fromString("0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452");
-export const POOL_LP_TOKEN_MAP = new Map<Address, Address>();
+export const POOL_LP_TOKEN_MAP = new Map<string, Address>();
 POOL_LP_TOKEN_MAP.set(
-  Address.fromString("0x160CAed03795365F3A589f10C379FfA7d75d4E76"),
+  "0x160CAed03795365F3A589f10C379FfA7d75d4E76".toLowerCase(),
   Address.fromString("0xaF4dE8E872131AE328Ce21D909C74705d3Aaf452"),
 );
 POOL_LP_TOKEN_MAP.set(
-  Address.fromString("0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9"),
+  "0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9".toLowerCase(),
   Address.fromString("0x2a435Ecb3fcC0E316492Dc1cdd62d0F189be5640"),
 );
 POOL_LP_TOKEN_MAP.set(
-  Address.fromString("0x19EC9e3F7B21dd27598E7ad5aAe7dC0Db00A806d"),
+  "0x19EC9e3F7B21dd27598E7ad5aAe7dC0Db00A806d".toLowerCase(),
   Address.fromString("0x5b5bD8913D766D005859CE002533D4838B0Ebbb5"),
 );
 POOL_LP_TOKEN_MAP.set(
-  Address.fromString("0xfA715E7C8fA704Cf425Dd7769f4a77b81420fbF2"),
+  "0xfA715E7C8fA704Cf425Dd7769f4a77b81420fbF2".toLowerCase(),
   Address.fromString("0xdC7f3E34C43f8700B0EB58890aDd03AA84F7B0e1"),
 );
 
 export const BASE_POOL_MAP = new Map<Address, Address>();
 BASE_POOL_MAP.set(
-  Address.fromString("0x5A7d2F9595eA00938F3B5BA1f97a85274f20b96c"),
+  Address.fromString("0x5A7d2F9595eA00938F3B5BA1f97a85274f20b96c".toLowerCase()),
   Address.fromString("0x160CAed03795365F3A589f10C379FfA7d75d4E76"),
 );
 
@@ -211,8 +211,8 @@ export namespace PoolType {
 }
 
 export const EARLY_BASEPOOLS: Address[] = [
-  Address.fromString("0x160CAed03795365F3A589f10C379FfA7d75d4E76"),
-  Address.fromString("0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9"),
+  Address.fromString("0x160CAed03795365F3A589f10C379FfA7d75d4E76".toLowerCase()),
+  Address.fromString("0x2477fB288c5b4118315714ad3c7Fd7CC69b00bf9".toLowerCase()),
 ];
 
 export const EPS_ADDRESS = Address.fromString("0xA7f552078dcC247C2684336020c03648500C6d9F");

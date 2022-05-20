@@ -190,7 +190,7 @@ dataSources:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256)
           handler: handleNewFee3
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool3.ts
 
   - kind: ethereum
     name: btcEPS
@@ -242,7 +242,7 @@ dataSources:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256,uint256)
           handler: handleNewFee2
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
 
   - kind: ethereum
@@ -291,7 +291,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: DAI
@@ -339,7 +339,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: fUSDT
@@ -387,7 +387,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: pBTC
@@ -435,7 +435,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: USDN
@@ -483,7 +483,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: UST
@@ -531,7 +531,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
 
 templates:
@@ -579,7 +579,7 @@ templates:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: BasePool2
@@ -629,7 +629,7 @@ templates:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256,uint256)
           handler: handleNewFee2
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: BasePool3
@@ -679,4 +679,4 @@ templates:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256)
           handler: handleNewFee3
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool3.ts

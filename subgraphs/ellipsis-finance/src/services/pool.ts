@@ -3,6 +3,7 @@ import { Factory } from "../../generated/Factory/Factory";
 import { StableSwap } from "../../generated/Factory/StableSwap";
 import { LiquidityPool, LptokenPool } from "../../generated/schema";
 import {
+  ADDRESS_ZERO,
   BIGINT_ONE,
   BIGINT_ZERO,
   PoolType,
@@ -43,7 +44,8 @@ export function createNewPool(
   pool.createdTimestamp = timestamp;
   pool.basePool = basePool.toHexString();
   pool.outputTokenPriceUSD = getLpTokenPriceUSD(pool, timestamp);
-  pool.inputTokens = coins.length > 0 ? coins : getPoolCoins(pool);
+  pool.inputTokens = coins.length > 0 ? coins.sort() : getPoolCoins(pool).sort();
+  pool.coins = coins.length > 0 ? coins.sort() : getPoolCoins(pool).sort();
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
   log.error('setPoolBalances {}',[poolAddress.toHexString()]);
@@ -62,8 +64,18 @@ export function createNewPool(
 export function getLpToken(pool: Address): Address {
   log.error("getLpToken {}", [pool.toHexString()]);
   let stableSwap = StableSwap.bind(pool);
+  let lpToken = ADDRESS_ZERO
   let lpTokenCall = stableSwap.try_lp_token();
-  let lpToken = lpTokenCall.reverted ? POOL_LP_TOKEN_MAP.get(pool) : lpTokenCall.value;
+  if (lpTokenCall.reverted) {
+    const poolAddress = pool.toHexString().toLowerCase();
+    if (POOL_LP_TOKEN_MAP.has(poolAddress)){
+      lpToken = POOL_LP_TOKEN_MAP.get(poolAddress);
+    } else{
+      log.error('cannot find lptoken for pool {}',[pool.toHexString()]);
+    }
+  } else {
+    lpToken = lpTokenCall.value;
+  }
   let lpTokenPool = new LptokenPool(lpToken.toHexString());
   lpTokenPool.pool = pool.toHexString();
   lpTokenPool.save();
@@ -135,7 +147,7 @@ export function getBasePoolCoins(pool: LiquidityPool): string[] {
   let i = BIGINT_ZERO;
   let basePoolCoinsCall = curvePool.try_base_coins(i);
   while (!basePoolCoinsCall.reverted) {
-    underlyingTokens.push(getOrCreateToken(basePoolCoinsCall.value).id);
+    underlyingTokens.push(basePoolCoinsCall.value.toHexString());
     basePoolCoinsCall = curvePool.try_base_coins(i);
     i = i.plus(BIGINT_ONE);
   }
@@ -152,13 +164,13 @@ export function getUnderlyingTokens(pool: LiquidityPool): string[] {
       return [];
     }
     while (!coinResult.reverted) {
-      underlyingTokens.push(getOrCreateToken(coinResult.value).id);
+      underlyingTokens.push(coinResult.value.toHexString());
       i += 1;
       coinResult = curvePool.try_coins(BigInt.fromI32(i));
     }
   }
   if (underlyingTokens.length == 0) {
-    underlyingTokens = getBasePoolCoins(pool);
+    return getBasePoolCoins(pool);
   }
   return underlyingTokens;
 }

@@ -191,7 +191,7 @@ dataSources:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256{{NewFee}})
           handler: handleNewFee{{num_coins}}
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool{{num_coins}}.ts
 
 {{/basepools}}
 
@@ -242,7 +242,7 @@ dataSources:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
 {{/stablepools}}
 
@@ -291,7 +291,7 @@ templates:
           handler: handleTokenExchange
         - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchangeUnderlying
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: BasePool2
@@ -341,7 +341,7 @@ templates:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256,uint256)
           handler: handleNewFee2
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool2.ts
 
   - kind: ethereum
     name: BasePool3
@@ -391,4 +391,4 @@ templates:
           handler: handleTokenExchange
         - event: NewFee(uint256,uint256)
           handler: handleNewFee3
-      file: ./src/mappings/pools.ts
+      file: ./src/mappings/basepool3.ts

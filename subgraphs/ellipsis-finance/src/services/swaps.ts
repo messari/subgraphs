@@ -20,7 +20,33 @@ import {
   updateUsageMetrics,
 } from "../common/metrics";
 import { setPoolFeesV2 } from "../common/setters";
-import { BIGDECIMAL_TWO, PoolType } from "../common/constants";
+import { BIGDECIMAL_TWO, PoolType, ZERO_ADDRESS } from "../common/constants";
+
+function handleExchangeUnderlying(i: i32, j: i32, coins: string[], underlyingCoins: string[]): string[] { // i = sold_id, j = bought_id
+  const MAX_COIN = coins.length - 1;
+  let base_i: i32 = 0, base_j: i32 = 0;
+  let input_coin: string = ZERO_ADDRESS, output_coin: string = ZERO_ADDRESS;
+  if (i == 0){
+    input_coin = coins[0];
+  } else {
+    base_i = i - MAX_COIN
+    input_coin = underlyingCoins[base_i]
+  }
+  if (j == 0){
+        output_coin = coins[0];
+  } else{
+        base_j = j - MAX_COIN
+        output_coin = underlyingCoins[base_j]
+  }
+  return [input_coin, output_coin]
+}
+
+function handleExchangeUnderlyingLending(i: i32, j: i32, underlyingCoins: string[]): string[] { // i = sold_id, j = bought_id
+  let input_coin = underlyingCoins[i];
+  let output_coin = underlyingCoins[j];
+  return [input_coin, output_coin]
+}
+
 
 export function handleExchange(
   buyer: Address,
@@ -43,65 +69,19 @@ export function handleExchange(
   const boughtId = bought_id.toI32();
   let tokenSold: String, tokenBought: String;
   let tokenSoldDecimals: BigInt, tokenBoughtDecimals: BigInt;
-  let addTokenSoldAmt: boolean = false,
-    addTokenBoughtAmt: boolean = false;
+  let tokenList: string[] = [];
 
-  if (exchangeUnderlying && pool.poolType == PoolType.LENDING) {
-    const underlyingCoins = pool.underlyingTokens;
-    if (soldId > underlyingCoins.length - 1) {
-      log.error("Undefined underlying sold Id {} for lending pool {} at tx {}", [soldId.toString(), pool.id, txhash]);
-      return;
+  if (exchangeUnderlying) {
+    if (pool.underlyingTokens.length == 0) {
+      log.error("handleExchangeUnderlying: no underlying coins for pool = {}, txhash = {}",[pool.id, txhash]);
     }
-    tokenSold = underlyingCoins[soldId];
-    tokenSoldDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(tokenSold.toString())).decimals);
-  } else if (exchangeUnderlying && soldId != 0) {
-    const underlyingSoldIndex = soldId - 1;
-    const underlyingCoins = pool.underlyingTokens;
-    if (underlyingSoldIndex > underlyingCoins.length - 1) {
-      log.error("Undefined underlying sold Id {} for pool {} at tx {}", [soldId.toString(), pool.id, txhash]);
-      return;
-    }
-    tokenSold = underlyingCoins[underlyingSoldIndex];
-
-    tokenSoldDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(tokenSold.toString())).decimals);
+    tokenList = pool.poolType == PoolType.LENDING ? handleExchangeUnderlyingLending(soldId, boughtId, pool.underlyingTokens) : handleExchangeUnderlying(soldId, boughtId, pool.coins, pool.underlyingTokens);
   } else {
-    if (soldId > pool.inputTokens.length - 1) {
-      log.error("Undefined sold Id {} for pool {} at tx {}", [soldId.toString(), pool.id, txhash]);
-      return;
-    }
-    tokenSold = pool.inputTokens[soldId];
-    tokenSoldDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(pool.inputTokens[soldId])).decimals);
-    addTokenSoldAmt = true;
+    tokenList = [pool.coins[soldId],pool.coins[boughtId]]
   }
-
-  if (exchangeUnderlying && pool.poolType == PoolType.LENDING) {
-    const underlyingCoins = pool.underlyingTokens;
-    if (boughtId > underlyingCoins.length - 1) {
-      log.error("Undefined underlying bought Id {} for lending pool {} at tx {}", [
-        boughtId.toString(),
-        pool.id,
-        txhash,
-      ]);
-      return;
-    }
-    tokenBought = underlyingCoins[boughtId];
-    tokenBoughtDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(pool.inputTokens[boughtId])).decimals);
-  } else if (exchangeUnderlying && boughtId != 0) {
-    const underlyingBoughtIndex = boughtId - 1;
-    const underlyingCoins = pool.underlyingTokens;
-    if (underlyingBoughtIndex > underlyingCoins.length - 1) {
-      log.error("Undefined underlying bought Id {} for pool {} at tx {}", [boughtId.toString(), pool.id, txhash]);
-    }
-    tokenBought = underlyingCoins[underlyingBoughtIndex];
-    tokenBoughtDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(pool.inputTokens[boughtId])).decimals);
-  } else {
-    if (boughtId > pool.inputTokens.length - 1) {
-      return;
-    }
-    tokenBought = pool.inputTokens[boughtId];
-    tokenBoughtDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(pool.inputTokens[boughtId])).decimals);
-    addTokenBoughtAmt = true;
-  }
+  tokenSold = tokenList[0], tokenBought = tokenList[1];
+  tokenSoldDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(tokenSold.toString())).decimals);
+  tokenBoughtDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(tokenBought.toString())).decimals);
 
   const amountSold = tokens_sold.toBigDecimal().div(exponentToBigDecimal(tokenSoldDecimals.toI32()));
   const amountBought = tokens_bought.toBigDecimal().div(exponentToBigDecimal(tokenBoughtDecimals.toI32()));
@@ -149,17 +129,19 @@ export function handleExchange(
   let dailyVolumeByTokenUSD = dailySnapshot.dailyVolumeByTokenUSD;
   const protocol = getOrCreateDexAmm();
 
-  if (addTokenSoldAmt) {
-    hourlyVolumeByTokenAmount[soldId] = hourlyVolumeByTokenAmount[soldId].plus(tokens_sold);
-    dailyVolumeByTokenAmount[soldId] = dailyVolumeByTokenAmount[soldId].plus(tokens_sold);
-    hourlyVolumeByTokenUSD[soldId] = hourlyVolumeByTokenUSD[soldId].plus(amountSoldUSD);
-    dailyVolumeByTokenUSD[soldId] = dailyVolumeByTokenUSD[soldId].plus(amountSoldUSD);
+  if (pool.inputTokens.includes(tokenSold.toString())) {
+    const tokenSoldIndex = pool.inputTokens.indexOf(tokenSold.toString());
+    hourlyVolumeByTokenAmount[tokenSoldIndex] = hourlyVolumeByTokenAmount[tokenSoldIndex].plus(tokens_sold);
+    dailyVolumeByTokenAmount[tokenSoldIndex] = dailyVolumeByTokenAmount[tokenSoldIndex].plus(tokens_sold);
+    hourlyVolumeByTokenUSD[tokenSoldIndex] = hourlyVolumeByTokenUSD[tokenSoldIndex].plus(amountSoldUSD);
+    dailyVolumeByTokenUSD[tokenSoldIndex] = dailyVolumeByTokenUSD[tokenSoldIndex].plus(amountSoldUSD);
   }
-  if (addTokenBoughtAmt) {
-    hourlyVolumeByTokenAmount[boughtId] = hourlyVolumeByTokenAmount[boughtId].plus(tokens_bought);
-    dailyVolumeByTokenAmount[boughtId] = dailyVolumeByTokenAmount[boughtId].plus(tokens_bought);
-    hourlyVolumeByTokenUSD[boughtId] = hourlyVolumeByTokenUSD[boughtId].plus(amountBoughtUSD);
-    dailyVolumeByTokenUSD[boughtId] = dailyVolumeByTokenUSD[boughtId].plus(amountBoughtUSD);
+  if (pool.inputTokens.includes(tokenBought.toString())) {
+    const tokenBoughtIndex = pool.inputTokens.indexOf(tokenBought.toString());
+    hourlyVolumeByTokenAmount[tokenBoughtIndex] = hourlyVolumeByTokenAmount[tokenBoughtIndex].plus(tokens_bought);
+    dailyVolumeByTokenAmount[tokenBoughtIndex] = dailyVolumeByTokenAmount[tokenBoughtIndex].plus(tokens_bought);
+    hourlyVolumeByTokenUSD[tokenBoughtIndex] = hourlyVolumeByTokenUSD[tokenBoughtIndex].plus(amountBoughtUSD);
+    dailyVolumeByTokenUSD[tokenBoughtIndex] = dailyVolumeByTokenUSD[tokenBoughtIndex].plus(amountBoughtUSD);
   }
 
   hourlySnapshot.hourlyVolumeUSD = hourlySnapshot.hourlyVolumeUSD.plus(volumeUSD);

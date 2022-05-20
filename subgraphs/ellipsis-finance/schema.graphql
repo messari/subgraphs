@@ -438,6 +438,9 @@ type LiquidityPool @entity {
 
   poolType: String!
 
+  " same as inputTokens, but since input tokens include token entity, the graph will sort them out of order, keeping them in order helps with mapping "
+  coins: [String!]!
+
   underlyingTokens: [String!]!
   
   stakingContracts: [String!]!
