@@ -51,7 +51,7 @@ export const Deployment = ({ networkName, deployment }: DeploymentProps) => {
   }
 
   const navigateToSubgraph = (url: string) => () => {
-    navigate(`graphs?subgraph=${url}`);
+    navigate(`graphs?subgraph=${url}&tab=protocol`);
   };
 
   let color = "black";

@@ -19,7 +19,8 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
         currentData.amountOutUSD = Number(Number(currentData.amountOutUSD).toFixed(2)).toLocaleString();
       }
       if (data[poolName]?.inputToken) {
-        currentData.amount = convertTokenDecimals(currentData.amount, data[poolName].inputToken.decimals);
+        const convertedAmt = convertTokenDecimals(currentData.amount, data[poolName].inputToken.decimals);
+        currentData.amount = convertedAmt;
         tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData });
       }
       if (currentData?.amountUSD) {

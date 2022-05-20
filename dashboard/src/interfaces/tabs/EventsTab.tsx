@@ -1,48 +1,53 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { TableEvents } from "../../common/chartComponents/TableEvents";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
+import IssuesDisplay from "../IssuesDisplay";
 
 interface EventsTabProps {
     data: any;
     events: string[];
-    issues: { message: string, type: string }[];
     poolId: string;
     setPoolId: React.Dispatch<React.SetStateAction<string>>;
     poolNames: string;
-    setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>;
 }
 
 // This component is for each individual subgraph
 function EventsTab({
     data,
     events,
-    issues,
     poolId,
     setPoolId,
-    setWarning,
     poolNames }:
     EventsTabProps
 ) {
+    const [issuesState, setIssues] = useState<{ message: string, type: string, level: string, fieldName: string }[]>([]);
+    const issues: { message: string, type: string, level: string, fieldName: string }[] = issuesState;
 
     useEffect(() => {
-        setWarning(issues);
-    }, [issues]);
+        console.log('EVENTS ISSUES TO SET', issues, issuesState)
+        setIssues(issues);
+    }, [issuesState]);
 
     return (<>
-        <PoolDropDown poolId={poolId} setPoolId={(x) => setPoolId(x)} setWarning={(x) => setWarning(x)} markets={data[poolNames]} />
+        <IssuesDisplay issuesArray={issues} />
+        <PoolDropDown poolId={poolId} setPoolId={(x) => setPoolId(x)} setIssues={(x) => setIssues(x)} markets={data[poolNames]} />
         {events.map((eventName) => {
             if (!poolId && data[eventName].length > 0) {
-                const message = 'No pool selected, there should not be "' + eventName + '" events';
+                const message = `${eventName} events found with a pool id of "". All events need to be linked to a pool/market/vault by a valid id.`;
                 if (issues.filter((x) => x.message === message).length === 0) {
-                    issues.push({ message, type: "NOEV" });
+                    issues.push({ message, type: "NOEV", level: 'critical', fieldName: eventName });
                 }
             }
             if (poolId && data[eventName].length === 0) {
                 const message = "No " + eventName + " on pool " + poolId;
                 if (issues.filter((x) => x.message === message).length === 0) {
-                    issues.push({ message, type: "EVENT" });
+                    let level = 'warning';
+                    if (eventName.toUpperCase() === "DEPOSITS" || eventName.toUpperCase() === "SWAPS") {
+                        level = "critical";
+                    }
+                    issues.push({ message, type: "EVENT", level, fieldName: eventName });
                 }
-                return <div style={{ marginLeft: "40px", borderTop: "black 2px solid" }}><h3>{message}</h3></div>
+                return <div style={{ marginLeft: "40px", borderTop: "black 2px solid" }}><h2>{message}</h2></div>
             }
             return <React.Fragment>{TableEvents(eventName, data, eventName, poolId)}</React.Fragment>;
         })}

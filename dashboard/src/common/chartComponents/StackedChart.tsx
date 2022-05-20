@@ -50,7 +50,7 @@ export function StackedChart(tokens: any[], tokenWeightsArray: any[], poolTitle:
             },
         },
     };
-    const colorList = ['red', 'blue', 'yellow', 'lime']
+    const colorList = ['red', 'blue', 'yellow', 'lime', 'pink', 'black', 'purple']
     const labels = dates;
     const datasets = tokenWeightsValues.map((valArr: any[], idx: number) => {
         return { data: valArr, label: tokens[idx].name || "Token [" + idx + ']', backgroundColor: colorList[idx] }

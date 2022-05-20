@@ -39,6 +39,18 @@ export interface Schema {
   events: string[];
   protocolFields: { [x: string]: string };
 }
+export const percentageFieldList = [
+  "rates",
+  "rewardAPR",
+  "capitalEfficiency",
+  "maximumLTV",
+  "liquidationThreshold",
+  "liquidationPenalty",
+  "inputTokenWeights",
+  "baseYield",
+  "fee",
+  "percentage"
+];
 export const ProtocolsToQuery: { [name: string]: { [network: string]: string } } = {
   aaveV2: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum",

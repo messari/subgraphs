@@ -1,4 +1,4 @@
-import { MenuItem, Select, SelectChangeEvent, Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ComboBoxInput } from "./ComboBoxInput";
@@ -6,11 +6,11 @@ import { ComboBoxInput } from "./ComboBoxInput";
 interface PoolDropDownProps {
   poolId: string;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
-  setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>;
+  setIssues: React.Dispatch<React.SetStateAction<{ message: string; type: string, level: string, fieldName: string }[]>>;
   markets: [];
 }
 
-export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDropDownProps) => {
+export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   // Create the array of pool selections in the drop down
@@ -33,7 +33,7 @@ export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDro
         sx={{ maxWidth: 1000, margin: 2 }}
         onChange={(event: React.SyntheticEvent) => {
           // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
-          setWarning([]);
+          // setIssues([]);
           const targEle = (event?.target as HTMLLIElement);
           setTextInput(targEle.innerText);
           searchParams.delete('view');

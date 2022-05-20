@@ -44,9 +44,13 @@ Once the pool data is loaded, a table for each event type is loaded. The table c
 
 ## Troubleshooting
 
-In the case of data appearing differently as expected, here are some things to do to verify and correct the data.
+In the case of data appearing differently as expected, here are some things to do to verify and correct the data. If any issues arise or if you suspect something is erroneous on the dashboard, please leave a message in the 'Validation-Dashboard' Discord channel.
+
 -Upon entering a subgraph to validate, if an error is received saying `Required schema fields are missing from this subgraph. Verify that your schema has all of the fields that are in the common ***** schema.`, the specified field is required for the protocol type but is missing from the subgraph. 
+
 -Check the schema for that data field and check that the data is being saved in the correct unit
+
 -For data involving tokens, the Validation assumes that the token amount has not been converted with decimals. Make sure that the tokens on a pool have the correct value for decimals.
+
 -For zero values in the timeseries tables, make sure that the field is being saved on the snapshot
 

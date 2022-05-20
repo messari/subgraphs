@@ -14,9 +14,9 @@ function ScrollToElement({ poolId, elementId, tab, label }: ScrollToElementProps
     const subgraphName = searchParams.get("subgraph");
     let poolIdParam = '';
     if (poolId) {
-        poolIdParam = '&poolId=' + poolId
+        poolIdParam = '&poolId=' + poolId;
     }
-    let tabParam = '&tab=protocol'
+    let tabParam = '&tab=protocol';
     if (tab) {
         tabParam = '&tab=' + tab;
     }

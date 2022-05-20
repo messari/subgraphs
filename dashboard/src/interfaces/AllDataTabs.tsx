@@ -13,13 +13,11 @@ interface AllDataTabsProps {
     protocolFields: { [x: string]: string };
     tabValue: string;
     handleTabChange: (event: any, newValue: string) => void;
-    issues: { message: string, type: string }[];
     poolId: string;
     poolData: { [x: string]: string };
     events: string[];
     setPoolId: React.Dispatch<React.SetStateAction<string>>;
     poolNames: string;
-    setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>;
 }
 
 // This component is for each individual subgraph
@@ -30,12 +28,10 @@ function AllDataTabs({
     protocolFields,
     tabValue,
     handleTabChange,
-    issues,
     poolId,
     poolData,
     events,
     setPoolId,
-    setWarning,
     poolNames }:
     AllDataTabsProps
 ) {
@@ -59,8 +55,7 @@ function AllDataTabs({
                     </Box>
                     <TabPanel value="1">
                         {/* PROTOCOL TAB */}
-
-                        {ProtocolTab(data, entities, entitiesData, protocolFields, setWarning, issues)}
+                        <ProtocolTab data={data} entities={entities} entitiesData={entitiesData} protocolFields={protocolFields} />
                     </TabPanel>
                     <TabPanel value="2">
                         {/* POOL TAB */}
@@ -71,8 +66,6 @@ function AllDataTabs({
                             poolId={poolId}
                             setPoolId={(x) => setPoolId(x)}
                             poolData={poolData}
-                            setWarning={(x) => setWarning(x)}
-                            issues={issues}
                         />
                     </TabPanel>
                     <TabPanel value="3">
@@ -80,11 +73,9 @@ function AllDataTabs({
                         <EventsTab
                             data={data}
                             events={events}
-                            issues={issues}
                             poolId={poolId}
                             setPoolId={(x) => setPoolId(x)}
                             poolNames={poolNames}
-                            setWarning={(x) => setWarning(x)}
                         />
                     </TabPanel>
                 </TabContext>

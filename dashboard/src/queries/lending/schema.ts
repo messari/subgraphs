@@ -499,8 +499,8 @@ export const schema120 = (): Schema => {
 
   const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
   const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
-  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{rate,type}";
-  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{rate,type}";
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf('rates')] = "rates{side,rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf('rates')] = "rates{side,rate,type}";
 
 
   const finanQuery = "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" + Object.keys(entitiesData.financialsDailySnapshots).join(",") + '}';
@@ -636,6 +636,8 @@ export const schema120 = (): Schema => {
         }
       }
       rates {
+        id
+        side
         rate
         type
       }

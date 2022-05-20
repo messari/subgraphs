@@ -22,14 +22,13 @@ function DeploymentsPage() {
         <Button
           style={{ border: "black 0.2px solid", marginTop: "10px" }}
           onClick={() => {
-            navigate(`graphs?subgraph=${urlText}`);
+            navigate(`graphs?subgraph=${urlText}&tab=protocol`);
           }}
         >
           Load Subgraph
         </Button>
       </Box>
       <h2 style={{ textAlign: "center" }}>Deployed Subgraphs</h2>
-      {/*{errorRender}*/}
       {Object.keys(ProtocolsToQuery).map((key) => (
         <SubgraphDeployments
           key={key}
