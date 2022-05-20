@@ -1,12 +1,6 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import {
-  Deposit,
-  Strategy,
-  Token,
-  Vault,
-  YieldAggregator,
-} from "../../generated/schema";
-import { createStrategy } from "../mappings/strategy";
+import { Deposit, Token, Vault, YieldAggregator } from "../../generated/schema";
+import { createVault } from "../mappings/vault";
 import {
   fetchTokenDecimals,
   fetchTokenName,
@@ -38,25 +32,9 @@ export function getVaultOrCreate(
   const vaultId = vaultAddress.toHexString() + networkSuffix;
   let vault = Vault.load(vaultId);
   if (!vault) {
-    vault = new Vault(vaultId); //no!!! use createVault instead
-  } else {
-    //update vault
+    vault = createVault(vaultAddress, currentBlock);
   }
-
   return vault;
-}
-
-export function getStrategyOrCreate(
-  strategyAddress: Address,
-  currentBlock: ethereum.Block,
-  networkSuffix: string
-): Strategy {
-  const strategyId = strategyAddress.toHexString() + networkSuffix;
-  let strategy = Strategy.load(strategyId);
-  if (!strategy) {
-    strategy = createStrategy(strategyAddress, currentBlock);
-  }
-  return strategy;
 }
 
 export function getBeefyFinanceOrCreate(

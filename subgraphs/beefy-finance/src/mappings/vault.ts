@@ -1,60 +1,85 @@
-import { BigInt, Address } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault } from "../../generated/schema";
 import {
-  UpgradeStrat,
-  BeefyVault,
-} from "../../generated/templates/BeefyVault/BeefyVault";
+  BeefyStrategy,
+  Deposit,
+  Withdraw,
+} from "../../generated/ExampleVault/BeefyStrategy";
+import { BeefyVault } from "../../generated/ExampleVault/BeefyVault";
 import {
-  getTokenOrCreate,
-  getStrategyOrCreate,
+  getBeefyFinanceOrCreate,
   getVaultOrCreate,
+  getTokenOrCreate,
 } from "../utils/getters";
-import { createFirstDeposit } from "./deposit";
-import { createFirstWithdraw } from "./withdraw";
+import { createDeposit, getOrCreateFirstDeposit } from "./deposit";
+import { createWithdraw, getOrCreateFirstWithdraw } from "./withdraw";
 
 const NETWORK_SUFFIX: string = "-137";
-
-function handleUpgradeStrat(event: UpgradeStrat): void {
-  const vault = getVaultOrCreate(event.address, event.block, NETWORK_SUFFIX);
-
-  vault.strategy = getStrategyOrCreate(
-    event.params.implementation,
-    event.block,
-    NETWORK_SUFFIX
-  ).id;
-
-  vault.save();
-}
 
 export function createVault(
   vaultAddress: Address,
   currentBlock: ethereum.Block
 ): Vault {
   const vault = new Vault(vaultAddress.toHexString() + NETWORK_SUFFIX);
-  const vaultContract = BeefyVault.bind(vaultAddress);
-  //add parameters to vault
-  vault.protocol = "Assign BeefyFinance"; //type YieldAggregator
+  const strategyContract = BeefyStrategy.bind(vaultAddress);
+  const vaultContract = BeefyVault.bind(strategyContract.vault());
+
+  vault.protocol = getBeefyFinanceOrCreate(NETWORK_SUFFIX).id;
   vault.name = vaultContract.name();
   vault.symbol = vaultContract.symbol();
-
-  vault.strategy = getStrategyOrCreate(
-    vaultContract.strategy(),
-    currentBlock,
+  vault.inputToken = getTokenOrCreate(
+    strategyContract.want(),
     NETWORK_SUFFIX
   ).id;
-  vault.inputToken = getTokenOrCreate(vaultContract.want(), NETWORK_SUFFIX).id;
-  vault.outputToken = getTokenOrCreate(vaultAddress, NETWORK_SUFFIX).id;
-  vault.depositLimit = new BigInt(0); //TODO: verify if there is a depositLimit
-  //vault.fees = ["Assign Fee"]; //type [VaultFee] TODO: need to find contract where fees are stored
+  vault.outputToken = getTokenOrCreate(
+    vaultContract._address,
+    NETWORK_SUFFIX
+  ).id;
   vault.createdTimestamp = currentBlock.timestamp;
   vault.createdBlockNumber = currentBlock.number;
-  vault.inputTokenBalance = vaultContract.balance();
-  //vault.totalValueLockedUSD = new BigDecimal(new BigInt(0));
 
-  vault.deposits = [createFirstDeposit(vault).id];
-  vault.withdraws = [createFirstWithdraw(vault).id];
+  vault.inputTokenBalance = strategyContract.balanceOf();
+  vault.outputTokenSupply = vaultContract.totalSupply();
+  vault.pricePerShare = vaultContract.getPricePerFullShare();
+
+  vault.deposits = [getOrCreateFirstDeposit(vault).id];
+  vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
 
   vault.save();
   return vault;
+}
+
+export function handleDeposit(event: Deposit): void {
+  const vault = getVaultOrCreate(event.address, event.block, NETWORK_SUFFIX);
+  const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
+
+  vault.inputTokenBalance = event.params.tvl;
+
+  const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
+
+  if (vault.deposits[0] === "MockDeposit") {
+    vault.deposits = [deposit.id];
+  } else {
+    vault.deposits.push(deposit.id);
+  }
+
+  vault.save();
+}
+
+export function handleWithdraw(event: Withdraw): void {
+  const vault = getVaultOrCreate(event.address, event.block, NETWORK_SUFFIX);
+  const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
+
+  vault.inputTokenBalance = event.params.tvl;
+
+  const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
+
+  if (vault.withdraws[0] === "MockWithdraw") {
+    vault.withdraws = [withdraw.id];
+  } else {
+    vault.withdraws.push(withdraw.id);
+  }
+
+  vault.save();
 }

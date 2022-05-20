@@ -1,13 +1,13 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Deposit, Strategy, Vault } from "../../generated/schema";
+import { Deposit, Vault } from "../../generated/schema";
 import {
   BeefyStrategy,
   Deposit as DepositEvent,
-} from "../../generated/ExampleStrategy/BeefyStrategy";
+} from "../../generated/ExampleVault/BeefyStrategy";
 import {
   getBeefyFinanceOrCreate,
-  getStrategyOrCreate,
   getTokenOrCreate,
+  getVaultOrCreate,
 } from "../utils/getters";
 
 export function createDeposit(
@@ -24,18 +24,16 @@ export function createDeposit(
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.transaction.index.toI32();
-  deposit.protocol = getBeefyFinanceOrCreate().id;
-  //deposit.to = event.address.toHexString();
-  //deposit.from = call.from.toHexString();
+  deposit.protocol = getBeefyFinanceOrCreate(networkSuffix).id;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
 
-  const strategyContract = BeefyStrategy.bind(event.address);
-  deposit.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
+  const vaultContract = BeefyStrategy.bind(event.address);
+  deposit.asset = getTokenOrCreate(vaultContract.want(), networkSuffix).id;
   deposit.amount = depositedAmount;
   //TODO: deposit.amountUSD
 
-  deposit.strategy = getStrategyOrCreate(
+  deposit.vault = getVaultOrCreate(
     event.address,
     event.block,
     networkSuffix
@@ -45,7 +43,7 @@ export function createDeposit(
   return deposit;
 }
 
-export function getOrCreateFirstDeposit(strategy: Strategy): Deposit {
+export function getOrCreateFirstDeposit(vault: Vault): Deposit {
   let deposit = Deposit.load("MockDeposit");
   if (!deposit) {
     const zeroAddress = "0x0000000000000000000000000000000000000000";
@@ -53,17 +51,12 @@ export function getOrCreateFirstDeposit(strategy: Strategy): Deposit {
 
     deposit.hash = zeroAddress;
     deposit.logIndex = 0;
-    deposit.protocol = getBeefyFinanceOrCreate().id;
-
-    //deposit.to = zeroAddress;
-    //deposit.from = zeroAddress;
+    deposit.protocol = getBeefyFinanceOrCreate(vault.id.split("-")[1]).id;
     deposit.blockNumber = new BigInt(0);
     deposit.timestamp = new BigInt(0);
     deposit.asset = zeroAddress;
     deposit.amount = new BigInt(0);
-    //deposit.amountUSD = new BigDecimal(new BigInt(0));
-    //deposit.vault = vault.id;
-    deposit.strategy = strategy.id;
+    deposit.vault = vault.id;
 
     deposit.save();
   }

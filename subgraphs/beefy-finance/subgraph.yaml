@@ -28,7 +28,7 @@ dataSources:
   #         handler: handleNewStratCandidate
   #       - event: UpgradeStrat(address)
   #         handler: handleUpgradeStrat
-  - name: ExampleStrategy
+  - name: ExampleVault
     kind: ethereum/contract
     network: matic
     source:
@@ -39,16 +39,18 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/strategy.ts
+      file: ./src/mappings/vault.ts
       entities:
-        - Strategy
         - Token
         - Deposit
         - Withdraw
         - YieldAggregator
+        - Vault
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
+        - name: BeefyVault
+          file: ./abis/BeefyVault.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -87,11 +89,11 @@ dataSources:
 #           handler: handleVaultsRetireStatusUpdated
 #       file: ./src/mappings/registry.ts
 # templates:
-#   - name: BeefyVault
+#   - name: Vault
 #     kind: ethereum/contract
 #     network: matic
 #     source:
-#       abi: BeefyVault
+#       abi: Vault
 #     mapping:
 #       kind: ethereum/events
 #       apiVersion: 0.0.6
@@ -99,36 +101,9 @@ dataSources:
 #       file: ./src/mappings/vault.ts
 #       entities:
 #         - Vault
-#         - Token
-#         # other entities?
-#       abis:
-#         - name: BeefyVault
-#           file: ./abis/BeefyVault.json
-#         - name: ERC20
-#           file: ./abis/ERC20.json
-#       eventHandlers:
-#         - event: NewStratCandidate(address)
-#           handler: handleNewStratCandidate
-#         - event: UpgradeStrat(address)
-#           handler: handleUpgradeStrat
-#       callHandlers:
-#         - function: deposit(uint256)
-#           handler: handleDepositCall
-#   - name: Strategy
-#     kind: ethereum/contract
-#     network: matic
-#     source:
-#       abi: Strategy
-#     mapping:
-#       kind: ethereum/events
-#       apiVersion: 0.0.6
-#       language: wasm/assemblyscript
-#       file: ./src/mappings/strategy.ts
-#       entities:
-#         - Strategy
 #         #- Other entities?
 #       abis:
-#         - name: Strategy
+#         - name: BeefyStrategy
 #           file: ./abis/BeefyStrategy.json
 #       eventHandlers:
 #         - event: ChargedFees(uint256,uint256,uint256)
