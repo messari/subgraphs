@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum, BigInt, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,
@@ -264,22 +264,25 @@ export function getOrCreatePool(poolAddress: Address, event: ethereum.Event): Li
   if (!pool) {
     log.error("creating new pool {}", [poolAddress.toHexString()]);
     const lpToken = getLpToken(poolAddress);
+    log.error("lpToken {}, {}", [lpToken.toHexString(),poolAddress.toHexString()]);
     const lpTokenEntity = getOrCreateToken(lpToken);
-    createNewPool(
+    const basePool = getBasePool(poolAddress);
+    log.error("basePool {}, {}", [basePool.toHexString(), poolAddress.toHexString()]);
+    const poolCoins = getPoolCoinsFromAddress(poolAddress)
+    log.error("poolCoins {}, {}", [poolCoins.toString(), poolAddress.toHexString()]);
+    const pooltype = EARLY_BASEPOOLS.includes(poolAddress) ? PoolType.BASEPOOL : PoolType.PLAIN
+    log.error("pooltype {}, {}", [pooltype,poolAddress.toHexString()]);
+    pool = createNewPool(
       poolAddress,
       lpToken,
       lpTokenEntity.name,
       lpTokenEntity.symbol,
       event.block.number,
       event.block.timestamp,
-      getBasePool(poolAddress),
-      getPoolCoinsFromAddress(poolAddress),
-      EARLY_BASEPOOLS.includes(poolAddress) ? PoolType.BASEPOOL : PoolType.PLAIN,
+      basePool,
+      poolCoins,
+      pooltype
     );
-    pool = LiquidityPool.load(poolAddress.toHexString());
-    if (!pool) {
-      return new LiquidityPool(poolAddress.toHexString());
-    }
   }
   return pool;
 }

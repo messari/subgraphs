@@ -25,7 +25,8 @@ export function createNewPool(
   basePool: Address,
   coins: string[],
   poolType: string = PoolType.PLAIN,
-): void {
+): LiquidityPool {
+  log.error("createNewPool {}", [poolAddress.toHexString()]);
   const platform = getPlatform();
   const pools = platform.poolAddresses;
   pools.push(poolAddress.toHexString());
@@ -45,15 +46,21 @@ export function createNewPool(
   pool.inputTokens = coins.length > 0 ? coins : getPoolCoins(pool);
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
+  log.error('setPoolBalances {}',[poolAddress.toHexString()]);
   setPoolBalances(pool);
+  log.error('setPoolTVL {}',[poolAddress.toHexString()]);
   setPoolTVL(pool, timestamp);
+  log.error('setPoolFees {}',[poolAddress.toHexString()]);
   setPoolFees(pool);
+  log.error('setPoolOutputTokenSupply {}',[poolAddress.toHexString()]);
   setPoolOutputTokenSupply(pool);
   pool.save();
   setProtocolTVL();
+  return pool;
 }
 
 export function getLpToken(pool: Address): Address {
+  log.error("getLpToken {}", [pool.toHexString()]);
   let stableSwap = StableSwap.bind(pool);
   let lpTokenCall = stableSwap.try_lp_token();
   let lpToken = lpTokenCall.reverted ? POOL_LP_TOKEN_MAP.get(pool) : lpTokenCall.value;
@@ -64,6 +71,7 @@ export function getLpToken(pool: Address): Address {
 }
 
 export function getBasePool(pool: Address): Address {
+  log.error("getBasePool {}", [pool.toHexString()]);
   let stableSwap = StableSwap.bind(pool);
   let basePoolCall = stableSwap.try_base_pool();
   if (!basePoolCall.reverted) {

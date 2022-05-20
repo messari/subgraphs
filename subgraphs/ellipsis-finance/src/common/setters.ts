@@ -69,6 +69,7 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
 }
 
 export function setPoolFees(pool: LiquidityPool): void {
+  log.error('setPoolFees for {}', [pool.id]);
   let curvePool = StableSwap.bind(Address.fromString(pool.id));
   if (pool.isV2) {
     setPoolFeesV2(pool);

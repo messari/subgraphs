@@ -1,19 +1,17 @@
 import { log } from "@graphprotocol/graph-ts";
 import {
-  AddLiquidity,
+  AddLiquidity as AddLiquidity2,
   NewFee as NewFee2,
-  RemoveLiquidity,
-  RemoveLiquidityImbalance,
-  RemoveLiquidityOne,
-  TokenExchange,
-} from "../../generated/Factory/BasePool2";
+  RemoveLiquidity as RemoveLiquidity2,
+  RemoveLiquidityImbalance as RemoveLiquidityImbalance2,
+} from "../../generated/templates/BasePool2/BasePool2";
 import {
   AddLiquidity as AddLiquidity3,
   NewFee as NewFee3,
   RemoveLiquidity as RemoveLiquidity3,
   RemoveLiquidityImbalance as RemoveLiquidityImbalance3,
-} from "../../generated/Factory/BasePool3";
-import { TokenExchangeUnderlying } from "../../generated/Factory/StableSwap";
+} from "../../generated/templates/BasePool3/BasePool3";
+import { TokenExchangeUnderlying, TokenExchange, RemoveLiquidityOne } from "../../generated/templates/FactoryPools/StableSwap";
 import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType } from "../common/constants";
 import { getOrCreatePool, getPoolFee } from "../common/getters";
 import {
@@ -26,7 +24,7 @@ import {
 import { bigIntToBigDecimal } from "../common/utils/numbers";
 import { handleExchange } from "../services/swaps";
 
-export function handleAddLiquidity2(event: AddLiquidity): void {
+export function handleAddLiquidity2(event: AddLiquidity2): void {
   log.error("handleAddLiquidity2 for {}", [event.address.toHexString()]);
   let pool = getOrCreatePool(event.address, event);
   log.error("pool created for {}", [event.address.toHexString()]);
@@ -39,7 +37,7 @@ export function handleAddLiquidity2(event: AddLiquidity): void {
   updateUsageMetrics(event, "deposit");
 }
 
-export function handleRemoveLiquidity2(event: RemoveLiquidity): void {
+export function handleRemoveLiquidity2(event: RemoveLiquidity2): void {
   log.error("handleRemoveLiquidity2 for {}", [event.address.toHexString()]);
 
   let pool = getOrCreatePool(event.address, event);
@@ -49,7 +47,7 @@ export function handleRemoveLiquidity2(event: RemoveLiquidity): void {
   updateUsageMetrics(event, "withdraw");
 }
 
-export function handleRemoveLiquidityImbalance2(event: RemoveLiquidityImbalance): void {
+export function handleRemoveLiquidityImbalance2(event: RemoveLiquidityImbalance2): void {
   log.error("handleRemoveLiquidityImbalance2 for {}", [event.address.toHexString()]);
   let pool = getOrCreatePool(event.address, event);
 
@@ -61,7 +59,10 @@ export function handleRemoveLiquidityImbalance2(event: RemoveLiquidityImbalance)
 }
 
 export function handleAddLiquidity3(event: AddLiquidity3): void {
+  log.error("handleAddLiquidity3 for {}", [event.address.toHexString()]);
+  log.error("event fees {}", [event.params.fees.toString()]);
   let pool = getOrCreatePool(event.address, event);
+  log.error("pool created for {}", [event.address.toHexString()]);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
