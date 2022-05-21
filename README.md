@@ -117,7 +117,7 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Harvest Finance | 🔨  | | |
 | Liquid Driver | 🔨  | | |
 | Pancakebunny |  | | |
-| Rari Aggregator | 🛠 | 1.2.1 / 1.3.13 / 1.0.0 | [![Rari Vaults Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-vaults-ethereum)|
+| [Rari Aggregator](https://rari.capital/) | 🛠 | 1.2.1 / 1.3.13 / 1.0.0 | [![Rari Vaults Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-vaults-ethereum)|
 | Reaper Farm | 🔨  | | |
 | [Stake DAO](https://stakedao.org/) | 🛠 | 1.2.1 / 1.1.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum)|
 | [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak-ethereum) |
