@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   getOrCreateDex,
   getOrCreateFinancials,
@@ -19,10 +19,10 @@ import {
   LiquidityPoolDailySnapshot,
   _HourlyActiveAccount,
 } from "../../generated/schema";
-import { calculatePrice, isUSDStable, valueInUSD } from "./pricing";
-import { scaleDown } from "./tokens";
+import { calculatePrice, isUSDStable, TokenInfo, valueInUSD } from "./pricing";
+import { hasVirtualSupply, scaleDown } from "./tokens";
 import { ProtocolFeesCollector } from "../../generated/Vault/ProtocolFeesCollector";
-import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { getUsdPrice } from "../prices";
 
 export function updateFinancials(event: ethereum.Event): void {
   let financialMetrics = getOrCreateFinancials(event);
@@ -43,11 +43,12 @@ export function updateFinancials(event: ethereum.Event): void {
       totalRevenueGeneratedFee = totalRevenueGeneratedFee.plus(pool._sideRevenueGeneratedFee);
       totalProtocolGeneratedFee = totalProtocolGeneratedFee.plus(pool._protocolGeneratedFee);
       totalFeesUsd = totalFeesUsd.plus(pool._totalSwapFee);
-    }
-
-    let dailySnapshot = LiquidityPoolDailySnapshot.load(dex._poolIds[i]);
-    if (dailySnapshot) {
-      dailyVolumeUsd = dailyVolumeUsd.plus(dailySnapshot.dailyVolumeUSD);
+      // Number of days since Unix epoch
+      const daysSinceEpoch: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+      let dailySnapshot = LiquidityPoolDailySnapshot.load(pool.id.concat("-").concat(daysSinceEpoch.toString()));
+      if (dailySnapshot) {
+        dailyVolumeUsd = dailyVolumeUsd.plus(dailySnapshot.dailyVolumeUSD);
+      }
     }
   }
 
@@ -129,6 +130,8 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
       continue;
     }
 
+    if (pool.outputToken == pool.inputTokens[i] && pool._hasVirtualSupply) continue;
+
     const token = Token.load(currentToken.toHexString());
     let tokenPrice: BigDecimal | null = token!.lastPriceUSD;
     if (!token || !tokenPrice) {
@@ -185,9 +188,10 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
     protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapValue);
   }
   pool.totalValueLockedUSD = newPoolLiquidity;
-  pool.outputTokenPriceUSD = newPoolLiquidity.div(
-    scaleDown(pool.outputTokenSupply, Address.fromString(pool.outputToken)),
-  );
+  const outputTokenSupply = scaleDown(pool.outputTokenSupply, Address.fromString(pool.outputToken));
+  if (outputTokenSupply.gt(BIGDECIMAL_ZERO)) {
+    pool.outputTokenPriceUSD = newPoolLiquidity.div(outputTokenSupply);
+  }
 
   financials.save();
   protocol.save();
@@ -198,33 +202,40 @@ export function updatePoolMetrics(event: ethereum.Event, pool: LiquidityPool): v
 
 export function updateTokenPrice(
   pool: LiquidityPool,
-  tokenA: Address,
-  tokenAAmount: BigInt,
-  tokenAIndex: i32,
-  tokenB: Address,
-  tokenBAmount: BigInt,
-  tokenBIndex: i32,
+  tokenIn: Address,
+  tokenInAmount: BigInt,
+  tokenInIndex: i32,
+  tokenOut: Address,
+  tokenOutAmount: BigInt,
+  tokenOutIndex: i32,
   blockNumber: BigInt,
 ): void {
   let hasWeights = pool.inputTokenWeights.length > 0;
 
-  let weightTokenB: BigDecimal | null = null;
-  let weightTokenA: BigDecimal | null = null;
-  let tokenAmountIn = scaleDown(tokenAAmount, tokenA);
-  let tokenAmountOut = scaleDown(tokenBAmount, tokenB);
+  let weightTokenOut: BigDecimal | null = null;
+  let weightTokenIn: BigDecimal | null = null;
+  let tokenInDecimalsAmount = scaleDown(tokenInAmount, tokenIn);
+  let tokenOutDecimalsAmount = scaleDown(tokenOutAmount, tokenOut);
 
   if (hasWeights) {
-    weightTokenB = pool.inputTokenWeights[tokenBIndex];
-    weightTokenA = pool.inputTokenWeights[tokenAIndex];
-    tokenAmountIn = scaleDown(pool.inputTokenBalances[tokenAIndex], tokenA);
-    tokenAmountOut = scaleDown(pool.inputTokenBalances[tokenBIndex], tokenB);
+    weightTokenOut = pool.inputTokenWeights[tokenOutIndex];
+    weightTokenIn = pool.inputTokenWeights[tokenInIndex];
+    tokenInDecimalsAmount = scaleDown(pool.inputTokenBalances[tokenInIndex], tokenIn);
+    tokenOutDecimalsAmount = scaleDown(pool.inputTokenBalances[tokenOutIndex], tokenOut);
   }
 
-  const tokenInfo = calculatePrice(tokenA, tokenAmountIn, weightTokenA, tokenB, tokenAmountOut, weightTokenB);
+  let tokenInfo: TokenInfo | null = calculatePrice(
+    tokenIn,
+    tokenInDecimalsAmount,
+    weightTokenIn,
+    tokenOut,
+    tokenOutDecimalsAmount,
+    weightTokenOut,
+  );
 
   if (tokenInfo) {
     const token = getOrCreateToken(tokenInfo.address);
-    const index = tokenInfo.address == tokenB ? tokenBIndex : tokenAIndex;
+    const index = tokenInfo.address == tokenOut ? tokenOutIndex : tokenInIndex;
     const currentBalance = scaleDown(pool.inputTokenBalances[index], Address.fromString(pool.inputTokens[index]));
     // We check if current balance multiplied by the price is over 10k USD, if not,
     // it means that the pool does have too much liquidity, so we fetch the price from
@@ -237,18 +248,18 @@ export function updateTokenPrice(
     }
   }
 
-  if (getOrCreateDex().network == "MATIC") return;
+  if (getOrCreateDex().network == "MATIC" || getOrCreateDex().network == "ARBITRUM_ONE") return;
 
-  if (!isUSDStable(tokenA)) {
-    const token = getOrCreateToken(tokenA);
-    token.lastPriceUSD = getUsdPrice(tokenA, BIGDECIMAL_ONE);
+  if (!isUSDStable(tokenIn)) {
+    const token = getOrCreateToken(tokenIn);
+    token.lastPriceUSD = getUsdPrice(tokenIn, BIGDECIMAL_ONE);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
   }
 
-  if (!isUSDStable(tokenB)) {
-    const token = getOrCreateToken(tokenB);
-    token.lastPriceUSD = getUsdPrice(tokenB, BIGDECIMAL_ONE);
+  if (!isUSDStable(tokenOut)) {
+    const token = getOrCreateToken(tokenOut);
+    token.lastPriceUSD = getUsdPrice(tokenOut, BIGDECIMAL_ONE);
     token.lastPriceBlockNumber = blockNumber;
     token.save();
   }

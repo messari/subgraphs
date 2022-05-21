@@ -11,7 +11,7 @@ import {
 import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics } from "../common/metrics";
-import { isUSDStable, valueInUSD, fetchPrice } from "../common/pricing";
+import { valueInUSD, fetchPrice } from "../common/pricing";
 import { scaleDown } from "../common/tokens";
 import { ERC20 } from "../../generated/Vault/ERC20";
 import { updateWeight } from "../common/weight";
@@ -155,8 +155,8 @@ export function handleSwap(event: Swap): void {
   swap.tokenOut = tokenOut.toHexString();
   swap.amountIn = event.params.amountIn;
   swap.amountOut = event.params.amountOut;
-  swap.amountInUSD = isUSDStable(tokenIn) ? amountIn : valueInUSD(amountIn, tokenIn);
-  swap.amountOutUSD = isUSDStable(tokenOut) ? amountOut : valueInUSD(amountOut, tokenOut);
+  swap.amountInUSD = valueInUSD(amountIn, tokenIn);
+  swap.amountOutUSD = valueInUSD(amountOut, tokenOut);
   swap.save();
 
   let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event);

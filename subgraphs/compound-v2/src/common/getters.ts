@@ -306,8 +306,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
     market.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
-    market._lastRateUpdateBlock = event.block.number;
-    market._lastRevenueUpdateBlock = event.block.number;
+    market._lastUpdateBlock = event.block.number;
 
     // lending-specific data
     if (underlyingAddress == SAI_ADDRESS) {

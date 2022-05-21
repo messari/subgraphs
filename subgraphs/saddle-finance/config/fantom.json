@@ -1,0 +1,10 @@
+{
+  "chain": "fantom",
+  "pools": [
+    {
+      "name": "ftmUSD",
+      "address": "0xBea9F78090bDB9e662d8CB301A00ad09A5b756e9",
+      "startBlock": 28679173
+    }
+  ]
+}

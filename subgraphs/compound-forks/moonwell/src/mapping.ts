@@ -53,7 +53,6 @@ import {
   _handleRepayBorrow,
   _handleLiquidateBorrow,
   UpdateMarketData,
-  AccruePer,
   _handleAccrueInterest,
   getOrElse,
 } from "../../src/mapping";
@@ -70,7 +69,8 @@ import {
   MOVRAddr,
   nativeCToken,
   nativeToken,
-  SolarBeamLPTokenAddr,
+  SolarBeamMfamMovrPairAddr,
+  SolarBeamMfamMovrPairStartBlock,
 } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
@@ -185,7 +185,7 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
 
 export function handleAccrueInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
-  setMarketRewards(marketAddress);
+  setMarketRewards(marketAddress, event.block.number.toI32());
 
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
@@ -198,7 +198,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
-    AccruePer.Timestamp,
     oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
@@ -213,7 +212,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.0",
+    "1.0.2",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa()
@@ -316,7 +315,7 @@ function initMarketRewards(marketID: string): void {
   market.save();
 }
 
-function setMarketRewards(marketAddress: Address): void {
+function setMarketRewards(marketAddress: Address, blockNumber: i32): void {
   let marketID = marketAddress.toHexString();
   let market = Market.load(marketID);
   if (!market) {
@@ -333,8 +332,11 @@ function setMarketRewards(marketAddress: Address): void {
   }
 
   let MOVRPriceUSD = MOVRMarket.inputTokenPriceUSD;
-  let oneMFAMInMOVR = getOneMFAMInMOVR();
-  let MFAMPriceUSD = MOVRPriceUSD.times(oneMFAMInMOVR);
+  let MFAMPriceUSD = BIGDECIMAL_ZERO;
+  if (blockNumber >= SolarBeamMfamMovrPairStartBlock) {
+    let oneMFAMInMOVR = getOneMFAMInMOVR();
+    MFAMPriceUSD = MOVRPriceUSD.times(oneMFAMInMOVR);
+  }
   let comptroller = Comptroller.bind(comptrollerAddr);
 
   // In Comptroller, 0 = MFAM, 1 = MOVR
@@ -396,7 +398,7 @@ function getRewardTokenEmission(
 
 // Fetch MFAM vs MOVR price from SolarBeam, as suggested by Luke, Moonwell's CEO.
 function getOneMFAMInMOVR(): BigDecimal {
-  let lpTokenContract = SolarBeamLPToken.bind(SolarBeamLPTokenAddr);
+  let lpTokenContract = SolarBeamLPToken.bind(SolarBeamMfamMovrPairAddr);
   let getReservesResult = lpTokenContract.try_getReserves();
   if (getReservesResult.reverted) {
     log.warning("[getOneMFAMInMOVR] result reverted", []);
