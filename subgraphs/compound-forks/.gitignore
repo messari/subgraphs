@@ -2,3 +2,4 @@ node_modules/
 **/generated/
 **/build/
 iron-bank/subgraph.yaml
+cream-finance/subgraph.yaml
