@@ -246,10 +246,10 @@ export function _handleNewLiquidationIncentive(
   protocol.save();
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol.markets[i]);
+    let market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[handleNewLiquidationIncentive] Market not found: {}", [
-        protocol.markets[i],
+        protocol._marketIDs[i],
       ]);
       // best effort
       continue;
