@@ -278,7 +278,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                   } else {
                     if (
                       !Number(timeseriesInstance?.stakedOutputTokenAmount) ||
-                      Number(timeseriesInstance?.outputTokenSupply)
+                      !Number(timeseriesInstance?.outputTokenSupply)
                     ) {
                       apr = (Number(val) / Number(timeseriesInstance.totalValueLockedUSD)) * 100 * 365;
                     } else {
