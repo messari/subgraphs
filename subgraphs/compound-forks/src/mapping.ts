@@ -40,6 +40,7 @@ import {
 } from "../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
@@ -239,6 +240,7 @@ export function _handleNewLiquidationIncentive(
   let liquidationIncentive = event.params.newLiquidationIncentiveMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
+    .minus(BIGDECIMAL_ONE)
     .times(BIGDECIMAL_HUNDRED);
   protocol._liquidationIncentive = liquidationIncentive;
   protocol.save();
