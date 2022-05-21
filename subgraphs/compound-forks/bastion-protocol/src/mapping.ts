@@ -173,7 +173,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Bastion Protocol",
     "bastion-protocol",
     "1.2.1",
-    "1.0.2",
+    "1.0.3",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa()
