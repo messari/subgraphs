@@ -2,7 +2,7 @@ import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
 import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
-import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken, updatePricesForToken } from "../common/getters";
+import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 
@@ -31,7 +31,7 @@ export function createAsset(
   // Start Watching the Asset for updates
   AssetTemplate.create(assetAddress);
 
-  let _index = assets.length
+  let _index = assets.length;
   asset._index = BigInt.fromI32(_index);
   asset.save();
 
@@ -73,8 +73,6 @@ export function createDeposit(
   deposit.inputTokenAmounts = [amount];
   deposit.outputToken = inputToken._asset;
   deposit.outputTokenAmount = liquidity;
-
-  updatePricesForToken(event, inputTokenAddress);
   deposit.amountUSD = tokenAmountToUSDAmount(inputToken, amount);
   deposit.save();
   updateBalancesInPool<Deposit>(event, deposit, TransactionType.DEPOSIT);
@@ -108,8 +106,6 @@ export function createWithdraw(
   withdraw.inputTokenAmounts = [amount];
   withdraw.outputToken = inputToken._asset;
   withdraw.outputTokenAmount = liquidity;
-
-  updatePricesForToken(event, inputTokenAddress);
   withdraw.amountUSD = tokenAmountToUSDAmount(inputToken, amount);
   withdraw.save();
   updateBalancesInPool<Withdraw>(event, withdraw, TransactionType.WITHDRAW);

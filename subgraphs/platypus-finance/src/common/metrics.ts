@@ -309,7 +309,6 @@ function updateDailyPoolSwapVolume(event: ethereum.Event, swap: Swap): void {
     }
   }
 
-  
   snapshot.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
   snapshot.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
   snapshot.dailyVolumeUSD = snapshot.dailyVolumeUSD.plus(calculateSwapVolume(swap));
