@@ -158,8 +158,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_totalBorrows(),
-    cTokenContract.try_supplyRatePerBlock(),
-    cTokenContract.try_borrowRatePerBlock(),
+    cTokenContract.try_supplyRatePerTimestamp(),
+    cTokenContract.try_borrowRatePerTimestamp(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
