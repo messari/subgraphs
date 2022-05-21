@@ -23,10 +23,10 @@ export class SpookyswapFantomConfigurations implements Configurations {
     return BigDecimal.fromString("2");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.3");
+    return BigDecimal.fromString("0");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("1.7");
+    return BigDecimal.fromString("2");
   }
   getProtocolFeeToOff(): BigDecimal {
     return BigDecimal.fromString("0");

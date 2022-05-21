@@ -86,7 +86,7 @@
       "fantom": {
         "template": "spookyswap.template.yaml",
         "test": "dhruvjain1122/spookyswap_messari",
-        "messari": "messari/spookyswap"
+        "messari": "messari/spookyswap-fantom"
       }
     }
   }
