@@ -167,7 +167,8 @@ function getOrCreateProtocol(): LendingProtocol {
     "1.0.2",
     "1.0.0",
     network,
-    comptroller.try_liquidationIncentiveMantissa()
+    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
 }
