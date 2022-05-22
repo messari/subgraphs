@@ -16,25 +16,26 @@ function addDataPoint(
   entityFieldName: string,
   value: number,
   timestamp: number,
+  id: string,
 ): { [x: string]: any } {
   dataFields[entityFieldName].push({ value: value, date: Number(timestamp) });
   dataFieldMetrics[entityFieldName].sum += value;
 
   if (entityFieldName.includes("umulative")) {
     if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-      dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: 0 };
+      dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
     }
     if (value < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
-      dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(timestamp);
+      dataFieldMetrics[entityFieldName].cumulative.hasLowered = id;
     }
     dataFieldMetrics[entityFieldName].cumulative.prevVal = value;
   }
   if (entityFieldName.includes("umulative")) {
     if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-      dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: 0 };
+      dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
     }
     if (Number(value) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
-      dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(timestamp);
+      dataFieldMetrics[entityFieldName].cumulative.hasLowered = id;
     }
     dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(value);
   }
@@ -138,18 +139,21 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               dataType = "NaN";
             }
             dataFields[entityFieldName] = [];
-            dataFieldMetrics[entityFieldName] = { sum: 0, invalidData: dataType };
+            dataFieldMetrics[entityFieldName] = { sum: 0, invalidDataPlot: dataType };
             if (capsEntityFieldName === "REWARDTOKENEMISSIONSUSD") {
               dataFields.rewardAPR = [];
-              dataFieldMetrics.rewardAPR = { sum: 0, invalidData: dataType };
+              dataFieldMetrics.rewardAPR = { sum: 0, invalidDataPlot: dataType };
             }
             continue;
           }
           if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
             value = Number(currentInstanceField);
-
-            if (capsEntityFieldName.includes("OUTPUTTOKEN") && capsEntityFieldName !== "OUTPUTTOKEN") {
-              value = convertTokenDecimals(currentInstanceField, data[poolKeySingular].outputToken.decimals);
+            if (
+              capsEntityFieldName.includes("OUTPUTTOKEN") &&
+              capsEntityFieldName !== "OUTPUTTOKEN" &&
+              !capsEntityFieldName.includes("USD")
+            ) {
+              value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
             }
             if (entityFieldName === "inputTokenBalance" || entityFieldName === "pricePerShare") {
               const dec = data[poolKeySingular].inputToken.decimals;
@@ -168,9 +172,23 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               entityFieldName,
               Number(value),
               timeseriesInstance.timestamp,
+              timeseriesInstance.id,
             );
             dataFields[entityFieldName] = returnedData.currentEntityField;
             dataFieldMetrics[entityFieldName] = returnedData.currentEntityFieldMetrics;
+
+            if (
+              capsEntityFieldName.includes("LIQUIDATEUSD") &&
+              value > timeseriesInstance.totalValueLockedUSD &&
+              issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length === 0
+            ) {
+              issues.push({
+                type: "LIQ",
+                message: timeseriesInstance.id,
+                level: "critical",
+                fieldName: entityName + "-" + entityFieldName,
+              });
+            }
           }
 
           if (entityFieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
@@ -260,12 +278,6 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                     value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
                   } else {
                     value = convertTokenDecimals(val, 18);
-                    issues.push({
-                      type: "DEC",
-                      message: `${poolKeySingular}-${entityFieldName}-${arrayIndex}`,
-                      level: "error",
-                      fieldName: `${poolKeySingular}-${entityFieldName}`,
-                    });
                   }
                 }
 
@@ -321,6 +333,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                   dataFieldKey,
                   Number(value),
                   timeseriesInstance.timestamp,
+                  timeseriesInstance.id,
                 );
                 dataFields[dataFieldKey] = returnedData.currentEntityField;
                 dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
@@ -333,7 +346,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                   dataType = "NaN";
                 }
                 dataFields[dataFieldKey] = [];
-                dataFieldMetrics[dataFieldKey] = { sum: 0, invalidData: dataType };
+                dataFieldMetrics[dataFieldKey] = { sum: 0, invalidDataPlot: dataType };
               }
             });
           }
@@ -405,6 +418,12 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         for (let x = 0; x < amountOfInstances; x++) {
           tableVals.push({ value: [], date: rewardChart[firstKey][x].date });
           Object.keys(rewardChart).forEach((reward: any, idx: number) => {
+            if (
+              dataFieldMetrics[reward].sum === 0 &&
+              issues.filter((x) => x.fieldName === entityName + "-" + reward).length === 0
+            ) {
+              issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + reward, message: "" });
+            }
             let currentRewardToken: { [x: string]: string } = {};
             if (data[poolKeySingular].rewardTokens[idx]?.token) {
               currentRewardToken = data[poolKeySingular].rewardTokens[idx].token;
@@ -465,6 +484,12 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
           tableVals[x].value = tableVals[x].value.join(", ");
         }
         Object.keys(ratesChart).forEach((rate: any, idx: number) => {
+          if (
+            dataFieldMetrics[rate].sum === 0 &&
+            issues.filter((x) => x.fieldName === entityName + "-" + rate).length === 0
+          ) {
+            issues.push({ type: "SUM", level: "error", fieldName: entityName + "-" + rate, message: "" });
+          }
           if (data[poolKeySingular].rates[idx]?.side) {
             const val = ratesChart[rate];
             ratesChart[`${data[poolKeySingular].rates[idx]?.side}-${data[poolKeySingular].rates[idx]?.type} [${idx}]`] =
@@ -548,9 +573,9 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                 label += " - " + symbol + ": " + name;
               }
             } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
-              const name = data[poolKeySingular].outputToken.name ? data[poolKeySingular].outputToken.name : "N/A";
-              const symbol = data[poolKeySingular].outputToken.symbol
-                ? data[poolKeySingular].outputToken.symbol
+              const name = data[poolKeySingular]?.outputToken?.name ? data[poolKeySingular]?.outputToken?.name : "N/A";
+              const symbol = data[poolKeySingular]?.outputToken?.symbol
+                ? data[poolKeySingular]?.outputToken?.symbol
                 : "N/A";
               label += " - " + symbol + ": " + name;
             } else if (
@@ -585,7 +610,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             }
             const elementId = entityName + "-" + field;
             const linkToElementId = elementId.split(" ").join("%20");
-            if (dataFieldMetrics[field]?.invalidData) {
+            if (dataFieldMetrics[field]?.invalidDataPlot) {
               return (
                 <div id={linkToElementId}>
                   <Box mt={3} mb={1}>
@@ -596,7 +621,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                   <Grid container>
                     <Typography variant="body1" color="textSecondary">
                       {entityName}-{field} timeseries has invalid data. Cannot use{" "}
-                      {dataFieldMetrics[field]?.invalidData} data types to plot chart. Evaluate how this data is
+                      {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
                       collected.
                     </Typography>
                   </Grid>
@@ -605,7 +630,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             }
             if (dataFieldMetrics[field].sum === 0 && issues.filter((x) => x.fieldName === label).length === 0) {
               // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
-              const criticalZeroFields = ["totalValueLockedUSD", "deposit", "balance", "supply"];
+              const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
               let level = null;
               criticalZeroFields.forEach((criticalField) => {
                 if (field.toUpperCase().includes(criticalField.toUpperCase())) {
@@ -629,11 +654,11 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             }
             if (
               issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
-              dataFieldMetrics[field]?.cumulative?.hasLowered > 0
+              dataFieldMetrics[field]?.cumulative?.hasLowered.length > 0
             ) {
               issues.push({
                 type: "CUMULATIVE",
-                message: `${label}++${dataFieldMetrics[field].cumulative.hasLowered}`,
+                message: dataFieldMetrics[field]?.cumulative?.hasLowered,
                 level: "error",
                 fieldName: label,
               });
@@ -691,7 +716,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
   const entityData = data[poolKeySingular];
   return (
     <div>
-      <IssuesDisplay issuesArray={issuesState} />
+      <IssuesDisplay issuesArrayProps={issuesState} />
       <PoolDropDown
         poolId={poolId}
         setPoolId={(x) => setPoolId(x)}

@@ -91,10 +91,10 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
             }
             if (entityFieldName.includes("umulative")) {
               if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-                dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: 0 };
+                dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
               }
               if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
-                dataFieldMetrics[entityFieldName].cumulative.hasLowered = Number(entityInstance.timestamp);
+                dataFieldMetrics[entityFieldName].cumulative.hasLowered = entityInstance.id;
               }
               dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
             }
@@ -129,10 +129,10 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
               }
               if (dataFieldKey.includes("umulative")) {
                 if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
-                  dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: 0 };
+                  dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
                 }
                 if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
-                  dataFieldMetrics[dataFieldKey].cumulative.hasLowered = Number(entityInstance.timestamp);
+                  dataFieldMetrics[dataFieldKey].cumulative.hasLowered = entityInstance.id;
                 }
                 dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
               }
@@ -212,7 +212,6 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
               dataFieldMetrics[field]?.sum === 0
             ) {
               // Create a warning for the 0 sum of all snapshots for this field
-
               const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
                 return fieldName.toUpperCase().includes(fieldSchema.toUpperCase());
               });
@@ -220,18 +219,18 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
               if (schemaField) {
                 const fieldChars = entitiesData[entityName][schemaField].split("");
                 if (fieldChars[fieldChars.length - 1] === "!") {
-                  level = "critical";
+                  level = "error";
                 }
               }
               issues.push({ type: "SUM", message: "", fieldName: label, level });
             }
             if (
               issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
-              dataFieldMetrics[field]?.cumulative?.hasLowered > 0
+              dataFieldMetrics[field]?.cumulative?.hasLowered.length > 0
             ) {
               issues.push({
                 type: "CUMULATIVE",
-                message: `${label}++${dataFieldMetrics[field].cumulative.hasLowered}`,
+                message: dataFieldMetrics[field]?.cumulative?.hasLowered,
                 level: "error",
                 fieldName: label,
               });
@@ -288,7 +287,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
 
   return (
     <>
-      <IssuesDisplay issuesArray={issuesState} />
+      <IssuesDisplay issuesArrayProps={issuesState} />
       <SchemaTable
         entityData={data[protTypeEntity][0]}
         schemaName={protTypeEntity}
