@@ -828,6 +828,7 @@ export function _handleAccrueInterest(
     return;
   }
 
+  log.warning("pre update market", []);
   updateMarket(
     updateMarketData,
     marketID,
@@ -835,17 +836,21 @@ export function _handleAccrueInterest(
     event.block.number,
     event.block.timestamp
   );
+  log.warning("post update market", []);
   updateProtocol(comptrollerAddr);
+  log.warning("post update protocol", []);
   snapshotMarket(
     event.address.toHexString(),
     event.block.number,
     event.block.timestamp
   );
+  log.warning("post snapshot market", []);
   snapshotFinancials(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp
   );
+  log.warning("post update financials", []);
 }
 
 function snapshotMarket(
