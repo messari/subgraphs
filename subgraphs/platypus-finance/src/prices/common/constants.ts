@@ -100,6 +100,9 @@ SUSHISWAP_ROUTER_ADDRESS_MAP.set(FANTOM.NETWORK_STRING, FANTOM.SUSHISWAP_ROUTER_
 SUSHISWAP_ROUTER_ADDRESS_MAP.set(ARBITRUM_ONE.NETWORK_STRING, ARBITRUM_ONE.SUSHISWAP_ROUTER_ADDRESS);
 SUSHISWAP_ROUTER_ADDRESS_MAP.set(AVALANCHE.NETWORK_STRING, AVALANCHE.SUSHISWAP_ROUTER_ADDRESS);
 
+export const TRADERJOE_ROUTER_ADDRESS_MAP = new TypedMap<string, TypedMap<string, Address>>();
+SUSHISWAP_ROUTER_ADDRESS_MAP.set(AVALANCHE.NETWORK_STRING, AVALANCHE.TRADERJOE_ROUTER_ADDRESS);
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// UNISWAP CONTRACT ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////

@@ -2,6 +2,7 @@ import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
 import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
+import { getPriceUsdc as getPriceUsdcTraderJoe } from "./routers/TraderJoeRouter";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   // Check if tokenAddr is a NULL Address
@@ -10,6 +11,16 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
+
+  // TraderJoe Router
+  let traderJoePrice = getPriceUsdcTraderJoe(tokenAddr, network);
+  if (!traderJoePrice.reverted) {
+    log.warning("[TraderJoeRouter] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      traderJoePrice.usdPrice.div(traderJoePrice.decimalsBaseTen).toString(),
+    ]);
+    return traderJoePrice;
+  }
 
   // 7. SushiSwap Router
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);

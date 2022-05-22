@@ -122,6 +122,9 @@ dataSources:
           file: ./abis/Prices/SushiSwap/Factory.json
         - name: SushiSwapPair
           file: ./abis/Prices/SushiSwap/Pair.json
+        # TraderJOE Contracts
+        - name: TraderJoeRouter
+          file: ./abis/Prices/TraderJoe/Router.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:

@@ -25,6 +25,17 @@ SUSHISWAP_ROUTER_ADDRESS.set("routerV2", Address.fromString("0x00000000000000000
 ///////////////////////////// UNISWAP CONTRACT ////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+export const TRADERJOE_WETH_ADDRESS = Address.fromString("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");
+export const TRADERJOE_CALCULATIONS_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
+
+export const TRADERJOE_ROUTER_ADDRESS = new TypedMap<string, Address>();
+TRADERJOE_ROUTER_ADDRESS.set("routerV1", Address.fromString("0x60aE616a2155Ee3d9A68541Ba4544862310933d4"));
+TRADERJOE_ROUTER_ADDRESS.set("routerV2", Address.fromString("0x0000000000000000000000000000000000000000"));
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////// UNISWAP CONTRACT ////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
 export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 UNISWAP_ROUTER_ADDRESS.set("routerV1", Address.fromString("0x0000000000000000000000000000000000000000"));
 UNISWAP_ROUTER_ADDRESS.set("routerV2", Address.fromString("0x0000000000000000000000000000000000000000"));
