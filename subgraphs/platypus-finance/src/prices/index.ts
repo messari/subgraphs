@@ -21,6 +21,9 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return traderJoePrice;
   }
+  log.warning("[Oracle] Failed to Fetch Price with TraderJoe will try sushiswap next, tokenAddr: {}", [
+    tokenAddr.toHexString(),
+  ]);
 
   // 7. SushiSwap Router
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
@@ -32,8 +35,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return sushiswapPrice;
   }
 
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
-
   return new CustomPriceType();
 }
 
@@ -44,5 +45,6 @@ export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal 
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
   }
 
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [tokenAddr.toHexString()]);
   return constants.BIGDECIMAL_ZERO;
 }

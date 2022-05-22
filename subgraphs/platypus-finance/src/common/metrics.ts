@@ -26,7 +26,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
 
     for (let i = 0; i < pool._assets.length; i++) {
       let _asset = _Asset.load(pool._assets[i])!;
-      let _index = _asset._index.toI32();
+      let _index = _asset._index!.toI32();
       let token = getOrCreateToken(event, Address.fromString(_asset.token));
       let usdValue = bigIntToBigDecimal(pool.inputTokenBalances[_index], token.decimals);
       poolLockedValue = poolLockedValue.plus(usdValue);
@@ -245,15 +245,17 @@ export function updateBalancesInPoolAfterSwap(event: ethereum.Event, swap: Swap)
 
   for (let i = 0; i < pool._assets.length; i++) {
     let _asset = _Asset.load(pool._assets[i])!;
-    let _index = _asset._index.toI32();
+    let _index = _asset._index!.toI32();
     let token = _asset.token;
-
     if (token == swap.tokenIn) {
+      _asset.cash = _asset.cash.plus(swap.amountIn);
       balances[_index] = balances[_index].plus(swap.amountIn);
     }
     if (token == swap.tokenOut) {
+      _asset.cash = _asset.cash.minus(swap.amountOut);
       balances[_index] = balances[_index].minus(swap.amountOut);
     }
+    _asset.save();
   }
 
   pool.inputTokenBalances = balances;
@@ -268,7 +270,7 @@ function updateHourlyPoolSwapVolume(event: ethereum.Event, swap: Swap): void {
 
   for (let i = 0; i < snapshot._assets!.length; i++) {
     let _asset = _Asset.load(snapshot._assets![i])!;
-    let _index = _asset._index.toI32();
+    let _index = _asset._index!.toI32();
     let token = _asset.token;
 
     if (token == swap.tokenIn) {
@@ -296,7 +298,7 @@ function updateDailyPoolSwapVolume(event: ethereum.Event, swap: Swap): void {
 
   for (let i = 0; i < snapshot._assets!.length; i++) {
     let _asset = _Asset.load(snapshot._assets![i])!;
-    let _index = _asset._index.toI32();
+    let _index = _asset._index!.toI32();
     let token = _asset.token;
 
     if (token == swap.tokenIn) {

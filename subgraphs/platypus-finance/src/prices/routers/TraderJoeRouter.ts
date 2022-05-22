@@ -50,7 +50,7 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
 
-  log.warning("[TraderJoe Router]Calling: AmountIn: {} using path: {}!", [
+  log.info("[TraderJoe Router]Calling: AmountIn: {} using path: {}!", [
     amountIn.toString(),
     path.map<string>(item => item.toHexString()).toString(),
   ]);

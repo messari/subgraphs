@@ -1,4 +1,4 @@
-import { BigInt, Address, ethereum, BigDecimal } from "@graphprotocol/graph-ts";
+import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
 import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
@@ -6,22 +6,43 @@ import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from ".
 import { updateProtocolTVL } from "../common/metrics";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 
+export function getOrCreateAsset(
+  event: ethereum.Event,
+  poolAddress: Address,
+  tokenAddress: Address,
+  assetAddress: Address,
+): _Asset {
+  let id = poolAddress
+    .toHexString()
+    .concat("-")
+    .concat(tokenAddress.toHexString())
+    .concat("-")
+    .concat(assetAddress.toHexString());
+
+  let _asset = _Asset.load(id);
+  // fetch info if null
+  if (!_asset) {
+    _asset = new _Asset(id);
+    _asset.token = tokenAddress.toHexString();
+    _asset.pool = poolAddress.toHexString();
+    _asset.maxSupply = BigInt.zero();
+    _asset.blockNumber = event.block.number;
+    _asset.timestamp = event.block.timestamp;
+    _asset.cash = BigInt.zero();
+    _asset.save();
+  }
+
+  return _asset;
+}
+
 export function createAsset(
   event: ethereum.Event,
   poolAddress: Address,
   tokenAddress: Address,
   assetAddress: Address,
 ): void {
-  let asset = new _Asset(assetAddress.toHexString());
-  asset.token = tokenAddress.toHexString();
-  asset.pool = poolAddress.toHexString();
-  asset.maxSupply = BigInt.zero();
-  asset.blockNumber = event.block.number;
-  asset.timestamp = event.block.timestamp;
-
+  let asset = getOrCreateAsset(event, poolAddress, tokenAddress, assetAddress);
   const token = getOrCreateToken(event, tokenAddress);
-  // token._asset = assetAddress.toHexString();
-
   const pool = getOrCreateLiquidityPool(poolAddress);
 
   let assets: string[] = pool._assets;
@@ -31,13 +52,16 @@ export function createAsset(
   // Start Watching the Asset for updates
   AssetTemplate.create(assetAddress);
 
-  let _index = assets.length;
-  asset._index = BigInt.fromI32(_index);
-  asset.save();
+  if (!asset._index) {
+    let _index = assets.length;
+    asset._index = BigInt.fromI32(_index);
+    asset.save();
+    log.info("new asset {} for token {}, pool {} at index {}", [asset.id, asset.token, asset.pool, _index.toString()]);
 
-  inputTokens.push(token.id);
-  inputTokenBalances.push(BigInt.zero());
-  assets.push(assetAddress.toHexString());
+    inputTokens.push(token.id);
+    inputTokenBalances.push(BigInt.zero());
+    assets.push(asset.id);
+  }
 
   pool._assets = assets;
   pool.inputTokens = inputTokens;
@@ -163,15 +187,18 @@ export function updateBalancesInPool<T extends Deposit>(
   // There is always only one element in tx.inputTokens
   for (let i = 0; i < pool._assets.length; i++) {
     let _asset = _Asset.load(pool._assets[i])!;
-    let _index = _asset._index.toI32();
+    let _index = _asset._index!.toI32();
     let token = _asset.token;
 
     if (token == transaction.inputTokens[0]) {
       if (transactionType == TransactionType.DEPOSIT) {
+        _asset.cash = _asset.cash.plus(transaction.inputTokenAmounts[0]);
         balances[_index] = balances[_index].plus(transaction.inputTokenAmounts[0]);
       } else if (transactionType == TransactionType.WITHDRAW) {
+        _asset.cash = _asset.cash.minus(transaction.inputTokenAmounts[0]);
         balances[_index] = balances[_index].minus(transaction.inputTokenAmounts[0]);
       }
+      _asset.save();
     }
   }
 

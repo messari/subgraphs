@@ -814,7 +814,7 @@ type _Asset @entity {
   maxSupply: BigInt!
   
   " Asset contract cash "
-  cash: BigInt
+  cash: BigInt!
 
   " Asset contract liability "
   liability: BigInt
@@ -831,5 +831,5 @@ type _Asset @entity {
   " Timestamp of this event "
   timestamp: BigInt!
 
-  _index: BigInt!
+  _index: BigInt
 }

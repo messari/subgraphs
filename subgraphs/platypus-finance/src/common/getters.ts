@@ -1,7 +1,6 @@
 import { BigInt, log } from "@graphprotocol/graph-ts";
 import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
-  _Asset,
   Token,
   DexAmmProtocol,
   LiquidityPool,
@@ -106,9 +105,15 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     let detail: poolDetail = poolDetail.fromAddress(_address);
     pool.name = detail.name;
     pool.symbol = detail.symbol;
+
+    pool._assets = new Array<string>();
+    pool.inputTokens = new Array<string>();
+    pool.inputTokenBalances = new Array<BigInt>();
+
     pool.save();
 
     initAltPoolTemplates();
+
     let protocol = getOrCreateDexAmm();
     let _pools: string[] = protocol.pools;
     _pools.push(pool.id);
