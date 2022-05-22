@@ -74,6 +74,7 @@ export class ProtocolData {
   methodologyVersion: string;
   network: string;
   liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>;
+  oracleResult: ethereum.CallResult<Address>;
   constructor(
     comptrollerAddr: Address,
     name: string,
@@ -82,7 +83,8 @@ export class ProtocolData {
     subgraphVersion: string,
     methodologyVersion: string,
     network: string,
-    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>
+    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
+    oracleResult: ethereum.CallResult<Address>
   ) {
     this.comptrollerAddr = comptrollerAddr;
     this.name = name;
@@ -93,6 +95,7 @@ export class ProtocolData {
     this.network = network;
     this.liquidationIncentiveMantissaResult =
       liquidationIncentiveMantissaResult;
+    this.oracleResult = oracleResult;
   }
 }
 
@@ -183,6 +186,12 @@ export function _getOrCreateProtocol(
           .toBigDecimal()
           .div(mantissaFactorBD)
           .times(BIGDECIMAL_HUNDRED);
+    }
+
+    if (protocolData.oracleResult.reverted) {
+      log.warning("[getOrCreateProtocol] oracleResult reverted", []);
+    } else {
+      protocol._priceOracle = protocolData.oracleResult.value.toHexString();
     }
     protocol.save();
   }
