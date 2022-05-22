@@ -146,8 +146,10 @@ export function updateTVL(): void {
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
-    let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
-    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance, WAD).times(inputToken.lastPriceUSD); // prices are always up to date via the spot contract
+    if (!market.inputToken){
+      return
+    }
+    let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance, WAD).times(market.inputTokenPriceUSD); // prices are always up to date via the spot contract
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);
     protocolTotalValueLockedUSD = protocolTotalValueLockedUSD.plus(marketTVLusd);
   }

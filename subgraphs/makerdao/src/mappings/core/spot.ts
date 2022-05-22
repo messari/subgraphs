@@ -30,7 +30,10 @@ export function handleFile(event: LogNote): void {
 export function handlePoke(event: Poke): void {
   let ilk = event.params.ilk;
   let market = getMarketFromIlk(ilk);
-  let tokenAddress = market.inputToken;
+  if(!market.inputToken){
+    return
+  }
+  let tokenAddress = market.inputToken!;
   let priceUSD = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.val), DEFAULT_DECIMALS);
   market.inputTokenPriceUSD = priceUSD;
   market.save();
