@@ -17,17 +17,19 @@ function checkValueFalsey(
   if (fieldDataType[fieldDataType.length - 1] !== "!") {
     return undefined;
   }
-  if (value === null || value === "0" || value?.length === 0 || value === "") {
-    let valueMsg = value;
-    if (valueMsg === "" || valueMsg?.length === 0) {
-      valueMsg = "empty";
-    }
-    const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this value is correct";
-    if (issues.filter((x) => x.message === message).length === 0) {
-      return { type: "VAL", message, level: "warning", fieldName: schemaName };
-    } else {
-      return undefined;
-    }
+  let valueMsg = "";
+  if (value === "" || value?.length === 0) {
+    valueMsg = "empty";
+  } else if (!value) {
+    valueMsg = value;
+  } else if (value < 0) {
+    valueMsg = "negative";
+  }
+  const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this data is correct";
+  if (issues.filter((x) => x.message === message).length === 0 && valueMsg) {
+    return { type: "VAL", message, level: "warning", fieldName: schemaName + "-" + entityField };
+  } else {
+    return undefined;
   }
 }
 
@@ -81,17 +83,15 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           }
         }
 
-        if (
-          entityField === "outputTokenSupply" ||
-          entityField === "outputTokenPriceUSD" ||
-          entityField === "stakedOutputTokenAmount"
-        ) {
-          value = convertTokenDecimals(value, entityData.outputToken.decimals).toString();
+        if (entityField.toUpperCase().includes("OUTPUTTOKEN")) {
+          if (entityField === "outputTokenSupply" || entityField === "stakedOutputTokenAmount") {
+            value = convertTokenDecimals(value, entityData?.outputToken?.decimals).toString();
+          }
           const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
           if (issueReturned) {
             issues.push(issueReturned);
           }
-          dataType += " [" + entityData.outputToken.name + "]";
+          dataType += " [" + (entityData?.outputToken?.name || "N/A") + "]";
         }
         if (entityField === "inputTokenBalances") {
           const tokenNames: string[] = [];
@@ -111,7 +111,11 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           });
           dataType += " [" + tokenNames.join(",") + "]";
           value = "[ " + decimalMapped.join(", ") + " ]";
-        } else if (entityField === "inputTokenBalance" || entityField === "pricePerShare") {
+        } else if (
+          entityField === "inputTokenBalance" ||
+          entityField === "pricePerShare" ||
+          entityField === "depositLimit"
+        ) {
           value = convertTokenDecimals(value, entityData.inputToken.decimals);
           dataType += " [" + entityData.inputToken.name + "]";
           const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);

@@ -110,7 +110,7 @@ function ProtocolDashboard() {
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
-  }, []);
+  });
 
   const handleTabChange = (event: any, newValue: string) => {
     let tabName = "protocol";
@@ -122,9 +122,6 @@ function ProtocolDashboard() {
     navigate(`?subgraph=${subgraphParam}&poolId=${poolId}&tab=${tabName}`);
     setTabValue(newValue);
   };
-
-  // AllData() is what renders the tabs and all of the data within them. This is also were data is mapped to call functions for the compoenents to be rendered
-  // Chart/Table components are called as functions within here, they are imported from the chartComponents directory
 
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;

@@ -24,7 +24,7 @@ function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProp
 
   return (
     <>
-      <IssuesDisplay issuesArray={issues} />
+      <IssuesDisplay issuesArrayProps={issues} />
       <PoolDropDown
         poolId={poolId}
         setPoolId={(x) => setPoolId(x)}
