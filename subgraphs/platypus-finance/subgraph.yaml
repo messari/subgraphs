@@ -2,10 +2,6 @@ specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 features:
   - nonFatalErrors
-  - grafting
-graft:
-  base: QmXBZpFaCtBYhqUoV9qqsV8WLyXQHsPcqYUD2VtvQxyvTR # Subgraph ID of base subgraph
-  block: 15007421 # Block number
 schema:
   file: ./schema.graphql
 dataSources:
@@ -125,8 +121,6 @@ dataSources:
         # TraderJOE Contracts
         - name: TraderJoeRouter
           file: ./abis/Prices/TraderJoe/Router.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
         - event: Deposit(indexed address,address,uint256,uint256,indexed address)
           handler: handleDeposit
@@ -197,8 +191,9 @@ templates:
           file: ./abis/Prices/SushiSwap/Factory.json
         - name: SushiSwapPair
           file: ./abis/Prices/SushiSwap/Pair.json
-        - name: CalculationsSushiSwap
-          file: ./abis/Prices/Calculations/SushiSwap.json
+        # TraderJoe Contracts
+        - name: TraderJoeRouter
+          file: ./abis/Prices/TraderJoe/Router.json
       eventHandlers:
         - event: Deposit(indexed address,address,uint256,uint256,indexed address)
           handler: handleDeposit

@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
 ////////////////////////
 ///// Schema Enums /////
@@ -155,7 +155,7 @@ export class poolDetail {
   address: string;
 
   // Initialize a Token Definition with its attributes
-  constructor(address: string, symbol: string, name: string) {
+  constructor(name: string, symbol: string, address: string) {
     this.address = address;
     this.symbol = symbol;
     this.name = name;
@@ -174,7 +174,7 @@ export class poolDetail {
 
   // Get all tokens with a static defintion
   static getPoolDetails(): Array<poolDetail> {
-    let poolDetailArray = new Array<poolDetail>(6);
+    let poolDetailArray = new Array<poolDetail>();
     let detailsJson = [
       ["Main Pool", "Main Pool", "0x66357dCaCe80431aee0A7507e2E361B7e2402370"],
       ["Alt Pool UST", "UST-USDC Pool", "0xe0D166DE15665bC4B7185B2e35E847E51316E126"],
@@ -191,10 +191,10 @@ export class poolDetail {
     return poolDetailArray;
   }
 
-  static fromAddress(tokenAddress: string): poolDetail {
+  static fromAddress(poolAddress: string): poolDetail {
     let details = this.getPoolDetails();
     for (let i = 0; i < details.length; i++) {
-      if (details[i].address == tokenAddress) {
+      if (details[i].address.toLowerCase() == poolAddress.toLowerCase()) {
         return details[i];
       }
     }

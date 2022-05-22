@@ -43,7 +43,7 @@ export function getPriceFromRouter(token0Address: Address, token1Address: Addres
   let token0Decimals = utils.getTokenDecimals(token0Address);
   let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
-  const routerAddresses = constants.SUSHISWAP_ROUTER_ADDRESS_MAP.get(network)!;
+  const routerAddresses = constants.TRADERJOE_ROUTER_ADDRESS_MAP.get(network)!;
 
   let routerAddressV1 = routerAddresses.get("routerV1");
   let routerAddressV2 = routerAddresses.get("routerV2");
