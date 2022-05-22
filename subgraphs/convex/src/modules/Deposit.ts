@@ -59,7 +59,7 @@ export function createDepositTransaction(
   return depositTransaction;
 }
 
-export function _Deposit(
+export function deposit(
   to: Address,
   vault: VaultStore,
   depositAmount: BigInt,

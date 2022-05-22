@@ -57,3 +57,7 @@ Existing Subgraph
 https://thegraph.com/hosted-service/subgraph/convex-community/curve-pools
 
 https://github.com/convex-community/convex-subgraph
+
+
+## Convex Contract Interaction Diagram
+![alt text](https://cdn.discordapp.com/attachments/955977464247627826/972187577505415238/Flowchart.jpg)

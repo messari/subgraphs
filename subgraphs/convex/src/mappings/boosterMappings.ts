@@ -13,8 +13,8 @@ import {
 import * as utils from "../common/utils";
 import { _NewVault } from "../modules/Vault";
 import { log } from "@graphprotocol/graph-ts";
-import { _Deposit } from "../modules/Deposit";
-import { _Withdraw } from "../modules/Withdraw";
+import { deposit } from "../modules/Deposit";
+import { withdraw } from "../modules/Withdraw";
 import * as constants from "../common/constants";
 import { CustomFeesType } from "../common/types";
 import { VaultFee } from "../../generated/schema";
@@ -53,7 +53,7 @@ export function handleDeposited(event: DepositedEvent): void {
   const vault = VaultStore.load(vaultId);
 
   if (vault) {
-    _Deposit(user, vault, depositAmount, event.block, event.transaction);
+    deposit(user, vault, depositAmount, event.block, event.transaction);
   }
 
   updateFinancials(event.block);
@@ -78,7 +78,7 @@ export function handleWithdrawn(event: WithdrawnEvent): void {
   const vault = VaultStore.load(vaultId);
 
   if (vault) {
-    _Withdraw(user, vault, withdrawAmount, event.block, event.transaction);
+    withdraw(user, vault, withdrawAmount, event.block, event.transaction);
   }
 
   updateFinancials(event.block);

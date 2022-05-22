@@ -59,7 +59,7 @@ export function createWithdrawTransaction(
   return withdrawTransaction;
 }
 
-export function _Withdraw(
+export function withdraw(
   to: Address,
   vault: VaultStore,
   withdrawAmount: BigInt,
