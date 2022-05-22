@@ -21,7 +21,7 @@ dataSources:
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/CToken.json
         - name: ERC20
           file: ../abis/ERC20.json
       eventHandlers:
@@ -52,7 +52,7 @@ templates:
         - Liquidate
       abis:
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/CToken.json
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: ERC20
