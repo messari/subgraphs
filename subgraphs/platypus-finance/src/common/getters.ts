@@ -94,10 +94,11 @@ export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _Liq
 }
 
 export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
-  let pool = LiquidityPool.load(poolAddress.toHexString());
+  let _address = poolAddress.toHexString()
+  let pool = LiquidityPool.load(_address);
   // fetch info if null
   if (!pool) {
-    pool = new LiquidityPool(poolAddress.toHexString());
+    pool = new LiquidityPool(_address);
 
     pool.protocol = getOrCreateDexAmm().id;
     getOrCreateLiquidityPoolParamsHelper(poolAddress);
@@ -110,7 +111,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     protocol.save();
   }
 
-  let detail: poolDetail = poolDetail.fromAddress(poolAddress.toString());
+  let detail: poolDetail = poolDetail.fromAddress(_address);
   pool.name = detail.name;
   pool.symbol = detail.symbol;
   pool.save();
