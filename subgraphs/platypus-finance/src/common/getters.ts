@@ -22,7 +22,7 @@ import {
   BIGDECIMAL_ZERO,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
-  ALT_POOLS,
+  poolDetail,
 } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
@@ -35,10 +35,10 @@ export function initAltPoolTemplates(): void {
   // that clashes with an exisiting datasource
   if (!altPoolsInit) {
     altPoolsInit = true;
-    ALT_POOLS.forEach(poolDetails => {
-      const poolAddress = Address.fromString(poolDetails.address);
+    poolDetail.getAddressArray().forEach(addr => {
+      const poolAddress = Address.fromString(addr);
+      getOrCreateLiquidityPool(poolAddress);
       PoolTemplate.create(poolAddress);
-      getOrCreateLiquidityPool(poolAddress, poolDetails.name, poolDetails.symbol);
     });
   }
 }
@@ -93,17 +93,14 @@ export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _Liq
   return poolParam;
 }
 
-export function getOrCreateLiquidityPool(
-  poolAddress: Address,
-  name: string = "Main Pool",
-  symbol: string = "Main Pool",
-): LiquidityPool {
+export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
   let pool = LiquidityPool.load(poolAddress.toHexString());
   // fetch info if null
   if (!pool) {
     pool = new LiquidityPool(poolAddress.toHexString());
-    pool.name = name;
-    pool.symbol = symbol;
+    let detail: poolDetail = poolDetail.fromAddress(poolAddress.toString());
+    pool.name = detail.name;
+    pool.symbol = detail.symbol;
 
     pool.protocol = getOrCreateDexAmm().id;
     getOrCreateLiquidityPoolParamsHelper(poolAddress);

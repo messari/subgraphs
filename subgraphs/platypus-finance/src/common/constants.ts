@@ -149,24 +149,58 @@ export const PROTOCOL_ADMIN = "0x416a7989a964C9ED60257B064Efc3a30FE6bF2eE";
 // Main USD Pool
 export const POOL_PROXY = "0x66357dCaCe80431aee0A7507e2E361B7e2402370";
 
-class poolDetails {
+export class poolDetail {
   name: string;
   symbol: string;
   address: string;
-}
 
-export const ALT_POOLS: poolDetails[] = [
-  // Alt Pool UST:
-  { name: "Alt Pool UST", symbol: "UST-USDC Pool", address: "0xe0D166DE15665bC4B7185B2e35E847E51316E126" },
-  // Alt Pool Frax:
-  { name: "Alt Pool Frax", symbol: "Frax-USDC Pool", address: "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824" },
-  // Alt Pool MIM:
-  { name: "Alt Pool MIM", symbol: "MIM-USDC Pool", address: "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7" },
-  // Alt Pool YUSD
-  { name: "Alt Pool YUSD", symbol: "YUSD-USDC Pool", address: "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83" },
-  // Alt Pool sAVAX:
-  { name: "Alt Pool sAVAX", symbol: "sAVAX-AVAX Pool", address: "0x4658EA7e9960D6158a261104aAA160cC953bb6ba" },
-];
+  // Initialize a Token Definition with its attributes
+  constructor(address: string, symbol: string, name: string) {
+    this.address = address;
+    this.symbol = symbol;
+    this.name = name;
+  }
+
+  static getAddressArray(): Array<string> {
+    return [
+      "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
+      "0xe0D166DE15665bC4B7185B2e35E847E51316E126",
+      "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824",
+      "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7",
+      "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83",
+      "0x4658EA7e9960D6158a261104aAA160cC953bb6ba",
+    ];
+  }
+
+  // Get all tokens with a static defintion
+  static getPoolDetails(): Array<poolDetail> {
+    let poolDetailArray = new Array<poolDetail>(6);
+    let detailsJson = [
+      ["Main Pool", "Main Pool", "0x66357dCaCe80431aee0A7507e2E361B7e2402370"],
+      ["Alt Pool UST", "UST-USDC Pool", "0xe0D166DE15665bC4B7185B2e35E847E51316E126"],
+      ["Alt Pool Frax", "Frax-USDC Pool", "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824"],
+      ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7"],
+      ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83"],
+      ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba"],
+    ];
+    for (let i = 0; i < detailsJson.length; i++) {
+      let details = new poolDetail(detailsJson[i][0], detailsJson[i][1], detailsJson[i][2]);
+      poolDetailArray.push(details);
+    }
+
+    return poolDetailArray;
+  }
+
+  static fromAddress(tokenAddress: string): poolDetail {
+    let details = this.getPoolDetails();
+    for (let i = 0; i < details.length; i++) {
+      if (details[i].address == tokenAddress) {
+        return details[i];
+      }
+    }
+    return details[0];
+  }
+}
 
 export enum TransactionType {
   DEPOSIT,
