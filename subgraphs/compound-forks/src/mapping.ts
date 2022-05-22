@@ -40,6 +40,7 @@ import {
 } from "../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
@@ -73,6 +74,7 @@ export class ProtocolData {
   methodologyVersion: string;
   network: string;
   liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>;
+  oracleResult: ethereum.CallResult<Address>;
   constructor(
     comptrollerAddr: Address,
     name: string,
@@ -81,7 +83,8 @@ export class ProtocolData {
     subgraphVersion: string,
     methodologyVersion: string,
     network: string,
-    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>
+    liquidationIncentiveMantissaResult: ethereum.CallResult<BigInt>,
+    oracleResult: ethereum.CallResult<Address>
   ) {
     this.comptrollerAddr = comptrollerAddr;
     this.name = name;
@@ -92,6 +95,7 @@ export class ProtocolData {
     this.network = network;
     this.liquidationIncentiveMantissaResult =
       liquidationIncentiveMantissaResult;
+    this.oracleResult = oracleResult;
   }
 }
 
@@ -183,6 +187,12 @@ export function _getOrCreateProtocol(
           .div(mantissaFactorBD)
           .times(BIGDECIMAL_HUNDRED);
     }
+
+    if (protocolData.oracleResult.reverted) {
+      log.warning("[getOrCreateProtocol] oracleResult reverted", []);
+    } else {
+      protocol._priceOracle = protocolData.oracleResult.value.toHexString();
+    }
     protocol.save();
   }
   return protocol;
@@ -239,15 +249,16 @@ export function _handleNewLiquidationIncentive(
   let liquidationIncentive = event.params.newLiquidationIncentiveMantissa
     .toBigDecimal()
     .div(mantissaFactorBD)
+    .minus(BIGDECIMAL_ONE)
     .times(BIGDECIMAL_HUNDRED);
   protocol._liquidationIncentive = liquidationIncentive;
   protocol.save();
 
   for (let i = 0; i < protocol._marketIDs.length; i++) {
-    let market = Market.load(protocol.markets[i]);
+    let market = Market.load(protocol._marketIDs[i]);
     if (!market) {
       log.warning("[handleNewLiquidationIncentive] Market not found: {}", [
-        protocol.markets[i],
+        protocol._marketIDs[i],
       ]);
       // best effort
       continue;

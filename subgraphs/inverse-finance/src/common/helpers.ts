@@ -317,9 +317,12 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   // get exchangeRate for collateral token
   let collateralMarketId = event.params.cTokenCollateral.toHexString();
   let collateralMarket = getOrCreateMarket(collateralMarketId, event);
-  let exchangeRate = collateralMarket.exchangeRate
+  let exchangeRate = collateralMarket.exchangeRate;
   let liquidateAmount = event.params.seizeTokens;
-  let liquidateAmountUSD = liquidateAmount.toBigDecimal().times(exchangeRate!).times(pricePerCollateralToken);
+  let liquidateAmountUSD = liquidateAmount
+    .toBigDecimal()
+    .times(exchangeRate!)
+    .times(pricePerCollateralToken);
 
   if (liquidate == null) {
     liquidate = new Liquidate(liquidateId);
@@ -478,6 +481,32 @@ export function updateRevenue(
   financialMetrics.save();
 }
 
+// Add fees from Stablizer to protocolSideRevenue and totalRevenue
+//    - protocol.cumulativeProtocolSideRevenueUSD
+//    - protocol.cumulativeTotalRevenueUSD
+//    - FinancialsDailySnapshot.dailyProtocolSideRevenueUSD
+//    - FinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD
+//    - FinancialsDailySnapshot.dailyTotalRevenueUSD
+//    - FinancialsDailySnapshot.cumulativeTotalRevenueUSD
+export function updateStablizerFees(fees: BigDecimal, event: ethereum.Event): void {
+  let protocol = getOrCreateProtocol();
+  let cumulativePRev = protocol.cumulativeProtocolSideRevenueUSD;
+  let cumulativeTRev = protocol.cumulativeTotalRevenueUSD;
+  cumulativePRev = cumulativePRev.plus(fees);
+  cumulativeTRev = cumulativeTRev.plus(fees);
+
+  protocol.cumulativeProtocolSideRevenueUSD = cumulativePRev;
+  protocol.cumulativeTotalRevenueUSD = cumulativeTRev;
+  protocol.save();
+
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  financialMetrics.cumulativeProtocolSideRevenueUSD = cumulativePRev;
+  financialMetrics.cumulativeTotalRevenueUSD = cumulativeTRev;
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(fees);
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(fees);
+  financialMetrics.save();
+}
+
 // Update MarketDailySnapshot and MarketHourlySnapshot
 export function updateMarketMetrics(event: ethereum.Event): void {
   let marketId = event.address.toHexString();
@@ -551,7 +580,7 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     // To get the price of the underlying (input) token
     let inputTokenPriceUSD = getUnderlyingTokenPrice(event.address);
     let decimals = getOrCreateUnderlyingToken(event.address).decimals;
-    let inputTokenPriceUSDperAmount = inputTokenPriceUSD.div(decimalsToBigDecimal(decimals))
+    let inputTokenPriceUSDperAmount = inputTokenPriceUSD.div(decimalsToBigDecimal(decimals));
     let inputTokenBalance = tokenContract.getCash();
     market.inputTokenBalance = inputTokenBalance;
     market.inputTokenPriceUSD = inputTokenPriceUSD;
@@ -582,8 +611,8 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     }
 
     // derive outputToken (cToken) price from exchange rate and inputTokenPriceUSD
-    if ( market.exchangeRate ) {
-      market.outputTokenPriceUSD = inputTokenPriceUSD.div(market.exchangeRate!)
+    if (market.exchangeRate) {
+      market.outputTokenPriceUSD = inputTokenPriceUSD.div(market.exchangeRate!);
     }
 
     //

@@ -421,6 +421,7 @@ type LiquidityPool @entity {
   _protocolGeneratedFee: BigDecimal!
   " All side revenue fee generated from this pool "
   _sideRevenueGeneratedFee: BigDecimal!
+  _hasVirtualSupply: Boolean!
 }
 
 #################################

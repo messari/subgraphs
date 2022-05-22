@@ -33,6 +33,8 @@ dataSources:
           file: ./abis/ConvergentCurvePool.json
         - name: ProtocolFeesCollector
           file: ./abis/ProtocolFeesCollector.json
+        - name: LinearPool
+          file: ./abis/LinearPool.json
 
         ###########################################
         ############## Price Oracle ###############
