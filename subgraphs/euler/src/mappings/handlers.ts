@@ -332,6 +332,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     }
 
     const marketUtility = getOrCreateMarketUtility(eulerViewMarket.underlying.toHexString());
+    marketUtility.market = market.id;
     marketUtility.twap = eulerViewMarket.twap;
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
 
