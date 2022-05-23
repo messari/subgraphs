@@ -170,3 +170,4 @@ export const UNISWAP_Q192 = BigDecimal.fromString(
     .pow(192)
     .toString(),
 );
+export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();

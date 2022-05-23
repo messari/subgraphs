@@ -45,6 +45,7 @@ import {
   TransactionType,
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
+  DECIMAL_PRECISION,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
@@ -119,7 +120,6 @@ export function handleBorrow(event: Borrow): void {
 
 export function handleDeposit(event: Deposit): void {
   const deposit = getOrCreateDeposit(event);
-  const token = getOrCreateToken(event.params.underlying);
   const marketId = event.params.underlying.toHexString();
   const tokenId = event.params.underlying.toHexString();
   const accountAddress = event.params.account;
@@ -148,7 +148,6 @@ export function handleRepay(event: Repay): void {
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
   const tokenId = event.params.underlying.toHexString();
-  const token = getOrCreateToken(event.params.underlying);
   const accountAddress = event.params.account;
 
   repay.market = marketId;
@@ -169,7 +168,6 @@ export function handleWithdraw(event: Withdraw): void {
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
   const tokenId = event.params.underlying.toHexString();
-  const token = getOrCreateToken(event.params.underlying);
   const accountAddress = event.params.account;
 
   withdraw.market = marketId;
@@ -212,7 +210,7 @@ export function handleLiquidation(event: Liquidation): void {
   liquidation.asset = seizedTokenId;
   liquidation.from = event.params.liquidator.toHexString();
   liquidation.to = event.params.violator.toHexString();
-  liquidation.amount = event.params.repay; // TODO: Validate whether these should be denominated in underlying or dToken. This is currently in underlying
+  liquidation.amount = event.params.repay;  // Amount is denominated in underlying (not in dToken)
 
   if (collateralToken.lastPriceUSD) {
     const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
@@ -230,6 +228,7 @@ export function handleLiquidation(event: Liquidation): void {
       liquidation.profitUSD = yieldUSD.minus(liquidation.amountUSD!);
     }
   }
+  liquidation.save();
 }
 
 export function handleMarketActivated(event: MarketActivated): void {
@@ -239,9 +238,10 @@ export function handleMarketActivated(event: MarketActivated): void {
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
 
+  // All isolation tiers can 
   // https://docs.euler.finance/risk-framework/tiers
-  market.canUseAsCollateral = true; // TODO: Validate that isolate tier (default) is fine to consider as "canUseAsCollateral"
-  market.canBorrowFrom = true; // TODO: Validate that isolate tier (default) is fine to consider as "canBorrowFrom"
+  market.canUseAsCollateral = false;
+  market.canBorrowFrom = true;
 
   const token = getOrCreateToken(event.params.underlying);
   const dToken = getOrCreateToken(event.params.dToken);
@@ -273,7 +273,6 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     // Convert USD/ETH exchange rate to ETH/USD
     ethUsdcExchangeRate = BIGDECIMAL_ONE.div(getEthPriceUsd());
   }
-  const decimalPrecision = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
 
   const protocol = getOrCreateLendingProtocol();
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -288,15 +287,15 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     const market = getOrCreateMarket(eulerViewMarket.underlying.toHexString());
     const lendingRate = getOrCreateInterestRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, market.id);
     const borrowRate = getOrCreateInterestRate(InterestRateSide.BORROWER, InterestRateType.VARIABLE, market.id);
-    lendingRate.rate = eulerViewMarket.supplyAPY.toBigDecimal().div(decimalPrecision); // TODO Validate precision is good
-    borrowRate.rate = eulerViewMarket.borrowAPY.toBigDecimal().div(decimalPrecision); // TODO: Validate precision is good
+    lendingRate.rate = eulerViewMarket.supplyAPY.toBigDecimal().div(DECIMAL_PRECISION);
+    borrowRate.rate = eulerViewMarket.borrowAPY.toBigDecimal().div(DECIMAL_PRECISION);
     lendingRate.save();
     borrowRate.save();
     market.rates.push(lendingRate.id);
     market.rates.push(borrowRate.id);
 
     const totalBalances = eulerViewMarket.totalBalances;
-    const totalBalancesEth = totalBalances.toBigDecimal().times(eulerViewMarket.currPrice.toBigDecimal()).div(decimalPrecision);
+    const totalBalancesEth = totalBalances.toBigDecimal().times(eulerViewMarket.currPrice.toBigDecimal()).div(DECIMAL_PRECISION);
     market.totalDepositBalanceUSD = totalBalancesEth
       .times(ethUsdcExchangeRate);
 
@@ -304,20 +303,23 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     const totalBorrowsEth = totalBorrows
       .toBigDecimal()
       .times(eulerViewMarket.currPrice.toBigDecimal())
-      .div(decimalPrecision);
+      .div(DECIMAL_PRECISION);
     market.totalBorrowBalanceUSD = totalBorrowsEth
       .times(ethUsdcExchangeRate);
 
     market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD); // TODO: Validate this calculation
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD); // TODO: Validate this calculation
 
-    const currPrice = eulerViewMarket.currPrice.toBigDecimal().div(decimalPrecision);
+    const currPrice = eulerViewMarket.currPrice.toBigDecimal().div(DECIMAL_PRECISION);
     const currPriceUsd = currPrice
       .times(ethUsdcExchangeRate);
     
     market.inputTokenBalance = eulerViewMarket.totalBalances; // TODO: Validate whether token or eToken (maybe both?) is input token
     market.outputTokenSupply = eulerViewMarket.eTokenBalance;  // TODO: Validate whether eToken or dToken (maybe both?) is output token
-    market.outputTokenPriceUSD = eulerViewMarket.eTokenBalanceUnderlying.toBigDecimal().times(currPriceUsd).div(decimalPrecision);
+    market.outputTokenPriceUSD = eulerViewMarket.eTokenBalanceUnderlying
+      .toBigDecimal()
+      .times(currPriceUsd)
+      .div(DECIMAL_PRECISION);
     market.exchangeRate = eulerViewMarket.eTokenBalance.toBigDecimal().div(eulerViewMarket.eTokenBalanceUnderlying.toBigDecimal());
     
     const token = getOrCreateToken(eulerViewMarket.underlying);
@@ -349,12 +351,12 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     );
 
     const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
-    // Ignore case where there was a balance conversion happening at current block, in which case new balance is smaller than old.
+    // Ignore case where there was a balance conversion happening at current block.
     if (reserveBalanceDiff.gt(BIGINT_ZERO)) {
       const marketRevenueDiffUsd = reserveBalanceDiff
         .toBigDecimal()
         .times(currPriceUsd)
-        .div(decimalPrecision);
+        .div(DECIMAL_PRECISION);
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(marketRevenueDiffUsd);
     }
     
