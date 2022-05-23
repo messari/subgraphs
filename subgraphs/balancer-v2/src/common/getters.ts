@@ -25,6 +25,7 @@ import {
 import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { ConvergentCurvePool } from "../../generated/Vault/ConvergentCurvePool";
+import { LinearPool } from "../../generated/Vault/LinearPool";
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -32,7 +33,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
     protocol.name = "Balancer V2";
     protocol.slug = "balancer-v2";
-    protocol.subgraphVersion = "1.2.1";
+    protocol.subgraphVersion = "1.2.2";
     protocol.schemaVersion = "1.2.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -68,9 +69,9 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
   let outputToken = getOrCreateToken(address);
   let protocol = getOrCreateDex();
 
-  let wwPoolInstance = WeightedPool.bind(address);
+  let poolInstance = WeightedPool.bind(address);
   let swapFees: BigInt = BigInt.fromI32(0);
-  let swapFeesCall = wwPoolInstance.try_getSwapFeePercentage();
+  let swapFeesCall = poolInstance.try_getSwapFeePercentage();
   if (!swapFeesCall.reverted) {
     WeightedPoolTemplate.create(address);
     swapFees = swapFeesCall.value;
@@ -81,6 +82,8 @@ export function createPool(id: string, address: Address, blockInfo: ethereum.Blo
       swapFees = swapFeesCall.value;
     }
   }
+
+  pool._hasVirtualSupply = !LinearPool.bind(address).try_getVirtualSupply().reverted;
 
   let feeInDecimals = scaleDown(swapFees, null);
 
@@ -236,8 +239,8 @@ export function updatePoolDailySnapshot(event: ethereum.Event, pool: LiquidityPo
       }
 
       if (Address.fromString(swap.tokenOut) == Address.fromString(pool.inputTokens[i])) {
-        newTokensAmount[i] = newTokensAmount[i].minus(swap.amountOut);
-        newTokensUSD[i] = newTokensUSD[i].minus(swap.amountOutUSD);
+        newTokensAmount[i] = newTokensAmount[i].plus(swap.amountOut);
+        newTokensUSD[i] = newTokensUSD[i].plus(swap.amountOutUSD);
       }
     }
     let divisor =

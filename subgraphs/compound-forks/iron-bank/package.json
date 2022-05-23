@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:fantom": "YARN_SILENT=1 yarn mustache config/fantom.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:avalanche": "YARN_SILENT=1 yarn mustache config/avalanche.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:mainnet": "graph deploy --studio iron-bank-subgraph-mainnet",
+    "deploy:fantom": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/iron-bank-subgraph-fantom",
+    "deploy:avalanche": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/iron-bank-subgraph-avalanche"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0"
+  }
+}

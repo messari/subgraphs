@@ -1,12 +1,12 @@
-import "./App.css";
-
 import ProtocolDashboard from "./interfaces/ProtocolDashboard";
-import DeploymentsPage from "./interfaces/DeploymentsPage";
+import DeploymentsPage from "./deployments/DeploymentsPage";
 import { Route, Routes } from "react-router";
+import { DashboardVersion } from "./common/DashboardVersion";
 
 function App() {
   return (
-    <div className="App">
+    <div>
+      <DashboardVersion />
       <Routes>
         <Route path="/">
           <Route index element={<DeploymentsPage />} />

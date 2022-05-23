@@ -79,6 +79,23 @@ if (dataSource.network() == Network.MAINNET.toLowerCase()) {
     "0x6b4c7a5e3f0b99fcd83e9c089bddd6c7fce5c611", // Million
     "0x1a4b46696b2bb4794eb3d4c26f1c55f9170fa4c5",
     "0x18aaa7115705e8be94bffebde57af9bfc265b998", // Audius
+    "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f", // Synthetix
+    "0x9e46a38f5daabe8683e10793b06749eef7d733d1", // Nectar
+    "0xbc396689893d065f41bc2c6ecbee5e0085233447", // Perpetual
+    "0x1c5db575e2ff833e46a2e9864c22f4b22e0b37c2", // renZEC
+    "0x48fb253446873234f2febbf9bdeaa72d9d387f94", // Bancor Governance
+    "0xd5cd84d6f044abe314ee7e414d37cae8773ef9d3", // Harmony One
+    "0xb05097849bca421a3f51b249ba6cca4af4b97cb9", // Float Protocol
+    "0x8686525d6627a25c68de82c228448f43c97999f2", // Lilly Finance
+    "0x4f9254c83eb525f9fcf346490bbb3ed28a81c667", // Celer Token
+    "0x1559fa1b8f28238fd5d76d9f434ad86fd20d1559", // Eden
+    "0x99d8a9c45b2eca8864373a26d1459e3dff1e17f3", // Magic Internet Money
+    "0x2af1df3ab0ab157e1e2ad8f88a7d04fbea0c7dc6", // Bankless Bed Index
+    "0x15b7c0c907e4c6b9adaaaabc300c08991d6cea05", // Gelato Network Token
+    "0x4d224452801aced8b2f0aebe155379bb5d594381", // Apecoin
+    "0xc581b735a1688071a1746c968e0798d642ede491", // EuroTether
+    "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f", // Staked Olympus
+    "0x398aea1c9ceb7de800284bb399a15e0efe5a9ec2", // Escrowed Illuvium
   ];
 } else if (dataSource.network() == Network.MATIC.toLowerCase()) {
   PROTOCOL_SLUG_TEMP = "uniswap-v3";
@@ -145,6 +162,10 @@ if (dataSource.network() == Network.MAINNET.toLowerCase()) {
     "0x03aF20bDAaFfB4cC0A521796a223f7D85e2aAc31", // wETH/DAI
     "0xB589969D38CE76D3d7AA319De7133bC9755fD840", // wETH/USDC - 0.30
     "0x85149247691df622eaF1a8Bd0CaFd40BC45154a9", // wETH/USDC - 0.05
+  ];
+  UNTRACKED_TOKENS_TEMP = [
+    "0x296f55f8fb28e498b858d0bcda06d955b2cb3f97", // StargateToken
+    "0x2e3d870790dc77a83dd1d18184acc7439a53f475", // Frax
   ];
 } else {
   PROTOCOL_SLUG_TEMP = "uniswap-v3";

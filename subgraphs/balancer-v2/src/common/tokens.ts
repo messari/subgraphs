@@ -1,4 +1,5 @@
 import { ERC20 } from "../../generated/Vault/ERC20";
+import { LinearPool } from "../../generated/Vault/LinearPool";
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { getOrCreateToken } from "./getters";
 
@@ -33,4 +34,10 @@ export function scaleDown(amount: BigInt, token: Address | null): BigDecimal {
   let decimals = 18;
   if (token) decimals = getOrCreateToken(token).decimals;
   return amount.divDecimal(BigInt.fromI32(10).pow(u8(decimals)).toBigDecimal());
+}
+
+export function hasVirtualSupply(poolAddress: Address): bool {
+  let pool = LinearPool.bind(poolAddress);
+  let virtualSupply = pool.try_getVirtualSupply();
+  return !virtualSupply.reverted;
 }
