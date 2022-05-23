@@ -780,6 +780,7 @@ export function updateTVL(
     market
   );
   market.totalDepositUSD = market.totalValueLockedUSD;
+  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
   market.save();
   if (
     protocol.totalValueLockedUSD.gt(BIGDECIMAL_ZERO) &&
@@ -801,6 +802,6 @@ export function updateTVL(
     market.totalValueLockedUSD
   );
   protocol.totalDepositUSD = protocol.totalValueLockedUSD;
-  protocol.totalVolumeUSD = amountUSD;
+  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(amountUSD);
   protocol.save();
 }
