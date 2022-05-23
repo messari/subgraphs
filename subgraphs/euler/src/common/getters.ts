@@ -281,7 +281,6 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-    protocol.markets = [];
     protocol.save();
   }
   return protocol;

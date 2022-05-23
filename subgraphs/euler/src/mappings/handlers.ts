@@ -384,9 +384,9 @@ export function handleBlockUpdates(block: ethereum.Block): void {
     ? EULER_GENERAL_VIEW_V2_ADDRESS
     : EULER_GENERAL_VIEW_ADDRESS;
   const eulerGeneralView = EulerGeneralView.bind(Address.fromString(viewAddress));
-  const protocol = getOrCreateProtocolUtility();
+  const protocolUtility = getOrCreateProtocolUtility();
 
-  const markets = protocol.markets;
+  const markets = protocolUtility.markets;
   if (!markets || markets.length == 0) {
     return;
   }
