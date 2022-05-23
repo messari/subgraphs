@@ -298,8 +298,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     borrowRate.rate = eulerViewMarket.borrowAPY.toBigDecimal().div(DECIMAL_PRECISION);
     lendingRate.save();
     borrowRate.save();
-    market.rates.push(lendingRate.id);
-    market.rates.push(borrowRate.id);
+    market.rates = market.rates.concat([lendingRate.id, borrowRate.id]);
 
     const totalBalances = eulerViewMarket.totalBalances;
     const totalBalancesEth = totalBalances.toBigDecimal().times(eulerViewMarket.currPrice.toBigDecimal()).div(DECIMAL_PRECISION);
@@ -314,15 +313,15 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     market.totalBorrowBalanceUSD = totalBorrowsEth
       .times(ethUsdcExchangeRate);
 
-    market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD); // TODO: Validate this calculation
-    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD); // TODO: Validate this calculation
+    market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
+    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
 
     const currPrice = eulerViewMarket.currPrice.toBigDecimal().div(DECIMAL_PRECISION);
     const currPriceUsd = currPrice
       .times(ethUsdcExchangeRate);
     
-    market.inputTokenBalance = eulerViewMarket.totalBalances; // TODO: Validate whether token or eToken (maybe both?) is input token
-    market.outputTokenSupply = eulerViewMarket.eTokenBalance;  // TODO: Validate whether eToken or dToken (maybe both?) is output token
+    market.inputTokenBalance = eulerViewMarket.totalBalances;
+    market.outputTokenSupply = eulerViewMarket.eTokenBalance;
     market.outputTokenPriceUSD = eulerViewMarket.eTokenBalanceUnderlying
       .toBigDecimal()
       .times(currPriceUsd)
