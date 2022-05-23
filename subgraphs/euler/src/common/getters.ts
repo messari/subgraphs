@@ -250,11 +250,21 @@ export function getOrCreateMarket(id: string): Market {
     market.liquidationPenalty = BIGDECIMAL_ZERO;
     market.inputToken = id;
     market.rates = [];
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.createdTimestamp = BIGINT_ZERO;
+    market.createdBlockNumber = BIGINT_ZERO;
     market.save();
-    protocol.markets.push(market.id);
-    protocol.save();
   }
-  return market;
+  return market as Market;
 }
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
