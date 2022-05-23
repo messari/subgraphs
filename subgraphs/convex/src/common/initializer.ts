@@ -147,9 +147,9 @@ export function getOrCreateVaultsDailySnapshots(
   vaultId: string,
   block: ethereum.Block
 ): VaultDailySnapshot {
-  let id: string = vaultId.concat(
-    (block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString()
-  );
+  let id: string = vaultId
+    .concat("-")
+    .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString());
   let vaultSnapshots = VaultDailySnapshot.load(id);
 
   if (!vaultSnapshots) {
@@ -160,9 +160,7 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
     vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
     vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
@@ -180,6 +178,7 @@ export function getOrCreateVaultsHourlySnapshots(
   block: ethereum.Block
 ): VaultHourlySnapshot {
   let id: string = vaultId
+    .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_DAY).toString())
     .concat("-")
     .concat((block.timestamp.toI64() / constants.SECONDS_PER_HOUR).toString());
@@ -193,9 +192,7 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
     vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
     vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 

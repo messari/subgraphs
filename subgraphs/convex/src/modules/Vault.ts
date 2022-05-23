@@ -38,7 +38,6 @@ export function _NewVault(
     vault.outputToken = outputToken.id;
     vault.outputTokenSupply = constants.BIGINT_ZERO;
 
-    vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vault.pricePerShare = constants.BIGDECIMAL_ZERO;
     vault._crvRewards = poolInfo.crvRewards.toHexString();
 
@@ -76,7 +75,7 @@ export function _NewVault(
   utils.createFeeType(
     performanceFeeId,
     constants.VaultFeeType.PERFORMANCE_FEE,
-    performanceFee.totalFees()
+    performanceFee.totalFees().times(constants.BIGDECIMAL_HUNDRED)
   );
 
   vault._pool = poolAddress.toHexString();

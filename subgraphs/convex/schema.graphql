@@ -365,7 +365,7 @@ type Vault @entity {
   outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
   pricePerShare: BigDecimal!
@@ -428,13 +428,13 @@ type VaultDailySnapshot @entity {
   outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
   pricePerShare: BigDecimal!
 
   " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
-  stakedOutputTokenAmount: BigInt!
+  stakedOutputTokenAmount: BigInt
 
   " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsAmount: [BigDecimal!]
@@ -469,7 +469,7 @@ type VaultHourlySnapshot @entity {
   outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
   pricePerShare: BigDecimal!

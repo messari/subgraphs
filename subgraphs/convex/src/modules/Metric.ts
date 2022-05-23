@@ -86,9 +86,6 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply;
   vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply;
 
-  vaultDailySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
-  vaultHourlySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
-
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
 
