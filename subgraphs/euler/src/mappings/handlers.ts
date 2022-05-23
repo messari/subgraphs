@@ -187,7 +187,11 @@ export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
   const market = getOrCreateMarket(event.params.underlying.toHexString());
   market.maximumLTV = event.params.newConfig.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE); // TODO: Validate whether we should be using borrow factor or collateral factor
   market.liquidationThreshold = event.params.newConfig.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE); // TODO: Validate whether we should be using borrow factor or collateral factor
-  
+
+  if (market.maximumLTV != BIGDECIMAL_ZERO) {
+    market.canUseAsCollateral = true;
+  }
+
   // liquidationPenalty can't be set because Euler uses dynamic discount rate
   // More on this: https://docs.euler.finance/developers/architecture#dynamic-discounts
   market.save();
