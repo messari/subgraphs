@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
-    network: {{ network }}
+    network: aurora
     source:
-      address: "{{ comptrollerAddr }}"
+      address: "0x817af6cfAF35BdC1A634d6cC94eE9e4c68369Aeb"
       abi: Comptroller
-      startBlock: {{ startBlock }}
+      startBlock: 60501454
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -21,7 +21,7 @@ dataSources:
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/CToken.json
         - name: ERC20
           file: ../abis/ERC20.json
       eventHandlers:
@@ -37,7 +37,7 @@ dataSources:
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: {{ network }}
+    network: aurora
     source:
       abi: CToken
     mapping:
@@ -52,7 +52,7 @@ templates:
         - Liquidate
       abis:
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/CToken.json
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: ERC20

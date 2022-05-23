@@ -20,7 +20,7 @@ import {
   cTokenDecimals,
   Network,
   BIGINT_ZERO,
-  SECONDS_PER_YEAR,
+  FANTOM_BLOCKS_PER_YEAR,
 } from "../../src/constants";
 import {
   ProtocolData,
@@ -46,7 +46,7 @@ import { CToken } from "../generated/Comptroller/CToken";
 import { Comptroller } from "../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import { comptrollerAddr } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -70,16 +70,6 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
-  if (cTokenAddr == nativeCToken.address) {
-    let marketListedData = new MarketListedData(
-      protocol,
-      nativeToken,
-      nativeCToken,
-      cTokenReserveFactorMantissa
-    );
-    _handleMarketListed(marketListedData, event);
-    return;
-  }
 
   let underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (underlyingTokenAddrResult.reverted) {
@@ -161,7 +151,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    SECONDS_PER_YEAR
+    FANTOM_BLOCKS_PER_YEAR
   );
   _handleAccrueInterest(updateMarketData, comptrollerAddr, event);
 }
@@ -170,14 +160,13 @@ function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
     comptrollerAddr,
-    "Bastion Protocol",
-    "bastion-protocol",
+    "Scream",
+    "scream",
     "1.2.1",
-    "1.0.3",
     "1.0.0",
-    Network.AURORA,
-    comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_oracle()
+    "1.0.0",
+    Network.FANTOM,
+    comptroller.try_liquidationIncentiveMantissa()
   );
   return _getOrCreateProtocol(protocolData);
 }

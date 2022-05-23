@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
-    network: {{ network }}
+    network: arbitrum-one
     source:
-      address: "{{ comptrollerAddr }}"
+      address: "0xbadaC56c9aca307079e8B8FC699987AAc89813ee"
       abi: Comptroller
-      startBlock: {{ startBlock }}
+      startBlock: 291895
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -37,7 +37,7 @@ dataSources:
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: {{ network }}
+    network: arbitrum-one
     source:
       abi: CToken
     mapping:

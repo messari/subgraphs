@@ -158,8 +158,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_totalBorrows(),
-    cTokenContract.try_supplyRatePerBlock(),
-    cTokenContract.try_borrowRatePerBlock(),
+    cTokenContract.try_supplyRatePerTimestamp(),
+    cTokenContract.try_borrowRatePerTimestamp(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
     SECONDS_PER_YEAR
   );
@@ -170,10 +170,10 @@ function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
     comptrollerAddr,
-    "Bastion Protocol",
-    "bastion-protocol",
+    "Aurigami",
+    "aurigami",
     "1.2.1",
-    "1.0.3",
+    "1.0.0",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),

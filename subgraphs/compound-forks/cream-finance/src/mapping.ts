@@ -16,12 +16,7 @@ import {
   NewReserveFactor,
 } from "../../generated/templates/CToken/CToken";
 import { LendingProtocol, Token } from "../../generated/schema";
-import {
-  cTokenDecimals,
-  Network,
-  BIGINT_ZERO,
-  SECONDS_PER_YEAR,
-} from "../../src/constants";
+import { cTokenDecimals, BIGINT_ZERO } from "../../src/constants";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -46,8 +41,16 @@ import { CToken } from "../generated/Comptroller/CToken";
 import { Comptroller } from "../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
-import { comptrollerAddr, nativeCToken, nativeToken } from "./constants";
+import { getNetworkSpecificConstant } from "./constants";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
+
+// Constant values
+let constant = getNetworkSpecificConstant();
+let comptrollerAddr = constant.comptrollerAddr;
+let network = constant.network;
+let unitPerYear = constant.unitPerYear;
+let nativeToken = constant.nativeToken;
+let nativeCToken = constant.nativeCToken;
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
@@ -70,11 +73,12 @@ export function handleMarketListed(event: MarketListed): void {
     cTokenContract.try_reserveFactorMantissa(),
     BIGINT_ZERO
   );
-  if (cTokenAddr == nativeCToken.address) {
+  if (nativeToken && nativeCToken && cTokenAddr == nativeCToken!.address) {
+    // compilor is too silly to figure out this is not-null, hence the !
     let marketListedData = new MarketListedData(
       protocol,
-      nativeToken,
-      nativeCToken,
+      nativeToken!,
+      nativeCToken!,
       cTokenReserveFactorMantissa
     );
     _handleMarketListed(marketListedData, event);
@@ -161,7 +165,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    SECONDS_PER_YEAR
+    unitPerYear
   );
   _handleAccrueInterest(updateMarketData, comptrollerAddr, event);
 }
@@ -170,12 +174,12 @@ function getOrCreateProtocol(): LendingProtocol {
   let comptroller = Comptroller.bind(comptrollerAddr);
   let protocolData = new ProtocolData(
     comptrollerAddr,
-    "Bastion Protocol",
-    "bastion-protocol",
+    "CREAM Finance",
+    "cream-finance",
     "1.2.1",
-    "1.0.3",
     "1.0.0",
-    Network.AURORA,
+    "1.0.0",
+    network,
     comptroller.try_liquidationIncentiveMantissa(),
     comptroller.try_oracle()
   );
