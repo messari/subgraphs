@@ -67,6 +67,8 @@ export function handleAssetStatus(event: AssetStatus): void {
   token.lastPriceUSD = twapPrice;
   marketUtility.twapPrice = twapPrice;
   marketUtility.interestAccumulator = event.params.interestAccumulator;
+  marketUtility.save();
+
   market.totalDepositBalanceUSD = amountToUsd(
     event.params.totalBalances,
     marketUtility.twap,
@@ -80,7 +82,6 @@ export function handleAssetStatus(event: AssetStatus): void {
   
   market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD); // TODO: Validate this calculation
 
-  marketUtility.save();
   token.save();
   market.save();
   /**
@@ -238,7 +239,7 @@ export function handleLiquidation(event: Liquidation): void {
 
 export function handleMarketActivated(event: MarketActivated): void {
   let market = getOrCreateMarket(event.params.underlying.toHexString());
-  let protocolUtility = getOrCreateProtocolUtility();
+  getOrCreateMarketUtility(event.params.underlying.toHexString());
 
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
@@ -258,7 +259,9 @@ export function handleMarketActivated(event: MarketActivated): void {
   eToken.save();
 
   market.save();
-  protocolUtility.markets.push(market.id);
+
+  let protocolUtility = getOrCreateProtocolUtility();
+  protocolUtility.markets = protocolUtility.markets.concat([market.id]);
   protocolUtility.save();
 }
 
@@ -328,6 +331,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     token.save();
 
     market.name = token.name;
+    market.save();
     
     if (market.outputToken) {
       const eToken = getOrCreateToken(<Address>Address.fromHexString(market.outputToken!));
@@ -340,6 +344,8 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     marketUtility.market = market.id;
     marketUtility.twap = eulerViewMarket.twap;
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
+    marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
+    marketUtility.save();
 
     protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
       market.totalBorrowBalanceUSD
@@ -361,7 +367,6 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
       protocol.cumulativeSupplySideRevenueUSD
     );
 
-    marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
     /**
    *  ##### Quantitative Data #####
 
@@ -371,8 +376,6 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
     rewardTokenEmissionsUSD: [BigDecimal!]
    */
-    marketUtility.save();
-    market.save();
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);
   }
@@ -391,7 +394,7 @@ export function handleBlockUpdates(block: ethereum.Block): void {
     return;
   }
 
-  const marketAddresses: Array<Address> = markets.map<Address>((asset: string) => Address.fromString(asset));
+  const marketAddresses: Array<Address> = markets.map<Address>((market: string) => Address.fromString(market));
 
   const queryParameters: Array<ethereum.Value> = [
     ethereum.Value.fromAddress(Address.fromString(EULER_ADDRESS)),
