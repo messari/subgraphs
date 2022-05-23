@@ -60,4 +60,4 @@ https://github.com/convex-community/convex-subgraph
 
 
 ## Convex Contract Interaction Diagram
-![alt text](https://cdn.discordapp.com/attachments/955977464247627826/972187577505415238/Flowchart.jpg)
+![Convex Subgraph](/docs/images/protocols/convex.png)
