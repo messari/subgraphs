@@ -53,18 +53,13 @@ export function handleRewardV3(event: ethereum.Event, pid: BigInt, amount: BigIn
     lastRewardBlock = poolInfo.value2;
   }
 
-  let getRewardTokenPerBlock = poolContract.try_spiritPerBlock();
+  let getRewardTokenPerBlock = poolContract.try_joePerSec();
   let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
   if (!getRewardTokenPerBlock.reverted) {
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
   }
 
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
-
-  let multiplier: BigInt = BIGINT_ONE;
-  if (!getMultiplier.reverted) {
-    multiplier = getMultiplier.value;
-  }
+  let multiplier = event.block.number.minus(lastRewardBlock)
 
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
   let totalAllocPoint: BigInt = BIGINT_ZERO;

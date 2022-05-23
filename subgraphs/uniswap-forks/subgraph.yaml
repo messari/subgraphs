@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: aurora
+    network: avalanche
     source:
-      address: "0xc66f594268041db60507f00703b152492fb176e7"
+      address: "0x9ad6c38be94206ca50bb0d90783181662f0cfa10"
       abi: Factory
-      startBlock: 54069511
+      startBlock: 2486392
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,67 +16,67 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/trisolaris/Factory.json
+          file: ./abis/trader-joe/Factory.json
         - name: TokenABI
-          file: ./abis/trisolaris/ERC20.json
+          file: ./abis/trader-joe/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
   - kind: ethereum
-    name: MasterChef
-    network: aurora
+    name: MasterChefV2
+    network: avalanche
     source:
-      address: "0x1f1ed214bef5e83d8f5d0eb5d7011eb965d0d79b"
-      abi: MasterChefTrisolaris
-      startBlock: 52661885
+      address: "0xd6a4F121CA35509aF06A0Be99093d08462f53052"
+      abi: MasterChefV2TraderJoe
+      startBlock: 2486444
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: MasterChefTrisolaris
-          file: ./abis/trisolaris/MasterChefTrisolaris.json
+        - name: MasterChefV2TraderJoe
+          file: ./abis/trader-joe/MasterChefV2TraderJoe.json
         - name: TokenABI
-          file: ./abis/trisolaris/ERC20.json
+          file: ./abis/trader-joe/ERC20.json
       eventHandlers:
         - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDeposit
+          handler: handleDepositV2
         - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdraw
+          handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdraw
-      file: ./protocols/trisolaris/src/mappings/masterchef/reward.ts
+          handler: handleEmergencyWithdrawV2
+      file: ./protocols/trader-joe/src/mappings/masterchef/rewardV2.ts
   - kind: ethereum
-    name: MasterChefV2
-    network: aurora
+    name: MasterChefV3
+    network: avalanche
     source:
-      address: "0x3838956710bcc9d122dd23863a0549ca8d5675d6"
-      abi: MasterChefV2Trisolaris
-      startBlock: 54579980
+      address: "0x188bed1968b795d5c9022f6a0bb5931ac4c18f00"
+      abi: MasterChefV3TraderJoe
+      startBlock: 6034473
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities: []
       abis:
-        - name: MasterChefV2Trisolaris
-          file: ./abis/trisolaris/MasterChefV2Trisolaris.json
+        - name: MasterChefV3TraderJoe
+          file: ./abis/trader-joe/MasterChefV3TraderJoe.json
         - name: TokenABI
-          file: ./abis/trisolaris/ERC20.json
+          file: ./abis/trader-joe/ERC20.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositV2
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawV2
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawV2
-      file: ./protocols/trisolaris/src/mappings/masterchef/rewardV2.ts
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDepositV3
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdrawV3
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdrawV3
+      file: ./protocols/trader-joe/src/mappings/masterchef/rewardV3.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: aurora
+    network: avalanche
     source:
       abi: Pair
     mapping:

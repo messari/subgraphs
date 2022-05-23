@@ -24,80 +24,80 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     masterChefPool.save();
   }
 
-  // Return if pool does not exist - Banana tokens?
-  let pool = LiquidityPool.load(masterChefPool.valueString!);
-  if (!pool) {
-    return;
-  }
+  // // Return if pool does not exist - Banana tokens?
+  // let pool = LiquidityPool.load(masterChefPool.valueString!);
+  // if (!pool) {
+  //   return;
+  // }
 
-  // Update staked amounts
-  if (usageType == UsageType.DEPOSIT) {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  } else {
-    pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  }
+  // // Update staked amounts
+  // if (usageType == UsageType.DEPOSIT) {
+  //   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
+  // } else {
+  //   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
+  // }
 
-  // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
-    pool.save();
-    return;
-  }
+  // // Return if you have calculated rewards recently
+  // if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
+  //   pool.save();
+  //   return;
+  // }
 
-  // Get necessary values from the master chef contract to calculate rewards
-  let getPoolInfo = poolContract.try_poolInfo(pid);
-  let poolAllocPoint: BigInt = BIGINT_ZERO;
-  let lastRewardBlock: BigInt = BIGINT_ZERO;
-  if (!getPoolInfo.reverted) {
-    let poolInfo = getPoolInfo.value;
-    poolAllocPoint = poolInfo.value1;
-    lastRewardBlock = poolInfo.value2;
-  }
+  // // Get necessary values from the master chef contract to calculate rewards
+  // let getPoolInfo = poolContract.try_poolInfo(pid);
+  // let poolAllocPoint: BigInt = BIGINT_ZERO;
+  // let lastRewardBlock: BigInt = BIGINT_ZERO;
+  // if (!getPoolInfo.reverted) {
+  //   let poolInfo = getPoolInfo.value;
+  //   poolAllocPoint = poolInfo.value1;
+  //   lastRewardBlock = poolInfo.value2;
+  // }
 
-  let getRewardTokenPerBlock = poolContract.try_triPerBlock();
-  let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
-  if (!getRewardTokenPerBlock.reverted) {
-    rewardTokenPerBlock = getRewardTokenPerBlock.value;
-  }
+  // let getRewardTokenPerBlock = poolContract.try_triPerBlock();
+  // let rewardTokenPerBlock: BigInt = BIGINT_ZERO;
+  // if (!getRewardTokenPerBlock.reverted) {
+  //   rewardTokenPerBlock = getRewardTokenPerBlock.value;
+  // }
 
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
+  // let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
 
-  let multiplier: BigInt = BIGINT_ONE;
-  if (!getMultiplier.reverted) {
-    multiplier = getMultiplier.value;
-  }
+  // let multiplier: BigInt = BIGINT_ONE;
+  // if (!getMultiplier.reverted) {
+  //   multiplier = getMultiplier.value;
+  // }
 
-  let getTotalAllocPoint = poolContract.try_totalAllocPoint();
-  let totalAllocPoint: BigInt = BIGINT_ZERO;
-  if (!getTotalAllocPoint.reverted) {
-    totalAllocPoint = getTotalAllocPoint.value;
-  }
+  // let getTotalAllocPoint = poolContract.try_totalAllocPoint();
+  // let totalAllocPoint: BigInt = BIGINT_ZERO;
+  // if (!getTotalAllocPoint.reverted) {
+  //   totalAllocPoint = getTotalAllocPoint.value;
+  // }
 
-  log.warning("multiplier: " + multiplier.toString(), []);
-  log.warning("rewardTokenPerBlock: " + rewardTokenPerBlock.toString(), []);
-  log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);
-  log.warning("totalAllocPoint: " + totalAllocPoint.toString(), []);
+  // log.warning("multiplier: " + multiplier.toString(), []);
+  // log.warning("rewardTokenPerBlock: " + rewardTokenPerBlock.toString(), []);
+  // log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);
+  // log.warning("totalAllocPoint: " + totalAllocPoint.toString(), []);
 
-  // Calculate Reward Emission per Block
-  let rewardTokenRate = multiplier
-    .times(rewardTokenPerBlock)
-    .times(poolAllocPoint)
-    .div(totalAllocPoint);
+  // // Calculate Reward Emission per Block
+  // let rewardTokenRate = multiplier
+  //   .times(rewardTokenPerBlock)
+  //   .times(poolAllocPoint)
+  //   .div(totalAllocPoint);
 
-  let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
-  let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
+  // let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
+  // let rewardTokenPerDay = getRewardsPerDay(event.block.timestamp, event.block.number, rewardTokenRateBigDecimal, NetworkConfigs.getRewardIntervalType());
 
-  let nativeToken = updateNativeTokenPriceInUSD();
+  // let nativeToken = updateNativeTokenPriceInUSD();
 
-  let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
-  rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
+  // let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
+  // rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
 
-  pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
-  pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
+  // pool.rewardTokenEmissionsAmount = [BigInt.fromString(rewardTokenPerDay.toString())];
+  // pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
-  masterChefPool.valueBigInt = event.block.number;
+  // masterChefPool.valueBigInt = event.block.number;
 
-  masterChefPool.save();
-  rewardToken.save();
-  nativeToken.save();
-  pool.save();
+  // masterChefPool.save();
+  // rewardToken.save();
+  // nativeToken.save();
+  // pool.save();
 }

@@ -49,7 +49,7 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
     return FeeSwitch.ON;
   }
   getRewardIntervalType(): string {
-    return RewardIntervalType.BLOCK;
+    return RewardIntervalType.TIMESTAMP;
   }
   getReferenceToken(): string {
     return toLowerCase("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");
@@ -61,19 +61,24 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
     return toLowerCaseList([
       "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", // wAVAX
       "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
-      "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT
+      "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
+      "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
+      "0xde3a24028580884448a5397872046a019649b084", // USDT old
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
       "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
-      "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT
+      "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
+      "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
     ]);
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
+      "0xe4b9865c0866346ba3613ec122040a365637fb46", // USDT/wAVAX
       "0xf4003f4efbe8691b60249e6afbd307abe7758adb", // USDC/wAVAX
-      "0xed8cbd9f0ce3c6986b22002f03c6475ceb7a6256"  // USDT/wAVAX
+      "0xed8cbd9f0ce3c6986b22002f03c6475ceb7a6256", // USDT.e/wAVAX
+      "0xbb4646a764358ee93c2a9c4a147d5aded527ab73", // USDT old/wAVAX
     ]);
   }
   getUntrackedPairs(): string[] {
