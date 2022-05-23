@@ -159,13 +159,13 @@ export function updateProtocolRevenue(
 ): void {
   let protocol = getOrCreateDexAmm();
   let financialSnapshot = getOrCreateFinancialsDailySnapshot(event);
-  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage!.div(
+  let LpFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_LP_FEE).feePercentage.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
-  let protocolFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage!.div(
+  let protocolFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_PROTOCOL_FEE).feePercentage.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
-  let totalFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_TRADING_FEE).feePercentage!.div(
+  let totalFee = getPoolFee(liquidityPool.id, LiquidityPoolFeeType.FIXED_TRADING_FEE).feePercentage.div(
     BIGDECIMAL_ONE_HUNDRED,
   );
 

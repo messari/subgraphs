@@ -12,7 +12,7 @@ import {
   ZERO_ADDRESS,
 } from "../common/constants";
 import { getOrCreateToken } from "../common/getters";
-import { setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
+import { setLpTokenPool, setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
 import { getPlatform } from "./platform";
 import { getLpTokenPriceUSD } from "./snapshots";
 
@@ -48,21 +48,18 @@ export function createNewPool(
   pool.coins = coins.length > 0 ? coins.sort() : getPoolCoins(pool).sort();
   pool.underlyingTokens = getUnderlyingTokens(pool);
   pool.poolType = poolType;
-  log.error('setPoolBalances {}',[poolAddress.toHexString()]);
+  pool.stakedOutputTokenAmount = BIGINT_ZERO;
   setPoolBalances(pool);
-  log.error('setPoolTVL {}',[poolAddress.toHexString()]);
   setPoolTVL(pool, timestamp);
-  log.error('setPoolFees {}',[poolAddress.toHexString()]);
   setPoolFees(pool);
-  log.error('setPoolOutputTokenSupply {}',[poolAddress.toHexString()]);
   setPoolOutputTokenSupply(pool);
   pool.save();
   setProtocolTVL();
+  setLpTokenPool(lpToken,poolAddress)
   return pool;
 }
 
 export function getLpToken(pool: Address): Address {
-  log.error("getLpToken {}", [pool.toHexString()]);
   let stableSwap = StableSwap.bind(pool);
   let lpToken = ADDRESS_ZERO
   let lpTokenCall = stableSwap.try_lp_token();
@@ -76,14 +73,10 @@ export function getLpToken(pool: Address): Address {
   } else {
     lpToken = lpTokenCall.value;
   }
-  let lpTokenPool = new LptokenPool(lpToken.toHexString());
-  lpTokenPool.pool = pool.toHexString();
-  lpTokenPool.save();
   return lpToken;
 }
 
 export function getBasePool(pool: Address): Address {
-  log.error("getBasePool {}", [pool.toHexString()]);
   let stableSwap = StableSwap.bind(pool);
   let basePoolCall = stableSwap.try_base_pool();
   if (!basePoolCall.reverted) {

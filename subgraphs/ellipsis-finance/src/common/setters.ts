@@ -1,5 +1,5 @@
 import { Address, BigInt, log, BigDecimal } from "@graphprotocol/graph-ts";
-import { LiquidityPool } from "../../generated/schema";
+import { LiquidityPool, LptokenPool } from "../../generated/schema";
 import { getOrCreateDexAmm, getOrCreateToken, getPoolFee } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
 import {
@@ -69,7 +69,6 @@ export function setPoolFeesV2(pool: LiquidityPool): void {
 }
 
 export function setPoolFees(pool: LiquidityPool): void {
-  log.error('setPoolFees for {}', [pool.id]);
   let curvePool = StableSwap.bind(Address.fromString(pool.id));
   if (pool.isV2) {
     setPoolFeesV2(pool);
@@ -79,7 +78,6 @@ export function setPoolFees(pool: LiquidityPool): void {
   let adminFeeCall = curvePool.try_admin_fee();
   let totalFee = totalFeeCall.reverted ? POOL_FEE : bigIntToBigDecimal(totalFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
   let adminFee = adminFeeCall.reverted ? ADMIN_FEE : bigIntToBigDecimal(adminFeeCall.value, FEE_DENOMINATOR_DECIMALS); // format to percentage
-  log.error("total fee = {}, admin fee = {} for {}", [totalFee.toString(), adminFee.toString(), pool.id]);
   let tradingFee = getPoolFee(pool.id, LiquidityPoolFeeType.FIXED_TRADING_FEE);
   tradingFee.feePercentage = totalFee.times(BIGDECIMAL_ONE_HUNDRED);
   tradingFee.save();
@@ -157,4 +155,10 @@ export function setProtocolTVL(): void {
   }
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.save();
+}
+
+export function setLpTokenPool(lpToken: Address, pool: Address): void {
+  let lpTokenPool = new LptokenPool(lpToken.toHexString());
+  lpTokenPool.pool = pool.toHexString();
+  lpTokenPool.save();
 }

@@ -1,8 +1,6 @@
 import { Address, BigDecimal, BigInt, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { Swap } from "../../generated/schema";
 import { getPoolAssetPrice, getTokenPriceSnapshot } from "./snapshots";
-//import { BIG_DECIMAL_TWO, LENDING, STABLE_FACTORY } from "../common/constants/index";
-//import { getBasePool, getVirtualBaseLendingPool } from "./pools";
 import { exponentToBigDecimal } from "../common/utils/numbers";
 import {
   getOrCreateDexAmm,
