@@ -185,6 +185,9 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
   const market = getOrCreateMarket(event.params.underlying.toHexString());
+
+  // Collateral and borrow factor are scaled by 4e9
+  // https://github.com/euler-xyz/euler-contracts/blob/60114fafd99ee6a57d53c069660e0a976874819d/test/governorAdmin.js#L117
   market.maximumLTV = event.params.newConfig.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE); // TODO: Validate whether we should be using borrow factor or collateral factor
   market.liquidationThreshold = event.params.newConfig.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE); // TODO: Validate whether we should be using borrow factor or collateral factor
 
@@ -193,7 +196,7 @@ export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
   }
 
   // liquidationPenalty can't be set because Euler uses dynamic discount rate
-  // More on this: https://docs.euler.finance/developers/architecture#dynamic-discounts
+  // https://docs.euler.finance/developers/architecture#dynamic-discounts
   market.save();
 }
 
