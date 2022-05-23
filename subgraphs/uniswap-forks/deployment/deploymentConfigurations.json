@@ -81,6 +81,13 @@
         "steegecs": "steegecs/sushiswap-xdai",
         "messari": "messari/sushiswap-xdai"
       }
+    },"ubeswap": {
+      "celo": {
+        "template": "ubeswap-template.yaml",
+        "steegecs": "steegecs/ubeswap-celo",
+        "messari": "messari/ubeswap-celo",
+        "sevenshi": "sevenshi/ubeswap_celo"
+      }
     }
   }
 }

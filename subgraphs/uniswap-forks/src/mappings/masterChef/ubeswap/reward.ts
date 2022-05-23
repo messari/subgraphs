@@ -5,29 +5,33 @@ import {
   Address,
   log,
 } from "@graphprotocol/graph-ts";
-import { handleRewardPaidStakedImpl, handleStakedImpl, handleWithdrawnImpl } from "../../../common/masterChef/ubeswap/handleReward";
-
+import { StakeCall } from "../../../../generated/templates/StakingRewards/StakingRewards";
+import {
+  handleRewardPaidImpl,
+  handleStakedImpl,
+  handleWithdrawnImpl,
+} from "../../../common/masterChef/ubeswap/handleReward";
 
 export function handleStaked(
   event: ethereum.Event,
   address: Address,
   amount: BigInt
 ): void {
-    handleStakedImpl(event,address,amount);
+  handleStakedImpl(event,address, amount);
 }
 
-export function handlWithdrawn(
+export function handleWithdrawn(
   event: ethereum.Event,
   address: Address,
   amount: BigInt
 ): void {
-    handleWithdrawnImpl(event,address,amount);
+  handleWithdrawnImpl(event, address, amount);
 }
 
-export function handleRewardPaidStaked(
+export function handleRewardPaid(
   event: ethereum.Event,
   address: Address,
   amount: BigInt
 ): void {
-    handleRewardPaidStakedImpl(event,address,amount);
+  handleRewardPaidImpl(event, address, amount);
 }

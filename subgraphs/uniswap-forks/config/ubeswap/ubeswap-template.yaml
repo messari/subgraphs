@@ -38,10 +38,14 @@ dataSources:
       abis:
         - name: PoolManager
           file: ./abis/ubeswap/PoolManager.json
+        - name: StakingRewards
+          file: ./abis/ubeswap/StakingRewards.json
+        - name: TokenABI
+          file: ./abis/ubeswap/ERC20.json
       eventHandlers:
         - event: UpdatePoolWeight(indexed address,indexed uint256,uint256,indexed bool)
           handler: handleUpdatePoolWeight
-      file: ./src/mappings/masterChef/ubeswap/reward.ts
+      file: ./src/mappings/masterChef/ubeswap/createpool.ts
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -81,11 +85,13 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/mappings/pool.ts
+      file: ./src/mappings/masterChef/ubeswap/reward.ts
       entities: []
       abis:
         - name: StakingRewards
           file: ./abis/ubeswap/StakingRewards.json
+        - name: TokenABI
+          file: ./abis/ubeswap/ERC20.json
       eventHandlers:
         - event: Staked(indexed address,uint256)
           handler: handleStaked

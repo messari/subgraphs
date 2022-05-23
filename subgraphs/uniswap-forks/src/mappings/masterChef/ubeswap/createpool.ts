@@ -1,12 +1,4 @@
-import {
-  BigDecimal,
-  BigInt,
-  ethereum,
-  Address,
-  log,
-} from "@graphprotocol/graph-ts";
-
-import { PoolManager } from "../../../../generated/PoolManager/PoolManager";
+import { ethereum } from "@graphprotocol/graph-ts";
 
 import { handleUpdatePoolWeightImpl } from "../../../common/masterChef/ubeswap/handelCreatePool";
 

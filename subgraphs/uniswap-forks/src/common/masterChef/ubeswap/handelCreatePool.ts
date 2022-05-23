@@ -28,28 +28,40 @@ import { getOrCreateDex, getOrCreateToken } from "../../getters";
 export function handleUpdatePoolWeightImpl(event: ethereum.Event): void {
   const poolManager = PoolManager.bind(event.address);
   const poolsCount = poolManager.try_poolsCount();
-
+  if (poolsCount.reverted) {
+    return
+  }
   const protocol = getOrCreateDex();
   for (let index: i32 = 0; index < poolsCount.value.toI32(); index++) {
-    const pooladdress = poolManager.poolsByIndex(BigInt.fromI32(index));
-    getOrCreateStackPool(event, protocol, pooladdress);
+    const stackTokenAddress = poolManager.poolsByIndex(BigInt.fromI32(index));
+    const poolInfo = poolManager.try_pools(stackTokenAddress);
+    if (poolInfo.reverted) {
+      return
+    }
+    // poolInfo.value.value2  is poolAddress
+    getOrCreateStackPool(event, protocol, poolInfo.value.value2, stackTokenAddress);
   }
 }
 
 export function getOrCreateStackPool(
   event: ethereum.Event,
   protocol: DexAmmProtocol,
-  poolAddress: Address
+  poolAddress: Address,
+  stackTokenAddress: Address
 ): void {
   let pool = LiquidityPool.load(poolAddress.toHexString());
   if (!pool) {
     const stakingRewards = StakingRewards.bind(poolAddress);
-    let LPtokenAddress = stakingRewards.stakingToken();
     pool = new LiquidityPool(poolAddress.toHexString());
     let poolAmounts = new _LiquidityPoolAmount(poolAddress.toHexString());
-    let LPtoken = getOrCreateToken(LPtokenAddress.toHexString());
-    pool.protocol = protocol.id;
+    pool.name = protocol.name;
+    let LPtoken = getOrCreateToken(stackTokenAddress.toHexString());
     pool.inputTokens = [LPtoken.id];
+    pool.name = protocol.name + " " + LPtoken.symbol;
+    pool.symbol = LPtoken.symbol;
+    poolAmounts.inputTokens = [LPtoken.id];
+    
+    pool.protocol = protocol.id;
     pool.outputToken = NetworkConfigs.getRewardToken();
     pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
@@ -66,9 +78,7 @@ export function getOrCreateStackPool(
     pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     pool.createdTimestamp = event.block.timestamp;
     pool.createdBlockNumber = event.block.number;
-    pool.name = protocol.name + " " + LPtoken.symbol;
-    pool.symbol = LPtoken.symbol;
-    poolAmounts.inputTokens = [LPtoken.id];
+
     poolAmounts.inputTokenBalances = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     // Used to track the number of deposits in a liquidity pool
     let poolDeposits = new _HelperStore(poolAddress.toHexString());
@@ -77,8 +87,9 @@ export function getOrCreateStackPool(
     // create the tracked contract based on the template
     StakingRewardsTemplate.create(poolAddress);
 
-    pool.save();
+    log.warning("StakingRewardsTemplate add : {}",[poolAddress.toHexString()])
     LPtoken.save();
+    pool.save();
     poolAmounts.save();
     poolDeposits.save();
   }
