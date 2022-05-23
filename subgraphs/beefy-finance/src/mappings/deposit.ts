@@ -6,8 +6,8 @@ import {
 } from "../../generated/ExampleVault/BeefyStrategy";
 import {
   getBeefyFinanceOrCreate,
+  getVaultFromStrategyOrCreate,
   getTokenOrCreate,
-  getVaultOrCreate,
 } from "../utils/getters";
 
 export function createDeposit(
@@ -24,16 +24,18 @@ export function createDeposit(
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.transaction.index.toI32();
-  deposit.protocol = getBeefyFinanceOrCreate(networkSuffix).id;
+  deposit.protocol = getBeefyFinanceOrCreate().id;
+  //deposit.to = event.address.toHexString();
+  //deposit.from = call.from.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
 
-  const vaultContract = BeefyStrategy.bind(event.address);
-  deposit.asset = getTokenOrCreate(vaultContract.want(), networkSuffix).id;
+  const strategyContract = BeefyStrategy.bind(event.address);
+  deposit.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   deposit.amount = depositedAmount;
   //TODO: deposit.amountUSD
 
-  deposit.vault = getVaultOrCreate(
+  deposit.vault = getVaultFromStrategyOrCreate(
     event.address,
     event.block,
     networkSuffix
@@ -44,18 +46,22 @@ export function createDeposit(
 }
 
 export function getOrCreateFirstDeposit(vault: Vault): Deposit {
-  let deposit = Deposit.load("MockDeposit");
+  let deposit = Deposit.load("MockDeposit" + vault.id);
   if (!deposit) {
     const zeroAddress = "0x0000000000000000000000000000000000000000";
-    deposit = new Deposit("MockDeposit");
+    deposit = new Deposit("MockDeposit" + vault.id);
 
     deposit.hash = zeroAddress;
     deposit.logIndex = 0;
-    deposit.protocol = getBeefyFinanceOrCreate("-" + vault.id.split("-")[1]).id;
-    deposit.blockNumber = new BigInt(0);
-    deposit.timestamp = new BigInt(0);
-    deposit.asset = zeroAddress;
+    deposit.protocol = getBeefyFinanceOrCreate().id;
+
+    //deposit.to = zeroAddress;
+    //deposit.from = zeroAddress;
+    deposit.blockNumber = vault.createdBlockNumber;
+    deposit.timestamp = vault.createdTimestamp;
+    deposit.asset = vault.inputToken;
     deposit.amount = new BigInt(0);
+    //deposit.amountUSD = new BigDecimal(new BigInt(0));
     deposit.vault = vault.id;
 
     deposit.save();

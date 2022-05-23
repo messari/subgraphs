@@ -29,7 +29,7 @@ enum ProtocolType {
 }
 
 type Token @entity {
-  " Smart contract address of the token - chain id "
+  " Smart contract address of the token "
   id: ID!
 
   " Name of the token, mirrored from the smart contract "
@@ -69,7 +69,7 @@ interface Protocol {
   subgraphVersion: String!
 
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
-  methodologyVersion: String!
+  methodologyVersion: String
 
   " The blockchain network this subgraph is indexing on "
   network: Network!
@@ -128,7 +128,7 @@ type YieldAggregator implements Protocol @entity {
   subgraphVersion: String!
 
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
-  methodologyVersion: String!
+  methodologyVersion: String
 
   " The blockchain network this subgraph is indexing on "
   network: Network!
@@ -174,22 +174,21 @@ type YieldAggregator implements Protocol @entity {
   #vaults: [Vault!]! #@derivedFrom(field: "protocol")
 }
 
-###############################
-##### Pool-Level Metadata #####
-###############################
-
 type Vault @entity {
-  " Smart contract address of the vault "
+  " Smart contract address of the Vault "
   id: ID!
 
-  " The protocol this vault belongs to "
+  " The protocol this Vault belongs to "
   protocol: YieldAggregator!
 
-  " Name of liquidity pool (e.g. Curve.fi DAI/USDC/USDT) "
-  name: String!
+  " Name of Vault (e.g. Onsen) "
+  name: String
 
-  " Symbol of liquidity pool (e.g. 3CRV) "
-  symbol: String!
+  " Symbol of Vault (e.g. ONS) "
+  symbol: String
+
+  " Strategy of the vault "
+  strategy: String
 
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
@@ -214,10 +213,10 @@ type Vault @entity {
 
   ##### Quantitative Data #####
 
-  #" Current TVL (Total Value Locked) of this pool in USD "
+  #" Current TVL (Total Value Locked) of this Vault in USD "
   #totalValueLockedUSD: BigDecimal!
 
-  " Amount of input token in the pool "
+  " Amount of input token in the Vault "
   inputTokenBalance: BigInt!
 
   " Total supply of output token "
@@ -248,10 +247,10 @@ type Vault @entity {
 
   ##### Events #####
 
-  " All deposits made to this vault "
+  " All deposits made to this Vault "
   deposits: [Deposit!]!
 
-  " All withdrawals made from this vault "
+  " All withdrawals made from this Vault "
   withdraws: [Withdraw!]!
 }
 
@@ -332,7 +331,7 @@ type Deposit implements Event @entity {
 }
 
 type Withdraw implements Event @entity {
-  " { Transaction hash }-{ Log index }-{ network ID }"
+  " { Transaction hash }-{ Log index }-{ network ID"
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "

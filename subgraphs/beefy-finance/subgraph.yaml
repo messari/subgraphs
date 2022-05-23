@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
@@ -41,11 +41,11 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/vault.ts
       entities:
+        - Vault
         - Token
         - Deposit
         - Withdraw
         - YieldAggregator
-        - Vault
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -89,11 +89,11 @@ dataSources:
 #           handler: handleVaultsRetireStatusUpdated
 #       file: ./src/mappings/registry.ts
 # templates:
-#   - name: Vault
+#   - name: BeefyVault
 #     kind: ethereum/contract
 #     network: matic
 #     source:
-#       abi: Vault
+#       abi: BeefyVault
 #     mapping:
 #       kind: ethereum/events
 #       apiVersion: 0.0.6
@@ -101,9 +101,36 @@ dataSources:
 #       file: ./src/mappings/vault.ts
 #       entities:
 #         - Vault
+#         - Token
+#         # other entities?
+#       abis:
+#         - name: BeefyVault
+#           file: ./abis/BeefyVault.json
+#         - name: ERC20
+#           file: ./abis/ERC20.json
+#       eventHandlers:
+#         - event: NewStratCandidate(address)
+#           handler: handleNewStratCandidate
+#         - event: UpgradeStrat(address)
+#           handler: handleUpgradeStrat
+#       callHandlers:
+#         - function: deposit(uint256)
+#           handler: handleDepositCall
+#   - name: Strategy
+#     kind: ethereum/contract
+#     network: matic
+#     source:
+#       abi: Strategy
+#     mapping:
+#       kind: ethereum/events
+#       apiVersion: 0.0.6
+#       language: wasm/assemblyscript
+#       file: ./src/mappings/strategy.ts
+#       entities:
+#         - Strategy
 #         #- Other entities?
 #       abis:
-#         - name: BeefyStrategy
+#         - name: Strategy
 #           file: ./abis/BeefyStrategy.json
 #       eventHandlers:
 #         - event: ChargedFees(uint256,uint256,uint256)

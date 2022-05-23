@@ -1,12 +1,12 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Deposit, Token, Vault, YieldAggregator } from "../../generated/schema";
-import { createVault } from "../mappings/vault";
+import { Token, Vault, YieldAggregator } from "../../generated/schema";
+import { createVaultFromStrategy } from "../mappings/vault";
+import { BeefyStrategy } from "../../generated/ExampleVault/BeefyStrategy";
 import {
   fetchTokenDecimals,
   fetchTokenName,
   fetchTokenSymbol,
 } from "../mappings/token";
-import { Deposit as DepositEvent } from "../../generated/ExampleStrategy/BeefyStrategy";
 
 export function getTokenOrCreate(
   tokenAddress: Address,
@@ -24,30 +24,29 @@ export function getTokenOrCreate(
   return token;
 }
 
-export function getVaultOrCreate(
-  vaultAddress: Address,
+export function getVaultFromStrategyOrCreate(
+  strategyAddress: Address,
   currentBlock: ethereum.Block,
   networkSuffix: string
 ): Vault {
-  const vaultId = vaultAddress.toHexString() + networkSuffix;
+  const strategyContract = BeefyStrategy.bind(strategyAddress);
+  const vaultId = strategyContract.vault().toHexString() + networkSuffix;
   let vault = Vault.load(vaultId);
   if (!vault) {
-    vault = createVault(vaultAddress, currentBlock);
+    vault = createVaultFromStrategy(strategyAddress, currentBlock);
   }
   return vault;
 }
 
-export function getBeefyFinanceOrCreate(
-  networkSuffix: string
-): YieldAggregator {
-  let beefy = YieldAggregator.load("BeefyFinance" + networkSuffix);
+export function getBeefyFinanceOrCreate(): YieldAggregator {
+  let beefy = YieldAggregator.load("BeefyFinance");
   if (!beefy) {
-    beefy = new YieldAggregator("BeefyFinance" + networkSuffix);
+    beefy = new YieldAggregator("BeefyFinance");
     beefy.name = "Beefy Finance";
     beefy.slug = "beefy-finance";
     beefy.schemaVersion = "1.2.1";
     beefy.subgraphVersion = "0.0.2";
-    beefy.methodologyVersion = "Abboh";
+    //beefy.methodologyVersion = "Abboh";
     beefy.network = "MATIC";
     beefy.type = "YIELD";
     /* beefy.totalValueLockedUSD = new BigDecimal(new BigInt(0));
