@@ -243,7 +243,7 @@ export function getOrCreateMarket(id: string): Market {
     const protocol = getOrCreateLendingProtocol();
     market.protocol = protocol.id;
     market.isActive = true;
-    market.canUseAsCollateral = true;
+    market.canUseAsCollateral = false;
     market.canBorrowFrom = true;
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
