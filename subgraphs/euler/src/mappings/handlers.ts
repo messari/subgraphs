@@ -367,15 +367,6 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
       protocol.cumulativeSupplySideRevenueUSD
     );
 
-    /**
-   *  ##### Quantitative Data #####
-
-    " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-    rewardTokenEmissionsAmount: [BigInt!]
-
-    " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-    rewardTokenEmissionsUSD: [BigDecimal!]
-   */
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);
   }
