@@ -979,6 +979,7 @@ type _MarketUtility @entity {
   " Time-weighted averege price, in USD"
   twapPrice: BigDecimal!
 
+  " Cumulated interest on the reserve balance. Starts at 1e27, multiplied by (1e27 + interestRate) every second. "
   interestAccumulator: BigInt!
 
   " Cumulated govenance reserves conversions. Used for protocol revenue calculation."

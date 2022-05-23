@@ -66,6 +66,9 @@ export function handleAssetStatus(event: AssetStatus): void {
 
   token.lastPriceUSD = twapPrice;
   marketUtility.twapPrice = twapPrice;
+
+  // More information about interest accumulator 
+  // https://github.com/euler-xyz/euler-contracts/blob/60114fafd99ee6a57d53c069660e0a976874819d/docs/limits.md#interestaccumulator
   marketUtility.interestAccumulator = event.params.interestAccumulator;
   marketUtility.save();
 
@@ -84,14 +87,6 @@ export function handleAssetStatus(event: AssetStatus): void {
 
   token.save();
   market.save();
-  /**
-   * https://github.com/euler-xyz/euler-contracts/blob/60114fafd99ee6a57d53c069660e0a976874819d/docs/limits.md#interestaccumulator
-   * interestAccumulator
-      uint256
-
-      Starts at 1e27, multiplied by (1e27 + interestRate) every second
-      Spec: 100% APR for 100 years -> 2^256 ~= 1.1579208923e+77 -> 10^27 * (1 + (100/100 / (86400365)))^(86400365*100) ~= 2.6881128798e+70
-    */
 }
 
 export function handleBorrow(event: Borrow): void {
@@ -394,7 +389,6 @@ export function handleBlockUpdates(block: ethereum.Block): void {
   ];
 
   const queryParametersTuple = changetype<EulerGeneralView__doQueryInputQStruct>(queryParameters);
-
   const result = eulerGeneralView.try_doQuery(queryParametersTuple);
 
   if (result.reverted) {
