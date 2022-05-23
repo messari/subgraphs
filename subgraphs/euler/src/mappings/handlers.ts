@@ -25,6 +25,8 @@ import {
   getOrCreateLendingProtocol,
   getOrCreateLiquidate,
   getOrCreateMarketUtility,
+  getOrCreateRepay,
+  getOrCreateProtocolUtility,
 } from "../common/getters";
 import {
   BIGDECIMAL_ONE,
@@ -146,7 +148,7 @@ export function handleDeposit(event: Deposit): void {
 
 
 export function handleRepay(event: Repay): void {
-  const repay = getOrCreateWithdraw(event);
+  const repay = getOrCreateRepay(event);
   const marketId = event.params.underlying.toHexString();
   const market = getOrCreateMarket(marketId);
   const tokenId = event.params.underlying.toHexString();
@@ -236,6 +238,7 @@ export function handleLiquidation(event: Liquidation): void {
 
 export function handleMarketActivated(event: MarketActivated): void {
   let market = getOrCreateMarket(event.params.underlying.toHexString());
+  let protocolUtility = getOrCreateProtocolUtility();
 
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
@@ -255,6 +258,8 @@ export function handleMarketActivated(event: MarketActivated): void {
   eToken.save();
 
   market.save();
+  protocolUtility.markets.push(market.id);
+  protocolUtility.save();
 }
 
 function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRStruct, block: ethereum.Block): void {
@@ -379,7 +384,7 @@ export function handleBlockUpdates(block: ethereum.Block): void {
     ? EULER_GENERAL_VIEW_V2_ADDRESS
     : EULER_GENERAL_VIEW_ADDRESS;
   const eulerGeneralView = EulerGeneralView.bind(Address.fromString(viewAddress));
-  const protocol = getOrCreateLendingProtocol();
+  const protocol = getOrCreateProtocolUtility();
 
   const markets = protocol.markets;
   if (!markets || markets.length == 0) {

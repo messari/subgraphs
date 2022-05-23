@@ -17,6 +17,7 @@ import {
   Liquidate,
   InterestRate,
   _MarketUtility,
+  _ProtocolUtility,
 } from "../../generated/schema";
 import { getAssetSymbol, getAssetName, getAssetDecimals } from "./tokens";
 import {
@@ -396,4 +397,15 @@ export function getOrCreateMarketUtility(id: string): _MarketUtility {
     entity.save();
   }
   return entity as _MarketUtility;
+}
+
+export function getOrCreateProtocolUtility(): _ProtocolUtility {
+  let protocol = _ProtocolUtility.load(EULER_ADDRESS);
+
+  if (!protocol) {
+    protocol = new _ProtocolUtility(EULER_ADDRESS);
+    protocol.markets = [];
+    protocol.save();
+  }
+  return protocol as _ProtocolUtility;
 }

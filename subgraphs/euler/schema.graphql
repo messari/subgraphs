@@ -275,7 +275,7 @@ type LendingProtocol implements Protocol @entity {
   ##### Markets #####
 
   " All markets that belong to this protocol "
-  markets: [Market!]! # Note: Intentionally omitting @derivedFrom(field: "protocol") as list of markets is needed for euler view query
+  markets: [Market!]! @derivedFrom(field: "protocol")
 }
 
 ###############################
@@ -983,4 +983,12 @@ type _MarketUtility @entity {
 
   " Cumulated govenance reserves conversions. Used for protocol revenue calculation."
   cumulatedGovConvertReservesUSD: BigDecimal!
+}
+
+type _ProtocolUtility @entity {
+  " Smart contract address of the protocol's main contract (Factory, Registry, etc) "
+  id: ID!
+
+  " Active markets on the protocol. "
+  markets: [Market!]!
 }
