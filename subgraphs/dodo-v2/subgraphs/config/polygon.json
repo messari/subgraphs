@@ -1,0 +1,15 @@
+{
+  "startBlock": "10970196",
+  "network": "matic",
+  "dvmFactory": "0x79887f65f83bdf15Bcc8736b5e5BcDB48fb8fE13",
+  "cpFactory": "0x42ddEc68db70F5992eB7AB22dfaD8A57109841C9",
+  "dppFactory": "0xd24153244066F0afA9415563bFC7Ba248bfB7a51",
+  "dspFactory": "0x43C49f8DD240e1545F147211Ec9f917376Ac1e87",
+  "mineproxy": "0x47a65e74dd6b6B5E3243dBb01EDEd9D55ba234Ad",
+  "dodo": "0xe4bf2864ebec7b7fdf6eeca9bacae7cdfdaffe78",
+  "vdodo": "0x0000000000000000000000000000000000000000",
+  "feeModelI": "0x67Df06D0a3c9ab146358C9CE97403C6b00B234d6",
+  "dai": "0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
+  "usdc": "0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
+  "usdt": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+}

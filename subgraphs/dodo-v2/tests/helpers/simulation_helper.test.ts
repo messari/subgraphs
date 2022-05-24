@@ -2,9 +2,9 @@ import { Address, BigInt, Bytes, ethereum } from "@graphprotocol/graph-ts";
 
 import { createMockedFunction, newMockEvent } from "matchstick-as";
 
-import { handleDODOSwapDVM } from "../../src/mappingDVM";
+import { handleDODOSwapDVM } from "../../src/mappings/mappingDVM";
 
-import { handleDODOSwapDSP } from "../../src/mappingDSP";
+import { handleDODOSwapDSP } from "../../src/mappings/mappingDSP";
 
 import { createDODOSwapDSPEvent } from "./helpers_DSP.test";
 
@@ -16,7 +16,7 @@ import {
   handleNewCP,
   handleNewDPP,
   handleNewDSP
-} from "../../src/mappingFactory";
+} from "../../src/mappings/mappingFactory";
 
 import {
   createNewDVMEvent,
@@ -37,6 +37,7 @@ import {
   DAI,
   USDC,
   USDT,
+  WRAPPED_ETH,
   DVMPoolAddress,
   DSPPoolAddress,
   DPPPoolAddress,
@@ -197,6 +198,20 @@ export function simulateActivity(): void {
     CPPoolAddress,
     "DODO",
     "vDODOToken_ADDRESS",
+    18
+  );
+
+  let dvmT = createERC20Instance(
+    DVMPoolAddress,
+    "DVMPOOL",
+    "DVMPoolAddress",
+    18
+  );
+
+  let dspT = createERC20Instance(
+    DSPPoolAddress,
+    "DSPPOOL",
+    "DSPPoolAddress",
     18
   );
 

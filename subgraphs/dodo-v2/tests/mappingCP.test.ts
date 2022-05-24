@@ -1,6 +1,6 @@
 import { test, assert } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { handleBid } from "../src/mappingCP";
+import { handleBid } from "../src/mappings/mappingCP";
 import { createBidEvent } from "./helpers/helpers_CP.test";
 
 import {

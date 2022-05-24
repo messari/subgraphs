@@ -4,7 +4,7 @@ import {
   handleBuyShares,
   handleSellShares,
   handleDODOSwapDSP
-} from "../src/mappingDSP";
+} from "../src/mappings/mappingDSP";
 
 import {
   createBuySharesEvent,

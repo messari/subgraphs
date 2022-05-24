@@ -30,6 +30,7 @@ import {
 } from "./helpers/constants.test";
 
 test("Creates an ERC20 Token instance", () => {
+  simulateActivity();
   let name = ethereum.Value.fromString("Test Token Name");
   let symbol = ethereum.Value.fromString("TTN");
   let decimals = ethereum.Value.fromI32(18);

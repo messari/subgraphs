@@ -1,7 +1,7 @@
 import { test, assert } from "matchstick-as/assembly/index";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { DODOSwap } from "../generated/DPP/DPP";
-import { handleDODOSwap } from "../src/mappingDPP";
+import { handleDODOSwap } from "../src/mappings/mappingDPP";
 import { createDODOSwapEvent } from "./helpers/helpers_DPP.test";
 import {
   Account1Add,

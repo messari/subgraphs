@@ -8,6 +8,8 @@ import {
 
 import { createDeposit, createWithdraw } from "../utils/setters";
 
+// event Bid(address to, uint256 amount, uint256 fee);
+
 export function handleBid(event: Bid): void {
   updateUsageMetrics(event, event.params.to, true, false);
   createDeposit(event, event.params.to, event.address, event.params.amount);

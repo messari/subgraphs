@@ -4,7 +4,7 @@ import {
   handleBuyShares,
   handleSellShares,
   handleDODOSwapDVM
-} from "../src/mappingDVM";
+} from "../src/mappings/mappingDVM";
 
 import {
   createBuySharesEvent,

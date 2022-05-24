@@ -190,8 +190,8 @@ export function createDeposit(
   deposit.pool = pool.id;
 
   pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
-
   pool.outputTokenSupply += shareAmount;
+
   deposit.save();
   pool.save();
 }
@@ -268,6 +268,7 @@ export function createWithdraw(
 
   pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
   pool.outputTokenSupply -= shareAmount;
+
   withdraw.save();
   pool.save();
 }
