@@ -8,7 +8,7 @@ export class SpookyswapFantomConfigurations implements Configurations {
     return Network.FANTOM;
   }
   getProtocolName(): string {
-    return "Spookyswap";
+    return "SpookySwap";
   }
   getProtocolSlug(): string {
     return "spookyswap";
