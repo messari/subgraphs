@@ -46,10 +46,13 @@ import {
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
   DECIMAL_PRECISION,
+  USDC_WETH_03_ADDRESS,
+  USDC_ERC20_ADDRESS,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
 import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
+import { _MarketUtility } from "../../generated/schema";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const tokenAddress = event.params.underlying.toHexString();
@@ -183,21 +186,49 @@ export function handleWithdraw(event: Withdraw): void {
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
 }
 
-export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
-  const market = getOrCreateMarket(event.params.underlying.toHexString());
+function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility) {
+  /**
+   * Maximum LTV and liquidation thresholds calculations assume the following:
+   * - Collateral asset is given market
+   * - Borrowed asset is USDC.
+   *  
+   * In theory, there is a max LTV and liquidation threshold for each possible pair of collateral/borrowed asset, but
+   * we are using USDC as borrowed asset for simplification.
+   */
+  const market = getOrCreateMarket(marketUtility.id);
 
-  // Collateral and borrow factor are scaled by 4e9
-  // https://github.com/euler-xyz/euler-contracts/blob/60114fafd99ee6a57d53c069660e0a976874819d/test/governorAdmin.js#L117
-  market.maximumLTV = event.params.newConfig.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE); // TODO: Validate whether we should be using borrow factor or collateral factor
-  market.liquidationThreshold = event.params.newConfig.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE); // TODO: Validate whether we should be using borrow factor or collateral factor
+  const marketCollateralFactor = marketUtility.collateralFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
+  const usdcBorrowFactorDecimal = usdcMarketUtility.borrowFactor.toBigDecimal().div(CONFIG_FACTOR_SCALE);
 
+  market.maximumLTV = marketCollateralFactor.times(usdcBorrowFactorDecimal);
+  market.liquidationThreshold = market.maximumLTV;
   if (market.maximumLTV != BIGDECIMAL_ZERO) {
     market.canUseAsCollateral = true;
   }
-
-  // liquidationPenalty can't be set because Euler uses dynamic discount rate
-  // https://docs.euler.finance/developers/architecture#dynamic-discounts
   market.save();
+}
+
+export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
+  const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
+  marketUtility.borrowFactor = event.params.newConfig.borrowFactor;
+  marketUtility.collateralFactor = event.params.newConfig.collateralFactor;
+  marketUtility.save();
+
+  if (event.params.underlying.toHexString() === USDC_ERC20_ADDRESS) {
+    // When USDC asset config is updated, max LTV and liquidation threshold for all currencies need
+    // to be updated as well.
+    const usdcMarketUtility = marketUtility;
+    const protocolUtility = getOrCreateProtocolUtility();
+    for (let i = 0; i < protocolUtility.markets.length; i += 1) {
+      const marketId = protocolUtility.markets[i];
+      const otherMarketUtility =
+        marketId !== USDC_ERC20_ADDRESS ? getOrCreateMarketUtility(marketId) : usdcMarketUtility;
+      updateMarketLendingFactors(otherMarketUtility, usdcMarketUtility);
+    }
+  } else {
+    const usdcMarketUtility = getOrCreateMarketUtility(USDC_ERC20_ADDRESS);
+    updateMarketLendingFactors(marketUtility, usdcMarketUtility);
+  }
 }
 
 export function handleGovSetReserveFee(event: GovSetReserveFee): void {
@@ -245,21 +276,17 @@ export function handleMarketActivated(event: MarketActivated): void {
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
 
-  // All isolation tiers can 
+  // Market are initliazed in isolated tier, which means currency can't be used as collateral.
   // https://docs.euler.finance/risk-framework/tiers
   market.canUseAsCollateral = false;
   market.canBorrowFrom = true;
 
   const token = getOrCreateToken(event.params.underlying);
-  const dToken = getOrCreateToken(event.params.dToken);
+  getOrCreateToken(event.params.dToken);
   const eToken = getOrCreateToken(event.params.eToken);
+
   market.outputToken = eToken.id;
   market.inputToken = token.id;
-
-  token.save();
-  dToken.save();
-  eToken.save();
-
   market.save();
 
   let protocolUtility = getOrCreateProtocolUtility();

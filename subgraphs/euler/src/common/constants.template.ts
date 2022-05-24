@@ -105,6 +105,7 @@ export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const EULER_ADDRESS = "{{address}}";
 export const EXEC_PROXY_ADDRESS = "{{execProxyAddress}}";
 export const USDC_WETH_03_ADDRESS = "{{uniswapV3UsdWethPoolAddress}}";
+export const USDC_ERC20_ADDRESS = "{{erc20UsdcAddress}}";
 export const EULER_GENERAL_VIEW_ADDRESS = "{{eulerGeneralViewAddress}}";
 
 export const VIEW_V2_START_BLOCK_NUMBER = BigInt.fromI32(14482429);

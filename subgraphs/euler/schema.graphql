@@ -984,6 +984,12 @@ type _MarketUtility @entity {
 
   " Cumulated govenance reserves conversions. Used for protocol revenue calculation."
   cumulatedGovConvertReservesUSD: BigDecimal!
+
+  " Borrow factor for max LTV and liquidation threshold calculation. Number between 0 and 1, scaled by 4e9."
+  borrowFactor: BigInt!
+
+  " Collateral factor for max LTV and liquidation threshold  calculation. Number between 0 and 1, scaled by 4e9. "
+  collateralFactor: BigInt!
 }
 
 type _ProtocolUtility @entity {
