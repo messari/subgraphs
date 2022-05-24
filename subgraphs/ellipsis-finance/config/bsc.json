@@ -23,6 +23,7 @@
     { "name": "fUSDT", "address": "0x556ea0b4c06D043806859c9490072FaadC104b63", "startblock": 6310798 },
     { "name": "pBTC", "address": "0x60E4ED61C6f17972559E86F2125BF8A30f249088", "startblock": 7868603 },
     { "name": "USDN", "address": "0x2f8E25C21A17BD9D0C337e1b409e73bc959B41BE", "startblock": 8186429 },
-    { "name": "UST", "address": "0x780de1A0E4613da6b65ceF7F5FB63d14CbDcfB72", "startblock": 10655759 }
+    { "name": "UST", "address": "0x780de1A0E4613da6b65ceF7F5FB63d14CbDcfB72", "startblock": 10655759 },
+    { "name": "TUSD", "address": "0x8D7408C2b3154F9f97fc6dd24cd36143908d1E52", "startblock": 6936611 }
   ]
 }
