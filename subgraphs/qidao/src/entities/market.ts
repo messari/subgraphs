@@ -53,7 +53,6 @@ export function createERC20Market(event: ethereum.Event): void {
     market.canUseAsCollateral = true;
     market.canBorrowFrom = true;
     market.inputToken = getOrCreateToken(contract.collateral()).id;
-    market.outputToken = getMaiToken().id;
     market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
@@ -91,7 +90,6 @@ export function createMaticMarket(event: ethereum.Event): void {
     market.maximumLTV = MATIC_MAXIMUM_LTV;
     market.liquidationPenalty = BIGDECIMAL_TEN;
     market.inputToken = getOrCreateToken(MATIC_ADDRESS).id;
-    market.outputToken = getMaiToken().id;
     market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
