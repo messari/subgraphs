@@ -5,33 +5,39 @@ import {
   Address,
   log,
 } from "@graphprotocol/graph-ts";
-import { StakeCall } from "../../../../generated/templates/StakingRewards/StakingRewards";
+import { Transfer } from "../../../../generated/Factory/TokenABI";
+import { RewardPaid, Staked, Withdrawn } from "../../../../generated/templates/StakingRewards/StakingRewards";
+import { UsageType } from "../../../common/constants";
 import {
   handleRewardPaidImpl,
   handleStakedImpl,
   handleWithdrawnImpl,
 } from "../../../common/masterChef/ubeswap/handleReward";
+import { updateFinancials, updatePoolMetrics, updateUsageMetrics } from "../../../common/updateMetrics";
 
 export function handleStaked(
-  event: ethereum.Event,
-  address: Address,
-  amount: BigInt
+  event: Staked,
 ): void {
-  handleStakedImpl(event,address, amount);
+  handleStakedImpl(event, event.params.amount);
+  updateUsageMetrics(event, event.transaction.from, UsageType.DEPOSIT);
+  updateFinancials(event);
+  updatePoolMetrics(event);
 }
 
 export function handleWithdrawn(
-  event: ethereum.Event,
-  address: Address,
-  amount: BigInt
+  event: Withdrawn,
 ): void {
-  handleWithdrawnImpl(event, address, amount);
+  handleWithdrawnImpl(event, event.params.amount);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
+  updateFinancials(event);
+  updatePoolMetrics(event);
 }
 
 export function handleRewardPaid(
-  event: ethereum.Event,
-  address: Address,
-  amount: BigInt
+  event: RewardPaid
 ): void {
-  handleRewardPaidImpl(event, address, amount);
+  handleRewardPaidImpl(event, event.params.reward);
+  updateUsageMetrics(event, event.transaction.from, UsageType.WITHDRAW);
+  updateFinancials(event);
+  updatePoolMetrics(event);
 }
