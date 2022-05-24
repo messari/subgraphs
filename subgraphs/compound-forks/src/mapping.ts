@@ -68,6 +68,10 @@ enum EventType {
   Liquidate,
 }
 
+////////////////////////
+//// Custom Classes ////
+////////////////////////
+
 export class ProtocolData {
   comptrollerAddr: Address;
   name: string;
@@ -160,81 +164,9 @@ export class UpdateMarketData {
   }
 }
 
-export function _getOrCreateProtocol(
-  protocolData: ProtocolData
-): LendingProtocol {
-  let protocol = LendingProtocol.load(
-    protocolData.comptrollerAddr.toHexString()
-  );
-  if (!protocol) {
-    protocol = new LendingProtocol(protocolData.comptrollerAddr.toHexString());
-    protocol.name = protocolData.name;
-    protocol.slug = protocolData.slug;
-    protocol.schemaVersion = protocolData.schemaVersion;
-    protocol.subgraphVersion = protocolData.subgraphVersion;
-    protocol.methodologyVersion = protocolData.methodologyVersion;
-    protocol.network = protocolData.network;
-    protocol.type = ProtocolType.LENDING;
-    protocol.lendingType = LendingType.POOLED;
-    protocol.riskType = RiskType.GLOBAL;
-
-    // Set quantitative data params
-    protocol.cumulativeUniqueUsers = 0;
-    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-    protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
-    protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
-    protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-
-    protocol._priceOracle = "";
-    protocol._marketIDs = [];
-
-    // set liquidation incentive
-    if (protocolData.liquidationIncentiveMantissaResult.reverted) {
-      log.warning(
-        "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
-        []
-      );
-    } else {
-      protocol._liquidationIncentive =
-        protocolData.liquidationIncentiveMantissaResult.value
-          .toBigDecimal()
-          .div(mantissaFactorBD)
-          .times(BIGDECIMAL_HUNDRED);
-    }
-
-    if (protocolData.oracleResult.reverted) {
-      log.warning("[getOrCreateProtocol] oracleResult reverted", []);
-    } else {
-      protocol._priceOracle = protocolData.oracleResult.value.toHexString();
-    }
-    protocol.save();
-  }
-  return protocol;
-}
-
-//
-//
-// event.params
-// - oldReserveFactorMantissa
-// - newReserveFactorMantissa
-export function _handleNewReserveFactor(event: NewReserveFactor): void {
-  let marketID = event.address.toHexString();
-  let market = Market.load(marketID);
-  if (market == null) {
-    log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
-    return;
-  }
-  let reserveFactor = event.params.newReserveFactorMantissa
-    .toBigDecimal()
-    .div(mantissaFactorBD);
-  market._reserveFactor = reserveFactor;
-  market.save();
-}
+////////////////////////////////////
+//// Comptroller Event Handlers ////
+////////////////////////////////////
 
 //
 //
@@ -431,6 +363,10 @@ export function _handleMarketListed(
   marketListedData.protocol._marketIDs = marketIDs;
   marketListedData.protocol.save();
 }
+
+////////////////////////////////////
+//// Transaction Event Handlers ////
+////////////////////////////////////
 
 //
 //
@@ -826,6 +762,10 @@ export function _handleLiquidateBorrow(
   );
 }
 
+///////////////////////////////
+//// CToken Event Handlers ////
+///////////////////////////////
+
 // This function is called whenever mint, redeem, borrow, repay, liquidateBorrow happens
 export function _handleAccrueInterest(
   updateMarketData: UpdateMarketData,
@@ -861,6 +801,29 @@ export function _handleAccrueInterest(
     event.block.timestamp
   );
 }
+
+//
+//
+// event.params
+// - oldReserveFactorMantissa
+// - newReserveFactorMantissa
+export function _handleNewReserveFactor(event: NewReserveFactor): void {
+  let marketID = event.address.toHexString();
+  let market = Market.load(marketID);
+  if (market == null) {
+    log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
+    return;
+  }
+  let reserveFactor = event.params.newReserveFactorMantissa
+    .toBigDecimal()
+    .div(mantissaFactorBD);
+  market._reserveFactor = reserveFactor;
+  market.save();
+}
+
+/////////////////////////
+//// Entity Updaters ////
+/////////////////////////
 
 export function snapshotMarket(
   marketID: string,
@@ -1401,6 +1364,11 @@ export function updateProtocol(comptrollerAddr: Address): void {
       market._cumulativeSupplySideRevenueUSD
     );
   }
+
+  log.warning("previous Rev: ${} new revenue: ${}", [
+    protocol.cumulativeTotalRevenueUSD.toString(),
+    cumulativeTotalRevenueUSD.toString(),
+  ]);
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
@@ -1412,6 +1380,89 @@ export function updateProtocol(comptrollerAddr: Address): void {
   protocol.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
   protocol.save();
 }
+
+////////////////////////
+//// Entity Getters ////
+////////////////////////
+
+export function _getOrCreateProtocol(
+  protocolData: ProtocolData
+): LendingProtocol {
+  let protocol = LendingProtocol.load(
+    protocolData.comptrollerAddr.toHexString()
+  );
+  if (!protocol) {
+    protocol = new LendingProtocol(protocolData.comptrollerAddr.toHexString());
+    protocol.name = protocolData.name;
+    protocol.slug = protocolData.slug;
+    protocol.schemaVersion = protocolData.schemaVersion;
+    protocol.subgraphVersion = protocolData.subgraphVersion;
+    protocol.methodologyVersion = protocolData.methodologyVersion;
+    protocol.network = protocolData.network;
+    protocol.type = ProtocolType.LENDING;
+    protocol.lendingType = LendingType.POOLED;
+    protocol.riskType = RiskType.GLOBAL;
+
+    // Set quantitative data params
+    protocol.cumulativeUniqueUsers = 0;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+
+    protocol._priceOracle = "";
+    protocol._marketIDs = [];
+
+    // set liquidation incentive
+    if (protocolData.liquidationIncentiveMantissaResult.reverted) {
+      log.warning(
+        "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
+        []
+      );
+    } else {
+      protocol._liquidationIncentive =
+        protocolData.liquidationIncentiveMantissaResult.value
+          .toBigDecimal()
+          .div(mantissaFactorBD)
+          .times(BIGDECIMAL_HUNDRED);
+    }
+
+    if (protocolData.oracleResult.reverted) {
+      log.warning("[getOrCreateProtocol] oracleResult reverted", []);
+    } else {
+      protocol._priceOracle = protocolData.oracleResult.value.toHexString();
+    }
+    protocol.save();
+  }
+  return protocol;
+}
+
+function getOrCreateMarketHourlySnapshot(
+  marketID: string,
+  blockTimestamp: i32
+): MarketHourlySnapshot {
+  let snapshotID = getMarketHourlySnapshotID(marketID, blockTimestamp);
+  let snapshot = MarketHourlySnapshot.load(snapshotID);
+  if (!snapshot) {
+    snapshot = new MarketHourlySnapshot(snapshotID);
+
+    // initialize zero values to ensure no null runtime errors
+    snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
+  }
+
+  return snapshot;
+}
+
+/////////////////
+//// Helpers ////
+/////////////////
 
 export function setSupplyInterestRate(
   marketID: string,
@@ -1489,24 +1540,6 @@ export function getOrCreateMarketDailySnapshot(
     snapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     snapshot._dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     snapshot._dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  }
-
-  return snapshot;
-}
-
-function getOrCreateMarketHourlySnapshot(
-  marketID: string,
-  blockTimestamp: i32
-): MarketHourlySnapshot {
-  let snapshotID = getMarketHourlySnapshotID(marketID, blockTimestamp);
-  let snapshot = MarketHourlySnapshot.load(snapshotID);
-  if (!snapshot) {
-    snapshot = new MarketHourlySnapshot(snapshotID);
-
-    // initialize zero values to ensure no null runtime errors
-    snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
-    snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
   }
 
   return snapshot;

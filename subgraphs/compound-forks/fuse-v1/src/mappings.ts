@@ -35,10 +35,8 @@ import {
 } from "../../src/mapping";
 import { PoolRegistered } from "../generated/FusePoolDirectory/FusePoolDirectory";
 import {
-  CDAI_ADDRESS,
   ETH_ADDRESS,
   ETH_NAME,
-  ETH_PRICE_ORACLE,
   ETH_SYMBOL,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
@@ -80,6 +78,7 @@ import {
   BIGINT_ZERO,
   cTokenDecimals,
   DAYS_PER_YEAR,
+  ETHEREUM_BLOCKS_PER_YEAR,
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
@@ -90,6 +89,7 @@ import {
 import { InterestRate, Market } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 import { getUsdPricePerToken } from "./prices";
+import { getOrCreateCircularBuffer } from "./rewards";
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -332,6 +332,17 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let oracleContract = PriceOracle.bind(
     Address.fromString(protocol!._priceOracle)
   );
+
+  // get rolling blocks/day count
+  let blocksPerDayBD = getOrCreateCircularBuffer().blocksPerDay;
+  let blocksPerDayBI = BigInt.fromString(blocksPerDayBD.truncate(0).toString());
+  let blocksPerYear: i32;
+  if (blocksPerDayBI.isI32()) {
+    blocksPerYear = blocksPerDayBI.toI32() * DAYS_PER_YEAR;
+  } else {
+    blocksPerYear = ETHEREUM_BLOCKS_PER_YEAR;
+  }
+
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
@@ -339,12 +350,12 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    4 * 60 * 24 * DAYS_PER_YEAR // TODO: is this accurate enough ?
+    blocksPerYear
   );
 
   //
   // replacing _handleAccrueInterst() to properly derive assetPrice
-  // 
+  //
 
   let marketID = event.address.toHexString();
   let market = Market.load(marketID);
@@ -370,7 +381,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
   updateProtocol(trollerAddr);
 
-  snapshotFinancials(trollerAddr, event.block.number, event.block.timestamp);
+  snapshotFinancials(trollerAddr, event.block.number, event.block.timestamp); // TODO: snapshot should be for each protocol
 }
 
 export function handleNewFuseFee(event: NewFuseFee): void {
@@ -589,25 +600,14 @@ function updateMarket(
     exponentToBigDecimal(INT_TWO)
   );
 
-  log.warning("reserve factor: {} fuse fee: {} admin fee: {}, combined: {}", [
-    market._reserveFactor.toString(),
-    fuseFee.toString(),
-    adminFee.toString(),
-    market._reserveFactor.plus(fuseFee).plus(adminFee).toString(),
-  ]);
-
   let interestAccumulatedUSD = interestAccumulatedMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
 
-  log.warning("rev accrued: ${}", [interestAccumulatedUSD.toString()]);
   let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor.plus(fuseFee).plus(adminFee)
   );
-  log.warning("protocol side rev: ${}", [
-    protocolSideRevenueUSDDelta.toString(),
-  ]);
   let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
     protocolSideRevenueUSDDelta
   );
