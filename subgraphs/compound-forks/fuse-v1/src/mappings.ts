@@ -75,6 +75,7 @@ import { LendingProtocol, Token } from "../../generated/schema";
 import { ERC20 } from "../generated/templates/Comptroller/ERC20";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
   DAYS_PER_YEAR,
@@ -89,7 +90,11 @@ import {
 import { InterestRate, Market } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 import { getUsdPricePerToken } from "./prices";
-import { getOrCreateCircularBuffer } from "./rewards";
+import {
+  getOrCreateCircularBuffer,
+  getRewardsPerDay,
+  RewardIntervalType,
+} from "./rewards";
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -334,6 +339,12 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 
   // get rolling blocks/day count
+  getRewardsPerDay(
+    event.block.timestamp,
+    event.block.number,
+    BIGDECIMAL_ZERO,
+    RewardIntervalType.BLOCK
+  );
   let blocksPerDayBD = getOrCreateCircularBuffer().blocksPerDay;
   let blocksPerDayBI = BigInt.fromString(blocksPerDayBD.truncate(0).toString());
   let blocksPerYear: i32;
