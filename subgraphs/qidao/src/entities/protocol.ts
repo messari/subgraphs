@@ -24,10 +24,11 @@ import {
   RiskType,
   SECONDS_PER_DAY,
 } from "../utils/constants";
+import { uppercaseNetwork } from "../utils/strings";
 import { getMaiToken } from "./token";
 
 export function getOrCreateLendingProtocol(): LendingProtocol {
-  const id = MAI_TOKEN_ADDRESS.get(dataSource.network().toUpperCase());
+  const id = MAI_TOKEN_ADDRESS.get(uppercaseNetwork(dataSource.network()));
   let protocol = LendingProtocol.load(id);
   if (!protocol) {
     protocol = new LendingProtocol(id);
@@ -36,7 +37,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
     protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
-    protocol.network = dataSource.network().toUpperCase();
+    protocol.network = dataSource.network().toUpperCase().replace("-", "_");
     protocol.type = ProtocolType.LENDING;
     protocol.lendingType = LendingType.CDP;
     protocol.riskType = RiskType.ISOLATED;

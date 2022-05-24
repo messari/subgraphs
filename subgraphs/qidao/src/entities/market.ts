@@ -13,6 +13,7 @@ import {
   Withdraw,
 } from "../../generated/schema";
 import {
+  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
@@ -51,12 +52,10 @@ export function createERC20Market(event: ethereum.Event): void {
     market.isActive = true;
     market.canUseAsCollateral = true;
     market.canBorrowFrom = true;
-    market.liquidationThreshold = contract
-      ._minimumCollateralPercentage()
-      .toBigDecimal();
-    market.maximumLTV = market.liquidationThreshold;
-    // Liquidation penalty (gainRatio) can be changed by admin, but there is no event emitted
+    // Set liquidationPenalty to 10 by default, in case it can't be read from contract
     market.liquidationPenalty = BIGDECIMAL_TEN;
+    // Read LTV and liquidationPenalty from contract
+    updateMetadata(market, contract);
     market.inputToken = getOrCreateToken(contract.collateral()).id;
     market.outputToken = getMaiToken().id;
     market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
@@ -221,6 +220,7 @@ export function handleMarketLiquidate(
   market.inputTokenBalance = market.inputTokenBalance.minus(amount);
   updateTVL(event, market, token);
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(amountUSD);
+  updateMetadata(market);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
   dailySnapshot.dailyLiquidateUSD =
@@ -303,4 +303,33 @@ function updateTVL(event: ethereum.Event, market: Market, token: Token): void {
   updateProtocolTVL(event, totalValueLocked.minus(market.totalValueLockedUSD));
   market.totalValueLockedUSD = totalValueLocked;
   market.totalDepositBalanceUSD = totalValueLocked;
+}
+
+function updateMetadata(
+  market: Market,
+  contract: erc20QiStablecoin | null = null
+): void {
+  if (market.inputToken == MATIC_ADDRESS.toHexString()) {
+    // No set/get functions in contract
+    return;
+  }
+  if (contract == null) {
+    contract = erc20QiStablecoin.bind(Address.fromString(market.id));
+  }
+  const minCollateralPercent = contract.try__minimumCollateralPercentage();
+  if (!minCollateralPercent.reverted) {
+    const maximumLTV = BIGDECIMAL_HUNDRED.div(
+      minCollateralPercent.value.toBigDecimal()
+    );
+    market.maximumLTV = maximumLTV;
+    market.liquidationThreshold = maximumLTV;
+  }
+  const gainRatio = contract.try_gainRatio();
+  if (!gainRatio.reverted) {
+    const decimals = gainRatio.value.toString().length - 1;
+    const liquidationPenalty = bigIntToBigDecimal(gainRatio.value, decimals)
+      .times(BIGDECIMAL_HUNDRED)
+      .minus(BIGDECIMAL_HUNDRED);
+    market.liquidationPenalty = liquidationPenalty;
+  }
 }

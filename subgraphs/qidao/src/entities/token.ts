@@ -4,6 +4,7 @@ import { ERC20NameBytes } from "../../generated/templates/Vault/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/templates/Vault/ERC20SymbolBytes";
 import { RewardToken, Token } from "../../generated/schema";
 import { MAI_TOKEN_ADDRESS, RewardTokenType } from "../utils/constants";
+import { uppercaseNetwork } from "../utils/strings";
 
 export const UNKNOWN_TOKEN_VALUE = "unknown";
 
@@ -82,7 +83,7 @@ export function getOrCreateRewardToken(tokenAddress: Address): RewardToken {
 }
 
 export function getMaiToken(): Token {
-  const id = MAI_TOKEN_ADDRESS.get(dataSource.network().toUpperCase());
+  const id = MAI_TOKEN_ADDRESS.get(uppercaseNetwork(dataSource.network()));
   let token = Token.load(id);
   if (!token) {
     const tokenAddress = Address.fromString(id);
