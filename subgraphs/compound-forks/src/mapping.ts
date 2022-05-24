@@ -10,7 +10,6 @@ import {
   NewCollateralFactor,
   NewLiquidationIncentive,
   NewPriceOracle,
-  ActionPaused,
   ActionPaused1,
 } from "../generated/Comptroller/Comptroller";
 import {
@@ -51,6 +50,7 @@ import {
   initialExchangeRate,
   InterestRateSide,
   InterestRateType,
+  INT_ZERO,
   LendingType,
   mantissaFactor,
   mantissaFactorBD,
@@ -839,7 +839,13 @@ export function _handleAccrueInterest(
     return;
   }
 
-  log.warning("pre update market", []);
+  // creates and initializes market snapshots
+  snapshotMarket(
+    event.address.toHexString(),
+    event.block.number,
+    event.block.timestamp
+  );
+
   updateMarket(
     updateMarketData,
     marketID,
@@ -847,21 +853,13 @@ export function _handleAccrueInterest(
     event.block.number,
     event.block.timestamp
   );
-  log.warning("post update market", []);
   updateProtocol(comptrollerAddr);
-  log.warning("post update protocol", []);
-  snapshotMarket(
-    event.address.toHexString(),
-    event.block.number,
-    event.block.timestamp
-  );
-  log.warning("post snapshot market", []);
+
   snapshotFinancials(
     comptrollerAddr,
     event.block.number,
     event.block.timestamp
   );
-  log.warning("post update financials", []);
 }
 
 function snapshotMarket(
@@ -886,9 +884,12 @@ function snapshotMarket(
   dailySnapshot.market = marketID;
   dailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   dailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  dailySnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
   dailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   dailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  dailySnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
   dailySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  dailySnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
   dailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   dailySnapshot.inputTokenBalance = market.inputTokenBalance;
   dailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
@@ -898,8 +899,6 @@ function snapshotMarket(
   dailySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   dailySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   dailySnapshot.rates = market.rates;
-  dailySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  dailySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
   dailySnapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
@@ -918,9 +917,12 @@ function snapshotMarket(
   hourlySnapshot.market = marketID;
   hourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   hourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+  hourlySnapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
   hourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   hourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+  hourlySnapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
   hourlySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  hourlySnapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
   hourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   hourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   hourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
@@ -930,8 +932,6 @@ function snapshotMarket(
   hourlySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   hourlySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   hourlySnapshot.rates = market.rates;
-  hourlySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
-  hourlySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   hourlySnapshot.blockNumber = blockNumber;
   hourlySnapshot.timestamp = blockTimestamp;
   hourlySnapshot.save();
@@ -995,6 +995,7 @@ function snapshotFinancials(
     );
     let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
     if (!marketDailySnapshot) {
+      // this is okay - no MarketDailySnapshot means no transactions in that market during that day
       log.warning("[snapshotFinancials] MarketDailySnapshot not found: {}", [
         marketDailySnapshotID,
       ]);
@@ -1064,6 +1065,16 @@ function snapshotUsage(
   if (!dailySnapshot) {
     dailySnapshot = new UsageMetricsDailySnapshot(dailySnapshotID);
     dailySnapshot.protocol = protocol.id;
+    dailySnapshot.dailyActiveUsers = INT_ZERO;
+    dailySnapshot.cumulativeUniqueUsers = INT_ZERO;
+    dailySnapshot.dailyTransactionCount = INT_ZERO;
+    dailySnapshot.dailyDepositCount = INT_ZERO;
+    dailySnapshot.dailyWithdrawCount = INT_ZERO;
+    dailySnapshot.dailyBorrowCount = INT_ZERO;
+    dailySnapshot.dailyRepayCount = INT_ZERO;
+    dailySnapshot.dailyLiquidateCount = INT_ZERO;
+    dailySnapshot.blockNumber = blockNumber;
+    dailySnapshot.timestamp = blockTimestamp;
   }
   let dailyAccountID = accountID.concat("-").concat(dailySnapshotID);
   let dailyActiveAccount = ActiveAccount.load(dailyAccountID);
@@ -1106,6 +1117,16 @@ function snapshotUsage(
   if (!hourlySnapshot) {
     hourlySnapshot = new UsageMetricsHourlySnapshot(hourlySnapshotID);
     hourlySnapshot.protocol = protocol.id;
+    hourlySnapshot.hourlyActiveUsers = INT_ZERO;
+    hourlySnapshot.cumulativeUniqueUsers = INT_ZERO;
+    hourlySnapshot.hourlyTransactionCount = INT_ZERO;
+    hourlySnapshot.hourlyDepositCount = INT_ZERO;
+    hourlySnapshot.hourlyWithdrawCount = INT_ZERO;
+    hourlySnapshot.hourlyBorrowCount = INT_ZERO;
+    hourlySnapshot.hourlyRepayCount = INT_ZERO;
+    hourlySnapshot.hourlyLiquidateCount = INT_ZERO;
+    hourlySnapshot.blockNumber = blockNumber;
+    hourlySnapshot.timestamp = blockTimestamp;
   }
   let hourlyAccountID = accountID.concat("-").concat(hourlySnapshotID);
   let hourlyActiveAccount = ActiveAccount.load(hourlyAccountID);
@@ -1214,6 +1235,12 @@ function updateMarket(
     updateMarketData.getUnderlyingPriceResult,
     underlyingToken.decimals
   );
+
+  log.warning("Updated price for {}, mantissa: {}, price: ${}", [
+    market.name!,
+    updateMarketData.getUnderlyingPriceResult.value.toString(),
+    underlyingTokenPriceUSD.toString(),
+  ]);
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
@@ -1474,6 +1501,7 @@ function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
 ): BigDecimal {
+  // TODO: add in tokenPriceCalculations if Protocol is Rari
   let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
   let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
   return getOrElse<BigInt>(getUnderlyingPriceResult, BIGINT_ZERO)

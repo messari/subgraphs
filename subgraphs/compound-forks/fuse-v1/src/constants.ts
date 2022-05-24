@@ -1,11 +1,5 @@
 // rari fuse v1 constants
-import { BigDecimal } from "@graphprotocol/graph-ts";
-import {
-  LendingType,
-  Network,
-  ProtocolType,
-  RiskType,
-} from "../../src/constants";
+import { Network } from "../../src/constants";
 
 ////////////////////////////
 //// Ethereum Addresses ////
@@ -25,8 +19,6 @@ export const FACTORY_CONTRACT = "0x835482FE0532f169024d5E9410199369aAD5C77E"; //
 ///////////////////////////
 
 export const NETWORK_ETHEREUM = Network.MAINNET;
-export const PROTOCOL_NAME = "Fuse v1";
-export const PROTOCOL_SLUG = "fuse-v2";
-export const SUBGRAPH_VERSION = "0.1.4";
+export const SUBGRAPH_VERSION = "0.1.12";
 export const SCHEMA_VERSION = "1.2.1";
 export const METHODOLOGY_VERSION = "1.0.0";

@@ -49,7 +49,7 @@ templates:
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/fuse/CToken.json
         - name: ERC20
           file: ../abis/ERC20.json
         - name: PriceOracle

@@ -1,5 +1,5 @@
 // fuse v1 handlers
-import { Address, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -20,16 +20,13 @@ import {
   getOrElse,
   _handleActionPaused,
 } from "../../src/mapping";
-
 import { PoolRegistered } from "../generated/FusePoolDirectory/FusePoolDirectory";
 import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
-  FACTORY_CONTRACT,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
-  PROTOCOL_NAME,
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
   ZERO_ADDRESS,
@@ -63,30 +60,24 @@ import {
 } from "../generated/templates";
 import { LendingProtocol } from "../../generated/schema";
 import { ERC20 } from "../generated/templates/Comptroller/ERC20";
-import { FusePoolDirectory } from "../generated/FusePoolDirectory/FusePoolDirectory";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   DAYS_PER_YEAR,
-  exponentToBigDecimal,
   InterestRateSide,
+  InterestRateType,
   mantissaFactor,
   mantissaFactorBD,
-  RewardTokenType,
-  SECONDS_PER_DAY,
 } from "../../src/constants";
-import { InterestRate, Market, Token } from "../generated/schema";
-import {
-  getOrCreateCircularBuffer,
-  getRewardsPerDay,
-  RewardIntervalType,
-} from "./rewards";
+import { InterestRate, Market } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 
-////////////////////
-//// Fuse Enums ////
-////////////////////
+// TODO: fix inputTokenPriceUSD is in ETH from oracle
+
+//////////////////////
+//// Fuse Enum(s) ////
+//////////////////////
 
 export namespace RariFee {
   export const FUSE_FEE = "FUSE_FEE";
@@ -113,7 +104,8 @@ export function handlePoolRegistered(event: PoolRegistered): void {
     SUBGRAPH_VERSION,
     METHODOLOGY_VERSION,
     NETWORK_ETHEREUM,
-    troller.try_liquidationIncentiveMantissa()
+    troller.try_liquidationIncentiveMantissa(),
+    troller.try_oracle()
   );
 
   // only needed to create the new pool (ie, pool's Comptroller implementation)
@@ -128,7 +120,6 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 // Source: https://docs.rari.capital/fuse
 
 // add a new market
-// TODO: add fuse/admin fees
 export function handleMarketListed(event: MarketListed): void {
   let protocol = LendingProtocol.load(event.address.toHexString());
   if (!protocol) {
@@ -186,55 +177,21 @@ export function handleMarketListed(event: MarketListed): void {
 
   // fuse-specific: add fuseFees and adminFees
 
-  // get fuse fee - rari collects this
-  // let tryFuseFee = cTokenContract.try_fuseFeeMantissa();
+  // get fuse fee - rari collects this (ie, protocol revenue)
+  let tryFuseFeeMantissa = cTokenContract.try_fuseFeeMantissa();
+  updateOrCreateRariFee(
+    tryFuseFeeMantissa.reverted ? BIGINT_ZERO : tryFuseFeeMantissa.value,
+    RariFee.FUSE_FEE,
+    event.params.cToken.toHexString()
+  );
 
-  // let fuseFeeId =
-  //   InterestRateSide.BORROWER +
-  //   "-" +
-  //   RariFee.FUSE_FEE +
-  //   "-" +
-  //   event.params.cToken.toHexString();
-  // let fuseFee = new InterestRate(fuseFeeId);
-  // fuseFee.rate = tryFuseFee.reverted
-  //   ? BIGDECIMAL_ZERO
-  //   : tryFuseFee.value
-  //       .toBigDecimal()
-  //       .div(mantissaFactorBD)
-  //       .times(BIGDECIMAL_HUNDRED);
-  // fuseFee.side = InterestRateSide.BORROWER;
-  // fuseFee.type = RariFee.FUSE_FEE;
-  // fuseFee.save();
-
-  // // get admin fee - pool owners (admin) collect this
-  // let tryAdminFee = cTokenContract.try_adminFeeMantissa();
-  // let adminFeeId =
-  //   InterestRateSide.BORROWER +
-  //   "-" +
-  //   RariFee.ADMIN_FEE +
-  //   "-" +
-  //   event.params.cToken.toHexString();
-  // let adminFee = new InterestRate(adminFeeId);
-  // adminFee.rate = tryAdminFee.reverted
-  //   ? BIGDECIMAL_ZERO
-  //   : tryAdminFee.value
-  //       .toBigDecimal()
-  //       .div(mantissaFactorBD)
-  //       .times(BIGDECIMAL_HUNDRED);
-  // adminFee.side = InterestRateSide.BORROWER;
-  // adminFee.type = RariFee.ADMIN_FEE;
-  // adminFee.save();
-
-  // let market = Market.load(event.params.cToken.toHexString());
-  // if (!market) {
-  //   // seemingly impossible, but want to
-  //   return;
-  // }
-  // let marketRates = market.rates;
-  // marketRates.push(fuseFee.id);
-  // marketRates.push(adminFee.id);
-  // market.rates = marketRates;
-  // market.save();
+  // get admin fee - pool owners (admin) collect this (ie, protocol revenue)
+  let tryAdminFeeMantissa = cTokenContract.try_adminFeeMantissa();
+  updateOrCreateRariFee(
+    tryAdminFeeMantissa.reverted ? BIGINT_ZERO : tryAdminFeeMantissa.value,
+    RariFee.ADMIN_FEE,
+    event.params.cToken.toHexString()
+  );
 }
 
 // update a given markets collateral factor
@@ -366,88 +323,39 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    4 * 60 * 24 * DAYS_PER_YEAR
+    4 * 60 * 24 * DAYS_PER_YEAR // TODO: is this accurate enough ?
   );
 
   _handleAccrueInterest(updateMarketData, trollerAddr, event);
+
+  // TODO: subtract admin/fuse fees from supply rev and add to protocol rev
+  // 1- take accumlated interest and find fuse fee amount and admin fee amount
+  // subtract these two amounts from supply revenues and add to protocol revenues
+  // do this for protocol rev, market rev, financial daily snapshot rev, market daily rev
 }
 
 export function handleNewFuseFee(event: NewFuseFee): void {
-  // calculate fee
-  let fuseFeeDecimal = event.params.newFuseFeeMantissa
-    .toBigDecimal()
-    .div(mantissaFactorBD)
-    .times(BIGDECIMAL_HUNDRED);
+  // TODO: remove
+  log.warning("new fuse fee: {}", [event.params.newFuseFeeMantissa.toString()]);
 
-  let fuseFeeId =
-    InterestRateSide.BORROWER +
-    "-" +
-    RariFee.FUSE_FEE +
-    "-" +
-    event.address.toHexString();
-  let fuseFee = InterestRate.load(fuseFeeId);
-
-  // create fee and add to market if non-existant
-  if (!fuseFee) {
-    fuseFee = new InterestRate(fuseFeeId);
-    fuseFee.rate = fuseFeeDecimal;
-    fuseFee.side = InterestRateSide.BORROWER;
-    fuseFee.type = RariFee.FUSE_FEE;
-    fuseFee.save();
-
-    let market = Market.load(event.address.toHexString());
-    if (!market) {
-      // best effort
-      return;
-    }
-    let rates = market.rates;
-    rates.push(fuseFee.id);
-    market.save();
-
-    return;
-  }
-
-  fuseFee.rate = fuseFeeDecimal;
-  fuseFee.save();
+  updateOrCreateRariFee(
+    event.params.newFuseFeeMantissa,
+    RariFee.FUSE_FEE,
+    event.address.toHexString()
+  );
 }
 
 export function handleNewAdminFee(event: NewAdminFee): void {
-  // calculate fee
-  let adminFeeDecimal = event.params.newAdminFeeMantissa
-    .toBigDecimal()
-    .div(mantissaFactorBD)
-    .times(BIGDECIMAL_HUNDRED);
+  // TODO: remove
+  log.warning("new admin fee: {}", [
+    event.params.newAdminFeeMantissa.toString(),
+  ]);
 
-  let adminFeeId =
-    InterestRateSide.BORROWER +
-    "-" +
-    RariFee.ADMIN_FEE +
-    "-" +
-    event.address.toHexString();
-  let adminFee = InterestRate.load(adminFeeId);
-
-  // create fee and add to market if non-existant
-  if (!adminFee) {
-    adminFee = new InterestRate(adminFeeId);
-    adminFee.rate = adminFeeDecimal;
-    adminFee.side = InterestRateSide.BORROWER;
-    adminFee.type = RariFee.ADMIN_FEE;
-    adminFee.save();
-
-    let market = Market.load(event.address.toHexString());
-    if (!market) {
-      // best effort
-      return;
-    }
-    let rates = market.rates;
-    rates.push(adminFee.id);
-    market.save();
-
-    return;
-  }
-
-  adminFee.rate = adminFeeDecimal;
-  adminFee.save();
+  updateOrCreateRariFee(
+    event.params.newAdminFeeMantissa,
+    RariFee.ADMIN_FEE,
+    event.address.toHexString()
+  );
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
@@ -479,4 +387,40 @@ function getComptrollerAddress(event: ethereum.Event): Address {
   }
 
   return tryComptroller.value;
+}
+
+// updates the rate or creates the rari fee (either fuse or admin fee)
+function updateOrCreateRariFee(
+  rateMantissa: BigInt,
+  rariFeeType: string,
+  marketID: string
+): void {
+  let rariFeeId =
+    InterestRateSide.BORROWER + "-" + rariFeeType + "-" + marketID;
+  let rariFee = InterestRate.load(rariFeeId);
+
+  // calculate fee rate
+  let rate = rateMantissa
+    .toBigDecimal()
+    .div(mantissaFactorBD)
+    .times(BIGDECIMAL_HUNDRED);
+
+  if (!rariFee) {
+    rariFee = new InterestRate(rariFeeId);
+    rariFee.side = InterestRateSide.BORROWER;
+    rariFee.type = InterestRateType.STABLE;
+
+    // add to market rates array
+    let market = Market.load(marketID);
+    if (!market) {
+      // best effort
+      return;
+    }
+    let rates = market.rates;
+    rates.push(rariFee.id);
+    market.save();
+  }
+
+  rariFee.rate = rate;
+  rariFee.save();
 }
