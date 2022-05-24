@@ -326,8 +326,13 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
       .toBigDecimal()
       .times(currPriceUsd)
       .div(DECIMAL_PRECISION);
-    market.exchangeRate = eulerViewMarket.eTokenBalance.toBigDecimal().div(eulerViewMarket.eTokenBalanceUnderlying.toBigDecimal());
-    
+
+    if (eulerViewMarket.eTokenBalanceUnderlying.gt(BIGINT_ZERO)) {
+      market.exchangeRate = eulerViewMarket.eTokenBalance
+        .toBigDecimal()
+        .div(eulerViewMarket.eTokenBalanceUnderlying.toBigDecimal());
+    }
+
     const token = getOrCreateToken(eulerViewMarket.underlying);
     token.lastPriceUSD = currPriceUsd;
     token.lastPriceBlockNumber = block.number;
