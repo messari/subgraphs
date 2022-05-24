@@ -862,7 +862,7 @@ export function _handleAccrueInterest(
   );
 }
 
-function snapshotMarket(
+export function snapshotMarket(
   marketID: string,
   blockNumber: BigInt,
   blockTimestamp: BigInt
@@ -884,12 +884,9 @@ function snapshotMarket(
   dailySnapshot.market = marketID;
   dailySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   dailySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
-  dailySnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
   dailySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   dailySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  dailySnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
   dailySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-  dailySnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
   dailySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   dailySnapshot.inputTokenBalance = market.inputTokenBalance;
   dailySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
@@ -901,9 +898,6 @@ function snapshotMarket(
   dailySnapshot.rates = market.rates;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
-  dailySnapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
-  dailySnapshot._dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
-  dailySnapshot._dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   dailySnapshot.save();
 
   //
@@ -917,12 +911,9 @@ function snapshotMarket(
   hourlySnapshot.market = marketID;
   hourlySnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   hourlySnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
-  hourlySnapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
   hourlySnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   hourlySnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
-  hourlySnapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
   hourlySnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
-  hourlySnapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
   hourlySnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   hourlySnapshot.inputTokenBalance = market.inputTokenBalance;
   hourlySnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
@@ -943,7 +934,7 @@ function snapshotMarket(
  * @param blockTimestamp
  * @returns
  */
-function snapshotFinancials(
+export function snapshotFinancials(
   comptrollerAddr: Address,
   blockNumber: BigInt,
   blockTimestamp: BigInt
@@ -1210,7 +1201,7 @@ function updateMarketSnapshots(
   marketDailySnapshot.save();
 }
 
-function updateMarket(
+export function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
   interestAccumulatedMantissa: BigInt,
@@ -1357,7 +1348,7 @@ function updateMarket(
   snapshot.save();
 }
 
-function updateProtocol(comptrollerAddr: Address): void {
+export function updateProtocol(comptrollerAddr: Address): void {
   let protocol = LendingProtocol.load(comptrollerAddr.toHexString());
   if (!protocol) {
     log.error(
@@ -1422,11 +1413,17 @@ function updateProtocol(comptrollerAddr: Address): void {
   protocol.save();
 }
 
-function setSupplyInterestRate(marketID: string, rate: BigDecimal): void {
+export function setSupplyInterestRate(
+  marketID: string,
+  rate: BigDecimal
+): void {
   setInterestRate(marketID, rate, true);
 }
 
-function setBorrowInterestRate(marketID: string, rate: BigDecimal): void {
+export function setBorrowInterestRate(
+  marketID: string,
+  rate: BigDecimal
+): void {
   setInterestRate(marketID, rate, false);
 }
 
@@ -1473,7 +1470,7 @@ function setInterestRate(
   market.save();
 }
 
-function getOrCreateMarketDailySnapshot(
+export function getOrCreateMarketDailySnapshot(
   marketID: string,
   blockTimestamp: i32
 ): MarketDailySnapshot {
@@ -1481,7 +1478,16 @@ function getOrCreateMarketDailySnapshot(
   let snapshot = MarketDailySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketDailySnapshot(snapshotID);
+
+    // initialize zero values to ensure no null runtime errors
+    snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    snapshot._dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot._dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    snapshot._dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   }
+
   return snapshot;
 }
 
@@ -1493,7 +1499,13 @@ function getOrCreateMarketHourlySnapshot(
   let snapshot = MarketHourlySnapshot.load(snapshotID);
   if (!snapshot) {
     snapshot = new MarketHourlySnapshot(snapshotID);
+
+    // initialize zero values to ensure no null runtime errors
+    snapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    snapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
   }
+
   return snapshot;
 }
 
@@ -1501,7 +1513,6 @@ function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
 ): BigDecimal {
-  // TODO: add in tokenPriceCalculations if Protocol is Rari
   let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
   let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
   return getOrElse<BigInt>(getUnderlyingPriceResult, BIGINT_ZERO)
@@ -1517,7 +1528,7 @@ function getMarketDailySnapshotID(marketID: string, timestamp: i32): string {
   return marketID.concat("-").concat((timestamp / SECONDS_PER_DAY).toString());
 }
 
-function convertRatePerUnitToAPY(
+export function convertRatePerUnitToAPY(
   ratePerUnit: BigInt,
   unitPerYear: i32
 ): BigDecimal {

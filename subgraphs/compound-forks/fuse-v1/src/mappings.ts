@@ -1,5 +1,11 @@
 // fuse v1 handlers
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   ProtocolData,
   _getOrCreateProtocol,
@@ -19,11 +25,20 @@ import {
   _handleAccrueInterest,
   getOrElse,
   _handleActionPaused,
+  snapshotMarket,
+  updateProtocol,
+  snapshotFinancials,
+  setSupplyInterestRate,
+  convertRatePerUnitToAPY,
+  setBorrowInterestRate,
+  getOrCreateMarketDailySnapshot,
 } from "../../src/mapping";
 import { PoolRegistered } from "../generated/FusePoolDirectory/FusePoolDirectory";
 import {
+  CDAI_ADDRESS,
   ETH_ADDRESS,
   ETH_NAME,
+  ETH_PRICE_ORACLE,
   ETH_SYMBOL,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
@@ -58,13 +73,15 @@ import {
   Comptroller as ComptrollerTemplate,
   CToken as CTokenTemplate,
 } from "../generated/templates";
-import { LendingProtocol } from "../../generated/schema";
+import { LendingProtocol, Token } from "../../generated/schema";
 import { ERC20 } from "../generated/templates/Comptroller/ERC20";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  cTokenDecimals,
   DAYS_PER_YEAR,
+  exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
   mantissaFactor,
@@ -72,8 +89,6 @@ import {
 } from "../../src/constants";
 import { InterestRate, Market } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
-
-// TODO: fix inputTokenPriceUSD is in ETH from oracle
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -326,7 +341,36 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     4 * 60 * 24 * DAYS_PER_YEAR // TODO: is this accurate enough ?
   );
 
-  _handleAccrueInterest(updateMarketData, trollerAddr, event);
+  //
+  //
+  // replacing _handleAccrueInterst() to properly derive assetPrice
+
+  let marketID = event.address.toHexString();
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
+    return;
+  }
+
+  // creates and initializes market snapshots
+  snapshotMarket(
+    event.address.toHexString(),
+    event.block.number,
+    event.block.timestamp
+  );
+
+  updateMarket(
+    updateMarketData,
+    marketID,
+    event.params.interestAccumulated,
+    event.block.number,
+    event.block.timestamp
+  );
+  updateProtocol(trollerAddr);
+
+  snapshotFinancials(trollerAddr, event.block.number, event.block.timestamp);
+
+  // _handleAccrueInterest(updateMarketData, trollerAddr, event);
 
   // TODO: subtract admin/fuse fees from supply rev and add to protocol rev
   // 1- take accumlated interest and find fuse fee amount and admin fee amount
@@ -423,4 +467,177 @@ function updateOrCreateRariFee(
 
   rariFee.rate = rate;
   rariFee.save();
+}
+
+// this function will "override" the updateMarket() function in ../../src/mapping.ts
+// this function accounts for price oracles returning price in ETH in fuse
+function updateMarket(
+  updateMarketData: UpdateMarketData,
+  marketID: string,
+  interestAccumulatedMantissa: BigInt,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt
+): void {
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[updateMarket] Market not found: {}", [marketID]);
+    return;
+  }
+
+  let underlyingToken = Token.load(market.inputToken);
+  if (!underlyingToken) {
+    log.warning("[updateMarket] Underlying token not found: {}", [
+      market.inputToken,
+    ]);
+    return;
+  }
+
+  let underlyingTokenPriceUSD = getTokenPriceUSD(
+    updateMarketData.getUnderlyingPriceResult,
+    underlyingToken.decimals
+  );
+
+  underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
+  underlyingToken.lastPriceBlockNumber = blockNumber;
+  underlyingToken.save();
+
+  market.inputTokenPriceUSD = underlyingTokenPriceUSD;
+
+  if (updateMarketData.totalSupplyResult.reverted) {
+    log.warning("[updateMarket] Failed to get totalSupply of Market {}", [
+      marketID,
+    ]);
+  } else {
+    market.outputTokenSupply = updateMarketData.totalSupplyResult.value;
+  }
+
+  let underlyingSupplyUSD = market.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  market.totalValueLockedUSD = underlyingSupplyUSD;
+  market.totalDepositBalanceUSD = underlyingSupplyUSD;
+
+  if (updateMarketData.exchangeRateStoredResult.reverted) {
+    log.warning(
+      "[updateMarket] Failed to get exchangeRateStored of Market {}",
+      [marketID]
+    );
+  } else {
+    // Formula: check out "Interpreting Exchange Rates" in https://compound.finance/docs#protocol-math
+    let oneCTokenInUnderlying = updateMarketData.exchangeRateStoredResult.value
+      .toBigDecimal()
+      .div(
+        exponentToBigDecimal(
+          mantissaFactor + underlyingToken.decimals - cTokenDecimals
+        )
+      );
+    market.exchangeRate = oneCTokenInUnderlying;
+    market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
+      underlyingTokenPriceUSD
+    );
+  }
+
+  if (updateMarketData.totalBorrowsResult.reverted) {
+    log.warning("[updateMarket] Failed to get totalBorrows of Market {}", [
+      marketID,
+    ]);
+  } else {
+    market.totalBorrowBalanceUSD = updateMarketData.totalBorrowsResult.value
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(underlyingTokenPriceUSD);
+  }
+
+  if (updateMarketData.supplyRateResult.reverted) {
+    log.warning("[updateMarket] Failed to get supplyRate of Market {}", [
+      marketID,
+    ]);
+  } else {
+    setSupplyInterestRate(
+      marketID,
+      convertRatePerUnitToAPY(
+        updateMarketData.supplyRateResult.value,
+        updateMarketData.unitPerYear
+      )
+    );
+  }
+
+  if (updateMarketData.borrowRateResult.reverted) {
+    log.warning("[updateMarket] Failed to get borrowRate of Market {}", [
+      marketID,
+    ]);
+  } else {
+    setBorrowInterestRate(
+      marketID,
+      convertRatePerUnitToAPY(
+        updateMarketData.borrowRateResult.value,
+        updateMarketData.unitPerYear
+      )
+    );
+  }
+
+  let interestAccumulatedUSD = interestAccumulatedMantissa
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
+    market._reserveFactor
+  );
+  let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
+    protocolSideRevenueUSDDelta
+  );
+
+  market._cumulativeTotalRevenueUSD = market._cumulativeTotalRevenueUSD.plus(
+    interestAccumulatedUSD
+  );
+  market._cumulativeProtocolSideRevenueUSD =
+    market._cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  market._cumulativeSupplySideRevenueUSD =
+    market._cumulativeSupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  market.save();
+
+  // update daily fields in snapshot
+  let snapshot = getOrCreateMarketDailySnapshot(
+    market.id,
+    blockTimestamp.toI32()
+  );
+  snapshot._dailyTotalRevenueUSD = snapshot._dailyTotalRevenueUSD.plus(
+    interestAccumulatedUSD
+  );
+  snapshot._dailyProtocolSideRevenueUSD =
+    snapshot._dailyProtocolSideRevenueUSD.plus(protocolSideRevenueUSDDelta);
+  snapshot._dailySupplySideRevenueUSD =
+    snapshot._dailySupplySideRevenueUSD.plus(supplySideRevenueUSDDelta);
+  snapshot.save();
+}
+
+// this function will "override" the getTokenPrice() function in ../../src/mapping.ts
+function getTokenPriceUSD(
+  getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
+  underlyingDecimals: i32
+): BigDecimal {
+  let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
+  let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+  let priceInETH = getOrElse<BigInt>(getUnderlyingPriceResult, BIGINT_ZERO)
+    .toBigDecimal()
+    .div(bdFactor);
+
+  // grab the price of ETH to find token price
+  return getETHPrice().times(priceInETH);
+}
+
+function getETHPrice(): BigDecimal {
+  // load up DAI/ETH price oracle to get ETH price in DAI
+  let oracle = PriceOracle.bind(Address.fromString(ETH_PRICE_ORACLE));
+  let tryETHPrice = oracle.try_getUnderlyingPrice(
+    Address.fromString(CDAI_ADDRESS)
+  );
+
+  log.warning("ETH price: {}", [tryETHPrice.value.toString()]);
+
+  let bdFactor = exponentToBigDecimal(18);
+  return getOrElse<BigInt>(tryETHPrice, BIGINT_ZERO)
+    .toBigDecimal()
+    .div(bdFactor);
 }
