@@ -22,7 +22,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Pools:
 
-`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
+`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor + Fuse Fee + Admin Fee)`
 
 Note: This currently excludes Liquidations
 
@@ -32,7 +32,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor - Fuse Fee - Admin Fee)`
 
 Note: This currently excludes Liquidations
 
@@ -52,15 +52,11 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Amount of reward tokens (COMP) distributed each day.
-
-Following calculation gives the COMP distributed (in COMP) to suppliers OR borrowers
-
-`COMP per block * 4 * 60 * 24`
+NA
 
 ### Protocol Controlled Value
 
-Not applicable to Compound v2
+Not applicable to Fuse v1
 
 ## Reference and Useful Links
 

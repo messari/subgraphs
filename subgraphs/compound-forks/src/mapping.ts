@@ -1479,7 +1479,10 @@ export function getOrCreateMarketDailySnapshot(
   if (!snapshot) {
     snapshot = new MarketDailySnapshot(snapshotID);
 
+    let market = Market.load(marketID);
+
     // initialize zero values to ensure no null runtime errors
+    snapshot.protocol = market!.protocol;
     snapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
     snapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
     snapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;

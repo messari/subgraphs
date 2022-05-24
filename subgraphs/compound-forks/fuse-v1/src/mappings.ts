@@ -77,18 +77,19 @@ import { LendingProtocol, Token } from "../../generated/schema";
 import { ERC20 } from "../generated/templates/Comptroller/ERC20";
 import {
   BIGDECIMAL_HUNDRED,
-  BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
   DAYS_PER_YEAR,
   exponentToBigDecimal,
   InterestRateSide,
   InterestRateType,
+  INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
 } from "../../src/constants";
 import { InterestRate, Market } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
+import { getUsdPricePerToken } from "./prices";
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -342,8 +343,8 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   );
 
   //
-  //
   // replacing _handleAccrueInterst() to properly derive assetPrice
+  // 
 
   let marketID = event.address.toHexString();
   let market = Market.load(marketID);
@@ -359,6 +360,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.timestamp
   );
 
+  // handles fuse and admin fees (ie, protocol-side)
   updateMarket(
     updateMarketData,
     marketID,
@@ -369,13 +371,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   updateProtocol(trollerAddr);
 
   snapshotFinancials(trollerAddr, event.block.number, event.block.timestamp);
-
-  // _handleAccrueInterest(updateMarketData, trollerAddr, event);
-
-  // TODO: subtract admin/fuse fees from supply rev and add to protocol rev
-  // 1- take accumlated interest and find fuse fee amount and admin fee amount
-  // subtract these two amounts from supply revenues and add to protocol revenues
-  // do this for protocol rev, market rev, financial daily snapshot rev, market daily rev
 }
 
 export function handleNewFuseFee(event: NewFuseFee): void {
@@ -462,6 +457,7 @@ function updateOrCreateRariFee(
     }
     let rates = market.rates;
     rates.push(rariFee.id);
+    market.rates = rates;
     market.save();
   }
 
@@ -471,6 +467,7 @@ function updateOrCreateRariFee(
 
 // this function will "override" the updateMarket() function in ../../src/mapping.ts
 // this function accounts for price oracles returning price in ETH in fuse
+// this function calculates revenues with admin and fuse fees as well (fuse-specific)
 function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
@@ -577,13 +574,40 @@ function updateMarket(
     );
   }
 
+  // calculate new interests accumulated
+  // With fuse protocol revenue includes (reserve factor + fuse fee + admin fee)
+
+  let fuseFeeId =
+    InterestRateSide.BORROWER + "-" + RariFee.FUSE_FEE + "-" + marketID;
+  let fuseFee = InterestRate.load(fuseFeeId)!.rate.div(
+    exponentToBigDecimal(INT_TWO)
+  );
+
+  let adminFeeId =
+    InterestRateSide.BORROWER + "-" + RariFee.ADMIN_FEE + "-" + marketID;
+  let adminFee = InterestRate.load(adminFeeId)!.rate.div(
+    exponentToBigDecimal(INT_TWO)
+  );
+
+  log.warning("reserve factor: {} fuse fee: {} admin fee: {}, combined: {}", [
+    market._reserveFactor.toString(),
+    fuseFee.toString(),
+    adminFee.toString(),
+    market._reserveFactor.plus(fuseFee).plus(adminFee).toString(),
+  ]);
+
   let interestAccumulatedUSD = interestAccumulatedMantissa
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
+
+  log.warning("rev accrued: ${}", [interestAccumulatedUSD.toString()]);
   let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
-    market._reserveFactor
+    market._reserveFactor.plus(fuseFee).plus(adminFee)
   );
+  log.warning("protocol side rev: ${}", [
+    protocolSideRevenueUSDDelta.toString(),
+  ]);
   let supplySideRevenueUSDDelta = interestAccumulatedUSD.minus(
     protocolSideRevenueUSDDelta
   );
@@ -624,20 +648,9 @@ function getTokenPriceUSD(
     .div(bdFactor);
 
   // grab the price of ETH to find token price
-  return getETHPrice().times(priceInETH);
-}
-
-function getETHPrice(): BigDecimal {
-  // load up DAI/ETH price oracle to get ETH price in DAI
-  let oracle = PriceOracle.bind(Address.fromString(ETH_PRICE_ORACLE));
-  let tryETHPrice = oracle.try_getUnderlyingPrice(
-    Address.fromString(CDAI_ADDRESS)
-  );
-
-  log.warning("ETH price: {}", [tryETHPrice.value.toString()]);
-
-  let bdFactor = exponentToBigDecimal(18);
-  return getOrElse<BigInt>(tryETHPrice, BIGINT_ZERO)
-    .toBigDecimal()
-    .div(bdFactor);
+  const priceOffset = 6;
+  let ethPrice = getUsdPricePerToken(
+    Address.fromString(ETH_ADDRESS)
+  ).usdPrice.div(exponentToBigDecimal(priceOffset));
+  return ethPrice.times(priceInETH);
 }
