@@ -217,7 +217,8 @@ function getOrCreateProtocol(): LendingProtocol {
     "1.0.1",
     "1.0.0",
     Network.AVALANCHE,
-    comptroller.try_liquidationIncentiveMantissa()
+    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_oracle()
   );
 
   return _getOrCreateProtocol(protocolData);

@@ -73,6 +73,10 @@ export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number)
                   color: "#fff",
                 },
               },
+              tooltip: {
+                enabled: true,
+                position: "nearest",
+              },
             },
           }}
         />

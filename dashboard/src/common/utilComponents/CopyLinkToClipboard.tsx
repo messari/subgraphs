@@ -31,9 +31,9 @@ export const CopyLinkToClipboard: FC<CopyLinkToClipboardProps> = ({ link, scroll
     const href = new URL(link);
     const p = new URLSearchParams(href.search);
     if (scrollId) {
-      p.set("elementId", scrollId);
+      p.set("view", scrollId);
     } else {
-      p.delete("elementId");
+      p.delete("view");
     }
     return `${href.origin}${href.pathname}?${p.toString()}`;
   }, [scrollId, link]);
