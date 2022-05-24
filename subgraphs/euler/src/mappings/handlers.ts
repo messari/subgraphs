@@ -32,7 +32,6 @@ import {
   BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  BIGINT_TEN_TO_EIGHTEENTH,
   EULER_ADDRESS,
   EULER_GENERAL_VIEW_ADDRESS,
   EXEC_START_BLOCK_NUMBER,
@@ -46,7 +45,6 @@ import {
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
   DECIMAL_PRECISION,
-  USDC_WETH_03_ADDRESS,
   USDC_ERC20_ADDRESS,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
