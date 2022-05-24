@@ -184,7 +184,7 @@ export function handleWithdraw(event: Withdraw): void {
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
 }
 
-function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility) {
+function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility): void {
   /**
    * Maximum LTV and liquidation thresholds calculations assume the following:
    * - Collateral asset is given market
