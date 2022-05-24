@@ -1,0 +1,15 @@
+{
+  "chain": "xdai",
+  "erc20Vaults": [
+    {
+      "name": "WETH",
+      "address": "0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b",
+      "startBlock": 20432509
+    },
+    {
+      "name": "GNO",
+      "address": "0x014a177e9642d1b4e970418f894985dc1b85657f",
+      "startBlock": 21666284
+    }
+  ]
+}

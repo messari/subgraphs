@@ -52,15 +52,15 @@ export function createERC20Market(event: ethereum.Event): void {
     market.isActive = true;
     market.canUseAsCollateral = true;
     market.canBorrowFrom = true;
-    // Set liquidationPenalty to 10 by default, in case it can't be read from contract
-    market.liquidationPenalty = BIGDECIMAL_TEN;
-    // Read LTV and liquidationPenalty from contract
-    updateMetadata(market, contract);
     market.inputToken = getOrCreateToken(contract.collateral()).id;
     market.outputToken = getMaiToken().id;
     market.rates = [getOrCreateStableBorrowerInterestRate(id).id];
     market.createdTimestamp = event.block.timestamp;
     market.createdBlockNumber = event.block.number;
+    // Set liquidationPenalty to 10 by default, in case it can't be read from contract
+    market.liquidationPenalty = BIGDECIMAL_TEN;
+    // Read LTV and liquidationPenalty from contract
+    updateMetadata(market, contract);
 
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
@@ -320,7 +320,7 @@ function updateMetadata(
   if (!minCollateralPercent.reverted) {
     const maximumLTV = BIGDECIMAL_HUNDRED.div(
       minCollateralPercent.value.toBigDecimal()
-    );
+    ).times(BIGDECIMAL_HUNDRED);
     market.maximumLTV = maximumLTV;
     market.liquidationThreshold = maximumLTV;
   }
