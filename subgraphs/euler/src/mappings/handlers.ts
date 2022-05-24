@@ -298,7 +298,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 
   // Try to get ETH/USDC exchange rate directly from Euler query...
   const usdcMarketIndex = eulerViewMarkets.findIndex(m => m.symbol === USDC_SYMBOL);
-  if (usdcMarketIndex > 0) {
+  if (usdcMarketIndex !== -1) {
     ethUsdcExchangeRate = eulerViewMarkets[usdcMarketIndex].currPrice.toBigDecimal();
   } else {
     // ...otherwise fallback to Uniswap,
