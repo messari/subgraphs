@@ -51,6 +51,8 @@ dataSources:
           file: ./abis/BeefyStrategy.json
         - name: BeefyVault
           file: ./abis/BeefyVault.json
+        - name: ChainlinkOracle
+          file: ./abis/Chainlink.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:

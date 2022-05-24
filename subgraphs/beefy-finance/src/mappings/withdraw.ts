@@ -1,4 +1,4 @@
-import { BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Vault, Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,
@@ -9,6 +9,7 @@ import {
   getVaultFromStrategyOrCreate,
   getTokenOrCreate,
 } from "../utils/getters";
+import { getUSDPrice } from "../utils/prices";
 
 export function createWithdraw(
   event: WithdrawEvent,
@@ -33,7 +34,9 @@ export function createWithdraw(
   const strategyContract = BeefyStrategy.bind(event.address);
   withdraw.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   withdraw.amount = withdrawnAmount;
-  //TODO: withdraw.amountUSD
+  withdraw.amountUSD = getUSDPrice(
+    getTokenOrCreate(strategyContract.want(), networkSuffix)
+  ).times(new BigDecimal(withdrawnAmount));
 
   withdraw.vault = getVaultFromStrategyOrCreate(
     event.address,
@@ -61,7 +64,7 @@ export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
     withdraw.timestamp = vault.createdTimestamp;
     withdraw.asset = vault.inputToken;
     withdraw.amount = new BigInt(0);
-    //withdraw.amountUSD = new BigDecimal(new BigInt(0));
+    withdraw.amountUSD = new BigDecimal(new BigInt(0));
     withdraw.vault = vault.id;
 
     withdraw.save();

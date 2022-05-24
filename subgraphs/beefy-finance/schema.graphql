@@ -226,7 +226,7 @@ type Vault @entity {
   #outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
-  pricePerShare: BigInt
+  pricePerShare: BigInt!
 
   #" Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
   #stakedOutputTokenAmount: BigInt
@@ -323,8 +323,8 @@ type Deposit implements Event @entity {
   " Amount of token deposited in native units "
   amount: BigInt!
 
-  #" Amount of token deposited in USD "
-  #amountUSD: BigDecimal!
+  " Amount of token deposited in USD "
+  amountUSD: BigDecimal!
 
   " The vault involving this transaction "
   vault: Vault!
@@ -361,8 +361,8 @@ type Withdraw implements Event @entity {
   " Amount of token withdrawn in native units "
   amount: BigInt!
 
-  #" Amount of token withdrawn in USD "
-  #amountUSD: BigDecimal!
+  " Amount of token withdrawn in USD "
+  amountUSD: BigDecimal!
 
   " The vault involving this transaction "
   vault: Vault!
