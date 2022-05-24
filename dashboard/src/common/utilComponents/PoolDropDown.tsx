@@ -42,7 +42,7 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
           if (targEle.innerText) {
             setPoolId(targEle.innerText?.split(" / ")[0]);
             navigate(
-              `?subgraph=${searchParams.get("subgraph")}&tab=${searchParams.get("tab")}&poolId=${
+              `?endpoint=${searchParams.get("endpoint")}&tab=${searchParams.get("tab")}&poolId=${
                 targEle.innerText?.split(" / ")[0]
               }`,
             );

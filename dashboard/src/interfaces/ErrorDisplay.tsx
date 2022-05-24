@@ -4,7 +4,7 @@ import React from "react";
 import { useSearchParams } from "react-router-dom";
 import { Versions } from "../constants";
 import { isValidHttpUrl } from "../utils";
-import { IndexingErrorDisplay } from "./IndexingErrorDisplay";
+import IssuesDisplay from "./IssuesDisplay";
 
 interface ErrorDisplayProps {
   errorObject: ApolloError | null;
@@ -27,7 +27,8 @@ function ErrorDisplay({
   if (!errorObject) {
     return null;
   }
-  console.log("ERR OR", Object.values(errorObject), Object.keys(errorObject));
+
+  console.log("ERR OR", Object.values(errorObject), Object.keys(errorObject), errorObject);
   const subgraphParam = searchParams.get("subgraph");
   const errorMsgs = [];
   let errorTotalCount = 0;
@@ -75,18 +76,13 @@ function ErrorDisplay({
         </>,
       );
     }
-  }
-  if (errorObject.message) {
+  } else if (errorObject.message) {
     if (errorObject.message === "indexing_error") {
       let subgraphName = subgraphParam || "";
       const parseCheck = isValidHttpUrl(subgraphName);
       if (parseCheck) {
         subgraphName = subgraphName?.split("name/")[1];
       }
-      if (subgraphName && subgraphName.length !== 0) {
-        return <IndexingErrorDisplay subgraphName={subgraphName} />;
-      }
-
       // return new indexing error component which makes a query
       // parseSubgraphName
     }
@@ -96,6 +92,10 @@ function ErrorDisplay({
       errorDisplayCount += 1;
       errorMsgs.push(<li>{msg}</li>);
     });
+    const errorsToRender = errorMessagesSplit.map((msg) => {
+      return { message: msg, type: "DEPLOY", level: "critical", fieldName: "" };
+    });
+    return <IssuesDisplay issuesArrayProps={errorsToRender} />;
   }
 
   if (errorMsgs.length >= 1) {
