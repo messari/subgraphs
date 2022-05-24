@@ -8,7 +8,7 @@ import {
   ACTIVE_POOL,
   ACTIVE_POOL_CREATED_BLOCK,
   ACTIVE_POOL_CREATED_TIMESTAMP,
-  LIQUIDATION_FEE,
+  LIQUIDATION_FEE_PERCENT,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -36,7 +36,7 @@ export function getOrCreateMarket(): Market {
     market.canBorrowFrom = true;
     market.maximumLTV = MAXIMUM_LTV;
     market.liquidationThreshold = MAXIMUM_LTV;
-    market.liquidationPenalty = LIQUIDATION_FEE;
+    market.liquidationPenalty = LIQUIDATION_FEE_PERCENT;
     market.inputToken = getETHToken().id;
     market.rates = [getOrCreateStableBorrowerInterestRate(ACTIVE_POOL).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
