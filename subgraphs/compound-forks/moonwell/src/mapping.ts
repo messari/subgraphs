@@ -212,10 +212,11 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.2",
+    "1.0.3",
     "1.0.0",
     Network.MOONRIVER,
-    comptroller.try_liquidationIncentiveMantissa()
+    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_oracle()
   );
 
   return _getOrCreateProtocol(protocolData);

@@ -81,6 +81,9 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const ETHEREUM_BLOCKS_PER_YEAR = SECONDS_PER_YEAR / 13; // 13 = seconds per block
 export const AVALANCHE_BLOCKS_PER_YEAR = SECONDS_PER_DAY / 2; // 2 = seconds per block. This is NOT ideal since avalanche has variable block time.
 export const FANTOM_BLOCKS_PER_YEAR = SECONDS_PER_DAY / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
+export const BSC_BLOCKS_PER_YEAR = SECONDS_PER_DAY / 3; // 3 = seconds per block
+export const MATIC_BLOCKS_PER_YEAR = SECONDS_PER_DAY / 2; // 2 = seconds per block
+export const ARBITRUM_BLOCKS_PER_YEAR = SECONDS_PER_DAY / 1; // 1 = seconds per block. This is NOT ideal since fantom has variable block time.
 
 /////////////////////////////
 /////        Math       /////
