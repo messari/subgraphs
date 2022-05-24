@@ -67,6 +67,18 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
     arbitrum: "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-arbitrum",
     matic: "https://api.thegraph.com/subgraphs/name/messari/balancer-v2-polygon",
   },
+  curve: {
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-ethereum",
+    gnosis: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-gnosis",
+    matic: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-polygon",
+    arbitrum: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-arbitrum",
+    optimism: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-optimism",
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-avalanche",
+    fantom: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-fantom",
+  },
+  ellipsis: {
+    bsc: "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc",
+  },
   saddleFinance: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-ethereum",
     arbitrum: "https://api.thegraph.com/subgraphs/name/messari/saddle-finance-arbitrum",
@@ -75,6 +87,18 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
   },
   bastion: {
     aurora: "https://api.thegraph.com/subgraphs/name/messari/bastion-protocol-aurora",
+  },
+  aurigami: {
+    aurora: "https://api.thegraph.com/subgraphs/name/messari/aurigami-aurora",
+  },
+  convex: {
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/convex-finance-ethereum",
+  },
+  inverse: {
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/inverse-finance-ethereum",
+  },
+  rari: {
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/rari-vaults-ethereum",
   },
   moonwell: {
     moonriver: "https://api.thegraph.com/subgraphs/name/messari/moonwell-moonriver",

@@ -1,5 +1,5 @@
 import { CircularProgress } from "@mui/material";
-import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
+import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 
 import { Chart as ChartJS, registerables } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
@@ -14,7 +14,7 @@ import { DashboardHeader } from "../graphs/DashboardHeader";
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
-  const subgraphParam = searchParams.get("subgraph");
+  const subgraphParam = searchParams.get("endpoint");
   const tabString = searchParams.get("tab") || "";
   const poolIdString = searchParams.get("poolId") || "";
   const scrollToView = searchParams.get("view") || "";
@@ -38,6 +38,7 @@ function ProtocolDashboard() {
         type
         schemaVersion
         subgraphVersion
+        methodologyVersion
         name
         id
         network
@@ -114,12 +115,15 @@ function ProtocolDashboard() {
 
   const handleTabChange = (event: any, newValue: string) => {
     let tabName = "protocol";
-    if (newValue === "2") {
+    let poolParam = `&poolId=${poolId}`;
+    if (newValue === "1") {
+      poolParam = "";
+    } else if (newValue === "2") {
       tabName = "pool";
     } else if (newValue === "3") {
       tabName = "events";
     }
-    navigate(`?subgraph=${subgraphParam}&poolId=${poolId}&tab=${tabName}`);
+    navigate(`?endpoint=${subgraphParam}&tab=${tabName}${poolParam}`);
     setTabValue(newValue);
   };
 
@@ -129,7 +133,14 @@ function ProtocolDashboard() {
   // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
 
   if (protocolSchemaQueryError && !loading) {
-    errorDisplayProps = protocolSchemaQueryError;
+    // ...includes('has no field') checks if the error is describing a discrepancy between the protocol query and the fields in the protocol entity on the schema
+    if (!protocolSchemaData && !protocolSchemaQueryError.message.includes("has no field")) {
+      errorDisplayProps = new ApolloError({
+        errorMessage: `DEPLOYMENT UNREACHABLE - ${subgraphToQuery.url} is not a valid subgraph endpoint URL. If a subgraph namestring was used, make sure that the namestring points to a hosted service deployment named using the standard naming convention (messari/uniswap-v3-ethereum).`,
+      });
+    } else {
+      errorDisplayProps = protocolSchemaQueryError;
+    }
   }
   if (error && !loading) {
     errorDisplayProps = error;

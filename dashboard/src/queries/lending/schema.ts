@@ -254,10 +254,12 @@ export const schema110 = (): Schema => {
           deployment
         }
         protocols {
+          id
           name
           type
           schemaVersion
           subgraphVersion
+          methodologyVersion
         }
         lendingProtocols {
           id
@@ -411,28 +413,30 @@ export const schema120 = (): Schema => {
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
-      dailySupplySideRevenueUSD: "BigDecimal!",
-      dailyProtocolSideRevenueUSD: "BigDecimal!",
-      dailyTotalRevenueUSD: "BigDecimal!",
-      dailyBorrowUSD: "BigDecimal!",
-      dailyDepositUSD: "BigDecimal!",
-      dailyLiquidateUSD: "BigDecimal!",
-      cumulativeSupplySideRevenueUSD: "BigDecimal!",
-      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-      cumulativeTotalRevenueUSD: "BigDecimal!",
-      cumulativeBorrowUSD: "BigDecimal!",
-      cumulativeDepositUSD: "BigDecimal!",
-      cumulativeLiquidateUSD: "BigDecimal!",
-      totalDepositBalanceUSD: "BigDecimal!",
-      totalBorrowBalanceUSD: "BigDecimal!",
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
+      dailySupplySideRevenueUSD: "BigDecimal!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      dailyProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      dailyTotalRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      totalBorrowBalanceUSD: "BigDecimal!",
+      dailyBorrowUSD: "BigDecimal!",
+      cumulativeBorrowUSD: "BigDecimal!",
+      totalDepositBalanceUSD: "BigDecimal!",
+      dailyDepositUSD: "BigDecimal!",
+      cumulativeDepositUSD: "BigDecimal!",
+      dailyLiquidateUSD: "BigDecimal!",
+      cumulativeLiquidateUSD: "BigDecimal!",
       mintedTokenSupplies: "[BigInt!]",
       protocolControlledValueUSD: "BigDecimal",
       timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
-      dailyActiveUsers: "Int!",
+      id: "ID!",
       cumulativeUniqueUsers: "Int!",
+      dailyActiveUsers: "Int!",
       dailyTransactionCount: "Int!",
       dailyDepositCount: "Int!",
       dailyWithdrawCount: "Int!",
@@ -442,6 +446,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     marketDailySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       totalDepositBalanceUSD: "BigDecimal!",
       dailyDepositUSD: "BigDecimal!",
@@ -462,8 +467,9 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
-      hourlyActiveUsers: "Int!",
+      id: "ID!",
       cumulativeUniqueUsers: "Int!",
+      hourlyActiveUsers: "Int!",
       hourlyTransactionCount: "Int!",
       hourlyDepositCount: "Int!",
       hourlyWithdrawCount: "Int!",
@@ -473,6 +479,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     marketHourlySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       totalDepositBalanceUSD: "BigDecimal!",
       hourlyDepositUSD: "BigDecimal!",
@@ -577,6 +584,7 @@ export const schema120 = (): Schema => {
       type
       schemaVersion
       subgraphVersion
+      methodologyVersion
     }
     lendingProtocols {
       id      
