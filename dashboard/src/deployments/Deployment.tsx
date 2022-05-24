@@ -119,7 +119,6 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   if (!status) {
     return null;
   }
-
   const indexed = synced
     ? 100
     : toPercent(
@@ -128,7 +127,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
       );
 
   const navigateToSubgraph = (url: string) => () => {
-    navigate(`graphs?subgraph=${url}&tab=protocol`);
+    navigate(`subgraph?endpoint=${url}&tab=protocol`);
   };
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {

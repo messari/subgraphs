@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import { ProtocolTypeEntity } from "../../constants";
-import { convertTokenDecimals } from "../../utils";
+import { convertTokenDecimals, toDate } from "../../utils";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect } from "react";
@@ -41,14 +41,14 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
       // If the current entity has no instances, return the following
       if (currentEntityData.length === 0) {
         return (
-          <Grid key={entityName} style={{ borderTop: "black 2px solid" }}>
-            <h2>ENTITY: {entityName}</h2>
-            <h3 style={{ color: "red" }}>{entityName} HAS NO INSTANCES.</h3>
-          </Grid>
+          <Box key={entityName}>
+            <Typography variant="h4">ENTITY: {entityName}</Typography>
+            <Typography variant="body1">{entityName} HAS NO TIMESERIES DATA.</Typography>
+          </Box>
         );
       }
       // dataFields object has corresponding key:value pairs. Key is the field name and value is an array with an object holding the coordinates to be plotted on the chart for that entity field.
-      const dataFields: { [dataField: string]: [{ date: number; value: number }] } = {};
+      const dataFields: { [dataField: string]: { date: number; value: number }[] } = {};
       // dataFieldMetrics is used to store sums, expressions, etc calculated upon certain certain datafields to check for irregularities in the data
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
@@ -66,76 +66,92 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
             dataFieldMetrics.capitalEfficiency.sum += value;
           }
         }
-        // entityInstance.dailySupplySideRevenue / totalValueLockedUSD * 100
         Object.keys(entityInstance).forEach((entityFieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (entityFieldName === "timestamp") {
+          if (entityFieldName === "timestamp" || entityFieldName === "id") {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
           const currentInstanceField = entityInstance[entityFieldName];
-          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
-            // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
-            // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
-            if (!dataFields[entityFieldName]) {
-              dataFields[entityFieldName] = [
-                { value: Number(currentInstanceField), date: Number(entityInstance.timestamp) },
-              ];
-              dataFieldMetrics[entityFieldName] = { sum: Number(currentInstanceField) };
-            } else {
-              dataFields[entityFieldName].push({
-                value: Number(currentInstanceField),
-                date: Number(entityInstance.timestamp),
-              });
-              dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
-            }
-            if (entityFieldName.includes("umulative")) {
-              if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-                dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
-              }
-              if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
-                dataFieldMetrics[entityFieldName].cumulative.hasLowered = entityInstance.id;
-              }
-              dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
-            }
-          } else if (Array.isArray(currentInstanceField)) {
-            // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
-            // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
-            // currentInstanceField.forEach((val: string, arrayIndex: number) => {
-            for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
-              const val = currentInstanceField[arrayIndex];
-              const dataFieldKey = entityFieldName + " [" + arrayIndex + "]";
-              let value = Number(val);
-              try {
-                if (entityFieldName === "mintedTokenSupplies" && data[protocolEntityName][0]?.lendingType === "CDP") {
-                  if (data[protocolEntityName][0]?.mintedTokens.length > 0) {
-                    value = convertTokenDecimals(val, data[protocolEntityName][0].mintedTokens[arrayIndex]?.decimals);
-                  }
-                } else if (
-                  entityFieldName === "mintedTokenSupplies" &&
-                  data[protocolEntityName][0]?.lendingType !== "CDP"
-                ) {
-                  continue;
-                }
-              } catch (err) {
-                console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
-              }
-              if (!dataFields[dataFieldKey]) {
-                dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
-                dataFieldMetrics[dataFieldKey] = { sum: value };
+          try {
+            if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
+              // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
+              // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
+              if (!dataFields[entityFieldName]) {
+                dataFields[entityFieldName] = [
+                  { value: Number(currentInstanceField), date: Number(entityInstance.timestamp) },
+                ];
+                dataFieldMetrics[entityFieldName] = { sum: Number(currentInstanceField) };
               } else {
-                dataFields[dataFieldKey].push({ value: value, date: Number(entityInstance.timestamp) });
-                dataFieldMetrics[dataFieldKey].sum += value;
+                dataFields[entityFieldName].push({
+                  value: Number(currentInstanceField),
+                  date: Number(entityInstance.timestamp),
+                });
+                dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
               }
-              if (dataFieldKey.includes("umulative")) {
-                if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
-                  dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
+              if (entityFieldName.includes("umulative")) {
+                if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
+                  dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
                 }
-                if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
-                  dataFieldMetrics[dataFieldKey].cumulative.hasLowered = entityInstance.id;
+                if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName]?.cumulative?.prevVal) {
+                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = entityInstance.id;
                 }
-                dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
+                dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
               }
+            } else if (Array.isArray(currentInstanceField)) {
+              // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
+              // This way, each index on the field will have its own chart (ie rewardTokenEmissions[0] and rewardTokenEmissions[1] have their own charts)
+              // currentInstanceField.forEach((val: string, arrayIndex: number) => {
+              for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
+                const val = currentInstanceField[arrayIndex];
+                const dataFieldKey = entityFieldName + " [" + arrayIndex + "]";
+                let value = Number(val);
+                try {
+                  if (entityFieldName === "mintedTokenSupplies" && data[protocolEntityName][0]?.lendingType === "CDP") {
+                    if (data[protocolEntityName][0]?.mintedTokens.length > 0) {
+                      value = convertTokenDecimals(val, data[protocolEntityName][0].mintedTokens[arrayIndex]?.decimals);
+                    }
+                  } else if (
+                    entityFieldName === "mintedTokenSupplies" &&
+                    data[protocolEntityName][0]?.lendingType !== "CDP"
+                  ) {
+                    continue;
+                  }
+                } catch (err) {
+                  console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
+                }
+                if (!dataFields[dataFieldKey]) {
+                  dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
+                  dataFieldMetrics[dataFieldKey] = { sum: value };
+                } else {
+                  dataFields[dataFieldKey].push({ value: value, date: Number(entityInstance.timestamp) });
+                  dataFieldMetrics[dataFieldKey].sum += value;
+                }
+                if (dataFieldKey.includes("umulative")) {
+                  if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
+                    dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
+                  }
+                  if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
+                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = entityInstance.id;
+                  }
+                  dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
+                }
+              }
+            }
+          } catch (err) {
+            if (
+              issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "JS")?.length === 0
+            ) {
+              let message = "JAVASCRIPT ERROR";
+              if (err instanceof Error) {
+                message = err.message;
+              }
+              issues.push({
+                type: "JS",
+                message: message,
+                level: "critical",
+                fieldName: entityName + "-" + entityFieldName,
+              });
             }
           }
         });
@@ -160,7 +176,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-                entitiesData[entityName][entityField].split("").length - 1
+              entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -207,35 +223,63 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
               }
             }
             const label = entityName + "-" + field;
-            if (
-              issues.filter((x) => x.message === label && x.type === "SUM").length === 0 &&
-              dataFieldMetrics[field]?.sum === 0
-            ) {
-              // Create a warning for the 0 sum of all snapshots for this field
-              const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
-                return fieldName.toUpperCase().includes(fieldSchema.toUpperCase());
-              });
-              let level = "warning";
-              if (schemaField) {
-                const fieldChars = entitiesData[entityName][schemaField].split("");
-                if (fieldChars[fieldChars.length - 1] === "!") {
-                  level = "error";
-                }
-              }
-              issues.push({ type: "SUM", message: "", fieldName: label, level });
-            }
-            if (
-              issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
-              dataFieldMetrics[field]?.cumulative?.hasLowered.length > 0
-            ) {
-              issues.push({
-                type: "CUMULATIVE",
-                message: dataFieldMetrics[field]?.cumulative?.hasLowered,
-                level: "error",
-                fieldName: label,
-              });
-            }
             const elementId = label.split(" ").join("%20");
+
+            try {
+              if (
+                issues.filter((x) => x.message === label && x.type === "SUM")?.length === 0 &&
+                dataFieldMetrics[field]?.sum === 0
+              ) {
+                // Create a warning for the 0 sum of all snapshots for this field
+                const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
+                  return fieldName.toUpperCase().includes(fieldSchema.toUpperCase());
+                });
+                let level = "warning";
+                if (schemaField) {
+                  const fieldChars = entitiesData[entityName][schemaField].split("");
+                  if (fieldChars[fieldChars.length - 1] === "!") {
+                    level = "error";
+                  }
+                }
+                issues.push({ type: "SUM", message: "", fieldName: label, level });
+              }
+              if (
+                issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE")?.length === 0 &&
+                dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
+              ) {
+                issues.push({
+                  type: "CUMULATIVE",
+                  message: dataFieldMetrics[field]?.cumulative?.hasLowered,
+                  level: "error",
+                  fieldName: label,
+                });
+              }
+            } catch (err) {
+              console.log("ERROR RENDER", err);
+              let message = "JAVASCRIPT ERROR";
+              if (err instanceof Error) {
+                message = err.message;
+              }
+              if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
+                issues.push({
+                  type: "JS",
+                  message: message,
+                  level: "critical",
+                  fieldName: entityName + "-" + field,
+                });
+              }
+              return (
+                <div>
+                  <Box mt={3} mb={1} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
+                    <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                      <Typography variant="h6">
+                        {field} - {message}
+                      </Typography>
+                    </CopyLinkToClipboard>
+                  </Box>
+                </div>
+              );
+            }
             return (
               <div id={elementId}>
                 <Box mt={3} mb={1}>
@@ -245,10 +289,10 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
                 </Box>
                 <Grid container justifyContent="space-between">
                   <Grid key={label + "1"} item xs={7.5}>
-                    {Chart(label, dataFields[field], currentEntityData.length)}
+                    {Chart(label, dataFields[field], currentEntityData?.length)}
                   </Grid>
                   <Grid key={label + "2"} item xs={4}>
-                    {TableChart(label, dataFields[field], currentEntityData.length)}
+                    {TableChart(label, dataFields[field], currentEntityData?.length)}
                   </Grid>
                 </Grid>
               </div>

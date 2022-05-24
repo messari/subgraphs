@@ -82,9 +82,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         return (
           <Box key={entityName}>
             <Typography variant="h4">ENTITY: {entityName}</Typography>
-            <Typography variant="body1" style={{ color: "red" }}>
-              {entityName} HAS NO INSTANCES.
-            </Typography>
+            <Typography variant="body1">{entityName} HAS NO TIMESERIES DATA.</Typography>
           </Box>
         );
       }
@@ -124,231 +122,255 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
         for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
           const entityFieldName = Object.keys(timeseriesInstance)[z];
-          if (entityFieldName === "timestamp" || entityFieldName === "__typename") {
+          if (entityFieldName === "timestamp" || entityFieldName === "__typename" || entityFieldName === "id") {
             continue;
           }
           const capsEntityFieldName = entityFieldName.toUpperCase();
           const currentInstanceField = timeseriesInstance[entityFieldName];
           let value: any = currentInstanceField;
-          if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
-            let dataType = "undefined";
-            if (value === null) {
-              dataType = "null";
-            }
-            if (isNaN(value)) {
-              dataType = "NaN";
-            }
-            dataFields[entityFieldName] = [];
-            dataFieldMetrics[entityFieldName] = { sum: 0, invalidDataPlot: dataType };
-            if (capsEntityFieldName === "REWARDTOKENEMISSIONSUSD") {
-              dataFields.rewardAPR = [];
-              dataFieldMetrics.rewardAPR = { sum: 0, invalidDataPlot: dataType };
-            }
-            continue;
-          }
-          if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
-            value = Number(currentInstanceField);
-            if (
-              capsEntityFieldName.includes("OUTPUTTOKEN") &&
-              capsEntityFieldName !== "OUTPUTTOKEN" &&
-              !capsEntityFieldName.includes("USD")
-            ) {
-              value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
-            }
-            if (entityFieldName === "inputTokenBalance" || entityFieldName === "pricePerShare") {
-              const dec = data[poolKeySingular].inputToken.decimals;
-              value = convertTokenDecimals(currentInstanceField, dec);
-            }
-
-            // Add the data to the array held on the dataField key of the entityFieldName
-            if (!dataFields[entityFieldName]) {
+          try {
+            if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
+              let dataType = "undefined";
+              if (value === null) {
+                dataType = "null";
+              }
+              if (isNaN(value)) {
+                dataType = "NaN";
+              }
               dataFields[entityFieldName] = [];
-              dataFieldMetrics[entityFieldName] = { sum: 0 };
+              dataFieldMetrics[entityFieldName] = { sum: 0, invalidDataPlot: dataType };
+              if (capsEntityFieldName === "REWARDTOKENEMISSIONSUSD") {
+                dataFields.rewardAPR = [];
+                dataFieldMetrics.rewardAPR = { sum: 0, invalidDataPlot: dataType };
+              }
+              continue;
+            }
+            if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
+              value = Number(currentInstanceField);
+              if (
+                capsEntityFieldName.includes("OUTPUTTOKEN") &&
+                capsEntityFieldName !== "OUTPUTTOKEN" &&
+                !capsEntityFieldName.includes("USD")
+              ) {
+                value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
+              }
+              if (entityFieldName === "inputTokenBalance" || entityFieldName === "pricePerShare") {
+                const dec = data[poolKeySingular].inputToken.decimals;
+                value = convertTokenDecimals(currentInstanceField, dec);
+              }
+
+              // Add the data to the array held on the dataField key of the entityFieldName
+              if (!dataFields[entityFieldName]) {
+                dataFields[entityFieldName] = [];
+                dataFieldMetrics[entityFieldName] = { sum: 0 };
+              }
+
+              const returnedData = addDataPoint(
+                dataFields,
+                dataFieldMetrics,
+                entityFieldName,
+                Number(value),
+                timeseriesInstance.timestamp,
+                timeseriesInstance.id,
+              );
+              dataFields[entityFieldName] = returnedData.currentEntityField;
+              dataFieldMetrics[entityFieldName] = returnedData.currentEntityFieldMetrics;
+
+              if (
+                capsEntityFieldName.includes("LIQUIDATEUSD") &&
+                value > timeseriesInstance.totalValueLockedUSD &&
+                issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length ===
+                0
+              ) {
+                issues.push({
+                  type: "LIQ",
+                  message: timeseriesInstance.id,
+                  level: "critical",
+                  fieldName: entityName + "-" + entityFieldName,
+                });
+              }
             }
 
-            const returnedData = addDataPoint(
-              dataFields,
-              dataFieldMetrics,
-              entityFieldName,
-              Number(value),
-              timeseriesInstance.timestamp,
-              timeseriesInstance.id,
-            );
-            dataFields[entityFieldName] = returnedData.currentEntityField;
-            dataFieldMetrics[entityFieldName] = returnedData.currentEntityFieldMetrics;
+            if (entityFieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
+              // Catch the fields for reward token data that is optional but would be handled as an array
+              let dataFieldKey = "";
+              let iterateArray = data[poolKeySingular][entityFieldName];
+              if (!Array.isArray(iterateArray)) {
+                iterateArray = data[poolKeySingular]?.rewardTokens;
+              }
+              iterateArray.forEach((item: any, idx: number) => {
+                const token = data[poolKeySingular]?.rewardTokens[idx];
+                if (token?.token?.name) {
+                  dataFieldKey = " [" + token?.token?.name + "]";
+                } else if (token?.name) {
+                  dataFieldKey = " [" + token?.name + "]";
+                } else {
+                  dataFieldKey = " [" + idx + "]";
+                }
+                if (!dataFields[entityFieldName + dataFieldKey]) {
+                  dataFields[entityFieldName + dataFieldKey] = [
+                    { value: 0, date: Number(timeseriesInstance.timestamp) },
+                  ];
+                  dataFieldMetrics[entityFieldName + dataFieldKey] = { sum: 0 };
+                } else {
+                  dataFields[entityFieldName + dataFieldKey].push({
+                    value: 0,
+                    date: Number(timeseriesInstance.timestamp),
+                  });
+                  dataFieldMetrics[entityFieldName + dataFieldKey].sum += 0;
+                }
+                if (entityFieldName === "rewardTokenEmissionsUSD") {
+                  if (!dataFields["rewardAPR" + dataFieldKey]) {
+                    dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
+                    dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
+                  } else {
+                    dataFields["rewardAPR" + dataFieldKey].push({
+                      value: 0,
+                      date: Number(timeseriesInstance.timestamp),
+                    });
+                    dataFieldMetrics["rewardAPR" + dataFieldKey].sum += 0;
+                  }
+                }
+              });
+              continue;
+            } else if (Array.isArray(currentInstanceField)) {
+              // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
+              currentInstanceField.forEach((val: any, arrayIndex: number) => {
+                // Determine the name/label/id of each element to be separated out of the array
+                let fieldSplitIdentifier = arrayIndex.toString();
+                let value: number = 0;
+                if (!isNaN(Number(val))) {
+                  value = Number(val);
+                } else if (typeof val === "object") {
+                  const holdingValueKey = Object.keys(val).find((x) => {
+                    return !isNaN(Number(val[x]));
+                  });
+                  if (holdingValueKey) {
+                    value = Number(val[holdingValueKey]);
+                  }
+                  if (val["type"]) {
+                    fieldSplitIdentifier = val["type"];
+                  } else {
+                    const holdingValueStr = Object.keys(val).find((x) => {
+                      return typeof val[x] === "string" && isNaN(Number(val[x]));
+                    });
+                    if (holdingValueStr) {
+                      fieldSplitIdentifier = holdingValueStr;
+                    }
+                  }
+                }
 
+                if (entityFieldName === "rates") {
+                  fieldSplitIdentifier = val.side + "-" + val.type;
+                }
+
+                const dataFieldKey = entityFieldName + " [" + fieldSplitIdentifier + "]";
+
+                if (value || value === 0) {
+                  if (entityFieldName === "inputTokenBalances" || capsEntityFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                    // convert the value with decimals for certain fields
+                    value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
+                  }
+
+                  if (entityFieldName === "rewardTokenEmissionsAmount") {
+                    // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
+                    // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
+
+                    const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
+                    if (currentRewardToken?.decimals) {
+                      value = convertTokenDecimals(val, currentRewardToken?.decimals);
+                    } else if (currentRewardToken?.token?.decimals) {
+                      value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
+                    } else {
+                      value = convertTokenDecimals(val, 18);
+                    }
+                  }
+
+                  if (entityFieldName === "rewardTokenEmissionsUSD") {
+                    //Convert emissions amount in USD to APY/APR
+                    // total reward emission USD / total staked USD * 100 = reward APR
+                    let apr = 0;
+                    if (timeseriesInstance?.totalDepositBalanceUSD && poolKeySingular === "LENDING") {
+                      apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
+                    } else {
+                      if (
+                        !Number(timeseriesInstance?.stakedOutputTokenAmount) ||
+                        !Number(timeseriesInstance?.outputTokenSupply)
+                      ) {
+                        apr = (Number(val) / Number(timeseriesInstance.totalValueLockedUSD)) * 100 * 365;
+                      } else {
+                        apr =
+                          (Number(val) /
+                            (Number(timeseriesInstance.totalValueLockedUSD) *
+                              (Number(timeseriesInstance?.stakedOutputTokenAmount) /
+                                Number(timeseriesInstance?.outputTokenSupply)))) *
+                          100 *
+                          365;
+                      }
+                    }
+
+                    if (!apr || !isFinite(apr)) {
+                      apr = 0;
+                    }
+                    // Create the reward APR [idx] field
+                    if (!dataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
+                      dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
+                        { value: apr, date: Number(timeseriesInstance.timestamp) },
+                      ];
+                      dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = { sum: apr };
+                    } else {
+                      dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
+                        value: apr,
+                        date: Number(timeseriesInstance.timestamp),
+                      });
+                      dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
+                    }
+                  }
+
+                  // Save the data to the dataFields object array
+                  if (!dataFields[dataFieldKey]) {
+                    dataFields[dataFieldKey] = [];
+                    dataFieldMetrics[dataFieldKey] = { sum: 0 };
+                  }
+                  const returnedData = addDataPoint(
+                    dataFields,
+                    dataFieldMetrics,
+                    dataFieldKey,
+                    Number(value),
+                    timeseriesInstance.timestamp,
+                    timeseriesInstance.id,
+                  );
+                  dataFields[dataFieldKey] = returnedData.currentEntityField;
+                  dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
+                } else {
+                  let dataType = "undefined";
+                  if (value === null) {
+                    dataType = "null";
+                  }
+                  if (isNaN(value)) {
+                    dataType = "NaN";
+                  }
+                  dataFields[dataFieldKey] = [];
+                  dataFieldMetrics[dataFieldKey] = { sum: 0, invalidDataPlot: dataType };
+                }
+              });
+            }
+          } catch (err) {
             if (
-              capsEntityFieldName.includes("LIQUIDATEUSD") &&
-              value > timeseriesInstance.totalValueLockedUSD &&
-              issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length === 0
+              issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "JS")?.length === 0
             ) {
+              let message = "JAVASCRIPT ERROR";
+              if (err instanceof Error) {
+                message = err.message;
+              }
+              console.log(err)
               issues.push({
-                type: "LIQ",
-                message: timeseriesInstance.id,
+                type: "JS",
+                message: message,
                 level: "critical",
                 fieldName: entityName + "-" + entityFieldName,
               });
             }
-          }
-
-          if (entityFieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
-            // Catch the fields for reward token data that is optional but would be handled as an array
-            let dataFieldKey = "";
-            let iterateArray = data[poolKeySingular][entityFieldName];
-            if (!Array.isArray(iterateArray)) {
-              iterateArray = data[poolKeySingular]?.rewardTokens;
-            }
-            iterateArray.forEach((item: any, idx: number) => {
-              const token = data[poolKeySingular]?.rewardTokens[idx];
-              if (token?.token?.name) {
-                dataFieldKey = " [" + token?.token?.name + "]";
-              } else if (token?.name) {
-                dataFieldKey = " [" + token?.name + "]";
-              } else {
-                dataFieldKey = " [" + idx + "]";
-              }
-              if (!dataFields[entityFieldName + dataFieldKey]) {
-                dataFields[entityFieldName + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
-                dataFieldMetrics[entityFieldName + dataFieldKey] = { sum: 0 };
-              } else {
-                dataFields[entityFieldName + dataFieldKey].push({
-                  value: 0,
-                  date: Number(timeseriesInstance.timestamp),
-                });
-                dataFieldMetrics[entityFieldName + dataFieldKey].sum += 0;
-              }
-              if (entityFieldName === "rewardTokenEmissionsUSD") {
-                if (!dataFields["rewardAPR" + dataFieldKey]) {
-                  dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
-                  dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
-                } else {
-                  dataFields["rewardAPR" + dataFieldKey].push({ value: 0, date: Number(timeseriesInstance.timestamp) });
-                  dataFieldMetrics["rewardAPR" + dataFieldKey].sum += 0;
-                }
-              }
-            });
-            continue;
-          } else if (Array.isArray(currentInstanceField)) {
-            // If the instance field data is an array, extrapolate this array into multiple keys (one for each element of the array)
-            currentInstanceField.forEach((val: any, arrayIndex: number) => {
-              // Determine the name/label/id of each element to be separated out of the array
-              let fieldSplitIdentifier = arrayIndex.toString();
-              let value: number = 0;
-              if (!isNaN(Number(val))) {
-                value = Number(val);
-              } else if (typeof val === "object") {
-                const holdingValueKey = Object.keys(val).find((x) => {
-                  return !isNaN(Number(val[x]));
-                });
-                if (holdingValueKey) {
-                  value = Number(val[holdingValueKey]);
-                }
-                if (val["type"]) {
-                  fieldSplitIdentifier = val["type"];
-                } else {
-                  const holdingValueStr = Object.keys(val).find((x) => {
-                    return typeof val[x] === "string" && isNaN(Number(val[x]));
-                  });
-                  if (holdingValueStr) {
-                    fieldSplitIdentifier = holdingValueStr;
-                  }
-                }
-              }
-
-              if (entityFieldName === "rates") {
-                fieldSplitIdentifier = val.side + "-" + val.type;
-              }
-
-              const dataFieldKey = entityFieldName + " [" + fieldSplitIdentifier + "]";
-
-              if (value || value === 0) {
-                if (entityFieldName === "inputTokenBalances") {
-                  // If the current field is inputTokenBalances, convert the value with decimals
-                  value = convertTokenDecimals(val, data[poolKeySingular].inputTokens[arrayIndex].decimals);
-                }
-
-                if (entityFieldName === "rewardTokenEmissionsAmount") {
-                  // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
-                  // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
-
-                  const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                  if (currentRewardToken?.decimals) {
-                    value = convertTokenDecimals(val, currentRewardToken?.decimals);
-                  } else if (currentRewardToken?.token?.decimals) {
-                    value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
-                  } else {
-                    value = convertTokenDecimals(val, 18);
-                  }
-                }
-
-                if (entityFieldName === "rewardTokenEmissionsUSD") {
-                  //Convert emissions amount in USD to APY/APR
-                  // total reward emission USD / total staked USD * 100 = reward APR
-                  let apr = 0;
-                  if (timeseriesInstance?.totalDepositBalanceUSD && poolKeySingular === "LENDING") {
-                    apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
-                  } else {
-                    if (
-                      !Number(timeseriesInstance?.stakedOutputTokenAmount) ||
-                      !Number(timeseriesInstance?.outputTokenSupply)
-                    ) {
-                      apr = (Number(val) / Number(timeseriesInstance.totalValueLockedUSD)) * 100 * 365;
-                    } else {
-                      apr =
-                        (Number(val) /
-                          (Number(timeseriesInstance.totalValueLockedUSD) *
-                            (Number(timeseriesInstance?.stakedOutputTokenAmount) /
-                              Number(timeseriesInstance?.outputTokenSupply)))) *
-                        100 *
-                        365;
-                    }
-                  }
-
-                  if (!apr || !isFinite(apr)) {
-                    apr = 0;
-                  }
-                  // Create the reward APR [idx] field
-                  if (!dataFields["rewardAPR [" + fieldSplitIdentifier + "]"]) {
-                    dataFields["rewardAPR [" + fieldSplitIdentifier + "]"] = [
-                      { value: apr, date: Number(timeseriesInstance.timestamp) },
-                    ];
-                    dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"] = { sum: apr };
-                  } else {
-                    dataFields["rewardAPR [" + fieldSplitIdentifier + "]"].push({
-                      value: apr,
-                      date: Number(timeseriesInstance.timestamp),
-                    });
-                    dataFieldMetrics["rewardAPR [" + fieldSplitIdentifier + "]"].sum += apr;
-                  }
-                }
-
-                // Save the data to the dataFields object array
-                if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [];
-                  dataFieldMetrics[dataFieldKey] = { sum: 0 };
-                }
-                const returnedData = addDataPoint(
-                  dataFields,
-                  dataFieldMetrics,
-                  dataFieldKey,
-                  Number(value),
-                  timeseriesInstance.timestamp,
-                  timeseriesInstance.id,
-                );
-                dataFields[dataFieldKey] = returnedData.currentEntityField;
-                dataFieldMetrics[dataFieldKey] = returnedData.currentEntityFieldMetrics;
-              } else {
-                let dataType = "undefined";
-                if (value === null) {
-                  dataType = "null";
-                }
-                if (isNaN(value)) {
-                  dataType = "NaN";
-                }
-                dataFields[dataFieldKey] = [];
-                dataFieldMetrics[dataFieldKey] = { sum: 0, invalidDataPlot: dataType };
-              }
-            });
           }
         }
       }
@@ -430,8 +452,8 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             } else {
               currentRewardToken = data[poolKeySingular].rewardTokens[idx];
             }
-            const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
-            tableVals[x].value.push(`${name} [${idx}]: ${rewardChart[reward][x].value.toFixed(3)}%`);
+            const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
+            tableVals[x].value.push(`${symbol}[${idx}]: ${rewardChart[reward][x].value.toFixed(3)}%`);
           });
           tableVals[x].value = tableVals[x].value.join(", ");
         }
@@ -556,112 +578,144 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             const fieldName = field.split(" [")[0];
             // const schemaFieldTypeString = entitiesData[entityName][fieldName].split("");
             let label = entityName + "-" + field;
-            const arrayIndex = Number(field?.split(" [")[1]?.split("]")[0]);
+            // Label changes, element id is constant
+            const elementId = label;
+            const linkToElementId = elementId.split(" ").join("%20");
 
-            // Generate the labeling for different token charts
-            if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
-              if ((arrayIndex || arrayIndex === 0) && data[poolKeySingular]?.inputTokens) {
-                const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
-                const name = currentInputToken.name ? currentInputToken.name : "N/A";
-                const symbol = currentInputToken.symbol ? currentInputToken.symbol : "N/A";
+            try {
+              const arrayIndex = Number(field?.split(" [")[1]?.split("]")[0]);
+              // Generate the labeling for different token charts
+              if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
+                if ((arrayIndex || arrayIndex === 0) && data[poolKeySingular]?.inputTokens) {
+                  const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
+                  const name = currentInputToken?.name ? currentInputToken.name : "N/A";
+                  const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
+                  label += " - " + symbol + ": " + name;
+                } else if (data[poolKeySingular]?.inputToken) {
+                  const name = data[poolKeySingular].inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
+                  const symbol = data[poolKeySingular].inputToken?.symbol
+                    ? data[poolKeySingular].inputToken.symbol
+                    : "N/A";
+                  label += " - " + symbol + ": " + name;
+                }
+              } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
+                const name = data[poolKeySingular]?.outputToken?.name
+                  ? data[poolKeySingular]?.outputToken?.name
+                  : "N/A";
+                const symbol = data[poolKeySingular]?.outputToken?.symbol
+                  ? data[poolKeySingular]?.outputToken?.symbol
+                  : "N/A";
                 label += " - " + symbol + ": " + name;
-              } else if (data[poolKeySingular]?.inputToken) {
-                const name = data[poolKeySingular].inputToken.name ? data[poolKeySingular].inputToken.name : "N/A";
-                const symbol = data[poolKeySingular].inputToken.symbol
+              } else if (
+                fieldName.toUpperCase().includes("TOKEN") &&
+                data[poolKeySingular]?.inputToken &&
+                !arrayIndex &&
+                arrayIndex !== 0
+              ) {
+                const name = data[poolKeySingular]?.inputToken?.name ? data[poolKeySingular].inputToken.name : "N/A";
+                const symbol = data[poolKeySingular]?.inputToken?.symbol
                   ? data[poolKeySingular].inputToken.symbol
                   : "N/A";
                 label += " - " + symbol + ": " + name;
-              }
-            } else if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
-              const name = data[poolKeySingular]?.outputToken?.name ? data[poolKeySingular]?.outputToken?.name : "N/A";
-              const symbol = data[poolKeySingular]?.outputToken?.symbol
-                ? data[poolKeySingular]?.outputToken?.symbol
-                : "N/A";
-              label += " - " + symbol + ": " + name;
-            } else if (
-              fieldName.toUpperCase().includes("TOKEN") &&
-              data[poolKeySingular]?.inputToken &&
-              !arrayIndex &&
-              arrayIndex !== 0
-            ) {
-              const name = data[poolKeySingular].inputToken.name ? data[poolKeySingular].inputToken.name : "N/A";
-              const symbol = data[poolKeySingular].inputToken.symbol ? data[poolKeySingular].inputToken.symbol : "N/A";
-              label += " - " + symbol + ": " + name;
-            } else if (arrayIndex || arrayIndex === 0) {
-              if (
-                (fieldName.toUpperCase().includes("REWARDTOKEN") || fieldName.toUpperCase().includes("REWARDAPR")) &&
-                data[poolKeySingular]?.rewardTokens
-              ) {
-                let currentRewardToken: { [x: string]: string } = {};
-                if (data[poolKeySingular].rewardTokens[arrayIndex]?.token) {
-                  currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex].token;
-                } else {
-                  currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
+              } else if (arrayIndex || arrayIndex === 0) {
+                if (
+                  (fieldName.toUpperCase().includes("REWARDTOKEN") || fieldName.toUpperCase().includes("REWARDAPR")) &&
+                  data[poolKeySingular]?.rewardTokens
+                ) {
+                  let currentRewardToken: { [x: string]: string } = {};
+                  if (data[poolKeySingular]?.rewardTokens[arrayIndex]?.token) {
+                    currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex].token;
+                  } else {
+                    currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
+                  }
+                  const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
+                  const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
+                  label += " - " + symbol + ": " + name;
+                } else if (data[poolKeySingular]?.inputTokens) {
+                  const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
+                  const name = currentInputToken?.name ? currentInputToken.name : "N/A";
+                  const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
+                  label += " - " + symbol + ": " + name;
                 }
-                const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
-                const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
-                label += " - " + symbol + ": " + name;
-              } else if (data[poolKeySingular]?.inputTokens) {
-                const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
-                const name = currentInputToken.name ? currentInputToken.name : "N/A";
-                const symbol = currentInputToken.symbol ? currentInputToken.symbol : "N/A";
-                label += " - " + symbol + ": " + name;
               }
-            }
-            const elementId = entityName + "-" + field;
-            const linkToElementId = elementId.split(" ").join("%20");
-            if (dataFieldMetrics[field]?.invalidDataPlot) {
-              return (
-                <div id={linkToElementId}>
-                  <Box mt={3} mb={1}>
-                    <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
-                      <Typography variant="h6">{label}</Typography>
-                    </CopyLinkToClipboard>
-                  </Box>
-                  <Grid container>
-                    <Typography variant="body1" color="textSecondary">
-                      {entityName}-{field} timeseries has invalid data. Cannot use{" "}
-                      {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
-                      collected.
-                    </Typography>
-                  </Grid>
-                </div>
-              );
-            }
-            if (dataFieldMetrics[field].sum === 0 && issues.filter((x) => x.fieldName === label).length === 0) {
-              // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
-              const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
-              let level = null;
-              criticalZeroFields.forEach((criticalField) => {
-                if (field.toUpperCase().includes(criticalField.toUpperCase())) {
-                  level = "critical";
-                }
-              });
-
-              if (!level) {
-                const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
-                  return field.includes(fieldSchema);
+              if (dataFieldMetrics[field]?.invalidDataPlot) {
+                return (
+                  <div id={linkToElementId}>
+                    <Box mt={3} mb={1}>
+                      <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
+                        <Typography variant="h6">{label}</Typography>
+                      </CopyLinkToClipboard>
+                    </Box>
+                    <Grid container>
+                      <Typography variant="body1" color="textSecondary">
+                        {entityName}-{field} timeseries has invalid data. Cannot use{" "}
+                        {dataFieldMetrics[field]?.invalidDataPlot} data types to plot chart. Evaluate how this data is
+                        collected.
+                      </Typography>
+                    </Grid>
+                  </div>
+                );
+              }
+              if (dataFieldMetrics[field].sum === 0 && issues.filter((x) => x.fieldName === label).length === 0) {
+                // This array holds field names for fields that trigger a critical level issue rather than just an error level if all values are 0
+                const criticalZeroFields = ["totalValueLockedUSD", "deposit"];
+                let level = null;
+                criticalZeroFields.forEach((criticalField) => {
+                  if (field.toUpperCase().includes(criticalField.toUpperCase())) {
+                    level = "critical";
+                  }
                 });
-                level = "warning";
-                if (schemaField) {
-                  const fieldChars = entitiesData[entityName][schemaField].split("");
-                  if (fieldChars[fieldChars.length - 1] === "!") {
-                    level = "error";
+
+                if (!level) {
+                  const schemaField = Object.keys(entitiesData[entityName]).find((fieldSchema: string) => {
+                    return field.includes(fieldSchema);
+                  });
+                  level = "warning";
+                  if (schemaField) {
+                    const fieldChars = entitiesData[entityName][schemaField].split("");
+                    if (fieldChars[fieldChars.length - 1] === "!") {
+                      level = "error";
+                    }
                   }
                 }
+                issues.push({ type: "SUM", message: "", level, fieldName: label });
               }
-              issues.push({ type: "SUM", message: "", level, fieldName: label });
-            }
-            if (
-              issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
-              dataFieldMetrics[field]?.cumulative?.hasLowered.length > 0
-            ) {
-              issues.push({
-                type: "CUMULATIVE",
-                message: dataFieldMetrics[field]?.cumulative?.hasLowered,
-                level: "error",
-                fieldName: label,
-              });
+              if (
+                issues.filter((x) => x.fieldName === label && x.type === "CUMULATIVE").length === 0 &&
+                dataFieldMetrics[field]?.cumulative?.hasLowered?.length > 0
+              ) {
+                issues.push({
+                  type: "CUMULATIVE",
+                  message: dataFieldMetrics[field]?.cumulative?.hasLowered,
+                  level: "error",
+                  fieldName: label,
+                });
+              }
+            } catch (err) {
+              let message = "JAVASCRIPT ERROR";
+              if (err instanceof Error) {
+                message = err.message;
+              }
+              console.log(err)
+              if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
+                issues.push({
+                  type: "JS",
+                  message: message,
+                  level: "critical",
+                  fieldName: entityName + "-" + field,
+                });
+              }
+              return (
+                <div>
+                  <Box mt={3} mb={1}>
+                    <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
+                      <Typography variant="h6">
+                        {field} - {message}
+                      </Typography>
+                    </CopyLinkToClipboard>
+                  </Box>
+                </div>
+              );
             }
 
             return (
@@ -709,7 +763,6 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
   }
 
   useEffect(() => {
-    console.log("POOL ISSUES TO SET", issues, issuesState);
     setIssues(issues);
   }, [issuesState]);
 
