@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 import { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -26,26 +26,29 @@ const messagesByLevel = (
   const issuesMsgs = [];
   if (issuesArray.length > 0) {
     for (let x = 0; x < issuesArray.length; x++) {
-      let issuesMsg = issuesArray[x].fieldName;
+      let issuesMsg = (issuesArray[x].fieldName ? issuesArray[x].fieldName + ": " : "") + issuesArray[x].message;
       if (issuesArray[x].type === "SUM") {
         issuesMsg = `All values in ${issuesArray[x].fieldName} are zero. Verify that this data is being mapped correctly.`;
       }
       if (issuesArray[x].type === "LIQ") {
-        issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot on snapshot id ${issuesArray[x].message}`;
+        issuesMsg = `${issuesArray[x].fieldName} timeseries value cannot be higher than totalValueLockedUSD on the pool. Look at snapshot id ${issuesArray[x].message}`;
       }
       if (issuesArray[x].type === "CUMULATIVE") {
         issuesMsg = `
           ${issuesArray[x].fieldName} cumulative value dropped on snapshot id ${issuesArray[x].message}. Cumulative values should always increase.`;
       }
       if (issuesArray[x].type === "TVL-") {
-        issuesMsg = `totalValueLockedUSD on ${issuesArray[x].message} is below 1000. This is likely erroneous.`;
+        issuesMsg = `totalValueLockedUSD on ${issuesArray[x].fieldName} is below 1000.`;
       }
       if (issuesArray[x].type === "TVL+") {
         issuesMsg = `
-          totalValueLockedUSD on ${issuesArray[x].message} is above 1,000,000,000,000. This is likely erroneous.`;
+          totalValueLockedUSD on ${issuesArray[x].fieldName} is above 1,000,000,000,000.`;
       }
       if (issuesArray[x].type === "DEC") {
         issuesMsg = `Decimals on ${issuesArray[x].fieldName} could not be pulled. The default decimal value of 18 has been applied.`;
+      }
+      if (issuesArray[x].type === "JS") {
+        issuesMsg = `JavaScript Error thrown processing the data for ${issuesArray[x].fieldName}: ${issuesArray[x].message}. Verify that the data is in the expected form. If the data is correct and this error persists, leave a message in the 'Validation-Dashboard' Discord channel.`;
       }
       issuesMsgs.push(<li>{issuesMsg}</li>);
     }
@@ -61,7 +64,7 @@ export const IssuesDisplay = ({ issuesArrayProps }: IssuesProps) => {
   const [issuesArray, setIssuesArray] = useState(issuesArrayProps);
   useEffect(() => {
     setIssuesArray(issuesArrayProps);
-  }, [issuesArrayProps]);
+  }, []);
 
   const criticalIssues = issuesArray.filter((iss) => iss.level === "critical");
   const errorIssues = issuesArray.filter((iss) => iss.level === "error");

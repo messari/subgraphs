@@ -346,6 +346,7 @@ export const schema120 = (): Schema => {
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       protocolControlledValueUSD: "BigDecimal",
       dailySupplySideRevenueUSD: "BigDecimal!",
@@ -357,6 +358,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
+      id: "ID!",
       dailyActiveUsers: "Int!",
       cumulativeUniqueUsers: "Int!",
       dailyTransactionCount: "Int!",
@@ -365,17 +367,19 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     vaultDailySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       inputTokenBalance: "BigInt!",
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal",
-      pricePerShare: "BigDecimal",
       stakedOutputTokenAmount: "BigInt",
+      pricePerShare: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
+      id: "ID!",
       hourlyActiveUsers: "Int!",
       cumulativeUniqueUsers: "Int!",
       hourlyTransactionCount: "Int!",
@@ -384,12 +388,13 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     vaultHourlySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       inputTokenBalance: "BigInt!",
       outputTokenSupply: "BigInt!",
       outputTokenPriceUSD: "BigDecimal",
-      pricePerShare: "BigDecimal",
       stakedOutputTokenAmount: "BigInt",
+      pricePerShare: "BigDecimal",
       rewardTokenEmissionsAmount: "[BigInt!]",
       rewardTokenEmissionsUSD: "[BigDecimal!]",
       timestamp: "BigInt!",
@@ -456,6 +461,8 @@ export const schema120 = (): Schema => {
         deployment
       }
       protocols {
+        id
+        methodologyVersion
         name
         type
         schemaVersion

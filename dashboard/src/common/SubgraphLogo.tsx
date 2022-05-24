@@ -17,6 +17,12 @@ const subgraphLogoMap: Record<string, string> = {
   stakeDAO: "https://assets.coingecko.com/coins/images/13724/small/stakedao_logo.jpg?1611195011",
   tokemak: "https://messari.io/asset-images/39d6707f-c1f0-4ef9-b916-a3613dc7bd0f/128.png?v=2",
   yearn: "https://messari.io/asset-images/75af0d92-7ec7-4279-bd5b-05eafa1090bf/128.png?v=2",
+  curve: "https://assets.coingecko.com/coins/images/12124/small/Curve.png?1597369484",
+  ellipsis: "https://assets.coingecko.com/coins/images/25444/small/ellipsis-light_%281%29.png?1651786591",
+  rari: "https://assets.coingecko.com/coins/images/12900/small/Rari_Logo_Transparent.png?1613978014",
+  inverse: "https://assets.coingecko.com/coins/images/14205/small/inverse_finance.jpg?1614921871",
+  convex: "https://assets.coingecko.com/coins/images/15585/small/convex.png?1621256328",
+  aurigami: "https://assets.coingecko.com/coins/images/24074/small/EbB5N8IN_400x400.jpg?1646230298",
 };
 
 const subgraphMap: Record<string, string> = {

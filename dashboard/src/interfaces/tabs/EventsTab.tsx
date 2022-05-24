@@ -42,14 +42,17 @@ function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProp
           const message = "No " + eventName + " on pool " + poolId;
           if (issues.filter((x) => x.message === message).length === 0) {
             let level = "warning";
-            if (eventName.toUpperCase() === "DEPOSITS" || eventName.toUpperCase() === "SWAPS") {
+            if (eventName.toUpperCase() === "DEPOSITS") {
               level = "critical";
             }
             issues.push({ message, type: "EVENT", level, fieldName: eventName });
           }
           return (
-            <Box my={3}>
-              <Typography variant="h4">{message}</Typography>
+            <Box key={eventName}>
+              <Typography fontSize={20}>
+                <b>{eventName.toUpperCase()}</b>
+              </Typography>
+              <Typography variant="body1">{message}</Typography>
             </Box>
           );
         }
