@@ -1,14 +1,15 @@
-import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
-import { Strategy, Vault, Withdraw } from "../../generated/schema";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Vault, Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,
   Withdraw as WithdrawEvent,
-} from "../../generated/ExampleStrategy/BeefyStrategy";
+} from "../../generated/ExampleVault/BeefyStrategy";
 import {
   getBeefyFinanceOrCreate,
-  getStrategyOrCreate,
+  getVaultFromStrategyOrCreate,
   getTokenOrCreate,
 } from "../utils/getters";
+import { getUSDPrice } from "../utils/prices";
 
 export function createWithdraw(
   event: WithdrawEvent,
@@ -33,9 +34,11 @@ export function createWithdraw(
   const strategyContract = BeefyStrategy.bind(event.address);
   withdraw.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   withdraw.amount = withdrawnAmount;
-  //TODO: withdraw.amountUSD
+  withdraw.amountUSD = getUSDPrice(
+    getTokenOrCreate(strategyContract.want(), networkSuffix)
+  ).times(new BigDecimal(withdrawnAmount));
 
-  withdraw.strategy = getStrategyOrCreate(
+  withdraw.vault = getVaultFromStrategyOrCreate(
     event.address,
     event.block,
     networkSuffix
@@ -45,11 +48,11 @@ export function createWithdraw(
   return withdraw;
 }
 
-export function getOrCreateFirstWithdraw(strategy: Strategy): Withdraw {
-  let withdraw = Withdraw.load("MockWithdraw");
+export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
+  let withdraw = Withdraw.load("MockWithdraw" + vault.id);
   if (!withdraw) {
     const zeroAddress = "0x0000000000000000000000000000000000000000";
-    withdraw = new Withdraw("MockWithdraw");
+    withdraw = new Withdraw("MockWithdraw" + vault.id);
 
     withdraw.hash = zeroAddress;
     withdraw.logIndex = 0;
@@ -57,13 +60,12 @@ export function getOrCreateFirstWithdraw(strategy: Strategy): Withdraw {
 
     //withdraw.to = zeroAddress;
     //withdraw.from = zeroAddress;
-    withdraw.blockNumber = new BigInt(0);
-    withdraw.timestamp = new BigInt(0);
-    withdraw.asset = zeroAddress;
+    withdraw.blockNumber = vault.createdBlockNumber;
+    withdraw.timestamp = vault.createdTimestamp;
+    withdraw.asset = vault.inputToken;
     withdraw.amount = new BigInt(0);
-    //withdraw.amountUSD = new BigDecimal(new BigInt(0));
-    //withdraw.vault = vault.id;}
-    withdraw.strategy = strategy.id;
+    withdraw.amountUSD = new BigDecimal(new BigInt(0));
+    withdraw.vault = vault.id;
 
     withdraw.save();
   }

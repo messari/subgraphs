@@ -1,3 +1,24 @@
+# Subgraph Schema: Yield Aggregator
+# Version: 1.2.1
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+
+enum Network {
+  ARBITRUM_ONE
+  AURORA
+  AVALANCHE
+  BSC # aka BNB Chain
+  CELO
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
+}
+
 enum ProtocolType {
   EXCHANGE
   LENDING
@@ -48,10 +69,10 @@ interface Protocol {
   subgraphVersion: String!
 
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
-  methodologyVersion: String!
+  methodologyVersion: String
 
-  #" The blockchain network this subgraph is indexing on "
-  #network: Network!
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
 
   " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
@@ -107,10 +128,10 @@ type YieldAggregator implements Protocol @entity {
   subgraphVersion: String!
 
   " Version of the methodology used to compute metrics, loosely based on SemVer format (e.g. 1.0.0) "
-  methodologyVersion: String!
+  methodologyVersion: String
 
-  #" The blockchain network this subgraph is indexing on "
-  #network: Network!
+  " The blockchain network this subgraph is indexing on "
+  network: Network!
 
   " The type of protocol (e.g. DEX, Lending, Yield, etc) "
   type: ProtocolType!
@@ -153,18 +174,36 @@ type YieldAggregator implements Protocol @entity {
   #vaults: [Vault!]! #@derivedFrom(field: "protocol")
 }
 
-type Strategy @entity {
-  " Smart contract address of the strategy "
+type Vault @entity {
+  " Smart contract address of the Vault "
   id: ID!
 
-  " The protocol this strategy belongs to "
+  " The protocol this Vault belongs to "
   protocol: YieldAggregator!
 
-  " Name of strategy (e.g. Onsen) "
+  " Name of Vault (e.g. Onsen) "
   name: String
 
-  " Symbol of strategy (e.g. ONS) "
+  " Symbol of Vault (e.g. ONS) "
   symbol: String
+
+  " Strategy of the vault "
+  strategy: String
+
+  " Token that need to be deposited to take a position in protocol "
+  inputToken: Token!
+
+  " Token that is minted to track ownership of position in protocol "
+  outputToken: Token
+
+  #" Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  #rewardTokens: [RewardToken!]
+
+  " Some vaults have a deposit cap. This is in input token amount "
+  depositLimit: BigInt
+
+  #" Type of fees incurred to the user. Should include all fees that apply to the vault "
+  #fees: [VaultFee!] #!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -172,24 +211,46 @@ type Strategy @entity {
   " Creation block number "
   createdBlockNumber: BigInt!
 
-  #" Vault associated to the strategy "
-  #vault: Vault!
-
   ##### Quantitative Data #####
 
-  #" Current TVL (Total Value Locked) of this strategy in USD "
+  #" Current TVL (Total Value Locked) of this Vault in USD "
   #totalValueLockedUSD: BigDecimal!
 
-  " Amount of input token in the strategy "
+  " Amount of input token in the Vault "
   inputTokenBalance: BigInt!
 
   " Total supply of output token "
   outputTokenSupply: BigInt
 
-  " All deposits made to this strategy "
+  #" Price per share of output token in USD "
+  #outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
+  pricePerShare: BigInt!
+
+  #" Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  #stakedOutputTokenAmount: BigInt
+
+  #" Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  #rewardTokenEmissionsAmount: [BigInt!]
+
+  #" Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  #rewardTokenEmissionsUSD: [BigDecimal!]
+
+  ##### Snapshots #####
+
+  #" Vault daily snapshots "
+  #dailySnapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
+
+  #" Vault hourly snapshots "
+  #hourlySnapshots: [VaultHourlySnapshot!]! @derivedFrom(field: "vault")
+
+  ##### Events #####
+
+  " All deposits made to this Vault "
   deposits: [Deposit!]!
 
-  " All withdrawals made from this strategy "
+  " All withdrawals made from this Vault "
   withdraws: [Withdraw!]!
 }
 
@@ -262,14 +323,11 @@ type Deposit implements Event @entity {
   " Amount of token deposited in native units "
   amount: BigInt!
 
-  #" Amount of token deposited in USD "
-  #amountUSD: BigDecimal!
+  " Amount of token deposited in USD "
+  amountUSD: BigDecimal!
 
-  #" The vault involving this transaction "
-  #vault: Vault!
-
-  " The strategy this deposit belongs to "
-  strategy: Strategy!
+  " The vault involving this transaction "
+  vault: Vault!
 }
 
 type Withdraw implements Event @entity {
@@ -303,17 +361,9 @@ type Withdraw implements Event @entity {
   " Amount of token withdrawn in native units "
   amount: BigInt!
 
-  #" Amount of token withdrawn in USD "
-  #amountUSD: BigDecimal!
+  " Amount of token withdrawn in USD "
+  amountUSD: BigDecimal!
 
-  #" The vault involving this transaction "
-  #vault: Vault!
-
-  " The strategy this deposit belongs to "
-  strategy: Strategy!
-}
-
-type Vault @entity {
-  " Address of the vault "
-  id: ID!
+  " The vault involving this transaction "
+  vault: Vault!
 }

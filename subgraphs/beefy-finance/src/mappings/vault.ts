@@ -1,60 +1,105 @@
-import { BigInt, Address } from "@graphprotocol/graph-ts";
+import { BigDecimal, Address } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault } from "../../generated/schema";
 import {
-  UpgradeStrat,
-  BeefyVault,
-} from "../../generated/templates/BeefyVault/BeefyVault";
+  BeefyStrategy,
+  Deposit,
+  Withdraw,
+} from "../../generated/ExampleVault/BeefyStrategy";
+import { BeefyVault } from "../../generated/ExampleVault/BeefyVault";
 import {
+  getBeefyFinanceOrCreate,
   getTokenOrCreate,
-  getStrategyOrCreate,
-  getVaultOrCreate,
+  getVaultFromStrategyOrCreate,
 } from "../utils/getters";
-import { createFirstDeposit } from "./deposit";
-import { createFirstWithdraw } from "./withdraw";
+import { getAddressFromId } from "../utils/helpers";
+import { createDeposit, getOrCreateFirstDeposit } from "./deposit";
+import { createWithdraw, getOrCreateFirstWithdraw } from "./withdraw";
 
 const NETWORK_SUFFIX: string = "-137";
 
-function handleUpgradeStrat(event: UpgradeStrat): void {
-  const vault = getVaultOrCreate(event.address, event.block, NETWORK_SUFFIX);
+export function createVaultFromStrategy(
+  strategyAddress: Address,
+  currentBlock: ethereum.Block
+): Vault {
+  const strategyContract = BeefyStrategy.bind(strategyAddress);
+  const vaultAddress = strategyContract.vault();
+  let vault = Vault.load(vaultAddress.toHexString() + NETWORK_SUFFIX);
+  if (!vault) {
+    vault = new Vault(vaultAddress.toHexString() + NETWORK_SUFFIX);
+  }
+  const vaultContract = BeefyVault.bind(vaultAddress);
 
-  vault.strategy = getStrategyOrCreate(
-    event.params.implementation,
-    event.block,
+  vault.protocol = getBeefyFinanceOrCreate().id;
+  vault.name = vaultContract.name();
+  vault.symbol = vaultContract.symbol();
+  vault.strategy = strategyAddress.toHexString() + NETWORK_SUFFIX;
+
+  vault.inputToken = getTokenOrCreate(
+    strategyContract.want(),
     NETWORK_SUFFIX
   ).id;
+  vault.outputToken = getTokenOrCreate(vaultAddress, NETWORK_SUFFIX).id;
+
+  vault.createdTimestamp = currentBlock.timestamp;
+  vault.createdBlockNumber = currentBlock.number;
+
+  vault.inputTokenBalance = vaultContract.balance();
+  vault.outputTokenSupply = vaultContract.totalSupply();
+
+  vault.pricePerShare = vaultContract.getPricePerFullShare();
+
+  vault.deposits = [getOrCreateFirstDeposit(vault).id];
+  vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
+
+  vault.save();
+  return vault;
+}
+
+export function handleDeposit(event: Deposit): void {
+  const vault = getVaultFromStrategyOrCreate(
+    event.address,
+    event.block,
+    NETWORK_SUFFIX
+  );
+
+  const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
+  //updateVault(vault);
+  const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
+
+  if (vault.deposits[0] === "MockDeposit" + vault.id) {
+    vault.deposits = [deposit.id];
+  } else {
+    vault.deposits = vault.deposits.concat([deposit.id]);
+  }
 
   vault.save();
 }
 
-export function createVault(
-  vaultAddress: Address,
-  currentBlock: ethereum.Block
-): Vault {
-  const vault = new Vault(vaultAddress.toHexString() + NETWORK_SUFFIX);
-  const vaultContract = BeefyVault.bind(vaultAddress);
-  //add parameters to vault
-  vault.protocol = "Assign BeefyFinance"; //type YieldAggregator
-  vault.name = vaultContract.name();
-  vault.symbol = vaultContract.symbol();
-
-  vault.strategy = getStrategyOrCreate(
-    vaultContract.strategy(),
-    currentBlock,
+export function handleWithdraw(event: Withdraw): void {
+  const vault = getVaultFromStrategyOrCreate(
+    event.address,
+    event.block,
     NETWORK_SUFFIX
-  ).id;
-  vault.inputToken = getTokenOrCreate(vaultContract.want(), NETWORK_SUFFIX).id;
-  vault.outputToken = getTokenOrCreate(vaultAddress, NETWORK_SUFFIX).id;
-  vault.depositLimit = new BigInt(0); //TODO: verify if there is a depositLimit
-  //vault.fees = ["Assign Fee"]; //type [VaultFee] TODO: need to find contract where fees are stored
-  vault.createdTimestamp = currentBlock.timestamp;
-  vault.createdBlockNumber = currentBlock.number;
-  vault.inputTokenBalance = vaultContract.balance();
-  //vault.totalValueLockedUSD = new BigDecimal(new BigInt(0));
+  );
+  const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
 
-  vault.deposits = [createFirstDeposit(vault).id];
-  vault.withdraws = [createFirstWithdraw(vault).id];
+  //updateVault(vault);
+  const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
+
+  if (vault.withdraws[0] === "MockWithdraw" + vault.id) {
+    vault.withdraws = [withdraw.id];
+  } else {
+    vault.withdraws = vault.withdraws.concat([withdraw.id]);
+  }
 
   vault.save();
+}
+
+export function updateVault(vault: Vault): Vault {
+  const vaultContract = BeefyVault.bind(getAddressFromId(vault.id));
+  vault.inputTokenBalance = vaultContract.balance();
+  vault.outputTokenSupply = vaultContract.totalSupply();
+  vault.pricePerShare = vaultContract.getPricePerFullShare();
   return vault;
 }

@@ -8,12 +8,16 @@
     "deploy": "graph deploy --node https://api.thegraph.com/deploy/ beefy-finance",
     "create-local": "graph create --node http://localhost:8020/ beefy-finance",
     "remove-local": "graph remove --node http://localhost:8020/ beefy-finance",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 beefy-finance"
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 beefy-finance",
+    "bootstrap": "node ./bootstrap/bootstrap.js"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.29.2",
     "@graphprotocol/graph-ts": "0.26.0",
-    "ethers": "^5.6.6"
+    "dotenv": "^16.0.1",
+    "ethereum-block-by-date": "^1.4.5",
+    "ethers": "^5.6.8",
+    "write-yaml-file": "^4.2.0"
   },
   "devDependencies": {
     "matchstick-as": "^0.4.3"
