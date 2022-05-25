@@ -1,29 +1,40 @@
-import * as constants from "../common/constants";
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
-import { ChainLinkContract } from "../../../generated/UniswapV2Factory/ChainLinkContract";
+import { ChainlinkOracle } from "../../../generated/ExampleVault/ChainlinkOracle";
+import oracles from "./oracles";
+import { ERC20 } from "../../../generated/ExampleVault/ERC20";
 
-export function getChainLinkContract(network: string): ChainLinkContract {
-  return ChainLinkContract.bind(constants.CHAIN_LINK_CONTRACT_ADDRESS.get(network));
+console.log(oracles[0].address);
+
+export function getChainLinkContract(asset: string, network: string): any {
+  for (let i = 0; i < oracles.length; i++) {
+    if (oracles[i].asset === asset) {
+      return ChainlinkOracle.bind(Address.fromString(oracles[i].address));
+    }
+  }
+  return undefined;
 }
 
-export function getTokenPriceFromChainLink(tokenAddr: Address, network: string): CustomPriceType {
-  const chainLinkContract = getChainLinkContract(network);
+export function getTokenPriceFromChainLink(
+  tokenAddr: Address,
+  network: string
+): CustomPriceType {
+  const tokenContract = ERC20.bind(tokenAddr);
+  const symbol = tokenContract.symbol();
+  const chainLinkContract = getChainLinkContract(symbol, network);
 
   if (!chainLinkContract) {
     return new CustomPriceType();
   }
-
-  let result = chainLinkContract.try_latestRoundData(tokenAddr, constants.CHAIN_LINK_USD_ADDRESS);
+  let result = chainLinkContract.try_getLatestRoundData(tokenAddr);
 
   if (!result.reverted) {
-    let decimals = chainLinkContract.try_decimals(tokenAddr, constants.CHAIN_LINK_USD_ADDRESS);
+    const decimals = tokenContract.decimals();
 
-    if (decimals.reverted) {
-      new CustomPriceType();
-    }
-
-    return CustomPriceType.initialize(result.value.value1.toBigDecimal(), decimals.value);
+    return CustomPriceType.initialize(
+      result.value.value1.toBigDecimal(),
+      decimals
+    );
   }
 
   return new CustomPriceType();

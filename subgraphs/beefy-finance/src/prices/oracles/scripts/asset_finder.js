@@ -14,7 +14,7 @@ async function findAssets() {
   );
 
   let contract, asset, denominator;
-  let oraclesJson = { polygonOracles: [] };
+  let oraclesJson = { polygon: [] };
 
   for (let i = 0; i < oracles.constants.polygonChainLinkOracles.length; i++) {
     contract = new ethers.Contract(
@@ -24,12 +24,13 @@ async function findAssets() {
     );
     [asset, , denominator] = (await contract.description()).split(" ");
     if (denominator === "USD") {
-      oraclesJson.polygonOracles.push(
+      oraclesJson.polygon.push(
         oracleTemplate(
           oracles.constants.polygonChainLinkOracles[i].toString(),
           asset
         )
       );
+      console.log("saving data for " + asset + " oracle");
     }
   }
   fs.writeFileSync(

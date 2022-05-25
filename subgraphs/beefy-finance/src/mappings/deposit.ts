@@ -9,7 +9,7 @@ import {
   getVaultFromStrategyOrCreate,
   getTokenOrCreate,
 } from "../utils/getters";
-import { getUSDPrice } from "../utils/prices";
+import { getLastPriceUSD } from "./token";
 
 export function createDeposit(
   event: DepositEvent,
@@ -34,9 +34,9 @@ export function createDeposit(
   const strategyContract = BeefyStrategy.bind(event.address);
   deposit.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   deposit.amount = depositedAmount;
-  deposit.amountUSD = getUSDPrice(
-    getTokenOrCreate(strategyContract.want(), networkSuffix)
-  ).times(new BigDecimal(depositedAmount));
+  deposit.amountUSD = getLastPriceUSD(strategyContract.want()).times(
+    new BigDecimal(depositedAmount)
+  );
 
   deposit.vault = getVaultFromStrategyOrCreate(
     event.address,
