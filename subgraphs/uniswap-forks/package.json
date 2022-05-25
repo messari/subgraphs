@@ -1,0 +1,26 @@
+{
+  "name": "apeswap",
+  "license": "MIT",
+  "type": "module",
+
+
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+
+    "prepare:yaml": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/${npm_config_protocol}/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/configure.template.ts > config/configure.ts",
+    "prepare:build": "yarn codegen && yarn build",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+
+    "deploy": "node --experimental-json-modules deployment/deployment.js"
+
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.28.0",
+    "@graphprotocol/graph-ts": "0.26.0"
+  },
+  "devDependencies": {
+    "mustache": "^3.1.0"
+  }
+}

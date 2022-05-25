@@ -1,0 +1,13 @@
+{
+  "startBlock": "2918231",
+  "network": "fantom",
+
+  "BentoBoxAddress": "0xF5BCE5077908a1b7370B9ae04AdC565EBd643966",
+  "DegenBoxEnabled": true,
+  "DegenBoxAddress": "0x74A0BcA2eeEdf8883cb91E37e9ff49430f20a616",
+  "DegenBoxStartBlock": "17010677",
+  "SpellEnabled": true,
+  "SpellAddress": "0x468003B688943977e6130F4F68F23aad939a1040",
+  "SpellStartBlock": "16717812",
+  "OffchainAggregatorEnabled": false
+}

@@ -1,0 +1,46 @@
+{
+  "chain": "mainnet",
+  "miniChef": {
+    "address": "0x691ef79e40d909C715BE5e9e93738B3fF7D58534",
+    "startBlock": 13625116
+  },
+  "pools": [
+    {
+      "name": "BTCv1",
+      "address": "0x4f6A43Ad7cba042606dECaCA730d4CE0A57ac62e",
+      "startBlock": 11685571
+    },
+    {
+      "name": "wCUSDv1",
+      "address": "0x3F1d224557afA4365155ea77cE4BC32D5Dae2174",
+      "startBlock": 13156995
+    },
+    {
+      "name": "sUSDv1",
+      "address": "0x0C8BAe14c9f9BF2c953997C881BEfaC7729FD314",
+      "startBlock": 12912720
+    },
+    {
+      "name": "sUSDv2",
+      "address": "0x824dcD7b044D60df2e89B1bB888e66D8BCf41491",
+      "startBlock": 13806669
+    }
+  ],
+  "deployers": [
+    {
+      "name": "tBTCv2Deployer",
+      "address": "0xF6C2e0aDc659007Ba7c48446F5A4e4E94dfe08b5",
+      "startBlock": 13130166
+    },
+    {
+      "name": "USDDeployer",
+      "address": "0x29FD31d37AB8D27f11EAB68F96424bf64231fFce",
+      "startBlock": 12064255
+    },
+    {
+      "name": "alETHDeployer",
+      "address": "0x7003102c75587E8D29c56124060463Ef319407D0",
+      "startBlock": 12634667
+    }
+  ]
+}

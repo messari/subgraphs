@@ -1,0 +1,10 @@
+{
+  "deployment": "APESWAP_MATIC",
+  "network": "matic",
+  "address": "0xCf083Be4164828f00cAE704EC15a36D711491284",
+  "startBlock": 15298800,
+  "masterChefAddress": "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd",
+  "masterChefV2Address": "0x54aff400858Dcac39797a81894D9920f16972D1D",
+  "masterChefStartBlock": 15550194,
+  "masterChefV2StartBlock": 15797921
+}
