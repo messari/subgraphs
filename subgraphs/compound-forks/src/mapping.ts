@@ -950,9 +950,10 @@ export function snapshotFinancials(
     let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
     if (!marketDailySnapshot) {
       // this is okay - no MarketDailySnapshot means no transactions in that market during that day
-      log.warning("[snapshotFinancials] MarketDailySnapshot not found (ie, no transactions in that market during this day): {}", [
-        marketDailySnapshotID,
-      ]);
+      log.warning(
+        "[snapshotFinancials] MarketDailySnapshot not found (ie, no transactions in that market during this day): {}",
+        [marketDailySnapshotID]
+      );
       continue;
     }
     dailyDepositUSD = dailyDepositUSD.plus(marketDailySnapshot.dailyDepositUSD);
