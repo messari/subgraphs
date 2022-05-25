@@ -1,4 +1,9 @@
-import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
+import {
+  SushiSwapPair as SushiSwapPairContract,
+  SushiSwapPair__getReservesResult,
+} from "../../generated/bBadger/SushiSwapPair";
+import * as utils from "../utils/contracts";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import * as constants from "./common/constants";
@@ -6,7 +11,10 @@ import { CustomPriceType } from "./common/types";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getCurvePriceUsdc } from "./routers/CurveRouter";
-import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
+import {
+  getPriceFromRouterUsdc,
+  getPriceUsdc as getPriceUsdcSushiswap,
+} from "./routers/SushiSwapRouter";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
@@ -104,3 +112,25 @@ export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal 
 
   return constants.BIGDECIMAL_ZERO;
 }
+// function getSushiLPTokenPrice(tokenAddr: Address) {
+//   // bitcoin price
+//   // slp total reserves of token 0
+//   // slp total supply
+//   let bitcoinPrice = getPriceFromRouterUsdc(
+//     Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"),
+//     dataSource.network(),
+//   );
+//   const sushiswapPair = SushiSwapPairContract.bind(tokenAddr);
+
+//   let reserves = utils.readValue<SushiSwapPair__getReservesResult>(
+//     sushiswapPair.try_getReserves(),
+//     constants.SUSHISWAP_DEFAULT_RESERVE_CALL,
+//   );
+//   let reserve0 = reserves.value0
+//     .toBigDecimal()
+//     .div(.BIGINT_TEN.pow(18 as u8))
+//     .toBigDecimal();
+
+
+//   let totalSupply = utils.readValue<BigInt>(sushiswapPair.try_totalSupply(), constants.BIGINT_ZERO);
+// }

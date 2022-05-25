@@ -83,6 +83,7 @@ function updateProtocolMetrics(block: ethereum.Block): void {
     let vault = Vault.load(vaultId);
 
     if (vault) {
+      // TODO: update token price for each vault
       totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
     }
   }

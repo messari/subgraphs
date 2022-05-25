@@ -125,10 +125,13 @@ export function getLpTokenPriceUsdc(tokenAddress: Address, network: string): Cus
     constants.DEFAULT_DECIMALS.toI32() as u8,
   );
 
+  // total liquidity = 39 * 2 * price of wbtc
+  // price per token = liquidity * 10^18 / total supply
   let pricePerLpTokenUsdc = totalLiquidity.usdPrice
     .times(constants.BIGINT_TEN.pow(pairDecimals as u8).toBigDecimal())
     .div(totalSupply.toBigDecimal());
 
+  //5784037712100085
   log.warning("[SUSHI] lp token price usdc token {} price {}", [
     tokenAddress.toHex(),
     pricePerLpTokenUsdc.toString(),
@@ -154,10 +157,6 @@ export function getLpTokenTotalLiquidityUsdc(
     return new CustomPriceType();
   }
 
-  if (token1Address == Address.fromString("0xc4E15973E6fF2A35cC804c2CF9D2a1b817a8b40F")) {
-    token1Address = wbtcAddress;
-  }
-
   let token0Decimals = utils.getTokenDecimals(token0Address);
   let token1Decimals = utils.getTokenDecimals(token1Address);
 
@@ -166,13 +165,18 @@ export function getLpTokenTotalLiquidityUsdc(
     constants.SUSHISWAP_DEFAULT_RESERVE_CALL,
   );
 
+  if (token1Address == Address.fromString("0xc4E15973E6fF2A35cC804c2CF9D2a1b817a8b40F")) {
+    // reserves.value1 = reserves.value1.times(BIGINT_TEN.pow(10));
+    token1Address = wbtcAddress;
+  }
+
   let token0Price = getPriceUsdc(token0Address, network);
   let token1Price = getPriceUsdc(token1Address, network);
 
   /**
-    token0 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599 
+    token0 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599 wbtc 
     token1 0xc4e15973e6ff2a35cc804c2cf9d2a1b817a8b40f 
-    token0price 57225543954 
+    token0price 57,225,543,954 
     token1price 0 
     token0revert false 
     token1revert true
@@ -195,6 +199,11 @@ export function getLpTokenTotalLiquidityUsdc(
 
   let reserve0 = reserves.value0;
   let reserve1 = reserves.value1;
+
+  log.warning("[SUSHI] reserves reserv0 {} reserve1 {}", [
+    reserve0.toString(),
+    reserve1.toString(),
+  ]);
 
   if (reserve0.notEqual(constants.BIGINT_ZERO) || reserve1.notEqual(constants.BIGINT_ZERO)) {
     let liquidity0 = reserve0
