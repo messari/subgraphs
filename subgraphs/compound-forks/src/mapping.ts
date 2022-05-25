@@ -248,7 +248,7 @@ export function _handleActionPaused(event: ActionPaused1): void {
   let marketID = event.params.cToken.toHexString();
   let market = Market.load(marketID);
   if (!market) {
-    log.warning("[handleMint] Market not found: {}", [marketID]);
+    log.warning("[handleActionPaused] Market not found: {}", [marketID]);
     return;
   }
 
@@ -950,7 +950,7 @@ export function snapshotFinancials(
     let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
     if (!marketDailySnapshot) {
       // this is okay - no MarketDailySnapshot means no transactions in that market during that day
-      log.warning("[snapshotFinancials] MarketDailySnapshot not found: {}", [
+      log.warning("[snapshotFinancials] MarketDailySnapshot not found (ie, no transactions in that market during this day): {}", [
         marketDailySnapshotID,
       ]);
       continue;
@@ -1365,10 +1365,6 @@ export function updateProtocol(comptrollerAddr: Address): void {
     );
   }
 
-  log.warning("previous Rev: ${} new revenue: ${}", [
-    protocol.cumulativeTotalRevenueUSD.toString(),
-    cumulativeTotalRevenueUSD.toString(),
-  ]);
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
@@ -1414,8 +1410,6 @@ export function _getOrCreateProtocol(
     protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
-
-    protocol._priceOracle = "";
     protocol._marketIDs = [];
 
     // set liquidation incentive
@@ -1434,6 +1428,7 @@ export function _getOrCreateProtocol(
 
     if (protocolData.oracleResult.reverted) {
       log.warning("[getOrCreateProtocol] oracleResult reverted", []);
+      protocol._priceOracle = "";
     } else {
       protocol._priceOracle = protocolData.oracleResult.value.toHexString();
     }
