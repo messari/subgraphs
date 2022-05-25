@@ -328,6 +328,7 @@ export const schema120 = (): Schema => {
 
   const entitiesData = {
     financialsDailySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       protocolControlledValueUSD: "BigDecimal",
       dailyVolumeUSD: "BigDecimal!",
@@ -341,8 +342,9 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
-      dailyActiveUsers: "Int!",
+      id: "ID!",
       cumulativeUniqueUsers: "Int!",
+      dailyActiveUsers: "Int!",
       dailyTransactionCount: "Int!",
       dailyDepositCount: "Int!",
       dailyWithdrawCount: "Int!",
@@ -350,6 +352,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     liquidityPoolDailySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       dailyVolumeUSD: "BigDecimal!",
       dailyVolumeByTokenAmount: "[BigInt!]!",
@@ -365,8 +368,9 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
-      hourlyActiveUsers: "Int!",
+      id: "ID!",
       cumulativeUniqueUsers: "Int!",
+      hourlyActiveUsers: "Int!",
       hourlyTransactionCount: "Int!",
       hourlyDepositCount: "Int!",
       hourlyWithdrawCount: "Int!",
@@ -374,6 +378,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     liquidityPoolHourlySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       hourlyVolumeUSD: "BigDecimal!",
       hourlyVolumeByTokenAmount: "[BigInt!]!",
@@ -459,6 +464,8 @@ export const schema120 = (): Schema => {
       deployment
     }
     protocols {
+      id
+      methodologyVersion
       name
       type
       schemaVersion
