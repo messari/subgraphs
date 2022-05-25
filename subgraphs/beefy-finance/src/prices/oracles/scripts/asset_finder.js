@@ -1,5 +1,49 @@
 const oracles = require("../ChainLinkAddresses");
+const ethers = require("ethers");
+const chainLinkAbi = require("../../../../abis/Chainlink.json");
+const fs = require("fs");
+require("dotenv").config();
 
-for (let i = 0; i < oracles.polygonChainLinkOracles.length; i++) {
-  console.log(oracles.polygonChainLinkOracles[i]);
+async function findAssets() {
+  const provider = new ethers.providers.JsonRpcProvider(
+    process.env.ALCHEMY_POLYGON
+  );
+  const signer = new ethers.Wallet(
+    process.env.TEST_PRIVATE_KEY || "",
+    provider
+  );
+
+  let contract, asset, denominator;
+  let oraclesJson = { polygonOracles: [] };
+
+  for (let i = 0; i < oracles.constants.polygonChainLinkOracles.length; i++) {
+    contract = new ethers.Contract(
+      oracles.constants.polygonChainLinkOracles[i],
+      chainLinkAbi,
+      signer
+    );
+    [asset, , denominator] = (await contract.description()).split(" ");
+    if (denominator === "USD") {
+      oraclesJson.polygonOracles.push(
+        oracleTemplate(
+          oracles.constants.polygonChainLinkOracles[i].toString(),
+          asset
+        )
+      );
+    }
+  }
+  fs.writeFileSync(
+    "./src/prices/oracles/oracles.json",
+    JSON.stringify(oraclesJson)
+  );
 }
+
+function oracleTemplate(address, asset) {
+  template = {
+    asset: asset,
+    address: address,
+  };
+  return template;
+}
+
+findAssets();

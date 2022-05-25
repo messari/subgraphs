@@ -1,268 +1,123 @@
 [
     {
-        "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
                 "internalType": "address",
-                "name": "token",
+                "name": "_aggregator",
                 "type": "address"
             },
             {
-                "indexed": false,
-                "internalType": "bool",
-                "name": "direct",
-                "type": "bool"
+                "internalType": "address",
+                "name": "_accessController",
+                "type": "address"
             }
         ],
-        "name": "SetDirectTokenMap",
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "int256",
+                "name": "current",
+                "type": "int256"
+            },
+            {
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "roundId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
+            }
+        ],
+        "name": "AnswerUpdated",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "tokens",
-                "type": "address[]"
+                "indexed": true,
+                "internalType": "uint256",
+                "name": "roundId",
+                "type": "uint256"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "startedBy",
+                "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "bool",
-                "name": "direct",
-                "type": "bool"
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
             }
         ],
-        "name": "SetDirectTokenMaps",
+        "name": "NewRound",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
+                "indexed": true,
                 "internalType": "address",
-                "name": "token",
+                "name": "from",
                 "type": "address"
             },
             {
-                "indexed": false,
+                "indexed": true,
                 "internalType": "address",
-                "name": "chainlink",
+                "name": "to",
                 "type": "address"
             }
         ],
-        "name": "SetTokenChainlinkMap",
+        "name": "OwnershipTransferRequested",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "tokens",
-                "type": "address[]"
+                "indexed": true,
+                "internalType": "address",
+                "name": "from",
+                "type": "address"
             },
             {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "chainlinks",
-                "type": "address[]"
+                "indexed": true,
+                "internalType": "address",
+                "name": "to",
+                "type": "address"
             }
         ],
-        "name": "SetTokenChainlinkMaps",
+        "name": "OwnershipTransferred",
         "type": "event"
     },
     {
         "inputs": [],
-        "name": "admin",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "bnbToUsdPriceOracle",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "name": "directTokenMap",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "ethToUsdPriceOracle",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-            }
-        ],
-        "name": "get",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-            }
-        ],
-        "name": "getChainLinkPrice",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-            }
-        ],
-        "name": "getLatestRoundData",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address[]",
-                "name": "tokens",
-                "type": "address[]"
-            }
-        ],
-        "name": "gets",
-        "outputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "uint256",
-                        "name": "px",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "updatedAt",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct ChainlinkWrapper.ChainlinkPrice[]",
-                "name": "",
-                "type": "tuple[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_multiSig",
-                "type": "address"
-            }
-        ],
-        "name": "initialize",
+        "name": "acceptOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-            }
-        ],
-        "name": "isEthOrBnB",
+        "inputs": [],
+        "name": "accessController",
         "outputs": [
             {
-                "internalType": "bool",
+                "internalType": "contract AccessControllerInterface",
                 "name": "",
-                "type": "bool"
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -270,7 +125,7 @@
     },
     {
         "inputs": [],
-        "name": "multiSig",
+        "name": "aggregator",
         "outputs": [
             {
                 "internalType": "address",
@@ -285,21 +140,94 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "",
+                "name": "_aggregator",
                 "type": "address"
             }
         ],
-        "name": "prices",
+        "name": "confirmAggregator",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "decimals",
         "outputs": [
             {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "description",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "uint256",
-                "name": "price",
+                "name": "_roundId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getAnswer",
+        "outputs": [
+            {
+                "internalType": "int256",
+                "name": "",
+                "type": "int256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint80",
+                "name": "_roundId",
+                "type": "uint80"
+            }
+        ],
+        "name": "getRoundData",
+        "outputs": [
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            },
+            {
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "startedAt",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
-                "name": "expiration",
+                "name": "updatedAt",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
             }
         ],
         "stateMutability": "view",
@@ -308,136 +236,97 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "_admin",
-                "type": "address"
+                "internalType": "uint256",
+                "name": "_roundId",
+                "type": "uint256"
             }
         ],
-        "name": "setAdmin",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
+        "name": "getTimestamp",
+        "outputs": [
             {
-                "internalType": "address",
-                "name": "_bnbToUsdPriceOracle",
-                "type": "address"
-            }
-        ],
-        "name": "setBnbToUsdPriceOracle",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-            },
-            {
-                "internalType": "bool",
-                "name": "direct",
-                "type": "bool"
-            }
-        ],
-        "name": "setDirectTokenMap",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address[]",
-                "name": "tokens",
-                "type": "address[]"
-            },
-            {
-                "internalType": "bool",
-                "name": "direct",
-                "type": "bool"
-            }
-        ],
-        "name": "setDirectTokenMaps",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_ethToUsdPriceOracle",
-                "type": "address"
-            }
-        ],
-        "name": "setEthToUsdPriceOracle",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_multiSig",
-                "type": "address"
-            }
-        ],
-        "name": "setMultiSig",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "token",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "chainlink",
-                "type": "address"
-            }
-        ],
-        "name": "setTokenChainlinkMap",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address[]",
-                "name": "tokens",
-                "type": "address[]"
-            },
-            {
-                "internalType": "address[]",
-                "name": "chainlinks",
-                "type": "address[]"
-            }
-        ],
-        "name": "setTokenChainlinkMaps",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
+                "internalType": "uint256",
                 "name": "",
-                "type": "address"
+                "type": "uint256"
             }
         ],
-        "name": "tokenChainlinkMap",
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestAnswer",
+        "outputs": [
+            {
+                "internalType": "int256",
+                "name": "",
+                "type": "int256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestRound",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestRoundData",
+        "outputs": [
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            },
+            {
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "latestTimestamp",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
         "outputs": [
             {
                 "internalType": "address",
@@ -449,7 +338,172 @@
         "type": "function"
     },
     {
-        "stateMutability": "payable",
-        "type": "receive"
+        "inputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "name": "phaseAggregators",
+        "outputs": [
+            {
+                "internalType": "contract AggregatorV2V3Interface",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "phaseId",
+        "outputs": [
+            {
+                "internalType": "uint16",
+                "name": "",
+                "type": "uint16"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_aggregator",
+                "type": "address"
+            }
+        ],
+        "name": "proposeAggregator",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "proposedAggregator",
+        "outputs": [
+            {
+                "internalType": "contract AggregatorV2V3Interface",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint80",
+                "name": "_roundId",
+                "type": "uint80"
+            }
+        ],
+        "name": "proposedGetRoundData",
+        "outputs": [
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            },
+            {
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "proposedLatestRoundData",
+        "outputs": [
+            {
+                "internalType": "uint80",
+                "name": "roundId",
+                "type": "uint80"
+            },
+            {
+                "internalType": "int256",
+                "name": "answer",
+                "type": "int256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "startedAt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "updatedAt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint80",
+                "name": "answeredInRound",
+                "type": "uint80"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_accessController",
+                "type": "address"
+            }
+        ],
+        "name": "setController",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "version",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
 ]
