@@ -93,8 +93,8 @@ export function getOrCreatePair(address: string): Token {
     let symbol = erc20Contract.try_symbol();
     // TODO: add overrides for name and symbol
     token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
+    token.name = name.reverted ? "Ubeswap LP Token" : name.value;
+    token.symbol = symbol.reverted ? "ULP" : symbol.value;
     token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
