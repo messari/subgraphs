@@ -35,3 +35,8 @@ export function getUSDPriceOfOutputToken(
   );
   return tokenPrice.times(ratio);
 }
+
+// export function getPriceForLPToken(lpToken: Token): BigDecimal {
+
+//   return new BigDecimal(0);
+// }
