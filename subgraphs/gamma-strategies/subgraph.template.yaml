@@ -23,10 +23,19 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
+        - YieldAggregator
         - Account
+        - ActiveAccount
         - Deposit
         - Withdraw
         - Vault
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - FinancialsDailySnapshot
+        - _UnderlyingToken
+        - _Rebalance
       abis:
         - name: Hypervisor
           file: ./abis/Hypervisor.json
@@ -93,7 +102,11 @@ dataSources:
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
+        - YieldAggregator
         - Vault
+        - VaultFee
+        - Token
+        - _UnderlyingToken
       abis:
         - name: HypeRegistry
           file: ./abis/HypeRegistry.json
@@ -121,10 +134,19 @@ templates:
       language: wasm/assemblyscript
       file: ./src/mappings/handlers.ts
       entities:
+        - YieldAggregator
         - Account
+        - ActiveAccount
         - Deposit
         - Withdraw
         - Vault
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - FinancialsDailySnapshot
+        - _UnderlyingToken
+        - _Rebalance
       abis:
         - name: Hypervisor
           file: ./abis/Hypervisor.json

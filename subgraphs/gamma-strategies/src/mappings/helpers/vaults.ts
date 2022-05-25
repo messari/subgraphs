@@ -8,6 +8,7 @@ import { Vault, VaultFee, _UnderlyingToken } from "../../../generated/schema";
 import { Hypervisor as HypervisorContract } from "../../../generated/templates/Hypervisor/Hypervisor";
 import {
   BIGINT_MAX,
+  BIGINT_ONE,
   BIGINT_ZERO,
   PROTOCOL_PERFORMANCE_FEE,
   REGISTRY_ADDRESS_MAP,
@@ -64,12 +65,12 @@ export function getOrCreateVault(
     vault.inputToken = vaultId;
     vault.outputToken = vaultId;
     vault.rewardTokens = null;
-    vault.depositLimit = BIGINT_MAX;
+    vault.depositLimit = BIGINT_MAX.minus(BIGINT_ONE);
     vault.createdTimestamp = block.timestamp;
     vault.createdBlockNumber = block.number;
     vault.totalValueLockedUSD = BigDecimal.zero();
     vault.inputTokenBalance = BIGINT_ZERO;
-    vault.outputTokenSupply = hypeContract.totalSupply();
+    vault.outputTokenSupply = BIGINT_ZERO;
     vault.outputTokenPriceUSD = BigDecimal.zero();
     vault.pricePerShare = null;
     vault.stakedOutputTokenAmount = null;
