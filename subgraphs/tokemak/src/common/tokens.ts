@@ -25,22 +25,30 @@ export function getOrCreateToken(address: Address): Token {
 
 export function getOrCreateRewardToken(address: Address): RewardToken {
   let id = address.toHexString();
-  let token = RewardToken.load(id);
-  if (!token) {
-    token = new RewardToken(id);
-    let erc20Contract = ERC20Contract.bind(address);
-    let decimals = erc20Contract.try_decimals();
-    // Using try_cause some values might be missing
-    let name = erc20Contract.try_name();
-    let symbol = erc20Contract.try_symbol();
-    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
+  let rewardToken = RewardToken.load(id);
 
-    token.name = name.reverted ? "" : name.value;
-    token.symbol = symbol.reverted ? "" : symbol.value;
+  if (!rewardToken) {
+    let token = getOrCreateToken(address);
+    rewardToken = new RewardToken(id);
 
-    token.type = RewardTokenType.DEPOSIT;
+    rewardToken.token = token.id;
+    rewardToken.type = RewardTokenType.DEPOSIT;
 
+    rewardToken.save();
+  }
+  return rewardToken as RewardToken;
+}
+
+export function createRewardTokens(): RewardToken {
+  const address = Address.fromString(TOKE_ADDRESS);
+  const rewardToken = getOrCreateRewardToken(address);
+
+  // Values if TOKE token is not deployed yet
+  const token = getOrCreateToken(Address.fromString(rewardToken.token));
+  if (token.name === "") {
+    token.name = TOKE_NAME;
+    token.symbol = TOKE_SYMBOL;
     token.save();
   }
-  return token as RewardToken;
+  return rewardToken;
 }

@@ -72,7 +72,7 @@ export function fetchTokenDecimals(tokenAddress: Address): i32 {
   let decimalResult = contract.try_decimals();
   if (!decimalResult.reverted) {
     let decimalValue = decimalResult.value;
-    return decimalValue as i32;
+    return decimalValue.toI32();
   }
 
   // try with the static definition
