@@ -2,20 +2,21 @@ import {
   BigInt,
   ethereum,
   Address,
-  log,
 } from "@graphprotocol/graph-ts";
-import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
-import { StakeCall } from "../../../../generated/templates/StakingRewards/StakingRewards";
+import { LiquidityPool, Token, _HelperStore } from "../../../../generated/schema";
+import { UniswapV2Pair } from "../../../../generated/templates/StakingRewards/UniswapV2Pair";
 import {
   INT_ZERO,
-  DEFAULT_DECIMALS
+  DEFAULT_DECIMALS,
+  BIGINT_ZERO,
+  BIGDECIMAL_ZERO
 } from "../../constants";
 import { getOrCreateToken } from "../../getters";
 import {
   findNativeTokenPerToken,
   updateNativeTokenPriceInUSD,
 } from "../../price/price";
-import { convertTokenToDecimal, exponentToBigDecimal } from "../../utils/utils";
+import { convertTokenToDecimal } from "../../utils/utils";
 
 export function handleStakedImpl(
   event: ethereum.Event,
@@ -26,7 +27,7 @@ export function handleStakedImpl(
   if (!pool) {
     return;
   }
-  let stakeToken = getOrCreateToken(pool.inputTokens[0]);
+  let stakeToken = getOrCreatePair(pool.inputTokens[0]);
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
   pool.inputTokenBalances[0] = pool.stakedOutputTokenAmount!;
@@ -49,7 +50,7 @@ export function handleWithdrawnImpl(
   if (!pool) {
     return;
   }
-  let stakeToken = getOrCreateToken(pool.inputTokens[0]);
+  let stakeToken = getOrCreatePair(pool.inputTokens[0]);
 
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   pool.inputTokenBalances[0] = pool.stakedOutputTokenAmount!;
@@ -75,9 +76,29 @@ export function handleRewardPaidImpl(
   let rewardToken = getOrCreateToken(pool.rewardTokens![INT_ZERO]);
   rewardToken.lastPriceUSD = findNativeTokenPerToken(rewardToken, nativeToken);
   pool.rewardTokenEmissionsAmount![0] = pool.rewardTokenEmissionsAmount![0].plus(amount);
-  pool.rewardTokenEmissionsUSD![0] = convertTokenToDecimal(pool.rewardTokenEmissionsAmount![0], rewardToken.decimals).plus(rewardToken.lastPriceUSD!);
+  pool.rewardTokenEmissionsUSD![0] = convertTokenToDecimal(pool.rewardTokenEmissionsAmount![0], rewardToken.decimals).times(rewardToken.lastPriceUSD!);
   nativeToken.save();
   rewardToken.save();
   pool.save();
+}
+
+export function getOrCreatePair(address: string): Token {
+  let token = Token.load(address);
+  if (!token) {
+    token = new Token(address);
+    let erc20Contract = UniswapV2Pair.bind(Address.fromString(address));
+    let decimals = erc20Contract.try_decimals();
+    // Using try_cause some values might be missing
+    let name = erc20Contract.try_name();
+    let symbol = erc20Contract.try_symbol();
+    // TODO: add overrides for name and symbol
+    token.decimals = decimals.reverted ? DEFAULT_DECIMALS : decimals.value;
+    token.name = name.reverted ? "" : name.value;
+    token.symbol = symbol.reverted ? "" : symbol.value;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+    token.lastPriceBlockNumber = BIGINT_ZERO;
+    token.save();
+  }
+  return token as Token;
 }
 

@@ -1,5 +1,4 @@
 import {
-  BigDecimal,
   BigInt,
   ethereum,
   Address,
@@ -17,13 +16,13 @@ import {
 } from "../../../../generated/schema";
 import { StakingRewards as StakingRewardsTemplate } from "../../../../generated/templates";
 import {
-  BIGDECIMAL_ONE,
-  BIGDECIMAL_TWO,
+  BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   INT_ZERO,
 } from "../../constants";
-import { getOrCreateDex, getOrCreateToken } from "../../getters";
+import { getOrCreateDex } from "../../getters";
+import { getOrCreatePair } from "./handleReward";
 
 export function handleUpdatePoolWeightImpl(event: ethereum.Event): void {
   const poolManager = PoolManager.bind(event.address);
@@ -55,7 +54,8 @@ export function getOrCreateStackPool(
     pool = new LiquidityPool(poolAddress.toHexString());
     let poolAmounts = new _LiquidityPoolAmount(poolAddress.toHexString());
     pool.name = protocol.name;
-    let LPtoken = getOrCreateToken(stackTokenAddress.toHexString());
+    let LPtoken = getOrCreatePair(stackTokenAddress.toHexString());
+    
     pool.inputTokens = [LPtoken.id];
     pool.name = protocol.name + " " + LPtoken.symbol;
     pool.symbol = LPtoken.symbol;
@@ -65,10 +65,9 @@ export function getOrCreateStackPool(
     pool.outputToken = NetworkConfigs.getRewardToken();
     pool.totalValueLockedUSD = BIGDECIMAL_ZERO;
     pool.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    pool.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
+    pool.inputTokenBalances = [BIGINT_ZERO];
     pool.inputTokenWeights = [
-      BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
-      BIGDECIMAL_ONE.div(BIGDECIMAL_TWO),
+      BIGDECIMAL_HUNDRED 
     ];
     pool.outputTokenSupply = BIGINT_ZERO;
     pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
@@ -86,8 +85,8 @@ export function getOrCreateStackPool(
 
     // create the tracked contract based on the template
     StakingRewardsTemplate.create(poolAddress);
-
     log.warning("StakingRewardsTemplate add : {}",[poolAddress.toHexString()])
+    log.warning("getOrCreateStackPool stackTokenAddress {} LPtoken id {} name {}   symbol {}",[stackTokenAddress.toHexString(),  LPtoken.id,  LPtoken.name ,LPtoken.symbol]);
     LPtoken.save();
     pool.save();
     poolAmounts.save();
