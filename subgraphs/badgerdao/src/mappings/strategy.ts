@@ -3,7 +3,7 @@ import {
   Harvest,
   SetPerformanceFeeGovernanceCall,
   SetWithdrawalFeeCall,
-} from "../../generated/bBadger/Strategy";
+} from "../../generated/bimBTC/Strategy";
 import { Token, Vault, VaultFee, _Strategy } from "../../generated/schema";
 import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, MAX_FEE, VaultFeeType } from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";

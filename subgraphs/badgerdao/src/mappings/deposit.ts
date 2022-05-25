@@ -1,5 +1,5 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { VaultV4 as VaultContract } from "../../generated/bBadger/VaultV4";
+import { VaultV4 as VaultContract } from "../../generated/bimBTC/VaultV4";
 import { Vault } from "../../generated/schema";
 import { BIGINT_TEN, BIGINT_ZERO } from "../constant";
 import { getOrCreateToken } from "../entities/Token";

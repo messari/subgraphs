@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Token, Vault } from "../../generated/schema";
-import { BIGINT_TEN, DEFAULT_DECIMALS } from "../constant";
+import { BIGDECIMAL_ZERO, BIGINT_TEN, BIGINT_ZERO, DEFAULT_DECIMALS } from "../constant";
 import { getUsdPricePerToken } from "../price";
 
 export function getPriceOfStakeToken(
@@ -20,20 +20,14 @@ export function getOrUpdateTokenPrice(
   token: Token,
   block: ethereum.Block,
 ): BigDecimal {
-  // let lastPriceUSD = token.lastPriceUSD as BigDecimal;
-  // let lastPriceBlockNumber = token.lastPriceBlockNumber as BigInt;
+  let tokenAddress = Address.fromString(token.id);
+  let mHBTC = Address.fromString("0x48c59199Da51B7E30Ea200a74Ea07974e62C4bA7");
+  let imbtc = Address.fromString("0x17d8CBB6Bce8cEE970a4027d1198F6700A7a6c24");
 
-  // if (lastPriceUSD.notEqual(BIGDECIMAL_ZERO)) {
-  //   if (lastPriceBlockNumber.equals(block.number)) {
-  //     log.warning("[Oracle] from cache token {} tokenPrice {}", [
-  //       token.id,
-  //       lastPriceUSD.toString(),
-  //     ]);
-  //     return lastPriceUSD as BigDecimal;
-  //   }
-  // }
+  if (tokenAddress == mHBTC || tokenAddress == imbtc) {
+    tokenAddress = Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"); // wbtc
+  }
 
-  // let tokenAddress = Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599")
   let fetchPrice = getUsdPricePerToken(Address.fromString(token.id));
   let inputTokenPrice = !fetchPrice.reverted
     ? fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen)
@@ -46,7 +40,10 @@ export function getOrUpdateTokenPrice(
     block.number.toString(),
   ]);
 
-  token.lastPriceBlockNumber = block.number;
+  // to check when the actual price were caught
+  if (token.lastPriceBlockNumber == BIGINT_ZERO && inputTokenPrice != BIGDECIMAL_ZERO) {
+    token.lastPriceBlockNumber = block.number;
+  }
   token.lastPriceUSD = inputTokenPrice;
   token.save();
 

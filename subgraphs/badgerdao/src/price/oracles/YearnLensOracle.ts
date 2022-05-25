@@ -1,5 +1,5 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { YearnLensContract } from "../../../generated/bBadger/YearnLensContract";
+import { YearnLensContract } from "../../../generated/bimBTC/YearnLensContract";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import * as utils from "../common/utils";

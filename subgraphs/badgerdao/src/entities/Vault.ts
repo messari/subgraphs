@@ -1,17 +1,17 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { Controller } from "../../generated/bBadger/Controller";
-import { Strategy as StrategyContract } from "../../generated/bBadger/Strategy";
-import { VaultV2 as VaultV2Contract } from "../../generated/bBadger/VaultV2";
-import { VaultV4 as VaultContract } from "../../generated/bBadger/VaultV4";
+import { Controller } from "../../generated/bimBTC/Controller";
+import { Strategy as StrategyContract } from "../../generated/bimBTC/Strategy";
+import { VaultV2 as VaultV2Contract } from "../../generated/bimBTC/VaultV2";
+import { VaultV4 as VaultContract } from "../../generated/bimBTC/VaultV4";
 import { Vault, VaultFee, _Strategy } from "../../generated/schema";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import {
-    BIGDECIMAL_HUNDRED,
-    BIGDECIMAL_ZERO,
-    BIGINT_ZERO,
-    MAX_FEE,
-    NULL_ADDRESS,
-    VaultFeeType
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  MAX_FEE,
+  NULL_ADDRESS,
+  VaultFeeType,
 } from "../constant";
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";

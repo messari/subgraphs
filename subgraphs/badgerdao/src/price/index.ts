@@ -1,20 +1,14 @@
-import { Address, BigDecimal, BigInt, dataSource, log } from "@graphprotocol/graph-ts";
-import {
-  SushiSwapPair as SushiSwapPairContract,
-  SushiSwapPair__getReservesResult,
-} from "../../generated/bBadger/SushiSwapPair";
-import * as utils from "../utils/contracts";
+import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
+import { getUsdPriceOfBadgerWbtcToken } from "./custom/BadgerWbtc";
+import { getUsdPriceOfWbtcDiggToken } from "./custom/WbtcDigg";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getCurvePriceUsdc } from "./routers/CurveRouter";
-import {
-  getPriceFromRouterUsdc,
-  getPriceUsdc as getPriceUsdcSushiswap,
-} from "./routers/SushiSwapRouter";
+import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
 
 export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
@@ -24,6 +18,30 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
+
+  // if it is Digg token
+  if (tokenAddr == Address.fromString("0x798D1bE841a82a273720CE31c822C61a67a601C3")) {
+    let wbtcDiggPrice = getUsdPriceOfWbtcDiggToken(tokenAddr, network);
+    if (!wbtcDiggPrice.reverted) {
+      log.warning("[WBTCDIGG] tokenAddress: {}, Price: {}", [
+        tokenAddr.toHexString(),
+        wbtcDiggPrice.usdPrice.div(wbtcDiggPrice.decimalsBaseTen).toString(),
+      ]);
+      return wbtcDiggPrice;
+    }
+  }
+
+  // if it is badger/wbtc token
+  if (tokenAddr == Address.fromString("0x137469B55D1f15651BA46A89D0588e97dD0B6562")) {
+    let badgerWbtcPrice = getUsdPriceOfBadgerWbtcToken(tokenAddr);
+    if (!badgerWbtcPrice.reverted) {
+      log.warning("[BADGERWBTC] tokenAddress: {}, Price: {}", [
+        tokenAddr.toHexString(),
+        badgerWbtcPrice.usdPrice.div(badgerWbtcPrice.decimalsBaseTen).toString(),
+      ]);
+      return badgerWbtcPrice;
+    }
+  }
 
   // 2. ChainLink Feed Registry
   let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
@@ -130,7 +148,6 @@ export function getUsdPrice(tokenAddr: Address, amount: BigDecimal): BigDecimal 
 //     .toBigDecimal()
 //     .div(.BIGINT_TEN.pow(18 as u8))
 //     .toBigDecimal();
-
 
 //   let totalSupply = utils.readValue<BigInt>(sushiswapPair.try_totalSupply(), constants.BIGINT_ZERO);
 // }

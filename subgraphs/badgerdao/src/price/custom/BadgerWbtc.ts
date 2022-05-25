@@ -1,7 +1,7 @@
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { ChainLinkSolo } from "../../../generated/bBadger/ChainLinkSolo";
-import { ERC20 } from "../../../generated/bBadger/ERC20";
-import { PoolContract } from "../../../generated/bBadger/PoolContract";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { ChainLinkSolo } from "../../../generated/bimBTC/ChainLinkSolo";
+import { ERC20 } from "../../../generated/bimBTC/ERC20";
+import { PoolContract } from "../../../generated/bimBTC/PoolContract";
 import {
   BADGER_TOKEN,
   BADGER_WBTC_POOL_CONTRACT,
@@ -49,6 +49,13 @@ export function getUsdPriceOfBadgerWbtcToken(tokenAddress: Address): CustomPrice
   let priceOfToken = totalValueOfPool.div(
     totalLPSupply.toBigDecimal().div(tokenADecimals.toBigDecimal()),
   );
+
+  log.warning("[CUSTOM] price {} tokenA price {} tokenB price {} lp supply {}", [
+    priceOfToken.toString(),
+    tokenAPrice.toString(),
+    tokenBPrice.toString(),
+    totalLPSupply.toString(),
+  ]);
 
   return CustomPriceType.initialize(priceOfToken, 0);
 }

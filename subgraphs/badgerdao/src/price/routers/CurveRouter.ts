@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/bBadger/CurvePoolRegistry";
-import { CurveRegistry as CurveRegistryContract } from "../../../generated/bBadger/CurveRegistry";
+import { CurvePoolRegistry as CurvePoolRegistryContract } from "../../../generated/bimBTC/CurvePoolRegistry";
+import { CurveRegistry as CurveRegistryContract } from "../../../generated/bimBTC/CurveRegistry";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import * as utils from "../common/utils";

@@ -8,4 +8,5 @@ tests/.bin/
 # custom
 mainnet.original.json
 BADGER_WBTC.md
+LOGS.md
 subgraph.yaml

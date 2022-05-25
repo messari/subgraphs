@@ -6,7 +6,7 @@ import {
   DepositForCall,
   WithdrawAllCall,
   WithdrawCall,
-} from "../../generated/bBadger/VaultV4";
+} from "../../generated/bimBTC/VaultV4";
 import { Vault } from "../../generated/schema";
 import { createVault } from "../entities/Vault";
 import { deposit } from "./deposit";

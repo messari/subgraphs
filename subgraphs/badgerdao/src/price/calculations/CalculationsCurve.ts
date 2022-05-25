@@ -1,5 +1,5 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/bBadger/CalculationsCurve";
+import { CalculationsCurve as CalculationsCurveContract } from "../../../generated/bimBTC/CalculationsCurve";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import * as utils from "../common/utils";

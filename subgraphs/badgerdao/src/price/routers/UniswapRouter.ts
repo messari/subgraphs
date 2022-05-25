@@ -1,9 +1,9 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   UniswapPair as UniswapPairContract,
-  UniswapPair__getReservesResult,
-} from "../../../generated/bBadger/UniswapPair";
-import { UniswapRouter as UniswapRouterContract } from "../../../generated/bBadger/UniswapRouter";
+  UniswapPair__getReservesResult
+} from "../../../generated/bimBTC/UniswapPair";
+import { UniswapRouter as UniswapRouterContract } from "../../../generated/bimBTC/UniswapRouter";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import * as utils from "../common/utils";

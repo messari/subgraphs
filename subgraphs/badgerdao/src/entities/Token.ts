@@ -1,5 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { ERC20 } from "../../generated/bBadger/ERC20";
+import { ERC20 } from "../../generated/bimBTC/ERC20";
 import { RewardToken, Token } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, RewardTokenType } from "../constant";
 import { readValue } from "../utils/contracts";

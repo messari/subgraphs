@@ -1,5 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { ChainLinkContract } from "../../../generated/bBadger/ChainLinkContract";
+import { ChainLinkContract } from "../../../generated/bimBTC/ChainLinkContract";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 

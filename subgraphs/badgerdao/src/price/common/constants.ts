@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { SushiSwapPair__getReservesResult } from "../../../generated/bBadger/SushiSwapPair";
-import { UniswapPair__getReservesResult } from "../../../generated/bBadger/UniswapPair";
+import { SushiSwapPair__getReservesResult } from "../../../generated/bimBTC/SushiSwapPair";
+import { UniswapPair__getReservesResult } from "../../../generated/bimBTC/UniswapPair";
 import * as ARBITRUM_ONE from "../config/arbitrum_one";
 import * as FANTOM from "../config/fantom";
 import * as MAINNET from "../config/mainnet";

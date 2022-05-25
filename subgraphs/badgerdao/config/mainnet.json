@@ -2,9 +2,29 @@
   "chain": "mainnet",
   "vaults": [
     {
-      "name": "bBadger",
+      "name": "bimBTC",
+      "address": "0x599D92B453C010b1050d31C364f6ee17E819f193",
+      "startBlock": 12834526
+    },
+    {
+      "name": "bFpMbtcHbtc",
+      "address": "0x26B8efa69603537AC8ab55768b6740b67664D518",
+      "startBlock": 12834617
+    },
+    {
+      "name": "bDigg",
+      "address": "0x7e7E112A68d8D2E221E11047a72fFC1065c38e1a",
+      "startBlock": 11680422
+    },
+    {
+      "name": "bslpWbtcibBTC",
       "address": "0x8a8FFec8f4A0C8c9585Da95D9D97e8Cd6de273DE",
-      "startBlock": 14811907
+      "startBlock": 12383984
+    },
+    {
+      "name": "bcrvBADGER",
+      "address": "0xeC1c717A3b02582A4Aa2275260C583095536b613",
+      "startBlock": 14412299
     }
   ]
 }

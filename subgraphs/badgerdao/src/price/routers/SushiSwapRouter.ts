@@ -2,8 +2,8 @@ import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   SushiSwapPair as SushiSwapPairContract,
   SushiSwapPair__getReservesResult,
-} from "../../../generated/bBadger/SushiSwapPair";
-import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/bBadger/SushiSwapRouter";
+} from "../../../generated/bimBTC/SushiSwapPair";
+import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/bimBTC/SushiSwapRouter";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import * as utils from "../common/utils";
