@@ -14,12 +14,18 @@ const BackBanner = styled("div")`
 `;
 
 interface DashboardHeaderProps {
-  protocolSchemaData: Record<string, any> | undefined;
+  protocolData: Record<string, any> | undefined;
+  protocolId: string;
   subgraphToQueryURL: string;
   schemaVersion: string;
 }
 
-export const DashboardHeader = ({ protocolSchemaData, subgraphToQueryURL, schemaVersion }: DashboardHeaderProps) => {
+export const DashboardHeader = ({
+  protocolData,
+  protocolId,
+  subgraphToQueryURL,
+  schemaVersion,
+}: DashboardHeaderProps) => {
   return (
     <div>
       <BackBanner>
@@ -28,9 +34,10 @@ export const DashboardHeader = ({ protocolSchemaData, subgraphToQueryURL, schema
           Back to Deployments
         </Link>
       </BackBanner>
-      {protocolSchemaData && (
+      {protocolData && (
         <ProtocolInfo
-          protocolSchemaData={protocolSchemaData}
+          protocolData={protocolData}
+          protocolId={protocolId}
           subgraphToQueryURL={subgraphToQueryURL}
           schemaVersion={schemaVersion}
         />

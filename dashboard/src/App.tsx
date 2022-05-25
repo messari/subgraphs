@@ -17,7 +17,7 @@ function App() {
             path="*"
             element={
               <>
-                <DashboardHeader protocolSchemaData={undefined} subgraphToQueryURL="" schemaVersion="" />
+                <DashboardHeader protocolData={undefined} protocolId="" subgraphToQueryURL="" schemaVersion="" />
                 <IssuesDisplay
                   issuesArrayProps={[
                     {

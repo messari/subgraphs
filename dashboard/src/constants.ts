@@ -26,7 +26,12 @@ export const PoolNames: Record<string, string> = {
   LENDING: "markets",
   YIELD: "vaults",
 };
-export const ProtocolTypeEntity: Record<string, string> = {
+export const ProtocolTypeEntityName: Record<string, string> = {
+  EXCHANGE: "dexAmmProtocol",
+  LENDING: "lendingProtocol",
+  YIELD: "yieldAggregator",
+};
+export const ProtocolTypeEntityNames: Record<string, string> = {
   EXCHANGE: "dexAmmProtocols",
   LENDING: "lendingProtocols",
   YIELD: "yieldAggregators",

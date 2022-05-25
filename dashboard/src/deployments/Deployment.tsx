@@ -106,7 +106,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   const { schemaVersion } = protocol ?? {};
 
   useEffect(() => {
-    console.log("DEPLOYMENT ERR?", error, errorIndexing, status, data?.protocols[0]?.name, subgraphName);
+    console.log("DEPLOYMENT ERR?", error, errorIndexing, status, subgraphName);
   }, [error]);
 
   const { schemaOutdated, indexedSuccess } = useMemo(() => {

@@ -45,7 +45,7 @@ export const schema100 = (): Schema => {
     },
   };
   const query = `
-      query Data($poolId: String){
+      query Data($poolId: String, $protocolId: String){
         _meta {
           block {
             number
@@ -57,6 +57,17 @@ export const schema100 = (): Schema => {
           type
           schemaVersion
           subgraphVersion
+        }
+        dexAmmProtocol(id: $protocolId) {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          network
+          type
+          totalUniqueUsers
+          totalValueLockedUSD
         }
         dexAmmProtocols {
           id
@@ -192,7 +203,7 @@ export const schema110 = (): Schema => {
     },
   };
   const query = `
-      query Data($poolId: String){
+      query Data($poolId: String, $protocolId: String){
         _meta {
           block {
             number
@@ -204,6 +215,19 @@ export const schema110 = (): Schema => {
           type
           schemaVersion
           subgraphVersion
+        }
+        dexAmmProtocol(id: $protocolId) {
+          id
+          name
+          slug
+          schemaVersion
+          subgraphVersion
+          methodologyVersion
+          network
+          type
+          totalUniqueUsers
+          totalValueLockedUSD
+          totalVolumeUSD
         }
         dexAmmProtocols {
           id
@@ -228,6 +252,22 @@ export const schema110 = (): Schema => {
         liquidityPools {
           id
           name
+          fees{
+            feePercentage
+            feeType
+          }
+          inputTokens{
+            decimals
+            name
+          }
+          outputToken {
+            id
+            decimals
+          }
+          rewardTokens {
+            id
+          }
+          symbol
         }
         usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
@@ -456,7 +496,7 @@ export const schema120 = (): Schema => {
   });
 
   let query = `
-  query Data($poolId: String){
+  query Data($poolId: String, $protocolId: String){
     _meta {
       block {
         number
@@ -470,6 +510,23 @@ export const schema120 = (): Schema => {
       type
       schemaVersion
       subgraphVersion
+    }
+    dexAmmProtocol(id: $protocolId) {
+      id
+      name
+      slug
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      network
+      type
+      totalValueLockedUSD
+      protocolControlledValueUSD
+      cumulativeVolumeUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      cumulativeUniqueUsers
     }
     dexAmmProtocols {
       id
@@ -491,6 +548,41 @@ export const schema120 = (): Schema => {
     liquidityPools {
       id
       name
+      symbol
+      fees{
+        feePercentage
+        feeType
+      }
+      inputTokens{
+        id
+        decimals
+        name
+        symbol
+      }
+      outputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      rewardTokens {
+        id
+        token {
+          id
+          decimals
+          name
+          symbol
+        }
+      }
+      totalValueLockedUSD
+      cumulativeVolumeUSD
+      inputTokenBalances
+      inputTokenWeights
+      outputTokenSupply
+      outputTokenPriceUSD
+      stakedOutputTokenAmount
+      rewardTokenEmissionsAmount
+      rewardTokenEmissionsUSD
     }
     ${finanQuery}
     ${usageHourlyQuery}

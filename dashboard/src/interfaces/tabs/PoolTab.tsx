@@ -51,16 +51,17 @@ interface PoolTabProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   poolId: string;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  protocolData: { [x: string]: any };
   poolData: { [x: string]: string };
 }
 
-function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: PoolTabProps) {
+function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, protocolData }: PoolTabProps) {
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
 
   // Get the key name of the pool specific to the protocol type (singular and plural)
-  const poolKeySingular = PoolName[data.protocols[0].type];
-  const poolKeyPlural = PoolNames[data.protocols[0].type];
+  const poolKeySingular = PoolName[protocolData.type];
+  const poolKeyPlural = PoolNames[protocolData.type];
 
   const excludedEntities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "usageMetricsHourlySnapshots"];
 
@@ -93,7 +94,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
 
         // For exchange protocols, calculate the baseYield
-        if (data.protocols[0].type === "EXCHANGE") {
+        if (protocolData.type === "EXCHANGE") {
           let value = 0;
           if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
             // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
@@ -180,7 +181,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                 capsEntityFieldName.includes("LIQUIDATEUSD") &&
                 value > timeseriesInstance.totalValueLockedUSD &&
                 issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length ===
-                0
+                  0
               ) {
                 issues.push({
                   type: "LIQ",
@@ -277,9 +278,9 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                     // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
 
                     const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                    if (currentRewardToken?.decimals) {
+                    if (currentRewardToken?.decimals || currentRewardToken?.decimals === 0) {
                       value = convertTokenDecimals(val, currentRewardToken?.decimals);
-                    } else if (currentRewardToken?.token?.decimals) {
+                    } else if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
                       value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
                     } else {
                       value = convertTokenDecimals(val, 18);
@@ -290,7 +291,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                     //Convert emissions amount in USD to APY/APR
                     // total reward emission USD / total staked USD * 100 = reward APR
                     let apr = 0;
-                    if (timeseriesInstance?.totalDepositBalanceUSD && poolKeySingular === "LENDING") {
+                    if (timeseriesInstance?.totalDepositBalanceUSD && protocolData.type === "LENDING") {
                       apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
                     } else {
                       if (
@@ -363,7 +364,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               if (err instanceof Error) {
                 message = err.message;
               }
-              console.log(err)
+              console.log(err);
               issues.push({
                 type: "JS",
                 message: message,
@@ -696,7 +697,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               if (err instanceof Error) {
                 message = err.message;
               }
-              console.log(err)
+              console.log(err);
               if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
                 issues.push({
                   type: "JS",

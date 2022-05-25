@@ -1,9 +1,9 @@
 import { styled } from "../styled";
 import { Typography } from "@mui/material";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -50,6 +50,9 @@ const messagesByLevel = (
       if (issuesArray[x].type === "JS") {
         issuesMsg = `JavaScript Error thrown processing the data for ${issuesArray[x].fieldName}: ${issuesArray[x].message}. Verify that the data is in the expected form. If the data is correct and this error persists, leave a message in the 'Validation-Dashboard' Discord channel.`;
       }
+      if (issuesArray[x].type === "VAL") {
+        issuesMsg = issuesArray[x].message;
+      }
       issuesMsgs.push(<li>{issuesMsg}</li>);
     }
   }
@@ -61,10 +64,12 @@ interface IssuesProps {
 }
 // The issues display function takes the issues object passed in and creates the elements/messages to be rendered
 export const IssuesDisplay = ({ issuesArrayProps }: IssuesProps) => {
-  const [issuesArray, setIssuesArray] = useState(issuesArrayProps);
+  const [issuesArray, setIssuesArray] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
+    [],
+  );
   useEffect(() => {
     setIssuesArray(issuesArrayProps);
-  }, []);
+  }, [issuesArrayProps]);
 
   const criticalIssues = issuesArray.filter((iss) => iss.level === "critical");
   const errorIssues = issuesArray.filter((iss) => iss.level === "error");
