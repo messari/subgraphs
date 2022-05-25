@@ -1365,10 +1365,6 @@ export function updateProtocol(comptrollerAddr: Address): void {
     );
   }
 
-  log.warning("previous Rev: ${} new revenue: ${}", [
-    protocol.cumulativeTotalRevenueUSD.toString(),
-    cumulativeTotalRevenueUSD.toString(),
-  ]);
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
