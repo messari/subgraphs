@@ -47,7 +47,6 @@ import {
   cTokenDecimals,
   cTokenDecimalsBD,
   exponentToBigDecimal,
-  initialExchangeRate,
   InterestRateSide,
   InterestRateType,
   INT_ZERO,
@@ -348,7 +347,7 @@ export function _handleMarketListed(
   market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  market.exchangeRate = initialExchangeRate;
+  market.exchangeRate = BIGDECIMAL_ZERO;
   market._cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   market._cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   market._cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
