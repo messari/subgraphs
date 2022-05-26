@@ -56,7 +56,6 @@ export function updateFinancials(event: ethereum.Event): void {
   financialMetrics.save();
 }
 
-// handle unique account overall
 function handleAccount(event: ethereum.Event, user: Address): void {
   let protocol = getOrCreateDexAmm();
   let account = Account.load(user.toHexString());
@@ -69,7 +68,6 @@ function handleAccount(event: ethereum.Event, user: Address): void {
   }
 }
 
-// handle unique account hourly
 function handleHourlyAccount(event: ethereum.Event, user: Address): void {
   let snapshot = getOrCreateHourlyUsageMetricSnapshot(event);
   let hourlyAccountId = user.toHexString() + "-" + (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
@@ -83,7 +81,6 @@ function handleHourlyAccount(event: ethereum.Event, user: Address): void {
   }
 }
 
-// handle unique account daily
 function handleDailyAccount(event: ethereum.Event, user: Address): void {
   let snapshot = getOrCreateDailyUsageMetricSnapshot(event);
   let timestamp = event.block.timestamp.toI64();
@@ -220,23 +217,19 @@ export function calculateSwapFeeInUsd(event: ethereum.Event, poolAddress: Addres
   return tokenAmountToUSDAmount(feeToken, BigInt.fromString(feeInTokenAmount.toString().split(".")[0]));
 }
 
-function updateProtocolAndFinancialSwapVolume(event: ethereum.Event, swap: Swap): void {
-  let protocol = getOrCreateDexAmm();
-  let swapVolumeUsd = calculateSwapVolume(swap);
-  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapVolumeUsd);
-
-  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
-  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(swapVolumeUsd);
-
-  protocol.save();
-  financialMetrics.save();
-  updateFinancials(event);
-}
-
-function updatePoolSwapVolume(event: ethereum.Event, swap: Swap): void {
+function updateSwapVolume(event: ethereum.Event, swap: Swap): void {
   let pool = getOrCreateLiquidityPool(event.address);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(calculateSwapVolume(swap));
   pool.save();
+
+  let protocol = getOrCreateDexAmm();
+  let swapVolumeUsd = calculateSwapVolume(swap);
+  protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(swapVolumeUsd);
+  protocol.save();
+
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  financialMetrics.dailyVolumeUSD = financialMetrics.dailyVolumeUSD.plus(swapVolumeUsd);
+  financialMetrics.save();
 }
 
 export function updateBalancesInPoolAfterSwap(event: ethereum.Event, swap: Swap): void {
@@ -323,21 +316,13 @@ export function updatePoolMetrics(event: ethereum.Event): void {
   updateDailyPoolMetrics(event);
 }
 
-function updateSwapTradingVolumes(event: ethereum.Event, swap: Swap): void {
-  updateProtocolAndFinancialSwapVolume(event, swap);
-  updatePoolSwapVolume(event, swap);
-  updatePoolMetrics(event);
+export function updateSwapMetrics(event: ethereum.Event, swap: Swap): void {
+  updateSwapVolume(event, swap);
   updateHourlyPoolSwapVolume(event, swap);
   updateDailyPoolSwapVolume(event, swap);
 }
 
-export function updateSwapMetrics(event: ethereum.Event, swap: Swap): void {
-  updateBalancesInPoolAfterSwap(event, swap);
-  updateProtocolTVL(event);
-  updateSwapTradingVolumes(event, swap);
-}
-
-function updateProtocolAndFinancialSwapFeeVolumes(event: ethereum.Event, poolAddress: Address, swap: Swap): void {
+export function updateFeeMetrics(event: ethereum.Event, poolAddress: Address, swap: Swap): void {
   let protocol = getOrCreateDexAmm();
   let swapFeeUsd = calculateSwapFeeInUsd(event, poolAddress, swap);
 
@@ -353,8 +338,4 @@ function updateProtocolAndFinancialSwapFeeVolumes(event: ethereum.Event, poolAdd
   snapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   snapshot.save();
-}
-
-export function updateFeeMetrics(event: ethereum.Event, poolAddress: Address, swap: Swap): void {
-  updateProtocolAndFinancialSwapFeeVolumes(event, poolAddress, swap);
 }

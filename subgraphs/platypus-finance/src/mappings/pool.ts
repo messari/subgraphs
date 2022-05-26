@@ -12,31 +12,24 @@ import {
   HaircutRateUpdated,
   AssetAdded,
 } from "../../generated/Pool/Pool";
+
+import { Deposit as DepositSchema, Swap as SwapSchema, Withdraw as WithdrawSchema } from "../../generated/schema";
 import { TransactionType } from "../common/constants";
 import { getOrCreateLiquidityPoolParamsHelper } from "../common/getters";
+
 import {
-  updateFeeMetrics,
+  updateBalancesInPoolAfterSwap,
   updateFinancials,
   updatePoolMetrics,
+  updateProtocolTVL,
   updateSwapMetrics,
   updateUsageMetrics,
+  updateFeeMetrics,
 } from "../common/metrics";
-import { createDeposit, createAsset, createWithdraw, createSwap } from "./helpers";
+import { createDeposit, createAsset, createWithdraw, createSwap, updateBalancesInPool } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
-  // Steps to implement
-  // 1. Create Deposit
-  // 2. Update Financials
-  // 3. Update Protocol Usage Metrics - Timeseries
-  // 4. Update Pool Metrics - Timeseries
-
-  // Pending
-  //  Update Token Balances in Pool Entity
-  //  Update TVL for pools and protocol
-  //  HandleSwap Pending:
-  //
-  // Create Deposit
-  createDeposit(
+  let deposit = createDeposit(
     event,
     event.params.amount,
     event.params.token,
@@ -44,23 +37,15 @@ export function handleDeposit(event: Deposit): void {
     event.params.to,
     event.params.sender,
   );
-  // Update Financials
+  updateBalancesInPool<DepositSchema>(event, deposit, TransactionType.DEPOSIT);
+  updateProtocolTVL(event);
   updateFinancials(event);
-  // Update Protocol Usage Metrics
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
-  // Update Pool Metrics
   updatePoolMetrics(event);
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  // Steps to implement
-  // 1. Create Withdraw
-  // 2. Update Financials
-  // 3. Update Protocol Usage Metrics
-  // 4. Update Pool Metrics
-
-  // Create Withdraw
-  createWithdraw(
+  let withdraw = createWithdraw(
     event,
     event.params.amount,
     event.params.token,
@@ -68,23 +53,14 @@ export function handleWithdraw(event: Withdraw): void {
     event.params.to,
     event.params.sender,
   );
-  // Update Financials
+  updateBalancesInPool<WithdrawSchema>(event, withdraw, TransactionType.WITHDRAW);
+  updateProtocolTVL(event);
   updateFinancials(event);
-  // Update Protocol Usage Metrics
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
-  // Update Pool Metrics
   updatePoolMetrics(event);
 }
 
 export function handleSwap(event: Swap): void {
-  // Steps to implement
-  // 1. Create Swap - Done
-  // 2. Update Fee Metrics
-  // 3. Update Swap Volume Metrics - Done
-  // 4. Update Usage Metrics - Done
-
-  // Create Swap
-  log.debug("handling swap", []);
   let swap = createSwap(
     event,
     event.params.sender,
@@ -94,13 +70,13 @@ export function handleSwap(event: Swap): void {
     event.params.toAmount,
     event.params.to,
   );
-  log.debug("swap created {}", [swap.hash]);
-  // Update Fee Metrics
+  updateBalancesInPoolAfterSwap(event, swap);
+  updateProtocolTVL(event);
+  updateFinancials(event);
   updateFeeMetrics(event, event.address, swap);
-  // Update Swap Volume Metrics
   updateSwapMetrics(event, swap);
-  // Update Usage Metrics
   updateUsageMetrics(event, event.params.sender, TransactionType.SWAP);
+  updatePoolMetrics(event);
 }
 
 export function handleAssetAdded(event: AssetAdded): void {

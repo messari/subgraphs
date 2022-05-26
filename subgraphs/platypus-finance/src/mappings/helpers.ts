@@ -3,7 +3,6 @@ import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
 import { TransactionType } from "../common/constants";
 import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from "../common/getters";
-import { updateProtocolTVL } from "../common/metrics";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "../common/tokens";
 
@@ -78,7 +77,7 @@ export function createDeposit(
   liquidity: BigInt,
   to: Address,
   sender: Address,
-): void {
+): Deposit {
   let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
@@ -99,8 +98,7 @@ export function createDeposit(
   deposit.outputTokenAmount = liquidity;
   deposit.amountUSD = tokenAmountToUSDAmount(inputToken, amount);
   deposit.save();
-  updateBalancesInPool<Deposit>(event, deposit, TransactionType.DEPOSIT);
-  updateProtocolTVL(event);
+  return deposit;
 }
 
 // Generate the withdraw entity
@@ -111,7 +109,7 @@ export function createWithdraw(
   liquidity: BigInt,
   to: Address,
   sender: Address,
-): void {
+): Withdraw {
   let withdraw = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
@@ -132,8 +130,7 @@ export function createWithdraw(
   withdraw.outputTokenAmount = liquidity;
   withdraw.amountUSD = tokenAmountToUSDAmount(inputToken, amount);
   withdraw.save();
-  updateBalancesInPool<Withdraw>(event, withdraw, TransactionType.WITHDRAW);
-  updateProtocolTVL(event);
+  return withdraw;
 }
 
 // Handle swaps data and update entities volumes and fees
@@ -194,10 +191,11 @@ export function updateBalancesInPool<T extends Deposit>(
     let txAmt = transaction.inputTokenAmounts[0];
 
     if (token == txToken) {
-      log.debug("[UpdateBalancesInPool] Processing: {} {} {} Before {}", [
+      log.debug("[UpdateBalancesInPool] Processing: {} {} {} {} Before {}", [
         transactionType.toString(),
         transaction.hash,
         token,
+        _asset.id.toString(),
         _asset.cash.toString(),
       ]);
 
@@ -209,10 +207,11 @@ export function updateBalancesInPool<T extends Deposit>(
         balances[_index] = balances[_index].minus(txAmt);
       }
 
-      log.debug("[UpdateBalancesInPool] Processing: {} {} {} After {}", [
+      log.debug("[UpdateBalancesInPool] Processing: {} {} {} {} After {}", [
         transactionType.toString(),
         transaction.hash,
         token,
+        _asset.id.toString(),
         _asset.cash.toString(),
       ]);
       _asset.save();
