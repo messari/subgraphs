@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
     "prepare:bsc": "YARN_SILENT=1 yarn mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",

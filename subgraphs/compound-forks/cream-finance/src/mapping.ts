@@ -5,6 +5,7 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
+  ActionPaused1,
 } from "../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -39,7 +40,7 @@ import {
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
-import { ActionPaused1, Comptroller } from "../generated/Comptroller/Comptroller";
+import { Comptroller } from "../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
 import { getNetworkSpecificConstant } from "./constants";
