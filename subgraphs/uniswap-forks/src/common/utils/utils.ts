@@ -54,3 +54,16 @@ export function readValue<T>(callResult: ethereum.CallResult<T>, defaultValue: T
 export function toPercentage(n: BigDecimal): BigDecimal {
   return n.div(BIGDECIMAL_HUNDRED);
 }
+
+// Convert a list of strings to lower case
+export function toLowerCaseList(list: string[]): string[] {
+  let lowerCaseList = new Array<string>(list.length);
+  for (let i = 0; i < list.length; i++) {
+    lowerCaseList[i] = list[i].toLowerCase();
+  }
+  return lowerCaseList;
+}
+
+export function toLowerCase(string: string): string {
+  return string.toLowerCase();
+}

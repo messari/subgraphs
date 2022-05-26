@@ -1,94 +1,22 @@
 name: Deployment
+
 on: 
-  pull_request: 
-    branches:
-      - master
+  pull_request:
     types: [closed]
+
 jobs:
-  Deployment:
-    if: github.event.pull_request.merged == true
+  Deployment: 
+    if: github.event.pull_request.merged == 'true'
     runs-on: ubuntu-latest
-    steps:
-    - id: files
-      uses: jitterbit/get-changed-files@v1
-      continue-on-error: true
+    steps: 
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+        continue-on-error: true
 
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-
-    - name: Get Updated Files Indicating Deployment
-      run: |
-        declare -i deploy_any
-        declare -i deploy_all
-        declare -A deploy_protocol_all
-        declare -A deploy_network
-        deploy_any=0
-        deploy_all=0
-
-        for changed_file in ${{ steps.files.outputs.all }}; do
-          if [[ ${changed_file} == *"/src/"* ]]; then
-            ref_folder=$( echo ${changed_file%/src/*} | rev | cut -d / -f 2| rev);
-            if [[ $ref_folder == subgraphs ]]; then
-              deploy_all=1;
-              deploy_any=1;
-            elif [[ $ref_folder == protocols ]]; then
-              protocol=$( echo ${changed_file%/src/*} | rev | cut -d / -f 1| rev);
-              deploy_protocol_all[$protocol]=1;
-              deploy_any=1;
-            else 
-              echo "Warning: src/ folder should be located at subgraphs/**subgraph**/protocols/src/ or subgraphs/**subgraph**/src/"; 
-            fi;
-          elif [[ ${changed_file} == *"/config/"* ]]; then
-            ref_folder=$( echo ${changed_file%/config/*} | rev | cut -d / -f 2| rev);
-
-            if [[ $ref_folder == protocols ]]; then
-              ref_folder2=$( echo ${changed_file#*/config/} | cut -d / -f 1 );
-              echo $ref_folder2
-
-              if [[ $ref_folder2 == networks ]]; then
-                protocol=$( echo ${changed_file%/config/*} | rev | cut -d / -f 1| rev);
-                network=$( echo ${changed_file#*/config/} | rev | cut -d / -f 2| rev);
-
-                protocol_network=$(echo ${protocol}_${network})
-                deploy_network[$protocol_network]=1
-                deploy_any=1;
-              fi;
-            else 
-              echo "Warning: config/ folder should be located at subgraphs/**subgraph**/protocols/config/";
-            fi;
-          fi;
-        done
-
-        if [[ $deploy_any == 1 ]]; then
-          npm install -g @graphprotocol/graph-cli
-          npm install --dev @graphprotocol/graph-ts
-          npm install mustache
-          yarn install
-          graph auth --product hosted-service 0845de8b9d834db8b16b5c97ba33ec53
-          cd subgraphs/$(echo ${{ github.head_ref }} | cut -d / -f 1)
-
-          if [[ $deploy_all == 1 ]]; then
-            npm run deploy;
-          else 
-            for protocol in "${!deploy_protocol_all[@]}"; do
-              if [[ ${deploy_protocol_all[$protocol]} == 1 ]]; then
-                npm run deploy ${protocol} steegecs;
-              fi;
-            done
-
-            for protocol_network in "${!deploy_network[@]}"; do
-              if [[ ${deploy_network[$protocol_network]} == 1 ]]; then
-                protocol=$( echo ${protocol_network} | cut -d _ -f 1);
-                network=$( echo ${protocol_network} | cut -d _ -f 2);
-
-                if ! [[ ${deploy_protocol[$protocol]} ]]; then
-                  npm run deploy ${protocol} ${network} steegecs;
-                fi;
-              fi;
-            done
-          fi;
-        fi;
-
-
-
- 
+      - uses: actions/checkout@v2
+      - uses: steegecs/Action-Subgraph-Deployment@main
+        with: 
+          HOSTED_SERVICE_ACCESS_TOKEN: ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }}
+          CHANGED_FILES: "${{ steps.files.outputs.all }}"
+          ABSOLUTE_PATH: ${{ github.workspace }}
+          GRAPH_DEPLOYMENT_LOCATION: messari

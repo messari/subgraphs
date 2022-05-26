@@ -1,0 +1,198 @@
+
+> prepare:yaml
+> mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml
+
+
+> prepare:constants
+> mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts
+
+[32m[39m
+[32mTypes generated successfully[39m
+[32m[39m
+
+[32mBuild completed: /Users/chris/repos/subgraphs/subgraphs/uniswap-forks/build/subgraph.yaml[39m
+
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.1 to 0.0.2[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.2 to 0.0.3[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.3 to 0.0.4[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.4 to 0.0.5[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping specVersion from 0.0.1 to 0.0.2[39m
+- Apply migrations
+✔ Apply migrations
+- Load subgraph from subgraph.yaml
+✔ Load subgraph from subgraph.yaml
+- Load contract ABIs
+  [90mLoad contract ABI from abis/uniswap-v2/Factory.json[39m
+- Load contract ABIs
+  [90mLoad contract ABI from abis/uniswap-v2/ERC20.json[39m
+- Load contract ABIs
+✔ Load contract ABIs
+- Generate types for contract ABIs
+  [90mGenerate types for contract ABI: Factory (abis/uniswap-v2/Factory.json)[39m
+- Generate types for contract ABIs
+  [90mWrite types to generated/Factory/Factory.ts[39m
+- Generate types for contract ABIs
+  [90mGenerate types for contract ABI: TokenABI (abis/uniswap-v2/ERC20.json)[39m
+- Generate types for contract ABIs
+  [90mWrite types to generated/Factory/TokenABI.ts[39m
+- Generate types for contract ABIs
+✔ Generate types for contract ABIs
+- Generate types for data source templates
+  [90mGenerate types for data source template Pair[39m
+- Generate types for data source templates
+  [90mWrite types for templates to generated/templates.ts[39m
+- Generate types for data source templates
+✔ Generate types for data source templates
+- Load data source template ABIs
+  [90mLoad data source template ABI from abis/uniswap-v2/Pair.json[39m
+- Load data source template ABIs
+  [90mLoad data source template ABI from abis/uniswap-v2/Factory.json[39m
+- Load data source template ABIs
+  [90mLoad data source template ABI from abis/uniswap-v2/ERC20.json[39m
+- Load data source template ABIs
+✔ Load data source template ABIs
+- Generate types for data source template ABIs
+  [90mGenerate types for data source template ABI: Pair > Pair (abis/uniswap-v2/Pair.json)[39m
+- Generate types for data source template ABIs
+  [90mWrite types to generated/templates/Pair/Pair.ts[39m
+- Generate types for data source template ABIs
+  [90mGenerate types for data source template ABI: Pair > Factory (abis/uniswap-v2/Factory.json)[39m
+- Generate types for data source template ABIs
+  [90mWrite types to generated/templates/Pair/Factory.ts[39m
+- Generate types for data source template ABIs
+  [90mGenerate types for data source template ABI: Pair > TokenABI (abis/uniswap-v2/ERC20.json)[39m
+- Generate types for data source template ABIs
+  [90mWrite types to generated/templates/Pair/TokenABI.ts[39m
+- Generate types for data source template ABIs
+✔ Generate types for data source template ABIs
+- Load GraphQL schema from schema.graphql
+✔ Load GraphQL schema from schema.graphql
+- Generate types for GraphQL schema
+  [90mWrite types to generated/schema.ts[39m
+- Generate types for GraphQL schema
+✔ Generate types for GraphQL schema
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.1 to 0.0.2[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.2 to 0.0.3[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.3 to 0.0.4[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.4 to 0.0.5[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping specVersion from 0.0.1 to 0.0.2[39m
+- Apply migrations
+✔ Apply migrations
+- Load subgraph from subgraph.yaml
+✔ Load subgraph from subgraph.yaml
+- Compile subgraph
+  [90mCompile data source: Factory => build/Factory/Factory.wasm[39m
+- Compile subgraph
+  [90mCompile data source template: Pair => build/templates/Pair/Pair.wasm[39m
+- Compile subgraph
+✔ Compile subgraph
+- Write compiled subgraph to build/
+  [90mCopy schema file build/schema.graphql[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Factory/abis/uniswap-v2/Factory.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Factory/abis/uniswap-v2/ERC20.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Pair/abis/uniswap-v2/Pair.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Pair/abis/uniswap-v2/Factory.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Pair/abis/uniswap-v2/ERC20.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph manifest build/subgraph.yaml[39m
+- Write compiled subgraph to build/
+✔ Write compiled subgraph to build/
+
+> deploy:subgraph
+> graph deploy --product hosted-service ${npm_config_location}
+
+
+[32mBuild completed: Qmdagv7kTXnoL4XgrEKSEQbLySpYhD8B84UR8pPE4ZGmJm[39m
+
+[32mDeployed to https://thegraph.com/explorer/subgraph/steegecs/uniswap-v2[39m
+[0m[0m
+[0mSubgraph endpoints:[0m
+[0mQueries (HTTP):     https://api.thegraph.com/subgraphs/name/steegecs/uniswap-v2[0m
+[0mSubscriptions (WS): wss://api.thegraph.com/subgraphs/name/steegecs/uniswap-v2[0m
+
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.1 to 0.0.2[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.2 to 0.0.3[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.3 to 0.0.4[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping apiVersion from 0.0.4 to 0.0.5[39m
+- Apply migrations
+  [90mSkip migration: Bump mapping specVersion from 0.0.1 to 0.0.2[39m
+- Apply migrations
+✔ Apply migrations
+- Load subgraph from subgraph.yaml
+✔ Load subgraph from subgraph.yaml
+- Compile subgraph
+  [90mCompile data source: Factory => build/Factory/Factory.wasm[39m
+- Compile subgraph
+  [90mCompile data source template: Pair => build/templates/Pair/Pair.wasm[39m
+- Compile subgraph
+✔ Compile subgraph
+- Write compiled subgraph to build/
+  [90mCopy schema file build/schema.graphql[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Factory/abis/uniswap-v2/Factory.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Factory/abis/uniswap-v2/ERC20.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Pair/abis/uniswap-v2/Pair.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Pair/abis/uniswap-v2/Factory.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph file build/Pair/abis/uniswap-v2/ERC20.json[39m
+- Write compiled subgraph to build/
+  [90mWrite subgraph manifest build/subgraph.yaml[39m
+- Write compiled subgraph to build/
+✔ Write compiled subgraph to build/
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/schema.graphql[39m
+- Upload subgraph to IPFS
+  [90m              .. QmbsFMKZju2hVheTioYnxiXPV96v9EhyQjradummxvHACL[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/Factory/abis/uniswap-v2/Factory.json[39m
+- Upload subgraph to IPFS
+  [90m              .. QmZ55G1yYFzde8Vcq4cpLfNgPSEibpLi9aYCqS1jEvCKQ9[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/Factory/abis/uniswap-v2/ERC20.json[39m
+- Upload subgraph to IPFS
+  [90m              .. QmXuTbDkNrN27VydxbS2huvKRk62PMgUTdPDWkxcr2w7j2[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/Factory/Factory.wasm[39m
+- Upload subgraph to IPFS
+  [90m              .. QmYVHgab9jKrCNLFiJydcBdxysMaRxErNGRiNSr7DEAzhj[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/Pair/abis/uniswap-v2/Pair.json[39m
+- Upload subgraph to IPFS
+  [90m              .. QmbPLMADBP8L6LBVP3ZBQ8RgG7ghamD8DvbdUxHAjZrLgm[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/Pair/abis/uniswap-v2/Factory.json[39m
+- Upload subgraph to IPFS
+  [90m              .. QmZ55G1yYFzde8Vcq4cpLfNgPSEibpLi9aYCqS1jEvCKQ9 (already uploaded)[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/Pair/abis/uniswap-v2/ERC20.json[39m
+- Upload subgraph to IPFS
+  [90m              .. QmXuTbDkNrN27VydxbS2huvKRk62PMgUTdPDWkxcr2w7j2 (already uploaded)[39m
+- Upload subgraph to IPFS
+  [90mAdd file to IPFS build/templates/Pair/Pair.wasm[39m
+- Upload subgraph to IPFS
+  [90m              .. QmbhPpzv7yqqYZaHVNS4LGBk1tv2PD8orMMwRZ6Y1BZSpk[39m
+- Upload subgraph to IPFS
+✔ Upload subgraph to IPFS
+- Deploying to Graph node https://api.thegraph.com/deploy/

@@ -9,12 +9,10 @@
 
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
     "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
-    "prepare:build": "yarn codegen && yarn build",
+    "prepare:build": "graph codegen && graph build",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
 
-    "deploy": "node --experimental-json-modules deployment/deployment.js",
-    "deployTest": "node --experimental-json-modules deployment/test.js"
-
+    "deploy": "node  --experimental-json-modules --no-warnings deployment/deployment.js"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",
