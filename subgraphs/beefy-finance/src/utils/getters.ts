@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Token, Vault, YieldAggregator } from "../../generated/schema";
 import { createVaultFromStrategy } from "../mappings/vault";
 import { BeefyStrategy } from "../../generated/ExampleVault/BeefyStrategy";
