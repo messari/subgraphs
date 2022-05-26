@@ -58,7 +58,10 @@ import {
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
-import { ActionPaused1, Comptroller } from "../generated/Comptroller/Comptroller";
+import {
+  ActionPaused1,
+  Comptroller,
+} from "../generated/Comptroller/Comptroller";
 import { SolarBeamLPToken } from "../generated/templates/CToken/SolarBeamLPToken";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
@@ -229,7 +232,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.4",
+    "1.0.5",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa(),

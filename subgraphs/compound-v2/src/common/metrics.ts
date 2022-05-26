@@ -132,20 +132,8 @@ export function updateMarketDailyMetrics(event: ethereum.Event): void {
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
-  // create seperate InterestRate Entities for each day to have unique ids for each day
-  let dailyRates: string[] = [];
-  for (let i = 0; i < market.rates.length; i++) {
-    // get/create new snapshot rate
-    let actualRate = InterestRate.load(market.rates[i]);
-    let days = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-    let _rate = getOrCreateRate(actualRate!.side, actualRate!.type, market.id + "-" + days.toString());
-
-    // update rate to current rate
-    _rate.rate = actualRate!.rate;
-    _rate.save();
-    dailyRates.push(_rate.id);
-  }
-  marketMetrics.rates = dailyRates;
+  let identifier = market.id + "-" + (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  marketMetrics.rates = getSnapshotRates(market.rates, identifier);
 
   marketMetrics.save();
 }
@@ -175,20 +163,8 @@ export function updateMarketHourlyMetrics(event: ethereum.Event): void {
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
-  // create seperate InterestRate Entities for each hour to have unique ids for each hour
-  let hourlyRates: string[] = [];
-  for (let i = 0; i < market.rates.length; i++) {
-    // get/create new snapshot rate
-    let actualRate = InterestRate.load(market.rates[i]);
-    let hours = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
-    let _rate = getOrCreateRate(actualRate!.side, actualRate!.type, market.id + "-" + hours.toString());
-
-    // update rate to current rate
-    _rate.rate = actualRate!.rate;
-    _rate.save();
-    hourlyRates.push(_rate.id);
-  }
-  marketMetrics.rates = hourlyRates;
+  let identifier = market.id + "-" + (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  marketMetrics.rates = getSnapshotRates(market.rates, identifier);
 
   marketMetrics.save();
 }
@@ -221,4 +197,22 @@ function updateTransactionCount(
 
   hourlyUsage.save();
   dailyUsage.save();
+}
+
+// create seperate InterestRate Entities for each market snapshot
+// this is needed to prevent snapshot rates from being pointers to the current rate
+function getSnapshotRates(rates: string[], identifier: string): string[] {
+  let snapshotRates: string[] = [];
+  for (let i = 0; i < rates.length; i++) {
+    let actualRate = InterestRate.load(rates[i]);
+
+    // get/create new snapshot rate
+    let _rate = getOrCreateRate(actualRate!.side, actualRate!.type, identifier);
+
+    // update rate to current rate
+    _rate.rate = actualRate!.rate;
+    _rate.save();
+    snapshotRates.push(_rate.id);
+  }
+  return snapshotRates;
 }
