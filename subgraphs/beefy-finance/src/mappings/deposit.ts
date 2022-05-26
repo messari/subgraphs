@@ -34,9 +34,10 @@ export function createDeposit(
   const strategyContract = BeefyStrategy.bind(event.address);
   deposit.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   deposit.amount = depositedAmount;
-  deposit.amountUSD = getLastPriceUSD(strategyContract.want()).times(
-    new BigDecimal(depositedAmount)
-  );
+  deposit.amountUSD = getLastPriceUSD(
+    strategyContract.want(),
+    event.block.number
+  ).times(new BigDecimal(depositedAmount));
 
   deposit.vault = getVaultFromStrategyOrCreate(
     event.address,

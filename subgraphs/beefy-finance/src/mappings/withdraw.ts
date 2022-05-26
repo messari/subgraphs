@@ -34,9 +34,10 @@ export function createWithdraw(
   const strategyContract = BeefyStrategy.bind(event.address);
   withdraw.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   withdraw.amount = withdrawnAmount;
-  withdraw.amountUSD = getLastPriceUSD(strategyContract.want()).times(
-    new BigDecimal(withdrawnAmount)
-  );
+  withdraw.amountUSD = getLastPriceUSD(
+    strategyContract.want(),
+    event.block.number
+  ).times(new BigDecimal(withdrawnAmount));
 
   withdraw.vault = getVaultFromStrategyOrCreate(
     event.address,
