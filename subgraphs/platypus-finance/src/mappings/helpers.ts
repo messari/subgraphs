@@ -5,6 +5,7 @@ import { TransactionType } from "../common/constants";
 import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from "../common/getters";
 import { updateProtocolTVL } from "../common/metrics";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
+import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "../common/tokens";
 
 export function getOrCreateAsset(
   event: ethereum.Event,
