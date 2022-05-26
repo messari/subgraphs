@@ -161,9 +161,9 @@ export class poolDetail {
     this.name = name;
   }
 
-  static getAddressArray(): Array<string> {
+  static getAltPoolAddressArray(): Array<string> {
     return [
-      "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
+      // "0x66357dCaCe80431aee0A7507e2E361B7e2402370",
       "0xe0D166DE15665bC4B7185B2e35E847E51316E126",
       "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824",
       "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7",

@@ -33,7 +33,7 @@ export function initAltPoolTemplates(): void {
   // that clashes with an exisiting datasource
   if (!altPoolsInit) {
     altPoolsInit = true;
-    poolDetail.getAddressArray().forEach(addr => {
+    poolDetail.getAltPoolAddressArray().forEach(addr => {
       const poolAddress = Address.fromString(addr);
       getOrCreateLiquidityPool(poolAddress);
       PoolTemplate.create(poolAddress);
