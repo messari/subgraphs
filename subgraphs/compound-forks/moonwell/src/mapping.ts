@@ -58,7 +58,10 @@ import {
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
-import { ActionPaused1, Comptroller } from "../generated/Comptroller/Comptroller";
+import {
+  ActionPaused1,
+  Comptroller,
+} from "../generated/Comptroller/Comptroller";
 import { SolarBeamLPToken } from "../generated/templates/CToken/SolarBeamLPToken";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
