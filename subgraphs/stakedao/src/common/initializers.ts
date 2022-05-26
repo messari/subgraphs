@@ -100,7 +100,6 @@ export function getOrCreateFinancialDailySnapshots(
     financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;

@@ -1,13 +1,13 @@
-import * as constants from "./constants";
-import { VaultFee, Vault as VaultStore } from "../../generated/schema";
-import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 import {
   BigInt,
   Address,
   ethereum,
   BigDecimal,
 } from "@graphprotocol/graph-ts";
+import * as constants from "./constants";
 import { getOrCreateYieldAggregator } from "./initializers";
+import { VaultFee, Vault as VaultStore } from "../../generated/schema";
+import { ERC20 as ERC20Contract } from "../../generated/Controller/ERC20";
 
 export function enumToPrefix(snake: string): string {
   return snake.toLowerCase().replace("_", "-") + "-";
@@ -15,10 +15,6 @@ export function enumToPrefix(snake: string): string {
 
 export function prefixID(enumString: string, ID: string): string {
   return enumToPrefix(enumString) + ID;
-}
-
-export function getTimestampInMillis(block: ethereum.Block): BigInt {
-  return block.timestamp.times(BigInt.fromI32(1000));
 }
 
 export function readValue<T>(

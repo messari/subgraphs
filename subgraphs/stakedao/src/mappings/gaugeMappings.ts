@@ -33,6 +33,9 @@ export function handleAddReward(call: AddRewardCall): void {
         constants.ZERO_ADDRESS
       );
 
+      if (rewardTokenAddress.equals(constants.ZERO_ADDRESS)) {
+        break;
+      }
       const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
       rewardTokensIds.push(rewardToken.id);
     }
@@ -98,7 +101,6 @@ export function handleRewardAdded(event: RewardAdded): void {
     protocolSideRewardEarnedUSD
   );
 
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(event.params.reward);
   vault.save();
 
   updateRewardTokenEmission(
