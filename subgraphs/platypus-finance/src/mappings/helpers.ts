@@ -13,17 +13,16 @@ export function getOrCreateAsset(
   tokenAddress: Address,
   assetAddress: Address,
 ): _Asset {
-  let id = poolAddress
-    .toHexString()
-    .concat("-")
-    .concat(tokenAddress.toHexString())
-    .concat("-")
-    .concat(assetAddress.toHexString());
+  let id = assetAddress.toHexString();
 
   let _asset = _Asset.load(id);
   // fetch info if null
   if (!_asset) {
     _asset = new _Asset(id);
+    _asset.symbol = fetchTokenSymbol(assetAddress);
+    _asset.name = fetchTokenName(assetAddress);
+    _asset.decimals = fetchTokenDecimals(assetAddress);
+
     _asset.token = tokenAddress.toHexString();
     _asset.pool = poolAddress.toHexString();
     _asset.maxSupply = BigInt.zero();
@@ -189,17 +188,46 @@ export function updateBalancesInPool<T extends Deposit>(
   for (let i = 0; i < pool._assets.length; i++) {
     let _asset = _Asset.load(pool._assets[i])!;
     let _index = _asset._index!.toI32();
-    let token = _asset.token;
+    let token = _asset.token.toLowerCase();
 
-    if (token == transaction.inputTokens[0]) {
+    let txToken = transaction.inputTokens[0].toLowerCase();
+    let txAmt = transaction.inputTokenAmounts[0];
+
+    if (token == txToken) {
       if (transactionType == TransactionType.DEPOSIT) {
-        _asset.cash = _asset.cash.plus(transaction.inputTokenAmounts[0]);
-        balances[_index] = balances[_index].plus(transaction.inputTokenAmounts[0]);
+        log.debug("[UpdateBalancesInPool] Processing {} {}: Token: {} == {} before: {}+{}=={}", [
+          transactionType.toString(),
+          transaction.hash,
+          token,
+          txToken,
+          _asset.cash.toString(),
+          txAmt.toString(),
+          _asset.cash.plus(txAmt).toString(),
+        ]);
+
+        _asset.cash = _asset.cash.plus(txAmt);
+        balances[_index] = balances[_index].plus(txAmt);
       } else if (transactionType == TransactionType.WITHDRAW) {
-        _asset.cash = _asset.cash.minus(transaction.inputTokenAmounts[0]);
-        balances[_index] = balances[_index].minus(transaction.inputTokenAmounts[0]);
+        log.debug("[UpdateBalancesInPool] Processing {} {}: Token: {} == {} before: {}-{}=={}", [
+          transactionType.toString(),
+          transaction.hash,
+          token,
+          txToken,
+          _asset.cash.toString(),
+          txAmt.toString(),
+          _asset.cash.minus(txAmt).toString(),
+        ]);
+        _asset.cash = _asset.cash.minus(txAmt);
+        balances[_index] = balances[_index].minus(txAmt);
       }
       _asset.save();
+    } else {
+      log.debug("[UpdateBalancesInPool] Processing {} {}: Token: {} != {} skipping", [
+        transactionType.toString(),
+        transaction.hash,
+        token,
+        txToken,
+      ]);
     }
   }
 
