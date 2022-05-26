@@ -1,7 +1,50 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 schema:
-    file: ./schema.graphql
+  file: ./schema.graphql
 dataSources:
+  - kind: ethereum/contract
+    name: MapleGlobals
+    network: mainnet
+    source:
+      address: "0xC234c62c8C09687DFf0d9047e40042cd166F3600"
+      abi: MapleGlobals
+      startBlock: 12428577
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/maple-globals.ts
+      entities:
+        - PoolFactory
+        - LendingProtocol
+      abis:
+        - name: MapleGlobals
+          file: ./abis/MapleGlobals.json
+      eventHandlers:
+        - event: GlobalsParamSet(indexed bytes32,uint256)
+          handler: handleGlobalsParamSet
+      callHandlers:
+        - function: setValidPoolFactory(address,bool)
+          handler: handleSetValidPoolFactory
 
 templates:
+  - name: PoolFactory
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: PoolFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool-factory.ts
+      entities:
+        - Market
+        - _StakeLocker
+      abis:
+        - name: PoolFactory
+          file: ./abis/PoolFactory.json
+      eventHandlers:
+        - event: PoolCreated(indexed address,indexed address,address,address,address,address,uint256,uint256,uint256,string,string)
+          handler: handlePoolCreated
