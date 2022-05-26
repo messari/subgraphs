@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import { ProtocolTypeEntity } from "../../constants";
+import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../../constants";
 import { convertTokenDecimals, toDate } from "../../utils";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
@@ -14,14 +14,15 @@ interface ProtocolTabProps {
   entities: string[];
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
+  protocolData: { [x: string]: any };
 }
 
 // This component is for each individual subgraph
-function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolTabProps) {
+function ProtocolTab({ data, entities, entitiesData, protocolFields, protocolData }: ProtocolTabProps) {
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
   const list: { [x: string]: any } = {};
-  const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
+  const protocolEntityName = ProtocolTypeEntityNames[protocolData?.type];
 
   const excludedEntities = [
     "liquidityPoolHourlySnapshots",
@@ -31,7 +32,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
     "vaultHourlySnapshots",
     "vaultDailySnapshots",
   ];
-  const protocolData = entities.map((entityName: string) => {
+  const protocolDataRender = entities.map((entityName: string) => {
     try {
       // Exclude the following entities because they are not on the protocol tab
       if (excludedEntities.includes(entityName)) {
@@ -176,7 +177,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-              entitiesData[entityName][entityField].split("").length - 1
+                entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -310,7 +311,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
     }
   });
 
-  const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type];
+  const protTypeEntity = ProtocolTypeEntityNames[protocolData?.type];
   const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD);
   if (
     issues.filter((x) => x.fieldName === protTypeEntity && x.type === "TVL-").length === 0 &&
@@ -333,13 +334,13 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
     <>
       <IssuesDisplay issuesArrayProps={issuesState} />
       <SchemaTable
-        entityData={data[protTypeEntity][0]}
-        schemaName={protTypeEntity}
+        entityData={protocolData}
+        schemaName={ProtocolTypeEntityName[protocolData?.type]}
         setIssues={(x) => setIssues(x)}
         dataFields={protocolFields}
         issuesProps={issuesState}
       />
-      {protocolData}
+      {protocolDataRender}
     </>
   );
 }

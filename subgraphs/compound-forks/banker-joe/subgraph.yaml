@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
-    network: arbitrum-one
+    network: avalanche
     source:
-      address: "0xbadaC56c9aca307079e8B8FC699987AAc89813ee"
+      address: "0xdc13687554205E5b89Ac783db14bb5bba4A1eDaC"
       abi: Comptroller
-      startBlock: 291895
+      startBlock: 5449252
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -21,7 +21,7 @@ dataSources:
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/CToken.json
         - name: ERC20
           file: ../abis/ERC20.json
       eventHandlers:
@@ -33,13 +33,11 @@ dataSources:
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
           handler: handleNewLiquidationIncentive
-        - event: ActionPaused(address,string,bool)
-          handler: handleActionPaused
       file: ./src/mapping.ts
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: arbitrum-one
+    network: avalanche
     source:
       abi: CToken
     mapping:
@@ -54,7 +52,7 @@ templates:
         - Liquidate
       abis:
         - name: CToken
-          file: ../abis/CToken.json
+          file: ./abis/CToken.json
         - name: Comptroller
           file: ../abis/Comptroller.json
         - name: ERC20

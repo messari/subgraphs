@@ -20,7 +20,7 @@ function checkValueFalsey(
   let valueMsg = "";
   if (value === "" || value?.length === 0) {
     valueMsg = "empty";
-  } else if (!value) {
+  } else if (!value || Number(value) === 0) {
     valueMsg = value;
   } else if (value < 0) {
     valueMsg = "negative";
@@ -200,7 +200,11 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           if (entityField === "inputTokens") {
             value = value.map((val: { [x: string]: string }, idx: number) => {
               const label = schemaName + "-" + entityField + " " + (val.symbol || idx);
-              if (!Number(val.decimals) && issues.filter((x) => x.fieldName === label).length === 0) {
+              if (
+                !Number(val.decimals) &&
+                Number(val.decimals) !== 0 &&
+                issues.filter((x) => x.fieldName === label).length === 0
+              ) {
                 issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
               }
               return {
@@ -308,7 +312,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
   useEffect(() => {
     console.log("SCHEMATABLE ISSUE TO SET", issues, issuesProps);
     setIssues(issues);
-  }, [issuesProps]);
+  }, [issues]);
 
   let schemaHeader = null;
   if (schema && entityData) {
