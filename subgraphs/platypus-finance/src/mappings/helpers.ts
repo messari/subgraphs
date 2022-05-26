@@ -194,40 +194,29 @@ export function updateBalancesInPool<T extends Deposit>(
     let txAmt = transaction.inputTokenAmounts[0];
 
     if (token == txToken) {
-      if (transactionType == TransactionType.DEPOSIT) {
-        log.debug("[UpdateBalancesInPool] Processing {} {}: Token: {} == {} before: {}+{}=={}", [
-          transactionType.toString(),
-          transaction.hash,
-          token,
-          txToken,
-          _asset.cash.toString(),
-          txAmt.toString(),
-          _asset.cash.plus(txAmt).toString(),
-        ]);
-
-        _asset.cash = _asset.cash.plus(txAmt);
-        balances[_index] = balances[_index].plus(txAmt);
-      } else if (transactionType == TransactionType.WITHDRAW) {
-        log.debug("[UpdateBalancesInPool] Processing {} {}: Token: {} == {} before: {}-{}=={}", [
-          transactionType.toString(),
-          transaction.hash,
-          token,
-          txToken,
-          _asset.cash.toString(),
-          txAmt.toString(),
-          _asset.cash.minus(txAmt).toString(),
-        ]);
-        _asset.cash = _asset.cash.minus(txAmt);
-        balances[_index] = balances[_index].minus(txAmt);
-      }
-      _asset.save();
-    } else {
-      log.debug("[UpdateBalancesInPool] Processing {} {}: Token: {} != {} skipping", [
+      log.debug("[UpdateBalancesInPool] Processing: {} {} {} Before {}", [
         transactionType.toString(),
         transaction.hash,
         token,
-        txToken,
+        _asset.cash.toString(),
       ]);
+
+      if (transactionType == TransactionType.DEPOSIT) {
+        _asset.cash = _asset.cash.plus(txAmt);
+        balances[_index] = balances[_index].plus(txAmt);
+      } else if (transactionType == TransactionType.WITHDRAW) {
+        _asset.cash = _asset.cash.minus(txAmt);
+        balances[_index] = balances[_index].minus(txAmt);
+      }
+
+      log.debug("[UpdateBalancesInPool] Processing: {} {} {} After {}", [
+        transactionType.toString(),
+        transaction.hash,
+        token,
+        _asset.cash.toString(),
+      ]);
+      _asset.save();
+      break;
     }
   }
 
