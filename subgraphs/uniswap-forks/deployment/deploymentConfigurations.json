@@ -29,7 +29,7 @@
       "matic": {
         "template": "quickswap.template.yaml",
         "steegecs": "steegecs/quickswap-matic",
-        "messari": "messari/quickswap-matic"
+        "messari": "messari/quickswap-polygon"
       }
     },
     "solarbeam": {
@@ -100,14 +100,14 @@
       "xdai": {
         "template": "sushiswap.alt.template.yaml",
         "steegecs": "steegecs/sushiswap-xdai",
-        "messari": "messari/sushiswap-xdai"
+        "messari": "messari/sushiswap-gnosis"
       }
     },
     "trader-joe": {
       "avalanche": {
         "template": "trader.joe.template.yaml",
         "steegecs": "steegecs/trader-joe-avalanche",
-        "messari": "messari/trade-joe-avalanche"
+        "messari": "messari/trader-joe-avalanche"
       }
     },
     "trisolaris": {

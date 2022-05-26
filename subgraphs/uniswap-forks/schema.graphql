@@ -753,6 +753,7 @@ type _HelperStore @entity {
   " number of deposits, number of unique users "
   valueInt: Int
 
+  " number of days since last reward calculations "
   valueBigInt: BigInt
 
   " Contains the address mapping for MasterChef pool id "

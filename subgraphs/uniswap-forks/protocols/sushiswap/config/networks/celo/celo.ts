@@ -59,13 +59,13 @@ export class SushiswapCeloConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x471ece3750da237f93b8e339c536989b8978a438",
-      "0x765de816845861e75a25fca122bb6898b8b1282a",
-      "0xef4229c8c3250c675f21bcefa42f58efbff6002a",
-      "0x88eec49252c8cbc039dcdb394c0c2ba2f1637ea0",
-      "0x90ca507a5d4458a4c6c6249d186b6dcb02a5bccd",
-      "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73",
-      "0xbaab46e28388d2779e6e31fd00cf0e5ad95e327b"
+      "0x122013fd7dF1C6F636a5bb8f03108E876548b455", // wETH
+      "0x471ece3750da237f93b8e339c536989b8978a438", // celo
+      "0x765de816845861e75a25fca122bb6898b8b1282a", // cUSD
+      "0xef4229c8c3250c675f21bcefa42f58efbff6002a", // USDC
+      "0x88eec49252c8cbc039dcdb394c0c2ba2f1637ea0", // USDT
+      "0x90ca507a5d4458a4c6c6249d186b6dcb02a5bccd", // DAI
+      "0xbaab46e28388d2779e6e31fd00cf0e5ad95e327b"  // wBTC
     ]);
   }
   getStableCoins(): string[] {

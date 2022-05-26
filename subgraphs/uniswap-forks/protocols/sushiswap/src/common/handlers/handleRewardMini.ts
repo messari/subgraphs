@@ -66,7 +66,7 @@ export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: Big
   }
 
   // Calculate Reward Emission per sec
-  // let time = event.block.timestamp.minus(lastRewardTime);
+  let multiplier = event.block.timestamp.minus(masterChefPool.valueBigInt);
   let rewardTokenRate = rewardTokenPerSecond.times(poolAllocPoint).div(totalAllocPoint);
 
   // Get the estimated rewards emitted for the upcoming day for this pool

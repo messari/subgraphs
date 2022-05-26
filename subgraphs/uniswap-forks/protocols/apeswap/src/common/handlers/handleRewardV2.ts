@@ -37,7 +37,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   }
 
-  // Return if you have calculated rewards recently
+  // Return if you have calculated rewards recently for efficiency
   if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
     pool.save();
     return;
@@ -66,8 +66,8 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
   }
 
   // Calculate Reward Emission per sec
-  // let time = event.block.timestamp.minus(lastRewardTime);
-  let rewardTokenRate = rewardTokenPerSecond.times(poolAllocPoint).div(totalAllocPoint);
+  let multiplier = event.block.timestamp.minus(masterChefPool.valueBigInt);
+  let rewardTokenRate = rewardTokenPerSecond.times(multiplier).times(poolAllocPoint).div(totalAllocPoint);
 
   // Get the estimated rewards emitted for the upcoming day for this pool
   let rewardTokenRateBigDecimal = BigDecimal.fromString(rewardTokenRate.toString());
@@ -82,6 +82,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
 
   pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
+  // This keeps track of the last reward timestamp for this masterchef pool
   masterChefPool.valueBigInt = event.block.number;
 
   masterChefPool.save();

@@ -59,7 +59,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
   }
 
-  let multiplier = event.block.number.minus(lastRewardBlock)
+  let multiplier = event.block.number.minus(masterChefPool.valueBigInt)
 
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
   let totalAllocPoint: BigInt = BIGINT_ZERO;

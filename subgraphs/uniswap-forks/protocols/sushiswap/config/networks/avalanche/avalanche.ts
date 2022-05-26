@@ -52,37 +52,30 @@ export class SushiswapAvalancheConfigurations implements Configurations {
     return RewardIntervalType.NONE;
   }
   getReferenceToken(): string {
-    return toLowerCase("0x49D5c2BdFfac6CE2BFdB6640F4F80f226bc10bAB");
+    return toLowerCase("0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7");
   }
   getRewardToken(): string {
     return toLowerCase("0x37B608519F91f70F2EeB0e5Ed9AF4061722e4F76");
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7",
-      "0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab",
-      "0x50b7545627a5162f82a992c33b87adc75187b218",
-      "0x130966628846bfd36ff31a822705796e8cb8c18d",
-      "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
-      "0xc7198437980c041c805a1edcba50c1ce5db95118",
-      "0xd586e7f844cea2f87f50152665bcbc2c279d8d70",
-      "0x37b608519f91f70f2eeb0e5ed9af4061722e4f76",
-      "0xb54f16fb19478766a268f172c9480f8da1a7c9c3",
-      "0xce1bffbd5374dac86a2893119683f4911a2f7814"
+      "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7", // wAVAX
+      "0xf20d962a6c8f70c731bd838a3a388d7d48fa6e15", // wETH
+      "0x408d4cd0adb7cebd1f1a1c33a0ba2098e1295bab", // wBTC
+      "0xde3a24028580884448a5397872046a019649b084", // USDT
+      "0xba7deebbfc5fa1100fb055a87773e1e99cd3507a", // DAI
     ]);
   }
   getStableCoins(): string[] {
     return toLowerCaseList([
-      "0xA7D7079b0FEaD91F3e65f86E8915Cb59c1a4C664", // USDC
-      "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70", // DAI
-      "0xc7198437980c041c805A1EDcbA50c1Ce5db95118", // USDT
+      "0xba7deebbfc5fa1100fb055a87773e1e99cd3507a", // DAI
+      "0xde3a24028580884448a5397872046a019649b084", // USDT
     ]);
   }
   getStableOraclePools(): string[] {
     return toLowerCaseList([
-      "0x4ed65dab34d5fd4b1eb384432027ce47e90e1185", // wETH/USDC
-      "0x09657b445df5bf0141e3ef0f5276a329fc01de01", // wETH/USDT
-      "0x55cf10bfbc6a9deaeb3c7ec0dd96d3c1179cb948", // wETH/DAI
+      "0x47f1c2a9c9027a10c3b13d1c40dd976c5014339b", // wAVAX/USDT
+      "0x034c1b19dab61b5de448efc1e10a2e592725c893", // wAVAX/DAI
     ]);
   }
   getUntrackedPairs(): string[] {

@@ -59,7 +59,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   //   rewardTokenPerBlock = getRewardTokenPerBlock.value;
   // }
 
-  // let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
+  // let getMultiplier = poolContract.try_getMultiplier(masterChefPool.valueBigInt, event.block.number);
 
   // let multiplier: BigInt = BIGINT_ONE;
   // if (!getMultiplier.reverted) {
