@@ -40,10 +40,7 @@ async function findAssets() {
 }
 
 function oracleTemplate(address, asset) {
-  template = {
-    asset: asset,
-    address: address,
-  };
+  template = [asset, address];
   return template;
 }
 

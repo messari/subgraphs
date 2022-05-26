@@ -1,18 +1,20 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { CustomPriceType } from "../common/types";
 import { ChainlinkOracle } from "../../../generated/ExampleVault/ChainlinkOracle";
-import oracles from "./oracles";
+import { polygonOracles as oracles } from "./oracles";
 import { ERC20 } from "../../../generated/ExampleVault/ERC20";
+import { ZERO_ADDRESS } from "../common/constants";
 
-console.log(oracles[0].address);
-
-export function getChainLinkContract(asset: string, network: string): any {
+export function getChainLinkContract(
+  asset: string,
+  network: string
+): ChainlinkOracle {
   for (let i = 0; i < oracles.length; i++) {
-    if (oracles[i].asset === asset) {
-      return ChainlinkOracle.bind(Address.fromString(oracles[i].address));
+    if (oracles[i][0] === asset) {
+      return ChainlinkOracle.bind(Address.fromString(oracles[i][1]));
     }
   }
-  return undefined;
+  return ChainlinkOracle.bind(ZERO_ADDRESS);
 }
 
 export function getTokenPriceFromChainLink(
@@ -23,9 +25,10 @@ export function getTokenPriceFromChainLink(
   const symbol = tokenContract.symbol();
   const chainLinkContract = getChainLinkContract(symbol, network);
 
-  if (!chainLinkContract) {
+  if (chainLinkContract._address === ZERO_ADDRESS) {
     return new CustomPriceType();
   }
+
   let result = chainLinkContract.try_getLatestRoundData(tokenAddr);
 
   if (!result.reverted) {
