@@ -1,11 +1,12 @@
 import { TabContext, TabPanel } from "@mui/lab";
 import { Tab, Tabs } from "@mui/material";
 import React from "react";
-import { ProtocolTypeEntity } from "../constants";
+import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 import EventsTab from "./tabs/EventsTab";
 import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
+import PoolOverviewTab from "./tabs/PoolOverviewTab";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -40,9 +41,15 @@ function AllDataTabs({
   setPoolId,
   poolNames,
 }: AllDataTabsProps) {
-  const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
-  console.log("FULLDATAOBJ", data, data[protocolEntityName][0]?.lendingType, "sloop", events);
-  if (data[protocolEntityName][0]?.lendingType === "CDP") {
+  const protocolEntityName = ProtocolTypeEntityName[data.protocols[0].type];
+  const protocolEntityNames = ProtocolTypeEntityNames[data.protocols[0].type];
+
+  let protocolData = data[protocolEntityName];
+  if (!protocolData) {
+    protocolData = data[protocolEntityNames][0];
+  }
+  console.log("FULLDATAOBJ", data, protocolData, "sloop", events);
+  if (protocolData?.lendingType === "CDP") {
     protocolFields.mintedTokens += "!";
     protocolFields.mintedTokenSupplies += "!";
   }
@@ -54,10 +61,17 @@ function AllDataTabs({
           <Tab label="Protocol" value="1" />
           <Tab label="Pool" value="2" />
           <Tab label="Events" value="3" />
+          <Tab label="Pool Overview" value="4" />
         </StyledTabs>
         <TabPanel value="1">
           {/* PROTOCOL TAB */}
-          <ProtocolTab data={data} entities={entities} entitiesData={entitiesData} protocolFields={protocolFields} />
+          <ProtocolTab
+            data={data}
+            protocolData={protocolData}
+            entities={entities}
+            entitiesData={entitiesData}
+            protocolFields={protocolFields}
+          />
         </TabPanel>
         <TabPanel value="2">
           {/* POOL TAB */}
@@ -68,6 +82,7 @@ function AllDataTabs({
             poolId={poolId}
             setPoolId={(x) => setPoolId(x)}
             poolData={poolData}
+            protocolData={protocolData}
           />
         </TabPanel>
         <TabPanel value="3">
@@ -79,6 +94,10 @@ function AllDataTabs({
             setPoolId={(x) => setPoolId(x)}
             poolNames={poolNames}
           />
+        </TabPanel>
+        <TabPanel value="4">
+          {/* POOLOVERVIEW TAB */}
+          <PoolOverviewTab pools={data[poolNames]} protocolData={protocolData} />
         </TabPanel>
       </TabContext>
     </>
