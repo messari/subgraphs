@@ -35,10 +35,11 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
+  _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
-import { Comptroller } from "../generated/Comptroller/Comptroller";
+import { ActionPaused1, Comptroller } from "../generated/Comptroller/Comptroller";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
 import { getNetworkSpecificConstant } from "./constants";
@@ -127,6 +128,10 @@ export function handleNewLiquidationIncentive(
   _handleNewLiquidationIncentive(protocol, event);
 }
 
+export function handleActionPaused(event: ActionPaused1): void {
+  _handleActionPaused(event);
+}
+
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   _handleNewReserveFactor(event);
 }
@@ -177,7 +182,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "CREAM Finance",
     "cream-finance",
     "1.2.1",
-    "1.0.0",
+    "1.0.1",
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),

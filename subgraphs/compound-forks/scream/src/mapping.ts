@@ -5,6 +5,7 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
+  ActionPaused1,
 } from "../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -40,6 +41,7 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
+  _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
@@ -117,6 +119,10 @@ export function handleNewReserveFactor(event: NewReserveFactor): void {
   _handleNewReserveFactor(event);
 }
 
+export function handleActionPaused(event: ActionPaused1): void {
+  _handleActionPaused(event);
+}
+
 export function handleMint(event: Mint): void {
   _handleMint(comptrollerAddr, event);
 }
@@ -163,10 +169,11 @@ function getOrCreateProtocol(): LendingProtocol {
     "Scream",
     "scream",
     "1.2.1",
-    "1.0.0",
+    "1.0.1",
     "1.0.0",
     Network.FANTOM,
-    comptroller.try_liquidationIncentiveMantissa()
+    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
 }

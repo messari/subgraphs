@@ -33,6 +33,8 @@ dataSources:
           handler: handleNewCollateralFactor
         - event: NewLiquidationIncentive(uint256,uint256)
           handler: handleNewLiquidationIncentive
+        - event: ActionPaused(address,string,bool)
+          handler: handleActionPaused
       file: ./src/mapping.ts
 templates:
   - name: CToken
