@@ -18,6 +18,7 @@ function ProtocolDashboard() {
   const tabString = searchParams.get("tab") || "";
   const poolIdString = searchParams.get("poolId") || "";
   const scrollToView = searchParams.get("view") || "";
+  const protocolParam = searchParams.get("protocolId");
   const navigate = useNavigate();
 
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
@@ -71,14 +72,16 @@ function ProtocolDashboard() {
   const queryMain = gql`
     ${graphQuery}
   `;
-
-  const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId }, client });
+  const protocolId = protocolParam || "";
+  const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOL" || tabString.toUpperCase() === "MARKET") {
     tabNum = "2";
   } else if (tabString.toUpperCase() === "EVENTS") {
     tabNum = "3";
+  } else if (tabString.toUpperCase() === "POOLOVERVIEW") {
+    tabNum = "4";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
@@ -115,13 +118,15 @@ function ProtocolDashboard() {
 
   const handleTabChange = (event: any, newValue: string) => {
     let tabName = "protocol";
-    let poolParam = `&poolId=${poolId}`;
-    if (newValue === "1") {
-      poolParam = "";
-    } else if (newValue === "2") {
+    let poolParam = "";
+    if (newValue === "2") {
+      poolParam = `&poolId=${poolId}`;
       tabName = "pool";
     } else if (newValue === "3") {
+      poolParam = `&poolId=${poolId}`;
       tabName = "events";
+    } else if (newValue === "4") {
+      tabName = "poolOverview";
     }
     navigate(`?endpoint=${subgraphParam}&tab=${tabName}${poolParam}`);
     setTabValue(newValue);
@@ -149,7 +154,8 @@ function ProtocolDashboard() {
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader
-        protocolSchemaData={protocolSchemaData}
+        protocolData={protocolSchemaData}
+        protocolId={protocolId}
         subgraphToQueryURL={subgraphToQuery.url}
         schemaVersion={schemaVersion}
       />
@@ -159,7 +165,7 @@ function ProtocolDashboard() {
       <ErrorDisplay
         errorObject={errorDisplayProps}
         setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
-        protocolSchemaData={protocolSchemaData}
+        protocolData={data}
         subgraphToQuery={subgraphToQuery}
       />
       {!!data && (
