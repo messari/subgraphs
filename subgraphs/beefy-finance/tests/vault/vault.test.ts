@@ -1,5 +1,5 @@
 import { clearStore, test, assert } from "matchstick-as/assembly/index";
-// import { Gravatar } from "../../generated/schema";
+import { Vault } from "../../generated/schema";
 // import { NewGravatar } from "../../generated/Gravity/Gravity";
 // import { createNewGravatarEvent, handleNewGravatars } from "../mappings/gravity";
 
@@ -36,6 +36,4 @@ import { clearStore, test, assert } from "matchstick-as/assembly/index";
 //   clearStore();
 // });
 
-test("First test", () => {
-  console.log('Test: Hello World!');
-});
+test("First test", () => {});
