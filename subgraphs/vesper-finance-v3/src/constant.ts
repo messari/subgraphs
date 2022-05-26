@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 
 export const ROUTER_ADDRESS = Address.fromString(
   "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
@@ -20,3 +20,9 @@ export const SECONDS_PER_DAY = 84600;
 export const VESPER_TOKEN_HEX = "0x1b40183EFB4Dd766f11bDa7A7c3AD8982e998421";
 export const VESPER_TOKEN = Address.fromString(VESPER_TOKEN_HEX);
 export const SECONDS_PER_HOUR = 3600;
+
+export const GROW_POOL_WITHDRAW_FEE = BigDecimal.fromString("0.6").div(BigDecimal.fromString("100"));
+export const GROW_POOL_PLATFORM_FEE = BigDecimal.fromString("20").div(BigDecimal.fromString("100"));
+export const EARN_POOL_WITHDRAW_FEE = BigDecimal.zero();
+export const EARN_POOL_PLATFORM_FEE = BigDecimal.fromString("25").div(BigDecimal.fromString("100"));;
+export const POOL_DEVELOPER_FEE = BigDecimal.fromString("5").div(BigDecimal.fromString("100"));;

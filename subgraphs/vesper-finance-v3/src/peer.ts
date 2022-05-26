@@ -1,15 +1,28 @@
-import { Address, BigDecimal, BigInt, log, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  log,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { PoolV3 } from "../generated/vaUSDC_prod_RL4/PoolV3";
 import { Controller } from "../generated/vaUSDC_prod_RL4/Controller";
 import { StrategyV3 } from "../generated/vaUSDC_prod_RL4/StrategyV3";
 import { PriceRouter } from "../generated/vaUSDC_prod_RL4/PriceRouter";
 import { Erc20Token } from "../generated/vaUSDC_prod_RL4/Erc20Token";
+import { PoolRewards } from "../generated/vaUSDC_prod_RL4/PoolRewards";
+import { PoolRewardsOld } from "../generated/vaUSDC_prod_RL4/PoolRewardsOld";
 import {
   ROUTER_ADDRESS,
   USDC_ADDRESS,
   WETH_ADDRESS,
   CONTROLLER_ADDRESS_HEX,
   ZERO_ADDRESS,
+  VESPER_TOKEN,
+  GROW_POOL_WITHDRAW_FEE,
+  GROW_POOL_PLATFORM_FEE,
+  EARN_POOL_WITHDRAW_FEE,
+  EARN_POOL_PLATFORM_FEE,
 } from "./constant";
 import { getUsdPrice } from "./prices";
 
@@ -140,10 +153,16 @@ export class Revenue {
     let tokenDecimals = Erc20Token.bind(tokenAddress).decimals();
     let protocolRevenue = _protocolRevenue.times(shareToTokenRate);
     this.protocolRevenue = protocolRevenue;
-    this.protocolRevenueUsd = getUsdPrice(tokenAddress, protocolRevenue.div(getDecimalDivisor(tokenDecimals)));
+    this.protocolRevenueUsd = getUsdPrice(
+      tokenAddress,
+      protocolRevenue.div(getDecimalDivisor(tokenDecimals))
+    );
     let supplySideRevenue = _supplySideRevenue.times(shareToTokenRate);
     this.supplySideRevenue = supplySideRevenue;
-    this.supplySideRevenueUsd = getUsdPrice(tokenAddress, supplySideRevenue.div(getDecimalDivisor(tokenDecimals)));
+    this.supplySideRevenueUsd = getUsdPrice(
+      tokenAddress,
+      supplySideRevenue.div(getDecimalDivisor(tokenDecimals))
+    );
   }
 }
 
@@ -162,4 +181,65 @@ export function calculateRevenue(
     shareToTokenRate,
     tokenAddress
   );
+}
+
+export class WithdrawRevenue {
+  protocolUsd: BigDecimal;
+  supplyUsd: BigDecimal;
+
+  constructor(poolAddress: Address, account: Address, withdrawAmount: BigInt) {
+    const poolV3 = PoolV3.bind(poolAddress);
+    const vesperToken = Erc20Token.bind(VESPER_TOKEN);
+    const token = Erc20Token.bind(poolV3.token());
+    const withdrawFee = poolV3.withdrawFee();
+    const rewardAddress = poolV3.poolRewards();
+    const rewards_call = PoolRewards.bind(rewardAddress).try_claimable(account);
+    const rewardsOld_call = PoolRewardsOld.bind(rewardAddress).try_claimable(
+      account
+    );
+    const isEarnPool = withdrawFee.isZero();
+    let yieldAmount = BigDecimal.zero();
+    let yieldUsd = BigDecimal.zero();
+    let yieldCompUsd = BigDecimal.zero();
+    let withdrawAmountCompUsd = BigDecimal.zero();
+
+    if (!rewards_call.reverted) {
+      for (let i = 0, k = rewards_call.value.value0.length; i < k; ++i) {
+        yieldAmount = rewards_call.value.value1[i].toBigDecimal();
+      }
+    }
+
+    if (!rewardsOld_call.reverted) {
+      yieldAmount = rewardsOld_call.value.toBigDecimal();
+    }
+
+    yieldUsd = getUsdPrice(
+      VESPER_TOKEN,
+      yieldAmount.div(getDecimalDivisor(vesperToken.decimals()))
+    );
+    yieldCompUsd = getUsdPrice(
+      VESPER_TOKEN,
+      yieldAmount
+        .times(isEarnPool ? EARN_POOL_PLATFORM_FEE : GROW_POOL_PLATFORM_FEE)
+        .div(getDecimalDivisor(vesperToken.decimals()))
+    );
+    withdrawAmountCompUsd = getUsdPrice(
+      poolV3.token(),
+      withdrawAmount
+        .toBigDecimal()
+        .times(isEarnPool ? EARN_POOL_WITHDRAW_FEE : GROW_POOL_WITHDRAW_FEE)
+        .div(getDecimalDivisor(token.decimals()))
+    );
+
+    this.protocolUsd = withdrawAmountCompUsd.plus(yieldCompUsd);
+    this.supplyUsd = yieldUsd.minus(withdrawAmountCompUsd).minus(yieldCompUsd);
+  }
+}
+
+export function withdrawRevenueCalc(
+  poolAddress: Address,
+  account: Address,
+  amount: BigInt
+): WithdrawRevenue {
+  return new WithdrawRevenue(poolAddress, account, amount);
 }
