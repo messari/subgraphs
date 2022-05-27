@@ -54,10 +54,6 @@ templates:
           file: ../abis/ERC20.json
         - name: PriceOracle
           file: ../abis/PriceOracle.json
-        # - name: AccessControlledAggregator
-        #   file: ./abis/AccessControlledAggregator.json
-        # - name: EthBalance
-        #   file: ./abis/EthBalance.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -151,5 +147,5 @@ templates:
           handler: handleNewFuseFee
         - event: NewAdminFee(uint256,uint256)
           handler: handleNewAdminFee
-        - event: NewComptroller(address,address)
-          handler: handleNewComptroller
+        # - event: NewComptroller(address,address)
+        #   handler: handleNewComptroller

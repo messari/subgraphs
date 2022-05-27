@@ -280,6 +280,7 @@ type LendingProtocol implements Protocol @entity {
   markets: [Market!]! @derivedFrom(field: "protocol")
 
   #### Add-Ons ####
+
   " oracle for the protocol "
   _priceOracle: String!
 
@@ -557,6 +558,7 @@ type Market @entity {
   liquidates: [Liquidate!]! @derivedFrom(field: "market")
 
   ### Add-Ons ###
+
   _cumulativeSupplySideRevenueUSD: BigDecimal!
 
   _cumulativeProtocolSideRevenueUSD: BigDecimal!
@@ -1009,4 +1011,21 @@ type _CircularBuffer @entity {
 
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
+}
+
+type _FusePool @entity {
+  " {Comptroller implementation} "
+  id: ID!
+
+  " Fuse pool  number "
+  poolNumber: String!
+
+  " Price oracle for the "
+  priceOracle: String!
+
+  " Liquidation incentive for the pool "
+  liquidationIncentive: BigDecimal!
+
+  " IDs of all the markets in this fuse pool "
+  marketIDs: [String!]!
 }

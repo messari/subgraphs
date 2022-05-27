@@ -38,8 +38,11 @@ import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
+  FACTORY_CONTRACT,
   METHODOLOGY_VERSION,
   NETWORK_ETHEREUM,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
   ZERO_ADDRESS,
@@ -57,7 +60,6 @@ import {
   Borrow,
   LiquidateBorrow,
   Mint,
-  NewComptroller,
   NewReserveFactor,
   Redeem,
   RepayBorrow,
@@ -75,6 +77,7 @@ import { LendingProtocol, Token } from "../../generated/schema";
 import { ERC20 } from "../generated/templates/Comptroller/ERC20";
 import {
   BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   cTokenDecimals,
@@ -87,7 +90,7 @@ import {
   mantissaFactor,
   mantissaFactorBD,
 } from "../../src/constants";
-import { InterestRate, Market } from "../generated/schema";
+import { InterestRate, Market, _FusePool } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 import { getUsdPricePerToken } from "./prices";
 import {
@@ -118,9 +121,9 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
   // populate pool data
   let poolData = new ProtocolData(
-    event.params.pool.comptroller,
-    event.params.pool.name,
-    event.params.index.toString(),
+    Address.fromString(FACTORY_CONTRACT),
+    PROTOCOL_NAME,
+    PROTOCOL_SLUG,
     SCHEMA_VERSION,
     SUBGRAPH_VERSION,
     METHODOLOGY_VERSION,
@@ -131,6 +134,35 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
   // only needed to create the new pool (ie, pool's Comptroller implementation)
   _getOrCreateProtocol(poolData);
+
+  // create helper fuse pool entity
+  let pool = new _FusePool(event.params.pool.comptroller.toHexString());
+  pool.poolNumber = event.params.index.toString();
+  pool.marketIDs = [];
+
+  // set price oracle for pool entity
+  let tryOracle = troller.try_oracle();
+  if (tryOracle.reverted) {
+    pool.priceOracle = "";
+  } else {
+    pool.priceOracle = tryOracle.value.toHexString();
+  }
+
+  // set liquidation incentive for pool entity
+  let tryLiquidationIncentive = troller.try_liquidationIncentiveMantissa();
+  if (tryLiquidationIncentive.reverted) {
+    log.warning(
+      "[getOrCreateProtocol] liquidationIncentiveMantissaResult reverted",
+      []
+    );
+  } else {
+    pool.liquidationIncentive =
+      tryLiquidationIncentive.value
+        .toBigDecimal()
+        .div(mantissaFactorBD)
+        .times(BIGDECIMAL_HUNDRED);
+  }
+  pool.save();
 }
 
 //////////////////////////////
@@ -142,7 +174,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
 
 // add a new market
 export function handleMarketListed(event: MarketListed): void {
-  let protocol = LendingProtocol.load(event.address.toHexString());
+  let protocol = LendingProtocol.load(FACTORY_CONTRACT);
   if (!protocol) {
     // best effort
     log.warning("[handleMarketListed] Comptroller not found: {}", [
@@ -213,6 +245,18 @@ export function handleMarketListed(event: MarketListed): void {
     RariFee.ADMIN_FEE,
     event.params.cToken.toHexString()
   );
+
+  // add market ID to the fuse pool
+  let pool = _FusePool.load(event.address.toHexString());
+  let markets = pool.marketIDs;
+  markets.push(event.params.cToken.toHexString());
+  pool.marketIDs = markets;
+  pool.save();
+
+  // set liquidation incentive (fuse-specific)
+  let market = Market.load(event.params.cToken.toHexString())
+  market.liquidationPenalty = pool.liquidationIncentive;
+  market.save();
 }
 
 // update a given markets collateral factor
@@ -223,15 +267,27 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
-  let protocol = LendingProtocol.load(event.address.toHexString());
-  if (!protocol) {
-    // best effort
-    log.warning("[handleMarketListed] Comptroller not found: {}", [
-      event.address.toHexString(),
-    ]);
-    return;
+  let liquidationIncentive = event.params.newLiquidationIncentiveMantissa
+    .toBigDecimal()
+    .div(mantissaFactorBD)
+    .minus(BIGDECIMAL_ONE)
+    .times(BIGDECIMAL_HUNDRED);
+  let pool = _FusePool.load(event.address.toHexString());
+  pool.liquidationIncentive = liquidationIncentive;
+  pool.save();
+
+  for (let i = 0; i < pool.marketIDs.length; i++) {
+    let market = Market.load(pool.marketIDs[i]);
+    if (!market) {
+      log.warning("[handleNewLiquidationIncentive] Market not found: {}", [
+        pool.marketIDs[i],
+      ]);
+      // best effort
+      continue;
+    }
+    market.liquidationPenalty = liquidationIncentive;
+    market.save();
   }
-  _handleNewLiquidationIncentive(protocol, event);
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
@@ -421,13 +477,6 @@ export function handleNewAdminFee(event: NewAdminFee): void {
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   _handleNewReserveFactor(event);
-}
-
-// TODO: is this necessary, not much we can do, excpet delete old lendingProtocol and move to new lendingProtocol..
-export function handleNewComptroller(event: NewComptroller): void {
-  log.error("WOAH: NEW COMPTROLLER at transaction: {}", [
-    event.transaction.hash.toHexString(),
-  ]);
 }
 
 /////////////////
