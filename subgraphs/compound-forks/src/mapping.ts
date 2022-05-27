@@ -355,6 +355,8 @@ export function _handleMarketListed(
   market.outputTokenSupply = BIGINT_ZERO;
   market.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   market.exchangeRate = BIGDECIMAL_ZERO;
+  market.rewardTokenEmissionsAmount = [];
+  market.rewardTokenEmissionsUSD = [];
   market._cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   market._cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   market._cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
