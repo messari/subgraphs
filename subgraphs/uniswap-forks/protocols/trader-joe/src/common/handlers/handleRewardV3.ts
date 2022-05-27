@@ -20,7 +20,7 @@ export function handleRewardV3(event: ethereum.Event, pid: BigInt, amount: BigIn
       lpTokenAddress = poolInfo.value.value1.toHexString();
     }
     masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = BIGINT_ZERO;
+    masterChefPool.valueBigInt = event.block.number;
     masterChefPool.save();
   }
 
@@ -59,7 +59,7 @@ export function handleRewardV3(event: ethereum.Event, pid: BigInt, amount: BigIn
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
   }
 
-  let multiplier = event.block.number.minus(masterChefPool.valueBigInt)
+  let multiplier = event.block.number.minus(masterChefPool.valueBigInt!)
 
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
   let totalAllocPoint: BigInt = BIGINT_ZERO;

@@ -20,7 +20,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
       lpTokenAddress = getlpAddress.value.toHexString();
     }
     masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = BIGINT_ZERO;
+    masterChefPool.valueBigInt = event.block.number;
     masterChefPool.save();
   }
 
@@ -66,7 +66,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
   }
 
   // Calculate Reward Emission per sec
-  let multiplier = event.block.timestamp.minus(masterChefPool.valueBigInt);
+  let multiplier = event.block.timestamp.minus(masterChefPool.valueBigInt!);
   let rewardTokenRate = rewardTokenPerBlock.times(poolAllocPoint).div(totalAllocPoint);
 
   // Get the estimated rewards emitted for the upcoming day for this pool
