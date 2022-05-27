@@ -17,11 +17,11 @@ export function priceInUSD(tokenAddress: Address, amount: BigInt): BigDecimal {
 
   tokenPriceInUSDWithDecimal = pathFinder("2", amount, tokenAddress)
   if (tokenPriceInUSDWithDecimal == ZERO_BIGDECIMAL) {
-    log.debug('Cant find 2 lenght path,searching 3 length path for {}', [tokenAddress.toString()]);
+    log.debug('Cant find 2 lenght path,searching 3 length path for {}', [tokenAddress.toHexString()]);
     tokenPriceInUSDWithDecimal = pathFinder("3", amount, tokenAddress)
   }
   if (tokenPriceInUSDWithDecimal == ZERO_BIGDECIMAL) {
-    log.debug('Cant find 3 lenght path,searching 4 length path for {}', [tokenAddress.toString()]);
+    log.debug('Cant find 3 lenght path,searching 4 length path for {}', [tokenAddress.toHexString()]);
     tokenPriceInUSDWithDecimal = pathFinder("4", amount, tokenAddress)
   }
   return tokenPriceInUSDWithDecimal;
