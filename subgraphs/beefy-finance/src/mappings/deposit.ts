@@ -10,6 +10,7 @@ import {
   getTokenOrCreate,
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
+import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
 
 export function createDeposit(
   event: DepositEvent,
@@ -26,8 +27,9 @@ export function createDeposit(
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.transaction.index.toI32();
   deposit.protocol = getBeefyFinanceOrCreate().id;
-  deposit.to = event.transaction.to.toHexString();
   deposit.from = event.transaction.from.toHexString();
+  const to = event.transaction.to;
+  deposit.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
 
@@ -52,15 +54,13 @@ export function createDeposit(
 export function getOrCreateFirstDeposit(vault: Vault): Deposit {
   let deposit = Deposit.load("MockDeposit" + vault.id);
   if (!deposit) {
-    const zeroAddress = "0x0000000000000000000000000000000000000000";
     deposit = new Deposit("MockDeposit" + vault.id);
 
-    deposit.hash = zeroAddress;
+    deposit.hash = ZERO_ADDRESS_STRING;
     deposit.logIndex = 0;
     deposit.protocol = getBeefyFinanceOrCreate().id;
-
-    deposit.to = zeroAddress;
-    deposit.from = zeroAddress;
+    deposit.from = ZERO_ADDRESS_STRING;
+    deposit.to = ZERO_ADDRESS_STRING;
     deposit.blockNumber = vault.createdBlockNumber;
     deposit.timestamp = vault.createdTimestamp;
     deposit.asset = vault.inputToken;

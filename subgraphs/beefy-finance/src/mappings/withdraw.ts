@@ -10,6 +10,7 @@ import {
   getTokenOrCreate,
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
+import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
 
 export function createWithdraw(
   event: WithdrawEvent,
@@ -26,8 +27,9 @@ export function createWithdraw(
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.transaction.index.toI32();
   withdraw.protocol = getBeefyFinanceOrCreate().id;
-  //withdraw.to = event.address.toHexString();
-  //withdraw.from = call.from.toHexString();
+  withdraw.from = event.transaction.from.toHexString();
+  const to = event.transaction.to;
+  withdraw.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
 
@@ -52,15 +54,13 @@ export function createWithdraw(
 export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
   let withdraw = Withdraw.load("MockWithdraw" + vault.id);
   if (!withdraw) {
-    const zeroAddress = "0x0000000000000000000000000000000000000000";
     withdraw = new Withdraw("MockWithdraw" + vault.id);
 
-    withdraw.hash = zeroAddress;
+    withdraw.hash = ZERO_ADDRESS_STRING;
     withdraw.logIndex = 0;
     withdraw.protocol = getBeefyFinanceOrCreate().id;
-
-    //withdraw.to = zeroAddress;
-    //withdraw.from = zeroAddress;
+    withdraw.from = ZERO_ADDRESS_STRING;
+    withdraw.to = ZERO_ADDRESS_STRING;
     withdraw.blockNumber = vault.createdBlockNumber;
     withdraw.timestamp = vault.createdTimestamp;
     withdraw.asset = vault.inputToken;

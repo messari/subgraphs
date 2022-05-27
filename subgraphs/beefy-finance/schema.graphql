@@ -365,11 +365,11 @@ interface Event {
   " The protocol this transaction belongs to "
   protocol: YieldAggregator!
 
-  #" Address that received tokens "
-  #to: String!
+  " Address that received tokens "
+  to: String!
 
-  #" Address that sent tokens "
-  #from: String!
+  " Address that sent tokens "
+  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -391,11 +391,11 @@ type Deposit implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: YieldAggregator!
 
-  #" Market that tokens are deposited into "
-  #to: String!
+  " Market that tokens are deposited into "
+  to: String!
 
-  #" Address that deposited tokens "
-  #from: String!
+  " Address that deposited tokens "
+  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -429,11 +429,11 @@ type Withdraw implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: YieldAggregator!
 
-  #" Address that received tokens "
-  #to: String!
+  " Address that received tokens "
+  to: String!
 
-  #" Market that tokens are withdrawn from "
-  #from: String!
+  " Market that tokens are withdrawn from "
+  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
