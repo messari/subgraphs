@@ -128,18 +128,6 @@ dataSources:
           handler: handleWithdraw
         - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
           handler: handleSwap
-        - event: DevUpdated(indexed address,indexed address)
-          handler: handleDevUpdated
-        - event: SlippageParamsUpdated(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleSlippageParamsUpdated
-        - event: OracleUpdated(indexed address,indexed address)
-          handler: handleOracleUpdated
-        - event: RetentionRatioUpdated(uint256,uint256)
-          handler: handleRetentionRatioUpdated
-        - event: PriceDeviationUpdated(uint256,uint256)
-          handler: handlePriceDeviationUpdated
-        - event: HaircutRateUpdated(uint256,uint256)
-          handler: handleHaircutRateUpdated
         - event: AssetAdded(indexed address,indexed address)
           handler: handleAssetAdded
 
@@ -201,18 +189,6 @@ templates:
           handler: handleWithdraw
         - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
           handler: handleSwap
-        - event: DevUpdated(indexed address,indexed address)
-          handler: handleDevUpdated
-        - event: SlippageParamsUpdated(uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleSlippageParamsUpdated
-        - event: OracleUpdated(indexed address,indexed address)
-          handler: handleOracleUpdated
-        - event: RetentionRatioUpdated(uint256,uint256)
-          handler: handleRetentionRatioUpdated
-        - event: PriceDeviationUpdated(uint256,uint256)
-          handler: handlePriceDeviationUpdated
-        - event: HaircutRateUpdated(uint256,uint256)
-          handler: handleHaircutRateUpdated
         - event: AssetAdded(indexed address,indexed address)
           handler: handleAssetAdded
   - kind: ethereum/contract
@@ -278,9 +254,5 @@ templates:
           handler: handleCashAdded
         - event: CashRemoved(uint256,uint256)
           handler: handleCashRemoved
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: MaxSupplyUpdated(uint256,uint256)
-          handler: handleMaxSupplyUpdated
         - event: PoolUpdated(indexed address,indexed address)
           handler: handlePoolUpdated

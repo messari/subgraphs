@@ -78,7 +78,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
 
   newPoolUpdatedInputTokens.push(_asset.token);
   newPoolUpdatedAssets.push(_asset.id);
-  newPoolUpdatedInputTokens.sort();
+  newPoolUpdatedInputTokens = newPoolUpdatedInputTokens.sort();
 
   let newPoolIndex = newPoolUpdatedInputTokens.indexOf(_asset.token);
 
