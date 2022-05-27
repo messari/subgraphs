@@ -18,15 +18,13 @@ import { TransactionType } from "../common/constants";
 import { getOrCreateLiquidityPoolParamsHelper } from "../common/getters";
 
 import {
-  updateBalancesInPoolAfterSwap,
   updateFinancials,
   updatePoolMetrics,
-  updateProtocolTVL,
   updateSwapMetrics,
   updateUsageMetrics,
   updateFeeMetrics,
 } from "../common/metrics";
-import { createDeposit, createAsset, createWithdraw, createSwap, updateBalancesInPool } from "./helpers";
+import { createDeposit, createAsset, createWithdraw, createSwap } from "./helpers";
 
 export function handleDeposit(event: Deposit): void {
   let deposit = createDeposit(
@@ -37,8 +35,8 @@ export function handleDeposit(event: Deposit): void {
     event.params.to,
     event.params.sender,
   );
-  updateBalancesInPool<DepositSchema>(event, deposit, TransactionType.DEPOSIT);
-  updateProtocolTVL(event);
+  // updateBalancesInPool<DepositSchema>(event, deposit, TransactionType.DEPOSIT);
+  // updateProtocolTVL(event);
   updateFinancials(event);
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updatePoolMetrics(event);
@@ -53,8 +51,8 @@ export function handleWithdraw(event: Withdraw): void {
     event.params.to,
     event.params.sender,
   );
-  updateBalancesInPool<WithdrawSchema>(event, withdraw, TransactionType.WITHDRAW);
-  updateProtocolTVL(event);
+  // updateBalancesInPool<WithdrawSchema>(event, withdraw, TransactionType.WITHDRAW);
+  // updateProtocolTVL(event);
   updateFinancials(event);
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updatePoolMetrics(event);
@@ -70,8 +68,8 @@ export function handleSwap(event: Swap): void {
     event.params.toAmount,
     event.params.to,
   );
-  updateBalancesInPoolAfterSwap(event, swap);
-  updateProtocolTVL(event);
+  // updateBalancesInPoolAfterSwap(event, swap);
+  // updateProtocolTVL(event);
   updateFinancials(event);
   updateFeeMetrics(event, event.address, swap);
   updateSwapMetrics(event, swap);

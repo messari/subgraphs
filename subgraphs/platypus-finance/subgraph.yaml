@@ -248,6 +248,10 @@ templates:
         - name: Pool
           file: ./abis/pool.json
       eventHandlers:
+        - event: CashAdded(uint256,uint256)
+          handler: handleCashAdded
+        - event: CashRemoved(uint256,uint256)
+          handler: handleCashRemoved
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
         - event: MaxSupplyUpdated(uint256,uint256)
