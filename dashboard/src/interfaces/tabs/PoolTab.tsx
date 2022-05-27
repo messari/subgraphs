@@ -147,7 +147,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
               continue;
             }
             if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
-              value = Number(currentInstanceField);
+              value = currentInstanceField;
               if (
                 capsEntityFieldName.includes("OUTPUTTOKEN") &&
                 capsEntityFieldName !== "OUTPUTTOKEN" &&
@@ -178,8 +178,8 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
               dataFieldMetrics[entityFieldName] = returnedData.currentEntityFieldMetrics;
 
               if (
-                capsEntityFieldName.includes("LIQUIDATEUSD") &&
-                value > timeseriesInstance.totalValueLockedUSD &&
+                (capsEntityFieldName === "HOURLYLIQUIDATEUSD" || capsEntityFieldName === "DAILYLIQUIDATEUSD") &&
+                Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
                 issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length ===
                   0
               ) {
@@ -526,7 +526,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
           </Grid>
         );
         ratesElement = (
-          <div id={elementId}>
+          <div key={elementId} id={elementId}>
             <Box mt={3} mb={1}>
               <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                 <Typography variant="h6">{elementId}</Typography>
@@ -547,7 +547,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
         tokenWeightComponent = Object.keys(tokenWeightData).map((tokenWeightFieldName) => {
           const currentTokenWeightArray = tokenWeightData[tokenWeightFieldName];
           return (
-            <div id={entityName + "-" + tokenWeightFieldName}>
+            <div key={entityName + "-" + tokenWeightFieldName} id={entityName + "-" + tokenWeightFieldName}>
               <Box mt={3} mb={1}>
                 <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
                   <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
@@ -632,16 +632,38 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
                   const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
                   const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
                   label += " - " + symbol + ": " + name;
+                  if (
+                    arrayIndex + 1 > data[poolKeySingular]?.rewardTokens.length &&
+                    issues.filter((x) => x.fieldName === `${fieldName}[${arrayIndex}]` && x.type === "TOK").length === 0
+                  ) {
+                    issues.push({
+                      type: "TOK",
+                      level: "error",
+                      fieldName: `${fieldName}[${arrayIndex}]`,
+                      message: `rewardTokens [${arrayIndex}]`,
+                    });
+                  }
                 } else if (data[poolKeySingular]?.inputTokens) {
                   const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
                   const name = currentInputToken?.name ? currentInputToken.name : "N/A";
                   const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
                   label += " - " + symbol + ": " + name;
+                  if (
+                    arrayIndex + 1 > data[poolKeySingular]?.inputTokens.length &&
+                    issues.filter((x) => x.fieldName === `${fieldName}[${arrayIndex}]` && x.type === "TOK").length === 0
+                  ) {
+                    issues.push({
+                      type: "TOK",
+                      level: "error",
+                      fieldName: `${fieldName}[${arrayIndex}]`,
+                      message: `inputTokens [${arrayIndex}]`,
+                    });
+                  }
                 }
               }
               if (dataFieldMetrics[field]?.invalidDataPlot) {
                 return (
-                  <div id={linkToElementId}>
+                  <div key={elementId} id={linkToElementId}>
                     <Box mt={3} mb={1}>
                       <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
                         <Typography variant="h6">{label}</Typography>
@@ -707,7 +729,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
                 });
               }
               return (
-                <div>
+                <div key={elementId}>
                   <Box mt={3} mb={1}>
                     <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                       <Typography variant="h6">
@@ -720,7 +742,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
             }
 
             return (
-              <div id={linkToElementId}>
+              <div key={elementId} id={linkToElementId}>
                 <Box mt={3} mb={1}>
                   <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
                     <Typography variant="h6">{label}</Typography>

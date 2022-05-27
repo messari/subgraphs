@@ -1,14 +1,7 @@
-import React, { MouseEventHandler, useContext, useMemo } from "react";
-import { latestSchemaVersion } from "../constants";
+import React from "react";
 import { useNavigate } from "react-router";
-import { ApolloClient, HttpLink, InMemoryCache, useQuery } from "@apollo/client";
-import { NewClient, parseSubgraphName, toPercent } from "../utils";
-import { ProtocolQuery } from "../queries/protocolQuery";
-import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
-import { useEffect } from "react";
 import { styled } from "../styled";
-import { alpha, Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { NetworkLogo } from "../common/NetworkLogo";
+import { Box, Card, CardContent, Typography } from "@mui/material";
 
 const PoolBackground = styled("div")`
   background: rgba(22, 24, 29, 0.95);
@@ -32,7 +25,7 @@ const StyledPool = styled(Card)(() => {
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,24 +35,16 @@ const CardRow = styled("div")<{ $warning?: boolean }>`
   ${({ $warning, theme }) => $warning && `color: ${theme.palette.warning.main}`};
 `;
 
-const CardButton = styled(Button)`
-  width: 100%;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-`;
-
 interface PoolProps {
   pool: { [x: string]: any };
   protocolData: { [x: string]: any };
+  handleTabChange: (event: any, newValue: string) => void;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // This component is for each individual pool
-export const Pool = ({ pool, protocolData }: PoolProps) => {
+export const Pool = ({ pool, protocolData, handleTabChange, setPoolId }: PoolProps) => {
   const navigate = useNavigate();
-
-  const navigateToSubgraph = (url: string) => () => {
-    navigate(`subgraph?endpoint=${url}&tab=protocol`);
-  };
 
   let baseYieldElement = null;
   if (protocolData.type === "EXCHANGE") {
@@ -131,7 +116,15 @@ export const Pool = ({ pool, protocolData }: PoolProps) => {
 
   return (
     <StyledPool
-    // onClick={navigateToSubgraph("")}
+      onClick={() => {
+        const href = new URL(window.location.href);
+        const p = new URLSearchParams(href.search);
+        p.set("tab", "pool");
+        p.set("poolId", pool.id);
+        navigate("?" + p.toString());
+        setPoolId(pool.id);
+        handleTabChange(null, "2");
+      }}
     >
       <PoolBackground>
         <CardContent>
