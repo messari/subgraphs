@@ -147,7 +147,7 @@ async function bootstrap() {
     );
     strategyAddress = await contract.strategy();
     vaultName = vaults.polygonPools[i].id;
-    startBlock = 13500000;
+    startBlock = 19500000;
     console.log(
       "Adding " + vaultName + "with starting block " + startBlock + "..."
     );

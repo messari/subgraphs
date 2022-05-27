@@ -310,7 +310,7 @@ type VaultHourlySnapshot @entity {
   vault: Vault!
 
   " Current TVL (Total Value Locked) of this pool in USD "
-  totalValueLockedUSD: BigDecimal!
+  totalValueLockedUSD: BigDecimal
 
   " Amount of input token in the pool "
   inputTokenBalance: BigInt!
