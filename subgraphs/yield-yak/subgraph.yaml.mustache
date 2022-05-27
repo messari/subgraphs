@@ -42,8 +42,6 @@ dataSources:
         {{#isDexStrategyV4}}
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit
-        - event: Recovered(address,uint256)
-          handler: handleRecovered
         - event: Reinvest(uint256,uint256)
           handler: handleReinvest
         - event: Withdraw(indexed address,uint256)

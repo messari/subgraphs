@@ -24,7 +24,6 @@ import { updateDailyOrHourlyEntities } from './updateDailyOrHourlyEntities'
 import { feeUpdater } from './FeeUpdater';
 
 export function handleDeposit(event: DepositEvent): void {
-  
   let transactionHash = event.transaction.hash;
   let logIndex = event.logIndex;
   let deposit = Deposit.load(transactionHash.toHexString().concat("-").concat(logIndex.toHexString()));
