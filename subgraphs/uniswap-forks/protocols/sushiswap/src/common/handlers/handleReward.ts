@@ -2,7 +2,7 @@ import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefSushiswap } from "../../../../../generated/MasterChef/MasterChefSushiswap";
 import { LiquidityPool, _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
+import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, RECENT_BLOCK_THRESHOLD, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
@@ -38,7 +38,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   }
 
   // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
+  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(RECENT_BLOCK_THRESHOLD)) {
     pool.save();
     return;
   }

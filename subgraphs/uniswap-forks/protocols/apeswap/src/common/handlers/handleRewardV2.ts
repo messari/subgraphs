@@ -2,7 +2,7 @@ import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { NetworkConfigs } from "../../../../../configurations/configure";
 import { MasterChefV2Apeswap } from "../../../../../generated/MasterChefV2/MasterChefV2Apeswap";
 import { LiquidityPool, _HelperStore } from "../../../../../generated/schema";
-import { BIGINT_FIVE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
+import { BIGINT_FIVE, BIGINT_ZERO, INT_ZERO, RECENT_BLOCK_THRESHOLD, UsageType, ZERO_ADDRESS } from "../../../../../src/common/constants";
 import { getOrCreateToken } from "../../../../../src/common/getters";
 import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../../../src/price/price";
 import { getRewardsPerDay } from "../../../../../src/common/rewards";
@@ -37,8 +37,8 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
   }
 
-  // Return if you have calculated rewards recently for efficiency
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
+  // Return if you have calculated rewards recently
+  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(RECENT_BLOCK_THRESHOLD)) {
     pool.save();
     return;
   }
@@ -82,7 +82,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
 
   pool.rewardTokenEmissionsUSD = [rewardTokenPerDay.times(rewardToken.lastPriceUSD!)];
 
-  // This keeps track of the last reward timestamp for this masterchef pool
+  // This keeps track of the last time the pool reward was calculated
   masterChefPool.valueBigInt = event.block.number;
 
   masterChefPool.save();

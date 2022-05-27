@@ -87,6 +87,30 @@ dataSources:
         - event: NewLiquidationIncentive(uint256,uint256)
           handler: handleNewLiquidationIncentive
 
+  - kind: ethereum/contract
+    name: Stablizer
+    network: mainnet
+    source:
+      address: "0x7eC0D931AFFBa01b77711C2cD07c76B970795CDd"
+      abi: Stablizer
+      startBlock: 11915920
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/stablizer.ts
+      entities:
+        - LendingProtocol
+        - FinancialsDailySnapshot
+      abis:
+        - name: Stablizer
+          file: ./abis/Stablizer.json
+      eventHandlers:
+        - event: Sell(indexed address,uint256,uint256)
+          handler: handleSell
+        - event: Buy(indexed address,uint256,uint256)
+          handler: handleBuy
+
 templates:
   - kind: ethereum/contract
     name: CToken
