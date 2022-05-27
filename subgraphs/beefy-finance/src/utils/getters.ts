@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import { Token, Vault, YieldAggregator } from "../../generated/schema";
 import { createVaultFromStrategy } from "../mappings/vault";
 import { BeefyStrategy } from "../../generated/ExampleVault/BeefyStrategy";
@@ -7,6 +7,7 @@ import {
   fetchTokenName,
   fetchTokenSymbol,
 } from "../mappings/token";
+import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 export function getTokenOrCreate(
   tokenAddress: Address,
@@ -19,6 +20,7 @@ export function getTokenOrCreate(
     token.name = fetchTokenName(tokenAddress);
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress) as i32;
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
     token.save();
   }
   return token;

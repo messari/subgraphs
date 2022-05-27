@@ -9,7 +9,7 @@ import {
   getVaultFromStrategyOrCreate,
   getTokenOrCreate,
 } from "../utils/getters";
-import { getUSDPrice } from "../utils/prices";
+import { getLastPriceUSD } from "./token";
 
 export function createWithdraw(
   event: WithdrawEvent,
@@ -34,8 +34,9 @@ export function createWithdraw(
   const strategyContract = BeefyStrategy.bind(event.address);
   withdraw.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
   withdraw.amount = withdrawnAmount;
-  withdraw.amountUSD = getUSDPrice(
-    getTokenOrCreate(strategyContract.want(), networkSuffix)
+  withdraw.amountUSD = getLastPriceUSD(
+    strategyContract.want(),
+    event.block.number
   ).times(new BigDecimal(withdrawnAmount));
 
   withdraw.vault = getVaultFromStrategyOrCreate(

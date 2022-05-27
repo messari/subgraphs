@@ -84,7 +84,6 @@ export function handleWithdraw(event: Withdraw): void {
   );
   const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
 
-  //updateVault(vault);
   const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
 
   if (vault.withdraws[0] === "MockWithdraw" + vault.id) {
