@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -53,7 +53,10 @@ const messagesByLevel = (
       if (issuesArray[x].type === "VAL") {
         issuesMsg = issuesArray[x].message;
       }
-      issuesMsgs.push(<li>{issuesMsg}</li>);
+      if (issuesArray[x].type === "TOK") {
+        issuesMsg = `'${issuesArray[x].fieldName}' in the timeseries data refers to a token that does not exist on this pool. '${issuesArray[x].message}' is an invalid index.`;
+      }
+      issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
   }
   return issuesMsgs;

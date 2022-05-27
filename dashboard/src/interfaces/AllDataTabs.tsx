@@ -7,6 +7,7 @@ import PoolTab from "./tabs/PoolTab";
 import ProtocolTab from "./tabs/ProtocolTab";
 import { styled } from "../styled";
 import PoolOverviewTab from "./tabs/PoolOverviewTab";
+import { ProtocolDropDown } from "../common/utilComponents/ProtocolDropDown";
 
 const StyledTabs = styled(Tabs)`
   background: #292f38;
@@ -24,7 +25,13 @@ interface AllDataTabsProps {
   poolData: { [x: string]: string };
   events: string[];
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  setProtocolId: React.Dispatch<React.SetStateAction<string>>;
   poolNames: string;
+  subgraphToQueryURL: string;
+  pools: any[];
+  paginate: React.Dispatch<React.SetStateAction<number>>;
+  skipAmt: number;
+  poolOverviewRequest: { [x: string]: any };
 }
 
 // This component is for each individual subgraph
@@ -40,15 +47,28 @@ function AllDataTabs({
   events,
   setPoolId,
   poolNames,
+  subgraphToQueryURL,
+  pools,
+  paginate,
+  setProtocolId,
+  skipAmt,
+  poolOverviewRequest,
 }: AllDataTabsProps) {
   const protocolEntityName = ProtocolTypeEntityName[data.protocols[0].type];
   const protocolEntityNames = ProtocolTypeEntityNames[data.protocols[0].type];
 
+  let protocolDropDown = null;
+  if (data[protocolEntityNames].length > 1) {
+    protocolDropDown = (
+      <div style={{ padding: "24px" }}>
+        <ProtocolDropDown setProtocolId={(x) => setProtocolId(x)} protocols={data[protocolEntityNames]} />
+      </div>
+    );
+  }
   let protocolData = data[protocolEntityName];
   if (!protocolData) {
     protocolData = data[protocolEntityNames][0];
   }
-  console.log("FULLDATAOBJ", data, protocolData, "sloop", events);
   if (protocolData?.lendingType === "CDP") {
     protocolFields.mintedTokens += "!";
     protocolFields.mintedTokenSupplies += "!";
@@ -63,6 +83,7 @@ function AllDataTabs({
           <Tab label="Events" value="3" />
           <Tab label="Pool Overview" value="4" />
         </StyledTabs>
+        {protocolDropDown}
         <TabPanel value="1">
           {/* PROTOCOL TAB */}
           <ProtocolTab
@@ -97,7 +118,16 @@ function AllDataTabs({
         </TabPanel>
         <TabPanel value="4">
           {/* POOLOVERVIEW TAB */}
-          <PoolOverviewTab pools={data[poolNames]} protocolData={protocolData} />
+          <PoolOverviewTab
+            pools={pools}
+            subgraphToQueryURL={subgraphToQueryURL}
+            protocolData={protocolData}
+            poolOverviewRequest={poolOverviewRequest}
+            setPoolId={(x) => setPoolId(x)}
+            paginate={(x) => paginate(x)}
+            skipAmt={skipAmt}
+            handleTabChange={(x, y) => handleTabChange(x, y)}
+          />
         </TabPanel>
       </TabContext>
     </>

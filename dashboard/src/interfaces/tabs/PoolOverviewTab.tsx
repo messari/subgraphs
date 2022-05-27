@@ -1,15 +1,21 @@
-import React, { useEffect, useState } from "react";
-import { TableEvents } from "../../common/chartComponents/TableEvents";
-import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
+import React from "react";
 import IssuesDisplay from "../IssuesDisplay";
-import { Box, Typography } from "@mui/material";
 import { Pool } from "../Pool";
 import { styled } from "../../styled";
+import { CircularProgress } from "@mui/material";
 
-interface PoolOverviewTabProps {
-  pools: any[];
-  protocolData: { [x: string]: any };
-}
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useNavigate } from "react-router";
+
+const ChangePageEle = styled("div")`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing(1)};
+  padding: ${({ theme }) => theme.spacing(2)};
+  margin: 10px 0;
+  cursor: pointer;
+`;
 
 const PoolContainer = styled("div")`
   display: flex;
@@ -17,24 +23,136 @@ const PoolContainer = styled("div")`
   gap: ${({ theme }) => theme.spacing(2)};
 `;
 
-// This component is for each individual subgraph
-function PoolOverviewTab({ pools, protocolData }: PoolOverviewTabProps) {
-  const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
-  const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
+interface PoolOverviewTabProps {
+  pools: any[];
+  protocolData: { [x: string]: any };
+  subgraphToQueryURL: string;
+  poolOverviewRequest: { [x: string]: any };
+  handleTabChange: (event: any, newValue: string) => void;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  paginate: React.Dispatch<React.SetStateAction<number>>;
+  skipAmt: number;
+}
 
-  // useEffect(() => {
-  //     console.log("PoolOverview ISSUES TO SET", issues, issuesState);
-  //     setIssues(issues);
-  // }, [issuesState]);
+// This component is for each individual subgraph
+function PoolOverviewTab({
+  pools,
+  setPoolId,
+  protocolData,
+  poolOverviewRequest,
+  handleTabChange,
+  paginate,
+  skipAmt,
+}: PoolOverviewTabProps) {
+  const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
+  const navigate = useNavigate();
+  const href = new URL(window.location.href);
+  const p = new URLSearchParams(href.search);
+  if (!!poolOverviewRequest.poolOverviewError) {
+    issues.push({
+      message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
+      type: "",
+      fieldName: "PoolOverviewTab",
+      level: "critical",
+    });
+  }
+
+  if (poolOverviewRequest.poolOverviewLoading) {
+    return <CircularProgress sx={{ margin: 6 }} size={50} />;
+  }
+
+  let nextButton = null;
+  if (pools.length === 100) {
+    nextButton = (
+      <>
+        <ChangePageEle>
+          <span
+            onClick={() => {
+              window.scrollTo(0, 0);
+              paginate(skipAmt + 100);
+              p.set("skipAmt", (skipAmt + 100).toString());
+              navigate("?" + p.toString());
+            }}
+          >
+            NEXT
+          </span>
+          <ChevronRightIcon />
+        </ChangePageEle>
+      </>
+    );
+  }
+
+  let prevButton = null;
+  if (skipAmt > 0 && skipAmt <= 100) {
+    prevButton = (
+      <>
+        <ChangePageEle>
+          <ChevronLeftIcon />
+          <span
+            onClick={() => {
+              window.scrollTo(0, document.body.scrollHeight);
+              paginate(0);
+              p.delete("skipAmt");
+              navigate("?" + p.toString());
+            }}
+          >
+            BACK
+          </span>
+        </ChangePageEle>
+      </>
+    );
+  } else if (skipAmt > 0) {
+    prevButton = (
+      <>
+        <ChangePageEle>
+          <ChevronLeftIcon />
+          <span
+            onClick={() => {
+              window.scrollTo(0, document.body.scrollHeight);
+              paginate(skipAmt - 100);
+              p.set("skipAmt", (skipAmt - 100).toString());
+              navigate("?" + p.toString());
+            }}
+          >
+            BACK
+          </span>
+        </ChangePageEle>
+      </>
+    );
+  }
+
+  if (!poolOverviewRequest.poolOverviewLoading && pools.length === 0) {
+    if (skipAmt > 0) {
+      p.delete("skipAmt");
+      window.location.href = `${href.origin}${href.pathname}?${p.toString()}`;
+    } else {
+      issues.push({
+        message: "No pools returned in pool overview.",
+        type: "POOL",
+        level: "error",
+        fieldName: "poolOverview",
+      });
+    }
+  }
 
   return (
     <>
       <IssuesDisplay issuesArrayProps={issues} />
+      {prevButton}
       <PoolContainer>
         {pools.map((pool) => {
-          return <Pool pool={pool} protocolData={protocolData} />;
+          return (
+            <Pool
+              key={pool.id}
+              pool={pool}
+              setPoolId={(x) => setPoolId(x)}
+              protocolData={protocolData}
+              handleTabChange={(x, y) => handleTabChange(x, y)}
+            />
+          );
         })}
       </PoolContainer>
+      {nextButton}
     </>
   );
 }
