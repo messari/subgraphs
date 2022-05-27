@@ -69,8 +69,6 @@ function AllDataTabs({
   if (!protocolData) {
     protocolData = data[protocolEntityNames][0];
   }
-
-  console.log("FULLDATAOBJ", data, protocolData, "sloop", events, tabValue);
   if (protocolData?.lendingType === "CDP") {
     protocolFields.mintedTokens += "!";
     protocolFields.mintedTokenSupplies += "!";

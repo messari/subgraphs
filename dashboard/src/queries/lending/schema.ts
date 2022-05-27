@@ -299,6 +299,37 @@ export const schema110 = (): Schema => {
         markets {
           id
           name
+          inputTokens{
+            id
+            decimals
+            name
+            symbol
+          }
+          outputToken {
+            id
+            decimals
+            name
+            symbol
+          }
+          rewardTokens{
+            id
+            decimals
+            name
+            symbol
+          }
+          inputTokenBalances
+          outputTokenSupply
+         isActive
+         canUseAsCollateral
+         canBorrowFrom
+         maximumLTV
+         liquidationThreshold
+         liquidationPenalty
+         depositRate
+         stableBorrowRate
+         variableBorrowRate
+         rewardTokenEmissionsAmount
+         rewardTokenEmissionsUSD
         }
         financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
@@ -663,6 +694,52 @@ export const schema120 = (): Schema => {
     markets {
       id
       name
+      inputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      outputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      rewardTokens {
+        id
+        token {
+          id
+          decimals
+          name
+          symbol
+        }
+      }
+      rates {
+        id
+        side
+        rate
+        type
+      }
+      isActive
+      canUseAsCollateral
+      canBorrowFrom
+      maximumLTV
+      liquidationThreshold
+      liquidationPenalty
+      totalValueLockedUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      inputTokenBalance
+      inputTokenPriceUSD
+      outputTokenSupply
+      outputTokenPriceUSD
+      exchangeRate
+      rewardTokenEmissionsAmount
+      rewardTokenEmissionsUSD
     }
     ${finanQuery}
     ${usageHourlyQuery}

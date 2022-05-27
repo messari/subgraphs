@@ -77,7 +77,6 @@ function ProtocolDashboard() {
   const queryMain = gql`
     ${graphQuery}
   `;
-
   const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
 
   let tabNum = "1";

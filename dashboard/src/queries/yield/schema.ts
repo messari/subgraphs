@@ -107,6 +107,26 @@ export const schema100 = (): Schema => {
         vaults {
           id
           name
+          fees{
+            feePercentage
+            feeType
+          }
+          inputTokens {
+            name
+            decimals
+          }
+          outputToken {
+            id
+            decimals
+          }
+          rewardTokens {
+            id
+            decimals
+          }
+          symbol
+          depositLimit
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
         }
         usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
@@ -274,6 +294,26 @@ export const schema110 = (): Schema => {
         vaults {
           id
           name
+          fees{
+            feePercentage
+            feeType
+          }
+          inputTokens {
+            name
+            decimals
+          }
+          outputToken {
+            id
+            decimals
+          }
+          rewardTokens {
+            id
+            decimals
+          }
+          symbol
+          depositLimit
+          rewardTokenEmissionsAmount
+          rewardTokenEmissionsUSD
         }
         usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
@@ -529,6 +569,41 @@ export const schema120 = (): Schema => {
       vaults {
         id
         name
+        symbol
+        fees {
+          feeType
+          feePercentage
+        }
+        inputToken {
+          id
+          decimals
+          name
+          symbol
+        }
+        outputToken {
+          id
+          decimals
+          name
+          symbol
+        }
+        rewardTokens {
+          id
+          token {
+            id
+            decimals
+            name
+            symbol
+          }
+        }
+        depositLimit
+        totalValueLockedUSD
+        stakedOutputTokenAmount
+        pricePerShare
+        inputTokenBalance
+        outputTokenSupply
+        outputTokenPriceUSD
+        rewardTokenEmissionsAmount
+        rewardTokenEmissionsUSD
       }
       ${finanQuery}
       ${usageHourlyQuery}
