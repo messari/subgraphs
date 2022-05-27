@@ -252,22 +252,6 @@ export const schema110 = (): Schema => {
         liquidityPools {
           id
           name
-          fees{
-            feePercentage
-            feeType
-          }
-          inputTokens{
-            decimals
-            name
-          }
-          outputToken {
-            id
-            decimals
-          }
-          rewardTokens {
-            id
-          }
-          symbol
         }
         usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalUniqueUsers
@@ -548,41 +532,6 @@ export const schema120 = (): Schema => {
     liquidityPools {
       id
       name
-      symbol
-      fees{
-        feePercentage
-        feeType
-      }
-      inputTokens{
-        id
-        decimals
-        name
-        symbol
-      }
-      outputToken {
-        id
-        decimals
-        name
-        symbol
-      }
-      rewardTokens {
-        id
-        token {
-          id
-          decimals
-          name
-          symbol
-        }
-      }
-      totalValueLockedUSD
-      cumulativeVolumeUSD
-      inputTokenBalances
-      inputTokenWeights
-      outputTokenSupply
-      outputTokenPriceUSD
-      stakedOutputTokenAmount
-      rewardTokenEmissionsAmount
-      rewardTokenEmissionsUSD
     }
     ${finanQuery}
     ${usageHourlyQuery}

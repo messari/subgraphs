@@ -270,7 +270,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields, protocolDat
                 });
               }
               return (
-                <div>
+                <div key={elementId}>
                   <Box mt={3} mb={1} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
                     <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                       <Typography variant="h6">
@@ -282,7 +282,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields, protocolDat
               );
             }
             return (
-              <div id={elementId}>
+              <div key={elementId} id={elementId}>
                 <Box mt={3} mb={1}>
                   <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                     <Typography variant="h6">{field}</Typography>

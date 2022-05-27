@@ -14,20 +14,22 @@ function checkValueFalsey(
   if (!fieldDataType || fieldDataType.length === 0) {
     return undefined;
   }
-  if (fieldDataType[fieldDataType.length - 1] !== "!") {
+  if (fieldDataType[fieldDataType.length - 1] !== "!" && !value) {
     return undefined;
   }
   let valueMsg = "";
+  let level = "warning";
   if (value === "" || value?.length === 0) {
     valueMsg = "empty";
   } else if (!value || Number(value) === 0) {
     valueMsg = value;
-  } else if (value < 0) {
+  } else if (Number(value) < 0) {
     valueMsg = "negative";
+    level = "critical";
   }
   const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this data is correct";
   if (issues.filter((x) => x.message === message).length === 0 && valueMsg) {
-    return { type: "VAL", message, level: "warning", fieldName: schemaName + "-" + entityField };
+    return { type: "VAL", message, level, fieldName: schemaName + "-" + entityField };
   } else {
     return undefined;
   }

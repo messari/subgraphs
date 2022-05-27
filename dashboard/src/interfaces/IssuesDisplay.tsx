@@ -53,7 +53,10 @@ const messagesByLevel = (
       if (issuesArray[x].type === "VAL") {
         issuesMsg = issuesArray[x].message;
       }
-      issuesMsgs.push(<li>{issuesMsg}</li>);
+      if (issuesArray[x].type === "TOK") {
+        issuesMsg = `'${issuesArray[x].fieldName}' in the timeseries data refers to a token that does not exist on this pool. '${issuesArray[x].message}' is an invalid index.`;
+      }
+      issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
   }
   return issuesMsgs;
