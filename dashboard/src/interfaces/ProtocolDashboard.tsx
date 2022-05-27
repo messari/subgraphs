@@ -109,7 +109,9 @@ function ProtocolDashboard() {
       tabName = "events";
     } else if (newValue === "4") {
       tabName = "poolOverview";
-      skipAmtParam = `&skipAmt=${skipAmt}`;
+      if (skipAmt > 0) {
+        skipAmtParam = `&skipAmt=${skipAmt}`;
+      }
     }
     navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
     setTabValue(newValue);
