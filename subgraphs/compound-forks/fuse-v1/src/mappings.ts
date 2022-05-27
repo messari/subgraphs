@@ -291,16 +291,9 @@ export function handleNewLiquidationIncentive(
 }
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
-  let protocol = LendingProtocol.load(event.address.toHexString());
-  if (!protocol) {
-    // best effort
-    log.warning("[handleMarketListed] Comptroller not found: {}", [
-      event.address.toHexString(),
-    ]);
-    return;
-  }
-
-  _handleNewPriceOracle(protocol, event);
+  let pool = _FusePool.load(event.address.toHexString());
+  pool.priceOracle = event.params.newPriceOracle.toHexString();
+  pool.save();
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
