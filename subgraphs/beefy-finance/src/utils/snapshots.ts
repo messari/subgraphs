@@ -65,12 +65,3 @@ export function updateVaultHourlySnapshot(
 
   return vaultHourlySnapshot;
 }
-
-export function updateSnapshots(
-  block: ethereum.Block,
-  vault: Vault
-): [VaultDailySnapshot, VaultHourlySnapshot] {
-  const dailySnapshot = updateVaultDailySnapshot(block, vault);
-  const hourlySnapshot = updateVaultHourlySnapshot(block, vault);
-  return [dailySnapshot, hourlySnapshot];
-}

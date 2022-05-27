@@ -15,7 +15,10 @@ import {
 import { getAddressFromId } from "../utils/helpers";
 import { createDeposit, getOrCreateFirstDeposit } from "./deposit";
 import { createWithdraw, getOrCreateFirstWithdraw } from "./withdraw";
-import { updateSnapshots } from "../utils/snapshots";
+import {
+  updateVaultDailySnapshot,
+  updateVaultHourlySnapshot,
+} from "../utils/snapshots";
 
 const NETWORK_SUFFIX: string = "-137";
 
@@ -53,9 +56,8 @@ export function createVaultFromStrategy(
   vault.deposits = [getOrCreateFirstDeposit(vault).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
 
-  const snapshots = updateSnapshots(currentBlock, vault);
-  vault.dailySnapshots = [snapshots[0].id];
-  vault.hourlySnapshots = [snapshots[1].id];
+  vault.dailySnapshots = [updateVaultDailySnapshot(currentBlock, vault).id];
+  vault.hourlySnapshots = [updateVaultHourlySnapshot(currentBlock, vault).id];
 
   vault.save();
   return vault;
@@ -103,12 +105,16 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   vault.inputTokenBalance = vaultContract.balance();
   vault.outputTokenSupply = vaultContract.totalSupply();
   vault.pricePerShare = vaultContract.getPricePerFullShare();
-  const snapshots = updateSnapshots(block, vault);
-  if (vault.dailySnapshots[vault.dailySnapshots.length - 1] !== snapshots[0].id)
-    vault.dailySnapshots = vault.dailySnapshots.concat([snapshots[0].id]);
+  const dailySnapshot = updateVaultDailySnapshot(block, vault);
   if (
-    vault.hourlySnapshots[vault.hourlySnapshots.length - 1] !== snapshots[1].id
+    vault.dailySnapshots[vault.dailySnapshots.length - 1] !== dailySnapshot.id
   )
-    vault.hourlySnapshots = vault.hourlySnapshots.concat([snapshots[1].id]);
+    vault.dailySnapshots = vault.dailySnapshots.concat([dailySnapshot.id]);
+  const hourlySnapshot = updateVaultHourlySnapshot(block, vault);
+  if (
+    vault.hourlySnapshots[vault.hourlySnapshots.length - 1] !==
+    hourlySnapshot.id
+  )
+    vault.hourlySnapshots = vault.hourlySnapshots.concat([hourlySnapshot.id]);
   vault.save();
 }
