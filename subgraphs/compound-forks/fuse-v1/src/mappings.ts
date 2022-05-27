@@ -156,11 +156,10 @@ export function handlePoolRegistered(event: PoolRegistered): void {
       []
     );
   } else {
-    pool.liquidationIncentive =
-      tryLiquidationIncentive.value
-        .toBigDecimal()
-        .div(mantissaFactorBD)
-        .times(BIGDECIMAL_HUNDRED);
+    pool.liquidationIncentive = tryLiquidationIncentive.value
+      .toBigDecimal()
+      .div(mantissaFactorBD)
+      .times(BIGDECIMAL_HUNDRED);
   }
   pool.save();
 }
@@ -254,7 +253,7 @@ export function handleMarketListed(event: MarketListed): void {
   pool.save();
 
   // set liquidation incentive (fuse-specific)
-  let market = Market.load(event.params.cToken.toHexString())
+  let market = Market.load(event.params.cToken.toHexString());
   market.liquidationPenalty = pool.liquidationIncentive;
   market.save();
 }
