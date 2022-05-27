@@ -1,6 +1,6 @@
 specVersion: 0.0.4
 description: Yield Yak
-repository: https://github.com/yieldyak/subgraph
+repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
