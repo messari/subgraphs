@@ -25,7 +25,15 @@ function createDataSource(contractName, contractAddress, startBlock) {
       kind: "ethereum/events",
       apiVersion: "0.0.6",
       language: "wasm/assemblyscript",
-      entities: ["Vault", "Token", "Deposit", "Withdraw", "YieldAggregator"],
+      entities: [
+        "Vault",
+        "Token",
+        "Deposit",
+        "Withdraw",
+        "YieldAggregator",
+        "VaultDailySnapshot",
+        "VaultHourlySnapshot",
+      ],
       abis: [
         {
           name: "BeefyStrategy",

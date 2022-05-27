@@ -1,4 +1,4 @@
-import { BigDecimal, Address } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault } from "../../generated/schema";
 import {
@@ -15,6 +15,7 @@ import {
 import { getAddressFromId } from "../utils/helpers";
 import { createDeposit, getOrCreateFirstDeposit } from "./deposit";
 import { createWithdraw, getOrCreateFirstWithdraw } from "./withdraw";
+import { updateSnapshots } from "../utils/snapshots";
 
 const NETWORK_SUFFIX: string = "-137";
 
@@ -52,6 +53,10 @@ export function createVaultFromStrategy(
   vault.deposits = [getOrCreateFirstDeposit(vault).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
 
+  const snapshots = updateSnapshots(currentBlock, vault);
+  vault.dailySnapshots = [snapshots[0].id];
+  vault.hourlySnapshots = [snapshots[1].id];
+
   vault.save();
   return vault;
 }
@@ -64,7 +69,6 @@ export function handleDeposit(event: Deposit): void {
   );
 
   const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-  //updateVault(vault);
   const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
 
   if (vault.deposits[0] === "MockDeposit" + vault.id) {
@@ -73,7 +77,7 @@ export function handleDeposit(event: Deposit): void {
     vault.deposits = vault.deposits.concat([deposit.id]);
   }
 
-  vault.save();
+  updateVaultAndSave(vault, event.block);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -83,7 +87,6 @@ export function handleWithdraw(event: Withdraw): void {
     NETWORK_SUFFIX
   );
   const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
-
   const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
 
   if (vault.withdraws[0] === "MockWithdraw" + vault.id) {
@@ -92,13 +95,20 @@ export function handleWithdraw(event: Withdraw): void {
     vault.withdraws = vault.withdraws.concat([withdraw.id]);
   }
 
-  vault.save();
+  updateVaultAndSave(vault, event.block);
 }
 
-export function updateVault(vault: Vault): Vault {
+export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   const vaultContract = BeefyVault.bind(getAddressFromId(vault.id));
   vault.inputTokenBalance = vaultContract.balance();
   vault.outputTokenSupply = vaultContract.totalSupply();
   vault.pricePerShare = vaultContract.getPricePerFullShare();
-  return vault;
+  const snapshots = updateSnapshots(block, vault);
+  if (vault.dailySnapshots[vault.dailySnapshots.length - 1] !== snapshots[0].id)
+    vault.dailySnapshots = vault.dailySnapshots.concat([snapshots[0].id]);
+  if (
+    vault.hourlySnapshots[vault.hourlySnapshots.length - 1] !== snapshots[1].id
+  )
+    vault.hourlySnapshots = vault.hourlySnapshots.concat([snapshots[1].id]);
+  vault.save();
 }
