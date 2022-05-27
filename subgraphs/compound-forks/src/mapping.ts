@@ -47,7 +47,6 @@ import {
   cTokenDecimals,
   cTokenDecimalsBD,
   exponentToBigDecimal,
-  initialExchangeRate,
   InterestRateSide,
   InterestRateType,
   INT_ZERO,
@@ -251,6 +250,13 @@ export function _handleActionPaused(event: ActionPaused1): void {
     log.warning("[handleActionPaused] Market not found: {}", [marketID]);
     return;
   }
+
+  // TODO: remove
+  log.warning("[handleActionPaused] action: {} state: {} market: {}", [
+    event.params.action,
+    event.params.pauseState.toString(),
+    marketID,
+  ]);
 
   if (event.params.action == "Mint") {
     market.isActive = event.params.pauseState;
@@ -950,7 +956,7 @@ export function snapshotFinancials(
     let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
     if (!marketDailySnapshot) {
       // this is okay - no MarketDailySnapshot means no transactions in that market during that day
-      log.warning(
+      log.info(
         "[snapshotFinancials] MarketDailySnapshot not found (ie, no transactions in that market during this day): {}",
         [marketDailySnapshotID]
       );

@@ -176,8 +176,8 @@ export function handleMarketListed(event: MarketListed): void {
   let protocol = LendingProtocol.load(FACTORY_CONTRACT);
   if (!protocol) {
     // best effort
-    log.warning("[handleMarketListed] Comptroller not found: {}", [
-      event.address.toHexString(),
+    log.warning("[handleMarketListed] Protocol not found: {}", [
+      FACTORY_CONTRACT,
     ]);
     return;
   }
@@ -247,13 +247,20 @@ export function handleMarketListed(event: MarketListed): void {
 
   // add market ID to the fuse pool
   let pool = _FusePool.load(event.address.toHexString());
+  if (!pool) {
+    // best effort
+    log.warning("[handleMarketListed] FusePool not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
   let markets = pool.marketIDs;
   markets.push(event.params.cToken.toHexString());
   pool.marketIDs = markets;
   pool.save();
 
   // set liquidation incentive (fuse-specific)
-  let market = Market.load(event.params.cToken.toHexString());
+  let market = Market.load(event.params.cToken.toHexString())!;
   market.liquidationPenalty = pool.liquidationIncentive;
   market.save();
 }
@@ -272,6 +279,13 @@ export function handleNewLiquidationIncentive(
     .minus(BIGDECIMAL_ONE)
     .times(BIGDECIMAL_HUNDRED);
   let pool = _FusePool.load(event.address.toHexString());
+  if (!pool) {
+    // best effort
+    log.warning("[handleNewLiquidationIncentive] FusePool not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
   pool.liquidationIncentive = liquidationIncentive;
   pool.save();
 
@@ -291,6 +305,13 @@ export function handleNewLiquidationIncentive(
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let pool = _FusePool.load(event.address.toHexString());
+  if (!pool) {
+    // best effort
+    log.warning("[handleNewPriceOracle] FusePool not found: {}", [
+      event.address.toHexString(),
+    ]);
+    return;
+  }
   pool.priceOracle = event.params.newPriceOracle.toHexString();
   pool.save();
 }
@@ -304,87 +325,47 @@ export function handleActionPaused(event: ActionPaused1): void {
 /////////////////////////
 
 export function handleMint(event: Mint): void {
-  // get comptroller address
-  let trollerAddr: Address;
-  if (
-    (trollerAddr = getComptrollerAddress(event)) ==
-    Address.fromString(ZERO_ADDRESS)
-  ) {
-    return;
-  }
-
-  _handleMint(trollerAddr, event);
+  _handleMint(Address.fromString(FACTORY_CONTRACT), event);
 }
 
 export function handleRedeem(event: Redeem): void {
-  // get comptroller address
-  let trollerAddr: Address;
-  if (
-    (trollerAddr = getComptrollerAddress(event)) ==
-    Address.fromString(ZERO_ADDRESS)
-  ) {
-    return;
-  }
-
-  _handleRedeem(trollerAddr, event);
+  _handleRedeem(Address.fromString(FACTORY_CONTRACT), event);
 }
 
 export function handleBorrow(event: Borrow): void {
-  // get comptroller address
-  let trollerAddr: Address;
-  if (
-    (trollerAddr = getComptrollerAddress(event)) ==
-    Address.fromString(ZERO_ADDRESS)
-  ) {
-    return;
-  }
-
-  _handleBorrow(trollerAddr, event);
+  _handleBorrow(Address.fromString(FACTORY_CONTRACT), event);
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  // get comptroller address
-  let trollerAddr: Address;
-  if (
-    (trollerAddr = getComptrollerAddress(event)) ==
-    Address.fromString(ZERO_ADDRESS)
-  ) {
-    return;
-  }
-
-  _handleRepayBorrow(trollerAddr, event);
+  _handleRepayBorrow(Address.fromString(FACTORY_CONTRACT), event);
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  // get comptroller address
-  let trollerAddr: Address;
-  if (
-    (trollerAddr = getComptrollerAddress(event)) ==
-    Address.fromString(ZERO_ADDRESS)
-  ) {
-    return;
-  }
-
-  _handleLiquidateBorrow(trollerAddr, event);
+  _handleLiquidateBorrow(Address.fromString(FACTORY_CONTRACT), event);
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
+  let marketAddress = event.address;
   // get comptroller address
   let trollerAddr: Address;
   if (
     (trollerAddr = getComptrollerAddress(event)) ==
     Address.fromString(ZERO_ADDRESS)
   ) {
+    log.warning("[handleAccrueInterest] Comptroller address not found.", []);
     return;
   }
 
-  let marketAddress = event.address;
-
   let cTokenContract = CToken.bind(marketAddress);
-  let protocol = LendingProtocol.load(trollerAddr.toHexString());
-  let oracleContract = PriceOracle.bind(
-    Address.fromString(protocol!._priceOracle)
-  );
+  let pool = _FusePool.load(trollerAddr.toHexString());
+  if (!pool) {
+    // best effort
+    log.warning("[handleAccrueInterest] FusePool not found: {}", [
+      trollerAddr.toHexString(),
+    ]);
+    return;
+  }
+  let oracleContract = PriceOracle.bind(Address.fromString(pool.priceOracle));
 
   // get rolling blocks/day count
   getRewardsPerDay(
@@ -438,9 +419,13 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.block.number,
     event.block.timestamp
   );
-  updateProtocol(trollerAddr);
+  updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
-  snapshotFinancials(trollerAddr, event.block.number, event.block.timestamp); // TODO: snapshot should be for each protocol
+  snapshotFinancials(
+    Address.fromString(FACTORY_CONTRACT),
+    event.block.number,
+    event.block.timestamp
+  ); // TODO: snapshot should be for each protocol
 }
 
 export function handleNewFuseFee(event: NewFuseFee): void {
