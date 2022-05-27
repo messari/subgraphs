@@ -8,6 +8,7 @@ enum Network {
   AVALANCHE
   BSC # aka BNB Chain
   CELO
+  CRONOS
   MAINNET # Ethereum Mainnet
   FANTOM
   FUSE

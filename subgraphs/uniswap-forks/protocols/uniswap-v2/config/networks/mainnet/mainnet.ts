@@ -42,7 +42,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
     return BigDecimal.fromString("0");
   }
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("0");
+    return BigDecimal.fromString("3.0");
   }
   getFeeOnOff(): string {
     return FeeSwitch.OFF;

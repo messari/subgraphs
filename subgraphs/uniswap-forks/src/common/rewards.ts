@@ -229,10 +229,11 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("13.39")
   } else if (NetworkConfigs.getNetwork() == Network.AVALANCHE) {
     return BigDecimal.fromString("13.39")
+  } else if (NetworkConfigs.getNetwork() == Network.CRONOS) {
+    return BigDecimal.fromString("5.5")
   } 
 
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
-  // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
   // else if (dataSource.network() == "harmony") return BigDecimal.fromString("13.39")
   else {
     log.warning("getStartingBlockRate(): Network not found", []);

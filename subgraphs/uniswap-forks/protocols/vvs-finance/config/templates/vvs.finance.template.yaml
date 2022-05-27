@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15"
+      address: "{{factory.address}}"
       abi: Factory
-      startBlock: 4100
+      startBlock: {{factory.startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -34,11 +34,11 @@ dataSources:
           ##handler: handleFeeTo
   - kind: ethereum
     name: Craftsman
-    network: mainnet
+    network: {{network}}
     source:
-      address: "0xDccd6455AE04b03d785F12196B492b18129564bc"
+      address: "{{CraftsmanAddress}}"
       abi: Craftsman
-      startBlock: 4100
+      startBlock: {{CraftsmanStartBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -60,7 +60,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: mainnet
+    network: {{network}}
     source:
       abi: Pair
     mapping:

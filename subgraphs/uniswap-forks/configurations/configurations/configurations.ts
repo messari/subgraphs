@@ -17,6 +17,7 @@ import { QuickswapMaticConfigurations } from "../../protocols/quickswap/config/n
 import { SolarbeamMoonriverConfigurations } from "../../protocols/solarbeam/config/networks/moonriver/moonriver";
 import { TraderJoeAvalancheConfigurations } from "../../protocols/trader-joe/config/networks/avalanche/avalanche";
 import { TrisolarisAuroraConfigurations } from "../../protocols/trisolaris/config/networks/aurora/aurora";
+import { VSSFinanceCronosConfigurations } from "../../protocols/vvs-finance/config/networks/cronos/cronos";
 import { Configurations } from "./interface";
 import { Deploy } from "./deploy";
 import { log } from "@graphprotocol/graph-ts";
@@ -61,6 +62,8 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
             return new TraderJoeAvalancheConfigurations();
         } case Deploy.TRISOLARIS_AURORA: {
             return new TrisolarisAuroraConfigurations();
+        } case Deploy.VVS_FINANCE_CRONOS: {
+            return new VSSFinanceCronosConfigurations();
         } default: {
             log.critical("No configurations found for deployment protocol/network", []);
             return new SushiswapArbitrumConfigurations();
