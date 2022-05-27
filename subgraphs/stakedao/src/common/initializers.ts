@@ -188,9 +188,7 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -220,9 +218,7 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
