@@ -15,8 +15,8 @@ import {
 } from "./getters";
 import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ZERO, BIGINT_ZERO, DEFAULT_DECIMALS, INT_ONE, INT_TWO, INT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, UsageType } from "./constants";
 import { convertTokenToDecimal } from "./utils/utils";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "./price/price";
-import { NetworkConfigs } from "../../config/configure";
+import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../price/price";
+import { NetworkConfigs } from "../../configurations/configure";
 
 // Update FinancialsDailySnapshots entity
 export function updateFinancials(event: ethereum.Event): void {
@@ -225,7 +225,6 @@ export function updateVolumeAndFees(
   token0Amount: BigInt,
   token1Amount: BigInt
 ): void {
-  let poolAddress = event.address.toHexString();
   let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
   let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event);
   let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event);
