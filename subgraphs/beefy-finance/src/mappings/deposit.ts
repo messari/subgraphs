@@ -26,8 +26,8 @@ export function createDeposit(
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.transaction.index.toI32();
   deposit.protocol = getBeefyFinanceOrCreate().id;
-  //deposit.to = event.address.toHexString();
-  //deposit.from = call.from.toHexString();
+  deposit.to = event.transaction.to.toHexString();
+  deposit.from = event.transaction.from.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
 
@@ -59,8 +59,8 @@ export function getOrCreateFirstDeposit(vault: Vault): Deposit {
     deposit.logIndex = 0;
     deposit.protocol = getBeefyFinanceOrCreate().id;
 
-    //deposit.to = zeroAddress;
-    //deposit.from = zeroAddress;
+    deposit.to = zeroAddress;
+    deposit.from = zeroAddress;
     deposit.blockNumber = vault.createdBlockNumber;
     deposit.timestamp = vault.createdTimestamp;
     deposit.asset = vault.inputToken;
