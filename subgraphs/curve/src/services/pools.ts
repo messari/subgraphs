@@ -76,6 +76,7 @@ export function createNewPool(
   const inputTokens = getPoolCoins(pool);
   pool.coins = inputTokens;
   pool.inputTokens = inputTokens.sort();
+  pool.save();
   setPoolBalances(pool);
   setPoolTVL(pool, timestamp);
   setPoolFees(pool);
