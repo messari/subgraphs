@@ -23,16 +23,21 @@ export function updateProtocolTVL(event: ethereum.Event): void {
   for (let i = 0; i < protocol.pools.length; i++) {
     let poolLockedValue = BIGDECIMAL_ZERO;
     let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]));
+    let inputTokenBalances = pool.inputTokenBalances.sort();
 
     for (let i = 0; i < pool._assets.length; i++) {
       let _asset = _Asset.load(pool._assets[i])!;
       let token = getOrCreateToken(event, Address.fromString(_asset.token));
       let usdValue = bigIntToBigDecimal(_asset.cash, token.decimals);
       poolLockedValue = poolLockedValue.plus(usdValue);
-
-      pool.inputTokenBalances[pool.inputTokens.indexOf(token.id)] = _asset.cash;
+      
+      let _index = pool.inputTokens.indexOf(token.id);
+      _asset._index = BigInt.fromI32(_index);
+      _asset.save();
+      inputTokenBalances[_index] = _asset.cash;
     }
 
+    pool.inputTokenBalances = inputTokenBalances;
     pool.totalValueLockedUSD = poolLockedValue;
     pool.save();
 

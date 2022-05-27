@@ -64,7 +64,7 @@ export function createAsset(
 
   pool._assets = assets;
   pool.inputTokens = inputTokens;
-  pool.inputTokenBalances = inputTokenBalances;
+  pool.inputTokenBalances = inputTokenBalances.sort();
 
   pool.save();
 }

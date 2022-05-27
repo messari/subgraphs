@@ -247,6 +247,32 @@ templates:
           file: ./abis/asset.json
         - name: Pool
           file: ./abis/pool.json
+        - name: SecondaryPool
+          file: ./abis/secondaryPool.json
+        - name: Router
+          file: ./abis/router.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        # TraderJoe Contracts
+        - name: TraderJoeRouter
+          file: ./abis/Prices/TraderJoe/Router.json
       eventHandlers:
         - event: CashAdded(uint256,uint256)
           handler: handleCashAdded
