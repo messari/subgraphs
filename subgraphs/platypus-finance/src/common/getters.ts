@@ -53,7 +53,11 @@ export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): 
     token.lastPriceBlockNumber = event.block.number;
   }
 
-  if (!token.lastPriceBlockNumber || token.lastPriceBlockNumber < event.block.number) {
+  if (token.lastPriceBlockNumber! < event.block.number) {
+    log.warning("updating price for token {} for event: {}", [
+      tokenAddress.toHexString(),
+      event.transaction.hash.toHexString(),
+    ]);
     token.lastPriceUSD = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
     if (token.lastPriceUSD == BIGDECIMAL_ZERO) {
       token.lastPriceUSD = BigDecimal.fromString("1");
@@ -62,7 +66,6 @@ export function getOrCreateToken(event: ethereum.Event, tokenAddress: Address): 
   }
 
   token.save();
-
   return token;
 }
 
