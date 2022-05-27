@@ -26,8 +26,15 @@ export function updateRewardTokenEmission(
     constants.BIGINT_SECONDS_PER_DAY
   );
 
-  let rewardTokenEmissionsAmount = vault.rewardTokenEmissionsAmount!;
-  let rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD!;
+  let rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
+  if (vault.rewardTokenEmissionsAmount) {
+    rewardTokenEmissionsAmount =  vault.rewardTokenEmissionsAmount;
+  }
+
+  let rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
+  if (vault.rewardTokenEmissionsUSD) {
+    rewardTokenEmissionsUSD = vault.rewardTokenEmissionsUSD;
+  }
 
   rewardTokenEmissionsAmount[rewardTokenIdx] = rewardEmissionRatePerDay;
   rewardTokenEmissionsUSD[rewardTokenIdx] = rewardEmissionRatePerDay
