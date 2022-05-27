@@ -184,8 +184,12 @@ export function calculateRevenue(
 }
 
 export class WithdrawRevenue {
-  protocolUsd: BigDecimal;
-  supplyUsd: BigDecimal;
+  protocolUsd: BigDecimal = BigDecimal.zero();
+  supplyUsd: BigDecimal = BigDecimal.zero();
+  yieldAmount: BigDecimal = BigDecimal.zero();
+  yieldUsd: BigDecimal = BigDecimal.zero();
+  yieldCompUsd: BigDecimal = BigDecimal.zero();
+  withdrawAmountCompUsd: BigDecimal = BigDecimal.zero();
 
   constructor(poolAddress: Address, account: Address, withdrawAmount: BigInt) {
     const poolV3 = PoolV3.bind(poolAddress);
@@ -198,32 +202,28 @@ export class WithdrawRevenue {
       account
     );
     const isEarnPool = withdrawFee.isZero();
-    let yieldAmount = BigDecimal.zero();
-    let yieldUsd = BigDecimal.zero();
-    let yieldCompUsd = BigDecimal.zero();
-    let withdrawAmountCompUsd = BigDecimal.zero();
 
     if (!rewards_call.reverted) {
       for (let i = 0, k = rewards_call.value.value0.length; i < k; ++i) {
-        yieldAmount = rewards_call.value.value1[i].toBigDecimal();
+        this.yieldAmount = rewards_call.value.value1[i].toBigDecimal();
       }
     }
 
     if (!rewardsOld_call.reverted) {
-      yieldAmount = rewardsOld_call.value.toBigDecimal();
+      this.yieldAmount = rewardsOld_call.value.toBigDecimal();
     }
 
-    yieldUsd = getUsdPrice(
+    this.yieldUsd = getUsdPrice(
       VESPER_TOKEN,
-      yieldAmount.div(getDecimalDivisor(vesperToken.decimals()))
+      this.yieldAmount.div(getDecimalDivisor(vesperToken.decimals()))
     );
-    yieldCompUsd = getUsdPrice(
+    this.yieldCompUsd = getUsdPrice(
       VESPER_TOKEN,
-      yieldAmount
+      this.yieldAmount
         .times(isEarnPool ? EARN_POOL_PLATFORM_FEE : GROW_POOL_PLATFORM_FEE)
         .div(getDecimalDivisor(vesperToken.decimals()))
     );
-    withdrawAmountCompUsd = getUsdPrice(
+    this.withdrawAmountCompUsd = getUsdPrice(
       poolV3.token(),
       withdrawAmount
         .toBigDecimal()
@@ -231,8 +231,10 @@ export class WithdrawRevenue {
         .div(getDecimalDivisor(token.decimals()))
     );
 
-    this.protocolUsd = withdrawAmountCompUsd.plus(yieldCompUsd);
-    this.supplyUsd = yieldUsd.minus(withdrawAmountCompUsd).minus(yieldCompUsd);
+    this.protocolUsd = this.withdrawAmountCompUsd.plus(this.yieldCompUsd);
+    this.supplyUsd = this.yieldUsd
+      .minus(this.withdrawAmountCompUsd)
+      .minus(this.yieldCompUsd);
   }
 }
 
