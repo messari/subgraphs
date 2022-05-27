@@ -39,5 +39,8 @@
   "gaugeController": false,
   "curveToken": "0x0000000000000000000000000000000000000000",
   "abiName": "",
-  "abiPath": ""
+  "abiPath": "",
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
 }

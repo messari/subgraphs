@@ -23,6 +23,11 @@ import {
   ETH_ADDRESS,
   ZERO_ADDRESS,
   RewardTokenType,
+  PROTOCOL_METHODOLOGY_VERSION,
+  PROTOCOL_SUBGRAPH_VERSION,
+  PROTOCOL_SCHEMA_VERSION,
+  PROTOCOL_SLUG,
+  PROTOCOL_NAME,
 } from "../common/constants";
 import { BIG_DECIMAL_ZERO, CURVE_REGISTRY } from "./constants/index";
 import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/CurvePool";
@@ -206,11 +211,11 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
 
   if (!protocol) {
     protocol = new DexAmmProtocol(CURVE_REGISTRY.toHexString());
-    protocol.name = "Curve";
-    protocol.slug = "curve";
-    protocol.schemaVersion = "1.2.1";
-    protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.0.0";
+    protocol.name = PROTOCOL_NAME;
+    protocol.slug = PROTOCOL_SLUG;
+    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
+    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
+    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = dataSource.network().toUpperCase();
     protocol.type = ProtocolType.EXCHANGE;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
