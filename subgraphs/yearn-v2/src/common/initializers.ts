@@ -62,7 +62,6 @@ export function getOrCreateYieldAggregator(id: string): YieldAggregator {
 
     //////// Quantitative Data ////////
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    protocol.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -105,7 +104,6 @@ export function getOrCreateFinancialDailySnapshots(
     financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -196,9 +194,6 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -230,9 +225,6 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -278,6 +270,8 @@ export function getOrCreateVault(
     vault.createdTimestamp = block.timestamp;
 
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    vault.lastReport = constants.BIGINT_ZERO;
+    vault.totalAssets = constants.BIGINT_ZERO;
 
     const managementFeeId =
       utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
@@ -306,6 +300,7 @@ export function getOrCreateVault(
     );
 
     vault.fees = [managementFeeId, performanceFeeId];
+
     vault.save();
   }
 

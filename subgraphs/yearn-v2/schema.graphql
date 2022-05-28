@@ -365,6 +365,9 @@ type Vault @entity {
   " Vault last reported harvest timestamp "
   lastReport: BigInt!
 
+  " Vault Total Asssets "
+  totalAssets: BigInt!
+
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
 

@@ -50,7 +50,7 @@ export function createDepositTransaction(
     depositTransaction.amount = amount;
     depositTransaction.amountUSD = amountUSD;
 
-    depositTransaction.timestamp = utils.getTimestampInMillis(block);
+    depositTransaction.timestamp = block.timestamp;
     depositTransaction.blockNumber = block.number;
 
     depositTransaction.save();
@@ -127,6 +127,8 @@ export function _Deposit(
   vault.pricePerShare = utils
     .readValue<BigInt>(vaultContract.try_pricePerShare(), constants.BIGINT_ZERO)
     .toBigDecimal();
+  vault.totalAssets = vault.totalAssets.plus(depositAmount);
+  
   vault.save();
 
   createDepositTransaction(

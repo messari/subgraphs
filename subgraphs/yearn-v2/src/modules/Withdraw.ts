@@ -50,7 +50,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.amount = amount;
     withdrawTransaction.amountUSD = amountUSD;
 
-    withdrawTransaction.timestamp = utils.getTimestampInMillis(block);
+    withdrawTransaction.timestamp = block.timestamp;
     withdrawTransaction.blockNumber = block.number;
 
     withdrawTransaction.save();
@@ -126,6 +126,9 @@ export function _Withdraw(
   vault.pricePerShare = utils
     .readValue<BigInt>(vaultContract.try_pricePerShare(), constants.BIGINT_ZERO)
     .toBigDecimal();
+  
+  vault.totalAssets = vault.totalAssets.minus(withdrawAmount);
+
   vault.save();
 
   createWithdrawTransaction(

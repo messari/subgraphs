@@ -13,10 +13,6 @@ export function prefixID(enumString: string, ID: string): string {
   return enumToPrefix(enumString) + ID;
 }
 
-export function getTimestampInMillis(block: ethereum.Block): BigInt {
-  return block.timestamp.times(BigInt.fromI32(1000));
-}
-
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
   defaultValue: T
