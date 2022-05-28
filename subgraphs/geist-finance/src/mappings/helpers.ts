@@ -17,6 +17,8 @@ import {
   FinancialsDailySnapshot,
   Account,
   ActiveAccount,
+  UsageMetricsHourlySnapshot,
+  InterestRate,
 } from "../../generated/schema";
 
 import {
@@ -34,7 +36,9 @@ import {
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
   REWARD_TOKEN_ADDRESS,
-  PROTOCOL_METHODOLOGY_VERSION
+  PROTOCOL_METHODOLOGY_VERSION,
+  InterestRateSide,
+  InterestRateType,
 } from "../common/constants";
 
 import * as addresses from "../common/addresses";
@@ -47,7 +51,10 @@ import {
 
 import { emissionsPerDay } from "../common/rewards";
 
-import { getDaysSinceEpoch } from "../common/utils/datetime";
+import {
+  getDaysSinceEpoch,
+  getHoursSinceEpoch,
+} from "../common/utils/datetime";
 
 import { getOrCreateToken } from "../common/getters";
 
@@ -63,6 +70,36 @@ import { AaveOracle } from "../../generated/templates/LendingPool/AaveOracle";
 
 import { AaveProtocolDataProvider } from "../../generated/templates/LendingPool/AaveProtocolDataProvider";
 
+export function getOrCreateInterestRate(
+  marketId: string,
+  side: string,
+  type: string
+): InterestRate {
+  const interestRateID = side + "-" + type + "-" + marketId;
+  let interestRate = InterestRate.load(interestRateID);
+  if (interestRate == null) {
+    interestRate = new InterestRate(interestRateID);
+    interestRate.rate = BIGDECIMAL_ZERO;
+  }
+
+  if (side == "LENDER") {
+    interestRate.side = InterestRateSide.LENDER;
+  } else if (side == "BORROWER") {
+    interestRate.side = InterestRateSide.BORROWER;
+  }
+
+  if (type == "STABLE") {
+    interestRate.type = InterestRateType.STABLE;
+  } else if (type == "VARIABLE") {
+    interestRate.type = InterestRateType.VARIABLE;
+  } else if (type == "FIXED_TERM") {
+    interestRate.type = InterestRateType.FIXED_TERM;
+  }
+
+  interestRate.save();
+  return interestRate as InterestRate;
+}
+
 export function initializeMarket(
   blockNumber: BigInt,
   timestamp: BigInt,
@@ -70,6 +107,7 @@ export function initializeMarket(
 ): Market {
   // Create (or load) a Market and give it default values
   const token = getOrCreateToken(Address.fromString(id)) as Token;
+
   let market = Market.load(id);
   if (market === null) {
     // Get the lending pool to get the reserve data for this Market entity
@@ -78,28 +116,17 @@ export function initializeMarket(
       Address.fromString(lendingPool)
     );
     // The input token, which would be the token instantiated from the id/address input
-    const inputTokens = [token.id];
     // Populate fields with data that has been passed to the function
     // Other data fields are initialized as 0/[]/false
-    const inputTokenBalances = [BIGINT_ZERO];
     const protocolId = getProtocolIdFromCtx();
     const protocol = getOrCreateProtocol(protocolId);
     // Initialize market fields as zero
     market = new Market(id);
     market.name = token.name;
     market.protocol = protocol.name;
-    market.stableBorrowRate = BIGDECIMAL_ZERO;
-    market.variableBorrowRate = BIGDECIMAL_ZERO;
-    market.totalStableValueLocked = BIGINT_ZERO;
-    market.totalVariableValueLocked = BIGINT_ZERO;
-    market.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    market.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    market.reserveFactor = BIGINT_ZERO;
     market.outputToken = addresses.ZERO_ADDRESS.toHexString();
-    market.inputTokens = inputTokens;
-    market.inputTokenBalances = inputTokenBalances;
-    market.sToken = addresses.ZERO_ADDRESS.toHexString();
-    market.vToken = addresses.ZERO_ADDRESS.toHexString();
+    market.inputToken = token.id;
+    market.inputTokenBalance = BIGINT_ZERO;
     market.rewardTokens = [];
     market.rewardTokenEmissionsAmount = [];
     market.rewardTokenEmissionsUSD = [];
@@ -111,25 +138,34 @@ export function initializeMarket(
     market.maximumLTV = BIGDECIMAL_ZERO;
     market.liquidationPenalty = BIGDECIMAL_ZERO;
     market.liquidationThreshold = BIGDECIMAL_ZERO;
-    market.depositRate = BIGDECIMAL_ZERO;
-    market.totalRevenueUSD = BIGDECIMAL_ZERO;
-    market.totalVolumeUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
+    market.exchangeRate = BIGDECIMAL_ZERO;
+    market.rates = [];
     const tryReserve = lendingPoolContract.try_getReserveData(
       Address.fromString(id)
     );
-    if (!tryReserve.reverted) {
-      // If a valid reserve is returned, add fields from the reserve to the market entity
-      // Rates are saved as a decimal (ie the borrow rate of 5% is saved as 0.05)
-      market.stableBorrowRate = bigIntToBigDecimal(
-        rayToWad(tryReserve.value.currentStableBorrowRate)
-      );
-      market.variableBorrowRate = bigIntToBigDecimal(
-        rayToWad(tryReserve.value.currentVariableBorrowRate)
-      );
-    } else {
-      log.error("Failed to get market ID={} reserve data", [market.id]);
-    }
+
+    let stableBorrowRate = getOrCreateInterestRate(
+      market.id,
+      "BORROWER",
+      "STABLE"
+    );
+    stableBorrowRate.rate = bigIntToBigDecimal(
+      rayToWad(tryReserve.value.currentStableBorrowRate)
+    );
+
+    let variableBorrowRate = getOrCreateInterestRate(
+      market.id,
+      "BORROWER",
+      "VARIABLE"
+    );
+    variableBorrowRate.rate = bigIntToBigDecimal(
+      rayToWad(tryReserve.value.currentVariableBorrowRate)
+    );
+
+    market.rates = [stableBorrowRate.id, variableBorrowRate.id];
+  } else {
+    log.error("Failed to get market ID={} reserve data", [market.id]);
   }
 
   let rewardTokens = market.rewardTokens;
@@ -157,7 +193,7 @@ export function initializeMarket(
 
   const currentPriceUSD = getAssetPriceInUSDC(Address.fromString(market.id));
   market.outputTokenPriceUSD = currentPriceUSD;
-  market.inputTokenPricesUSD = [currentPriceUSD];
+  market.inputTokenPriceUSD = currentPriceUSD;
   market.save();
   return market as Market;
 }
@@ -223,12 +259,8 @@ export function updateOutputTokenSupply(event: ethereum.Event): void {
       tryTokenSupply.value.toString(),
     ]);
 
-    let marketId = "";
-    if (gToken.underlyingAsset !== "") {
-      marketId = gToken.underlyingAsset;
-    } else {
-      marketId = gTokenInstance.UNDERLYING_ASSET_ADDRESS().toHexString();
-    }
+    let marketId = gTokenInstance.UNDERLYING_ASSET_ADDRESS().toHexString();
+
     const market = Market.load(marketId);
     if (!market) {
       return;
@@ -259,16 +291,15 @@ export function getOrCreateRewardToken(
   let rewardToken = RewardToken.load(type + "-" + assetAddr.toHex());
   if (rewardToken === null) {
     rewardToken = new RewardToken(type + "-" + assetAddr.toHex());
-    rewardToken.symbol = fetchTokenSymbol(assetAddr);
-    rewardToken.name = fetchTokenName(assetAddr);
-    rewardToken.decimals = fetchTokenDecimals(assetAddr);
+    let token = getOrCreateToken(assetAddr);
+    rewardToken.token = token.id;
     rewardToken.type = type;
     rewardToken.save();
   }
   getOrCreateToken(assetAddr);
   log.info(
-    "Created (or loaded) reward token with ID={}, name={}, decimals={}",
-    [rewardToken.id, rewardToken.name, rewardToken.decimals.toString()]
+    "Created (or loaded) reward token with ID={}, with TokenID={}, and type={}",
+    [rewardToken.id, rewardToken.token, rewardToken.type]
   );
   return rewardToken as RewardToken;
 }
@@ -279,23 +310,28 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
 
   if (!lendingProtocol) {
     lendingProtocol = new LendingProtocol(protocolId);
-    lendingProtocol.totalUniqueUsers = 0;
-    lendingProtocol.network = SchemaNetwork.FANTOM;
-    lendingProtocol.type = ProtocolType.LENDING;
-    lendingProtocol.subgraphVersion = SUBGRAPH_VERSION;
-    lendingProtocol.schemaVersion = SCHEMA_VERSION;
     lendingProtocol.name = PROTOCOL_NAME;
     lendingProtocol.slug = PROTOCOL_SLUG;
+    lendingProtocol.schemaVersion = SCHEMA_VERSION;
+    lendingProtocol.subgraphVersion = SUBGRAPH_VERSION;
     lendingProtocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
-    lendingProtocol.totalRevenueUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.totalVolumeUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.totalDepositUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.protocolSideRevenueUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.supplySideRevenueUSD = BIGDECIMAL_ZERO;
-    lendingProtocol.protocolPriceOracle = addresses.PRICE_ORACLE_ADDRESS.toHexString();
+    lendingProtocol.network = SchemaNetwork.FANTOM;
+    lendingProtocol.type = ProtocolType.LENDING;
     lendingProtocol.lendingType = LENDING_TYPE;
     lendingProtocol.riskType = RISK_TYPE;
+    lendingProtocol.mintedTokens = [];
+    lendingProtocol.cumulativeUniqueUsers = 0;
+    lendingProtocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    lendingProtocol.mintedTokenSupplies = [];
     lendingProtocol.save();
   }
   log.info("Created (or loaded) lending protocol with ID={}", [
@@ -307,10 +343,15 @@ export function getOrCreateProtocol(protocolId: string): LendingProtocol {
 
 export function initializeIncentivesController(market: Market): Address {
   // Initialize the incentives controller for a specific gToken
-  log.info(
-    "Initializing incentives controller for market with ID={}, gToken={}",
-    [market.id, market.outputToken]
-  );
+  if (market.outputToken) {
+    log.info(
+      "Initializing incentives controller for market with ID={}, gToken={}",
+      [market.id, market.outputToken]
+    );
+  } else {
+    log.error("No output token for for market with ID={}", [market.id]);
+    return addresses.INCENTIVE_CONTROLLER_ADDRESS;
+  }
 
   const gToken = GToken.bind(Address.fromString(market.outputToken));
   if (!gToken.try_getIncentivesController().reverted) {
@@ -381,27 +422,74 @@ export function getMarketDailySnapshot(
 
   const token = getOrCreateToken(Address.fromString(market.id));
   marketSnapshot.totalValueLockedUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
-    market.inputTokenBalances[0],
+    market.inputTokenBalance,
     market
   );
 
-  marketSnapshot.totalVolumeUSD = market.totalVolumeUSD;
-  marketSnapshot.inputTokenBalances = market.inputTokenBalances;
-  marketSnapshot.inputTokenPricesUSD = market.inputTokenPricesUSD;
+  marketSnapshot.inputTokenBalance = market.inputTokenBalance;
+  marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
   marketSnapshot.outputTokenSupply = market.outputTokenSupply;
   marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
-  marketSnapshot.totalBorrowUSD = market.totalBorrowUSD;
-  marketSnapshot.totalDepositUSD = market.totalDepositUSD;
+  marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+  marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
-  marketSnapshot.depositRate = market.depositRate;
-  marketSnapshot.stableBorrowRate = market.stableBorrowRate;
-  marketSnapshot.variableBorrowRate = market.variableBorrowRate;
   marketSnapshot.save();
   log.info("Saving market snapshot with ID={}", [marketSnapshot.id]);
   return marketSnapshot as MarketDailySnapshot;
+}
+
+export function updateMetricsHourlySnapshot(
+  event: ethereum.Event
+): UsageMetricsHourlySnapshot {
+  // Create (or load) the days UsageMetricsDailySnapshot
+  const hoursSinceEpoch = getHoursSinceEpoch(event.block.timestamp.toI32());
+  const protocolId = getProtocolIdFromCtx();
+  const protocol = getOrCreateProtocol(protocolId);
+
+  let usageMetricsHourlySnapshot = UsageMetricsHourlySnapshot.load(
+    hoursSinceEpoch
+  );
+  if (!usageMetricsHourlySnapshot) {
+    usageMetricsHourlySnapshot = new UsageMetricsHourlySnapshot(
+      hoursSinceEpoch
+    );
+    usageMetricsHourlySnapshot.protocol = protocol.id;
+    usageMetricsHourlySnapshot.hourlyActiveUsers = 0;
+    usageMetricsHourlySnapshot.cumulativeUniqueUsers =
+      protocol.cumulativeUniqueUsers;
+    usageMetricsHourlySnapshot.hourlyTransactionCount = 0;
+    usageMetricsHourlySnapshot.hourlyDepositCount = 0;
+    usageMetricsHourlySnapshot.hourlyBorrowCount = 0;
+    usageMetricsHourlySnapshot.hourlyWithdrawCount = 0;
+    usageMetricsHourlySnapshot.hourlyRepayCount = 0;
+    usageMetricsHourlySnapshot.hourlyLiquidateCount = 0;
+  }
+
+  const userAddress = event.transaction.from;
+  let user = Account.load(userAddress.toHexString());
+  if (!user) {
+    user = new Account(userAddress.toHexString());
+    user.save();
+    usageMetricsHourlySnapshot.cumulativeUniqueUsers += 1;
+  }
+  let accountActive = ActiveAccount.load(
+    "hourly" + "-" + userAddress.toHexString() + "-" + hoursSinceEpoch
+  );
+  if (!accountActive) {
+    accountActive = new ActiveAccount(
+      "hourly" + "-" + userAddress.toHexString() + "-" + hoursSinceEpoch
+    );
+    accountActive.save();
+    usageMetricsHourlySnapshot.hourlyActiveUsers += 1;
+  }
+  usageMetricsHourlySnapshot.hourlyTransactionCount += 1;
+  usageMetricsHourlySnapshot.blockNumber = event.block.number;
+  usageMetricsHourlySnapshot.timestamp = event.block.timestamp;
+  usageMetricsHourlySnapshot.save();
+  return usageMetricsHourlySnapshot as UsageMetricsHourlySnapshot;
 }
 
 export function updateMetricsDailySnapshot(
@@ -418,9 +506,14 @@ export function updateMetricsDailySnapshot(
   if (!usageMetricsDailySnapshot) {
     usageMetricsDailySnapshot = new UsageMetricsDailySnapshot(daysSinceEpoch);
     usageMetricsDailySnapshot.protocol = protocol.id;
-    usageMetricsDailySnapshot.activeUsers = 0;
-    usageMetricsDailySnapshot.totalUniqueUsers = protocol.totalUniqueUsers;
+    usageMetricsDailySnapshot.dailyActiveUsers = 0;
+    usageMetricsDailySnapshot.cumulativeUniqueUsers =
+      protocol.cumulativeUniqueUsers;
     usageMetricsDailySnapshot.dailyTransactionCount = 0;
+    usageMetricsDailySnapshot.dailyDepositCount = 0;
+    usageMetricsDailySnapshot.dailyBorrowCount = 0;
+    usageMetricsDailySnapshot.dailyWithdrawCount = 0;
+    usageMetricsDailySnapshot.dailyLiquidateCount = 0;
   }
 
   const userAddress = event.transaction.from;
@@ -428,18 +521,18 @@ export function updateMetricsDailySnapshot(
   if (!user) {
     user = new Account(userAddress.toHexString());
     user.save();
-    usageMetricsDailySnapshot.totalUniqueUsers += 1;
-    protocol.totalUniqueUsers += 1;
+    usageMetricsDailySnapshot.cumulativeUniqueUsers += 1;
+    protocol.cumulativeUniqueUsers += 1;
   }
   let accountActive = ActiveAccount.load(
-    daysSinceEpoch + "-" + userAddress.toHexString()
+    "daily" + "-" + userAddress.toHexString() + "-" + daysSinceEpoch
   );
   if (!accountActive) {
     accountActive = new ActiveAccount(
-      daysSinceEpoch + "-" + userAddress.toHexString()
+      "daily" + "-" + userAddress.toHexString() + "-" + daysSinceEpoch
     );
     accountActive.save();
-    usageMetricsDailySnapshot.activeUsers += 1;
+    usageMetricsDailySnapshot.dailyActiveUsers += 1;
   }
   protocol.save();
   usageMetricsDailySnapshot.dailyTransactionCount += 1;
@@ -466,13 +559,14 @@ export function updateFinancialsDailySnapshot(
     "Created (or updated) FinancialsDailySnapshot with ID={}, tx hash={}",
     [financialsDailySnapshot.id, event.transaction.hash.toHexString()]
   );
-  financialsDailySnapshot.totalVolumeUSD = protocol.totalVolumeUSD;
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialsDailySnapshot.totalDepositUSD = protocol.totalDepositUSD;
-  financialsDailySnapshot.protocolSideRevenueUSD =
-    protocol.protocolSideRevenueUSD;
-  financialsDailySnapshot.supplySideRevenueUSD = protocol.supplySideRevenueUSD;
-  financialsDailySnapshot.totalRevenueUSD = protocol.totalRevenueUSD;
+  financialsDailySnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  financialsDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialsDailySnapshot.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialsDailySnapshot.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.save();
@@ -486,7 +580,7 @@ export function getPriceOracle(): AaveOracle {
   // priceOracle is set the address of the price oracle contract of the address provider contract, pulled from context
   const protocolId = getProtocolIdFromCtx();
   const lendingProtocol = getOrCreateProtocol(protocolId);
-  const priceOracle = lendingProtocol.protocolPriceOracle;
+  const priceOracle = addresses.PRICE_ORACLE_ADDRESS.toHexString();
   return AaveOracle.bind(Address.fromString(priceOracle));
 }
 
@@ -602,7 +696,7 @@ export function tokenAmountInUSD(
       amount.toString(),
       priceInUSDC.toString(),
       amountUSD.toString(),
-      market.inputTokens.length.toString(),
+      market.inputToken.length.toString(),
     ]
   );
   return amountUSD.truncate(3);
@@ -621,13 +715,13 @@ export function getCurrentRewardEmissionsUSD(market: Market): BigDecimal[] {
   const rewardPriceInUSDC = getAssetPriceInUSDC(rewardTokenAddr);
   rewardEmissionsUSD[0] = tokenAmountInUSD(
     rewardPriceInUSDC,
-    rewardToken.decimals,
+    getOrCreateToken(rewardTokenAddr).decimals,
     market.rewardTokenEmissionsAmount[0],
     market
   );
   rewardEmissionsUSD[1] = tokenAmountInUSD(
     rewardPriceInUSDC,
-    rewardToken.decimals,
+    getOrCreateToken(rewardTokenAddr).decimals,
     market.rewardTokenEmissionsAmount[1],
     market
   );
@@ -661,77 +755,84 @@ export function calculateRevenues(market: Market, token: Token): void {
     addresses.AAVE_PROTOCOL_DATA_PROVIDER
   );
 
+  let totalStableValueLocked = BIGINT_ZERO;
+  let totalVariableValueLocked = BIGINT_ZERO;
   const reserve_data = dataProviderContract.try_getReserveData(
     Address.fromString(market.id)
   );
 
   if (!reserve_data.reverted) {
-    market.totalStableValueLocked = reserve_data.value.value1;
-    market.totalVariableValueLocked = reserve_data.value.value2;
+    totalStableValueLocked = reserve_data.value.value1;
+    totalVariableValueLocked = reserve_data.value.value2;
   }
 
   // Subtract prior market total fees protocol.totalRevenueUSD
   const protocolId = getProtocolIdFromCtx();
   const protocol = getOrCreateProtocol(protocolId);
-  log.info("Subtract prior market fees ({} USD) from protocol fees ({} USD)", [
-    market.totalRevenueUSD.toString(),
-    protocol.totalRevenueUSD.toString(),
-  ]);
 
-  // Get the protocol revenues/fees subtracting the market values before calculation
-  const protoMinusMarketProtoRevenue = protocol.protocolSideRevenueUSD.minus(
-    market.protocolSideRevenueUSD
-  );
-  const protoMinusMarketSupplyRevenue = protocol.supplySideRevenueUSD.minus(
-    market.supplySideRevenueUSD
-  );
-  const protoMinusMarketFees = protocol.totalRevenueUSD.minus(
-    market.totalRevenueUSD
-  );
   // Multiply total Variable value Locked in USD by market.variableBorrowRate
   const varAmountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
-    market.totalVariableValueLocked,
+    totalVariableValueLocked,
     market
   );
-  const varFees = varAmountUSD.times(market.variableBorrowRate);
-  // Multiply total Stable value Locked in USD by market.variableStableRate
+
+  const variableBorrow = getOrCreateInterestRate(
+    market.id,
+    "BORROWER",
+    "VARIABLE"
+  );
+  const varFees = varAmountUSD.times(variableBorrow.rate);
+
+  // Multiply total Stable value Locked in USD by market.stableBorrowRate
   const staAmountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
-    market.totalStableValueLocked,
+    totalStableValueLocked,
     market
   );
-  const staFees = staAmountUSD.times(market.stableBorrowRate);
+  const stableBorrow = getOrCreateInterestRate(market.id, "BORROWER", "STABLE");
+  const staFees = staAmountUSD.times(stableBorrow.rate);
+  const marketRevenueUSD = staFees.plus(varFees).truncate(3);
+  log.info("Subtract prior market fees ({} USD) from protocol fees ({} USD)", [
+    marketRevenueUSD.toString(),
+    protocol.cumulativeTotalRevenueUSD.toString(),
+  ]);
 
   // Add these values together, save to market and add protocol total
-  market.totalRevenueUSD = staFees.plus(varFees).truncate(3);
-  protocol.totalRevenueUSD = protoMinusMarketFees.plus(market.totalRevenueUSD);
-  market.protocolSideRevenueUSD = market.totalRevenueUSD
-    .times(bigIntToBigDecimal(market.reserveFactor, 4))
+  const marketTotalRevenueUSD = staFees.plus(varFees).truncate(3);
+  const marketProtocolSideRevenueUSD = marketTotalRevenueUSD
+    .times(market.exchangeRate)
     .truncate(3);
-  protocol.protocolSideRevenueUSD = protoMinusMarketProtoRevenue.plus(
-    market.protocolSideRevenueUSD
+
+  const marketSupplySideRevenueUSD = marketTotalRevenueUSD
+    .times(BIGDECIMAL_ONE.minus(market.exchangeRate))
+    .truncate(3);
+
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+    marketTotalRevenueUSD
   );
-  market.supplySideRevenueUSD = market.totalRevenueUSD
-    .times(BIGDECIMAL_ONE.minus(bigIntToBigDecimal(market.reserveFactor, 4)))
-    .truncate(3);
-  protocol.supplySideRevenueUSD = protoMinusMarketSupplyRevenue.plus(
-    market.supplySideRevenueUSD
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+    marketProtocolSideRevenueUSD
+  );
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    marketSupplySideRevenueUSD
   );
 
   // CALCULATE totalBorrowUSD FIELDS ON MARKET AND PROTOCOL ENTITIES
   // The sum in USD of s and v tokens on market is totalBorrowUSD
   // Subtract the previously saved amount of the market TotalBorrowUSD value from the protocol totalBorrowUSD
   // This gets the amount in USD out in borrows on the protocol not including this market
-  const tempProtocolBorrowTotal = protocol.totalBorrowUSD.minus(
-    market.totalBorrowUSD
+  const tempProtocolBorrowTotal = protocol.cumulativeBorrowUSD.minus(
+    market.cumulativeBorrowUSD
   );
   // Sum the amount in USD of the stable borrows and variable borrows currently in use
-  market.totalBorrowUSD = staAmountUSD.plus(varAmountUSD);
+  market.cumulativeBorrowUSD = staAmountUSD.plus(varAmountUSD);
   // Add this markets new amount out in borrows to the protocol value
-  protocol.totalBorrowUSD = tempProtocolBorrowTotal.plus(market.totalBorrowUSD);
+  protocol.cumulativeBorrowUSD = tempProtocolBorrowTotal.plus(
+    market.cumulativeBorrowUSD
+  );
 
   market.save();
   protocol.save();
@@ -747,7 +848,7 @@ export function updateTVL(
   toSubtract: bool
 ): void {
   // Update the total value locked in a market and the protocol overall after transactions
-  let newMarketTVL = market.inputTokenBalances[0];
+  let newMarketTVL = market.inputTokenBalance;
   if (toSubtract) {
     newMarketTVL = newMarketTVL.minus(amountInTokens);
   } else {
@@ -774,13 +875,12 @@ export function updateTVL(
     market.totalValueLockedUSD
   );
   market.totalValueLockedUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
     newMarketTVL,
     market
   );
-  market.totalDepositUSD = market.totalValueLockedUSD;
-  market.totalVolumeUSD = market.totalVolumeUSD.plus(amountUSD);
+  market.cumulativeDepositUSD = market.totalValueLockedUSD;
   market.save();
   if (
     protocol.totalValueLockedUSD.gt(BIGDECIMAL_ZERO) &&
@@ -801,7 +901,6 @@ export function updateTVL(
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
     market.totalValueLockedUSD
   );
-  protocol.totalDepositUSD = protocol.totalValueLockedUSD;
-  protocol.totalVolumeUSD = protocol.totalVolumeUSD.plus(amountUSD);
+  protocol.cumulativeDepositUSD = protocol.totalValueLockedUSD;
   protocol.save();
 }

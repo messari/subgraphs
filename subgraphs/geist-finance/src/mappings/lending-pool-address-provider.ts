@@ -16,7 +16,7 @@ import {
 
 import { getOrCreateProtocol } from "./helpers";
 
-import { PROTOCOL_ADDRESS, PRICE_ORACLE_ADDRESS } from "../common/constants";
+import { PROTOCOL_ADDRESS } from "../common/constants";
 
 import { AddressesProviderRegistered } from "../../generated/LendingPoolAddressesProviderRegistry/LendingPoolAddressesProviderRegistry";
 
@@ -47,7 +47,6 @@ export function handlePriceOracleUpdated(event: PriceOracleUpdated): void {
     event.params.newAddress.toHexString(),
   ]);
   const lendingProtocol = getOrCreateProtocol(PROTOCOL_ADDRESS);
-  lendingProtocol.protocolPriceOracle = event.params.newAddress.toHexString();
   lendingProtocol.save();
 }
 
@@ -102,20 +101,6 @@ function initiateContext(addrProvider: Address): DataSourceContext {
 
   // Initialize the protocol entity
   const lendingProtocol = getOrCreateProtocol(PROTOCOL_ADDRESS);
-  // Get the Address Provider Contract's Price Oracle
-  const tryPriceOracle = contract.try_getPriceOracle();
-  if (!tryPriceOracle.reverted) {
-    lendingProtocol.protocolPriceOracle = tryPriceOracle.value.toHexString();
-    log.info("Initializing price oracle from context {}", [
-      lendingProtocol.protocolPriceOracle,
-    ]);
-  } else {
-    lendingProtocol.protocolPriceOracle = PRICE_ORACLE_ADDRESS;
-    log.error("Failed to extract oracle {}", [
-      lendingProtocol.protocolPriceOracle,
-    ]);
-  }
-  lendingProtocol.save();
   log.info("Creating context with lending pool={} with ID={}", [
     lendingPool,
     lendingProtocol.id,

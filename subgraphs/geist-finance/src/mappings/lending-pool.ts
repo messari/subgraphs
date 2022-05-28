@@ -30,6 +30,8 @@ import {
   updateMetricsDailySnapshot,
   updateTVL,
   calculateRevenues,
+  updateMetricsHourlySnapshot,
+  getOrCreateInterestRate,
 } from "./helpers";
 
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
@@ -37,46 +39,6 @@ import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { bigIntToBigDecimal, rayToWad } from "../common/utils/numbers";
 
 import { getOrCreateToken } from "../common/getters";
-
-import { getDaysSinceEpoch } from "../common/utils/datetime";
-
-export function getTokenBalanceIndex(market: Market, asset: string): number {
-  // Get the index of a token stored in Market, -1 for token not found in Market
-  let tokenBalanceIndex = market.inputTokens.indexOf(asset);
-  if (tokenBalanceIndex < 0) {
-    log.error(
-      "Tx event asset ({}) not found in market.inputTokens. tokenBalanceIndex={}",
-      [asset, tokenBalanceIndex.toString()]
-    );
-    tokenBalanceIndex = market.inputTokens.length;
-    getOrCreateToken(Address.fromString(asset));
-    market.inputTokens.push(asset);
-    market.inputTokenBalances.push(BIGINT_ZERO);
-    market.save();
-  }
-  log.info("Found asset ({}) in market.inputTokens at index {}", [
-    asset,
-    tokenBalanceIndex.toString(),
-  ]);
-  return <i32>tokenBalanceIndex;
-}
-
-export function setTokenBalanceArray(
-  newBal: BigInt,
-  tokenBalanceIndex: number,
-  tokenBalances: BigInt[]
-): BigInt[] {
-  // Update a specific token balance in the token balances array
-  const newInputTokenBalanceArr: BigInt[] = [];
-  for (let x = 0; x < tokenBalances.length; x++) {
-    if (x !== <i32>tokenBalanceIndex) {
-      newInputTokenBalanceArr.push(tokenBalances[x]);
-    } else {
-      newInputTokenBalanceArr.push(newBal);
-    }
-  }
-  return newInputTokenBalanceArr;
-}
 
 export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
   // Update deposit borrow rates when the market reserve data is updated
@@ -97,21 +59,48 @@ export function handleReserveDataUpdated(event: ReserveDataUpdated): void {
       event.params.stableBorrowRate.toString(),
     ]
   );
-  market.depositRate = bigIntToBigDecimal(rayToWad(event.params.liquidityRate));
-  market.variableBorrowRate = bigIntToBigDecimal(
-    rayToWad(event.params.variableBorrowRate)
+  let variableDepositRate = getOrCreateInterestRate(
+    market.id,
+    "LENDER",
+    "VARIABLE"
   );
-  market.stableBorrowRate = bigIntToBigDecimal(
+  variableDepositRate.rate = bigIntToBigDecimal(event.params.liquidityRate);
+  variableDepositRate.save();
+
+  let stableBorrowRate = getOrCreateInterestRate(
+    market.id,
+    "BORROWER",
+    "STABLE"
+  );
+  stableBorrowRate.rate = bigIntToBigDecimal(
     rayToWad(event.params.stableBorrowRate)
   );
+  stableBorrowRate.save();
+
+  let variableBorrowRate = getOrCreateInterestRate(
+    market.id,
+    "BORROWER",
+    "VARIABLE"
+  );
+  variableBorrowRate.rate = bigIntToBigDecimal(
+    rayToWad(event.params.variableBorrowRate)
+  );
+  variableBorrowRate.save();
+
+  market.rates = [
+    stableBorrowRate.id,
+    variableBorrowRate.id,
+    variableDepositRate.id,
+  ];
+
   log.info(
     "Updated market ID={} reserve data: token decimals={}, deposit rate={}, variable borrow rate={}, stable borrow rate={}",
     [
       market.id,
       token.decimals.toString(),
-      market.depositRate.toString(),
-      market.variableBorrowRate.toString(),
-      market.stableBorrowRate.toString(),
+      variableDepositRate.rate.toString(),
+      variableBorrowRate.rate.toString(),
+      stableBorrowRate.rate.toString(),
     ]
   );
   market.save();
@@ -153,29 +142,13 @@ export function handleDeposit(event: Deposit): void {
     marketAddress
   ) as Market;
   const amountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
     event.params.amount,
     market
   );
   deposit.amountUSD = amountUSD;
-  // Get the index of the balance to be changed
-  const tokenBalanceIndex = getTokenBalanceIndex(market, deposit.asset);
-  if (tokenBalanceIndex >= market.inputTokens.length) {
-    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
-    market = initializeMarket(
-      event.block.number,
-      event.block.timestamp,
-      marketAddress
-    ) as Market;
-  }
-  const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
-  const newBal = balanceAtIdx.plus(deposit.amount);
-  market.inputTokenBalances = setTokenBalanceArray(
-    newBal,
-    tokenBalanceIndex,
-    market.inputTokenBalances
-  );
+  market.inputTokenBalance = market.inputTokenBalance.plus(deposit.amount);
 
   // Update total value locked on the market level
   updateTVL(hash, token, market, protocol, deposit.amount, amountUSD, false);
@@ -183,11 +156,16 @@ export function handleDeposit(event: Deposit): void {
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
-  updateMetricsDailySnapshot(event);
+  let dailyMetrics = updateMetricsDailySnapshot(event);
+  dailyMetrics.dailyDepositCount += 1;
+  dailyMetrics.save();
+
+  let hourlyMetrics = updateMetricsHourlySnapshot(event);
+  hourlyMetrics.hourlyDepositCount += 1;
+  hourlyMetrics.save();
+
   let financial = updateFinancialsDailySnapshot(event);
   financial.save();
-  // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
-  deposit.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   deposit.save();
 }
 
@@ -226,30 +204,13 @@ export function handleWithdraw(event: Withdraw): void {
     marketAddr
   ) as Market;
   const amountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
     event.params.amount,
     market
   );
   withdraw.amountUSD = amountUSD;
-  // The index of the inputToken and the inputTokenBalance are the same, as these arrays push the
-  // corresponding values to the same index when added
-  const tokenBalanceIndex = getTokenBalanceIndex(market, withdraw.asset);
-  if (tokenBalanceIndex >= market.inputTokens.length) {
-    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
-    market = initializeMarket(
-      event.block.number,
-      event.block.timestamp,
-      marketAddr
-    ) as Market;
-  }
-  const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
-  const newBal = balanceAtIdx.minus(withdraw.amount);
-  market.inputTokenBalances = setTokenBalanceArray(
-    newBal,
-    tokenBalanceIndex,
-    market.inputTokenBalances
-  );
+  market.inputTokenBalance = market.inputTokenBalance.minus(withdraw.amount);
 
   // Update total value locked on the market level
   updateTVL(hash, token, market, protocol, withdraw.amount, amountUSD, true);
@@ -257,12 +218,16 @@ export function handleWithdraw(event: Withdraw): void {
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
-  updateMetricsDailySnapshot(event);
+  let dailyMetrics = updateMetricsDailySnapshot(event);
+  dailyMetrics.dailyWithdrawCount += 1;
+  dailyMetrics.save();
+
+  let hourlyMetrics = updateMetricsHourlySnapshot(event);
+  hourlyMetrics.hourlyWithdrawCount += 1;
+  hourlyMetrics.save();
+
   let financial = updateFinancialsDailySnapshot(event);
   financial.save();
-
-  // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
-  withdraw.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   withdraw.save();
 }
 
@@ -298,29 +263,13 @@ export function handleBorrow(event: Borrow): void {
     marketAddr
   ) as Market;
   const amountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
     event.params.amount,
     market
   );
   borrow.amountUSD = amountUSD;
-
-  const tokenBalanceIndex = getTokenBalanceIndex(market, borrow.asset);
-  if (tokenBalanceIndex >= market.inputTokens.length) {
-    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
-    market = initializeMarket(
-      event.block.number,
-      event.block.timestamp,
-      marketAddr
-    ) as Market;
-  }
-  const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
-  const newBal = balanceAtIdx.minus(borrow.amount);
-  market.inputTokenBalances = setTokenBalanceArray(
-    newBal,
-    tokenBalanceIndex,
-    market.inputTokenBalances
-  );
+  market.inputTokenBalance = market.inputTokenBalance.minus(borrow.amount);
 
   // Update total value locked on the market level
   updateTVL(hash, token, market, protocol, borrow.amount, amountUSD, true);
@@ -331,11 +280,16 @@ export function handleBorrow(event: Borrow): void {
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
-  updateMetricsDailySnapshot(event);
+  let dailyMetrics = updateMetricsDailySnapshot(event);
+  dailyMetrics.dailyBorrowCount += 1;
+  dailyMetrics.save();
+
+  let hourlyMetrics = updateMetricsHourlySnapshot(event);
+  hourlyMetrics.hourlyBorrowCount += 1;
+  hourlyMetrics.save();
+
   let financial = updateFinancialsDailySnapshot(event);
   financial.save();
-  // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
-  borrow.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   borrow.save();
 }
 
@@ -369,28 +323,14 @@ export function handleRepay(event: Repay): void {
     marketAddr
   ) as Market;
   const amountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
     event.params.amount,
     market
   );
   repay.amountUSD = amountUSD;
 
-  const tokenBalanceIndex = getTokenBalanceIndex(market, repay.asset);
-  if (tokenBalanceIndex >= market.inputTokens.length) {
-    market = initializeMarket(
-      event.block.number,
-      event.block.timestamp,
-      marketAddr
-    ) as Market;
-  }
-  const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
-  const newBal = balanceAtIdx.plus(repay.amount);
-  market.inputTokenBalances = setTokenBalanceArray(
-    newBal,
-    tokenBalanceIndex,
-    market.inputTokenBalances
-  );
+  market.inputTokenBalance = market.inputTokenBalance.plus(repay.amount);
 
   // Update total value locked on the market level
   updateTVL(hash, token, market, protocol, repay.amount, amountUSD, false);
@@ -400,11 +340,16 @@ export function handleRepay(event: Repay): void {
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
-  updateMetricsDailySnapshot(event);
+  let dailyMetrics = updateMetricsDailySnapshot(event);
+  dailyMetrics.dailyRepayCount += 1;
+  dailyMetrics.save();
+
+  let hourlyMetrics = updateMetricsHourlySnapshot(event);
+  hourlyMetrics.hourlyRepayCount += 1;
+  hourlyMetrics.save();
+
   let financial = updateFinancialsDailySnapshot(event);
-  financial.save()
-  // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
-  repay.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
+  financial.save();
   repay.save();
 }
 
@@ -436,28 +381,14 @@ export function handleLiquidationCall(event: LiquidationCall): void {
     marketAddr
   ) as Market;
   const amountUSD = tokenAmountInUSD(
-    market.inputTokenPricesUSD[0],
+    market.inputTokenPriceUSD,
     token.decimals,
     event.params.liquidatedCollateralAmount,
     market
   );
   liquidate.amountUSD = amountUSD;
-  const tokenBalanceIndex = getTokenBalanceIndex(market, liquidate.asset);
-  if (tokenBalanceIndex >= market.inputTokens.length) {
-    // if the getTokenBalanceIndex function added the event asset to the inputTokens array, reinitialize the market
-    market = initializeMarket(
-      event.block.number,
-      event.block.timestamp,
-      marketAddr
-    ) as Market;
-  }
-  const balanceAtIdx = market.inputTokenBalances[<i32>tokenBalanceIndex];
-  const newBal = balanceAtIdx.plus(liquidate.amount);
-  market.inputTokenBalances = setTokenBalanceArray(
-    newBal,
-    tokenBalanceIndex,
-    market.inputTokenBalances
-  );
+
+  market.inputTokenBalance = market.inputTokenBalance.plus(liquidate.amount);
 
   // Update total value locked on the market level
   updateTVL(hash, token, market, protocol, liquidate.amount, amountUSD, false);
@@ -466,7 +397,14 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
-  updateMetricsDailySnapshot(event);
+  let dailyMetrics = updateMetricsDailySnapshot(event);
+  dailyMetrics.dailyLiquidateCount += 1;
+  dailyMetrics.save();
+
+  let hourlyMetrics = updateMetricsHourlySnapshot(event);
+  hourlyMetrics.hourlyLiquidateCount += 1;
+  hourlyMetrics.save();
+
   let financial = updateFinancialsDailySnapshot(event);
   financial.save();
 
@@ -482,8 +420,6 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   } else {
     liquidate.profitUSD = BIGDECIMAL_ZERO;
   }
-  // Add the snapshot id (the number of days since unix epoch) for easier indexing for events within a specific snapshot
-  liquidate.snapshotId = getDaysSinceEpoch(event.block.timestamp.toI32());
   liquidate.save();
 }
 

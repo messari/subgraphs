@@ -9,19 +9,19 @@ import { BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 // The enum values are derived from Coingecko slugs (converted to uppercase
 // and replaced hyphens with underscores for Postgres enum compatibility)
 export namespace SchemaNetwork {
-  export const ARBITRUM = "ARBITRUM_ONE";
+  export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
   export const BSC = "BINANCE_SMART_CHAIN";
   export const CELO = "CELO";
-  export const ETHEREUM = "ETHEREUM";
+  export const MAINNET = "ETHEREUM";
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const NEAR = "NEAR";
+  export const NEAR_MAINNET = "NEAR";
   export const OPTIMISM = "OPTIMISTIC_ETHEREUM";
-  export const POLYGON = "POLYGON_POS";
+  export const MATIC = "POLYGON_POS";
   export const XDAI = "XDAI";
 }
 
@@ -77,6 +77,27 @@ export namespace RewardTokenType {
   export const BORROW = "BORROW";
 }
 
+export  namespace LendingType {
+  export const CDP = "CDP";
+  export const POOLED = "POOLED";
+}
+
+export namespace RiskType {
+  export const GLOBAL = "GLOBAL";
+  export const ISOLATED = "ISOLATED";
+}
+
+export namespace InterestRateType {
+  export const STABLE = "STABLE";
+  export const VARIABLE = "VARIABLE";
+  export const FIXED_TERM = "FIXED_TERM";
+}
+
+export namespace InterestRateSide {
+  export const LENDER = "LENDER";
+  export const BORROWER = "BORROWER";
+}
+
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////
@@ -118,6 +139,8 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 /////////////////////
 
 export const SECONDS_PER_DAY = 86400; // 86400
+export const SECONDS_PER_HOUR = 3600; // 3600
+
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(86400000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(
@@ -146,8 +169,8 @@ export const UNSTAKE_INTERACTION = "UNSTAKE";
 export const LIQUIDATION_INTERACTION = "LIQUIDATION";
 
 // Version and general info about protocol
-export const SUBGRAPH_VERSION = "1.1.0";
-export const SCHEMA_VERSION = "1.1.0";
+export const SUBGRAPH_VERSION = "1.2.0";
+export const SCHEMA_VERSION = "1.2.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.1.0"
 export const PROTOCOL_NAME = "Geist-Finance";
 export const PROTOCOL_SLUG = "geist-finance";

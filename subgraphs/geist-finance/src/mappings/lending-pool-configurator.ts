@@ -12,6 +12,8 @@ import {
 
 import { initializeMarket } from "./helpers";
 
+import { bigIntToBigDecimal, rayToWad } from "../common/utils/numbers";
+
 import { Market } from "../../generated/schema";
 
 import { GToken as GTokenTemplate } from "../../generated/templates";
@@ -41,8 +43,6 @@ export function handleReserveInitialized(event: ReserveInitialized): void {
   getOrCreateToken(event.params.aToken);
   market.outputToken = event.params.aToken.toHexString();
   // Set the s/vToken addresses from params
-  market.sToken = event.params.stableDebtToken.toHexString();
-  market.vToken = event.params.variableDebtToken.toHexString();
   market.save();
 }
 
@@ -167,6 +167,6 @@ export function handleReserveFactorChanged(event: ReserveFactorChanged): void {
     marketAddr
   ) as Market;
   // Set the reserve factor as an integer * 100 of a percent (ie 2500 represents 25% of the reserve)
-  market.reserveFactor = event.params.factor;
+  market.exchangeRate = bigIntToBigDecimal(event.params.factor, 4);
   market.save();
 }
