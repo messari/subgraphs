@@ -25,21 +25,23 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     let poolLockedValue = BIGDECIMAL_ZERO;
     let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]));
     let inputTokenBalances = pool.inputTokenBalances;
+
     log.debug("[UpdateTVL][{}] get pool {} {}", [
       event.transaction.hash.toHexString(),
       i.toString(),
       protocol.pools[i],
     ]);
 
-    for (let i = 0; i < pool._assets.length; i++) {
-      let _asset = _Asset.load(pool._assets[i])!;
+    for (let j = 0; j < pool._assets.length; j++) {
+      let _asset = _Asset.load(pool._assets[j])!;
 
       let token = getOrCreateToken(event, Address.fromString(_asset.token));
       let usdValue = bigIntToBigDecimal(_asset.cash, token.decimals);
-      log.debug("[UpdateTVL][{}] get asset {} {} tvl => pool={}+asset={}", [
+      log.debug("[UpdateTVL][{}] get asset {} {} for pool {} tvl => pool={}+asset={}", [
         event.transaction.hash.toHexString(),
-        i.toString(),
-        pool._assets[i],
+        j.toString(),
+        pool._assets[j],
+        pool.id,
         poolLockedValue.toString(),
         usdValue.toString(),
       ]);
@@ -55,7 +57,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     log.debug("[UpdateTVL][{}] final pooltvl {} {} {}", [
       event.transaction.hash.toHexString(),
       i.toString(),
-      protocol.pools[i],
+      pool.id,
       poolLockedValue.toString(),
     ]);
 

@@ -52,15 +52,18 @@ export function createAsset(
   AssetTemplate.create(assetAddress);
 
   if (!asset._index) {
+    assets.push(asset.id);
     inputTokens.push(token.id);
+
+    assets = assets.sort();
     inputTokens = inputTokens.sort();
+
     let _index = inputTokens.indexOf(token.id);
     asset._index = BigInt.fromI32(_index);
     asset.save();
     log.info("new asset {} for token {}, pool {} at index {}", [asset.id, asset.token, asset.pool, _index.toString()]);
 
     inputTokenBalances.push(BigInt.zero());
-    assets.push(asset.id);
   }
 
   pool._assets = assets;

@@ -114,7 +114,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     let protocol = getOrCreateDexAmm();
     let _pools: string[] = protocol.pools;
     _pools.push(pool.id);
-    protocol.pools = _pools;
+    protocol.pools = _pools.sort();
     protocol.save();
   }
 

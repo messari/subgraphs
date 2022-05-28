@@ -48,11 +48,20 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     oldPool.inputTokenBalances.toString(),
   ]);
 
-  let oldPoolIndex = oldPool.inputTokens.indexOf(_asset.token);
+  let oldPoolIndexInputTokens = oldPool.inputTokens.indexOf(_asset.token);
+  let oldPoolIndexAssets = oldPool.inputTokens.indexOf(_asset.id);
 
-  let oldPoolUpdatedAssets = slicer<string>(oldPool._assets, oldPoolIndex, oldPoolIndex + 1);
-  let oldPoolUpdatedInputTokens = slicer<string>(oldPool.inputTokens, oldPoolIndex, oldPoolIndex + 1);
-  let oldPoolUpdatedInputTokenBalances = slicer<BigInt>(oldPool.inputTokenBalances, oldPoolIndex, oldPoolIndex + 1);
+  let oldPoolUpdatedAssets = slicer<string>(oldPool._assets, oldPoolIndexAssets, oldPoolIndexAssets + 1);
+  let oldPoolUpdatedInputTokens = slicer<string>(
+    oldPool.inputTokens,
+    oldPoolIndexInputTokens,
+    oldPoolIndexInputTokens + 1,
+  );
+  let oldPoolUpdatedInputTokenBalances = slicer<BigInt>(
+    oldPool.inputTokenBalances,
+    oldPoolIndexInputTokens,
+    oldPoolIndexInputTokens + 1,
+  );
 
   oldPool._assets = oldPoolUpdatedAssets;
   oldPool.inputTokens = oldPoolUpdatedInputTokens;
@@ -73,13 +82,19 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   newPoolUpdatedInputTokens.push(_asset.token);
   newPoolUpdatedAssets.push(_asset.id);
   newPoolUpdatedInputTokens = newPoolUpdatedInputTokens.sort();
-  let newPoolIndex = newPoolUpdatedInputTokens.indexOf(_asset.token);
-  let newPoolUpdatedInputTokenBalances = slicer<BigInt>(newPool.inputTokenBalances, newPoolIndex, newPoolIndex, [
-    _asset.cash,
-  ]);
+
+  let newPoolIndexInputTokens = newPoolUpdatedInputTokens.indexOf(_asset.token);
+  let newPoolIndexAssets = oldPool.inputTokens.indexOf(_asset.id);
+
+  let newPoolUpdatedInputTokenBalances = slicer<BigInt>(
+    newPool.inputTokenBalances,
+    newPoolIndexInputTokens,
+    newPoolIndexInputTokens,
+    [_asset.cash],
+  );
 
   _asset.pool = newPool.id;
-  _asset._index = BigInt.fromI32(newPoolIndex);
+  _asset._index = BigInt.fromI32(newPoolIndexInputTokens);
   _asset.save();
 
   newPool._assets = newPoolUpdatedAssets;
