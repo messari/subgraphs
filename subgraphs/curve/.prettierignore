@@ -1,0 +1,4 @@
+# mustache code
+*.template.ts
+generated/*
+build/*
