@@ -16,6 +16,7 @@ import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, SECONDS_PER_HOUR, TransactionType } fr
 import { bigIntToBigDecimal, exponentToBigDecimal, tokenAmountToUSDAmount } from "./utils/numbers";
 
 export function updateProtocolTVL(event: ethereum.Event): void {
+  log.debug("[UpdateTVL][{}] get protocol", [event.transaction.hash.toHexString()]);
   let protocol = getOrCreateDexAmm();
   let protocolLockedValue = BIGDECIMAL_ZERO;
 
@@ -24,11 +25,25 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     let poolLockedValue = BIGDECIMAL_ZERO;
     let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]));
     let inputTokenBalances = pool.inputTokenBalances;
+    log.debug("[UpdateTVL][{}] get pool {} {}", [
+      event.transaction.hash.toHexString(),
+      i.toString(),
+      protocol.pools[i],
+    ]);
 
     for (let i = 0; i < pool._assets.length; i++) {
       let _asset = _Asset.load(pool._assets[i])!;
+
       let token = getOrCreateToken(event, Address.fromString(_asset.token));
       let usdValue = bigIntToBigDecimal(_asset.cash, token.decimals);
+      log.debug("[UpdateTVL][{}] get asset {} {} tvl => pool={}+asset={}", [
+        event.transaction.hash.toHexString(),
+        i.toString(),
+        pool._assets[i],
+        poolLockedValue.toString(),
+        usdValue.toString(),
+      ]);
+
       poolLockedValue = poolLockedValue.plus(usdValue);
 
       let _index = pool.inputTokens.indexOf(token.id);
@@ -37,12 +52,24 @@ export function updateProtocolTVL(event: ethereum.Event): void {
       inputTokenBalances[_index] = _asset.cash;
     }
 
+    log.debug("[UpdateTVL][{}] final pooltvl {} {} {}", [
+      event.transaction.hash.toHexString(),
+      i.toString(),
+      protocol.pools[i],
+      poolLockedValue.toString(),
+    ]);
+
     pool.inputTokenBalances = inputTokenBalances;
     pool.totalValueLockedUSD = poolLockedValue;
     pool.save();
 
     protocolLockedValue = protocolLockedValue.plus(poolLockedValue);
   }
+
+  log.debug("[UpdateTVL][{}] final protocoltvl {}", [
+    event.transaction.hash.toHexString(),
+    protocolLockedValue.toString(),
+  ]);
 
   protocol.totalValueLockedUSD = protocolLockedValue;
   protocol.save();

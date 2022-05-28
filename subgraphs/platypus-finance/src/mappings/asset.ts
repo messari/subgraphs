@@ -1,7 +1,7 @@
 // Asset is the LP token for each Token that is added to a pool
 
 import { Transfer, MaxSupplyUpdated, PoolUpdated, CashAdded, CashRemoved } from "../../generated/templates/Asset/Asset";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { LiquidityPoolDailySnapshot, LiquidityPoolHourlySnapshot, _Asset } from "../../generated/schema";
 import { updatePoolMetrics, updateProtocolTVL } from "../common/metrics";
 import { getOrCreateLiquidityPool, getOrCreateLiquidityPoolDailySnapshot } from "../common/getters";
@@ -45,13 +45,13 @@ export function handlePoolUpdated(event: PoolUpdated): void {
 
   let oldPoolIndex = oldPool.inputTokens.indexOf(_asset.token);
 
-  let oldPoolUpdatedAssets = oldPool._assets.slice(0, oldPoolIndex).concat(oldPool._assets.slice(oldPoolIndex + 1));
-  let oldPoolUpdatedInputTokens = oldPool.inputTokens
-    .slice(0, oldPoolIndex)
-    .concat(oldPool.inputTokens.slice(oldPoolIndex + 1));
-  let oldPoolUpdatedInputTokenBalances = oldPool.inputTokenBalances
-    .slice(0, oldPoolIndex)
-    .concat(oldPool.inputTokenBalances.slice(oldPoolIndex + 1));
+  let slicer = (x: any, start: i32, end: i32, insert?: any): any => {
+    return x.slice(0, start).concat([insert]).concat(x.slice(end));
+  };
+
+  let oldPoolUpdatedAssets = slicer(oldPool.inputTokens, oldPoolIndex, oldPoolIndex + 1);
+  let oldPoolUpdatedInputTokens = slicer(oldPool.inputTokens, oldPoolIndex, oldPoolIndex + 1);
+  let oldPoolUpdatedInputTokenBalances = slicer(oldPool.inputTokenBalances, oldPoolIndex, oldPoolIndex + 1);
 
   oldPool._assets = oldPoolUpdatedAssets;
   oldPool.inputTokens = oldPoolUpdatedInputTokens;
@@ -65,8 +65,6 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   oldPool.save();
 
   let newPool = getOrCreateLiquidityPool(event.params.newPool);
-  _asset.pool = newPool.id;
-  _asset.save();
 
   let newPoolUpdatedAssets = newPool._assets;
   let newPoolUpdatedInputTokens = newPool.inputTokens;
@@ -74,13 +72,12 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   newPoolUpdatedInputTokens.push(_asset.token);
   newPoolUpdatedAssets.push(_asset.id);
   newPoolUpdatedInputTokens = newPoolUpdatedInputTokens.sort();
-
   let newPoolIndex = newPoolUpdatedInputTokens.indexOf(_asset.token);
+  let newPoolUpdatedInputTokenBalances = slicer(newPool.inputTokenBalances, newPoolIndex, newPoolIndex, _asset.cash);
 
-  let newPoolUpdatedInputTokenBalances = newPool.inputTokenBalances
-    .slice(0, newPoolIndex)
-    .concat([_asset.cash])
-    .concat(newPool.inputTokenBalances.slice(newPoolIndex));
+  _asset.pool = newPool.id;
+  _asset._index = BigInt.fromI32(newPoolIndex);
+  _asset.save();
 
   newPool._assets = newPoolUpdatedAssets;
   newPool.inputTokens = newPoolUpdatedInputTokens;
@@ -160,7 +157,6 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   let newIdHourly: string = newPool.id.concat("-").concat(timestampHourly.toString());
   let newPoolHourlySnapshot = LiquidityPoolHourlySnapshot.load(newIdHourly);
   if (newPoolHourlySnapshot) {
-
     log.debug("[ChangePool] newPoolHourlySnapshot oldAMT {} oldUSD {}", [
       newPoolHourlySnapshot.hourlyVolumeByTokenAmount.toString(),
       newPoolHourlySnapshot.hourlyVolumeByTokenUSD.toString(),
