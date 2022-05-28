@@ -4,10 +4,10 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: AddressProvider
-    network: avalanche
+    network: matic
     source:
       address: "0x0000000022d53366457f9d5e68ec105046fc4383"
-      startBlock: 5209504
+      startBlock: 13549563
       abi: AddressProvider
     mapping:
       kind: ethereum/events
@@ -88,7 +88,7 @@ dataSources:
 templates:
   - name: RegistryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: MainRegistry
     mapping:
@@ -168,7 +168,7 @@ templates:
       file: ./src/mapping.ts
   - name: StableFactoryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: StableFactory
     mapping:
@@ -249,7 +249,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoRegistryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: CryptoRegistry
     mapping:
@@ -330,7 +330,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: CurvePool
     mapping:
@@ -423,7 +423,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoFactoryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: CryptoFactory
     mapping:
@@ -504,7 +504,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplateV2
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: CurvePoolV2
     mapping:
@@ -589,7 +589,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurveGauge
     kind: ethereum/contract
-    network: avalanche
+    network: matic
     source:
       abi: Gauge
     mapping:

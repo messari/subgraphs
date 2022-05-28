@@ -220,3 +220,6 @@ export const GAUGE_CONTROLLER = Address.fromString("0x2F50D538606Fa9EDD2B11E2446
 export const CURVE_TOKEN = Address.fromString("{{curveToken}}")
 
 export const CTOKEN_DECIMALS = 8;
+
+export const LP_TOKEN_POOL_MAP = new Map<string, Address>()
+LP_TOKEN_POOL_MAP.set("0x445FE580eF8d70FF569aB36e80c647af338db351".toLowerCase(),Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))

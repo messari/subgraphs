@@ -5,7 +5,7 @@ import {
   BIG_INT_ZERO,
   EARLY_V2_POOLS,
   LENDING,
-  LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY, METAPOOL_FACTORY
+  LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY, METAPOOL_FACTORY, LP_TOKEN_POOL_MAP
 } from './common/constants/index'
 import { BigInt, dataSource } from '@graphprotocol/graph-ts/index'
 import { Factory, LiquidityPool, Registry } from '../generated/schema'
@@ -37,7 +37,7 @@ import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/Stab
 import { setGaugeData } from './services/gauges/helpers'
 import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
 
-import { catchUpAvax } from './services/catchup'
+
 
 
 export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt): void {
@@ -45,7 +45,7 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
   if (!platform.catchup && (block > CATCHUP_BLOCK)) {
     platform.catchup = true
     platform.save()
-    catchUpAvax()
+    
   }
   if (providedId == BIG_INT_ZERO) {
     let mainRegistry = Registry.load(addedAddress.toHexString())
@@ -102,6 +102,8 @@ export function getLpToken(pool: Address, registryAddress: Address): Address {
       lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
       if (!lpTokenResult.reverted) {
         return lpTokenResult.value
+      } else if (LP_TOKEN_POOL_MAP.has(pool.toHexString().toLowerCase())) {
+        return LP_TOKEN_POOL_MAP.get(pool.toHexString().toLowerCase())
       }
     }
     log.warning('getLpToken reverted: {}', [pool.toHexString()])

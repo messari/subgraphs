@@ -15,16 +15,16 @@ export const BIG_INT_ONE = BigInt.fromString('1')
 
 export const NATIVE_PLACEHOLDER_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 export const NATIVE_PLACEHOLDER = Address.fromString(NATIVE_PLACEHOLDER_ADDRESS)
-export const NATIVE_TOKEN = '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7'
+export const NATIVE_TOKEN = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
 export const NATIVE_TOKEN_ADDRESS = Address.fromString(NATIVE_TOKEN)
 export const ADDRESS_ZERO = Address.fromString('0x0000000000000000000000000000000000000000')
 
-export const THREE_CRV_TOKEN = '0x1337bedc9d22ecbe766df105c9623922a27963ec'
+export const THREE_CRV_TOKEN = '0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171'
 export const THREE_CRV_ADDRESS = Address.fromString(THREE_CRV_TOKEN)
 
-export const WETH_TOKEN = '0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab'
-export const WBTC_TOKEN = '0x50b7545627a5162f82a992c33b87adc75187b218'
-export const USDT_TOKEN = '0xc7198437980c041c805a1edcba50c1ce5db95118'
+export const WETH_TOKEN = '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'
+export const WBTC_TOKEN = '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6'
+export const USDT_TOKEN = '0xc2132d05d31c914a87c6611c10748aeb04b58e8f'
 export const WETH_ADDRESS = Address.fromString(WETH_TOKEN)
 export const USDT_ADDRESS = Address.fromString(USDT_TOKEN)
 export const WBTC_ADDRESS = Address.fromString(WBTC_TOKEN)
@@ -159,14 +159,14 @@ FOREX_ORACLES.set(POLYGON_JJPY_TOKEN, Address.fromString('0xD647a6fC9BC640230158
 FOREX_ORACLES.set(ARBI_EURS_TOKEN, Address.fromString('0xA14d53bC1F1c0F31B4aA3BD109344E5009051a84'))
 FOREX_ORACLES.set(ARBI_FXEUR_TOKEN, Address.fromString('0xA14d53bC1F1c0F31B4aA3BD109344E5009051a84'))
 
-export const SUSHI_FACTORY = '0x9Ad6C38BE94206cA50bb0d90783181662f0Cfa10'
+export const SUSHI_FACTORY = '0xc35DADB65012eC5796536bD9864eD8773aBc74C4'
 export const SUSHI_FACTORY_ADDRESS = Address.fromString(SUSHI_FACTORY)
 
-export const UNI_FACTORY = '0xefa94DE7a4656D787667C749f7E1223D71E9FD88'
+export const UNI_FACTORY = '0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32'
 export const UNI_FACTORY_ADDRESS = Address.fromString(UNI_FACTORY)
-export const UNI_V3_FACTORY = '0x0000000000000000000000000000000000000000'
+export const UNI_V3_FACTORY = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 export const UNI_V3_FACTORY_ADDRESS = Address.fromString(UNI_V3_FACTORY)
-export const UNI_V3_QUOTER = '0x0000000000000000000000000000000000000000'
+export const UNI_V3_QUOTER = '0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6'
 export const UNI_V3_QUOTER_ADDRESS = Address.fromString(UNI_V3_QUOTER)
 
 export const CURVE_REGISTRY = Address.fromString('0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5')
@@ -177,7 +177,7 @@ export const CURVE_FACTORY_V2 = Address.fromString('0xf18056bbd320e96a48e3fbf8bc
 
 export const TRIPOOL_ADDRESS = Address.fromString('0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7')
 
-export const TRICRYPTO2_POOL = '0xb755b949c126c04e0348dd881a5cf55d424742b2'
+export const TRICRYPTO2_POOL = '0x92215849c439E1f8612b6646060B4E3E5ef822cC'
 export const TRICRYPTO2_POOL_ADDRESS = Address.fromString(TRICRYPTO2_POOL)
 // Pools that are v2 but were originally added to v1 registry
 export const EURT_USD_POOL = Address.fromString('0x9838eCcC42659FA8AA7daF2aD134b53984c9427b')
@@ -185,7 +185,7 @@ export const EURS_USDC_POOL = Address.fromString('0x98a7F18d4E56Cfe84E3D081B4000
 export const TRICRYPTO_V1_POOL = Address.fromString('0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5')
 export const EARLY_V2_POOLS = [TRICRYPTO2_POOL_ADDRESS, EURS_USDC_POOL, EURT_USD_POOL]
 
-export const CATCHUP_BLOCK = BigInt.fromI32(9384780)
+export const CATCHUP_BLOCK = BigInt.fromI32(0)
 export const CURVE_REGISTRY_V1 = Address.fromString('0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5')
 
 export const METAPOOL_FACTORY = 'METAPOOL_FACTORY'
@@ -214,6 +214,9 @@ export const ASSET_TYPES = new Map<string, i32>()
 //export const CATCHUP_ASSET_TYPES = []
 export const GAUGE_CONTROLLER = Address.fromString("0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB")
 
-export const CURVE_TOKEN = Address.fromString("0x249848BeCA43aC405b8102Ec90Dd5F22CA513c06")
+export const CURVE_TOKEN = Address.fromString("0x172370d5Cd63279eFa6d502DAB29171933a610AF")
 
 export const CTOKEN_DECIMALS = 8;
+
+export const LP_TOKEN_POOL_MAP = new Map<string, Address>()
+LP_TOKEN_POOL_MAP.set("0x445FE580eF8d70FF569aB36e80c647af338db351".toLowerCase(),Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))
