@@ -2,14 +2,14 @@ import { ApolloError } from "@apollo/client";
 import { Button } from "@mui/material";
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Versions } from "../constants";
+import { ProtocolTypeEntityName, ProtocolTypeEntityNames, Versions } from "../constants";
 import { isValidHttpUrl } from "../utils";
-import { IndexingErrorDisplay } from "./IndexingErrorDisplay";
+import IssuesDisplay from "./IssuesDisplay";
 
 interface ErrorDisplayProps {
   errorObject: ApolloError | null;
   setSubgraphToQuery: React.Dispatch<React.SetStateAction<any>>;
-  protocolSchemaData: any;
+  protocolData: { [x: string]: any };
   subgraphToQuery: {
     url: string;
     version: string;
@@ -20,14 +20,26 @@ interface ErrorDisplayProps {
 function ErrorDisplay({
   errorObject,
   setSubgraphToQuery,
-  protocolSchemaData,
+  protocolData,
   subgraphToQuery: { url, version },
 }: ErrorDisplayProps) {
   const [searchParams] = useSearchParams();
   if (!errorObject) {
     return null;
   }
-  console.log("ERR OR", Object.values(errorObject), Object.keys(errorObject));
+
+  let protocolSchemaData: any = {};
+
+  const protocolEntityName = ProtocolTypeEntityName[protocolData?.protocols[0]?.type];
+  const protocolEntityNames = ProtocolTypeEntityNames[protocolData?.protocols[0]?.type];
+  if (protocolData) {
+    protocolSchemaData = protocolData[protocolEntityName];
+    if (!protocolSchemaData) {
+      protocolSchemaData = protocolData[protocolEntityNames][0];
+    }
+  }
+
+  console.log("ERR OR", Object.values(errorObject), Object.keys(errorObject), errorObject);
   const subgraphParam = searchParams.get("subgraph");
   const errorMsgs = [];
   let errorTotalCount = 0;
@@ -54,7 +66,7 @@ function ErrorDisplay({
       errorMsgs.push(
         <h3>
           Required schema fields are missing from this subgraph. Verify that your schema has all of the fields that are
-          in the common {protocolSchemaData?.protocols[0].type} {protocolSchemaData?.protocols[0].version} schema.
+          in the common {protocolSchemaData?.type} {protocolSchemaData?.version} schema.
         </h3>,
       );
     } else {
@@ -62,12 +74,12 @@ function ErrorDisplay({
       errorMsgs.push(
         <>
           <h2>
-            Queried {protocolSchemaData?.protocols[0].type} schema version{" "}
-            {protocolSchemaData?.protocols[0].schemaVersion} - Select a different schema to query below:
+            Queried {protocolSchemaData?.type} schema version {protocolSchemaData?.schemaVersion} - Select a different
+            schema to query below:
           </h2>
           {/* Create a button for every other schema version */}
           {Versions.SchemaVersions.map((version: string) => {
-            if (version === protocolSchemaData?.protocols[0].schemaVersion) {
+            if (version === protocolSchemaData?.schemaVersion) {
               return null;
             }
             return <Button onClick={() => setSubgraphToQuery({ url: url, version: version })}>Schema {version}</Button>;
@@ -75,18 +87,13 @@ function ErrorDisplay({
         </>,
       );
     }
-  }
-  if (errorObject.message) {
+  } else if (errorObject.message) {
     if (errorObject.message === "indexing_error") {
       let subgraphName = subgraphParam || "";
       const parseCheck = isValidHttpUrl(subgraphName);
       if (parseCheck) {
         subgraphName = subgraphName?.split("name/")[1];
       }
-      if (subgraphName && subgraphName.length !== 0) {
-        return <IndexingErrorDisplay subgraphName={subgraphName} />;
-      }
-
       // return new indexing error component which makes a query
       // parseSubgraphName
     }
@@ -96,6 +103,10 @@ function ErrorDisplay({
       errorDisplayCount += 1;
       errorMsgs.push(<li>{msg}</li>);
     });
+    const errorsToRender = errorMessagesSplit.map((msg) => {
+      return { message: msg, type: "DEPLOY", level: "critical", fieldName: "" };
+    });
+    return <IssuesDisplay issuesArrayProps={errorsToRender} />;
   }
 
   if (errorMsgs.length >= 1) {

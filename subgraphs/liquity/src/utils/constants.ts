@@ -7,7 +7,7 @@ import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Liquity";
 export const PROTOCOL_SLUG = "liquity";
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.1.2";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.1.3";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.1";
 
 ////////////////////////
@@ -168,7 +168,9 @@ export const LUSD_ADDRESS = "0x5f98805A4E8be255a32880FDeC7F6728C6568bA0";
 
 export const MINIMUM_COLLATERAL_RATIO = BigDecimal.fromString("1.1");
 
-export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO);
+export const MAXIMUM_LTV = BIGDECIMAL_ONE.div(MINIMUM_COLLATERAL_RATIO).times(
+  BIGDECIMAL_HUNDRED
+);
 
 export const LIQUIDATION_FEE_PERCENT = BigDecimal.fromString("0.5");
 export const LIQUIDATION_FEE = LIQUIDATION_FEE_PERCENT.div(BIGDECIMAL_HUNDRED);
