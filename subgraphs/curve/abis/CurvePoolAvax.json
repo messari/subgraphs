@@ -1,0 +1,10 @@
+[
+  {
+    "stateMutability": "view",
+    "type": "function",
+    "name": "lp_token",
+    "inputs": [],
+    "outputs": [{ "name": "", "type": "address" }],
+    "gas": 3498
+  }
+]
