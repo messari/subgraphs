@@ -29,7 +29,21 @@ export function handleMaxSupplyUpdated(event: MaxSupplyUpdated): void {
 }
 
 function slicer<T>(x: T[], start: i32, end: i32, insert: T[] = []): T[] {
-  return x.slice(0, start).concat(insert).concat(x.slice(end));
+  const A = x.slice(0, start);
+  const B = x.slice(end);
+
+  const retval = A.concat(insert).concat(B);
+  log.debug("[ChangePool][slicer] with x:{}, start: {}, end: {}, insert: {}, A: {}, B: {}, retval: {}", [
+    x.toString(),
+    start.toString(),
+    end.toString(),
+    insert.toString(),
+    A.toString(),
+    B.toString(),
+    retval.toString(),
+  ]);
+
+  return retval;
 }
 
 export function handlePoolUpdated(event: PoolUpdated): void {
@@ -50,7 +64,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   ]);
 
   let oldPoolIndexInputTokens = oldPool.inputTokens.indexOf(_asset.token);
-  let oldPoolIndexAssets = oldPool.inputTokens.indexOf(_asset.id);
+  let oldPoolIndexAssets = oldPool._assets.indexOf(_asset.id);
 
   let oldPoolUpdatedAssets = slicer<string>(oldPool._assets, oldPoolIndexAssets, oldPoolIndexAssets + 1);
   let oldPoolUpdatedInputTokens = slicer<string>(
