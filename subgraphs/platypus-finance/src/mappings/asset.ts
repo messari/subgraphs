@@ -28,21 +28,30 @@ export function handleMaxSupplyUpdated(event: MaxSupplyUpdated): void {
   // noop
 }
 
-function slicer<T>(x: T[], start: i32, end: i32, insert: T[] = []): T[] {
-  const A = x.slice(0, start);
-  const B = x.slice(end);
+function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
+  let retval = new Array<T>(x.length - 1);
+  let nI = 0;
+  for (let i = 0; i < x.length; i++) {
+    if (i != index) {
+      retval[nI] = x[i];
+      nI += 1;
+    }
+  }
+  return retval;
+}
 
-  const retval = A.concat(insert).concat(B);
-  log.debug("[ChangePool][slicer] with x:{}, start: {}, end: {}, insert: {}, A: {}, B: {}, retval: {}", [
-    x.toString(),
-    start.toString(),
-    end.toString(),
-    insert.toString(),
-    A.toString(),
-    B.toString(),
-    retval.toString(),
-  ]);
-
+function addToArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
+  let retval = new Array<T>(x.length + 1);
+  let i = 0;
+  while (i < index) {
+    retval[i] = x[i];
+    i += 1;
+  }
+  retval[i] = item;
+  while (i < retval.length) {
+    retval[i] = x[i + 1];
+    i += 1;
+  }
   return retval;
 }
 
@@ -66,17 +75,9 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   let oldPoolIndexInputTokens = oldPool.inputTokens.indexOf(_asset.token);
   let oldPoolIndexAssets = oldPool._assets.indexOf(_asset.id);
 
-  let oldPoolUpdatedAssets = slicer<string>(oldPool._assets, oldPoolIndexAssets, oldPoolIndexAssets + 1);
-  let oldPoolUpdatedInputTokens = slicer<string>(
-    oldPool.inputTokens,
-    oldPoolIndexInputTokens,
-    oldPoolIndexInputTokens + 1,
-  );
-  let oldPoolUpdatedInputTokenBalances = slicer<BigInt>(
-    oldPool.inputTokenBalances,
-    oldPoolIndexInputTokens,
-    oldPoolIndexInputTokens + 1,
-  );
+  let oldPoolUpdatedAssets = removeFromArrayAtIndex(oldPool._assets, oldPoolIndexAssets);
+  let oldPoolUpdatedInputTokens = removeFromArrayAtIndex(oldPool.inputTokens, oldPoolIndexInputTokens);
+  let oldPoolUpdatedInputTokenBalances = removeFromArrayAtIndex(oldPool.inputTokenBalances, oldPoolIndexInputTokens);
 
   oldPool._assets = oldPoolUpdatedAssets;
   oldPool.inputTokens = oldPoolUpdatedInputTokens;
@@ -91,9 +92,14 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   ]);
 
   let newPool = getOrCreateLiquidityPool(event.params.newPool);
-
   let newPoolUpdatedAssets = newPool._assets;
   let newPoolUpdatedInputTokens = newPool.inputTokens;
+
+  log.debug("[ChangePool] newPool oldAssets {} OldInputTokens {} OldBalances {}", [
+    newPool._assets.toString(),
+    newPool.inputTokens.toString(),
+    newPool.inputTokenBalances.toString(),
+  ]);
 
   newPoolUpdatedInputTokens.push(_asset.token);
   newPoolUpdatedAssets.push(_asset.id);
@@ -103,11 +109,10 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   let newPoolIndexInputTokens = newPoolUpdatedInputTokens.indexOf(_asset.token);
   let newPoolIndexAssets = newPoolUpdatedAssets.indexOf(_asset.id);
 
-  let newPoolUpdatedInputTokenBalances = slicer<BigInt>(
+  let newPoolUpdatedInputTokenBalances = addToArrayAtIndex(
     newPool.inputTokenBalances,
+    _asset.cash,
     newPoolIndexInputTokens,
-    newPoolIndexInputTokens,
-    [_asset.cash],
   );
 
   _asset.pool = newPool.id;
@@ -155,16 +160,14 @@ export function handlePoolUpdated(event: PoolUpdated): void {
       oldPoolHourlySnapshot.hourlyVolumeByTokenUSD.toString(),
     ]);
 
-    let newSwapVolumeTokenAmount = slicer<BigInt>(
+    let newSwapVolumeTokenAmount = removeFromArrayAtIndex(
       oldPoolHourlySnapshot.hourlyVolumeByTokenAmount,
       oldPoolIndexInputTokens,
-      oldPoolIndexInputTokens + 1,
     );
 
-    let newSwapVolumeUSD = slicer<BigDecimal>(
+    let newSwapVolumeUSD = removeFromArrayAtIndex(
       oldPoolHourlySnapshot.hourlyVolumeByTokenUSD,
       oldPoolIndexInputTokens,
-      oldPoolIndexInputTokens + 1,
     );
 
     oldPoolHourlySnapshot.hourlyVolumeByTokenAmount = newSwapVolumeTokenAmount;
@@ -186,17 +189,12 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     oldPoolDailySnapshot._inputTokens = oldPool.inputTokens;
     oldPoolDailySnapshot.inputTokenBalances = oldPool.inputTokenBalances;
 
-    let newSwapVolumeTokenAmount = slicer<BigInt>(
+    let newSwapVolumeTokenAmount = removeFromArrayAtIndex(
       oldPoolDailySnapshot.dailyVolumeByTokenAmount,
       oldPoolIndexInputTokens,
-      oldPoolIndexInputTokens + 1,
     );
 
-    let newSwapVolumeUSD = slicer<BigDecimal>(
-      oldPoolDailySnapshot.dailyVolumeByTokenUSD,
-      oldPoolIndexInputTokens,
-      oldPoolIndexInputTokens + 1,
-    );
+    let newSwapVolumeUSD = removeFromArrayAtIndex(oldPoolDailySnapshot.dailyVolumeByTokenUSD, oldPoolIndexInputTokens);
 
     oldPoolDailySnapshot.dailyVolumeByTokenAmount = newSwapVolumeTokenAmount;
     oldPoolDailySnapshot.dailyVolumeByTokenUSD = newSwapVolumeUSD;
@@ -215,18 +213,16 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     newPoolHourlySnapshot._inputTokens = newPool.inputTokens;
     newPoolHourlySnapshot.inputTokenBalances = newPool.inputTokenBalances;
 
-    let newSwapVolumeTokenAmount = slicer<BigInt>(
+    let newSwapVolumeTokenAmount = addToArrayAtIndex(
       newPoolHourlySnapshot.hourlyVolumeByTokenAmount,
+      BIGINT_ZERO,
       newPoolIndexInputTokens,
-      newPoolIndexInputTokens,
-      [BIGINT_ZERO],
     );
 
-    let newSwapVolumeUSD = slicer<BigDecimal>(
+    let newSwapVolumeUSD = addToArrayAtIndex(
       newPoolHourlySnapshot.hourlyVolumeByTokenUSD,
+      BIGDECIMAL_ZERO,
       newPoolIndexInputTokens,
-      newPoolIndexInputTokens,
-      [BIGDECIMAL_ZERO],
     );
 
     newPoolHourlySnapshot.hourlyVolumeByTokenAmount = newSwapVolumeTokenAmount;
@@ -253,18 +249,16 @@ export function handlePoolUpdated(event: PoolUpdated): void {
       newPoolDailySnapshot.dailyVolumeByTokenUSD.toString(),
     ]);
 
-    let newSwapVolumeTokenAmount = slicer<BigInt>(
+    let newSwapVolumeTokenAmount = addToArrayAtIndex(
       newPoolDailySnapshot.dailyVolumeByTokenAmount,
+      BIGINT_ZERO,
       newPoolIndexInputTokens,
-      newPoolIndexInputTokens,
-      [BIGINT_ZERO],
     );
 
-    let newSwapVolumeUSD = slicer<BigDecimal>(
+    let newSwapVolumeUSD = addToArrayAtIndex(
       newPoolDailySnapshot.dailyVolumeByTokenUSD,
+      BIGDECIMAL_ZERO,
       newPoolIndexInputTokens,
-      newPoolIndexInputTokens,
-      [BIGDECIMAL_ZERO],
     );
 
     newPoolDailySnapshot.dailyVolumeByTokenAmount = newSwapVolumeTokenAmount;
