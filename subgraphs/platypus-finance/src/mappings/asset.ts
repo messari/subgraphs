@@ -71,11 +71,6 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   let newPoolUpdatedAssets = newPool._assets;
   let newPoolUpdatedInputTokens = newPool.inputTokens;
 
-  log.debug("[ChangePool] newPool OldInputTokens {} OldBalances {}", [
-    newPool.inputTokens.toString(),
-    newPool.inputTokenBalances.toString(),
-  ]);
-
   newPoolUpdatedInputTokens.push(_asset.token);
   newPoolUpdatedAssets.push(_asset.id);
   newPoolUpdatedInputTokens = newPoolUpdatedInputTokens.sort();
@@ -102,20 +97,30 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     newPoolIndex.toString(),
   ]);
 
+  log.debug("[ChangePool] Calling updateprotocol with event {}", [event.transaction.hash.toHexString()]);
   updateProtocolTVL(event);
+  log.debug("[ChangePool] Called updateprotocol with event {}", [event.transaction.hash.toHexString()]);
 
   let timestampHourly: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let oldIdHourly: string = oldPool.id.concat("-").concat(timestampHourly.toString());
 
   let oldPoolHourlySnapshot = LiquidityPoolHourlySnapshot.load(oldIdHourly);
+  log.debug("[ChangePool] Fetched Snapshot {}", [oldIdHourly]);
+
   if (oldPoolHourlySnapshot) {
     oldPoolHourlySnapshot._assets = oldPool._assets;
     oldPoolHourlySnapshot._inputTokens = oldPool.inputTokens;
     oldPoolHourlySnapshot.inputTokenBalances = oldPool.inputTokenBalances;
 
+    log.debug("[ChangePool] oldPoolHourlySnapshot oldAMT {} oldUSD {}", [
+      oldPoolHourlySnapshot.hourlyVolumeByTokenAmount.toString(),
+      oldPoolHourlySnapshot.hourlyVolumeByTokenUSD.toString(),
+    ]);
+
     let newSwapVolumeTokenAmount = oldPoolHourlySnapshot.hourlyVolumeByTokenAmount
       .slice(0, oldPoolIndex)
       .concat(oldPoolHourlySnapshot.hourlyVolumeByTokenAmount.slice(oldPoolIndex + 1));
+
     let newSwapVolumeUSD = oldPoolHourlySnapshot.hourlyVolumeByTokenUSD
       .slice(0, oldPoolIndex)
       .concat(oldPoolHourlySnapshot.hourlyVolumeByTokenUSD.slice(oldPoolIndex + 1));
@@ -123,6 +128,11 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     oldPoolHourlySnapshot.hourlyVolumeByTokenAmount = newSwapVolumeTokenAmount;
     oldPoolHourlySnapshot.hourlyVolumeByTokenUSD = newSwapVolumeUSD;
     oldPoolHourlySnapshot.save();
+
+    log.debug("[ChangePool] oldPoolHourlySnapshot newAMT {} newUSD {}", [
+      oldPoolHourlySnapshot.hourlyVolumeByTokenAmount.toString(),
+      oldPoolHourlySnapshot.hourlyVolumeByTokenUSD.toString(),
+    ]);
   }
 
   let timestampDaily: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
@@ -137,6 +147,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     let newSwapVolumeTokenAmount = oldPoolDailySnapshot.dailyVolumeByTokenAmount
       .slice(0, oldPoolIndex)
       .concat(oldPoolDailySnapshot.dailyVolumeByTokenAmount.slice(oldPoolIndex + 1));
+
     let newSwapVolumeUSD = oldPoolDailySnapshot.dailyVolumeByTokenUSD
       .slice(0, oldPoolIndex)
       .concat(oldPoolDailySnapshot.dailyVolumeByTokenUSD.slice(oldPoolIndex + 1));
@@ -149,6 +160,12 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   let newIdHourly: string = newPool.id.concat("-").concat(timestampHourly.toString());
   let newPoolHourlySnapshot = LiquidityPoolHourlySnapshot.load(newIdHourly);
   if (newPoolHourlySnapshot) {
+
+    log.debug("[ChangePool] newPoolHourlySnapshot oldAMT {} oldUSD {}", [
+      newPoolHourlySnapshot.hourlyVolumeByTokenAmount.toString(),
+      newPoolHourlySnapshot.hourlyVolumeByTokenUSD.toString(),
+    ]);
+
     newPoolHourlySnapshot._assets = newPool._assets;
     newPoolHourlySnapshot._inputTokens = newPool.inputTokens;
     newPoolHourlySnapshot.inputTokenBalances = newPool.inputTokenBalances;
@@ -157,6 +174,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
       .slice(0, newPoolIndex)
       .concat([BIGINT_ZERO])
       .concat(newPoolHourlySnapshot.hourlyVolumeByTokenAmount.slice(newPoolIndex));
+
     let newSwapVolumeUSD = newPoolHourlySnapshot.hourlyVolumeByTokenUSD
       .slice(0, newPoolIndex)
       .concat([BIGDECIMAL_ZERO])
@@ -165,14 +183,26 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     newPoolHourlySnapshot.hourlyVolumeByTokenAmount = newSwapVolumeTokenAmount;
     newPoolHourlySnapshot.hourlyVolumeByTokenUSD = newSwapVolumeUSD;
     newPoolHourlySnapshot.save();
+
+    log.debug("[ChangePool] newPoolHourlySnapshot newAMT {} newUSD {}", [
+      newPoolHourlySnapshot.hourlyVolumeByTokenAmount.toString(),
+      newPoolHourlySnapshot.hourlyVolumeByTokenUSD.toString(),
+    ]);
   }
 
   let newIdDaily: string = newPool.id.concat("-").concat(timestampDaily.toString());
   let newPoolDailySnapshot = LiquidityPoolDailySnapshot.load(newIdDaily);
+  log.debug("[ChangePool] Final Fetched Snapshot {}", [newIdDaily]);
+
   if (newPoolDailySnapshot) {
     newPoolDailySnapshot._assets = newPool._assets;
     newPoolDailySnapshot._inputTokens = newPool.inputTokens;
     newPoolDailySnapshot.inputTokenBalances = newPool.inputTokenBalances;
+
+    log.debug("[ChangePool] newPoolDailySnapshot oldAMT {} oldUSD {}", [
+      newPoolDailySnapshot.dailyVolumeByTokenAmount.toString(),
+      newPoolDailySnapshot.dailyVolumeByTokenUSD.toString(),
+    ]);
 
     let newSwapVolumeTokenAmount = newPoolDailySnapshot.dailyVolumeByTokenAmount
       .slice(0, newPoolIndex)
@@ -186,5 +216,10 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     newPoolDailySnapshot.dailyVolumeByTokenAmount = newSwapVolumeTokenAmount;
     newPoolDailySnapshot.dailyVolumeByTokenUSD = newSwapVolumeUSD;
     newPoolDailySnapshot.save();
+
+    log.debug("[ChangePool] newPoolDailySnapshot newAMT {} newUSD {}", [
+      newPoolDailySnapshot.dailyVolumeByTokenAmount.toString(),
+      newPoolDailySnapshot.dailyVolumeByTokenUSD.toString(),
+    ]);
   }
 }
