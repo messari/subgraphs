@@ -2,7 +2,7 @@ import {
     GlobalsParamSet as GlobalsParamSetEvent,
     SetValidPoolFactoryCall
 } from "../../generated/MapleGlobals/MapleGlobals";
-import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { BigDecimal } from "@graphprotocol/graph-ts";
 import { PoolFactory as PoolFactoryTemplate } from "../../generated/templates";
 import { _PoolFactory } from "../../generated/schema";
 import { PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY } from "../common/constants";

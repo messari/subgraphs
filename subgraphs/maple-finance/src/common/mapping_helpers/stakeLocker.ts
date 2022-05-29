@@ -1,6 +1,6 @@
 import { Address, log } from "@graphprotocol/graph-ts";
 import { _StakeLocker } from "../../../generated/schema";
-import { ZERO_BD, ZERO_BI } from "../constants";
+import { ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 import { getOrCreateToken } from "./token";
 
 /**
@@ -12,15 +12,16 @@ import { getOrCreateToken } from "./token";
  */
 export function getOrCreateStakeLocker(
     stakeLockerAddress: Address,
-    marketAddress: Address = Address.zero(),
-    stakeTokenAddress: Address = Address.zero()
+    marketAddress: Address = ZERO_ADDRESS,
+    stakeTokenAddress: Address = ZERO_ADDRESS
 ): _StakeLocker {
-    const stakeLocker = new _StakeLocker(stakeLockerAddress.toHexString());
-    const stakeToken = getOrCreateToken(stakeTokenAddress);
+    let stakeLocker = _StakeLocker.load(stakeLockerAddress.toHexString());
 
     if (!stakeLocker) {
+        stakeLocker = new _StakeLocker(stakeLockerAddress.toHexString());
+
         stakeLocker.market = marketAddress.toHexString();
-        stakeLocker.stakeToken = stakeToken.id;
+        stakeLocker.stakeToken = stakeTokenAddress.toHexString();
         stakeLocker.stakeTokenBalance = ZERO_BI;
         stakeLocker.stakeTokenBalanceInPoolInputTokens = ZERO_BI;
         stakeLocker.stakeTokenPriceUSD = ZERO_BD;
@@ -30,8 +31,8 @@ export function getOrCreateStakeLocker(
         stakeLocker.revenueInPoolInputTokens = ZERO_BI;
         stakeLocker.revenueUSD = ZERO_BD;
 
-        if (Address.zero() == marketAddress || Address.zero() == stakeTokenAddress) {
-            log.error("Created stake locker with invalid marketAddress ({}) or stakeTokenAddress ({})", [
+        if (ZERO_ADDRESS == marketAddress || ZERO_ADDRESS == stakeTokenAddress) {
+            log.error("Created stake locker with invalid params: marketAddress ({}) or stakeTokenAddress ({})", [
                 marketAddress.toHexString(),
                 stakeTokenAddress.toHexString()
             ]);

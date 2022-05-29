@@ -26,7 +26,6 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     getOrCreateToken(inputTokenAddress);
     getOrCreateToken(outputTokenAddress);
     getOrCreateToken(stakeTokenAddress);
-    getOrCreateStakeLocker(stakeLockerAddress, poolAddress, stakeTokenAddress);
 
     getOrCreateMarket(
         poolAddress,
@@ -39,4 +38,7 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
         event.block.timestamp,
         event.block.number
     );
+
+    // Create the stake locker for this market
+    getOrCreateStakeLocker(stakeLockerAddress, poolAddress, stakeTokenAddress);
 }

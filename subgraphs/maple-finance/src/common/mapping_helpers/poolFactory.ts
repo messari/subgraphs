@@ -19,21 +19,15 @@ export function getOrCreatePoolFactory(
     if (!poolFactory) {
         poolFactory = new _PoolFactory(poolFactoryAddress.toHexString());
 
-        if (ZERO_BI == creationBlockNumber || ZERO_BI == creationBlockTimestamp) {
-            log.error("Created pool factory with invalid creationBlockNumber ({}) or creationBlockTimestamp ({})", [
-                creationBlockNumber.toString(),
-                creationBlockTimestamp.toString()
-            ]);
-        }
-    }
-
-    // Update creation times if they haven't been
-    if (ZERO_BI != creationBlockTimestamp && ZERO_BI == poolFactory.creationTimestamp) {
         poolFactory.creationTimestamp = creationBlockTimestamp;
-    }
-
-    if (ZERO_BI != creationBlockNumber && ZERO_BI == poolFactory.creationBlockNumber) {
         poolFactory.creationTimestamp = creationBlockNumber;
+
+        if (ZERO_BI == creationBlockNumber || ZERO_BI == creationBlockTimestamp) {
+            log.error(
+                "Created pool factory with invalid params: creationBlockNumber ({}) or creationBlockTimestamp ({})",
+                [creationBlockNumber.toString(), creationBlockTimestamp.toString()]
+            );
+        }
     }
 
     poolFactory.save();
