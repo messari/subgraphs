@@ -1,34 +1,32 @@
 import {
-  GlobalsParamSet as GlobalsParamSetEvent,
-  SetValidPoolFactoryCall
+    GlobalsParamSet as GlobalsParamSetEvent,
+    SetValidPoolFactoryCall
 } from "../../generated/MapleGlobals/MapleGlobals";
+import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
+import { PoolFactory as PoolFactoryTemplate } from "../../generated/templates";
+import { _PoolFactory } from "../../generated/schema";
+import { PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY } from "../common/constants";
 
-// import {
-//     MarketListed as MarketListedEvent,
-//     NewPriceOracle as NewPriceOracleEvent,
-//     MarketEntered as MarketEnteredEvent,
-//     MarketExited as MarketExitedEvent,
-// } from "../../generated/comptroller/comptroller";
-
-// import { Market, Protocol, User, UserMarket } from "../../generated/schema";
-// import { CToken as CTokenTemplate } from "../../generated/templates";
+import { getOrCreatePoolFactory } from "../common/mapping_helpers/poolFactory";
+import { getOrCreateProtocol } from "../common/mapping_helpers/protocol";
 
 export function handleGlobalsParamSet(event: GlobalsParamSetEvent): void {
-  // Accessing the event parameters
-  event.params.value;
-  event.params.which;
+    if (PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY == event.params.which.toString()) {
+        const protocol = getOrCreateProtocol();
 
-  // Accessing event data
-  event.block.timestamp;
-  event.transaction.from;
+        // Convert bips to percentage
+        protocol._treasuryFee = event.params.value.toBigDecimal().div(BigDecimal.fromString("1000"));
+
+        protocol.save();
+    }
 }
 
 export function handleSetValidPoolFactory(call: SetValidPoolFactoryCall): void {
-  // Access function call inputs
-  call.inputs.poolFactory;
-  call.inputs.valid;
+    const poolFactoryAddress = call.inputs.poolFactory;
 
-  // Access other call data
-  call.block.timestamp;
-  call.transaction.value;
+    // Create pool factory template
+    PoolFactoryTemplate.create(poolFactoryAddress);
+
+    // Create pool factory entity
+    getOrCreatePoolFactory(poolFactoryAddress, call.block.timestamp, call.block.number);
 }
