@@ -40,7 +40,7 @@
   "curveToken": "0x172370d5Cd63279eFa6d502DAB29171933a610AF",
   "abiName": "",
   "abiPath": "",
-  "graftEnabled": false,
-  "subgraphId": "",
-  "graftStartBlock": 0
+  "graftEnabled": true,
+  "subgraphId": "QmYMiLYZQmxmjEBP68bbktYpujyNk6Jv8XEkXfvndyeBnH",
+  "graftStartBlock": 22244309
 }

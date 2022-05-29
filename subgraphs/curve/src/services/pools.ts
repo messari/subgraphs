@@ -21,13 +21,7 @@ import { getFactory } from "./factory";
 import { CryptoFactory } from "../../generated/templates/CryptoRegistryTemplate/CryptoFactory";
 import { fetchTokenDecimals } from "../common/tokens";
 import { getOrCreateToken, getPoolCoins } from "../common/getters";
-import {
-  setPoolBalances,
-  setPoolFees,
-  setPoolOutputTokenSupply,
-  setPoolTVL,
-  setProtocolTVL,
-} from "../common/setters";
+import { setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
 import { getLpTokenPriceUSD } from "./snapshots";
 import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
 import { setGaugeData } from "./gauges/helpers";
@@ -345,12 +339,12 @@ export function getAssetType(pool: LiquidityPool): i32 {
 }
 
 export function isLendingPool(pool: Address): boolean {
-  const testLending = CurveLendingPool.bind(pool)
+  const testLending = CurveLendingPool.bind(pool);
   // The test would not work on mainnet because there are no
   // specific functions for lending pools there.
-  const testLendingResult = testLending.try_offpeg_fee_multiplier()
+  const testLendingResult = testLending.try_offpeg_fee_multiplier();
   if (!testLendingResult.reverted || LENDING_POOLS.includes(pool)) {
-    log.debug('Newly registered Pool is a lending pool: {}', [pool.toHexString()])
+    log.debug("Newly registered Pool is a lending pool: {}", [pool.toHexString()]);
     return true;
   }
   return false;

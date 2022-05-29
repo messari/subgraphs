@@ -62,19 +62,24 @@ export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, for
   if (tokenSnapshot) {
     return tokenSnapshot.price;
   }
-  if (isKp3rToken(tokenAddr)) { // kp3r token
+  if (isKp3rToken(tokenAddr)) {
+    // kp3r token
     return getRKp3rPrice();
   }
-  if (isBalancerToken(tokenAddr)) { // balancer
+  if (isBalancerToken(tokenAddr)) {
+    // balancer
     return getBalancerLpPriceUSD(tokenAddr, timestamp);
   }
-  if (isCtoken(tokenAddr)) { // ctoken
+  if (isCtoken(tokenAddr)) {
+    // ctoken
     return getCtokenPriceUSD(tokenAddr, timestamp);
   }
-  if (isIearnToken(tokenAddr)) { // yearn v1
+  if (isIearnToken(tokenAddr)) {
+    // yearn v1
     return getIearnPriceUSD(tokenAddr, timestamp);
   }
-  if (isAtoken(tokenAddr)) { // aave
+  if (isAtoken(tokenAddr)) {
+    // aave
     return getAtokenPriceUSD(tokenAddr, timestamp);
   }
   if (isYearnTokenV2(tokenAddr)) {

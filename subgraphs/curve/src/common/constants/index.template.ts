@@ -119,6 +119,8 @@ export const LENDING_POOLS = [
   Address.fromString('0x8925d9d9b4569d737a48499def3f67baa5a144b9'),
   // FANTOM
   Address.fromString('0x4fc8d635c3cb1d0aa123859e2b2587d0ff2707b1'),
+  // Matic 
+  Address.fromString('0x445fe580ef8d70ff569ab36e80c647af338db351')
 ]
 
 // some v2 pools can have Forex : Crypto pairs for which we need
@@ -222,4 +224,4 @@ export const CURVE_TOKEN = Address.fromString("{{curveToken}}")
 export const CTOKEN_DECIMALS = 8;
 
 export const LP_TOKEN_POOL_MAP = new Map<string, Address>()
-LP_TOKEN_POOL_MAP.set("0x445FE580eF8d70FF569aB36e80c647af338db351".toLowerCase(),Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))
+LP_TOKEN_POOL_MAP.set("0x445fe580ef8d70ff569ab36e80c647af338db351",Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))

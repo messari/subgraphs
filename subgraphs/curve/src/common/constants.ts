@@ -146,8 +146,7 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
-export const SNAPSHOT_SECONDS = SECONDS_PER_DAY
-
+export const SNAPSHOT_SECONDS = SECONDS_PER_DAY;
 
 ////////////////
 ///// Misc /////
@@ -163,4 +162,3 @@ export const ETH_NAME = "Ether";
 export const FEE_DENOMINATOR_DECIMALS = 10;
 export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52");
 export const CRV_POOL_START_BLOCK = 10928474;
-
