@@ -18,6 +18,7 @@ import {
   Repay as RepayEntity,
   Liquidate as LiquidateEntity,
   Market,
+  FinancialsDailySnapshot,
 } from "../../generated/schema";
 
 import {
@@ -154,6 +155,11 @@ export function handleDeposit(event: Deposit): void {
   updateTVL(hash, token, market, protocol, deposit.amount, amountUSD, false);
   market.save();
 
+  protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(
+    amountUSD
+  );
+  protocol.save();
+
   // Update snapshots
   getMarketDailySnapshot(event, market);
   let dailyMetrics = updateMetricsDailySnapshot(event);
@@ -165,6 +171,16 @@ export function handleDeposit(event: Deposit): void {
   hourlyMetrics.save();
 
   let financial = updateFinancialsDailySnapshot(event);
+  financial.dailyDepositUSD = financial.dailyDepositUSD.plus(amountUSD);
+  financial.cumulativeDepositUSD = financial.cumulativeDepositUSD.plus(
+    amountUSD
+  );
+  financial.totalDepositBalanceUSD = financial.totalDepositBalanceUSD.plus(
+    amountUSD
+  );
+
+  calculateRevenues(market, financial, token, event);
+  market.save();
   financial.save();
   deposit.save();
 }
@@ -216,6 +232,11 @@ export function handleWithdraw(event: Withdraw): void {
   updateTVL(hash, token, market, protocol, withdraw.amount, amountUSD, true);
   market.save();
 
+  protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.minus(
+    amountUSD
+  );
+  protocol.save();
+
   // Update snapshots
   getMarketDailySnapshot(event, market);
   let dailyMetrics = updateMetricsDailySnapshot(event);
@@ -227,6 +248,13 @@ export function handleWithdraw(event: Withdraw): void {
   hourlyMetrics.save();
 
   let financial = updateFinancialsDailySnapshot(event);
+  financial.dailyDepositUSD = financial.dailyDepositUSD.minus(amountUSD);
+  financial.totalDepositBalanceUSD = financial.totalDepositBalanceUSD.minus(
+    amountUSD
+  );
+  calculateRevenues(market, financial, token, event);
+  market.save();
+
   financial.save();
   withdraw.save();
 }
@@ -275,8 +303,12 @@ export function handleBorrow(event: Borrow): void {
   updateTVL(hash, token, market, protocol, borrow.amount, amountUSD, true);
   market.save();
 
+  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(
+    amountUSD
+  );
+  protocol.save();
+
   // Calculate the revenues and fees as a result of the borrow
-  calculateRevenues(market, token);
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
@@ -289,6 +321,14 @@ export function handleBorrow(event: Borrow): void {
   hourlyMetrics.save();
 
   let financial = updateFinancialsDailySnapshot(event);
+  financial.dailyBorrowUSD = financial.dailyBorrowUSD.plus(amountUSD);
+  financial.cumulativeBorrowUSD = financial.cumulativeBorrowUSD.plus(amountUSD);
+  financial.totalBorrowBalanceUSD = financial.totalBorrowBalanceUSD.plus(
+    amountUSD
+  );
+
+  calculateRevenues(market, financial, token, event);
+
   financial.save();
   borrow.save();
 }
@@ -336,7 +376,10 @@ export function handleRepay(event: Repay): void {
   updateTVL(hash, token, market, protocol, repay.amount, amountUSD, false);
   market.save();
 
-  calculateRevenues(market, token);
+  protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.minus(
+    amountUSD
+  );
+  protocol.save();
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
@@ -349,6 +392,14 @@ export function handleRepay(event: Repay): void {
   hourlyMetrics.save();
 
   let financial = updateFinancialsDailySnapshot(event);
+  financial.dailyBorrowUSD = financial.dailyBorrowUSD.minus(amountUSD);
+  financial.totalBorrowBalanceUSD = financial.totalBorrowBalanceUSD.minus(
+    amountUSD
+  );
+
+  calculateRevenues(market, financial, token, event);
+  market.save();
+
   financial.save();
   repay.save();
 }
@@ -392,8 +443,11 @@ export function handleLiquidationCall(event: LiquidationCall): void {
 
   // Update total value locked on the market level
   updateTVL(hash, token, market, protocol, liquidate.amount, amountUSD, false);
-  calculateRevenues(market, token);
-  market.save();
+
+  protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
+    amountUSD
+  );
+  protocol.save();
 
   // Update snapshots
   getMarketDailySnapshot(event, market);
@@ -406,6 +460,12 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   hourlyMetrics.save();
 
   let financial = updateFinancialsDailySnapshot(event);
+  financial.dailyLiquidateUSD = financial.dailyLiquidateUSD.plus(amountUSD);
+  financial.cumulativeLiquidateUSD = financial.cumulativeLiquidateUSD.plus(
+    amountUSD
+  );
+  calculateRevenues(market, financial, token, event);
+  market.save();
   financial.save();
 
   if (market.liquidationPenalty.gt(BIGDECIMAL_ZERO)) {

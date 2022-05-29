@@ -55,6 +55,10 @@ export function getDaysSinceEpoch(secondsSinceEpoch: number): string {
   return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_DAY)).toString();
 }
 
+export function getPreviousDaysSinceEpoch(secondsSinceEpoch: number): string {
+  return (<i32>Math.floor((secondsSinceEpoch - SECONDS_PER_DAY) / SECONDS_PER_DAY)).toString();
+}
+
 export function getHoursSinceEpoch(secondsSinceEpoch: number): string {
   return (<i32>Math.floor(secondsSinceEpoch / SECONDS_PER_HOUR)).toString();
 }

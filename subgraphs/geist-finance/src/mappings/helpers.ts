@@ -54,6 +54,7 @@ import { emissionsPerDay } from "../common/rewards";
 import {
   getDaysSinceEpoch,
   getHoursSinceEpoch,
+  getPreviousDaysSinceEpoch,
 } from "../common/utils/datetime";
 
 import { getOrCreateToken } from "../common/getters";
@@ -547,6 +548,9 @@ export function updateFinancialsDailySnapshot(
 ): FinancialsDailySnapshot {
   // Create (or load) the days FinancialsDailySnapshot
   const daysSinceEpoch = getDaysSinceEpoch(event.block.timestamp.toI32());
+  const previousDaysSinceEpoch = getPreviousDaysSinceEpoch(
+    event.block.timestamp.toI32()
+  );
   const protocolId = getProtocolIdFromCtx();
   const protocol = getOrCreateProtocol(protocolId);
 
@@ -554,6 +558,52 @@ export function updateFinancialsDailySnapshot(
   if (!financialsDailySnapshot) {
     financialsDailySnapshot = new FinancialsDailySnapshot(daysSinceEpoch);
     financialsDailySnapshot.protocol = protocol.id;
+    financialsDailySnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsDailySnapshot.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+    // Add current days to previous days for cumulative and total data
+    let previousFinancialsDailySnapshot = FinancialsDailySnapshot.load(
+      previousDaysSinceEpoch
+    );
+
+    if (previousFinancialsDailySnapshot) {
+      financialsDailySnapshot.totalBorrowBalanceUSD = financialsDailySnapshot.totalBorrowBalanceUSD.plus(
+        previousFinancialsDailySnapshot.totalBorrowBalanceUSD
+      );
+      financialsDailySnapshot.totalDepositBalanceUSD = financialsDailySnapshot.totalDepositBalanceUSD.plus(
+        previousFinancialsDailySnapshot.totalDepositBalanceUSD
+      );
+      financialsDailySnapshot.cumulativeBorrowUSD = financialsDailySnapshot.cumulativeBorrowUSD.plus(
+        previousFinancialsDailySnapshot.cumulativeBorrowUSD
+      );
+      financialsDailySnapshot.cumulativeDepositUSD = financialsDailySnapshot.cumulativeDepositUSD.plus(
+        previousFinancialsDailySnapshot.cumulativeDepositUSD
+      );
+      financialsDailySnapshot.cumulativeLiquidateUSD = financialsDailySnapshot.cumulativeLiquidateUSD.plus(
+        previousFinancialsDailySnapshot.cumulativeLiquidateUSD
+      );
+      financialsDailySnapshot.cumulativeProtocolSideRevenueUSD = financialsDailySnapshot.cumulativeProtocolSideRevenueUSD.plus(
+        previousFinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD
+      );
+      financialsDailySnapshot.cumulativeSupplySideRevenueUSD = financialsDailySnapshot.cumulativeSupplySideRevenueUSD.plus(
+        previousFinancialsDailySnapshot.cumulativeSupplySideRevenueUSD
+      );
+      financialsDailySnapshot.cumulativeTotalRevenueUSD = financialsDailySnapshot.cumulativeTotalRevenueUSD.plus(
+        previousFinancialsDailySnapshot.cumulativeTotalRevenueUSD
+      );
+    }
   }
   log.info(
     "Created (or updated) FinancialsDailySnapshot with ID={}, tx hash={}",
@@ -561,12 +611,16 @@ export function updateFinancialsDailySnapshot(
   );
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsDailySnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+
   financialsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD;
+
   financialsDailySnapshot.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
+
   financialsDailySnapshot.cumulativeTotalRevenueUSD =
     protocol.cumulativeTotalRevenueUSD;
+
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
   financialsDailySnapshot.save();
@@ -746,7 +800,12 @@ export function getProtocolIdFromCtx(): string {
 // MATH FUNCTIONS
 // --------------
 
-export function calculateRevenues(market: Market, token: Token): void {
+export function calculateRevenues(
+  market: Market,
+  financial: FinancialsDailySnapshot,
+  token: Token,
+  event: ethereum.Event
+): void {
   // Calculate and save the fees and revenue on both market and protocol level
   // Additionally calculate the total borrow amount on market and protocol
   // Pull S and V debt tokens to get the amount currently borrowed as stable debt or variable debt
@@ -760,7 +819,6 @@ export function calculateRevenues(market: Market, token: Token): void {
   const reserve_data = dataProviderContract.try_getReserveData(
     Address.fromString(market.id)
   );
-
   if (!reserve_data.reverted) {
     totalStableValueLocked = reserve_data.value.value1;
     totalVariableValueLocked = reserve_data.value.value2;
@@ -777,7 +835,6 @@ export function calculateRevenues(market: Market, token: Token): void {
     totalVariableValueLocked,
     market
   );
-
   const variableBorrow = getOrCreateInterestRate(
     market.id,
     "BORROWER",
@@ -794,46 +851,48 @@ export function calculateRevenues(market: Market, token: Token): void {
   );
   const stableBorrow = getOrCreateInterestRate(market.id, "BORROWER", "STABLE");
   const staFees = staAmountUSD.times(stableBorrow.rate);
+
   const marketRevenueUSD = staFees.plus(varFees).truncate(3);
   log.info("Subtract prior market fees ({} USD) from protocol fees ({} USD)", [
     marketRevenueUSD.toString(),
     protocol.cumulativeTotalRevenueUSD.toString(),
   ]);
-
   // Add these values together, save to market and add protocol total
-  const marketTotalRevenueUSD = staFees.plus(varFees).truncate(3);
-  const marketProtocolSideRevenueUSD = marketTotalRevenueUSD
+  const marketProtocolSideRevenueUSD = marketRevenueUSD
     .times(market.exchangeRate)
     .truncate(3);
-
-  const marketSupplySideRevenueUSD = marketTotalRevenueUSD
+  const marketSupplySideRevenueUSD = marketRevenueUSD
     .times(BIGDECIMAL_ONE.minus(market.exchangeRate))
     .truncate(3);
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    marketTotalRevenueUSD
-  );
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    marketProtocolSideRevenueUSD
-  );
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    marketSupplySideRevenueUSD
-  );
+  protocol.cumulativeTotalRevenueUSD = marketRevenueUSD;
+  protocol.cumulativeProtocolSideRevenueUSD = marketProtocolSideRevenueUSD;
+  protocol.cumulativeSupplySideRevenueUSD = marketSupplySideRevenueUSD;
 
-  // CALCULATE totalBorrowUSD FIELDS ON MARKET AND PROTOCOL ENTITIES
-  // The sum in USD of s and v tokens on market is totalBorrowUSD
-  // Subtract the previously saved amount of the market TotalBorrowUSD value from the protocol totalBorrowUSD
-  // This gets the amount in USD out in borrows on the protocol not including this market
-  const tempProtocolBorrowTotal = protocol.cumulativeBorrowUSD.minus(
-    market.cumulativeBorrowUSD
-  );
-  // Sum the amount in USD of the stable borrows and variable borrows currently in use
-  market.cumulativeBorrowUSD = staAmountUSD.plus(varAmountUSD);
-  // Add this markets new amount out in borrows to the protocol value
-  protocol.cumulativeBorrowUSD = tempProtocolBorrowTotal.plus(
-    market.cumulativeBorrowUSD
-  );
+  financial.cumulativeProtocolSideRevenueUSD = marketProtocolSideRevenueUSD;
+  financial.cumulativeSupplySideRevenueUSD = marketSupplySideRevenueUSD;
+  financial.cumulativeTotalRevenueUSD = marketRevenueUSD;
 
+  // For daily metrics subtract fees from previous days
+  const previousDaysSinceEpoch = getPreviousDaysSinceEpoch(
+    event.block.timestamp.toI32()
+  );
+  let previousFinancialsDailySnapshot = FinancialsDailySnapshot.load(
+    previousDaysSinceEpoch
+  );
+  if (previousFinancialsDailySnapshot) {
+    financial.dailyProtocolSideRevenueUSD = marketProtocolSideRevenueUSD.minus(
+      previousFinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD
+    );
+    financial.dailySupplySideRevenueUSD = marketSupplySideRevenueUSD.minus(
+      previousFinancialsDailySnapshot.cumulativeSupplySideRevenueUSD
+    );
+    financial.dailyTotalRevenueUSD = marketRevenueUSD.minus(
+      previousFinancialsDailySnapshot.cumulativeTotalRevenueUSD
+    );
+  }
+
+  financial.save();
   market.save();
   protocol.save();
 }
