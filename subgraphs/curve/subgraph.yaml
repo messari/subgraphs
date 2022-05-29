@@ -1,0 +1,666 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: AddressProvider
+    network: matic
+    source:
+      address: "0x0000000022d53366457f9d5e68ec105046fc4383"
+      startBlock: 13549563
+      abi: AddressProvider
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - Registry
+        - Factory
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: AddressProvider
+          file: ./abis/AddressProvider.json
+        - name: StableFactory
+          file: ./abis/StableFactory.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: CryptoRegistry
+          file: ./abis/CryptoRegistry.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurveLendingPool
+          file: ./abis/CurveLendingPool.json
+        - name: CurveLendingPoolCoin128
+          file: ./abis/CurveLendingPoolCoin128.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: NewAddressIdentifier(indexed uint256,address,string)
+          handler: handleNewAddressIdentifier
+        - event: AddressModified(indexed uint256,address,uint256)
+          handler: handleAddressModified
+      file: ./src/mapping.ts
+
+templates:
+  - name: RegistryTemplate
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: MainRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Registry
+        - LiquidityPool
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurveLendingPool
+          file: ./abis/CurveLendingPool.json
+        - name: CurveLendingPoolCoin128
+          file: ./abis/CurveLendingPoolCoin128.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: PoolAdded(indexed address,bytes)
+          handler: handleMainRegistryPoolAdded
+      
+        
+          
+      file: ./src/mapping.ts
+  - name: StableFactoryTemplate
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: StableFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Platform
+        - LiquidityPool
+        - BasePool
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: StableFactory
+          file: ./abis/StableFactory.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: PlainPoolDeployed(address[4],uint256,uint256,address)
+          handler: handlePlainPoolDeployed
+        - event: MetaPoolDeployed(address,address,uint256,uint256,address)
+          handler: handleMetaPoolDeployed
+        - event: LiquidityGaugeDeployed(address,address)
+          handler: handleLiquidityGaugeDeployed
+      
+        
+          
+      file: ./src/mapping.ts
+  - name: CryptoRegistryTemplate
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: CryptoRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Platform
+        - LiquidityPool
+        - BasePool
+        - GaugePool
+        - Registry
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: CryptoRegistry
+          file: ./abis/CryptoRegistry.json
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: PoolAdded(indexed address)
+          handler: handleCryptoPoolAdded
+      
+        
+          
+        
+          
+      file: ./src/mappingV2.ts
+  - name: CurvePoolTemplate
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: CurvePool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - TokenSnapshot
+        - LiquidityPoolHourlySnapshot
+        - LiquidityPoolDailySnapshot
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: CryptoRegistry
+          file: ./abis/CryptoRegistry.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: StableFactory
+          file: ./abis/StableFactory.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurveLendingPool
+          file: ./abis/CurveLendingPool.json
+        - name: CurveLendingPoolCoin128
+          file: ./abis/CurveLendingPoolCoin128.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchange
+        - event: TokenExchangeUnderlying(indexed address,int128,uint256,int128,uint256)
+          handler: handleTokenExchangeUnderlying
+        - event: AddLiquidity(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleAddLiquidity
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256[2],uint256)
+          handler: handleRemoveLiquidity
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOne
+        - event: RemoveLiquidityImbalance(indexed address,uint256[2],uint256[2],uint256,uint256)
+          handler: handleRemoveLiquidityImbalance
+        - event: NewFee(uint256,uint256)
+          handler: handleNewFee
+      file: ./src/mapping.ts
+  - name: CryptoFactoryTemplate
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: CryptoFactory
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - Candle
+        - TokenSnapshot
+        - HourlyVolumeSnapshot
+        - DailyVolumeSnapshot
+        - WeeklyVolumeSnapshot
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: CryptoRegistry
+          file: ./abis/CryptoRegistry.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: StableFactory
+          file: ./abis/StableFactory.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleCryptoPoolDeployed
+        - event: LiquidityGaugeDeployed(address,address,address)
+          handler: handleLiquidityGaugeDeployed
+      file: ./src/mappingV2.ts
+  - name: CurvePoolTemplateV2
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: CurvePoolV2
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - Candle
+        - TokenSnapshot
+        - HourlyVolumeSnapshot
+        - DailyVolumeSnapshot
+        - WeeklyVolumeSnapshot
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: CryptoRegistry
+          file: ./abis/CryptoRegistry.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: StableFactory
+          file: ./abis/StableFactory.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleTokenExchangeV2
+        - event: AddLiquidity(indexed address,uint256[2],uint256,uint256)
+          handler: handleAddLiquidityV2
+        - event: RemoveLiquidity(indexed address,uint256[2],uint256)
+          handler: handleRemoveLiquidityV2
+        - event: RemoveLiquidityOne(indexed address,uint256,uint256,uint256)
+          handler: handleRemoveLiquidityOneV2
+      file: ./src/mappingV2.ts
+  - name: CurveGauge
+    kind: ethereum/contract
+    network: matic
+    source:
+      abi: Gauge
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - LiquidityPool
+        - RewardToken
+      abis:
+        - name: CryptoFactory
+          file: ./abis/CryptoFactory.json
+        - name: CryptoRegistry
+          file: ./abis/CryptoRegistry.json
+        - name: MainRegistry
+          file: ./abis/MainRegistry.json
+        - name: StableFactory
+          file: ./abis/StableFactory.json
+        - name: CurvePool
+          file: ./abis/CurvePool.json
+        - name: CurvePoolV2
+          file: ./abis/CurvePoolV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        - name: Factory
+          file: ./abis/UniswapV2Factory.json
+        - name: Pair
+          file: ./abis/UniswapV2Pair.json
+        - name: FactoryV3
+          file: ./abis/UniswapV3Factory.json
+        - name: Quoter
+          file: ./abis/UniswapV3Quoter.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: CurvePoolCoin128
+          file: ./abis/CurvePoolCoin128.json
+        - name: MetaPool
+          file: ./abis/MetaPool.json
+        - name: Gauge
+          file: ./abis/Gauge.json
+        - name: GaugeV2
+          file: ./abis/GaugeV2.json
+        - name: GaugeV3
+          file: ./abis/GaugeV3.json
+        - name: CurveRewards
+          file: ./abis/CurveRewards.json
+        - name: GaugeController
+          file: ./abis/GaugeController.json
+        - name: CrvERC20
+          file: ./abis/CrvERC20.json
+        - name: RedeemableKeep3r
+          file: ./abis/RedeemableKeep3r.json
+        - name: BalancerPoolToken
+          file: ./abis/prices/BalancerPoolToken.json
+        - name: CurvePoolAvax
+          file: ./abis/CurvePoolAvax.json
+        - name: Ctoken
+          file: ./abis/prices/Ctoken.json
+        - name: Iearn
+          file: ./abis/prices/Iearn.json
+        - name: Atoken
+          file: ./abis/prices/Atoken.json
+        - name: YearnTokenV2
+          file: ./abis/prices/YearnTokenV2.json
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+      file: ./src/services/rewards.ts
