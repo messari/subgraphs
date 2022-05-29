@@ -10,6 +10,7 @@ const NetworkLogos: Record<string, string> = {
   matic: "https://directus.messari.io/assets/ac98defc-d493-4a65-bbec-d2c76d905d01",
   moonriver: "https://messari.io/asset-images/27cbdc16-de27-4a65-a8c3-40bb205fe94f/128.png?v=2",
   optimism: "https://directus.messari.io/assets/8249c927-2347-411e-b725-bce15c41ca87",
+  gnosis: "https://assets.coingecko.com/coins/images/662/small/logo_square_simple_300px.png?1609402668",
 };
 
 interface NetworkLogoProps {

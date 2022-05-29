@@ -14,20 +14,22 @@ function checkValueFalsey(
   if (!fieldDataType || fieldDataType.length === 0) {
     return undefined;
   }
-  if (fieldDataType[fieldDataType.length - 1] !== "!") {
+  if (fieldDataType[fieldDataType.length - 1] !== "!" && !value) {
     return undefined;
   }
   let valueMsg = "";
+  let level = "warning";
   if (value === "" || value?.length === 0) {
     valueMsg = "empty";
-  } else if (!value) {
+  } else if (!value || Number(value) === 0) {
     valueMsg = value;
-  } else if (value < 0) {
+  } else if (Number(value) < 0) {
     valueMsg = "negative";
+    level = "critical";
   }
   const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this data is correct";
   if (issues.filter((x) => x.message === message).length === 0 && valueMsg) {
-    return { type: "VAL", message, level: "warning", fieldName: schemaName + "-" + entityField };
+    return { type: "VAL", message, level, fieldName: schemaName + "-" + entityField };
   } else {
     return undefined;
   }
@@ -49,16 +51,16 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
     schema = Object.keys(entityData).map((entityField: string) => {
+      if (entityField === "__typename") {
+        return null;
+      }
+      let dataType = dataFields[entityField];
+      let value = entityData[entityField];
       try {
-        if (entityField === "__typename") {
-          return null;
-        }
-        let dataType = dataFields[entityField];
-        let value = entityData[entityField];
         const isPercentageField = percentageFieldList.find((x) => {
           return entityField.toUpperCase().includes(x.toUpperCase());
         });
-        const fieldDataTypeChars = dataFields[entityField].split("");
+        const fieldDataTypeChars = dataFields[entityField]?.split("");
         const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
         if (issueReturned) {
           issues.push(issueReturned);
@@ -200,7 +202,11 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           if (entityField === "inputTokens") {
             value = value.map((val: { [x: string]: string }, idx: number) => {
               const label = schemaName + "-" + entityField + " " + (val.symbol || idx);
-              if (!Number(val.decimals) && issues.filter((x) => x.fieldName === label).length === 0) {
+              if (
+                !Number(val.decimals) &&
+                Number(val.decimals) !== 0 &&
+                issues.filter((x) => x.fieldName === label).length === 0
+              ) {
                 issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
               }
               return {
@@ -267,40 +273,63 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
             value = Number(value).toFixed(2) + "%";
           }
         }
-
-        return (
-          <TableRow key={entityField}>
-            <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-              {entityField}: <b>{dataType}</b>
-            </TableCell>
-            <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
-              {value}
-            </TableCell>
-          </TableRow>
-        );
       } catch (err) {
         if (err instanceof Error) {
           console.log("CATCH,", Object.keys(err), Object.values(err), err);
-          return <h3>JAVASCRIPT ERROR - RENDERING SCHEMA TABLE - {err.message}</h3>;
+          if (issues.filter((x) => x.fieldName === schemaName + "-" + entityField && x.type === "JS")?.length === 0) {
+            issues.push({
+              type: "JS",
+              message: err.message,
+              level: "critical",
+              fieldName: schemaName + "-" + entityField,
+            });
+          }
+          return (
+            <TableRow key={entityField} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
+              <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
+                {entityField}: <b>{dataType}</b>
+              </TableCell>
+              <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
+                JavaScript Error - {err?.message}
+              </TableCell>
+            </TableRow>
+          );
         } else {
-          return <h3>JAVASCRIPT ERROR - RENDERING SCHEMA TABLE</h3>;
+          return <h3>JAVASCRIPT ERROR</h3>;
         }
       }
+      return (
+        <TableRow key={entityField}>
+          <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
+            {entityField}: <b>{dataType}</b>
+          </TableCell>
+          <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
+            {value}
+          </TableCell>
+        </TableRow>
+      );
     });
   }
 
   useEffect(() => {
     console.log("SCHEMATABLE ISSUE TO SET", issues, issuesProps);
     setIssues(issues);
-  }, [issuesProps]);
+  }, [issues]);
 
-  return (
-    <>
+  let schemaHeader = null;
+  if (schema && entityData) {
+    schemaHeader = (
       <Box my={3}>
         <CopyLinkToClipboard link={window.location.href}>
           <Typography variant="h4">{schemaName} schema</Typography>
         </CopyLinkToClipboard>
       </Box>
+    );
+  }
+
+  return (
+    <>
+      {schemaHeader}
       <TableContainer component={Paper} sx={{ justifyContent: "center", display: "flex", alignItems: "center" }}>
         <Table sx={{ maxWidth: 800 }} aria-label="simple table">
           <TableBody>{schema}</TableBody>
