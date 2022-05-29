@@ -27,6 +27,9 @@ export function handleSetValidPoolFactory(call: SetValidPoolFactoryCall): void {
     // Create pool factory template
     PoolFactoryTemplate.create(poolFactoryAddress);
 
+    // Trigger protocol creation here for convienence
+    getOrCreateProtocol();
+
     // Create pool factory entity
     getOrCreatePoolFactory(poolFactoryAddress, call.block.timestamp, call.block.number);
 }

@@ -978,7 +978,7 @@ type Repay implements Event @entity {
     _interestPaid: BigInt!
 
     " If the repayment was late "
-    _wasLate: Boolean!
+    _late: Boolean!
 }
 
 type Liquidate implements Event @entity {
@@ -1032,7 +1032,7 @@ type Liquidate implements Event @entity {
     _defaultSufferedToPoolAndStake: BigInt!
 
     " Amount of pool input tokens returned to the borrower "
-    _amountReturnedToBorrower: Boolean!
+    _amountReturnedToBorrower: BigInt!
 }
 
 # An account is a unique Ethereum address

@@ -75,6 +75,16 @@ export namespace TransactionType {
     export const LIQUIDATE = "LIQUIDATE";
 }
 
+////////////////////////////
+///// Solifidity Enums /////
+////////////////////////////
+
+export namespace PoolState {
+    export const Initialized = 0;
+    export const Finalized = 1;
+    export const Deactivated = 2;
+}
+
 //////////////////////////////
 ///// Ethereum Addresses /////
 //////////////////////////////

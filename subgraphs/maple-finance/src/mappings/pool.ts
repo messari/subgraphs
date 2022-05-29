@@ -1,5 +1,5 @@
-import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
-
+import { Address } from "@graphprotocol/graph-ts";
+import { Loan as LoanTemplate } from "../../generated/templates";
 import {
     PoolStateChanged as PoolStateChangedEvent,
     LoanFunded as LoanFundedEvent,
@@ -8,14 +8,11 @@ import {
     DefaultSuffered as DefaultSufferedEvent,
     BalanceUpdated as BalanceUpdatedEvent
 } from "../../generated/templates/Pool/Pool";
-import { Deposit, Withdraw } from "../../generated/schema";
-import { PROTOCOL_ID } from "../common/constants";
+
+import { PoolState } from "../common/constants";
 import { getOrCreateMarket } from "../common/mapping_helpers/market";
 import { createDeposit, createWithdraw } from "../common/mapping_helpers/transactions";
-
-export function handlePoolStateChanged(event: PoolStateChangedEvent): void {}
-
-export function handleLoanFunded(event: LoanFundedEvent): void {}
+import { getOrCreateLoan } from "../common/mapping_helpers/loan";
 
 export function handleTransfer(event: TransferEvent): void {
     if (Address.zero() == event.params.from) {
@@ -29,6 +26,24 @@ export function handleTransfer(event: TransferEvent): void {
         const market = getOrCreateMarket(marketAddress);
         createWithdraw(event, market, event.params.value);
     }
+}
+
+export function handlePoolStateChanged(event: PoolStateChangedEvent): void {
+    const market = getOrCreateMarket(event.address);
+
+    const active = event.params.state == PoolState.Finalized;
+    market.isActive = active;
+    market.canBorrowFrom = active;
+}
+
+export function handleLoanFunded(event: LoanFundedEvent): void {
+    const loanAddress = event.params.loan;
+
+    // Create loan template
+    LoanTemplate.create(loanAddress);
+
+    // Create loan entity
+    getOrCreateLoan(loanAddress, event.address, event.params.amountFunded);
 }
 
 export function handleClaim(event: ClaimEvent): void {}

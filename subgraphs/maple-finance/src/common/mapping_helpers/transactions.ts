@@ -1,12 +1,12 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Deposit, Market, Withdraw } from "../../../generated/schema";
-import { PROTOCOL_ID, ZERO_ADDRESS, ZERO_BI } from "../constants";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Borrow, Deposit, Liquidate, Market, Repay, Withdraw } from "../../../generated/schema";
+import { PROTOCOL_ID } from "../constants";
 
 export function createDeposit(event: ethereum.Event, market: Market, amountMPTMinted: BigInt): Deposit {
-    const id = event.transaction.hash.toString() + "-" + event.logIndex.toString();
+    const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const deposit = new Deposit(id);
 
-    deposit.hash = event.transaction.hash.toString();
+    deposit.hash = event.transaction.hash.toHexString();
     deposit.logIndex = event.logIndex.toI32();
     deposit.protocol = PROTOCOL_ID;
     deposit.to = market.id;
@@ -29,10 +29,10 @@ export function createDeposit(event: ethereum.Event, market: Market, amountMPTMi
 }
 
 export function createWithdraw(event: ethereum.Event, market: Market, amountMPTBurned: BigInt): Withdraw {
-    const id = event.transaction.hash.toString() + "-" + event.logIndex.toString();
+    const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const withdraw = new Withdraw(id);
 
-    withdraw.hash = event.transaction.hash.toString();
+    withdraw.hash = event.transaction.hash.toHexString();
     withdraw.logIndex = event.logIndex.toI32();
     withdraw.protocol = PROTOCOL_ID;
     withdraw.to = event.transaction.from.toString(); // from since its a burn
@@ -52,4 +52,84 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
 
     withdraw.save();
     return withdraw;
+}
+
+export function createBorrow(event: ethereum.Event, market: Market, amount: BigInt): Borrow {
+    const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+    const borrow = new Borrow(id);
+
+    borrow.hash = event.transaction.hash.toHexString();
+    borrow.logIndex = event.logIndex.toI32();
+    borrow.protocol = PROTOCOL_ID;
+    borrow.to = event.transaction.from.toString(); // from since its a burn
+    borrow.from = market.id;
+    borrow.blockNumber = event.block.number;
+    borrow.timestamp = event.block.timestamp;
+    borrow.market = market.id;
+    borrow.asset = market.inputToken;
+    borrow.amount = amount;
+    borrow.amountUSD = borrow.amount.toBigDecimal().times(market.inputTokenPriceUSD);
+
+    borrow.save();
+    return borrow;
+}
+
+export function createRepay(
+    event: ethereum.Event,
+    market: Market,
+    amount: BigInt,
+    principalPaid: BigInt,
+    interestPaid: BigInt,
+    late: boolean
+): Repay {
+    const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+    const repay = new Repay(id);
+
+    repay.hash = event.transaction.hash.toHexString();
+    repay.logIndex = event.logIndex.toI32();
+    repay.protocol = PROTOCOL_ID;
+    repay.to = event.transaction.from.toString(); // from since its a burn
+    repay.from = market.id;
+    repay.blockNumber = event.block.number;
+    repay.timestamp = event.block.timestamp;
+    repay.market = market.id;
+    repay.asset = market.inputToken;
+    repay.amount = amount;
+    repay.amountUSD = repay.amount.toBigDecimal().times(market.inputTokenPriceUSD);
+    repay._principalPaid = principalPaid;
+    repay._interestPaid = interestPaid;
+    repay._late = late;
+
+    repay.save();
+    return repay;
+}
+
+export function createLiquidate(
+    event: ethereum.Event,
+    market: Market,
+    amountRecoveredFromCollatoral: BigInt,
+    defaultSufferedToPoolAndStake: BigInt,
+    amountReturnedToBorrower: BigInt
+): Liquidate {
+    const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+    const liquidate = new Liquidate(id);
+
+    liquidate.hash = event.transaction.hash.toHexString();
+    liquidate.logIndex = event.logIndex.toI32();
+    liquidate.protocol = PROTOCOL_ID;
+    liquidate.to = event.transaction.from.toString(); // from since its a burn
+    liquidate.from = market.id;
+    liquidate.blockNumber = event.block.number;
+    liquidate.timestamp = event.block.timestamp;
+    liquidate.market = market.id;
+    liquidate.asset = market.inputToken;
+    liquidate.amountUSD = liquidate.amount.toBigDecimal().times(market.inputTokenPriceUSD);
+    liquidate._amountRecoveredFromCollatoral = amountRecoveredFromCollatoral;
+    liquidate._defaultSufferedToPoolAndStake = defaultSufferedToPoolAndStake;
+    liquidate._amountReturnedToBorrower = amountReturnedToBorrower;
+
+    liquidate.amount = liquidate._amountRecoveredFromCollatoral.plus(liquidate._defaultSufferedToPoolAndStake);
+
+    liquidate.save();
+    return liquidate;
 }

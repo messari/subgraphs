@@ -98,12 +98,12 @@ templates:
               - name: Pool
                 file: ./abis/Pool.json
           eventHandlers:
+              - event: Transfer(indexed address,indexed address,uint256)
+                handler: handleTransfer
               - event: PoolStateChanged(uint8)
                 handler: handlePoolStateChanged
               - event: LoanFunded(indexed address,address,uint256)
                 handler: handleLoanFunded
-              - event: Transfer(indexed address,indexed address,uint256)
-                handler: handleTransfer
               - event: Claim(indexed address,uint256,uint256,uint256,uint256,uint256)
                 handler: handleClaim
               - event: DefaultSuffered(indexed address,uint256,uint256,uint256,uint256)
