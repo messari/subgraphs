@@ -18,7 +18,6 @@ import {
   getOrCreateLendingProtocol,
   getMarket,
   getOrCreateMarketHourlySnapshot,
-  getOrCreateToken,
 } from "./getters";
 import { getMarketFromIlk } from "../common/getters";
 import { Vat } from "../../generated/Vat/Vat";
@@ -80,8 +79,14 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address): void {
 // Update MarketDailySnapshot entity
 export function updateMarketMetrics(ilk: Bytes, event: ethereum.Event): void {
   let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
+  }
   let protocol = getOrCreateLendingProtocol();
 
   marketHourlySnapshot.protocol = protocol.id;
@@ -146,8 +151,8 @@ export function updateTVL(): void {
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
-    if (!market.inputToken){
-      return
+    if (!market) {
+      return;
     }
     let marketTVLusd = bigIntToBigDecimal(market.inputTokenBalance, WAD).times(market.inputTokenPriceUSD); // prices are always up to date via the spot contract
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);

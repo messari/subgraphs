@@ -53,6 +53,9 @@ export function handleRely(event: LogNote): void {
 
 export function handleCage(event: GemLogNote): void {
   let market = getMarket(event.address.toHexString());
+  if (!market){
+    return
+  }
   market.isActive = false;
   market.save();
 }
@@ -195,11 +198,14 @@ export function handleFrob(event: LogNote): void {
   let dink = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(132, 164))); // change in collateral
   let dart = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(164, 196))); // change in debt
   let market = getMarketFromIlk(ilk);
-  if (!market.inputToken){
-    return
+  if (!market) {
+    return;
   }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
+  }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let inputTokenBalance = market.inputTokenBalance.plus(dink);
@@ -273,11 +279,14 @@ export function handleGrab(event: LogNote): void {
   let dink = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(132, 164))); // delta collateral
   let dart = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(164, 196))); // delta debt
   let market = getMarketFromIlk(ilk);
-  if (!market.inputToken){
-    return
+  if (!market) {
+    return;
   }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
+  }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken!));
@@ -379,6 +388,9 @@ export function handleFold(event: LogNote): void {
   let dRate = bigIntToBigDecimal(bytesToSignedInt(event.params.arg3), RAY);
   log.debug("dRate = {}", [dRate.toString()]);
   let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
   // stability fee collection, fold is called when someone calls jug.drip which increases debt balance for user
   let feesAccrued = dRate.times(market.totalBorrowBalanceUSD); // change in rate multiplied by total borrowed amt, compounded
   let financialsDailySnapshot = getOrCreateFinancials(event);
