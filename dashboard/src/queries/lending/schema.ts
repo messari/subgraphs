@@ -112,6 +112,7 @@ export const schema100 = (): Schema => {
           rewardTokens{
             id
           }
+          id
          name
          isActive
          canUseAsCollateral
@@ -246,7 +247,7 @@ export const schema110 = (): Schema => {
     canUseAsCollateral: "Boolean!",
   };
   const query = `
-      query Data($poolId: String){
+      query Data($poolId: String, $protocolId: String){
         _meta {
           block {
             number
@@ -254,10 +255,29 @@ export const schema110 = (): Schema => {
           deployment
         }
         protocols {
+          id
           name
           type
           schemaVersion
           subgraphVersion
+          methodologyVersion
+        }
+        lendingProtocol(id: $protocolId) {
+          id
+          name,
+          slug,
+          schemaVersion,
+          subgraphVersion,
+          methodologyVersion,
+          network,
+          type,
+          riskType,
+          lendingType,
+          totalUniqueUsers,
+          totalValueLockedUSD,
+          totalVolumeUSD,
+          totalDepositUSD,
+          totalBorrowUSD
         }
         lendingProtocols {
           id
@@ -279,6 +299,37 @@ export const schema110 = (): Schema => {
         markets {
           id
           name
+          inputTokens{
+            id
+            decimals
+            name
+            symbol
+          }
+          outputToken {
+            id
+            decimals
+            name
+            symbol
+          }
+          rewardTokens{
+            id
+            decimals
+            name
+            symbol
+          }
+          inputTokenBalances
+          outputTokenSupply
+         isActive
+         canUseAsCollateral
+         canBorrowFrom
+         maximumLTV
+         liquidationThreshold
+         liquidationPenalty
+         depositRate
+         stableBorrowRate
+         variableBorrowRate
+         rewardTokenEmissionsAmount
+         rewardTokenEmissionsUSD
         }
         financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
           totalValueLockedUSD
@@ -411,28 +462,30 @@ export const schema120 = (): Schema => {
   const entitiesData = {
     // Each Array within this array contains strings of the fields to pull for the entity type of the same index above
     financialsDailySnapshots: {
-      dailySupplySideRevenueUSD: "BigDecimal!",
-      dailyProtocolSideRevenueUSD: "BigDecimal!",
-      dailyTotalRevenueUSD: "BigDecimal!",
-      dailyBorrowUSD: "BigDecimal!",
-      dailyDepositUSD: "BigDecimal!",
-      dailyLiquidateUSD: "BigDecimal!",
-      cumulativeSupplySideRevenueUSD: "BigDecimal!",
-      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
-      cumulativeTotalRevenueUSD: "BigDecimal!",
-      cumulativeBorrowUSD: "BigDecimal!",
-      cumulativeDepositUSD: "BigDecimal!",
-      cumulativeLiquidateUSD: "BigDecimal!",
-      totalDepositBalanceUSD: "BigDecimal!",
-      totalBorrowBalanceUSD: "BigDecimal!",
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
+      dailySupplySideRevenueUSD: "BigDecimal!",
+      cumulativeSupplySideRevenueUSD: "BigDecimal!",
+      dailyProtocolSideRevenueUSD: "BigDecimal!",
+      cumulativeProtocolSideRevenueUSD: "BigDecimal!",
+      dailyTotalRevenueUSD: "BigDecimal!",
+      cumulativeTotalRevenueUSD: "BigDecimal!",
+      totalBorrowBalanceUSD: "BigDecimal!",
+      dailyBorrowUSD: "BigDecimal!",
+      cumulativeBorrowUSD: "BigDecimal!",
+      totalDepositBalanceUSD: "BigDecimal!",
+      dailyDepositUSD: "BigDecimal!",
+      cumulativeDepositUSD: "BigDecimal!",
+      dailyLiquidateUSD: "BigDecimal!",
+      cumulativeLiquidateUSD: "BigDecimal!",
       mintedTokenSupplies: "[BigInt!]",
       protocolControlledValueUSD: "BigDecimal",
       timestamp: "BigInt!",
     },
     usageMetricsDailySnapshots: {
-      dailyActiveUsers: "Int!",
+      id: "ID!",
       cumulativeUniqueUsers: "Int!",
+      dailyActiveUsers: "Int!",
       dailyTransactionCount: "Int!",
       dailyDepositCount: "Int!",
       dailyWithdrawCount: "Int!",
@@ -442,6 +495,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     marketDailySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       totalDepositBalanceUSD: "BigDecimal!",
       dailyDepositUSD: "BigDecimal!",
@@ -462,8 +516,9 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     usageMetricsHourlySnapshots: {
-      hourlyActiveUsers: "Int!",
+      id: "ID!",
       cumulativeUniqueUsers: "Int!",
+      hourlyActiveUsers: "Int!",
       hourlyTransactionCount: "Int!",
       hourlyDepositCount: "Int!",
       hourlyWithdrawCount: "Int!",
@@ -473,6 +528,7 @@ export const schema120 = (): Schema => {
       timestamp: "BigInt!",
     },
     marketHourlySnapshots: {
+      id: "ID!",
       totalValueLockedUSD: "BigDecimal!",
       totalDepositBalanceUSD: "BigDecimal!",
       hourlyDepositUSD: "BigDecimal!",
@@ -564,7 +620,7 @@ export const schema120 = (): Schema => {
   };
 
   const query = `
-  query Data($poolId: String){
+  query Data($poolId: String, $protocolId: String){
     _meta {
       block {
         number
@@ -577,6 +633,35 @@ export const schema120 = (): Schema => {
       type
       schemaVersion
       subgraphVersion
+      methodologyVersion
+    }
+    lendingProtocol(id:$protocolId) {
+      id      
+      name
+      slug
+      schemaVersion
+      subgraphVersion
+      methodologyVersion
+      network
+      type
+      lendingType
+      riskType
+      mintedTokens {
+        id
+        decimals
+      }
+      cumulativeUniqueUsers
+      totalValueLockedUSD
+      protocolControlledValueUSD
+      cumulativeSupplySideRevenueUSD
+      cumulativeProtocolSideRevenueUSD
+      cumulativeTotalRevenueUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      mintedTokenSupplies
     }
     lendingProtocols {
       id      
@@ -609,6 +694,52 @@ export const schema120 = (): Schema => {
     markets {
       id
       name
+      inputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      outputToken {
+        id
+        decimals
+        name
+        symbol
+      }
+      rewardTokens {
+        id
+        token {
+          id
+          decimals
+          name
+          symbol
+        }
+      }
+      rates {
+        id
+        side
+        rate
+        type
+      }
+      isActive
+      canUseAsCollateral
+      canBorrowFrom
+      maximumLTV
+      liquidationThreshold
+      liquidationPenalty
+      totalValueLockedUSD
+      totalDepositBalanceUSD
+      cumulativeDepositUSD
+      totalBorrowBalanceUSD
+      cumulativeBorrowUSD
+      cumulativeLiquidateUSD
+      inputTokenBalance
+      inputTokenPriceUSD
+      outputTokenSupply
+      outputTokenPriceUSD
+      exchangeRate
+      rewardTokenEmissionsAmount
+      rewardTokenEmissionsUSD
     }
     ${finanQuery}
     ${usageHourlyQuery}

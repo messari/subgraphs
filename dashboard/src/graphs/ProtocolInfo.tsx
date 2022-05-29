@@ -1,6 +1,7 @@
 import { styled } from "../styled";
 import { Box, Chip, Link, Typography } from "@mui/material";
 import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboard";
+import { ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../constants";
 
 const ProtocolContainer = styled("div")`
   background: rgba(32, 37, 44, 1);
@@ -18,31 +19,39 @@ const ChipContainer = styled("div")`
 `;
 
 interface ProtocolInfoProps {
-  protocolSchemaData: { [x: string]: any };
+  protocolData: { [x: string]: any };
+  protocolId: string;
   subgraphToQueryURL: string;
   schemaVersion: string;
 }
 
 // This component is for each individual subgraph
-function ProtocolInfo({ protocolSchemaData, subgraphToQueryURL, schemaVersion }: ProtocolInfoProps) {
+function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVersion }: ProtocolInfoProps) {
+  let protocolSchemaData = protocolData.protocols[0];
+  if (protocolData.protocols?.length > 1) {
+    const findProto = protocolData.protocols?.find((pro: any) => pro?.id === protocolId);
+    if (findProto) {
+      protocolSchemaData = findProto;
+    }
+  }
   return (
     <ProtocolContainer>
       <Box>
         <Link href={subgraphToQueryURL} target="_blank">
           <Typography variant="h6">
-            <span>{protocolSchemaData.protocols[0].name} - </span>
+            <span>{protocolSchemaData?.name} - </span>
             <Typography variant="body1" component="span">
-              {protocolSchemaData.protocols[0].network}
+              {protocolSchemaData?.network}
             </Typography>
           </Typography>
         </Link>
-        <Typography variant="caption">{protocolSchemaData.protocols[0].id}</Typography>
+        <Typography variant="caption">{protocolSchemaData?.id}</Typography>
         <ChipContainer>
-          <Chip label={protocolSchemaData.protocols[0].type} />
+          <Chip label={protocolSchemaData?.type} />
           <Chip label={`Schema: ${schemaVersion}`} />
-          <Chip label={`Subgraph: ${protocolSchemaData?.protocols[0]?.subgraphVersion}`} />
-          {protocolSchemaData?.protocols[0]?.methodologyVersion && (
-            <Chip label={`Methodology: ${protocolSchemaData.protocols[0].methodologyVersion}`} />
+          <Chip label={`Subgraph: ${protocolSchemaData?.subgraphVersion}`} />
+          {protocolSchemaData?.methodologyVersion && (
+            <Chip label={`Methodology: ${protocolSchemaData?.methodologyVersion}`} />
           )}
         </ChipContainer>
       </Box>

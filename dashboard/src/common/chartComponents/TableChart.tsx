@@ -8,26 +8,28 @@ export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: n
   });
   if (dataTable) {
     const columns = [
-      { field: "date", headerName: "Date", width: 150 },
+      { field: "date", headerName: "Date", width: 120 },
       {
         field: "value",
         headerName: "Value",
-        width: 150,
+        flex: 1,
       },
     ];
     let suffix = "";
     if (isPercentageField) {
       suffix = "%";
     }
+    const hourly = _datasetLabel.toUpperCase().includes("HOURLY");
     const tableData = dataTable.map((val: any, i: any) => {
       return {
         id: i,
-        date: toDate(val.date),
+        date: toDate(val.date, hourly),
         value: val.value.toLocaleString() + suffix,
       };
     });
     return (
       <DataGrid
+        sx={{ textOverflow: "clip" }}
         initialState={{
           sorting: {
             sortModel: [{ field: "date", sort: "desc" }],
