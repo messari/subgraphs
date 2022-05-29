@@ -72,8 +72,9 @@ export function handleEvent(
   let usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
   let usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   if (eventType == "DEPOSIT") {
+
     let depositEvent = new Deposit("deposit-" + createEntityID(event));
-    let borrowEvent = new Borrow("borrow-" + createEntityID(event));
+    
     depositEvent.hash = event.transaction.hash.toHexString();
     depositEvent.logIndex = event.logIndex.toI32();
     depositEvent.protocol = protocol.id;
@@ -85,8 +86,17 @@ export function handleEvent(
     depositEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
     depositEvent.amount = absValBigInt(amountCollateral);
     depositEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
+
     usageMetricsHourlySnapshot.hourlyDepositCount += 1;
     usageMetricsDailySnapshot.dailyDepositCount += 1;
+
+    depositEvent.save();
+    usageMetricsHourlySnapshot.save();
+    usageMetricsDailySnapshot.save();
+
+  } else if (eventType == "BORROW"){
+
+    let borrowEvent = new Borrow("borrow-" + createEntityID(event));
 
     borrowEvent.hash = event.transaction.hash.toHexString();
     borrowEvent.logIndex = event.logIndex.toI32();
@@ -99,16 +109,18 @@ export function handleEvent(
     borrowEvent.asset = DAI;
     borrowEvent.amount = absValBigInt(amountDAI);
     borrowEvent.amountUSD = bigIntToBigDecimal(absValBigInt(amountDAI), WAD);
+
     usageMetricsHourlySnapshot.hourlyBorrowCount += 1;
     usageMetricsDailySnapshot.dailyBorrowCount += 1;
 
-    depositEvent.save();
     borrowEvent.save();
     usageMetricsHourlySnapshot.save();
     usageMetricsDailySnapshot.save();
+
   } else if (eventType == "WITHDRAW") {
+
     let withdrawEvent = new Withdraw("withdraw-" + createEntityID(event));
-    let repayEvent = new Repay("repay-" + createEntityID(event));
+    
     withdrawEvent.hash = event.transaction.hash.toHexString();
     withdrawEvent.logIndex = event.logIndex.toI32();
     withdrawEvent.protocol = protocol.id;
@@ -122,6 +134,14 @@ export function handleEvent(
     withdrawEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;
     usageMetricsDailySnapshot.dailyWithdrawCount += 1;
+
+    withdrawEvent.save();
+    usageMetricsHourlySnapshot.save();
+    usageMetricsDailySnapshot.save();
+
+  } else if (eventType == "REPAY") {
+
+    let repayEvent = new Repay("repay-" + createEntityID(event));
 
     repayEvent.hash = event.transaction.hash.toHexString();
     repayEvent.logIndex = event.logIndex.toI32();
@@ -137,12 +157,14 @@ export function handleEvent(
     usageMetricsHourlySnapshot.hourlyRepayCount += 1;
     usageMetricsDailySnapshot.dailyRepayCount += 1;
 
-    withdrawEvent.save();
     repayEvent.save();
     usageMetricsHourlySnapshot.save();
     usageMetricsDailySnapshot.save();
+
   } else if (eventType == "LIQUIDATE") {
+
     let liquidateEvent = new Liquidate(createEntityID(event));
+
     liquidateEvent.hash = event.transaction.hash.toHexString();
     liquidateEvent.logIndex = event.logIndex.toI32();
     liquidateEvent.protocol = protocol.id;
@@ -157,6 +179,7 @@ export function handleEvent(
     liquidateEvent.profitUSD = bigIntToBigDecimal(absValBigInt(amountDAI), WAD)
       .times(market.debtMultiplier)
       .times(market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED));
+
     usageMetricsHourlySnapshot.hourlyLiquidateCount += 1;
     usageMetricsDailySnapshot.dailyLiquidateCount += 1;
 
@@ -220,16 +243,25 @@ export function handleFrob(event: LogNote): void {
     ? protocol.cumulativeBorrowUSD.plus(ΔdebtUSD)
     : protocol.cumulativeBorrowUSD;
 
-  if (dart.gt(BIGINT_ZERO)) {
+  if (dink.gt(BIGINT_ZERO)){ // if change in collateral is > 0
     handleEvent(event, market, "DEPOSIT", dink, ΔcollateralUSD, dart);
-  } else if (dart.lt(BIGINT_ZERO)) {
+  }
+  if (dart.gt(BIGINT_ZERO)) { // if change in debt is > 0
+    handleEvent(event, market, "BORROW", dink, ΔcollateralUSD, dart);
+  }
+  if (dink.lt(BIGINT_ZERO)) { // if change in collateral is < 0
     handleEvent(event, market, "WITHDRAW", dink, ΔcollateralUSD, dart);
   }
+  if (dart.lt(BIGINT_ZERO)) { // if change in debt is < 0
+    handleEvent(event, market, "REPAY", dink, ΔcollateralUSD, dart);
+  }
+
   market.save();
   marketHourlySnapshot.save();
   marketDailySnapshot.save();
   financialsDailySnapshot.save();
   protocol.save();
+
   updateTotalBorrowUSD(); // protocol debt: add dart * rate to protocol debt
   updateMarketMetrics(ilk, event);
   updateFinancialMetrics(event); // updates TVL and financial daily snapshot
