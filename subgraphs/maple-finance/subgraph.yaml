@@ -28,6 +28,29 @@ dataSources:
         - function: setValidPoolFactory(address,bool)
           handler: handleSetValidPoolFactory
 
+  - kind: ethereum/contract
+    name: MapleRewardsFactory
+    network: mainnet
+    source:
+      address: "0x0155729EbCd47Cb1fBa02bF5a8DA20FaF3860535"
+      abi: MapleRewardsFactory
+      startBlock: 12428577
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/maple-rewards-factory.ts
+      entities:
+        - Market
+        - RewardTokens
+        - MplRewards
+      abis:
+        - name: MapleRewardsFactory
+          file: ./abis/MapleRewardsFactory.json
+      eventHandlers:
+        - event: MplRewardsCreated(indexed address,indexed address,indexed address,address)
+          handler: handleMplRewardsCreated
+
 templates:
   - name: PoolFactory
     kind: ethereum/contract
@@ -48,3 +71,107 @@ templates:
       eventHandlers:
         - event: PoolCreated(indexed address,indexed address,address,address,address,address,uint256,uint256,uint256,string,string)
           handler: handlePoolCreated
+
+  - name: Pool
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Pool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities:
+        - Market
+        - Deposit
+        - Withdraw
+        - _Loan
+        - _StakeLocker
+      abis:
+        - name: Pool
+          file: ./abis/Pool.json
+      eventHandlers:
+        - event: PoolStateChanged(uint8)
+          handler: handlePoolStateChanged
+        - event: LoanFunded(indexed address,address,uint256)
+          handler: handleLoanFunded
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Claim(indexed address,uint256,uint256,uint256,uint256,uint256)
+          handler: handleClaim
+        - event: DefaultSuffered(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleDefaultSuffered
+        - event: BalanceUpdated(indexed address,indexed address,uint256)
+          handler: handleBalanceUpdated
+
+  - name: StakeLocker
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: StakeLocker
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/stake-locker.ts
+      entities:
+        - _StakeLocker
+        - Stake
+        - Unstake
+      abis:
+        - name: StakeLocker
+          file: ./abis/StakeLocker.json
+      eventHandlers:
+        - event: Stake(indexed address,uint256)
+          handler: handleStake
+        - event: Unstake(indexed address,uint256)
+          handler: handleUnstake
+
+  - name: Loan
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Loan
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/loan.ts
+      entities:
+        - _Loan
+        - Borrow
+        - Repay
+        - Liquidate
+      abis:
+        - name: Loan
+          file: ./abis/Loan.json
+      eventHandlers:
+        - event: Drawdown(uint256)
+          handler: handleDrawdown
+        - event: PaymentMade(uint256,uint256,uint256,uint256,uint256,uint256,bool)
+          handler: handlePaymentMade
+        - event: Liquidation(uint256,uint256,uint256,uint256)
+          handler: handleLiquidation
+
+  - name: MplRewards
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: MplRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      file: ./src/mappings/mpl-rewards.ts
+      entities:
+        - Market
+        - _MplRewards
+      abis:
+        - name: MplRewards
+          file: ./abis/MplRewards.json
+      eventHandlers:
+        - event: RewardAdded(uint256)
+          handler: handleRewardAdded
+        - event: RewardsDurationUpdated(uint256)
+          handler: handleRewardsDurationUpdated
