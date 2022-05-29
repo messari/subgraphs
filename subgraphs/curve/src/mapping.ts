@@ -18,7 +18,7 @@ import {
 } from '../generated/templates'
 import { Address, Bytes, log } from '@graphprotocol/graph-ts'
 import { MainRegistry, PoolAdded, Set_liquidity_gaugesCall } from '../generated/AddressProvider/MainRegistry'
-import { createNewFactoryPool, createNewPool } from './services/pools'
+import { createNewFactoryPool, createNewPool, isLendingPool } from './services/pools'
 import { createNewRegistryPool } from './services/pools'
 import { MetaPool } from '../generated/templates/RegistryTemplate/MetaPool'
 import { CurveLendingPool } from '../generated/templates/RegistryTemplate/CurveLendingPool'
@@ -37,7 +37,7 @@ import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/Stab
 import { setGaugeData } from './services/gauges/helpers'
 import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
 
-
+import { catchUpAvax } from './services/catchup'
 
 
 export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt): void {
@@ -45,7 +45,7 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
   if (!platform.catchup && (block > CATCHUP_BLOCK)) {
     platform.catchup = true
     platform.save()
-    
+    catchUpAvax()
   }
   if (providedId == BIG_INT_ZERO) {
     let mainRegistry = Registry.load(addedAddress.toHexString())
@@ -98,13 +98,12 @@ export function getLpToken(pool: Address, registryAddress: Address): Address {
   const registry = MainRegistry.bind(registryAddress)
   let lpTokenResult = registry.try_get_lp_token(pool)
   if (lpTokenResult.reverted) {
-    if(dataSource.network()== Network.AVALANCHE.toLowerCase()){
-      lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
-      if (!lpTokenResult.reverted) {
-        return lpTokenResult.value
-      } else if (LP_TOKEN_POOL_MAP.has(pool.toHexString().toLowerCase())) {
-        return LP_TOKEN_POOL_MAP.get(pool.toHexString().toLowerCase())
-      }
+    lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
+    if (!lpTokenResult.reverted) {
+      return lpTokenResult.value
+    }
+    if (LP_TOKEN_POOL_MAP.has(pool.toHexString().toLowerCase())) {
+      return LP_TOKEN_POOL_MAP.get(pool.toHexString())
     }
     log.warning('getLpToken reverted: {}', [pool.toHexString()])
   }
@@ -121,9 +120,10 @@ export function ensureBasePoolTracking(pool: Address, eventAddress: Address, tim
   const basePool = LiquidityPool.load(pool.toHexString())
   if (!basePool) {
     log.warning('New missing base pool {} added from registry', [pool.toHexString()])
+    const basePoolLending = isLendingPool(pool) ? pool : ADDRESS_ZERO // if it's a lending pool, it's the pool itself (virtual base pool)
     createNewRegistryPool(
       pool,
-      ADDRESS_ZERO,
+      basePoolLending,
       getLpToken(pool, eventAddress),
       false,
       false,
@@ -147,11 +147,7 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
     gauge = gaugeCall.value.value0[0]
   }
   log.info('New pool {} added to registry at {}', [pool.toHexString(), event.transaction.hash.toHexString()])
-  const testLending = CurveLendingPool.bind(pool)
-  // The test would not work on mainnet because there are no
-  // specific functions for lending pools there.
-  const testLendingResult = testLending.try_offpeg_fee_multiplier()
-  if (!testLendingResult.reverted || LENDING_POOLS.includes(pool)) {
+  if (isLendingPool(pool)) {
     // Lending pool
     log.info('New lending pool {} added from registry at {}', [
       pool.toHexString(),

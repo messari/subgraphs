@@ -7,6 +7,7 @@ import {
   ASSET_TYPES,
   BIG_INT_ONE,
   CRYPTO_FACTORY,
+  LENDING_POOLS,
   METAPOOL_FACTORY,
   METAPOOL_FACTORY_ADDRESS,
   STABLE_FACTORY,
@@ -341,4 +342,16 @@ export function getAssetType(pool: LiquidityPool): i32 {
     return assetTypeCall.value.toI32();
   }
   return getAssetTypeCrude(pool.name!, pool.symbol!);
+}
+
+export function isLendingPool(pool: Address): boolean {
+  const testLending = CurveLendingPool.bind(pool)
+  // The test would not work on mainnet because there are no
+  // specific functions for lending pools there.
+  const testLendingResult = testLending.try_offpeg_fee_multiplier()
+  if (!testLendingResult.reverted || LENDING_POOLS.includes(pool)) {
+    log.debug('Newly registered Pool is a lending pool: {}', [pool.toHexString()])
+    return true;
+  }
+  return false;
 }
