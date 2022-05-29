@@ -75,6 +75,12 @@ export namespace TransactionType {
     export const LIQUIDATE = "LIQUIDATE";
 }
 
+export namespace StakeType {
+    export const STAKE_LOCKER = "STAKE_LOCKER";
+    export const MPL_LP_REWARDS = "MPL_LP_REWARDS";
+    export const MPL_STAKE_REWARDS = "MPL_STAKE_REWARDS";
+}
+
 ////////////////////////////
 ///// Solifidity Enums /////
 ////////////////////////////
@@ -107,6 +113,8 @@ export const ZERO_BD = BigDecimal.zero();
 export const ZERO_BI = BigInt.zero();
 
 export const DEFAULT_DECIMALS = 18;
+
+export const MPL_REWARDS_DEFAULT_DURATION_TIME_S = BigInt.fromString("604800"); // 7 days
 
 /////////////////////////////
 ///// Protocol Specific /////

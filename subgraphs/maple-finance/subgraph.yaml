@@ -43,10 +43,16 @@ dataSources:
           entities:
               - Market
               - RewardTokens
-              - MplRewards
+              - _MplReward
           abis:
               - name: MapleRewardsFactory
                 file: ./abis/MapleRewardsFactory.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
           eventHandlers:
               - event: MplRewardsCreated(indexed address,indexed address,indexed address,address)
                 handler: handleMplRewardsCreated
@@ -99,6 +105,12 @@ templates:
                 file: ./abis/Pool.json
               - name: Loan
                 file: ./abis/Loan.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
           eventHandlers:
               - event: Transfer(indexed address,indexed address,uint256)
                 handler: handleTransfer
@@ -130,6 +142,12 @@ templates:
           abis:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
           eventHandlers:
               - event: Stake(indexed address,uint256)
                 handler: handleStake
@@ -154,6 +172,12 @@ templates:
           abis:
               - name: Loan
                 file: ./abis/Loan.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
           eventHandlers:
               - event: Drawdown(uint256)
                 handler: handleDrawdown
@@ -162,11 +186,11 @@ templates:
               - event: Liquidation(uint256,uint256,uint256,uint256)
                 handler: handleLiquidation
 
-    - name: MplRewards
+    - name: MplReward
       kind: ethereum/contract
       network: mainnet
       source:
-          abi: MplRewards
+          abi: MplReward
       mapping:
           kind: ethereum/events
           apiVersion: 0.0.5
@@ -174,11 +198,22 @@ templates:
           file: ./src/mappings/mpl-rewards.ts
           entities:
               - Market
-              - _MplRewards
+              - _MplReward
+              - Token
           abis:
-              - name: MplRewards
+              - name: MplReward
                 file: ./abis/MplRewards.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
           eventHandlers:
+              - event: Staked(indexed address,uint256)
+                handler: handleStaked
+              - event: Withdrawn(indexed address,uint256)
+                handler: handleWidthdrawn
               - event: RewardAdded(uint256)
                 handler: handleRewardAdded
               - event: RewardsDurationUpdated(uint256)

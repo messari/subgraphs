@@ -67,8 +67,8 @@ export function getOrCreateMarket(
         market._totalRevenueUSD = ZERO_BD;
 
         // No maple rewards pools to begin with, they get added on MplRewards.sol->MplRewardsCreated
-        market._mplRewardsMplLp = null;
-        market._mplRewardsMplStake = null;
+        market._mplRewardMplLp = null;
+        market._mplRewardMplStake = null;
 
         if (
             UNPROVIDED_NAME == marketName ||
@@ -81,7 +81,7 @@ export function getOrCreateMarket(
             ZERO_BI == creationBlockNumber
         ) {
             log.error(
-                "Created market invalid params: marketName={}, poolFactoryAddress={}, delegateAddress={}, stakeLockerAddress={}, inputTokenAddress={}, outputTokenAddress={}, creationTimestamp={}, creationBlockNumber={{",
+                "Created market with invalid params: marketName={}, poolFactoryAddress={}, delegateAddress={}, stakeLockerAddress={}, inputTokenAddress={}, outputTokenAddress={}, creationTimestamp={}, creationBlockNumber={{",
                 [
                     marketName,
                     poolFactoryAddress.toHexString(),

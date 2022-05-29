@@ -1,21 +1,23 @@
+import { Address } from "@graphprotocol/graph-ts";
 import {
     Drawdown as DrawdownEvent,
     PaymentMade as PaymentMadeEvent,
     Liquidation as LiquidationEvent
 } from "../../generated/templates/Loan/Loan";
+import { getOrCreateLoan } from "../common/mapping_helpers/loan";
 import { getOrCreateMarket } from "../common/mapping_helpers/market";
 import { createBorrow, createLiquidate, createRepay } from "../common/mapping_helpers/transactions";
 
 export function handleDrawdown(event: DrawdownEvent): void {
-    const market = getOrCreateMarket(event.address);
-    createBorrow(event, market, event.params.drawdownAmount);
+    const loan = getOrCreateLoan(event.address);
+    createBorrow(event, loan, event.params.drawdownAmount);
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
-    const market = getOrCreateMarket(event.address);
+    const loan = getOrCreateLoan(event.address);
     createRepay(
         event,
-        market,
+        loan,
         event.params.totalPaid,
         event.params.principalPaid,
         event.params.interestPaid,
@@ -24,10 +26,10 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 }
 
 export function handleLiquidation(event: LiquidationEvent): void {
-    const market = getOrCreateMarket(event.address);
+    const loan = getOrCreateLoan(event.address);
     createLiquidate(
         event,
-        market,
+        loan,
         event.params.liquidityAssetReturned,
         event.params.defaultSuffered,
         event.params.liquidationExcess

@@ -599,10 +599,10 @@ type Market @entity {
     _totalRevenueUSD: BigDecimal!
 
     " Maple market pool LP rewards "
-    _mplRewardsMplLp: _MplRewards
+    _mplRewardMplLp: _MplReward
 
     " Maple pool LP rewards "
-    _mplRewardsMplStake: _MplRewards
+    _mplRewardMplStake: _MplReward
 
     " All loans that have been taken out of this market "
     _loans: [_Loan!]! @derivedFrom(field: "market")
@@ -1101,6 +1101,12 @@ type _StakeLocker @entity {
     revenueUSD: BigDecimal!
 }
 
+enum StakeType {
+    STAKE_LOCKER
+    MPL_LP_REWARDS
+    MPL_STAKE_REWARDS
+}
+
 type _Stake implements Event @entity {
     " { Transaction hash }-{ Log index } "
     id: ID!
@@ -1139,6 +1145,9 @@ type _Stake implements Event @entity {
 
     " Amount of stake tokens being staked in USD "
     amountUSD: BigDecimal
+
+    " Type of staking this transaction is for "
+    stakeType: StakeType!
 }
 
 type _Unstake implements Event @entity {
@@ -1179,6 +1188,9 @@ type _Unstake implements Event @entity {
 
     " Amount of stake tokens being unstaked in USD "
     amountUSD: BigDecimal
+
+    " Type of staking this transaction is for "
+    stakeType: StakeType!
 }
 
 type _Loan @entity {
@@ -1213,14 +1225,17 @@ type _Loan @entity {
     defaultSuffered: BigInt!
 }
 
-type _MplRewards @entity {
+type _MplReward @entity {
     " Smart contract address of the maple rewards "
     id: ID!
 
     " Market that the maple rewards belongs to "
     market: Market!
 
-    " Token he maple rewards are providing (generally MPL) "
+    " Token being staked to the mpl rewards (generally MPL-LP or MPL-STAKE) "
+    stakeToken: Token!
+
+    " Token the maple rewards are providing (generally MPL) "
     rewardToken: Token!
 
     " Total rewardToken distribution per second "
