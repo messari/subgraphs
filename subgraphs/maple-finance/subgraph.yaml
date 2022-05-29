@@ -97,6 +97,8 @@ templates:
           abis:
               - name: Pool
                 file: ./abis/Pool.json
+              - name: Loan
+                file: ./abis/Loan.json
           eventHandlers:
               - event: Transfer(indexed address,indexed address,uint256)
                 handler: handleTransfer

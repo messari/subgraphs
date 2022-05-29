@@ -15,7 +15,7 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     StakeLockerTemplate.create(stakeLockerAddress);
 
     const marketName = event.params.name;
-    const poolFactoryAddress = event.transaction.from;
+    const poolFactoryAddress = event.address;
     const delegateAddresss = event.params.delegate;
     const inputTokenAddress = event.params.liquidityAsset;
     const outputTokenAddress = poolAddress;
