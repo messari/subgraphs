@@ -14,7 +14,7 @@ import {
 } from "../../../generated/schema";
 import { PROTOCOL_ID } from "../constants";
 
-import { getOrCreateMarket } from "./market";
+import { getOrCreateMarket, marketTick } from "./market";
 
 export function createDeposit(event: ethereum.Event, market: Market, amountMPTMinted: BigInt): Deposit {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
@@ -39,6 +39,7 @@ export function createDeposit(event: ethereum.Event, market: Market, amountMPTMi
     deposit.amountUSD = deposit.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     deposit.save();
+
     return deposit;
 }
 
@@ -65,6 +66,7 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
     withdraw.amountUSD = withdraw.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     withdraw.save();
+
     return withdraw;
 }
 
@@ -86,6 +88,7 @@ export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt)
     borrow.amountUSD = borrow.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     borrow.save();
+
     return borrow;
 }
 
@@ -117,6 +120,7 @@ export function createRepay(
     repay._late = late;
 
     repay.save();
+
     return repay;
 }
 
@@ -148,6 +152,7 @@ export function createLiquidate(
     liquidate.amountUSD = liquidate.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     liquidate.save();
+
     return liquidate;
 }
 
@@ -175,6 +180,7 @@ export function createStake(
     stake.stakeType = type;
 
     stake.save();
+
     return stake;
 }
 
@@ -202,5 +208,6 @@ export function createUnstake(
     unstake.stakeType = type;
 
     unstake.save();
+
     return unstake;
 }

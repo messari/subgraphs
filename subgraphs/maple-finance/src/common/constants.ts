@@ -108,12 +108,14 @@ export const PROTOCOL_ID = MAPLE_GLOBALS_ADDRESS.toHexString();
 // Oracle addresses
 export const CHAIN_LINK_ORACLE_ADDRESS = Address.fromString("0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf");
 export const CHAIN_LINK_USD_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000348");
-export const CHAIN_LINK_ORACLE_QUOTE_DECIMALS = BigInt.fromString("8");
+export const CHAIN_LINK_ORACLE_QUOTE_DECIMALS = 8;
 
 export const YEARN_ORACLE_ADDRESS = Address.fromString("0x83d95e0D5f402511dB06817Aff3f9eA88224B030");
-export const YEARN_ORACLE_QUOTE_DECIMALS = BigInt.fromString("6");
+export const YEARN_ORACLE_QUOTE_DECIMALS = 6;
 
-export const MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS = BigInt.fromString("8");
+export const MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS = 8;
+
+export const MAPLE_POOL_LIB_ADDRESS = Address.fromString("0x2c1C30fb8cC313Ef3cfd2E2bBf2da88AdD902C30");
 
 ////////////////////////
 ///// Type Helpers /////

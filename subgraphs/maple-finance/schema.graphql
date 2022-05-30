@@ -42,10 +42,10 @@ type Token @entity {
     decimals: Int!
 
     " Optional field to track the price of a token, mostly for caching purposes "
-    lastPriceUSD: BigDecimal
+    lastPriceUSD: BigDecimal!
 
     " Optional field to track the block number of the last token price "
-    lastPriceBlockNumber: BigInt
+    lastPriceBlockNumber: BigInt!
 }
 
 enum RewardTokenType {
@@ -1099,6 +1099,12 @@ type _StakeLocker @entity {
 
     " Revenue of the stake locker in USD "
     revenueUSD: BigDecimal!
+
+    " Block the stake locker was created "
+    creationBlock: BigInt!
+
+    " Block the stake locker was last updated "
+    lastUpdatedBlock: BigInt!
 }
 
 enum StakeType {

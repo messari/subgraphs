@@ -5,12 +5,15 @@ import {
     Liquidation as LiquidationEvent
 } from "../../generated/templates/Loan/Loan";
 import { getOrCreateLoan } from "../common/mapping_helpers/loan";
-import { getOrCreateMarket } from "../common/mapping_helpers/market";
+import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";
 import { createBorrow, createLiquidate, createRepay } from "../common/mapping_helpers/transactions";
 
 export function handleDrawdown(event: DrawdownEvent): void {
     const loan = getOrCreateLoan(event.address);
     createBorrow(event, loan, event.params.drawdownAmount);
+
+    const market = getOrCreateMarket(Address.fromString(loan.market));
+    marketTick(market, event);
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
@@ -23,6 +26,10 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
         event.params.interestPaid,
         event.params.latePayment
     );
+
+    // Trigger market tick
+    const market = getOrCreateMarket(Address.fromString(loan.market));
+    marketTick(market, event);
 }
 
 export function handleLiquidation(event: LiquidationEvent): void {
@@ -34,4 +41,8 @@ export function handleLiquidation(event: LiquidationEvent): void {
         event.params.defaultSuffered,
         event.params.liquidationExcess
     );
+
+    // Trigger market tick
+    const market = getOrCreateMarket(Address.fromString(loan.market));
+    marketTick(market, event);
 }

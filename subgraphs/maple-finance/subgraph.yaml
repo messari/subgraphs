@@ -102,6 +102,7 @@ templates:
               - Withdraw
               - _Loan
               - _StakeLocker
+              - Token
           abis:
               - name: Pool
                 file: ./abis/Pool.json
@@ -119,6 +120,8 @@ templates:
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
           eventHandlers:
               - event: Transfer(indexed address,indexed address,uint256)
                 handler: handleTransfer
@@ -130,8 +133,6 @@ templates:
                 handler: handleClaim
               - event: DefaultSuffered(indexed address,uint256,uint256,uint256,uint256)
                 handler: handleDefaultSuffered
-              - event: BalanceUpdated(indexed address,indexed address,uint256)
-                handler: handleBalanceUpdated
 
     - name: StakeLocker
       kind: ethereum/contract
@@ -162,6 +163,8 @@ templates:
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
           eventHandlers:
               - event: Stake(indexed address,uint256)
                 handler: handleStake
@@ -198,6 +201,8 @@ templates:
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
           eventHandlers:
               - event: Drawdown(uint256)
                 handler: handleDrawdown
@@ -235,6 +240,8 @@ templates:
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: PoolLib
+                file: ./abis/PoolLib.json
           eventHandlers:
               - event: Staked(indexed address,uint256)
                 handler: handleStaked
