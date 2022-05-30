@@ -112,6 +112,7 @@ export const schema100 = (): Schema => {
           rewardTokens{
             id
           }
+          id
          name
          isActive
          canUseAsCollateral
