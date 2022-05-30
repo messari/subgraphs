@@ -416,6 +416,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     updateMarketData,
     marketID,
     event.params.interestAccumulated,
+    event.params.totalBorrows,
     event.block.number,
     event.block.timestamp
   );
@@ -425,7 +426,7 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     Address.fromString(FACTORY_CONTRACT),
     event.block.number,
     event.block.timestamp
-  ); // TODO: snapshot should be for each protocol
+  );
 }
 
 export function handleNewFuseFee(event: NewFuseFee): void {
@@ -520,6 +521,7 @@ function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
   interestAccumulatedMantissa: BigInt,
+  newTotalBorrow: BigInt,
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
@@ -555,13 +557,17 @@ function updateMarket(
   } else {
     market.outputTokenSupply = updateMarketData.totalSupplyResult.value;
   }
-
-  let underlyingSupplyUSD = market.inputTokenBalance
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingToken.decimals))
-    .times(underlyingTokenPriceUSD);
-  market.totalValueLockedUSD = underlyingSupplyUSD;
-  market.totalDepositBalanceUSD = underlyingSupplyUSD;
+  let outputTokenDecimals = cTokenDecimals;
+  if (market.outputToken) {
+    let outputToken = Token.load(market.outputToken!);
+    if (!outputToken) {
+      log.warning("[updateMarket] Output token not found: {}", [
+        market.outputToken!,
+      ]);
+    } else {
+      outputTokenDecimals = outputToken.decimals;
+    }
+  }
 
   if (updateMarketData.exchangeRateStoredResult.reverted) {
     log.warning(
@@ -574,25 +580,54 @@ function updateMarket(
       .toBigDecimal()
       .div(
         exponentToBigDecimal(
-          mantissaFactor + underlyingToken.decimals - cTokenDecimals
+          mantissaFactor + underlyingToken.decimals - outputTokenDecimals
         )
       );
     market.exchangeRate = oneCTokenInUnderlying;
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
       underlyingTokenPriceUSD
     );
+
+    // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
+    // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
+    if (underlyingToken.decimals > outputTokenDecimals) {
+      // we want to multiply out the difference to expand BD
+      let mantissaFactorBD = exponentToBigDecimal(
+        underlyingToken.decimals - outputTokenDecimals
+      );
+      let inputTokenBalanceBD = market.outputTokenSupply
+        .toBigDecimal()
+        .times(mantissaFactorBD)
+        .truncate(0);
+      market.inputTokenBalance = BigInt.fromString(
+        inputTokenBalanceBD.toString()
+      );
+    } else {
+      // we want to divide back the difference to decrease the BD
+      let mantissaFactorBD = exponentToBigDecimal(
+        outputTokenDecimals - underlyingToken.decimals
+      );
+      let inputTokenBalanceBD = market.outputTokenSupply
+        .toBigDecimal()
+        .div(mantissaFactorBD)
+        .truncate(0);
+      market.inputTokenBalance = BigInt.fromString(
+        inputTokenBalanceBD.toString()
+      );
+    }
   }
 
-  if (updateMarketData.totalBorrowsResult.reverted) {
-    log.warning("[updateMarket] Failed to get totalBorrows of Market {}", [
-      marketID,
-    ]);
-  } else {
-    market.totalBorrowBalanceUSD = updateMarketData.totalBorrowsResult.value
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingToken.decimals))
-      .times(underlyingTokenPriceUSD);
-  }
+  let underlyingSupplyUSD = market.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  market.totalValueLockedUSD = underlyingSupplyUSD;
+  market.totalDepositBalanceUSD = underlyingSupplyUSD;
+
+  market.totalBorrowBalanceUSD = newTotalBorrow
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
 
   if (updateMarketData.supplyRateResult.reverted) {
     log.warning("[updateMarket] Failed to get supplyRate of Market {}", [
