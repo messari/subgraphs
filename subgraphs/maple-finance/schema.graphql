@@ -1251,5 +1251,11 @@ type _MplReward @entity {
     rewardTokenEmissionAmountPerDay: BigInt!
 
     " Amount of reward tokens that get emittered per day "
-    rewardTokenEmissionsUSDPerDayUSD: BigInt!
+    rewardTokenEmissionsUSDPerDay: BigDecimal!
+
+    " Block the mpl rewards was created "
+    creationBlock: BigInt!
+
+    " Block the mpl rewards was last updated "
+    lastUpdatedBlock: BigInt!
 }

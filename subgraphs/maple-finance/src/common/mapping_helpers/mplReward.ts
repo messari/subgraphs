@@ -1,6 +1,9 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, _MplReward } from "../../../generated/schema";
-import { MPL_REWARDS_DEFAULT_DURATION_TIME_S, ZERO_ADDRESS, ZERO_BI } from "../constants";
+import { MplRewards } from "../../../generated/templates/MplRewards/MplRewards";
+import { MPL_REWARDS_DEFAULT_DURATION_TIME_S, SEC_PER_DAY, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
+import { getTokenPriceInUSD } from "../prices/prices";
+import { parseUnits } from "../utils";
 import { getOrCreateMarket } from "./market";
 import { getOrCreateStakeLocker } from "./stakeLocker";
 import { getOrCreateToken } from "./token";
@@ -12,7 +15,8 @@ import { getOrCreateToken } from "./token";
 export function getOrCreateMplReward(
     mplRewardAddress: Address,
     stakeTokenAddress: Address = ZERO_ADDRESS,
-    rewardTokenAddress: Address = ZERO_ADDRESS
+    rewardTokenAddress: Address = ZERO_ADDRESS,
+    creationBlock: BigInt = ZERO_BI
 ): _MplReward {
     let mplReward = _MplReward.load(mplRewardAddress.toHexString());
 
@@ -42,18 +46,48 @@ export function getOrCreateMplReward(
         mplReward.rewardDurationSec = MPL_REWARDS_DEFAULT_DURATION_TIME_S;
         mplReward.periodFinishedTimestamp = ZERO_BI;
         mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
-        mplReward.rewardTokenEmissionsUSDPerDayUSD = ZERO_BI;
+        mplReward.rewardTokenEmissionsUSDPerDay = ZERO_BD;
+        mplReward.creationBlock = creationBlock;
+        mplReward.lastUpdatedBlock = creationBlock;
 
         market.save();
 
-        if (ZERO_ADDRESS == stakeTokenAddress || ZERO_ADDRESS == rewardTokenAddress) {
-            log.error("Created mpl rewards with invalid params: stakeTokenAddress={}, rewardTokenAddress={}", [
-                stakeTokenAddress.toHexString(),
-                rewardTokenAddress.toHexString()
-            ]);
+        if (ZERO_ADDRESS == stakeTokenAddress || ZERO_ADDRESS == rewardTokenAddress || ZERO_BI == creationBlock) {
+            log.error(
+                "Created mpl rewards with invalid params: stakeTokenAddress={}, rewardTokenAddress={}, creationBlock={}",
+                [stakeTokenAddress.toHexString(), rewardTokenAddress.toHexString(), creationBlock.toString()]
+            );
         }
     }
 
     mplReward.save();
     return mplReward;
+}
+
+/**
+ * Function which should get called on every update of the market this belongs to
+ */
+export function mplRewardTick(mplReward: _MplReward, event: ethereum.Event): void {
+    // Update only if it hasn't been updated this block
+    if (mplReward.lastUpdatedBlock != event.block.number) {
+        const rewardActive = event.block.timestamp > mplReward.periodFinishedTimestamp;
+        if (rewardActive) {
+            mplReward.rewardTokenEmissionAmountPerDay = mplReward.rewardRatePerSecond
+                .times(mplReward.rewardDurationSec)
+                .times(SEC_PER_DAY);
+        } else {
+            mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
+        }
+
+        const rewardToken = getOrCreateToken(Address.fromString(mplReward.rewardToken));
+        const rewardTokenPriceUSD = getTokenPriceInUSD(rewardToken, event);
+        mplReward.rewardTokenEmissionsUSDPerDay = parseUnits(
+            mplReward.rewardTokenEmissionAmountPerDay,
+            rewardToken.decimals
+        ).times(rewardTokenPriceUSD);
+
+        mplReward.lastUpdatedBlock = event.block.number;
+
+        mplReward.save();
+    }
 }

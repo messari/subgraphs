@@ -9,5 +9,5 @@ export function handleMplRewardsCreated(event: MplRewardsCreatedEvent): void {
     MplRewardTemplate.create(mplRewardAddress);
 
     // Create mpl rewards entity
-    getOrCreateMplReward(mplRewardAddress, event.params.stakingToken, event.params.rewardsToken);
+    getOrCreateMplReward(mplRewardAddress, event.params.stakingToken, event.params.rewardsToken, event.block.number);
 }

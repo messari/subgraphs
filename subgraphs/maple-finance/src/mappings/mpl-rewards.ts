@@ -3,7 +3,8 @@ import {
     Staked as StakedEvent,
     Withdrawn as WithdrawnEvent,
     RewardAdded as RewardAddedEvent,
-    RewardsDurationUpdated as RewardsDurationUpdatedEvent
+    RewardsDurationUpdated as RewardsDurationUpdatedEvent,
+    UpdatePeriodFinishCall
 } from "../../generated/templates/MplRewards/MplRewards";
 import { StakeType } from "../common/constants";
 import { getOrCreateMarket } from "../common/mapping_helpers/market";
@@ -29,6 +30,20 @@ export function handleWidthdrawn(event: WithdrawnEvent): void {
     createUnstake(event, market, stakeToken, event.params.amount, stakeType);
 }
 
-export function handleRewardAdded(event: RewardAddedEvent): void {}
+export function handleRewardAdded(event: RewardAddedEvent): void {
+    const mplReward = getOrCreateMplReward(event.address);
+    mplReward.rewardRatePerSecond = event.params.reward;
+    mplReward.save();
+}
 
-export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {}
+export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {
+    const mplReward = getOrCreateMplReward(event.address);
+    mplReward.rewardRatePerSecond = event.params.newDuration;
+    mplReward.save();
+}
+
+export function handleUpdatePeriodFinish(call: UpdatePeriodFinishCall): void {
+    const mplReward = getOrCreateMplReward(call.to);
+    mplReward.periodFinishedTimestamp = call.inputs.timestamp;
+    mplReward.save();
+}

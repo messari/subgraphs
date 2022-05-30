@@ -102,8 +102,18 @@ export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 export const UNPROVIDED_NAME: string = "NOT_PROVIDED";
 
-// Maple globals address
-export const PROTOCOL_ID = "0xC234c62c8C09687DFf0d9047e40042cd166F3600";
+export const MAPLE_GLOBALS_ADDRESS = Address.fromString("0xC234c62c8C09687DFf0d9047e40042cd166F3600");
+export const PROTOCOL_ID = MAPLE_GLOBALS_ADDRESS.toHexString();
+
+// Oracle addresses
+export const CHAIN_LINK_ORACLE_ADDRESS = Address.fromString("0x47Fb2585D2C56Fe188D0E6ec628a38b74fCeeeDf");
+export const CHAIN_LINK_USD_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000348");
+export const CHAIN_LINK_ORACLE_QUOTE_DECIMALS = BigInt.fromString("8");
+
+export const YEARN_ORACLE_ADDRESS = Address.fromString("0x83d95e0D5f402511dB06817Aff3f9eA88224B030");
+export const YEARN_ORACLE_QUOTE_DECIMALS = BigInt.fromString("6");
+
+export const MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS = BigInt.fromString("8");
 
 ////////////////////////
 ///// Type Helpers /////
@@ -112,9 +122,14 @@ export const PROTOCOL_ID = "0xC234c62c8C09687DFf0d9047e40042cd166F3600";
 export const ZERO_BD = BigDecimal.zero();
 export const ZERO_BI = BigInt.zero();
 
+export const ONE_BD = BigDecimal.fromString("1");
+export const ONE_BI = BigInt.fromString("1");
+
 export const DEFAULT_DECIMALS = 18;
 
 export const MPL_REWARDS_DEFAULT_DURATION_TIME_S = BigInt.fromString("604800"); // 7 days
+
+export const SEC_PER_DAY = BigInt.fromString("86400");
 
 /////////////////////////////
 ///// Protocol Specific /////
