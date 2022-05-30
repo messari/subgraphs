@@ -188,20 +188,20 @@ async function bootstrap() {
   // fs.writeFileSync("./schema.graphql", schemaContent);
 
   // STEP 3: Export the constants in contract_addresses.ts
-  let constantsTemplate = fs.readFileSync(
-    "./bootstrap/templates/contract_addresses.template.ts"
-  );
-  let constantString = "";
-  for (const constant in constants) {
-    const constantValue = constants[constant];
-    constantString = constantString.concat(
-      constantsTemplate
-        .toString()
-        .replace("$CONST_NAME$", constant)
-        .replace("$CONST_VALUE$", constantValue)
-    );
-  }
-  fs.writeFileSync("./src/contract_addresses.ts", constantString);
+  // let constantsTemplate = fs.readFileSync(
+  //   "./bootstrap/templates/contract_addresses.template.ts"
+  // );
+  // let constantString = "";
+  // for (const constant in constants) {
+  //   const constantValue = constants[constant];
+  //   constantString = constantString.concat(
+  //     constantsTemplate
+  //       .toString()
+  //       .replace("$CONST_NAME$", constant)
+  //       .replace("$CONST_VALUE$", constantValue)
+  //   );
+  // }
+  // fs.writeFileSync("./src/contract_addresses.ts", constantString);
 
   // STEP 4.1: Import the constants in utils.ts
   // let utilsContent = fs.readFileSync("./bootstrap/templates/utils.template.ts");
