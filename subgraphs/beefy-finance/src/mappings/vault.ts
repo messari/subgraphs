@@ -76,7 +76,7 @@ export function createVaultFromStrategy(
   }
 
   vault.totalValueLockedUSD = getLastPriceUSD(
-    vaultContract.want(),
+    strategyContract.want(),
     currentBlock.number
   ).times(new BigDecimal(vault.inputTokenBalance));
 
@@ -154,10 +154,15 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
     vault.pricePerShare = call.value;
   }
 
-  vault.totalValueLockedUSD = getLastPriceUSD(
-    vaultContract.want(),
-    block.number
-  ).times(new BigDecimal(vault.inputTokenBalance));
+  const wantCall = vaultContract.try_want();
+  if (wantCall.reverted) {
+    vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  } else {
+    vault.totalValueLockedUSD = getLastPriceUSD(
+      wantCall.value,
+      block.number
+    ).times(new BigDecimal(vault.inputTokenBalance));
+  }
 
   const outputSupply = vault.outputTokenSupply;
   if (outputSupply && outputSupply != BIGINT_ZERO)
