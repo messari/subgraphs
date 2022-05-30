@@ -1,5 +1,4 @@
 {
-  "name": "apeswap",
   "license": "MIT",
   "type": "module",
 
@@ -8,13 +7,12 @@
     "codegen": "graph codegen",
     "build": "graph build",
 
-    "prepare:yaml": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/${npm_config_protocol}/${npm_config_template} > subgraph.yaml",
-    "prepare:constants": "mustache config/${npm_config_protocol}/${npm_config_network}/${npm_config_network}.json config/configure.template.ts > config/configure.ts",
-    "prepare:build": "yarn codegen && yarn build",
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:constants": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json configurations/configure.template.ts > configurations/configure.ts",
+    "prepare:build": "graph codegen && graph build",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
 
-    "deploy": "node --experimental-json-modules deployment/deployment.js"
-
+    "deploy": "node  --experimental-json-modules --no-warnings deployment/deployment.js"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",
