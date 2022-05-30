@@ -71,11 +71,18 @@ export function handleAssetStatus(event: AssetStatus): void {
   token.lastPriceUSD = twapPrice;
   marketUtility.twapPrice = twapPrice;
 
+  const cumulatedInterestDelta = event.params.interestAccumulator.minus(marketUtility.interestAccumulator).toBigDecimal().div(INITIAL_INTEREST_ACCUMULATOR.toBigDecimal());
+  const supplySideRevenueDelta = market.totalBorrowBalanceUSD.times(cumulatedInterestDelta);
+  const lendingProtocol = getOrCreateLendingProtocol();
+  lendingProtocol.cumulativeSupplySideRevenueUSD = lendingProtocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDelta);
+  lendingProtocol.cumulativeTotalRevenueUSD = lendingProtocol.cumulativeTotalRevenueUSD.plus(supplySideRevenueDelta);
+  lendingProtocol.save();
+
   // More information about interest accumulator 
   // https://github.com/euler-xyz/euler-contracts/blob/60114fafd99ee6a57d53c069660e0a976874819d/docs/limits.md#interestaccumulator
+  // https://docs.euler.finance/developers/architecture#external-access-to-interest-accumulators
   marketUtility.interestAccumulator = event.params.interestAccumulator;
-  marketUtility.save();
-
+  
   market.totalDepositBalanceUSD = amountToUsd(
     event.params.totalBalances,
     marketUtility.twap,
@@ -86,9 +93,10 @@ export function handleAssetStatus(event: AssetStatus): void {
     marketUtility.twap,
     marketUtility.twapPrice,
   );
-  
+
   market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD); // TODO: Validate this calculation
 
+  marketUtility.save();
   token.save();
   market.save();
 }
@@ -311,9 +319,6 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 
   const protocol = getOrCreateLendingProtocol();
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
-  protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
-  protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
 
   // Using an indexed for loop because AssemblyScript does not support closures.
   // AS100: Not implemented: Closures
@@ -328,31 +333,32 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     borrowRate.save();
     market.rates = market.rates.concat([lendingRate.id, borrowRate.id]);
 
-    const totalBalances = eulerViewMarket.totalBalances;
-    const totalBalancesEth = totalBalances.toBigDecimal().times(eulerViewMarket.currPrice.toBigDecimal()).div(DECIMAL_PRECISION);
-    market.totalDepositBalanceUSD = totalBalancesEth
-      .times(ethUsdcExchangeRate);
-
-    const totalBorrows = eulerViewMarket.totalBorrows;
-    const totalBorrowsEth = totalBorrows
-      .toBigDecimal()
-      .times(eulerViewMarket.currPrice.toBigDecimal())
-      .div(DECIMAL_PRECISION);
-    market.totalBorrowBalanceUSD = totalBorrowsEth
-      .times(ethUsdcExchangeRate);
-
-    market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
-    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
-
     const currPrice = eulerViewMarket.currPrice.toBigDecimal().div(DECIMAL_PRECISION);
     const currPriceUsd = currPrice.times(ethUsdcExchangeRate);
-    
+
+    const token = getOrCreateToken(eulerViewMarket.underlying);
+    token.lastPriceUSD = currPriceUsd;
+    token.lastPriceBlockNumber = block.number;
+    token.save();
+
+    const tokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>token.decimals));
+    market.totalDepositBalanceUSD = eulerViewMarket.totalBalances
+      .toBigDecimal()
+      .div(tokenPrecision)
+      .times(currPriceUsd);
+    market.totalBorrowBalanceUSD = eulerViewMarket.totalBorrows
+      .toBigDecimal()
+      .div(tokenPrecision)
+      .times(currPriceUsd);
+    market.totalValueLockedUSD = market.totalDepositBalanceUSD.minus(market.totalBorrowBalanceUSD);
+    market.name = token.name;
     market.inputTokenBalance = eulerViewMarket.totalBalances;
+    market.inputTokenPriceUSD = currPriceUsd;
     market.outputTokenSupply = eulerViewMarket.eTokenBalance;
     market.outputTokenPriceUSD = eulerViewMarket.eTokenBalanceUnderlying
       .toBigDecimal()
-      .times(currPriceUsd)
-      .div(DECIMAL_PRECISION);
+      .div(tokenPrecision)
+      .times(currPriceUsd);
 
     if (eulerViewMarket.eTokenBalanceUnderlying.gt(BIGINT_ZERO)) {
       market.exchangeRate = eulerViewMarket.eTokenBalance
@@ -360,12 +366,6 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
         .div(eulerViewMarket.eTokenBalanceUnderlying.toBigDecimal());
     }
 
-    const token = getOrCreateToken(eulerViewMarket.underlying);
-    token.lastPriceUSD = currPriceUsd;
-    token.lastPriceBlockNumber = block.number;
-    token.save();
-
-    market.name = token.name;
     market.save();
     
     if (market.outputToken) {
@@ -382,25 +382,20 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
     marketUtility.save();
 
-    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-      market.totalBorrowBalanceUSD
-        .times(marketUtility.interestAccumulator.minus(INITIAL_INTEREST_ACCUMULATOR).toBigDecimal())
-        .div(INITIAL_INTEREST_ACCUMULATOR.toBigDecimal()),
-    );
-
     const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
-    // Ignore case where there was a balance conversion happening at current block.
-    if (reserveBalanceDiff.gt(BIGINT_ZERO)) {
+    // Ignore case where there was a balance conversion (negative diff) happening at current block.
+    if (reserveBalanceDiff.gt(BIGINT_ZERO) && market.exchangeRate) {
       const marketRevenueDiffUsd = reserveBalanceDiff
         .toBigDecimal()
-        .times(currPriceUsd)
-        .div(DECIMAL_PRECISION);
+        .div(tokenPrecision)
+        .div(market.exchangeRate!)
+        .times(currPriceUsd);
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(marketRevenueDiffUsd);
+      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(marketRevenueDiffUsd);
     }
     
-    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(protocol.cumulativeProtocolSideRevenueUSD).plus(
-      protocol.cumulativeSupplySideRevenueUSD
-    );
+    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
+
 
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);
