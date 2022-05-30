@@ -368,12 +368,11 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 
     market.save();
     
-    if (market.outputToken) {
-      const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
-      eToken.lastPriceUSD = market.outputTokenPriceUSD;
-      eToken.lastPriceBlockNumber = block.number;
-      eToken.save();
-    }
+    const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
+    eToken.lastPriceUSD = market.outputTokenPriceUSD;
+    eToken.lastPriceBlockNumber = block.number;
+    eToken.save();
+    const eTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>eToken.decimals));
 
     const marketUtility = getOrCreateMarketUtility(market.id);
     marketUtility.market = market.id;
@@ -387,7 +386,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     if (reserveBalanceDiff.gt(BIGINT_ZERO) && market.exchangeRate) {
       const marketRevenueDiffUsd = reserveBalanceDiff
         .toBigDecimal()
-        .div(tokenPrecision)
+        .div(eTokenPrecision)
         .div(market.exchangeRate!)
         .times(currPriceUsd);
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(marketRevenueDiffUsd);
