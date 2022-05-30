@@ -19,7 +19,7 @@ import {
   updateVaultDailySnapshot,
   updateVaultHourlySnapshot,
 } from "../utils/snapshots";
-import { fetchTokenName, fetchTokenSymbol } from "./token";
+import { fetchTokenName, fetchTokenSymbol, getLastPriceUSD } from "./token";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
@@ -74,6 +74,17 @@ export function createVaultFromStrategy(
   } else {
     vault.pricePerShare = call.value;
   }
+
+  vault.totalValueLockedUSD = getLastPriceUSD(
+    vaultContract.want(),
+    currentBlock.number
+  ).times(new BigDecimal(vault.inputTokenBalance));
+
+  const outputSupply = vault.outputTokenSupply;
+  if (outputSupply)
+    vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
+      new BigDecimal(outputSupply)
+    );
 
   vault.deposits = [getOrCreateFirstDeposit(vault).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
@@ -143,6 +154,17 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
     vault.pricePerShare = call.value;
   }
 
+  vault.totalValueLockedUSD = getLastPriceUSD(
+    vaultContract.want(),
+    block.number
+  ).times(new BigDecimal(vault.inputTokenBalance));
+
+  const outputSupply = vault.outputTokenSupply;
+  if (outputSupply)
+    vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
+      new BigDecimal(outputSupply)
+    );
+
   const dailySnapshot = updateVaultDailySnapshot(block, vault);
   if (
     vault.dailySnapshots[vault.dailySnapshots.length - 1] !== dailySnapshot.id
@@ -162,7 +184,7 @@ export function getFees(
   vaultId: string,
   strategyContract: BeefyStrategy
 ): string[] {
-  const strategistFee = new VaultFee("STRATEGIST_FEE" + vaultId);
+  const strategistFee = new VaultFee("STRATEGIST_FEE-" + vaultId);
   let call = strategyContract.try_STRATEGIST_FEE();
   if (call.reverted) {
     strategistFee.feePercentage = BIGDECIMAL_ZERO;
@@ -172,7 +194,7 @@ export function getFees(
   strategistFee.feeType = "STRATEGIST_FEE";
   strategistFee.save();
 
-  const withdrawalFee = new VaultFee("WITHDRAWAL_FEE" + vaultId);
+  const withdrawalFee = new VaultFee("WITHDRAWAL_FEE-" + vaultId);
   call = strategyContract.try_withdrawalFee();
   if (call.reverted) {
     withdrawalFee.feePercentage = BIGDECIMAL_ZERO;
@@ -182,7 +204,7 @@ export function getFees(
   withdrawalFee.feeType = "WITHDRAWAL_FEE";
   withdrawalFee.save();
 
-  const callFee = new VaultFee("MANAGEMENT_FEE" + vaultId);
+  const callFee = new VaultFee("MANAGEMENT_FEE-" + vaultId);
   call = strategyContract.try_callFee();
   if (call.reverted) {
     callFee.feePercentage = BIGDECIMAL_ZERO;
@@ -192,7 +214,7 @@ export function getFees(
   callFee.feeType = "MANAGEMENT_FEE";
   callFee.save();
 
-  const beefyFee = new VaultFee("PERFORMANCE_FEE" + vaultId);
+  const beefyFee = new VaultFee("PERFORMANCE_FEE-" + vaultId);
   call = strategyContract.try_beefyFee();
   if (call.reverted) {
     beefyFee.feePercentage = BIGDECIMAL_ZERO;

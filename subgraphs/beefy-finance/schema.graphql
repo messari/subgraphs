@@ -241,8 +241,8 @@ type Vault @entity {
 
   ##### Quantitative Data #####
 
-  #" Current TVL (Total Value Locked) of this Vault in USD "
-  #totalValueLockedUSD: BigDecimal!
+  " Current TVL (Total Value Locked) of this Vault in USD "
+  totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the Vault "
   inputTokenBalance: BigInt!
@@ -250,8 +250,8 @@ type Vault @entity {
   " Total supply of output token "
   outputTokenSupply: BigInt
 
-  #" Price per share of output token in USD "
-  #outputTokenPriceUSD: BigDecimal
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
   pricePerShare: BigInt!
