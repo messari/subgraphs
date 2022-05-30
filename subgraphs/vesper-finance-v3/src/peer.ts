@@ -203,7 +203,7 @@ export class WithdrawRevenue {
     );
 
     if (withdrawFee_call.reverted) {
-      return;
+      return this;
     }
 
     const isEarnPool = withdrawFee_call.value.isZero();
