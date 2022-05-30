@@ -158,4 +158,6 @@ templates:
       eventHandlers:
         - event: Harvest(uint256,indexed uint256)
           handler: handleHarvest
+        - event: TreeDistribution(indexed address,uint256,indexed uint256,uint256)
+          handler: handleRewards
       file: ./src/mappings/strategy.ts

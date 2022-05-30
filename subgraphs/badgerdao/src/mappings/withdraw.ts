@@ -1,7 +1,13 @@
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { VaultV4 as VaultContract } from "../../generated/bimBTC/VaultV4";
 import { Vault } from "../../generated/schema";
-import { BIGDECIMAL_HUNDRED, BIGINT_TEN, BIGINT_ZERO, VaultFeeType } from "../constant";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
+  BIGINT_TEN,
+  BIGINT_ZERO,
+  VaultFeeType,
+} from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getOrCreateProtocol } from "../entities/Protocol";
 import { getOrCreateToken } from "../entities/Token";
@@ -66,36 +72,42 @@ export function withdraw(call: ethereum.Call, vault: Vault, shares: BigInt | nul
   const withdrawalFees = getFeePercentage(vault, VaultFeeType.WITHDRAWAL_FEE).div(
     BIGDECIMAL_HUNDRED,
   );
-
-  const protocolSideWithdrawalAmount = withdrawAmount
-    .toBigDecimal()
-    .times(withdrawalFees)
-    .div(tokenDecimals);
+  const protocolSideWithdrawalAmount = withdrawAmount.toBigDecimal().times(withdrawalFees);
+  const protocolSideWithdrawalAmountUSD = protocolSideWithdrawalAmount
+    .div(tokenDecimals)
+    .times(inputTokenPrice);
 
   const supplySideWithdrawalAmount = withdrawAmount
     .toBigDecimal()
+    .times(BIGDECIMAL_ONE.minus(withdrawalFees));
+  const supplySideWithdrawalAmountUSD = supplySideWithdrawalAmount
     .div(tokenDecimals)
-    .minus(protocolSideWithdrawalAmount);
+    .times(inputTokenPrice);
 
-  const protocolSideWithdrawalAmountUSD = protocolSideWithdrawalAmount.times(inputTokenPrice);
+  const totalRevenueUSD = supplySideWithdrawalAmountUSD.plus(protocolSideWithdrawalAmountUSD);
 
-  updateFinancialsAfterWithdrawal(call.block, protocolSideWithdrawalAmountUSD);
+  updateFinancialsAfterWithdrawal(
+    call.block,
+    protocolSideWithdrawalAmountUSD,
+    supplySideWithdrawalAmountUSD,
+    totalRevenueUSD,
+  );
 }
 
 export function updateFinancialsAfterWithdrawal(
   block: ethereum.Block,
   protocolSideRevenueUSD: BigDecimal,
+  supplySideRevenueUSD: BigDecimal,
+  totalRevenueUSD: BigDecimal,
 ): void {
   const financialMetrics = getOrCreateFinancialsDailySnapshot(block);
   const protocol = getOrCreateProtocol();
 
   // TotalRevenueUSD Metrics
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(
-    protocolSideRevenueUSD,
+    totalRevenueUSD,
   );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
-    protocolSideRevenueUSD,
-  );
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(totalRevenueUSD);
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
 
   // ProtocolSideRevenueUSD Metrics
@@ -106,6 +118,15 @@ export function updateFinancialsAfterWithdrawal(
     protocolSideRevenueUSD,
   );
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+  // SupplySideRevenueUSD Metrics
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD,
+  );
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    supplySideRevenueUSD,
+  );
+  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
 
   financialMetrics.save();
   protocol.save();

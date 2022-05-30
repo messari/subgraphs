@@ -44,8 +44,8 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   vault.pricePerShare = BIGDECIMAL_ZERO;
   vault.stakedOutputTokenAmount = BIGINT_ZERO;
-  vault.rewardTokenEmissionsAmount = [];
-  vault.rewardTokenEmissionsUSD = [];
+  vault.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+  vault.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   vault.save();
 
   // storing vault ids

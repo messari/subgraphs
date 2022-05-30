@@ -1,13 +1,22 @@
-import { BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Harvest,
   SetPerformanceFeeGovernanceCall,
   SetWithdrawalFeeCall,
+  TreeDistribution,
 } from "../../generated/bimBTC/Strategy";
 import { Token, Vault, VaultFee, _Strategy } from "../../generated/schema";
-import { BIGDECIMAL_HUNDRED, BIGDECIMAL_ONE, MAX_FEE, VaultFeeType } from "../constant";
+import {
+  BADGER_TOKEN,
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ONE,
+  BIGINT_TEN,
+  MAX_FEE,
+  VaultFeeType,
+} from "../constant";
 import { getOrCreateFinancialsDailySnapshot } from "../entities/Metrics";
 import { getOrCreateProtocol } from "../entities/Protocol";
+import { getOrCreateToken } from "../entities/Token";
 import { getFeePercentage } from "../entities/Vault";
 import { enumToPrefix } from "../utils/strings";
 import { getOrUpdateTokenPrice } from "./price";
@@ -48,45 +57,86 @@ export function handleWithdrawalFee(call: SetWithdrawalFeeCall): void {
   }
 }
 
-export function handleHarvest(event: Harvest): void {
+export function handleRewards(event: TreeDistribution): void {
   const strategyAddress = event.address;
   const strategy = _Strategy.load(strategyAddress.toHex());
 
   if (strategy) {
     let vault = Vault.load(strategy.vault);
+    let rewardToken = getOrCreateToken(BADGER_TOKEN);
+
+    if (!vault) return;
+
+    let tokenDecimals = BIGINT_TEN.pow(rewardToken.decimals as u8);
+    let tokenPrice = getOrUpdateTokenPrice(vault, rewardToken, event.block);
+
+    log.warning("[REWARD] vault {} amount {} tokenPrice {} block {}", [
+      vault.id,
+      event.params.amount.toString(),
+      tokenPrice.toString(),
+      event.params.blockNumber.toString(),
+    ]);
+
+    vault.rewardTokens = [rewardToken.id];
+    vault.rewardTokenEmissionsAmount = [
+      vault.rewardTokenEmissionsAmount![0].plus(event.params.amount),
+    ];
+    vault.rewardTokenEmissionsUSD = [
+      vault
+        .rewardTokenEmissionsAmount![0].toBigDecimal()
+        .div(tokenDecimals.toBigDecimal())
+        .times(tokenPrice),
+    ];
+    vault.save();
+  }
+}
+
+export function handleHarvest(event: Harvest): void {
+  const strategyAddress = event.address;
+  const strategy = _Strategy.load(strategyAddress.toHex());
+
+  if (strategy) {
+    if (
+      Address.fromString(strategy.vault) ==
+      Address.fromString("0x7e7e112a68d8d2e221e11047a72ffc1065c38e1a")
+    ) {
+      return;
+    }
+
+    let vault = Vault.load(strategy.vault);
     let token = Token.load(strategy.token);
     if (!vault || !token) return;
 
     let performanceFee = getFeePercentage(vault, VaultFeeType.PERFORMANCE_FEE);
-
     let tokenPrice = getOrUpdateTokenPrice(vault, token, event.block);
-    let tokenDecimals = BigDecimal.fromString(token.decimals.toString());
+    let tokenDecimals = BIGINT_TEN.pow(token.decimals as u8);
 
-    log.warning("[BADGER] harvest - vault {} token {} strategy {} price {}", [
+    log.warning("[BADGER] harvest - vault {} token {} strategy {} harvested {} price {}", [
       vault.id,
       token.id,
       strategy.id,
+      event.params.harvested.toString(),
       tokenPrice.toString(),
     ]);
 
-    let supplySideRewardEarned = event.params.harvested
+    const supplySideRewardEarned = event.params.harvested
       .toBigDecimal()
       .times(BIGDECIMAL_ONE.minus(performanceFee.div(BIGDECIMAL_HUNDRED)));
+    const supplySideRewardEarnedUSD = supplySideRewardEarned
+      .div(tokenDecimals.toBigDecimal())
+      .times(tokenPrice);
 
-    const supplySideRewardEarnedUSD = supplySideRewardEarned.div(tokenDecimals).times(tokenPrice);
-
-    let protocolSideRewardEarned = event.params.harvested
+    const protocolSideRewardEarned = event.params.harvested
       .toBigDecimal()
       .times(performanceFee)
       .div(BIGDECIMAL_HUNDRED);
-
     const protocolSideRewardEarnedUSD = protocolSideRewardEarned
-      .div(tokenDecimals)
+      .div(tokenDecimals.toBigDecimal())
       .times(tokenPrice);
 
     const totalRevenueUSD = supplySideRewardEarnedUSD.plus(protocolSideRewardEarnedUSD);
 
-    updateFinancialsAfterRewardAdded(
+    updateFinancials(
       event.block,
       totalRevenueUSD,
       supplySideRewardEarnedUSD,
@@ -95,7 +145,7 @@ export function handleHarvest(event: Harvest): void {
   }
 }
 
-export function updateFinancialsAfterRewardAdded(
+export function updateFinancials(
   block: ethereum.Block,
   totalRevenueUSD: BigDecimal,
   supplySideRevenueUSD: BigDecimal,

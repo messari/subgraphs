@@ -28,7 +28,7 @@ export function getOrUpdateTokenPrice(
     tokenAddress = Address.fromString("0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599"); // wbtc
   }
 
-  let fetchPrice = getUsdPricePerToken(Address.fromString(token.id));
+  let fetchPrice = getUsdPricePerToken(tokenAddress);
   let inputTokenPrice = !fetchPrice.reverted
     ? fetchPrice.usdPrice.div(fetchPrice.decimalsBaseTen)
     : fetchPrice.usdPrice;

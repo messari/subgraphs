@@ -1,8 +1,10 @@
 import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
+import { BADGER_TOKEN } from "../constant";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import * as constants from "./common/constants";
 import { CustomPriceType } from "./common/types";
+import { getUsdPriceOfBadgerToken } from "./custom/Badger";
 import { getUsdPriceOfBadgerWbtcToken } from "./custom/BadgerWbtc";
 import { getUsdPriceOfWbtcDiggToken } from "./custom/WbtcDigg";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
@@ -40,6 +42,18 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
         badgerWbtcPrice.usdPrice.div(badgerWbtcPrice.decimalsBaseTen).toString(),
       ]);
       return badgerWbtcPrice;
+    }
+  }
+
+  // if it is a badger token
+  if (tokenAddr == BADGER_TOKEN) {
+    let badgerPrice = getUsdPriceOfBadgerToken(BADGER_TOKEN);
+    if (!badgerPrice.reverted) {
+      log.warning("[BADGER] tokenAddress: {}, Price: {}", [
+        tokenAddr.toHexString(),
+        badgerPrice.usdPrice.div(badgerPrice.decimalsBaseTen).toString(),
+      ]);
+      return badgerPrice;
     }
   }
 
