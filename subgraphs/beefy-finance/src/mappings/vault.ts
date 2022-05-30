@@ -19,6 +19,8 @@ import {
   updateVaultDailySnapshot,
   updateVaultHourlySnapshot,
 } from "../utils/snapshots";
+import { fetchTokenName, fetchTokenSymbol } from "./token";
+import { BIGINT_ZERO } from "../prices/common/constants";
 
 const NETWORK_SUFFIX: string = "-137";
 
@@ -35,8 +37,8 @@ export function createVaultFromStrategy(
   const vaultContract = BeefyVault.bind(vaultAddress);
 
   vault.protocol = getBeefyFinanceOrCreate().id;
-  vault.name = vaultContract.name();
-  vault.symbol = vaultContract.symbol();
+  vault.name = fetchTokenName(vaultAddress);
+  vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHexString() + NETWORK_SUFFIX;
 
   vault.inputToken = getTokenOrCreate(
@@ -48,10 +50,24 @@ export function createVaultFromStrategy(
   vault.createdTimestamp = currentBlock.timestamp;
   vault.createdBlockNumber = currentBlock.number;
 
-  vault.inputTokenBalance = vaultContract.balance();
-  vault.outputTokenSupply = vaultContract.totalSupply();
-
-  vault.pricePerShare = vaultContract.getPricePerFullShare();
+  let call = vaultContract.try_balance();
+  if (call.reverted) {
+    vault.inputTokenBalance = BIGINT_ZERO;
+  } else {
+    vault.inputTokenBalance = call.value;
+  }
+  call = vaultContract.try_totalSupply();
+  if (call.reverted) {
+    vault.outputTokenSupply = BIGINT_ZERO;
+  } else {
+    vault.outputTokenSupply = call.value;
+  }
+  call = vaultContract.try_getPricePerFullShare();
+  if (call.reverted) {
+    vault.pricePerShare = BIGINT_ZERO;
+  } else {
+    vault.pricePerShare = call.value;
+  }
 
   vault.deposits = [getOrCreateFirstDeposit(vault).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
@@ -102,9 +118,25 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   const vaultContract = BeefyVault.bind(getAddressFromId(vault.id));
-  vault.inputTokenBalance = vaultContract.balance();
-  vault.outputTokenSupply = vaultContract.totalSupply();
-  vault.pricePerShare = vaultContract.getPricePerFullShare();
+  let call = vaultContract.try_balance();
+  if (call.reverted) {
+    vault.inputTokenBalance = BIGINT_ZERO;
+  } else {
+    vault.inputTokenBalance = call.value;
+  }
+  call = vaultContract.try_totalSupply();
+  if (call.reverted) {
+    vault.outputTokenSupply = BIGINT_ZERO;
+  } else {
+    vault.outputTokenSupply = call.value;
+  }
+  call = vaultContract.try_getPricePerFullShare();
+  if (call.reverted) {
+    vault.pricePerShare = BIGINT_ZERO;
+  } else {
+    vault.pricePerShare = call.value;
+  }
+
   const dailySnapshot = updateVaultDailySnapshot(block, vault);
   if (
     vault.dailySnapshots[vault.dailySnapshots.length - 1] !== dailySnapshot.id
@@ -116,5 +148,6 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
     hourlySnapshot.id
   )
     vault.hourlySnapshots = vault.hourlySnapshots.concat([hourlySnapshot.id]);
+
   vault.save();
 }
