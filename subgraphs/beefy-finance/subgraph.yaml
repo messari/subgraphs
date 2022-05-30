@@ -8,7 +8,7 @@ dataSources:
     source:
       address: '0xD126BA764D2fA052Fc14Ae012Aef590Bc6aE0C4f'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -19,6 +19,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -64,7 +66,7 @@ dataSources:
     source:
       address: '0xe10199F521ca6f7E7c50bf0a042794de7E30C709'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -75,6 +77,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -120,7 +124,7 @@ dataSources:
     source:
       address: '0x8171D97Ac65B07A09385530Baa0Dd7C7409Bd422'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -131,6 +135,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -176,7 +182,7 @@ dataSources:
     source:
       address: '0x68d2177D146F524e6B51d52123A6e630014A0028'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -187,6 +193,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -232,7 +240,7 @@ dataSources:
     source:
       address: '0x84602F119ebDBedEB3bA7c6E23FF398cb61c609F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -243,6 +251,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -288,7 +298,7 @@ dataSources:
     source:
       address: '0x510d494211895a32B5d933686AcE077bA6c4E624'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -299,6 +309,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -344,7 +356,7 @@ dataSources:
     source:
       address: '0x042215e7E93F4e4D42d84DEd5C33b4e1f7d3E988'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -355,6 +367,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -400,7 +414,7 @@ dataSources:
     source:
       address: '0x2aB8add4e367cb2AD9a497155031dAD49a2432ed'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -411,6 +425,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -456,7 +472,7 @@ dataSources:
     source:
       address: '0xBC3Df9A5879432135f4A976795b1fC1728279012'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -467,6 +483,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -512,7 +530,7 @@ dataSources:
     source:
       address: '0xA81ef4627471AC434b784C4efa271Fba1C53Be04'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -523,6 +541,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -568,7 +588,7 @@ dataSources:
     source:
       address: '0xED5c4150F867b278866bbAD33e947287cc5a2Ef1'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -579,6 +599,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -624,7 +646,7 @@ dataSources:
     source:
       address: '0xB2385DF6d76Bed9F8163037eCab5A8A38dd3FD22'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -635,6 +657,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -680,7 +704,7 @@ dataSources:
     source:
       address: '0xB574bcAbc4f9b98B13E599d44F98e3c1642E525B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -691,6 +715,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -736,7 +762,7 @@ dataSources:
     source:
       address: '0x1592550E083286C35282E53732FDE11800A187E1'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -747,6 +773,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -792,7 +820,7 @@ dataSources:
     source:
       address: '0x845b0456c8eA0C674Daa7211A2B2D8c729263DdB'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -803,6 +831,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -848,7 +878,7 @@ dataSources:
     source:
       address: '0x52043542e153E079779e1D21B1458ee3faE8c586'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -859,6 +889,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -904,7 +936,7 @@ dataSources:
     source:
       address: '0xd5598958715C7cd6DD0E0e23F2396FfB5cb85c00'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -915,6 +947,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -960,7 +994,7 @@ dataSources:
     source:
       address: '0x02A0c97BE6D8f4F144AFE5f41C51b5cef192480C'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -971,6 +1005,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1016,7 +1052,7 @@ dataSources:
     source:
       address: '0x894206e3efAd85C49b2B042A6b44b33ad7107acd'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1027,6 +1063,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1072,7 +1110,7 @@ dataSources:
     source:
       address: '0x876ab6493B42a630f5FB2eD98d8AD23f0629b068'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1083,6 +1121,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1128,7 +1168,7 @@ dataSources:
     source:
       address: '0x456eAea680B8D8E5dAE6F5bfdeE8484E0D2accD6'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1139,6 +1179,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1184,7 +1226,7 @@ dataSources:
     source:
       address: '0x42D4EfA605eE2433918e7C9ae1Fc32494b217c12'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1195,6 +1237,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1240,7 +1284,7 @@ dataSources:
     source:
       address: '0x22F8365a9d689Fe32aAD7B455c9D14F04b395419'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1251,6 +1295,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1296,7 +1342,7 @@ dataSources:
     source:
       address: '0xE44000972e7C737a2D43609c2254a8F7B646BF9D'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1307,6 +1353,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1352,7 +1400,7 @@ dataSources:
     source:
       address: '0x70c6AF9Dff8C19B3db576E5E199B22A883874f05'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1363,6 +1411,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1408,7 +1458,7 @@ dataSources:
     source:
       address: '0x2D48D94ABfaD5a95b5fCA0fAB9cD37dd722C84A4'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1419,6 +1469,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1464,7 +1516,7 @@ dataSources:
     source:
       address: '0xf9bd7bcdD8c5B6dE4Af7Dff0A9aF6f9494e6AA83'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1475,6 +1527,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1520,7 +1574,7 @@ dataSources:
     source:
       address: '0xd23A1FEE38B63464ded77Dd21A35ae514A7f21Db'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1531,6 +1585,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1576,7 +1632,7 @@ dataSources:
     source:
       address: '0x1B85cc576e97Fd55369e05a424fE3b8dcAEE57B9'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1587,6 +1643,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1632,7 +1690,7 @@ dataSources:
     source:
       address: '0xBaBaC5560Aa4CA3C5290DfcC5C159EdC0a51c316'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1643,6 +1701,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1688,7 +1748,7 @@ dataSources:
     source:
       address: '0xc04f79B751C470b5c53705BB3813B173DC8ab19B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1699,6 +1759,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1744,7 +1806,7 @@ dataSources:
     source:
       address: '0x22f72e86A9CA2CDD3Cdc94012E9901D93E3d90F8'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1755,6 +1817,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1800,7 +1864,7 @@ dataSources:
     source:
       address: '0xA30a5631AdcF7a1Ae1Ab991cBEf23d4381031660'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1811,6 +1875,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1856,7 +1922,7 @@ dataSources:
     source:
       address: '0x7fe0dd3D7259092A3ae4709b1598C7eD502DaaBB'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1867,6 +1933,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1912,7 +1980,7 @@ dataSources:
     source:
       address: '0x3da758e2be3183fed8604FE0D23EC22bA15786A2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1923,6 +1991,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -1968,7 +2038,7 @@ dataSources:
     source:
       address: '0xE85c4A30e55255ef3B7880777256c128C25367fd'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -1979,6 +2049,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2024,7 +2096,7 @@ dataSources:
     source:
       address: '0xE13fDa9D26961954E95a02a825A304dBB58f3B47'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2035,6 +2107,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2080,7 +2154,7 @@ dataSources:
     source:
       address: '0x8c5c1A7695E9450d21Cd3041614F2bbdca1134D6'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2091,6 +2165,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2136,7 +2212,7 @@ dataSources:
     source:
       address: '0xb19482B4f628Fa1218a637232D91e761053eC70D'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2147,6 +2223,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2192,7 +2270,7 @@ dataSources:
     source:
       address: '0x8BCEff0f5143A04D85893433a04a8C94d6f2d8b6'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2203,6 +2281,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2248,7 +2328,7 @@ dataSources:
     source:
       address: '0x17720F863DA01Bc9e266e4eE872E3c98fA1FeAA8'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2259,6 +2339,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2304,7 +2386,7 @@ dataSources:
     source:
       address: '0x825B726fc5DEb89b42352458C28f9F2ce20AEc13'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2315,6 +2397,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2360,7 +2444,7 @@ dataSources:
     source:
       address: '0x1F9871133c8E093e9e1E2815Ca76B75CC7bB8c11'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2371,6 +2455,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2416,7 +2502,7 @@ dataSources:
     source:
       address: '0xbD9238a23C7D88aaaF18a188191f57bB5D99AAfb'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2427,6 +2513,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2472,7 +2560,7 @@ dataSources:
     source:
       address: '0x937B63dB07929Cbc27a72C4A7A2999Ae3Cc1cAfF'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2483,6 +2571,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2528,7 +2618,7 @@ dataSources:
     source:
       address: '0xc60693d8e3e2B8aB28C5CE9Dc38c87414A924B23'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2539,6 +2629,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2584,7 +2676,7 @@ dataSources:
     source:
       address: '0xc0c198742Bb0724ee1141F61eDD492eefe48495a'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2595,6 +2687,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2640,7 +2734,7 @@ dataSources:
     source:
       address: '0xc1662Ea590b3ad990d77be487FBDeBb7bedF0C39'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2651,6 +2745,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2696,7 +2792,7 @@ dataSources:
     source:
       address: '0xF4e2d1413917AA0b3e26a7203b95FB58Bc48a7d3'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2707,6 +2803,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2752,7 +2850,7 @@ dataSources:
     source:
       address: '0xb8EB11aff4AFA5987940c665E393EF905A098486'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2763,6 +2861,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2808,7 +2908,7 @@ dataSources:
     source:
       address: '0x04a7D46df890fc20664217301850dadeEBDB7b38'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2819,6 +2919,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2864,7 +2966,7 @@ dataSources:
     source:
       address: '0xB6ca7D8F93a2eb0CcBC83b38d4d94B4b0FB6811c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2875,6 +2977,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2920,7 +3024,7 @@ dataSources:
     source:
       address: '0xD771f9711b863c0d1CE007fd6b613a69b16CFA41'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2931,6 +3035,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -2976,7 +3082,7 @@ dataSources:
     source:
       address: '0xC3F4f41cC874146b1fA7F4a0A35168eb8C0E3761'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -2987,6 +3093,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3032,7 +3140,7 @@ dataSources:
     source:
       address: '0xE7c85f80fA04f013241a7509FBbCb613bbCc50c2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3043,6 +3151,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3088,7 +3198,7 @@ dataSources:
     source:
       address: '0x21068F35fffC2BadE50Defc33261782d3e5Afa6D'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3099,6 +3209,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3144,7 +3256,7 @@ dataSources:
     source:
       address: '0x703372131e77aE0c69B51e41A901315087A314D2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3155,6 +3267,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3200,7 +3314,7 @@ dataSources:
     source:
       address: '0xBBf720404ba3F71d03fBda851F30267156c2cec2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3211,6 +3325,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3256,7 +3372,7 @@ dataSources:
     source:
       address: '0xF21893aa7C4AA97C0327D7275176F6A88871f706'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3267,6 +3383,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3312,7 +3430,7 @@ dataSources:
     source:
       address: '0xb95F2f442F0640cDE238CA1d2a370fe889B5e375'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3323,6 +3441,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3368,7 +3488,7 @@ dataSources:
     source:
       address: '0x9cA8109453cADbbA8B072951e9eb5c7fc39d0299'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3379,6 +3499,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3424,7 +3546,7 @@ dataSources:
     source:
       address: '0x17F9352c4bf06cD29395bd0C98D28c28e626d93a'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3435,6 +3557,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3480,7 +3604,7 @@ dataSources:
     source:
       address: '0x7Ea5eed1E90A52D29a4bF2051703c6802cEEA7fD'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3491,6 +3615,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3536,7 +3662,7 @@ dataSources:
     source:
       address: '0xF00b3BE39C94f5f5dE7AfA5ebC1a36E6D2D91f82'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3547,6 +3673,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3592,7 +3720,7 @@ dataSources:
     source:
       address: '0x1D6B0510D3863879AfA39534719A3B3A6A69eEeB'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3603,6 +3731,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3648,7 +3778,7 @@ dataSources:
     source:
       address: '0x5FaDa24d37A27323D74af57Bd01786866e950550'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3659,6 +3789,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3704,7 +3836,7 @@ dataSources:
     source:
       address: '0x453054B9C2CD3dF1c57E0866241f460B78eE3ebB'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3715,6 +3847,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3760,7 +3894,7 @@ dataSources:
     source:
       address: '0x41D7529b4C9245a50ca6A169d39719DFF117f6CA'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3771,6 +3905,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3816,7 +3952,7 @@ dataSources:
     source:
       address: '0x42844d785816e53adfFBdFc66d6BFC2E3E83d8FD'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3827,6 +3963,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3872,7 +4010,7 @@ dataSources:
     source:
       address: '0x2b92996787D7aB695FAb545ccb984b3895409619'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3883,6 +4021,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3928,7 +4068,7 @@ dataSources:
     source:
       address: '0x5cC78F9FE3DaDeccAaeF83726c1864996D1FAb49'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3939,6 +4079,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -3984,7 +4126,7 @@ dataSources:
     source:
       address: '0xAC074B7515011E08828821d53A3b71fB643773aB'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -3995,6 +4137,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4040,7 +4184,7 @@ dataSources:
     source:
       address: '0xf88c19c035756fd280c0683cca4c358C69932ba9'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4051,6 +4195,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4096,7 +4242,7 @@ dataSources:
     source:
       address: '0xF212621976dB35c9fA4f7579D684fe2E66e577F1'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4107,6 +4253,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4152,7 +4300,7 @@ dataSources:
     source:
       address: '0x3922459D97e663c09ea611170d795c83727F224A'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4163,6 +4311,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4208,7 +4358,7 @@ dataSources:
     source:
       address: '0x464893e1A23026de87fd487A25341553B0f9cf03'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4219,6 +4369,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4264,7 +4416,7 @@ dataSources:
     source:
       address: '0x528e01637aaE1c5CAa3c34b0295958Cc8f382C09'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4275,6 +4427,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4320,7 +4474,7 @@ dataSources:
     source:
       address: '0xa69D35C1b1b66B6e977294C76542e2C86617Adb7'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4331,6 +4485,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4376,7 +4532,7 @@ dataSources:
     source:
       address: '0x23C28C24cb57F7b7D82cbf4788cdAD132051F1FD'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4387,6 +4543,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4432,7 +4590,7 @@ dataSources:
     source:
       address: '0x51F68538944B1cbE15A8144F3e1053F1820D5702'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4443,6 +4601,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4488,7 +4648,7 @@ dataSources:
     source:
       address: '0x7BB5e5fb8b2843C2f94265eFe94B4F448eB916Ff'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4499,6 +4659,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4544,7 +4706,7 @@ dataSources:
     source:
       address: '0xF93f69d9F768100D2641e6ddC04012E76D1C8Dfd'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4555,6 +4717,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4600,7 +4764,7 @@ dataSources:
     source:
       address: '0xa8232bdd730Edf961BCa6aEa3F26887bc0eDa107'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4611,6 +4775,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4656,7 +4822,7 @@ dataSources:
     source:
       address: '0x83394Ee753450920222327F4eCBB4b747f235659'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4667,6 +4833,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4712,7 +4880,7 @@ dataSources:
     source:
       address: '0xE166AaF67DC8FA9607B2F34Ac4057e98E6197462'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4723,6 +4891,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4768,7 +4938,7 @@ dataSources:
     source:
       address: '0xD4610a11680e9b5d0FC80D65008C577CBe45090e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4779,6 +4949,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4824,7 +4996,7 @@ dataSources:
     source:
       address: '0x6EFE2a7cD607A2e0D84Ab87E7A7E57E19B50148F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4835,6 +5007,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4880,7 +5054,7 @@ dataSources:
     source:
       address: '0x44831fc132CbFa5099335517B9A83f817bFE41ee'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4891,6 +5065,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4936,7 +5112,7 @@ dataSources:
     source:
       address: '0xA11C1200c06f1B3e10137e551783ba01b8AD1b88'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -4947,6 +5123,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -4992,7 +5170,7 @@ dataSources:
     source:
       address: '0x5f2484F24a3134D6AcC5145AEDABf0Cd25223b53'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5003,6 +5181,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5048,7 +5228,7 @@ dataSources:
     source:
       address: '0x969D6b814303DAe5a05485a5957C8c181d7FC8d7'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5059,6 +5239,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5104,7 +5286,7 @@ dataSources:
     source:
       address: '0xD556A69d7f37FeCe0C025bd4934Da2799cD48234'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5115,6 +5297,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5160,7 +5344,7 @@ dataSources:
     source:
       address: '0x4750Efcdc3809b624515A78794777a7F64051362'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5171,6 +5355,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5216,7 +5402,7 @@ dataSources:
     source:
       address: '0x2f57815D41fb365064878b6405856Eb9aB49d70A'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5227,6 +5413,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5272,7 +5460,7 @@ dataSources:
     source:
       address: '0x9C1c20a777EB616efcD420679E2aA02776a9729c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5283,6 +5471,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5328,7 +5518,7 @@ dataSources:
     source:
       address: '0x585b4c8C0D4C62f663DF6945524E59F69273f1Df'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5339,6 +5529,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5384,7 +5576,7 @@ dataSources:
     source:
       address: '0x9616eD357812ddc14bE3833fEc37F6Ce76eB5D1e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5395,6 +5587,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5440,7 +5634,7 @@ dataSources:
     source:
       address: '0xA54f5470D3C03BF088372F31dD0a69Cf6c262478'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5451,6 +5645,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5496,7 +5692,7 @@ dataSources:
     source:
       address: '0x2DE7e25b19dbff36d92B62d6692eb568Bba29c3c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5507,6 +5703,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5552,7 +5750,7 @@ dataSources:
     source:
       address: '0xd0AEd4Bb2050b4E4b8F5C9A4bcC5D1C46D4b397b'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5563,6 +5761,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5608,7 +5808,7 @@ dataSources:
     source:
       address: '0x33b35C38Ae0a3c2c4C9262217cb34DAdfB37a985'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5619,6 +5819,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5664,7 +5866,7 @@ dataSources:
     source:
       address: '0x0A866E75963d6EEc4EdA1e8E8b91F76228f2348e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5675,6 +5877,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5720,7 +5924,7 @@ dataSources:
     source:
       address: '0xfDE3FAa7D40B6F1417d9000bE6028638E4Df0F2b'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5731,6 +5935,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5776,7 +5982,7 @@ dataSources:
     source:
       address: '0x54b1FE5f9162141740A2cF0e2044D82b8F570e08'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5787,6 +5993,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5832,7 +6040,7 @@ dataSources:
     source:
       address: '0xd85BAF8b9Ab657921c6D2700AA0e78928dC2922C'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5843,6 +6051,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5888,7 +6098,7 @@ dataSources:
     source:
       address: '0x6ed82Aaa6D421404D43389a4F497923912De0916'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5899,6 +6109,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -5944,7 +6156,7 @@ dataSources:
     source:
       address: '0x680fFd9E16a3f18576be2A0a03c528a353D6B622'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -5955,6 +6167,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6000,7 +6214,7 @@ dataSources:
     source:
       address: '0xed28adB653C55B63997C6f576DAcFaB2b1c94f17'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6011,6 +6225,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6056,7 +6272,7 @@ dataSources:
     source:
       address: '0xA4352F2eCC3DDDb85CCfEaDf2ab991dB2Eb5bbf2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6067,6 +6283,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6112,7 +6330,7 @@ dataSources:
     source:
       address: '0x78b8C22A2FbB6C4Bf9E9570DCAC3b1F5EFB7D6a5'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6123,6 +6341,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6168,7 +6388,7 @@ dataSources:
     source:
       address: '0x9ab0f5b4504A9Ee0b2c830BC84dc78Aae54F4DD9'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6179,6 +6399,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6224,7 +6446,7 @@ dataSources:
     source:
       address: '0x8699D5a2DFDd48Ea7333E9069125e7EfDe4AfF91'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6235,6 +6457,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6280,7 +6504,7 @@ dataSources:
     source:
       address: '0x717593C671183b8af2981A5d1b190bc9978962DA'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6291,6 +6515,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6336,7 +6562,7 @@ dataSources:
     source:
       address: '0x67A3bD5F88f9cFD186179b50dFA2B698Ab99D734'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6347,6 +6573,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6392,7 +6620,7 @@ dataSources:
     source:
       address: '0x969e3201ecb6A3Ed9662e75E8436d24B02f7E9Bb'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6403,6 +6631,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6448,7 +6678,7 @@ dataSources:
     source:
       address: '0xD9c67fa57AaDf12F39D8340901F7BD7b337bf761'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6459,6 +6689,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6504,7 +6736,7 @@ dataSources:
     source:
       address: '0x459beC2474D88D6fCf50071E36124b9c420aa9e0'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6515,6 +6747,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6560,7 +6794,7 @@ dataSources:
     source:
       address: '0xc2f3338847D05A9A28b763c77556cD693f7f6C7e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6571,6 +6805,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6616,7 +6852,7 @@ dataSources:
     source:
       address: '0xa6984233aD18987de3dbDAF37Bc0F0C4070F5faC'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6627,6 +6863,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6672,7 +6910,7 @@ dataSources:
     source:
       address: '0x6048e8BC353bCEe221e11Cde2359E3b34ee9a726'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6683,6 +6921,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6728,7 +6968,7 @@ dataSources:
     source:
       address: '0xF00Fd3EAAc684fDcdB5a740550ceAbF7e580E8D5'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6739,6 +6979,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6784,7 +7026,7 @@ dataSources:
     source:
       address: '0xC42908F4C14E01379C0D16cF07dcBB413D2f6a2A'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6795,6 +7037,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6840,7 +7084,7 @@ dataSources:
     source:
       address: '0x8e1097A2374C81D17E0589cbD935957329bbC331'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6851,6 +7095,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6896,7 +7142,7 @@ dataSources:
     source:
       address: '0x986B6a9097D1B3fb01BC593cD63784B750401Fe4'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6907,6 +7153,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -6952,7 +7200,7 @@ dataSources:
     source:
       address: '0xECB07aB9E318d55f8018Bc1d01effe1680d1f68c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -6963,6 +7211,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7008,7 +7258,7 @@ dataSources:
     source:
       address: '0x315324Bcd724b8CF01FfE6d04F029328f595e126'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7019,6 +7269,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7064,7 +7316,7 @@ dataSources:
     source:
       address: '0xB8cb0958B3943E63917Bdfe4b93201Cf5cC7De18'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7075,6 +7327,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7120,7 +7374,7 @@ dataSources:
     source:
       address: '0x59d6200BD6E5c3326Ab2A3784bce65EfDD36f8BD'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7131,6 +7385,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7176,7 +7432,7 @@ dataSources:
     source:
       address: '0xdeAdcbc04D78440612dC4Ed0651C2698695C2AD2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7187,6 +7443,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7232,7 +7490,7 @@ dataSources:
     source:
       address: '0xA8d2F663dA905dB94684da5E7955239B80085171'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7243,6 +7501,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7288,7 +7548,7 @@ dataSources:
     source:
       address: '0x968Eb3feCFEE8310C035CdAE07F6eD804b460c45'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7299,6 +7559,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7344,7 +7606,7 @@ dataSources:
     source:
       address: '0x8C0410A6C1fF46be696E5aCC6b3cA977AD5b176A'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7355,6 +7617,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7400,7 +7664,7 @@ dataSources:
     source:
       address: '0x9D78991a30f9822f6b5cBc521D5Ba203f0930c0E'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7411,6 +7675,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7456,7 +7722,7 @@ dataSources:
     source:
       address: '0x83ee18Af41163e6889C502Fa3c876366E53D15DA'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7467,6 +7733,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7512,7 +7780,7 @@ dataSources:
     source:
       address: '0xAa4EFbd9a98503844036306A6510B7DA59EfEaB3'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7523,6 +7791,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7568,7 +7838,7 @@ dataSources:
     source:
       address: '0x0C0C75AF434519AB96E34EB3bbEea726324d6264'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7579,6 +7849,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7624,7 +7896,7 @@ dataSources:
     source:
       address: '0x6ef302f46543d1045F3c93D2eE77AcD58d3854C4'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7635,6 +7907,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7680,7 +7954,7 @@ dataSources:
     source:
       address: '0x57e07d6958fd38AA2f46699744e322d3fB3db60f'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7691,6 +7965,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7736,7 +8012,7 @@ dataSources:
     source:
       address: '0x40e51fc986405684ca3E4f049426a78c20A1BC03'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7747,6 +8023,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7792,7 +8070,7 @@ dataSources:
     source:
       address: '0x6195187d06948fB14b20FD3c639F8cb8a335c29c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7803,6 +8081,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7848,7 +8128,7 @@ dataSources:
     source:
       address: '0x476be63e41f8E47910eDa5F50507EF49aC75A8a3'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7859,6 +8139,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7904,7 +8186,7 @@ dataSources:
     source:
       address: '0x0010cB56ABF8969EA3885950CcAADB2300cd5C7d'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7915,6 +8197,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -7960,7 +8244,7 @@ dataSources:
     source:
       address: '0xCFa03c845437ED660eaA38dD18316f6451410488'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -7971,6 +8255,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8016,7 +8302,7 @@ dataSources:
     source:
       address: '0x77092b29492163c0695Af17e94d29E73Dcba8743'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8027,6 +8313,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8072,7 +8360,7 @@ dataSources:
     source:
       address: '0x80F442b0207Fbc58efBd55da37F2fCc134CAEE7B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8083,6 +8371,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8128,7 +8418,7 @@ dataSources:
     source:
       address: '0xd55745876d04E45F7CB32bf816BAbf670A9F260b'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8139,6 +8429,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8184,7 +8476,7 @@ dataSources:
     source:
       address: '0xa145e4b08969b344Eb9478E89e351cc6b5c7D5EF'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8195,6 +8487,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8240,7 +8534,7 @@ dataSources:
     source:
       address: '0x9ED77C14DE83a24c9E1Ca97472a22a86d90EEA0c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8251,6 +8545,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8296,7 +8592,7 @@ dataSources:
     source:
       address: '0xa6a9da7890DeD8FEcc3be2f8b13ca424689fc413'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8307,6 +8603,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8352,7 +8650,7 @@ dataSources:
     source:
       address: '0xA58f0953261EcB55A128F721841416717B327833'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8363,6 +8661,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8408,7 +8708,7 @@ dataSources:
     source:
       address: '0xC32CCCfF0777C145e7d658081D141ec8A38f8133'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8419,6 +8719,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8464,7 +8766,7 @@ dataSources:
     source:
       address: '0x3dE892BBc1cC1D22F069a4A985F58052244Acc5e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8475,6 +8777,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8520,7 +8824,7 @@ dataSources:
     source:
       address: '0x5a2448b0306D24C2ed3AE3186f32bbB023B8dCf9'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8531,6 +8835,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8576,7 +8882,7 @@ dataSources:
     source:
       address: '0x7207E31f503981DC0D57cC04AD4713DCBD5C0010'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8587,6 +8893,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8632,7 +8940,7 @@ dataSources:
     source:
       address: '0x8F9f69ac6aD32Fd6394DDC414f724C534B60F877'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8643,6 +8951,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8688,7 +8998,7 @@ dataSources:
     source:
       address: '0x09b379B9008BF69a06A5ed8D97FEd39Bc830784E'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8699,6 +9009,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8744,7 +9056,7 @@ dataSources:
     source:
       address: '0x827D4f4f92281690aD0591aFa0F90450A785199F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8755,6 +9067,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8800,7 +9114,7 @@ dataSources:
     source:
       address: '0xF68536DA80F58c3dEF57fB06ADA7998a1E2Cee97'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8811,6 +9125,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8856,7 +9172,7 @@ dataSources:
     source:
       address: '0x8c5E402F3F43958Ecb83b10aD9bE98Fd026C52c6'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8867,6 +9183,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8912,7 +9230,7 @@ dataSources:
     source:
       address: '0xcd170fa0C80Ea060a9Df6bf91BfF24cBDC4e0f30'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8923,6 +9241,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -8968,7 +9288,7 @@ dataSources:
     source:
       address: '0xf2F5C13686b79b92dC73F6Bb1D2663329658EC87'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -8979,6 +9299,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9024,7 +9346,7 @@ dataSources:
     source:
       address: '0x21a9b464DAD1c10985eB8B735A3918fFf24034bc'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9035,6 +9357,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9080,7 +9404,7 @@ dataSources:
     source:
       address: '0xF8f071033bfF4100B4b010cE11F95c95950F69b6'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9091,6 +9415,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9136,7 +9462,7 @@ dataSources:
     source:
       address: '0x0F5cdA7EaFC6dc0D10a131c9BD946C1F6634F9d0'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9147,6 +9473,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9192,7 +9520,7 @@ dataSources:
     source:
       address: '0x1Fb8021FcAB1b54B3f2C6D9D8562DC16CF1fAe21'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9203,6 +9531,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9248,7 +9578,7 @@ dataSources:
     source:
       address: '0xB63e910A2DcD6362f7F631542a700C3139b6185a'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9259,6 +9589,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9304,7 +9636,7 @@ dataSources:
     source:
       address: '0x0603141F2D39264BCE263a2107fA2045cC435b47'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9315,6 +9647,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9360,7 +9694,7 @@ dataSources:
     source:
       address: '0xeBD96C075Eb7D2a968b4479aA1CC9b2808e0029e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9371,6 +9705,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9416,7 +9752,7 @@ dataSources:
     source:
       address: '0xa7377CDb25BfA2889B6e4c9463Cd0858A57aB315'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9427,6 +9763,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9472,7 +9810,7 @@ dataSources:
     source:
       address: '0xEccBDD3fA855c75eD0D7Dbd8E24aAFcde62a81ce'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9483,6 +9821,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9528,7 +9868,7 @@ dataSources:
     source:
       address: '0xA82b0a53Dc044C7B885D32FA4EEaA4FeD7528773'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9539,6 +9879,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9584,7 +9926,7 @@ dataSources:
     source:
       address: '0x46FfF3f004afeE180CF96cCa92560a94A696044B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9595,6 +9937,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9640,7 +9984,7 @@ dataSources:
     source:
       address: '0xebcAD445f52231887c493995F4413A57c09f5f00'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9651,6 +9995,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9696,7 +10042,7 @@ dataSources:
     source:
       address: '0xE81436bdf7162e46cac9D58CfAC5ec31e9475446'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9707,6 +10053,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9752,7 +10100,7 @@ dataSources:
     source:
       address: '0x35D578CBeFf8F7A4e1c3Beed0D8CC42D71A08A27'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9763,6 +10111,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9808,7 +10158,7 @@ dataSources:
     source:
       address: '0x966fC9Ee8500b470C653c339c8fa0a68520CC3ea'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9819,6 +10169,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9864,7 +10216,7 @@ dataSources:
     source:
       address: '0x7593747a19a50451bBe6E0f1D427D4F80796f684'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9875,6 +10227,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9920,7 +10274,7 @@ dataSources:
     source:
       address: '0x1a09FD524D6a7c99903648Bfa8535D43B4F215c2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9931,6 +10285,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -9976,7 +10332,7 @@ dataSources:
     source:
       address: '0x47c1772E850F627Bf41f52e44219d9bDab66D963'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -9987,6 +10343,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10032,7 +10390,7 @@ dataSources:
     source:
       address: '0x18c52B6dCe0D65ddB2F9EB482163956a28818C18'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10043,6 +10401,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10088,7 +10448,7 @@ dataSources:
     source:
       address: '0x401Fa12777e303CBbFa0Ce8c95014d3CA1ee02c0'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10099,6 +10459,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10144,7 +10506,7 @@ dataSources:
     source:
       address: '0xaf9DD4c1d755402868fFE2A0B7C0E8a6664a0f2F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10155,6 +10517,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10200,7 +10564,7 @@ dataSources:
     source:
       address: '0x8E82b1A03698d0597D3414F6CC5C57005480DEf4'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10211,6 +10575,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10256,7 +10622,7 @@ dataSources:
     source:
       address: '0xE91262c6Cf7B28948EF6f8a6B554758791c31340'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10267,6 +10633,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10312,7 +10680,7 @@ dataSources:
     source:
       address: '0xC0F43f3d242fEDd9FD82e5a5856E577d908a083A'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10323,6 +10691,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10368,7 +10738,7 @@ dataSources:
     source:
       address: '0x156463c7a644726994b658B5164edA0B6D68544E'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10379,6 +10749,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10424,7 +10796,7 @@ dataSources:
     source:
       address: '0x038A80FA19191FF6A1788cEb6f503FB0FDf83aE8'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10435,6 +10807,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10480,7 +10854,7 @@ dataSources:
     source:
       address: '0x23679B038eb6f090f9b0f121A1F29b7cA3993F77'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10491,6 +10865,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10536,7 +10912,7 @@ dataSources:
     source:
       address: '0x1C5e120604537B44B635f9c932A26Abf7bb97E4E'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10547,6 +10923,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10592,7 +10970,7 @@ dataSources:
     source:
       address: '0x107711a7f61c2867B72E0Dd926755dDeEe75F9f0'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10603,6 +10981,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10648,7 +11028,7 @@ dataSources:
     source:
       address: '0xea025B73A536F876d63022629B1d4a2271556056'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10659,6 +11039,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10704,7 +11086,7 @@ dataSources:
     source:
       address: '0x0B7FEA4506006f1bA0718585cFAb638424A86d94'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10715,6 +11097,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10760,7 +11144,7 @@ dataSources:
     source:
       address: '0x6a440102015bf4D81D56fBc2fd4F27797D183931'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10771,6 +11155,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10816,7 +11202,7 @@ dataSources:
     source:
       address: '0xcb6e386Ad643a6D77C940BF69303cEBD34c04757'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10827,6 +11213,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10872,7 +11260,7 @@ dataSources:
     source:
       address: '0x0D62f1b1BF511E155e357184dcfC1e8D54B41a5f'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10883,6 +11271,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10928,7 +11318,7 @@ dataSources:
     source:
       address: '0xb15B8E50b79b4D6723DC297aD6313B9Dc3c51Db3'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10939,6 +11329,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -10984,7 +11376,7 @@ dataSources:
     source:
       address: '0x12B5EC1cFa07732540F3d9D4eCF040328bc1EEdC'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -10995,6 +11387,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11040,7 +11434,7 @@ dataSources:
     source:
       address: '0x1885b6281Ff3F43df54bD61513B80b6fd64B45aC'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11051,6 +11445,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11096,7 +11492,7 @@ dataSources:
     source:
       address: '0x4b0e4CDEA00C90F786bd817751159f46EA38A58D'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11107,6 +11503,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11152,7 +11550,7 @@ dataSources:
     source:
       address: '0xD208C42cd08a5CaD8C53add2365153e8e24EbdF9'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11163,6 +11561,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11208,7 +11608,7 @@ dataSources:
     source:
       address: '0x53F816063523D9883C83863CbD5D8EAF9Ffc4641'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11219,6 +11619,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11264,7 +11666,7 @@ dataSources:
     source:
       address: '0x5c912a5C6ABFa927E8104f48dCFf4C97900426ec'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11275,6 +11677,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11320,7 +11724,7 @@ dataSources:
     source:
       address: '0x5F8e043670412e2C8Eb2A01f6382Faf91922BfF8'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11331,6 +11735,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11376,7 +11782,7 @@ dataSources:
     source:
       address: '0x4E0e85692b239e57128103b4Ad6f39Ac3BBE0c15'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11387,6 +11793,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11432,7 +11840,7 @@ dataSources:
     source:
       address: '0x3777a06B71B2Aaf105e855693C56768117712B6F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11443,6 +11851,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11488,7 +11898,7 @@ dataSources:
     source:
       address: '0x55a10618c7E9489ceE047705cD003df6d9e09195'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11499,6 +11909,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11544,7 +11956,7 @@ dataSources:
     source:
       address: '0x8136C5EE816fD80b80C9679e785F37EBdf2199eE'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11555,6 +11967,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11600,7 +12014,7 @@ dataSources:
     source:
       address: '0x099CE8F12D9824F7441950759d2999022b717ff2'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11611,6 +12025,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11656,7 +12072,7 @@ dataSources:
     source:
       address: '0x2ABB0ea3A5C038f60E677Bf14d2F6095786650Ae'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11667,6 +12083,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11712,7 +12130,7 @@ dataSources:
     source:
       address: '0x92E586d7dB14483C103c2e0FE6A596F8b55DA752'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11723,6 +12141,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11768,7 +12188,7 @@ dataSources:
     source:
       address: '0x441b8Ad6Cfa6707E7A8F1398c2067996611fbc66'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11779,6 +12199,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11824,7 +12246,7 @@ dataSources:
     source:
       address: '0x3bb6D727622A35816916C3e04920ADd7800BAB0E'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11835,6 +12257,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11880,7 +12304,7 @@ dataSources:
     source:
       address: '0xE4cd42e17bbc54455c5855eCF4Bd46D51dA5133C'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11891,6 +12315,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11936,7 +12362,7 @@ dataSources:
     source:
       address: '0x7fB420eB7D5B19131f40E8D0422202cF0B46d458'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -11947,6 +12373,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -11992,7 +12420,7 @@ dataSources:
     source:
       address: '0xeb38761E6b58Bb9acB4F52077d9eEbFf7D0248Bd'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12003,6 +12431,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12048,7 +12478,7 @@ dataSources:
     source:
       address: '0x98F332EC4D39fB943080813B381b88D57b432124'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12059,6 +12489,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12104,7 +12536,7 @@ dataSources:
     source:
       address: '0x6cBaEBC1333E72206FC326e810972D28f8250485'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12115,6 +12547,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12160,7 +12594,7 @@ dataSources:
     source:
       address: '0xa3c2E189a3c809a04d52DD1FfF1610439798887c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12171,6 +12605,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12216,7 +12652,7 @@ dataSources:
     source:
       address: '0xa425DeadFf443f3574F02585CE5154BBd5D14213'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12227,6 +12663,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12272,7 +12710,7 @@ dataSources:
     source:
       address: '0xA9319b8F327dBB744c63e6b9FfaDf9A93C30687c'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12283,6 +12721,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12328,7 +12768,7 @@ dataSources:
     source:
       address: '0x658F5577b5a161A4aC2F0bb513af49ece812f077'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12339,6 +12779,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12384,7 +12826,7 @@ dataSources:
     source:
       address: '0x05b6e52227985C401eDd5d1635DcEa204857a81d'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12395,6 +12837,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12440,7 +12884,7 @@ dataSources:
     source:
       address: '0x1848FBA9Ac7B4783F513d336171037941a637c55'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12451,6 +12895,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12496,7 +12942,7 @@ dataSources:
     source:
       address: '0xc231e28ceC2C44E774d40499CE255843CAF35E1e'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12507,6 +12953,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12552,7 +13000,7 @@ dataSources:
     source:
       address: '0x83c6e9C6119D0a7C1ac4fF86b970e54278140D45'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12563,6 +13011,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12608,7 +13058,7 @@ dataSources:
     source:
       address: '0x402ee2A54138465D19EFdEFA60c1d9ffDFfF41eC'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12619,6 +13069,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12664,7 +13116,7 @@ dataSources:
     source:
       address: '0x736Ea4A3a0143986B8cc8bCcD077F93052231996'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12675,6 +13127,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12720,7 +13174,7 @@ dataSources:
     source:
       address: '0xB682a2F1e6C87819e9aDEdBe366548B59Ab122E8'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12731,6 +13185,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12776,7 +13232,7 @@ dataSources:
     source:
       address: '0xaEaF5294Cc6FAcB023c0999A0b1786C4C0b3d520'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12787,6 +13243,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12832,7 +13290,7 @@ dataSources:
     source:
       address: '0x9e6d524b000066e60284E2Ee14437d071B6b498F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12843,6 +13301,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12888,7 +13348,7 @@ dataSources:
     source:
       address: '0x9E75f8298e458B76382870982788988A0799195b'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12899,6 +13359,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -12944,7 +13406,7 @@ dataSources:
     source:
       address: '0x6677c03B2c7Da09dfbD869daeec3ccFd4eCC4B5F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -12955,6 +13417,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13000,7 +13464,7 @@ dataSources:
     source:
       address: '0xc7506185DD847346B34e495C3Ffd8F9d34824F5F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13011,6 +13475,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13056,7 +13522,7 @@ dataSources:
     source:
       address: '0xd8d7DB8272C02fcf784a6794b4e51647258c0660'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13067,6 +13533,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13112,7 +13580,7 @@ dataSources:
     source:
       address: '0x57FdEB65b71e6aD212088E63E85825e314F2Ea62'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13123,6 +13591,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13168,7 +13638,7 @@ dataSources:
     source:
       address: '0x8F755873546F4D0EDf7d41fF8604C8A632113eB7'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13179,6 +13649,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13224,7 +13696,7 @@ dataSources:
     source:
       address: '0xb29cCE04365400409d476e95410547275D1F86Cf'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13235,6 +13707,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13280,7 +13754,7 @@ dataSources:
     source:
       address: '0x4Dcbd7A18d04343aFa534f945ad13E096ebd9Ae1'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13291,6 +13765,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13336,7 +13812,7 @@ dataSources:
     source:
       address: '0xCF0354f8dAB741b889e753cCe1656327fe6ce474'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13347,6 +13823,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13392,7 +13870,7 @@ dataSources:
     source:
       address: '0x5FCcFcd07D03FfdDa3A560d3af15d2bd7AaeE21d'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13403,6 +13881,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13448,7 +13928,7 @@ dataSources:
     source:
       address: '0x0536984a70BE296A35feD83DC8fF5d30338AbeA1'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13459,6 +13939,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13504,7 +13986,7 @@ dataSources:
     source:
       address: '0xe1B9EB8eAf3F278800AcE13a815DDdc24673F0C6'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13515,6 +13997,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13560,7 +14044,7 @@ dataSources:
     source:
       address: '0x5E70Ad3438Fe87e0ec89CF15a53aFb2caC39cC6C'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13571,6 +14055,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13616,7 +14102,7 @@ dataSources:
     source:
       address: '0x57b3D28fe4824d42c1F8d2786B89bC89e8c68d66'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13627,6 +14113,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13672,7 +14160,7 @@ dataSources:
     source:
       address: '0x71e2c040F3B9670C693215509A0c0846D221756a'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13683,6 +14171,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13728,7 +14218,7 @@ dataSources:
     source:
       address: '0xB982421883c5c022181b67cBC6b4709A564A6728'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13739,6 +14229,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13784,7 +14276,7 @@ dataSources:
     source:
       address: '0x170712B04A24FdBCC021Dd461Afd048c8cF2348d'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13795,6 +14287,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13840,7 +14334,7 @@ dataSources:
     source:
       address: '0xc4cb1Dc51eAD37fD19d0C24EC6136Dbb639789cA'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13851,6 +14345,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13896,7 +14392,7 @@ dataSources:
     source:
       address: '0xB4cc236af16e8FBEf8600C2D482901E84AB723c4'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13907,6 +14403,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -13952,7 +14450,7 @@ dataSources:
     source:
       address: '0x8A8E3aBAb418671bdb7A47E45d2Fcd7726e46D74'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -13963,6 +14461,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14008,7 +14508,7 @@ dataSources:
     source:
       address: '0xa54e6dc91FCb22a24437e8650266BfE9590a2820'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14019,6 +14519,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14064,7 +14566,7 @@ dataSources:
     source:
       address: '0xfb7344a4cF25CDe5aaF6415107a8deF769FC200B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14075,6 +14577,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14120,7 +14624,7 @@ dataSources:
     source:
       address: '0xa5487C4eECDc72742b1704f4C6C89b92850f460B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14131,6 +14635,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14176,7 +14682,7 @@ dataSources:
     source:
       address: '0x0BF58A328C7739D8b097B1d4199f48AA3F1b2788'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14187,6 +14693,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14232,7 +14740,7 @@ dataSources:
     source:
       address: '0x089eb06FF6b02155580a9Be04FF117387829ABEF'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14243,6 +14751,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14288,7 +14798,7 @@ dataSources:
     source:
       address: '0x470052FEd23A2887e3e679c3D8544529DA8B272f'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14299,6 +14809,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14344,7 +14856,7 @@ dataSources:
     source:
       address: '0xc1C1eB984218B9570beA53C0Dad14283a6E9E81C'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14355,6 +14867,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14400,7 +14914,7 @@ dataSources:
     source:
       address: '0x88F2ADA49F24fF14005633e66050f763b2E07b7f'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14411,6 +14925,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14456,7 +14972,7 @@ dataSources:
     source:
       address: '0x06A1f520555222758eaE4dA0573351FdaD1e7843'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14467,6 +14983,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14512,7 +15030,7 @@ dataSources:
     source:
       address: '0xDC73067A6E2c6BEE8e5BC0d916b84A95b5B3cA4B'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14523,6 +15041,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14568,7 +15088,7 @@ dataSources:
     source:
       address: '0x0B2798c89EfeC9BcFB7730e7A42c75ce6D5b6254'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14579,6 +15099,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14624,7 +15146,7 @@ dataSources:
     source:
       address: '0x3E96fb641967F9A8fBa8DdAcf19d11790A264C44'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14635,6 +15157,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14680,7 +15204,7 @@ dataSources:
     source:
       address: '0x2BDA70d1DcE6b0855e812daaBB096F3DaaEBd4Bc'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14691,6 +15215,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14736,7 +15262,7 @@ dataSources:
     source:
       address: '0xeC94C5F7b9dcAe393D4Ab87821eAd4e934d89619'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14747,6 +15273,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14792,7 +15320,7 @@ dataSources:
     source:
       address: '0xe14bA7aa3f5c76c3B77a5F8a29B1aB9CCB11b9F5'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14803,6 +15331,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14848,7 +15378,7 @@ dataSources:
     source:
       address: '0xD621e3Bb2Aa579E4D41A998dE119b4F85f190428'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14859,6 +15389,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14904,7 +15436,7 @@ dataSources:
     source:
       address: '0xb0F9c6FBcfE226EEAD3AE8b019ce4666cE223a78'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14915,6 +15447,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -14960,7 +15494,7 @@ dataSources:
     source:
       address: '0xA338D34c5de06B88197609956a2dEAAfF7Af46c8'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -14971,6 +15505,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json
@@ -15016,7 +15552,7 @@ dataSources:
     source:
       address: '0xf6fD90FE8f057a63F0368B0B551D5e52C7Ae821F'
       abi: BeefyStrategy
-      startBlock: 13500000
+      startBlock: 23900000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -15027,6 +15563,8 @@ dataSources:
         - Deposit
         - Withdraw
         - YieldAggregator
+        - VaultDailySnapshot
+        - VaultHourlySnapshot
       abis:
         - name: BeefyStrategy
           file: ./abis/BeefyStrategy.json

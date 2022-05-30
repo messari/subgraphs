@@ -5,7 +5,7 @@
     "test": "graph test",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ beefy-finance",
+    "deploy": "graph deploy --product hosted-service RiccardoGalbusera/beefy-finance",
     "create-local": "graph create --node http://localhost:8020/ beefy-finance",
     "remove-local": "graph remove --node http://localhost:8020/ beefy-finance",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 beefy-finance",

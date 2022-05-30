@@ -1,4 +1,4 @@
-import { BigDecimal, Address } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault } from "../../generated/schema";
 import {
@@ -15,6 +15,12 @@ import {
 import { getAddressFromId } from "../utils/helpers";
 import { createDeposit, getOrCreateFirstDeposit } from "./deposit";
 import { createWithdraw, getOrCreateFirstWithdraw } from "./withdraw";
+import {
+  updateVaultDailySnapshot,
+  updateVaultHourlySnapshot,
+} from "../utils/snapshots";
+import { fetchTokenName, fetchTokenSymbol } from "./token";
+import { BIGINT_ZERO } from "../prices/common/constants";
 
 const NETWORK_SUFFIX: string = "-137";
 
@@ -31,8 +37,8 @@ export function createVaultFromStrategy(
   const vaultContract = BeefyVault.bind(vaultAddress);
 
   vault.protocol = getBeefyFinanceOrCreate().id;
-  vault.name = vaultContract.name();
-  vault.symbol = vaultContract.symbol();
+  vault.name = fetchTokenName(vaultAddress);
+  vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHexString() + NETWORK_SUFFIX;
 
   vault.inputToken = getTokenOrCreate(
@@ -44,13 +50,30 @@ export function createVaultFromStrategy(
   vault.createdTimestamp = currentBlock.timestamp;
   vault.createdBlockNumber = currentBlock.number;
 
-  vault.inputTokenBalance = vaultContract.balance();
-  vault.outputTokenSupply = vaultContract.totalSupply();
-
-  vault.pricePerShare = vaultContract.getPricePerFullShare();
+  let call = vaultContract.try_balance();
+  if (call.reverted) {
+    vault.inputTokenBalance = BIGINT_ZERO;
+  } else {
+    vault.inputTokenBalance = call.value;
+  }
+  call = vaultContract.try_totalSupply();
+  if (call.reverted) {
+    vault.outputTokenSupply = BIGINT_ZERO;
+  } else {
+    vault.outputTokenSupply = call.value;
+  }
+  call = vaultContract.try_getPricePerFullShare();
+  if (call.reverted) {
+    vault.pricePerShare = BIGINT_ZERO;
+  } else {
+    vault.pricePerShare = call.value;
+  }
 
   vault.deposits = [getOrCreateFirstDeposit(vault).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
+
+  vault.dailySnapshots = [updateVaultDailySnapshot(currentBlock, vault).id];
+  vault.hourlySnapshots = [updateVaultHourlySnapshot(currentBlock, vault).id];
 
   vault.save();
   return vault;
@@ -64,7 +87,6 @@ export function handleDeposit(event: Deposit): void {
   );
 
   const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-  //updateVault(vault);
   const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
 
   if (vault.deposits[0] === "MockDeposit" + vault.id) {
@@ -73,7 +95,7 @@ export function handleDeposit(event: Deposit): void {
     vault.deposits = vault.deposits.concat([deposit.id]);
   }
 
-  vault.save();
+  updateVaultAndSave(vault, event.block);
 }
 
 export function handleWithdraw(event: Withdraw): void {
@@ -83,7 +105,6 @@ export function handleWithdraw(event: Withdraw): void {
     NETWORK_SUFFIX
   );
   const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
-
   const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
 
   if (vault.withdraws[0] === "MockWithdraw" + vault.id) {
@@ -92,13 +113,41 @@ export function handleWithdraw(event: Withdraw): void {
     vault.withdraws = vault.withdraws.concat([withdraw.id]);
   }
 
-  vault.save();
+  updateVaultAndSave(vault, event.block);
 }
 
-export function updateVault(vault: Vault): Vault {
+export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   const vaultContract = BeefyVault.bind(getAddressFromId(vault.id));
-  vault.inputTokenBalance = vaultContract.balance();
-  vault.outputTokenSupply = vaultContract.totalSupply();
-  vault.pricePerShare = vaultContract.getPricePerFullShare();
-  return vault;
+  let call = vaultContract.try_balance();
+  if (call.reverted) {
+    vault.inputTokenBalance = BIGINT_ZERO;
+  } else {
+    vault.inputTokenBalance = call.value;
+  }
+  call = vaultContract.try_totalSupply();
+  if (call.reverted) {
+    vault.outputTokenSupply = BIGINT_ZERO;
+  } else {
+    vault.outputTokenSupply = call.value;
+  }
+  call = vaultContract.try_getPricePerFullShare();
+  if (call.reverted) {
+    vault.pricePerShare = BIGINT_ZERO;
+  } else {
+    vault.pricePerShare = call.value;
+  }
+
+  const dailySnapshot = updateVaultDailySnapshot(block, vault);
+  if (
+    vault.dailySnapshots[vault.dailySnapshots.length - 1] !== dailySnapshot.id
+  )
+    vault.dailySnapshots = vault.dailySnapshots.concat([dailySnapshot.id]);
+  const hourlySnapshot = updateVaultHourlySnapshot(block, vault);
+  if (
+    vault.hourlySnapshots[vault.hourlySnapshots.length - 1] !==
+    hourlySnapshot.id
+  )
+    vault.hourlySnapshots = vault.hourlySnapshots.concat([hourlySnapshot.id]);
+
+  vault.save();
 }

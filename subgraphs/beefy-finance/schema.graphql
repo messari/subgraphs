@@ -239,11 +239,11 @@ type Vault @entity {
 
   ##### Snapshots #####
 
-  #" Vault daily snapshots "
-  #dailySnapshots: [VaultDailySnapshot!]! @derivedFrom(field: "vault")
+  " Vault daily snapshots "
+  dailySnapshots: [VaultDailySnapshot!]!
 
-  #" Vault hourly snapshots "
-  #hourlySnapshots: [VaultHourlySnapshot!]! @derivedFrom(field: "vault")
+  " Vault hourly snapshots "
+  hourlySnapshots: [VaultHourlySnapshot!]!
 
   ##### Events #####
 
@@ -252,6 +252,92 @@ type Vault @entity {
 
   " All withdrawals made from this Vault "
   withdraws: [Withdraw!]!
+}
+
+#################################
+##### Pool-Level Timeseries #####
+#################################
+
+type VaultDailySnapshot @entity {
+  " { Smart contract address of the vault }-{ # of days since Unix epoch time } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: YieldAggregator!
+
+  " The vault this snapshot belongs to "
+  vault: Vault!
+
+  " Current TVL (Total Value Locked) of this pool in USD "
+  totalValueLockedUSD: BigDecimal
+
+  " Amount of input token in the pool "
+  inputTokenBalance: BigInt!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
+  pricePerShare: BigInt
+
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+}
+
+type VaultHourlySnapshot @entity {
+  " { Smart contract address of the vault }-{ # of hours since Unix epoch time } "
+  id: ID!
+
+  " The protocol this snapshot belongs to "
+  protocol: YieldAggregator!
+
+  " The vault this snapshot belongs to "
+  vault: Vault!
+
+  " Current TVL (Total Value Locked) of this pool in USD "
+  totalValueLockedUSD: BigDecimal
+
+  " Amount of input token in the pool "
+  inputTokenBalance: BigInt!
+
+  " Total supply of output token "
+  outputTokenSupply: BigInt
+
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
+
+  " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
+  pricePerShare: BigInt
+
+  " Total supply of output tokens that are staked (usually in the MasterChef contract). Used to calculate reward APY. "
+  stakedOutputTokenAmount: BigInt
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
 }
 
 ##################################
@@ -279,11 +365,11 @@ interface Event {
   " The protocol this transaction belongs to "
   protocol: YieldAggregator!
 
-  #" Address that received tokens "
-  #to: String!
+  " Address that received tokens "
+  to: String!
 
-  #" Address that sent tokens "
-  #from: String!
+  " Address that sent tokens "
+  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -305,11 +391,11 @@ type Deposit implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: YieldAggregator!
 
-  #" Market that tokens are deposited into "
-  #to: String!
+  " Market that tokens are deposited into "
+  to: String!
 
-  #" Address that deposited tokens "
-  #from: String!
+  " Address that deposited tokens "
+  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
@@ -343,11 +429,11 @@ type Withdraw implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: YieldAggregator!
 
-  #" Address that received tokens "
-  #to: String!
+  " Address that received tokens "
+  to: String!
 
-  #" Market that tokens are withdrawn from "
-  #from: String!
+  " Market that tokens are withdrawn from "
+  from: String!
 
   " Block number of this event "
   blockNumber: BigInt!
