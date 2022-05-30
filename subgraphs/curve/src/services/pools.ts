@@ -103,7 +103,11 @@ export function createNewFactoryPool( // @ts-ignore
       log.error("factoryPoolCall.reverted for factory {}", [factoryContract.toHexString()]);
       return;
     }
-    factoryPool = factoryPoolCall.value;
+    factoryPool =  factoryPoolCall.value;
+    if (factoryPool == ADDRESS_ZERO) {
+      log.error("factoryPool is zero for factory {} at count {}", [factoryContract.toHexString(),poolCount.toString()]);
+      return;
+    }
     let gaugeCall = factory.try_get_gauge(factoryPool);
     if (!gaugeCall.reverted) {
       gauge = gaugeCall.value;

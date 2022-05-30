@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts/index";
+import { Address, log, Bytes, BigInt } from "@graphprotocol/graph-ts/index";
 import {
   Batch_set_liquidity_gaugesCall,
   CryptoRegistry,
@@ -20,51 +20,68 @@ import { setGaugeData } from "./services/gauges/helpers";
 import { LiquidityGaugeDeployed } from "../generated/templates/CryptoFactoryTemplate/CryptoFactory";
 import { ZERO_ADDRESS } from "./common/constants";
 
-export function handleCryptoPoolAdded(event: PoolAdded): void {
-  log.debug("New V2 factory crypto pool {} deployed at {}", [
-    event.params.pool.toHexString(),
-    event.transaction.hash.toHexString(),
-  ]);
-  const cryptoRegistryAddress = event.address;
-  const pool = event.params.pool;
-  let cryptoRegistry = CryptoRegistry.bind(cryptoRegistryAddress);
+export function addCryptoRegistryPool(pool: Address,
+                                      registry: Address,
+                                      block: BigInt,
+                                      timestamp: BigInt,
+                                      hash: Bytes): void {
+
+  log.debug('New V2 factory crypto pool {} deployed at {}', [
+    pool.toHexString(),
+    hash.toHexString(),
+  ])
+  let cryptoRegistry = CryptoRegistry.bind(registry);
   let gauge = ADDRESS_ZERO;
   let gaugeCall = cryptoRegistry.try_get_gauges(pool);
   if (!gaugeCall.reverted) {
     gauge = gaugeCall.value.value0[0];
   }
   // Useless for now, but v2 metapools may be a thing at some point
-  const testMetaPool = MetaPool.bind(pool);
-  const testMetaPoolResult = testMetaPool.try_base_pool();
+  const testMetaPool = MetaPool.bind(pool)
+  const testMetaPoolResult = testMetaPool.try_base_pool()
   if (!testMetaPoolResult.reverted) {
     createNewRegistryPool(
       pool,
       testMetaPoolResult.value,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       true,
       true,
       REGISTRY_V2,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      cryptoRegistryAddress,
+      registry,
     );
   } else {
     createNewRegistryPool(
       pool,
       ADDRESS_ZERO,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       false,
       true,
       REGISTRY_V2,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      cryptoRegistryAddress,
+      registry,
     );
   }
+}
+
+export function handleCryptoPoolAdded(event: PoolAdded): void {
+  log.debug("New V2 factory crypto pool {} deployed at {}", [
+    event.params.pool.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
+  addCryptoRegistryPool(
+    event.params.pool,
+    event.address,
+    event.block.number,
+    event.block.timestamp,
+    event.transaction.hash
+  )
 }
 
 export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {

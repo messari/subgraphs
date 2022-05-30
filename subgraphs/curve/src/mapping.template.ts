@@ -27,7 +27,7 @@ import { LiquidityGaugeDeployed, MetaPoolDeployed, PlainPoolDeployed } from '../
 import { getFactory } from './services/factory'
 import { getPlatform } from './services/platform'
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityImbalance, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
-import { NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
+import { CurveLendingPool, NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
 import { getLiquidityPool, getOrCreateToken, getPoolFee } from './common/getters'
 import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, Network, ZERO_ADDRESS } from './common/constants'
 import { bigIntToBigDecimal } from './common/utils/numbers'
@@ -35,11 +35,12 @@ import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, u
 import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
 import { setGaugeData } from './services/gauges/helpers'
 import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
+import { catchUp } from './services/catchup'
 {{{ importExistingMetaPools }}}
 {{{ importCatchupFunction }}}
 
 
-export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt): void {
+export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt, timestamp: BigInt, hash: Bytes): void {
   const platform = getPlatform()
   if (!platform.catchup && (block > CATCHUP_BLOCK)) {
     platform.catchup = true
@@ -53,6 +54,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       mainRegistry = new Registry(addedAddress.toHexString())
       mainRegistry.save()
       RegistryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, false, 1, block, timestamp, hash)
+      }
     }
   } else if (providedId == BigInt.fromString('3')) {
     let stableFactory = Factory.load(addedAddress.toHexString())
@@ -61,6 +65,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       stableFactory = getFactory(addedAddress, 1)
       stableFactory.save()
       StableFactoryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, true, 1, block, timestamp, hash)
+      }
     }
   } else if (providedId == BigInt.fromString('5')) {
     let cryptoRegistry = Registry.load(addedAddress.toHexString())
@@ -69,6 +76,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       cryptoRegistry = new Registry(addedAddress.toHexString())
       cryptoRegistry.save()
       CryptoRegistryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, false, 2, block, timestamp, hash)
+      }
     }
   } else if (providedId == BigInt.fromString('6')) {
     let cryptoFactory = Factory.load(addedAddress.toHexString())
@@ -77,6 +87,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       cryptoFactory = getFactory(addedAddress, 2)
       cryptoFactory.save()
       CryptoFactoryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, true, 2, block, timestamp, hash)
+      }
     }
   }
 }
@@ -84,13 +97,13 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
 export function handleNewAddressIdentifier(event: NewAddressIdentifier): void {
   const providedId = event.params.id
   const addedAddress = event.params.addr
-  addAddress(providedId, addedAddress, event.block.number)
+  addAddress(providedId, addedAddress, event.block.number, event.block.timestamp, event.transaction.hash)
 }
 
 export function handleAddressModified(event: AddressModified): void {
   const providedId = event.params.id
   const addedAddress = event.params.new_address
-  addAddress(providedId, addedAddress, event.block.number)
+  addAddress(providedId, addedAddress, event.block.number, event.block.timestamp, event.transaction.hash)
 }
 
 export function getLpToken(pool: Address, registryAddress: Address): Address {
@@ -138,38 +151,41 @@ export function ensureBasePoolTracking(pool: Address, eventAddress: Address, tim
   }
 }
 
-export function handleMainRegistryPoolAdded(event: PoolAdded): void {
-  const pool = event.params.pool
-  const registryAddress = event.address;
-  let mainRegistry = MainRegistry.bind(registryAddress);
+export function addRegistryPool(pool: Address,
+                                registry: Address,
+                                block: BigInt,
+                                timestamp: BigInt,
+                                hash: Bytes): void {
+  log.info('New pool {} added to registry at {}', [pool.toHexString(), hash.toHexString()])
+  let mainRegistry = MainRegistry.bind(registry);
   let gauge = ADDRESS_ZERO
   let gaugeCall = mainRegistry.try_get_gauges(pool)
   if (!gaugeCall.reverted) {
     gauge = gaugeCall.value.value0[0]
   }
-  log.info('New pool {} added to registry at {}', [pool.toHexString(), event.transaction.hash.toHexString()])
+
   if (isLendingPool(pool)) {
     // Lending pool
     log.info('New lending pool {} added from registry at {}', [
       pool.toHexString(),
-      event.transaction.hash.toHexString(),
+      hash.toHexString(),
     ])
     CurvePoolTemplate.create(pool)
-    const lpToken = getLpToken(pool, event.address)
-    let lpTokenEntity = getOrCreateToken(lpToken)
+    const lpToken = getLpToken(pool, registry)
+    const lpTokenContract = getOrCreateToken(lpToken)
     createNewPool(
       pool,
-      lpToken,
-      lpTokenEntity.name,
-      lpTokenEntity.symbol,
-      LENDING, // poolType
-      false, // is Metapool
-      false, // is V2
-      event.block.number,
-      event.block.timestamp,
-      pool, // basePool
-      gauge, // gauge address
-      registryAddress // registry
+      lpToken, // lp token
+      lpTokenContract.name, // pool name
+      lpTokenContract.symbol, // pool symbol
+      LENDING, // pool type
+      false, // is metapool
+      false, // is v2
+      block,
+      timestamp,
+      pool,
+      gauge,
+      registry
     )
   }
 
@@ -177,7 +193,7 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
   const testMetaPoolResult = testMetaPool.try_base_pool()
   const unknownMetapool = UNKNOWN_METAPOOLS.has(pool.toHexString())
   if (!testMetaPoolResult.reverted || unknownMetapool) {
-    log.info('New meta pool {} added from registry {} at {}', [pool.toHexString(), registryAddress.toHexString(), event.transaction.hash.toHexString()])
+    log.info('New meta pool {} added from registry {} at {}', [pool.toHexString(), registry.toHexString(), hash.toHexString()])
     const basePool = unknownMetapool ? UNKNOWN_METAPOOLS.get(pool.toHexString()) : testMetaPoolResult.value
     let basePoolGauge = ADDRESS_ZERO;
     let gaugeCall = mainRegistry.try_get_gauges(basePool)
@@ -187,43 +203,53 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
     // check if we're tracking the base pool
     ensureBasePoolTracking(
       basePool,
-      event.address,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      registry,
+      timestamp,
+      block,
+      hash,
       basePoolGauge
     )
     createNewRegistryPool(
       pool,
       basePool,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       true,
       EARLY_V2_POOLS.includes(pool) ? true : false,
       // on mainnet the unknown metapools are legacy metapools deployed before the
       // contract was added to the address indexer
       UNKNOWN_METAPOOLS.has(pool.toHexString()) ? {{ unknownMetapoolType }} : STABLE_FACTORY,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      registryAddress
+      registry
     )
   } else {
-    log.info('New plain pool {} added from registry at {}', [pool.toHexString(), event.transaction.hash.toHexString()])
+    log.info('New plain pool {} added from registry at {}', [pool.toHexString(), hash.toHexString()])
     createNewRegistryPool(
       pool,
       ADDRESS_ZERO,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       false,
       EARLY_V2_POOLS.includes(pool) ? true : false,
       REGISTRY_V1,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      registryAddress
+      registry
     )
   }
+}
+
+export function handleMainRegistryPoolAdded(event: PoolAdded): void {
+  addRegistryPool(
+    event.params.pool,
+    event.address,
+    event.block.number,
+    event.block.timestamp,
+    event.transaction.hash
+  )
 }
 
 export function handleTokenExchange(event: TokenExchange): void {

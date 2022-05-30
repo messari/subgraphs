@@ -84,6 +84,8 @@ dataSources:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier

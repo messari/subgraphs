@@ -1,13 +1,17 @@
+description: ...
+graft:
+  base: QmNZQBGizE6LJpCa282SRwJSgczTobQeieNnwzqNnYSRxv # Subgraph ID of base subgraph
+  block: 7636794 # Block number
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: AddressProvider
-    network: matic
+    network: avalanche
     source:
       address: "0x0000000022d53366457f9d5e68ec105046fc4383"
-      startBlock: 13549563
+      startBlock: 5209504
       abi: AddressProvider
     mapping:
       kind: ethereum/events
@@ -78,6 +82,8 @@ dataSources:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
@@ -88,7 +94,7 @@ dataSources:
 templates:
   - name: RegistryTemplate
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: MainRegistry
     mapping:
@@ -168,7 +174,7 @@ templates:
       file: ./src/mapping.ts
   - name: StableFactoryTemplate
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: StableFactory
     mapping:
@@ -249,7 +255,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoRegistryTemplate
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: CryptoRegistry
     mapping:
@@ -330,7 +336,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplate
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: CurvePool
     mapping:
@@ -423,7 +429,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoFactoryTemplate
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: CryptoFactory
     mapping:
@@ -504,7 +510,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplateV2
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: CurvePoolV2
     mapping:
@@ -589,7 +595,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurveGauge
     kind: ethereum/contract
-    network: matic
+    network: avalanche
     source:
       abi: Gauge
     mapping:

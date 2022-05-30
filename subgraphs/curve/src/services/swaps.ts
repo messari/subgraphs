@@ -32,6 +32,7 @@ export function handleExchange(
   event: ethereum.Event,
   exchangeUnderlying: boolean,
 ): void {
+  log.error('handleExchange at {}',[event.transaction.hash.toHexString()])
   const pool = LiquidityPool.load(address.toHexString());
   const txhash = event.transaction.hash.toHexString();
   if (!pool) {
