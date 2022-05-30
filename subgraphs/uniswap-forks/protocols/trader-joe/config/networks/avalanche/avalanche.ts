@@ -71,6 +71,7 @@ export class TraderJoeAvalancheConfigurations implements Configurations {
       "0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e", // USDC
       "0xc7198437980c041c805a1edcba50c1ce5db95118", // USDT.e
       "0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7", // USDT
+      "0xde3a24028580884448a5397872046a019649b084", // USDT old
     ]);
   }
   getStableOraclePools(): string[] {

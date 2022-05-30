@@ -72,6 +72,7 @@ export class SushiswapCeloConfigurations implements Configurations {
       "0xef4229c8c3250C675F21BCefa42f58EfbfF6002a", // USDC
       "0xe4fe50cdd716522a56204352f00aa110f731932d", // DAI
       "0xb020d981420744f6b0fedd22bb67cd37ce18a1d5", // USDT
+      "0x765de816845861e75a25fca122bb6898b8b1282a"  // Celo Dollar
     ]);
   }
   getStableOraclePools(): string[] {

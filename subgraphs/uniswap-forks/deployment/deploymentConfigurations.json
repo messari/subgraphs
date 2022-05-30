@@ -110,6 +110,13 @@
         "steegecs": "steegecs/trisolaris-aurora",
         "messari": "messari/trisolaris-aurora"
       }
+    },
+    "vvs-finance": {
+      "cronos": {
+        "template": "vvs.finance.template.yaml",
+        "steegecs": "steegecs/trisolaris-aurora",
+        "messari": "messari/trisolaris-aurora"
+      }
     }
   }
 }
