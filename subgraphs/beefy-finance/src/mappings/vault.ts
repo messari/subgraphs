@@ -1,6 +1,6 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
-import { Vault } from "../../generated/schema";
+import { Vault, VaultFee } from "../../generated/schema";
 import {
   BeefyStrategy,
   Deposit,
@@ -20,7 +20,11 @@ import {
   updateVaultHourlySnapshot,
 } from "../utils/snapshots";
 import { fetchTokenName, fetchTokenSymbol } from "./token";
-import { BIGINT_ZERO } from "../prices/common/constants";
+import {
+  BIGDECIMAL_HUNDRED,
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+} from "../prices/common/constants";
 
 const NETWORK_SUFFIX: string = "-137";
 
@@ -46,6 +50,8 @@ export function createVaultFromStrategy(
     NETWORK_SUFFIX
   ).id;
   vault.outputToken = getTokenOrCreate(vaultAddress, NETWORK_SUFFIX).id;
+
+  vault.fees = getFees(vault.id, strategyContract);
 
   vault.createdTimestamp = currentBlock.timestamp;
   vault.createdBlockNumber = currentBlock.number;
@@ -150,4 +156,51 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
     vault.hourlySnapshots = vault.hourlySnapshots.concat([hourlySnapshot.id]);
 
   vault.save();
+}
+
+export function getFees(
+  vaultId: string,
+  strategyContract: BeefyStrategy
+): string[] {
+  const strategistFee = new VaultFee("STRATEGIST_FEE" + vaultId);
+  let call = strategyContract.try_STRATEGIST_FEE();
+  if (call.reverted) {
+    strategistFee.feePercentage = BIGDECIMAL_ZERO;
+  } else {
+    strategistFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
+  }
+  strategistFee.feeType = "STRATEGIST_FEE";
+  strategistFee.save();
+
+  const withdrawalFee = new VaultFee("WITHDRAWAL_FEE" + vaultId);
+  call = strategyContract.try_withdrawalFee();
+  if (call.reverted) {
+    withdrawalFee.feePercentage = BIGDECIMAL_ZERO;
+  } else {
+    withdrawalFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
+  }
+  withdrawalFee.feeType = "WITHDRAWAL_FEE";
+  withdrawalFee.save();
+
+  const callFee = new VaultFee("MANAGEMENT_FEE" + vaultId);
+  call = strategyContract.try_callFee();
+  if (call.reverted) {
+    callFee.feePercentage = BIGDECIMAL_ZERO;
+  } else {
+    callFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
+  }
+  callFee.feeType = "MANAGEMENT_FEE";
+  callFee.save();
+
+  const beefyFee = new VaultFee("PERFORMANCE_FEE" + vaultId);
+  call = strategyContract.try_beefyFee();
+  if (call.reverted) {
+    beefyFee.feePercentage = BIGDECIMAL_ZERO;
+  } else {
+    beefyFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
+  }
+  beefyFee.feeType = "PERFORMANCE_FEE";
+  beefyFee.save();
+
+  return [strategistFee.id, withdrawalFee.id, callFee.id, beefyFee.id];
 }

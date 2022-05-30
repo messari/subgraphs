@@ -33,6 +33,7 @@ function createDataSource(contractName, contractAddress, startBlock) {
         "YieldAggregator",
         "VaultDailySnapshot",
         "VaultHourlySnapshot",
+        "VaultFee",
       ],
       abis: [
         {
@@ -256,9 +257,7 @@ async function bootstrap() {
         MONITORED_VAULTS
     You can now deploy your subgraph and start indexing :)
     Run: 
-        graph deploy --studio <your_sub_graph_slug>
-                    OR
-        graph deploy --hosted <your_sub_graph_slug>
+        yarn deploy
 `.replace("MONITORED_VAULTS", monitoredVaults.join(", "))
   );
 }
