@@ -50,7 +50,7 @@ export function createDepositTransaction(
     depositTransaction.amount = amount;
     depositTransaction.amountUSD = amountUSD;
 
-    depositTransaction.timestamp = utils.getTimestampInMillis(block);
+    depositTransaction.timestamp = block.timestamp;
     depositTransaction.blockNumber = block.number;
 
     depositTransaction.save();
@@ -70,10 +70,19 @@ export function _Deposit(
   const vaultContract = VaultContract.bind(vaultAddress);
   const protocol = getOrCreateYieldAggregator();
 
-  // calculate shares minted as per the deposit function in vault contract address
-  let sharesMinted = vault.outputTokenSupply.isZero()
-    ? depositAmount
-    : depositAmount.times(vault.outputTokenSupply).div(vault.inputTokenBalance);
+  let sharesMinted: BigInt;
+  if (vaultAddress.equals(constants.ANGLE_USDC_VAULT_ADDRESS)) {
+    sharesMinted = utils
+      .readValue<BigInt>(vaultContract.try_totalSupply(), constants.BIGINT_ZERO)
+      .minus(vault.outputTokenSupply);
+  } else {
+    // calculate shares minted as per the deposit function in vault contract address
+    sharesMinted = vault.outputTokenSupply.isZero()
+      ? depositAmount
+      : depositAmount
+          .times(vault.outputTokenSupply)
+          .div(vault.inputTokenBalance);
+  }
 
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
@@ -91,10 +100,11 @@ export function _Deposit(
   vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
   vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.plus(depositAmountUSD);
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
-    depositAmountUSD
-  );
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
@@ -121,6 +131,7 @@ export function _Deposit(
   protocol.save();
   vault.save();
 
+  utils.updateProtocolTotalValueLockedUSD();
   createDepositTransaction(
     to,
     vaultAddress,
@@ -131,8 +142,7 @@ export function _Deposit(
     depositAmountUSD
   );
 
-
-  log.info(
+  log.warning(
     "[Deposit] TxHash: {}, vaultAddress: {}, _sharesMinted: {}, _depositAmount: {}",
     [
       transaction.hash.toHexString(),
