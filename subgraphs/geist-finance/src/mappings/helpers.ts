@@ -579,12 +579,6 @@ export function updateFinancialsDailySnapshot(
     );
 
     if (previousFinancialsDailySnapshot) {
-      financialsDailySnapshot.totalBorrowBalanceUSD = financialsDailySnapshot.totalBorrowBalanceUSD.plus(
-        previousFinancialsDailySnapshot.totalBorrowBalanceUSD
-      );
-      financialsDailySnapshot.totalDepositBalanceUSD = financialsDailySnapshot.totalDepositBalanceUSD.plus(
-        previousFinancialsDailySnapshot.totalDepositBalanceUSD
-      );
       financialsDailySnapshot.cumulativeBorrowUSD = financialsDailySnapshot.cumulativeBorrowUSD.plus(
         previousFinancialsDailySnapshot.cumulativeBorrowUSD
       );
@@ -610,7 +604,6 @@ export function updateFinancialsDailySnapshot(
     [financialsDailySnapshot.id, event.transaction.hash.toHexString()]
   );
   financialsDailySnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialsDailySnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
 
   financialsDailySnapshot.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD;
@@ -623,6 +616,7 @@ export function updateFinancialsDailySnapshot(
 
   financialsDailySnapshot.blockNumber = event.block.number;
   financialsDailySnapshot.timestamp = event.block.timestamp;
+  financialsDailySnapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
   financialsDailySnapshot.save();
   return financialsDailySnapshot as FinancialsDailySnapshot;
 }
@@ -960,6 +954,5 @@ export function updateTVL(
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
     market.totalValueLockedUSD
   );
-  protocol.cumulativeDepositUSD = protocol.totalValueLockedUSD;
   protocol.save();
 }

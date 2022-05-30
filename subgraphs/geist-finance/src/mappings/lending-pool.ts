@@ -155,6 +155,7 @@ export function handleDeposit(event: Deposit): void {
   updateTVL(hash, token, market, protocol, deposit.amount, amountUSD, false);
   market.save();
 
+  protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
   protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(
     amountUSD
   );
@@ -303,6 +304,7 @@ export function handleBorrow(event: Borrow): void {
   updateTVL(hash, token, market, protocol, borrow.amount, amountUSD, true);
   market.save();
 
+  protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(amountUSD);
   protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(
     amountUSD
   );
