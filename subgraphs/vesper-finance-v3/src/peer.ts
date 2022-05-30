@@ -195,13 +195,18 @@ export class WithdrawRevenue {
     const poolV3 = PoolV3.bind(poolAddress);
     const vesperToken = Erc20Token.bind(VESPER_TOKEN);
     const token = Erc20Token.bind(poolV3.token());
-    const withdrawFee = poolV3.withdrawFee();
+    const withdrawFee_call = poolV3.try_withdrawFee();
     const rewardAddress = poolV3.poolRewards();
     const rewards_call = PoolRewards.bind(rewardAddress).try_claimable(account);
     const rewardsOld_call = PoolRewardsOld.bind(rewardAddress).try_claimable(
       account
     );
-    const isEarnPool = withdrawFee.isZero();
+
+    if (withdrawFee_call.reverted) {
+      return;
+    }
+
+    const isEarnPool = withdrawFee_call.value.isZero();
 
     if (!rewards_call.reverted) {
       for (let i = 0, k = rewards_call.value.value0.length; i < k; ++i) {
