@@ -1,23 +1,16 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Token } from "../../../../generated/schema";
-import {
-    CHAIN_LINK_ORACLE_ADDRESS,
-    CHAIN_LINK_ORACLE_QUOTE_DECIMALS,
-    CHAIN_LINK_USD_ADDRESS,
-    ZERO_BD
-} from "../../constants";
 import { ChainLinkOracle } from "../../../../generated/templates/Pool/ChainLinkOracle";
 
-import { PriceQuote } from "../../types";
+import { CHAIN_LINK_ORACLE_ADDRESS, CHAIN_LINK_ORACLE_QUOTE_DECIMALS, CHAIN_LINK_USD_ADDRESS } from "../../constants";
 import { parseUnits } from "../../utils";
 
 /**
- * Get a quote in USD from chain link oracle for token, this quote is only valid if valid is true.
- * If invalid, the value of the quote will be ZERO_BD
+ * Get token price in USD from chain link oracle
  * @param token token to get the quote for
- * @returns quote
+ * @returns token price or null if no price is available
  */
-export function chainlinkOracleGetTokenPriceInUSD(token: Token): PriceQuote {
+export function chainlinkOracleGetTokenPriceInUSD(token: Token): BigDecimal | null {
     const chainLinkContract = ChainLinkOracle.bind(CHAIN_LINK_ORACLE_ADDRESS);
 
     const latestRoundDataCall = chainLinkContract.try_latestRoundData(
@@ -25,16 +18,12 @@ export function chainlinkOracleGetTokenPriceInUSD(token: Token): PriceQuote {
         CHAIN_LINK_USD_ADDRESS
     );
 
-    const priceQuote: PriceQuote = {
-        value: ZERO_BD,
-        valid: false
-    };
+    let price: BigDecimal | null = null;
 
     if (!latestRoundDataCall.reverted) {
         const rawQuote = latestRoundDataCall.value.value1;
-        priceQuote.value = parseUnits(rawQuote, CHAIN_LINK_ORACLE_QUOTE_DECIMALS);
-        priceQuote.valid = true;
+        price = parseUnits(rawQuote, CHAIN_LINK_ORACLE_QUOTE_DECIMALS);
     }
 
-    return priceQuote;
+    return price;
 }

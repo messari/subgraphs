@@ -1,6 +1,6 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
-import { DEFAULT_DECIMALS, ETH_ADDRESS, ETH_NAME, ETH_SYMBOL } from "../constants";
+import { DEFAULT_DECIMALS, ETH_ADDRESS, ETH_NAME, ETH_SYMBOL, ZERO_BD, ZERO_BI } from "../constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "../utils";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -20,8 +20,9 @@ export function getOrCreateToken(tokenAddress: Address): Token {
             token.decimals = getAssetDecimals(tokenAddress);
         }
 
-        token.lastPriceUSD = null;
-        token.lastPriceBlockNumber = null;
+        // TODO: get token price
+        token.lastPriceUSD = ZERO_BD;
+        token.lastPriceBlockNumber = ZERO_BI;
     }
 
     token.save();

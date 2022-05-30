@@ -2,6 +2,7 @@ import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, _PoolFactory, _StakeLocker } from "../../../generated/schema";
 import { PROTOCOL_ID, UNPROVIDED_NAME, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 import { getOrCreateMplReward, mplRewardTick } from "./mplReward";
+import { getOrCreateStakeLocker, stakeLockerTick } from "./stakeLocker";
 
 /**
  * Get the market at marketAddress, or create it if it doesn't exist
@@ -105,14 +106,22 @@ export function getOrCreateMarket(
  * Function which should get called every update of the market
  */
 export function marketTick(market: Market, event: ethereum.Event): void {
-    // Trigger mplRewards tick update
+    // TODO: update market prices
+
+    // Trigger mplReward's tick
     if (market._mplRewardMplLp) {
-        const lpMplReward = getOrCreateMplReward(Address.fromString(market._mplRewardMplLp));
+        const lpMplReward = getOrCreateMplReward(Address.fromString(<string>market._mplRewardMplLp));
         mplRewardTick(lpMplReward, event);
     }
 
     if (market._mplRewardMplStake) {
-        const stakeMplReward = getOrCreateMplReward(Address.fromString(market._mplRewardMplStake));
+        const stakeMplReward = getOrCreateMplReward(Address.fromString(<string>market._mplRewardMplStake));
         mplRewardTick(stakeMplReward, event);
     }
+
+    // Trigger stakeLocker tick
+    const stakeLocker = getOrCreateStakeLocker(Address.fromString(market._stakeLocker));
+    stakeLockerTick(stakeLocker, event);
+
+    // TODO: update market cumulatives
 }

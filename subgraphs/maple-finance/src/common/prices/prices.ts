@@ -1,5 +1,6 @@
 import { BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
+import { ZERO_BD } from "../constants";
 import { chainlinkOracleGetTokenPriceInUSD } from "./oracles/chainlink";
 import { mapleOracleGetTokenPriceInUSD } from "./oracles/maple";
 import { yearnOracleGetTokenPriceInUSD } from "./oracles/yearn";
@@ -15,24 +16,21 @@ import { yearnOracleGetTokenPriceInUSD } from "./oracles/yearn";
 export function getTokenPriceInUSD(token: Token, event: ethereum.Event): BigDecimal {
     // Only update if it hasn't already been updated this block
     if (token.lastPriceBlockNumber != event.block.number) {
-        let quote = mapleOracleGetTokenPriceInUSD(token);
-
-        if (!quote.valid) {
+        let price = mapleOracleGetTokenPriceInUSD(token);
+        if (!price) {
             // Maple quote failed
-            quote = chainlinkOracleGetTokenPriceInUSD(token);
-
-            if (!quote.valid) {
+            price = chainlinkOracleGetTokenPriceInUSD(token);
+            if (!price) {
                 // Chainlink quote failed
-                quote = yearnOracleGetTokenPriceInUSD(token);
-
-                if (!quote.valid) {
+                price = yearnOracleGetTokenPriceInUSD(token);
+                if (!price) {
                     // Yearn quote failed
                     log.error("Unable to get token price for {}", [token.id]);
                 }
             }
         }
 
-        token.lastPriceUSD = quote.value; // ZERO_BD if invalid
+        token.lastPriceUSD = price !== null ? <BigDecimal>price : ZERO_BD; // ZERO_BD if invalid
         token.lastPriceBlockNumber = event.block.number;
     }
 

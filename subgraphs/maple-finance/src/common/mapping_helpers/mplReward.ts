@@ -81,13 +81,13 @@ export function mplRewardTick(mplReward: _MplReward, event: ethereum.Event): voi
 
         const rewardToken = getOrCreateToken(Address.fromString(mplReward.rewardToken));
         const rewardTokenPriceUSD = getTokenPriceInUSD(rewardToken, event);
+
         mplReward.rewardTokenEmissionsUSDPerDay = parseUnits(
             mplReward.rewardTokenEmissionAmountPerDay,
             rewardToken.decimals
         ).times(rewardTokenPriceUSD);
 
         mplReward.lastUpdatedBlock = event.block.number;
-
         mplReward.save();
     }
 }

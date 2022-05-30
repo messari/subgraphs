@@ -1,15 +1,8 @@
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 import { Token } from "../../../../generated/schema";
-import {
-    MAPLE_GLOBALS_ADDRESS,
-    MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS,
-    YEARN_ORACLE_ADDRESS,
-    YEARN_ORACLE_QUOTE_DECIMALS,
-    ZERO_BD
-} from "../../constants";
 import { YearnOracle } from "../../../../generated/templates/Pool/YearnOracle";
 
-import { PriceQuote } from "../../types";
+import { YEARN_ORACLE_ADDRESS, YEARN_ORACLE_QUOTE_DECIMALS } from "../../constants";
 import { parseUnits } from "../../utils";
 
 /**
@@ -18,21 +11,17 @@ import { parseUnits } from "../../utils";
  * @param token token to get the quote for
  * @returns quote
  */
-export function yearnOracleGetTokenPriceInUSD(token: Token): PriceQuote {
+export function yearnOracleGetTokenPriceInUSD(token: Token): BigDecimal | null {
     const yearnOracleContract = YearnOracle.bind(YEARN_ORACLE_ADDRESS);
 
     const getLatestPriceCall = yearnOracleContract.try_getPriceUsdcRecommended(Address.fromString(token.id));
 
-    const priceQuote: PriceQuote = {
-        value: ZERO_BD,
-        valid: false
-    };
+    let price: BigDecimal | null = null;
 
     if (!getLatestPriceCall.reverted) {
         const rawQuote = getLatestPriceCall.value;
-        priceQuote.value = parseUnits(rawQuote, YEARN_ORACLE_QUOTE_DECIMALS);
-        priceQuote.valid = true;
+        price = parseUnits(rawQuote, YEARN_ORACLE_QUOTE_DECIMALS);
     }
 
-    return priceQuote;
+    return price;
 }
