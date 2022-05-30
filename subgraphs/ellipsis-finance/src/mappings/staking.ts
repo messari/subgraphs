@@ -1,4 +1,4 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { Deposit, Withdraw, EmergencyWithdraw, LpStaking__poolInfoResult } from "../../generated/LpStaking/LpStaking";
 import {
   Deposit as DepositV2,
@@ -48,9 +48,15 @@ export function handleDeposit(event: Deposit): void {
   let poolId = event.params.pid;
   const poolInfoCall = lpstakingContract.try_poolInfo(poolId);
   if (!poolInfoCall.reverted) {
+    log.error('pool info call for pool id: {}', [poolId.toString()]);
     const poolInfo = poolInfoCall.value;
     const lptoken = poolInfo.value0;
+    log.error('pool info call for lpToken: {}', [lptoken.toHexString()]);
     let poolAddress = getPoolFromLpToken(lptoken);
+    if (poolAddress == ZERO_ADDRESS) {
+      log.error('pool address not found for lpToken: {}', [lptoken.toHexString()]);
+      return;
+    }
     let pool = getOrCreatePool(Address.fromString(poolAddress), event);
     handleLpStaking(pool, poolInfo, lpstakingContract, event.block.timestamp);
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.plus(event.params.amount);

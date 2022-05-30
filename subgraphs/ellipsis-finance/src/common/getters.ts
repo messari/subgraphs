@@ -1,4 +1,4 @@
-import { Address, ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   DexAmmProtocol,

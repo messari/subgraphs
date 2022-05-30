@@ -25,5 +25,8 @@
     { "name": "USDN", "address": "0x2f8E25C21A17BD9D0C337e1b409e73bc959B41BE", "startblock": 8186429 },
     { "name": "UST", "address": "0x780de1A0E4613da6b65ceF7F5FB63d14CbDcfB72", "startblock": 10655759 },
     { "name": "TUSD", "address": "0x8D7408C2b3154F9f97fc6dd24cd36143908d1E52", "startblock": 6936611 }
-  ]
+  ],
+  "graftEnabled": true,
+  "subgraphId": "QmUMPYpA6opkMhqvtPCH4vnaQhpY4MmWQPHiE525AeYZtN",
+  "graftStartBlock": 13585709
 }
