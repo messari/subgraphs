@@ -70,11 +70,9 @@ export function getOrCreateMplReward(
 export function mplRewardTick(mplReward: _MplReward, event: ethereum.Event): void {
     // Update only if it hasn't been updated this block
     if (mplReward.lastUpdatedBlock != event.block.number) {
-        const rewardActive = event.block.timestamp > mplReward.periodFinishedTimestamp;
+        const rewardActive = event.block.timestamp < mplReward.periodFinishedTimestamp;
         if (rewardActive) {
-            mplReward.rewardTokenEmissionAmountPerDay = mplReward.rewardRatePerSecond
-                .times(mplReward.rewardDurationSec)
-                .times(SEC_PER_DAY);
+            mplReward.rewardTokenEmissionAmountPerDay = mplReward.rewardRatePerSecond.times(SEC_PER_DAY);
         } else {
             mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
         }

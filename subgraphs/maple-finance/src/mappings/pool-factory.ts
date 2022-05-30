@@ -40,5 +40,5 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     );
 
     // Create the stake locker for this market
-    getOrCreateStakeLocker(stakeLockerAddress, poolAddress, stakeTokenAddress);
+    getOrCreateStakeLocker(stakeLockerAddress, poolAddress, stakeTokenAddress, event.block.number);
 }
