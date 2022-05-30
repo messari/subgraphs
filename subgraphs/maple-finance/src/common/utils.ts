@@ -1,7 +1,8 @@
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/PoolFactory/ERC20";
 import { ERC20NameBytes } from "../../generated/templates/PoolFactory/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/templates/PoolFactory/ERC20SymbolBytes";
+import { ONE_BD } from "./constants";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
 export function getAssetName(address: Address): string {
@@ -47,4 +48,36 @@ export function getAssetDecimals(address: Address): i32 {
 
     log.error("decimals() call reverted for {}", [address.toHex()]);
     return -1;
+}
+
+/**
+ * Parse value to BigDecimal representation with decimals
+ *      Ex. value = 123456789, decimal = 8 => 1.23456789
+ * @param value value to parse
+ * @param decimals number of decimals to parse this value with
+ * @return parsed value
+ */
+export function parseUnits(value: BigInt, decimals: BigInt): BigDecimal {
+    let parsedValue = value.toBigDecimal();
+    for (let i = 0; i < decimals.toU32(); i++) {
+        parsedValue = parsedValue.times(BigDecimal.fromString("10"));
+    }
+
+    return parsedValue;
+}
+
+/**
+ * Format value to BigInt representation with decimals
+ *      Ex. value = 1.23456789, decimal = 8 => 123456789
+ * @param value
+ * @param decimals
+ * @return formatted value
+ */
+export function formatUnits(value: BigDecimal, decimals: BigInt): BigInt {
+    let formattedValue = value;
+    for (let i = 0; i < decimals.toU32(); i++) {
+        formattedValue = formattedValue.div(BigDecimal.fromString("10"));
+    }
+
+    return BigInt.fromString(formattedValue.toString());
 }

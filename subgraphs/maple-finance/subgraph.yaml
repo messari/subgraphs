@@ -53,6 +53,8 @@ dataSources:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
           eventHandlers:
               - event: MplRewardsCreated(indexed address,indexed address,indexed address,address)
                 handler: handleMplRewardsCreated
@@ -111,6 +113,12 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
           eventHandlers:
               - event: Transfer(indexed address,indexed address,uint256)
                 handler: handleTransfer
@@ -148,6 +156,12 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
           eventHandlers:
               - event: Stake(indexed address,uint256)
                 handler: handleStake
@@ -178,6 +192,12 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
           eventHandlers:
               - event: Drawdown(uint256)
                 handler: handleDrawdown
@@ -209,6 +229,12 @@ templates:
                 file: ./abis/ERC20NameBytes.json
               - name: ERC20SymbolBytes
                 file: ./abis/ERC20SymbolBytes.json
+              - name: MapleGlobals
+                file: ./abis/MapleGlobals.json
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
           eventHandlers:
               - event: Staked(indexed address,uint256)
                 handler: handleStaked
@@ -218,3 +244,6 @@ templates:
                 handler: handleRewardAdded
               - event: RewardsDurationUpdated(uint256)
                 handler: handleRewardsDurationUpdated
+          callHandlers:
+              - function: updatePeriodFinish(uint256)
+                handler: handleUpdatePeriodFinish
