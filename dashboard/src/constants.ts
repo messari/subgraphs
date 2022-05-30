@@ -56,6 +56,8 @@ export const percentageFieldList = [
   "fee",
   "percentage",
 ];
+// negativeFieldList contains field names that can be negative
+export const negativeFieldList = [];
 export const ProtocolsToQuery: { [name: string]: { [network: string]: string } } = {
   aaveV2: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum",

@@ -4,7 +4,13 @@ import { convertTokenDecimals, toDate } from "../../../src/utils/index";
 import { PoolName } from "../../constants";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 
-export const TableEvents = (_datasetLabel: string, data: any, eventName: string, poolId: string) => {
+interface TableEventsProps {
+  _datasetLabel: string;
+  data: any;
+  eventName: string;
+}
+
+export const TableEvents = ({ _datasetLabel, data, eventName }: TableEventsProps) => {
   const dataTable = data[eventName];
   const protocolType = data.protocols[0].type;
   const poolName = PoolName[protocolType];

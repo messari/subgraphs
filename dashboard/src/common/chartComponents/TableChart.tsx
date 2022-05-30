@@ -2,7 +2,13 @@ import { DataGrid } from "@mui/x-data-grid";
 import { toDate } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 
-export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: number) => {
+interface TableChartProps {
+  _datasetLabel: string;
+  dataTable: any;
+  _dataLength: number;
+}
+
+export const TableChart = ({ _datasetLabel, dataTable, _dataLength }: TableChartProps) => {
   const isPercentageField = percentageFieldList.find((x) => {
     return _datasetLabel.toUpperCase().includes(x.toUpperCase());
   });
@@ -21,10 +27,14 @@ export const TableChart = (_datasetLabel: string, dataTable: any, _dataLength: n
     }
     const hourly = _datasetLabel.toUpperCase().includes("HOURLY");
     const tableData = dataTable.map((val: any, i: any) => {
+      let returnVal = val.value.toLocaleString() + suffix;
+      if (isPercentageField && Array.isArray(val.value)) {
+        returnVal = val.value.map((ele: string) => ele.toLocaleString() + "%").join(", ");
+      }
       return {
         id: i,
         date: toDate(val.date, hourly),
-        value: val.value.toLocaleString() + suffix,
+        value: returnVal,
       };
     });
     return (
