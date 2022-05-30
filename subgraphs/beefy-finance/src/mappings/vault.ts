@@ -81,7 +81,7 @@ export function createVaultFromStrategy(
   ).times(new BigDecimal(vault.inputTokenBalance));
 
   const outputSupply = vault.outputTokenSupply;
-  if (outputSupply)
+  if (outputSupply && outputSupply != BIGINT_ZERO)
     vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
       new BigDecimal(outputSupply)
     );
@@ -160,7 +160,7 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   ).times(new BigDecimal(vault.inputTokenBalance));
 
   const outputSupply = vault.outputTokenSupply;
-  if (outputSupply)
+  if (outputSupply && outputSupply != BIGINT_ZERO)
     vault.outputTokenPriceUSD = vault.totalValueLockedUSD.div(
       new BigDecimal(outputSupply)
     );
