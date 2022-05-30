@@ -60,7 +60,7 @@ export function getAssetDecimals(address: Address): i32 {
 export function parseUnits(value: BigInt, decimals: i32): BigDecimal {
     let parsedValue = value.toBigDecimal();
     for (let i = 0; i < decimals; i++) {
-        parsedValue = parsedValue.times(BigDecimal.fromString("10"));
+        parsedValue = parsedValue.div(BigDecimal.fromString("10"));
     }
 
     return parsedValue;
@@ -76,7 +76,7 @@ export function parseUnits(value: BigInt, decimals: i32): BigDecimal {
 export function formatUnits(value: BigDecimal, decimals: i32): BigInt {
     let formattedValue = value;
     for (let i = 0; i < decimals; i++) {
-        formattedValue = formattedValue.div(BigDecimal.fromString("10"));
+        formattedValue = formattedValue.times(BigDecimal.fromString("10"));
     }
 
     return BigInt.fromString(formattedValue.toString());

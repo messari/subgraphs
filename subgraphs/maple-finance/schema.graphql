@@ -28,6 +28,13 @@ enum ProtocolType {
     # Will add more
 }
 
+enum OracleType {
+    NONE
+    MAPLE
+    CHAIN_LINK
+    YEARN_LENS
+}
+
 type Token @entity {
     " Smart contract address of the token "
     id: ID!
@@ -46,6 +53,9 @@ type Token @entity {
 
     " Optional field to track the block number of the last token price "
     lastPriceBlockNumber: BigInt!
+
+    " The price oracle which gave the last price "
+    _lastPriceOracle: OracleType!
 }
 
 enum RewardTokenType {
@@ -1225,7 +1235,7 @@ type _Loan @entity {
     interestPaid: BigInt!
 
     " Amout of collatoral recovered from a liquidation in market input tokens "
-    collateralLiquidated: BigInt!
+    collateralLiquidatedInPoolInputTokens: BigInt!
 
     " Amount of default remaining after liquidations that the stake and pool must cover in market input tokens "
     defaultSuffered: BigInt!

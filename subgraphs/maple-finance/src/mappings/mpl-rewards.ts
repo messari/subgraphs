@@ -6,7 +6,7 @@ import {
     RewardsDurationUpdated as RewardsDurationUpdatedEvent,
     UpdatePeriodFinishCall
 } from "../../generated/templates/MplRewards/MplRewards";
-import { StakeType } from "../common/constants";
+import { StakeType, ZERO_BI } from "../common/constants";
 import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";
 import { getOrCreateMplReward } from "../common/mapping_helpers/mplReward";
 import { getOrCreateToken } from "../common/mapping_helpers/token";
@@ -38,17 +38,35 @@ export function handleWidthdrawn(event: WithdrawnEvent): void {
 
 export function handleRewardAdded(event: RewardAddedEvent): void {
     const mplReward = getOrCreateMplReward(event.address);
-    mplReward.rewardRatePerSecond = event.params.reward;
-    mplReward.save();
 
-    // Trigger market tick
-    const market = getOrCreateMarket(Address.fromString(mplReward.market));
-    marketTick(market, event);
+    // Update rate
+    if (mplReward.rewardDurationSec.gt(ZERO_BI)) {
+        const currentTimestamp = event.block.timestamp;
+        const rewardAdded = event.params.reward;
+
+        mplReward.rewardRatePerSecond =
+            currentTimestamp >= mplReward.periodFinishedTimestamp
+                ? rewardAdded.div(mplReward.rewardDurationSec) // No overlap, total reward devided by time
+                : rewardAdded
+                      .plus(
+                          mplReward.periodFinishedTimestamp.minus(currentTimestamp).times(mplReward.rewardRatePerSecond)
+                      )
+                      .div(mplReward.rewardDurationSec); // Overlap with last reward, so account for last reward remainder
+
+        // Update period finished
+        mplReward.periodFinishedTimestamp = currentTimestamp.plus(mplReward.rewardDurationSec);
+
+        mplReward.save();
+
+        // Trigger market tick
+        const market = getOrCreateMarket(Address.fromString(mplReward.market));
+        marketTick(market, event);
+    }
 }
 
 export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {
     const mplReward = getOrCreateMplReward(event.address);
-    mplReward.rewardRatePerSecond = event.params.newDuration;
+    mplReward.rewardDurationSec = event.params.newDuration;
     mplReward.save();
 
     // Trigger market tick

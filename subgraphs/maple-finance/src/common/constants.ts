@@ -81,6 +81,13 @@ export namespace StakeType {
     export const MPL_STAKE_REWARDS = "MPL_STAKE_REWARDS";
 }
 
+export namespace OracleType {
+    export const NONE = "NONE";
+    export const MAPLE = "MAPLE";
+    export const CHAIN_LINK = "CHAIN_LINK";
+    export const YEARN_LENS = "YEARN_LENS";
+}
+
 ////////////////////////////
 ///// Solifidity Enums /////
 ////////////////////////////

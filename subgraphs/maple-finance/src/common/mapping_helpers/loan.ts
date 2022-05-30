@@ -1,7 +1,7 @@
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { _Loan } from "../../../generated/schema";
 import { Loan } from "../../../generated/templates/Loan/Loan";
-import { ZERO_ADDRESS, ZERO_BI } from "../constants";
+import { ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 
 /**
  * Get the loan at loanAddress, or create it if is doesn't already exist.
@@ -32,12 +32,13 @@ export function getOrCreateLoan(
         if (!aprCall.reverted) {
             loan.interestRate = aprCall.value.toBigDecimal().div(BigDecimal.fromString("100"));
         } else {
+            loan.interestRate = ZERO_BD;
             log.error("Unable to apr loan creation", []);
         }
 
         loan.drawnDown = ZERO_BI;
         loan.principalPaid = ZERO_BI;
-        loan.collateralLiquidated = ZERO_BI;
+        loan.collateralLiquidatedInPoolInputTokens = ZERO_BI;
         loan.defaultSuffered = ZERO_BI;
 
         if (ZERO_ADDRESS == marketAddress || ZERO_BI == amountFunded) {

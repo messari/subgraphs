@@ -1,9 +1,10 @@
 import { BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
-import { ZERO_BD } from "../constants";
+
 import { chainlinkOracleGetTokenPriceInUSD } from "./oracles/chainlink";
 import { mapleOracleGetTokenPriceInUSD } from "./oracles/maple";
 import { yearnOracleGetTokenPriceInUSD } from "./oracles/yearn";
+import { ZERO_BD, OracleType } from "../constants";
 
 /**
  * Get the token price in USD, this will try to get price from:
@@ -17,14 +18,21 @@ export function getTokenPriceInUSD(token: Token, event: ethereum.Event): BigDeci
     // Only update if it hasn't already been updated this block
     if (token.lastPriceBlockNumber != event.block.number) {
         let price = mapleOracleGetTokenPriceInUSD(token);
+        token._lastPriceOracle = OracleType.MAPLE;
+
         if (!price) {
             // Maple quote failed
             price = chainlinkOracleGetTokenPriceInUSD(token);
+            token._lastPriceOracle = OracleType.CHAIN_LINK;
+
             if (!price) {
                 // Chainlink quote failed
                 price = yearnOracleGetTokenPriceInUSD(token);
+                token._lastPriceOracle = OracleType.YEARN_LENS;
+
                 if (!price) {
                     // Yearn quote failed
+                    token._lastPriceOracle = OracleType.NONE;
                     log.error("Unable to get token price for {}", [token.id]);
                 }
             }
