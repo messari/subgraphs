@@ -125,7 +125,7 @@ export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
-export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromString('10').pow(18);
+export const BIGINT_TEN_TO_EIGHTEENTH = BigInt.fromI32(10).pow(18);
 export const BIGINT_MAX = BigInt.fromString(
   "115792089237316195423570985008687907853269984665640564039457584007913129639935",
 );
@@ -164,7 +164,7 @@ export const USDC_SYMBOL = "USDC";
 ///// Euler Specific /////
 //////////////////////////
 
-export const CONFIG_FACTOR_SCALE = new BigDecimal(BigInt.fromI32(4).times(BigInt.fromI32(10).pow(9)));
+export const CONFIG_FACTOR_SCALE = BigDecimal.fromString("4e9");
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
 export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);
 export const UNISWAP_Q192 = BigDecimal.fromString(
@@ -173,3 +173,4 @@ export const UNISWAP_Q192 = BigDecimal.fromString(
     .toString(),
 );
 export const DECIMAL_PRECISION = BIGINT_TEN_TO_EIGHTEENTH.toBigDecimal();
+export const INTEREST_RATE_PRECISION = BigDecimal.fromString("1e25");

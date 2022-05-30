@@ -46,11 +46,13 @@ import {
   VIEW_V2_START_BLOCK_NUMBER,
   DECIMAL_PRECISION,
   USDC_ERC20_ADDRESS,
+  INTEREST_RATE_PRECISION,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
 import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
 import { _MarketUtility } from "../../generated/schema";
+import { BigInt } from "@graphprotocol/graph-ts";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const tokenAddress = event.params.underlying.toHexString();
@@ -77,7 +79,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   market.totalDepositBalanceUSD = amountToUsd(
     event.params.totalBalances,
     marketUtility.twap,
-    marketUtility.twapPrice,
+    marketUtility.twapPrice, 
   );
   market.totalBorrowBalanceUSD = amountToUsd(
     event.params.totalBorrows,
@@ -293,7 +295,8 @@ export function handleMarketActivated(event: MarketActivated): void {
 }
 
 function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRStruct, block: ethereum.Block): void {
-  let ethUsdcExchangeRate: BigDecimal;
+  // let ethUsdcExchangeRate: BigDecimal;
+  let ethUsdcExchangeRate = BIGDECIMAL_ONE;
   const eulerViewMarkets = eulerViewQueryResponse.markets;
 
   // Try to get ETH/USDC exchange rate directly from Euler query...
@@ -319,8 +322,8 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     const market = getOrCreateMarket(eulerViewMarket.underlying.toHexString());
     const lendingRate = getOrCreateInterestRate(InterestRateSide.LENDER, InterestRateType.VARIABLE, market.id);
     const borrowRate = getOrCreateInterestRate(InterestRateSide.BORROWER, InterestRateType.VARIABLE, market.id);
-    lendingRate.rate = eulerViewMarket.supplyAPY.toBigDecimal().div(DECIMAL_PRECISION);
-    borrowRate.rate = eulerViewMarket.borrowAPY.toBigDecimal().div(DECIMAL_PRECISION);
+    lendingRate.rate = eulerViewMarket.supplyAPY.toBigDecimal().div(INTEREST_RATE_PRECISION);
+    borrowRate.rate = eulerViewMarket.borrowAPY.toBigDecimal().div(INTEREST_RATE_PRECISION);
     lendingRate.save();
     borrowRate.save();
     market.rates = market.rates.concat([lendingRate.id, borrowRate.id]);
@@ -342,8 +345,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
 
     const currPrice = eulerViewMarket.currPrice.toBigDecimal().div(DECIMAL_PRECISION);
-    const currPriceUsd = currPrice
-      .times(ethUsdcExchangeRate);
+    const currPriceUsd = currPrice.times(ethUsdcExchangeRate);
     
     market.inputTokenBalance = eulerViewMarket.totalBalances;
     market.outputTokenSupply = eulerViewMarket.eTokenBalance;
@@ -367,13 +369,13 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     market.save();
     
     if (market.outputToken) {
-      const eToken = getOrCreateToken(<Address>Address.fromHexString(market.outputToken!));
+      const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
       eToken.lastPriceUSD = market.outputTokenPriceUSD;
       eToken.lastPriceBlockNumber = block.number;
       eToken.save();
     }
 
-    const marketUtility = getOrCreateMarketUtility(eulerViewMarket.underlying.toHexString());
+    const marketUtility = getOrCreateMarketUtility(market.id);
     marketUtility.market = market.id;
     marketUtility.twap = eulerViewMarket.twap;
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
@@ -407,6 +409,11 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 }
 
 export function handleBlockUpdates(block: ethereum.Block): void {
+  // Markets are refreshed every 50 blocks in order to improve indexing performance.
+  if (!block.number.mod(BigInt.fromI32(50)).equals(BIGINT_ZERO)) {
+    return;
+  }
+
   const viewAddress = block.number.gt(VIEW_V2_START_BLOCK_NUMBER)
     ? EULER_GENERAL_VIEW_V2_ADDRESS
     : EULER_GENERAL_VIEW_ADDRESS;

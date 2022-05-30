@@ -23,7 +23,6 @@ import { getAssetSymbol, getAssetName, getAssetDecimals } from "./tokens";
 import {
   BIGDECIMAL_ZERO,
   Network,
-  INT_ZERO,
   EULER_ADDRESS,
   ProtocolType,
   SECONDS_PER_DAY,
@@ -37,7 +36,6 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   LendingType,
   RiskType,
-  InterestRateType,
   INITIAL_INTEREST_ACCUMULATOR
 } from "../common/constants";
 
@@ -54,7 +52,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
     token.lastPriceBlockNumber = BIGINT_ZERO;
     token.save();
   }
-  return token;
+  return token as Token;
 }
 
 export function getOrCreateRewardToken(address: Address): RewardToken {
@@ -104,7 +102,7 @@ export function getOrCreateFinancials(block: ethereum.Block): FinancialsDailySna
 
     financialMetrics.save();
   }
-  return financialMetrics;
+  return financialMetrics as FinancialsDailySnapshot;
 }
 
 export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
@@ -131,7 +129,7 @@ export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetri
     usageMetrics.save();
   }
 
-  return usageMetrics;
+  return usageMetrics as UsageMetricsDailySnapshot;
 }
 
 export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
@@ -158,7 +156,7 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
     usageMetrics.save();
   }
 
-  return usageMetrics;
+  return usageMetrics as UsageMetricsHourlySnapshot;
 }
 
 export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: string): MarketDailySnapshot {
@@ -193,7 +191,7 @@ export function getOrCreateMarketDailySnapshot(block: ethereum.Block, marketId: 
     marketMetrics.save();
   }
 
-  return marketMetrics;
+  return marketMetrics as MarketDailySnapshot;
 }
 
 export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId: string): MarketHourlySnapshot {
@@ -229,7 +227,7 @@ export function getOrCreateMarketHourlySnapshot(block: ethereum.Block, marketId:
     marketMetrics.save();
   }
 
-  return marketMetrics;
+  return marketMetrics as MarketHourlySnapshot;
 }
 
 ////////////////////////////
@@ -293,7 +291,7 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
     protocol.save();
   }
-  return protocol;
+  return protocol as LendingProtocol;
 }
 
 export function getOrCreateDeposit(event: ethereum.Event): Deposit {
