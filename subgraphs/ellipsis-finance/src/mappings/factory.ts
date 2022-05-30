@@ -1,56 +1,74 @@
 import { Address } from "@graphprotocol/graph-ts";
-import {
-  MetaPoolDeployed,
-  PlainPoolDeployed,
-} from "../../generated/Factory/Factory";
+import { BasePoolAdded, MetaPoolDeployed, PlainPoolDeployed } from "../../generated/Factory/Factory";
+import { LiquidityPool } from "../../generated/schema";
 import { FactoryPools } from "../../generated/templates";
-import {
-  getOrCreatePool,
-} from "../helpers/pool/createPool";
-import { ZERO_ADDRESS } from "../utils/constant";
+import { ADDRESS_ZERO, PoolType } from "../common/constants";
+import { getOrCreateToken } from "../common/getters";
+import { createNewPool, getBasePool, getLpToken, isLendingPool } from "../services/pool";
 
-export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
-  let coins = event.params.coins;
-  let fee = event.params.fee;
-  let lp_token = event.params.lp_token;
-  let pool = event.params.pool;
-
-  let sorted_coins: Address[] = []
-  for(let i = 0; i < coins.length; i++) {
-    if(coins[i] !== Address.fromString(ZERO_ADDRESS)) {
-      sorted_coins.push(coins[i])
+function sortCoins(coins: Address[]): string[] {
+  let sorted_coins: string[] = [];
+  for (let i = 0; i < coins.length; i++) {
+    if (coins[i] !== ADDRESS_ZERO) {
+      sorted_coins.push(coins[i].toHexString());
     }
   }
+  return sorted_coins;
+}
 
-  // Create a new pool
-  getOrCreatePool(
-    event,
-    sorted_coins,
+export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
+  const coins = sortCoins(event.params.coins);
+  const lp_token = event.params.lp_token;
+  const lpTokenEntity = getOrCreateToken(lp_token);
+  let pool = event.params.pool;
+  createNewPool(
+    pool,
     lp_token,
-    pool
+    lpTokenEntity.name,
+    lpTokenEntity.symbol,
+    event.block.number,
+    event.block.timestamp,
+    getBasePool(pool),
+    coins,
   );
+  // Create a new pool
   FactoryPools.create(pool);
 }
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
-  let coins = event.params.coins;
+  const coins = sortCoins(event.params.coins);
   let lp_token = event.params.lp_token;
+  const lpTokenEntity = getOrCreateToken(lp_token);
   let pool = event.params.pool;
-
-  let sorted_coins: Address[] = []
-  for(let i = 0; i < coins.length; i++) {
-    if(coins[i] !== Address.fromString(ZERO_ADDRESS)) {
-      sorted_coins.push(coins[i])
-    }
-  }
-
-  // Create a new pool
-  getOrCreatePool(
-    event,
-    coins,
+  createNewPool(
+    pool,
     lp_token,
-    pool
+    lpTokenEntity.name,
+    lpTokenEntity.symbol,
+    event.block.number,
+    event.block.timestamp,
+    event.params.base_pool,
+    coins,
+    PoolType.METAPOOL,
   );
-
+  // Create a new pool
   FactoryPools.create(pool);
+}
+
+export function handleBasePoolAdded(event: BasePoolAdded): void {
+  let pool = LiquidityPool.load(event.params.base_pool.toHexString());
+  if (!pool) {
+    let lpTokenEntity = getOrCreateToken(getLpToken(event.params.base_pool));
+    createNewPool(
+      event.params.base_pool,
+      Address.fromString(lpTokenEntity.id),
+      lpTokenEntity.name,
+      lpTokenEntity.symbol,
+      event.block.number,
+      event.block.timestamp,
+      getBasePool(event.params.base_pool),
+      [],
+      isLendingPool(event.params.base_pool) ? PoolType.LENDING : PoolType.BASEPOOL,
+    );
+  }
 }
