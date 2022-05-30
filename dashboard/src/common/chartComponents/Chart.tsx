@@ -5,10 +5,9 @@ import { toDate } from "../../utils";
 interface ChartProps {
   datasetLabel: string;
   dataChart: any;
-  _dataLength: number;
 }
 
-export const Chart = ({ datasetLabel, dataChart, _dataLength }: ChartProps) => {
+export const Chart = ({ datasetLabel, dataChart }: ChartProps) => {
   if (dataChart) {
     let labels: string[] = [];
     let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];

@@ -5,12 +5,12 @@ import { PoolName } from "../../constants";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 
 interface TableEventsProps {
-  _datasetLabel: string;
+  datasetLabel: string;
   data: any;
   eventName: string;
 }
 
-export const TableEvents = ({ _datasetLabel, data, eventName }: TableEventsProps) => {
+export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps) => {
   const dataTable = data[eventName];
   const protocolType = data.protocols[0].type;
   const poolName = PoolName[protocolType];
@@ -83,7 +83,7 @@ export const TableEvents = ({ _datasetLabel, data, eventName }: TableEventsProps
       <Box height={750} py={6} id={eventName}>
         <CopyLinkToClipboard link={window.location.href} scrollId={eventName}>
           <Typography fontSize={20}>
-            <b>{_datasetLabel.toUpperCase()}</b>
+            <b>{datasetLabel.toUpperCase()}</b>
           </Typography>
         </CopyLinkToClipboard>
         <DataGrid

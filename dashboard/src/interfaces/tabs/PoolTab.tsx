@@ -193,7 +193,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
                 (capsEntityFieldName === "HOURLYLIQUIDATEUSD" || capsEntityFieldName === "DAILYLIQUIDATEUSD") &&
                 Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
                 issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length ===
-                  0
+                0
               ) {
                 issues.push({
                   type: "LIQ",
@@ -496,7 +496,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
         });
         const table = (
           <Grid key={elementId + "Table"} item xs={4}>
-            <TableChart _datasetLabel="rewardAPR" dataTable={tableVals} _dataLength={currentEntityData.length} />
+            <TableChart datasetLabel="rewardAPR" dataTable={tableVals} />
           </Grid>
         );
         rewardAPRElement = (
@@ -508,7 +508,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
             </Box>
             <Grid container justifyContent="space-between">
               <Grid key={elementId + "Chart"} item xs={7.5}>
-                <Chart datasetLabel="rewardAPR" dataChart={rewardChart} _dataLength={amountOfInstances} />
+                <Chart datasetLabel="rewardAPR" dataChart={rewardChart} />
               </Grid>
               {table}
             </Grid>
@@ -544,7 +544,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
         });
         const table = (
           <Grid key={elementId + "Table"} item xs={4}>
-            <TableChart _datasetLabel="RATES" dataTable={tableVals} _dataLength={currentEntityData.length} />
+            <TableChart datasetLabel="RATES" dataTable={tableVals} />
           </Grid>
         );
         ratesElement = (
@@ -556,7 +556,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
             </Box>
             <Grid container justifyContent="space-between">
               <Grid key={elementId + "Chart"} item xs={7.5}>
-                <Chart datasetLabel="RATES" dataChart={ratesChart} _dataLength={amountOfInstances} />
+                <Chart datasetLabel="RATES" dataChart={ratesChart} />
               </Grid>
               {table}
             </Grid>
@@ -791,13 +791,12 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
                 </Box>
                 <Grid container justifyContent="space-between">
                   <Grid key={elementId + "1"} item xs={7.5}>
-                    <Chart datasetLabel={label} dataChart={dataFields[field]} _dataLength={currentEntityData.length} />
+                    <Chart datasetLabel={label} dataChart={dataFields[field]} />
                   </Grid>
                   <Grid key={elementId + "2"} item xs={4}>
                     <TableChart
-                      _datasetLabel={label}
+                      datasetLabel={label}
                       dataTable={dataFields[field]}
-                      _dataLength={currentEntityData.length}
                     />
                   </Grid>
                 </Grid>

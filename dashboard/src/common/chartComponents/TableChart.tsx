@@ -3,14 +3,13 @@ import { toDate } from "../../../src/utils/index";
 import { percentageFieldList } from "../../constants";
 
 interface TableChartProps {
-  _datasetLabel: string;
+  datasetLabel: string;
   dataTable: any;
-  _dataLength: number;
 }
 
-export const TableChart = ({ _datasetLabel, dataTable, _dataLength }: TableChartProps) => {
+export const TableChart = ({ datasetLabel, dataTable }: TableChartProps) => {
   const isPercentageField = percentageFieldList.find((x) => {
-    return _datasetLabel.toUpperCase().includes(x.toUpperCase());
+    return datasetLabel.toUpperCase().includes(x.toUpperCase());
   });
   if (dataTable) {
     const columns = [
@@ -25,7 +24,7 @@ export const TableChart = ({ _datasetLabel, dataTable, _dataLength }: TableChart
     if (isPercentageField) {
       suffix = "%";
     }
-    const hourly = _datasetLabel.toUpperCase().includes("HOURLY");
+    const hourly = datasetLabel.toUpperCase().includes("HOURLY");
     const tableData = dataTable.map((val: any, i: any) => {
       let returnVal = val.value.toLocaleString() + suffix;
       if (isPercentageField && Array.isArray(val.value)) {
