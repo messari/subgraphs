@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/PoolFactory/ERC20";
 import { ERC20NameBytes } from "../../generated/templates/PoolFactory/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/templates/PoolFactory/ERC20SymbolBytes";
-import { ONE_BD } from "./constants";
+import { ONE_BD, TEN_BD, ZERO_BI } from "./constants";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
 export function getAssetName(address: Address): string {
@@ -51,33 +51,49 @@ export function getAssetDecimals(address: Address): i32 {
 }
 
 /**
- * Parse value to BigDecimal representation with decimals
+ * Convert a big decimal to a big int represenation
+ * @param input big decimal to convert
+ * @returns big int representation
+ */
+export function bigDecimalToBigInt(input: BigDecimal): BigInt {
+    const str = input.truncate(0).toString();
+    return BigInt.fromString(str);
+}
+
+/**
+ * Compute base^exponent
+ * @param base base of the computation
+ * @param exponent exponent raising base to
+ * @return base^exponent
+ */
+export function powBigDecimal(base: BigDecimal, exponent: i32): BigDecimal {
+    let output = ONE_BD;
+    for (let i = 0; i < exponent; i++) {
+        output = output.times(base);
+    }
+    return output;
+}
+
+/**
+ * Parse value to BigDecimal representation with decimals (i.e compute actual value from mantissa)
  *      Ex. value = 123456789, decimal = 8 => 1.23456789
  * @param value value to parse
  * @param decimals number of decimals to parse this value with
  * @return parsed value
  */
 export function parseUnits(value: BigInt, decimals: i32): BigDecimal {
-    let parsedValue = value.toBigDecimal();
-    for (let i = 0; i < decimals; i++) {
-        parsedValue = parsedValue.div(BigDecimal.fromString("10"));
-    }
-
-    return parsedValue;
+    const powerTerm = powBigDecimal(BigDecimal.fromString("10"), decimals);
+    return value.toBigDecimal().div(powerTerm);
 }
 
 /**
- * Format value to BigInt representation with decimals
+ * Format value to BigInt representation with decimals (i.e compute mantissa)
  *      Ex. value = 1.23456789, decimal = 8 => 123456789
  * @param value
  * @param decimals
  * @return formatted value
  */
 export function formatUnits(value: BigDecimal, decimals: i32): BigInt {
-    let formattedValue = value;
-    for (let i = 0; i < decimals; i++) {
-        formattedValue = formattedValue.times(BigDecimal.fromString("10"));
-    }
-
-    return BigInt.fromString(formattedValue.toString());
+    const powerTerm = powBigDecimal(TEN_BD, decimals);
+    return bigDecimalToBigInt(value.times(powerTerm));
 }

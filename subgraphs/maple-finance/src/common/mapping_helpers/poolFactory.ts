@@ -1,6 +1,7 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { _PoolFactory } from "../../../generated/schema";
-import { ZERO_BD, ZERO_BI } from "../constants";
+
+import { ZERO_BI } from "../constants";
 
 /**
  * Get the pool factory at poolFactoryAddress, or create it if it doesn't exist
@@ -22,6 +23,8 @@ export function getOrCreatePoolFactory(
         poolFactory.creationTimestamp = creationBlockTimestamp;
         poolFactory.creationTimestamp = creationBlockNumber;
 
+        poolFactory.save();
+
         if (ZERO_BI == creationBlockNumber || ZERO_BI == creationBlockTimestamp) {
             log.error(
                 "Created pool factory with invalid params: creationBlockNumber ({}) or creationBlockTimestamp ({})",
@@ -30,6 +33,5 @@ export function getOrCreatePoolFactory(
         }
     }
 
-    poolFactory.save();
     return poolFactory;
 }

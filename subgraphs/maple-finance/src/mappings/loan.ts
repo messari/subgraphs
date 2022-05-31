@@ -4,9 +4,12 @@ import {
     PaymentMade as PaymentMadeEvent,
     Liquidation as LiquidationEvent
 } from "../../generated/templates/Loan/Loan";
+
 import { getOrCreateLoan } from "../common/mapping_helpers/loan";
 import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";
+import { getOrCreateProtocol } from "../common/mapping_helpers/protocol";
 import { createBorrow, createLiquidate, createRepay } from "../common/mapping_helpers/transactions";
+import { bigDecimalToBigInt } from "../common/utils";
 
 export function handleDrawdown(event: DrawdownEvent): void {
     const loan = getOrCreateLoan(event.address);
@@ -17,8 +20,15 @@ export function handleDrawdown(event: DrawdownEvent): void {
     loan.drawnDown = loan.drawnDown.plus(drawdownAmount);
     loan.save();
 
-    // Trigger market tick
+    // Update market
+    const protocol = getOrCreateProtocol();
     const market = getOrCreateMarket(Address.fromString(loan.market));
+    market._treasuryRevenue = market._treasuryRevenue.plus(
+        bigDecimalToBigInt(event.params.drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
+    );
+    market.save();
+
+    // Trigger market tick
     marketTick(market, event);
 }
 

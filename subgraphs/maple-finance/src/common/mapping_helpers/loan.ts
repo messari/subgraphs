@@ -1,6 +1,7 @@
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { _Loan } from "../../../generated/schema";
 import { Loan } from "../../../generated/templates/Loan/Loan";
+
 import { ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 
 /**
@@ -41,6 +42,8 @@ export function getOrCreateLoan(
         loan.collateralLiquidatedInPoolInputTokens = ZERO_BI;
         loan.defaultSuffered = ZERO_BI;
 
+        loan.save();
+
         if (ZERO_ADDRESS == marketAddress || ZERO_BI == amountFunded) {
             log.error("Created loan with invalid params: marketAddress={}, amountFunded={}", [
                 marketAddress.toHexString(),
@@ -49,6 +52,5 @@ export function getOrCreateLoan(
         }
     }
 
-    loan.save();
     return loan;
 }

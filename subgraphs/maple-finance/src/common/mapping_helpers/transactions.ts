@@ -12,9 +12,10 @@ import {
     _StakeLocker,
     _Unstake
 } from "../../../generated/schema";
-import { PROTOCOL_ID } from "../constants";
 
-import { getOrCreateMarket, marketTick } from "./market";
+import { PROTOCOL_ID } from "../constants";
+import { bigDecimalToBigInt } from "../utils";
+import { getOrCreateMarket } from "./market";
 
 export function createDeposit(event: ethereum.Event, market: Market, amountMPTMinted: BigInt): Deposit {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
@@ -30,12 +31,7 @@ export function createDeposit(event: ethereum.Event, market: Market, amountMPTMi
     deposit.market = market.id;
     deposit.asset = market.inputToken;
     deposit._amountMPT = amountMPTMinted;
-    deposit.amount = BigInt.fromString(
-        deposit._amountMPT
-            .toBigDecimal()
-            .times(market.exchangeRate)
-            .toString()
-    );
+    deposit.amount = bigDecimalToBigInt(deposit._amountMPT.toBigDecimal().times(market.exchangeRate));
     deposit.amountUSD = deposit.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     deposit.save();
@@ -57,12 +53,7 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
     withdraw.market = market.id;
     withdraw.asset = market.inputToken;
     withdraw._amountMPT = amountMPTBurned;
-    withdraw.amount = BigInt.fromString(
-        withdraw._amountMPT
-            .toBigDecimal()
-            .times(market.exchangeRate)
-            .toString()
-    );
+    withdraw.amount = bigDecimalToBigInt(withdraw._amountMPT.toBigDecimal().times(market.exchangeRate));
     withdraw.amountUSD = withdraw.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     withdraw.save();

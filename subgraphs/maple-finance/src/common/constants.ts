@@ -93,9 +93,9 @@ export namespace OracleType {
 ////////////////////////////
 
 export namespace PoolState {
-    export const Initialized = 0;
-    export const Finalized = 1;
-    export const Deactivated = 2;
+    export const Initialized: i32 = 0;
+    export const Finalized: i32 = 1;
+    export const Deactivated: i32 = 2;
 }
 
 //////////////////////////////
@@ -134,11 +134,14 @@ export const ZERO_BI = BigInt.zero();
 export const ONE_BD = BigDecimal.fromString("1");
 export const ONE_BI = BigInt.fromString("1");
 
-export const DEFAULT_DECIMALS = 18;
+export const TEN_BD = BigDecimal.fromString("10");
 
 export const MPL_REWARDS_DEFAULT_DURATION_TIME_S = BigInt.fromString("604800"); // 7 days
 
 export const SEC_PER_DAY = BigInt.fromString("86400");
+
+export const ETH_DECIMALS = 18;
+export const POOL_WAD_DECIMALS: i32 = 18;
 
 /////////////////////////////
 ///// Protocol Specific /////
@@ -152,3 +155,6 @@ export const PROTOCOL_TYPE = ProtocolType.LENDING;
 export const PROTOCOL_LENDING_TYPE = LendingType.POOLED;
 export const PROTOCOL_RISK_TYPE = RiskType.ISOLATED;
 export const PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY = "TREASURY_FEE";
+
+export const PROTOCOL_INTEREST_RATE_TYPE = InterestRateType.FIXED_TERM;
+export const PROTOCOL_INTEREST_RATE_SIDE = InterestRateSide.BORROWER;

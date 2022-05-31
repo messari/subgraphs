@@ -1,8 +1,8 @@
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { _StakeLocker } from "../../../generated/schema";
-import { MAPLE_POOL_LIB_ADDRESS, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 import { PoolLib } from "../../../generated/templates/Pool/PoolLib";
 
+import { MAPLE_POOL_LIB_ADDRESS, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 import { getOrCreateMarket } from "./market";
 import { getOrCreateToken } from "./token";
 import { parseUnits } from "../utils";
@@ -44,9 +44,10 @@ export function getOrCreateStakeLocker(
                 [marketAddress.toHexString(), stakeTokenAddress.toHexString(), creationBlock.toString()]
             );
         }
+
+        stakeLocker.save();
     }
 
-    stakeLocker.save();
     return stakeLocker;
 }
 
