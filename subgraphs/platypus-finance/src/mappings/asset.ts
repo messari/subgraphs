@@ -41,15 +41,18 @@ function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
 }
 
 function addToArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
-  let retval = new Array<T>(x.length + 1);
+  if (x.length == 0) {
+    return [item];
+  }
+  let retval = new Array<T>();
   let i = 0;
   while (i < index) {
-    retval[i] = x[i];
+    retval.push(x[i]);
     i += 1;
   }
-  retval[i] = item;
-  while (i < retval.length) {
-    retval[i] = x[i + 1];
+  retval.push(item);
+  while (i < x.length) {
+    retval.push(x[i]);
     i += 1;
   }
   return retval;
