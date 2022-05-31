@@ -42,6 +42,8 @@ dataSources:
           file: ./abis/ubeswap/StakingRewards.json
         - name: TokenABI
           file: ./abis/ubeswap/ERC20.json
+        - name: UniswapV2Pair
+          file: ./abis/ubeswap/UniswapV2Pair.json
       eventHandlers:
         - event: UpdatePoolWeight(indexed address,indexed uint256,uint256,indexed bool)
           handler: handleUpdatePoolWeight
@@ -92,6 +94,9 @@ templates:
           file: ./abis/ubeswap/StakingRewards.json
         - name: TokenABI
           file: ./abis/ubeswap/ERC20.json
+        - name: UniswapV2Pair
+          file: ./abis/ubeswap/UniswapV2Pair.json
+          
       eventHandlers:
         - event: Staked(indexed address,uint256)
           handler: handleStaked
