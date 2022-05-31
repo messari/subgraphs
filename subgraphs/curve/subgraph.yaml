@@ -1,17 +1,13 @@
-description: ...
-graft:
-  base: QmNZQBGizE6LJpCa282SRwJSgczTobQeieNnwzqNnYSRxv # Subgraph ID of base subgraph
-  block: 7636794 # Block number
 specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: AddressProvider
-    network: avalanche
+    network: mainnet
     source:
       address: "0x0000000022d53366457f9d5e68ec105046fc4383"
-      startBlock: 5209504
+      startBlock: 11153725
       abi: AddressProvider
     mapping:
       kind: ethereum/events
@@ -94,7 +90,7 @@ dataSources:
 templates:
   - name: RegistryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: MainRegistry
     mapping:
@@ -168,13 +164,13 @@ templates:
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handleMainRegistryPoolAdded
-      
-        
-          
+      callHandlers:
+        - function: set_liquidity_gauges(address,address[10])
+          handler: handleSetLiquidityGauges
       file: ./src/mapping.ts
   - name: StableFactoryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: StableFactory
     mapping:
@@ -249,13 +245,13 @@ templates:
           handler: handleMetaPoolDeployed
         - event: LiquidityGaugeDeployed(address,address)
           handler: handleLiquidityGaugeDeployed
-      
-        
-          
+      callHandlers:
+        - function: add_existing_metapools(address[10])
+          handler: handleAddExistingMetaPools
       file: ./src/mapping.ts
   - name: CryptoRegistryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: CryptoRegistry
     mapping:
@@ -328,15 +324,15 @@ templates:
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
-      
-        
-          
-        
-          
+      callHandlers:
+        - function: set_liquidity_gauges(address,address[10])
+          handler: handleSetLiquidityGauges
+        - function: batch_set_liquidity_gauges(address[10],address[10])
+          handler: handleBatchSetLiquidityGauges
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: CurvePool
     mapping:
@@ -429,7 +425,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoFactoryTemplate
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: CryptoFactory
     mapping:
@@ -510,7 +506,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplateV2
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: CurvePoolV2
     mapping:
@@ -595,7 +591,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurveGauge
     kind: ethereum/contract
-    network: avalanche
+    network: mainnet
     source:
       abi: Gauge
     mapping:

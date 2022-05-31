@@ -36,8 +36,10 @@ import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/Stab
 import { setGaugeData } from './services/gauges/helpers'
 import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
 import { catchUp } from './services/catchup'
-
-
+import { handleLiquidityEvent, handleLiquidityRemoveOne } from './services/liquidity'
+import { setPoolBalances } from './common/setters'
+import { Add_existing_metapoolsCall } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
+import { catchUpRegistryMainnet } from './services/catchup'
 
 
 export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt, timestamp: BigInt, hash: Bytes): void {
@@ -45,7 +47,7 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
   if (!platform.catchup && (block > CATCHUP_BLOCK)) {
     platform.catchup = true
     platform.save()
-    
+    catchUpRegistryMainnet()
   }
   if (providedId == BIG_INT_ZERO) {
     let mainRegistry = Registry.load(addedAddress.toHexString())
@@ -217,7 +219,7 @@ export function addRegistryPool(pool: Address,
       EARLY_V2_POOLS.includes(pool) ? true : false,
       // on mainnet the unknown metapools are legacy metapools deployed before the
       // contract was added to the address indexer
-      UNKNOWN_METAPOOLS.has(pool.toHexString()) ? STABLE_FACTORY : STABLE_FACTORY,
+      UNKNOWN_METAPOOLS.has(pool.toHexString()) ? METAPOOL_FACTORY : STABLE_FACTORY,
       timestamp,
       block,
       hash,
@@ -289,6 +291,7 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
   
+  handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -298,6 +301,8 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
+
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -306,6 +311,9 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString())
+
+  handleLiquidityRemoveOne(pool,event.params.token_supply,event.params.token_amount,event.params.provider,event);
+  setPoolBalances(pool);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -314,7 +322,8 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance): void {
   let pool = getLiquidityPool(event.address.toHexString())
-
+  
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -393,10 +402,10 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
 // event emitted. So we need a call handler. But this is only (so far) a mainnet
 // problem - and only mainnet can handle call triggers. Hence why we need to hack
 // around with mustache to avoid issues 
-export function handleAddExistingMetaPools(): void {
+export function handleAddExistingMetaPools(call: Add_existing_metapoolsCall): void {
 
-  const pools = [ADDRESS_ZERO]
-  const factory = Factory.load('0x0000000000000000000000000000000000000001')
+  const pools = call.inputs._pools
+  const factory = Factory.load(call.to.toHexString())
   if (!factory) {
     return
   }
@@ -408,7 +417,7 @@ export function handleAddExistingMetaPools(): void {
     log.info('Existing meta pool {} added to factory contract ({}) at {}', [
       pools[i].toHexString(),
       i.toString(),
-      LENDING
+      call.transaction.hash.toHexString()
     ])
   }
   factory.save()

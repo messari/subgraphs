@@ -39,8 +39,8 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 export function updateUsageMetrics(event: ethereum.Event, action: string = ""): void {
-  // Number of days since Unix epoch
-  let hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  //@ts-ignore // Number of days since Unix epoch
+  let hourlyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR; //@ts-ignore
   let dailyId: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let usageHourlyMetrics = getOrCreateUsageMetricHourlySnapshot(event);
   let usageDailyMetrics = getOrCreateUsageMetricDailySnapshot(event);
@@ -144,8 +144,8 @@ export function updatePoolMetrics(poolAddress: string, event: ethereum.Event): v
 
 export function updatePool(liquidityPool: LiquidityPool, event: ethereum.Event): void {
   liquidityPool.outputTokenPriceUSD = getLpTokenPriceUSD(liquidityPool, event.block.timestamp);
-  setPoolBalances(liquidityPool);
-  setPoolOutputTokenSupply(liquidityPool);
+  //setPoolBalances(liquidityPool);
+  //setPoolOutputTokenSupply(liquidityPool);
   setPoolTVL(liquidityPool, event.block.timestamp); // updates pool token weights too
   setProtocolTVL(); // updates the protocol totalValueLockedUSD, along with the pool's tvl being updated
   liquidityPool.save();

@@ -36,6 +36,8 @@ import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/Stab
 import { setGaugeData } from './services/gauges/helpers'
 import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
 import { catchUp } from './services/catchup'
+import { handleLiquidityEvent, handleLiquidityRemoveOne } from './services/liquidity'
+import { setPoolBalances } from './common/setters'
 {{{ importExistingMetaPools }}}
 {{{ importCatchupFunction }}}
 
@@ -289,6 +291,7 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
   
+  handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -298,6 +301,8 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
+
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -306,6 +311,9 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString())
+
+  handleLiquidityRemoveOne(pool,event.params.token_supply,event.params.token_amount,event.params.provider,event);
+  setPoolBalances(pool);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -314,7 +322,8 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance): void {
   let pool = getLiquidityPool(event.address.toHexString())
-
+  
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
