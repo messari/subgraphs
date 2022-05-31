@@ -56,6 +56,8 @@ export const percentageFieldList = [
   "fee",
   "percentage",
 ];
+// negativeFieldList contains field names that can be negative
+export const negativeFieldList = [];
 export const ProtocolsToQuery: { [name: string]: { [network: string]: string } } = {
   aaveV2: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum",
@@ -80,6 +82,37 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
     optimism: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-optimism",
     avalanche: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-avalanche",
     fantom: "https://api.thegraph.com/subgraphs/name/messari/curve-finance-fantom",
+  },
+  cream: {
+    arbitrum: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-arbitrum",
+    matic: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-polygon",
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-ethereum",
+    bsc: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-bsc"
+  },
+  ironbank: {
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-ethereum",
+    fantom: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-fantom",
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-avalanche"
+  },
+  traderjoe: {
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/trader-joe-avalanche"
+  },
+  sushiswap: {
+    fantom: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-fantom",
+    fuse: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-fuse",
+    bsc: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-bsc",
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-avalanche",
+    arbitrum: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-arbitrum",
+    mainnet: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-ethereum",
+    matic: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-polygon",
+    moonriver: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-moonriver",
+    celo: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-celo"
+  },
+  quickswap: {
+    matic: "https://api.thegraph.com/subgraphs/name/messari/quickswap-polygon"
+  },
+  solarbeam: {
+    moonriver: "https://api.thegraph.com/subgraphs/name/messari/solarbeam-moonriver"
   },
   ellipsis: {
     bsc: "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc",
