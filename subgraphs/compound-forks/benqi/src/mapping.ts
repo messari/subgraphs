@@ -11,6 +11,7 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
+  ActionPaused1,
 } from "../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -55,6 +56,7 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
+  _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
@@ -161,6 +163,10 @@ export function handleNewLiquidationIncentive(
   _handleNewLiquidationIncentive(protocol, event);
 }
 
+export function handleActionPaused(event: ActionPaused1): void {
+  _handleActionPaused(event);
+}
+
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   _handleNewReserveFactor(event);
 }
@@ -214,7 +220,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "BENQI",
     "benqi",
     "1.2.1",
-    "1.0.1",
+    "1.0.2",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

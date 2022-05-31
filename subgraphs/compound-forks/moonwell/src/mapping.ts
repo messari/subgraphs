@@ -58,7 +58,10 @@ import {
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
-import { Comptroller } from "../generated/Comptroller/Comptroller";
+import {
+  ActionPaused1,
+  Comptroller,
+} from "../generated/Comptroller/Comptroller";
 import { SolarBeamLPToken } from "../generated/templates/CToken/SolarBeamLPToken";
 import { CToken as CTokenTemplate } from "../generated/templates";
 import { ERC20 } from "../generated/Comptroller/ERC20";
@@ -152,6 +155,23 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   _handleNewCollateralFactor(event);
 }
 
+export function handleActionPaused(event: ActionPaused1): void {
+  let marketID = event.params.mToken.toHexString();
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[handleActionPaused] Market not found: {}", [marketID]);
+    return;
+  }
+
+  if (event.params.action == "Mint") {
+    market.isActive = event.params.pauseState;
+  } else if (event.params.action == "Borrow") {
+    market.canBorrowFrom = event.params.pauseState;
+  }
+
+  market.save();
+}
+
 export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
@@ -212,7 +232,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.3",
+    "1.0.4",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa(),

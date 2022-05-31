@@ -1,5 +1,7 @@
 node_modules/
 **/generated/
 **/build/
+
+# multi-chain auto-generated files
 iron-bank/subgraph.yaml
 cream-finance/subgraph.yaml
