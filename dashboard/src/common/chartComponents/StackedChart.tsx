@@ -5,7 +5,13 @@ import { toDate } from "../../utils";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export function StackedChart(tokens: any[], tokenWeightsArray: any[], poolTitle: string) {
+interface StackedChartProps {
+  tokens: any[];
+  tokenWeightsArray: any[];
+  poolTitle: string;
+}
+
+export function StackedChart({ tokens, tokenWeightsArray, poolTitle }: StackedChartProps) {
   const dates: string[] = [];
 
   const tokenWeightsValues = tokenWeightsArray.map((x) => {

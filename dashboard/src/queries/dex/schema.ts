@@ -479,7 +479,7 @@ export const schema120 = (): Schema => {
   };
 
   // Query liquidityPool(pool) entity and events entities
-  let events: string[] = ["withdraws", "deposits", "swaps"];
+  let events: string[] = ["deposits", "withdraws", "swaps"];
   let eventsQuery: any[] = events.map((event) => {
     let options = "";
     const baseStr =

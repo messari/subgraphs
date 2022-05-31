@@ -25,7 +25,7 @@ const StyledPool = styled(Card)(() => {
   `;
 });
 
-const CardRow = styled("div") <{ $warning?: boolean }>`
+const CardRow = styled("div")<{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;

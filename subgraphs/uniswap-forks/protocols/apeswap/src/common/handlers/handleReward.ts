@@ -20,11 +20,10 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
       lpTokenAddress = poolInfo.value.value1.toHexString();
     }
     masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = BIGINT_ZERO;
+    masterChefPool.valueBigInt = event.block.number;
     masterChefPool.save();
   }
 
-  // Return if pool does not exist - Banana tokens?
   let pool = LiquidityPool.load(masterChefPool.valueString!);
   if (!pool) {
     return;
@@ -59,7 +58,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     rewardTokenPerBlock = getRewardTokenPerBlock.value;
   }
 
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.number);
+  let getMultiplier = poolContract.try_getMultiplier(masterChefPool.valueBigInt!, event.block.number);
 
   let multiplier: BigInt = BIGINT_ONE;
   if (!getMultiplier.reverted) {

@@ -72,7 +72,7 @@ export function handleHarvested(event: HarvestedEvent): void {
   const strategy = StrategyStore.load(strategyAddress.toHexString());
   if (!strategy) return;
 
-  const vaultAddress = strategy!.vaultAddress;
+  const vaultAddress = strategy.vaultAddress;
   const vault = VaultStore.load(vaultAddress.toHexString());
 
   if (vault) {

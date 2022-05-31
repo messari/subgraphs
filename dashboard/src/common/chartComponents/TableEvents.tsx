@@ -4,7 +4,13 @@ import { convertTokenDecimals, toDate } from "../../../src/utils/index";
 import { PoolName } from "../../constants";
 import { CopyLinkToClipboard } from "../utilComponents/CopyLinkToClipboard";
 
-export const TableEvents = (_datasetLabel: string, data: any, eventName: string, poolId: string) => {
+interface TableEventsProps {
+  datasetLabel: string;
+  data: any;
+  eventName: string;
+}
+
+export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps) => {
   const dataTable = data[eventName];
   const protocolType = data.protocols[0].type;
   const poolName = PoolName[protocolType];
@@ -77,7 +83,7 @@ export const TableEvents = (_datasetLabel: string, data: any, eventName: string,
       <Box height={750} py={6} id={eventName}>
         <CopyLinkToClipboard link={window.location.href} scrollId={eventName}>
           <Typography fontSize={20}>
-            <b>{_datasetLabel.toUpperCase()}</b>
+            <b>{datasetLabel.toUpperCase()}</b>
           </Typography>
         </CopyLinkToClipboard>
         <DataGrid

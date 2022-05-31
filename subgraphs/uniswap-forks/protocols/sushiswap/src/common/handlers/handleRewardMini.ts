@@ -20,11 +20,11 @@ export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: Big
       lpTokenAddress = getlpAddress.value.toHexString();
     }
     masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = BIGINT_ZERO;
+    masterChefPool.valueBigInt = event.block.number;
     masterChefPool.save();
   }
 
-  // Return if pool does not exist
+  // Return if pool does not exist - Banana tokens?
   let pool = LiquidityPool.load(masterChefPool.valueString!);
   if (!pool) {
     return;
@@ -66,7 +66,7 @@ export function handleRewardMini(event: ethereum.Event, pid: BigInt, amount: Big
   }
 
   // Calculate Reward Emission per sec
-  let multiplier = event.block.timestamp.minus(lastRewardTime);
+  let multiplier = event.block.timestamp.minus(masterChefPool.valueBigInt!);
   let rewardTokenRate = rewardTokenPerSecond.times(multiplier).times(poolAllocPoint).div(totalAllocPoint);
 
   // Get the estimated rewards emitted for the upcoming day for this pool
