@@ -25,6 +25,27 @@
         "deploy-on-merge": "false"
       }
     },
+    "quickswap": {
+      "matic": {
+        "template": "quickswap.template.yaml",
+        "steegecs": "steegecs/quickswap-matic",
+        "messari": "messari/quickswap-polygon"
+      }
+    },
+    "solarbeam": {
+      "moonriver": {
+        "template": "solarbeam.template.yaml",
+        "steegecs": "steegecs/solarbeam-moonriver",
+        "messari": "messari/solarbeam-moonriver"
+      }
+    },
+    "spiritswap": {
+      "fantom": {
+        "template": "spiritswap.template.yaml",
+        "steegecs": "steegecs/spiritswap-fantom",
+        "messari": "messari/spiritswap-fantom"
+      }
+    },
     "sushiswap": {
       "arbitrum": {
         "template": "sushiswap.alt.template.yaml",
@@ -53,7 +74,8 @@
       },
       "mainnet": {
         "template": "uniswap.v2.template.yaml",
-        "steegecs": "steegecs/sushiswap-mainnet"
+        "steegecs": "steegecs/sushiswap-mainnet",
+        "messari": "messari/sushiswap-ethereum"
       },
       "matic": {
         "template": "sushiswap.alt.template.yaml",
@@ -66,7 +88,34 @@
       },
       "moonriver": {
         "template": "sushiswap.alt.template.yaml",
-        "deploy-on-merge": "false"
+        "steegecs": "steegecs/sushiswap-moonriver",
+        "messari": "messari/sushiswap-moonriver"
+      },
+      "xdai": {
+        "template": "sushiswap.alt.template.yaml",
+        "steegecs": "steegecs/sushiswap-xdai",
+        "messari": "messari/sushiswap-gnosis"
+      }
+    },
+    "trader-joe": {
+      "avalanche": {
+        "template": "trader.joe.template.yaml",
+        "steegecs": "steegecs/trader-joe-avalanche",
+        "messari": "messari/trader-joe-avalanche"
+      }
+    },
+    "trisolaris": {
+      "aurora": {
+        "template": "trisolaris.template.yaml",
+        "steegecs": "steegecs/trisolaris-aurora",
+        "messari": "messari/trisolaris-aurora"
+      }
+    },
+    "vvs-finance": {
+      "cronos": {
+        "template": "vvs.finance.template.yaml",
+        "steegecs": "steegecs/trisolaris-aurora",
+        "messari": "messari/trisolaris-aurora"
       }
     }
   }

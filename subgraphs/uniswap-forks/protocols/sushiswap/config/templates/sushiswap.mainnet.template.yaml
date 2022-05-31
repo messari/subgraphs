@@ -47,7 +47,7 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./src/mappings/masterChef/sushiswap/reward.ts
+      file: ./protocols/sushiswap/src/mappings/masterchef/reward.ts
 
   - kind: ethereum
     name: MasterChefV2
@@ -73,7 +73,7 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/masterChef/sushiswap/rewardV2.ts   
+      file: ./protocols/sushiswap/src/mappings/masterchef/rewardV2.ts
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -104,4 +104,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          
