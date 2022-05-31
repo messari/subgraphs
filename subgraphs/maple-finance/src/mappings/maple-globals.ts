@@ -5,8 +5,8 @@ import {
 import { BigDecimal } from "@graphprotocol/graph-ts";
 import { PoolFactory as PoolFactoryTemplate } from "../../generated/templates";
 import { _PoolFactory } from "../../generated/schema";
-import { PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY } from "../common/constants";
 
+import { PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY } from "../common/constants";
 import { getOrCreatePoolFactory } from "../common/mapping_helpers/poolFactory";
 import { getOrCreateProtocol } from "../common/mapping_helpers/protocol";
 

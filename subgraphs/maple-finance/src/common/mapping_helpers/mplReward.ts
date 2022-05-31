@@ -1,15 +1,16 @@
 import { Address, BigInt, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, _MplReward } from "../../../generated/schema";
-import { MplRewards } from "../../../generated/templates/MplRewards/MplRewards";
+
 import { MPL_REWARDS_DEFAULT_DURATION_TIME_S, SEC_PER_DAY, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
 import { getTokenPriceInUSD } from "../prices/prices";
 import { parseUnits } from "../utils";
 import { getOrCreateMarket } from "./market";
 import { getOrCreateStakeLocker } from "./stakeLocker";
-import { getOrCreateToken } from "./token";
+import { getOrCreateRewardToken, getOrCreateToken } from "./token";
 
 /**
  * Get the mpl rewards at mplRewardAddress, or create it if it doesn't exist
+ * On creation this will also connect it to the market and add a new rewards token (if applicable)
  * Only mplRewardAddress is required for get, everything should be set for create
  */
 export function getOrCreateMplReward(
@@ -23,7 +24,7 @@ export function getOrCreateMplReward(
     if (!mplReward) {
         mplReward = new _MplReward(mplRewardAddress.toHexString());
 
-        const rewardToken = getOrCreateToken(rewardTokenAddress);
+        const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
         const stakeToken = getOrCreateToken(stakeTokenAddress);
 
         // Explicity load market, we need to see if it exists
@@ -39,6 +40,23 @@ export function getOrCreateMplReward(
             market._mplRewardMplStake = mplReward.id;
         }
 
+        // Add reward token to market if it doesn't exist
+        let newRewardTokenForMarket = true;
+        for (let i = 0; i < market.rewardTokens.length; i++) {
+            if (market.rewardTokens[i] == rewardToken.id) {
+                newRewardTokenForMarket = false;
+            }
+        }
+
+        if (newRewardTokenForMarket) {
+            const newRewardTokens = market.rewardTokens;
+            newRewardTokens.push(rewardToken.id);
+            market.rewardTokens = newRewardTokens;
+            log.warning("Added reward token: {}", [rewardToken.id]);
+        } else {
+            log.warning("Already have reward token: {}", [rewardToken.id]);
+        }
+
         mplReward.market = market.id;
         mplReward.stakeToken = stakeToken.id;
         mplReward.rewardToken = rewardToken.id;
@@ -51,6 +69,7 @@ export function getOrCreateMplReward(
         mplReward.lastUpdatedBlock = creationBlock;
 
         market.save();
+        mplReward.save();
 
         if (ZERO_ADDRESS == stakeTokenAddress || ZERO_ADDRESS == rewardTokenAddress || ZERO_BI == creationBlock) {
             log.error(
@@ -60,7 +79,6 @@ export function getOrCreateMplReward(
         }
     }
 
-    mplReward.save();
     return mplReward;
 }
 
@@ -77,7 +95,7 @@ export function mplRewardTick(mplReward: _MplReward, event: ethereum.Event): voi
             mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
         }
 
-        const rewardToken = getOrCreateToken(Address.fromString(mplReward.rewardToken));
+        const rewardToken = getOrCreateToken(Address.fromString(mplReward.rewardToken)); // Actual token instead of RewardToken
         const rewardTokenPriceUSD = getTokenPriceInUSD(rewardToken, event);
 
         mplReward.rewardTokenEmissionsUSDPerDay = parseUnits(

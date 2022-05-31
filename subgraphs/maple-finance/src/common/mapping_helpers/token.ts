@@ -1,6 +1,16 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { Token } from "../../../generated/schema";
-import { DEFAULT_DECIMALS, ETH_ADDRESS, ETH_NAME, ETH_SYMBOL, OracleType, ZERO_BD, ZERO_BI } from "../constants";
+import { RewardToken, Token } from "../../../generated/schema";
+
+import {
+    ETH_DECIMALS,
+    ETH_ADDRESS,
+    ETH_NAME,
+    ETH_SYMBOL,
+    OracleType,
+    ZERO_BD,
+    ZERO_BI,
+    RewardTokenType
+} from "../constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "../utils";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
@@ -13,7 +23,7 @@ export function getOrCreateToken(tokenAddress: Address): Token {
         if (tokenAddress.toHexString() == ETH_ADDRESS) {
             token.name = ETH_NAME;
             token.symbol = ETH_SYMBOL;
-            token.decimals = DEFAULT_DECIMALS;
+            token.decimals = ETH_DECIMALS;
         } else {
             token.name = getAssetName(tokenAddress);
             token.symbol = getAssetSymbol(tokenAddress);
@@ -23,8 +33,26 @@ export function getOrCreateToken(tokenAddress: Address): Token {
         token.lastPriceUSD = ZERO_BD;
         token.lastPriceBlockNumber = ZERO_BI;
         token._lastPriceOracle = OracleType.NONE;
+
+        token.save();
     }
 
-    token.save();
     return token;
+}
+
+export function getOrCreateRewardToken(tokenAddress: Address): RewardToken {
+    let rewardToken = RewardToken.load(tokenAddress.toHexString());
+
+    if (!rewardToken) {
+        rewardToken = new RewardToken(tokenAddress.toHexString());
+
+        const token = getOrCreateToken(tokenAddress);
+
+        rewardToken.token = token.id;
+        rewardToken.type = RewardTokenType.DEPOSIT;
+
+        rewardToken.save();
+    }
+
+    return rewardToken;
 }

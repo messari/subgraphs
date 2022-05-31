@@ -134,6 +134,9 @@ type InterestRate @entity {
 
     " The type of interest rate (e.g. stable, fixed, variable, etc) "
     type: InterestRateType!
+
+    " The loan that this rate exists for "
+    _loan: _Loan!
 }
 
 #############################
@@ -452,7 +455,7 @@ type Market @entity {
     protocol: LendingProtocol!
 
     " Name of market "
-    name: String
+    name: String!
 
     " Is this market active or is it frozen "
     isActive: Boolean!
@@ -476,10 +479,10 @@ type Market @entity {
     inputToken: Token!
 
     " Token that is minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist "
-    outputToken: Token
+    outputToken: Token!
 
     " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
-    rewardTokens: [RewardToken!]
+    rewardTokens: [RewardToken!]!
 
     ##### Quantitative Data #####
 
@@ -522,10 +525,10 @@ type Market @entity {
     exchangeRate: BigDecimal!
 
     " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-    rewardTokenEmissionsAmount: [BigInt!]
+    rewardTokenEmissionsAmount: [BigInt!]!
 
     " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
-    rewardTokenEmissionsUSD: [BigDecimal!]
+    rewardTokenEmissionsUSD: [BigDecimal!]!
 
     " Creation timestamp "
     createdTimestamp: BigInt!
@@ -601,6 +604,9 @@ type Market @entity {
 
     " Revenue going to the suppliers in USD "
     _supplierRevenueUSD: BigDecimal!
+
+    " Supply side recenue in USD "
+    _supplySideRevenueUSD: BigDecimal!
 
     " Revenue going to the supply side in USD "
     _protocolSideRevenueUSD: BigDecimal!
@@ -1252,7 +1258,7 @@ type _MplReward @entity {
     stakeToken: Token!
 
     " Token the maple rewards are providing (generally MPL) "
-    rewardToken: Token!
+    rewardToken: RewardToken!
 
     " Total rewardToken distribution per second "
     rewardRatePerSecond: BigInt!

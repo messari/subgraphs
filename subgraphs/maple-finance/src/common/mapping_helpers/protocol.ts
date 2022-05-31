@@ -1,4 +1,5 @@
 import { LendingProtocol } from "../../../generated/schema";
+
 import {
     PROTOCOL_ID,
     PROTOCOL_INITIAL_TREASURY_FEE,
@@ -43,8 +44,9 @@ export function getOrCreateProtocol(): LendingProtocol {
         protocol.cumulativeLiquidateUSD = ZERO_BD;
         protocol.mintedTokenSupplies = [];
         protocol._treasuryFee = PROTOCOL_INITIAL_TREASURY_FEE;
+
+        protocol.save();
     }
 
-    protocol.save();
     return protocol;
 }

@@ -44,6 +44,7 @@ dataSources:
               - Market
               - RewardTokens
               - _MplReward
+              - Token
           abis:
               - name: MapleRewardsFactory
                 file: ./abis/MapleRewardsFactory.json
@@ -73,6 +74,7 @@ templates:
           entities:
               - Market
               - _StakeLocker
+              - Token
           abis:
               - name: PoolFactory
                 file: ./abis/PoolFactory.json
@@ -103,6 +105,8 @@ templates:
               - _Loan
               - _StakeLocker
               - Token
+              - InterestRate
+              - _MplRewards
           abis:
               - name: Pool
                 file: ./abis/Pool.json
@@ -146,8 +150,11 @@ templates:
           file: ./src/mappings/stake-locker.ts
           entities:
               - _StakeLocker
-              - Stake
-              - Unstake
+              - _Stake
+              - _Unstake
+              - Market
+              - Token
+              - _MplRewards
           abis:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
@@ -186,6 +193,10 @@ templates:
               - Borrow
               - Repay
               - Liquidate
+              - Market
+              - _StakeLocker
+              - _MplRewards
+              - Token
           abis:
               - name: Loan
                 file: ./abis/Loan.json
@@ -225,6 +236,8 @@ templates:
               - Market
               - _MplReward
               - Token
+              - _Stake
+              - _Unstake
           abis:
               - name: MplReward
                 file: ./abis/MplRewards.json

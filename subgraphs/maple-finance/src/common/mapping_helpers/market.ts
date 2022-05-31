@@ -1,8 +1,12 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Market, _PoolFactory, _StakeLocker } from "../../../generated/schema";
-import { PROTOCOL_ID, UNPROVIDED_NAME, ZERO_ADDRESS, ZERO_BD, ZERO_BI } from "../constants";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Market, _MplReward, _PoolFactory, _StakeLocker } from "../../../generated/schema";
+
+import { POOL_WAD_DECIMALS, PROTOCOL_ID, UNPROVIDED_NAME, ZERO_ADDRESS, ZERO_BD, ZERO_BI, TEN_BD } from "../constants";
+import { getTokenPriceInUSD } from "../prices/prices";
+import { parseUnits, powBigDecimal } from "../utils";
 import { getOrCreateMplReward, mplRewardTick } from "./mplReward";
 import { getOrCreateStakeLocker, stakeLockerTick } from "./stakeLocker";
+import { getOrCreateToken } from "./token";
 
 /**
  * Get the market at marketAddress, or create it if it doesn't exist
@@ -23,6 +27,13 @@ export function getOrCreateMarket(
 
     if (!market) {
         market = new Market(marketAddress.toHexString());
+
+        const inputToken = getOrCreateToken(inputTokenAddress);
+
+        // Following _toWad function
+        const initalExchangeRate = powBigDecimal(TEN_BD, inputToken.decimals).div(
+            powBigDecimal(TEN_BD, POOL_WAD_DECIMALS)
+        );
 
         market.protocol = PROTOCOL_ID;
         market.name = marketName;
@@ -46,7 +57,7 @@ export function getOrCreateMarket(
         market.inputTokenPriceUSD = ZERO_BD;
         market.outputTokenSupply = ZERO_BI;
         market.outputTokenPriceUSD = ZERO_BD;
-        market.exchangeRate = ZERO_BD;
+        market.exchangeRate = initalExchangeRate;
         market.rewardTokenEmissionsAmount = [];
         market.rewardTokenEmissionsUSD = [];
         market.createdTimestamp = creationTimestamp;
@@ -71,6 +82,8 @@ export function getOrCreateMarket(
         // No maple rewards pools to begin with, they get added on MplRewards.sol->MplRewardsCreated
         market._mplRewardMplLp = null;
         market._mplRewardMplStake = null;
+
+        market.save();
 
         if (
             UNPROVIDED_NAME == marketName ||
@@ -98,7 +111,6 @@ export function getOrCreateMarket(
         }
     }
 
-    market.save();
     return market;
 }
 
@@ -106,22 +118,121 @@ export function getOrCreateMarket(
  * Function which should get called every update of the market
  */
 export function marketTick(market: Market, event: ethereum.Event): void {
-    // TODO: update market prices
+    ////
+    // update market prices
+    ////
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    const outputToken = getOrCreateToken(Address.fromString(market.outputToken));
+    market.inputTokenPriceUSD = getTokenPriceInUSD(inputToken, event);
 
+    if (market.outputTokenSupply.gt(ZERO_BI)) {
+        market.exchangeRate = market.inputTokenBalance.toBigDecimal().div(market.outputTokenSupply.toBigDecimal());
+    }
+
+    if (market.exchangeRate.gt(ZERO_BD)) {
+        market.outputTokenPriceUSD = market.inputTokenPriceUSD
+            .div(powBigDecimal(TEN_BD, inputToken.decimals)) // USD per input token mantissa
+            .times(market.exchangeRate) // USD per output token mantissa
+            .times(powBigDecimal(TEN_BD, outputToken.decimals)); // USD per output token
+    } else {
+        market.outputTokenPriceUSD = ZERO_BD;
+    }
+
+    let lpMplReward: _MplReward | null = null;
+    let stakeMplReward: _MplReward | null = null;
+
+    ////
     // Trigger mplReward's tick
+    ////
     if (market._mplRewardMplLp) {
-        const lpMplReward = getOrCreateMplReward(Address.fromString(<string>market._mplRewardMplLp));
-        mplRewardTick(lpMplReward, event);
+        lpMplReward = getOrCreateMplReward(Address.fromString(<string>market._mplRewardMplLp));
+        mplRewardTick(<_MplReward>lpMplReward, event);
     }
 
     if (market._mplRewardMplStake) {
-        const stakeMplReward = getOrCreateMplReward(Address.fromString(<string>market._mplRewardMplStake));
-        mplRewardTick(stakeMplReward, event);
+        stakeMplReward = getOrCreateMplReward(Address.fromString(<string>market._mplRewardMplStake));
+        mplRewardTick(<_MplReward>stakeMplReward, event);
     }
 
+    ////
     // Trigger stakeLocker tick
+    ////
     const stakeLocker = getOrCreateStakeLocker(Address.fromString(market._stakeLocker));
     stakeLockerTick(stakeLocker, event);
 
-    // TODO: update market cumulatives
+    ////
+    // Update market cumulatives
+    ////
+    market.totalValueLockedUSD = parseUnits(
+        market.inputTokenBalance.plus(stakeLocker.stakeTokenBalanceInPoolInputTokens),
+        inputToken.decimals
+    ).times(market.inputTokenPriceUSD);
+
+    market.totalDepositBalanceUSD = parseUnits(market.inputTokenBalance, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market.cumulativeDepositUSD = parseUnits(market._cumulativeDeposit, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market.totalBorrowBalanceUSD = parseUnits(market._totalBorrowBalance, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market.cumulativeBorrowUSD = parseUnits(market._cumulativeBorrow, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    const cumulativeLiquidate = market._cumulativePoolDefault
+        .plus(market._cumulativeCollatoralLiquidationInPoolInputTokens)
+        .plus(stakeLocker.cumulativeStakeDefaultInPoolInputTokens);
+    market.cumulativeLiquidateUSD = parseUnits(cumulativeLiquidate, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market._poolDelegateRevenueUSD = parseUnits(market._poolDelegateRevenue, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market._treasuryRevenueUSD = parseUnits(market._treasuryRevenue, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market._supplierRevenueUSD = parseUnits(market._supplierRevenue, inputToken.decimals).times(
+        market.inputTokenPriceUSD
+    );
+
+    market._supplySideRevenueUSD = market._supplierRevenueUSD
+        .plus(market._poolDelegateRevenueUSD)
+        .plus(stakeLocker.revenueUSD);
+
+    market._protocolSideRevenueUSD = market._treasuryRevenueUSD;
+
+    market._totalRevenueUSD = market._protocolSideRevenueUSD.plus(market._supplySideRevenueUSD);
+
+    let rewardTokenEmissionAmount: BigInt[] = [];
+    let rewardTokenEmissionUSD: BigDecimal[] = [];
+    for (let i = 0; i < market.rewardTokens.length; i++) {
+        let tokenEmission = ZERO_BI;
+        let tokenEmissionUSD = ZERO_BD;
+        const rewardToken = market.rewardTokens[i];
+
+        if (lpMplReward && (<_MplReward>lpMplReward).rewardToken == rewardToken) {
+            tokenEmission = tokenEmission.plus(lpMplReward.rewardTokenEmissionAmountPerDay);
+            tokenEmissionUSD = tokenEmissionUSD.plus(lpMplReward.rewardTokenEmissionsUSDPerDay);
+        }
+
+        if (stakeMplReward && (<_MplReward>stakeMplReward).rewardToken == rewardToken) {
+            tokenEmission = tokenEmission.plus(stakeMplReward.rewardTokenEmissionAmountPerDay);
+            tokenEmissionUSD = tokenEmissionUSD.plus(stakeMplReward.rewardTokenEmissionsUSDPerDay);
+        }
+
+        rewardTokenEmissionAmount.push(tokenEmission);
+        rewardTokenEmissionUSD.push(tokenEmissionUSD);
+    }
+    market.rewardTokenEmissionsAmount = rewardTokenEmissionAmount;
+    market.rewardTokenEmissionsUSD = rewardTokenEmissionUSD;
+
+    market.save();
 }
