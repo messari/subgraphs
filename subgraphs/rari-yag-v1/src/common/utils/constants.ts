@@ -221,10 +221,10 @@ export const ETHER_VAULT_SYMBOL = "REPT"; // REPT = rariether pool token
 /////////////////////////////
 
 export const RARI_DEPLOYER = "0xb8f02248d53f7edfa38e79263e743e9390f81942"; // using as "protocol address" b/c no factory contract
-export const PROTOCOL_NAME = "Rari Vaults v1";
-export const PROTOCOL_SLUG = "rari-vaults-v1";
+export const PROTOCOL_NAME = "Rari Vaults";
+export const PROTOCOL_SLUG = "rari-vaults";
 export const SCHEMA_VERSION = "1.2.1";
-export const SUBGRAPH_VERSION = "1.3.13";
+export const SUBGRAPH_VERSION = "1.3.14";
 export const METHODOLOGY_VERSION = "1.0.0";
 export const PROTOCOL_NETWORK = Network.MAINNET;
 export const PROTOCOL_TYPE = ProtocolType.YIELD;
