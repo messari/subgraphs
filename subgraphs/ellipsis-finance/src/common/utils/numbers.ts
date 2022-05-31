@@ -1,4 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BIGINT_NEG_ONE, BIGINT_ZERO } from "../constants";
 
 export function bigIntToBigDecimal(quantity: BigInt, decimals: i32 = 18): BigDecimal {
   return quantity.divDecimal(
@@ -60,4 +61,11 @@ export function rayToWad(a: BigInt): BigInt {
 export function wadToRay(a: BigInt): BigInt {
   const result = a.times(BigInt.fromI32(10).pow(9));
   return result;
+}
+
+export function absValBigInt(value: BigInt): BigInt {
+  if (value.lt(BIGINT_ZERO)) {
+    return value.times(BIGINT_NEG_ONE);
+  }
+  return value;
 }
