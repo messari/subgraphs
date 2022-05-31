@@ -1,0 +1,80 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Factory
+    network: {{network}}
+    source:
+      address: "{{address}}"
+      abi: Factory
+      startBlock: {{startBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: Factory
+          file: ./abis/spiritswap/Factory.json
+        - name: TokenABI
+          file: ./abis/spiritswap/ERC20.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+      file: ./src/mappings/factory.ts
+  - kind: ethereum
+    name: MasterChef
+    network: {{network}}
+    source:
+      address: "{{MasterChefAddress}}"
+      abi: MasterChefSpiritSwap
+      startBlock: {{MasterChefStartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: []
+      abis:
+        - name: MasterChefSpiritSwap
+          file: ./abis/spiritswap/MasterChefSpiritSwap.json
+        - name: TokenABI
+          file: ./abis/spiritswap/ERC20.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdraw
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdraw
+      file: ./protocols/spiritswap/src/mappings/masterchef/reward.ts
+templates:
+  - kind: ethereum/contract
+    name: Pair
+    network: {{network}}
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/pool.ts
+      entities: []
+      abis:
+        - name: Pair
+          file: ./abis/spiritswap/Pair.json
+        - name: Factory
+          file: ./abis/spiritswap/Factory.json
+        - name: TokenABI
+          file: ./abis/spiritswap/ERC20.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync
