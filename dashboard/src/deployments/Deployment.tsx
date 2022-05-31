@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -106,7 +106,9 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   const { schemaVersion } = protocol ?? {};
 
   useEffect(() => {
-    console.log("DEPLOYMENT ERR?", error, errorIndexing, status, subgraphName);
+    if (error || errorIndexing) {
+      console.log("DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
+    }
   }, [error]);
 
   const { schemaOutdated, indexedSuccess } = useMemo(() => {
@@ -122,9 +124,9 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   const indexed = synced
     ? 100
     : toPercent(
-        status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number,
-        status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number,
-      );
+      status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number,
+      status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number,
+    );
 
   const navigateToSubgraph = (url: string) => () => {
     navigate(`subgraph?endpoint=${url}&tab=protocol`);

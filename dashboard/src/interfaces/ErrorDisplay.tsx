@@ -39,7 +39,6 @@ function ErrorDisplay({
     }
   }
 
-  console.log("ERR OR", Object.values(errorObject), Object.keys(errorObject), errorObject);
   const subgraphParam = searchParams.get("subgraph");
   const errorMsgs = [];
   let errorTotalCount = 0;
