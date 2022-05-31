@@ -72,7 +72,7 @@ export function handleAssetStatus(event: AssetStatus): void {
   marketUtility.twapPrice = twapPrice;
 
   const cumulatedInterestDelta = event.params.interestAccumulator.minus(marketUtility.interestAccumulator).toBigDecimal().div(INITIAL_INTEREST_ACCUMULATOR.toBigDecimal());
-  const supplySideRevenueDelta = market.totalBorrowBalanceUSD.times(cumulatedInterestDelta);
+  const supplySideRevenueDelta = market.totalDepositBalanceUSD.times(cumulatedInterestDelta);
   const lendingProtocol = getOrCreateLendingProtocol();
   lendingProtocol.cumulativeSupplySideRevenueUSD = lendingProtocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueDelta);
   lendingProtocol.cumulativeTotalRevenueUSD = lendingProtocol.cumulativeTotalRevenueUSD.plus(supplySideRevenueDelta);
@@ -319,6 +319,8 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 
   const protocol = getOrCreateLendingProtocol();
   protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
+  protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
 
   // Using an indexed for loop because AssemblyScript does not support closures.
   // AS100: Not implemented: Closures
@@ -394,8 +396,8 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     }
     
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
-
-
+    protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
+    protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);
   }
