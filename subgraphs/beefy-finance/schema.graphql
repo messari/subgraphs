@@ -48,6 +48,34 @@ type Token @entity {
   lastPriceBlockNumber: BigInt
 }
 
+enum VaultFeeType {
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
+  DEPOSIT_FEE
+
+  " One-time fee charged by the protocol during withdrawal, in percentages of the withdrawal token "
+  WITHDRAWAL_FEE
+
+  " Fees charged by the protocol during harvest, in percentages of the interest accrued "
+  PERFORMANCE_FEE
+
+  "Fees charged by the protocol during harvest, destinated to the strategy creator"
+  STRATEGIST_FEE
+
+  " Fees charged by the protocol during harvest, destinated to the keeper"
+  MANAGEMENT_FEE
+}
+
+type VaultFee @entity {
+  " { Vault fee type }-{ Vault address } "
+  id: ID!
+
+  " Fee as a percentage of the trade (swap) amount. Does not always apply "
+  feePercentage: BigDecimal
+
+  " Type of fee this vault uses "
+  feeType: VaultFeeType!
+}
+
 #############################
 ##### Protocol Metadata #####
 #############################
@@ -202,8 +230,8 @@ type Vault @entity {
   " Some vaults have a deposit cap. This is in input token amount "
   depositLimit: BigInt
 
-  #" Type of fees incurred to the user. Should include all fees that apply to the vault "
-  #fees: [VaultFee!] #!
+  " Type of fees incurred to the user. Should include all fees that apply to the vault "
+  fees: [VaultFee!]!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
@@ -213,8 +241,8 @@ type Vault @entity {
 
   ##### Quantitative Data #####
 
-  #" Current TVL (Total Value Locked) of this Vault in USD "
-  #totalValueLockedUSD: BigDecimal!
+  " Current TVL (Total Value Locked) of this Vault in USD "
+  totalValueLockedUSD: BigDecimal!
 
   " Amount of input token in the Vault "
   inputTokenBalance: BigInt!
@@ -222,8 +250,8 @@ type Vault @entity {
   " Total supply of output token "
   outputTokenSupply: BigInt
 
-  #" Price per share of output token in USD "
-  #outputTokenPriceUSD: BigDecimal
+  " Price per share of output token in USD "
+  outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
   pricePerShare: BigInt!

@@ -13,9 +13,11 @@ import { SushiSwapPair__getReservesResult } from "../../../generated/aave-aave-e
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_TEN = BigInt.fromI32(10);
+export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
 
 export const BIGDECIMAL_ZERO = new BigDecimal(BIGINT_ZERO);
+export const BIGDECIMAL_HUNDRED = new BigDecimal(BIGINT_HUNDRED);
 
 export const DEFAULT_USDC_DECIMALS = 6;
 export const DEFAULT_DECIMALS = BigInt.fromI32(18);

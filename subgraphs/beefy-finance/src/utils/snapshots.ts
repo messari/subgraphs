@@ -29,12 +29,14 @@ export function updateVaultDailySnapshot(
     vaultDailySnapshot.protocol = vault.protocol;
     vaultDailySnapshot.vault = vault.id;
   }
-  //vaultDailySnapshot.totalValueLockedUSD =
   vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
   if (vault.outputTokenSupply)
     vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;
   if (vault.pricePerShare)
     vaultDailySnapshot.pricePerShare = vault.pricePerShare;
+  vaultDailySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultDailySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+
   vaultDailySnapshot.blockNumber = block.number;
   vaultDailySnapshot.timestamp = block.timestamp;
   vaultDailySnapshot.save();
