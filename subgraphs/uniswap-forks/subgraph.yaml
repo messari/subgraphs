@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Factory
-    network: matic
+    network: celo
     source:
-      address: "0xCf083Be4164828f00cAE704EC15a36D711491284"
+      address: "0x62d5b84be28a183abb507e125b384122d2c25fae"
       abi: Factory
-      startBlock: 15298800
+      startBlock: 5272596
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -16,78 +16,40 @@ dataSources:
       entities: []
       abis:
         - name: Factory
-          file: ./abis/apeswap/Factory.json
+          file: ./abis/ubeswap/Factory.json
         - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
+          file: ./abis/ubeswap/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
-
   - kind: ethereum
-    name: MasterChef
-    network: matic
+    name: PoolManager
+    network: celo
     source:
-      address: "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd"
-      abi: MasterChefSushiswap
-      startBlock: 15550194
+      address: "0x9Ee3600543eCcc85020D6bc77EB553d1747a65D2"
+      abi: PoolManager
+      startBlock: 6234663
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      entities:
-        - _CircularBuffer
-        - RewardToken
+      entities: []
       abis:
-        - name: MasterChefSushiswap
-          file: ./abis/sushiswap/MasterChefSushiswap.json
-        - name: MasterChefApeswap
-          file: ./abis/apeswap/MasterChefApeswap.json
+        - name: PoolManager
+          file: ./abis/ubeswap/PoolManager.json
+        - name: StakingRewards
+          file: ./abis/ubeswap/StakingRewards.json
         - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
+          file: ./abis/ubeswap/ERC20.json
       eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdraw
-      file: ./src/mappings/masterChef/apeswap/reward.ts
-
-  - kind: ethereum
-    name: MasterChefV2
-    network: matic
-    source:
-      address: "0x54aff400858Dcac39797a81894D9920f16972D1D"
-      abi: MasterChefV2Sushiswap
-      startBlock: 15797921
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: 
-        - _CircularBuffer
-        - RewardToken
-      abis:
-        - name: MasterChefV2Sushiswap
-          file: ./abis/sushiswap/MasterChefV2Sushiswap.json
-        - name: MasterChefV2Apeswap
-          file: ./abis/apeswap/MasterChefV2Apeswap.json
-        - name: TokenABI
-          file: ./abis/sushiswap/ERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleDepositV2
-        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleWithdrawV2
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
-          handler: handleEmergencyWithdrawV2
-      file: ./src/mappings/masterChef/apeswap/rewardV2.ts
- 
+        - event: UpdatePoolWeight(indexed address,indexed uint256,uint256,indexed bool)
+          handler: handleUpdatePoolWeight
+      file: ./protocols/ubeswap/src/mappings/stakingrewards/createpool.ts
 templates:
   - kind: ethereum/contract
     name: Pair
-    network: matic
+    network: celo
     source:
       abi: Pair
     mapping:
@@ -98,11 +60,11 @@ templates:
       entities: []
       abis:
         - name: Pair
-          file: ./abis/apeswap/Pair.json
+          file: ./abis/ubeswap/Pair.json
         - name: Factory
-          file: ./abis/apeswap/Factory.json
+          file: ./abis/ubeswap/Factory.json
         - name: TokenABI
-          file: ./abis/apeswap/IERC20.json
+          file: ./abis/ubeswap/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
@@ -114,3 +76,26 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
+  - kind: ethereum/contract
+    name: StakingRewards
+    network: celo
+    source:
+      abi: StakingRewards
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./protocols/ubeswap/src/mappings/stakingrewards/reward.ts
+      entities: []
+      abis:
+        - name: StakingRewards
+          file: ./abis/ubeswap/StakingRewards.json
+        - name: TokenABI
+          file: ./abis/ubeswap/ERC20.json
+      eventHandlers:
+        - event: Staked(indexed address,uint256)
+          handler: handleStaked
+        - event: Withdrawn(indexed address,uint256)
+          handler: handleWithdrawn
+        - event: RewardPaid(indexed address,uint256)
+          handler: handleRewardPaid

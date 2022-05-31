@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import { useState } from "react";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
-import { ProtocolTypeEntity } from "../../constants";
+import { negativeFieldList, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../../constants";
 import { convertTokenDecimals, toDate } from "../../utils";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
@@ -14,14 +14,15 @@ interface ProtocolTabProps {
   entities: string[];
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
+  protocolData: { [x: string]: any };
 }
 
 // This component is for each individual subgraph
-function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolTabProps) {
+function ProtocolTab({ data, entities, entitiesData, protocolFields, protocolData }: ProtocolTabProps) {
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
   const list: { [x: string]: any } = {};
-  const protocolEntityName = ProtocolTypeEntity[data.protocols[0].type];
+  const protocolEntityName = ProtocolTypeEntityNames[protocolData?.type];
 
   const excludedEntities = [
     "liquidityPoolHourlySnapshots",
@@ -31,7 +32,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
     "vaultHourlySnapshots",
     "vaultDailySnapshots",
   ];
-  const protocolData = entities.map((entityName: string) => {
+  const protocolDataRender = entities.map((entityName: string) => {
     try {
       // Exclude the following entities because they are not on the protocol tab
       if (excludedEntities.includes(entityName)) {
@@ -53,48 +54,59 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
       const dataFieldMetrics: { [dataField: string]: { [metric: string]: any } } = {};
       // For the current entity, loop through all instances of that entity
       for (let x = currentEntityData.length - 1; x >= 0; x--) {
-        const entityInstance: { [x: string]: any } = currentEntityData[x];
+        const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
-        if (entityInstance.dailySupplySideRevenueUSD && entityInstance.totalValueLockedUSD) {
-          const value = (entityInstance.dailySupplySideRevenueUSD / entityInstance.totalValueLockedUSD) * 100;
+        if (timeseriesInstance.dailySupplySideRevenueUSD && timeseriesInstance.totalValueLockedUSD) {
+          const value = (timeseriesInstance.dailySupplySideRevenueUSD / timeseriesInstance.totalValueLockedUSD) * 100;
           if (!dataFields.capitalEfficiency) {
-            dataFields.capitalEfficiency = [{ value, date: Number(entityInstance.timestamp) }];
+            dataFields.capitalEfficiency = [{ value, date: Number(timeseriesInstance.timestamp) }];
             dataFieldMetrics.capitalEfficiency = { sum: value };
           } else {
-            dataFields.capitalEfficiency.push({ value, date: Number(entityInstance.timestamp) });
+            dataFields.capitalEfficiency.push({ value, date: Number(timeseriesInstance.timestamp) });
             dataFieldMetrics.capitalEfficiency.sum += value;
           }
         }
-        Object.keys(entityInstance).forEach((entityFieldName: string) => {
+        Object.keys(timeseriesInstance).forEach((entityFieldName: string) => {
           // skip the timestamp field on each entity instance
           if (entityFieldName === "timestamp" || entityFieldName === "id") {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
-          const currentInstanceField = entityInstance[entityFieldName];
+          const currentInstanceField = timeseriesInstance[entityFieldName];
           try {
             if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
               // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
               // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
               if (!dataFields[entityFieldName]) {
                 dataFields[entityFieldName] = [
-                  { value: Number(currentInstanceField), date: Number(entityInstance.timestamp) },
+                  { value: Number(currentInstanceField), date: Number(timeseriesInstance.timestamp) },
                 ];
                 dataFieldMetrics[entityFieldName] = { sum: Number(currentInstanceField) };
               } else {
                 dataFields[entityFieldName].push({
                   value: Number(currentInstanceField),
-                  date: Number(entityInstance.timestamp),
+                  date: Number(timeseriesInstance.timestamp),
                 });
                 dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
+              }
+              if (Number(currentInstanceField) < 0) {
+                if (!dataFieldMetrics[entityFieldName].negative) {
+                  // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                  dataFieldMetrics[entityFieldName].negative = {
+                    firstSnapshot: timeseriesInstance.id,
+                    value: Number(currentInstanceField),
+                    count: 0,
+                  };
+                }
+                dataFieldMetrics[entityFieldName].negative.count += 1;
               }
               if (entityFieldName.includes("umulative")) {
                 if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
                   dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
                 }
                 if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName]?.cumulative?.prevVal) {
-                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = entityInstance.id;
+                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = timeseriesInstance.id;
                 }
                 dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
               }
@@ -121,18 +133,29 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
                   console.error("ERR - COULD NOT GET MINTED TOKEN DECIMALS", err);
                 }
                 if (!dataFields[dataFieldKey]) {
-                  dataFields[dataFieldKey] = [{ value: value, date: Number(entityInstance.timestamp) }];
+                  dataFields[dataFieldKey] = [{ value: value, date: Number(timeseriesInstance.timestamp) }];
                   dataFieldMetrics[dataFieldKey] = { sum: value };
                 } else {
-                  dataFields[dataFieldKey].push({ value: value, date: Number(entityInstance.timestamp) });
+                  dataFields[dataFieldKey].push({ value: value, date: Number(timeseriesInstance.timestamp) });
                   dataFieldMetrics[dataFieldKey].sum += value;
+                }
+                if (Number(value) < 0) {
+                  if (!dataFieldMetrics[entityFieldName].negative) {
+                    // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                    dataFieldMetrics[entityFieldName].negative = {
+                      firstSnapshot: timeseriesInstance.id,
+                      value: Number(value),
+                      count: 0,
+                    };
+                  }
+                  dataFieldMetrics[entityFieldName].negative.count += 1;
                 }
                 if (dataFieldKey.includes("umulative")) {
                   if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
                     dataFieldMetrics[dataFieldKey].cumulative = { prevVal: 0, hasLowered: "" };
                   }
                   if (value < dataFieldMetrics[dataFieldKey].cumulative.prevVal) {
-                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = entityInstance.id;
+                    dataFieldMetrics[dataFieldKey].cumulative.hasLowered = timeseriesInstance.id;
                   }
                   dataFieldMetrics[dataFieldKey].cumulative.prevVal = value;
                 }
@@ -254,6 +277,21 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
                   fieldName: label,
                 });
               }
+              const isNegativeField = negativeFieldList.find((x: string) => {
+                return field.toUpperCase().includes(x.toUpperCase());
+              });
+              if (
+                dataFieldMetrics[field]?.negative &&
+                !isNegativeField &&
+                issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
+              ) {
+                issues.push({
+                  message: JSON.stringify(dataFieldMetrics[field]?.negative),
+                  type: "NEG",
+                  level: "critical",
+                  fieldName: `${entityName}-${field}`,
+                });
+              }
             } catch (err) {
               console.log("ERROR RENDER", err);
               let message = "JAVASCRIPT ERROR";
@@ -269,7 +307,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
                 });
               }
               return (
-                <div>
+                <div key={elementId}>
                   <Box mt={3} mb={1} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
                     <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                       <Typography variant="h6">
@@ -281,7 +319,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
               );
             }
             return (
-              <div id={elementId}>
+              <div key={elementId} id={elementId}>
                 <Box mt={3} mb={1}>
                   <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                     <Typography variant="h6">{field}</Typography>
@@ -289,10 +327,13 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
                 </Box>
                 <Grid container justifyContent="space-between">
                   <Grid key={label + "1"} item xs={7.5}>
-                    {Chart(label, dataFields[field], currentEntityData?.length)}
+                    <Chart datasetLabel={label} dataChart={dataFields[field]} />
                   </Grid>
                   <Grid key={label + "2"} item xs={4}>
-                    {TableChart(label, dataFields[field], currentEntityData?.length)}
+                    <TableChart
+                      datasetLabel={label}
+                      dataTable={dataFields[field]}
+                    />
                   </Grid>
                 </Grid>
               </div>
@@ -302,7 +343,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
       );
     } catch (err) {
       if (err instanceof Error) {
-        console.log("CATCH,", Object.keys(err), Object.values(err), err);
+        console.log("CATCH", Object.keys(err), Object.values(err), err);
         return <h3>JAVASCRIPT ERROR - PROTOCOL TAB - {err.message}</h3>;
       } else {
         return <h3>JAVASCRIPT ERROR - PROTOCOL TAB</h3>;
@@ -310,7 +351,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
     }
   });
 
-  const protTypeEntity = ProtocolTypeEntity[data.protocols[0].type];
+  const protTypeEntity = ProtocolTypeEntityNames[protocolData?.type];
   const protocolLevelTVL = parseFloat(data[protTypeEntity][0]?.totalValueLockedUSD);
   if (
     issues.filter((x) => x.fieldName === protTypeEntity && x.type === "TVL-").length === 0 &&
@@ -333,13 +374,13 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields }: ProtocolT
     <>
       <IssuesDisplay issuesArrayProps={issuesState} />
       <SchemaTable
-        entityData={data[protTypeEntity][0]}
-        schemaName={protTypeEntity}
+        entityData={protocolData}
+        schemaName={ProtocolTypeEntityName[protocolData?.type]}
         setIssues={(x) => setIssues(x)}
         dataFields={protocolFields}
         issuesProps={issuesState}
       />
-      {protocolData}
+      {protocolDataRender}
     </>
   );
 }

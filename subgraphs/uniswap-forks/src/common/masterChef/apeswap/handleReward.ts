@@ -1,10 +1,10 @@
 import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../../../config/configure";
+import { NetworkConfigs } from "../../../../configurations/configure";
 import { MasterChefApeswap } from "../../../../generated/MasterChef/MasterChefApeswap";
 import { LiquidityPool, _HelperStore } from "../../../../generated/schema";
 import { BIGINT_FIVE, BIGINT_ONE, BIGINT_ZERO, INT_ZERO, UsageType, ZERO_ADDRESS } from "../../constants";
 import { getOrCreateToken } from "../../getters";
-import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../price/price";
+import { findNativeTokenPerToken, updateNativeTokenPriceInUSD } from "../../../price/price";
 import { getRewardsPerDay } from "../../rewards";
 
 export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt, usageType: string): void {

@@ -56,7 +56,7 @@ function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProp
             </Box>
           );
         }
-        return <React.Fragment>{TableEvents(eventName, data, eventName, poolId)}</React.Fragment>;
+        return <TableEvents datasetLabel={eventName} data={data} eventName={eventName} />;
       })}
     </>
   );

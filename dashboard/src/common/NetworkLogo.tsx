@@ -11,6 +11,8 @@ const NetworkLogos: Record<string, string> = {
   moonriver: "https://messari.io/asset-images/27cbdc16-de27-4a65-a8c3-40bb205fe94f/128.png?v=2",
   optimism: "https://directus.messari.io/assets/8249c927-2347-411e-b725-bce15c41ca87",
   gnosis: "https://assets.coingecko.com/coins/images/662/small/logo_square_simple_300px.png?1609402668",
+  celo: "https://assets.coingecko.com/coins/images/11090/small/icon-celo-CELO-color-500.png?1592293590",
+  fuse: "https://assets.coingecko.com/coins/images/10347/small/vUXKHEe.png?1601523640"
 };
 
 interface NetworkLogoProps {

@@ -2,7 +2,7 @@ import { Box, Grid, Typography } from "@mui/material";
 import { Chart } from "../../common/chartComponents/Chart";
 import { TableChart } from "../../common/chartComponents/TableChart";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
-import { PoolName, PoolNames } from "../../constants";
+import { negativeFieldList, PoolName, PoolNames } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import { convertTokenDecimals } from "../../utils";
 import { StackedChart } from "../../common/chartComponents/StackedChart";
@@ -51,16 +51,17 @@ interface PoolTabProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   poolId: string;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  protocolData: { [x: string]: any };
   poolData: { [x: string]: string };
 }
 
-function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: PoolTabProps) {
+function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, protocolData }: PoolTabProps) {
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
 
   // Get the key name of the pool specific to the protocol type (singular and plural)
-  const poolKeySingular = PoolName[data.protocols[0].type];
-  const poolKeyPlural = PoolNames[data.protocols[0].type];
+  const poolKeySingular = PoolName[protocolData.type];
+  const poolKeyPlural = PoolNames[protocolData.type];
 
   const excludedEntities = ["financialsDailySnapshots", "usageMetricsDailySnapshots", "usageMetricsHourlySnapshots"];
 
@@ -79,6 +80,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
       // currentEntityData holds the data on this entity
       const currentEntityData = data[entityName];
       if (currentEntityData.length === 0) {
+        issues.push({ fieldName: entityName, type: "EMPTY", level: "critical", message: "" });
         return (
           <Box key={entityName}>
             <Typography variant="h4">ENTITY: {entityName}</Typography>
@@ -93,7 +95,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
 
         // For exchange protocols, calculate the baseYield
-        if (data.protocols[0].type === "EXCHANGE") {
+        if (protocolData.type === "EXCHANGE") {
           let value = 0;
           if (Object.keys(data[poolKeySingular]?.fees)?.length > 0 && timeseriesInstance.totalValueLockedUSD) {
             // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
@@ -146,7 +148,24 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               continue;
             }
             if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
-              value = Number(currentInstanceField);
+              // Add the data to the array held on the dataField key of the entityFieldName
+              if (!dataFields[entityFieldName]) {
+                dataFields[entityFieldName] = [];
+                dataFieldMetrics[entityFieldName] = { sum: 0 };
+              }
+
+              value = currentInstanceField;
+              if (value < 0) {
+                if (!dataFieldMetrics[entityFieldName].negative) {
+                  // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                  dataFieldMetrics[entityFieldName].negative = {
+                    firstSnapshot: timeseriesInstance.id,
+                    value: value,
+                    count: 0,
+                  };
+                }
+                dataFieldMetrics[entityFieldName].negative.count += 1;
+              }
               if (
                 capsEntityFieldName.includes("OUTPUTTOKEN") &&
                 capsEntityFieldName !== "OUTPUTTOKEN" &&
@@ -157,12 +176,6 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               if (entityFieldName === "inputTokenBalance" || entityFieldName === "pricePerShare") {
                 const dec = data[poolKeySingular].inputToken.decimals;
                 value = convertTokenDecimals(currentInstanceField, dec);
-              }
-
-              // Add the data to the array held on the dataField key of the entityFieldName
-              if (!dataFields[entityFieldName]) {
-                dataFields[entityFieldName] = [];
-                dataFieldMetrics[entityFieldName] = { sum: 0 };
               }
 
               const returnedData = addDataPoint(
@@ -177,8 +190,8 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               dataFieldMetrics[entityFieldName] = returnedData.currentEntityFieldMetrics;
 
               if (
-                capsEntityFieldName.includes("LIQUIDATEUSD") &&
-                value > timeseriesInstance.totalValueLockedUSD &&
+                (capsEntityFieldName === "HOURLYLIQUIDATEUSD" || capsEntityFieldName === "DAILYLIQUIDATEUSD") &&
+                Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
                 issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length ===
                 0
               ) {
@@ -261,10 +274,28 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                 }
 
                 if (entityFieldName === "rates") {
-                  fieldSplitIdentifier = val.side + "-" + val.type;
+                  fieldSplitIdentifier = val.id.split("-0x")[0];
                 }
 
                 const dataFieldKey = entityFieldName + " [" + fieldSplitIdentifier + "]";
+
+                // Save the data to the dataFields object array
+                if (!dataFields[dataFieldKey]) {
+                  dataFields[dataFieldKey] = [];
+                  dataFieldMetrics[dataFieldKey] = { sum: 0 };
+                }
+
+                if (val < 0) {
+                  if (!dataFieldMetrics[dataFieldKey].negative) {
+                    // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
+                    dataFieldMetrics[dataFieldKey].negative = {
+                      firstSnapshot: timeseriesInstance.id,
+                      value: val,
+                      count: 0,
+                    };
+                  }
+                  dataFieldMetrics[dataFieldKey].negative.count += 1;
+                }
 
                 if (value || value === 0) {
                   if (entityFieldName === "inputTokenBalances" || capsEntityFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
@@ -277,9 +308,9 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                     // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
 
                     const currentRewardToken = data[poolKeySingular].rewardTokens[arrayIndex];
-                    if (currentRewardToken?.decimals) {
+                    if (currentRewardToken?.decimals || currentRewardToken?.decimals === 0) {
                       value = convertTokenDecimals(val, currentRewardToken?.decimals);
-                    } else if (currentRewardToken?.token?.decimals) {
+                    } else if (currentRewardToken?.token?.decimals || currentRewardToken?.token?.decimals === 0) {
                       value = convertTokenDecimals(val, currentRewardToken?.token?.decimals);
                     } else {
                       value = convertTokenDecimals(val, 18);
@@ -290,7 +321,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                     //Convert emissions amount in USD to APY/APR
                     // total reward emission USD / total staked USD * 100 = reward APR
                     let apr = 0;
-                    if (timeseriesInstance?.totalDepositBalanceUSD && poolKeySingular === "LENDING") {
+                    if (timeseriesInstance?.totalDepositBalanceUSD && protocolData.type === "LENDING") {
                       apr = (Number(val) / timeseriesInstance.totalDepositBalanceUSD) * 100 * 365;
                     } else {
                       if (
@@ -327,11 +358,6 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                     }
                   }
 
-                  // Save the data to the dataFields object array
-                  if (!dataFields[dataFieldKey]) {
-                    dataFields[dataFieldKey] = [];
-                    dataFieldMetrics[dataFieldKey] = { sum: 0 };
-                  }
                   const returnedData = addDataPoint(
                     dataFields,
                     dataFieldMetrics,
@@ -363,7 +389,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               if (err instanceof Error) {
                 message = err.message;
               }
-              console.log(err)
+              console.log(err);
               issues.push({
                 type: "JS",
                 message: message,
@@ -453,9 +479,8 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               currentRewardToken = data[poolKeySingular].rewardTokens[idx];
             }
             const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol + " " : "";
-            tableVals[x].value.push(`${symbol}[${idx}]: ${rewardChart[reward][x].value.toFixed(3)}%`);
+            tableVals[x].value.push(`${symbol}[${idx}]: ${rewardChart[reward][x].value.toFixed(3)}`);
           });
-          tableVals[x].value = tableVals[x].value.join(", ");
         }
         Object.keys(rewardChart).forEach((reward: any, idx: number) => {
           let currentRewardToken: { [x: string]: string } = {};
@@ -471,7 +496,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         });
         const table = (
           <Grid key={elementId + "Table"} item xs={4}>
-            {TableChart("REWARD-APR", tableVals, currentEntityData.length)}
+            <TableChart datasetLabel="rewardAPR" dataTable={tableVals} />
           </Grid>
         );
         rewardAPRElement = (
@@ -483,7 +508,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             </Box>
             <Grid container justifyContent="space-between">
               <Grid key={elementId + "Chart"} item xs={7.5}>
-                {Chart("REWARD-APR", rewardChart, amountOfInstances)}
+                <Chart datasetLabel="rewardAPR" dataChart={rewardChart} />
               </Grid>
               {table}
             </Grid>
@@ -503,7 +528,6 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
           Object.keys(ratesChart).forEach((rate: any, idx: number) => {
             tableVals[x].value.push(`[${idx}]: ${ratesChart[rate][x].value.toFixed(3)}`);
           });
-          tableVals[x].value = tableVals[x].value.join(", ");
         }
         Object.keys(ratesChart).forEach((rate: any, idx: number) => {
           if (
@@ -514,18 +538,17 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
           }
           if (data[poolKeySingular].rates[idx]?.side) {
             const val = ratesChart[rate];
-            ratesChart[`${data[poolKeySingular].rates[idx]?.side}-${data[poolKeySingular].rates[idx]?.type} [${idx}]`] =
-              val;
+            ratesChart[`${data[poolKeySingular].rates[idx]?.id.split("-0x")[0]} [${idx}]`] = val;
             delete ratesChart[rate];
           }
         });
         const table = (
           <Grid key={elementId + "Table"} item xs={4}>
-            {TableChart("RATES", tableVals, currentEntityData.length)}
+            <TableChart datasetLabel="RATES" dataTable={tableVals} />
           </Grid>
         );
         ratesElement = (
-          <div id={elementId}>
+          <div key={elementId} id={elementId}>
             <Box mt={3} mb={1}>
               <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                 <Typography variant="h6">{elementId}</Typography>
@@ -533,7 +556,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             </Box>
             <Grid container justifyContent="space-between">
               <Grid key={elementId + "Chart"} item xs={7.5}>
-                {Chart("RATES", ratesChart, amountOfInstances)}
+                <Chart datasetLabel="RATES" dataChart={ratesChart} />
               </Grid>
               {table}
             </Grid>
@@ -546,14 +569,18 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
         tokenWeightComponent = Object.keys(tokenWeightData).map((tokenWeightFieldName) => {
           const currentTokenWeightArray = tokenWeightData[tokenWeightFieldName];
           return (
-            <div id={entityName + "-" + tokenWeightFieldName}>
+            <div key={entityName + "-" + tokenWeightFieldName} id={entityName + "-" + tokenWeightFieldName}>
               <Box mt={3} mb={1}>
                 <CopyLinkToClipboard link={window.location.href} scrollId={entityName + "-" + tokenWeightFieldName}>
                   <Typography variant="h6">{entityName + "-" + tokenWeightFieldName}</Typography>
                 </CopyLinkToClipboard>
               </Box>
               <Grid container>
-                {StackedChart(data[poolKeySingular].inputTokens, currentTokenWeightArray, tokenWeightFieldName)}
+                <StackedChart
+                  tokens={data[poolKeySingular].inputTokens}
+                  tokenWeightsArray={currentTokenWeightArray}
+                  poolTitle={tokenWeightFieldName}
+                />
               </Grid>
             </div>
           );
@@ -631,16 +658,53 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                   const name = currentRewardToken?.name ? currentRewardToken?.name : "N/A";
                   const symbol = currentRewardToken?.symbol ? currentRewardToken?.symbol : "N/A";
                   label += " - " + symbol + ": " + name;
+                  if (
+                    arrayIndex + 1 > data[poolKeySingular]?.rewardTokens.length &&
+                    issues.filter((x) => x.fieldName === `${fieldName}[${arrayIndex}]` && x.type === "TOK").length === 0
+                  ) {
+                    issues.push({
+                      type: "TOK",
+                      level: "error",
+                      fieldName: `${fieldName}[${arrayIndex}]`,
+                      message: `rewardTokens [${arrayIndex}]`,
+                    });
+                  }
                 } else if (data[poolKeySingular]?.inputTokens) {
                   const currentInputToken = data[poolKeySingular].inputTokens[arrayIndex];
                   const name = currentInputToken?.name ? currentInputToken.name : "N/A";
                   const symbol = currentInputToken?.symbol ? currentInputToken.symbol : "N/A";
                   label += " - " + symbol + ": " + name;
+                  if (
+                    arrayIndex + 1 > data[poolKeySingular]?.inputTokens.length &&
+                    issues.filter((x) => x.fieldName === `${fieldName}[${arrayIndex}]` && x.type === "TOK").length === 0
+                  ) {
+                    issues.push({
+                      type: "TOK",
+                      level: "error",
+                      fieldName: `${fieldName}[${arrayIndex}]`,
+                      message: `inputTokens [${arrayIndex}]`,
+                    });
+                  }
                 }
+              }
+              const isNegativeField = negativeFieldList.find((x: string) => {
+                return field.toUpperCase().includes(x.toUpperCase());
+              });
+              if (
+                dataFieldMetrics[field]?.negative &&
+                !isNegativeField &&
+                issues.filter((x) => x.fieldName === `${entityName}-${field}` && x.type === "NEG").length === 0
+              ) {
+                issues.push({
+                  message: JSON.stringify(dataFieldMetrics[field]?.negative),
+                  type: "NEG",
+                  level: "critical",
+                  fieldName: `${entityName}-${field}`,
+                });
               }
               if (dataFieldMetrics[field]?.invalidDataPlot) {
                 return (
-                  <div id={linkToElementId}>
+                  <div key={elementId} id={linkToElementId}>
                     <Box mt={3} mb={1}>
                       <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
                         <Typography variant="h6">{label}</Typography>
@@ -696,7 +760,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
               if (err instanceof Error) {
                 message = err.message;
               }
-              console.log(err)
+              console.log(err);
               if (issues.filter((x) => x.fieldName === entityName + "-" + field && x.type === "JS")?.length === 0) {
                 issues.push({
                   type: "JS",
@@ -706,7 +770,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                 });
               }
               return (
-                <div>
+                <div key={elementId}>
                   <Box mt={3} mb={1}>
                     <CopyLinkToClipboard link={window.location.href} scrollId={elementId}>
                       <Typography variant="h6">
@@ -719,7 +783,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
             }
 
             return (
-              <div id={linkToElementId}>
+              <div key={elementId} id={linkToElementId}>
                 <Box mt={3} mb={1}>
                   <CopyLinkToClipboard link={window.location.href} scrollId={linkToElementId}>
                     <Typography variant="h6">{label}</Typography>
@@ -727,10 +791,13 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData }: 
                 </Box>
                 <Grid container justifyContent="space-between">
                   <Grid key={elementId + "1"} item xs={7.5}>
-                    {Chart(label, dataFields[field], currentEntityData.length)}
+                    <Chart datasetLabel={label} dataChart={dataFields[field]} />
                   </Grid>
                   <Grid key={elementId + "2"} item xs={4}>
-                    {TableChart(label, dataFields[field], currentEntityData.length)}
+                    <TableChart
+                      datasetLabel={label}
+                      dataTable={dataFields[field]}
+                    />
                   </Grid>
                 </Grid>
               </div>

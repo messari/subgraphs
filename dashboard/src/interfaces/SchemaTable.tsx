@@ -14,20 +14,22 @@ function checkValueFalsey(
   if (!fieldDataType || fieldDataType.length === 0) {
     return undefined;
   }
-  if (fieldDataType[fieldDataType.length - 1] !== "!") {
+  if (fieldDataType[fieldDataType.length - 1] !== "!" && !value) {
     return undefined;
   }
   let valueMsg = "";
+  let level = "warning";
   if (value === "" || value?.length === 0) {
     valueMsg = "empty";
-  } else if (!value) {
+  } else if (!value || Number(value) === 0) {
     valueMsg = value;
-  } else if (value < 0) {
+  } else if (Number(value) < 0) {
     valueMsg = "negative";
+    level = "critical";
   }
   const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this data is correct";
   if (issues.filter((x) => x.message === message).length === 0 && valueMsg) {
-    return { type: "VAL", message, level: "warning", fieldName: schemaName + "-" + entityField };
+    return { type: "VAL", message, level, fieldName: schemaName + "-" + entityField };
   } else {
     return undefined;
   }
@@ -200,7 +202,11 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           if (entityField === "inputTokens") {
             value = value.map((val: { [x: string]: string }, idx: number) => {
               const label = schemaName + "-" + entityField + " " + (val.symbol || idx);
-              if (!Number(val.decimals) && issues.filter((x) => x.fieldName === label).length === 0) {
+              if (
+                !Number(val.decimals) &&
+                Number(val.decimals) !== 0 &&
+                issues.filter((x) => x.fieldName === label).length === 0
+              ) {
                 issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
               }
               return {
@@ -308,7 +314,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
   useEffect(() => {
     console.log("SCHEMATABLE ISSUE TO SET", issues, issuesProps);
     setIssues(issues);
-  }, [issuesProps]);
+  }, [issues]);
 
   let schemaHeader = null;
   if (schema && entityData) {
