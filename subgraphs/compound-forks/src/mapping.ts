@@ -47,7 +47,6 @@ import {
   cTokenDecimals,
   cTokenDecimalsBD,
   exponentToBigDecimal,
-  initialExchangeRate,
   InterestRateSide,
   InterestRateType,
   INT_ZERO,
