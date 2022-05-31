@@ -343,6 +343,7 @@ export function updateOutputToken(vault: Vault, vaultContract: string, event: et
           tryBalance.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
         );
     outputTokenPrice = balanceUSD.div(outputTokenSupplyBD);
+    log.warning("OutputtokenSupply of REPT: {} ${} from balance {}", [outputTokenSupply!.toString(), outputTokenPrice.toString(), tryBalance.value.toString()]);
   }
 
   // set outputToken values to each vault
@@ -351,9 +352,9 @@ export function updateOutputToken(vault: Vault, vaultContract: string, event: et
     let splitArr = protocol._vaultList[i].split("-", 2);
     let vaultAddress = splitArr[0];
     let tokenAddress = splitArr[1];
-    let _vault = getOrCreateVault(event, vaultAddress, tokenAddress);
 
     if (vaultAddress.toLowerCase() == vaultContract.toLowerCase()) {
+      let _vault = getOrCreateVault(event, vaultAddress, tokenAddress);
       _vault.outputTokenSupply = outputTokenSupply;
       _vault.outputTokenPriceUSD = outputTokenPrice;
       _vault.save();
