@@ -23,6 +23,12 @@ const subgraphLogoMap: Record<string, string> = {
   inverse: "https://assets.coingecko.com/coins/images/14205/small/inverse_finance.jpg?1614921871",
   convex: "https://assets.coingecko.com/coins/images/15585/small/convex.png?1621256328",
   aurigami: "https://assets.coingecko.com/coins/images/24074/small/EbB5N8IN_400x400.jpg?1646230298",
+  cream: "https://assets.coingecko.com/coins/images/11976/small/Cream.png?1596593418",
+  ironbank: "https://assets.coingecko.com/coins/images/22902/small/ironbank.png?1642872464",
+  traderjoe: "https://assets.coingecko.com/markets/images/692/small/traderjoe.png?1628152581",
+  sushiswap: "https://assets.coingecko.com/markets/images/576/small/2048x2048_Logo.png?1609208464",
+  quickswap: "https://assets.coingecko.com/coins/images/25393/small/quickswap.jpg?1651680141",
+  solarbeam: "https://assets.coingecko.com/coins/images/18260/small/solarbeamlogo.png?1636080005"
 };
 
 const subgraphMap: Record<string, string> = {

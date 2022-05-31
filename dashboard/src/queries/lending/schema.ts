@@ -552,8 +552,8 @@ export const schema120 = (): Schema => {
 
   const adjustedMarketDailyFields = Object.keys(entitiesData.marketDailySnapshots);
   const adjustedMarketHourlyFields = Object.keys(entitiesData.marketHourlySnapshots);
-  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf("rates")] = "rates{side,rate,type}";
-  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf("rates")] = "rates{side,rate,type}";
+  adjustedMarketDailyFields[adjustedMarketDailyFields.indexOf("rates")] = "rates{id,side,rate,type}";
+  adjustedMarketHourlyFields[adjustedMarketHourlyFields.indexOf("rates")] = "rates{id,side,rate,type}";
 
   const finanQuery =
     "financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {" +
@@ -579,7 +579,7 @@ export const schema120 = (): Schema => {
 
   const eventsFields = ["hash", "to", "from", "timestamp", "amount", "amountUSD"];
 
-  const events: string[] = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
+  const events: string[] = ["deposits", "withdraws", "borrows", "repays", "liquidates"];
   const eventsQuery: any[] = events.map((event) => {
     let options = "";
     const baseStr =

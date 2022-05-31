@@ -1,0 +1,9 @@
+{
+    "deployment": "SPIRITSWAP_FANTOM",
+    "network": "fantom",
+    "address": "0xef45d134b73241eda7703fa787148d9c9f4950b0",
+    "startBlock": 4250094,
+    "MasterChefAddress": "0x9083ea3756bde6ee6f27a6e996806fbd37f6f093",
+    "MasterChefStartBlock": 4202418
+  }
+  

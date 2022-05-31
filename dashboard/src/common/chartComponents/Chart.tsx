@@ -2,7 +2,12 @@ import { Box } from "@mui/material";
 import { Line } from "react-chartjs-2";
 import { toDate } from "../../utils";
 
-export const Chart = (datasetLabel: string, dataChart: any, _dataLength: number) => {
+interface ChartProps {
+  datasetLabel: string;
+  dataChart: any;
+}
+
+export const Chart = ({ datasetLabel, dataChart }: ChartProps) => {
   if (dataChart) {
     let labels: string[] = [];
     let datasets: { data: any; backgroundColor: string; borderColor: string; label: string }[] = [];

@@ -3,7 +3,7 @@ import { Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -55,6 +55,13 @@ const messagesByLevel = (
       }
       if (issuesArray[x].type === "TOK") {
         issuesMsg = `'${issuesArray[x].fieldName}' in the timeseries data refers to a token that does not exist on this pool. '${issuesArray[x].message}' is an invalid index.`;
+      }
+      if (issuesArray[x].type === "NEG") {
+        const msgObj = JSON.parse(issuesArray[x].message);
+        issuesMsg = `'${issuesArray[x].fieldName}' has ${msgObj.count} negative values. First instance of a negative value is on snapshot ${msgObj.firstSnapshot} with a value of ${msgObj.value}`;
+      }
+      if (issuesArray[x].type === "EMPTY") {
+        issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but did no transactions were detected on it.`;
       }
       issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
