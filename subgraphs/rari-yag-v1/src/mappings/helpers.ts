@@ -72,8 +72,12 @@ export function createDeposit(
 
   updateTVL(event); // also updates inputTokenBalance
 
-  // update outputToken/fees/revenues/token balances
-  let outputTokenSupply = updateOutputToken(vault, vaultAddress, event);
+  // get outputToken Supply/price
+  let outputTokenInfo = updateOutputToken(vault, vaultAddress, event);
+  vault.outputTokenSupply = outputTokenInfo.supply;
+  vault.outputTokenPriceUSD = outputTokenInfo.priceUSD;
+
+  // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, BIGDECIMAL_ZERO);
 
@@ -82,7 +86,7 @@ export function createDeposit(
   vault.pricePerShare = vault.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(decimals))
-    .div(outputTokenSupply.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
+    .div(vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 
   vault.save();
 }
@@ -133,8 +137,12 @@ export function createWithdraw(
     }
   }
 
-  // update outputToken/fees/revenues/token balances
-  let outputTokenSupply = updateOutputToken(vault, vaultAddress, event);
+  // get outputToken Supply/price
+  let outputTokenInfo = updateOutputToken(vault, vaultAddress, event);
+  vault.outputTokenSupply = outputTokenInfo.supply;
+  vault.outputTokenPriceUSD = outputTokenInfo.priceUSD;
+
+  // update fees/revenues/token balances
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, withdrawalFee);
 
@@ -143,7 +151,7 @@ export function createWithdraw(
   vault.pricePerShare = vault.inputTokenBalance
     .toBigDecimal()
     .div(exponentToBigDecimal(decimals))
-    .div(outputTokenSupply.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
+    .div(vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 
   vault.save();
 }
@@ -298,8 +306,21 @@ export function updateTVL(event: ethereum.Event): void {
   protocol.save();
 }
 
+// custom class to pass output token values back to calling function
+export class OutputTokenValues {
+  supply: BigInt;
+  priceUSD: BigDecimal;
+  constructor(
+    supply: BigInt,
+    priceUSD: BigDecimal
+  ) {
+    this.supply = supply;
+    this.priceUSD = priceUSD;
+  }
+}
+
 // returns output token price in USD
-export function updateOutputToken(vault: Vault, vaultContract: string, event: ethereum.Event): BigInt {
+export function updateOutputToken(vault: Vault, vaultContract: string, event: ethereum.Event): OutputTokenValues {
   // OutputTokenPrice = getFundBalance() / outputTokenSupply
   // Here: https://docs.rari.capital/yag/#usage
 
@@ -343,7 +364,6 @@ export function updateOutputToken(vault: Vault, vaultContract: string, event: et
           tryBalance.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
         );
     outputTokenPrice = balanceUSD.div(outputTokenSupplyBD);
-    log.warning("OutputtokenSupply of REPT: {} ${} from balance {}", [outputTokenSupply!.toString(), outputTokenPrice.toString(), tryBalance.value.toString()]);
   }
 
   // set outputToken values to each vault
@@ -361,5 +381,7 @@ export function updateOutputToken(vault: Vault, vaultContract: string, event: et
     }
   }
 
-  return outputTokenSupply!;
+  let output = new OutputTokenValues(outputTokenSupply!, outputTokenPrice);
+
+  return output;
 }
