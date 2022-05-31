@@ -23,6 +23,7 @@ dataSources:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
       file: ./src/mappings/factory.ts
+
   - kind: ethereum
     name: MasterChef
     network: fantom
@@ -49,7 +50,8 @@ dataSources:
           handler: handleWithdraw
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-      file: ./protocols/apeswap/src/mappings/masterchef/reward.ts
+      file: ./protocols/spookyswap/src/mappings/masterchef/reward.ts
+
   - kind: ethereum
     name: MasterChefV2
     network: fantom
@@ -76,7 +78,8 @@ dataSources:
           handler: handleWithdrawV2
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawV2
-      file: ./protocols/apeswap/src/mappings/masterchef/rewardV2.ts
+      file: ./protocols/spookyswap/src/mappings/masterchef/rewardV2.ts
+ 
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -107,4 +110,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          

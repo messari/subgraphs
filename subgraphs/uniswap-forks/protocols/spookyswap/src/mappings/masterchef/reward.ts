@@ -1,8 +1,7 @@
-// import { log } from "@graphprotocol/graph-ts";
-import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../../../generated/MasterChef/MasterChefSpookyswap";
-import { _HelperStore } from "../../../../generated/schema";
-import { UsageType } from "../../../common/constants";
-import { handleReward } from "../../../common/masterChef/spookyswap/handleReward";
+import { Deposit as DepositEvent, Withdraw as WithdrawEvent, EmergencyWithdraw } from "../../../../../generated/MasterChef/MasterChefSpookyswap";
+import { _HelperStore } from "../../../../../generated/schema";
+import { UsageType } from "../../../../../src/common/constants";
+import { handleReward } from "../../common/handlers/handleReward";
 
 export function handleDeposit(event: DepositEvent): void {
   handleReward(event, event.params.pid, event.params.amount, UsageType.DEPOSIT);
