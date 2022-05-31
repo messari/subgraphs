@@ -184,6 +184,6 @@ export const BSC_NETWORK = "bsc";
 export const AVALANCHE_NETWORK = "avalanche";
 
 export const schemaVersion = "1.2.1";
-export const subgraphVersion = "1.0.2";
+export const subgraphVersion = "1.0.3";
 export const methodologyVersion = "1.0.0";
 
