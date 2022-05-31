@@ -489,7 +489,7 @@ export const schema120 = (): Schema => {
     Object.keys(entitiesData.vaultHourlySnapshots).join(",") +
     "}";
 
-  const events = ["withdraws", "deposits"];
+  const events = ["deposits", "withdraws"];
   const eventsFields = ["hash", "to", "from", "timestamp", "amount", "amountUSD"];
   const eventsQuery = events.map((event) => {
     let options = "";

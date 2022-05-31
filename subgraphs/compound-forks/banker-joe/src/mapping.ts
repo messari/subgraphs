@@ -5,6 +5,7 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
+  ActionPaused1,
 } from "../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -40,6 +41,7 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
+  _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
@@ -111,6 +113,10 @@ export function handleNewLiquidationIncentive(
 ): void {
   let protocol = getOrCreateProtocol();
   _handleNewLiquidationIncentive(protocol, event);
+}
+
+export function handleActionPaused(event: ActionPaused1): void {
+  _handleActionPaused(event);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {

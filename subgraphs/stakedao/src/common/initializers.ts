@@ -43,6 +43,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.slug = constants.Protocol.SLUG;
     protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
     protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
+    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.Protocol.TYPE;
 
@@ -99,7 +100,6 @@ export function getOrCreateFinancialDailySnapshots(
     financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -188,11 +188,7 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -222,11 +218,7 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.inputTokenBalance = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
-    vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;

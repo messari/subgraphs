@@ -175,7 +175,7 @@ function ProtocolDashboard() {
     // ...includes('has no field') checks if the error is describing a discrepancy between the protocol query and the fields in the protocol entity on the schema
     if (!protocolSchemaData && !protocolSchemaQueryError.message.includes("has no field")) {
       errorDisplayProps = new ApolloError({
-        errorMessage: `DEPLOYMENT UNREACHABLE - ${subgraphToQuery.url} is not a valid subgraph endpoint URL. If a subgraph namestring was used, make sure that the namestring points to a hosted service deployment named using the standard naming convention (messari/uniswap-v3-ethereum).`,
+        errorMessage: `DEPLOYMENT UNREACHABLE - ${subgraphToQuery.url} is not a valid subgraph endpoint URL. If a subgraph namestring was used, make sure that the namestring points to a hosted service deployment named using the standard naming convention (for example 'messari/uniswap-v3-ethereum').`,
       });
     } else {
       errorDisplayProps = protocolSchemaQueryError;

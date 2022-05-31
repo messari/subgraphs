@@ -38,9 +38,6 @@ export function handleSetVault(call: SetVaultCall): void {
 
   vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
 
-  vault.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-  vault.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
-
   vault.createdBlockNumber = call.block.number;
   vault.createdTimestamp = call.block.timestamp;
 
@@ -54,7 +51,11 @@ export function handleSetVault(call: SetVaultCall): void {
   );
 
   let protocol = getOrCreateYieldAggregator();
-  protocol._vaultIds.push(vaultAddress.toHexString());
+  
+  let vaultIds = protocol._vaultIds;
+  vaultIds.push(vaultAddress.toHexString())
+  
+  protocol._vaultIds = vaultIds;
   protocol.save();
 
   log.warning("[SetVault] - TxHash: {}, VaultId: {}, StrategyId: {}", [
