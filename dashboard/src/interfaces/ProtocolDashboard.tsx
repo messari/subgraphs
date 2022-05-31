@@ -1,62 +1,52 @@
-import "./ProtocolDashboard.css";
-import { Button, CircularProgress, Tab, Tabs, Typography } from "@mui/material";
-import TabPanel from "@mui/lab/TabPanel";
-import { ApolloClient, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
-import { Box } from "@mui/system";
+import { CircularProgress } from "@mui/material";
+import { ApolloClient, ApolloError, gql, HttpLink, InMemoryCache, useLazyQuery, useQuery } from "@apollo/client";
 
 import { Chart as ChartJS, registerables } from "chart.js";
 import React, { useEffect, useMemo, useState } from "react";
-import moment from "moment";
-import { schema } from "../queries/schema";
-import { PoolNames, ProtocolTypeEntity, SubgraphBaseUrl } from "../constants";
-import { TabContext } from "@mui/lab";
-import ProtocolTab from "./tabs/ProtocolTab";
-import PoolTab from "./tabs/PoolTab";
+import { poolOverview, schema } from "../queries/schema";
+import { PoolNames, SubgraphBaseUrl } from "../constants";
 import ErrorDisplay from "./ErrorDisplay";
-import WarningDisplay from "./WarningDisplay";
 import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router";
-import { isValidHttpUrl, parseSubgraphName } from "../utils";
-import EventsTab from "./tabs/EventsTab";
+import { isValidHttpUrl, NewClient } from "../utils";
 import AllDataTabs from "./AllDataTabs";
-import ProtocolInfo from "./ProtocolInfo";
-
-export const toDate = (timestamp: number) => {
-  return moment.unix(timestamp).format("YYYY-MM-DD");
-};
+import { DashboardHeader } from "../graphs/DashboardHeader";
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
-  const subgraphParam = searchParams.get("subgraph");
+  const subgraphParam = searchParams.get("endpoint");
   const tabString = searchParams.get("tab") || "";
   const poolIdString = searchParams.get("poolId") || "";
   const scrollToView = searchParams.get("view") || "";
+  const protocolIdString = searchParams.get("protocolId") || "";
+  const skipAmtParam = Number(searchParams.get("skipAmt")) || 0;
+
   const navigate = useNavigate();
 
   const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
   const [poolId, setPoolId] = useState<string>(poolIdString);
-  const [warning, setWarning] = useState<{ message: string; type: string }[]>([]);
+  const [protocolId, setprotocolId] = useState<string>(protocolIdString);
+  const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
   ChartJS.register(...registerables);
-  const link = new HttpLink({
-    uri: subgraphToQuery.url
-  });
-  const client = useMemo(
-    () =>
-      new ApolloClient({
-        link,
-        cache: new InMemoryCache(),
+  const client = useMemo(() => {
+    return new ApolloClient({
+      link: new HttpLink({
+        uri: subgraphToQuery.url,
       }),
-    [subgraphToQuery.url],
-  );
+      cache: new InMemoryCache(),
+    });
+  }, [subgraphToQuery.url]);
   const query = gql`
     {
       protocols {
         type
         schemaVersion
         subgraphVersion
+        methodologyVersion
         name
         id
+        network
       }
     }
   `;
@@ -65,7 +55,7 @@ function ProtocolDashboard() {
   const {
     data: protocolSchemaData,
     loading: protocolSchemaQueryLoading,
-    error: protocolSchemaQueryError
+    error: protocolSchemaQueryError,
   } = useQuery(query, { client });
 
   // By default, set the schema version to the user selected. If user has not selected, go to the version on the protocol entity
@@ -83,35 +73,75 @@ function ProtocolDashboard() {
     events,
     protocolFields,
   } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
+
   const queryMain = gql`
     ${graphQuery}
   `;
-
-  const [getData, { data, loading, error, refetch }] = useLazyQuery(queryMain, { variables: { poolId }, client });
+  const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
 
   let tabNum = "1";
   if (tabString.toUpperCase() === "POOL" || tabString.toUpperCase() === "MARKET") {
     tabNum = "2";
   } else if (tabString.toUpperCase() === "EVENTS") {
     tabNum = "3";
+  } else if (tabString.toUpperCase() === "POOLOVERVIEW") {
+    tabNum = "4";
   }
 
   const [tabValue, setTabValue] = useState(tabNum);
 
-  // Error logging in case the full data request throws an error
-  useEffect(() => {
-    console.log("--------------------Error Start-------------------------");
-    console.log(error, error ? Object.values(error) : null);
-    console.log(protocolSchemaQueryError ? Object.values(protocolSchemaQueryError) : null);
-    console.log("--------------------Error End---------------------------");
-  }, [error]);
+  const handleTabChange = (event: any, newValue: string) => {
+    let tabName = "protocol";
+    const href = new URL(window.location.href);
+    const p = new URLSearchParams(href.search);
+    const poolIdFromParam = p.get("poolId");
+    let protocolParam = "";
+    if (protocolId) {
+      protocolParam = `&protocolId=${protocolId}`;
+    }
+    let skipAmtParam = "";
+    let poolParam = "";
+    if (newValue === "2") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "pool";
+    } else if (newValue === "3") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "events";
+    } else if (newValue === "4") {
+      tabName = "poolOverview";
+      if (skipAmt > 0) {
+        skipAmtParam = `&skipAmt=${skipAmt}`;
+      }
+    }
+    navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
+    setTabValue(newValue);
+  };
+
+  const queryPoolOverview = gql`
+    ${poolOverview(protocolSchemaData?.protocols[0].type, schemaVersion)}
+  `;
+
+  const clientPoolOverview = useMemo(() => NewClient(subgraphToQuery.url), [subgraphToQuery.url]);
+  const {
+    data: dataPools,
+    error: poolOverviewError,
+    loading: poolOverviewLoading,
+  } = useQuery(queryPoolOverview, {
+    client: clientPoolOverview,
+    variables: { skipAmt },
+  });
+
+  let pools: { [x: string]: any }[] = [];
+  if (dataPools && data) {
+    pools = dataPools[PoolNames[data?.protocols[0]?.type]];
+  }
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
     if (protocolSchemaData) {
       getData();
     }
-  }, [subgraphToQuery.url, refetch, protocolSchemaData]);
+  }, [protocolSchemaData, getData]);
 
   useEffect(() => {
     if (!subgraphToQuery.url && subgraphParam) {
@@ -122,87 +152,77 @@ function ProtocolDashboard() {
       }
       setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
     }
-  }, [subgraphToQuery.url, subgraphParam]);
+  }, [subgraphToQuery.url, subgraphParam, subgraphToQuery.version]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
-  }, [scrollToView])
+  });
 
-  const handleTabChange = (event: any, newValue: string) => {
-    setWarning([]);
-    let tabName = "protocol";
-    if (newValue === "2") {
-      tabName = "pool";
-    } else if (newValue === "3") {
-      tabName = "events";
-    }
-    navigate(`?subgraph=${subgraphParam}&poolId=${poolId}&tab=${tabName}`);
-    setTabValue(newValue);
-  };
-
-  // AllData() is what renders the tabs and all of the data within them. This is also were data is mapped to call functions for the compoenents to be rendered
-  // Chart/Table components are called as functions within here, they are imported from the chartComponents directory
-
-
+  // Error logging in case the full data request throws an error
+  useEffect(() => {
+    console.log("--------------------Error Start-------------------------");
+    console.log(error, error ? Object.values(error) : null);
+    console.log(protocolSchemaQueryError ? Object.values(protocolSchemaQueryError) : null);
+    console.log("--------------------Error End---------------------------");
+  }, [error, protocolSchemaQueryError]);
 
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
   // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
 
-  if (protocolSchemaQueryError && !loading) {
-    errorDisplayProps = protocolSchemaQueryError;
+  if (protocolSchemaQueryError && !protocolSchemaQueryLoading) {
+    // ...includes('has no field') checks if the error is describing a discrepancy between the protocol query and the fields in the protocol entity on the schema
+    if (!protocolSchemaData && !protocolSchemaQueryError.message.includes("has no field")) {
+      errorDisplayProps = new ApolloError({
+        errorMessage: `DEPLOYMENT UNREACHABLE - ${subgraphToQuery.url} is not a valid subgraph endpoint URL. If a subgraph namestring was used, make sure that the namestring points to a hosted service deployment named using the standard naming convention (for example 'messari/uniswap-v3-ethereum').`,
+      });
+    } else {
+      errorDisplayProps = protocolSchemaQueryError;
+    }
   }
   if (error && !loading) {
     errorDisplayProps = error;
   }
 
-  let protocolInfo = null;
-  if (protocolSchemaData?.protocols.length > 0) {
-    protocolInfo = <ProtocolInfo protocolSchemaData={protocolSchemaData} subgraphToQueryURL={subgraphToQuery.url} schemaVersion={schemaVersion} />
-  }
-
-  let allDataTabs = null;
-  if (data) {
-    allDataTabs = <AllDataTabs
-      data={data}
-      entities={entities}
-      entitiesData={entitiesData}
-      tabValue={tabValue}
-      protocolFields={protocolFields}
-      issues={warning}
-      poolNames={PoolNames[data.protocols[0].type]}
-      poolId={poolId}
-      poolData={poolData}
-      events={events}
-      setWarning={(x) => setWarning(x)}
-      setPoolId={(x) => setPoolId(x)}
-      handleTabChange={(x, y) => handleTabChange(x, y)}
-    />
-  }
-
   return (
     <div className="ProtocolDashboard">
-      <Button
-        style={{ margin: "24px" }}
-        onClick={(name) => {
-          navigate(`/`);
-        }}
-      >
-        RETURN TO DEPLOYMENTS
-      </Button>
-      {protocolInfo}
-      <ErrorDisplay
-        errorObject={errorDisplayProps}
-        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
-        protocolSchemaData={protocolSchemaData}
-        subgraphToQuery={subgraphToQuery}
+      <DashboardHeader
+        protocolData={protocolSchemaData}
+        protocolId={protocolId}
+        subgraphToQueryURL={subgraphToQuery.url}
+        schemaVersion={schemaVersion}
       />
-      <WarningDisplay warningArray={warning} />
       {(protocolSchemaQueryLoading || loading) && !!subgraphToQuery.url ? (
         <CircularProgress sx={{ margin: 6 }} size={50} />
       ) : null}
-      {allDataTabs}
+      <ErrorDisplay
+        errorObject={errorDisplayProps}
+        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
+        protocolData={data}
+        subgraphToQuery={subgraphToQuery}
+      />
+      {!!data && (
+        <AllDataTabs
+          data={data}
+          entities={entities}
+          entitiesData={entitiesData}
+          tabValue={tabValue}
+          protocolFields={protocolFields}
+          poolNames={PoolNames[data.protocols[0].type]}
+          poolId={poolId}
+          poolData={poolData}
+          events={events}
+          setPoolId={(x) => setPoolId(x)}
+          handleTabChange={(x, y) => handleTabChange(x, y)}
+          subgraphToQueryURL={subgraphToQuery.url}
+          pools={pools}
+          paginate={(x) => paginate(x)}
+          skipAmt={skipAmt}
+          setProtocolId={(x) => setprotocolId(x)}
+          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
+        />
+      )}
     </div>
   );
 }

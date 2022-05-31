@@ -22,6 +22,7 @@ import * as constants from "../common/constants";
 import { getPriceOfOutputTokens } from "./Price";
 import { Vault as VaultContract } from "../../generated/Controller/Vault";
 import { Strategy as StrategyContract } from "../../generated/controller/Strategy";
+import { StableMaster as StableMasterContract } from "../../generated/controller/StableMaster";
 
 export function createWithdrawTransaction(
   to: Address,
@@ -52,7 +53,7 @@ export function createWithdrawTransaction(
     withdrawTransaction.amount = amount;
     withdrawTransaction.amountUSD = amountUSD;
 
-    withdrawTransaction.timestamp = utils.getTimestampInMillis(block);
+    withdrawTransaction.timestamp = block.timestamp;
     withdrawTransaction.blockNumber = block.number;
 
     withdrawTransaction.save();
@@ -75,11 +76,30 @@ export function _Withdraw(
   const strategyAddress = Address.fromString(vault._strategy);
   const strategyContract = StrategyContract.bind(strategyAddress);
 
-  // calculate withdraw amount as per the withdraw function in vault
-  // contract address
-  let withdrawAmount = vault.inputTokenBalance
-    .times(sharesBurnt)
-    .div(vault.outputTokenSupply);
+  let withdrawAmount: BigInt;
+  if (vaultAddress.equals(constants.ANGLE_USDC_VAULT_ADDRESS)) {
+    const stableMasterContract = StableMasterContract.bind(
+      constants.STABLE_MASTER_ADDRESS
+    );
+    const collateralMap = stableMasterContract.collateralMap(
+      constants.POOL_MANAGER_ADDRESS
+    );
+    let sanRate = collateralMap.value5;
+    let slpDataSlippage = collateralMap.value7.slippage;
+
+    // StableMasterFront: (amount * (BASE_PARAMS - col.slpData.slippage) * col.sanRate) / (BASE_TOKENS * BASE_PARAMS)
+    withdrawAmount = sharesBurnt
+      .times(constants.BASE_PARAMS.minus(slpDataSlippage))
+      .times(sanRate)
+      .div(constants.BASE_TOKENS.times(constants.BASE_PARAMS));
+  } else {
+    
+    // calculate withdraw amount as per the withdraw function in vault
+    // contract address
+    withdrawAmount = vault.inputTokenBalance
+      .times(sharesBurnt)
+      .div(vault.outputTokenSupply);
+  }
 
   let inputToken = Token.load(vault.inputToken);
   let inputTokenAddress = Address.fromString(vault.inputToken);
@@ -113,12 +133,11 @@ export function _Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.totalValueLockedUSD = vault.totalValueLockedUSD.minus(
-    withdrawAmountUSD
-  );
-  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(
-    withdrawAmountUSD
-  );
+  vault.totalValueLockedUSD = vault.inputTokenBalance
+    .toBigDecimal()
+    .div(inputTokenDecimals)
+    .times(inputTokenPrice.usdPrice)
+    .div(inputTokenPrice.decimalsBaseTen);
 
   vault.outputTokenPriceUSD = getPriceOfOutputTokens(
     vaultAddress,
@@ -134,6 +153,7 @@ export function _Withdraw(
     .toBigDecimal();
 
   const protocolSideWithdrawalAmountUSD = protocolSideWithdrawalAmount
+    .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
@@ -149,6 +169,8 @@ export function _Withdraw(
   protocol.save();
   vault.save();
 
+  utils.updateProtocolTotalValueLockedUSD();
+
   createWithdrawTransaction(
     to,
     vaultAddress,
@@ -161,14 +183,15 @@ export function _Withdraw(
 
   updateFinancialsAfterWithdrawal(block, protocolSideWithdrawalAmountUSD);
 
-  log.info(
-    "[Withdrawn] TxHash: {}, vaultAddress: {}, sharesBurnt: {}, supplySideWithdrawAmount: {}, protocolSideWithdrawAmount: {}",
+  log.warning(
+    "[Withdrawn] TxHash: {}, vaultAddress: {}, withdrawAmount: {}, sharesBurnt: {}, supplySideWithdrawAmount: {}, protocolSideWithdrawAmount: {}",
     [
       transaction.hash.toHexString(),
       vault.id,
+      withdrawAmount.toString(),
       sharesBurnt.toString(),
       supplySideWithdrawalAmount.toString(),
-      protocolSideWithdrawalAmount.toString()
+      protocolSideWithdrawalAmount.toString(),
     ]
   );
 }

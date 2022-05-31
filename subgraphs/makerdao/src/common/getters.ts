@@ -32,6 +32,7 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
+  ADDRESS_ZERO,
 } from "../common/constants";
 import { DsProxy } from "../../generated/templates/DsProxy/DsProxy";
 
@@ -99,11 +100,13 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot {
+export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketMetrics = MarketHourlySnapshot.load(marketAddress.concat("-").concat(id.toString()));
   let market = getMarket(marketAddress);
-
+  if (!market){
+    return null
+  }
   if (!marketMetrics) {
     marketMetrics = new MarketHourlySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
@@ -133,11 +136,13 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
   return marketMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
   let market = getMarket(marketAddress);
-
+  if (!market){
+    return null
+  }
   if (!marketMetrics) {
     marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
@@ -227,29 +232,29 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
 ///////// Helpers /////////
 ///////////////////////////
 
-function getIlkMarketAddress(ilk: Bytes): string {
+function getIlkMarketAddress(ilk: Bytes): Address {
   let ilkEntity = _Ilk.load(ilk.toString());
   if (!ilkEntity) {
-    return ZERO_ADDRESS;
+    return ADDRESS_ZERO;
   }
-  return ilkEntity.marketAddress;
+  return Address.fromString(ilkEntity.marketAddress);
 }
 
-export function getMarketFromIlk(ilk: Bytes): Market {
-  let marketAddress = getIlkMarketAddress(ilk);
-  let market = Market.load(marketAddress);
-  if (market) {
-    return market;
+export function getMarketFromIlk(ilk: Bytes): Market | null {
+  const marketAddress = getIlkMarketAddress(ilk);
+  const market = Market.load(marketAddress.toHexString());
+  if (!market) {
+    return null;
   }
-  return new Market(marketAddress);
+  return market
 }
 
-export function getMarket(marketAddress: string): Market {
+export function getMarket(marketAddress: string): Market | null {
   let market = Market.load(marketAddress);
-  if (market) {
-    return market;
+  if (!market) {
+    return null;
   }
-  return new Market(marketAddress);
+  return market;
 }
 
 export function getProxy(proxyAddress: Address): _Proxy {

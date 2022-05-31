@@ -15,19 +15,6 @@
     - BSC, Matic
         - The two chains use the code from uniswap V2. Additionally, there is a Masterchef and MasterchefV2 contract. BSC only uses the Masterchef contract, while MasterchefV2 is used on the Matic chain. The masterchef contracts are slightly different for Apeswap vs. Sushiswap in the naming of certain functions. This is why they each have a separate folder for Masterchef. 
 
-## Deployment Instructions:
-- Add/update configuraptions to the deployment/deploymentConfigurations.json file in order to add or update deployments.
-
-```
-# Deploys uniswap-v2 to mainnet in my hosted service.
-npm run deploy uniswap-v2 mainnet steegecs
-
-# Deploys uniswap-v2 to all networks in my hosted service.
-npm run deploy uniswap-v2 steegecs
-
-# Deploys protocols and networks in my hosted service.
-npm run deploy steege
-```
 
 ## Project Layout:
 ### schema.graphql
