@@ -1,7 +1,7 @@
 import { Address, BigDecimal, BigInt, Bytes, log, ethereum } from "@graphprotocol/graph-ts";
 import { LiquidityPool, Swap } from "../../generated/schema";
 import { getCryptoTokenPrice, getPoolAssetPrice } from "./snapshots";
-import { BIG_DECIMAL_TWO, LENDING, STABLE_FACTORY } from "../common/constants/index";
+import { BIG_DECIMAL_TWO, LENDING, METAPOOL_FACTORY, STABLE_FACTORY } from "../common/constants/index";
 import { getBasePool, getVirtualBaseLendingPool } from "./pools";
 import { exponentToBigDecimal } from "../common/utils/numbers";
 import {
@@ -61,7 +61,7 @@ export function handleExchange(
       return;
     }
     tokenSold = basePool.coins[underlyingSoldIndex];
-    if ((pool.assetType == 2 || pool.assetType == 0) && pool.poolType == STABLE_FACTORY && boughtId == 0) {
+    if ((pool.assetType == 2 || pool.assetType == 0) && (pool.poolType == STABLE_FACTORY || pool.poolType == METAPOOL_FACTORY) && boughtId == 0) {
       // handling an edge-case in the way the dx is logged in the event
       // for BTC metapools and for USD Metapool from factory v1.2
       tokenSoldDecimals = BigInt.fromI32(18);

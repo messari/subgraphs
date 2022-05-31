@@ -163,3 +163,5 @@ export const ETH_NAME = "Ether";
 export const FEE_DENOMINATOR_DECIMALS = 10;
 export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52");
 export const CRV_POOL_START_BLOCK = 10928474;
+
+export const MISPRICE_TOKENS: string[] = ["0x48759f220ed983db51fa7a8c0d2aab8f3ce4166a","0x76eb2fe28b36b3ee97f3adae0c69606eedb2a37c","0x8e595470ed749b85c6f7669de83eae304c2ec68f"]

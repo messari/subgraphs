@@ -184,7 +184,7 @@ export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): st
 
 export function getTokenPrice(token: Address, pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   if (!pool.isV2) {
-    const latestPrice = getPoolAssetPrice(pool, timestamp);
+    const latestPrice = getTokenPriceSnapshot(token, timestamp, FOREX_TOKENS.includes(token.toHexString()));
     return latestPrice;
   }
   return getCryptoTokenPrice(token, timestamp, pool);
