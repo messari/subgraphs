@@ -23,6 +23,9 @@ export function handleFile(event: LogNote): void {
   if (signature == COLLATERAL_FILE_SIGNATURE) {
     if (what == "chop") {
       let market = getMarketFromIlk(ilk);
+      if (!market) {
+        return;
+      }
       let catContract = Cat.bind(Address.fromString(MCD_CAT_ADDRESS));
       market.liquidationPenalty = bigIntToBigDecimal(catContract.ilks(ilk).value1, 27)
         .minus(BIGDECIMAL_ONE)
@@ -39,6 +42,9 @@ export function handleFileV2(event: LogNoteV2): void {
   if (signature == COLLATERAL_FILE_SIGNATURE) {
     if (what == "chop") {
       let market = getMarketFromIlk(ilk);
+      if (!market) {
+        return;
+      }
       let catContract = Cat.bind(Address.fromString(MCD_CAT_V2_ADDRESS));
       market.liquidationPenalty = bigIntToBigDecimal(catContract.ilks(ilk).value1, 27)
         .minus(BIGDECIMAL_ONE)
@@ -53,6 +59,9 @@ export function handleFileDog(event: File2): void {
   let what = event.params.what.toString();
   if (what == "chop") {
     let market = getMarketFromIlk(ilk);
+    if (!market) {
+      return;
+    }
     market.liquidationPenalty = bigIntToBigDecimal(event.params.data, DEFAULT_DECIMALS)
       .minus(BIGDECIMAL_ONE)
       .times(BIGDECIMAL_ONE_HUNDRED);

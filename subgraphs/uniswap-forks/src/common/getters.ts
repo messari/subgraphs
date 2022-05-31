@@ -1,6 +1,6 @@
 // import { log } from "@graphprotocol/graph-ts";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/configure";
+import { NetworkConfigs } from "../../configurations/configure";
 import { TokenABI } from "../../generated/Factory/TokenABI";
 import {
   DexAmmProtocol,
@@ -26,10 +26,7 @@ import {
   DEFAULT_DECIMALS,
   RewardTokenType,
   BIGINT_ZERO,
-  SECONDS_PER_HOUR,
-  PROTOCOL_SCHEMA_VERSION,
-  PROTOCOL_SUBGRAPH_VERSION,
-  PROTOCOL_METHODOLOGY_VERSION,
+  SECONDS_PER_HOUR
 } from "./constants";
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(NetworkConfigs.getFactoryAddress());
@@ -38,9 +35,9 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol = new DexAmmProtocol(NetworkConfigs.getFactoryAddress());
     protocol.name = NetworkConfigs.getProtocolName();
     protocol.slug = NetworkConfigs.getProtocolSlug();
-    protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
-    protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
-    protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
+    protocol.schemaVersion = NetworkConfigs.getSchemaVersion();
+    protocol.subgraphVersion = NetworkConfigs.getSubgraphVersion();
+    protocol.methodologyVersion = NetworkConfigs.getMethodologyVersion();
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

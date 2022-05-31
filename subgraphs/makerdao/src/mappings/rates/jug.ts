@@ -21,6 +21,9 @@ export function handleFile(event: LogNote): void {
     if (what == "duty") {
       let jugContract = Jug.bind(Address.fromString(MCD_JUG_ADDRESS));
       let market = getMarketFromIlk(ilk);
+      if (!market) {
+        return;
+      }
       let interestRate = getOrCreateInterestRate(market.id);
       let rate = bigIntToBigDecimal(jugContract.ilks(ilk).value0, RAY).minus(BIGDECIMAL_ONE);
       let interestRateAnnualized = bigDecimalExponential(rate, SECONDS_PER_YEAR_BIGDECIMAL).times(

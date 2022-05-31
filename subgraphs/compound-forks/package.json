@@ -1,12 +1,14 @@
 {
   "name": "compound-forks",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "format": "npx prettier --write ."
+  },
   "dependencies": {
-    "@graphprotocol/graph-ts": "0.26.0"
+    "@graphprotocol/graph-ts": "^0.27.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "0.28.0",
-    "prettier": "^2.6.2"
+    "@graphprotocol/graph-cli": "^0.30.1",
+    "prettier": "^2.6.0"
   }
 }

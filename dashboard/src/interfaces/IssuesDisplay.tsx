@@ -1,9 +1,9 @@
 import { styled } from "../styled";
 import { Typography } from "@mui/material";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 
-const IssuesContainer = styled("div") <{ $hasCritical: boolean }>`
+const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
   max-height: 230px;
   overflow-y: scroll;
   background-color: rgb(28, 28, 28);
@@ -50,7 +50,20 @@ const messagesByLevel = (
       if (issuesArray[x].type === "JS") {
         issuesMsg = `JavaScript Error thrown processing the data for ${issuesArray[x].fieldName}: ${issuesArray[x].message}. Verify that the data is in the expected form. If the data is correct and this error persists, leave a message in the 'Validation-Dashboard' Discord channel.`;
       }
-      issuesMsgs.push(<li>{issuesMsg}</li>);
+      if (issuesArray[x].type === "VAL") {
+        issuesMsg = issuesArray[x].message;
+      }
+      if (issuesArray[x].type === "TOK") {
+        issuesMsg = `'${issuesArray[x].fieldName}' in the timeseries data refers to a token that does not exist on this pool. '${issuesArray[x].message}' is an invalid index.`;
+      }
+      if (issuesArray[x].type === "NEG") {
+        const msgObj = JSON.parse(issuesArray[x].message);
+        issuesMsg = `'${issuesArray[x].fieldName}' has ${msgObj.count} negative values. First instance of a negative value is on snapshot ${msgObj.firstSnapshot} with a value of ${msgObj.value}`;
+      }
+      if (issuesArray[x].type === "EMPTY") {
+        issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but did no transactions were detected on it.`;
+      }
+      issuesMsgs.push(<li key={`${x}-${issuesArray[x].fieldName}`}>{issuesMsg}</li>);
     }
   }
   return issuesMsgs;
@@ -61,10 +74,12 @@ interface IssuesProps {
 }
 // The issues display function takes the issues object passed in and creates the elements/messages to be rendered
 export const IssuesDisplay = ({ issuesArrayProps }: IssuesProps) => {
-  const [issuesArray, setIssuesArray] = useState(issuesArrayProps);
+  const [issuesArray, setIssuesArray] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
+    [],
+  );
   useEffect(() => {
     setIssuesArray(issuesArrayProps);
-  }, []);
+  }, [issuesArrayProps]);
 
   const criticalIssues = issuesArray.filter((iss) => iss.level === "critical");
   const errorIssues = issuesArray.filter((iss) => iss.level === "error");
