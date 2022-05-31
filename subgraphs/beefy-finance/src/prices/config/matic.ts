@@ -10,10 +10,10 @@ export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0x094d12e5b541784701fd8d65f11fc0598fbc6332"
 );
 export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0x094d12e5b541784701fd8d65f11fc0598fbc6332"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x0000000000000000000000000000000000000000"
+  "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
@@ -34,7 +34,7 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -49,6 +49,20 @@ UNISWAP_ROUTER_ADDRESS.set(
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
   Address.fromString("0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45")
+);
+
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////// QUICKSWAP CONTRACT ///////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+export const QUICKSWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
+QUICKSWAP_ROUTER_ADDRESS.set(
+  "routerV1",
+  Address.fromString("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
+);
+QUICKSWAP_ROUTER_ADDRESS.set(
+  "routerV2",
+  Address.fromString("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
 );
 
 ///////////////////////////////////////////////////////////////////////////

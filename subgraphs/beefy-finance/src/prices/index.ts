@@ -15,8 +15,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return new CustomPriceType();
   }
   log.warning("fetching network...", []);
-  //let network = dataSource.network();
-  let network = "matic";
+  let network = dataSource.network();
   log.warning("network fetched", []);
 
   // 1. Yearn Lens Oracle
@@ -110,6 +109,18 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     return sushiswapPrice;
   }
   log.warning("sushi swap router failed", []);
+
+  // 6. Quickswap Router
+  log.warning("trying with quickswap router...", []);
+  let quickswapPrice = getPriceUsdcUniswap(tokenAddr, network);
+  if (!quickswapPrice.reverted) {
+    log.warning("[QuickswapRouter] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      quickswapPrice.usdPrice.div(quickswapPrice.decimalsBaseTen).toString(),
+    ]);
+    return quickswapPrice;
+  }
+  log.warning("quickswap router failed", []);
 
   log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
     tokenAddr.toHexString(),
