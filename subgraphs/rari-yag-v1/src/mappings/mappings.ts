@@ -57,7 +57,6 @@ export function handleUSDCDeposit(event: USDCDeposit): void {
     event,
     event.params.amount,
     event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    event.params.rftMinted,
     assetAddress,
     USDC_VAULT_ADDRESS,
   );
@@ -85,7 +84,6 @@ export function handleUSDCWithdrawal(event: USDCWithdrawal): void {
     event.params.amount,
     event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     BIGINT_ZERO,
-    event.params.rftBurned,
     assetAddress,
     USDC_VAULT_ADDRESS,
   );
@@ -115,7 +113,6 @@ export function handleYieldDeposit(event: YieldDeposit): void {
     event,
     event.params.amount,
     event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    event.params.rftMinted,
     assetAddress,
     YIELD_VAULT_ADDRESS,
   );
@@ -142,7 +139,6 @@ export function handleYieldWithdrawal(event: YieldWithdrawal): void {
     event.params.amount,
     event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     event.params.amountTransferred,
-    event.params.rftBurned,
     assetAddress,
     YIELD_VAULT_ADDRESS,
   );
@@ -172,7 +168,6 @@ export function handleDAIDeposit(event: DAIDeposit): void {
     event,
     event.params.amount,
     event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-    event.params.rftMinted,
     assetAddress,
     DAI_VAULT_ADDRESS,
   );
@@ -199,7 +194,6 @@ export function handleDAIWithdrawal(event: DAIWithdrawal): void {
     event.params.amount,
     event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     BIGINT_ZERO,
-    event.params.rftBurned,
     assetAddress,
     DAI_VAULT_ADDRESS,
   );
@@ -223,7 +217,6 @@ export function handleEtherDeposit(event: EtherDeposit): void {
       Address.fromString(ETH_ADDRESS),
       event.params.amount.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     ),
-    event.params.reptMinted,
     ETH_ADDRESS, // only token in this pool
     ETHER_VAULT_ADDRESS,
   );
@@ -244,7 +237,6 @@ export function handleEtherWithdrawal(event: EtherWithdrawal): void {
       event.params.amount.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     ),
     BIGINT_ZERO,
-    event.params.reptBurned,
     ETH_ADDRESS,
     ETHER_VAULT_ADDRESS,
   );

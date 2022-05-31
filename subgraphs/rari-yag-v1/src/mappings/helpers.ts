@@ -30,6 +30,7 @@ import { RariYieldFundManager } from "../../generated/RariYieldFundManager/RariY
 import { RariStableFundManager } from "../../generated/RariUSDCFundManager/RariStableFundManager";
 import { RariEtherFundManager } from "../../generated/RariEtherFundManager/RariEtherFundManager";
 import { getUsdPrice } from "../prices";
+import { ERC20 } from "../../generated/RariYieldFundManager/ERC20";
 
 //////////////////////////////
 //// Transaction Entities ////
@@ -39,7 +40,6 @@ export function createDeposit(
   event: ethereum.Event,
   amount: BigInt,
   amountUSD: BigDecimal,
-  outputTokensMinted: BigInt,
   asset: string,
   vaultAddress: string,
 ): void {
@@ -70,22 +70,19 @@ export function createDeposit(
 
   deposit.save();
 
-  updateTVL(event);
+  updateTVL(event); // also updates inputTokenBalance
 
-  // update outputTokenPrice
-  vault.outputTokenSupply = vault.outputTokenSupply!.plus(outputTokensMinted);
-  vault.outputTokenPriceUSD = getOutputTokenPrice(vault.outputTokenSupply!, vaultAddress);
-
-  // update fees/revenues/token balances
+  // update outputToken/fees/revenues/token balances
+  let outputTokenSupply = updateOutputToken(vault, vaultAddress, event);
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, BIGDECIMAL_ZERO);
-  updateInputTokenBalance(vault);
 
   // calculate pricePerShare
+  let decimals = token.decimals == -1 ? DEFAULT_DECIMALS : token.decimals;
   vault.pricePerShare = vault.inputTokenBalance
     .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
-    .div(vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
+    .div(exponentToBigDecimal(decimals))
+    .div(outputTokenSupply.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 
   vault.save();
 }
@@ -95,7 +92,6 @@ export function createWithdraw(
   amount: BigInt,
   amountUSD: BigDecimal,
   afterFeeUSD: BigInt, // used to calculate withdrawal fee - only used in Yield Pool
-  outputTokensBurned: BigInt,
   asset: string,
   vaultAddress: string,
 ): void {
@@ -126,11 +122,7 @@ export function createWithdraw(
 
   withdraw.save();
 
-  updateTVL(event);
-
-  // update outputTokenPrice
-  vault.outputTokenSupply = vault.outputTokenSupply!.minus(outputTokensBurned);
-  vault.outputTokenPriceUSD = getOutputTokenPrice(vault.outputTokenSupply!, vaultAddress);
+  updateTVL(event); // also updates inputTokenBalance
 
   // calculate withdrawal fee
   let withdrawalFee = BIGDECIMAL_ZERO;
@@ -141,16 +133,17 @@ export function createWithdraw(
     }
   }
 
-  // update fees/revenues/token balances
+  // update outputToken/fees/revenues/token balances
+  let outputTokenSupply = updateOutputToken(vault, vaultAddress, event);
   updateYieldFees(vaultAddress);
   updateRevenues(event, vault, withdrawalFee);
-  updateInputTokenBalance(vault);
 
   // calculate pricePerShare
+  let decimals = token.decimals == -1 ? DEFAULT_DECIMALS : token.decimals;
   vault.pricePerShare = vault.inputTokenBalance
     .toBigDecimal()
-    .div(exponentToBigDecimal(DEFAULT_DECIMALS))
-    .div(vault.outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
+    .div(exponentToBigDecimal(decimals))
+    .div(outputTokenSupply.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)));
 
   vault.save();
 }
@@ -176,7 +169,7 @@ export function updateYieldFees(vaultAddress: string): void {
       // only update fee if it was not reverted
       withdrawalFee.feePercentage = tryWithdrawalFee.value
         .toBigDecimal()
-        .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2));
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS - 2)); // this fee has mantissa factor 18 set on contract-level
       withdrawalFee.save();
     }
   } else if (vaultAddress == USDC_VAULT_ADDRESS) {
@@ -262,6 +255,7 @@ export function updateRevenues(event: ethereum.Event, vault: Vault, extraFee: Bi
   financialMetrics.save();
 }
 
+// as a side effect inputTokenBalance is updated
 export function updateTVL(event: ethereum.Event): void {
   let protocol = getOrCreateYieldAggregator();
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -275,43 +269,26 @@ export function updateTVL(event: ethereum.Event): void {
     let inputToken = getOrCreateToken(vault.inputToken);
 
     // if...else to grab TVL for correct vault
+    let tryTokenBalance: ethereum.CallResult<BigInt>;
     if (vaultAddress == YIELD_VAULT_ADDRESS) {
       let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
-      let tryVaultTVL = contract.try_getRawFundBalance1(inputToken.symbol);
-      vault.totalValueLockedUSD = tryVaultTVL.reverted
-        ? vault.totalValueLockedUSD
-        : getUsdPrice(
-            Address.fromString(vault.inputToken),
-            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-          );
+      tryTokenBalance = contract.try_getRawFundBalance1(inputToken.symbol);
     } else if (vaultAddress == USDC_VAULT_ADDRESS) {
       let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
-      let tryVaultTVL = contract.try_getRawFundBalance1(inputToken.symbol);
-      vault.totalValueLockedUSD = tryVaultTVL.reverted
-        ? vault.totalValueLockedUSD
-        : getUsdPrice(
-            Address.fromString(vault.inputToken),
-            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-          );
+      tryTokenBalance = contract.try_getRawFundBalance1(inputToken.symbol);
     } else if (vaultAddress == DAI_VAULT_ADDRESS) {
       let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
-      let tryVaultTVL = contract.try_getRawFundBalance1(inputToken.symbol);
-      vault.totalValueLockedUSD = tryVaultTVL.reverted
-        ? vault.totalValueLockedUSD
-        : getUsdPrice(
-            Address.fromString(vault.inputToken),
-            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-          );
+      tryTokenBalance = contract.try_getRawFundBalance1(inputToken.symbol);
     } else {
       let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
-      let tryVaultTVL = contract.try_getRawFundBalance(); // in ETH
-      vault.totalValueLockedUSD = tryVaultTVL.reverted
-        ? vault.totalValueLockedUSD
-        : getUsdPrice(
-            Address.fromString(ETH_ADDRESS),
-            tryVaultTVL.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
-          );
+      tryTokenBalance = contract.try_getRawFundBalance(); // in ETH
     }
+
+    vault.inputTokenBalance = tryTokenBalance.reverted ? vault.inputTokenBalance : tryTokenBalance.value;
+    vault.totalValueLockedUSD = getUsdPrice(
+      Address.fromString(inputToken.id),
+      vault.inputTokenBalance.toBigDecimal().div(exponentToBigDecimal(inputToken.decimals)),
+    );
 
     totalValueLockedUSD = totalValueLockedUSD.plus(vault.totalValueLockedUSD);
     vault.save();
@@ -321,57 +298,38 @@ export function updateTVL(event: ethereum.Event): void {
   protocol.save();
 }
 
-// updates the input balance of a given pool
-export function updateInputTokenBalance(vault: Vault): void {
-  let tryFundBalance: ethereum.CallResult<BigInt>;
-  let inputToken = getOrCreateToken(vault.inputToken);
-
-  if (vault._vaultInterest == YIELD_VAULT_ADDRESS) {
-    let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
-    tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
-  } else if (vault._vaultInterest == USDC_VAULT_ADDRESS) {
-    let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
-    tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
-  } else if (vault._vaultInterest == DAI_VAULT_ADDRESS) {
-    let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
-    tryFundBalance = contract.try_getRawFundBalance1(inputToken.symbol);
-  } else {
-    // must be Ether vault
-    let contract = RariEtherFundManager.bind(Address.fromString(ETHER_VAULT_MANAGER_ADDRESS));
-    tryFundBalance = contract.try_getRawFundBalance();
-  }
-
-  // udpate balance if not reverted
-  if (!tryFundBalance.reverted) {
-    vault.inputTokenBalance = tryFundBalance.value;
-  }
-
-  vault.save();
-}
-
 // returns output token price in USD
-export function getOutputTokenPrice(outputTokenSupply: BigInt, vaultContract: string): BigDecimal {
+export function updateOutputToken(vault: Vault, vaultContract: string, event: ethereum.Event): BigInt {
   // OutputTokenPrice = getFundBalance() / outputTokenSupply
   // Here: https://docs.rari.capital/yag/#usage
 
-  let outputTokenSupplyBD = outputTokenSupply.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS));
+  // get and update outputTokenSupply
+  let outputTokenContract = ERC20.bind(Address.fromString(vault.outputToken!));
+  let tryTotalSupply = outputTokenContract.try_totalSupply();
+  let outputTokenSupply = tryTotalSupply.reverted ? vault.outputTokenSupply : tryTotalSupply.value;
 
+  // convert supply to BD
+  let outputToken = getOrCreateToken(vault.outputToken!);
+  let outputTokenSupplyBD = outputTokenSupply!.toBigDecimal().div(exponentToBigDecimal(outputToken.decimals));
+
+  // calculate outputTokenPrice
+  let outputTokenPrice = BIGDECIMAL_ZERO;
   if (vaultContract == YIELD_VAULT_ADDRESS) {
     let contract = RariYieldFundManager.bind(Address.fromString(YIELD_VAULT_MANAGER_ADDRESS));
     let tryBalance = contract.try_getFundBalance();
-    return tryBalance.reverted
+    outputTokenPrice = tryBalance.reverted
       ? BIGDECIMAL_ZERO
       : tryBalance.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)).div(outputTokenSupplyBD);
   } else if (vaultContract == USDC_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(USDC_VAULT_MANAGER_ADDRESS));
     let tryBalance = contract.try_getFundBalance();
-    return tryBalance.reverted
+    outputTokenPrice = tryBalance.reverted
       ? BIGDECIMAL_ZERO
       : tryBalance.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)).div(outputTokenSupplyBD);
   } else if (vaultContract == DAI_VAULT_ADDRESS) {
     let contract = RariStableFundManager.bind(Address.fromString(DAI_VAULT_MANAGER_ADDRESS));
     let tryBalance = contract.try_getFundBalance();
-    return tryBalance.reverted
+    outputTokenPrice = tryBalance.reverted
       ? BIGDECIMAL_ZERO
       : tryBalance.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)).div(outputTokenSupplyBD);
   } else {
@@ -384,6 +342,23 @@ export function getOutputTokenPrice(outputTokenSupply: BigInt, vaultContract: st
           Address.fromString(ETH_ADDRESS),
           tryBalance.value.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
         );
-    return balanceUSD.div(outputTokenSupplyBD);
+    outputTokenPrice = balanceUSD.div(outputTokenSupplyBD);
   }
+
+  // set outputToken values to each vault
+  let protocol = getOrCreateYieldAggregator();
+  for (let i = 0; i < protocol._vaultList.length; i++) {
+    let splitArr = protocol._vaultList[i].split("-", 2);
+    let vaultAddress = splitArr[0];
+    let tokenAddress = splitArr[1];
+    let _vault = getOrCreateVault(event, vaultAddress, tokenAddress);
+
+    if (vaultAddress.toLowerCase() == vaultContract.toLowerCase()) {
+      _vault.outputTokenSupply = outputTokenSupply;
+      _vault.outputTokenPriceUSD = outputTokenPrice;
+      _vault.save();
+    }
+  }
+
+  return outputTokenSupply!;
 }
