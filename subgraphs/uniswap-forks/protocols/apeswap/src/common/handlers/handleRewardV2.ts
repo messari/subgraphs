@@ -24,7 +24,6 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
     masterChefPool.save();
   }
 
-  // Return if pool does not exist - Banana tokens?
   let pool = LiquidityPool.load(masterChefPool.valueString!);
   if (!pool) {
     return;
