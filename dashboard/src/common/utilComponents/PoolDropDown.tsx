@@ -35,7 +35,7 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
         sx={{ maxWidth: 1000, my: 2 }}
         onChange={(event: React.SyntheticEvent) => {
           // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
-          // setIssues([]);
+          setIssues([]);
           const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
           searchParams.delete("view");
@@ -48,7 +48,7 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
             );
           }
         }}
-        renderInput={(params) => <ComboBoxInput params={params} setTextInput={setTextInput} />}
+        renderInput={(params) => <ComboBoxInput label="PoolList" params={params} setTextInput={setTextInput} />}
       />
     </>
   );

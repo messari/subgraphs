@@ -1,4 +1,4 @@
-// import { log } from "@graphprotocol/graph-ts";
+import { log } from "@graphprotocol/graph-ts";
 import { _HelperStore } from "../../generated/schema";
 import { Mint, Burn, Swap, Transfer, Sync } from "../../generated/templates/Pair/Pair";
 import { createDeposit, createWithdraw, createSwapHandleVolumeAndFees } from "../common/creators";
@@ -11,7 +11,6 @@ export function handleTransfer(event: Transfer): void {
   if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.value.equals(BIGINT_THOUSAND)) {
     return;
   }
-
   // mints
   if (event.params.from.toHexString() == ZERO_ADDRESS) {
     handleTransferMint(event, event.params.value, event.params.to.toHexString());
@@ -23,7 +22,6 @@ export function handleTransfer(event: Transfer): void {
   if (event.params.to == event.address) {
     handleTransferToPoolBurn(event, event.params.from.toHexString());
   }
-
   // burn
   if (event.params.to.toHexString() == ZERO_ADDRESS && event.params.from == event.address) {
     handleTransferBurn(event, event.params.value, event.params.from.toHexString());
