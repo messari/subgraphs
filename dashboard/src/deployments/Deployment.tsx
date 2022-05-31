@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div") <{ $warning?: boolean }>`
+const CardRow = styled("div")<{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -95,7 +95,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
     variables: { subgraphName },
     client: clientIndexing,
   });
-  const { nonFatalErrors, fatalError, synced } = status?.indexingStatusesForSubgraphName[0] ?? {};
+  const { nonFatalErrors, fatalError, synced } = status?.indexingStatusForCurrentVersion ?? {};
 
   const client = useMemo(() => NewClient(deployment), [deployment]);
   const { data, error } = useQuery(ProtocolQuery, {
@@ -121,12 +121,13 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   if (!status) {
     return null;
   }
+  console.log("STATUS", status);
   const indexed = synced
     ? 100
     : toPercent(
-      status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number,
-      status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number,
-    );
+        status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
+        status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
+      );
 
   const navigateToSubgraph = (url: string) => () => {
     navigate(`subgraph?endpoint=${url}&tab=protocol`);
@@ -169,11 +170,11 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
           </CardRow>
           <CardRow>
             <span>Latest Block:</span>{" "}
-            <span>{status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number}</span>
+            <span>{status.indexingStatusForCurrentVersion.chains[0].latestBlock.number}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>
-            <span>{status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number}</span>
+            <span>{status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number}</span>
           </CardRow>
           <CardRow $warning={schemaOutdated}>
             <span>Schema version:</span> <span>{protocol?.schemaVersion || "N/A"}</span>
@@ -186,7 +187,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
           </CardRow>
           <CardRow>
             <span>Entity count:</span>{" "}
-            <span>{parseInt(status.indexingStatusesForSubgraphName[0].entityCount).toLocaleString()}</span>
+            <span>{parseInt(status.indexingStatusForCurrentVersion.entityCount).toLocaleString()}</span>
           </CardRow>
         </CardContent>
         {(nonFatalErrors.length > 0 || fatalError) && (

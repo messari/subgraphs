@@ -193,7 +193,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
                 (capsEntityFieldName === "HOURLYLIQUIDATEUSD" || capsEntityFieldName === "DAILYLIQUIDATEUSD") &&
                 Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
                 issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length ===
-                0
+                  0
               ) {
                 issues.push({
                   type: "LIQ",
@@ -794,10 +794,7 @@ function PoolTab({ data, entities, entitiesData, poolId, setPoolId, poolData, pr
                     <Chart datasetLabel={label} dataChart={dataFields[field]} />
                   </Grid>
                   <Grid key={elementId + "2"} item xs={4}>
-                    <TableChart
-                      datasetLabel={label}
-                      dataTable={dataFields[field]}
-                    />
+                    <TableChart datasetLabel={label} dataTable={dataFields[field]} />
                   </Grid>
                 </Grid>
               </div>

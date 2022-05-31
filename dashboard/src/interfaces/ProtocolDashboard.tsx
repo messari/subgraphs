@@ -169,7 +169,6 @@ function ProtocolDashboard() {
   // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
 
   if (protocolSchemaQueryError && !protocolSchemaQueryLoading) {
-    console.log('scoob', Object.values(protocolSchemaQueryError), Object.keys(protocolSchemaQueryError))
     // ...includes('has no field') checks if the error is describing a discrepancy between the protocol query and the fields in the protocol entity on the schema
     if (!protocolSchemaData && !protocolSchemaQueryError.message.includes("has no field")) {
       errorDisplayProps = new ApolloError({
