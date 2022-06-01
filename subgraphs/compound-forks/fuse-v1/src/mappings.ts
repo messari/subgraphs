@@ -386,7 +386,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
@@ -557,6 +556,8 @@ function updateMarket(
   } else {
     market.outputTokenSupply = updateMarketData.totalSupplyResult.value;
   }
+
+  // get correct outputTokenDecimals for generic exchangeRate calculation
   let outputTokenDecimals = cTokenDecimals;
   if (market.outputToken) {
     let outputToken = Token.load(market.outputToken!);
@@ -588,6 +589,7 @@ function updateMarket(
       underlyingTokenPriceUSD
     );
 
+    // calculate inputTokenBalance only if exchangeRate is updated properly
     // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
     // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
     if (underlyingToken.decimals > outputTokenDecimals) {
@@ -597,6 +599,7 @@ function updateMarket(
       );
       let inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
+        .times(market.exchangeRate!)
         .times(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
@@ -609,6 +612,7 @@ function updateMarket(
       );
       let inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
+        .times(market.exchangeRate!)
         .div(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
