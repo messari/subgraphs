@@ -38,10 +38,9 @@ import {
   ETH_ADDRESS,
   ETH_NAME,
   ETH_SYMBOL,
-  FACTORY_CONTRACT,
+  getNetworkSpecificConstant,
   METHODOLOGY_VERSION,
   PROTOCOL_NAME,
-  PROTOCOL_NETWORK,
   PROTOCOL_SLUG,
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
@@ -89,6 +88,7 @@ import {
   INT_TWO,
   mantissaFactor,
   mantissaFactorBD,
+  Network,
 } from "../../src/constants";
 import { InterestRate, Market, _FusePool } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
@@ -98,6 +98,15 @@ import {
   getRewardsPerDay,
   RewardIntervalType,
 } from "./rewards";
+
+//////////////////////////////////
+//// Chain-specific Constants ////
+//////////////////////////////////
+
+let constants = getNetworkSpecificConstant();
+const FACTORY_CONTRACT = constants.fusePoolDirectoryAddress;
+const PROTOCOL_NETWORK = constants.network;
+const ETH_PRICEORACLE = constants.ethPriceOracle;
 
 //////////////////////
 //// Fuse Enum(s) ////
@@ -716,9 +725,20 @@ function getTokenPriceUSD(
     .div(bdFactor);
 
   // grab the price of ETH to find token price
-  const priceOffset = 6;
-  let ethPrice = getUsdPricePerToken(
-    Address.fromString(ETH_ADDRESS)
-  ).usdPrice.div(exponentToBigDecimal(priceOffset));
-  return ethPrice.times(priceInETH);
+  if (PROTOCOL_NETWORK == Network.MAINNET) {
+    const priceOffset = 6;
+    let ethPrice = getUsdPricePerToken(
+      Address.fromString(ETH_ADDRESS)
+    ).usdPrice.div(exponentToBigDecimal(priceOffset));
+    return ethPrice.times(priceInETH);
+  }
+
+  // TODO: verify this is good enough to calculate price
+  if (PROTOCOL_NETWORK == Network.ARBITRUM_ONE) {
+    return priceInETH;
+
+    let priceOracleContract = PriceOracle.bind(
+      Address.fromString(ETH_PRICEORACLE)
+    );
+  }
 }
