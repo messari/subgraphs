@@ -1,5 +1,6 @@
 import moment from "moment";
 import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
+import { useEffect, useRef } from "react";
 
 export const toDate = (timestamp: number, hour: boolean = false) => {
   let formatString = "YYYY-MM-DD";
@@ -28,6 +29,28 @@ export function NewClient(url: string): ApolloClient<NormalizedCacheObject> {
     link,
     cache: new InMemoryCache(),
   });
+}
+
+export function useInterval(callback: any, delay: number) {
+  const savedCallback = useRef<any>();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      if (savedCallback) {
+        savedCallback?.current();
+      }
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
 }
 
 export function convertTokenDecimals(value: string, decimals: number): number {

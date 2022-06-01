@@ -1,13 +1,13 @@
 import React, { MouseEventHandler, useContext, useMemo } from "react";
 import { latestSchemaVersion } from "../constants";
 import { useNavigate } from "react-router";
-import { ApolloClient, HttpLink, InMemoryCache, useQuery } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, useQuery } from "@apollo/client";
 import { NewClient, parseSubgraphName, toPercent } from "../utils";
 import { ProtocolQuery } from "../queries/protocolQuery";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
 import { useEffect } from "react";
 import { styled } from "../styled";
-import { alpha, Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { alpha, Box, Button, Card, CardContent, CircularProgress, Typography } from "@mui/material";
 import DeploymentsContext from "./DeploymentsContext";
 import { NetworkLogo } from "../common/NetworkLogo";
 
@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -72,22 +72,13 @@ interface DeploymentProps {
   networkName: string;
   deployment: string;
   subgraphID: string;
+  clientIndexing: ApolloClient<NormalizedCacheObject>;
 }
 
 // This component is for each individual subgraph
-export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentProps) => {
+export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing }: DeploymentProps) => {
   const deploymentsContext = useContext(DeploymentsContext);
   const navigate = useNavigate();
-  const clientIndexing = useMemo(
-    () =>
-      new ApolloClient({
-        link: new HttpLink({
-          uri: "https://api.thegraph.com/index-node/graphql",
-        }),
-        cache: new InMemoryCache(),
-      }),
-    [],
-  );
 
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
@@ -98,7 +89,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   const { nonFatalErrors, fatalError, synced } = status?.indexingStatusForCurrentVersion ?? {};
 
   const client = useMemo(() => NewClient(deployment), [deployment]);
-  const { data, error } = useQuery(ProtocolQuery, {
+  const { data, error, loading } = useQuery(ProtocolQuery, {
     client,
   });
 
@@ -117,17 +108,18 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
       indexedSuccess: synced && schemaVersion === latestSchemaVersion,
     };
   }, [schemaVersion, fatalError, synced]);
-
+  if (loading) {
+    return <CircularProgress sx={{ margin: 6 }} size={50} />;
+  }
   if (!status) {
     return null;
   }
-  console.log("STATUS", status);
   const indexed = synced
     ? 100
     : toPercent(
-        status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
-        status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
-      );
+      status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
+      status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
+    );
 
   const navigateToSubgraph = (url: string) => () => {
     navigate(`subgraph?endpoint=${url}&tab=protocol`);
