@@ -503,11 +503,26 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
     let rewardDecimals = getOrCreateToken(rewardTokenBorrow.token).decimals;
     let troller = Comptroller.bind(Address.fromString(COMPTROLLER_ADDRESS));
     let blocksPerDay = BigInt.fromString(getOrCreateCircularBuffer().blocksPerDay.truncate(0).toString());
-    let tryDistribution = troller.try_compSpeeds(event.address);
-    // get comp speed per day - this is the distribution amount for supplying and borrowing
-    let compPerDay = tryDistribution.reverted ? BIGINT_ZERO : tryDistribution.value.times(blocksPerDay);
-    let compPriceUSD = BIGDECIMAL_ZERO;
 
+    let compPriceUSD = BIGDECIMAL_ZERO;
+    let supplyCompPerDay = BIGINT_ZERO;
+    let borrowCompPerDay = BIGINT_ZERO;
+    // get comp speeds (changed storage after block 13322798)
+    // See proposal 62: https://compound.finance/governance/proposals/62
+    if (event.block.number.toI32() > 13322798) {
+      // comp speeds can be different for supply/borrow side
+      let tryBorrowSpeed = troller.try_compBorrowSpeeds(event.address);
+      let trySupplySpeed = troller.try_compSupplySpeeds(event.address);
+      borrowCompPerDay = tryBorrowSpeed.reverted ? BIGINT_ZERO : tryBorrowSpeed.value.times(blocksPerDay);
+      supplyCompPerDay = trySupplySpeed.reverted ? BIGINT_ZERO : trySupplySpeed.value.times(blocksPerDay);
+    } else {
+      // comp speeds are the same for supply/borrow side
+      let tryCompSpeed = troller.try_compSpeeds(event.address);
+      supplyCompPerDay = tryCompSpeed.reverted ? BIGINT_ZERO : tryCompSpeed.value.times(blocksPerDay);
+      borrowCompPerDay = supplyCompPerDay;
+    }
+
+    // get COMP price
     // cCOMP was made at this block height 10960099
     if (event.block.number.toI32() > 10960099) {
       let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
@@ -526,9 +541,14 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
       );
     }
 
-    let compPerDayUSD = compPerDay.toBigDecimal().div(exponentToBigDecimal(rewardDecimals)).times(compPriceUSD);
-    market.rewardTokenEmissionsAmount = [compPerDay, compPerDay];
-    market.rewardTokenEmissionsUSD = [compPerDayUSD, compPerDayUSD];
+    let borrowCompPerDayUSD = borrowCompPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals).times(compPriceUSD));
+    let supplyCompPerDayUSD = supplyCompPerDay
+      .toBigDecimal()
+      .div(exponentToBigDecimal(rewardDecimals).times(compPriceUSD));
+    market.rewardTokenEmissionsAmount = [borrowCompPerDay, supplyCompPerDay]; // same order as market.rewardTokens
+    market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
     market.save();
   }
 }
