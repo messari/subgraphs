@@ -10,6 +10,7 @@ import {
   BADGER_TOKEN,
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
   BIGINT_TEN,
   MAX_FEE,
   VaultFeeType,
@@ -151,6 +152,14 @@ export function updateFinancials(
   supplySideRevenueUSD: BigDecimal,
   protocolSideRevenueUSD: BigDecimal,
 ): void {
+  if (
+    protocolSideRevenueUSD == BIGDECIMAL_ZERO ||
+    supplySideRevenueUSD == BIGDECIMAL_ZERO ||
+    totalRevenueUSD == BIGDECIMAL_ZERO
+  ) {
+    return;
+  }
+
   const financialMetrics = getOrCreateFinancialsDailySnapshot(block);
   const protocol = getOrCreateProtocol();
 

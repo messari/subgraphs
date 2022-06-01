@@ -4,6 +4,7 @@ import { Vault } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ONE,
+  BIGDECIMAL_ZERO,
   BIGINT_TEN,
   BIGINT_ZERO,
   VaultFeeType,
@@ -100,6 +101,14 @@ export function updateFinancialsAfterWithdrawal(
   supplySideRevenueUSD: BigDecimal,
   totalRevenueUSD: BigDecimal,
 ): void {
+  if (
+    protocolSideRevenueUSD == BIGDECIMAL_ZERO ||
+    supplySideRevenueUSD == BIGDECIMAL_ZERO ||
+    totalRevenueUSD == BIGDECIMAL_ZERO
+  ) {
+    return;
+  }
+
   const financialMetrics = getOrCreateFinancialsDailySnapshot(block);
   const protocol = getOrCreateProtocol();
 
