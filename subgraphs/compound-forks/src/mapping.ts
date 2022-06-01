@@ -186,6 +186,9 @@ export function _handleNewCollateralFactor(event: NewCollateralFactor): void {
   if (market.maximumLTV == BIGDECIMAL_ZERO) {
     // when collateral factor is 0 the asset CANNOT be used as collateral
     market.canUseAsCollateral = false;
+  } else {
+    // ensure canUseAsCollateral can return to true
+    market.canUseAsCollateral = true;
   }
 
   market.save();
