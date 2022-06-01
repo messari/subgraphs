@@ -1,11 +1,5 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
-features:
-  - nonFatalErrors
-  - grafting
-graft:
-  base: QmPDQhqVrYBKfdmzDywsbZJe7aNj84s5Lab3Hbu44GXdgc
-  block: 10128245
 schema:
   file: ./schema.graphql
 dataSources:

@@ -103,6 +103,7 @@ export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.E
     let detail: poolDetail = poolDetail.fromAddress(_address);
     pool.name = detail.name;
     pool.symbol = detail.symbol;
+    pool._ignore = detail.ignore;
 
     pool._assets = new Array<string>();
     pool.inputTokens = new Array<string>();

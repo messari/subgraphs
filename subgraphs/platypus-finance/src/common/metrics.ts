@@ -32,26 +32,28 @@ export function updateProtocolTVL(event: ethereum.Event): void {
       protocol.pools[i],
     ]);
 
-    for (let j = 0; j < pool._assets.length; j++) {
-      let _asset = _Asset.load(pool._assets[j])!;
+    if (!pool._ignore) {
+      for (let j = 0; j < pool._assets.length; j++) {
+        let _asset = _Asset.load(pool._assets[j])!;
 
-      let token = getOrCreateToken(event, Address.fromString(_asset.token));
-      let usdValue = bigIntToBigDecimal(_asset.cash, token.decimals);
-      log.debug("[UpdateTVL][{}] get asset {} {} for pool {} tvl => pool={}+asset={}", [
-        event.transaction.hash.toHexString(),
-        j.toString(),
-        pool._assets[j],
-        pool.id,
-        poolLockedValue.toString(),
-        usdValue.toString(),
-      ]);
+        let token = getOrCreateToken(event, Address.fromString(_asset.token));
+        let usdValue = bigIntToBigDecimal(_asset.cash, token.decimals);
+        log.debug("[UpdateTVL][{}] get asset {} {} for pool {} tvl => pool={}+asset={}", [
+          event.transaction.hash.toHexString(),
+          j.toString(),
+          pool._assets[j],
+          pool.id,
+          poolLockedValue.toString(),
+          usdValue.toString(),
+        ]);
 
-      poolLockedValue = poolLockedValue.plus(usdValue);
+        poolLockedValue = poolLockedValue.plus(usdValue);
 
-      let _index = pool.inputTokens.indexOf(token.id);
-      _asset._index = BigInt.fromI32(_index);
-      _asset.save();
-      inputTokenBalances[_index] = _asset.cash;
+        let _index = pool.inputTokens.indexOf(token.id);
+        _asset._index = BigInt.fromI32(_index);
+        _asset.save();
+        inputTokenBalances[_index] = _asset.cash;
+      }
     }
 
     log.debug("[UpdateTVL][{}] final pooltvl {} {} {}", [

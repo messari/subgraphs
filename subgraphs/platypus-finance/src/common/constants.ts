@@ -153,12 +153,14 @@ export class poolDetail {
   name: string;
   symbol: string;
   address: string;
+  ignore: bool;
 
   // Initialize a Token Definition with its attributes
-  constructor(name: string, symbol: string, address: string) {
+  constructor(name: string, symbol: string, address: string, ignore: string) {
     this.address = address;
     this.symbol = symbol;
     this.name = name;
+    this.ignore = ignore == "true";
   }
 
   static getAltPoolAddressArray(): Array<string> {
@@ -176,18 +178,20 @@ export class poolDetail {
   static getPoolDetails(): Array<poolDetail> {
     let poolDetailArray = new Array<poolDetail>();
     let detailsJson = [
-      ["Main Pool", "Main Pool", "0x66357dCaCe80431aee0A7507e2E361B7e2402370"],
-      ["Alt Pool UST", "UST-USDC Pool", "0xe0D166DE15665bC4B7185B2e35E847E51316E126"],
-      ["Alt Pool Frax", "Frax-USDC Pool", "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824"],
-      ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7"],
-      ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83"],
-      ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba"],
-      ["Withdraw Pool MIM", "MIM-Ignore", "0x6c84f0580c8ffab0c716c87e66ab474e4bea97d9"],
-      ["Withdraw Pool UST", "UST-USDC-Ignore", "0xefa5d088a58a2d4ee5504102c5ffde69301527b0"],
-      ["unknown pool", "unknown pool", "unknown"],
+      ["Main Pool", "Main Pool", "0x66357dCaCe80431aee0A7507e2E361B7e2402370", "false"],
+      ["Alt Pool UST", "UST-USDC Pool", "0xe0D166DE15665bC4B7185B2e35E847E51316E126", "false"],
+      ["Alt Pool Frax", "Frax-USDC Pool", "0xB8E567fc23c39C94a1f6359509D7b43D1Fbed824", "false"],
+      ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7", "false"],
+      ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83", "false"],
+      ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba", "false"],
+      ["Withdraw Pool MIM", "MIM-Ignore", "0x6c84f0580c8ffab0c716c87e66ab474e4bea97d9", "true"],
+      ["Withdraw Pool UST", "UST-USDC-Ignore", "0xefa5d088a58a2d4ee5504102c5ffde69301527b0", "true"],
+      ["Multisig-Treasury", "Multisig-Treasury", "0x068e297e8ff74115c9e1c4b5b83b700fda5afdeb", "true"],
+      ["Multisig-Incentives", "Multisig-Incentives", "0xD2805cff8877235d9EC88F683F85A8213DC288BC", "true"],
+      ["unknown pool", "unknown pool", "unknown", "true"],
     ];
     for (let i = 0; i < detailsJson.length; i++) {
-      let details = new poolDetail(detailsJson[i][0], detailsJson[i][1], detailsJson[i][2]);
+      let details = new poolDetail(detailsJson[i][0], detailsJson[i][1], detailsJson[i][2], detailsJson[i][3]);
       poolDetailArray.push(details);
     }
 
