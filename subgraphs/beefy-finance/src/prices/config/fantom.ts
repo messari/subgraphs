@@ -1,6 +1,8 @@
 import { Address, TypedMap } from "@graphprotocol/graph-ts";
 
 export const NETWORK_STRING = "fantom";
+export const NETWORK_CHAIN_ID = 250;
+export const NETWORK_SUFFIX = "-" + NETWORK_CHAIN_ID.toString();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
