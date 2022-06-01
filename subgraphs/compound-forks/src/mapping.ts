@@ -139,7 +139,6 @@ export class MarketListedData {
 export class UpdateMarketData {
   totalSupplyResult: ethereum.CallResult<BigInt>;
   exchangeRateStoredResult: ethereum.CallResult<BigInt>;
-  totalBorrowsResult: ethereum.CallResult<BigInt>;
   supplyRateResult: ethereum.CallResult<BigInt>;
   borrowRateResult: ethereum.CallResult<BigInt>;
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>;
@@ -147,7 +146,6 @@ export class UpdateMarketData {
   constructor(
     totalSupplyResult: ethereum.CallResult<BigInt>,
     exchangeRateStoredResult: ethereum.CallResult<BigInt>,
-    totalBorrowsResult: ethereum.CallResult<BigInt>,
     supplyRateResult: ethereum.CallResult<BigInt>,
     borrowRateResult: ethereum.CallResult<BigInt>,
     getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
@@ -155,7 +153,6 @@ export class UpdateMarketData {
   ) {
     this.totalSupplyResult = totalSupplyResult;
     this.exchangeRateStoredResult = exchangeRateStoredResult;
-    this.totalBorrowsResult = totalBorrowsResult;
     this.supplyRateResult = supplyRateResult;
     this.borrowRateResult = borrowRateResult;
     this.getUnderlyingPriceResult = getUnderlyingPriceResult;
@@ -1215,6 +1212,7 @@ export function updateMarket(
     market.outputTokenSupply = updateMarketData.totalSupplyResult.value;
   }
 
+  // get correct outputTokenDecimals for generic exchangeRate calculation
   let outputTokenDecimals = cTokenDecimals;
   if (market.outputToken) {
     let outputToken = Token.load(market.outputToken!);
@@ -1246,6 +1244,7 @@ export function updateMarket(
       underlyingTokenPriceUSD
     );
 
+    // calculate inputTokenBalance only if exchangeRate is updated properly
     // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
     // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
     if (underlyingToken.decimals > outputTokenDecimals) {
@@ -1255,6 +1254,7 @@ export function updateMarket(
       );
       let inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
+        .times(market.exchangeRate!)
         .times(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
@@ -1267,6 +1267,7 @@ export function updateMarket(
       );
       let inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
+        .times(market.exchangeRate!)
         .div(mantissaFactorBD)
         .truncate(0);
       market.inputTokenBalance = BigInt.fromString(
