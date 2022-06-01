@@ -862,10 +862,10 @@ export function snapshotMarket(
   dailySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   dailySnapshot.blockNumber = blockNumber;
   dailySnapshot.timestamp = blockTimestamp;
-
-  let dailyIdentifier =
-    marketID + "-" + (blockTimestamp.toI64() / SECONDS_PER_DAY).toString();
-  dailySnapshot.rates = getSnapshotRates(market.rates, dailyIdentifier);
+  dailySnapshot.rates = getSnapshotRates(
+    market.rates,
+    (blockTimestamp.toI64() / SECONDS_PER_DAY).toString()
+  );
 
   dailySnapshot.save();
 
@@ -891,13 +891,12 @@ export function snapshotMarket(
   hourlySnapshot.exchangeRate = market.exchangeRate;
   hourlySnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   hourlySnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  hourlySnapshot.rates = market.rates;
   hourlySnapshot.blockNumber = blockNumber;
   hourlySnapshot.timestamp = blockTimestamp;
-
-  let hourlyIdentifier =
-    marketID + "-" + (blockTimestamp.toI64() / SECONDS_PER_HOUR).toString();
-  hourlySnapshot.rates = getSnapshotRates(market.rates, hourlyIdentifier);
+  hourlySnapshot.rates = getSnapshotRates(
+    market.rates,
+    (blockTimestamp.toI64() / SECONDS_PER_HOUR).toString()
+  );
 
   hourlySnapshot.save();
 }
@@ -1590,25 +1589,25 @@ export function getOrElse<T>(
 //
 // create seperate InterestRate Entities for each market snapshot
 // this is needed to prevent snapshot rates from being pointers to the current rate
-function getSnapshotRates(rates: string[], identifier: string): string[] {
+function getSnapshotRates(rates: string[], timeSuffix: string): string[] {
   let snapshotRates: string[] = [];
   for (let i = 0; i < rates.length; i++) {
-    let actualRate = InterestRate.load(rates[i]);
-
-    // get/create new snapshot rate
-    let rateId = actualRate!.side + "-" + actualRate!.type + "-" + identifier;
-    let _rate = InterestRate.load(rateId);
-    if (!_rate) {
-      _rate = new InterestRate(rateId);
-      _rate.rate = BIGDECIMAL_ZERO;
-      _rate.side = actualRate!.side;
-      _rate.type = actualRate!.type;
+    let rate = InterestRate.load(rates[i]);
+    if (!rate) {
+      log.warning("[getSnapshotRates] rate {} not found, should not happen", [
+        rates[i],
+      ]);
+      continue;
     }
 
-    // update rate to current rate
-    _rate.rate = actualRate!.rate;
-    _rate.save();
-    snapshotRates.push(_rate.id);
+    // create new snapshot rate
+    let snapshotRateId = rates[i].concat("-").concat(timeSuffix);
+    let snapshotRate = new InterestRate(snapshotRateId);
+    snapshotRate.side = rate.side;
+    snapshotRate.type = rate.type;
+    snapshotRate.rate = rate.rate;
+    snapshotRate.save();
+    snapshotRates.push(snapshotRateId);
   }
   return snapshotRates;
 }
