@@ -14,7 +14,7 @@ import { DashboardHeader } from "../graphs/DashboardHeader";
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
-  const subgraphParam = searchParams.get("endpoint");
+  const subgraphParam = searchParams.get("endpoint") || "";
   const tabString = searchParams.get("tab") || "";
   const poolIdString = searchParams.get("poolId") || "";
   const scrollToView = searchParams.get("view") || "";
@@ -22,8 +22,15 @@ function ProtocolDashboard() {
   const skipAmtParam = Number(searchParams.get("skipAmt")) || 0;
 
   const navigate = useNavigate();
+  let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
+  if (subgraphParam) {
+    const parseCheck = isValidHttpUrl(subgraphParam);
+    if (parseCheck) {
+      queryURL = subgraphParam;
+    }
+  }
 
-  const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
+  const [subgraphToQuery, setSubgraphToQuery] = useState({ url: queryURL, version: "" });
   const [poolId, setPoolId] = useState<string>(poolIdString);
   const [protocolId, setprotocolId] = useState<string>(protocolIdString);
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
@@ -144,26 +151,16 @@ function ProtocolDashboard() {
   }, [protocolSchemaData, getData]);
 
   useEffect(() => {
-    if (!subgraphToQuery.url && subgraphParam) {
-      let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
-      const parseCheck = isValidHttpUrl(subgraphParam);
-      if (parseCheck) {
-        queryURL = subgraphParam;
-      }
-      setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
-    }
-  }, [subgraphToQuery.url, subgraphParam, subgraphToQuery.version]);
-
-  useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
   });
 
   // Error logging in case the full data request throws an error
   useEffect(() => {
-    console.log("--------------------Error Start-------------------------");
-    console.log(error, error ? Object.values(error) : null);
-    console.log(protocolSchemaQueryError ? Object.values(protocolSchemaQueryError) : null);
-    console.log("--------------------Error End---------------------------");
+    if (error || protocolSchemaQueryError) {
+      console.log("--------------------Error Start-------------------------");
+      console.log(error, protocolSchemaQueryError);
+      console.log("--------------------Error End---------------------------");
+    }
   }, [error, protocolSchemaQueryError]);
 
   // errorRender is the element to be rendered to display the error
