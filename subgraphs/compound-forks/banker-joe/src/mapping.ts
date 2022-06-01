@@ -153,7 +153,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerSecond(),
     cTokenContract.try_borrowRatePerSecond(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
@@ -169,7 +168,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Banker Joe",
     "banker-joe",
     "1.2.1",
-    "1.0.0",
+    "1.0.1",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),

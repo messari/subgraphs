@@ -426,33 +426,30 @@ export function updateProtocolTVL(event: ethereum.Event): void {
     // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
     if (underlyingToken.decimals > COMPOUND_DECIMALS) {
       // we want to multiply out the difference to expand BD
-      let mantissaFactorBD = exponentToBigDecimal(
-        underlyingToken.decimals - COMPOUND_DECIMALS
-      );
+      let mantissaFactorBD = exponentToBigDecimal(underlyingToken.decimals - COMPOUND_DECIMALS);
       let inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
+        .times(market.exchangeRate)
         .times(mantissaFactorBD)
         .truncate(0);
-      market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
-      );
+      market.inputTokenBalance = BigInt.fromString(inputTokenBalanceBD.toString());
     } else {
       // we want to divide back the difference to decrease the BD
-      let mantissaFactorBD = exponentToBigDecimal(
-        COMPOUND_DECIMALS - underlyingToken.decimals
-      );
+      let mantissaFactorBD = exponentToBigDecimal(COMPOUND_DECIMALS - underlyingToken.decimals);
       let inputTokenBalanceBD = market.outputTokenSupply
         .toBigDecimal()
+        .times(market.exchangeRate)
         .div(mantissaFactorBD)
         .truncate(0);
-      market.inputTokenBalance = BigInt.fromString(
-        inputTokenBalanceBD.toString()
-      );
+      market.inputTokenBalance = BigInt.fromString(inputTokenBalanceBD.toString());
     }
 
     // calculate inputTokenBalance in USD
     market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
-    let supplyUSD = market.inputTokenBalance.toBigDecimal().div(exponentToBigDecimal(underlyingToken.decimals)).times(market.inputTokenPriceUSD);
+    let supplyUSD = market.inputTokenBalance
+      .toBigDecimal()
+      .div(exponentToBigDecimal(underlyingToken.decimals))
+      .times(market.inputTokenPriceUSD);
     market.totalValueLockedUSD = supplyUSD;
     market.totalDepositBalanceUSD = supplyUSD;
     totalValueLockedUSD = totalValueLockedUSD.plus(supplyUSD);

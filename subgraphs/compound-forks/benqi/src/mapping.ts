@@ -203,7 +203,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
@@ -220,7 +219,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "BENQI",
     "benqi",
     "1.2.1",
-    "1.0.2",
+    "1.0.3",
     "1.0.0",
     Network.AVALANCHE,
     comptroller.try_liquidationIncentiveMantissa(),
