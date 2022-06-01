@@ -14,4 +14,10 @@ export namespace Deploy {
     export const SUSHISWAP_XDAI = 12;
     export const UNISWAP_V2_MAINNET = 13;
     export const SPOOKYSWAP_FANTOM = 14;
+    export const SPIRITSWAP_FANTOM = 15;
+    export const TRADER_JOE_AVALANCHE = 16;
+    export const QUICKSWAP_MATIC = 17;
+    export const TRISOLARIS_AURORA = 18;
+    export const SOLARBEAM_MOONRIVER = 19;
+    export const VVS_FINANCE_CRONOS = 20;
   }

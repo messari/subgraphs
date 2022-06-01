@@ -1,0 +1,468 @@
+[
+    {
+      "inputs": [
+        {
+          "internalType": "contract IMasterChef",
+          "name": "_MASTER_CHEF_V2",
+          "type": "address"
+        },
+        { "internalType": "contract IERC20", "name": "_joe", "type": "address" },
+        { "internalType": "uint256", "name": "_MASTER_PID", "type": "uint256" }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "allocPoint",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IERC20",
+          "name": "lpToken",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IRewarder",
+          "name": "rewarder",
+          "type": "address"
+        }
+      ],
+      "name": "Add",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Deposit",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "EmergencyWithdraw",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Harvest",
+      "type": "event"
+    },
+    { "anonymous": false, "inputs": [], "name": "Init", "type": "event" },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "allocPoint",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IRewarder",
+          "name": "rewarder",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "overwrite",
+          "type": "bool"
+        }
+      ],
+      "name": "Set",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lastRewardTimestamp",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "lpSupply",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "accJoePerShare",
+          "type": "uint256"
+        }
+      ],
+      "name": "UpdatePool",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "pid",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "Withdraw",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "JOE",
+      "outputs": [
+        { "internalType": "contract IERC20", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MASTER_CHEF_V2",
+      "outputs": [
+        { "internalType": "contract IMasterChef", "name": "", "type": "address" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MASTER_PID",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "allocPoint", "type": "uint256" },
+        {
+          "internalType": "contract IERC20",
+          "name": "_lpToken",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IRewarder",
+          "name": "_rewarder",
+          "type": "address"
+        }
+      ],
+      "name": "add",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "pid", "type": "uint256" },
+        { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "pid", "type": "uint256" }],
+      "name": "emergencyWithdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "harvestFromMasterChef",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "dummyToken",
+          "type": "address"
+        }
+      ],
+      "name": "init",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "joePerSec",
+      "outputs": [
+        { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256[]", "name": "pids", "type": "uint256[]" }
+      ],
+      "name": "massUpdatePools",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_pid", "type": "uint256" },
+        { "internalType": "address", "name": "_user", "type": "address" }
+      ],
+      "name": "pendingTokens",
+      "outputs": [
+        { "internalType": "uint256", "name": "pendingJoe", "type": "uint256" },
+        {
+          "internalType": "address",
+          "name": "bonusTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "bonusTokenSymbol",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "pendingBonusToken",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "name": "poolInfo",
+      "outputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "lpToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "accJoePerShare",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "lastRewardTimestamp",
+          "type": "uint256"
+        },
+        { "internalType": "uint256", "name": "allocPoint", "type": "uint256" },
+        {
+          "internalType": "contract IRewarder",
+          "name": "rewarder",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "poolLength",
+      "outputs": [
+        { "internalType": "uint256", "name": "pools", "type": "uint256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "_pid", "type": "uint256" },
+        { "internalType": "uint256", "name": "_allocPoint", "type": "uint256" },
+        {
+          "internalType": "contract IRewarder",
+          "name": "_rewarder",
+          "type": "address"
+        },
+        { "internalType": "bool", "name": "overwrite", "type": "bool" }
+      ],
+      "name": "set",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalAllocPoint",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "newOwner", "type": "address" }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "pid", "type": "uint256" }],
+      "name": "updatePool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "", "type": "uint256" },
+        { "internalType": "address", "name": "", "type": "address" }
+      ],
+      "name": "userInfo",
+      "outputs": [
+        { "internalType": "uint256", "name": "amount", "type": "uint256" },
+        { "internalType": "uint256", "name": "rewardDebt", "type": "uint256" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "pid", "type": "uint256" },
+        { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+]
