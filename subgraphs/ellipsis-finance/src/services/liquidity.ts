@@ -37,7 +37,7 @@ export function handleDepositEvent(pool: LiquidityPool, tokenSupply: BigInt, tok
     liquidityEvent.inputTokenAmounts = inputTokenAmounts;
     liquidityEvent.amountUSD = amountUSD;
   
-    pool.inputTokenBalances = inputTokenBalances;
+    //pool.inputTokenBalances = inputTokenBalances;
     pool.outputTokenSupply = tokenSupply;
     
     liquidityEvent.save();
@@ -76,7 +76,7 @@ export function handleDepositEvent(pool: LiquidityPool, tokenSupply: BigInt, tok
     liquidityEvent.inputTokenAmounts = inputTokenAmounts;
     liquidityEvent.amountUSD = amountUSD;
   
-    pool.inputTokenBalances = inputTokenBalances;
+    //pool.inputTokenBalances = inputTokenBalances;
     pool.outputTokenSupply = tokenSupply;
     
     liquidityEvent.save();

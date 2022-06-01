@@ -134,7 +134,7 @@ export function handleExchange(
     dailyVolumeByTokenAmount[tokenSoldIndex] = dailyVolumeByTokenAmount[tokenSoldIndex].plus(tokens_sold);
     hourlyVolumeByTokenUSD[tokenSoldIndex] = hourlyVolumeByTokenUSD[tokenSoldIndex].plus(amountSoldUSD);
     dailyVolumeByTokenUSD[tokenSoldIndex] = dailyVolumeByTokenUSD[tokenSoldIndex].plus(amountSoldUSD);
-    inputTokenBalances[tokenSoldIndex] = inputTokenBalances[tokenSoldIndex].plus(tokens_sold);
+    //inputTokenBalances[tokenSoldIndex] = inputTokenBalances[tokenSoldIndex].plus(tokens_sold);
   }
   if (pool.inputTokens.includes(tokenBought.toString())) {
     const tokenBoughtIndex = pool.inputTokens.indexOf(tokenBought.toString());
@@ -142,7 +142,7 @@ export function handleExchange(
     dailyVolumeByTokenAmount[tokenBoughtIndex] = dailyVolumeByTokenAmount[tokenBoughtIndex].plus(tokens_bought);
     hourlyVolumeByTokenUSD[tokenBoughtIndex] = hourlyVolumeByTokenUSD[tokenBoughtIndex].plus(amountBoughtUSD);
     dailyVolumeByTokenUSD[tokenBoughtIndex] = dailyVolumeByTokenUSD[tokenBoughtIndex].plus(amountBoughtUSD);
-    inputTokenBalances[tokenBoughtIndex] = inputTokenBalances[tokenBoughtIndex].minus(tokens_bought);
+    //inputTokenBalances[tokenBoughtIndex] = inputTokenBalances[tokenBoughtIndex].minus(tokens_bought);
   }
 
   hourlySnapshot.hourlyVolumeUSD = hourlySnapshot.hourlyVolumeUSD.plus(volumeUSD);
