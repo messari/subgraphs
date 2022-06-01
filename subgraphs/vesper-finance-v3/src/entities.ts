@@ -82,12 +82,13 @@ export function updateVaultFee(vault: Vault): void {
   const vaultAddress = Address.fromString(vault.id);
   const poolv3 = PoolV3.bind(vaultAddress);
   let fee = VaultFee.load(id);
+  const withdrawFee_call = poolv3.try_withdrawFee();
 
   if (fee) {
-    fee.feePercentage = poolv3.withdrawFee().toBigDecimal();
+    fee.feePercentage = withdrawFee_call.reverted ? BigDecimal.zero() : withdrawFee_call.value.toBigDecimal();
   } else {
     fee = new VaultFee(id);
-    fee.feePercentage = poolv3.withdrawFee().toBigDecimal();
+    fee.feePercentage = withdrawFee_call.reverted ? BigDecimal.zero() : withdrawFee_call.value.toBigDecimal();
     fee.feeType = "WITHDRAWAL_FEE";
   }
 
