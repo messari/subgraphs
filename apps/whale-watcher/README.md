@@ -1,5 +1,7 @@
 # Whale Watcher
 
+![Whale Watcher](../../docs/images/apps/whale-watcher.png "Whale Watcher")
+
 ## Development
 
 Install venv

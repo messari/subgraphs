@@ -1,5 +1,7 @@
 # Uniswap Analytics
 
+![Uniswap Analytics](../../docs/images/apps/uniswap-analytics.png "Uniswap Analytics")
+
 ## Development
 
 Install venv
