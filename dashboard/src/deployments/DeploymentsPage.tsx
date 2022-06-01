@@ -5,6 +5,8 @@ import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
 import { Typography } from "@mui/material";
+import LazyLoad from "react-lazyload";
+import { NewClient } from "../utils";
 
 const DeploymentsLayout = styled("div")`
   padding: ${({ theme }) => theme.spacing(4)};
@@ -12,6 +14,8 @@ const DeploymentsLayout = styled("div")`
 
 function DeploymentsPage() {
   const navigate = useNavigate();
+  const clientIndexing = NewClient("https://api.thegraph.com/index-node/graphql");
+  window.scrollTo(0, 0);
 
   return (
     <DeploymentsContextProvider>
@@ -30,7 +34,11 @@ function DeploymentsPage() {
           Deployed Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => (
-          <SubgraphDeployments key={key} protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }} />
+          <SubgraphDeployments
+            clientIndexing={clientIndexing}
+            key={key}
+            protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }}
+          />
         ))}
       </DeploymentsLayout>
     </DeploymentsContextProvider>

@@ -372,7 +372,7 @@ type Vault @entity {
   outputTokenSupply: BigInt!
 
   " Price per share of output token in USD "
-  outputTokenPriceUSD: BigDecimal!
+  outputTokenPriceUSD: BigDecimal
 
   " Amount of input token per full share of output token. Usually corresponds to the value of `pricePerShare` or `pricePerFullShare` in the vault contract. "
   pricePerShare: BigDecimal

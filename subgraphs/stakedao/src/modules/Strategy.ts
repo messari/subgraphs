@@ -1,7 +1,4 @@
-import {
-  Token,
-  Vault as VaultStore,
-} from "../../generated/schema";
+import { Token, Vault as VaultStore } from "../../generated/schema";
 import {
   log,
   BigInt,
@@ -35,36 +32,39 @@ export function _StrategyHarvested(
   ).toBigDecimal();
 
   // load performance fee and get the fees percentage
-  let performanceFee = utils
-    .readValue<BigInt>(
-      strategyContract.try_performanceFee(),
-      constants.BIGINT_ZERO
-    )
-    .toBigDecimal();
+  let performanceFee = utils.readValue<BigInt>(
+    strategyContract.try_performanceFee(),
+    constants.BIGINT_ZERO
+  );
 
   let supplySideWantEarned = wantEarned
-    .toBigDecimal()
     .times(
-      constants.BIGDECIMAL_ONE.minus(performanceFee.div(constants.DENOMINATOR))
-    );
+      constants.BIGINT_HUNDRED.minus(
+        performanceFee.div(constants.BIGINT_HUNDRED)
+      )
+    )
+    .div(constants.BIGINT_HUNDRED);
+
   const supplySideWantEarnedUSD = supplySideWantEarned
+    .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
   let protocolSideWantEarned = wantEarned
-    .toBigDecimal()
-    .times(performanceFee)
-    .div(constants.BIGDECIMAL_HUNDRED);
+    .times(performanceFee.div(constants.BIGINT_HUNDRED))
+    .div(constants.BIGINT_HUNDRED);
   const protocolSideWantEarnedUSD = protocolSideWantEarned
+    .toBigDecimal()
     .div(inputTokenDecimals)
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  const totalRevenueUSD = supplySideWantEarnedUSD
-    .plus(protocolSideWantEarnedUSD);
-  
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(wantEarned);
+  const totalRevenueUSD = supplySideWantEarnedUSD.plus(
+    protocolSideWantEarnedUSD
+  );
+
+  vault.inputTokenBalance = vault.inputTokenBalance.plus(supplySideWantEarned);
   vault.save();
 
   updateFinancialsAfterReport(

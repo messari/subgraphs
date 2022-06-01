@@ -186,10 +186,13 @@ export function handleLiquidation(event: LogRepay): void {
 
   let protocolCumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(collateralAmountUSD);
 
+  marketHourlySnapshot.hourlyLiquidateUSD = marketHourlySnapshot.hourlyLiquidateUSD.plus(collateralAmountUSD);
+  marketDailySnapshot.dailyLiquidateUSD = marketDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
+  financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
+  
   market.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
   marketHourlySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
   marketDailySnapshot.cumulativeLiquidateUSD = marketCumulativeLiquidateUSD;
-  financialsDailySnapshot.dailyLiquidateUSD = financialsDailySnapshot.dailyLiquidateUSD.plus(collateralAmountUSD);
   financialsDailySnapshot.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
   protocol.cumulativeLiquidateUSD = protocolCumulativeLiquidateUSD;
 
