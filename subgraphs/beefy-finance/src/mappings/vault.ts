@@ -1,4 +1,4 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultFee } from "../../generated/schema";
 import {
@@ -24,14 +24,16 @@ import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  NETWORK_SUFFIX_MAP,
 } from "../prices/common/constants";
-
-const NETWORK_SUFFIX: string = "-137";
 
 export function createVaultFromStrategy(
   strategyAddress: Address,
   currentBlock: ethereum.Block
 ): Vault {
+  let network = dataSource.network();
+  let NETWORK_SUFFIX = NETWORK_SUFFIX_MAP.get(network);
+  if (!NETWORK_SUFFIX) NETWORK_SUFFIX = "";
   const strategyContract = BeefyStrategy.bind(strategyAddress);
   const vaultAddress = strategyContract.vault();
   let vault = Vault.load(vaultAddress.toHexString() + NETWORK_SUFFIX);
@@ -77,6 +79,7 @@ export function createVaultFromStrategy(
 
   vault.totalValueLockedUSD = getLastPriceUSD(
     strategyContract.want(),
+    NETWORK_SUFFIX,
     currentBlock.number
   ).times(new BigDecimal(vault.inputTokenBalance));
 
@@ -97,6 +100,9 @@ export function createVaultFromStrategy(
 }
 
 export function handleDeposit(event: Deposit): void {
+  let network = dataSource.network();
+  let NETWORK_SUFFIX = NETWORK_SUFFIX_MAP.get(network);
+  if (!NETWORK_SUFFIX) NETWORK_SUFFIX = "";
   const vault = getVaultFromStrategyOrCreate(
     event.address,
     event.block,
@@ -112,10 +118,13 @@ export function handleDeposit(event: Deposit): void {
     vault.deposits = vault.deposits.concat([deposit.id]);
   }
 
-  updateVaultAndSave(vault, event.block);
+  updateVaultAndSave(vault, event.block, NETWORK_SUFFIX);
 }
 
 export function handleWithdraw(event: Withdraw): void {
+  let network = dataSource.network();
+  let NETWORK_SUFFIX = NETWORK_SUFFIX_MAP.get(network);
+  if (!NETWORK_SUFFIX) NETWORK_SUFFIX = "";
   const vault = getVaultFromStrategyOrCreate(
     event.address,
     event.block,
@@ -130,10 +139,14 @@ export function handleWithdraw(event: Withdraw): void {
     vault.withdraws = vault.withdraws.concat([withdraw.id]);
   }
 
-  updateVaultAndSave(vault, event.block);
+  updateVaultAndSave(vault, event.block, NETWORK_SUFFIX);
 }
 
-export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
+export function updateVaultAndSave(
+  vault: Vault,
+  block: ethereum.Block,
+  networkSuffix: string
+): void {
   const vaultContract = BeefyVault.bind(getAddressFromId(vault.id));
   let call = vaultContract.try_balance();
   if (call.reverted) {
@@ -160,6 +173,7 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   } else {
     vault.totalValueLockedUSD = getLastPriceUSD(
       wantCall.value,
+      networkSuffix,
       block.number
     ).times(new BigDecimal(vault.inputTokenBalance));
   }

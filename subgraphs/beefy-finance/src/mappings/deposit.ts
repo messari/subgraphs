@@ -38,6 +38,7 @@ export function createDeposit(
   deposit.amount = depositedAmount;
   deposit.amountUSD = getLastPriceUSD(
     strategyContract.want(),
+    networkSuffix,
     event.block.number
   ).times(new BigDecimal(depositedAmount));
 

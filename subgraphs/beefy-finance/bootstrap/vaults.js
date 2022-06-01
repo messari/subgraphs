@@ -17413,7 +17413,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xfbdd194376de19a88118e84e279b977f165d01b8",
     createdAt: 1621450869,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD126BA764D2fA052Fc14Ae012Aef590Bc6aE0C4f",
     lastHarvest: 0,
   },
@@ -17453,7 +17453,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xD30DC92b8ec0fa8de625768d208f51A93C10aFF2",
     createdAt: 1653558101,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7a20f3d9a95C07130078DB77484AC2DD694cB9d9",
     lastHarvest: 1654078723,
   },
@@ -17492,7 +17492,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1653558100,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7C45D71Ad822Fa9a7bfBd03536d5E01B91450C82",
     lastHarvest: 1654040910,
   },
@@ -17531,7 +17531,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174/0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1653558999,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x836102E0Af7E9F55E780747a5A63108345c7B789",
     lastHarvest: 1654057858,
   },
@@ -17569,7 +17569,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/228/deposit",
     createdAt: 1653327832,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xe10199F521ca6f7E7c50bf0a042794de7E30C709",
     lastHarvest: 1654014651,
   },
@@ -17607,7 +17607,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/255/deposit",
     createdAt: 1653321475,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8171D97Ac65B07A09385530Baa0Dd7C7409Bd422",
     lastHarvest: 1654066738,
   },
@@ -17644,7 +17644,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/209/deposit",
     createdAt: 1653230127,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x68d2177D146F524e6B51d52123A6e630014A0028",
     lastHarvest: 1654077333,
   },
@@ -17683,7 +17683,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xB5C064F955D8e7F38fE0460C556a72987494eE17/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1652347933,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x84602F119ebDBedEB3bA7c6E23FF398cb61c609F",
     lastHarvest: 1654061946,
   },
@@ -17722,7 +17722,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xB5C064F955D8e7F38fE0460C556a72987494eE17/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1652347932,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x510d494211895a32B5d933686AcE077bA6c4E624",
     lastHarvest: 1654069027,
   },
@@ -17760,7 +17760,7 @@ const vaults = [
     withdrawalFee: "0%",
     buyTokenUrl: "https://beta.quickswap.exchange/#/convert",
     createdAt: 1652179476,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x042215e7E93F4e4D42d84DEd5C33b4e1f7d3E988",
     lastHarvest: 1654077307,
   },
@@ -17799,7 +17799,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xfa68FB4628DFF1028CFEc22b4162FCcd0d45efb6/ETH",
     createdAt: 1651088631,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2aB8add4e367cb2AD9a497155031dAD49a2432ed",
     lastHarvest: 1654077535,
   },
@@ -17837,7 +17837,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0x580A84C73811E1839F75d86d75d88cCa0c241fF4",
     createdAt: 1650557677,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xBC3Df9A5879432135f4A976795b1fC1728279012",
     lastHarvest: 1654069783,
   },
@@ -17877,7 +17877,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x596ebe76e2db4470966ea395b0d063ac6197a8c5",
     createdAt: 1634625658,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA81ef4627471AC434b784C4efa271Fba1C53Be04",
     lastHarvest: 1653611480,
   },
@@ -17916,7 +17916,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x3A58a54C066FdC0f2D55FC9C89F0415C92eBf3C4/ETH",
     createdAt: 1650004194,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xED5c4150F867b278866bbAD33e947287cc5a2Ef1",
     lastHarvest: 1654076773,
   },
@@ -17956,7 +17956,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x72bd80445b0db58ebe3E8dB056529D4C5FAF6F2f/ETH",
     createdAt: 1650024276,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB2385DF6d76Bed9F8163037eCab5A8A38dd3FD22",
     lastHarvest: 1652313866,
   },
@@ -17996,7 +17996,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x80c0CBDB8d0B190238795d376f0bD57fd40525F2/ETH",
     createdAt: 1650028184,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB574bcAbc4f9b98B13E599d44F98e3c1642E525B",
     lastHarvest: 1651091245,
   },
@@ -18036,7 +18036,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xA863246658DEA34111C3C1DceDb2cfd5d6067334/ETH",
     createdAt: 1650029492,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1592550E083286C35282E53732FDE11800A187E1",
     lastHarvest: 1652307474,
   },
@@ -18075,7 +18075,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/0xD85d1e945766Fea5Eda9103F918Bd915FbCa63E6",
     createdAt: 1649961634,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x845b0456c8eA0C674Daa7211A2B2D8c729263DdB",
     lastHarvest: 1654043452,
   },
@@ -18114,7 +18114,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xE06Bd4F5aAc8D0aA337D13eC88dB6defC6eAEefE/0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1649257590,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x52043542e153E079779e1D21B1458ee3faE8c586",
     lastHarvest: 1654043456,
   },
@@ -18144,7 +18144,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/22/deposit",
     createdAt: 1653327757,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xd5598958715C7cd6DD0E0e23F2396FfB5cb85c00",
     lastHarvest: 1654017395,
   },
@@ -18184,7 +18184,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0xF915fDDa4c882731C0456a4214548Cd13A822886",
     createdAt: 1647440992,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x02A0c97BE6D8f4F144AFE5f41C51b5cef192480C",
     lastHarvest: 1651149065,
   },
@@ -18223,7 +18223,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174/0x614389EaAE0A6821DC49062D56BDA3d9d45Fa2ff",
     createdAt: 1647302895,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x894206e3efAd85C49b2B042A6b44b33ad7107acd",
     lastHarvest: 1654077759,
   },
@@ -18263,7 +18263,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xfe4546fefe124f30788c4cc1bb9aa6907a7987f9",
     createdAt: 1645899124,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x876ab6493B42a630f5FB2eD98d8AD23f0629b068",
     lastHarvest: 1654070311,
   },
@@ -18303,7 +18303,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x64875aaa68d1d5521666c67d692ee0b926b08b2f&outputCurrency=0xfe4546fefe124f30788c4cc1bb9aa6907a7987f9",
     createdAt: 1645967761,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x456eAea680B8D8E5dAE6F5bfdeE8484E0D2accD6",
     lastHarvest: 1654072251,
   },
@@ -18343,7 +18343,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x9bd9ad490dd3a52f096d229af4483b94d63be618&outputCurrency=0xfe4546fefe124f30788c4cc1bb9aa6907a7987f9",
     createdAt: 1645982670,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x42D4EfA605eE2433918e7C9ae1Fc32494b217c12",
     lastHarvest: 1654029051,
   },
@@ -18382,7 +18382,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xB382C1cfA622795a534e5bd56Fac93d59BAc8B0D/ETH",
     createdAt: 1642000487,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x22F8365a9d689Fe32aAD7B455c9D14F04b395419",
     lastHarvest: 1654076108,
   },
@@ -18422,7 +18422,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x831753DD7087CaC61aB5644b308642cc1c33Dc13/0x51869836681BcE74a514625c856aFb697a013797",
     createdAt: 1645091761,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE44000972e7C737a2D43609c2254a8F7B646BF9D",
     lastHarvest: 1647600003,
   },
@@ -18461,7 +18461,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x91c89A94567980f0e9723b487b0beD586eE96aa7",
     createdAt: 1645091761,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x70c6AF9Dff8C19B3db576E5E199B22A883874f05",
     lastHarvest: 1654050914,
   },
@@ -18501,7 +18501,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/ETH/0x5314bA045a459f63906Aa7C76d9F337DcB7d6995",
     createdAt: 1644238771,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2D48D94ABfaD5a95b5fCA0fAB9cD37dd722C84A4",
     lastHarvest: 1646255331,
   },
@@ -18541,7 +18541,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x831753DD7087CaC61aB5644b308642cc1c33Dc13/0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1644239255,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xf9bd7bcdD8c5B6dE4Af7Dff0A9aF6f9494e6AA83",
     lastHarvest: 1651163873,
   },
@@ -18581,7 +18581,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174/0x5c4b7CCBF908E64F32e12c6650ec0C96d717f03F",
     createdAt: 1644238131,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xd23A1FEE38B63464ded77Dd21A35ae514A7f21Db",
     lastHarvest: 1651125205,
   },
@@ -18621,7 +18621,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/ETH/0x8192759Bf7f247cC92F74E39B3A4225516624fC1",
     createdAt: 1644238407,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1B85cc576e97Fd55369e05a424fE3b8dcAEE57B9",
     lastHarvest: 1652318388,
   },
@@ -18660,7 +18660,7 @@ const vaults = [
     addLiquidityUrl:
       "https://app.sushi.com/add/0x7ceb23fd6bc0add59e62ac25578270cff1b9f619/0xa1c57f48f0deb89f569dfbe6e2b7f46d33606fd4",
     createdAt: 1643755752,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xBaBaC5560Aa4CA3C5290DfcC5C159EdC0a51c316",
     lastHarvest: 1654005130,
   },
@@ -18700,7 +18700,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xBbba073C31bF03b8ACf7c28EF0738DeCF3695683/ETH",
     createdAt: 1643011650,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc04f79B751C470b5c53705BB3813B173DC8ab19B",
     lastHarvest: 1645054064,
   },
@@ -18738,7 +18738,7 @@ const vaults = [
     addLiquidityUrl:
       "https://app.sushi.com/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x4e1581f01046eFDd7a1a2CDB0F82cdd7F71F2E59",
     createdAt: 1642630360,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x22f72e86A9CA2CDD3Cdc94012E9901D93E3d90F8",
     lastHarvest: 1654019263,
   },
@@ -18776,7 +18776,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/23/deposit",
     createdAt: 1653323113,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA30a5631AdcF7a1Ae1Ab991cBEf23d4381031660",
     lastHarvest: 1654017189,
   },
@@ -18817,7 +18817,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xE6469Ba6D2fD6130788E0eA9C0a0515900563b59&inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     createdAt: 1641937774,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7fe0dd3D7259092A3ae4709b1598C7eD502DaaBB",
     lastHarvest: 1652311982,
   },
@@ -18857,7 +18857,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x42d61D766B85431666B39B89C43011f24451bFf6/ETH",
     createdAt: 1641848936,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x3da758e2be3183fed8604FE0D23EC22bA15786A2",
     lastHarvest: 1648925225,
   },
@@ -18897,7 +18897,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0xE5417Af564e4bFDA1c483642db72007871397896/0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     createdAt: 1641761360,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE85c4A30e55255ef3B7880777256c128C25367fd",
     lastHarvest: 1647829537,
   },
@@ -18936,7 +18936,7 @@ const vaults = [
     retireReason: "rewards",
     addLiquidityUrl: "https://polygon.curve.fi/factory/85/deposit",
     createdAt: 1641144218,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE13fDa9D26961954E95a02a825A304dBB58f3B47",
     lastHarvest: 1652078779,
   },
@@ -18974,7 +18974,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/72/deposit",
     createdAt: 1640691348,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8c5c1A7695E9450d21Cd3041614F2bbdca1134D6",
     lastHarvest: 1648339570,
   },
@@ -19014,7 +19014,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1&inputCurrency=0x0e98C977B943f06075b2D795794238fBfB9b9a34",
     createdAt: 1640281502,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xb19482B4f628Fa1218a637232D91e761053eC70D",
     lastHarvest: 1645048158,
   },
@@ -19054,7 +19054,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1&inputCurrency=0x1646C835d70F76D9030DF6BaAeec8f65c250353d",
     createdAt: 1640281632,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8BCEff0f5143A04D85893433a04a8C94d6f2d8b6",
     lastHarvest: 1645052140,
   },
@@ -19094,7 +19094,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1&inputCurrency=0xC250e9987A032ACAC293d838726C511E6E1C029d",
     createdAt: 1640281264,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x17720F863DA01Bc9e266e4eE872E3c98fA1FeAA8",
     lastHarvest: 1645072328,
   },
@@ -19135,7 +19135,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x4e78011Ce80ee02d2c3e649Fb657E45898257815&outputCurrency=0x2F800Db0fdb5223b3C3f354886d907A671414A7F",
     createdAt: 1640136296,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x825B726fc5DEb89b42352458C28f9F2ce20AEc13",
     lastHarvest: 1647092430,
   },
@@ -19175,7 +19175,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x2F800Db0fdb5223b3C3f354886d907A671414A7F",
     createdAt: 1640137462,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1F9871133c8E093e9e1E2815Ca76B75CC7bB8c11",
     lastHarvest: 1654029055,
   },
@@ -19215,7 +19215,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89&outputCurrency=0x1a3acf6D19267E2d3e7f898f42803e90C9219062",
     createdAt: 1639747398,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xbD9238a23C7D88aaaF18a188191f57bB5D99AAfb",
     lastHarvest: 1654014657,
   },
@@ -19255,7 +19255,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x3Ad707dA309f3845cd602059901E39C4dcd66473",
     createdAt: 1639689694,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x937B63dB07929Cbc27a72C4A7A2999Ae3Cc1cAfF",
     lastHarvest: 1654016319,
   },
@@ -19295,7 +19295,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x45c32fA6DF82ead1e2EF74d17b76547EDdFaFF89&outputCurrency=0x1a3acf6D19267E2d3e7f898f42803e90C9219062",
     createdAt: 1639691972,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc60693d8e3e2B8aB28C5CE9Dc38c87414A924B23",
     lastHarvest: 1654057862,
   },
@@ -19333,7 +19333,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/factory/37/deposit",
     createdAt: 1653328330,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc0c198742Bb0724ee1141F61eDD492eefe48495a",
     lastHarvest: 1654078551,
   },
@@ -19371,7 +19371,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/eurtusd/deposit",
     createdAt: 1652662923,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc1662Ea590b3ad990d77be487FBDeBb7bedF0C39",
     lastHarvest: 1654044036,
   },
@@ -19412,7 +19412,7 @@ const vaults = [
     buyTokenUrl:
       "https://dmm.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0x4e3decbb3645551b8a19f0ea1678079fcb33fb4c",
     createdAt: 1633957002,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF4e2d1413917AA0b3e26a7203b95FB58Bc48a7d3",
     lastHarvest: 1650256254,
   },
@@ -19450,7 +19450,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/aave/deposit",
     createdAt: 1652662923,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xb8EB11aff4AFA5987940c665E393EF905A098486",
     lastHarvest: 1654063052,
   },
@@ -19490,7 +19490,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xf2D8124b8F9267DaD61351c7aD252362880C6638&inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
     createdAt: 1638099468,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x04a7D46df890fc20664217301850dadeEBDB7b38",
     lastHarvest: 1652344276,
   },
@@ -19530,7 +19530,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xA1c57f48F0Deb89f569dFbE6E2B7f46D33606fD4&inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
     createdAt: 1638101634,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB6ca7D8F93a2eb0CcBC83b38d4d94B4b0FB6811c",
     lastHarvest: 1646249053,
   },
@@ -19570,7 +19570,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x6f8a06447Ff6FcF75d803135a7de15CE88C1d4ec&inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",
     createdAt: 1635166901,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD771f9711b863c0d1CE007fd6b613a69b16CFA41",
     lastHarvest: 1643824091,
   },
@@ -19610,7 +19610,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&inputCurrency=0x85955046DF4668e1DD369D2DE9f3AEB98DD2A369",
     createdAt: 1635166761,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xC3F4f41cC874146b1fA7F4a0A35168eb8C0E3761",
     lastHarvest: 1638985065,
   },
@@ -19650,7 +19650,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&inputCurrency=0xB85517b87BF64942adf3A0B9E4c71E4Bc5Caa4e5",
     createdAt: 1635166165,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE7c85f80fA04f013241a7509FBbCb613bbCc50c2",
     lastHarvest: 1651091871,
   },
@@ -19689,7 +19689,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x831753DD7087CaC61aB5644b308642cc1c33Dc13",
     createdAt: 1630505284,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x21068F35fffC2BadE50Defc33261782d3e5Afa6D",
     lastHarvest: 1653542028,
   },
@@ -19728,7 +19728,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xFbdd194376de19a88118e84E279b977f165d01b8",
     createdAt: 1623949163,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x703372131e77aE0c69B51e41A901315087A314D2",
     lastHarvest: 0,
   },
@@ -19758,7 +19758,7 @@ const vaults = [
     buyTokenUrl: "https://app.apeswap.finance/swap",
     createdAt: 1634055850,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xBBf720404ba3F71d03fBda851F30267156c2cec2",
     lastHarvest: 1647392280,
   },
@@ -19797,7 +19797,7 @@ const vaults = [
     buyTokenUrl:
       "https://dmm.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0x767058f11800fba6a682e73a6e79ec5eb74fac8c",
     createdAt: 1634040443,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF21893aa7C4AA97C0327D7275176F6A88871f706",
     lastHarvest: 1650241862,
   },
@@ -19836,7 +19836,7 @@ const vaults = [
     buyTokenUrl:
       "https://dmm.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0xbd1463f02f61676d53fd183c2b19282bff93d099",
     createdAt: 1634042173,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xb95F2f442F0640cDE238CA1d2a370fe889B5e375",
     lastHarvest: 1650241868,
   },
@@ -19874,7 +19874,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/ren/deposit",
     createdAt: 1652662923,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9cA8109453cADbbA8B072951e9eb5c7fc39d0299",
     lastHarvest: 1654074030,
   },
@@ -19903,7 +19903,7 @@ const vaults = [
       "https://quickswap.exchange/#/add/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174/0x2ed945Dc703D85c80225d95ABDe41cdeE14e1992",
     buyTokenUrl: "https://quickswap.exchange/#/swap",
     createdAt: 1633808799,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x17F9352c4bf06cD29395bd0C98D28c28e626d93a",
     lastHarvest: 1635026891,
   },
@@ -19932,7 +19932,7 @@ const vaults = [
       "https://quickswap.exchange/#/add/0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270/0x2ed945Dc703D85c80225d95ABDe41cdeE14e1992",
     buyTokenUrl: "https://quickswap.exchange/#/swap",
     createdAt: 1633808533,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7Ea5eed1E90A52D29a4bF2051703c6802cEEA7fD",
     lastHarvest: 1635041824,
   },
@@ -19962,7 +19962,7 @@ const vaults = [
       "https://polygondex.cafeswap.finance/#/swap?outputCurrency=0xb5106a3277718ecad2f20ab6b86ce0fee7a21f09",
     createdAt: 1633695157,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF00b3BE39C94f5f5dE7AfA5ebC1a36E6D2D91f82",
     lastHarvest: 1653846142,
   },
@@ -19992,7 +19992,7 @@ const vaults = [
       "https://polygondex.cafeswap.finance/#/swap?outputCurrency=0xb5106a3277718ecad2f20ab6b86ce0fee7a21f09",
     createdAt: 1633695451,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1D6B0510D3863879AfA39534719A3B3A6A69eEeB",
     lastHarvest: 1646283279,
   },
@@ -20022,7 +20022,7 @@ const vaults = [
       "https://app.apeswap.finance/#/swap?outputCurrency=0xCB898b0eFb084Df14dd8E018dA37B4d0f06aB26D",
     createdAt: 1633615462,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5FaDa24d37A27323D74af57Bd01786866e950550",
     lastHarvest: 1646283323,
   },
@@ -20061,7 +20061,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0x5d47bAbA0d66083C52009271faF3F50DCc01023C",
     createdAt: 1624340191,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x453054B9C2CD3dF1c57E0866241f460B78eE3ebB",
     lastHarvest: 0,
   },
@@ -20099,7 +20099,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/atricrypto3/deposit",
     createdAt: 1652662923,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x41D7529b4C9245a50ca6A169d39719DFF117f6CA",
     lastHarvest: 1654069679,
   },
@@ -20139,7 +20139,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x385eeac5cb85a38a9a07a70c73e0a3271cfb54a7",
     createdAt: 1632922881,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x42844d785816e53adfFBdFc66d6BFC2E3E83d8FD",
     lastHarvest: 1647830617,
   },
@@ -20168,7 +20168,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x4c19DdeebAF84cA3A255730295AD9d824D4Ff51f&outputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     createdAt: 1632516813,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2b92996787D7aB695FAb545ccb984b3895409619",
     lastHarvest: 1633762279,
   },
@@ -20198,7 +20198,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x4c19DdeebAF84cA3A255730295AD9d824D4Ff51f&outputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     createdAt: 1632511554,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5cC78F9FE3DaDeccAaeF83726c1864996D1FAb49",
     lastHarvest: 1633766829,
   },
@@ -20226,7 +20226,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x0B048D6e01a6b9002C291060bF2179938fd8264c",
     createdAt: 1632219035,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xAC074B7515011E08828821d53A3b71fB643773aB",
     lastHarvest: 1632823736,
   },
@@ -20254,7 +20254,7 @@ const vaults = [
     buyTokenUrl:
       "https://polygon-exchange.jetswap.finance/#/swap?outputCurrency=0x0B048D6e01a6b9002C291060bF2179938fd8264c",
     createdAt: 1632219357,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xf88c19c035756fd280c0683cca4c358C69932ba9",
     lastHarvest: 1632751994,
   },
@@ -20282,7 +20282,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x238779aFfE6FFD475cB7e84582FcA7789F310Dc8",
     createdAt: 1632157998,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF212621976dB35c9fA4f7579D684fe2E66e577F1",
     lastHarvest: 1633210995,
   },
@@ -20310,7 +20310,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x238779aFfE6FFD475cB7e84582FcA7789F310Dc8",
     createdAt: 1632157642,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x3922459D97e663c09ea611170d795c83727F224A",
     lastHarvest: 1633173915,
   },
@@ -20341,7 +20341,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0x580A84C73811E1839F75d86d75d88cCa0c241fF4",
     createdAt: 1631621928,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x464893e1A23026de87fd487A25341553B0f9cf03",
     lastHarvest: 1654065994,
   },
@@ -20381,7 +20381,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x580A84C73811E1839F75d86d75d88cCa0c241fF4",
     createdAt: 1631186885,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x528e01637aaE1c5CAa3c34b0295958Cc8f382C09",
     lastHarvest: 1640226375,
   },
@@ -20419,7 +20419,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1",
     createdAt: 1631184021,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa69D35C1b1b66B6e977294C76542e2C86617Adb7",
     lastHarvest: 1654058116,
   },
@@ -20457,7 +20457,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1",
     createdAt: 1631181877,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x23C28C24cb57F7b7D82cbf4788cdAD132051F1FD",
     lastHarvest: 1653985850,
   },
@@ -20496,7 +20496,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1",
     createdAt: 1630874617,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x51F68538944B1cbE15A8144F3e1053F1820D5702",
     lastHarvest: 1640274198,
   },
@@ -20535,7 +20535,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1630873083,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7BB5e5fb8b2843C2f94265eFe94B4F448eB916Ff",
     lastHarvest: 1654071280,
   },
@@ -20575,7 +20575,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xb8ab048D6744a276b2772dC81e406a4b769A5c3D",
     createdAt: 1630750371,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF93f69d9F768100D2641e6ddC04012E76D1C8Dfd",
     lastHarvest: 1637034150,
   },
@@ -20614,7 +20614,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/swap?outputCurrency=0x09211Dc67f9fe98Fb7bBB91Be0ef05f4a12FA2b2",
     createdAt: 1630476350,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa8232bdd730Edf961BCa6aEa3F26887bc0eDa107",
     lastHarvest: 1654057870,
   },
@@ -20654,7 +20654,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x4c4BF319237D98a30A929A96112EfFa8DA3510EB",
     createdAt: 1630426679,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x83394Ee753450920222327F4eCBB4b747f235659",
     lastHarvest: 1644503202,
   },
@@ -20694,7 +20694,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x61BDD9C7d4dF4Bf47A4508c0c8245505F2Af5b7b",
     createdAt: 1630168878,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE166AaF67DC8FA9607B2F34Ac4057e98E6197462",
     lastHarvest: 1647092764,
   },
@@ -20724,7 +20724,7 @@ const vaults = [
       "https://exchange.dfyn.network/#/swap?inputCurrency=0xD86b5923F3AD7b585eD81B448170ae026c65ae9a&outputCurrency=0x4A81f8796e0c6Ad4877A51C86693B0dE8093F2ef",
     createdAt: 1630075988,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD4610a11680e9b5d0FC80D65008C577CBe45090e",
     lastHarvest: 1646350154,
   },
@@ -20764,7 +20764,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     createdAt: 1630064594,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6EFE2a7cD607A2e0D84Ab87E7A7E57E19B50148F",
     lastHarvest: 1654076212,
   },
@@ -20803,7 +20803,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x2C89bbc92BD86F8075d1DEcc58C7F4E0107f286b",
     createdAt: 1630000146,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x44831fc132CbFa5099335517B9A83f817bFE41ee",
     lastHarvest: 1654038734,
   },
@@ -20841,7 +20841,7 @@ const vaults = [
     withdrawalFee: "0.01%",
     addLiquidityUrl: "https://app.iron.finance/swap/pools/isiron/deposit",
     createdAt: 1629902239,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA11C1200c06f1B3e10137e551783ba01b8AD1b88",
     lastHarvest: 1654072263,
   },
@@ -20882,7 +20882,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xcE829A89d4A55a63418bcC43F00145adef0eDB8E",
     createdAt: 1629635082,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5f2484F24a3134D6AcC5145AEDABf0Cd25223b53",
     lastHarvest: 1640283921,
   },
@@ -20912,7 +20912,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x883aBe4168705d2e5dA925d28538B7a6AA9d8419",
     createdAt: 1629256207,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x969D6b814303DAe5a05485a5957C8c181d7FC8d7",
     lastHarvest: 1632295153,
   },
@@ -20942,7 +20942,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x883aBe4168705d2e5dA925d28538B7a6AA9d8419",
     createdAt: 1629262245,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD556A69d7f37FeCe0C025bd4934Da2799cD48234",
     lastHarvest: 1632315870,
   },
@@ -20973,7 +20973,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0x883aBe4168705d2e5dA925d28538B7a6AA9d8419",
     createdAt: 1629258699,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x4750Efcdc3809b624515A78794777a7F64051362",
     lastHarvest: 1632331637,
   },
@@ -21013,7 +21013,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13",
     createdAt: 1629158545,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2f57815D41fb365064878b6405856Eb9aB49d70A",
     lastHarvest: 1654072271,
   },
@@ -21054,7 +21054,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=0x2c89bbc92bd86f8075d1decc58c7f4e0107f286b",
     createdAt: 1629159263,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9C1c20a777EB616efcD420679E2aA02776a9729c",
     lastHarvest: 1651177885,
   },
@@ -21084,7 +21084,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?outputCurrency=0xc8bcb58caEf1bE972C0B638B1dD8B0748Fdc8A44",
     createdAt: 1628607022,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x585b4c8C0D4C62f663DF6945524E59F69273f1Df",
     lastHarvest: 0,
   },
@@ -21114,7 +21114,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?outputCurrency=0xc8bcb58caEf1bE972C0B638B1dD8B0748Fdc8A44",
     createdAt: 1628607888,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9616eD357812ddc14bE3833fEc37F6Ce76eB5D1e",
     lastHarvest: 0,
   },
@@ -21144,7 +21144,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0xf5EA626334037a2cf0155D49eA6462fDdC6Eff19",
     createdAt: 1628592682,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA54f5470D3C03BF088372F31dD0a69Cf6c262478",
     lastHarvest: 0,
   },
@@ -21174,7 +21174,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0xf5EA626334037a2cf0155D49eA6462fDdC6Eff19",
     createdAt: 1628592884,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2DE7e25b19dbff36d92B62d6692eb568Bba29c3c",
     lastHarvest: 0,
   },
@@ -21204,7 +21204,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&outputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
     createdAt: 1627720202,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xd0AEd4Bb2050b4E4b8F5C9A4bcC5D1C46D4b397b",
     lastHarvest: 0,
   },
@@ -21234,7 +21234,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&outputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1628517667,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x33b35C38Ae0a3c2c4C9262217cb34DAdfB37a985",
     lastHarvest: 0,
   },
@@ -21274,7 +21274,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x7DfF46370e9eA5f0Bad3C4E29711aD50062EA7A4",
     createdAt: 1628164489,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0A866E75963d6EEc4EdA1e8E8b91F76228f2348e",
     lastHarvest: 1642622934,
   },
@@ -21314,7 +21314,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xb33EaAd8d922B1083446DC23f610c2567fB5180f",
     createdAt: 1627994474,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xfDE3FAa7D40B6F1417d9000bE6028638E4Df0F2b",
     lastHarvest: 1639046301,
   },
@@ -21344,7 +21344,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x948d2a81086A075b3130BAc19e4c6DEe1D2E3fE8",
     createdAt: 1628007315,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x54b1FE5f9162141740A2cF0e2044D82b8F570e08",
     lastHarvest: 0,
   },
@@ -21374,7 +21374,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xAa9654BECca45B5BDFA5ac646c939C62b527D394",
     createdAt: 1627984193,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xd85BAF8b9Ab657921c6D2700AA0e78928dC2922C",
     lastHarvest: 0,
   },
@@ -21415,7 +21415,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x692597b009d13C4049a947CAB2239b7d6517875F&outputCurrency=0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1627747757,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6ed82Aaa6D421404D43389a4F497923912De0916",
     lastHarvest: 0,
   },
@@ -21445,7 +21445,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97",
     createdAt: 1627747533,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x680fFd9E16a3f18576be2A0a03c528a353D6B622",
     lastHarvest: 0,
   },
@@ -21475,7 +21475,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x87f654c4b347230C60CAD8d7ea9cF0D7238bcc79",
     createdAt: 1627653529,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xed28adB653C55B63997C6f576DAcFaB2b1c94f17",
     lastHarvest: 0,
   },
@@ -21505,7 +21505,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x2628568509E87c4429fBb5c664Ed11391BE1BD29",
     createdAt: 1627656527,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA4352F2eCC3DDDb85CCfEaDf2ab991dB2Eb5bbf2",
     lastHarvest: 0,
   },
@@ -21535,7 +21535,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x8A953CfE442c5E8855cc6c61b1293FA648BAE472",
     createdAt: 1627489669,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x78b8C22A2FbB6C4Bf9E9570DCAC3b1F5EFB7D6a5",
     lastHarvest: 0,
   },
@@ -21565,7 +21565,7 @@ const vaults = [
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xb82A20B4522680951F11c94c54B8800c1C237693",
     createdAt: 1627447004,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9ab0f5b4504A9Ee0b2c830BC84dc78Aae54F4DD9",
     lastHarvest: 0,
   },
@@ -21595,7 +21595,7 @@ const vaults = [
       "https://swap.wault.finance/polygon/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xb82A20B4522680951F11c94c54B8800c1C237693",
     createdAt: 1627447222,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8699D5a2DFDd48Ea7333E9069125e7EfDe4AfF91",
     lastHarvest: 0,
   },
@@ -21625,7 +21625,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=ETH&outputCurrency=0xc168e40227e4ebd8c1cae80f7a55a4f0e6d66c97",
     createdAt: 1627604368,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x717593C671183b8af2981A5d1b190bc9978962DA",
     lastHarvest: 0,
   },
@@ -21655,7 +21655,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x24834bbec7e39ef42f4a75eaf8e5b6486d3f0e57&outputCurrency=0xc168e40227e4ebd8c1cae80f7a55a4f0e6d66c97",
     createdAt: 1627605208,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x67A3bD5F88f9cFD186179b50dFA2B698Ab99D734",
     lastHarvest: 0,
   },
@@ -21685,7 +21685,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0xb33EaAd8d922B1083446DC23f610c2567fB5180f&outputCurrency=0xc168e40227e4ebd8c1cae80f7a55a4f0e6d66c97",
     createdAt: 1627605778,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x969e3201ecb6A3Ed9662e75E8436d24B02f7E9Bb",
     lastHarvest: 0,
   },
@@ -21715,7 +21715,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x172370d5Cd63279eFa6d502DAB29171933a610AF&outputCurrency=0xc168e40227e4ebd8c1cae80f7a55a4f0e6d66c97",
     createdAt: 1627605878,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD9c67fa57AaDf12F39D8340901F7BD7b337bf761",
     lastHarvest: 0,
   },
@@ -21744,7 +21744,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0x90AC3fa9fCD997B168f218041de26eB01399Bb55",
     createdAt: 1626553687,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x459beC2474D88D6fCf50071E36124b9c420aa9e0",
     lastHarvest: 0,
   },
@@ -21772,7 +21772,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xfE1a200637464FBC9B60Bc7AeCb9b86c0E1d486E",
     createdAt: 1627398246,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc2f3338847D05A9A28b763c77556cD693f7f6C7e",
     lastHarvest: 0,
   },
@@ -21801,7 +21801,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xfE1a200637464FBC9B60Bc7AeCb9b86c0E1d486E",
     createdAt: 1627397974,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa6984233aD18987de3dbDAF37Bc0F0C4070F5faC",
     lastHarvest: 0,
   },
@@ -21831,7 +21831,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xf153eff70dc0bf3b085134928daeea248d9b30d0",
     createdAt: 1627204805,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6048e8BC353bCEe221e11Cde2359E3b34ee9a726",
     lastHarvest: 0,
   },
@@ -21861,7 +21861,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xAa9654BECca45B5BDFA5ac646c939C62b527D394",
     createdAt: 1626613413,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF00Fd3EAAc684fDcdB5a740550ceAbF7e580E8D5",
     lastHarvest: 0,
   },
@@ -21902,7 +21902,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1",
     createdAt: 1626609638,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xC42908F4C14E01379C0D16cF07dcBB413D2f6a2A",
     lastHarvest: 0,
   },
@@ -21931,7 +21931,7 @@ const vaults = [
     addLiquidityUrl:
       "https://quickswap.exchange/#/add/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174/0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1626611305,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8e1097A2374C81D17E0589cbD935957329bbC331",
     lastHarvest: 0,
   },
@@ -21959,7 +21959,7 @@ const vaults = [
     addLiquidityUrl:
       "https://polygon-exchange.jetswap.finance/#/add/0xc2132D05D31c914a87C6611C10748AEb04B58e8F/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1625847401,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x986B6a9097D1B3fb01BC593cD63784B750401Fe4",
     lastHarvest: 0,
   },
@@ -21999,7 +21999,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1",
     createdAt: 1624076992,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xECB07aB9E318d55f8018Bc1d01effe1680d1f68c",
     lastHarvest: 0,
   },
@@ -22029,7 +22029,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x6bb45cEAC714c52342Ef73ec663479da35934bf7",
     createdAt: 1625098451,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x315324Bcd724b8CF01FfE6d04F029328f595e126",
     lastHarvest: 0,
   },
@@ -22057,7 +22057,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x90AC3fa9fCD997B168f218041de26eB01399Bb55",
     createdAt: 1626552470,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB8cb0958B3943E63917Bdfe4b93201Cf5cC7De18",
     lastHarvest: 0,
   },
@@ -22085,7 +22085,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xd0f3121A190d85dE0AB6131f2bCEcdbfcfB38891",
     createdAt: 1626551580,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x59d6200BD6E5c3326Ab2A3784bce65EfDD36f8BD",
     lastHarvest: 0,
   },
@@ -22114,7 +22114,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0xd0f3121A190d85dE0AB6131f2bCEcdbfcfB38891",
     createdAt: 1626553815,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xdeAdcbc04D78440612dC4Ed0651C2698695C2AD2",
     lastHarvest: 0,
   },
@@ -22154,7 +22154,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x41b3966B4FF7b427969ddf5da3627d6AEAE9a48E",
     createdAt: 1626349862,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA8d2F663dA905dB94684da5E7955239B80085171",
     lastHarvest: 1638984995,
   },
@@ -22185,7 +22185,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753DD7087CaC61aB5644b308642cc1c33Dc13&outputCurrency=0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1626289895,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x968Eb3feCFEE8310C035CdAE07F6eD804b460c45",
     lastHarvest: 0,
   },
@@ -22214,7 +22214,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1626322235,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8C0410A6C1fF46be696E5aCC6b3cA977AD5b176A",
     lastHarvest: 0,
   },
@@ -22245,7 +22245,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1626306817,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9D78991a30f9822f6b5cBc521D5Ba203f0930c0E",
     lastHarvest: 0,
   },
@@ -22274,7 +22274,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xD6DF932A45C0f255f85145f286eA0b292B21C90B&outputCurrency=0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1626327159,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x83ee18Af41163e6889C502Fa3c876366E53D15DA",
     lastHarvest: 0,
   },
@@ -22303,7 +22303,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6&outputCurrency=0xdF7837DE1F2Fa4631D716CF2502f8b230F1dcc32",
     createdAt: 1626327313,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xAa4EFbd9a98503844036306A6510B7DA59EfEaB3",
     lastHarvest: 0,
   },
@@ -22331,7 +22331,7 @@ const vaults = [
     withdrawalFee: "0%",
     addLiquidityUrl: "https://polygon.curve.fi/atricrypto/deposit",
     createdAt: 1625140527,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0C0C75AF434519AB96E34EB3bbEea726324d6264",
     lastHarvest: 0,
   },
@@ -22361,7 +22361,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?outputCurrency=0x4A81f8796e0c6Ad4877A51C86693B0dE8093F2ef",
     createdAt: 1626270600,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6ef302f46543d1045F3c93D2eE77AcD58d3854C4",
     lastHarvest: 0,
   },
@@ -22391,7 +22391,7 @@ const vaults = [
       "https://app.firebird.finance/swap?outputCurrency=0x4A81f8796e0c6Ad4877A51C86693B0dE8093F2ef",
     createdAt: 1626155225,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x57e07d6958fd38AA2f46699744e322d3fB3db60f",
     lastHarvest: 0,
   },
@@ -22421,7 +22421,7 @@ const vaults = [
       "https://exchange.dfyn.network/#/swap?outputCurrency=0x4A81f8796e0c6Ad4877A51C86693B0dE8093F2ef",
     createdAt: 1626164436,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x40e51fc986405684ca3E4f049426a78c20A1BC03",
     lastHarvest: 0,
   },
@@ -22449,7 +22449,7 @@ const vaults = [
     withdrawalFee: "0.01%",
     addLiquidityUrl: "https://app.iron.finance/swap/pools/is3usd/deposit",
     createdAt: 1626100387,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6195187d06948fB14b20FD3c639F8cb8a335c29c",
     lastHarvest: 0,
   },
@@ -22490,7 +22490,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?inputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6&outputCurrency=0x4c4BF319237D98a30A929A96112EfFa8DA3510EB",
     createdAt: 1625995689,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x476be63e41f8E47910eDa5F50507EF49aC75A8a3",
     lastHarvest: 0,
   },
@@ -22519,7 +22519,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0xfbdd194376de19a88118e84e279b977f165d01b8&outputCurrency=0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97",
     createdAt: 1625919162,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0010cB56ABF8969EA3885950CcAADB2300cd5C7d",
     lastHarvest: 0,
   },
@@ -22548,7 +22548,7 @@ const vaults = [
       "https://polygon-exchange.jetswap.finance/#/swap?outputCurrency=0x845E76A8691423fbc4ECb8Dd77556Cb61c09eE25",
     createdAt: 1625919720,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xCFa03c845437ED660eaA38dD18316f6451410488",
     lastHarvest: 0,
   },
@@ -22577,7 +22577,7 @@ const vaults = [
     buyTokenUrl:
       "https://polygon-exchange.jetswap.finance/#/swap?outputCurrency=0x845E76A8691423fbc4ECb8Dd77556Cb61c09eE25",
     createdAt: 1625844034,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x77092b29492163c0695Af17e94d29E73Dcba8743",
     lastHarvest: 0,
   },
@@ -22607,7 +22607,7 @@ const vaults = [
       "https://polygon-exchange.jetswap.finance/#/swap?outputCurrency=0x845E76A8691423fbc4ECb8Dd77556Cb61c09eE25",
     createdAt: 1625845966,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x80F442b0207Fbc58efBd55da37F2fCc134CAEE7B",
     lastHarvest: 0,
   },
@@ -22639,7 +22639,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xa3fa99a148fa48d14ed51d610c367c61876997f1&outputCurrency=0x580A84C73811E1839F75d86d75d88cCa0c241fF4",
     createdAt: 1624074452,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xd55745876d04E45F7CB32bf816BAbf670A9F260b",
     lastHarvest: 0,
   },
@@ -22669,7 +22669,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753DD7087CaC61aB5644b308642cc1c33Dc13&outputCurrency=0x580A84C73811E1839F75d86d75d88cCa0c241fF4",
     createdAt: 1624073954,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa145e4b08969b344Eb9478E89e351cc6b5c7D5EF",
     lastHarvest: 0,
   },
@@ -22700,7 +22700,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0xa3Fa99A148fA48D14Ed51d610c367C61876997F1",
     createdAt: 1623631997,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9ED77C14DE83a24c9E1Ca97472a22a86d90EEA0c",
     lastHarvest: 0,
   },
@@ -22730,7 +22730,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x4C16f69302CcB511c5Fac682c7626B9eF0Dc126a",
     createdAt: 1625698210,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa6a9da7890DeD8FEcc3be2f8b13ca424689fc413",
     lastHarvest: 0,
   },
@@ -22760,7 +22760,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x4C16f69302CcB511c5Fac682c7626B9eF0Dc126a",
     createdAt: 1625698046,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA58f0953261EcB55A128F721841416717B327833",
     lastHarvest: 0,
   },
@@ -22790,7 +22790,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x80244C2441779361F35803b8C711C6c8fC6054a3",
     createdAt: 1625567504,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xC32CCCfF0777C145e7d658081D141ec8A38f8133",
     lastHarvest: 0,
   },
@@ -22820,7 +22820,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=ETH&outputCurrency=0x80244C2441779361F35803b8C711C6c8fC6054a3",
     createdAt: 1625569831,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x3dE892BBc1cC1D22F069a4A985F58052244Acc5e",
     lastHarvest: 0,
   },
@@ -22850,7 +22850,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0x80244C2441779361F35803b8C711C6c8fC6054a3",
     createdAt: 1625570159,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5a2448b0306D24C2ed3AE3186f32bbB023B8dCf9",
     lastHarvest: 0,
   },
@@ -22880,7 +22880,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x80244C2441779361F35803b8C711C6c8fC6054a3",
     createdAt: 1625571379,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7207E31f503981DC0D57cC04AD4713DCBD5C0010",
     lastHarvest: 0,
   },
@@ -22909,7 +22909,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xd0f3121A190d85dE0AB6131f2bCEcdbfcfB38891&outputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     createdAt: 1624239175,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8F9f69ac6aD32Fd6394DDC414f724C534B60F877",
     lastHarvest: 0,
   },
@@ -22939,7 +22939,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x16ECCfDbb4eE1A85A33f3A9B21175Cd7Ae753dB4&outputCurrency=0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97",
     createdAt: 1625512841,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x09b379B9008BF69a06A5ed8D97FEd39Bc830784E",
     lastHarvest: 1632345480,
   },
@@ -22969,7 +22969,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x840195888Db4D6A99ED9F73FcD3B225Bb3cB1A79&outputCurrency=0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97",
     createdAt: 1625512471,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x827D4f4f92281690aD0591aFa0F90450A785199F",
     lastHarvest: 0,
   },
@@ -22999,7 +22999,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x34C1b299A74588D6Abdc1b85A53345A48428a521&outputCurrency=0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97",
     createdAt: 1625512895,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF68536DA80F58c3dEF57fB06ADA7998a1E2Cee97",
     lastHarvest: 0,
   },
@@ -23028,7 +23028,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x5B4CF2C120A9702225814E18543ee658c5f8631e&outputCurrency=0xC168E40227E4ebD8C1caE80F7a55a4F0e6D66C97",
     createdAt: 1625513153,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8c5E402F3F43958Ecb83b10aD9bE98Fd026C52c6",
     lastHarvest: 0,
   },
@@ -23058,7 +23058,7 @@ const vaults = [
     buyTokenUrl:
       "https://exchange.dfyn.network/#/swap?inputCurrency=0x3a3df212b7aa91aa0402b9035b098891d276572b&outputCurrency=ETH",
     createdAt: 1625170837,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xcd170fa0C80Ea060a9Df6bf91BfF24cBDC4e0f30",
     lastHarvest: 0,
   },
@@ -23087,7 +23087,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x6bb45cEAC714c52342Ef73ec663479da35934bf7",
     createdAt: 1625093994,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xf2F5C13686b79b92dC73F6Bb1D2663329658EC87",
     lastHarvest: 0,
   },
@@ -23116,7 +23116,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59",
     createdAt: 1624640068,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x21a9b464DAD1c10985eB8B735A3918fFf24034bc",
     lastHarvest: 0,
   },
@@ -23146,7 +23146,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0x6bb45cEAC714c52342Ef73ec663479da35934bf7",
     createdAt: 1625079217,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xF8f071033bfF4100B4b010cE11F95c95950F69b6",
     lastHarvest: 0,
   },
@@ -23176,7 +23176,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59",
     createdAt: 1625082947,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0F5cdA7EaFC6dc0D10a131c9BD946C1F6634F9d0",
     lastHarvest: 0,
   },
@@ -23206,7 +23206,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59",
     createdAt: 1624581505,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1Fb8021FcAB1b54B3f2C6D9D8562DC16CF1fAe21",
     lastHarvest: 0,
   },
@@ -23245,7 +23245,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1624811048,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB63e910A2DcD6362f7F631542a700C3139b6185a",
     lastHarvest: 0,
   },
@@ -23284,7 +23284,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     createdAt: 1624810792,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0603141F2D39264BCE263a2107fA2045cC435b47",
     lastHarvest: 0,
   },
@@ -23313,7 +23313,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xcFe2cF35D2bDDE84967e67d00aD74237e234CE59",
     createdAt: 1624580199,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xeBD96C075Eb7D2a968b4479aA1CC9b2808e0029e",
     lastHarvest: 0,
   },
@@ -23343,7 +23343,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xaECeBfcF604AD245Eaf0D5BD68459C3a7A6399c2",
     createdAt: 1624595881,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa7377CDb25BfA2889B6e4c9463Cd0858A57aB315",
     lastHarvest: 0,
   },
@@ -23384,7 +23384,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0xfC40a4F89b410a1b855b5e205064a38fC29F5eb5",
     createdAt: 1624637764,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xEccBDD3fA855c75eD0D7Dbd8E24aAFcde62a81ce",
     lastHarvest: 1640268460,
   },
@@ -23413,7 +23413,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?inputCurrency=0xd0f3121A190d85dE0AB6131f2bCEcdbfcfB38891&outputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     createdAt: 1624588799,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA82b0a53Dc044C7B885D32FA4EEaA4FeD7528773",
     lastHarvest: 0,
   },
@@ -23452,7 +23452,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6&outputCurrency=0x4EaC4c4e9050464067D673102F8E24b2FccEB350",
     createdAt: 1624343679,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x46FfF3f004afeE180CF96cCa92560a94A696044B",
     lastHarvest: 0,
   },
@@ -23491,7 +23491,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1624378113,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xebcAD445f52231887c493995F4413A57c09f5f00",
     lastHarvest: 0,
   },
@@ -23530,7 +23530,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
     createdAt: 1624376861,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE81436bdf7162e46cac9D58CfAC5ec31e9475446",
     lastHarvest: 0,
   },
@@ -23569,7 +23569,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.apeswap.finance/#/swap?outputCurrency=0xA649325Aa7C5093d12D6F98EB4378deAe68CE23F",
     createdAt: 1624375449,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x35D578CBeFf8F7A4e1c3Beed0D8CC42D71A08A27",
     lastHarvest: 0,
   },
@@ -23598,7 +23598,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0xd0f3121A190d85dE0AB6131f2bCEcdbfcfB38891&outputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     createdAt: 1624375717,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x966fC9Ee8500b470C653c339c8fa0a68520CC3ea",
     lastHarvest: 0,
   },
@@ -23627,7 +23627,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xd0f3121A190d85dE0AB6131f2bCEcdbfcfB38891&outputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1624239489,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7593747a19a50451bBe6E0f1D427D4F80796f684",
     lastHarvest: 0,
   },
@@ -23657,7 +23657,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xE55cb144E02Cffb6fBD65d9a4BD62378998Bc267&outputCurrency=0x831753DD7087CaC61aB5644b308642cc1c33Dc13",
     createdAt: 1624037936,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1a09FD524D6a7c99903648Bfa8535D43B4F215c2",
     lastHarvest: 0,
   },
@@ -23687,7 +23687,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xE55cb144E02Cffb6fBD65d9a4BD62378998Bc267&outputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1623985582,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x47c1772E850F627Bf41f52e44219d9bDab66D963",
     lastHarvest: 0,
   },
@@ -23728,7 +23728,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063&outputCurrency=0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1623912540,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x18c52B6dCe0D65ddB2F9EB482163956a28818C18",
     lastHarvest: 1643933077,
   },
@@ -23758,7 +23758,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x9aceb6f749396d1930abc9e263efc449e5e82c13",
     createdAt: 1623786134,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x401Fa12777e303CBbFa0Ce8c95014d3CA1ee02c0",
     lastHarvest: 0,
   },
@@ -23796,7 +23796,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1623864761,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xaf9DD4c1d755402868fFE2A0B7C0E8a6664a0f2F",
     lastHarvest: 0,
   },
@@ -23834,7 +23834,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1623864893,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8E82b1A03698d0597D3414F6CC5C57005480DEf4",
     lastHarvest: 0,
   },
@@ -23873,7 +23873,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/MATIC/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1623848947,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE91262c6Cf7B28948EF6f8a6B554758791c31340",
     lastHarvest: 0,
   },
@@ -23901,7 +23901,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/MATIC/0x8A953CfE442c5E8855cc6c61b1293FA648BAE472",
     createdAt: 1624043620,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xC0F43f3d242fEDd9FD82e5a5856E577d908a083A",
     lastHarvest: 0,
   },
@@ -23939,7 +23939,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x50B728D8D964fd00C2d0AAD81718b71311feF68a",
     createdAt: 1624054007,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x156463c7a644726994b658B5164edA0B6D68544E",
     lastHarvest: 0,
   },
@@ -23977,7 +23977,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39",
     createdAt: 1624055417,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x038A80FA19191FF6A1788cEb6f503FB0FDf83aE8",
     lastHarvest: 0,
   },
@@ -24015,7 +24015,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0xD6DF932A45C0f255f85145f286eA0b292B21C90B",
     createdAt: 1624057500,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x23679B038eb6f090f9b0f121A1F29b7cA3993F77",
     lastHarvest: 0,
   },
@@ -24053,7 +24053,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619/0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     createdAt: 1624062063,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1C5e120604537B44B635f9c932A26Abf7bb97E4E",
     lastHarvest: 0,
   },
@@ -24092,7 +24092,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174/0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     createdAt: 1624058722,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x107711a7f61c2867B72E0Dd926755dDeEe75F9f0",
     lastHarvest: 0,
   },
@@ -24131,7 +24131,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/MATIC/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1623849475,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xea025B73A536F876d63022629B1d4a2271556056",
     lastHarvest: 0,
   },
@@ -24171,7 +24171,7 @@ const vaults = [
     addLiquidityUrl:
       "https://swap.wault.finance/polygon/#/add/0x2791bca1f2de4661ed88a30c99a7a9449aa84174/0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1623753043,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0B7FEA4506006f1bA0718585cFAb638424A86d94",
     lastHarvest: 0,
   },
@@ -24212,7 +24212,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?outputCurrency=0x4c4BF319237D98a30A929A96112EfFa8DA3510EB",
     createdAt: 1623752473,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6a440102015bf4D81D56fBc2fd4F27797D183931",
     lastHarvest: 0,
   },
@@ -24251,7 +24251,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?outputCurrency=0x4c4BF319237D98a30A929A96112EfFa8DA3510EB",
     createdAt: 1623690831,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xcb6e386Ad643a6D77C940BF69303cEBD34c04757",
     lastHarvest: 0,
   },
@@ -24292,7 +24292,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?outputCurrency=0x4c4BF319237D98a30A929A96112EfFa8DA3510EB",
     createdAt: 1623688343,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0D62f1b1BF511E155e357184dcfC1e8D54B41a5f",
     lastHarvest: 0,
   },
@@ -24333,7 +24333,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.wault.finance/polygon/#/swap?outputCurrency=0xFbdd194376de19a88118e84E279b977f165d01b8",
     createdAt: 1623689233,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xb15B8E50b79b4D6723DC297aD6313B9Dc3c51Db3",
     lastHarvest: 0,
   },
@@ -24374,7 +24374,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0xEde1B77C0Ccc45BFa949636757cd2cA7eF30137F&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1623529777,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x12B5EC1cFa07732540F3d9D4eCF040328bc1EEdC",
     lastHarvest: 0,
   },
@@ -24415,7 +24415,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     createdAt: 1623516421,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1885b6281Ff3F43df54bD61513B80b6fd64B45aC",
     lastHarvest: 1654072283,
   },
@@ -24455,7 +24455,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753DD7087CaC61aB5644b308642cc1c33Dc13&outputCurrency=0xb33EaAd8d922B1083446DC23f610c2567fB5180f",
     createdAt: 1623516309,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x4b0e4CDEA00C90F786bd817751159f46EA38A58D",
     lastHarvest: 0,
   },
@@ -24486,7 +24486,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39&outputCurrency=0x831753DD7087CaC61aB5644b308642cc1c33Dc13",
     createdAt: 1623515927,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD208C42cd08a5CaD8C53add2365153e8e24EbdF9",
     lastHarvest: 0,
   },
@@ -24515,7 +24515,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x3a3Df212b7AA91Aa0402B9035b098891d276572B",
     createdAt: 1623280369,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x53F816063523D9883C83863CbD5D8EAF9Ffc4641",
     lastHarvest: 0,
   },
@@ -24555,7 +24555,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1622693962,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5c912a5C6ABFa927E8104f48dCFf4C97900426ec",
     lastHarvest: 1654050548,
   },
@@ -24595,7 +24595,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x8f3cf7ad23cd3cadbd9735aff958023239c6a063&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1622675730,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5F8e043670412e2C8Eb2A01f6382Faf91922BfF8",
     lastHarvest: 1654012215,
   },
@@ -24626,7 +24626,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x9aceb6f749396d1930abc9e263efc449e5e82c13",
     createdAt: 1623016533,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x4E0e85692b239e57128103b4Ad6f39Ac3BBE0c15",
     lastHarvest: 0,
   },
@@ -24666,7 +24666,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
     createdAt: 1620900077,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x3777a06B71B2Aaf105e855693C56768117712B6F",
     lastHarvest: 0,
   },
@@ -24706,7 +24706,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1620569907,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x55a10618c7E9489ceE047705cD003df6d9e09195",
     lastHarvest: 0,
   },
@@ -24736,7 +24736,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A",
     createdAt: 1622729319,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8136C5EE816fD80b80C9679e785F37EBdf2199eE",
     lastHarvest: 0,
   },
@@ -24766,7 +24766,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xD86b5923F3AD7b585eD81B448170ae026c65ae9a",
     createdAt: 1622727165,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x099CE8F12D9824F7441950759d2999022b717ff2",
     lastHarvest: 0,
   },
@@ -24796,7 +24796,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=0x3a3df212b7aa91aa0402b9035b098891d276572b",
     createdAt: 1622658346,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2ABB0ea3A5C038f60E677Bf14d2F6095786650Ae",
     lastHarvest: 0,
   },
@@ -24826,7 +24826,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0x3a3Df212b7AA91Aa0402B9035b098891d276572B",
     createdAt: 1622658318,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x92E586d7dB14483C103c2e0FE6A596F8b55DA752",
     lastHarvest: 0,
   },
@@ -24866,7 +24866,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x5fe2B58c013d7601147DcdD68C143A77499f5531&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1622513600,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x441b8Ad6Cfa6707E7A8F1398c2067996611fbc66",
     lastHarvest: 0,
   },
@@ -24908,7 +24908,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x104592a158490a9228070E0A8e5343B499e125D0&outputCurrency=0x3e121107F6F22DA4911079845a470757aF4e1A1b",
     createdAt: 1622513442,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x3bb6D727622A35816916C3e04920ADd7800BAB0E",
     lastHarvest: 0,
   },
@@ -24949,7 +24949,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x104592a158490a9228070E0A8e5343B499e125D0&outputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1622513282,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xE4cd42e17bbc54455c5855eCF4Bd46D51dA5133C",
     lastHarvest: 0,
   },
@@ -24990,7 +24990,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270&outputCurrency=0xD0660cD418a64a1d44E9214ad8e459324D8157f1",
     createdAt: 1622512744,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x7fB420eB7D5B19131f40E8D0422202cF0B46d458",
     lastHarvest: 0,
   },
@@ -25031,7 +25031,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
     createdAt: 1622177876,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xeb38761E6b58Bb9acB4F52077d9eEbFf7D0248Bd",
     lastHarvest: 0,
   },
@@ -25072,7 +25072,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x50B728D8D964fd00C2d0AAD81718b71311feF68a&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1622508134,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x98F332EC4D39fB943080813B381b88D57b432124",
     lastHarvest: 0,
   },
@@ -25100,7 +25100,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?outputCurrency=0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A",
     createdAt: 1622454663,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6cBaEBC1333E72206FC326e810972D28f8250485",
     lastHarvest: 0,
   },
@@ -25130,7 +25130,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A&outputCurrency=0xD86b5923F3AD7b585eD81B448170ae026c65ae9a",
     createdAt: 1622452079,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa3c2E189a3c809a04d52DD1FfF1610439798887c",
     lastHarvest: 0,
   },
@@ -25161,7 +25161,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xfbdd194376de19a88118e84e279b977f165d01b8",
     createdAt: 1622053127,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa425DeadFf443f3574F02585CE5154BBd5D14213",
     lastHarvest: 0,
   },
@@ -25192,7 +25192,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13&outputCurrency=0xfbdd194376de19a88118e84e279b977f165d01b8",
     createdAt: 1622053085,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA9319b8F327dBB744c63e6b9FfaDf9A93C30687c",
     lastHarvest: 0,
   },
@@ -25223,7 +25223,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13&outputCurrency=0x8a2870fb69A90000D6439b7aDfB01d4bA383A415",
     createdAt: 1622087987,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x658F5577b5a161A4aC2F0bb513af49ece812f077",
     lastHarvest: 0,
   },
@@ -25254,7 +25254,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13&outputCurrency=0x9c49BA0212Bb5Db371e66b59D1565b7c06E4894e",
     createdAt: 1622088077,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x05b6e52227985C401eDd5d1635DcEa204857a81d",
     lastHarvest: 0,
   },
@@ -25285,7 +25285,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13&outputCurrency=0x42435F467D33e5C4146a4E8893976ef12BBCE762",
     createdAt: 1622088167,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x1848FBA9Ac7B4783F513d336171037941a637c55",
     lastHarvest: 0,
   },
@@ -25325,7 +25325,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6&outputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1622047000,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc231e28ceC2C44E774d40499CE255843CAF35E1e",
     lastHarvest: 1654014669,
   },
@@ -25355,7 +25355,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?outputCurrency=0xaAa5B9e6c589642f98a1cDA99B9D024B8407285A",
     createdAt: 1622024916,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x83c6e9C6119D0a7C1ac4fF86b970e54278140D45",
     lastHarvest: 0,
   },
@@ -25385,7 +25385,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?outputCurrency=0xD86b5923F3AD7b585eD81B448170ae026c65ae9a",
     createdAt: 1622026912,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x402ee2A54138465D19EFdEFA60c1d9ffDFfF41eC",
     lastHarvest: 0,
   },
@@ -25425,7 +25425,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=ETH&outputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     createdAt: 1621983287,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x736Ea4A3a0143986B8cc8bCcD077F93052231996",
     lastHarvest: 1654073584,
   },
@@ -25456,7 +25456,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x034b2090b579228482520c589dbd397c53fc51cc",
     createdAt: 1621961982,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB682a2F1e6C87819e9aDEdBe366548B59Ab122E8",
     lastHarvest: 0,
   },
@@ -25487,7 +25487,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x8a2870fb69A90000D6439b7aDfB01d4bA383A415",
     createdAt: 1621918051,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xaEaF5294Cc6FAcB023c0999A0b1786C4C0b3d520",
     lastHarvest: 0,
   },
@@ -25518,7 +25518,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x9c49BA0212Bb5Db371e66b59D1565b7c06E4894e",
     createdAt: 1621903565,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9e6d524b000066e60284E2Ee14437d071B6b498F",
     lastHarvest: 0,
   },
@@ -25549,7 +25549,7 @@ const vaults = [
       "https://polyzap.app/#/swap?outputCurrency=0xeb2778f74E5ee038E67AA6c77f0F0451ABd748FD",
     createdAt: 1621345663,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x9E75f8298e458B76382870982788988A0799195b",
     lastHarvest: 0,
   },
@@ -25580,7 +25580,7 @@ const vaults = [
       "https://polyzap.app/#/swap?outputCurrency=0xeb2778f74E5ee038E67AA6c77f0F0451ABd748FD",
     createdAt: 1621425966,
     retireReason: "tvl",
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x6677c03B2c7Da09dfbD869daeec3ccFd4eCC4B5F",
     lastHarvest: 0,
   },
@@ -25620,7 +25620,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&outputCurrency=0xfbdd194376de19a88118e84e279b977f165d01b8",
     createdAt: 1621259977,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc7506185DD847346B34e495C3Ffd8F9d34824F5F",
     lastHarvest: 0,
   },
@@ -25660,7 +25660,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x9c78ee466d6cb57a4d01fd887d2b5dfb2d46288f&outputCurrency=0xfbdd194376de19a88118e84e279b977f165d01b8",
     createdAt: 1621260031,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xd8d7DB8272C02fcf784a6794b4e51647258c0660",
     lastHarvest: 0,
   },
@@ -25699,7 +25699,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
     createdAt: 1621100435,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x57FdEB65b71e6aD212088E63E85825e314F2Ea62",
     lastHarvest: 0,
   },
@@ -25739,7 +25739,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0xD6DF932A45C0f255f85145f286eA0b292B21C90B",
     createdAt: 1621097202,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8F755873546F4D0EDf7d41fF8604C8A632113eB7",
     lastHarvest: 0,
   },
@@ -25779,7 +25779,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
     createdAt: 1620900737,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xb29cCE04365400409d476e95410547275D1F86Cf",
     lastHarvest: 0,
   },
@@ -25819,7 +25819,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?outputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     createdAt: 1620539520,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x4Dcbd7A18d04343aFa534f945ad13E096ebd9Ae1",
     lastHarvest: 0,
   },
@@ -25859,7 +25859,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x172370d5cd63279efa6d502dab29171933a610af&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1621010827,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xCF0354f8dAB741b889e753cCe1656327fe6ce474",
     lastHarvest: 0,
   },
@@ -25900,7 +25900,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1621012117,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5FCcFcd07D03FfdDa3A560d3af15d2bd7AaeE21d",
     lastHarvest: 0,
   },
@@ -25940,7 +25940,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1621012201,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0536984a70BE296A35feD83DC8fF5d30338AbeA1",
     lastHarvest: 0,
   },
@@ -25971,7 +25971,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
     createdAt: 1620755335,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xe1B9EB8eAf3F278800AcE13a815DDdc24673F0C6",
     lastHarvest: 0,
   },
@@ -26002,7 +26002,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x6ab6d61428fde76768d7b45d8bfeec19c6ef91a8&outputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13",
     createdAt: 1620765461,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x5E70Ad3438Fe87e0ec89CF15a53aFb2caC39cC6C",
     lastHarvest: 0,
   },
@@ -26032,7 +26032,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x104592a158490a9228070e0a8e5343b499e125d0&outputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13",
     createdAt: 1620767599,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x57b3D28fe4824d42c1F8d2786B89bC89e8c68d66",
     lastHarvest: 0,
   },
@@ -26072,7 +26072,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0xD6DF932A45C0f255f85145f286eA0b292B21C90B&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1620418656,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x71e2c040F3B9670C693215509A0c0846D221756a",
     lastHarvest: 0,
   },
@@ -26112,7 +26112,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x8f3cf7ad23cd3cadbd9735aff958023239c6a063",
     createdAt: 1620653470,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB982421883c5c022181b67cBC6b4709A564A6728",
     lastHarvest: 0,
   },
@@ -26152,7 +26152,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1620655127,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x170712B04A24FdBCC021Dd461Afd048c8cF2348d",
     lastHarvest: 0,
   },
@@ -26192,7 +26192,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     createdAt: 1620655517,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc4cb1Dc51eAD37fD19d0C24EC6136Dbb639789cA",
     lastHarvest: 0,
   },
@@ -26232,7 +26232,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1620655909,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xB4cc236af16e8FBEf8600C2D482901E84AB723c4",
     lastHarvest: 0,
   },
@@ -26272,7 +26272,7 @@ const vaults = [
     buyTokenUrl:
       "https://app.sushi.com/#/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1620656197,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x8A8E3aBAb418671bdb7A47E45d2Fcd7726e46D74",
     lastHarvest: 0,
   },
@@ -26303,7 +26303,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&outputCurrency=0x7CdC0421469398e0F3aA8890693d86c840Ac8931",
     createdAt: 1620677262,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa54e6dc91FCb22a24437e8650266BfE9590a2820",
     lastHarvest: 0,
   },
@@ -26334,7 +26334,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&outputCurrency=0x5C7F7Fe4766fE8f0fa9b41E2E4194d939488ff1C",
     createdAt: 1620677292,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xfb7344a4cF25CDe5aaF6415107a8deF769FC200B",
     lastHarvest: 0,
   },
@@ -26374,7 +26374,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
     createdAt: 1619825239,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xa5487C4eECDc72742b1704f4C6C89b92850f460B",
     lastHarvest: 1654018507,
   },
@@ -26405,7 +26405,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619&outputCurrency=0x9c78ee466d6cb57a4d01fd887d2b5dfb2d46288f",
     createdAt: 1620068910,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0BF58A328C7739D8b097B1d4199f48AA3F1b2788",
     lastHarvest: 0,
   },
@@ -26445,7 +26445,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6",
     createdAt: 1619797422,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x089eb06FF6b02155580a9Be04FF117387829ABEF",
     lastHarvest: 1654072303,
   },
@@ -26476,7 +26476,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x7FBc10850caE055B27039aF31bD258430e714c62",
     createdAt: 1620048684,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x470052FEd23A2887e3e679c3D8544529DA8B272f",
     lastHarvest: 0,
   },
@@ -26507,7 +26507,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x42435F467D33e5C4146a4E8893976ef12BBCE762",
     createdAt: 1620048552,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xc1C1eB984218B9570beA53C0Dad14283a6E9E81C",
     lastHarvest: 0,
   },
@@ -26538,7 +26538,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xB77e62709e39aD1cbeEBE77cF493745AeC0F453a",
     createdAt: 1620048454,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x88F2ADA49F24fF14005633e66050f763b2E07b7f",
     lastHarvest: 0,
   },
@@ -26569,7 +26569,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0xD85d1e945766Fea5Eda9103F918Bd915FbCa63E6",
     createdAt: 1620048432,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x06A1f520555222758eaE4dA0573351FdaD1e7843",
     lastHarvest: 0,
   },
@@ -26609,7 +26609,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619&outputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13",
     createdAt: 1620048408,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xDC73067A6E2c6BEE8e5BC0d916b84A95b5B3cA4B",
     lastHarvest: 1654072315,
   },
@@ -26650,7 +26650,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0xD6DF932A45C0f255f85145f286eA0b292B21C90B&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1619797482,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x0B2798c89EfeC9BcFB7730e7A42c75ce6D5b6254",
     lastHarvest: 1647459042,
   },
@@ -26691,7 +26691,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x53e0bca35ec356bd5dddfebbd1fc0fd03fabad39&outputCurrency=0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
     createdAt: 1619797458,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x3E96fb641967F9A8fBa8DdAcf19d11790A264C44",
     lastHarvest: 1646327328,
   },
@@ -26721,7 +26721,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x05089c9ebffa4f0aca269e32056b1b36b37ed71b&outputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174",
     createdAt: 1619551330,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0x2BDA70d1DcE6b0855e812daaBB096F3DaaEBd4Bc",
     lastHarvest: 0,
   },
@@ -26761,7 +26761,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=ETH&outputCurrency=0xc2132d05d31c914a87c6611c10748aeb04b58e8f",
     createdAt: 1619717061,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xeC94C5F7b9dcAe393D4Ab87821eAd4e934d89619",
     lastHarvest: 1654058460,
   },
@@ -26800,7 +26800,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=ETH",
     createdAt: 1619717027,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xe14bA7aa3f5c76c3B77a5F8a29B1aB9CCB11b9F5",
     lastHarvest: 1654073422,
   },
@@ -26840,7 +26840,7 @@ const vaults = [
     buyTokenUrl:
       "https://quickswap.exchange/#/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=0x831753dd7087cac61ab5644b308642cc1c33dc13",
     createdAt: 1619716993,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xD621e3Bb2Aa579E4D41A998dE119b4F85f190428",
     lastHarvest: 1654064582,
   },
@@ -26871,7 +26871,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=0x7ceb23fd6bc0add59e62ac25578270cff1b9f619",
     createdAt: 1619529365,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xb0F9c6FBcfE226EEAD3AE8b019ce4666cE223a78",
     lastHarvest: 0,
   },
@@ -26902,7 +26902,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270&outputCurrency=0x9c78ee466d6cb57a4d01fd887d2b5dfb2d46288f",
     createdAt: 1619529345,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xA338D34c5de06B88197609956a2dEAAfF7Af46c8",
     lastHarvest: 0,
   },
@@ -26933,7 +26933,7 @@ const vaults = [
     buyTokenUrl:
       "https://swap.cometh.io/#/swap?inputCurrency=0x2791bca1f2de4661ed88a30c99a7a9449aa84174&outputCurrency=0x9c78ee466d6cb57a4d01fd887d2b5dfb2d46288f",
     createdAt: 1619529291,
-    chain: "polygon",
+    chain: "matic",
     strategy: "0xf6fD90FE8f057a63F0368B0B551D5e52C7Ae821F",
     lastHarvest: 0,
   },

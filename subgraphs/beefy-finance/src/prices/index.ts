@@ -4,7 +4,6 @@ import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
-import { getPriceUsdc as getPriceUsdcQuickswap } from "./routers/QuickswapRouter";
 import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
@@ -96,16 +95,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
     ]);
     return sushiswapPrice;
-  }
-
-  // 6. Quickswap Router
-  let quickswapPrice = getPriceUsdcQuickswap(tokenAddr, network);
-  if (!quickswapPrice.reverted) {
-    log.warning("[QuickswapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      quickswapPrice.usdPrice.div(quickswapPrice.decimalsBaseTen).toString(),
-    ]);
-    return quickswapPrice;
   }
 
   log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
