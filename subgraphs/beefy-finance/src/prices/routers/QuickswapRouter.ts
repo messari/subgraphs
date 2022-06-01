@@ -6,7 +6,7 @@ import {
   UniswapPair__getReservesResult,
 } from "../../../generated/aave-aave-eol/UniswapPair";
 
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/aave-aave-eol/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
@@ -56,7 +56,6 @@ export function getPriceFromRouter(
 ): CustomPriceType {
   let ethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!;
   let wethAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get("WETH")!;
-
   // Convert ETH address to WETH
   if (token0Address == ethAddress) {
     token0Address = wethAddress;

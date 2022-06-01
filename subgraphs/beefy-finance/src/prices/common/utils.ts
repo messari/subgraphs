@@ -1,6 +1,6 @@
 import * as constants from "./constants";
 import { ERC20 } from "../../../generated/aave-aave-eol/ERC20";
-import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 export function readValue<T>(
   callResult: ethereum.CallResult<T>,
@@ -12,7 +12,10 @@ export function readValue<T>(
 export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = ERC20.bind(tokenAddr);
 
-  let decimals = token.decimals();
-
-  return new BigInt(decimals);
+  let decimals = token.try_decimals();
+  if (decimals.reverted) {
+    return constants.DEFAULT_DECIMALS;
+  } else {
+    return BigInt.fromI32(decimals.value);
+  }
 }

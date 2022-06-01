@@ -4,6 +4,7 @@ import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
+import { getPriceUsdc as getPriceUsdcQuickswap } from "./routers/QuickswapRouter";
 import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
@@ -14,12 +15,10 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (tokenAddr.toHex() == constants.ZERO_ADDRESS_STRING) {
     return new CustomPriceType();
   }
-  log.warning("fetching network...", []);
+
   let network = dataSource.network();
-  log.warning("network fetched", []);
 
   // 1. Yearn Lens Oracle
-  log.warning("trying with yearn lens...", []);
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
     log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
@@ -28,10 +27,8 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return yearnLensPrice;
   }
-  log.warning("yearn lens failed", []);
 
   // 2. ChainLink Feed Registry
-  log.warning("trying with chainlink...", []);
   let chainLinkPrice = getTokenPriceFromChainLink(tokenAddr, network);
   if (!chainLinkPrice.reverted) {
     log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
@@ -40,10 +37,8 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return chainLinkPrice;
   }
-  log.warning("chainlink failed", []);
 
   // 3. CalculationsCurve
-  log.warning("trying with calculations curve...", []);
   let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
     tokenAddr,
     network
@@ -57,7 +52,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return calculationsCurvePrice;
   }
-  log.warning("calculations curve failed", []);
 
   // 4. CalculationsSushiSwap
   let calculationsSushiSwapPrice = getTokenPriceFromSushiSwap(
@@ -75,7 +69,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   // 5. Curve Router
-  log.warning("trying with curve router...", []);
   let curvePrice = getCurvePriceUsdc(tokenAddr, network);
   if (!curvePrice.reverted) {
     log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
@@ -84,10 +77,8 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return curvePrice;
   }
-  log.warning("curve router failed", []);
 
   // 6. Uniswap Router
-  log.warning("trying with uniswap router...", []);
   let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
   if (!uniswapPrice.reverted) {
     log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
@@ -96,10 +87,8 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return uniswapPrice;
   }
-  log.warning("uniswap router failed", []);
 
   // 7. SushiSwap Router
-  log.warning("trying with sushi swap router...", []);
   let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
   if (!sushiswapPrice.reverted) {
     log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
@@ -108,11 +97,9 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return sushiswapPrice;
   }
-  log.warning("sushi swap router failed", []);
 
   // 6. Quickswap Router
-  log.warning("trying with quickswap router...", []);
-  let quickswapPrice = getPriceUsdcUniswap(tokenAddr, network);
+  let quickswapPrice = getPriceUsdcQuickswap(tokenAddr, network);
   if (!quickswapPrice.reverted) {
     log.warning("[QuickswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
@@ -120,7 +107,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return quickswapPrice;
   }
-  log.warning("quickswap router failed", []);
 
   log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
     tokenAddr.toHexString(),

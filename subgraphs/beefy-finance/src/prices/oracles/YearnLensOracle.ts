@@ -1,7 +1,7 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
-import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { YearnLensContract } from "../../../generated/aave-aave-eol/YearnLensContract";
 
 export function getYearnLensContract(network: string): YearnLensContract {
