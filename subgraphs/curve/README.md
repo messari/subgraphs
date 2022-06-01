@@ -70,6 +70,7 @@ Extra Rewards:
 - Curve gauge rewards are technically allocated for pools across all chains that Curve is deployed on. Unfortunately, this allocation data based on pool type is only available on ethereum mainnet. Gauge rewards data for Curve on alternate chains will need to be manually integrated at another stage of the data ETL pipeline.
 
 - Some withdraw events do not have the amount of pool input tokens removed, as it is impossible to get that information without access to transaction trace
+
 ## Smart Contracts Interactions
 
 ![Curve](../../docs/images/protocols/curve.png "Curve")

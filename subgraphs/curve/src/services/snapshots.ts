@@ -23,6 +23,7 @@ import { getBalancerLpPriceUSD, isBalancerToken } from "../common/prices/balance
 import { getCtokenPriceUSD, isCtoken } from "../common/prices/compound";
 import { getIearnPriceUSD, getYearnTokenV2PriceUSD, isIearnToken, isYearnTokenV2 } from "../common/prices/yearn";
 import { getAtokenPriceUSD, isAtoken } from "../common/prices/aave";
+import { getIdleTokenPriceUSD, isIdleToken } from "../common/prices/idle";
 
 function isKp3rToken(tokenAddr: Address): boolean {
   if (tokenAddr.equals(RKP3R_ADDRESS)) {
@@ -84,6 +85,9 @@ export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, for
   }
   if (isYearnTokenV2(tokenAddr)) {
     return getYearnTokenV2PriceUSD(tokenAddr, timestamp);
+  }
+  if (isIdleToken(tokenAddr)){
+    return getIdleTokenPriceUSD(tokenAddr,timestamp);
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
   let priceUSD = BIGDECIMAL_ZERO;
@@ -180,7 +184,6 @@ export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigD
 export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): string {
   return tokenAddr.toHexString() + "-" + timestamp.div(BigInt.fromI32(SNAPSHOT_SECONDS)).toString();
 }
-
 
 export function getTokenPrice(token: Address, pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   if (!pool.isV2) {

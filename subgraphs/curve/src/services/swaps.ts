@@ -32,7 +32,7 @@ export function handleExchange(
   event: ethereum.Event,
   exchangeUnderlying: boolean,
 ): void {
-  log.error('handleExchange at {}',[event.transaction.hash.toHexString()])
+  log.error("handleExchange at {}", [event.transaction.hash.toHexString()]);
   const pool = LiquidityPool.load(address.toHexString());
   const txhash = event.transaction.hash.toHexString();
   if (!pool) {
@@ -61,7 +61,11 @@ export function handleExchange(
       return;
     }
     tokenSold = basePool.coins[underlyingSoldIndex];
-    if ((pool.assetType == 2 || pool.assetType == 0) && (pool.poolType == STABLE_FACTORY || pool.poolType == METAPOOL_FACTORY) && boughtId == 0) {
+    if (
+      (pool.assetType == 2 || pool.assetType == 0) &&
+      (pool.poolType == STABLE_FACTORY || pool.poolType == METAPOOL_FACTORY) &&
+      boughtId == 0
+    ) {
       // handling an edge-case in the way the dx is logged in the event
       // for BTC metapools and for USD Metapool from factory v1.2
       tokenSoldDecimals = BigInt.fromI32(18);
@@ -153,7 +157,7 @@ export function handleExchange(
   let dailyVolumeByTokenUSD = dailySnapshot.dailyVolumeByTokenUSD;
   const protocol = getOrCreateDexAmm();
 
-  let inputTokenBalances = pool.inputTokenBalances;
+  //let inputTokenBalances = pool.inputTokenBalances;
 
   if (addTokenSoldAmt) {
     const soldIndex = pool.inputTokens.indexOf(tokenSold.toString());
@@ -161,7 +165,7 @@ export function handleExchange(
     dailyVolumeByTokenAmount[soldIndex] = dailyVolumeByTokenAmount[soldIndex].plus(tokens_sold);
     hourlyVolumeByTokenUSD[soldIndex] = hourlyVolumeByTokenUSD[soldIndex].plus(amountSoldUSD);
     dailyVolumeByTokenUSD[soldIndex] = dailyVolumeByTokenUSD[soldIndex].plus(amountSoldUSD);
-    inputTokenBalances[soldIndex] = inputTokenBalances[soldIndex].plus(tokens_sold);
+    //inputTokenBalances[soldIndex] = inputTokenBalances[soldIndex].plus(tokens_sold);
   }
   if (addTokenBoughtAmt) {
     const boughtIndex = pool.inputTokens.indexOf(tokenBought.toString());
@@ -169,7 +173,7 @@ export function handleExchange(
     dailyVolumeByTokenAmount[boughtIndex] = dailyVolumeByTokenAmount[boughtIndex].plus(tokens_bought);
     hourlyVolumeByTokenUSD[boughtIndex] = hourlyVolumeByTokenUSD[boughtIndex].plus(amountBoughtUSD);
     dailyVolumeByTokenUSD[boughtIndex] = dailyVolumeByTokenUSD[boughtIndex].plus(amountBoughtUSD);
-    inputTokenBalances[boughtIndex] = inputTokenBalances[boughtIndex].minus(tokens_bought);
+    //inputTokenBalances[boughtIndex] = inputTokenBalances[boughtIndex].minus(tokens_bought);
   }
 
   hourlySnapshot.hourlyVolumeUSD = hourlySnapshot.hourlyVolumeUSD.plus(volumeUSD);
@@ -183,7 +187,7 @@ export function handleExchange(
   financialSnapshot.dailyVolumeUSD = financialSnapshot.dailyVolumeUSD.plus(volumeUSD);
 
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(volumeUSD);
-  pool.inputTokenBalances = inputTokenBalances;
+  //pool.inputTokenBalances = inputTokenBalances;
 
   pool.save();
   hourlySnapshot.save();

@@ -21,16 +21,14 @@ import { LiquidityGaugeDeployed } from "../generated/templates/CryptoFactoryTemp
 import { ZERO_ADDRESS } from "./common/constants";
 import { handleLiquidityEvent, handleLiquidityRemoveOne } from "./services/liquidity";
 
-export function addCryptoRegistryPool(pool: Address,
-                                      registry: Address,
-                                      block: BigInt,
-                                      timestamp: BigInt,
-                                      hash: Bytes): void {
-
-  log.debug('New V2 factory crypto pool {} deployed at {}', [
-    pool.toHexString(),
-    hash.toHexString(),
-  ])
+export function addCryptoRegistryPool(
+  pool: Address,
+  registry: Address,
+  block: BigInt,
+  timestamp: BigInt,
+  hash: Bytes,
+): void {
+  log.debug("New V2 factory crypto pool {} deployed at {}", [pool.toHexString(), hash.toHexString()]);
   let cryptoRegistry = CryptoRegistry.bind(registry);
   let gauge = ADDRESS_ZERO;
   let gaugeCall = cryptoRegistry.try_get_gauges(pool);
@@ -38,8 +36,8 @@ export function addCryptoRegistryPool(pool: Address,
     gauge = gaugeCall.value.value0[0];
   }
   // Useless for now, but v2 metapools may be a thing at some point
-  const testMetaPool = MetaPool.bind(pool)
-  const testMetaPoolResult = testMetaPool.try_base_pool()
+  const testMetaPool = MetaPool.bind(pool);
+  const testMetaPoolResult = testMetaPool.try_base_pool();
   if (!testMetaPoolResult.reverted) {
     createNewRegistryPool(
       pool,
@@ -81,8 +79,8 @@ export function handleCryptoPoolAdded(event: PoolAdded): void {
     event.address,
     event.block.number,
     event.block.timestamp,
-    event.transaction.hash
-  )
+    event.transaction.hash,
+  );
 }
 
 export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
@@ -118,7 +116,14 @@ export function handleTokenExchangeV2(event: TokenExchange): void {
 export function handleAddLiquidityV2(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString());
 
-  handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
+  handleLiquidityEvent(
+    "deposit",
+    pool,
+    event.params.token_supply,
+    event.params.token_amounts,
+    event.params.provider,
+    event,
+  );
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -128,7 +133,14 @@ export function handleAddLiquidityV2(event: AddLiquidity): void {
 export function handleRemoveLiquidityV2(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString());
 
-  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
+  handleLiquidityEvent(
+    "withdraw",
+    pool,
+    event.params.token_supply,
+    event.params.token_amounts,
+    event.params.provider,
+    event,
+  );
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -138,7 +150,7 @@ export function handleRemoveLiquidityV2(event: RemoveLiquidity): void {
 export function handleRemoveLiquidityOneV2(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString());
 
-  handleLiquidityRemoveOne(pool,event.params.token_supply,event.params.token_amount,event.params.provider,event);
+  handleLiquidityRemoveOne(pool, event.params.token_supply, event.params.token_amount, event.params.provider, event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
