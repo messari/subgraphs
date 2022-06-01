@@ -1,7 +1,8 @@
 const fs = require("fs");
 const writeYamlFile = require("write-yaml-file");
 const ethers = require("ethers");
-const vaults = require("./vaults");
+const { vaults } = require("./vaults");
+const { providers } = require("./publicRpcs");
 const vaultAbi = require("../abis/BeefyVault.json");
 require("dotenv").config();
 
@@ -11,11 +12,11 @@ let constants = {};
 let monitoredVaults = [];
 
 // STEP 1: Build the subgraph.yaml file
-function createDataSource(contractName, contractAddress, startBlock) {
+function createDataSource(contractName, contractAddress, network, startBlock) {
   let dataSource = {
     kind: "ethereum",
     name: contractName,
-    network: "matic",
+    network: network,
     source: {
       address: contractAddress,
       abi: "BeefyStrategy",
@@ -120,13 +121,6 @@ function createDataSource(contractName, contractAddress, startBlock) {
 
 async function bootstrap() {
   //setup provider to get contract addresses
-  const provider = new ethers.providers.JsonRpcProvider(
-    process.env.ALCHEMY_POLYGON
-  );
-  const signer = new ethers.Wallet(
-    process.env.TEST_PRIVATE_KEY || "",
-    provider
-  );
 
   let subgraphYamlDoc = {
     specVersion: "0.0.5",
@@ -136,26 +130,48 @@ async function bootstrap() {
     dataSources: [],
   };
   //loop through all the pools and get the strategy addresses
-  let contract, strategyAddress, vaultName, startBlock;
-  //const minStartBlock = 0;
-  //const currentBlock = await provider.getBlockNumber();
+  let provider,
+    signer,
+    contract,
+    network,
+    strategyAddress,
+    vaultName,
+    startBlock;
+  for (let i = 0; i < vaults.length; i++) {
+    network = vaults[i].network;
+    provider = new ethers.providers.JsonRpcProvider(providers[0][network]);
+    signer = new ethers.Wallet(process.env.TEST_PRIVATE_KEY || "", provider);
 
-  for (let i = 0; i < vaults.polygonPools.length; i++) {
     contract = new ethers.Contract(
-      vaults.polygonPools[i].earnContractAddress,
+      vaults[i].earnContractAddress,
       vaultAbi,
       signer
     );
-    strategyAddress = await contract.strategy();
-    vaultName = vaults.polygonPools[i].id;
-    startBlock = 19500000;
+    strategyAddress = vaults[i].strategyAddress;
+    vaultName = vaults[i].id;
+
+    if (contract.deployTransaction) {
+      startBlock = contract.deployTransaction.blockNumber;
+      if (!startBlock) {
+        startBlock = 1;
+      }
+    } else {
+      startBlock = 1;
+    }
+
     console.log(
-      "Adding " + vaultName + "with starting block " + startBlock + "..."
+      "Adding " +
+        vaultName +
+        " on " +
+        network +
+        "with starting block " +
+        startBlock +
+        "..."
     );
 
     // Add the datasource
     subgraphYamlDoc["dataSources"].push(
-      createDataSource(vaultName, strategyAddress, startBlock, true)
+      createDataSource(vaultName, strategyAddress, network, startBlock)
     );
 
     //add the strategy address to the list of monitored contracts
