@@ -21,7 +21,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
       lpTokenAddress = getlpAddress.value.toHexString();
     }
     masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = BIGINT_ZERO;
+    masterChefPool.valueBigInt = event.block.number;
     masterChefPool.save();
   }
 
@@ -39,7 +39,7 @@ export function handleRewardV2(event: ethereum.Event, pid: BigInt, amount: BigIn
   }
 
   // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
+  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(RECENT_BLOCK_THRESHOLD)) {
     pool.save();
     return;
   }

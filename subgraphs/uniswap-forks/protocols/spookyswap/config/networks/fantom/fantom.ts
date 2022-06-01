@@ -59,16 +59,11 @@ export class SpookyswapFantomConfigurations implements Configurations {
   getWhitelistTokens(): string[] {
     return [
       "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83", // WFTM
-      "0x841fad6eae12c286d1fd18d1d525dffa75c7effe", // BOO
-      "0xa48d959AE2E88f1dAA7D5F611E01908106dE7598", // xBOO
       "0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E", // DAI
       "0x04068DA6C83AFCFA0e13ba15A6696662335D5B75", // USDC
       "0x049d68029688eabf473097a2fc38ef61633a3c7a", // fUSDT
-      "0x321162Cd933E2Be498Cd2267a90534A804051b11", // WBTC
-      "0xD67de0e0a0Fd7b15dC8348Bb9BE742F3c5850454", // BNB
       "0x74b23882a30290451A17c44f4F05243b6b58C76d", // WETH
-      "0x657A1861c15A3deD9AF0B6799a195a249ebdCbc6", // CREAM
-      "0xB01E8419d842beebf1b70A7b5f7142abbaf7159D", // COVER
+      "0x321162Cd933E2Be498Cd2267a90534A804051b11" // WBTC
     ];
   }
   getStableCoins(): string[] {

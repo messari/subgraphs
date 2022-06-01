@@ -20,7 +20,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
       lpTokenAddress = poolInfo.value.value1.toHexString();
     }
     masterChefPool.valueString = lpTokenAddress;
-    masterChefPool.valueBigInt = BIGINT_ZERO;
+    masterChefPool.valueBigInt = event.block.number;
     masterChefPool.save();
   }
 
@@ -38,7 +38,7 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
   }
 
   // Return if you have calculated rewards recently
-  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(BIGINT_FIVE)) {
+  if (event.block.number.minus(masterChefPool.valueBigInt!).lt(RECENT_BLOCK_THRESHOLD)) {
     pool.save();
     return;
   }
@@ -59,20 +59,12 @@ export function handleReward(event: ethereum.Event, pid: BigInt, amount: BigInt,
     rewardTokenPerSecond = getRewardTokenPerSecond.value;
   }
 
-  let getMultiplier = poolContract.try_getMultiplier(lastRewardBlock, event.block.timestamp);
-
-  let multiplier: BigInt = BIGINT_ONE;
-  if (!getMultiplier.reverted) {
-    multiplier = getMultiplier.value;
-  }
-
   let getTotalAllocPoint = poolContract.try_totalAllocPoint();
   let totalAllocPoint: BigInt = BIGINT_ZERO;
   if (!getTotalAllocPoint.reverted) {
     totalAllocPoint = getTotalAllocPoint.value;
   }
 
-  log.warning("multiplier: " + multiplier.toString(), []);
   log.warning("rewardTokenPerSecond: " + rewardTokenPerSecond.toString(), []);
   log.warning("poolAllocPoint: " + poolAllocPoint.toString(), []);
   log.warning("totalAllocPoint: " + totalAllocPoint.toString(), []);
