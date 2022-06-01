@@ -4,7 +4,12 @@ import {
   DepositCall,
   WithdrawCall,
 } from "../../generated/vaUSDC_prod_RL4/PoolV3";
-import { isStrategy, calculateRevenue, getDecimalDivisor } from "../peer";
+import {
+  isStrategy,
+  calculateRevenue,
+  getDecimalDivisor,
+  withdrawRevenueCalc,
+} from "../peer";
 
 import {
   getOrCreateVault,
@@ -28,9 +33,21 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     return;
   }
 
+  const revenue = withdrawRevenueCalc(
+    dataSource.address(),
+    call.to,
+    call.inputs._shares
+  );
+
   updateVaultRewardEmission(dataSource.address());
   getOrCreateWithdraw(call, dataSource.address());
-  updateAllSnapshots(1, call, dataSource.address());
+  updateAllSnapshots(
+    1,
+    call,
+    dataSource.address(),
+    revenue.protocolUsd,
+    revenue.supplyUsd
+  );
 }
 
 export function handleDepositV3(call: DepositCall): void {
@@ -69,11 +86,5 @@ export function handleDepositV3(call: DepositCall): void {
     ]
   );
 
-  updateAllSnapshots(
-    2,
-    call,
-    dataSource.address(),
-    revenue.protocolRevenueUsd,
-    revenue.supplySideRevenueUsd
-  );
+  updateAllSnapshots(2, call, dataSource.address());
 }

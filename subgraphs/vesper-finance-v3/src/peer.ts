@@ -240,6 +240,14 @@ export class WithdrawRevenue {
     this.supplyUsd = this.yieldUsd
       .minus(this.withdrawAmountCompUsd)
       .minus(this.yieldCompUsd);
+
+    if (this.protocolUsd.lt(BigDecimal.zero())) {
+      this.protocolUsd = BigDecimal.zero();
+    }
+
+    if (this.supplyUsd.lt(BigDecimal.zero())) {
+      this.supplyUsd = BigDecimal.zero();
+    }
   }
 }
 
