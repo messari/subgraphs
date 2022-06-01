@@ -27,17 +27,18 @@ import { getUsdPrice } from "../prices";
 
 let altPoolsInit = false;
 
-export function initAltPoolTemplates(): void {
+export function initAltPoolTemplates(event: ethereum.Event): void {
   // Start watching the LiquidityPools
   // Note: I have no idea what happens if I create a dynamic datasource
   // that clashes with an exisiting datasource
   if (!altPoolsInit) {
     altPoolsInit = true;
-    poolDetail.getAltPoolAddressArray().forEach(addr => {
-      const poolAddress = Address.fromString(addr);
-      getOrCreateLiquidityPool(poolAddress);
+    let altArray = poolDetail.getAltPoolAddressArray();
+    for (let i = 0; i < altArray.length; i++) {
+      let poolAddress = Address.fromString(altArray[i]);
+      getOrCreateLiquidityPool(poolAddress, event);
       PoolTemplate.create(poolAddress);
-    });
+    }
   }
 }
 
@@ -89,7 +90,7 @@ export function getOrCreateLiquidityPoolParamsHelper(poolAddress: Address): _Liq
   return poolParam;
 }
 
-export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
+export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.Event): LiquidityPool {
   let _address = poolAddress.toHexString();
   let pool = LiquidityPool.load(_address);
   // fetch info if null
@@ -106,10 +107,11 @@ export function getOrCreateLiquidityPool(poolAddress: Address): LiquidityPool {
     pool._assets = new Array<string>();
     pool.inputTokens = new Array<string>();
     pool.inputTokenBalances = new Array<BigInt>();
-
+    pool.createdBlockNumber = event.block.number;
+    pool.createdTimestamp = event.block.timestamp;
     pool.save();
 
-    initAltPoolTemplates();
+    initAltPoolTemplates(event);
 
     let protocol = getOrCreateDexAmm();
     let _pools: string[] = protocol.pools;
@@ -161,7 +163,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
   let id: string = poolAddress.concat("-").concat(timestamp.toString());
 
   let poolDailyMetrics = LiquidityPoolDailySnapshot.load(id);
-  let pool = getOrCreateLiquidityPool(Address.fromString(poolAddress));
+  let pool = getOrCreateLiquidityPool(Address.fromString(poolAddress), event);
 
   if (!poolDailyMetrics) {
     poolDailyMetrics = new LiquidityPoolDailySnapshot(id);
@@ -215,7 +217,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
 
   let poolHourlyMetrics = LiquidityPoolHourlySnapshot.load(id);
 
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
   if (!poolHourlyMetrics) {
     poolHourlyMetrics = new LiquidityPoolHourlySnapshot(id);
     poolHourlyMetrics.protocol = PROTOCOL_ADMIN;

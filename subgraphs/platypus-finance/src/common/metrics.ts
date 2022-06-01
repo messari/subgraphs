@@ -23,7 +23,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
   // loop through each pool and update total value locked in USD for protocol and each pool
   for (let i = 0; i < protocol.pools.length; i++) {
     let poolLockedValue = BIGDECIMAL_ZERO;
-    let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]));
+    let pool = getOrCreateLiquidityPool(Address.fromString(protocol.pools[i]), event);
     let inputTokenBalances = pool.inputTokenBalances;
 
     log.debug("[UpdateTVL][{}] get pool {} {}", [
@@ -188,7 +188,7 @@ export function updateUsageMetrics(event: ethereum.Event, user: Address, transac
 
 function updateHourlyPoolMetrics(event: ethereum.Event): void {
   let snapshot = getOrCreateLiquidityPoolHourlySnapshot(event);
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
 
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -210,7 +210,7 @@ function updateHourlyPoolMetrics(event: ethereum.Event): void {
 
 function updateDailyPoolMetrics(event: ethereum.Event): void {
   let snapshot = getOrCreateLiquidityPoolDailySnapshot(event);
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
 
   snapshot.blockNumber = event.block.number;
   snapshot.timestamp = event.block.timestamp;
@@ -255,7 +255,7 @@ export function calculateSwapFeeInUsd(event: ethereum.Event, poolAddress: Addres
 function updateCumulativeSwapVolume(event: ethereum.Event, swap: Swap): void {
   let swapVolumeUsd = calculateSwapVolume(swap);
 
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(swapVolumeUsd);
   pool.save();
 

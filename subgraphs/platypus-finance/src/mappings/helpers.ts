@@ -42,7 +42,7 @@ export function createAsset(
 ): void {
   let asset = getOrCreateAsset(event, poolAddress, tokenAddress, assetAddress);
   const token = getOrCreateToken(event, tokenAddress);
-  const pool = getOrCreateLiquidityPool(poolAddress);
+  const pool = getOrCreateLiquidityPool(poolAddress, event);
 
   let assets: string[] = pool._assets;
   let inputTokens: string[] = pool.inputTokens;
@@ -85,7 +85,7 @@ export function createDeposit(
   let deposit = new Deposit(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
   let inputToken = getOrCreateToken(event, inputTokenAddress);
 
   deposit.hash = event.transaction.hash.toHexString();
@@ -117,7 +117,7 @@ export function createWithdraw(
   let withdraw = new Withdraw(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
   let inputToken = getOrCreateToken(event, inputTokenAddress);
 
   withdraw.hash = event.transaction.hash.toHexString();
@@ -150,7 +150,7 @@ export function createSwap(
   let swap = new Swap(event.transaction.hash.toHexString().concat("-").concat(event.logIndex.toString()));
 
   let protocol = getOrCreateDexAmm();
-  let pool = getOrCreateLiquidityPool(event.address);
+  let pool = getOrCreateLiquidityPool(event.address, event);
   let inputToken = getOrCreateToken(event, inputTokenAddress);
   let outputToken = getOrCreateToken(event, outputTokenAddress);
 

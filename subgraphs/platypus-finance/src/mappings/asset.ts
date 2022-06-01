@@ -1,7 +1,7 @@
 // Asset is the LP token for each Token that is added to a pool
 
 import { Transfer, MaxSupplyUpdated, PoolUpdated, CashAdded, CashRemoved } from "../../generated/templates/Asset/Asset";
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { LiquidityPoolDailySnapshot, LiquidityPoolHourlySnapshot, _Asset } from "../../generated/schema";
 import { updatePoolMetrics, updateProtocolTVL } from "../common/metrics";
 import { getOrCreateLiquidityPool, getOrCreateLiquidityPoolDailySnapshot } from "../common/getters";
@@ -21,12 +21,6 @@ export function handleCashRemoved(event: CashRemoved): void {
   updateProtocolTVL(event);
 }
 
-export function handleTransfer(event: Transfer): void {
-  // noop
-}
-export function handleMaxSupplyUpdated(event: MaxSupplyUpdated): void {
-  // noop
-}
 
 function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
   let retval = new Array<T>(x.length - 1);
@@ -67,7 +61,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   ]);
 
   let _asset = _Asset.load(event.address.toHexString())!;
-  let oldPool = getOrCreateLiquidityPool(Address.fromString(_asset.pool));
+  let oldPool = getOrCreateLiquidityPool(Address.fromString(_asset.pool), event);
 
   log.debug("[ChangePool] oldPool oldAssets {} OldInputTokens {} OldBalances {}", [
     oldPool._assets.toString(),
@@ -94,7 +88,7 @@ export function handlePoolUpdated(event: PoolUpdated): void {
     oldPool.inputTokenBalances.toString(),
   ]);
 
-  let newPool = getOrCreateLiquidityPool(event.params.newPool);
+  let newPool = getOrCreateLiquidityPool(event.params.newPool, event);
   let newPoolUpdatedAssets = newPool._assets;
   let newPoolUpdatedInputTokens = newPool.inputTokens;
 
