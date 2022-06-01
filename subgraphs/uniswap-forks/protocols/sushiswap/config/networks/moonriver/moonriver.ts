@@ -59,14 +59,12 @@ export class SushiswapMoonriverConfigurations implements Configurations {
   }
   getWhitelistTokens(): string[] {
     return toLowerCaseList([
-      "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c",
-      "0xf50225a84382c74cbdea10b0c176f71fc3de0c4d",
-      "0xe6a991ffa8cfe62b0bf6bf72959a3d4f11b2e0f5",
-      "0x1a93b23281cc1cde4c4741353f3064709a16197d",
-      "0xb44a9b6905af7c801311e8f4e76932ee959c663c",
-      "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d",
-      "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844",
-      "0x0cae51e1032e8461f4806e26332c030e34de3adb"
+      "0x639a647fbe20b6c8ac19e48e2de44ea792c62c5c", // wETH
+      "0xf50225a84382c74cbdea10b0c176f71fc3de0c4d", // wMOVR
+      "0xe6a991ffa8cfe62b0bf6bf72959a3d4f11b2e0f5", // wBTC
+      "0xb44a9b6905af7c801311e8f4e76932ee959c663c", // USDT
+      "0xe3f5a90f9cb311505cd691a46596599aa1a0ad7d", // USDC
+      "0x80a16016cc4a2e6a2caca8a4a498b1699ff0f844", // DAI
     ]);
   }
   getStableCoins(): string[] {
