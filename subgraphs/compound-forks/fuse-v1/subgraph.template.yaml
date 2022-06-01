@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: FusePoolDirectory
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0x835482FE0532f169024d5E9410199369aAD5C77E"
+      address: "{{ fusePoolDirectoryAddress }}"
       abi: FusePoolDirectory
-      startBlock: 12060007
+      startBlock: {{ startBlock}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -20,12 +20,6 @@ dataSources:
           file: ./abis/fuse/FusePoolDirectory.json
         - name: Comptroller
           file: ../abis/Comptroller.json
-        # - name: AccessControlledAggregator
-        #   file: ./abis/AccessControlledAggregator.json
-        # - name: PriceOracle
-        #   file: ./abis/Oracles/PriceOracle.json
-        # - name: EthBalance
-        #   file: ./abis/EthBalance.json
       eventHandlers:
         - event: PoolRegistered(uint256,(string,address,address,uint256,uint256))
           handler: handlePoolRegistered
@@ -33,7 +27,7 @@ dataSources:
 templates:
   - name: Comptroller
     kind: ethereum/contract
-    network: mainnet
+    network: {{ network }}
     source:
       abi: Comptroller
     mapping:
@@ -67,7 +61,7 @@ templates:
           handler: handleActionPaused
   - name: CToken
     kind: ethereum/contract
-    network: mainnet
+    network: {{ network }}
     source:
       abi: CToken
     mapping:
@@ -124,10 +118,6 @@ templates:
           file: ./abis/Prices/SushiSwap/Pair.json
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
-        # - name: AccessControlledAggregator
-        #   file: ./abis/AccessControlledAggregator.json
-        # - name: EthBalance
-        #   file: ./abis/EthBalance.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint
@@ -147,5 +137,3 @@ templates:
           handler: handleNewFuseFee
         - event: NewAdminFee(uint256,uint256)
           handler: handleNewAdminFee
-        # - event: NewComptroller(address,address)
-        #   handler: handleNewComptroller

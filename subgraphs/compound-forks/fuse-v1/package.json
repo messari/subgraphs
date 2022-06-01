@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:arbitrum": "YARN_SILENT=1 yarn mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:mainnet": "graph deploy --studio fuse-v1",
+    "deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ dmelotik/fuse-v1"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0"
+  }
+}

@@ -251,13 +251,6 @@ export function _handleActionPaused(event: ActionPaused1): void {
     return;
   }
 
-  // TODO: remove
-  log.warning("[handleActionPaused] action: {} state: {} market: {}", [
-    event.params.action,
-    event.params.pauseState.toString(),
-    marketID,
-  ]);
-
   if (event.params.action == "Mint") {
     market.isActive = event.params.pauseState;
   } else if (event.params.action == "Borrow") {

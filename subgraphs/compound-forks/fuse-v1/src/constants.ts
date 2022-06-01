@@ -20,7 +20,7 @@ export const CDAI_ADDRESS = "0x03b6bff9a13adcbff10facc473c6ab2036a2412b"; // cTo
 //// Protocol Specific ////
 ///////////////////////////
 
-export const NETWORK_ETHEREUM = Network.MAINNET;
+export const PROTOCOL_NETWORK = ;
 export const PROTOCOL_NAME = "Fuse";
 export const PROTOCOL_SLUG = "fuse";
 export const SUBGRAPH_VERSION = "1.0.7";

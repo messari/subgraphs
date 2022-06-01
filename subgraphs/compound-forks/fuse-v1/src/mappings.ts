@@ -40,8 +40,8 @@ import {
   ETH_SYMBOL,
   FACTORY_CONTRACT,
   METHODOLOGY_VERSION,
-  NETWORK_ETHEREUM,
   PROTOCOL_NAME,
+  PROTOCOL_NETWORK,
   PROTOCOL_SLUG,
   SCHEMA_VERSION,
   SUBGRAPH_VERSION,
@@ -127,7 +127,7 @@ export function handlePoolRegistered(event: PoolRegistered): void {
     SCHEMA_VERSION,
     SUBGRAPH_VERSION,
     METHODOLOGY_VERSION,
-    NETWORK_ETHEREUM,
+    PROTOCOL_NETWORK,
     troller.try_liquidationIncentiveMantissa(),
     troller.try_oracle()
   );
@@ -429,9 +429,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 }
 
 export function handleNewFuseFee(event: NewFuseFee): void {
-  // TODO: remove
-  log.warning("new fuse fee: {}", [event.params.newFuseFeeMantissa.toString()]);
-
   updateOrCreateRariFee(
     event.params.newFuseFeeMantissa,
     RariFee.FUSE_FEE,
@@ -440,11 +437,6 @@ export function handleNewFuseFee(event: NewFuseFee): void {
 }
 
 export function handleNewAdminFee(event: NewAdminFee): void {
-  // TODO: remove
-  log.warning("new admin fee: {}", [
-    event.params.newAdminFeeMantissa.toString(),
-  ]);
-
   updateOrCreateRariFee(
     event.params.newAdminFeeMantissa,
     RariFee.ADMIN_FEE,
