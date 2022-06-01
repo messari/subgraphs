@@ -25,7 +25,11 @@ interface SubgraphDeploymentsProps extends BoxProps {
 }
 
 // This component is the container for all different subgraphs of a protocol (the container for the different networks)
-export const SubgraphDeployments = ({ protocol: { name, deploymentMap }, clientIndexing, ...rest }: SubgraphDeploymentsProps) => {
+export const SubgraphDeployments = ({
+  protocol: { name, deploymentMap },
+  clientIndexing,
+  ...rest
+}: SubgraphDeploymentsProps) => {
   const deployments = useMemo(
     () =>
       Object.entries(deploymentMap).map(([network, deployment]) => ({
@@ -44,7 +48,15 @@ export const SubgraphDeployments = ({ protocol: { name, deploymentMap }, clientI
       <LazyLoad height={260} offset={80}>
         <DeploymentContainer>
           {deployments.map(({ network, deployment }) => {
-            return <Deployment key={network} clientIndexing={clientIndexing} subgraphID={name} networkName={network} deployment={deployment} />
+            return (
+              <Deployment
+                key={network}
+                clientIndexing={clientIndexing}
+                subgraphID={name}
+                networkName={network}
+                deployment={deployment}
+              />
+            );
           })}
         </DeploymentContainer>
       </LazyLoad>

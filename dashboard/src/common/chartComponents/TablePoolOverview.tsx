@@ -8,16 +8,23 @@ interface TableChartProps {
   protocolType: string;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
-  skipAmt: number
+  skipAmt: number;
 }
 
 const tableCellTruncate: any = {
   whiteSpace: "nowrap",
   overflow: "hidden",
-  textOverflow: "ellipsis"
-}
+  textOverflow: "ellipsis",
+};
 
-export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handleTabChange, setPoolId, skipAmt }: TableChartProps) => {
+export const TablePoolOverview = ({
+  datasetLabel,
+  dataTable,
+  protocolType,
+  handleTabChange,
+  setPoolId,
+  skipAmt,
+}: TableChartProps) => {
   const navigate = useNavigate();
   if (dataTable) {
     const optionalFields = [];
@@ -33,12 +40,10 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         width: 150,
         renderCell: (params: any) => {
           return (
-            <Tooltip title={params.value} >
-              <span style={tableCellTruncate}>
-                {params.value}
-              </span>
+            <Tooltip title={params.value}>
+              <span style={tableCellTruncate}>{params.value}</span>
             </Tooltip>
-          )
+          );
         },
       });
       baseFieldCol = true;
@@ -52,15 +57,16 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         renderCell: (params: any) => {
           let nameStr = params.value;
           if (nameStr.length > 16) {
-            nameStr = `${params.value.slice(0, 7)}...${params.value.slice((params.value.length - 8), params.value.length)}`;
+            nameStr = `${params.value.slice(0, 7)}...${params.value.slice(
+              params.value.length - 8,
+              params.value.length,
+            )}`;
           }
           return (
-            <Tooltip title={params.value} >
-              <span style={tableCellTruncate} >
-                {nameStr}
-              </span>
+            <Tooltip title={params.value}>
+              <span style={tableCellTruncate}>{nameStr}</span>
             </Tooltip>
-          )
+          );
         },
       },
       {
@@ -70,15 +76,21 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         renderCell: (params: any) => {
           let poolIdStr = params.value;
           if (poolIdStr.length > 20) {
-            poolIdStr = `${params.value.slice(0, 10)}...${params.value.slice((params.value.length - 15), params.value.length)}`;
+            poolIdStr = `${params.value.slice(0, 10)}...${params.value.slice(
+              params.value.length - 15,
+              params.value.length,
+            )}`;
           }
           return (
-            <Tooltip title={params.value} >
-              <span onClick={() => (window.location.href = "https://etherscan.io/address/" + params.value)} style={tableCellTruncate}>
+            <Tooltip title={params.value}>
+              <span
+                onClick={() => (window.location.href = "https://etherscan.io/address/" + params.value)}
+                style={tableCellTruncate}
+              >
                 {poolIdStr}
               </span>
             </Tooltip>
-          )
+          );
         },
       },
       {
@@ -88,15 +100,16 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         renderCell: (params: any) => {
           let inputTokenStr = params.value;
           if (inputTokenStr.length > 18) {
-            inputTokenStr = `${params.value.slice(0, 8)}...${params.value.slice((params.value.length - 8), params.value.length)}`;
+            inputTokenStr = `${params.value.slice(0, 8)}...${params.value.slice(
+              params.value.length - 8,
+              params.value.length,
+            )}`;
           }
           return (
-            <Tooltip title={params.value} >
-              <span style={tableCellTruncate} >
-                {inputTokenStr}
-              </span>
+            <Tooltip title={params.value}>
+              <span style={tableCellTruncate}>{inputTokenStr}</span>
             </Tooltip>
-          )
+          );
         },
       },
       {
@@ -105,12 +118,10 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         width: 160,
         renderCell: (params: any) => {
           return (
-            <Tooltip title={params.value} >
-              <span style={tableCellTruncate}>
-                {params.value}
-              </span>
+            <Tooltip title={params.value}>
+              <span style={tableCellTruncate}>{params.value}</span>
             </Tooltip>
-          )
+          );
         },
       },
       {
@@ -120,15 +131,16 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         renderCell: (params: any) => {
           let rewardTokenStr = params.value;
           if (rewardTokenStr.length > 18) {
-            rewardTokenStr = `${params.value.slice(0, 8)}...${params.value.slice((params.value.length - 8), params.value.length)}`;
+            rewardTokenStr = `${params.value.slice(0, 8)}...${params.value.slice(
+              params.value.length - 8,
+              params.value.length,
+            )}`;
           }
           return (
-            <Tooltip title={params.value} >
-              <span style={tableCellTruncate} >
-                {rewardTokenStr}
-              </span>
+            <Tooltip title={params.value}>
+              <span style={tableCellTruncate}>{rewardTokenStr}</span>
             </Tooltip>
-          )
+          );
         },
       },
       {
@@ -137,14 +149,12 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         width: 225,
         renderCell: (params: any) => {
           return (
-            <Tooltip title={params.value} >
-              <span style={tableCellTruncate}>
-                {params.value}
-              </span>
+            <Tooltip title={params.value}>
+              <span style={tableCellTruncate}>{params.value}</span>
             </Tooltip>
-          )
+          );
         },
-      }
+      },
     ];
     columns = columns.concat(optionalFields);
     const tableData = dataTable.map((pool: any, i: any) => {
@@ -159,9 +169,9 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
         name: pool.name,
         poolId: pool.id,
         inputToken: inputTokenSymbol,
-        tvl: '$' + Number(Number(pool.totalValueLockedUSD).toFixed(2)).toLocaleString(),
+        tvl: "$" + Number(Number(pool.totalValueLockedUSD).toFixed(2)).toLocaleString(),
         rewardAPY: "",
-        rewardTokens: ""
+        rewardTokens: "",
       };
       if (pool.rewardTokens?.length > 0) {
         const rewardTokenSymbol = pool.rewardTokens.map((tok: any) => {
@@ -172,7 +182,7 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
           }
           return "N/A";
         });
-        returnObj.rewardTokens = `[${rewardTokenSymbol.join(', ')}]`;
+        returnObj.rewardTokens = `[${rewardTokenSymbol.join(", ")}]`;
 
         const rewardAPYs = pool.rewardTokenEmissionsUSD.map((val: string, idx: number) => {
           let apr = 0;
@@ -190,15 +200,15 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
                 365;
             }
           }
-          return Number(apr).toFixed(5) + '%';
-        })
-        returnObj.rewardAPY = `[${rewardAPYs.join(', ')}]`;
+          return Number(apr).toFixed(5) + "%";
+        });
+        returnObj.rewardAPY = `[${rewardAPYs.join(", ")}]`;
       } else {
-        returnObj.rewardTokens = 'N/A';
-        returnObj.rewardAPY = 'N/A';
+        returnObj.rewardTokens = "N/A";
+        returnObj.rewardAPY = "N/A";
       }
       if (baseFieldCol) {
-        returnObj.baseYield = '%' + 0;
+        returnObj.baseYield = "%" + 0;
         if (Object.keys(pool?.fees)?.length > 0 && pool?.totalValueLockedUSD) {
           // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
           const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
@@ -213,7 +223,7 @@ export const TablePoolOverview = ({ datasetLabel, dataTable, protocolType, handl
           if (!value) {
             value = 0;
           }
-          returnObj.baseYield = '%' + value.toFixed(2);
+          returnObj.baseYield = "%" + value.toFixed(2);
         }
       }
       return returnObj;

@@ -53,6 +53,9 @@ export function handleRely(event: LogNote): void {
 
 export function handleCage(event: GemLogNote): void {
   let market = getMarket(event.address.toHexString());
+  if (!market){
+    return
+  }
   market.isActive = false;
   market.save();
 }
@@ -65,12 +68,16 @@ export function handleEvent(
   amountCollateralUSD: BigDecimal,
   amountDAI: BigInt,
 ): void {
+  if (!market.inputToken){
+    return
+  }
   let protocol = getOrCreateLendingProtocol();
   let usageMetricsHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
   let usageMetricsDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   if (eventType == "DEPOSIT") {
+
     let depositEvent = new Deposit("deposit-" + createEntityID(event));
-    let borrowEvent = new Borrow("borrow-" + createEntityID(event));
+    
     depositEvent.hash = event.transaction.hash.toHexString();
     depositEvent.logIndex = event.logIndex.toI32();
     depositEvent.protocol = protocol.id;
@@ -79,11 +86,20 @@ export function handleEvent(
     depositEvent.blockNumber = event.block.number;
     depositEvent.timestamp = event.block.timestamp;
     depositEvent.market = market.id;
-    depositEvent.asset = getOrCreateToken(Address.fromString(market.inputToken)).id;
+    depositEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
     depositEvent.amount = absValBigInt(amountCollateral);
     depositEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
+
     usageMetricsHourlySnapshot.hourlyDepositCount += 1;
     usageMetricsDailySnapshot.dailyDepositCount += 1;
+
+    depositEvent.save();
+    usageMetricsHourlySnapshot.save();
+    usageMetricsDailySnapshot.save();
+
+  } else if (eventType == "BORROW"){
+
+    let borrowEvent = new Borrow("borrow-" + createEntityID(event));
 
     borrowEvent.hash = event.transaction.hash.toHexString();
     borrowEvent.logIndex = event.logIndex.toI32();
@@ -96,16 +112,18 @@ export function handleEvent(
     borrowEvent.asset = DAI;
     borrowEvent.amount = absValBigInt(amountDAI);
     borrowEvent.amountUSD = bigIntToBigDecimal(absValBigInt(amountDAI), WAD);
+
     usageMetricsHourlySnapshot.hourlyBorrowCount += 1;
     usageMetricsDailySnapshot.dailyBorrowCount += 1;
 
-    depositEvent.save();
     borrowEvent.save();
     usageMetricsHourlySnapshot.save();
     usageMetricsDailySnapshot.save();
+
   } else if (eventType == "WITHDRAW") {
+
     let withdrawEvent = new Withdraw("withdraw-" + createEntityID(event));
-    let repayEvent = new Repay("repay-" + createEntityID(event));
+    
     withdrawEvent.hash = event.transaction.hash.toHexString();
     withdrawEvent.logIndex = event.logIndex.toI32();
     withdrawEvent.protocol = protocol.id;
@@ -114,11 +132,19 @@ export function handleEvent(
     withdrawEvent.blockNumber = event.block.number;
     withdrawEvent.timestamp = event.block.timestamp;
     withdrawEvent.market = market.id;
-    withdrawEvent.asset = getOrCreateToken(Address.fromString(market.inputToken)).id;
+    withdrawEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
     withdrawEvent.amount = absValBigInt(amountCollateral);
     withdrawEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     usageMetricsHourlySnapshot.hourlyWithdrawCount += 1;
     usageMetricsDailySnapshot.dailyWithdrawCount += 1;
+
+    withdrawEvent.save();
+    usageMetricsHourlySnapshot.save();
+    usageMetricsDailySnapshot.save();
+
+  } else if (eventType == "REPAY") {
+
+    let repayEvent = new Repay("repay-" + createEntityID(event));
 
     repayEvent.hash = event.transaction.hash.toHexString();
     repayEvent.logIndex = event.logIndex.toI32();
@@ -134,12 +160,14 @@ export function handleEvent(
     usageMetricsHourlySnapshot.hourlyRepayCount += 1;
     usageMetricsDailySnapshot.dailyRepayCount += 1;
 
-    withdrawEvent.save();
     repayEvent.save();
     usageMetricsHourlySnapshot.save();
     usageMetricsDailySnapshot.save();
+
   } else if (eventType == "LIQUIDATE") {
+
     let liquidateEvent = new Liquidate(createEntityID(event));
+
     liquidateEvent.hash = event.transaction.hash.toHexString();
     liquidateEvent.logIndex = event.logIndex.toI32();
     liquidateEvent.protocol = protocol.id;
@@ -148,12 +176,13 @@ export function handleEvent(
     liquidateEvent.blockNumber = event.block.number;
     liquidateEvent.timestamp = event.block.timestamp;
     liquidateEvent.market = market.id;
-    liquidateEvent.asset = getOrCreateToken(Address.fromString(market.inputToken)).id;
+    liquidateEvent.asset = getOrCreateToken(Address.fromString(market.inputToken!)).id;
     liquidateEvent.amount = absValBigInt(amountCollateral);
     liquidateEvent.amountUSD = absValBigDecimal(amountCollateralUSD);
     liquidateEvent.profitUSD = bigIntToBigDecimal(absValBigInt(amountDAI), WAD)
       .times(market.debtMultiplier)
       .times(market.liquidationPenalty.div(BIGDECIMAL_ONE_HUNDRED));
+
     usageMetricsHourlySnapshot.hourlyLiquidateCount += 1;
     usageMetricsDailySnapshot.dailyLiquidateCount += 1;
 
@@ -169,21 +198,27 @@ export function handleFrob(event: LogNote): void {
   let dink = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(132, 164))); // change in collateral
   let dart = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(164, 196))); // change in debt
   let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
+  }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let inputTokenBalance = market.inputTokenBalance.plus(dink);
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken!));
   let collateralTokenUSD = getOrCreateToken(Address.fromString(collateralToken.id)).lastPriceUSD;
-  let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD);
+  let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD!);
   let ΔdebtUSD = bigIntToBigDecimal(dart, WAD);
 
   market.inputTokenBalance = inputTokenBalance;
-  market.inputTokenPriceUSD = collateralTokenUSD;
+  market.inputTokenPriceUSD = collateralTokenUSD!;
   market.outputTokenSupply = market.outputTokenSupply.plus(dart);
   market.totalBorrowBalanceUSD = bigIntToBigDecimal(market.outputTokenSupply, WAD);
-  market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, WAD).times(collateralTokenUSD);
+  market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, WAD).times(collateralTokenUSD!);
   market.totalValueLockedUSD = market.totalDepositBalanceUSD;
 
   marketHourlySnapshot.hourlyDepositUSD = ΔcollateralUSD.gt(BIGDECIMAL_ZERO)
@@ -214,16 +249,25 @@ export function handleFrob(event: LogNote): void {
     ? protocol.cumulativeBorrowUSD.plus(ΔdebtUSD)
     : protocol.cumulativeBorrowUSD;
 
-  if (dart.gt(BIGINT_ZERO)) {
+  if (dink.gt(BIGINT_ZERO)){ // if change in collateral is > 0
     handleEvent(event, market, "DEPOSIT", dink, ΔcollateralUSD, dart);
-  } else if (dart.lt(BIGINT_ZERO)) {
+  }
+  if (dart.gt(BIGINT_ZERO)) { // if change in debt is > 0
+    handleEvent(event, market, "BORROW", dink, ΔcollateralUSD, dart);
+  }
+  if (dink.lt(BIGINT_ZERO)) { // if change in collateral is < 0
     handleEvent(event, market, "WITHDRAW", dink, ΔcollateralUSD, dart);
   }
+  if (dart.lt(BIGINT_ZERO)) { // if change in debt is < 0
+    handleEvent(event, market, "REPAY", dink, ΔcollateralUSD, dart);
+  }
+
   market.save();
   marketHourlySnapshot.save();
   marketDailySnapshot.save();
   financialsDailySnapshot.save();
   protocol.save();
+
   updateTotalBorrowUSD(); // protocol debt: add dart * rate to protocol debt
   updateMarketMetrics(ilk, event);
   updateFinancialMetrics(event); // updates TVL and financial daily snapshot
@@ -235,13 +279,19 @@ export function handleGrab(event: LogNote): void {
   let dink = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(132, 164))); // delta collateral
   let dart = bytesToSignedInt(Bytes.fromUint8Array(event.params.data.subarray(164, 196))); // delta debt
   let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return;
+  }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
-  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
+  let collateralToken = getOrCreateToken(Address.fromString(market.inputToken!));
   let collateralTokenUSD = getOrCreateToken(Address.fromString(collateralToken.id)).lastPriceUSD;
-  let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD);
+  let ΔcollateralUSD = bigIntToBigDecimal(dink, WAD).times(collateralTokenUSD!);
   let ΔdebtUSD = bigIntToBigDecimal(dart, WAD);
   let totalLiqudationUSD = absValBigDecimal(ΔdebtUSD);
   // liquidation profit = dart * rate * liq penalty
@@ -256,7 +306,7 @@ export function handleGrab(event: LogNote): void {
   market.inputTokenBalance = inputTokenBalance;
   market.outputTokenSupply = outputTokenSupply;
   market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, WAD);
-  market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, WAD).times(collateralTokenUSD);
+  market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, WAD).times(collateralTokenUSD!);
   market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(totalLiqudationUSD);
 
   marketHourlySnapshot.hourlyLiquidateUSD = marketHourlySnapshot.hourlyLiquidateUSD.plus(totalLiqudationUSD);
@@ -338,6 +388,9 @@ export function handleFold(event: LogNote): void {
   let dRate = bigIntToBigDecimal(bytesToSignedInt(event.params.arg3), RAY);
   log.debug("dRate = {}", [dRate.toString()]);
   let market = getMarketFromIlk(ilk);
+  if (!market) {
+    return;
+  }
   // stability fee collection, fold is called when someone calls jug.drip which increases debt balance for user
   let feesAccrued = dRate.times(market.totalBorrowBalanceUSD); // change in rate multiplied by total borrowed amt, compounded
   let financialsDailySnapshot = getOrCreateFinancials(event);

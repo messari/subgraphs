@@ -15,6 +15,9 @@ export function handleFile(event: LogNote): void {
     log.info("spot handleFile", [event.transaction.hash.toHexString()]);
     let ilk = event.params.arg1;
     let market = getMarketFromIlk(ilk);
+    if (!market) {
+      return;
+    }
     let spotContract = Spot.bind(Address.fromString(MCD_SPOT_ADDRESS));
     let maximumLTV = bigIntToBigDecimal(spotContract.ilks(ilk).value1, 27);
     if (maximumLTV.gt(BIGDECIMAL_ZERO)) {
@@ -30,7 +33,10 @@ export function handleFile(event: LogNote): void {
 export function handlePoke(event: Poke): void {
   let ilk = event.params.ilk;
   let market = getMarketFromIlk(ilk);
-  let tokenAddress = market.inputToken;
+  if (!market) {
+    return;
+  }
+  let tokenAddress = market.inputToken!;
   let priceUSD = bigIntToBigDecimal(bytesToUnsignedBigInt(event.params.val), DEFAULT_DECIMALS);
   market.inputTokenPriceUSD = priceUSD;
   market.save();

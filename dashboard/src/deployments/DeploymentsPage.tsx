@@ -8,7 +8,6 @@ import { Typography } from "@mui/material";
 import LazyLoad from "react-lazyload";
 import { NewClient } from "../utils";
 
-
 const DeploymentsLayout = styled("div")`
   padding: ${({ theme }) => theme.spacing(4)};
 `;
@@ -35,7 +34,11 @@ function DeploymentsPage() {
           Deployed Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => (
-          <SubgraphDeployments clientIndexing={clientIndexing} key={key} protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }} />
+          <SubgraphDeployments
+            clientIndexing={clientIndexing}
+            key={key}
+            protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }}
+          />
         ))}
       </DeploymentsLayout>
     </DeploymentsContextProvider>
