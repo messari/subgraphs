@@ -193,20 +193,20 @@ export class WithdrawRevenue {
         .div(getDecimalDivisor(token.decimals()))
     );
 
-    this.protocolUsd = this.withdrawAmountCompUsd.plus(this.yieldCompUsd);
-    this.supplyUsd = this.yieldUsd.minus(this.yieldCompUsd);
     this.totalUsd = this.yieldUsd.plus(this.withdrawAmountCompUsd);
+    this.supplyUsd = this.yieldUsd.minus(this.yieldCompUsd);
+    this.protocolUsd = this.withdrawAmountCompUsd.plus(this.yieldCompUsd);
 
-    if (this.protocolUsd.lt(BigDecimal.zero())) {
-      this.protocolUsd = BigDecimal.zero();
+    if (this.totalUsd.lt(BigDecimal.zero())) {
+      this.totalUsd = BigDecimal.zero();
     }
 
     if (this.supplyUsd.lt(BigDecimal.zero())) {
       this.supplyUsd = BigDecimal.zero();
     }
 
-    if (this.totalUsd.lt(BigDecimal.zero())) {
-      this.totalUsd = BigDecimal.zero();
+    if (this.protocolUsd.lt(BigDecimal.zero())) {
+      this.protocolUsd = BigDecimal.zero();
     }
   }
 }
