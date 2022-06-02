@@ -1,0 +1,29 @@
+specVersion: 0.0.4
+description: Bancor V3
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: BancorNetwork
+    network: mainnet
+    source:
+      address: "0xeEF417e1D5CC832e619ae18D2F140De2999dD4fB"
+      abi: BancorNetwork
+      startBlock: 14609379
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      entities:
+        - DexAmmProtocol
+        - LiquidityPool
+        - Token
+        - Swap
+      abis:
+        - name: BancorNetwork
+          file: ./abis/BancorNetwork.json
+      eventHandlers:
+        - event: TokensTraded(indexed bytes32,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,address)
+          handler: handleTokensTraded
