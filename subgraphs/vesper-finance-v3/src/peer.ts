@@ -238,9 +238,7 @@ export class WithdrawRevenue {
     );
 
     this.protocolUsd = this.withdrawAmountCompUsd.plus(this.yieldCompUsd);
-    this.supplyUsd = this.yieldUsd
-      .minus(this.withdrawAmountCompUsd)
-      .minus(this.yieldCompUsd);
+    this.supplyUsd = this.yieldUsd.minus(this.yieldCompUsd);
     this.totalUsd = this.yieldUsd.plus(this.withdrawAmountCompUsd);
 
     if (this.protocolUsd.lt(BigDecimal.zero())) {
