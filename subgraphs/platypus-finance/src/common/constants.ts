@@ -171,6 +171,9 @@ export class poolDetail {
       "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7",
       "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83",
       "0x4658EA7e9960D6158a261104aAA160cC953bb6ba",
+      "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218",
+      "0x91BB10D68C72d64a7cE10482b453153eEa03322C",
+      "0x27912AE6Ba9a54219d8287C3540A8969FF35500B",
     ];
   }
 
@@ -184,10 +187,18 @@ export class poolDetail {
       ["Alt Pool MIM", "MIM-USDC Pool", "0x30C30d826be87Cd0A4b90855C2F38f7FcfE4eaA7", "false"],
       ["Alt Pool YUSD", "YUSD-USDC Pool", "0xC828D995C686AaBA78A4aC89dfc8eC0Ff4C5be83", "false"],
       ["Alt Pool sAVAX", "sAVAX-AVAX Pool", "0x4658EA7e9960D6158a261104aAA160cC953bb6ba", "false"],
+      ["Factory Pool H2O", "H2O-USDC Pool", "0x233Ba46B01d2FbF1A31bDBc500702E286d6de218", "false"],
+      ["Factory Pool TSD", "TSD-USDC Pool", "0x91BB10D68C72d64a7cE10482b453153eEa03322C", "false"],
+      ["Factory Pool MONEY", "MONEY-USDC Pool", "0x27912AE6Ba9a54219d8287C3540A8969FF35500B", "false"],
+
+      // Ignore pools while calculating TVL not in above list
       ["Withdraw Pool MIM", "MIM-Ignore", "0x6c84f0580c8ffab0c716c87e66ab474e4bea97d9", "true"],
       ["Withdraw Pool UST", "UST-USDC-Ignore", "0xefa5d088a58a2d4ee5504102c5ffde69301527b0", "true"],
-      ["Multisig-Treasury", "Multisig-Treasury", "0x068e297e8ff74115c9e1c4b5b83b700fda5afdeb", "true"],
-      ["Multisig-Incentives", "Multisig-Incentives", "0xD2805cff8877235d9EC88F683F85A8213DC288BC", "true"],
+      ["Multisig (Treasury)", "Multisig-Treasury", "0x068e297e8ff74115c9e1c4b5b83b700fda5afdeb", "true"],
+      ["Multisig (Incentives)", "Multisig-Incentives", "0xD2805cff8877235d9EC88F683F85A8213DC288BC", "true"],
+      ["Admin (Address)", "Admin-Address", "0x416a7989a964C9ED60257B064Efc3a30FE6bF2eE", "true"],
+
+      // Ignore all unknown pools
       ["unknown pool", "unknown pool", "unknown", "true"],
     ];
     for (let i = 0; i < detailsJson.length; i++) {
