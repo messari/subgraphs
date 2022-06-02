@@ -10,10 +10,10 @@ export class UbeswapCeloConfigurations implements Configurations {
     return Network.CELO;
   }
   getProtocolName(): string {
-    return "Ubeswap";
+    return "ubeswap";
   }
   getProtocolSlug(): string {
-    return "Ubeswap";
+    return "ubeswap";
   }
 
   getSchemaVersion(): string {
@@ -32,19 +32,20 @@ export class UbeswapCeloConfigurations implements Configurations {
     return Factory.bind(Address.fromString("0x62d5b84be28a183abb507e125b384122d2c25fae"));
   }
   getTradeFee(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.3");
   }
   getProtocolFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("0.5");
+    return BigDecimal.fromString("0.05");
   }
   getLPFeeToOn(): BigDecimal {
-    return BigDecimal.fromString("2.5");
+    return BigDecimal.fromString("0.25");
   }
   getProtocolFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("0");
+    return BigDecimal.fromString("0.05");
   }
+  //Liquidity providers earn a 0.25% fee on all trades proportional to their share of the pool. Fees are added to the pool, accrue in real time and can be claimed by withdrawing your liquidity.
   getLPFeeToOff(): BigDecimal {
-    return BigDecimal.fromString("3");
+    return BigDecimal.fromString("0.25");
   }
   getFeeOnOff(): string {
     return FeeSwitch.ON;

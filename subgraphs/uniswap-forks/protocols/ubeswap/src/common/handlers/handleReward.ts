@@ -28,10 +28,7 @@ export function handleStakedImpl(
     return;
   }
   let stakeToken = getOrCreatePair(pool.inputTokens[0]);
-
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.plus(amount);
-  pool.inputTokenBalances[0] = pool.stakedOutputTokenAmount!;
-
   let nativeToken = updateNativeTokenPriceInUSD();
   stakeToken.lastPriceUSD = findNativeTokenPerToken(stakeToken, nativeToken);
   if (stakeToken.lastPriceUSD) {
@@ -51,10 +48,7 @@ export function handleWithdrawnImpl(
     return;
   }
   let stakeToken = getOrCreatePair(pool.inputTokens[0]);
-
   pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount!.minus(amount);
-  pool.inputTokenBalances[0] = pool.stakedOutputTokenAmount!;
-
   let nativeToken = updateNativeTokenPriceInUSD();
   stakeToken.lastPriceUSD = findNativeTokenPerToken(stakeToken, nativeToken);
   if (stakeToken.lastPriceUSD) {
