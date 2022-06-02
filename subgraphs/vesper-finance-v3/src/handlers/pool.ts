@@ -49,6 +49,13 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     revenue.supplyUsd,
     revenue.totalUsd
   );
+
+  log.info("Revenue from withdraw {}, protocol {}, supply {}, total {}", [
+    call.inputs._shares.toString(),
+    revenue.protocolUsd.toString(),
+    revenue.supplyUsd.toString(),
+    revenue.totalUsd.toString(),
+  ]);
 }
 
 export function handleDepositV3(call: DepositCall): void {
@@ -71,21 +78,5 @@ export function handleDepositV3(call: DepositCall): void {
   );
   updateVaultRewardEmission(dataSource.address());
   getOrCreateDeposit(call, dataSource.address());
-
-  const token = Erc20Token.bind(poolV3.token());
-  const revenue = calculateRevenue(
-    call.inputs._amount.toBigDecimal().div(getDecimalDivisor(token.decimals())),
-    BigDecimal.fromString("1"),
-    poolV3.token()
-  );
-  log.info(
-    "Fees distribution for pool{}: ProtocolRevenue={}, supplySideRevenue={}",
-    [
-      poolAddressHex,
-      revenue.protocolRevenueUsd.toString(),
-      revenue.supplySideRevenueUsd.toString(),
-    ]
-  );
-
   updateAllSnapshots(2, call, dataSource.address());
 }
