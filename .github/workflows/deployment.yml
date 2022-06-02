@@ -1,0 +1,22 @@
+name: Deployment
+
+on: 
+  pull_request:
+    types: [closed]
+
+jobs:
+  Deployment: 
+    if: github.event.pull_request.merged == 'true'
+    runs-on: ubuntu-latest
+    steps: 
+      - id: files
+        uses: jitterbit/get-changed-files@v1
+        continue-on-error: true
+
+      - uses: actions/checkout@v2
+      - uses: steegecs/Action-Subgraph-Deployment@main
+        with: 
+          HOSTED_SERVICE_ACCESS_TOKEN: ${{ secrets.HOSTED_SERVICE_ACCESS_TOKEN }}
+          CHANGED_FILES: "${{ steps.files.outputs.all }}"
+          ABSOLUTE_PATH: ${{ github.workspace }}
+          GRAPH_DEPLOYMENT_LOCATION: messari

@@ -212,7 +212,7 @@ export function addProtocolDepositVolume(
 ): void {
   const protocol = getOrCreateLiquityProtocol();
   protocol.cumulativeDepositUSD =
-    protocol.cumulativeBorrowUSD.plus(depositedUSD);
+    protocol.cumulativeDepositUSD.plus(depositedUSD);
   protocol.save();
   const financialsSnapshot = getOrCreateFinancialsSnapshot(event, protocol);
   financialsSnapshot.dailyDepositUSD =

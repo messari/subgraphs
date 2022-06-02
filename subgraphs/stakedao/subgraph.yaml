@@ -25,7 +25,9 @@ dataSources:
           file: ./abis/Ethereum/ERC20.json
         - name: Strategy
           file: ./abis/Ethereum/strategy.json
-        
+        - name: StableMaster
+          file: ./abis/Ethereum/StableMaster.json
+
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -92,7 +94,9 @@ dataSources:
           file: ./abis/Ethereum/ERC20.json
         - name: Strategy
           file: ./abis/Ethereum/strategy.json
-
+        - name: StableMaster
+          file: ./abis/Ethereum/StableMaster.json
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -162,6 +166,8 @@ templates:
           file: ./abis/Ethereum/gauge.json
         - name: Strategy
           file: ./abis/Ethereum/strategy.json
+        - name: StableMaster
+          file: ./abis/Ethereum/StableMaster.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -229,6 +235,9 @@ templates:
           file: ./abis/Ethereum/controller.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: StableMaster
+          file: ./abis/Ethereum/StableMaster.json
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
@@ -296,6 +305,8 @@ templates:
           file: ./abis/Ethereum/controller.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: StableMaster
+          file: ./abis/Ethereum/StableMaster.json
         
         ###########################################
         ############## Price Oracle ###############
@@ -333,8 +344,6 @@ templates:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: RewardPaid(indexed address,indexed address,uint256)
-          handler: handleRewardPaid
         - event: RewardAdded(uint256)
           handler: handleRewardAdded
       callHandlers:

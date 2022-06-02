@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:bsc": "YARN_SILENT=1 yarn mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:matic": "YARN_SILENT=1 yarn mustache config/matic.json subgraph.template.yaml > subgraph.yaml",
+    "prepare:arbitrum": "YARN_SILENT=1 yarn mustache config/arbitrum.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:mainnet": "graph deploy --studio cream-subgraph-mainnet",
+    "deploy:bsc": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/cream-subgraph-bsc",
+    "deploy:matic": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/cream-subgraph-matic",
+    "deploy:arbitrum": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/cream-subgraph-arbitrum"
+  },
+  "devDependencies": {
+    "mustache": "^4.2.0"
+  }
+}
