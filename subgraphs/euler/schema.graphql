@@ -990,6 +990,15 @@ type _MarketUtility @entity {
 
   " Collateral factor for max LTV and liquidation threshold  calculation. Number between 0 and 1, scaled by 4e9. "
   collateralFactor: BigInt!
+
+  " Euler Debt token for the market "
+  dToken: Token!
+
+  " Euler Pool token for the market "
+  eToken: Token!
+
+  " Underlying token for the market "
+  token: Token!
 }
 
 type _ProtocolUtility @entity {

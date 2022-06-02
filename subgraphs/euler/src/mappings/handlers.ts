@@ -53,6 +53,7 @@ import { amountToUsd } from "../common/conversions";
 import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
 import { _MarketUtility } from "../../generated/schema";
 import { BigInt } from "@graphprotocol/graph-ts";
+import { getAssetTotalSupply } from "../common/tokens";
 
 export function handleAssetStatus(event: AssetStatus): void {
   const tokenAddress = event.params.underlying.toHexString();
@@ -278,26 +279,31 @@ export function handleLiquidation(event: Liquidation): void {
 }
 
 export function handleMarketActivated(event: MarketActivated): void {
-  let market = getOrCreateMarket(event.params.underlying.toHexString());
-  getOrCreateMarketUtility(event.params.underlying.toHexString());
+  const market = getOrCreateMarket(event.params.underlying.toHexString());
+  const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
 
   market.createdTimestamp = event.block.timestamp;
   market.createdBlockNumber = event.block.number;
 
-  // Market are initliazed in isolated tier, which means currency can't be used as collateral.
+  // Market are initialized in isolated tier, which means currency can't be used as collateral.
   // https://docs.euler.finance/risk-framework/tiers
   market.canUseAsCollateral = false;
   market.canBorrowFrom = true;
 
   const token = getOrCreateToken(event.params.underlying);
-  getOrCreateToken(event.params.dToken);
+  const dToken = getOrCreateToken(event.params.dToken);
   const eToken = getOrCreateToken(event.params.eToken);
 
   market.outputToken = eToken.id;
   market.inputToken = token.id;
   market.save();
 
-  let protocolUtility = getOrCreateProtocolUtility();
+  marketUtility.token = token.id;
+  marketUtility.eToken = eToken.id;
+  marketUtility.dToken = dToken.id;
+  marketUtility.save();
+
+  const protocolUtility = getOrCreateProtocolUtility();
   protocolUtility.markets = protocolUtility.markets.concat([market.id]);
   protocolUtility.save();
 }
@@ -356,26 +362,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     market.name = token.name;
     market.inputTokenBalance = eulerViewMarket.totalBalances;
     market.inputTokenPriceUSD = currPriceUsd;
-    market.outputTokenSupply = eulerViewMarket.eTokenBalance;
-    market.outputTokenPriceUSD = eulerViewMarket.eTokenBalanceUnderlying
-      .toBigDecimal()
-      .div(tokenPrecision)
-      .times(currPriceUsd);
-
-    if (eulerViewMarket.eTokenBalanceUnderlying.gt(BIGINT_ZERO)) {
-      market.exchangeRate = eulerViewMarket.eTokenBalance
-        .toBigDecimal()
-        .div(eulerViewMarket.eTokenBalanceUnderlying.toBigDecimal());
-    }
-
-    market.save();
     
-    const eToken = getOrCreateToken(Address.fromString(market.outputToken!));
-    eToken.lastPriceUSD = market.outputTokenPriceUSD;
-    eToken.lastPriceBlockNumber = block.number;
-    eToken.save();
-    const eTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>eToken.decimals));
-
     const marketUtility = getOrCreateMarketUtility(market.id);
     marketUtility.market = market.id;
     marketUtility.twap = eulerViewMarket.twap;
@@ -383,14 +370,50 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
     marketUtility.save();
 
+    /**
+     * The following fields are always equal to 0:
+     * - eulerMarketView.eTokenBalance
+     * - eulerMarketView.eTokenBalanceUnderlying
+     * - eulerMarketView.dTokenBalance
+     *
+     * In order to calculate eToken and dToken price, we need to pull supply off ERC-20 contracts and calculate
+     * token price by using totalDepositBalanceUSD and totalBorrowBalanceUSD.
+     */
+    const eTokenAddress = Address.fromString(marketUtility.eToken);
+    const eToken = getOrCreateToken(eTokenAddress);
+    const eTokenTotalSupply = getAssetTotalSupply(eTokenAddress);
+    const eTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>eToken.decimals));
+    if (eTokenTotalSupply.gt(BIGINT_ZERO)) {
+      const eTokenPriceUSD = market.totalDepositBalanceUSD.div(eTokenTotalSupply.toBigDecimal().div(eTokenPrecision));
+      eToken.lastPriceUSD = eTokenPriceUSD;
+      eToken.lastPriceBlockNumber = block.number;
+      eToken.save();
+
+      market.outputTokenPriceUSD = eTokenPriceUSD;
+      market.outputTokenSupply = eTokenTotalSupply;
+      market.exchangeRate = eTokenTotalSupply.toBigDecimal().div(eTokenPrecision).div(eulerViewMarket.totalBalances.toBigDecimal().div(tokenPrecision));
+    } 
+
+    const dTokenAddress = Address.fromString(marketUtility.dToken);
+    const dToken = getOrCreateToken(dTokenAddress);
+    const dTokenTotalSupply = getAssetTotalSupply(dTokenAddress);
+    if (dTokenTotalSupply.gt(BIGINT_ZERO)) {
+      const dTokenPrecision = new BigDecimal(BigInt.fromI32(10).pow(<u8>dToken.decimals));
+      const dTokenPriceUSD = market.totalBorrowBalanceUSD.div(dTokenTotalSupply.toBigDecimal().div(dTokenPrecision));
+      dToken.lastPriceUSD = dTokenPriceUSD;
+      dToken.lastPriceBlockNumber = block.number;
+      dToken.save();
+    }
+
+    market.save();
+
     const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
     // Ignore case where there was a balance conversion (negative diff) happening at current block.
-    if (reserveBalanceDiff.gt(BIGINT_ZERO) && market.exchangeRate) {
+    if (reserveBalanceDiff.gt(BIGINT_ZERO)) {
       const marketRevenueDiffUsd = reserveBalanceDiff
         .toBigDecimal()
         .div(eTokenPrecision)
-        .div(market.exchangeRate!)
-        .times(currPriceUsd);
+        .times(eToken.lastPriceUSD!);
       protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(marketRevenueDiffUsd);
       protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(marketRevenueDiffUsd);
     }

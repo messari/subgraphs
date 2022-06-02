@@ -1,7 +1,8 @@
 import { ERC20 } from "../../generated/euler/ERC20";
 import { ERC20SymbolBytes } from "../../generated/euler/ERC20SymbolBytes";
 import { ERC20NameBytes } from "../../generated/euler/ERC20NameBytes";
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { BIGINT_ZERO } from "./constants";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
 export function getAssetName(address: Address): string {
@@ -47,4 +48,15 @@ export function getAssetDecimals(address: Address): i32 {
 
   log.error("decimals() call reverted for {}", [address.toHex()]);
   return -1;
+}
+
+export function getAssetTotalSupply(address: Address): BigInt {
+  let contract = ERC20.bind(address);
+  let supplyCall = contract.try_totalSupply();
+  if (!supplyCall.reverted) {
+    return supplyCall.value;
+  }
+
+  log.error("try_totalSupply() call (bigint) reverted for {}", [address.toHex()]);
+  return BIGINT_ZERO;
 }
