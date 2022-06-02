@@ -47,7 +47,6 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
     MarketEntity.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     MarketEntity.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
     MarketEntity.inputTokenBalance = BIGINT_ZERO;
-    MarketEntity.outputToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).id;
     MarketEntity.outputTokenSupply = BIGINT_ZERO;
     MarketEntity.outputTokenPriceUSD = BIGDECIMAL_ONE;
     MarketEntity.createdTimestamp = blockTimestamp;

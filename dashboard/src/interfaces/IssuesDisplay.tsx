@@ -15,7 +15,7 @@ const IssuesContainer = styled("div")<{ $hasCritical: boolean }>`
     padding: ${({ theme }) => theme.spacing(2)};
   }
 
-  & > :nth-of-type(odd):not(:first-child) {
+  & > :nth-of-type(odd):not(:first-of-type) {
     background: rgba(0, 0, 0, 0.5);
   }
 `;
