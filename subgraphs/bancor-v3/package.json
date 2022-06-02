@@ -6,7 +6,7 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/"
+    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ 0xbe1/bancor-v3-mainnet"
   },
   "dependencies": {
     "@graphprotocol/graph-ts": "0.27.0"
