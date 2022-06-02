@@ -6,8 +6,6 @@ import {
 } from "../../generated/vaUSDC_prod_RL4/PoolV3";
 import {
   isStrategy,
-  calculateRevenue,
-  getDecimalDivisor,
   withdrawRevenueCalc,
 } from "../peer";
 

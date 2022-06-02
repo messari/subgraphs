@@ -139,50 +139,6 @@ export function getShareToTokenRateV3(pool: PoolV3): BigDecimal {
     .div(getDecimalDivisor(pool.decimals()));
 }
 
-export class Revenue {
-  protocolRevenue: BigDecimal;
-  protocolRevenueUsd: BigDecimal;
-  supplySideRevenue: BigDecimal;
-  supplySideRevenueUsd: BigDecimal;
-  constructor(
-    _protocolRevenue: BigDecimal,
-    _supplySideRevenue: BigDecimal,
-    shareToTokenRate: BigDecimal,
-    tokenAddress: Address
-  ) {
-    let tokenDecimals = Erc20Token.bind(tokenAddress).decimals();
-    let protocolRevenue = _protocolRevenue.times(shareToTokenRate);
-    this.protocolRevenue = protocolRevenue;
-    this.protocolRevenueUsd = getUsdPrice(
-      tokenAddress,
-      protocolRevenue.div(getDecimalDivisor(tokenDecimals))
-    );
-    let supplySideRevenue = _supplySideRevenue.times(shareToTokenRate);
-    this.supplySideRevenue = supplySideRevenue;
-    this.supplySideRevenueUsd = getUsdPrice(
-      tokenAddress,
-      supplySideRevenue.div(getDecimalDivisor(tokenDecimals))
-    );
-  }
-}
-
-export function calculateRevenue(
-  interest: BigDecimal,
-  shareToTokenRate: BigDecimal,
-  tokenAddress: Address
-): Revenue {
-  // 95% of the fees go to the protocol revenue
-  let protocolRevenue = interest.times(BigDecimal.fromString("0.95"));
-  // 5% of the fees go to the supply-side revenue
-  let supplySideRevenue = interest.times(BigDecimal.fromString("0.05"));
-  return new Revenue(
-    protocolRevenue,
-    supplySideRevenue,
-    shareToTokenRate,
-    tokenAddress
-  );
-}
-
 export class WithdrawRevenue {
   protocolUsd: BigDecimal = BigDecimal.zero();
   supplyUsd: BigDecimal = BigDecimal.zero();
