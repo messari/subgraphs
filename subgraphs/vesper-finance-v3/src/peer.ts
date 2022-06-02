@@ -186,6 +186,7 @@ export function calculateRevenue(
 export class WithdrawRevenue {
   protocolUsd: BigDecimal = BigDecimal.zero();
   supplyUsd: BigDecimal = BigDecimal.zero();
+  totalUsd: BigDecimal = BigDecimal.zero();
   yieldAmount: BigDecimal = BigDecimal.zero();
   yieldUsd: BigDecimal = BigDecimal.zero();
   yieldCompUsd: BigDecimal = BigDecimal.zero();
@@ -240,6 +241,7 @@ export class WithdrawRevenue {
     this.supplyUsd = this.yieldUsd
       .minus(this.withdrawAmountCompUsd)
       .minus(this.yieldCompUsd);
+    this.totalUsd = this.yieldUsd.plus(this.withdrawAmountCompUsd);
 
     if (this.protocolUsd.lt(BigDecimal.zero())) {
       this.protocolUsd = BigDecimal.zero();
@@ -247,6 +249,10 @@ export class WithdrawRevenue {
 
     if (this.supplyUsd.lt(BigDecimal.zero())) {
       this.supplyUsd = BigDecimal.zero();
+    }
+
+    if (this.totalUsd.lt(BigDecimal.zero())) {
+      this.totalUsd = BigDecimal.zero();
     }
   }
 }

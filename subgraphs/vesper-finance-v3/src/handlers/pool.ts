@@ -46,7 +46,8 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     call,
     dataSource.address(),
     revenue.protocolUsd,
-    revenue.supplyUsd
+    revenue.supplyUsd,
+    revenue.totalUsd
   );
 }
 

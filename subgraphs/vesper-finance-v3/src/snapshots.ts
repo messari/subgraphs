@@ -33,7 +33,7 @@ export function getOrCreateUsageMetricsDailySnapshot(
   object.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
-  
+
   if (eventId === 1) {
     object.dailyWithdrawCount += 1;
   }
@@ -73,7 +73,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   object.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
-  
+
   if (eventId === 1) {
     object.hourlyWithdrawCount += 1;
   }
@@ -81,7 +81,7 @@ export function getOrCreateUsageMetricsHourlySnapshot(
   if (eventId === 2) {
     object.hourlyDepositCount += 1;
   }
-  
+
   object.save();
 
   return object;
@@ -90,7 +90,8 @@ export function getOrCreateUsageMetricsHourlySnapshot(
 export function getOrCreateFinancialsDailySnapshot(
   call: ethereum.Call,
   protocolRevenueUsd: BigDecimal = BigDecimal.zero(),
-  supplySideRevenueUsd: BigDecimal = BigDecimal.zero()
+  supplySideRevenueUsd: BigDecimal = BigDecimal.zero(),
+  totalRevenueUsd: BigDecimal = BigDecimal.zero()
 ): FinancialsDailySnapshot {
   const day = getDay(call.block.timestamp);
   const protocol = getOrCreateYieldAggregator();
@@ -119,17 +120,19 @@ export function getOrCreateFinancialsDailySnapshot(
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
     protocolRevenueUsd
   );
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD
-    .plus(supplySideRevenueUsd)
-    .plus(protocolRevenueUsd);
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+    totalRevenueUsd
+  );
 
   protocol.save();
 
-  object.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  object.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  object.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  object.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
   object.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  object.dailyTotalRevenueUSD = protocolRevenueUsd.plus(supplySideRevenueUsd);
-  
+  object.dailyTotalRevenueUSD = totalRevenueUsd;
+
   object.save();
 
   return object;
@@ -213,14 +216,16 @@ export function updateAllSnapshots(
   call: ethereum.Call,
   vaultAddress: Address,
   protocolRevenueUsd: BigDecimal = BigDecimal.zero(),
-  supplySideRevenueUsd: BigDecimal = BigDecimal.zero()
+  supplySideRevenueUsd: BigDecimal = BigDecimal.zero(),
+  totalRevenueUsd: BigDecimal = BigDecimal.zero()
 ): void {
   getOrCreateUsageMetricsDailySnapshot(eventId, call);
   getOrCreateUsageMetricsHourlySnapshot(eventId, call);
   getOrCreateFinancialsDailySnapshot(
     call,
     protocolRevenueUsd,
-    supplySideRevenueUsd
+    supplySideRevenueUsd,
+    totalRevenueUsd
   );
   getOrCreateVaultDailySnapshot(call, vaultAddress);
   getOrCreateVaultHourlySnapshot(call, vaultAddress);
