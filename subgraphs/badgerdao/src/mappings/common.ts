@@ -90,6 +90,9 @@ function updateProtocolMetrics(block: ethereum.Block): void {
 
   let financial = getOrCreateFinancialsDailySnapshot(block);
   financial.totalValueLockedUSD = totalValueLockedUSD;
+  financial.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financial.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  financial.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financial.save();
 
   protocol.totalValueLockedUSD = totalValueLockedUSD;
