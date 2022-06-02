@@ -145,8 +145,8 @@ export class WithdrawRevenue {
   totalUsd: BigDecimal = BigDecimal.zero();
   yieldAmount: BigDecimal = BigDecimal.zero();
   yieldUsd: BigDecimal = BigDecimal.zero();
-  yieldCompUsd: BigDecimal = BigDecimal.zero();
-  withdrawAmountCompUsd: BigDecimal = BigDecimal.zero();
+  yieldFeeAppliedUsd: BigDecimal = BigDecimal.zero();
+  withdrawFeeAppliedUsd: BigDecimal = BigDecimal.zero();
 
   constructor(poolAddress: Address, account: Address, withdrawAmount: BigInt) {
     const poolV3 = PoolV3.bind(poolAddress);
@@ -179,13 +179,13 @@ export class WithdrawRevenue {
       VESPER_TOKEN,
       this.yieldAmount.div(getDecimalDivisor(vesperToken.decimals()))
     );
-    this.yieldCompUsd = getUsdPrice(
+    this.yieldFeeAppliedUsd = getUsdPrice(
       VESPER_TOKEN,
       this.yieldAmount
         .times(isEarnPool ? EARN_POOL_PLATFORM_FEE : GROW_POOL_PLATFORM_FEE)
         .div(getDecimalDivisor(vesperToken.decimals()))
     );
-    this.withdrawAmountCompUsd = getUsdPrice(
+    this.withdrawFeeAppliedUsd = getUsdPrice(
       poolV3.token(),
       withdrawAmount
         .toBigDecimal()
@@ -193,9 +193,9 @@ export class WithdrawRevenue {
         .div(getDecimalDivisor(token.decimals()))
     );
 
-    this.totalUsd = this.yieldUsd.plus(this.withdrawAmountCompUsd);
-    this.supplyUsd = this.yieldUsd.minus(this.yieldCompUsd);
-    this.protocolUsd = this.withdrawAmountCompUsd.plus(this.yieldCompUsd);
+    this.totalUsd = this.yieldUsd.plus(this.withdrawFeeAppliedUsd);
+    this.supplyUsd = this.yieldUsd.minus(this.yieldFeeAppliedUsd);
+    this.protocolUsd = this.withdrawFeeAppliedUsd.plus(this.yieldFeeAppliedUsd);
 
     if (this.totalUsd.lt(BigDecimal.zero())) {
       this.totalUsd = BigDecimal.zero();
