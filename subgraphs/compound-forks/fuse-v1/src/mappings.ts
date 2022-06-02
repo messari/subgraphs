@@ -731,14 +731,8 @@ function getTokenPriceUSD(
       Address.fromString(ETH_ADDRESS)
     ).usdPrice.div(exponentToBigDecimal(priceOffset));
     return ethPrice.times(priceInETH);
-  }
-
-  // TODO: verify this is good enough to calculate price
-  if (PROTOCOL_NETWORK == Network.ARBITRUM_ONE) {
-    return priceInETH;
-
-    let priceOracleContract = PriceOracle.bind(
-      Address.fromString(ETH_PRICEORACLE)
-    );
+  } else {
+    // arbitrum price
+    return priceInETH; // TODO: verify this is enough to calc price in arb
   }
 }

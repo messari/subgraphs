@@ -86,6 +86,9 @@ export const WINDOW_SIZE_SECONDS_BD = BigDecimal.fromString(
   WINDOW_SIZE_SECONDS.toString()
 );
 
+// "override" to include hyphen
+export const ARBITRUM = "ARBITRUM-ONE";
+
 // Call this function in event handlers frequently enough so that it calls on blocks frequently enough
 /**
  * @param {BigInt} currentTimestamp    - Timestamp for current event
@@ -245,7 +248,7 @@ function getStartingBlockRate(): BigDecimal {
   let network = dataSource.network();
   if (network == Network.MAINNET.toLowerCase()) {
     return BigDecimal.fromString("13.39");
-  } else if (network == Network.ARBITRUM_ONE.toLowerCase()) {
+  } else if (network == ARBITRUM.toLowerCase()) {
     return BigDecimal.fromString("15");
   } else if (network == Network.AURORA.toLowerCase()) {
     return BigDecimal.fromString("1.03");
@@ -269,7 +272,7 @@ function getStartingBlockRate(): BigDecimal {
   // else if (dataSource.network() == SubgraphNetwork.MOONBEAM.toLowerCase()) return BigDecimal.fromString("13.39")
   // else if (dataSource.network() == SubgraphNetwork.MOONRIVER.toLowerCase()) return BigDecimal.fromString("13.39")
   else {
-    log.warning("getStartingBlockRate(): Network not found", []);
+    log.warning("getStartingBlockRate(): Network not found: {}", [network]);
     return BIGDECIMAL_ZERO;
   }
 }
