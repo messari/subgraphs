@@ -79,6 +79,27 @@ export function calculateSharesBurnt(
   return sharesBurnt;
 }
 
+export function calculateAmountWithdrawn(
+  vaultAddress: Address,
+  sharesBurnt: BigInt
+): BigInt {
+  let vaultContract = VaultContract.bind(vaultAddress);
+  let totalAssets = utils.readValue<BigInt>(
+    vaultContract.try_totalAssets(),
+    constants.BIGINT_ZERO
+  );
+  let totalSupply = utils.readValue<BigInt>(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+
+  let amount = totalSupply.isZero()
+    ? constants.BIGINT_ZERO
+    : sharesBurnt.times(totalAssets).div(totalSupply);
+
+  return amount;
+}
+
 export function _Withdraw(
   to: Address,
   transaction: ethereum.Transaction,
@@ -91,8 +112,38 @@ export function _Withdraw(
   const vaultContract = VaultContract.bind(vaultAddress);
   const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
-  if (sharesBurnt.equals(constants.MAX_UINT256)) {
+  if (
+    sharesBurnt.toString() == "-1" ||
+    sharesBurnt.toString() == constants.MAX_UINT256_STR
+  ) {
     sharesBurnt = calculateSharesBurnt(vaultAddress, withdrawAmount);
+
+    log.info(
+      "[Withdraw_Shares_MAX_UINT] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",
+      [
+        transaction.hash.toHexString(),
+        vault.id,
+        sharesBurnt.toString(),
+        withdrawAmount.toString(),
+      ]
+    );
+  }
+
+  if (
+    withdrawAmount.toString() == "-1" ||
+    withdrawAmount.toString() == constants.MAX_UINT256_STR
+  ) {
+    withdrawAmount = calculateAmountWithdrawn(vaultAddress, sharesBurnt);
+
+    log.info(
+      "[Withdraw_Amount_MAX_UINT] TxHash: {}, vaultAddress: {}, _sharesBurnt: {}, _withdrawAmount: {}",
+      [
+        transaction.hash.toHexString(),
+        vault.id,
+        sharesBurnt.toString(),
+        withdrawAmount.toString(),
+      ]
+    );
   }
 
   let inputToken = Token.load(vault.inputToken);
@@ -108,8 +159,17 @@ export function _Withdraw(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  let totalSupply = utils.readValue<BigInt>(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+  vault.outputTokenSupply = totalSupply;
+
+  let totalAssets = utils.readValue<BigInt>(
+    vaultContract.try_totalAssets(),
+    constants.BIGINT_ZERO
+  );
+  vault.inputTokenBalance = totalAssets;
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
@@ -126,7 +186,7 @@ export function _Withdraw(
   vault.pricePerShare = utils
     .readValue<BigInt>(vaultContract.try_pricePerShare(), constants.BIGINT_ZERO)
     .toBigDecimal();
-  
+
   vault.totalAssets = vault.totalAssets.minus(withdrawAmount);
 
   vault.save();

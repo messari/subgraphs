@@ -92,8 +92,21 @@ export function _Deposit(
   const vaultContract = VaultContract.bind(vaultAddress);
   const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
 
-  if (depositAmount.equals(constants.MAX_UINT256)) {
+  if (
+    depositAmount.toString() == "-1" ||
+    depositAmount.toString() == constants.MAX_UINT256_STR
+  ) {
     depositAmount = calculateAmountDeposited(vaultAddress, sharesMinted);
+
+    log.info(
+      "[Deposit_MAX_UINT] TxHash: {}, vaultAddress: {}, _sharesMinted: {}, _depositAmount: {}",
+      [
+        transaction.hash.toHexString(),
+        vault.id,
+        sharesMinted.toString(),
+        depositAmount.toString(),
+      ]
+    );
   }
 
   let inputToken = Token.load(vault.inputToken);
@@ -109,8 +122,17 @@ export function _Deposit(
     .times(inputTokenPrice.usdPrice)
     .div(inputTokenPrice.decimalsBaseTen);
 
-  vault.inputTokenBalance = vault.inputTokenBalance.plus(depositAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply.plus(sharesMinted);
+  let totalSupply = utils.readValue<BigInt>(
+    vaultContract.try_totalSupply(),
+    constants.BIGINT_ZERO
+  );
+  vault.outputTokenSupply = totalSupply;
+
+  let totalAssets = utils.readValue<BigInt>(
+    vaultContract.try_totalAssets(),
+    constants.BIGINT_ZERO
+  );
+  vault.inputTokenBalance = totalAssets;
 
   vault.totalValueLockedUSD = vault.inputTokenBalance
     .toBigDecimal()
@@ -128,7 +150,7 @@ export function _Deposit(
     .readValue<BigInt>(vaultContract.try_pricePerShare(), constants.BIGINT_ZERO)
     .toBigDecimal();
   vault.totalAssets = vault.totalAssets.plus(depositAmount);
-  
+
   vault.save();
 
   createDepositTransaction(

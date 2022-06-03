@@ -120,6 +120,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
     const sharesMinted = call.outputs.value0;
     const depositAmount = call.inputs._amount;
 
+    call.transaction
     _Deposit(
       vaultAddress,
       call.transaction,
@@ -327,14 +328,14 @@ export function handleUpdateManagementFee(
 }
 
 export function handleStrategyReported_v1(
-  event: OldStrategyReportedEvent
+  event: NewStrategyReportedEvent
 ): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
 
   strategyReported(
     event.params.gain,
-    event.params.debtPaid,
+    constants.BIGINT_ZERO,
     event.params.debtAdded,
     event.params.totalDebt,
     event,
@@ -344,14 +345,14 @@ export function handleStrategyReported_v1(
 }
 
 export function handleStrategyReported_v2(
-  event: NewStrategyReportedEvent
+  event: OldStrategyReportedEvent
 ): void {
   const vaultAddress = event.address;
   const strategyAddress = event.params.strategy;
 
   strategyReported(
     event.params.gain,
-    constants.BIGINT_ZERO,
+    event.params.debtPaid,
     event.params.debtAdded,
     event.params.totalDebt,
     event,
