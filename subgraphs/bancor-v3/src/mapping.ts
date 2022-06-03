@@ -14,6 +14,8 @@ import {
 } from "../generated/schema";
 import {
   BancorNetworkAddr,
+  BnBntAddr,
+  BntAddr,
   EthAddr,
   Network,
   ProtocolType,
@@ -22,6 +24,9 @@ import {
 } from "./constants";
 
 export function handlePoolCreatedLegacy(event: PoolCreated__Legacy): void {
+  // PoolCreated__Legacy is emitted only on early blocks where we should create BNT token
+  // since there's no Create Pool op on BNT
+  createBntToken();
   _handlePoolCreated(
     event.params.poolToken,
     event.block.timestamp,
@@ -35,6 +40,26 @@ export function handlePoolCreated(event: PoolCreated): void {
     event.block.timestamp,
     event.block.number
   );
+}
+
+function createBntToken(): void {
+  let bnBntToken = Token.load(BnBntAddr);
+  if (bnBntToken) {
+    return;
+  }
+  bnBntToken = new Token(BnBntAddr);
+  bnBntToken.name = "Bancor BNT Pool Token";
+  bnBntToken.symbol = "bnBNT";
+  bnBntToken.decimals = 18;
+  bnBntToken.save();
+
+  let bntToken = new Token(BntAddr);
+  bntToken.name = "Bancor Network Token";
+  bntToken.symbol = "BNT";
+  bntToken.decimals = 18;
+  bntToken.save();
+
+  // TODO: liquidity pool?
 }
 
 function _handlePoolCreated(

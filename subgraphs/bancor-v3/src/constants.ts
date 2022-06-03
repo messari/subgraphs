@@ -60,6 +60,8 @@ export namespace UsageType {
 
 export let BancorNetworkAddr = "0xeEF417e1D5CC832e619ae18D2F140De2999dD4fB";
 export let EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+export let BntAddr = "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C";
+export let BnBntAddr = "0xAB05Cf7C6c3a288cd36326e4f7b8600e7268E344";
 
 export let zeroBD = BigDecimal.zero();
 export let zeroBI = BigInt.zero();
