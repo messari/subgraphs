@@ -16,6 +16,7 @@ import {
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
 import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { updateProtocolAndSave } from "./protocol";
 
 export function createDeposit(
   event: DepositEvent,
@@ -31,11 +32,6 @@ export function createDeposit(
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.transaction.index.toI32();
-  deposit.protocol = getBeefyFinanceOrCreate(
-    dataSource.network(),
-    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
-    event.block
-  ).id;
   deposit.from = event.transaction.from.toHexString();
   const to = event.transaction.to;
   deposit.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
@@ -55,6 +51,12 @@ export function createDeposit(
     event.address,
     event.block,
     networkSuffix
+  ).id;
+
+  deposit.protocol = getBeefyFinanceOrCreate(
+    dataSource.network(),
+    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    event.block
   ).id;
 
   deposit.save();

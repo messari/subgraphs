@@ -1,7 +1,8 @@
 import { ethereum } from "@graphprotocol/graph-ts";
 import { YieldAggregator } from "../../generated/schema";
-import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
+  getUniqueUsers,
   updateUsageMetricsDailySnapshot,
   updateUsageMetricsHourlySnapshot,
 } from "../utils/metrics";
@@ -24,7 +25,7 @@ export function createBeefyFinance(
   // beefy.cumulativeSupplySideRevenueUSD = new BigDecimal(new BigInt(0));
   // beefy.cumulativeProtocolSideRevenueUSD = new BigDecimal(new BigInt(0));
   // beefy.cumulativeTotalRevenueUSD = new BigDecimal(new BigInt(0));
-  beefy.cumulativeUniqueUsers = 0;
+  beefy.cumulativeUniqueUsers = BIGINT_ZERO;
   beefy.vaults = [vaultId];
   beefy.dailyUsageMetrics = [updateUsageMetricsDailySnapshot(block, beefy).id];
   beefy.hourlyUsageMetrics = [
@@ -32,4 +33,33 @@ export function createBeefyFinance(
   ];
   beefy.save();
   return beefy;
+}
+
+export function updateProtocolAndSave(
+  protocol: YieldAggregator,
+  block: ethereum.Block
+): YieldAggregator {
+  protocol.cumulativeUniqueUsers = getUniqueUsers(protocol, [
+    BIGINT_ZERO,
+    block.timestamp,
+  ]);
+  const dailySnapshot = updateUsageMetricsDailySnapshot(block, protocol);
+  if (
+    protocol.dailyUsageMetrics[protocol.dailyUsageMetrics.length - 1] !==
+    dailySnapshot.id
+  )
+    protocol.dailyUsageMetrics = protocol.dailyUsageMetrics.concat([
+      dailySnapshot.id,
+    ]);
+  const hourlySnapshot = updateUsageMetricsHourlySnapshot(block, protocol);
+  if (
+    protocol.hourlyUsageMetrics[protocol.hourlyUsageMetrics.length - 1] !==
+    hourlySnapshot.id
+  )
+    protocol.hourlyUsageMetrics = protocol.hourlyUsageMetrics.concat([
+      hourlySnapshot.id,
+    ]);
+  protocol.save();
+
+  return protocol;
 }

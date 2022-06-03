@@ -8,7 +8,10 @@ import {
   fetchTokenSymbol,
 } from "../mappings/token";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
-import { createBeefyFinance } from "../mappings/protocol";
+import {
+  createBeefyFinance,
+  updateProtocolAndSave,
+} from "../mappings/protocol";
 
 export function getTokenOrCreate(
   tokenAddress: Address,
@@ -49,6 +52,8 @@ export function getBeefyFinanceOrCreate(
   let beefy = YieldAggregator.load("BeefyFinance");
   if (!beefy) {
     beefy = createBeefyFinance(network, vaultId, currentBlock);
+  } else {
+    updateProtocolAndSave(beefy, currentBlock);
   }
   return beefy;
 }

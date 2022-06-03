@@ -107,11 +107,11 @@ export function updateUsageMetricsHourlySnapshot(
   return protocolHourlySnapshot;
 }
 
-function getUniqueUsers(
+export function getUniqueUsers(
   protocol: YieldAggregator,
   timeframe: BigInt[]
 ): BigInt {
-  let vault, deposit, user;
+  let vault: Vault | null, deposit: Deposit | null, user: string;
   let users: string[] = [];
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
@@ -146,7 +146,7 @@ function getDepositCount(
   protocol: YieldAggregator,
   timeframe: BigInt[]
 ): BigInt {
-  let vault, deposit;
+  let vault: Vault | null, deposit: Deposit | null;
   let count = BIGINT_ZERO;
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
@@ -173,7 +173,7 @@ function getWithdrawCount(
   protocol: YieldAggregator,
   timeframe: BigInt[]
 ): BigInt {
-  let vault, withdraw;
+  let vault: Vault | null, withdraw: Withdraw | null;
   let count = BIGINT_ZERO;
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field

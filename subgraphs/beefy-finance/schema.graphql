@@ -123,7 +123,7 @@ interface Protocol {
   #cumulativeTotalRevenueUSD: BigDecimal!
 
   " # of cumulative unique users "
-  cumulativeUniqueUsers: Int!
+  cumulativeUniqueUsers: BigInt!
 
   ##### Snapshots #####
 
@@ -182,7 +182,7 @@ type YieldAggregator implements Protocol @entity {
   #cumulativeTotalRevenueUSD: BigDecimal!
 
   " # of cumulative unique users "
-  cumulativeUniqueUsers: Int!
+  cumulativeUniqueUsers: BigInt!
 
   ##### Snapshots #####
 
@@ -214,19 +214,19 @@ type UsageMetricsDailySnapshot @entity {
   protocol: YieldAggregator!
 
   " # of unique daily active users "
-  dailyActiveUsers: Int!
+  dailyActiveUsers: BigInt!
 
   " # of cumulative unique users "
-  cumulativeUniqueUsers: Int!
+  cumulativeUniqueUsers: BigInt!
 
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
-  dailyTransactionCount: Int!
+  dailyTransactionCount: BigInt!
 
   " Total number of deposits in a day "
-  dailyDepositCount: Int!
+  dailyDepositCount: BigInt!
 
   " Total number of withdrawals in a day "
-  dailyWithdrawCount: Int!
+  dailyWithdrawCount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -243,19 +243,19 @@ type UsageMetricsHourlySnapshot @entity {
   protocol: YieldAggregator!
 
   " # of unique hourly active users "
-  hourlyActiveUsers: Int!
+  hourlyActiveUsers: BigInt!
 
   " # of cumulative unique users "
-  cumulativeUniqueUsers: Int!
+  cumulativeUniqueUsers: BigInt!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
-  hourlyTransactionCount: Int!
+  hourlyTransactionCount: BigInt!
 
   " Total number of deposits in an hour "
-  hourlyDepositCount: Int!
+  hourlyDepositCount: BigInt!
 
   " Total number of withdrawals in an hour "
-  hourlyWithdrawCount: Int!
+  hourlyWithdrawCount: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!

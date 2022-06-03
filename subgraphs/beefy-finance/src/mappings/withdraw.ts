@@ -31,11 +31,6 @@ export function createWithdraw(
 
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.transaction.index.toI32();
-  withdraw.protocol = getBeefyFinanceOrCreate(
-    dataSource.network(),
-    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
-    event.block
-  ).id;
   withdraw.from = event.transaction.from.toHexString();
   const to = event.transaction.to;
   withdraw.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
@@ -55,6 +50,11 @@ export function createWithdraw(
     event.address,
     event.block,
     networkSuffix
+  ).id;
+  withdraw.protocol = getBeefyFinanceOrCreate(
+    dataSource.network(),
+    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    event.block
   ).id;
 
   withdraw.save();
