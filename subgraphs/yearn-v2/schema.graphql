@@ -1,5 +1,5 @@
 # Subgraph Schema: Yield Aggregator
-# Version: 1.2.0
+# Version: 1.2.1
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -213,7 +213,7 @@ type YieldAggregator implements Protocol @entity {
   " All vaults that belong to this protocol "
   vaults: [Vault!]! @derivedFrom(field: "protocol")
   
-  _vaultIds: [String!]
+  _vaultIds: [String!]!
 }
 
 ###############################
@@ -364,6 +364,9 @@ type Vault @entity {
 
   " Vault last reported harvest timestamp "
   lastReport: BigInt!
+
+  " Vault Total Asssets "
+  totalAssets: BigInt!
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal!
@@ -601,7 +604,7 @@ type Account @entity {
 
 # Helper entity for calculating daily/hourly active users
 type ActiveAccount @entity {
-  " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
 
