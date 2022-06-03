@@ -6,7 +6,12 @@ import {
 import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection/PoolCollection";
 import { PoolToken } from "../generated/BancorNetwork/PoolToken";
 import { ERC20 } from "../generated/BancorNetwork/ERC20";
-import { DexAmmProtocol, LiquidityPool, Token } from "../generated/schema";
+import {
+  DexAmmProtocol,
+  LiquidityPool,
+  Swap,
+  Token,
+} from "../generated/schema";
 import {
   BancorNetworkAddr,
   EthAddr,
@@ -150,7 +155,42 @@ function _handlePoolCreated(
   liquidityPool.save();
 }
 
-export function handleTokensTraded(event: TokensTraded): void {}
+export function handleTokensTraded(event: TokensTraded): void {
+  let sourceTokenID = event.params.sourceToken.toHexString();
+  let targetTokenID = event.params.targetToken.toHexString();
+  let sourceToken = Token.load(sourceTokenID);
+  if (!sourceToken) {
+    log.warning("[handleTokensTraded] token {} not found", [sourceTokenID]);
+    return;
+  }
+  let targetToken = Token.load(targetTokenID);
+  if (!targetToken) {
+    log.warning("[handleTokensTraded] token {} not found", [targetTokenID]);
+    return;
+  }
+  let swap = new Swap(
+    event.transaction.hash
+      .toHexString()
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+  swap.hash = event.transaction.hash.toHexString();
+  swap.logIndex = event.logIndex.toI32();
+  swap.protocol = getOrCreateProtocol().id;
+  swap.blockNumber = event.block.number;
+  swap.timestamp = event.block.timestamp;
+  // TODO: swap.to and swap.from are both trader?
+  swap.from = event.params.trader.toHexString();
+  swap.to = event.params.trader.toHexString();
+  swap.tokenIn = sourceTokenID;
+  swap.amountIn = event.params.sourceAmount;
+  swap.amountInUSD = zeroBD; // TODO
+  swap.tokenOut = targetTokenID;
+  swap.amountOut = event.params.targetAmount;
+  swap.amountOutUSD = zeroBD; // TODO
+  swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
+  swap.save();
+}
 
 function getOrCreateProtocol(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(BancorNetworkAddr);
