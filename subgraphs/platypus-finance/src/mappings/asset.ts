@@ -83,7 +83,6 @@ export function handlePoolUpdated(event: PoolUpdated): void {
   );
 
   _asset.pool = newPool.id;
-  _asset._index = BigInt.fromI32(newPoolIndexInputTokens);
   _asset.save();
 
   newPool._assets = newPoolUpdatedAssets;

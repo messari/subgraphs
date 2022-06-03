@@ -37,7 +37,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
         let _asset = _Asset.load(pool._assets[j])!;
 
         let token = getOrCreateToken(event, Address.fromString(_asset.token));
-        let usdValue = bigIntToBigDecimal(_asset.cash, token.decimals);
+        let usdValue = tokenAmountToUSDAmount(token, _asset.cash);
         log.debug("[UpdateTVL][{}] get asset {} {} for pool {} tvl => pool={}+asset={}", [
           event.transaction.hash.toHexString(),
           j.toString(),
@@ -48,9 +48,7 @@ export function updateProtocolTVL(event: ethereum.Event): void {
         ]);
 
         poolLockedValue = poolLockedValue.plus(usdValue);
-
-        let _index = pool.inputTokens.indexOf(token.id);
-        inputTokenBalances[_index] = _asset.cash;
+        inputTokenBalances[pool.inputTokens.indexOf(token.id)] = _asset.cash;
       }
     }
 

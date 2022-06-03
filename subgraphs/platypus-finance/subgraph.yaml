@@ -28,6 +28,8 @@ dataSources:
         - _Oracle
         - _TokenTracker
       abis:
+        - name: SimpleRewarder
+          file: ./abis/simpleRewarder.json
         - name: MasterPlatypus
           file: ./abis/masterPlatypus.json
         - name: Asset
