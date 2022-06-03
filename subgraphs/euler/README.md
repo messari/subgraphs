@@ -54,7 +54,7 @@ Not applicable to Euler Finance
 
 ### Protocol Controlled Value
 
-Not applicable to Euler FInance
+Not applicable to Euler Finance
 
 ## Reference and Useful Links
 
