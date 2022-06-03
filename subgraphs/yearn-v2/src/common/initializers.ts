@@ -11,7 +11,9 @@ import {
 } from "../../generated/schema";
 import * as utils from "./utils";
 import * as constants from "./constants";
+import { Vault as VaultStore } from "../../generated/schema";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 import { ERC20 as ERC20Contract } from "../../generated/Registry_v1/ERC20";
 
 export function getOrCreateStrategy(
@@ -38,7 +40,6 @@ export function getOrCreateAccount(id: string): Account {
     account.save();
 
     const protocol = getOrCreateYieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-
     protocol.cumulativeUniqueUsers += 1;
     protocol.save();
   }
@@ -51,17 +52,16 @@ export function getOrCreateYieldAggregator(id: string): YieldAggregator {
 
   if (!protocol) {
     protocol = new YieldAggregator(constants.ETHEREUM_PROTOCOL_ID);
-    protocol.name = "Yearn v2";
-    protocol.slug = "yearn-v2";
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "1.0.0";
-    protocol.methodologyVersion = "1.0.0";
+    protocol.name = constants.Protocol.NAME;
+    protocol.slug = constants.Protocol.SLUG;
+    protocol.schemaVersion = constants.Protocol.SCHEMA_VERSION;
+    protocol.subgraphVersion = constants.Protocol.SUBGRAPH_VERSION;
+    protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Network.MAINNET;
     protocol.type = constants.ProtocolType.YIELD;
 
     //////// Quantitative Data ////////
     protocol.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    protocol.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -104,7 +104,6 @@ export function getOrCreateFinancialDailySnapshots(
     financialMetrics.protocol = constants.ETHEREUM_PROTOCOL_ID;
 
     financialMetrics.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
-    financialMetrics.protocolControlledValueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
     financialMetrics.dailyProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
@@ -195,9 +194,6 @@ export function getOrCreateVaultsDailySnapshots(
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -229,9 +225,6 @@ export function getOrCreateVaultsHourlySnapshots(
     vaultSnapshots.outputTokenSupply = constants.BIGINT_ZERO;
     vaultSnapshots.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
     vaultSnapshots.pricePerShare = constants.BIGDECIMAL_ZERO;
-    vaultSnapshots.stakedOutputTokenAmount = constants.BIGINT_ZERO;
-    vaultSnapshots.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
-    vaultSnapshots.rewardTokenEmissionsUSD = [constants.BIGDECIMAL_ZERO];
 
     vaultSnapshots.blockNumber = block.number;
     vaultSnapshots.timestamp = block.timestamp;
@@ -240,4 +233,76 @@ export function getOrCreateVaultsHourlySnapshots(
   }
 
   return vaultSnapshots;
+}
+
+export function getOrCreateVault(
+  vaultAddress: Address,
+  block: ethereum.Block
+): VaultStore {
+  const vaultAddressString = vaultAddress.toHexString();
+  const vaultContract = VaultContract.bind(vaultAddress);
+
+  let vault = VaultStore.load(vaultAddressString);
+
+  if (!vault) {
+    vault = new VaultStore(vaultAddressString);
+
+    vault.name = utils.readValue<string>(vaultContract.try_name(), "");
+    vault.symbol = utils.readValue<string>(vaultContract.try_symbol(), "");
+    vault.protocol = constants.ETHEREUM_PROTOCOL_ID;
+    vault.depositLimit = utils.readValue<BigInt>(
+      vaultContract.try_depositLimit(),
+      constants.BIGINT_ZERO
+    );
+
+    const inputToken = getOrCreateToken(vaultContract.token());
+    vault.inputToken = inputToken.id;
+    vault.inputTokenBalance = constants.BIGINT_ZERO;
+
+    const outputToken = getOrCreateToken(vaultAddress);
+    vault.outputToken = outputToken.id;
+    vault.outputTokenSupply = constants.BIGINT_ZERO;
+
+    vault.outputTokenPriceUSD = constants.BIGDECIMAL_ZERO;
+    vault.pricePerShare = constants.BIGDECIMAL_ZERO;
+
+    vault.createdBlockNumber = block.number;
+    vault.createdTimestamp = block.timestamp;
+
+    vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+    vault.lastReport = constants.BIGINT_ZERO;
+    vault.totalAssets = constants.BIGINT_ZERO;
+
+    const managementFeeId =
+      utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
+      vaultAddress.toHexString();
+    let managementFee = utils.readValue<BigInt>(
+      vaultContract.try_managementFee(),
+      constants.DEFAULT_MANAGEMENT_FEE
+    );
+    utils.createFeeType(
+      managementFeeId,
+      constants.VaultFeeType.MANAGEMENT_FEE,
+      managementFee
+    );
+
+    const performanceFeeId =
+      utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
+      vaultAddress.toHexString();
+    let performanceFee = utils.readValue<BigInt>(
+      vaultContract.try_performanceFee(),
+      constants.DEFAULT_PERFORMANCE_FEE
+    );
+    utils.createFeeType(
+      performanceFeeId,
+      constants.VaultFeeType.PERFORMANCE_FEE,
+      performanceFee
+    );
+
+    vault.fees = [managementFeeId, performanceFeeId];
+
+    vault.save();
+  }
+
+  return vault;
 }

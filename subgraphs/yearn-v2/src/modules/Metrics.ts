@@ -1,8 +1,8 @@
 import {
   ActiveAccount,
-  Vault as VaultStore,
 } from "../../generated/schema";
 import {
+  getOrCreateVault,
   getOrCreateAccount,
   getOrCreateYieldAggregator,
   getOrCreateVaultsDailySnapshots,
@@ -58,7 +58,7 @@ export function updateVaultSnapshots(
   vaultAddress: Address,
   block: ethereum.Block
 ): void {
-  const vault = VaultStore.load(vaultAddress.toHexString());
+  let vault = getOrCreateVault(vaultAddress, block);
 
   const vaultDailySnapshots = getOrCreateVaultsDailySnapshots(
     vaultAddress,
@@ -69,20 +69,20 @@ export function updateVaultSnapshots(
     block
   );
 
-  vaultDailySnapshots.totalValueLockedUSD = vault!.totalValueLockedUSD;
-  vaultHourlySnapshots.totalValueLockedUSD = vault!.totalValueLockedUSD;
+  vaultDailySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
+  vaultHourlySnapshots.totalValueLockedUSD = vault.totalValueLockedUSD;
 
-  vaultDailySnapshots.inputTokenBalance = vault!.inputTokenBalance;
-  vaultHourlySnapshots.inputTokenBalance = vault!.inputTokenBalance;
+  vaultDailySnapshots.inputTokenBalance = vault.inputTokenBalance;
+  vaultHourlySnapshots.inputTokenBalance = vault.inputTokenBalance;
 
-  vaultDailySnapshots.outputTokenSupply = vault!.outputTokenSupply;
-  vaultHourlySnapshots.outputTokenSupply = vault!.outputTokenSupply;
+  vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply;
+  vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply;
 
-  vaultDailySnapshots.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
-  vaultHourlySnapshots.outputTokenPriceUSD = vault!.outputTokenPriceUSD;
+  vaultDailySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
+  vaultHourlySnapshots.outputTokenPriceUSD = vault.outputTokenPriceUSD;
 
-  vaultDailySnapshots.pricePerShare = vault!.pricePerShare;
-  vaultHourlySnapshots.pricePerShare = vault!.pricePerShare;
+  vaultDailySnapshots.pricePerShare = vault.pricePerShare;
+  vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
 
   vaultDailySnapshots.blockNumber = block.number;
   vaultHourlySnapshots.blockNumber = block.number;

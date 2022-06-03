@@ -1,0 +1,11 @@
+{
+    "deployment": "TRISOLARIS_AURORA",
+    "network": "aurora",
+    "address": "0xc66f594268041db60507f00703b152492fb176e7",
+    "startBlock": 54069511,
+    "MasterChefAddress": "0x1f1ed214bef5e83d8f5d0eb5d7011eb965d0d79b",
+    "MasterChefStartBlock": 54069512,
+    "MasterChefV2Address": "0x3838956710bcc9d122dd23863a0549ca8d5675d6",
+    "MasterChefV2StartBlock": 54579980
+  }
+  

@@ -4,9 +4,6 @@ Reference/
 
 **/.DS_Store
 
-# alternate placement for generated files
-types/
-
 ############################
 ##### Default Template #####
 ############################
@@ -54,6 +51,9 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+
+# Text generating from running deployment scripts
+deployment/results.txt
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
@@ -141,3 +141,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# WebStorm cache
+.idea
+
+# Matchstick generated file
+.bin

@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Factory
-    network: mainnet
+    network: optimism
     source:
-      address: '0x1F98431c8aD98523631AE4a59f267346ea31F984'
+      address: "0x1F98431c8aD98523631AE4a59f267346ea31F984"
       abi: Factory
-      startBlock: 12369621
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -40,7 +40,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: Pool
-    network: mainnet
+    network: optimism
     source:
       abi: Pool
     mapping:

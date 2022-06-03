@@ -5,18 +5,17 @@
 
 Sum across all Pools:
 
-`Insert Calculation`
+`Sum of Pool Assets`
 
-<Add notes to consider if any - delete if none>
+ignore the LP staking (mining) and crowdpooling
 
 ### Total Revenue USD
 
 Sum across all Pools:
 
-`Insert Calculation`
+`PoolFeeModel * Pool Volume`
 
-<Add notes to consider if any - delete if none>
-
+Each pool has its own fee model - will need to pull for each. ignore fee discounts for vDODO holders. Private pools are different to a degree (single LP).
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
@@ -25,14 +24,14 @@ Sum across all Pools:
 
 `Insert Calculation`
 
-<Add notes to consider if any - delete if none>
+Unclear if protocol portion - TokenTerminal suggest no protocol revenue. DODO docs reference vDODO holders could potentially earn protocol fees suggesting there is a mechnism in place
 
 ### Supply-Side Revenue USD
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`Insert Calculation`
+`PoolFeeModel * Pool Volume`
 
 <Add notes to consider if any - delete if none>
 
