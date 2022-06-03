@@ -1,38 +1,36 @@
-# Compound v2 Subgraph
+# Euler Finance Subgraph
 
 ## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
-Sum across all Pools:
+Sum across all Markets:
 
-`Pool Deposit TVL`
+`Total Supply Balance - Total Borrow Balance`
 
-### Total Revenue USD
+### Cumulative Total Revenue USD
 
-Sum across all Pools:
-
-`(Pool Borrow Amount * Pool Borrow Rate)`
+`(Cumulative supply-side revenue + Cumulative protocol-side revenue)`
 
 Note: This currently excludes Liquidations
 
-### Protocol-Side Revenue USD
+### Cumulative Protocol-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Protocol
 
-Sum across all Pools:
+Sum across all Markets:
 
-`(Pool Oustanding Borrow Amount * Pool Borrow Rate) * (Pool Reserve Factor)`
+`Cumulative protocol-side revenue = Cumulative protocol-side revenue + (Reserve balance increase since last update * Current eTokenPrice)`
 
 Note: This currently excludes Liquidations
 
-### Supply-Side Revenue USD
+### Cumulative Supply-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`(Pool Outstanding Borrows * Pool Borrow Rate) * (1 - Pool Reserve Factor)`
+`Cumulative supply-side revenue = Cumulative supply-side revenue + (Interest accumulator increase since last update * Total deposit balance)`
 
 Note: This currently excludes Liquidations
 
@@ -52,30 +50,26 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-Amount of reward tokens (COMP) distributed each day.
-
-Following calculation gives the COMP distributed (in COMP) to suppliers OR borrowers
-
-`COMP per block * 4 * 60 * 24`
+Not applicable to Euler Finance
 
 ### Protocol Controlled Value
 
-Not applicable to Compound v2
+Not applicable to Euler FInance
 
 ## Reference and Useful Links
 
-Protocol: https://compound.finance/
+Protocol: https://euler.finance/
 
-Docs: https://compound.finance/docs
+Docs: https://docs.euler.finance/
 
-Smart contracts: https://github.com/compound-finance/compound-protocol
+Smart contracts: https://github.com/euler-xyz/euler-contracts
 
-Deployed addresses: https://compound.finance/docs#networks
+Deployed addresses: https://docs.euler.finance/protocol/addresses
 
-Existing subgraphs: https://github.com/graphprotocol/compound-v2-subgraph
+Existing subgraphs: https://thegraph.com/hosted-service/subgraph/euler-xyz/euler-mainnet
 
-Existing Subgraph in Studio: https://thegraph.com/hosted-service/subgraph/graphprotocol/compound-v2
+Existing Subgraph in Studio: N/A
 
-Explanation of lending metrics: https://docs.aave.com/risk/asset-risk/risk-parameters
+Explanation of lending metrics: https://docs.euler.finance/risk-framework/methodology
 
-Dune Dashboard for Testing: https://dune.xyz/messari/Messari:-Compound-Macro-Financial-Statements
+Dune Dashboard for Testing: https://dune.com/shippooordao/Euler-Finance-Dashboard https://dune.com/altooptimo/Euler-Finance
