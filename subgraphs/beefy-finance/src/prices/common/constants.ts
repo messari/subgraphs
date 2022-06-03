@@ -203,6 +203,15 @@ UNISWAP_ROUTER_CONTRACT_ADDRESSES.set(
   MATIC.UNISWAP_ROUTER_ADDRESS
 );
 
+export const QUICKSWAP_ROUTER_CONTRACT_ADDRESSES = new TypedMap<
+  string,
+  TypedMap<string, Address>
+>();
+QUICKSWAP_ROUTER_CONTRACT_ADDRESSES.set(
+  MATIC.NETWORK_STRING,
+  MATIC.QUICKSWAP_ROUTER_ADDRESS
+);
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// YEARNLENS CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -221,7 +230,7 @@ YEARN_LENS_CONTRACT_ADDRESS.set(
   ARBITRUM_ONE.YEARN_LENS_CONTRACT_ADDRESS
 );
 YEARN_LENS_CONTRACT_ADDRESS.set(
-  ARBITRUM_ONE.NETWORK_STRING,
+  MATIC.NETWORK_STRING,
   MATIC.YEARN_LENS_CONTRACT_ADDRESS
 );
 
