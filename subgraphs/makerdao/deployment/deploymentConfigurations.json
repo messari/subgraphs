@@ -1,0 +1,16 @@
+{
+  "configurations": {
+    "deployment": {
+      "locations": ["steegecs", "messari"]
+    }
+  },
+  "protocols": {
+    "makerdao": {
+      "mainnet": {
+        "template": "makerdao.template.yaml",
+        "deploy-on-merge": "false"
+
+      }
+    }
+  }
+}
