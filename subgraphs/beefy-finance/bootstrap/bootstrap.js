@@ -14,20 +14,20 @@ let monitoredVaults = [];
 
 const chains = [
   "bsc",
-  "avax",
-  "heco",
+  "avalanche",
+  "heco", //not supported yet by theGraph
   "polygon",
   "fantom",
-  "one",
+  "one", //not supported yet by theGraph
   "arbitrum-one",
   "celo",
   "moonriver",
-  "cronos",
+  "cronos", //not supported yet by theGraph
   "fuse",
-  "metis",
+  "metis", //not supported yet by theGraph
   "aurora",
-  "moonbeam",
-  "oasis",
+  "moonbeam", //not supported yet by theGraph
+  "oasis", //not supported yet by theGraph
 ];
 
 // STEP 1: Build the subgraph.yaml file
@@ -201,8 +201,10 @@ async function bootstrap(network) {
         MONITORED_VAULTS
     You can now deploy your subgraph and start indexing :)
     Run: 
-        yarn deploy RiccardoGalbusera/beefy-finance-[network]
-`.replace("MONITORED_VAULTS", monitoredVaults.join(", "))
+        yarn deploy RiccardoGalbusera/beefy-finance-network
+`
+      .replace("MONITORED_VAULTS", monitoredVaults.join(", "))
+      .replace("network", network)
   );
 }
 
