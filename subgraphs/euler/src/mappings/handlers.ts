@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { Address, ethereum } from "@graphprotocol/graph-ts";
 import {
   AssetStatus,
   Borrow,
@@ -6,20 +6,17 @@ import {
   GovSetAssetConfig,
   GovSetReserveFee,
   Liquidation,
-  MarketActivated,
   Repay,
   Withdraw
 } from "../../generated/euler/Euler"
 import {
   EulerGeneralView,
-  EulerGeneralView__doQueryResultRStruct,
   EulerGeneralView__doQueryInputQStruct
 } from "../../generated/euler/EulerGeneralView";
 import {
   getOrCreateDeposit,
   getOrCreateToken,
   getOrCreateMarket,
-  getOrCreateInterestRate,
   getOrCreateWithdraw,
   getOrCreateBorrow,
   getOrCreateLendingProtocol,
@@ -29,31 +26,24 @@ import {
   getOrCreateProtocolUtility,
 } from "../common/getters";
 import {
-  BIGDECIMAL_ONE,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
   EULER_ADDRESS,
   EULER_GENERAL_VIEW_ADDRESS,
   EXEC_START_BLOCK_NUMBER,
   ZERO_ADDRESS,
-  InterestRateSide,
-  InterestRateType,
   CONFIG_FACTOR_SCALE,
-  USDC_SYMBOL,
   INITIAL_INTEREST_ACCUMULATOR,
   TransactionType,
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
-  DECIMAL_PRECISION,
   USDC_ERC20_ADDRESS,
-  INTEREST_RATE_PRECISION,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
-import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
+import { updateFinancials, updateUsageMetrics } from "../common/metrics";
 import { _MarketUtility } from "../../generated/schema";
 import { BigInt } from "@graphprotocol/graph-ts";
-import { getAssetTotalSupply } from "../common/tokens";
 import { updateMarkets } from "./helpers";
 
 export function handleAssetStatus(event: AssetStatus): void {
