@@ -19,14 +19,70 @@ dataSources:
         - Protocol
         - DexAmmProtocol
         - LiquidityPool
-        - LiquidityPoolFee
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - PoolDailySnapshot
         - Token
-        - _PricesUSD
-        - _Oracle
-        - _TokenTracker
+        - RewardToken
+        - _Asset
+      abis:
+        - name: SimpleRewarder
+          file: ./abis/simpleRewarder.json
+        - name: MasterPlatypus
+          file: ./abis/masterPlatypus.json
+        - name: Asset
+          file: ./abis/asset.json
+        - name: Pool
+          file: ./abis/pool.json
+        - name: SecondaryPool
+          file: ./abis/secondaryPool.json
+        - name: Router
+          file: ./abis/router.json
+      eventHandlers:
+        - event: Add(indexed uint256,uint256,indexed address,indexed address)
+          handler: handleAdd
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDeposit
+        - event: DepositFor(indexed address,indexed uint256,uint256)
+          handler: handleDepositFor
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdraw
+        - event: Harvest(indexed address,indexed uint256,uint256)
+          handler: handleHarvest
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: Paused(address)
+          handler: handlePaused
+        - event: Set(indexed uint256,uint256,indexed address,bool)
+          handler: handleSet
+        - event: Unpaused(address)
+          handler: handleUnpaused
+        - event: UpdateEmissionRate(indexed address,uint256)
+          handler: handleUpdateEmissionRate
+        - event: UpdateEmissionRepartition(indexed address,uint256,uint256)
+          handler: handleUpdateEmissionRepartition
+        - event: UpdatePool(indexed uint256,uint256,uint256,uint256)
+          handler: handleUpdatePool
+        - event: UpdateVePTP(indexed address,address,address)
+          handler: handleUpdateVePTP
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdraw
+  - kind: ethereum/contract
+    name: MasterPlatypusOld
+    network: avalanche
+    source:
+      address: "0xB0523f9F473812FB195Ee49BC7d2ab9873a98044"
+      abi: MasterPlatypus
+      startBlock: 9529909
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/masterPlatypus.ts
+      entities:
+        - Protocol
+        - DexAmmProtocol
+        - LiquidityPool
+        - Token
+        - RewardToken
+        - _Asset
       abis:
         - name: SimpleRewarder
           file: ./abis/simpleRewarder.json
@@ -85,11 +141,14 @@ dataSources:
         - Protocol
         - DexAmmProtocol
         - LiquidityPool
-        - LiquidityPoolFee
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - PoolDailySnapshot
         - Token
+        - RewardToken
+        - _Asset
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - LiquidityPoolDailySnapshot
+        - LiquidityPoolHourlySnapshot
       abis:
         - name: Asset
           file: ./abis/asset.json
@@ -146,11 +205,14 @@ templates:
         - Protocol
         - DexAmmProtocol
         - LiquidityPool
-        - LiquidityPoolFee
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - PoolDailySnapshot
         - Token
+        - RewardToken
+        - _Asset
+        - FinancialsDailySnapshot
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - LiquidityPoolDailySnapshot
+        - LiquidityPoolHourlySnapshot
       abis:
         - name: Asset
           file: ./abis/asset.json
@@ -211,13 +273,7 @@ templates:
         - LiquidityPoolFee
         - DexAmmProtocol
         - Token
-        - _Transaction
-        - _Mint
-        - _Burn
-        - _PricesUSD
-        - _Account
         - _DailyActiveAccount
-        - _TokenTracker
       abis:
         - name: Asset
           file: ./abis/asset.json

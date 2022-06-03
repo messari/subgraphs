@@ -1,10 +1,6 @@
 import {
   Deposit,
   DepositFor,
-  UpdateEmissionRate,
-  UpdateEmissionRepartition,
-  UpdatePool,
-  UpdateVePTP,
   Withdraw,
 } from "../../generated/MasterPlatypus/MasterPlatypus";
 
@@ -17,13 +13,6 @@ import { SimpleRewarder } from "../../generated/MasterPlatypus/SimpleRewarder";
 import { BIGINT_ZERO, MasterPlatypusAddress } from "../common/constants";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 import { emissionsPerDay } from "../common/rewards";
-
-let MP = MasterPlatypus.bind(MasterPlatypusAddress);
-let vePTP = Address.fromString("0x0");
-
-let ptpPerSec = BIGINT_ZERO;
-let dialutingRepartition = BIGINT_ZERO;
-let nonDialutingRepartition = BIGINT_ZERO;
 
 export function updatePoolRewards(event: ethereum.Event, poolAddress: Address): void {
   log.debug("[UpdateRewards][{}] get pool {}", [event.transaction.hash.toHexString(), poolAddress.toHexString()]);
@@ -84,6 +73,8 @@ export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address,
 }
 
 export function getAssetForRewards<T>(event: T): _Asset {
+  let MP = MasterPlatypus.bind(event.address);
+
   let pid = event.params.pid;
   let poolInfo = MP.try_poolInfo(pid);
   if (poolInfo.reverted) {
@@ -97,10 +88,8 @@ export function getAssetForRewards<T>(event: T): _Asset {
   if (!_asset) {
     log.error("[RewardsHandleDeposit]Asset not found {}", [poolInfoMap.value0.toHexString()]);
   }
-  if (!_asset!._index) {
-    _asset!._index = pid;
-    addRewardTokenToAsset(event, MasterPlatypusAddress, _asset!);
-  }
+  _asset!._index = pid;
+  addRewardTokenToAsset(event, MasterPlatypusAddress, _asset!);
 
   if (poolInfoMap.value4 != Address.fromHexString("0x0000000000000000000000000000000000000000")) {
     let bonusRewards = MP.try_rewarderBonusTokenInfo(pid);
