@@ -1,20 +1,6 @@
-
-
-
 # Bancor V3 Subgraph Methodology v1.0.0
 
-
-## Contact Details
-
-
-
-* **Twitter:** @chainiqedu 
-* **Discord:** chainiqedu#0820 
-
-
 ## Useful Links
-
-
 
 * Bancor V3: [https://try.bancor.network/](https://try.bancor.network/)
 * Bancor V3 Proposal Document: 
@@ -234,8 +220,6 @@ Let’s assume that there are 4 liquidity pools in the Bancor V3 protocol which 
 
 The pools have the following TVL USD each:
 
-
-
 * ETH: $1,000,000 USD
 * BNT: $1,800,000 USD
 * DAI: $2,000,000 USD
@@ -256,8 +240,6 @@ _Total Protocol Controlled Value USD = Amount of vBNT Burned * Latest price of B
 This is how the official Bancor dune analytics dashboard estimated the BNT Value Locked Forever. 
 
 Reference links
-
-
 
 * Dune Analytics Dashboard: [https://dune.com/Bancor/bancor_1](https://dune.com/Bancor/bancor_1)
 * Dune Analytics BNT Value Locked Forever Query: [https://dune.com/queries/30032/73935](https://dune.com/queries/30032/73935)
