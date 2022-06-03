@@ -431,11 +431,7 @@ type LiquidityPool @entity {
 
   _ignore: Boolean!
   _assets: [_Asset!]!
-  _outputTokens: [Token!]
-  _outputTokensSupply: [BigInt!]
-  _outputTokenAmounts: [BigInt!]
-  _outputTokenPricesUSD: [BigDecimal!]
-  _stakedOutputTokenAmounts: [BigInt!]
+  _stakedAssetsAmounts: [BigInt!]!
 }
 
 #################################
@@ -498,11 +494,7 @@ type LiquidityPoolDailySnapshot @entity {
 
   _assets: [_Asset!]
   _inputTokens: [Token!]
-  _outputTokens: [Token!]
-  _outputTokensSupply: [BigInt!]
-  _outputTokenAmounts: [BigInt!]
-  _outputTokenPricesUSD: [BigDecimal!]
-  _stakedOutputTokenAmounts: [BigInt!]
+  _stakedAssetsAmounts: [BigInt!]!
 }
 
 type LiquidityPoolHourlySnapshot @entity {
@@ -561,11 +553,7 @@ type LiquidityPoolHourlySnapshot @entity {
 
   _assets: [_Asset!]
   _inputTokens: [Token!]
-  _outputTokens: [Token!]
-  _outputTokensSupply: [BigInt!]
-  _outputTokenAmounts: [BigInt!]
-  _outputTokenPricesUSD: [BigDecimal!]
-  _stakedOutputTokenAmounts: [BigInt!]
+  _stakedAssetsAmounts: [BigInt!]!
 }
 
 ##################################
@@ -819,17 +807,11 @@ type _Asset @entity {
   " Reference to the pool associated with the token"
   pool: LiquidityPool!
 
-  " Reference to the actual token "
-  maxSupply: BigInt!
-
   " Asset contract cash "
   cash: BigInt!
 
-  " Asset contract liability "
-  liability: BigInt
-
-  " Asset contract coverageRatio "
-  coverageRatio: BigInt
+  "Asset Amount staked in pool"
+  amountStaked: BigInt!
 
   " Reference to the underlying token "
   token: Token!
@@ -839,6 +821,15 @@ type _Asset @entity {
 
   " Timestamp of this event "
   timestamp: BigInt!
+
+  " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
+  rewardTokens: [RewardToken!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsAmount: [BigInt!]
+
+  " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
+  rewardTokenEmissionsUSD: [BigDecimal!]
 
   _index: BigInt
 }

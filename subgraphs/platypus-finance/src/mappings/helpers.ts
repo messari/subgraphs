@@ -1,38 +1,18 @@
 import { BigInt, Address, ethereum, log } from "@graphprotocol/graph-ts";
-import { _Asset, Deposit, Swap, Withdraw } from "../../generated/schema";
+import {
+  _Asset,
+  Deposit,
+  Swap,
+  Withdraw,
+  LiquidityPoolHourlySnapshot,
+  LiquidityPoolDailySnapshot,
+} from "../../generated/schema";
 import { Asset as AssetTemplate } from "../../generated/templates";
-import { TransactionType } from "../common/constants";
-import { getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from "../common/getters";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "../common/constants";
+import { getOrCreateAsset, getOrCreateDexAmm, getOrCreateLiquidityPool, getOrCreateToken } from "../common/getters";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "../common/tokens";
-
-export function getOrCreateAsset(
-  event: ethereum.Event,
-  poolAddress: Address,
-  tokenAddress: Address,
-  assetAddress: Address,
-): _Asset {
-  let id = assetAddress.toHexString();
-
-  let _asset = _Asset.load(id);
-  // fetch info if null
-  if (!_asset) {
-    _asset = new _Asset(id);
-    _asset.symbol = fetchTokenSymbol(assetAddress);
-    _asset.name = fetchTokenName(assetAddress);
-    _asset.decimals = fetchTokenDecimals(assetAddress);
-
-    _asset.token = tokenAddress.toHexString();
-    _asset.pool = poolAddress.toHexString();
-    _asset.maxSupply = BigInt.zero();
-    _asset.blockNumber = event.block.number;
-    _asset.timestamp = event.block.timestamp;
-    _asset.cash = BigInt.zero();
-    _asset.save();
-  }
-
-  return _asset;
-}
+import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/utils/arrays";
 
 export function createAsset(
   event: ethereum.Event,
@@ -47,30 +27,64 @@ export function createAsset(
   let assets: string[] = pool._assets;
   let inputTokens: string[] = pool.inputTokens;
   let inputTokenBalances: BigInt[] = pool.inputTokenBalances;
-
+  let _stakedAssetsAmounts: BigInt[] = pool._stakedAssetsAmounts;
   // Start Watching the Asset for updates
   AssetTemplate.create(assetAddress);
 
-  if (!asset._index) {
-    assets.push(asset.id);
-    inputTokens.push(token.id);
+  assets.push(asset.id);
+  inputTokens.push(token.id);
 
-    assets = assets.sort();
-    inputTokens = inputTokens.sort();
+  assets = assets.sort();
+  inputTokens = inputTokens.sort();
 
-    let _index = inputTokens.indexOf(token.id);
-    asset._index = BigInt.fromI32(_index);
-    asset.save();
-    log.info("new asset {} for token {}, pool {} at index {}", [asset.id, asset.token, asset.pool, _index.toString()]);
+  let _index = inputTokens.indexOf(token.id);
+  log.info("new asset {} for token {}, pool {} at index {}", [asset.id, asset.token, asset.pool, _index.toString()]);
 
-    inputTokenBalances.push(BigInt.zero());
-  }
+  inputTokenBalances.push(BIGINT_ZERO);
+  _stakedAssetsAmounts.push(BIGINT_ZERO);
 
   pool._assets = assets;
   pool.inputTokens = inputTokens;
   pool.inputTokenBalances = inputTokenBalances;
+  pool._stakedAssetsAmounts = _stakedAssetsAmounts;
 
   pool.save();
+
+  let timestampDaily: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
+  let idDaily: string = pool.id.concat("-").concat(timestampDaily.toString());
+  let dailySnapshot = LiquidityPoolDailySnapshot.load(idDaily);
+
+  if (dailySnapshot) {
+    dailySnapshot._assets = pool._assets;
+    dailySnapshot._inputTokens = pool.inputTokens;
+    dailySnapshot.inputTokenBalances = pool.inputTokenBalances;
+    dailySnapshot._stakedAssetsAmounts = pool._stakedAssetsAmounts;
+
+    let newSwapVolumeTokenAmount = addToArrayAtIndex(dailySnapshot.dailyVolumeByTokenAmount, BIGINT_ZERO, _index);
+    let newSwapVolumeUSD = addToArrayAtIndex(dailySnapshot.dailyVolumeByTokenUSD, BIGDECIMAL_ZERO, _index);
+
+    dailySnapshot.dailyVolumeByTokenAmount = newSwapVolumeTokenAmount;
+    dailySnapshot.dailyVolumeByTokenUSD = newSwapVolumeUSD;
+    dailySnapshot.save();
+  }
+
+  let timestampHourly: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
+  let idHourly: string = pool.id.concat("-").concat(timestampHourly.toString());
+  let hourlySnapshot = LiquidityPoolHourlySnapshot.load(idHourly);
+
+  if (hourlySnapshot) {
+    hourlySnapshot._assets = pool._assets;
+    hourlySnapshot._inputTokens = pool.inputTokens;
+    hourlySnapshot.inputTokenBalances = pool.inputTokenBalances;
+    hourlySnapshot._stakedAssetsAmounts = pool._stakedAssetsAmounts;
+
+    let newSwapVolumeTokenAmount = addToArrayAtIndex(hourlySnapshot.hourlyVolumeByTokenAmount, BIGINT_ZERO, _index);
+    let newSwapVolumeUSD = addToArrayAtIndex(hourlySnapshot.hourlyVolumeByTokenUSD, BIGDECIMAL_ZERO, _index);
+
+    hourlySnapshot.hourlyVolumeByTokenAmount = newSwapVolumeTokenAmount;
+    hourlySnapshot.hourlyVolumeByTokenUSD = newSwapVolumeUSD;
+    hourlySnapshot.save();
+  }
 }
 
 // Generate the deposit entity and update deposit account for the according pool.

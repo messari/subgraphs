@@ -10,6 +10,8 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolHourlySnapshot,
   _LiquidityPoolParamsHelper,
+  _Asset,
+  RewardToken,
 } from "../../generated/schema";
 import { Pool as PoolTemplate } from "../../generated/templates";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -21,6 +23,7 @@ import {
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
   poolDetail,
+  RewardTokenType,
 } from "../common/constants";
 import { exponentToBigDecimal } from "./utils/numbers";
 import { getUsdPrice } from "../prices";
@@ -108,6 +111,8 @@ export function getOrCreateLiquidityPool(poolAddress: Address, event: ethereum.E
     pool._assets = new Array<string>();
     pool.inputTokens = new Array<string>();
     pool.inputTokenBalances = new Array<BigInt>();
+    pool._stakedAssetsAmounts = new Array<BigInt>();
+
     pool.createdBlockNumber = event.block.number;
     pool.createdTimestamp = event.block.timestamp;
     pool.save();
@@ -174,6 +179,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
     poolDailyMetrics.rewardTokenEmissionsUSD = new Array<BigDecimal>();
     poolDailyMetrics._inputTokens = pool.inputTokens;
     poolDailyMetrics._assets = pool._assets;
+    poolDailyMetrics._stakedAssetsAmounts = pool._stakedAssetsAmounts;
     poolDailyMetrics.inputTokenBalances = pool.inputTokenBalances;
     poolDailyMetrics.blockNumber = event.block.number;
     poolDailyMetrics.timestamp = event.block.timestamp;
@@ -191,20 +197,6 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
     poolDailyMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
     poolDailyMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
 
-    poolDailyMetrics.save();
-  } else if (pool._assets.length > poolDailyMetrics.dailyVolumeByTokenUSD.length) {
-    let dailyVolumeByTokenUSD: BigDecimal[] = poolDailyMetrics.dailyVolumeByTokenUSD;
-    let dailyVolumeByTokenAmount: BigInt[] = poolDailyMetrics.dailyVolumeByTokenAmount;
-    poolDailyMetrics._inputTokens = pool.inputTokens;
-    poolDailyMetrics._assets = pool._assets;
-
-    for (let i = poolDailyMetrics.dailyVolumeByTokenUSD.length; i < pool.inputTokens.length; i++) {
-      dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
-      dailyVolumeByTokenAmount.push(BigInt.fromString("0"));
-    }
-
-    poolDailyMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
-    poolDailyMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
     poolDailyMetrics.save();
   }
 
@@ -226,6 +218,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolHourlyMetrics._inputTokens = pool.inputTokens;
     poolHourlyMetrics._assets = pool._assets;
     poolHourlyMetrics.inputTokenBalances = pool.inputTokenBalances;
+    poolHourlyMetrics._stakedAssetsAmounts = pool._stakedAssetsAmounts;
     poolHourlyMetrics.blockNumber = event.block.number;
     poolHourlyMetrics.timestamp = event.block.timestamp;
     poolHourlyMetrics.rewardTokenEmissionsAmount = new Array<BigInt>();
@@ -242,21 +235,6 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
     poolHourlyMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
     poolHourlyMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
 
-    poolHourlyMetrics.save();
-  } else if (pool._assets.length > poolHourlyMetrics.hourlyVolumeByTokenUSD.length) {
-    let hourlyVolumeByTokenUSD: BigDecimal[] = poolHourlyMetrics.hourlyVolumeByTokenUSD;
-    let hourlyVolumeByTokenAmount: BigInt[] = poolHourlyMetrics.hourlyVolumeByTokenAmount;
-
-    poolHourlyMetrics._inputTokens = pool.inputTokens;
-    poolHourlyMetrics._assets = pool._assets;
-
-    for (let i = poolHourlyMetrics.hourlyVolumeByTokenUSD.length; i < pool.inputTokens.length; i++) {
-      hourlyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
-      hourlyVolumeByTokenAmount.push(BigInt.fromString("0"));
-    }
-
-    poolHourlyMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
-    poolHourlyMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
     poolHourlyMetrics.save();
   }
 
@@ -301,4 +279,43 @@ export function getOrCreateDexAmm(): DexAmmProtocol {
     protocol.save();
   }
   return protocol;
+}
+
+export function getOrCreateAsset(
+  event: ethereum.Event,
+  poolAddress: Address,
+  tokenAddress: Address,
+  assetAddress: Address,
+): _Asset {
+  let id = assetAddress.toHexString();
+
+  let _asset = _Asset.load(id);
+  // fetch info if null
+  if (!_asset) {
+    _asset = new _Asset(id);
+    _asset.symbol = fetchTokenSymbol(assetAddress);
+    _asset.name = fetchTokenName(assetAddress);
+    _asset.decimals = fetchTokenDecimals(assetAddress);
+
+    _asset.token = tokenAddress.toHexString();
+    _asset.pool = poolAddress.toHexString();
+    _asset.blockNumber = event.block.number;
+    _asset.timestamp = event.block.timestamp;
+    _asset.cash = BigInt.zero();
+    _asset.save();
+  }
+
+  return _asset;
+}
+
+export function getOrCreateRewardToken(event: ethereum.Event, tokenAddress: Address): RewardToken {
+  let id = RewardTokenType.DEPOSIT.concat("-").concat(tokenAddress.toHexString());
+  let rewardToken = RewardToken.load(id);
+  if (!rewardToken) {
+    rewardToken = new RewardToken(id);
+    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.token = getOrCreateToken(event, tokenAddress).id;
+    rewardToken.save();
+  }
+  return rewardToken;
 }

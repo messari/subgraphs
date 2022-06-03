@@ -1,11 +1,12 @@
 // Asset is the LP token for each Token that is added to a pool
 
-import { Transfer, MaxSupplyUpdated, PoolUpdated, CashAdded, CashRemoved } from "../../generated/templates/Asset/Asset";
-import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { PoolUpdated, CashAdded, CashRemoved } from "../../generated/templates/Asset/Asset";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 import { LiquidityPoolDailySnapshot, LiquidityPoolHourlySnapshot, _Asset } from "../../generated/schema";
-import { updatePoolMetrics, updateProtocolTVL } from "../common/metrics";
-import { getOrCreateLiquidityPool, getOrCreateLiquidityPoolDailySnapshot } from "../common/getters";
-import { BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../common/constants";
+import { updateProtocolTVL } from "../common/metrics";
+import { getOrCreateLiquidityPool } from "../common/getters";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR } from "../common/constants";
+import { addToArrayAtIndex, removeFromArrayAtIndex } from "../common/utils/arrays";
 
 export function handleCashAdded(event: CashAdded): void {
   let _asset = _Asset.load(event.address.toHexString())!;
@@ -19,37 +20,6 @@ export function handleCashRemoved(event: CashRemoved): void {
   _asset.cash = _asset.cash.minus(event.params.cashBeingRemoved);
   _asset.save();
   updateProtocolTVL(event);
-}
-
-
-function removeFromArrayAtIndex<T>(x: T[], index: i32): T[] {
-  let retval = new Array<T>(x.length - 1);
-  let nI = 0;
-  for (let i = 0; i < x.length; i++) {
-    if (i != index) {
-      retval[nI] = x[i];
-      nI += 1;
-    }
-  }
-  return retval;
-}
-
-function addToArrayAtIndex<T>(x: T[], item: T, index: i32): T[] {
-  if (x.length == 0) {
-    return [item];
-  }
-  let retval = new Array<T>();
-  let i = 0;
-  while (i < index) {
-    retval.push(x[i]);
-    i += 1;
-  }
-  retval.push(item);
-  while (i < x.length) {
-    retval.push(x[i]);
-    i += 1;
-  }
-  return retval;
 }
 
 export function handlePoolUpdated(event: PoolUpdated): void {

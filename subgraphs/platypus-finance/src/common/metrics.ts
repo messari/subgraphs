@@ -50,8 +50,6 @@ export function updateProtocolTVL(event: ethereum.Event): void {
         poolLockedValue = poolLockedValue.plus(usdValue);
 
         let _index = pool.inputTokens.indexOf(token.id);
-        _asset._index = BigInt.fromI32(_index);
-        _asset.save();
         inputTokenBalances[_index] = _asset.cash;
       }
     }
@@ -200,10 +198,7 @@ function updateHourlyPoolMetrics(event: ethereum.Event): void {
   snapshot._inputTokens = pool.inputTokens;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot._outputTokens = pool._outputTokens;
-  snapshot._outputTokensSupply = pool._outputTokensSupply;
-  snapshot._outputTokenPricesUSD = pool._outputTokenPricesUSD;
-  snapshot._stakedOutputTokenAmounts = pool._stakedOutputTokenAmounts;
+  snapshot._stakedAssetsAmounts = pool._stakedAssetsAmounts;
   snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
@@ -222,10 +217,7 @@ function updateDailyPoolMetrics(event: ethereum.Event): void {
   snapshot._inputTokens = pool.inputTokens;
   snapshot.inputTokenBalances = pool.inputTokenBalances;
   snapshot.inputTokenWeights = pool.inputTokenWeights;
-  snapshot._outputTokens = pool._outputTokens;
-  snapshot._outputTokensSupply = pool._outputTokensSupply;
-  snapshot._outputTokenPricesUSD = pool._outputTokenPricesUSD;
-  snapshot._stakedOutputTokenAmounts = pool._stakedOutputTokenAmounts;
+  snapshot._stakedAssetsAmounts = pool._stakedAssetsAmounts;
   snapshot.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   snapshot.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
 
