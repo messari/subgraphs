@@ -364,11 +364,8 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     market.inputTokenPriceUSD = currPriceUsd;
     
     const marketUtility = getOrCreateMarketUtility(market.id);
-    marketUtility.market = market.id;
-    marketUtility.twap = eulerViewMarket.twap;
-    marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
-    marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
-    marketUtility.save();
+   
+    const previousReserveBalance = marketUtility.reserveBalance;
 
     /**
      * The following fields are always equal to 0:
@@ -407,7 +404,7 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
 
     market.save();
 
-    const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
+    const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(previousReserveBalance);
     // Ignore case where there was a balance conversion (negative diff) happening at current block.
     if (reserveBalanceDiff.gt(BIGINT_ZERO)) {
       const marketRevenueDiffUsd = reserveBalanceDiff
@@ -421,6 +418,13 @@ function updateMarkets(eulerViewQueryResponse: EulerGeneralView__doQueryResultRS
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
     protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
+
+     marketUtility.market = market.id;
+     marketUtility.twap = eulerViewMarket.twap;
+     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
+     marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
+     marketUtility.save();
+
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);
   }
