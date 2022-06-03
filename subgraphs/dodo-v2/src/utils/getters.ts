@@ -20,6 +20,7 @@ import {
   ZERO_BD,
   ZERO_BI,
   ONE_BI,
+  ADDRESS_ZERO,
   Network,
   ProtocolType,
   RewardTokenType,
@@ -40,8 +41,8 @@ import { ERC20 } from "../../generated/DVMFactory/ERC20";
 
 import { DVM } from "../../generated/DVM/DVM";
 import { CP } from "../../generated/CP/CP";
-import { DPP } from "../../generated/DPP/DPP";
 import { DSP } from "../../generated/DSP/DSP";
+import { DPP } from "../../generated/DPP/DPP";
 
 import { setPriceLP } from "./setters";
 
@@ -76,6 +77,11 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 export function getOrCreateDexAmm(poolAdd: Address): DexAmmProtocol {
   let proto = getProtocolFromPool(poolAdd);
   let protocol = DexAmmProtocol.load(proto);
+
+  let dvmP = DexAmmProtocol.load(DVMFactory_ADDRESS);
+  let cpP = DexAmmProtocol.load(CPFactory_ADDRESS);
+  let dppP = DexAmmProtocol.load(DPPFactory_ADDRESS);
+  let dspP = DexAmmProtocol.load(DSPFactory_ADDRESS);
 
   let name = "";
 
@@ -153,7 +159,8 @@ export function getOrCreatePool(
 }
 
 export function getOrCreateDailyUsageSnapshot(
-  event: ethereum.Event
+  event: ethereum.Event,
+  prevCount: i32
 ): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
@@ -166,7 +173,7 @@ export function getOrCreateDailyUsageSnapshot(
     usageMetrics.protocol = getProtocolFromPool(event.address);
 
     usageMetrics.dailyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = prevCount;
     usageMetrics.dailyTransactionCount = 0;
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyWithdrawCount = 0;
@@ -181,7 +188,8 @@ export function getOrCreateDailyUsageSnapshot(
 }
 
 export function getOrCreateHourlyUsageSnapshot(
-  event: ethereum.Event
+  event: ethereum.Event,
+  prevCount: i32
 ): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
@@ -194,7 +202,7 @@ export function getOrCreateHourlyUsageSnapshot(
     usageMetrics.protocol = getProtocolFromPool(event.address);
 
     usageMetrics.hourlyActiveUsers = 0;
-    usageMetrics.cumulativeUniqueUsers = 0;
+    usageMetrics.cumulativeUniqueUsers = prevCount;
     usageMetrics.hourlyTransactionCount = 0;
     usageMetrics.hourlyDepositCount = 0;
     usageMetrics.hourlyWithdrawCount = 0;
@@ -339,17 +347,22 @@ function getProtocolFromPool(poolAddress: Address): string {
     log.info("pool get version reverted", []);
   } else {
     version = callResult.value;
+    log.info("pool get version returned", [version]);
   }
 
   let factoryAdd = "";
-  if (version == "DVM 1.0.2") {
+  if (
+    version == "DVM 1.0.0" ||
+    version == "DVM 1.0.1" ||
+    version == "DVM 1.0.2"
+  ) {
     factoryAdd = DVMFactory_ADDRESS;
-  } else if (version == "CP 1.0.0") {
-    factoryAdd = CPFactory_ADDRESS;
   } else if (version == "DPP 1.0.0") {
     factoryAdd = DPPFactory_ADDRESS;
-  } else if (version == "DSP 1.0.1") {
+  } else if (version == "DSP 1.0.0" || version == "DSP 1.0.1") {
     factoryAdd = DSPFactory_ADDRESS;
+  } else {
+    factoryAdd = CPFactory_ADDRESS;
   }
   return factoryAdd;
 }

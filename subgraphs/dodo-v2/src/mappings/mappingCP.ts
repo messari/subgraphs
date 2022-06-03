@@ -1,12 +1,12 @@
 import { CP, Bid, Cancel, Settle } from "../../generated/CP/CP";
 
 import {
-  updateFinancials,
-  updateUsageMetrics,
-  updatePoolMetrics
+  updateUsageMetrics
 } from "../utils/metrics";
 
 import { createDeposit, createWithdraw } from "../utils/setters";
+import { updateCPpoolMetrics } from "../utils/metrics";
+
 
 // event Bid(address to, uint256 amount, uint256 fee);
 
@@ -21,9 +21,5 @@ export function handleCancel(event: Cancel): void {
 }
 
 export function handleSettle(event: Settle): void {
-  //the settle event doesnt supply any params however
-  //the settle function call in CPFunding creates a DVM and handles its
-  // logic by transfering all tokens and logic over to the created DVM
-  // This means we shouldnt need to actually track anything with this event as
-  // it will already be tracked through DVM graph logic
+  updateCPpoolMetrics(event, event.address);
 }

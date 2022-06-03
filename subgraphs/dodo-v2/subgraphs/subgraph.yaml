@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum
     name: DVMFactory
-    network: matic
+    network: mainnet
     source:
-      address: "0x79887f65f83bdf15Bcc8736b5e5BcDB48fb8fE13"
+      address: "0x72d220ce168c4f361dd4dee5d826a01ad8598f6c"
       abi: DVMFactory
       startBlock: 10970196
     mapping:
@@ -47,9 +47,9 @@ dataSources:
         # blank
   - kind: ethereum
     name: CrowdPoolingFactory
-    network: matic
+    network: mainnet
     source:
-      address: "0x42ddEc68db70F5992eB7AB22dfaD8A57109841C9"
+      address: "0xe8c9a78725d0451fa19878d5f8a3dc0d55fecf25"
       abi: CrowdPoolingFactory
       startBlock: 10970196
     mapping:
@@ -86,9 +86,9 @@ dataSources:
       # blank
   - kind: ethereum
     name: DPPFactory
-    network: matic
+    network: mainnet
     source:
-      address: "0xd24153244066F0afA9415563bFC7Ba248bfB7a51"
+      address: "0x5336ede8f971339f6c0e304c66ba16f1296a2fbe"
       abi: DPPFactory
       startBlock: 10970196
     mapping:
@@ -128,9 +128,9 @@ dataSources:
     # blank
   - kind: ethereum
     name: DSPFactory
-    network: matic
+    network: mainnet
     source:
-      address: "0x43C49f8DD240e1545F147211Ec9f917376Ac1e87"
+      address: "0x6fddb76c93299d985f4d3fc7ac468f9a168577a4"
       abi: DSPFactory
       startBlock: 10970196
     mapping:
@@ -170,9 +170,9 @@ dataSources:
     # blank
   - kind: ethereum
     name: DODOMineV3Proxy
-    network: matic
+    network: mainnet
     source:
-      address: "0x47a65e74dd6b6B5E3243dBb01EDEd9D55ba234Ad"
+      address: "0x0d9685D4037580F68D9F77B08971f17E1000bBdc"
       abi: DODOMineV3Proxy
       startBlock: 10970196
     mapping:
@@ -193,7 +193,7 @@ dataSources:
     # blank
   - name: DVM
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: DVM
       startBlock: 10970196
@@ -237,7 +237,7 @@ dataSources:
     # blank
   - name: CP
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: CP
       startBlock: 10970196
@@ -281,7 +281,7 @@ dataSources:
     # blank
   - name: DPP
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: DPP
       startBlock: 10970196
@@ -319,7 +319,7 @@ dataSources:
     # # blank
   - name: DSP
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: DSP
       startBlock: 10970196
