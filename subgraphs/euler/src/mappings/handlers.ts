@@ -95,7 +95,7 @@ function getEulerViewContract(block: ethereum.Block): EulerGeneralView {
  * Query Euler General View contract in order to get markets current status.
  * 
  * @param marketIds List of markets to query
- * @param block block number at which
+ * @param block current block
  * @returns query resul or null if nothing could be queried.
  */
 function queryEulerGeneralView(marketIds: string[], block: ethereum.Block): EulerGeneralView__doQueryResultRStruct | null {
