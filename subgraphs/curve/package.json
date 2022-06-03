@@ -2,6 +2,7 @@
   "name": "curve",
   "license": "UNLICENSED",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
     "codegen": "graph codegen",

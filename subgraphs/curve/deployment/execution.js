@@ -21,10 +21,13 @@ export function getDeploymentNetwork(network) {
     switch (network) {
         case "mainnet":
             deployNetwork = "ethereum"
+            break;
         case "xdai":
             deployNetwork = "gnosis"
+            break;
         case "matic":
             deployNetwork = "polygon"
+            break;
         default: 
             deployNetwork = network
     }
