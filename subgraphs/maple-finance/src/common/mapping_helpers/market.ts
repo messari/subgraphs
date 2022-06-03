@@ -5,6 +5,7 @@ import { POOL_WAD_DECIMALS, PROTOCOL_ID, UNPROVIDED_NAME, ZERO_ADDRESS, ZERO_BD,
 import { getTokenPriceInUSD } from "../prices/prices";
 import { parseUnits, powBigDecimal } from "../utils";
 import { getOrCreateMplReward, mplRewardTick } from "./mplReward";
+import { getOrCreateProtocol } from "./protocol";
 import { getOrCreateStakeLocker, stakeLockerTick } from "./stakeLocker";
 import { getOrCreateToken } from "./token";
 
@@ -161,6 +162,19 @@ export function marketTick(market: Market, event: ethereum.Event): void {
     stakeLockerTick(stakeLocker, event);
 
     ////
+    // Store old market cumulatives needed protocol update
+    ////
+    const oldMarketTotalValueLocked = market.totalValueLockedUSD;
+    const oldMarketTotalDepositBalanceUSD = market.totalDepositBalanceUSD;
+    const oldMarketCumulativeDepositUSD = market.cumulativeDepositUSD;
+    const oldMarketTotalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+    const oldMarketCumulativeBorrowUSD = market.cumulativeBorrowUSD;
+    const oldMarketCumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+    const oldMarketCumulativeSupplySideRevenueUSD = market._supplySideRevenueUSD;
+    const oldMarketProtocolSideRevenue = market._protocolSideRevenueUSD;
+    const oldMarketTotalRevenueUSD = market._totalRevenueUSD;
+
+    ////
     // Update market cumulatives
     ////
     market.totalValueLockedUSD = parseUnits(
@@ -235,4 +249,47 @@ export function marketTick(market: Market, event: ethereum.Event): void {
     market.rewardTokenEmissionsUSD = rewardTokenEmissionUSD;
 
     market.save();
+
+    ////
+    // Update protocol cumulatives
+    ////
+    const protocol = getOrCreateProtocol();
+
+    protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(
+        market.totalValueLockedUSD.minus(oldMarketTotalValueLocked)
+    );
+
+    protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(
+        market.totalDepositBalanceUSD.minus(oldMarketTotalDepositBalanceUSD)
+    );
+
+    protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
+        market.cumulativeDepositUSD.minus(oldMarketCumulativeDepositUSD)
+    );
+
+    protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(
+        market.totalBorrowBalanceUSD.minus(oldMarketTotalBorrowBalanceUSD)
+    );
+
+    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
+        market.cumulativeBorrowUSD.minus(oldMarketCumulativeBorrowUSD)
+    );
+
+    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(
+        market.cumulativeLiquidateUSD.minus(oldMarketCumulativeLiquidateUSD)
+    );
+
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+        market._supplySideRevenueUSD.minus(oldMarketCumulativeSupplySideRevenueUSD)
+    );
+
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+        market._protocolSideRevenueUSD.minus(oldMarketProtocolSideRevenue)
+    );
+
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+        market._totalRevenueUSD.minus(oldMarketTotalRevenueUSD)
+    );
+
+    protocol.save();
 }
