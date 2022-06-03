@@ -1,15 +1,7 @@
-const fs = require("fs");
 const writeYamlFile = require("write-yaml-file");
-const ethers = require("ethers");
 const { vaults } = require("./vaults");
-const { providers } = require("./publicRpcs");
-const vaultAbi = require("../abis/BeefyVault.json");
-const { assert } = require("console");
 require("dotenv").config();
 
-const commentTag = "__comments";
-
-let constants = {};
 let monitoredVaults = [];
 
 const chains = [
@@ -138,7 +130,7 @@ function createDataSource(contractName, contractAddress, network, startBlock) {
   return dataSource;
 }
 
-async function bootstrap(network) {
+function bootstrap(network) {
   //setup provider to get contract addresses
   let subgraphYamlDoc = {
     specVersion: "0.0.5",
@@ -148,29 +140,13 @@ async function bootstrap(network) {
     dataSources: [],
   };
   //loop through all the pools and get the strategy addresses
-  let provider, signer, contract, strategyAddress, vaultName, startBlock;
+  let strategyAddress, vaultName, startBlock;
   for (let i = 0; i < vaults.length; i++) {
     vaultNetwork = vaults[i].chain;
     if (vaultNetwork === network) {
-      provider = new ethers.providers.JsonRpcProvider(providers[0][network]);
-      signer = new ethers.Wallet(process.env.TEST_PRIVATE_KEY || "", provider);
-
-      contract = new ethers.Contract(
-        vaults[i].earnContractAddress,
-        vaultAbi,
-        signer
-      );
       strategyAddress = vaults[i].strategyAddress;
       vaultName = vaults[i].id;
-
-      if (contract.deployTransaction) {
-        startBlock = contract.deployTransaction.blockNumber;
-        if (!startBlock) {
-          startBlock = 1;
-        }
-      } else {
-        startBlock = 1;
-      }
+      startBlock = vaults[i].startBlock;
 
       console.log(
         "Adding " +

@@ -1,13 +1,13 @@
 const providers = [
   {
     bsc: "https://rpc.ankr.com/bsc",
-    avax: "https://rpc.ankr.com/avalanche",
+    avalanche: "https://ava-mainnet.public.blastapi.io/ext/bc/C/rpc	",
     heco: "https://http-mainnet.hecochain.com",
     matic: "https://matic-mainnet-full-rpc.bwarelabs.com",
     fantom: "https://rpc.ankr.com/fantom",
     harmony: "https://api.harmony.one",
-    arbitrum: "https://rpc.ankr.com/arbitrum",
-    celo: "https://rpc.ankr.com/celo",
+    arbitrum: "https://arb1.arbitrum.io/rpc	",
+    celo: "https://forno.celo.org	",
     moonriver: "https://moonriver.public.blastapi.io",
     cronos: "https://evm.cronos.org	",
     fuse: "https://rpc.fuse.io",
