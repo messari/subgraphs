@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { Vault, Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,
@@ -26,7 +26,10 @@ export function createWithdraw(
 
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.transaction.index.toI32();
-  withdraw.protocol = getBeefyFinanceOrCreate().id;
+  withdraw.protocol = getBeefyFinanceOrCreate(
+    dataSource.network(),
+    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id
+  ).id;
   withdraw.from = event.transaction.from.toHexString();
   const to = event.transaction.to;
   withdraw.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
@@ -59,7 +62,10 @@ export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
 
     withdraw.hash = ZERO_ADDRESS_STRING;
     withdraw.logIndex = 0;
-    withdraw.protocol = getBeefyFinanceOrCreate().id;
+    withdraw.protocol = getBeefyFinanceOrCreate(
+      dataSource.network(),
+      vault.id
+    ).id;
     withdraw.from = ZERO_ADDRESS_STRING;
     withdraw.to = ZERO_ADDRESS_STRING;
     withdraw.blockNumber = vault.createdBlockNumber;

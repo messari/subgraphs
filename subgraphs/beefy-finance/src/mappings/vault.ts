@@ -42,7 +42,7 @@ export function createVaultFromStrategy(
   }
   const vaultContract = BeefyVault.bind(vaultAddress);
 
-  vault.protocol = getBeefyFinanceOrCreate().id;
+  vault.protocol = getBeefyFinanceOrCreate(network, vault.id).id;
   vault.name = fetchTokenName(vaultAddress);
   vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHexString() + NETWORK_SUFFIX;
