@@ -48,7 +48,9 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     revenue.totalUsd
   );
 
-  log.info("Revenue from withdraw {}, protocol {}, supply {}, total {}", [
+  log.info("For transaction {} isEarnPool {} Revenue from withdraw {}, protocol {}, supply {}, total {}", [
+    call.transaction.hash.toHexString(),
+    revenue.isEarnPool.toString(),
     call.inputs._shares.toString(),
     revenue.protocolUsd.toString(),
     revenue.supplyUsd.toString(),
