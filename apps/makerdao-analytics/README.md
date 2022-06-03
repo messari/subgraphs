@@ -11,16 +11,18 @@ python3 -m venv venv
 Install dependencies
 
 ```
+Requires python3.10
+
 python3 install -r requirements.txt
 ```
 
 Run locally
 
 ```
-streamlit run makerdao.py
+python3.10 -m streamlit run makerdao.py
 ```
 
-## TODO
+# Overview
 
-- async https://gql.readthedocs.io/en/stable/advanced/async_advanced_usage.html#async-advanced-usage
-- less verbose logging https://gql.readthedocs.io/en/stable/advanced/logging.html
+Displays various analytics for MakerDao protocol utilizing Messari Lending Protocol standards. 
+Utilizes coingecko API for current price and market cap information for MKR token. 

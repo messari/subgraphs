@@ -13,7 +13,7 @@ REFRESH_INTERVAL_SEC = 30
 SUBGRAPH_URL = "https://api.thegraph.com/subgraphs/name/messari/makerdao-ethereum" # messari/makerdao-ethereum
 sg = Subgrounds()
 makerdao = sg.load_subgraph(SUBGRAPH_URL)
-#  python3.10 -m streamlit run protocols/makerdao.py 
+
 
 x= ["0xF72beaCc6fD334E14a7DDAC25c3ce1Eb8a827E10",
  "0xb0D2EB3C2cA3c6916FAb8DCbf9d9c165649231AE",
