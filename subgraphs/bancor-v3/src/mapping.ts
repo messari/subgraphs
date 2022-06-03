@@ -3,7 +3,7 @@ import {
   PoolCreated,
   TokensTraded,
 } from "../generated/BancorNetwork/BancorNetwork";
-import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection/PoolCollection";
+import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection1/PoolCollection1";
 import { PoolToken } from "../generated/BancorNetwork/PoolToken";
 import { ERC20 } from "../generated/BancorNetwork/ERC20";
 import {
