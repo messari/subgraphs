@@ -269,7 +269,7 @@ export function createLiquidation(event: Liquidation): void {
   liquidation.save();
 }
 
-export function updateMarkets(
+export function syncWithEulerGeneralView(
   eulerViewQueryResponse: EulerGeneralView__doQueryResultRStruct,
   block: ethereum.Block,
 ): void {

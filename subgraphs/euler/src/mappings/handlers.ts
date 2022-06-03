@@ -35,9 +35,9 @@ import {
   createLiquidation,
   createRepay,
   createWithdraw,
+  syncWithEulerGeneralView,
   updateAsset,
   updateLendingFactors,
-  updateMarkets,
   updateReserveFee,
 } from "./helpers";
 
@@ -129,6 +129,6 @@ export function handleBlockUpdates(block: ethereum.Block): void {
     return;
   }
 
-  updateMarkets(eulerViewQueryResult, block);
+  syncWithEulerGeneralView(eulerViewQueryResult, block);
   updateFinancials(block);
 }
