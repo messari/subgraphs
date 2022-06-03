@@ -6,6 +6,7 @@ import {
   GovSetAssetConfig,
   GovSetReserveFee,
   Liquidation,
+  MarketActivated,
   Repay,
   Withdraw
 } from "../../generated/euler/Euler"
@@ -33,6 +34,7 @@ import {
   createBorrow,
   createDeposit,
   createLiquidation,
+  createMarket,
   createRepay,
   createWithdraw,
   syncWithEulerGeneralView,
@@ -76,6 +78,10 @@ export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
 
 export function handleGovSetReserveFee(event: GovSetReserveFee): void {
   updateReserveFee(event);
+}
+
+export function handleMarketActivated(event: MarketActivated): void {
+  createMarket(event);
 }
 
 function getEulerViewContract(block: ethereum.Block): EulerGeneralView {

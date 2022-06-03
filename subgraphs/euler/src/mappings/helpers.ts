@@ -6,6 +6,7 @@ import {
   GovSetAssetConfig,
   GovSetReserveFee,
   Liquidation,
+  MarketActivated,
   Repay,
   Withdraw,
 } from "../../generated/euler/Euler";
@@ -235,6 +236,36 @@ export function updateReserveFee(event: GovSetReserveFee): void {
   const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
   marketUtility.reserveFee = event.params.newReserveFee;
   marketUtility.save();
+}
+
+export function createMarket(event: MarketActivated): void {
+  const market = getOrCreateMarket(event.params.underlying.toHexString());
+  const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
+
+  market.createdTimestamp = event.block.timestamp;
+  market.createdBlockNumber = event.block.number;
+
+  // Market are initialized in isolated tier, which means currency can't be used as collateral.
+  // https://docs.euler.finance/risk-framework/tiers
+  market.canUseAsCollateral = false;
+  market.canBorrowFrom = true;
+
+  const token = getOrCreateToken(event.params.underlying);
+  const dToken = getOrCreateToken(event.params.dToken);
+  const eToken = getOrCreateToken(event.params.eToken);
+
+  market.outputToken = eToken.id;
+  market.inputToken = token.id;
+  market.save();
+
+  marketUtility.token = token.id;
+  marketUtility.eToken = eToken.id;
+  marketUtility.dToken = dToken.id;
+  marketUtility.save();
+
+  const protocolUtility = getOrCreateProtocolUtility();
+  protocolUtility.markets = protocolUtility.markets.concat([market.id]);
+  protocolUtility.save();
 }
 
 export function createLiquidation(event: Liquidation): void {
