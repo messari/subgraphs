@@ -1,9 +1,15 @@
+import { ethereum } from "@graphprotocol/graph-ts";
 import { YieldAggregator } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import {
+  updateUsageMetricsDailySnapshot,
+  updateUsageMetricsHourlySnapshot,
+} from "../utils/metrics";
 
 export function createBeefyFinance(
   network: string,
-  vaultId: string
+  vaultId: string,
+  block: ethereum.Block
 ): YieldAggregator {
   const beefy = new YieldAggregator("BeefyFinance");
   beefy.name = "Beefy Finance";
@@ -19,9 +25,11 @@ export function createBeefyFinance(
   // beefy.cumulativeProtocolSideRevenueUSD = new BigDecimal(new BigInt(0));
   // beefy.cumulativeTotalRevenueUSD = new BigDecimal(new BigInt(0));
   beefy.cumulativeUniqueUsers = 0;
-  beefy.dailyUsageMetrics = [createFirstDailyUsageMetric()];
-  beefy.hourlyUsageMetrics = [createFirstHourlyUsageMetric()];
   beefy.vaults = [vaultId];
+  beefy.dailyUsageMetrics = [updateUsageMetricsDailySnapshot(block, beefy).id];
+  beefy.hourlyUsageMetrics = [
+    updateUsageMetricsHourlySnapshot(block, beefy).id,
+  ];
   beefy.save();
   return beefy;
 }

@@ -42,7 +42,7 @@ export function createVaultFromStrategy(
   }
   const vaultContract = BeefyVault.bind(vaultAddress);
 
-  vault.protocol = getBeefyFinanceOrCreate(network, vault.id).id;
+  vault.protocol = getBeefyFinanceOrCreate(network, vault.id, currentBlock).id;
   vault.name = fetchTokenName(vaultAddress);
   vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHexString() + NETWORK_SUFFIX;
@@ -89,8 +89,8 @@ export function createVaultFromStrategy(
       new BigDecimal(outputSupply)
     );
 
-  vault.deposits = [getOrCreateFirstDeposit(vault).id];
-  vault.withdraws = [getOrCreateFirstWithdraw(vault).id];
+  vault.deposits = [getOrCreateFirstDeposit(vault, currentBlock).id];
+  vault.withdraws = [getOrCreateFirstWithdraw(vault, currentBlock).id];
 
   vault.dailySnapshots = [updateVaultDailySnapshot(currentBlock, vault).id];
   vault.hourlySnapshots = [updateVaultHourlySnapshot(currentBlock, vault).id];

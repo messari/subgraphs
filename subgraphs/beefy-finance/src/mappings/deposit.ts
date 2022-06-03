@@ -1,4 +1,9 @@
-import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  BigInt,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { Deposit, Vault } from "../../generated/schema";
 import {
   BeefyStrategy,
@@ -28,7 +33,8 @@ export function createDeposit(
   deposit.logIndex = event.transaction.index.toI32();
   deposit.protocol = getBeefyFinanceOrCreate(
     dataSource.network(),
-    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id
+    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    event.block
   ).id;
   deposit.from = event.transaction.from.toHexString();
   const to = event.transaction.to;
@@ -55,7 +61,10 @@ export function createDeposit(
   return deposit;
 }
 
-export function getOrCreateFirstDeposit(vault: Vault): Deposit {
+export function getOrCreateFirstDeposit(
+  vault: Vault,
+  currentBlock: ethereum.Block
+): Deposit {
   let deposit = Deposit.load("MockDeposit" + vault.id);
   if (!deposit) {
     deposit = new Deposit("MockDeposit" + vault.id);
@@ -64,7 +73,8 @@ export function getOrCreateFirstDeposit(vault: Vault): Deposit {
     deposit.logIndex = 0;
     deposit.protocol = getBeefyFinanceOrCreate(
       dataSource.network(),
-      vault.id
+      vault.id,
+      currentBlock
     ).id;
     deposit.from = ZERO_ADDRESS_STRING;
     deposit.to = ZERO_ADDRESS_STRING;

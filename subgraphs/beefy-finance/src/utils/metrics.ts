@@ -1,14 +1,19 @@
-import { bigInt, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { time } from "console";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
   Vault,
   Withdraw,
   YieldAggregator,
 } from "../../generated/schema";
 import { BIGINT_ZERO } from "../prices/common/constants";
-import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
+import {
+  getDaysSinceEpoch,
+  getHoursSinceEpoch,
+  getBeginOfTheDayTimestamp,
+  getBeginOfTheHourTimestamp,
+} from "./time";
 
 export function getProtocolDailyId(
   block: ethereum.Block,
@@ -39,21 +44,67 @@ export function updateUsageMetricsDailySnapshot(
     protocolDailySnapshot.protocol = protocol.id;
   }
   protocolDailySnapshot.dailyActiveUsers = getUniqueUsers(protocol, [
-    beginDayTimestamp,
-    timestamp,
+    getBeginOfTheDayTimestamp(block.timestamp),
+    block.timestamp,
   ]);
   protocolDailySnapshot.cumulativeUniqueUsers = getUniqueUsers(protocol, [
-    0,
-    timestamp,
+    BIGINT_ZERO,
+    block.timestamp,
   ]);
-  protocolDailySnapshot.dailyTransactionCount = getDailyTransactionCount();
-  protocolDailySnapshot.dailyDepositCount = getDailyDepositCount();
-  protocolDailySnapshot.dailyWithdrawCount = getDailyWithdrawCount();
+  protocolDailySnapshot.dailyTransactionCount = getTransactionCount(protocol, [
+    getBeginOfTheDayTimestamp(block.timestamp),
+    block.timestamp,
+  ]);
+  protocolDailySnapshot.dailyDepositCount = getDepositCount(protocol, [
+    getBeginOfTheDayTimestamp(block.timestamp),
+    block.timestamp,
+  ]);
+  protocolDailySnapshot.dailyWithdrawCount = getWithdrawCount(protocol, [
+    getBeginOfTheDayTimestamp(block.timestamp),
+    block.timestamp,
+  ]);
   protocolDailySnapshot.blockNumber = block.number;
   protocolDailySnapshot.timestamp = block.timestamp;
   protocolDailySnapshot.save();
 
   return protocolDailySnapshot;
+}
+
+export function updateUsageMetricsHourlySnapshot(
+  block: ethereum.Block,
+  protocol: YieldAggregator
+): UsageMetricsHourlySnapshot {
+  const id = getProtocolHourlyId(block, protocol);
+  let protocolHourlySnapshot = UsageMetricsHourlySnapshot.load(id);
+  if (protocolHourlySnapshot == null) {
+    protocolHourlySnapshot = new UsageMetricsHourlySnapshot(id);
+    protocolHourlySnapshot.protocol = protocol.id;
+  }
+  protocolHourlySnapshot.hourlyActiveUsers = getUniqueUsers(protocol, [
+    getBeginOfTheHourTimestamp(block.timestamp),
+    block.timestamp,
+  ]);
+  protocolHourlySnapshot.cumulativeUniqueUsers = getUniqueUsers(protocol, [
+    BIGINT_ZERO,
+    block.timestamp,
+  ]);
+  protocolHourlySnapshot.hourlyTransactionCount = getTransactionCount(
+    protocol,
+    [getBeginOfTheHourTimestamp(block.timestamp), block.timestamp]
+  );
+  protocolHourlySnapshot.hourlyDepositCount = getDepositCount(protocol, [
+    getBeginOfTheHourTimestamp(block.timestamp),
+    block.timestamp,
+  ]);
+  protocolHourlySnapshot.hourlyWithdrawCount = getWithdrawCount(protocol, [
+    getBeginOfTheHourTimestamp(block.timestamp),
+    block.timestamp,
+  ]);
+  protocolHourlySnapshot.blockNumber = block.number;
+  protocolHourlySnapshot.timestamp = block.timestamp;
+  protocolHourlySnapshot.save();
+
+  return protocolHourlySnapshot;
 }
 
 function getUniqueUsers(

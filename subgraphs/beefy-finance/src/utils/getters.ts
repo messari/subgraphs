@@ -43,11 +43,12 @@ export function getVaultFromStrategyOrCreate(
 
 export function getBeefyFinanceOrCreate(
   network: string,
-  vaultId: string
+  vaultId: string,
+  currentBlock: ethereum.Block
 ): YieldAggregator {
   let beefy = YieldAggregator.load("BeefyFinance");
   if (!beefy) {
-    beefy = createBeefyFinance(network, vaultId);
+    beefy = createBeefyFinance(network, vaultId, currentBlock);
   }
   return beefy;
 }
