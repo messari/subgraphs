@@ -46,6 +46,8 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+  _poolToken: Token
 }
 
 enum RewardTokenType {
