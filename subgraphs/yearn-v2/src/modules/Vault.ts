@@ -1,6 +1,5 @@
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
-import { enumToPrefix } from "../common/strings";
 import { getOrCreateToken } from "../common/initializers";
 import { Vault as VaultStore } from "../../generated/schema";
 import { Vault as VaultTemplate } from "../../generated/templates";
@@ -10,9 +9,19 @@ import { Vault as VaultContract } from "../../generated/Registry_v1/Vault";
 export function _NewVault(
   vaultAddress: Address,
   block: ethereum.Block
-): VaultStore {
+): void {
   const vaultAddressString = vaultAddress.toHexString();
   const vaultContract = VaultContract.bind(vaultAddress);
+
+  const vaultVersion = utils.readValue<String>(
+    vaultContract.try_apiVersion(),
+    constants.VaultVersions.v0_3_0
+  );
+
+  // skipping yearn vaults with version less than 0.3.0
+  if (vaultVersion.split(".")[1] == "2") {
+    return
+  }
 
   let vault = VaultStore.load(vaultAddressString);
 
@@ -43,9 +52,10 @@ export function _NewVault(
 
     vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
     vault.lastReport = constants.BIGINT_ZERO;
+    vault.totalAssets = constants.BIGINT_ZERO;
 
     const managementFeeId =
-      enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
+      utils.enumToPrefix(constants.VaultFeeType.MANAGEMENT_FEE) +
       vaultAddress.toHexString();
     let managementFee = utils.readValue<BigInt>(
       vaultContract.try_managementFee(),
@@ -58,7 +68,7 @@ export function _NewVault(
     );
 
     const performanceFeeId =
-      enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
+      utils.enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE) +
       vaultAddress.toHexString();
     let performanceFee = utils.readValue<BigInt>(
       vaultContract.try_performanceFee(),
@@ -75,6 +85,4 @@ export function _NewVault(
 
     VaultTemplate.create(vaultAddress);
   }
-
-  return vault;
 }

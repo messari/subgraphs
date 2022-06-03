@@ -5,11 +5,18 @@ import {
   getOrCreateMarket,
   getOrCreateMarketDailySnapshot,
   getOrCreateMarketHourlySnapshot,
+  getOrCreateRate,
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
 } from "./getters";
 import { Address, ethereum } from "@graphprotocol/graph-ts";
-import { Account, ActiveAccount, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
+import {
+  Account,
+  ActiveAccount,
+  InterestRate,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
+} from "../../generated/schema";
 import { SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./utils/constants";
 
 ///////////////////////////
@@ -110,7 +117,6 @@ export function updateMarketDailyMetrics(event: ethereum.Event): void {
   marketMetrics.timestamp = event.block.timestamp;
 
   // update other vars
-  marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
@@ -126,6 +132,9 @@ export function updateMarketDailyMetrics(event: ethereum.Event): void {
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   // Note: daily tracking of deposit/borrow/liquidate in respective functions in helpers.ts
 
+  let identifier = market.id + "-" + (event.block.timestamp.toI64() / SECONDS_PER_DAY).toString();
+  marketMetrics.rates = getSnapshotRates(market.rates, identifier);
+
   marketMetrics.save();
 }
 
@@ -139,7 +148,6 @@ export function updateMarketHourlyMetrics(event: ethereum.Event): void {
   marketMetrics.timestamp = event.block.timestamp;
 
   // update other vars
-  marketMetrics.rates = market.rates;
   marketMetrics.totalValueLockedUSD = market.totalValueLockedUSD;
   marketMetrics.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
   marketMetrics.cumulativeDepositUSD = market.cumulativeDepositUSD;
@@ -153,7 +161,10 @@ export function updateMarketHourlyMetrics(event: ethereum.Event): void {
   marketMetrics.exchangeRate = market.exchangeRate;
   marketMetrics.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   marketMetrics.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
-  // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.tss
+  // Note: hourly tracking of deposit/borrow/liquidate in respective functions in helpers.ts
+
+  let identifier = market.id + "-" + (event.block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
+  marketMetrics.rates = getSnapshotRates(market.rates, identifier);
 
   marketMetrics.save();
 }
@@ -186,4 +197,22 @@ function updateTransactionCount(
 
   hourlyUsage.save();
   dailyUsage.save();
+}
+
+// create seperate InterestRate Entities for each market snapshot
+// this is needed to prevent snapshot rates from being pointers to the current rate
+function getSnapshotRates(rates: string[], identifier: string): string[] {
+  let snapshotRates: string[] = [];
+  for (let i = 0; i < rates.length; i++) {
+    let actualRate = InterestRate.load(rates[i]);
+
+    // get/create new snapshot rate
+    let _rate = getOrCreateRate(actualRate!.side, actualRate!.type, identifier);
+
+    // update rate to current rate
+    _rate.rate = actualRate!.rate;
+    _rate.save();
+    snapshotRates.push(_rate.id);
+  }
+  return snapshotRates;
 }

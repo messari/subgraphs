@@ -117,6 +117,13 @@
         "steegecs": "steegecs/trisolaris-aurora",
         "messari": "messari/trisolaris-aurora"
       }
+    },"ubeswap": {
+      "celo": {
+        "template": "ubeswap-template.yaml",
+        "steegecs": "steegecs/ubeswap-celo",
+        "messari": "messari/ubeswap-celo",
+        "sevenshi": "sevenshi/ubeswap_celo"
+      }
     }
   }
 }

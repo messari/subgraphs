@@ -56,7 +56,7 @@ function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProp
             </Box>
           );
         }
-        return <TableEvents datasetLabel={eventName} data={data} eventName={eventName} />;
+        return <TableEvents key={eventName + "Table"} datasetLabel={eventName} data={data} eventName={eventName} />;
       })}
     </>
   );

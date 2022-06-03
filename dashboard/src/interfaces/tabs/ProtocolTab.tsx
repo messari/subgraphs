@@ -199,7 +199,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields, protocolDat
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-              entitiesData[entityName][entityField].split("").length - 1
+                entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";
@@ -330,10 +330,7 @@ function ProtocolTab({ data, entities, entitiesData, protocolFields, protocolDat
                     <Chart datasetLabel={label} dataChart={dataFields[field]} />
                   </Grid>
                   <Grid key={label + "2"} item xs={4}>
-                    <TableChart
-                      datasetLabel={label}
-                      dataTable={dataFields[field]}
-                    />
+                    <TableChart datasetLabel={label} dataTable={dataFields[field]} />
                   </Grid>
                 </Grid>
               </div>
