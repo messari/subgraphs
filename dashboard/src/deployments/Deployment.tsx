@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -154,9 +154,9 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   const indexed = synced
     ? 100
     : toPercent(
-        status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
-        status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
-      );
+      status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
+      status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
+    );
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();

@@ -11,7 +11,7 @@ Sum across all Pools (Grow Pools + Earn Pools + Governance Pools):
 
 Sum across all Pools (Grow Pools + Earn Pools + Governance Pools):
 
-`Yield Generated`
+`Total Yield + Withdrawal Fees * Withdrawal Amount`
 
 ### Protocol-Side Revenue USD
 Portion of the Total Revenue allocated to the Protocol
@@ -30,7 +30,7 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Pools
 
-`Yield Generated - (Withdrawal Fees * Withdrawal Amount) - (Platform Fee * Yield Generated)`
+`Total Yield - Platform Fee * Total Yield`
 
 ### Total Unique Users
 

@@ -19,4 +19,5 @@ export namespace Deploy {
     export const TRISOLARIS_AURORA = 17;
     export const SOLARBEAM_MOONRIVER = 18;
     export const VVS_FINANCE_CRONOS = 19;
+    export const UBESWAP_CELO = 20;
   }
