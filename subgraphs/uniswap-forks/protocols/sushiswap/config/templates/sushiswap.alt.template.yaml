@@ -47,7 +47,7 @@ dataSources:
           handler: handleWithdrawMini
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256,indexed address)
           handler: handleEmergencyWithdrawMini
-      file: ./src/mappings/masterChef/sushiswap/rewardMini.ts
+      file: ./protocols/sushiswap/src/mappings/masterchef/rewardMini.ts
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -78,4 +78,3 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
-          

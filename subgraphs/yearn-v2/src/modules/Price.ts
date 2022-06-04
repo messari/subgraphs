@@ -1,11 +1,11 @@
-import * as utils from "../common/utils";
-import * as constants from "../common/constants";
 import {
   BigInt,
   Address,
   BigDecimal,
   dataSource,
 } from "@graphprotocol/graph-ts";
+import * as utils from "../common/utils";
+import * as constants from "../common/constants";
 import { Vault } from "../../generated/templates/Vault/Vault";
 import { getPriceUsdcRecommended } from "../Prices/routers/CurveRouter";
 

@@ -282,6 +282,7 @@ type LendingProtocol implements Protocol @entity {
   #### Add-Ons ####
   " oracle for the protocol "
   _priceOracle: String!
+
   " All markets that belong to this protocol. protocol.markets won't work, see https://github.com/graphprotocol/graph-ts/issues/219 "
   _marketIDs: [ID!]!
 
@@ -979,4 +980,33 @@ type Account @entity {
 type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
+}
+
+###########################
+##### Helper Entities #####
+###########################
+
+# Helper entities are additional entities created to help with mapping.
+# They are usually used to store internal states that would simplify
+# the mapping logic. All helper entities should be prefixed with an
+# underscore to differentiate them from the common schema.
+
+type _CircularBuffer @entity {
+  " 'CIRCULAR_BUFFER' "
+  id: ID!
+
+  " Array of sorted block numbers sorted continuously "
+  blocks: [Int!]!
+
+  " The index in the blocks array which will be used with the newest block to calculate block speed (Usally set to about a day before newest block) "
+  windowStartIndex: Int!
+
+  " The next index in the blocks array that will be replaced with the newest block "
+  nextIndex: Int!
+
+  " This determines the size of the blocks array. Should be set to contain at least a days worth of blocks according to a 1 day window for measuring speed"
+  bufferSize: Int!
+
+  " The current calculated number of blocks per day based on calculated block speed "
+  blocksPerDay: BigDecimal!
 }

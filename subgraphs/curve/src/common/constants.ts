@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Curve Finance";
 export const PROTOCOL_SLUG = "curve";
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -117,6 +117,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
@@ -146,8 +147,7 @@ export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
-export const SNAPSHOT_SECONDS = SECONDS_PER_DAY
-
+export const SNAPSHOT_SECONDS = SECONDS_PER_DAY;
 
 ////////////////
 ///// Misc /////
@@ -164,3 +164,8 @@ export const FEE_DENOMINATOR_DECIMALS = 10;
 export const CRV_TOKEN = Address.fromString("0xd533a949740bb3306d119cc777fa900ba034cd52");
 export const CRV_POOL_START_BLOCK = 10928474;
 
+export const MISPRICE_TOKENS: string[] = [
+  "0x48759f220ed983db51fa7a8c0d2aab8f3ce4166a",
+  "0x76eb2fe28b36b3ee97f3adae0c69606eedb2a37c",
+  "0x8e595470ed749b85c6f7669de83eae304c2ec68f",
+];
