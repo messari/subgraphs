@@ -29,19 +29,37 @@ export function updatePoolRewards(event: ethereum.Event, poolAddress: Address): 
       ]);
 
       if (_asset.rewardTokens) {
+        log.debug("[UpdateRewards][{}] get RTs {} for asset {} amt {}, usd {}, POOOL AMT {} POOL USD {}", [
+          event.transaction.hash.toHexString(),
+          _asset.rewardTokens!.toString(),
+          _asset.id,
+          _asset.rewardTokenEmissionsAmount!.toString(),
+          _asset.rewardTokenEmissionsUSD!.toString(),
+          poolRewardTokenEmissionsAmount.toString(),
+          poolRewardTokenEmissionsUSD.toString(),
+        ]);
+
         for (let k = 0; k < _asset.rewardTokens!.length; k++) {
-          poolRewardTokenEmissionsAmount[k] = poolRewardTokenEmissionsAmount[k].plus(
-            _asset.rewardTokenEmissionsAmount![k],
-          );
-          poolRewardTokenEmissionsUSD[k] = poolRewardTokenEmissionsUSD[k].plus(_asset.rewardTokenEmissionsUSD![k]);
+          if (poolRewardTokenEmissionsAmount.length) {
+            poolRewardTokenEmissionsAmount[k] = poolRewardTokenEmissionsAmount[k].plus(
+              _asset.rewardTokenEmissionsAmount![k],
+            );
+            poolRewardTokenEmissionsUSD[k] = poolRewardTokenEmissionsUSD[k].plus(_asset.rewardTokenEmissionsUSD![k]);
+          } else {
+            poolRewardTokenEmissionsAmount.push(_asset.rewardTokenEmissionsAmount![k]);
+            poolRewardTokenEmissionsUSD.push(_asset.rewardTokenEmissionsUSD![k]);
+          }
 
           log.debug("[UpdateRewards][{}] get RT at {} => {} AMT: {} USD: {}", [
             event.transaction.hash.toHexString(),
             k.toString(),
+            _asset.rewardTokens![k].toString(),
             _asset.rewardTokenEmissionsAmount![k].toString(),
             _asset.rewardTokenEmissionsUSD![k].toString(),
           ]);
         }
+
+        poolRewardTokens = _asset.rewardTokens!;
       }
     }
   }
@@ -69,6 +87,7 @@ export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address,
   if (rts.indexOf(rt.id) < 0) {
     rts.push(rt.id);
   }
+  log.debug("Added Reward {} Token {} to Asset {}", [rt.id.toString(), rtAddress.toHexString(), _asset.id.toString()]);
   _asset.rewardTokens = rts;
   _asset.save();
   return rt;
@@ -148,14 +167,22 @@ export function getAssetForRewardsOld<T>(event: T): _Asset {
     let token = getOrCreateToken(event, Address.fromString(rewardToken.token));
 
     if (token.id == PTPAddress) {
-      tps = allocPoint.div(totalAllocPoint).times(ptpPerSecond);
+      tps = ptpPerSecond.div(totalAllocPoint).times(allocPoint);
+      log.debug("PPS/TAP*AP {}/{}*{}={}", [
+        ptpPerSecond.toString(),
+        totalAllocPoint.toString(),
+        allocPoint.toString(),
+        tps.toString(),
+      ]);
     } else {
       let rewarderContract = SimpleRewarder.bind(rewarder);
       tps = getTPS(rewarderContract);
+      log.debug("TPS={}", [tps.toString()]);
     }
 
-    rewardTokenEmissionsAmount[k] = emissionsPerDay(tps);
-    rewardTokenEmissionsUSD[k] = tokenAmountToUSDAmount(token, rewardTokenEmissionsAmount[k]);
+    log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
+    rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
+    rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
   }
 
   _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
@@ -232,8 +259,9 @@ export function getAssetForRewardsNew<T>(event: T): _Asset {
       tps = getTPS(rewarderContract);
     }
 
-    rewardTokenEmissionsAmount[k] = emissionsPerDay(tps);
-    rewardTokenEmissionsUSD[k] = tokenAmountToUSDAmount(token, rewardTokenEmissionsAmount[k]);
+    log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
+    rewardTokenEmissionsAmount.push(emissionsPerDay(tps));
+    rewardTokenEmissionsUSD.push(tokenAmountToUSDAmount(token, emissionsPerDay(tps)));
   }
 
   _asset!.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
