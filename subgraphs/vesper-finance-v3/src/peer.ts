@@ -163,7 +163,7 @@ export class WithdrawRevenue {
     );
     this.withdrawAmount = withdrawAmount
       .toBigDecimal()
-      .div(getDecimalDivisor(token.decimals()));
+      .div(getDecimalDivisor(poolV3.decimals()));
     this.withdrawAmountUsd = getUsdPrice(poolV3.token(), this.withdrawAmount);
 
     if (withdrawFee_call.reverted) {
