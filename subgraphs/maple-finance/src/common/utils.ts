@@ -2,7 +2,7 @@ import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/PoolFactory/ERC20";
 import { ERC20NameBytes } from "../../generated/templates/PoolFactory/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/templates/PoolFactory/ERC20SymbolBytes";
-import { ONE_BD, TEN_BD, ZERO_BI } from "./constants";
+import { ONE_BD, ONE_BI, TEN_BD, ZERO_BI } from "./constants";
 
 // Functions designed to try...catch erc20 name/symbol/decimals to prevent errors
 export function getAssetName(address: Address): string {
@@ -96,4 +96,19 @@ export function parseUnits(value: BigInt, decimals: i32): BigDecimal {
 export function formatUnits(value: BigDecimal, decimals: i32): BigInt {
     const powerTerm = powBigDecimal(TEN_BD, decimals);
     return bigDecimalToBigInt(value.times(powerTerm));
+}
+
+/**
+ * Compute the new average given an old average and count, and new value
+ * @param oldAvg old average
+ * @param oldCount count of entries making up the old average
+ * @param newVal new value to add to the average
+ * @returns new average including newVal
+ */
+export function computeNewAverage(oldAvg: BigDecimal, oldCount: BigInt, newVal: BigDecimal): BigDecimal {
+    // new_avg = (old_avg * old_count + new_val) / (oldCount + 1)
+    return oldAvg
+        .times(oldCount.toBigDecimal())
+        .plus(newVal)
+        .div(oldCount.plus(ONE_BI).toBigDecimal());
 }

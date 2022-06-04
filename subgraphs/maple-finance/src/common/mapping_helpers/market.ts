@@ -5,7 +5,7 @@ import { POOL_WAD_DECIMALS, PROTOCOL_ID, UNPROVIDED_NAME, ZERO_ADDRESS, ZERO_BD,
 import { getTokenPriceInUSD } from "../prices/prices";
 import { parseUnits, powBigDecimal } from "../utils";
 import { getOrCreateMplReward, mplRewardTick } from "./mplReward";
-import { getOrCreateProtocol } from "./protocol";
+import { getOrCreateProtocol, updateFinancialMetrics } from "./protocol";
 import { getOrCreateStakeLocker, stakeLockerTick } from "./stakeLocker";
 import { getOrCreateToken } from "./token";
 
@@ -292,4 +292,7 @@ export function marketTick(market: Market, event: ethereum.Event): void {
     );
 
     protocol.save();
+
+    // Update financial metrics, must come after updating protocol
+    updateFinancialMetrics(event);
 }

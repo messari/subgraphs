@@ -441,6 +441,29 @@ type FinancialsDailySnapshot @entity {
 
     " Sum of all historical liquidations in USD "
     cumulativeLiquidateUSD: BigDecimal!
+
+    ##### Internal parameters #####
+
+    " Number of transactions making up the snapshot. This is used for average computation. "
+    _txCount: BigInt!
+
+    " Supply revenue when the snapshot was first created. This is used for computing the daily supply side revenue. "
+    _initialSupplySideRevenueUSD: BigDecimal!
+
+    " Prototcol side revenue when the snapshot was first created. This is used for computing the daily protocol side revenue. "
+    _initialProtocolSideRevenueUSD: BigDecimal!
+
+    " Total revenue when the snapshot was first created. This is used for computing the daily total revenue. "
+    _initialTotalRevenueUSD: BigDecimal!
+
+    " Deposit balance when the snapshot was first created. This is used for computing the daily deposit. "
+    _initialDepositUSD: BigDecimal!
+
+    " Borrow balance when the snapshot was first created. This is used for computing the daily borrow. "
+    _initialBorrowUSD: BigDecimal!
+
+    " Liquidation balance when the snapshot was first created. This is used for computing the daily liquidate. "
+    _initialLiquidateUSD: BigDecimal!
 }
 
 ###############################
