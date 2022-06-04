@@ -27,7 +27,7 @@ import {
   EULER_GENERAL_VIEW_V2_ADDRESS,
   VIEW_V2_START_BLOCK_NUMBER,
 } from "../common/constants";
-import { updateFinancials, updateUsageMetrics } from "../common/metrics";
+import { updateFinancials, updateMarketDailyMetrics, updateMarketHourlyMetrics, updateUsageMetrics } from "../common/metrics";
 import { _MarketUtility } from "../../generated/schema";
 import { BigInt } from "@graphprotocol/graph-ts";
 import {
@@ -48,28 +48,48 @@ export function handleAssetStatus(event: AssetStatus): void {
 }
 
 export function handleBorrow(event: Borrow): void {
-  createBorrow(event);
+  createBorrow(event)
+  const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.BORROW);
+  updateFinancials(event.block);
+  updateMarketDailyMetrics(event.block, marketId);
+  updateMarketHourlyMetrics(event.block, marketId);
 }
 
 export function handleDeposit(event: Deposit): void {
   createDeposit(event);
+  const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.DEPOSIT);
+  updateFinancials(event.block);
+  updateMarketDailyMetrics(event.block, marketId);
+  updateMarketHourlyMetrics(event.block, marketId);
 }
 
 export function handleRepay(event: Repay): void {
   createRepay(event);
+  const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.REPAY);
+  updateFinancials(event.block);
+  updateMarketDailyMetrics(event.block, marketId);
+  updateMarketHourlyMetrics(event.block, marketId);
 }
 
 export function handleWithdraw(event: Withdraw): void {
   createWithdraw(event);
+  const marketId = event.params.underlying.toHexString();
   updateUsageMetrics(event, event.params.account, TransactionType.WITHDRAW);
+  updateFinancials(event.block);
+  updateMarketDailyMetrics(event.block, marketId);
+  updateMarketHourlyMetrics(event.block, marketId);
 }
 
 export function handleLiquidation(event: Liquidation): void {
   createLiquidation(event);
-  updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
+  const marketId = event.params.underlying.toHexString();
+  updateUsageMetrics(event, event.params.liquidator, TransactionType.WITHDRAW);
+  updateFinancials(event.block);
+  updateMarketDailyMetrics(event.block, marketId);
+  updateMarketHourlyMetrics(event.block, marketId);
 }
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {

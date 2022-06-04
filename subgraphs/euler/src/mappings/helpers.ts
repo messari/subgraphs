@@ -185,6 +185,48 @@ export function createWithdraw(event: Withdraw): void {
   market.save();
 }
 
+export function createLiquidation(event: Liquidation): void {
+  const liquidation = getOrCreateLiquidate(event);
+  const collateralTokenId = event.params.underlying.toHexString();
+  const collateralToken = getOrCreateToken(event.params.underlying);
+  const seizedTokenId = event.params.collateral.toHexString();
+  const seizedToken = getOrCreateToken(event.params.collateral);
+
+  liquidation.market = collateralTokenId;
+  liquidation.asset = seizedTokenId;
+  liquidation.from = event.params.liquidator.toHexString();
+  liquidation.to = event.params.violator.toHexString();
+  liquidation.amount = event.params.repay; // Amount is denominated in underlying (not in dToken)
+
+  if (collateralToken.lastPriceUSD) {
+    const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
+    liquidation.amountUSD = amountToUsd(
+      event.params.repay,
+      collateralMarketUtility.twap,
+      collateralMarketUtility.twapPrice,
+    );
+    const collateralMarket = getOrCreateMarket(collateralTokenId);
+    collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
+
+    if (seizedToken.lastPriceUSD) {
+      const seizedMarketUtility = getOrCreateMarketUtility(seizedTokenId);
+      const yieldUSD = amountToUsd(event.params._yield, seizedMarketUtility.twap, seizedMarketUtility.twapPrice);
+      liquidation.profitUSD = yieldUSD.minus(liquidation.amountUSD!);
+    }
+  }
+  
+  if (liquidation.amountUSD) {
+    const market = getOrCreateMarket(collateralTokenId);
+    market.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
+    market.save();
+
+    const protocol = getOrCreateLendingProtocol();
+    protocol.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
+    protocol.save();
+  }
+  liquidation.save();
+}
+
 function updateMarketLendingFactors(marketUtility: _MarketUtility, usdcMarketUtility: _MarketUtility): void {
   /**
    * Euler has different collateral and borrow factors for all assets. This means that, in theory, there
@@ -266,38 +308,6 @@ export function createMarket(event: MarketActivated): void {
   const protocolUtility = getOrCreateProtocolUtility();
   protocolUtility.markets = protocolUtility.markets.concat([market.id]);
   protocolUtility.save();
-}
-
-export function createLiquidation(event: Liquidation): void {
-  const liquidation = getOrCreateLiquidate(event);
-  const collateralTokenId = event.params.underlying.toHexString();
-  const collateralToken = getOrCreateToken(event.params.underlying);
-  const seizedTokenId = event.params.collateral.toHexString();
-  const seizedToken = getOrCreateToken(event.params.collateral);
-
-  liquidation.market = collateralTokenId;
-  liquidation.asset = seizedTokenId;
-  liquidation.from = event.params.liquidator.toHexString();
-  liquidation.to = event.params.violator.toHexString();
-  liquidation.amount = event.params.repay; // Amount is denominated in underlying (not in dToken)
-
-  if (collateralToken.lastPriceUSD) {
-    const collateralMarketUtility = getOrCreateMarketUtility(collateralTokenId);
-    liquidation.amountUSD = amountToUsd(
-      event.params.repay,
-      collateralMarketUtility.twap,
-      collateralMarketUtility.twapPrice,
-    );
-    const collateralMarket = getOrCreateMarket(collateralTokenId);
-    collateralMarket.cumulativeLiquidateUSD = collateralMarket.cumulativeLiquidateUSD.plus(liquidation.amountUSD!);
-
-    if (seizedToken.lastPriceUSD) {
-      const seizedMarketUtility = getOrCreateMarketUtility(seizedTokenId);
-      const yieldUSD = amountToUsd(event.params._yield, seizedMarketUtility.twap, seizedMarketUtility.twapPrice);
-      liquidation.profitUSD = yieldUSD.minus(liquidation.amountUSD!);
-    }
-  }
-  liquidation.save();
 }
 
 export function syncWithEulerGeneralView(
