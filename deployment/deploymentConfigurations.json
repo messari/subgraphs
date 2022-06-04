@@ -10,31 +10,31 @@
         "template": "abracadabra.money.template.yaml",
         "steegecs": "steegecs/abracadabra-money-arbitrum",
         "messari": "messari/abracadabra-money-arbitrum",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "avalanche": {
         "template": "abracadabra.money.template.yaml",
         "steegecs": "steegecs/abracadabra-money-avalanche",
         "messari": "messari/abracadabra-money-avalanche",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "bsc": {
         "template": "abracadabra.money.template.yaml",
         "steegecs": "steegecs/abracadabra-money-bsc",
         "messari": "messari/abracadabra-money-bsc",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "fantom": {
         "template": "abracadabra.money.template.yaml",
         "steegecs": "steegecs/abracadabra-money-fantom",
         "messari": "messari/abracadabra-money-fantom",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "mainnet": {
         "template": "abracadabra.money.template.yaml",
         "steegecs": "steegecs/abracadabra-money-ethereum",
         "messari": "messari/abracadabra-money-ethereum",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       }
     },
     "apeswap": {
@@ -55,31 +55,31 @@
     "curve": {
       "arbitrum": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "avalanche": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "fantom": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "mainnet": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "matic": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "optimism": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       },
       "xdai": {
         "template": "apeswap.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
       }
     },
     "ellipsis-finance": {
@@ -91,7 +91,7 @@
     "makerdao": {
       "mainnet": {
         "template": "makerdao.template.yaml",
-        "deploy-on-merge": "false"
+        "deploy-on-merge": false
 
       }
     },
@@ -130,32 +130,32 @@
     "sushiswap": {
       "arbitrum": {
         "template": "sushiswap.alt.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "avalanche": {
         "template": "uniswap.v2.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "bsc": {
         "template": "uniswap.v2.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "celo": {
         "template": "sushiswap.alt.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "fantom": {
         "template": "sushiswap.alt.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "fuse": {
         "template": "sushiswap.alt.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "mainnet": {
@@ -167,12 +167,12 @@
       "matic": {
         "template": "sushiswap.alt.template.yaml",
         "steegecs": "steegecs/sushiswap-matic",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "moonbeam": {
         "template": "sushiswap.alt.template.yaml",
-        "deploy-on-merge": "false",
+        "deploy-on-merge": false,
         "prepare:constants": true
       },
       "moonriver": {
