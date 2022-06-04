@@ -39,10 +39,16 @@ export const ProtocolTypeEntityNames: Record<string, string> = {
 export interface Schema {
   entities: string[];
   entitiesData: { [x: string]: { [x: string]: string } };
-  query: string;
   poolData: { [x: string]: string };
   events: string[];
   protocolFields: { [x: string]: string };
+  query: string;
+  financialsQuery: string;
+  hourlyUsageQuery: string;
+  dailyUsageQuery: string;
+  protocolTableQuery: string;
+  poolsQuery: string;
+  poolTimeseriesQuery: string;
 }
 export const percentageFieldList = [
   "rates",

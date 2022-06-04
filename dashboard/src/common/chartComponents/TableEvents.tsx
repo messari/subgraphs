@@ -67,8 +67,8 @@ export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps)
       if (currentData?.tokenIn) {
         const amountIn = convertTokenDecimals(currentData.amountIn, currentData.tokenIn.decimals);
         const amountOut = convertTokenDecimals(currentData.amountOut, currentData.tokenOut.decimals);
-        currentData.amountIn = amountIn;
-        currentData.amountOut = amountOut;
+        currentData.amountIn = amountIn.toFixed(2);
+        currentData.amountOut = amountOut.toFixed(2);
         currentData.tokenIn = currentData.tokenIn.id;
         currentData.tokenOut = currentData.tokenOut.id;
         tableData.push({ id: i, date: toDate(currentData.timestamp), ...currentData });

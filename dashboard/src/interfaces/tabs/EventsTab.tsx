@@ -2,18 +2,20 @@ import React, { useEffect, useState } from "react";
 import { TableEvents } from "../../common/chartComponents/TableEvents";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
 import IssuesDisplay from "../IssuesDisplay";
-import { Box, Typography } from "@mui/material";
+import { Box, CircularProgress, Typography } from "@mui/material";
 
 interface EventsTabProps {
   data: any;
   events: string[];
   poolId: string;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  poolsList: { [x: string]: any[] };
+  poolListLoading: any;
   poolNames: string;
 }
 
 // This component is for each individual subgraph
-function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProps) {
+function EventsTab({ data, events, poolId, setPoolId, poolsList, poolNames, poolListLoading }: EventsTabProps) {
   const [issuesState, setIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>([]);
   const issues: { message: string; type: string; level: string; fieldName: string }[] = issuesState;
 
@@ -22,15 +24,23 @@ function EventsTab({ data, events, poolId, setPoolId, poolNames }: EventsTabProp
     setIssues(issues);
   }, [issuesState]);
 
-  return (
-    <>
-      <IssuesDisplay issuesArrayProps={issues} />
+  let poolDropDown = null;
+  if (poolsList) {
+    poolDropDown = (
       <PoolDropDown
         poolId={poolId}
         setPoolId={(x) => setPoolId(x)}
         setIssues={(x) => setIssues(x)}
-        markets={data[poolNames]}
+        markets={poolsList[poolNames]}
       />
+    );
+  } else if (poolListLoading) {
+    return <CircularProgress sx={{ margin: 6 }} size={50} />;
+  }
+  return (
+    <>
+      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+      {poolDropDown}
       {events.map((eventName) => {
         if (!poolId && data[eventName].length > 0) {
           const message = `${eventName} events found with a pool id of "". All events need to be linked to a pool/market/vault by a valid id.`;

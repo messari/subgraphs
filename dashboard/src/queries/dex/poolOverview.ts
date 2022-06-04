@@ -70,7 +70,7 @@ export const schema110 = (): string => {
 export const schema120 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        liquidityPools(first: 100, skip: $skipAmt) {
+        liquidityPools(first: 50, skip: $skipAmt) {
             id
       name
       symbol
