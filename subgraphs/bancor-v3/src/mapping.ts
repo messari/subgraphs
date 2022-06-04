@@ -234,6 +234,10 @@ export function handleTradingLiquidityUpdated(
     return;
   }
   liquidityPool.inputTokenBalances = [event.params.newLiquidity];
+  liquidityPool.totalValueLockedUSD = event.params.newLiquidity
+    .toBigDecimal()
+    .div(exponentToBigDecimal(token.decimals))
+    .times(getTokenPriceUSD(token.id));
   liquidityPool.save();
 }
 
@@ -400,7 +404,7 @@ function createLiquidityPool(
   liquidityPool.totalValueLockedUSD = zeroBD;
   liquidityPool.cumulativeVolumeUSD = zeroBD;
   liquidityPool.inputTokenBalances = [zeroBI];
-  liquidityPool.inputTokenWeights = []; // TODO
+  liquidityPool.inputTokenWeights = [new BigDecimal(BigInt.fromI32(1))];
   liquidityPool.outputTokenSupply = zeroBI;
   liquidityPool.outputTokenPriceUSD = zeroBD;
   liquidityPool.stakedOutputTokenAmount = zeroBI;
@@ -438,7 +442,7 @@ function _handleTokensDeposited(
   deposit.amountUSD = reserveTokenAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(reserveToken.decimals))
-    .times(getTokenPriceUSD(Address.fromString(reserveToken.id)));
+    .times(getTokenPriceUSD(reserveToken.id));
   deposit.pool = poolToken.id;
 
   deposit.save();
@@ -472,28 +476,26 @@ function _handleTokensWithdrawn(
   withdraw.amountUSD = reserveTokenAmount
     .toBigDecimal()
     .div(exponentToBigDecimal(reserveToken.decimals))
-    .times(getTokenPriceUSD(Address.fromString(reserveToken.id)));
+    .times(getTokenPriceUSD(reserveToken.id));
   withdraw.pool = poolToken.id;
 
   withdraw.save();
 }
 
 // reserve token only
-function getTokenPriceUSD(tokenAddress: Address): BigDecimal {
-  if (tokenAddress == Address.fromString(DaiAddr)) {
+function getTokenPriceUSD(tokenAddress: string): BigDecimal {
+  if (tokenAddress == DaiAddr) {
     return new BigDecimal(BigInt.fromI32(1));
   }
 
-  let token = Token.load(tokenAddress.toHexString());
+  let token = Token.load(tokenAddress);
   if (!token) {
-    log.warning("[getTokenPrice] token {} not found", [
-      tokenAddress.toHexString(),
-    ]);
+    log.warning("[getTokenPrice] token {} not found", [tokenAddress]);
     return zeroBD;
   }
   if (!token._poolToken) {
     log.warning("[getTokenPrice] token {} doesn't link to a pool token", [
-      tokenAddress.toHexString(),
+      tokenAddress,
     ]);
     return zeroBD;
   }
