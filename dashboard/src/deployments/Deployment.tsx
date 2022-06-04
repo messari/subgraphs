@@ -129,8 +129,8 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
         sx={{ width: "70%" }}
         $styleRules={{
           schemaOutdated,
-          nonFatalErrors: true,
-          fatalError: true,
+          nonFatalErrors: false,
+          fatalError: false,
           success: false,
         }}
       >
