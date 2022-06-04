@@ -1,7 +1,6 @@
 {
   "name": "abracadabra",
   "license": "UNLICENSED",
-  "type": "module",
   
   "scripts": {
     "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
