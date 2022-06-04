@@ -52,9 +52,6 @@ export function getOrCreateMplReward(
             const newRewardTokens = market.rewardTokens;
             newRewardTokens.push(rewardToken.id);
             market.rewardTokens = newRewardTokens;
-            log.warning("Added reward token: {}", [rewardToken.id]);
-        } else {
-            log.warning("Already have reward token: {}", [rewardToken.id]);
         }
 
         mplReward.market = market.id;

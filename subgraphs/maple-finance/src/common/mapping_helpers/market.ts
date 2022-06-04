@@ -1,9 +1,28 @@
 import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
-import { Market, _MplReward, _PoolFactory, _StakeLocker } from "../../../generated/schema";
+import {
+    Market,
+    MarketDailySnapshot,
+    MarketHourlySnapshot,
+    RewardToken,
+    _MplReward,
+    _PoolFactory,
+    _StakeLocker
+} from "../../../generated/schema";
 
-import { POOL_WAD_DECIMALS, PROTOCOL_ID, UNPROVIDED_NAME, ZERO_ADDRESS, ZERO_BD, ZERO_BI, TEN_BD } from "../constants";
+import {
+    POOL_WAD_DECIMALS,
+    PROTOCOL_ID,
+    UNPROVIDED_NAME,
+    ZERO_ADDRESS,
+    ZERO_BD,
+    ZERO_BI,
+    TEN_BD,
+    SEC_PER_DAY,
+    SEC_PER_HOUR,
+    ONE_BI
+} from "../constants";
 import { getTokenPriceInUSD } from "../prices/prices";
-import { parseUnits, powBigDecimal } from "../utils";
+import { bigDecimalToBigInt, computeNewAverage, parseUnits, powBigDecimal } from "../utils";
 import { getOrCreateMplReward, mplRewardTick } from "./mplReward";
 import { getOrCreateProtocol, updateFinancialMetrics } from "./protocol";
 import { getOrCreateStakeLocker, stakeLockerTick } from "./stakeLocker";
@@ -46,8 +65,8 @@ export function getOrCreateMarket(
         market.liquidationPenalty = ZERO_BD;
         market.inputToken = inputTokenAddress.toHexString();
         market.outputToken = outputTokenAddress.toHexString();
-        market.rewardTokens = [];
-        market.rates = [];
+        market.rewardTokens = new Array<string>();
+        market.rates = new Array<string>();
         market.totalValueLockedUSD = ZERO_BD;
         market.totalDepositBalanceUSD = ZERO_BD;
         market.cumulativeDepositUSD = ZERO_BD;
@@ -59,8 +78,8 @@ export function getOrCreateMarket(
         market.outputTokenSupply = ZERO_BI;
         market.outputTokenPriceUSD = ZERO_BD;
         market.exchangeRate = initalExchangeRate;
-        market.rewardTokenEmissionsAmount = [];
-        market.rewardTokenEmissionsUSD = [];
+        market.rewardTokenEmissionsAmount = new Array<BigInt>();
+        market.rewardTokenEmissionsUSD = new Array<BigDecimal>();
         market.createdTimestamp = creationTimestamp;
         market.createdBlockNumber = creationBlockNumber;
         market._poolFactory = poolFactoryAddress.toHexString();
@@ -113,6 +132,268 @@ export function getOrCreateMarket(
     }
 
     return market;
+}
+
+function getOrCreateMarketDailySnapshot(market: Market, event: ethereum.Event): MarketDailySnapshot {
+    const dayNumber = event.block.timestamp.div(SEC_PER_DAY);
+    const snapshotId = market.id + "-" + dayNumber.toString();
+    let marketSnapshot = MarketDailySnapshot.load(snapshotId);
+
+    if (!marketSnapshot) {
+        marketSnapshot = new MarketDailySnapshot(snapshotId);
+        const timestamp = dayNumber.times(SEC_PER_DAY); // Rounded to the start of the day
+
+        marketSnapshot.market = market.id;
+        marketSnapshot.blockNumber = event.block.number;
+        marketSnapshot.timestamp = timestamp;
+
+        marketSnapshot.rates = market.rates;
+        marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+        marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+        marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+        marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+        marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+        marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+        marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+        marketSnapshot.inputTokenBalance = market.inputTokenBalance;
+        marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+        marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+        marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+        marketSnapshot.exchangeRate = market.exchangeRate;
+
+        marketSnapshot.dailyDepositUSD = ZERO_BD;
+        marketSnapshot.dailyBorrowUSD = ZERO_BD;
+        marketSnapshot.dailyLiquidateUSD = ZERO_BD;
+
+        marketSnapshot._txCount = ZERO_BI;
+        marketSnapshot._initialDepositUSD = market.totalDepositBalanceUSD;
+        marketSnapshot._initialBorrowUSD = market.totalBorrowBalanceUSD;
+        marketSnapshot._initialLiquidateUSD = market.cumulativeLiquidateUSD;
+    }
+
+    return marketSnapshot;
+}
+
+function getOrCreateMarketHourlySnapshot(market: Market, event: ethereum.Event): MarketHourlySnapshot {
+    const hourNumber = event.block.timestamp.div(SEC_PER_HOUR);
+    const snapshotId = market.id + "-" + hourNumber.toString();
+    let marketSnapshot = MarketHourlySnapshot.load(snapshotId);
+
+    if (!marketSnapshot) {
+        marketSnapshot = new MarketHourlySnapshot(snapshotId);
+        const timestamp = hourNumber.times(SEC_PER_HOUR); // Rounded to the start of the hour
+
+        marketSnapshot.market = market.id;
+        marketSnapshot.blockNumber = event.block.number;
+        marketSnapshot.timestamp = timestamp;
+
+        marketSnapshot.rates = market.rates;
+        marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+        marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+        marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+        marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+        marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+        marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+        marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+        marketSnapshot.inputTokenBalance = market.inputTokenBalance;
+        marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+        marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+        marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+        marketSnapshot.exchangeRate = market.exchangeRate;
+
+        marketSnapshot.hourlyDepositUSD = ZERO_BD;
+        marketSnapshot.hourlyBorrowUSD = ZERO_BD;
+        marketSnapshot.hourlyLiquidateUSD = ZERO_BD;
+
+        marketSnapshot._txCount = ZERO_BI;
+        marketSnapshot._initialDepositUSD = market.totalDepositBalanceUSD;
+        marketSnapshot._initialBorrowUSD = market.totalBorrowBalanceUSD;
+        marketSnapshot._initialLiquidateUSD = market.cumulativeLiquidateUSD;
+    }
+
+    return marketSnapshot;
+}
+
+function updateMarketDailySnapshots(market: Market, event: ethereum.Event): void {
+    const marketSnapshot = getOrCreateMarketDailySnapshot(market, event);
+
+    ////
+    // Update direct copies
+    ////
+    marketSnapshot.rates = market.rates;
+    marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+    marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+    ////
+    // Update averages
+    ////
+    const txCount = marketSnapshot._txCount;
+
+    marketSnapshot.totalValueLockedUSD = computeNewAverage(
+        marketSnapshot.totalValueLockedUSD,
+        txCount,
+        market.totalValueLockedUSD
+    );
+
+    marketSnapshot.totalDepositBalanceUSD = computeNewAverage(
+        marketSnapshot.totalDepositBalanceUSD,
+        txCount,
+        market.totalDepositBalanceUSD
+    );
+
+    marketSnapshot.cumulativeDepositUSD = computeNewAverage(
+        marketSnapshot.cumulativeDepositUSD,
+        txCount,
+        market.cumulativeDepositUSD
+    );
+
+    marketSnapshot.cumulativeBorrowUSD = computeNewAverage(
+        marketSnapshot.cumulativeBorrowUSD,
+        txCount,
+        market.cumulativeBorrowUSD
+    );
+
+    marketSnapshot.cumulativeLiquidateUSD = computeNewAverage(
+        marketSnapshot.cumulativeLiquidateUSD,
+        txCount,
+        market.cumulativeLiquidateUSD
+    );
+
+    marketSnapshot.inputTokenBalance = bigDecimalToBigInt(
+        computeNewAverage(
+            marketSnapshot.inputTokenBalance.toBigDecimal(),
+            txCount,
+            market.inputTokenBalance.toBigDecimal()
+        )
+    );
+
+    marketSnapshot.inputTokenPriceUSD = computeNewAverage(
+        marketSnapshot.inputTokenPriceUSD,
+        txCount,
+        market.inputTokenPriceUSD
+    );
+
+    marketSnapshot.outputTokenSupply = bigDecimalToBigInt(
+        computeNewAverage(
+            marketSnapshot.outputTokenSupply.toBigDecimal(),
+            txCount,
+            market.outputTokenSupply.toBigDecimal()
+        )
+    );
+
+    marketSnapshot.outputTokenPriceUSD = computeNewAverage(
+        marketSnapshot.outputTokenPriceUSD,
+        txCount,
+        market.outputTokenPriceUSD
+    );
+
+    marketSnapshot.exchangeRate = computeNewAverage(marketSnapshot.exchangeRate, txCount, market.exchangeRate);
+
+    ////
+    // Update snapshot cumulatives
+    ////
+    marketSnapshot.dailyDepositUSD = market.totalDepositBalanceUSD.minus(marketSnapshot._initialDepositUSD);
+    marketSnapshot.dailyBorrowUSD = market.totalBorrowBalanceUSD.minus(marketSnapshot._initialBorrowUSD);
+    marketSnapshot.dailyLiquidateUSD = market.cumulativeLiquidateUSD.minus(marketSnapshot._initialLiquidateUSD);
+
+    ////
+    // Update tx count
+    ////
+    marketSnapshot._txCount = txCount.plus(ONE_BI);
+
+    marketSnapshot.save();
+}
+
+function updateMarketHourlySnapshots(market: Market, event: ethereum.Event): void {
+    const marketSnapshot = getOrCreateMarketHourlySnapshot(market, event);
+
+    ////
+    // Update direct copies
+    ////
+    marketSnapshot.rates = market.rates;
+    marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+    marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+    ////
+    // Update averages
+    ////
+    const txCount = marketSnapshot._txCount;
+
+    marketSnapshot.totalValueLockedUSD = computeNewAverage(
+        marketSnapshot.totalValueLockedUSD,
+        txCount,
+        market.totalValueLockedUSD
+    );
+
+    marketSnapshot.totalDepositBalanceUSD = computeNewAverage(
+        marketSnapshot.totalDepositBalanceUSD,
+        txCount,
+        market.totalDepositBalanceUSD
+    );
+
+    marketSnapshot.cumulativeDepositUSD = computeNewAverage(
+        marketSnapshot.cumulativeDepositUSD,
+        txCount,
+        market.cumulativeDepositUSD
+    );
+
+    marketSnapshot.cumulativeBorrowUSD = computeNewAverage(
+        marketSnapshot.cumulativeBorrowUSD,
+        txCount,
+        market.cumulativeBorrowUSD
+    );
+
+    marketSnapshot.cumulativeLiquidateUSD = computeNewAverage(
+        marketSnapshot.cumulativeLiquidateUSD,
+        txCount,
+        market.cumulativeLiquidateUSD
+    );
+
+    marketSnapshot.inputTokenBalance = bigDecimalToBigInt(
+        computeNewAverage(
+            marketSnapshot.inputTokenBalance.toBigDecimal(),
+            txCount,
+            market.inputTokenBalance.toBigDecimal()
+        )
+    );
+
+    marketSnapshot.inputTokenPriceUSD = computeNewAverage(
+        marketSnapshot.inputTokenPriceUSD,
+        txCount,
+        market.inputTokenPriceUSD
+    );
+
+    marketSnapshot.outputTokenSupply = bigDecimalToBigInt(
+        computeNewAverage(
+            marketSnapshot.outputTokenSupply.toBigDecimal(),
+            txCount,
+            market.outputTokenSupply.toBigDecimal()
+        )
+    );
+
+    marketSnapshot.outputTokenPriceUSD = computeNewAverage(
+        marketSnapshot.outputTokenPriceUSD,
+        txCount,
+        market.outputTokenPriceUSD
+    );
+
+    marketSnapshot.exchangeRate = computeNewAverage(marketSnapshot.exchangeRate, txCount, market.exchangeRate);
+
+    ////
+    // Update snapshot cumulatives
+    ////
+    marketSnapshot.hourlyDepositUSD = market.totalDepositBalanceUSD.minus(marketSnapshot._initialDepositUSD);
+    marketSnapshot.hourlyBorrowUSD = market.totalBorrowBalanceUSD.minus(marketSnapshot._initialBorrowUSD);
+    marketSnapshot.hourlyLiquidateUSD = market.cumulativeLiquidateUSD.minus(marketSnapshot._initialLiquidateUSD);
+
+    ////
+    // Update tx count
+    ////
+    marketSnapshot._txCount = txCount.plus(ONE_BI);
+
+    marketSnapshot.save();
 }
 
 /**
@@ -225,8 +506,8 @@ export function marketTick(market: Market, event: ethereum.Event): void {
 
     market._totalRevenueUSD = market._protocolSideRevenueUSD.plus(market._supplySideRevenueUSD);
 
-    let rewardTokenEmissionAmount: BigInt[] = [];
-    let rewardTokenEmissionUSD: BigDecimal[] = [];
+    let rewardTokenEmissionAmount = new Array<BigInt>();
+    let rewardTokenEmissionUSD = new Array<BigDecimal>();
     for (let i = 0; i < market.rewardTokens.length; i++) {
         let tokenEmission = ZERO_BI;
         let tokenEmissionUSD = ZERO_BD;
@@ -249,6 +530,12 @@ export function marketTick(market: Market, event: ethereum.Event): void {
     market.rewardTokenEmissionsUSD = rewardTokenEmissionUSD;
 
     market.save();
+
+    ////
+    // Update market snapshots, must come after updating market cumulatives
+    ////
+    updateMarketDailySnapshots(market, event);
+    updateMarketHourlySnapshots(market, event);
 
     ////
     // Update protocol cumulatives
