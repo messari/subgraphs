@@ -334,6 +334,14 @@ type UsageMetricsDailySnapshot @entity {
 
     " Timestamp of this snapshot "
     timestamp: BigInt!
+
+    ##### Internal parameters #####
+
+    " Total number of stakes in a day "
+    _dailyStakeCount: Int!
+
+    " Total number of unstakes in a day "
+    _dailyUnstakeCount: Int!
 }
 
 type UsageMetricsHourlySnapshot @entity {
@@ -372,6 +380,14 @@ type UsageMetricsHourlySnapshot @entity {
 
     " Timestamp of this snapshot "
     timestamp: BigInt!
+
+    ##### Internal parameters #####
+
+    " Total number of stakes in an hour "
+    _hourlyStakeCount: Int!
+
+    " Total number of unstakes in an hour "
+    _hourlyUnstakeCount: Int!
 }
 
 type FinancialsDailySnapshot @entity {

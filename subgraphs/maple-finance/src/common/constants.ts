@@ -73,6 +73,8 @@ export namespace TransactionType {
     export const BORROW = "BORROW";
     export const REPAY = "REPAY";
     export const LIQUIDATE = "LIQUIDATE";
+    export const STAKE = "STAKE";
+    export const UNSTAKE = "UNSTAKE";
 }
 
 export namespace StakeType {
@@ -136,8 +138,12 @@ export const ONE_BI = BigInt.fromString("1");
 
 export const TEN_BD = BigDecimal.fromString("10");
 
+export const ZERO_I32 = 0 as i32;
+export const ONE_I32 = 1 as i32;
+
 export const MPL_REWARDS_DEFAULT_DURATION_TIME_S = BigInt.fromString("604800"); // 7 days
 
+export const SEC_PER_HOUR = BigInt.fromString("3600");
 export const SEC_PER_DAY = BigInt.fromString("86400");
 
 export const ETH_DECIMALS = 18;
