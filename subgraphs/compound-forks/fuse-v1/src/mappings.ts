@@ -539,10 +539,23 @@ function updateMarket(
     return;
   }
 
-  let underlyingTokenPriceUSD = getTokenPriceUSD(
-    updateMarketData.getUnderlyingPriceResult,
-    underlyingToken.decimals
-  );
+  // TODO: remvoe
+  log.warning("asset: {}", [underlyingToken.name]);
+
+  let underlyingTokenPriceUSD: BigDecimal;
+  const priceOffset = 6;
+
+  // grab prices
+  underlyingTokenPriceUSD = getUsdPricePerToken(
+    Address.fromString(market.inputToken)
+  ).usdPrice.div(exponentToBigDecimal(priceOffset));
+  log.warning("price ${}", [underlyingTokenPriceUSD.toString()]);
+
+  // TODO: remove
+  // let underlyingTokenPriceUSD = getTokenPriceUSD(
+  //   updateMarketData.getUnderlyingPriceResult,
+  //   underlyingToken.decimals
+  // );
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
@@ -682,6 +695,8 @@ function updateMarket(
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
 
+  // TODO: find blocks where vesper price oracle is manipulated
+
   let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor.plus(fuseFee).plus(adminFee)
   );
@@ -730,9 +745,16 @@ function getTokenPriceUSD(
     let ethPrice = getUsdPricePerToken(
       Address.fromString(ETH_ADDRESS)
     ).usdPrice.div(exponentToBigDecimal(priceOffset));
-    return ethPrice.times(priceInETH);
+    let price = ethPrice.times(priceInETH);
+    log.warning("price in eth: {} price of ETH: ${} price of token: ${}", [
+      priceInETH.toString(),
+      ethPrice.toString(),
+      price.toString(),
+    ]);
+    return price;
   } else {
     // arbitrum price
+    log.warning("price: {}", [priceInETH.toString()]);
     return priceInETH; // TODO: verify this is enough to calc price in arb
   }
 }

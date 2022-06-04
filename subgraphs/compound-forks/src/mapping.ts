@@ -1401,6 +1401,11 @@ export function updateProtocol(comptrollerAddr: Address): void {
     );
   }
 
+  // TODO: remove
+  if (totalValueLockedUSD.gt(BigDecimal.fromString("1000000000"))) {
+    log.warning("TVL is too high: {}", [totalValueLockedUSD.toString()]);
+  }
+
   protocol.totalValueLockedUSD = totalValueLockedUSD;
   protocol.totalDepositBalanceUSD = totalDepositBalanceUSD;
   protocol.totalBorrowBalanceUSD = totalBorrowBalanceUSD;
