@@ -22,6 +22,7 @@ import {
   LiquidityPool,
   Swap,
   Token,
+  Withdraw,
 } from "../generated/schema";
 import {
   BancorNetworkAddr,
@@ -118,10 +119,10 @@ export function handleTokensDeposited(event: TokensDeposited): void {
 
   _handleTokensDeposited(
     event,
-    poolToken,
-    reserveToken,
     event.params.provider,
+    reserveToken,
     event.params.tokenAmount,
+    poolToken,
     event.params.poolTokenAmount
   );
 }
@@ -140,17 +141,62 @@ export function handleBNTDeposited(event: BNTDeposited): void {
 
   _handleTokensDeposited(
     event,
-    bnBntToken,
-    bntToken,
     event.params.provider,
+    bntToken,
     event.params.bntAmount,
+    bnBntToken,
     event.params.poolTokenAmount
   );
 }
 
-export function handleTokensWithdrawn(event: TokensWithdrawn): void {}
+export function handleTokensWithdrawn(event: TokensWithdrawn): void {
+  let reserveTokenID = event.params.token.toHexString();
+  let reserveToken = Token.load(reserveTokenID);
+  if (!reserveToken) {
+    log.warning("[handleTokensWithdrawn] reserve token {} not found", [
+      reserveTokenID,
+    ]);
+    return;
+  }
+  let poolToken = Token.load(reserveToken._poolToken!);
+  if (!poolToken) {
+    log.warning("[handleTokensWithdrawn] pool token {} not found", [
+      reserveToken._poolToken!,
+    ]);
+    return;
+  }
 
-export function handleBNTWithdrawn(event: BNTWithdrawn): void {}
+  _handleTokensWithdrawn(
+    event,
+    event.params.provider,
+    reserveToken,
+    event.params.tokenAmount,
+    poolToken,
+    event.params.poolTokenAmount
+  );
+}
+
+export function handleBNTWithdrawn(event: BNTWithdrawn): void {
+  let bntToken = Token.load(BntAddr);
+  if (!bntToken) {
+    log.warning("[handleBNTWithdrawn] BNT token {} not found", [BntAddr]);
+    return;
+  }
+  let bnBntToken = Token.load(BnBntAddr);
+  if (!bnBntToken) {
+    log.warning("[handleBNTWithdrawn] bnBNT token {} not found", [BnBntAddr]);
+    return;
+  }
+
+  _handleTokensWithdrawn(
+    event,
+    event.params.provider,
+    bntToken,
+    event.params.bntAmount,
+    bnBntToken,
+    event.params.poolTokenAmount
+  );
+}
 
 function createBntToken(): void {
   let bnBntToken = Token.load(BnBntAddr);
@@ -320,11 +366,11 @@ function getOrCreateProtocol(): DexAmmProtocol {
 
 function _handleTokensDeposited(
   event: ethereum.Event,
-  poolToken: Token,
-  reserveToken: Token,
   depositer: Address,
-  amountIn: BigInt,
-  amountOut: BigInt
+  reserveToken: Token,
+  reserveTokenAmount: BigInt,
+  poolToken: Token,
+  poolTokenAmount: BigInt
 ): void {
   let deposit = new Deposit(
     "deposit-"
@@ -340,11 +386,42 @@ function _handleTokensDeposited(
   deposit.to = poolToken.id;
   deposit.from = depositer.toHexString();
   deposit.inputTokens = [reserveToken.id];
-  deposit.inputTokenAmounts = [amountIn];
+  deposit.inputTokenAmounts = [reserveTokenAmount];
   deposit.outputToken = poolToken.id;
-  deposit.outputTokenAmount = amountOut;
+  deposit.outputTokenAmount = poolTokenAmount;
   deposit.amountUSD = zeroBD; // TODO
   deposit.pool = poolToken.id;
 
   deposit.save();
+}
+
+function _handleTokensWithdrawn(
+  event: ethereum.Event,
+  withdrawer: Address,
+  reserveToken: Token,
+  reserveTokenAmount: BigInt,
+  poolToken: Token,
+  poolTokenAmount: BigInt
+): void {
+  let withdraw = new Withdraw(
+    "withdraw-"
+      .concat(event.transaction.hash.toHexString())
+      .concat("-")
+      .concat(event.logIndex.toString())
+  );
+  withdraw.hash = event.transaction.hash.toHexString();
+  withdraw.logIndex = event.logIndex.toI32();
+  withdraw.protocol = getOrCreateProtocol().id;
+  withdraw.blockNumber = event.block.number;
+  withdraw.timestamp = event.block.timestamp;
+  withdraw.to = withdrawer.toHexString();
+  withdraw.from = poolToken.id;
+  withdraw.inputTokens = [reserveToken.id];
+  withdraw.inputTokenAmounts = [reserveTokenAmount];
+  withdraw.outputToken = poolToken.id;
+  withdraw.outputTokenAmount = poolTokenAmount;
+  withdraw.amountUSD = zeroBD; // TODO
+  withdraw.pool = poolToken.id;
+
+  withdraw.save();
 }
