@@ -1,4 +1,4 @@
-import { Address, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { ProtocolPaused } from "../../../generated/MapleGlobals/MapleGlobals";
 import {
     Account,
@@ -48,7 +48,7 @@ export function getOrCreateProtocol(): LendingProtocol {
         protocol.type = PROTOCOL_TYPE;
         protocol.lendingType = PROTOCOL_LENDING_TYPE;
         protocol.riskType = PROTOCOL_RISK_TYPE;
-        protocol.mintedTokens = [];
+        protocol.mintedTokens = new Array<string>();
         protocol.cumulativeUniqueUsers = ZERO_I32;
         protocol.totalValueLockedUSD = ZERO_BD;
         protocol.protocolControlledValueUSD = ZERO_BD;
@@ -60,7 +60,7 @@ export function getOrCreateProtocol(): LendingProtocol {
         protocol.totalBorrowBalanceUSD = ZERO_BD;
         protocol.cumulativeBorrowUSD = ZERO_BD;
         protocol.cumulativeLiquidateUSD = ZERO_BD;
-        protocol.mintedTokenSupplies = [];
+        protocol.mintedTokenSupplies = new Array<BigInt>();
         protocol._treasuryFee = PROTOCOL_INITIAL_TREASURY_FEE;
 
         protocol.save();
@@ -124,13 +124,13 @@ export function updateFinancialMetrics(event: ethereum.Event): void {
     const protocol = getOrCreateProtocol();
     const financialDailyMetric = getOrCreateFinancialDailyMetric(event);
 
-    const txCount = financialDailyMetric._txCount;
-
     financialDailyMetric.mintedTokenSupplies = protocol.mintedTokenSupplies;
 
     ////
-    // Update all averages
+    // Update averages
     ////
+    const txCount = financialDailyMetric._txCount;
+
     financialDailyMetric.totalValueLockedUSD = computeNewAverage(
         financialDailyMetric.totalValueLockedUSD,
         txCount,

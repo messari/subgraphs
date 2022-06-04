@@ -463,22 +463,22 @@ type FinancialsDailySnapshot @entity {
     " Number of transactions making up the snapshot. This is used for average computation. "
     _txCount: BigInt!
 
-    " Supply revenue when the snapshot was first created. This is used for computing the daily supply side revenue. "
+    " Supply revenue when the snapshot was first created. This is used for computing dailySupplySideRevenueUSD. "
     _initialSupplySideRevenueUSD: BigDecimal!
 
-    " Prototcol side revenue when the snapshot was first created. This is used for computing the daily protocol side revenue. "
+    " Prototcol side revenue when the snapshot was first created. This is used for computing dailyProtocolSideRevenueUSD. "
     _initialProtocolSideRevenueUSD: BigDecimal!
 
-    " Total revenue when the snapshot was first created. This is used for computing the daily total revenue. "
+    " Total revenue when the snapshot was first created. This is used for computing dailyTotalRevenueUSD. "
     _initialTotalRevenueUSD: BigDecimal!
 
-    " Deposit balance when the snapshot was first created. This is used for computing the daily deposit. "
+    " Deposit balance when the snapshot was first created. This is used for computing dailyDepositUSD. "
     _initialDepositUSD: BigDecimal!
 
-    " Borrow balance when the snapshot was first created. This is used for computing the daily borrow. "
+    " Borrow balance when the snapshot was first created. This is used for computing dailyBorrowUSD. "
     _initialBorrowUSD: BigDecimal!
 
-    " Liquidation balance when the snapshot was first created. This is used for computing the daily liquidate. "
+    " Liquidation balance when the snapshot was first created. This is used for computing dailyLiquidateUSD. "
     _initialLiquidateUSD: BigDecimal!
 }
 
@@ -730,13 +730,27 @@ type MarketDailySnapshot @entity {
     outputTokenPriceUSD: BigDecimal!
 
     " Amount of input token per full share of output token. Only applies when the output token exists "
-    exchangeRate: BigDecimal
+    exchangeRate: BigDecimal!
 
     " Per-block reward token emission as of the current block normalized to a day, in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
     rewardTokenEmissionsAmount: [BigInt!]
 
     " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
     rewardTokenEmissionsUSD: [BigDecimal!]
+
+    ##### Internal parameters #####
+
+    " Number of transactions making up the snapshot. This is used for average computation. "
+    _txCount: BigInt!
+
+    " Deposit balance when the snapshot was first created. This is used for computing dailyDepositUSD. "
+    _initialDepositUSD: BigDecimal!
+
+    " Borrow balance when the snapshot was first created. This is used for computing dailyBorrowUSD. "
+    _initialBorrowUSD: BigDecimal!
+
+    " Liquidate cumulative when the snapshot was first created. This is used for computing dailyLiquidateUSD. "
+    _initialLiquidateUSD: BigDecimal!
 }
 
 type MarketHourlySnapshot @entity {
@@ -802,13 +816,27 @@ type MarketHourlySnapshot @entity {
     outputTokenPriceUSD: BigDecimal!
 
     " Amount of input token per full share of output token. Only applies when the output token exists "
-    exchangeRate: BigDecimal
+    exchangeRate: BigDecimal!
 
     " Per-block reward token emission as of the current block normalized to a day (not hour), in token's native amount. This should be ideally calculated as the theoretical rate instead of the realized amount. "
     rewardTokenEmissionsAmount: [BigInt!]
 
     " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
     rewardTokenEmissionsUSD: [BigDecimal!]
+
+    ##### Internal parameters #####
+
+    " Number of transactions making up the snapshot. This is used for average computation. "
+    _txCount: BigInt!
+
+    " Deposit balance when the snapshot was first created. This is used for computing hourlyDepositUSD. "
+    _initialDepositUSD: BigDecimal!
+
+    " Borrow balance when the snapshot was first created. This is used for computing hourlyBorrowUSD. "
+    _initialBorrowUSD: BigDecimal!
+
+    " Liquidate cumulative when the snapshot was first created. This is used for computing hourlyLiquidateUSD. "
+    _initialLiquidateUSD: BigDecimal!
 }
 
 ##################################
