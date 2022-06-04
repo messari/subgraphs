@@ -4,10 +4,7 @@ import {
   DepositCall,
   WithdrawCall,
 } from "../../generated/vaUSDC_prod_RL4/PoolV3";
-import {
-  isStrategy,
-  withdrawRevenueCalc,
-} from "../peer";
+import { isStrategy, withdrawRevenueCalc } from "../peer";
 
 import {
   getOrCreateVault,
@@ -48,14 +45,17 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     revenue.totalUsd
   );
 
-  log.info("For transaction {} isEarnPool {} Revenue from withdraw {}, protocol {}, supply {}, total {}", [
-    call.transaction.hash.toHexString(),
-    revenue.isEarnPool.toString(),
-    call.inputs._shares.toString(),
-    revenue.protocolUsd.toString(),
-    revenue.supplyUsd.toString(),
-    revenue.totalUsd.toString(),
-  ]);
+  log.info(
+    "For transaction {} isEarnPool {} Revenue from withdraw {}, protocol {}, supply {}, total {}",
+    [
+      call.transaction.hash.toHexString(),
+      revenue.isEarnPool.toString(),
+      revenue.withdrawAmount.toString(),
+      revenue.protocolUsd.toString(),
+      revenue.supplyUsd.toString(),
+      revenue.totalUsd.toString(),
+    ]
+  );
 }
 
 export function handleDepositV3(call: DepositCall): void {
