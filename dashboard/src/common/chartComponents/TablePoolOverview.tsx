@@ -30,14 +30,14 @@ export const TablePoolOverview = ({
     const optionalFields = [];
     let baseFieldCol = false;
     let inputTokenLabel = "Input Token";
-    let inputTokenColWidth = 130;
+    let inputTokenColWidth = 160;
     if (protocolType === "EXCHANGE") {
       inputTokenLabel = "Input Tokens";
-      inputTokenColWidth = 190;
+      inputTokenColWidth = 220;
       optionalFields.push({
         field: "baseYield",
         headerName: "Base Yield %",
-        width: 150,
+        width: 180,
         renderCell: (params: any) => {
           return (
             <Tooltip title={params.value}>
@@ -99,9 +99,9 @@ export const TablePoolOverview = ({
         width: inputTokenColWidth,
         renderCell: (params: any) => {
           let inputTokenStr = params.value;
-          if (inputTokenStr.length > 18) {
-            inputTokenStr = `${params.value.slice(0, 8)}...${params.value.slice(
-              params.value.length - 8,
+          if (inputTokenStr.length > 15) {
+            inputTokenStr = `${params.value.slice(0, 6)}...${params.value.slice(
+              params.value.length - 7,
               params.value.length,
             )}`;
           }
@@ -115,7 +115,7 @@ export const TablePoolOverview = ({
       {
         field: "tvl",
         headerName: "TVL (USD)",
-        width: 160,
+        width: 180,
         renderCell: (params: any) => {
           return (
             <Tooltip title={params.value}>
@@ -132,25 +132,13 @@ export const TablePoolOverview = ({
           let rewardTokenStr = params.value;
           if (rewardTokenStr.length > 18) {
             rewardTokenStr = `${params.value.slice(0, 8)}...${params.value.slice(
-              params.value.length - 8,
+              params.value.length - 7,
               params.value.length,
             )}`;
           }
           return (
             <Tooltip title={params.value}>
               <span style={tableCellTruncate}>{rewardTokenStr}</span>
-            </Tooltip>
-          );
-        },
-      },
-      {
-        field: "rewardAPY",
-        headerName: "APY",
-        width: 225,
-        renderCell: (params: any) => {
-          return (
-            <Tooltip title={params.value}>
-              <span style={tableCellTruncate}>{params.value}</span>
             </Tooltip>
           );
         },
@@ -162,15 +150,13 @@ export const TablePoolOverview = ({
       if (pool.inputTokens) {
         inputTokenSymbol = pool.inputTokens.map((tok: any) => tok.symbol).join(", ");
       }
-
       const returnObj: { [x: string]: string } = {
         id: i + 1 + skipAmt,
         idx: i + 1 + skipAmt,
-        name: pool.name,
+        name: pool.name || "N/A",
         poolId: pool.id,
         inputToken: inputTokenSymbol,
         tvl: "$" + Number(Number(pool.totalValueLockedUSD).toFixed(2)).toLocaleString(),
-        rewardAPY: "",
         rewardTokens: "",
       };
       if (pool.rewardTokens?.length > 0) {
@@ -182,14 +168,17 @@ export const TablePoolOverview = ({
           }
           return "N/A";
         });
-        returnObj.rewardTokens = `[${rewardTokenSymbol.join(", ")}]`;
+        // returnObj.rewardTokens = `[${rewardTokenSymbol.join(", ")}]`;
 
         const rewardAPYs = pool.rewardTokenEmissionsUSD.map((val: string, idx: number) => {
           let apr = 0;
           if (pool?.totalDepositBalanceUSD && protocolType === "LENDING") {
             apr = (Number(val) / pool.totalDepositBalanceUSD) * 100 * 365;
           } else {
-            if (!Number(pool?.stakedOutputTokenAmount) || !Number(pool?.outputTokenSupply)) {
+            if (
+              (!Number(pool?.stakedOutputTokenAmount) || !Number(pool?.outputTokenSupply)) &&
+              Number(pool.totalValueLockedUSD) !== 0
+            ) {
               apr = (Number(val) / Number(pool.totalValueLockedUSD)) * 100 * 365;
             } else {
               apr =
@@ -200,15 +189,25 @@ export const TablePoolOverview = ({
                 365;
             }
           }
-          return Number(apr).toFixed(5) + "%";
+          if (isNaN(apr)) {
+            apr = 0;
+          }
+          return Number(apr).toFixed(2) + "%";
         });
-        returnObj.rewardAPY = `[${rewardAPYs.join(", ")}]`;
+        const rewardTokenCell = rewardTokenSymbol.map((tok: string, idx: number) => {
+          let str = `0.00% ${tok}`;
+          if (rewardAPYs[idx]) {
+            str = `${rewardAPYs[idx]} ${tok}`;
+          }
+          return str;
+        });
+        returnObj.rewardTokens = rewardTokenCell.join(", ");
+        // returnObj.rewardAPY = `[${rewardAPYs.join(", ")}]`;
       } else {
-        returnObj.rewardTokens = "N/A";
-        returnObj.rewardAPY = "N/A";
+        returnObj.rewardTokens = "No Reward Token";
       }
       if (baseFieldCol) {
-        returnObj.baseYield = "%" + 0;
+        returnObj.baseYield = "%0.00";
         if (Object.keys(pool?.fees)?.length > 0 && pool?.totalValueLockedUSD) {
           // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
           const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
@@ -220,7 +219,7 @@ export const TablePoolOverview = ({
           }
           const volumeUSD = Number(pool.cumulativeVolumeUSD);
           let value = ((feePercentage * volumeUSD) / Number(pool.totalValueLockedUSD)) * 100;
-          if (!value) {
+          if (!value || !Number(pool.totalValueLockedUSD)) {
             value = 0;
           }
           returnObj.baseYield = "%" + value.toFixed(2);
@@ -239,7 +238,7 @@ export const TablePoolOverview = ({
             p.set("poolId", row.row.poolId);
             navigate("?" + p.toString());
             setPoolId(row.row.poolId);
-            handleTabChange(null, "2");
+            handleTabChange(null, "3");
           }}
           columnBuffer={7}
           initialState={{
