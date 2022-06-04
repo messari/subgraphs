@@ -149,6 +149,7 @@ export class WithdrawRevenue {
   withdrawFeeAppliedUsd: BigDecimal = BigDecimal.zero();
   isEarnPool: boolean = false;
   withdrawAmount: BigDecimal = BigDecimal.zero();
+  withdrawAmountUsd: BigDecimal = BigDecimal.zero();
 
   constructor(poolAddress: Address, account: Address, withdrawAmount: BigInt) {
     const poolV3 = PoolV3.bind(poolAddress);
@@ -163,6 +164,7 @@ export class WithdrawRevenue {
     this.withdrawAmount = withdrawAmount
       .toBigDecimal()
       .div(getDecimalDivisor(token.decimals()));
+    this.withdrawAmountUsd = getUsdPrice(poolV3.token(), this.withdrawAmount);
 
     if (withdrawFee_call.reverted) {
       return this;
@@ -185,18 +187,12 @@ export class WithdrawRevenue {
     );
 
     this.yieldUsd = getUsdPrice(VESPER_TOKEN, this.yieldAmount);
-    this.yieldFeeAppliedUsd = getUsdPrice(
-      VESPER_TOKEN,
-      this.yieldAmount.times(
-        this.isEarnPool ? EARN_POOL_PLATFORM_FEE : GROW_POOL_PLATFORM_FEE
-      )
+    this.yieldFeeAppliedUsd = this.yieldUsd.times(
+      this.isEarnPool ? EARN_POOL_PLATFORM_FEE : GROW_POOL_PLATFORM_FEE
     );
     this.withdrawFeeAppliedUsd = this.isEarnPool
       ? BigDecimal.zero()
-      : getUsdPrice(
-          poolV3.token(),
-          this.withdrawAmount.times(GROW_POOL_WITHDRAW_FEE)
-        );
+      : this.withdrawAmountUsd.times(GROW_POOL_WITHDRAW_FEE);
 
     // Total Yield - Platform Fee * Total Yield
     this.supplyUsd = this.yieldUsd.minus(this.yieldFeeAppliedUsd);
