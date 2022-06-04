@@ -12,8 +12,7 @@
     "prepare:build": "graph codegen && graph build",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
 
-    "deploy": "node  --experimental-json-modules --no-warnings deployment/deployment.js"
-
+    "deploy": "node  --experimental-json-modules --no-warnings ../../deployment/deployment.js"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.0",
