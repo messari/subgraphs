@@ -397,7 +397,7 @@ function createLiquidityPool(
   liquidityPool.symbol = poolToken.symbol;
   liquidityPool.inputTokens = [reserveToken.id];
   liquidityPool.outputToken = poolToken.id;
-  liquidityPool.rewardTokens = []; // TODO
+  liquidityPool.rewardTokens = []; // reward is not yet live
   liquidityPool.fees = []; // TODO
   liquidityPool.createdTimestamp = blockTimestamp;
   liquidityPool.createdBlockNumber = blockNumber;
@@ -408,8 +408,8 @@ function createLiquidityPool(
   liquidityPool.outputTokenSupply = zeroBI;
   liquidityPool.outputTokenPriceUSD = zeroBD;
   liquidityPool.stakedOutputTokenAmount = zeroBI;
-  liquidityPool.rewardTokenEmissionsAmount = []; // TODO
-  liquidityPool.rewardTokenEmissionsUSD = []; // TODO
+  liquidityPool.rewardTokenEmissionsAmount = []; // reward is not yet live
+  liquidityPool.rewardTokenEmissionsUSD = []; // reward is not yet live
 
   liquidityPool.save();
 }
