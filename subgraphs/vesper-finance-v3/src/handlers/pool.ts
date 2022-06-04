@@ -50,7 +50,7 @@ export function handleWithdrawV3(call: WithdrawCall): void {
     [
       call.transaction.hash.toHexString(),
       revenue.isEarnPool.toString(),
-      revenue.withdrawAmount.toString(),
+      revenue.withdrawAmountUsd.toString(),
       revenue.protocolUsd.toString(),
       revenue.supplyUsd.toString(),
       revenue.totalUsd.toString(),
