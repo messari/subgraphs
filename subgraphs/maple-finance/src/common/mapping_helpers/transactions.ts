@@ -13,19 +13,21 @@ import {
     _Unstake
 } from "../../../generated/schema";
 
-import { PROTOCOL_ID } from "../constants";
+import { PROTOCOL_ID, TransactionType } from "../constants";
 import { bigDecimalToBigInt } from "../utils";
 import { getOrCreateMarket } from "./market";
+import { updateUsageMetrics } from "./protocol";
 
 export function createDeposit(event: ethereum.Event, market: Market, amountMPTMinted: BigInt): Deposit {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const deposit = new Deposit(id);
+    const account = event.transaction.from;
 
     deposit.hash = event.transaction.hash.toHexString();
     deposit.logIndex = event.logIndex.toI32();
     deposit.protocol = PROTOCOL_ID;
     deposit.to = market.id;
-    deposit.from = event.transaction.from.toHexString();
+    deposit.from = account.toHexString();
     deposit.blockNumber = event.block.number;
     deposit.timestamp = event.block.timestamp;
     deposit.market = market.id;
@@ -36,17 +38,20 @@ export function createDeposit(event: ethereum.Event, market: Market, amountMPTMi
 
     deposit.save();
 
+    updateUsageMetrics(event, account, TransactionType.DEPOSIT);
+
     return deposit;
 }
 
 export function createWithdraw(event: ethereum.Event, market: Market, amountMPTBurned: BigInt): Withdraw {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const withdraw = new Withdraw(id);
+    const account = event.transaction.from;
 
     withdraw.hash = event.transaction.hash.toHexString();
     withdraw.logIndex = event.logIndex.toI32();
     withdraw.protocol = PROTOCOL_ID;
-    withdraw.to = event.transaction.from.toHexString(); // from since its a burn
+    withdraw.to = account.toHexString(); // from since its a burn
     withdraw.from = market.id;
     withdraw.blockNumber = event.block.number;
     withdraw.timestamp = event.block.timestamp;
@@ -58,6 +63,8 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
 
     withdraw.save();
 
+    updateUsageMetrics(event, account, TransactionType.WITHDRAW);
+
     return withdraw;
 }
 
@@ -65,11 +72,12 @@ export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt)
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const borrow = new Borrow(id);
     const market = getOrCreateMarket(Address.fromString(loan.market));
+    const account = event.transaction.from;
 
     borrow.hash = event.transaction.hash.toHexString();
     borrow.logIndex = event.logIndex.toI32();
     borrow.protocol = PROTOCOL_ID;
-    borrow.to = event.transaction.from.toHexString(); // They were the ones that triggered the drawdown
+    borrow.to = account.toHexString(); // They were the ones that triggered the drawdown
     borrow.from = loan.id;
     borrow.blockNumber = event.block.number;
     borrow.timestamp = event.block.timestamp;
@@ -79,6 +87,8 @@ export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt)
     borrow.amountUSD = borrow.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     borrow.save();
+
+    updateUsageMetrics(event, account, TransactionType.BORROW);
 
     return borrow;
 }
@@ -94,12 +104,13 @@ export function createRepay(
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const repay = new Repay(id);
     const market = getOrCreateMarket(Address.fromString(loan.market));
+    const account = event.transaction.from;
 
     repay.hash = event.transaction.hash.toHexString();
     repay.logIndex = event.logIndex.toI32();
     repay.protocol = PROTOCOL_ID;
     repay.to = loan.id;
-    repay.from = event.transaction.from.toHexString();
+    repay.from = account.toHexString();
     repay.blockNumber = event.block.number;
     repay.timestamp = event.block.timestamp;
     repay.market = market.id;
@@ -111,6 +122,8 @@ export function createRepay(
     repay._late = late;
 
     repay.save();
+
+    updateUsageMetrics(event, account, TransactionType.REPAY);
 
     return repay;
 }
@@ -144,6 +157,9 @@ export function createLiquidate(
 
     liquidate.save();
 
+    const account = event.transaction.from; // Pool delegate
+    updateUsageMetrics(event, account, TransactionType.LIQUIDATE);
+
     return liquidate;
 }
 
@@ -156,12 +172,13 @@ export function createStake(
 ): _Stake {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const stake = new _Stake(id);
+    const account = event.transaction.from;
 
     stake.hash = event.transaction.hash.toHexString();
     stake.logIndex = event.logIndex.toI32();
     stake.protocol = PROTOCOL_ID;
     stake.to = event.address.toHexString(); // to whatever emitted this event (stakeLocker or mplReward)
-    stake.from = event.transaction.from.toHexString();
+    stake.from = account.toHexString();
     stake.blockNumber = event.block.number;
     stake.timestamp = event.block.timestamp;
     stake.market = market.id;
@@ -171,6 +188,8 @@ export function createStake(
     stake.stakeType = type;
 
     stake.save();
+
+    updateUsageMetrics(event, account, TransactionType.STAKE);
 
     return stake;
 }
@@ -184,11 +203,12 @@ export function createUnstake(
 ): _Unstake {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const unstake = new _Unstake(id);
+    const account = event.transaction.from;
 
     unstake.hash = event.transaction.hash.toHexString();
     unstake.logIndex = event.logIndex.toI32();
     unstake.protocol = PROTOCOL_ID;
-    unstake.to = event.transaction.from.toHexString();
+    unstake.to = account.toHexString();
     unstake.from = event.address.toHexString(); // from whatever emitted this event (stakeLocker or mplReward)
     unstake.blockNumber = event.block.number;
     unstake.timestamp = event.block.timestamp;
@@ -199,6 +219,8 @@ export function createUnstake(
     unstake.stakeType = type;
 
     unstake.save();
+
+    updateUsageMetrics(event, account, TransactionType.UNSTAKE);
 
     return unstake;
 }
