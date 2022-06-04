@@ -89,8 +89,14 @@ import {
   mantissaFactor,
   mantissaFactorBD,
   Network,
+  RewardTokenType,
 } from "../../src/constants";
-import { InterestRate, Market, _FusePool } from "../generated/schema";
+import {
+  InterestRate,
+  Market,
+  RewardToken,
+  _FusePool,
+} from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
 import { getUsdPricePerToken } from "./prices";
 import {
@@ -98,6 +104,8 @@ import {
   getRewardsPerDay,
   RewardIntervalType,
 } from "./rewards";
+import { FuseComptroller } from "../generated/templates/CToken/FuseComptroller";
+import { RewardsDistributorDelegator } from "../generated/templates/CToken/RewardsDistributorDelegator";
 
 //////////////////////////////////
 //// Chain-specific Constants ////
@@ -426,7 +434,9 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     event.params.interestAccumulated,
     event.params.totalBorrows,
     event.block.number,
-    event.block.timestamp
+    event.block.timestamp,
+    trollerAddr,
+    blocksPerDayBD
   );
   updateProtocol(Address.fromString(FACTORY_CONTRACT));
 
@@ -523,7 +533,9 @@ function updateMarket(
   interestAccumulatedMantissa: BigInt,
   newTotalBorrow: BigInt,
   blockNumber: BigInt,
-  blockTimestamp: BigInt
+  blockTimestamp: BigInt,
+  comptroller: Address,
+  blocksPerDay: BigDecimal
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -539,9 +551,6 @@ function updateMarket(
     return;
   }
 
-  // TODO: remvoe
-  log.warning("asset: {}", [underlyingToken.name]);
-
   let underlyingTokenPriceUSD: BigDecimal;
   const priceOffset = 6;
 
@@ -549,13 +558,6 @@ function updateMarket(
   underlyingTokenPriceUSD = getUsdPricePerToken(
     Address.fromString(market.inputToken)
   ).usdPrice.div(exponentToBigDecimal(priceOffset));
-  log.warning("price ${}", [underlyingTokenPriceUSD.toString()]);
-
-  // TODO: remove
-  // let underlyingTokenPriceUSD = getTokenPriceUSD(
-  //   updateMarketData.getUnderlyingPriceResult,
-  //   underlyingToken.decimals
-  // );
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
@@ -675,6 +677,16 @@ function updateMarket(
     );
   }
 
+  // update rewards
+  let troller = FuseComptroller.bind(comptroller);
+  let tryRewardDistributors = troller.try_getRewardsDistributors();
+  if (!tryRewardDistributors.reverted) {
+    let rewardDistributors = tryRewardDistributors.value;
+    for (let i = 0; i < rewardDistributors.length; i++) {
+      updateRewards(rewardDistributors[i], marketID, blocksPerDay);
+    }
+  }
+
   // calculate new interests accumulated
   // With fuse protocol revenue includes (reserve factor + fuse fee + admin fee)
 
@@ -694,8 +706,6 @@ function updateMarket(
     .toBigDecimal()
     .div(exponentToBigDecimal(underlyingToken.decimals))
     .times(underlyingTokenPriceUSD);
-
-  // TODO: find blocks where vesper price oracle is manipulated
 
   let protocolSideRevenueUSDDelta = interestAccumulatedUSD.times(
     market._reserveFactor.plus(fuseFee).plus(adminFee)
@@ -757,4 +767,96 @@ function getTokenPriceUSD(
     log.warning("price: {}", [priceInETH.toString()]);
     return priceInETH; // TODO: verify this is enough to calc price in arb
   }
+}
+
+function updateRewards(
+  rewardDistributor: Address,
+  marketID: string,
+  blocksPerDay: BigDecimal
+): void {
+  let market = Market.load(marketID);
+  if (!market) {
+    log.warning("[getRewardDistributorData] Market {} not found", [marketID]);
+    return;
+  }
+
+  // grab reward amounts
+  let rewardEmissions: BigInt[] = [];
+  let rewardEmissionsUSD: BigDecimal[] = [];
+  let rewardTokens: string[] = [];
+
+  // get distributor contract and grab borrow/supply distribution
+  let distributor = RewardsDistributorDelegator.bind(rewardDistributor);
+  let tryBorrowSpeeds = distributor.try_compBorrowSpeeds(
+    Address.fromString(marketID)
+  );
+  let trySupplySpeeds = distributor.try_compSupplySpeeds(
+    Address.fromString(marketID)
+  );
+  let tryRewardToken = distributor.try_rewardToken();
+
+  // create reward token if available
+  if (!tryRewardToken.reverted) {
+    let token = Token.load(tryRewardToken.value.toHexString());
+    if (!token) {
+      let tokenContract = ERC20.bind(tryRewardToken.value);
+      token = new Token(tryRewardToken.value.toHexString());
+      token.name = getOrElse(tokenContract.try_name(), "UNKNOWN");
+      token.symbol = getOrElse(tokenContract.try_symbol(), "UNKOWN");
+      token.decimals = getOrElse(tokenContract.try_decimals(), -1);
+      token.save();
+    }
+
+    // get reward token price
+    const priceOffset = 6;
+    let rewardTokenPriceUSD = getUsdPricePerToken(
+      Address.fromString(token.id)
+    ).usdPrice.div(exponentToBigDecimal(priceOffset));
+
+    // borrow speeds
+    if (!tryBorrowSpeeds.reverted) {
+      rewardEmissions.push(tryBorrowSpeeds.value);
+      let borrowRewardsBD = tryBorrowSpeeds.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals));
+      let rewardsPerDay = borrowRewardsBD.times(blocksPerDay);
+      rewardEmissionsUSD.push(rewardsPerDay.times(rewardTokenPriceUSD));
+
+      // create borrow reward token
+      let rewardTokenId = RewardTokenType.BORROW + "-" + token.id;
+      let rewardToken = RewardToken.load(rewardTokenId);
+      if (!rewardToken) {
+        rewardToken = new RewardToken(rewardTokenId);
+        rewardToken.token = token.id;
+        rewardToken.type = RewardTokenType.BORROW;
+      }
+      rewardTokens.push(rewardToken.id);
+    }
+
+    // supply speeds
+    if (!trySupplySpeeds.reverted) {
+      rewardEmissions.push(trySupplySpeeds.value);
+      let supplyRewardsBD = trySupplySpeeds.value
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals));
+      let rewardsPerDay = supplyRewardsBD.times(blocksPerDay);
+      rewardEmissionsUSD.push(rewardsPerDay.times(rewardTokenPriceUSD));
+
+      // create supply reward token
+      let rewardTokenId = RewardTokenType.DEPOSIT + "-" + token.id;
+      let rewardToken = RewardToken.load(rewardTokenId);
+      if (!rewardToken) {
+        rewardToken = new RewardToken(rewardTokenId);
+        rewardToken.token = token.id;
+        rewardToken.type = RewardTokenType.DEPOSIT;
+      }
+      rewardTokens.push(rewardToken.id);
+    }
+  }
+
+  // update market
+  market.rewardTokens = rewardTokens;
+  market.rewardTokenEmissionsAmount = rewardEmissions;
+  market.rewardTokenEmissionsUSD = rewardEmissionsUSD;
+  market.save();
 }

@@ -58,6 +58,6 @@ export const ETH_SYMBOL = "ETH";
 
 export const PROTOCOL_NAME = "Fuse";
 export const PROTOCOL_SLUG = "fuse";
-export const SUBGRAPH_VERSION = "1.0.9";
+export const SUBGRAPH_VERSION = "1.0.10";
 export const SCHEMA_VERSION = "1.2.1";
 export const METHODOLOGY_VERSION = "1.0.0";

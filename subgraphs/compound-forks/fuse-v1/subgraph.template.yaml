@@ -76,6 +76,10 @@ templates:
         - FinancialsDailySnapshot
         - MarketDailySnapshot
       abis:
+        - name: FuseComptroller
+          file: ./abis/fuse/FuseComptroller.json
+        - name: RewardsDistributorDelegator
+          file: ./abis/fuse/RewardsDistributorDelegator.json
         - name: CToken
           file: ./abis/fuse/CToken.json
         - name: PriceOracle
