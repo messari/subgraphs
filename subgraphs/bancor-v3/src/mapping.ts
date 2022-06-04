@@ -1,4 +1,10 @@
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  ethereum,
+  log,
+} from "@graphprotocol/graph-ts";
 import {
   PoolCollectionAdded,
   PoolCreated,
@@ -8,6 +14,7 @@ import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection1
 import {
   TokensDeposited,
   TokensWithdrawn,
+  TradingLiquidityUpdated,
 } from "../generated/templates/PoolCollection2/PoolCollection2";
 import { PoolCollection2 } from "../generated/templates";
 import {
@@ -27,8 +34,11 @@ import {
 import {
   BancorNetworkAddr,
   BnBntAddr,
+  BnDaiAddr,
   BntAddr,
+  DaiAddr,
   EthAddr,
+  exponentToBigDecimal,
   Network,
   ProtocolType,
   zeroBD,
@@ -38,7 +48,7 @@ import {
 export function handlePoolCreatedLegacy(event: PoolCreated__Legacy): void {
   // PoolCreated__Legacy is emitted only on early blocks where we should create BNT token
   // since there's no Create Pool op on BNT
-  createBntToken();
+  createBntToken(event.block.timestamp, event.block.number);
   _handlePoolCreated(
     event.params.poolToken,
     event.block.timestamp,
@@ -198,7 +208,36 @@ export function handleBNTWithdrawn(event: BNTWithdrawn): void {
   );
 }
 
-function createBntToken(): void {
+export function handleTradingLiquidityUpdated(
+  event: TradingLiquidityUpdated
+): void {
+  let tokenAddress = event.params.token.toHexString();
+  let token = Token.load(tokenAddress);
+  if (!token) {
+    log.warning("[handleTradingLiquidityUpdated] token {} not found", [
+      tokenAddress,
+    ]);
+    return;
+  }
+  if (!token._poolToken) {
+    log.warning(
+      "[handleTradingLiquidityUpdated] token {} doesn't link to a pool token",
+      [tokenAddress]
+    );
+    return;
+  }
+  let liquidityPool = LiquidityPool.load(token._poolToken!);
+  if (!liquidityPool) {
+    log.warning("[handleTradingLiquidityUpdated] liquidity pool {} not found", [
+      token._poolToken!,
+    ]);
+    return;
+  }
+  liquidityPool.inputTokenBalances = [event.params.newLiquidity];
+  liquidityPool.save();
+}
+
+function createBntToken(blockTimestamp: BigInt, blockNumber: BigInt): void {
   let bnBntToken = Token.load(BnBntAddr);
   if (bnBntToken) {
     return;
@@ -216,7 +255,7 @@ function createBntToken(): void {
   bntToken._poolToken = BnBntAddr;
   bntToken.save();
 
-  // TODO: liquidity pool?
+  createLiquidityPool(bntToken, bnBntToken, blockTimestamp, blockNumber);
 }
 
 function _handlePoolCreated(
@@ -224,8 +263,6 @@ function _handlePoolCreated(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): void {
-  let protocol = getOrCreateProtocol();
-
   let poolTokenAddr = pool.toHexString();
   let poolToken = Token.load(poolTokenAddr);
   if (poolToken != null) {
@@ -318,28 +355,7 @@ function _handlePoolCreated(
   }
   reserveToken.save();
 
-  // liquidity pool
-  let liquidityPool = new LiquidityPool(poolTokenAddr);
-  liquidityPool.protocol = protocol.id;
-  liquidityPool.name = poolToken.name;
-  liquidityPool.symbol = poolToken.symbol;
-  liquidityPool.inputTokens = [poolToken.id];
-  liquidityPool.outputToken = reserveToken.id;
-  liquidityPool.rewardTokens = []; // TODO
-  liquidityPool.fees = []; // TODO
-  liquidityPool.createdTimestamp = blockTimestamp;
-  liquidityPool.createdBlockNumber = blockNumber;
-  liquidityPool.totalValueLockedUSD = zeroBD;
-  liquidityPool.cumulativeVolumeUSD = zeroBD;
-  liquidityPool.inputTokenBalances = []; // TODO
-  liquidityPool.inputTokenWeights = []; // TODO
-  liquidityPool.outputTokenSupply = zeroBI;
-  liquidityPool.outputTokenPriceUSD = zeroBD;
-  liquidityPool.stakedOutputTokenAmount = zeroBI;
-  liquidityPool.rewardTokenEmissionsAmount = []; // TODO
-  liquidityPool.rewardTokenEmissionsUSD = []; // TODO
-
-  liquidityPool.save();
+  createLiquidityPool(reserveToken, poolToken, blockTimestamp, blockNumber);
 }
 
 function getOrCreateProtocol(): DexAmmProtocol {
@@ -362,6 +378,36 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol.save();
   }
   return protocol;
+}
+
+function createLiquidityPool(
+  reserveToken: Token,
+  poolToken: Token,
+  blockTimestamp: BigInt,
+  blockNumber: BigInt
+): void {
+  let liquidityPool = new LiquidityPool(poolToken.id);
+
+  liquidityPool.protocol = getOrCreateProtocol().id;
+  liquidityPool.name = poolToken.name;
+  liquidityPool.symbol = poolToken.symbol;
+  liquidityPool.inputTokens = [reserveToken.id];
+  liquidityPool.outputToken = poolToken.id;
+  liquidityPool.rewardTokens = []; // TODO
+  liquidityPool.fees = []; // TODO
+  liquidityPool.createdTimestamp = blockTimestamp;
+  liquidityPool.createdBlockNumber = blockNumber;
+  liquidityPool.totalValueLockedUSD = zeroBD;
+  liquidityPool.cumulativeVolumeUSD = zeroBD;
+  liquidityPool.inputTokenBalances = [zeroBI];
+  liquidityPool.inputTokenWeights = []; // TODO
+  liquidityPool.outputTokenSupply = zeroBI;
+  liquidityPool.outputTokenPriceUSD = zeroBD;
+  liquidityPool.stakedOutputTokenAmount = zeroBI;
+  liquidityPool.rewardTokenEmissionsAmount = []; // TODO
+  liquidityPool.rewardTokenEmissionsUSD = []; // TODO
+
+  liquidityPool.save();
 }
 
 function _handleTokensDeposited(
@@ -389,7 +435,10 @@ function _handleTokensDeposited(
   deposit.inputTokenAmounts = [reserveTokenAmount];
   deposit.outputToken = poolToken.id;
   deposit.outputTokenAmount = poolTokenAmount;
-  deposit.amountUSD = zeroBD; // TODO
+  deposit.amountUSD = reserveTokenAmount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(reserveToken.decimals))
+    .times(getTokenPriceUSD(Address.fromString(reserveToken.id)));
   deposit.pool = poolToken.id;
 
   deposit.save();
@@ -420,8 +469,64 @@ function _handleTokensWithdrawn(
   withdraw.inputTokenAmounts = [reserveTokenAmount];
   withdraw.outputToken = poolToken.id;
   withdraw.outputTokenAmount = poolTokenAmount;
-  withdraw.amountUSD = zeroBD; // TODO
+  withdraw.amountUSD = reserveTokenAmount
+    .toBigDecimal()
+    .div(exponentToBigDecimal(reserveToken.decimals))
+    .times(getTokenPriceUSD(Address.fromString(reserveToken.id)));
   withdraw.pool = poolToken.id;
 
   withdraw.save();
+}
+
+// reserve token only
+function getTokenPriceUSD(tokenAddress: Address): BigDecimal {
+  if (tokenAddress == Address.fromString(DaiAddr)) {
+    return new BigDecimal(BigInt.fromI32(1));
+  }
+
+  let token = Token.load(tokenAddress.toHexString());
+  if (!token) {
+    log.warning("[getTokenPrice] token {} not found", [
+      tokenAddress.toHexString(),
+    ]);
+    return zeroBD;
+  }
+  if (!token._poolToken) {
+    log.warning("[getTokenPrice] token {} doesn't link to a pool token", [
+      tokenAddress.toHexString(),
+    ]);
+    return zeroBD;
+  }
+  let tokenLiquidityPool = LiquidityPool.load(token._poolToken!);
+  if (!tokenLiquidityPool) {
+    log.warning("[getTokenPrice] token {} liquidity pool not found", [
+      token._poolToken!,
+    ]);
+    return zeroBD;
+  }
+
+  let daiToken = Token.load(DaiAddr);
+  if (!daiToken) {
+    log.warning("[getTokenPrice] DAI token not found", []);
+    return zeroBD;
+  }
+
+  let daiLiquidityPool = LiquidityPool.load(BnDaiAddr);
+  if (!daiLiquidityPool) {
+    log.warning("[getTokenPrice] DAI liquidity pool not found", [BnDaiAddr]);
+    return zeroBD;
+  }
+
+  if (tokenLiquidityPool.inputTokenBalances[0] == zeroBI) {
+    return zeroBD;
+  }
+
+  return daiLiquidityPool.inputTokenBalances[0]
+    .toBigDecimal()
+    .div(exponentToBigDecimal(daiToken.decimals))
+    .div(
+      tokenLiquidityPool.inputTokenBalances[0]
+        .toBigDecimal()
+        .div(exponentToBigDecimal(token.decimals))
+    );
 }

@@ -60,8 +60,18 @@ export namespace UsageType {
 
 export let BancorNetworkAddr = "0xeEF417e1D5CC832e619ae18D2F140De2999dD4fB";
 export let EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-export let BntAddr = "0x1F573D6Fb3F13d689FF844B4cE37794d79a7FF1C";
-export let BnBntAddr = "0xAB05Cf7C6c3a288cd36326e4f7b8600e7268E344";
+export let BntAddr = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";
+export let BnBntAddr = "0xab05cf7c6c3a288cd36326e4f7b8600e7268e344";
+export let DaiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
+export let BnDaiAddr = "0x06cd589760da4616a0606da1367855808196c352";
 
 export let zeroBD = BigDecimal.zero();
 export let zeroBI = BigInt.zero();
+
+export function exponentToBigDecimal(n: i32): BigDecimal {
+  let a = BigInt.fromI32(1);
+  for (let i = 0; i < n; i++) {
+    a = a.times(BigInt.fromI32(10));
+  }
+  return a.toBigDecimal();
+}

@@ -108,3 +108,5 @@ templates:
           handler: handleTokensDeposited
         - event: TokensWithdrawn(indexed bytes32,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleTokensWithdrawn
+        - event: TradingLiquidityUpdated(indexed bytes32,indexed address,indexed address,uint256,uint256)
+          handler: handleTradingLiquidityUpdated
