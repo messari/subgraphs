@@ -46,8 +46,7 @@ interface SchemaTableProps {
 }
 
 function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProps }: SchemaTableProps) {
-  const issues = issuesProps;
-
+  const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
     schema = Object.keys(entityData).map((entityField: string) => {
@@ -82,6 +81,20 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
             value = "True";
           } else {
             value = "False";
+          }
+        }
+
+        if (entityField.toUpperCase() === "TOTALVALUELOCKEDUSD") {
+          if (
+            issues.filter((x) => x.fieldName === `${schemaName}-${entityField}` && x.type === "TVL-").length === 0 &&
+            Number(value) < 1000
+          ) {
+            issues.push({ type: "TVL-", message: "", level: "critical", fieldName: `${schemaName}-${entityField}` });
+          } else if (
+            issues.filter((x) => x.fieldName === `${schemaName}-${entityField}` && x.type === "TVL+").length === 0 &&
+            Number(value) > 1_000_000_000_000
+          ) {
+            issues.push({ type: "TVL+", message: "", level: "critical", fieldName: `${schemaName}-${entityField}` });
           }
         }
 
@@ -313,8 +326,10 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
 
   useEffect(() => {
     console.log("SCHEMATABLE ISSUE TO SET", issues, issuesProps);
-    setIssues(issues);
-  }, [issues]);
+    if (JSON.stringify(issues) !== JSON.stringify(issuesProps)) {
+      setIssues(issues);
+    }
+  });
 
   let schemaHeader = null;
   if (schema && entityData) {
