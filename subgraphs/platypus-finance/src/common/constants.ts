@@ -146,7 +146,7 @@ export const WAVAX_ADDRESS = "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7";
 
 export const PROTOCOL_ADMIN = "0x416a7989a964C9ED60257B064Efc3a30FE6bF2eE";
 
-export const MasterPlatypusAddress: Address = Address.fromString("0x68c5f4374228BEEdFa078e77b5ed93C28a2f713E");
+export const PTPAddress = "0x22d4002028f537599be9f666d1c4fa138522f9c8";
 
 // Main USD Pool
 export const POOL_PROXY = "0x66357dCaCe80431aee0A7507e2E361B7e2402370";

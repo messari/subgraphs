@@ -1,5 +1,10 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
+features:
+  - grafting
+graft:
+  base: QmWQfGyDJ1ynDfEYqpDq7XH2war3D7SkfqWkAXT3twAxDL
+  block: 9551740
 schema:
   file: ./schema.graphql
 dataSources:
@@ -35,33 +40,37 @@ dataSources:
           file: ./abis/secondaryPool.json
         - name: Router
           file: ./abis/router.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        # TraderJOE Contracts
+        - name: TraderJoeRouter
+          file: ./abis/Prices/TraderJoe/Router.json
       eventHandlers:
-        - event: Add(indexed uint256,uint256,indexed address,indexed address)
-          handler: handleAdd
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
         - event: DepositFor(indexed address,indexed uint256,uint256)
           handler: handleDepositFor
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-        - event: Harvest(indexed address,indexed uint256,uint256)
-          handler: handleHarvest
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
-        - event: Set(indexed uint256,uint256,indexed address,bool)
-          handler: handleSet
-        - event: Unpaused(address)
-          handler: handleUnpaused
-        - event: UpdateEmissionRate(indexed address,uint256)
-          handler: handleUpdateEmissionRate
-        - event: UpdateEmissionRepartition(indexed address,uint256,uint256)
-          handler: handleUpdateEmissionRepartition
-        - event: UpdatePool(indexed uint256,uint256,uint256,uint256)
-          handler: handleUpdatePool
-        - event: UpdateVePTP(indexed address,address,address)
-          handler: handleUpdateVePTP
+        # - event: UpdatePool(indexed uint256,uint256,uint256,uint256)
+        # handler: handleUpdatePool
         - event: Withdraw(indexed address,indexed uint256,uint256)
           handler: handleWithdraw
   - kind: ethereum/contract
@@ -69,7 +78,7 @@ dataSources:
     network: avalanche
     source:
       address: "0xB0523f9F473812FB195Ee49BC7d2ab9873a98044"
-      abi: MasterPlatypus
+      abi: MasterPlatypusOld
       startBlock: 9529909
     mapping:
       kind: ethereum/events
@@ -84,6 +93,8 @@ dataSources:
         - RewardToken
         - _Asset
       abis:
+        - name: MasterPlatypusOld
+          file: ./abis/masterPlatypusOld.json
         - name: SimpleRewarder
           file: ./abis/simpleRewarder.json
         - name: MasterPlatypus
@@ -96,33 +107,35 @@ dataSources:
           file: ./abis/secondaryPool.json
         - name: Router
           file: ./abis/router.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        # TraderJOE Contracts
+        - name: TraderJoeRouter
+          file: ./abis/Prices/TraderJoe/Router.json
       eventHandlers:
-        - event: Add(indexed uint256,uint256,indexed address,indexed address)
-          handler: handleAdd
         - event: Deposit(indexed address,indexed uint256,uint256)
           handler: handleDeposit
         - event: DepositFor(indexed address,indexed uint256,uint256)
           handler: handleDepositFor
         - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
           handler: handleEmergencyWithdraw
-        - event: Harvest(indexed address,indexed uint256,uint256)
-          handler: handleHarvest
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: Paused(address)
-          handler: handlePaused
-        - event: Set(indexed uint256,uint256,indexed address,bool)
-          handler: handleSet
-        - event: Unpaused(address)
-          handler: handleUnpaused
-        - event: UpdateEmissionRate(indexed address,uint256)
-          handler: handleUpdateEmissionRate
-        - event: UpdateEmissionRepartition(indexed address,uint256,uint256)
-          handler: handleUpdateEmissionRepartition
-        - event: UpdatePool(indexed uint256,uint256,uint256,uint256)
-          handler: handleUpdatePool
-        - event: UpdateVePTP(indexed address,address,address)
-          handler: handleUpdateVePTP
         - event: Withdraw(indexed address,indexed uint256,uint256)
           handler: handleWithdraw
   - kind: ethereum/contract
