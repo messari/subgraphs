@@ -20,6 +20,12 @@
         "prepare:constants": true
       }
     },
+    "ellipsis-finance": {
+      "bsc": {
+        "template": "ellipsis.finance.template.yaml",
+        "deploy-on-merge": false
+      }
+    },
     "uniswap-v2": {
       "mainnet": {
         "template": "uniswap.v2.template.yaml",
