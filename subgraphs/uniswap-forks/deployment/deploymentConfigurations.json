@@ -117,7 +117,15 @@
         "steegecs": "steegecs/trisolaris-aurora",
         "messari": "messari/trisolaris-aurora"
       }
-    },"ubeswap": {
+    },
+    "spookyswap": {
+      "fantom": {
+        "template": "spookyswap.template.yaml",
+        "test": "dhruvjain1122/spookyswap_messari",
+        "messari": "messari/spookyswap-fantom"
+      }
+    },
+    "ubeswap": {
       "celo": {
         "template": "ubeswap-template.yaml",
         "steegecs": "steegecs/ubeswap-celo",
