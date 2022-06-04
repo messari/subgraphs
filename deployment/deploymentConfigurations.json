@@ -52,6 +52,36 @@
         "prepare:constants": true
       }
     },
+    "curve": {
+      "arbitrum": {
+        "template": "curve.template.yaml",
+        "deploy-on-merge": "false"
+      },
+      "avalanche": {
+        "template": "curve.template.yaml",
+        "deploy-on-merge": "false"
+      },
+      "fantom": {
+        "template": "curve.template.yaml",
+        "deploy-on-merge": "false"
+      },
+      "mainnet": {
+        "template": "curve.template.yaml",
+        "deploy-on-merge": "false"
+      },
+      "matic": {
+        "template": "curve.template.yaml",
+        "deploy-on-merge": "false"
+      },
+      "optimism": {
+        "template": "curve.template.yaml",
+        "deploy-on-merge": "false"
+      },
+      "xdai": {
+        "template": "apeswap.template.yaml",
+        "deploy-on-merge": "false"
+      }
+    },
     "ellipsis-finance": {
       "bsc": {
         "template": "ellipsis.finance.template.yaml",
