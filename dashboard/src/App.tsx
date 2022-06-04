@@ -19,6 +19,8 @@ function App() {
               <>
                 <DashboardHeader protocolData={undefined} protocolId="" subgraphToQueryURL="" schemaVersion="" />
                 <IssuesDisplay
+                  oneLoaded={true}
+                  allLoaded={true}
                   issuesArrayProps={[
                     {
                       message: "404: The route entered does not exist.",

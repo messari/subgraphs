@@ -5,7 +5,7 @@ import {
   BIG_INT_ZERO,
   EARLY_V2_POOLS,
   LENDING,
-  LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY, METAPOOL_FACTORY
+  LENDING_POOLS, BIG_INT_ONE, REGISTRY_V1, CATCHUP_BLOCK, STABLE_FACTORY, METAPOOL_FACTORY, LP_TOKEN_POOL_MAP
 } from './common/constants/index'
 import { BigInt, dataSource } from '@graphprotocol/graph-ts/index'
 import { Factory, LiquidityPool, Registry } from '../generated/schema'
@@ -18,17 +18,16 @@ import {
 } from '../generated/templates'
 import { Address, Bytes, log } from '@graphprotocol/graph-ts'
 import { MainRegistry, PoolAdded, Set_liquidity_gaugesCall } from '../generated/AddressProvider/MainRegistry'
-import { createNewFactoryPool, createNewPool } from './services/pools'
+import { createNewFactoryPool, createNewPool, isLendingPool } from './services/pools'
 import { createNewRegistryPool } from './services/pools'
 import { MetaPool } from '../generated/templates/RegistryTemplate/MetaPool'
-import { CurveLendingPool } from '../generated/templates/RegistryTemplate/CurveLendingPool'
 import { TokenExchange, TokenExchangeUnderlying } from '../generated/templates/CurvePoolTemplate/CurvePool'
 import { handleExchange } from './services/swaps'
 import { LiquidityGaugeDeployed, MetaPoolDeployed, PlainPoolDeployed } from '../generated/AddressProvider/StableFactory'
 import { getFactory } from './services/factory'
 import { getPlatform } from './services/platform'
 import { AddLiquidity, RemoveLiquidity, RemoveLiquidityImbalance, RemoveLiquidityOne } from '../generated/templates/RegistryTemplate/CurvePool'
-import { NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
+import { CurveLendingPool, NewFee } from '../generated/templates/CurvePoolTemplate/CurveLendingPool'
 import { getLiquidityPool, getOrCreateToken, getPoolFee } from './common/getters'
 import { BIGDECIMAL_ONE_HUNDRED, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType, Network, ZERO_ADDRESS } from './common/constants'
 import { bigIntToBigDecimal } from './common/utils/numbers'
@@ -36,11 +35,14 @@ import { handleLiquidityFees, updateFinancials, updatePool, updatePoolMetrics, u
 import { StableFactory } from '../generated/templates/CryptoFactoryTemplate/StableFactory'
 import { setGaugeData } from './services/gauges/helpers'
 import { CurvePoolAvax } from '../generated/templates/CurvePoolTemplate/CurvePoolAvax'
+import { catchUp } from './services/catchup'
+import { handleLiquidityEvent, handleLiquidityRemoveOne } from './services/liquidity'
+import { setPoolBalances } from './common/setters'
 {{{ importExistingMetaPools }}}
 {{{ importCatchupFunction }}}
 
 
-export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt): void {
+export function addAddress(providedId: BigInt, addedAddress: Address, block: BigInt, timestamp: BigInt, hash: Bytes): void {
   const platform = getPlatform()
   if (!platform.catchup && (block > CATCHUP_BLOCK)) {
     platform.catchup = true
@@ -54,6 +56,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       mainRegistry = new Registry(addedAddress.toHexString())
       mainRegistry.save()
       RegistryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, false, 1, block, timestamp, hash)
+      }
     }
   } else if (providedId == BigInt.fromString('3')) {
     let stableFactory = Factory.load(addedAddress.toHexString())
@@ -62,6 +67,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       stableFactory = getFactory(addedAddress, 1)
       stableFactory.save()
       StableFactoryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, true, 1, block, timestamp, hash)
+      }
     }
   } else if (providedId == BigInt.fromString('5')) {
     let cryptoRegistry = Registry.load(addedAddress.toHexString())
@@ -70,6 +78,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       cryptoRegistry = new Registry(addedAddress.toHexString())
       cryptoRegistry.save()
       CryptoRegistryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, false, 2, block, timestamp, hash)
+      }
     }
   } else if (providedId == BigInt.fromString('6')) {
     let cryptoFactory = Factory.load(addedAddress.toHexString())
@@ -78,6 +89,9 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
       cryptoFactory = getFactory(addedAddress, 2)
       cryptoFactory.save()
       CryptoFactoryTemplate.create(addedAddress)
+      if (dataSource.network().toLowerCase() == Network.AVALANCHE.toLowerCase()){
+        catchUp(addedAddress, true, 2, block, timestamp, hash)
+      }
     }
   }
 }
@@ -85,24 +99,25 @@ export function addAddress(providedId: BigInt, addedAddress: Address, block: Big
 export function handleNewAddressIdentifier(event: NewAddressIdentifier): void {
   const providedId = event.params.id
   const addedAddress = event.params.addr
-  addAddress(providedId, addedAddress, event.block.number)
+  addAddress(providedId, addedAddress, event.block.number, event.block.timestamp, event.transaction.hash)
 }
 
 export function handleAddressModified(event: AddressModified): void {
   const providedId = event.params.id
   const addedAddress = event.params.new_address
-  addAddress(providedId, addedAddress, event.block.number)
+  addAddress(providedId, addedAddress, event.block.number, event.block.timestamp, event.transaction.hash)
 }
 
 export function getLpToken(pool: Address, registryAddress: Address): Address {
   const registry = MainRegistry.bind(registryAddress)
   let lpTokenResult = registry.try_get_lp_token(pool)
   if (lpTokenResult.reverted) {
-    if(dataSource.network()== Network.AVALANCHE.toLowerCase()){
-      lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
-      if (!lpTokenResult.reverted) {
-        return lpTokenResult.value
-      }
+    lpTokenResult = CurvePoolAvax.bind(pool).try_lp_token();
+    if (!lpTokenResult.reverted) {
+      return lpTokenResult.value
+    }
+    if (LP_TOKEN_POOL_MAP.has(pool.toHexString().toLowerCase())) {
+      return LP_TOKEN_POOL_MAP.get(pool.toHexString())
     }
     log.warning('getLpToken reverted: {}', [pool.toHexString()])
   }
@@ -119,13 +134,16 @@ export function ensureBasePoolTracking(pool: Address, eventAddress: Address, tim
   const basePool = LiquidityPool.load(pool.toHexString())
   if (!basePool) {
     log.warning('New missing base pool {} added from registry', [pool.toHexString()])
+    const isLending = isLendingPool(pool)
+    const basePoolLending = isLending ? pool : ADDRESS_ZERO // if it's a lending pool, it's the pool itself (virtual base pool)
+    const poolType = isLending ? LENDING : REGISTRY_V1
     createNewRegistryPool(
       pool,
-      ADDRESS_ZERO,
+      basePoolLending,
       getLpToken(pool, eventAddress),
       false,
       false,
-      REGISTRY_V1,
+      poolType,
       timestamp,
       block,
       tx,
@@ -135,42 +153,41 @@ export function ensureBasePoolTracking(pool: Address, eventAddress: Address, tim
   }
 }
 
-export function handleMainRegistryPoolAdded(event: PoolAdded): void {
-  const pool = event.params.pool
-  const registryAddress = event.address;
-  let mainRegistry = MainRegistry.bind(registryAddress);
+export function addRegistryPool(pool: Address,
+                                registry: Address,
+                                block: BigInt,
+                                timestamp: BigInt,
+                                hash: Bytes): void {
+  log.info('New pool {} added to registry at {}', [pool.toHexString(), hash.toHexString()])
+  let mainRegistry = MainRegistry.bind(registry);
   let gauge = ADDRESS_ZERO
   let gaugeCall = mainRegistry.try_get_gauges(pool)
   if (!gaugeCall.reverted) {
     gauge = gaugeCall.value.value0[0]
   }
-  log.info('New pool {} added to registry at {}', [pool.toHexString(), event.transaction.hash.toHexString()])
-  const testLending = CurveLendingPool.bind(pool)
-  // The test would not work on mainnet because there are no
-  // specific functions for lending pools there.
-  const testLendingResult = testLending.try_offpeg_fee_multiplier()
-  if (!testLendingResult.reverted || LENDING_POOLS.includes(pool)) {
+
+  if (isLendingPool(pool)) {
     // Lending pool
     log.info('New lending pool {} added from registry at {}', [
       pool.toHexString(),
-      event.transaction.hash.toHexString(),
+      hash.toHexString(),
     ])
     CurvePoolTemplate.create(pool)
-    const lpToken = getLpToken(pool, event.address)
-    let lpTokenEntity = getOrCreateToken(lpToken)
+    const lpToken = getLpToken(pool, registry)
+    const lpTokenContract = getOrCreateToken(lpToken)
     createNewPool(
       pool,
-      lpToken,
-      lpTokenEntity.name,
-      lpTokenEntity.symbol,
-      LENDING, // poolType
-      false, // is Metapool
-      false, // is V2
-      event.block.number,
-      event.block.timestamp,
-      pool, // basePool
-      gauge, // gauge address
-      registryAddress // registry
+      lpToken, // lp token
+      lpTokenContract.name, // pool name
+      lpTokenContract.symbol, // pool symbol
+      LENDING, // pool type
+      false, // is metapool
+      false, // is v2
+      block,
+      timestamp,
+      pool,
+      gauge,
+      registry
     )
   }
 
@@ -178,7 +195,7 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
   const testMetaPoolResult = testMetaPool.try_base_pool()
   const unknownMetapool = UNKNOWN_METAPOOLS.has(pool.toHexString())
   if (!testMetaPoolResult.reverted || unknownMetapool) {
-    log.info('New meta pool {} added from registry {} at {}', [pool.toHexString(), registryAddress.toHexString(), event.transaction.hash.toHexString()])
+    log.info('New meta pool {} added from registry {} at {}', [pool.toHexString(), registry.toHexString(), hash.toHexString()])
     const basePool = unknownMetapool ? UNKNOWN_METAPOOLS.get(pool.toHexString()) : testMetaPoolResult.value
     let basePoolGauge = ADDRESS_ZERO;
     let gaugeCall = mainRegistry.try_get_gauges(basePool)
@@ -188,43 +205,53 @@ export function handleMainRegistryPoolAdded(event: PoolAdded): void {
     // check if we're tracking the base pool
     ensureBasePoolTracking(
       basePool,
-      event.address,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      registry,
+      timestamp,
+      block,
+      hash,
       basePoolGauge
     )
     createNewRegistryPool(
       pool,
       basePool,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       true,
       EARLY_V2_POOLS.includes(pool) ? true : false,
       // on mainnet the unknown metapools are legacy metapools deployed before the
       // contract was added to the address indexer
       UNKNOWN_METAPOOLS.has(pool.toHexString()) ? {{ unknownMetapoolType }} : STABLE_FACTORY,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      registryAddress
+      registry
     )
   } else {
-    log.info('New plain pool {} added from registry at {}', [pool.toHexString(), event.transaction.hash.toHexString()])
+    log.info('New plain pool {} added from registry at {}', [pool.toHexString(), hash.toHexString()])
     createNewRegistryPool(
       pool,
       ADDRESS_ZERO,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       false,
       EARLY_V2_POOLS.includes(pool) ? true : false,
       REGISTRY_V1,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      registryAddress
+      registry
     )
   }
+}
+
+export function handleMainRegistryPoolAdded(event: PoolAdded): void {
+  addRegistryPool(
+    event.params.pool,
+    event.address,
+    event.block.number,
+    event.block.timestamp,
+    event.transaction.hash
+  )
 }
 
 export function handleTokenExchange(event: TokenExchange): void {
@@ -264,6 +291,7 @@ export function handleTokenExchangeUnderlying(event: TokenExchangeUnderlying): v
 export function handleAddLiquidity(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
   
+  handleLiquidityEvent('deposit',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
@@ -273,6 +301,8 @@ export function handleAddLiquidity(event: AddLiquidity): void {
 
 export function handleRemoveLiquidity(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString())
+
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -281,6 +311,9 @@ export function handleRemoveLiquidity(event: RemoveLiquidity): void {
 
 export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString())
+
+  handleLiquidityRemoveOne(pool,event.params.token_supply,event.params.token_amount,event.params.provider,event);
+  setPoolBalances(pool);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -289,7 +322,8 @@ export function handleRemoveLiquidityOne(event: RemoveLiquidityOne): void {
 
 export function handleRemoveLiquidityImbalance(event: RemoveLiquidityImbalance): void {
   let pool = getLiquidityPool(event.address.toHexString())
-
+  
+  handleLiquidityEvent('withdraw',pool,event.params.token_supply,event.params.token_amounts,event.params.provider,event);
   handleLiquidityFees(pool, event.params.fees, event); // liquidity fees only take on remove liquidity imbalance and add liquidity
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);

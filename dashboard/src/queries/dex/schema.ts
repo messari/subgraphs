@@ -172,7 +172,20 @@ export const schema100 = (): Schema => {
   };
 
   const events = ["withdraws", "deposits", "swaps"];
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery: "",
+    financialsQuery: "",
+    hourlyUsageQuery: "",
+    dailyUsageQuery: "",
+    protocolTableQuery: "",
+    poolsQuery: "",
+  };
 };
 
 export const schema110 = (): Schema => {
@@ -354,7 +367,20 @@ export const schema110 = (): Schema => {
     totalVolumeUSD: "BigDecimal!",
   };
 
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery: "",
+    financialsQuery: "",
+    hourlyUsageQuery: "",
+    dailyUsageQuery: "",
+    protocolTableQuery: "",
+    poolsQuery: "",
+  };
 };
 
 export const schema120 = (): Schema => {
@@ -495,6 +521,56 @@ export const schema120 = (): Schema => {
     return baseStr + fields + " }";
   });
 
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      dexAmmProtocol(id: $protocolId) {
+        id
+        name
+        slug
+        schemaVersion
+        subgraphVersion
+        methodologyVersion
+        network
+        type
+        totalValueLockedUSD
+        protocolControlledValueUSD
+        cumulativeVolumeUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        cumulativeUniqueUsers
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        liquidityPools(first: 100) {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+      query Data($poolId: String) {
+        ${liquidityPoolDailyQuery}
+        ${liquidityPoolHourlyQuery}
+      }
+      `;
+
   let query = `
   query Data($poolId: String, $protocolId: String){
     _meta {
@@ -511,84 +587,7 @@ export const schema120 = (): Schema => {
       schemaVersion
       subgraphVersion
     }
-    dexAmmProtocol(id: $protocolId) {
-      id
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      totalValueLockedUSD
-      protocolControlledValueUSD
-      cumulativeVolumeUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      cumulativeUniqueUsers
-    }
-    dexAmmProtocols {
-      id
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      totalValueLockedUSD
-      protocolControlledValueUSD
-      cumulativeVolumeUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      cumulativeUniqueUsers
-    }
-    liquidityPools {
-      id
-      name
-      symbol
-      fees{
-        feePercentage
-        feeType
-      }
-      inputTokens{
-        id
-        decimals
-        name
-        symbol
-      }
-      outputToken {
-        id
-        decimals
-        name
-        symbol
-      }
-      rewardTokens {
-        id
-        token {
-          id
-          decimals
-          name
-          symbol
-        }
-      }
-      totalValueLockedUSD
-      cumulativeVolumeUSD
-      inputTokenBalances
-      inputTokenWeights
-      outputTokenSupply
-      outputTokenPriceUSD
-      stakedOutputTokenAmount
-      rewardTokenEmissionsAmount
-      rewardTokenEmissionsUSD
-    }
-    ${finanQuery}
-    ${usageHourlyQuery}
-    ${usageDailyQuery}
-    ${liquidityPoolDailyQuery}
-    ${liquidityPoolHourlyQuery}
+
     ${eventsQuery}
     liquidityPool(id: $poolId){
       id
@@ -649,5 +648,18 @@ export const schema120 = (): Schema => {
     cumulativeUniqueUsers: "Int!",
   };
 
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    protocolTableQuery,
+    poolData,
+    events,
+    protocolFields,
+    poolsQuery,
+    financialsQuery,
+    hourlyUsageQuery,
+    dailyUsageQuery,
+    poolTimeseriesQuery,
+  };
 };

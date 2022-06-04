@@ -179,7 +179,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Aurigami",
     "aurigami",
     "1.2.1",
-    "1.0.1",
+    "1.0.2",
     "1.0.0",
     Network.AURORA,
     comptroller.try_liquidationIncentiveMantissa(),

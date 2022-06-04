@@ -20,7 +20,7 @@ export const schema = (version: string): string => {
 export const schema100 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 100, skip: $skipAmt) {
+        markets(first: 50, skip: $skipAmt) {
             inputTokens{
                 decimals
                 name
@@ -52,7 +52,7 @@ export const schema100 = (): string => {
 export const schema110 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 100, skip: $skipAmt) {
+        markets(first: 50, skip: $skipAmt) {
             id
             name
             inputTokens{
@@ -93,7 +93,7 @@ export const schema110 = (): string => {
 export const schema120 = (): string => {
   return `
     query Data($skipAmt: Int!) {
-        markets(first: 100, skip: $skipAmt) {
+        markets(first: 50, skip: $skipAmt) {
             id
             name
             inputToken {

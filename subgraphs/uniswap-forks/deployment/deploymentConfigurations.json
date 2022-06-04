@@ -124,6 +124,14 @@
         "test": "dhruvjain1122/spookyswap_messari",
         "messari": "messari/spookyswap-fantom"
       }
+    },
+    "ubeswap": {
+      "celo": {
+        "template": "ubeswap-template.yaml",
+        "steegecs": "steegecs/ubeswap-celo",
+        "messari": "messari/ubeswap-celo",
+        "sevenshi": "sevenshi/ubeswap_celo"
+      }
     }
   }
 }

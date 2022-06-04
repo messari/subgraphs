@@ -15,16 +15,16 @@ export const BIG_INT_ONE = BigInt.fromString('1')
 
 export const NATIVE_PLACEHOLDER_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 export const NATIVE_PLACEHOLDER = Address.fromString(NATIVE_PLACEHOLDER_ADDRESS)
-export const NATIVE_TOKEN = '0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270'
+export const NATIVE_TOKEN = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
 export const NATIVE_TOKEN_ADDRESS = Address.fromString(NATIVE_TOKEN)
 export const ADDRESS_ZERO = Address.fromString('0x0000000000000000000000000000000000000000')
 
-export const THREE_CRV_TOKEN = '0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171'
+export const THREE_CRV_TOKEN = '0x6c3f90f043a72fa612cbac8115ee7e52bde6e490'
 export const THREE_CRV_ADDRESS = Address.fromString(THREE_CRV_TOKEN)
 
-export const WETH_TOKEN = '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619'
-export const WBTC_TOKEN = '0x1bfd67037b42cf73acf2047067bd4f2c47d9bfd6'
-export const USDT_TOKEN = '0xc2132d05d31c914a87c6611c10748aeb04b58e8f'
+export const WETH_TOKEN = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2'
+export const WBTC_TOKEN = '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'
+export const USDT_TOKEN = '0xdac17f958d2ee523a2206206994597c13d831ec7'
 export const WETH_ADDRESS = Address.fromString(WETH_TOKEN)
 export const USDT_ADDRESS = Address.fromString(USDT_TOKEN)
 export const WBTC_ADDRESS = Address.fromString(WBTC_TOKEN)
@@ -119,6 +119,8 @@ export const LENDING_POOLS = [
   Address.fromString('0x8925d9d9b4569d737a48499def3f67baa5a144b9'),
   // FANTOM
   Address.fromString('0x4fc8d635c3cb1d0aa123859e2b2587d0ff2707b1'),
+  // Matic 
+  Address.fromString('0x445fe580ef8d70ff569ab36e80c647af338db351')
 ]
 
 // some v2 pools can have Forex : Crypto pairs for which we need
@@ -159,10 +161,10 @@ FOREX_ORACLES.set(POLYGON_JJPY_TOKEN, Address.fromString('0xD647a6fC9BC640230158
 FOREX_ORACLES.set(ARBI_EURS_TOKEN, Address.fromString('0xA14d53bC1F1c0F31B4aA3BD109344E5009051a84'))
 FOREX_ORACLES.set(ARBI_FXEUR_TOKEN, Address.fromString('0xA14d53bC1F1c0F31B4aA3BD109344E5009051a84'))
 
-export const SUSHI_FACTORY = '0xc35DADB65012eC5796536bD9864eD8773aBc74C4'
+export const SUSHI_FACTORY = '0xc0aee478e3658e2610c5f7a4a2e1777ce9e4f2ac'
 export const SUSHI_FACTORY_ADDRESS = Address.fromString(SUSHI_FACTORY)
 
-export const UNI_FACTORY = '0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32'
+export const UNI_FACTORY = '0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f'
 export const UNI_FACTORY_ADDRESS = Address.fromString(UNI_FACTORY)
 export const UNI_V3_FACTORY = '0x1F98431c8aD98523631AE4a59f267346ea31F984'
 export const UNI_V3_FACTORY_ADDRESS = Address.fromString(UNI_V3_FACTORY)
@@ -177,7 +179,7 @@ export const CURVE_FACTORY_V2 = Address.fromString('0xf18056bbd320e96a48e3fbf8bc
 
 export const TRIPOOL_ADDRESS = Address.fromString('0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7')
 
-export const TRICRYPTO2_POOL = '0x92215849c439E1f8612b6646060B4E3E5ef822cC'
+export const TRICRYPTO2_POOL = '0xd51a44d3fae010294c616388b506acda1bfaae46'
 export const TRICRYPTO2_POOL_ADDRESS = Address.fromString(TRICRYPTO2_POOL)
 // Pools that are v2 but were originally added to v1 registry
 export const EURT_USD_POOL = Address.fromString('0x9838eCcC42659FA8AA7daF2aD134b53984c9427b')
@@ -185,7 +187,7 @@ export const EURS_USDC_POOL = Address.fromString('0x98a7F18d4E56Cfe84E3D081B4000
 export const TRICRYPTO_V1_POOL = Address.fromString('0x80466c64868E1ab14a1Ddf27A676C3fcBE638Fe5')
 export const EARLY_V2_POOLS = [TRICRYPTO2_POOL_ADDRESS, EURS_USDC_POOL, EURT_USD_POOL]
 
-export const CATCHUP_BLOCK = BigInt.fromI32(0)
+export const CATCHUP_BLOCK = BigInt.fromI32(11153725)
 export const CURVE_REGISTRY_V1 = Address.fromString('0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5')
 
 export const METAPOOL_FACTORY = 'METAPOOL_FACTORY'
@@ -201,22 +203,52 @@ export const CURVE_ADMIN_FEE = BigDecimal.fromString("0.5");
 export const CURVE_REGISTRY_V1_AVAX = Address.fromString("0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6")
 export const TRYCRYPTO2_POOL_AVAX_GAUGE = Address.fromString("0x445FE580eF8d70FF569aB36e80c647af338db351")
 
-export const CATCHUP_POOLS = []
-export const CATCHUP_LP_TOKENS = []
-export const CATCHUP_GAUGES = []
-export const CATCHUP_START_BLOCKS = []
-export const CATCHUP_START_TIMES = []
-export const CATCHUP_POOL_TYPES = []
-export const CATCHUP_REGISTRIES = []
+export const CATCHUP_POOLS = [Address.fromString("0x06364f10B501e868329afBc005b3492902d6C763"), Address.fromString("0x0f9cb53Ebe405d49A0bbdBD291A65Ff571bC83e1"), Address.fromString("0x3E01dD8a5E1fb3481F0F589056b428Fc308AF0Fb"), Address.fromString("0x3eF6A01A0f81D6046290f3e2A8c5b843e738E604"), Address.fromString("0x45F783CCE6B7FF23B2ab2D70e416cdb7D6055f51"), Address.fromString("0x4CA9b3063Ec5866A4B82E437059D2C43d1be596F"), Address.fromString("0x4f062658EaAF2C1ccf8C8e36D6824CDf41167956"), Address.fromString("0x52EA46506B9CC5Ef470C5bf89f17Dc28bB35D85C"), Address.fromString("0x79a8C46DeA5aDa233ABaFFD40F3A0A2B1e5A4F27"), Address.fromString("0x7fC77b5c7614E1533320Ea6DDc2Eb61fa00A9714"), Address.fromString("0x8474DdbE98F5aA3179B3B3F5942D724aFcdec9f6"), Address.fromString("0x93054188d876f558f4a66B2EF1d97d16eDf0895B"), Address.fromString("0xA2B47E3D5c44877cca798226B7B8118F9BFb7A56"), Address.fromString("0xA5407eAE9Ba41422680e2e00537571bcC53efBfD"), Address.fromString("0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7"), Address.fromString("0xC18cC39da8b11dA8c3541C598eE022258F9744da"), Address.fromString("0xC25099792E9349C7DD09759744ea681C7de2cb66"), Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"), ]
+export const CATCHUP_LP_TOKENS = [Address.fromString("0xd905e2eaebe188fc92179b6350807d8bd91db0d8"), Address.fromString("0x4f3e8f405cf5afc05d68142f3783bdfe13811522"), Address.fromString("0x97e2768e8e73511ca874545dc5ff8067eb19b787"), Address.fromString("0x5b5cfe992adac0c9d48e05854b2d91c73a003858"), Address.fromString("0xdf5e0e81dff6faf3a7e52ba697820c5e32d806a8"), Address.fromString("0xb19059ebb43466c323583928285a49f558e572fd"), Address.fromString("0xd2967f45c4f384deea880f807be904762a3dea07"), Address.fromString("0x9fc689ccada600b6df723d9e47d84d76664a1f23"), Address.fromString("0x3b3ac5386837dc563660fb6a0937dfaa5924333b"), Address.fromString("0x075b1bb99792c9e1041ba13afef80c91a1e70fb3"), Address.fromString("0x1aef73d49dedc4b1778d0706583995958dc862e6"), Address.fromString("0x49849c98ae39fff122806c06791fa73784fb3675"), Address.fromString("0x845838df265dcd2c412a1dc9e959c7d08537f8a2"), Address.fromString("0xc25a3a3b969415c80451098fa907ec722572917f"), Address.fromString("0x6c3f90f043a72fa612cbac8115ee7e52bde6e490"), Address.fromString("0xc2ee6b0334c261ed60c72f6054450b61b8f18e35"), Address.fromString("0x64eda51d3ad40d56b9dfc5554e06f94e1dd786fd"), Address.fromString("0x6d65b498cb23deaba52db31c93da9bffb340fb8f"), ]
+export const CATCHUP_GAUGES = [Address.fromString("0x64e3c23bfc40722d3b649844055f1d51c1ac041d"), Address.fromString("0xf98450b5602fa59cc66e1379dffb6fddc724cfc4"), Address.fromString("0xc2b1df84112619d190193e48148000e3990bf627"), Address.fromString("0x2db0e83599a91b508ac268a6197b8b14f5e72840"), Address.fromString("0xfa712ee4788c042e2b7bb55e6cb8ec569c4530c1"), Address.fromString("0x4c18e409dc8619bfb6a1cb56d114c3f592e0ae79"), Address.fromString("0xc5cfada84e902ad92dd40194f0883ad49639b023"), Address.fromString("0xbc89cd85491d81c6ad2954e6d0362ee29fca8f53"), Address.fromString("0x69fb7c45726cfe2badee8317005d3f94be838840"), Address.fromString("0x705350c4bcd35c9441419ddd5d2f097d7a55410f"), Address.fromString("0x5f626c30ec1215f4edcc9982265e8b1f411d1352"), Address.fromString("0xb1f2cdec61db658f091671f5f199635aef202cac"), Address.fromString("0x7ca5b0a2910b33e9759dc7ddb0413949071d7575"), Address.fromString("0xa90996896660decc6e997655e065b23788857849"), Address.fromString("0xbfcf63294ad7105dea65aa58f8ae5be2d9d0952a"), Address.fromString("0x4dc4a289a8e33600d8bd4cf5f6313e43a37adec7"), Address.fromString("0x6828bcf74279ee32f2723ec536c22c51eed383c6"), Address.fromString("0x0000000000000000000000000000000000000000"), ]
+export const CATCHUP_START_BLOCKS = [BigInt.fromI32(10041041), BigInt.fromI32(11010514), BigInt.fromI32(11010305), BigInt.fromI32(11010070), BigInt.fromI32(9476468), BigInt.fromI32(10732328), BigInt.fromI32(11005604), BigInt.fromI32(9456293), BigInt.fromI32(9567295), BigInt.fromI32(10276641), BigInt.fromI32(11011940), BigInt.fromI32(10151385), BigInt.fromI32(9554040), BigInt.fromI32(9906598), BigInt.fromI32(10809473), BigInt.fromI32(11037531), BigInt.fromI32(11095928), BigInt.fromI32(11011556), ]
+export const CATCHUP_START_TIMES = [BigInt.fromI32(1589148236), BigInt.fromI32(1602099761), BigInt.fromI32(1602097014), BigInt.fromI32(1602093743), BigInt.fromI32(1581620865), BigInt.fromI32(1598394762), BigInt.fromI32(1602032924), BigInt.fromI32(1581353158), BigInt.fromI32(1582828615), BigInt.fromI32(1592308622), BigInt.fromI32(1602119084), BigInt.fromI32(1590630643), BigInt.fromI32(1582652911), BigInt.fromI32(1587348844), BigInt.fromI32(1599414978), BigInt.fromI32(1602462378), BigInt.fromI32(1603235444), BigInt.fromI32(1602113863), ]
+export const CATCHUP_POOL_TYPES = ["LENDING", "REGISTRY_V1", "REGISTRY_V1", "REGISTRY_V1", "LENDING", "REGISTRY_V1", "REGISTRY_V1", "LENDING", "LENDING", "REGISTRY_V1", "REGISTRY_V1", "REGISTRY_V1", "LENDING", "LENDING", "REGISTRY_V1", "REGISTRY_V1", "REGISTRY_V1", "REGISTRY_V1", ]
+export const CATCHUP_REGISTRIES = [Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), Address.fromString("0x90e00ace148ca3b23ac1bc8c240c2a7dd9c2d7f5"), ]
 
 export const ASSET_TYPES = new Map<string, i32>()
+ASSET_TYPES.set("0x06364f10b501e868329afbc005b3492902d6c763".toLowerCase(), 0)
+ASSET_TYPES.set("0x0f9cb53ebe405d49a0bbdbd291a65ff571bc83e1".toLowerCase(), 0)
+ASSET_TYPES.set("0x3e01dd8a5e1fb3481f0f589056b428fc308af0fb".toLowerCase(), 0)
+ASSET_TYPES.set("0x3ef6a01a0f81d6046290f3e2a8c5b843e738e604".toLowerCase(), 0)
+ASSET_TYPES.set("0x45f783cce6b7ff23b2ab2d70e416cdb7d6055f51".toLowerCase(), 0)
+ASSET_TYPES.set("0x4ca9b3063ec5866a4b82e437059d2c43d1be596f".toLowerCase(), 2)
+ASSET_TYPES.set("0x4f062658eaaf2c1ccf8c8e36d6824cdf41167956".toLowerCase(), 0)
+ASSET_TYPES.set("0x52ea46506b9cc5ef470c5bf89f17dc28bb35d85c".toLowerCase(), 0)
+ASSET_TYPES.set("0x79a8c46dea5ada233abaffd40f3a0a2b1e5a4f27".toLowerCase(), 0)
+ASSET_TYPES.set("0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714".toLowerCase(), 2)
+ASSET_TYPES.set("0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6".toLowerCase(), 0)
+ASSET_TYPES.set("0x93054188d876f558f4a66b2ef1d97d16edf0895b".toLowerCase(), 2)
+ASSET_TYPES.set("0xa2b47e3d5c44877cca798226b7b8118f9bfb7a56".toLowerCase(), 4)
+ASSET_TYPES.set("0xa5407eae9ba41422680e2e00537571bcc53efbfd".toLowerCase(), 0)
+ASSET_TYPES.set("0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7".toLowerCase(), 0)
+ASSET_TYPES.set("0xc18cc39da8b11da8c3541c598ee022258f9744da".toLowerCase(), 0)
+ASSET_TYPES.set("0xc25099792e9349c7dd09759744ea681c7de2cb66".toLowerCase(), 2)
+ASSET_TYPES.set("0xe7a24ef0c5e95ffb0f6684b813a78f2a3ad7d171".toLowerCase(), 4)
 
-//export const CATCHUP_ASSET_TYPES = []
+//export const CATCHUP_ASSET_TYPES = ["[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", "[object Object]", ]
 export const GAUGE_CONTROLLER = Address.fromString("0x2F50D538606Fa9EDD2B11E2446BEb18C9D5846bB")
 
-export const CURVE_TOKEN = Address.fromString("0x172370d5Cd63279eFa6d502DAB29171933a610AF")
+export const CURVE_TOKEN = Address.fromString("0xD533a949740bb3306d119CC777fa900bA034cd52")
 
 export const CTOKEN_DECIMALS = 8;
 
 export const LP_TOKEN_POOL_MAP = new Map<string, Address>()
-LP_TOKEN_POOL_MAP.set("0x445FE580eF8d70FF569aB36e80c647af338db351".toLowerCase(),Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))
+LP_TOKEN_POOL_MAP.set("0x445fe580ef8d70ff569ab36e80c647af338db351",Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))
+
+export const POOL_REGISTRY_ID_MAP = new Map<string, BigInt>()
+POOL_REGISTRY_ID_MAP.set("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10",BigInt.fromI32(8))
+POOL_REGISTRY_ID_MAP.set("0xb0d2eb3c2ca3c6916fab8dcbf9d9c165649231ae",BigInt.fromI32(7))
+POOL_REGISTRY_ID_MAP.set("0x065f44cd602cc6680e82e516125839b9bbbbe57e",BigInt.fromI32(6))
+POOL_REGISTRY_ID_MAP.set("0x850c7cc8757ce1fa8ced709f297d842e12e61759",BigInt.fromI32(5))
+POOL_REGISTRY_ID_MAP.set("0xaea2e71b631fa93683bcf256a8689dfa0e094fcd",BigInt.fromI32(4))
+POOL_REGISTRY_ID_MAP.set("0x6041631c566eb8dc6258a75fa5370761d4873990",BigInt.fromI32(3))
+POOL_REGISTRY_ID_MAP.set("0xf92c2a3c91bf869f77f9cb221c5ab1b1ada8a586",BigInt.fromI32(2))
+POOL_REGISTRY_ID_MAP.set("0xe9dcf2d2a17ead11fab8b198578b20535370be6a",BigInt.fromI32(1))
+POOL_REGISTRY_ID_MAP.set("0x30df229cefa463e991e29d42db0bae2e122b2ac7",BigInt.fromI32(0))
+
