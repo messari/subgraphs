@@ -103,7 +103,6 @@ export function getOrCreateFinancialsDailySnapshot(
   }
 
   object.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  object.totalValueLockedUSD = protocol.totalValueLockedUSD;
   object.blockNumber = call.block.number;
   object.timestamp = call.block.timestamp;
 
