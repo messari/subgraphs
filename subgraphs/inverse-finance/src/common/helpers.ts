@@ -120,7 +120,7 @@ export function updateDeposit(event: Mint): void {
   //      - cumulativeDepositUSD
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
-  marketDaily.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  marketDaily.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketDaily.blockNumber = event.block.number;
   marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
@@ -130,7 +130,7 @@ export function updateDeposit(event: Mint): void {
   //      - cumulativeDepositUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
-  marketHourly.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  marketHourly.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
@@ -236,7 +236,7 @@ export function updateBorrow(event: Borrow): void {
   //      - cumulativeBorrowUSD
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
-  marketDaily.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  marketDaily.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketDaily.blockNumber = event.block.number;
   marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
@@ -246,7 +246,7 @@ export function updateBorrow(event: Borrow): void {
   //      - cumulativeBorrowUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
-  marketHourly.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  marketHourly.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
@@ -363,7 +363,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   //      - cumulativeLiquidateUSD
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
-  marketDaily.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  marketDaily.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketDaily.blockNumber = event.block.number;
   marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
@@ -373,7 +373,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   //      - cumulativeLiquidateUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
-  marketHourly.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  marketHourly.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();

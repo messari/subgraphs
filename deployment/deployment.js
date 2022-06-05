@@ -18,6 +18,7 @@ if (process.argv.length == 2) {
 
                 let template = protocolNetworkMap[protocol][network]['template']
                 let location = ""
+                let prepareConstants = protocolNetworkMap[protocol][network]['prepare:constants']
 
                 // Get location for configurations or derive using standard naming convention
                 if (process.argv[2] in protocolNetworkMap[protocol][network]) {
@@ -28,7 +29,7 @@ if (process.argv.length == 2) {
                 
                 // Check if deployment is ignored in configurations
                 if ([true, undefined].includes(protocolNetworkMap[protocol][network]['deploy-on-merge']) | process.argv[2] != 'messari') {
-                    allScripts.set(location, scripts(protocol, network, template, location))
+                    allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
                 } else {
                     results += "Ignored in Deployment Configurations: " + location + '\n'
                 }
@@ -50,6 +51,7 @@ if (process.argv.length == 2) {
         for (const network in protocolNetworkMap[protocol]) {
             let template = protocolNetworkMap[protocol][network]['template']
             let location = ""
+            let prepareConstants = protocolNetworkMap[protocol][network]['prepare:constants']
 
             // Get location for configurations or derive using standard naming convention
             if (process.argv[3] in protocolNetworkMap[protocol][network]) {
@@ -60,7 +62,7 @@ if (process.argv.length == 2) {
             
             // Check if deployment is ignored in configurations
             if ([true, undefined].includes(protocolNetworkMap[protocol][network]['deploy-on-merge']) | process.argv[3] != 'messari') {
-                allScripts.set(location, scripts(protocol, network, template, location))
+                allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
             } else {
                 results += "Ignored in Deployment Configurations: " + location + '\n'
             }
@@ -83,6 +85,7 @@ if (process.argv.length == 2) {
         let network = process.argv[3]
         let template = protocolNetworkMap[protocol][network]['template']
         let location = ""
+        let prepareConstants = protocolNetworkMap[protocol][network]['prepare:constants']
         
         // Get location for configurations or derive using standard naming convention
         if (process.argv[4] in protocolNetworkMap[protocol][network]) {
@@ -93,7 +96,7 @@ if (process.argv.length == 2) {
 
         // Check if deployment is ignored in configurations
         if ([true, undefined].includes(protocolNetworkMap[protocol][network]['deploy-on-merge']) | process.argv[4] != 'messari') {
-            allScripts.set(location, scripts(protocol, network, template, location))
+            allScripts.set(location, scripts(protocol, network, template, location, prepareConstants))
         }else {
             results += "Ignored in Deployment Configurations: " + location + '\n'
         }
