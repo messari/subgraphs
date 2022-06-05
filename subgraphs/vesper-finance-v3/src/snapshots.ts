@@ -131,7 +131,9 @@ export function getOrCreateFinancialsDailySnapshot(
   object.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD;
   object.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  object.dailyTotalRevenueUSD = totalRevenueUsd;
+  object.dailyTotalRevenueUSD = object.dailyTotalRevenueUSD.plus(
+    totalRevenueUsd
+  );
 
   object.save();
 
