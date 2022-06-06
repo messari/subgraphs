@@ -139,8 +139,9 @@ export const BLOCKS_PER_YEAR = BigDecimal.fromString("2102400");
 //// Rari Input Tokens ////
 ///////////////////////////
 
-// Note: Deposit/Withdrawal events return the currency as an indexed string
-// so we need to create a mapping between the 'currencyCode' to Token
+// Note: Deposit/Withdrawal events store the asset as an indexed string
+// This means the asset symbol is hashed using keccak256 and the result is stored in the transaction logs
+// Learn more here: https://medium.com/mycrypto/understanding-event-logs-on-the-ethereum-blockchain-f4ae7ba50378 
 
 export const TOKEN_MAPPING = new Map<string, string>();
 TOKEN_MAPPING.set(
