@@ -1,4 +1,9 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  BigInt,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { Vault, Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,
@@ -26,7 +31,6 @@ export function createWithdraw(
 
   withdraw.hash = event.transaction.hash.toHexString();
   withdraw.logIndex = event.transaction.index.toI32();
-  withdraw.protocol = getBeefyFinanceOrCreate().id;
   withdraw.from = event.transaction.from.toHexString();
   const to = event.transaction.to;
   withdraw.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
@@ -47,19 +51,31 @@ export function createWithdraw(
     event.block,
     networkSuffix
   ).id;
+  withdraw.protocol = getBeefyFinanceOrCreate(
+    dataSource.network(),
+    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    event.block
+  ).id;
 
   withdraw.save();
   return withdraw;
 }
 
-export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
+export function getOrCreateFirstWithdraw(
+  vault: Vault,
+  currentBlock: ethereum.Block
+): Withdraw {
   let withdraw = Withdraw.load("MockWithdraw" + vault.id);
   if (!withdraw) {
     withdraw = new Withdraw("MockWithdraw" + vault.id);
 
     withdraw.hash = ZERO_ADDRESS_STRING;
     withdraw.logIndex = 0;
-    withdraw.protocol = getBeefyFinanceOrCreate().id;
+    withdraw.protocol = getBeefyFinanceOrCreate(
+      dataSource.network(),
+      vault.id,
+      currentBlock
+    ).id;
     withdraw.from = ZERO_ADDRESS_STRING;
     withdraw.to = ZERO_ADDRESS_STRING;
     withdraw.blockNumber = vault.createdBlockNumber;

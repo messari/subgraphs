@@ -1,9 +1,11 @@
 import { getDaysSinceEpoch, getHoursSinceEpoch } from "./time";
 import { ethereum } from "@graphprotocol/graph-ts";
 import {
+  FinancialsDailySnapshot,
   Vault,
   VaultDailySnapshot,
   VaultHourlySnapshot,
+  YieldAggregator,
 } from "../../generated/schema";
 
 export function getVaultDailyId(block: ethereum.Block, vault: Vault): string {
@@ -55,7 +57,7 @@ export function updateVaultHourlySnapshot(
     vaultHourlySnapshot.protocol = vault.protocol;
     vaultHourlySnapshot.vault = vault.id;
   }
-  //vaultHourlySnapshot.totalValueLockedUSD =
+  vaultHourlySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshot.inputTokenBalance = vault.inputTokenBalance;
   if (vault.outputTokenSupply)
     vaultHourlySnapshot.outputTokenSupply = vault.outputTokenSupply;

@@ -8,6 +8,10 @@ import {
   fetchTokenSymbol,
 } from "../mappings/token";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import {
+  createBeefyFinance,
+  updateProtocolAndSave,
+} from "../mappings/protocol";
 
 export function getTokenOrCreate(
   tokenAddress: Address,
@@ -40,25 +44,16 @@ export function getVaultFromStrategyOrCreate(
   return vault;
 }
 
-export function getBeefyFinanceOrCreate(): YieldAggregator {
+export function getBeefyFinanceOrCreate(
+  network: string,
+  vaultId: string,
+  currentBlock: ethereum.Block
+): YieldAggregator {
   let beefy = YieldAggregator.load("BeefyFinance");
   if (!beefy) {
-    beefy = new YieldAggregator("BeefyFinance");
-    beefy.name = "Beefy Finance";
-    beefy.slug = "beefy-finance";
-    beefy.schemaVersion = "1.2.1";
-    beefy.subgraphVersion = "0.0.2";
-    //beefy.methodologyVersion = "Abboh";
-    beefy.network = "MATIC";
-    beefy.type = "YIELD";
-    /* beefy.totalValueLockedUSD = new BigDecimal(new BigInt(0));
-    beefy.protocolControlledValueUSD = new BigDecimal(new BigInt(0));
-    beefy.cumulativeSupplySideRevenueUSD = new BigDecimal(new BigInt(0));
-    beefy.cumulativeProtocolSideRevenueUSD = new BigDecimal(new BigInt(0));
-    beefy.cumulativeTotalRevenueUSD = new BigDecimal(new BigInt(0));
-    beefy.cumulativeUniqueUsers = 0; */
-    beefy.save();
+    beefy = createBeefyFinance(network, vaultId, currentBlock);
+  } else {
+    updateProtocolAndSave(beefy, currentBlock);
   }
-
   return beefy;
 }

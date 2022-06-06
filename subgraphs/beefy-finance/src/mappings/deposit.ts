@@ -1,4 +1,9 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  BigDecimal,
+  BigInt,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { Deposit, Vault } from "../../generated/schema";
 import {
   BeefyStrategy,
@@ -11,6 +16,7 @@ import {
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
 import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { updateProtocolAndSave } from "./protocol";
 
 export function createDeposit(
   event: DepositEvent,
@@ -26,7 +32,6 @@ export function createDeposit(
 
   deposit.hash = event.transaction.hash.toHexString();
   deposit.logIndex = event.transaction.index.toI32();
-  deposit.protocol = getBeefyFinanceOrCreate().id;
   deposit.from = event.transaction.from.toHexString();
   const to = event.transaction.to;
   deposit.to = to ? to.toHexString() : ZERO_ADDRESS_STRING;
@@ -48,18 +53,31 @@ export function createDeposit(
     networkSuffix
   ).id;
 
+  deposit.protocol = getBeefyFinanceOrCreate(
+    dataSource.network(),
+    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    event.block
+  ).id;
+
   deposit.save();
   return deposit;
 }
 
-export function getOrCreateFirstDeposit(vault: Vault): Deposit {
+export function getOrCreateFirstDeposit(
+  vault: Vault,
+  currentBlock: ethereum.Block
+): Deposit {
   let deposit = Deposit.load("MockDeposit" + vault.id);
   if (!deposit) {
     deposit = new Deposit("MockDeposit" + vault.id);
 
     deposit.hash = ZERO_ADDRESS_STRING;
     deposit.logIndex = 0;
-    deposit.protocol = getBeefyFinanceOrCreate().id;
+    deposit.protocol = getBeefyFinanceOrCreate(
+      dataSource.network(),
+      vault.id,
+      currentBlock
+    ).id;
     deposit.from = ZERO_ADDRESS_STRING;
     deposit.to = ZERO_ADDRESS_STRING;
     deposit.blockNumber = vault.createdBlockNumber;
