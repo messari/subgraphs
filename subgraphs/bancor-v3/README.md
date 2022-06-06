@@ -1,11 +1,7 @@
 # Bancor V3 Subgraph Methodology v1.0.1
 
 
-## Contact Details
-
-
 ## Useful Links
-
 
 
 * Bancor V3: [https://try.bancor.network/](https://try.bancor.network/)
