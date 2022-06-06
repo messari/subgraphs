@@ -36,9 +36,10 @@ export function fetchTokenSymbol(tokenAddress: Address): string {
 
 export function getLastPriceUSD(
   tokenAddress: Address,
+  networkSuffix: string,
   blockNumber: BigInt = BIGINT_ZERO
 ): BigDecimal {
-  const token = getTokenOrCreate(tokenAddress, "-137");
+  const token = getTokenOrCreate(tokenAddress, networkSuffix);
   const price = getUsdPricePerToken(tokenAddress);
   token.lastPriceUSD = price.usdPrice;
   if (blockNumber != BIGINT_ZERO) {

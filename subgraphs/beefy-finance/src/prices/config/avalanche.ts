@@ -1,7 +1,7 @@
 import { Address, TypedMap } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "matic";
-export const NETWORK_CHAIN_ID = 137;
+export const NETWORK_STRING = "avax";
+export const NETWORK_CHAIN_ID = 43114;
 export const NETWORK_SUFFIX = "-" + NETWORK_CHAIN_ID.toString();
 
 ///////////////////////////////////////////////////////////////////////////
@@ -12,10 +12,10 @@ export const CURVE_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const CURVE_REGISTRY_ADDRESS = Address.fromString(
-  "0x094d12e5b541784701fd8d65f11fc0598fbc6332"
+  "0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6"
 );
 export const CURVE_POOL_REGISTRY_ADDRESS = Address.fromString(
-  "0x094d12e5b541784701fd8d65f11fc0598fbc6332"
+  "0x8474ddbe98f5aa3179b3b3f5942d724afcdec9f6"
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -26,17 +26,17 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619"
+  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x1b02da8cb0d097eb8d57a175b88c7d8b47997506")
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
+  Address.fromString("0x0000000000000000000000000000000000000000")
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff")
+  Address.fromString("0xE592427A0AEce92De3Edee1F18E0157C05861564")
 );
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
@@ -75,7 +75,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(
   "WETH",
-  Address.fromString("0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619")
+  Address.fromString("0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7")
 );
 WHITELIST_TOKENS.set(
   "ETH",
@@ -83,25 +83,25 @@ WHITELIST_TOKENS.set(
 );
 WHITELIST_TOKENS.set(
   "USDT",
-  Address.fromString("0xc2132D05D31c914a87C6611C10748AEb04B58e8F")
+  Address.fromString("0xc7198437980c041c805A1EDcbA50c1Ce5db95118")
 );
 WHITELIST_TOKENS.set(
   "DAI",
-  Address.fromString("0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063")
+  Address.fromString("0xd586E7F844cEa2F87f50152665BCbc2C279D8d70")
 );
 WHITELIST_TOKENS.set(
   "USDC",
-  Address.fromString("0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174")
+  Address.fromString("0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E")
 );
 WHITELIST_TOKENS.set(
   "WBTC",
-  Address.fromString("0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6")
+  Address.fromString("0x50b7545627a5162F82A992c33b87aDc75187B218")
 );
 WHITELIST_TOKENS.set(
   "LINK",
-  Address.fromString("0xb0897686c545045aFc77CF20eC7A532E3120E0F1")
+  Address.fromString("0x5947BB275c521040051D82396192181b413227A3")
 );
 WHITELIST_TOKENS.set(
   "CRV",
-  Address.fromString("0x172370d5Cd63279eFa6d502DAB29171933a610AF")
+  Address.fromString("0x249848BeCA43aC405b8102Ec90Dd5F22CA513c06")
 );

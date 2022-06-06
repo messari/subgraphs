@@ -36,7 +36,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x436D5127F16fAC1F021733dda090b5E6DE30b3bB",
     lastHarvest: 1653985772,
-    startBlock: 530431,
   },
   {
     id: "tethys-rftm-metis",
@@ -75,7 +74,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x47Fe8272D12dA66f1a95dF386659bf4aa10f5349",
     lastHarvest: 1654057802,
-    startBlock: 1715869,
   },
   {
     id: "tethys-metis-ravax",
@@ -114,7 +112,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x84CfeE95C96b52F4DA0DdE25Cc5fF01B061C9d60",
     lastHarvest: 1654057802,
-    startBlock: 1715983,
   },
   {
     id: "tethys-dai-metis",
@@ -153,7 +150,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x7CE2332fAF6328986C75e3A8fCc1CB79621aeB1F",
     lastHarvest: 1654057802,
-    startBlock: 1716155,
   },
   {
     id: "netswap-byte-m.usdc",
@@ -192,7 +188,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x07622B8cF9130934643522E7c9D621707EF1d34F",
     lastHarvest: 1654014602,
-    startBlock: 1681668,
   },
   {
     id: "netswap-wbtc-metis",
@@ -231,7 +226,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xd1ba66039dFF60C5bD2b48D08058867E4cB9a5d3",
     lastHarvest: 1653049772,
-    startBlock: 979283,
   },
   {
     id: "netswap-wbtc-m.usdt",
@@ -270,7 +264,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x79149B500f0d796aA7f85e0170d16C7e79BAd3C5",
     lastHarvest: 1652920172,
-    startBlock: 979507,
   },
   {
     id: "tethys-wbtc-metis",
@@ -309,7 +302,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xe536F8141D8EB7B1f096934AF3329cB581bFe995",
     lastHarvest: 1653985772,
-    startBlock: 978354,
   },
   {
     id: "tethys-m.usdc-m.usdt",
@@ -348,7 +340,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x481a546dc0beb4d4C63Fd7cEE63053eE6D73EdDb",
     lastHarvest: 1654057802,
-    startBlock: 893229,
   },
   {
     id: "tethys-tethys-metis",
@@ -387,7 +378,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x0624Ab4290F9305fB2dE3fB287aa5CDcf36D6B51",
     lastHarvest: 1654000172,
-    startBlock: 539014,
   },
   {
     id: "tethys-m.usdt-metis",
@@ -426,7 +416,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x370a099D35c13188ADA19F46733A9892057b9d6e",
     lastHarvest: 1654043372,
-    startBlock: 539108,
   },
   {
     id: "tethys-metis-m.usdc",
@@ -465,7 +454,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xad8d4C77E32bCE1C9b9cBc43566AFDD41223fFb1",
     lastHarvest: 1654000172,
-    startBlock: 539169,
   },
   {
     id: "tethys-weth-metis",
@@ -504,7 +492,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x9584e368355D4634f1bdD7b0e7B08fFEa38ED0b0",
     lastHarvest: 1654072202,
-    startBlock: 539272,
   },
   {
     id: "netswap-nett-m.usdt",
@@ -543,7 +530,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xc0fbb8F79e6AB8cB0dCE77359748517F9DF1FE19",
     lastHarvest: 1652934632,
-    startBlock: 438263,
   },
   {
     id: "netswap-nett-metis",
@@ -582,7 +568,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xdeEf8995156Bd26e8814E96387Df79F197dED6A2",
     lastHarvest: 1654043372,
-    startBlock: 445386,
   },
   {
     id: "netswap-nett-m.usdc",
@@ -621,7 +606,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x06A1f520555222758eaE4dA0573351FdaD1e7843",
     lastHarvest: 1652977772,
-    startBlock: 446220,
   },
   {
     id: "netswap-bnb-nett-eol",
@@ -661,7 +645,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x452bE05439d83D3A6A510F11a4Ba1F1909d1cA6d",
     lastHarvest: 1652948972,
-    startBlock: 446531,
   },
   {
     id: "netswap-weth-nett",
@@ -700,7 +683,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xeF1870FddC25586636bf8a3d7cCf4d298f6E072e",
     lastHarvest: 1652934632,
-    startBlock: 446378,
   },
   {
     id: "netswap-weth-metis",
@@ -739,7 +721,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xCCa7A7952683e97af9cf8183064fd5EB6828dC16",
     lastHarvest: 1654009472,
-    startBlock: 446868,
   },
   {
     id: "netswap-m.usdt-metis-eol",
@@ -779,7 +760,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x86bCFEF2f95373Be391336d9B9Ced071da9C997d",
     lastHarvest: 1652948972,
-    startBlock: 447486,
   },
   {
     id: "netswap-metis-m.usdc",
@@ -818,7 +798,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x363F2fF189e499116baa89322F1a3Ade52EfE388",
     lastHarvest: 1654000172,
-    startBlock: 447615,
   },
   {
     id: "netswap-weth-m.usdt-eol",
@@ -858,7 +837,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x6039eBa7e4b74d859B9a0f9b12Ca6e50017C1802",
     lastHarvest: 1652977772,
-    startBlock: 447854,
   },
   {
     id: "netswap-weth-m.usdc",
@@ -897,7 +875,6 @@ const vaults = [
     chain: "metis",
     strategy: "0xA3e3Af161943CfB3941B631676134bb048739727",
     lastHarvest: 1654057892,
-    startBlock: 448058,
   },
   {
     id: "netswap-m.usdt-m.usdc",
@@ -936,7 +913,6 @@ const vaults = [
     chain: "metis",
     strategy: "0x74907ad4E79b1Ce415caB26FEf526ae017598cEe",
     lastHarvest: 1654057892,
-    startBlock: 448199,
   },
   {
     id: "celo-bifi-maxi",
@@ -975,7 +951,6 @@ const vaults = [
     chain: "celo",
     strategy: "0xF2f8c64691E0Be88535388675C01a58E8557D0E8",
     lastHarvest: 1654057844,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-celo-mobi",
@@ -1015,7 +990,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x3094Ab4Af54f5208B867125B5CCeCc94Bc17cbB6",
     lastHarvest: 1653619107,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-weth-usdt",
@@ -1055,7 +1029,6 @@ const vaults = [
     chain: "celo",
     strategy: "0xd4B95a7e8FAA968A90fBEf6BdAf870D89B4fc327",
     lastHarvest: 1653712247,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-weth-daiv2",
@@ -1095,7 +1068,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x3A8A26e3b38c4544f860D0e0CBD50095602D4cE5",
     lastHarvest: 1654078609,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-cusd-usdc",
@@ -1135,7 +1107,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x2C43DBef81ABa6b95799FD2aEc738Cd721ba77f3",
     lastHarvest: 1654077769,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-wethv2-celo",
@@ -1175,7 +1146,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x033cA6926dFF4F6848983731087907Dcc9dDBEE2",
     lastHarvest: 1654078029,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-wethv2-cusd",
@@ -1215,7 +1185,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x044e87f30bd9bD961c04028aC69155493E1b9eD0",
     lastHarvest: 1654076419,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-cusd-ceurv2",
@@ -1255,7 +1224,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x17657955D954bD7F7315C388D7099af7B0b851FA",
     lastHarvest: 1654073749,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-celo-weth-eol",
@@ -1296,7 +1264,6 @@ const vaults = [
     chain: "celo",
     strategy: "0xb0F9c6FBcfE226EEAD3AE8b019ce4666cE223a78",
     lastHarvest: 1640198297,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-cusd-dai-eol",
@@ -1337,7 +1304,6 @@ const vaults = [
     chain: "celo",
     strategy: "0x4f22BD7CE44b0e0B2681A28e300A7285319de3a0",
     lastHarvest: 1638500950,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-ceur-weth-eol",
@@ -1378,7 +1344,6 @@ const vaults = [
     chain: "celo",
     strategy: "0xC96b496F78d1a45D9cec6d628a75614ed230D6D4",
     lastHarvest: 1638502360,
-    startBlock: 1,
   },
   {
     id: "sushi-celo-cusd-ceur-eol",
@@ -1419,7 +1384,6 @@ const vaults = [
     chain: "celo",
     strategy: "0xcD5B6833d4A30c43F1c30bDC4D8DC5c7aCB50972",
     lastHarvest: 1638501355,
-    startBlock: 1,
   },
   {
     id: "cronos-bifi-maxi",
@@ -1458,7 +1422,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xa9E6E271b27b20F65394914f8784B3B860dBd259",
     lastHarvest: 1654075047,
-    startBlock: 257963,
   },
   {
     id: "vvs-vvs-versa",
@@ -1498,7 +1461,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x6f9FD59Db1698734a3FB2Ef07B0DA3Cb3D22c7f4",
     lastHarvest: 1653553354,
-    startBlock: 2349763,
   },
   {
     id: "vvs-vvs-tonic",
@@ -1538,7 +1500,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xD51F4682644673D9E7592401153d359eF6B68Ae0",
     lastHarvest: 1653772761,
-    startBlock: 2339967,
   },
   {
     id: "vvs-ali-cro",
@@ -1578,7 +1539,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x91573b07D01689A6450B85aCd17a5Fe1aFB585B2",
     lastHarvest: 1653989819,
-    startBlock: 2241892,
   },
   {
     id: "vvs-vvs-cro",
@@ -1618,7 +1578,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x55D618be955e58B5c3A917c4fdd6dab10c54d24F",
     lastHarvest: 1654078503,
-    startBlock: 126992,
   },
   {
     id: "dark-dark-cro",
@@ -1658,7 +1617,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x884cc665Ae351D1662dC0E069dDe89F4C5F1235A",
     lastHarvest: 1653997967,
-    startBlock: 1496596,
   },
   {
     id: "dark-sky-cro",
@@ -1698,7 +1656,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xbf0449E4C9a997800EedA1193625Ecd35A3d175e",
     lastHarvest: 1654014296,
-    startBlock: 1496596,
   },
   {
     id: "vvs-tonic-cro",
@@ -1738,7 +1695,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x2a1EFA6150a2e270CFD4F04140943f7e7aBFc3f7",
     lastHarvest: 1653324282,
-    startBlock: 914750,
   },
   {
     id: "vvs-cro-btc",
@@ -1778,7 +1734,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x3040387C46e21B453e4a8f648528368b9066628B",
     lastHarvest: 1654075753,
-    startBlock: 126966,
   },
   {
     id: "vvs-tonic-usdc-eol",
@@ -1819,7 +1774,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x184DC721a1C1D594E17161Ff5310cF42025dA798",
     lastHarvest: 1645196181,
-    startBlock: 674026,
   },
   {
     id: "liq-liq-cro",
@@ -1859,7 +1813,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x6677c03B2c7Da09dfbD869daeec3ccFd4eCC4B5F",
     lastHarvest: 1645285944,
-    startBlock: 673604,
   },
   {
     id: "vvs-cro-atom",
@@ -1899,7 +1852,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xE3FfFa31665869dB5A1b415E7fBaa2905E5EfeBC",
     lastHarvest: 1654076351,
-    startBlock: 599484,
   },
   {
     id: "vvs-cro-doge",
@@ -1939,7 +1891,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x54b083Ca9fD30ae83C47CDd3a59390F00a90E9CC",
     lastHarvest: 1653972869,
-    startBlock: 555546,
   },
   {
     id: "crona-wbtc-eth",
@@ -1978,7 +1929,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xA26Ff5c46E9e93d085713aDE7681cb7CAD3281a6",
     lastHarvest: 1645250856,
-    startBlock: 546765,
   },
   {
     id: "crona-usdc-eth",
@@ -2017,7 +1967,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xb63fc8418a296cF381d127d4047dAa47eAAD55E0",
     lastHarvest: 1645216244,
-    startBlock: 495544,
   },
   {
     id: "crona-wbtc-usdc-eol",
@@ -2057,7 +2006,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x3d91f38Abb9abEdd87099faF48eb2B3230f4f259",
     lastHarvest: 1645230665,
-    startBlock: 495336,
   },
   {
     id: "vvs-cro-bifi-eol",
@@ -2098,7 +2046,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x4dd1194c62D059ab1AE7515B6bEB79c3BC4CEaea",
     lastHarvest: 1643976387,
-    startBlock: 435348,
   },
   {
     id: "vvs-cro-dai",
@@ -2138,7 +2085,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x632a66b1Ff24A830aCcbBa28AE557e284BaE0221",
     lastHarvest: 1654069037,
-    startBlock: 328419,
   },
   {
     id: "crona-crona-usdc",
@@ -2177,7 +2123,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x1f533AD4232F52dA09CBDC3778DF8404A010A7Db",
     lastHarvest: 1645288248,
-    startBlock: 308763,
   },
   {
     id: "crona-usdt-crona",
@@ -2216,7 +2161,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x01873b6e4CEdA2A752FEadA7B370A372840bA2cd",
     lastHarvest: 1645259446,
-    startBlock: 308883,
   },
   {
     id: "crona-usdc-dai",
@@ -2255,7 +2199,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x212a9507CE6D0aC42990Bf42Db14d922a2A6bEed",
     lastHarvest: 1645201862,
-    startBlock: 308988,
   },
   {
     id: "crona-busd-bnb-eol",
@@ -2295,7 +2238,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xb1C3C51dB80f402ee258573e2A8587d48E36e0f6",
     lastHarvest: 1645173063,
-    startBlock: 308574,
   },
   {
     id: "vvs-cro-usdt",
@@ -2335,7 +2277,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x2a15C47F706DD9F03D04001bBD67870E6754838D",
     lastHarvest: 1654050339,
-    startBlock: 267986,
   },
   {
     id: "vvs-cro-usdc",
@@ -2375,7 +2316,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xC7EFbf084d0199D6814F3cAd730d28611e06E1c9",
     lastHarvest: 1654036847,
-    startBlock: 236152,
   },
   {
     id: "vvs-cro-shib",
@@ -2415,7 +2355,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x17f499f009bB796132b493F4BE12f8650a4f0768",
     lastHarvest: 1654004821,
-    startBlock: 221699,
   },
   {
     id: "vvs-vvs-usdt",
@@ -2455,7 +2394,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x05353E2666d955300a9525eB5861349450eb2fAF",
     lastHarvest: 1654078685,
-    startBlock: 176269,
   },
   {
     id: "vvs-usdt-usdc",
@@ -2495,7 +2433,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x0a350c62f4b8C7dA93fBca469e53a182b5BBD044",
     lastHarvest: 1653955487,
-    startBlock: 145885,
   },
   {
     id: "vvs-vvs",
@@ -2534,7 +2471,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x03509283B8927B69DE0E3314097c99C9Dfdcf011",
     lastHarvest: 1653874523,
-    startBlock: 128637,
   },
   {
     id: "vvs-vvs-usdc",
@@ -2574,7 +2510,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x14d07853560436aEe38BE12DD66d944B07D5E59F",
     lastHarvest: 1654076901,
-    startBlock: 127001,
   },
   {
     id: "vvs-cro-eth",
@@ -2614,7 +2549,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x0955479C61B37074d689319fCaA84ffE1E9e8CF5",
     lastHarvest: 1654073341,
-    startBlock: 126770,
   },
   {
     id: "crona-crona",
@@ -2653,7 +2587,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x64aa6c884e9b855C1161c60013F52F7Cc09Ac3dd",
     lastHarvest: 1653954100,
-    startBlock: 148584,
   },
   {
     id: "crona-cro-crona",
@@ -2692,7 +2625,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x44CD331279f27B63ce86395aFe53C2d7C219725B",
     lastHarvest: 1645212482,
-    startBlock: 143528,
   },
   {
     id: "crona-cro-usdc",
@@ -2731,7 +2663,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x1DEF2c354bcFa4d1A8F40c4c33Ef7d27DB4109cA",
     lastHarvest: 1645216267,
-    startBlock: 144982,
   },
   {
     id: "crona-cro-usdt",
@@ -2770,7 +2701,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xDC1dC2abC8775561A6065D0EE27E8fDCa8c4f7ED",
     lastHarvest: 1645216279,
-    startBlock: 145232,
   },
   {
     id: "crona-cro-eth-eol",
@@ -2810,7 +2740,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x6B2CFabf0703D807784D11eEE07759559EDeFF6A",
     lastHarvest: 1642105408,
-    startBlock: 145579,
   },
   {
     id: "crona-wbtc-cro-eol",
@@ -2850,7 +2779,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x822856E9433e7b4C268286Bf004b8c8ecf559d64",
     lastHarvest: 1645173074,
-    startBlock: 145691,
   },
   {
     id: "crona-cro-dai-eol",
@@ -2890,7 +2818,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x2E9706501ced79C0F34400E728d69C4A2E1496B3",
     lastHarvest: 1639424514,
-    startBlock: 146012,
   },
   {
     id: "crona-usdt-busd",
@@ -2929,7 +2856,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x42ab5A790E99dF1b5d46f1C5C3e61d0Cd63D1f6E",
     lastHarvest: 1645259458,
-    startBlock: 146262,
   },
   {
     id: "crona-usdt-matic-eol",
@@ -2969,7 +2895,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xeEaFF5116C09ECc20Ab72b53860A7ceAd97F0Ab4",
     lastHarvest: 1637846523,
-    startBlock: 146613,
   },
   {
     id: "crona-usdt-ftm-eol",
@@ -3009,7 +2934,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0xC3c2c91C82d3472F3FA4Cd7Bf48005d0EE43A723",
     lastHarvest: 1643387676,
-    startBlock: 147811,
   },
   {
     id: "crona-usdt-usdc",
@@ -3048,7 +2972,6 @@ const vaults = [
     chain: "cronos",
     strategy: "0x83a7a434b8219ae3e0976b74741bf8035a35A89B",
     lastHarvest: 1645245049,
-    startBlock: 148227,
   },
   {
     id: "moonbeam-bifi-maxi",
@@ -3087,7 +3010,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xb25eB9105549627050AAB3A1c909fBD454014beA",
     lastHarvest: 1654062552,
-    startBlock: 397730,
   },
   {
     id: "stellaswap-dualETH",
@@ -3125,7 +3047,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x4467f78F9054570d3eC811a2FDA5186b6D24b252",
     lastHarvest: 1654018656,
-    startBlock: 1121193,
   },
   {
     id: "stellaswap-weth-wglmr",
@@ -3163,7 +3084,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xBe206bDFCd4c080a24b0E6b34A95AFbB4d9917F4",
     lastHarvest: 1654078530,
-    startBlock: 1100353,
   },
   {
     id: "stellaswap-usdcmad-wglmr",
@@ -3201,7 +3121,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x7B717b445Ff27d5769E6a314235bC8D617dc80b9",
     lastHarvest: 1654077822,
-    startBlock: 1099728,
   },
   {
     id: "stellaswap-stella-usdc",
@@ -3240,7 +3159,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x7db7110476595EEF90ecEDfAe5104CbBf1aFaD5F",
     lastHarvest: 1654005768,
-    startBlock: 609582,
   },
   {
     id: "stellaswap-stella-wglmr",
@@ -3279,7 +3197,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xD297558f78b3f7ED075405e4D15aDd2b5BF762f1",
     lastHarvest: 1654077001,
-    startBlock: 608959,
   },
   {
     id: "stella-xstella",
@@ -3318,7 +3235,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x319DED38E2a647F41405eC694f703688388d0915",
     lastHarvest: 1654074636,
-    startBlock: 958182,
   },
   {
     id: "stellaswap-wglmr-xcdot",
@@ -3357,7 +3273,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xF49c523F08B4e7c8E51a44088ea2a5e6b5f397D9",
     lastHarvest: 1654077865,
-    startBlock: 957905,
   },
   {
     id: "stellaswap-atom-wglmr",
@@ -3396,7 +3311,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xFa5C2c0E5c3DF0500B380E751B118CDc548e588f",
     lastHarvest: 1653671460,
-    startBlock: 811081,
   },
   {
     id: "stellaswap-atom-usdc",
@@ -3435,7 +3349,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xCc1f8CAB2230cf85A62c2B7159b26246291E0964",
     lastHarvest: 1653677028,
-    startBlock: 811096,
   },
   {
     id: "stellaswap-usdc-ftm",
@@ -3474,7 +3387,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xBA061Ff2009905Cb45bABeb3eB7CFb8f97873555",
     lastHarvest: 1654070953,
-    startBlock: 721531,
   },
   {
     id: "stellaswap-wglmr-ftm",
@@ -3513,7 +3425,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xe9A624096E3dc62d897EE9E9A20c2aF1c364452D",
     lastHarvest: 1654066170,
-    startBlock: 721545,
   },
   {
     id: "stellaswap-avax-wglmr",
@@ -3552,7 +3463,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xAe6b83c138f84fa9E90CDbCDD105021173c8E579",
     lastHarvest: 1654075980,
-    startBlock: 721553,
   },
   {
     id: "stellaswap-matic-wglmr",
@@ -3591,7 +3501,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x7783d23C0880B553f97f084008b8ab7eE445701F",
     lastHarvest: 1654063476,
-    startBlock: 721560,
   },
   {
     id: "stellaswap-luna-wglmr-eol",
@@ -3631,7 +3540,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x8F8d1dE7f7E2B8C32BABFa1CE21613e8EcB49593",
     lastHarvest: 1652628168,
-    startBlock: 721567,
   },
   {
     id: "stellaswap-axlust-wglmr-eol",
@@ -3672,7 +3580,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x8a86D4Bd8A0c151b219F0Df68d577dD060b9d189",
     lastHarvest: 1652689830,
-    startBlock: 658261,
   },
   {
     id: "stellaswap-dai-usdc",
@@ -3711,7 +3618,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x46B75692C835f93C98800624329E987C0e1BA595",
     lastHarvest: 1654069710,
-    startBlock: 658273,
   },
   {
     id: "stellaswap-usdc-eth",
@@ -3750,7 +3656,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x79F26046D122d2F26B1D37237D5C056fB580447A",
     lastHarvest: 1654071654,
-    startBlock: 658293,
   },
   {
     id: "stellaswap-wglmr-eth",
@@ -3789,7 +3694,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xA27BF4d56870A37e37a687B8ab3740d8487Ee2C6",
     lastHarvest: 1654043082,
-    startBlock: 658301,
   },
   {
     id: "stellaswap-usdc-wglmr",
@@ -3828,7 +3732,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x037c541320141f5afcBd60F44780f1D5b9B057fC",
     lastHarvest: 1654061310,
-    startBlock: 609280,
   },
   {
     id: "stellaswap-usdc-usdt",
@@ -3867,7 +3770,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xC828EEF847Ea094465F7787CfA554f5d96e154d0",
     lastHarvest: 1654012362,
-    startBlock: 622875,
   },
   {
     id: "stellaswap-usdc-bnb",
@@ -3906,7 +3808,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x1d9119f32bebD2CD6850625176156384d0EF9F96",
     lastHarvest: 1654062864,
-    startBlock: 623018,
   },
   {
     id: "stellaswap-busd-wglmr",
@@ -3945,7 +3846,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x4C185A2b9214BC827129a4935Af49AA7071f9032",
     lastHarvest: 1654073172,
-    startBlock: 623072,
   },
   {
     id: "stellaswap-ape-wglmr-eol",
@@ -3985,7 +3885,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x3a5252cED60Dc299f4Cc037cF4a6DCD90609D7F7",
     lastHarvest: 1650344958,
-    startBlock: 709853,
   },
   {
     id: "solarflare-ust-wglmr-eol",
@@ -4027,7 +3926,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xF22DaE9c59044a1f37F7a73669506aF0790226bb",
     lastHarvest: 1653107502,
-    startBlock: 658261,
   },
   {
     id: "solarflare-luna-flare-eol",
@@ -4068,7 +3966,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xC0F7A280cD4EFa87d0Ae50f89D1111daf0Eee2F1",
     lastHarvest: 1653136272,
-    startBlock: 533854,
   },
   {
     id: "solarflare-wglmr-flare",
@@ -4108,7 +4005,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xecCb80E860561Ca9Ffb183A557F32CC90B05d3c3",
     lastHarvest: 1653991908,
-    startBlock: 533482,
   },
   {
     id: "solarflare-usdc-wglmr",
@@ -4148,7 +4044,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xaB4105375FbE5F502B0da986F46ADf7a21762e52",
     lastHarvest: 1654014642,
-    startBlock: 533712,
   },
   {
     id: "beamswap-bifi-wglmr",
@@ -4188,7 +4083,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x1EA73427874dccB2E01C53e25a21e92adA3Dc65b",
     lastHarvest: 1654056816,
-    startBlock: 397983,
   },
   {
     id: "beamswap-usdc-ftm",
@@ -4228,7 +4122,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x1Dd0D6508fF1Fc1a2433b4D37d7efb5680c6455E",
     lastHarvest: 1654057854,
-    startBlock: 397968,
   },
   {
     id: "beamswap-usdc-wglmr",
@@ -4268,7 +4161,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xdeEf8995156Bd26e8814E96387Df79F197dED6A2",
     lastHarvest: 1654043466,
-    startBlock: 389839,
   },
   {
     id: "beamswap-dai-usdc",
@@ -4308,7 +4200,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x66be88070D38d9F8eE96913aeDF1709ED35aB29A",
     lastHarvest: 1654014666,
-    startBlock: 389895,
   },
   {
     id: "beamswap-wglmr-glint",
@@ -4348,7 +4239,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x89E6F4dba7337F123D9915ADF2B61B8d8c2bCA31",
     lastHarvest: 1654076088,
-    startBlock: 389917,
   },
   {
     id: "beamswap-busd-bnb",
@@ -4388,7 +4278,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x5E61E78846368A40B3a7B482c260789589a4DEe6",
     lastHarvest: 1654072236,
-    startBlock: 389962,
   },
   {
     id: "beamswap-usdc-busd",
@@ -4428,7 +4317,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xaE1C8D06ccA5EF3d33Ac2c071D6630BA3BfAf9B2",
     lastHarvest: 1654072266,
-    startBlock: 389933,
   },
   {
     id: "beamswap-usdc-eth",
@@ -4468,7 +4356,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0x30cc81306B4f31052cd6Efe5Be6088e3696ee895",
     lastHarvest: 1654043490,
-    startBlock: 389977,
   },
   {
     id: "beamswap-usdc-usdt",
@@ -4508,7 +4395,6 @@ const vaults = [
     chain: "moonbeam",
     strategy: "0xD602655aAF104106E880221b124A20891f769dE1",
     lastHarvest: 1653985842,
-    startBlock: 389990,
   },
   {
     id: "one-bifi-maxi",
@@ -4546,7 +4432,6 @@ const vaults = [
     chain: "one",
     strategy: "0x5135C0af3080DF01ABF66491d5a1eD21fBEF3a7C",
     lastHarvest: 1654072227,
-    startBlock: 1,
   },
   {
     id: "sushi-one-bifi-wone",
@@ -4587,7 +4472,6 @@ const vaults = [
     chain: "one",
     strategy: "0x88F2ADA49F24fF14005633e66050f763b2E07b7f",
     lastHarvest: 1653683438,
-    startBlock: 1,
   },
   {
     id: "sushi-one-wone-1btc",
@@ -4628,7 +4512,6 @@ const vaults = [
     chain: "one",
     strategy: "0x3177389Fa69a226f52A079FDd0a564C813baB53B",
     lastHarvest: 1653985830,
-    startBlock: 1,
   },
   {
     id: "curve-harmony-tricrypto",
@@ -4667,7 +4550,6 @@ const vaults = [
     chain: "one",
     strategy: "0xFFf5df2dEcC66075E8d337349a34D5a12F7ADF62",
     lastHarvest: 1652142648,
-    startBlock: 1,
   },
   {
     id: "curve-harmony-3pool",
@@ -4706,7 +4588,6 @@ const vaults = [
     chain: "one",
     strategy: "0xBB4c90641e0eb43f19c5931C411C0Bc1a09d2cAA",
     lastHarvest: 1652128238,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1ygg-1eth-eol",
@@ -4748,7 +4629,6 @@ const vaults = [
     chain: "one",
     strategy: "0xA753AF8571ddf8c8fB16f676Fa004b4DadaB4E27",
     lastHarvest: 1649356053,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1eth-1aave",
@@ -4789,7 +4669,6 @@ const vaults = [
     chain: "one",
     strategy: "0x60052c097BD2a653AEA196fa8e9C378868DC24cB",
     lastHarvest: 1654057861,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1axs-1eth-eol",
@@ -4831,7 +4710,6 @@ const vaults = [
     chain: "one",
     strategy: "0xeaFD86c97DdB32d86808662Fe62131aad89129e7",
     lastHarvest: 1650141045,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1eth-1dai-eol",
@@ -4873,7 +4751,6 @@ const vaults = [
     chain: "one",
     strategy: "0xa59da54376Bdb3B49bF58412667054cCBF74BEDc",
     lastHarvest: 1646339450,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1usdt-1eth-eol",
@@ -4915,7 +4792,6 @@ const vaults = [
     chain: "one",
     strategy: "0x71b5852857b85D5096d4288AD6d293F217d8e162",
     lastHarvest: 1646339456,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1eth-1frax",
@@ -4956,7 +4832,6 @@ const vaults = [
     chain: "one",
     strategy: "0xDA875A511860f2752B891677489d08CaEDac00EA",
     lastHarvest: 1653669054,
-    startBlock: 1,
   },
   {
     id: "sushi-one-ust-1eth-eol",
@@ -4999,7 +4874,6 @@ const vaults = [
     chain: "one",
     strategy: "0x7a670e849DB824364d1031DEAfB4cD603144F23D",
     lastHarvest: 1653608440,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1wbtc-1eth",
@@ -5040,7 +4914,6 @@ const vaults = [
     chain: "one",
     strategy: "0xaBc6B4443c43530dfBf2Ef53d74ab1d7d20291ED",
     lastHarvest: 1654057867,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1usdt-1usdc",
@@ -5081,7 +4954,6 @@ const vaults = [
     chain: "one",
     strategy: "0x12e09a13f5e2d95b3B8db8741dFeBa453784d1DC",
     lastHarvest: 1654029061,
-    startBlock: 1,
   },
   {
     id: "sushi-one-1usdt-wone",
@@ -5122,7 +4994,6 @@ const vaults = [
     chain: "one",
     strategy: "0x646C536865603cFEB51dd35C36FD90296FB8DF26",
     lastHarvest: 1654057875,
-    startBlock: 1,
   },
   {
     id: "sushi-one-sushi-one-eol",
@@ -5164,7 +5035,6 @@ const vaults = [
     chain: "one",
     strategy: "0xe6CcE165Aa3e52B2cC55F17b1dBC6A8fe5D66610",
     lastHarvest: 1647853472,
-    startBlock: 1,
   },
   {
     id: "sushi-one-busd-one",
@@ -5205,7 +5075,6 @@ const vaults = [
     chain: "one",
     strategy: "0x29C4C22eC7dF7e936Cb3e6C4A7E5eAE751C7d86B",
     lastHarvest: 1654056053,
-    startBlock: 1,
   },
   {
     id: "sushi-one-bscbusd-busd",
@@ -5246,7 +5115,6 @@ const vaults = [
     chain: "one",
     strategy: "0x8d81807F19b97FA86EecaB32F1376645FBB4d2F9",
     lastHarvest: 1653625925,
-    startBlock: 1,
   },
   {
     id: "sushi-one-eth-one",
@@ -5287,7 +5155,6 @@ const vaults = [
     chain: "one",
     strategy: "0x4fd2e1c2395dc088F36cab06DCe47F88A912fC85",
     lastHarvest: 1654043469,
-    startBlock: 1,
   },
   {
     id: "sushi-one-btc-one",
@@ -5328,7 +5195,6 @@ const vaults = [
     chain: "one",
     strategy: "0x55f46144bC62e9Af4bAdB71842B62162e2194E90",
     lastHarvest: 1654043481,
-    startBlock: 1,
   },
   {
     id: "sushi-one-usdc-one",
@@ -5369,7 +5235,6 @@ const vaults = [
     chain: "one",
     strategy: "0x3dE0279f183f9C9eFCD19C60c1f83288B50dB659",
     lastHarvest: 1654027413,
-    startBlock: 1,
   },
   {
     id: "movr-bifi-maxi",
@@ -5407,7 +5272,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x8DB043df791A5D9b640E0919A007994E3635291e",
     lastHarvest: 1654068924,
-    startBlock: 887085,
   },
   {
     id: "solarbeam-frax-3pool",
@@ -5447,7 +5311,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xd100c80C82064DeC70d11DaCAf7599871e8654e9",
     lastHarvest: 1654075776,
-    startBlock: 1759031,
   },
   {
     id: "solarbeam-xcksm-stksm",
@@ -5486,7 +5349,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x4c048f34aaeC2fEEd37FF38Fc6eae6aa47E55d2c",
     lastHarvest: 1654030698,
-    startBlock: 1759031,
   },
   {
     id: "solarbeam-wmovr-xcksm",
@@ -5526,7 +5388,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xEd8f6da233F55dc4a79Ad4c58E37F784a28b721F",
     lastHarvest: 1654042782,
-    startBlock: 1759030,
   },
   {
     id: "solarbeam-3pool",
@@ -5565,7 +5426,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xC635717a00b5e4FDbC30deB8D72173EAAF1aE23d",
     lastHarvest: 1654045218,
-    startBlock: 1759030,
   },
   {
     id: "finn-usdc.m-usdc",
@@ -5604,7 +5464,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x0624Ab4290F9305fB2dE3fB287aa5CDcf36D6B51",
     lastHarvest: 1654029060,
-    startBlock: 1491931,
   },
   {
     id: "finn-finn-xcrmrk-eol",
@@ -5644,7 +5503,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x81F2F132465Ffb4B3C5d11f3d94582cC5c281c04",
     lastHarvest: 1651120260,
-    startBlock: 1389842,
   },
   {
     id: "finn-finn-xcksm-eol",
@@ -5684,7 +5542,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x98e6d738350a091d93719289C414C64a8C270FC6",
     lastHarvest: 1652085072,
-    startBlock: 1389858,
   },
   {
     id: "finn-usdc.m-wmovr-eol",
@@ -5724,7 +5581,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xD295d690b9BF17bd217B94BC50C12729762C1862",
     lastHarvest: 1651163478,
-    startBlock: 1389918,
   },
   {
     id: "sushi-mr-mim-wmovr-eol",
@@ -5763,7 +5619,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x5B0C4E1e246c4B6f7F86Bd4625c21625C4730249",
     lastHarvest: 1646397372,
-    startBlock: 1101290,
   },
   {
     id: "sushi-mr-frax-usdc",
@@ -5801,7 +5656,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xC1d194D9C2545125E5c6Df8e78bEd3f214447629",
     lastHarvest: 1654029084,
-    startBlock: 1101686,
   },
   {
     id: "sushi-mr-eth-wmovr",
@@ -5839,7 +5693,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x2ef6a416Be96f3711a9490Da543998e9a2d6145F",
     lastHarvest: 1654071714,
-    startBlock: 1101813,
   },
   {
     id: "sushi-mr-usdt-usdc",
@@ -5877,7 +5730,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x21107838C4c55b014a142d448dc8f588EA4DC1Ac",
     lastHarvest: 1654029120,
-    startBlock: 1101896,
   },
   {
     id: "sushi-mr-eth-bnb-eol",
@@ -5916,7 +5768,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xB7712F4dFcb763A1d0FEe60c062d058aDAe42A0a",
     lastHarvest: 1644222816,
-    startBlock: 1137620,
   },
   {
     id: "sushi-mr-eth-dai-eol",
@@ -5955,7 +5806,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xd31b8826Ff476C05098EBb926f4AA27b085e50C0",
     lastHarvest: 1645533300,
-    startBlock: 1137807,
   },
   {
     id: "solarbeam-mim-wmovr-eol",
@@ -5996,7 +5846,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xf04b019d8A6c96D248f334f9dF7C8a8c697624F7",
     lastHarvest: 1647884934,
-    startBlock: 1084704,
   },
   {
     id: "solarbeam-frax-rome-eol",
@@ -6037,7 +5886,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x225ed8407835285BAF4aD2788b828EFc56C54697",
     lastHarvest: 1646086068,
-    startBlock: 1058719,
   },
   {
     id: "solarbeam-wmovr-mai-eol",
@@ -6078,7 +5926,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xE63a7Efe21aeE6c4e9225622db71aBccf303D426",
     lastHarvest: 1647405060,
-    startBlock: 1059247,
   },
   {
     id: "solarbeam-frax-wmovr-2-eol",
@@ -6119,7 +5966,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xdc036Ab31d2f105E15c1896f88D13B7bcF3e9292",
     lastHarvest: 1651278720,
-    startBlock: 931060,
   },
   {
     id: "finn-wmovr-finn",
@@ -6158,7 +6004,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x1d9695E7EF656b7d8D6a70353B4ed9964EbC60FD",
     lastHarvest: 1654029144,
-    startBlock: 955157,
   },
   {
     id: "finn-finn-eol",
@@ -6197,7 +6042,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x9a23e988d5463A20E4b38A86762c8a78Da4ee98c",
     lastHarvest: 1640655366,
-    startBlock: 979962,
   },
   {
     id: "finn-wmovr-usdt",
@@ -6236,7 +6080,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x9Fe732dBeE7B403d1C7e7A55BDA28F452e91D29f",
     lastHarvest: 1654072248,
-    startBlock: 971121,
   },
   {
     id: "finn-eth-wmovr",
@@ -6275,7 +6118,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xa9Fd735728d65a3D786bE9fEFeCF400d23F46907",
     lastHarvest: 1654072272,
-    startBlock: 970988,
   },
   {
     id: "finn-wbtc-wmovr-eol",
@@ -6315,7 +6157,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x9dbbBaecACEDf53d5Caa295b8293c1def2055Adc",
     lastHarvest: 1645561878,
-    startBlock: 979247,
   },
   {
     id: "finn-usdc-usdt",
@@ -6354,7 +6195,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x64aa6c884e9b855C1161c60013F52F7Cc09Ac3dd",
     lastHarvest: 1654029168,
-    startBlock: 971174,
   },
   {
     id: "finn-wan-wmovr-eol",
@@ -6394,7 +6234,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x58511De7Dc12230096Feb1AAB420872Df0371A45",
     lastHarvest: 1645561938,
-    startBlock: 970695,
   },
   {
     id: "finn-eth-finn-eol",
@@ -6434,7 +6273,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x4A7A1d42ccef21Cb0A04F4c14c6473caD28338d2",
     lastHarvest: 1639724070,
-    startBlock: 979608,
   },
   {
     id: "finn-wbtc-finn-eol",
@@ -6474,7 +6312,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x836fa5a0311D3D62Ac513863343A4ADa3B4381f3",
     lastHarvest: 1639724070,
-    startBlock: 979532,
   },
   {
     id: "finn-finn-usdt-eol",
@@ -6514,7 +6351,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x805a9DeD5a6e03203c3FD6B2B4363E3A7e12dc73",
     lastHarvest: 1647334218,
-    startBlock: 979447,
   },
   {
     id: "finn-finn-avax-eol",
@@ -6554,7 +6390,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x442D0bcC3dbCD386095f982D7a93f036807A543D",
     lastHarvest: 1645533360,
-    startBlock: 979389,
   },
   {
     id: "finn-finn-ftm-eol",
@@ -6594,7 +6429,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x8E863c44eA7Ad276A66350A658C940B590248A86",
     lastHarvest: 1645641864,
-    startBlock: 979747,
   },
   {
     id: "finn-finn-bnb-eol",
@@ -6634,7 +6468,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x8737b6d8E46Ba94212443F9eC4059c8c9A2Bf51D",
     lastHarvest: 1646242122,
-    startBlock: 979847,
   },
   {
     id: "finn-finn-xrp-eol",
@@ -6674,7 +6507,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x1b18cA56128Eaf1c00d73019cBfdad0C3BC673B7",
     lastHarvest: 1645641822,
-    startBlock: 979334,
   },
   {
     id: "finn-wan-finn-eol",
@@ -6714,7 +6546,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x719548900bf4ed5673709a3dd2e59b84496bcbEf",
     lastHarvest: 1639724088,
-    startBlock: 979651,
   },
   {
     id: "finn-finn-doge-eol",
@@ -6754,7 +6585,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xD5d634926a5b58b2952F19335537F1ED3F09bfce",
     lastHarvest: 1641822990,
-    startBlock: 979703,
   },
   {
     id: "finn-usdc-finn-eol",
@@ -6794,7 +6624,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xE31596fdB92063877235bb500D0d5f329b5768ff",
     lastHarvest: 1651821020,
-    startBlock: 955269,
   },
   {
     id: "finn-dot-finn-eol",
@@ -6834,7 +6663,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x42ECfA11Db08FB3Bb0AAf722857be56FA8E57Dc0",
     lastHarvest: 1647865974,
-    startBlock: 955346,
   },
   {
     id: "solarbeam-wbtc-wmovr",
@@ -6874,7 +6702,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x2e2Cc6eFCf8B6193A32a92B33747C081FE44bf1d",
     lastHarvest: 1654042818,
-    startBlock: 930779,
   },
   {
     id: "solarbeam-eth-wmovr",
@@ -6914,7 +6741,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xE7E08D82853dcf1057B2f8BCeF781d904602B6a0",
     lastHarvest: 1654070058,
-    startBlock: 930856,
   },
   {
     id: "solarbeam-bnb-wmovr-eol",
@@ -6955,7 +6781,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x732161B51Ff7A2fee4D953E19f32827b3603c999",
     lastHarvest: 1651077120,
-    startBlock: 955477,
   },
   {
     id: "solarbeam-solar-eol",
@@ -6995,7 +6820,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xe10F7d1b694e90C67c8797F95762Afb08e255f71",
     lastHarvest: 1641482652,
-    startBlock: 843489,
   },
   {
     id: "solarbeam-solar-wmovr",
@@ -7035,7 +6859,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xC4a2b0BFbf0eCfa28d0366627F7f9EBA1729F8E5",
     lastHarvest: 1654043454,
-    startBlock: 833144,
   },
   {
     id: "solarbeam-solar-usdc-eol",
@@ -7076,7 +6899,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x8B356e7023dEcCFbeC16A3ed08E296015E11aC1a",
     lastHarvest: 1651163238,
-    startBlock: 833528,
   },
   {
     id: "solarbeam-wmovr-usdc",
@@ -7116,7 +6938,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xE406bb7d44e22512766f96B9d7ee7c8B883dB129",
     lastHarvest: 1654062084,
-    startBlock: 833421,
   },
   {
     id: "solarbeam-dai-usdc-eol",
@@ -7157,7 +6978,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x5303F41e9cbcc86B01B9Af3041D26c657e0fd67A",
     lastHarvest: 1650126930,
-    startBlock: 833609,
   },
   {
     id: "solarbeam-busd-usdc-eol",
@@ -7198,7 +7018,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xeAc0f11a93AaCC850dc67ee7A640E02F71f6D947",
     lastHarvest: 1644562236,
-    startBlock: 833675,
   },
   {
     id: "solarbeam-eth-usdc-eol",
@@ -7239,7 +7058,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xE3B2785fa1ED185a5BF2d9fbDb13e2CF5FcE4488",
     lastHarvest: 1653021162,
-    startBlock: 833712,
   },
   {
     id: "solarbeam-bnb-busd-eol",
@@ -7280,7 +7098,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x285BA5243B5b04c6eeD21175f5BAAb70F1c885F3",
     lastHarvest: 1649334828,
-    startBlock: 834019,
   },
   {
     id: "solarbeam-wbtc-usdc-eol",
@@ -7321,7 +7138,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x3b8c5FF87362e97d56C73FE11a99230b490f7860",
     lastHarvest: 1651278774,
-    startBlock: 834080,
   },
   {
     id: "solarbeam-usdt-usdc-eol",
@@ -7362,7 +7178,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x2dCb0D832a67331b3e557B889D57b9aC2D563F55",
     lastHarvest: 1644438822,
-    startBlock: 834146,
   },
   {
     id: "solarbeam-mim-usdc-eol",
@@ -7403,7 +7218,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x46c091c5c394ae0fA4F970573A54C0f9d35EC19a",
     lastHarvest: 1647376386,
-    startBlock: 834555,
   },
   {
     id: "solarbeam-matic-wmovr-eol",
@@ -7444,7 +7258,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x6C0229f93772E40fa9739E73782142830a3bEa65",
     lastHarvest: 1645533714,
-    startBlock: 834222,
   },
   {
     id: "solarbeam-avax-wmovr-eol",
@@ -7485,7 +7298,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x76964a4A2329d314f008a47fFA4600341dCf3dBd",
     lastHarvest: 1649277354,
-    startBlock: 834271,
   },
   {
     id: "solarbeam-wmovr-ftm-eol",
@@ -7526,7 +7338,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x75e9608E8eE64E7808D4d52B410574ED5F301940",
     lastHarvest: 1651048254,
-    startBlock: 834470,
   },
   {
     id: "solarbeam-wmovr-rib-eol",
@@ -7567,7 +7378,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xBF54eCbE5Fe9f07Bf50CDDDbBEFA8ec173b38169",
     lastHarvest: 1645533780,
-    startBlock: 833360,
   },
   {
     id: "solarbeam-wmovr-relay-eol",
@@ -7608,7 +7418,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x88A3fB4Dcb566ee39ec3a03d412682536F9941e6",
     lastHarvest: 1645533816,
-    startBlock: 834315,
   },
   {
     id: "solarbeam-pets-wmovr-eol",
@@ -7649,7 +7458,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0x3e778BDFF775A96536b40C8BcBD8Da31C4F87068",
     lastHarvest: 1645533846,
-    startBlock: 834656,
   },
   {
     id: "solarbeam-solar-rib-eol",
@@ -7690,7 +7498,6 @@ const vaults = [
     chain: "moonriver",
     strategy: "0xBE890712eeA59B89bA9EfE1A264713Db9B6391Bb",
     lastHarvest: 1638625560,
-    startBlock: 833278,
   },
   {
     id: "fuse-bifi-maxi",
@@ -7729,7 +7536,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x24AAaB9DA14308bAf9d670e2a37369FE8Cb5Fe36",
     lastHarvest: 1654057850,
-    startBlock: 15463535,
   },
   {
     id: "voltage-wfuse-elon",
@@ -7769,7 +7575,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x78A89b50F3F36cF9F83c8e41c747DD2dA2476b9a",
     lastHarvest: 1647241510,
-    startBlock: 15446308,
   },
   {
     id: "voltagev2-xvolt",
@@ -7809,7 +7614,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x52157Cdb625cDCB085F1613A178775f5F5F919Ea",
     lastHarvest: 1654057830,
-    startBlock: 16383035,
   },
   {
     id: "sushi-fuse-usdc-usdt",
@@ -7849,7 +7653,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xfB678A230E1221608BE3b89dE2035d6d717a2D5e",
     lastHarvest: 1653858545,
-    startBlock: 16354053,
   },
   {
     id: "voltagev2-wfuse-ageur",
@@ -7889,7 +7692,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x0681e84a2836e93Eadc66DEA324Ff443434ABeC0",
     lastHarvest: 1654078005,
-    startBlock: 16385974,
   },
   {
     id: "voltagev2-fusd-bnb",
@@ -7929,7 +7731,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x9d715C71AaCFe0EAFf0FCD77373623a1e9206199",
     lastHarvest: 1654072560,
-    startBlock: 16011464,
   },
   {
     id: "voltagev2-wbtc-weth",
@@ -7969,7 +7770,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x811429dd7184b3b198c3bF80765383ECa390B445",
     lastHarvest: 1654078390,
-    startBlock: 16011405,
   },
   {
     id: "voltagev2-wfuse-weth",
@@ -8009,7 +7809,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x2814a0b84b6B8f4DE0a539952df9219b29cF683e",
     lastHarvest: 1654029035,
-    startBlock: 16012893,
   },
   {
     id: "voltagev2-wfuse-busd",
@@ -8049,7 +7848,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xFdb394E0dcbBDbeD87796a7e689153fF2Ed10551",
     lastHarvest: 1653997065,
-    startBlock: 16022021,
   },
   {
     id: "voltagev2-wfuse-usdc",
@@ -8089,7 +7887,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x5f022E5Bf33bb1C957B7Da33a1b900E81D238618",
     lastHarvest: 1653996530,
-    startBlock: 16022058,
   },
   {
     id: "voltagev2-wfuse-fusd",
@@ -8129,7 +7926,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x7141424d50A9AB5CEDE7c979C6128Ce069A8bE1c",
     lastHarvest: 1654029050,
-    startBlock: 16022089,
   },
   {
     id: "voltagev2-wfuse-volt",
@@ -8169,7 +7965,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x440F1249349B185748C9aA8dAB26F067A515A68F",
     lastHarvest: 1654029065,
-    startBlock: 15994466,
   },
   {
     id: "voltagev2-fusd-volt",
@@ -8209,7 +8004,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xE5970DBF2015587baF7bA2c485F15EbFE990c6e3",
     lastHarvest: 1654015045,
-    startBlock: 16022115,
   },
   {
     id: "voltagev2-wfuse-atust-eol",
@@ -8251,7 +8045,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xE44000972e7C737a2D43609c2254a8F7B646BF9D",
     lastHarvest: 1652980995,
-    startBlock: 15994466,
   },
   {
     id: "voltagev2-volt-bnb",
@@ -8291,7 +8084,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xd1d13EaAb9A92c47E8D11628AE6cb6C824E85E4B",
     lastHarvest: 1654068225,
-    startBlock: 15957704,
   },
   {
     id: "voltagev2-wfuse-gdollar",
@@ -8331,7 +8123,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xA31184D2031ddFf2C2000B29B31593e82bCDa60C",
     lastHarvest: 1654064945,
-    startBlock: 15994534,
   },
   {
     id: "voltage-wfuse-usdc-eol",
@@ -8372,7 +8163,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xC3821F0b56FA4F4794d5d760f94B812DE261361B",
     lastHarvest: 1647174850,
-    startBlock: 14811587,
   },
   {
     id: "voltage-wfuse-ust-eol",
@@ -8414,7 +8204,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xe441aa3287857924e4aDA3c15612aE8dE29C684a",
     lastHarvest: 1647432885,
-    startBlock: 15289829,
   },
   {
     id: "sushi-wfuse-usdc",
@@ -8454,7 +8243,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x6e4c4a1e3bc0bD95e912f2a997aCA658b74057C1",
     lastHarvest: 1653921460,
-    startBlock: 15225191,
   },
   {
     id: "sushi-wfuse-weth",
@@ -8494,7 +8282,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x0073C4b8E39698631d8d3E61b487Ec620101BD4c",
     lastHarvest: 1653914290,
-    startBlock: 15211053,
   },
   {
     id: "fuse-fuse",
@@ -8532,7 +8319,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xD295d690b9BF17bd217B94BC50C12729762C1862",
     lastHarvest: 1654078125,
-    startBlock: 14911144,
   },
   {
     id: "voltage-wfuse-weth-eol",
@@ -8573,7 +8359,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x29C4C22eC7dF7e936Cb3e6C4A7E5eAE751C7d86B",
     lastHarvest: 1647090170,
-    startBlock: 14811746,
   },
   {
     id: "voltage-wfuse-g$-eol",
@@ -8614,7 +8399,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xf6fD90FE8f057a63F0368B0B551D5e52C7Ae821F",
     lastHarvest: 1644770010,
-    startBlock: 14811957,
   },
   {
     id: "voltage-fusd-bnb-eol",
@@ -8655,7 +8439,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x32d272C7F753698BB6ecde56CC599411C57Fa93a",
     lastHarvest: 1647010725,
-    startBlock: 14811891,
   },
   {
     id: "voltage-wfuse-busd-eol",
@@ -8696,7 +8479,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0x8a198BCbF313A5565c64A7Ed61FaA413eB4E0931",
     lastHarvest: 1647185715,
-    startBlock: 14811928,
   },
   {
     id: "voltage-wfuse-fusd-eol",
@@ -8737,7 +8519,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xcBd801AAdd138560b15DBFE0D173ea4774E20b40",
     lastHarvest: 1647126275,
-    startBlock: 14811825,
   },
   {
     id: "voltage-wbtc-weth-eol",
@@ -8778,7 +8559,6 @@ const vaults = [
     chain: "fuse",
     strategy: "0xF439B695bB28c9E9865170C1b3e98F5EB4cE9b48",
     lastHarvest: 1647102630,
-    startBlock: 14811781,
   },
   {
     id: "arbi-bifi-maxi",
@@ -8817,7 +8597,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x6207536011918F1A0D8a53Bc426f4Fd54df2E5a8",
     lastHarvest: 1654077582,
-    startBlock: 3005531,
   },
   {
     id: "sushi-arb-magic-weth",
@@ -8856,7 +8635,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x8F2894459026CaE358C4613eD6779e515f1F514e",
     lastHarvest: 1654076006,
-    startBlock: 3728501,
   },
   {
     id: "sushi-arb-weth-gohm",
@@ -8895,7 +8673,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0xFb952b88b2d2C99d2A30E78deD6d393e2a2a4553",
     lastHarvest: 1654064054,
-    startBlock: 3728419,
   },
   {
     id: "spell-mim-crv",
@@ -8933,7 +8710,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x8156e45dDD85FF1e6D013D0AE3424bBE20596aC3",
     lastHarvest: 1654076459,
-    startBlock: 1885980,
   },
   {
     id: "sushi-arb-spell-weth",
@@ -8972,7 +8748,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x66be88070D38d9F8eE96913aeDF1709ED35aB29A",
     lastHarvest: 1654039037,
-    startBlock: 1423153,
   },
   {
     id: "sushi-arb-weth-mim",
@@ -9011,7 +8786,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0xa61D6440880b51CFbD95b00B4189E6bF81aF4214",
     lastHarvest: 1653942630,
-    startBlock: 1423203,
   },
   {
     id: "sushi-arb-weth-link",
@@ -9050,7 +8824,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x3DC588c510C5735568d38dED3aB3eB426f5E7474",
     lastHarvest: 1653755338,
-    startBlock: 1420902,
   },
   {
     id: "sushi-arb-eth-usdc",
@@ -9089,7 +8862,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x5A1Aa857361a63dfcbbfCdEA811F6656822f367D",
     lastHarvest: 1654000215,
-    startBlock: 1417042,
   },
   {
     id: "curve-arb-tricrypto",
@@ -9127,7 +8899,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x9Bb9B11917e7bC3528B6048E9B01cD5E302bb27B",
     lastHarvest: 1654075461,
-    startBlock: 12171521,
   },
   {
     id: "curve-arb-2pool",
@@ -9165,7 +8936,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x2BdfBd329984Cf0DC9027734681A16f542cF3bB4",
     lastHarvest: 1654076124,
-    startBlock: 12171521,
   },
   {
     id: "curve-arb-ren",
@@ -9203,7 +8973,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0x0892a178c363b4739e5Ac89E9155B9c30214C0c0",
     lastHarvest: 1654075383,
-    startBlock: 12171521,
   },
   {
     id: "sushi-arb-wbtc-weth",
@@ -9242,7 +9011,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0xc5Be4084b3D945fe83e1Be4bd96522FA1D1c722D",
     lastHarvest: 1653942630,
-    startBlock: 1362989,
   },
   {
     id: "sushi-arb-sushi-eth",
@@ -9281,7 +9049,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0xa9E6E271b27b20F65394914f8784B3B860dBd259",
     lastHarvest: 1653942630,
-    startBlock: 1365241,
   },
   {
     id: "sushi-arb-weth-usdt",
@@ -9320,7 +9087,6 @@ const vaults = [
     chain: "arbitrum-one",
     strategy: "0xaDB9DDFA24E326dC9d337561f6c7ba2a6Ecec697",
     lastHarvest: 1654000236,
-    startBlock: 1365063,
   },
   {
     id: "heco-bifi-maxi",
@@ -9359,7 +9125,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xfdF1088F5B9Bd338D5197aCfB00b468f04bCC374",
     lastHarvest: 0,
-    startBlock: 4879889,
   },
   {
     id: "lendhub-btc-eol",
@@ -9389,7 +9154,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xf268Abe92481c8074f2eA37Ea21Bab003B73d194",
     lastHarvest: 0,
-    startBlock: 5456950,
   },
   {
     id: "lendhub-dot-eol",
@@ -9419,7 +9183,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x451b175e071B685ec6460d4802fcC526e38EcE45",
     lastHarvest: 0,
-    startBlock: 5458253,
   },
   {
     id: "lendhub-eth",
@@ -9448,7 +9211,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x4eB6BF9bE8ed51e3a7244925a51fc141F7676Fd7",
     lastHarvest: 0,
-    startBlock: 5377594,
   },
   {
     id: "lendhub-lhb-wht-eol",
@@ -9480,7 +9242,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xCDa53a5Cc60B138EFd677249BC3d3e2dc0b8e016",
     lastHarvest: 0,
-    startBlock: 5399153,
   },
   {
     id: "lendhub-lhb-usdt-eol",
@@ -9512,7 +9273,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x73766FceB829357bC0a9eddD0807467970A5dCA0",
     lastHarvest: 0,
-    startBlock: 5400115,
   },
   {
     id: "mdex-mdx-eol",
@@ -9542,7 +9302,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x94a06C3dAd933c81739a7D78E15EBc874e9A13f1",
     lastHarvest: 0,
-    startBlock: 4876073,
   },
   {
     id: "mdex-shib-usdt",
@@ -9573,7 +9332,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x2849095eE44eCd5f60Ed04f94e5BB45623A8e75a",
     lastHarvest: 0,
-    startBlock: 4790017,
   },
   {
     id: "mdex-bifi-usdt",
@@ -9613,7 +9371,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x4a9F72415A159753ee1eC85edBf4D212627762a9",
     lastHarvest: 0,
-    startBlock: 4671697,
   },
   {
     id: "hfi-hfi-ht-eol",
@@ -9646,7 +9403,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xE2eaAf941D6C28e94eE48cdF6451CAdc7876CeD8",
     lastHarvest: 0,
-    startBlock: 4245401,
   },
   {
     id: "hfi-hfi-husd-eol",
@@ -9678,7 +9434,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xBFd2e5D520BB40bDC1c3e906E0AEb978b8473f01",
     lastHarvest: 0,
-    startBlock: 4245409,
   },
   {
     id: "lava-lava-eol",
@@ -9707,7 +9462,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x913bd1F8770e3996B31cb3D8A023d2D44A03F350",
     lastHarvest: 0,
-    startBlock: 3900942,
   },
   {
     id: "lava-lava-usdt-eol",
@@ -9738,7 +9492,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x3B289DcCd55B46596FbBAFfEd6469a85d69426Dc",
     lastHarvest: 0,
-    startBlock: 3844154,
   },
   {
     id: "lava-lava-wht-eol",
@@ -9769,7 +9522,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x78AC41Dd7fd4fe86a79174fdD59a6E707E69c57E",
     lastHarvest: 0,
-    startBlock: 3843949,
   },
   {
     id: "mdex-hbtc-wht-eol",
@@ -9801,7 +9553,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xf27d800C69A6EE79F4878e6d4F72c4B50776111a",
     lastHarvest: 0,
-    startBlock: 2779660,
   },
   {
     id: "mdex-eth-wht-eol",
@@ -9833,7 +9584,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xf26607237355D7c6183ea66EC908729E9c6eEB6b",
     lastHarvest: 0,
-    startBlock: 2779713,
   },
   {
     id: "mdex-husd-usdt",
@@ -9864,7 +9614,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x09EF0e7b555599A9F810789FfF68Db8DBF4c51a0",
     lastHarvest: 0,
-    startBlock: 2289076,
   },
   {
     id: "mdex-hltc-usdt-eol",
@@ -9896,7 +9645,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xEe3a7c885Fd3cc5358FF583F2DAB3b8bC473316f",
     lastHarvest: 0,
-    startBlock: 2289323,
   },
   {
     id: "mdex-hbch-usdt-eol",
@@ -9928,7 +9676,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xDa4bb93Bac7CC00F6c6e2193d115Cf45099b31a0",
     lastHarvest: 0,
-    startBlock: 2289474,
   },
   {
     id: "mdex-hdot-usdt",
@@ -9959,7 +9706,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xf5d76A33953365e4f074AE58e34C39A52B8E9671",
     lastHarvest: 0,
-    startBlock: 2290467,
   },
   {
     id: "mdex-hfil-usdt",
@@ -9990,7 +9736,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x8F769621E63acE71132987Ec4DB14cc3d06AA684",
     lastHarvest: 0,
-    startBlock: 2323067,
   },
   {
     id: "mdex-hpt-usdt",
@@ -10021,7 +9766,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x12e09a13f5e2d95b3B8db8741dFeBa453784d1DC",
     lastHarvest: 0,
-    startBlock: 2776921,
   },
   {
     id: "mdex-lhb-usdt-eol",
@@ -10053,7 +9797,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x800A8fe2BE01cef25B5950cca56B954312049924",
     lastHarvest: 0,
-    startBlock: 2776942,
   },
   {
     id: "mdex-aave-usdt",
@@ -10084,7 +9827,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x646C536865603cFEB51dd35C36FD90296FB8DF26",
     lastHarvest: 0,
-    startBlock: 2776957,
   },
   {
     id: "mdex-snx-usdt",
@@ -10115,7 +9857,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xFc31C3CDDa5a05f6eEcd4335e0A082024a7998A6",
     lastHarvest: 0,
-    startBlock: 2776977,
   },
   {
     id: "mdex-link-usdt",
@@ -10146,7 +9887,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x37A8b016EF27fBCF73F73Fb9Dc1C09C47A5d7E48",
     lastHarvest: 0,
-    startBlock: 2779314,
   },
   {
     id: "mdex-bal-usdt",
@@ -10177,7 +9917,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x033cA6926dFF4F6848983731087907Dcc9dDBEE2",
     lastHarvest: 0,
-    startBlock: 2779295,
   },
   {
     id: "mdex-yfi-usdt",
@@ -10208,7 +9947,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x1c9270ac5C42E51611d7b97b1004313D52c80293",
     lastHarvest: 0,
-    startBlock: 2780569,
   },
   {
     id: "mdex-uni-usdt-eol",
@@ -10240,7 +9978,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xb42441990ffb06f155Bb5b52577Fb137Bcb1eb5F",
     lastHarvest: 0,
-    startBlock: 2777826,
   },
   {
     id: "mdex-mdx-usdt",
@@ -10271,7 +10008,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x5Eb9C8a31D25d681d0730ab420E1dBF040602C27",
     lastHarvest: 0,
-    startBlock: 2173151,
   },
   {
     id: "mdex-mdx-wht",
@@ -10302,7 +10038,6 @@ const vaults = [
     chain: "heco",
     strategy: "0xc8DfDD41B706A6897Ff17BF99e2e94Bb661da92c",
     lastHarvest: 0,
-    startBlock: 2173204,
   },
   {
     id: "mdex-wht-usdt",
@@ -10333,7 +10068,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x69640924876D3f294f5E95C305cb89E065038B2d",
     lastHarvest: 0,
-    startBlock: 2173270,
   },
   {
     id: "mdex-hbtc-usdt-eol",
@@ -10365,7 +10099,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x1aae69Ae19457AcD1A73C61Dd0f272e7f60D170c",
     lastHarvest: 0,
-    startBlock: 2173379,
   },
   {
     id: "mdex-eth-usdt-eol",
@@ -10397,7 +10130,6 @@ const vaults = [
     chain: "heco",
     strategy: "0x2C0eAE2D0c56fffC076ecAd9225c05CE1d34bf7A",
     lastHarvest: 0,
-    startBlock: 2173391,
   },
   {
     id: "avax-bifi-maxi",
@@ -10436,7 +10168,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xca077eEC87e2621F5B09AFE47C42BAF88c6Af18c",
     lastHarvest: 1654044036,
-    startBlock: 3052899,
   },
   {
     id: "joe-tus-wavax-eol",
@@ -10476,7 +10207,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x2197D016985b15bb13Afd84568dF215a65f54024",
     lastHarvest: 1653489830,
-    startBlock: 15077946,
   },
   {
     id: "png-klo-wavax",
@@ -10515,7 +10245,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x2BF1E2BbAbF7704D7C849c76456B208204086D18",
     lastHarvest: 1654057843,
-    startBlock: 15077946,
   },
   {
     id: "png-fitfi-wavax",
@@ -10554,7 +10283,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xB8ff233d024277b0E188A478C18e9263330A1B51",
     lastHarvest: 1654072805,
-    startBlock: 14394159,
   },
   {
     id: "mai-avax-mai-crv",
@@ -10593,7 +10321,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xbD5F9977Cf56BFBd338335De9CD790C6913876c6",
     lastHarvest: 1654065210,
-    startBlock: 14343059,
   },
   {
     id: "mai-qi-wavax",
@@ -10634,7 +10361,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0B1e288cc8B0a7aA982466Bb6E2207BB3C980e2b",
     lastHarvest: 1654034194,
-    startBlock: 14343058,
   },
   {
     id: "aavev3-avax",
@@ -10673,7 +10399,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x5a712EF5cF210B97eA20e54849409CB527D5f968",
     lastHarvest: 1654076857,
-    startBlock: 14343058,
   },
   {
     id: "aavev3-dai.e",
@@ -10713,7 +10438,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xec79B73EA9D70Eb29B927c6A8B20c6c3261C429a",
     lastHarvest: 1654000242,
-    startBlock: 14343057,
   },
   {
     id: "aavev3-usdc",
@@ -10753,7 +10477,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xd472f54579B2A82806fE2E7b85D82A1C956D2f9c",
     lastHarvest: 1654000248,
-    startBlock: 14343057,
   },
   {
     id: "aavev3-usdt",
@@ -10793,7 +10516,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xb9492cF6384985bFe71828feB7c3Ad53c5ea9Ef7",
     lastHarvest: 1654000256,
-    startBlock: 14343057,
   },
   {
     id: "aavev3-weth.e",
@@ -10833,7 +10555,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x54e498c95997D7dBBCc9935435250F2089B912eC",
     lastHarvest: 1654069659,
-    startBlock: 14343056,
   },
   {
     id: "aavev3-wbtc.e",
@@ -10873,7 +10594,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xFF897289b35d5d0b0b15AB9a797fCB8Bf4B7a64c",
     lastHarvest: 1654000264,
-    startBlock: 14343055,
   },
   {
     id: "joe-dby-wavax-eol",
@@ -10913,7 +10633,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x90D5e139c533F7F40FcA98699459A8F8e6c2119F",
     lastHarvest: 1653496281,
-    startBlock: 13961732,
   },
   {
     id: "joe-bpt-wavax-eol",
@@ -10953,7 +10672,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xeBE573160A91DdB3001720bd766d2fD4356D7B91",
     lastHarvest: 1652891487,
-    startBlock: 13830520,
   },
   {
     id: "png-axlatom-wavax",
@@ -10992,7 +10710,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x7D57e47E5F296Ee3f58b1B23a626e344a828955F",
     lastHarvest: 1653697898,
-    startBlock: 13500127,
   },
   {
     id: "png-png-ustw",
@@ -11032,7 +10749,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x4C6c2Aa430617f72e32B3f9db89B8e7c8cb4517d",
     lastHarvest: 1654000270,
-    startBlock: 13491733,
   },
   {
     id: "joe-yeti-wavax",
@@ -11071,7 +10787,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x50C3de1c25828Fa5b1010D672870ed712b889108",
     lastHarvest: 1654058033,
-    startBlock: 13582263,
   },
   {
     id: "joe-usdt-wavax",
@@ -11110,7 +10825,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xe9dB143D59311A2655D0BDB082Fe091e05c5CE5c",
     lastHarvest: 1654041260,
-    startBlock: 13421688,
   },
   {
     id: "curve-avax-f-3pool",
@@ -11147,7 +10861,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x214362CFAaCDF7Ba9C1951FbC455f4e04c6F6d17",
     lastHarvest: 1653611456,
-    startBlock: 13400918,
   },
   {
     id: "beefy-beJoe",
@@ -11187,7 +10900,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0c72Bf520D2B384D66Af7B6B71CdEc8616Db10C3",
     lastHarvest: 1654029041,
-    startBlock: 13152517,
   },
   {
     id: "joe-ustw-wavax-eol",
@@ -11228,7 +10940,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x34A94d5A2d128855CF5bFac3974b8bCDe97C5aa1",
     lastHarvest: 1652387513,
-    startBlock: 13103568,
   },
   {
     id: "joe-lost-wavax",
@@ -11267,7 +10978,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xCadceb1A542335f7f87D349939A0723F8149b703",
     lastHarvest: 1654023643,
-    startBlock: 13103672,
   },
   {
     id: "png-wavax-lost",
@@ -11306,7 +11016,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xFDF3BeD653d15825368A5f57547b246ef22f9B5e",
     lastHarvest: 1654040319,
-    startBlock: 14027317,
   },
   {
     id: "curve-avax-f-avaxl",
@@ -11344,7 +11053,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xf710D90A1Bd702dAEa619eEbbe876e7085c2A1df",
     lastHarvest: 1651114677,
-    startBlock: 13112255,
   },
   {
     id: "joe-money-wavax",
@@ -11383,7 +11091,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x22fB21EFf314f4F2288629122aaC59dBC839A400",
     lastHarvest: 1654000286,
-    startBlock: 12871503,
   },
   {
     id: "png-ustw-usdc",
@@ -11422,7 +11129,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x40082a9273a6C299cF7fEb08E0532521147000Dc",
     lastHarvest: 1653985847,
-    startBlock: 12842620,
   },
   {
     id: "png-wavax-ustw",
@@ -11462,7 +11168,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x3C472701D4536F526C88e382d35379618faAf267",
     lastHarvest: 1654014639,
-    startBlock: 12842495,
   },
   {
     id: "stargate-avax-usdc",
@@ -11501,7 +11206,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x3871E20e08ae59bDa4b42A1a6C27403bEedDa042",
     lastHarvest: 1654003897,
-    startBlock: 12813243,
   },
   {
     id: "stargate-avax-usdt",
@@ -11540,7 +11244,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0c326F2e869ae301628540C540633c5D25c7f40a",
     lastHarvest: 1654014646,
-    startBlock: 12813858,
   },
   {
     id: "png-wavax-ncash",
@@ -11578,7 +11281,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6339829d7fe037823AFFeDfd9aF16f7486C2c916",
     lastHarvest: 1654068846,
-    startBlock: 12815832,
   },
   {
     id: "curve-avax-atricrypto",
@@ -11616,7 +11318,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xE5e46f72039A0A4b7aBd0D659Cc5D198C64E6643",
     lastHarvest: 1654057679,
-    startBlock: 14750070,
   },
   {
     id: "joe-ape-wavax",
@@ -11655,7 +11356,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xee74313e61bd01035A1285e634A947FaD5DB0005",
     lastHarvest: 1654052822,
-    startBlock: 12509783,
   },
   {
     id: "joe-fly-wavax",
@@ -11694,7 +11394,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x5d12Bf3276811c7c1928e14767ACA4045D32eB36",
     lastHarvest: 1654000292,
-    startBlock: 12509587,
   },
   {
     id: "joe-deg-wavax",
@@ -11733,7 +11432,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x8DB1BA590CD32A2c6B2B4D5a3B82A60fD2697751",
     lastHarvest: 1654000298,
-    startBlock: 12096464,
   },
   {
     id: "joe-joe",
@@ -11773,7 +11471,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xe54dD8197aa2746C23Fa2db50E0b9eC5B8A154eF",
     lastHarvest: 1654033265,
-    startBlock: 3958898,
   },
   {
     id: "joe-wavax-usdc",
@@ -11812,7 +11509,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6Ac31814380D25a2fe82d3dec93aca28Fe391117",
     lastHarvest: 1654069771,
-    startBlock: 11689021,
   },
   {
     id: "joe-wavax-vtx",
@@ -11851,7 +11547,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xB140aD335af8B1Cad7b9fDd5EA5fA4a87123A097",
     lastHarvest: 1654072300,
-    startBlock: 11710918,
   },
   {
     id: "joe-wavax-ecd",
@@ -11890,7 +11585,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x7f7Fb573CBdbc2a7E349E5184bC39fB8eAEB88ce",
     lastHarvest: 1654057859,
-    startBlock: 11710918,
   },
   {
     id: "joe-egg-wavax",
@@ -11930,7 +11624,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x580dc7caCe89b63B2A2B6b05CC8a36711CF853A6",
     lastHarvest: 1653539431,
-    startBlock: 11868152,
   },
   {
     id: "png-usdc.e-usdc",
@@ -11969,7 +11662,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x3ABB46721669c5E0709B13D40e16F2fc3acDd320",
     lastHarvest: 1654057709,
-    startBlock: 11959571,
   },
   {
     id: "png-wavax-spell",
@@ -12007,7 +11699,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x80BA57715aF1a63F4A8C8858aaa38fF6f3707Ca6",
     lastHarvest: 1654029052,
-    startBlock: 11960794,
   },
   {
     id: "png-wavax-usdc",
@@ -12045,7 +11736,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xF98cd8b8b600e62e5D788F169Ec120bB02e4A2C3",
     lastHarvest: 1654077867,
-    startBlock: 11973318,
   },
   {
     id: "png-wavax-ime",
@@ -12083,7 +11773,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xD5F9E38e32B7e7920b0903c57B8926E6A9C07b56",
     lastHarvest: 1654057865,
-    startBlock: 11972860,
   },
   {
     id: "joe-joe-usdc",
@@ -12122,7 +11811,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x4eea4B89154430d9BEf9be393f342e24F60A26f1",
     lastHarvest: 1654014653,
-    startBlock: 11886995,
   },
   {
     id: "joe-wavax-fief-eol",
@@ -12162,7 +11850,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x3CeC1409d3a1de52bB566a7d006AbDb37c31Eea9",
     lastHarvest: 1651538015,
-    startBlock: 11551311,
   },
   {
     id: "ripae-pavax-wavax",
@@ -12202,7 +11889,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x036f797B1C87A0684283bC2301EfDAD3625A2d3E",
     lastHarvest: 1654076933,
-    startBlock: 11501117,
   },
   {
     id: "ripae-pae-wavax",
@@ -12242,7 +11928,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x7619Cc227F6dD355aA7B8b5B8B4760d501F1F79D",
     lastHarvest: 1654077523,
-    startBlock: 11501117,
   },
   {
     id: "png-acre-wavax",
@@ -12281,7 +11966,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x15D20d0074B3b887a6C4fF1483B8a71dE2d4C915",
     lastHarvest: 1653510659,
-    startBlock: 11423871,
   },
   {
     id: "png-bribe-wavax-eol",
@@ -12321,7 +12005,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x314EB4b2dbd9195105F77fcC31d5c6242C0f40aC",
     lastHarvest: 1647232304,
-    startBlock: 11465367,
   },
   {
     id: "png-tus-wavax",
@@ -12360,7 +12043,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xf48f9f754cB2A0F71A2b9A6E9e465E55B43245ab",
     lastHarvest: 1654000304,
-    startBlock: 11465367,
   },
   {
     id: "png-fire-wavax-eol",
@@ -12400,7 +12082,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x8C6069624e746513Ac1B1d1434aABbEDA152f181",
     lastHarvest: 1648787439,
-    startBlock: 11084829,
   },
   {
     id: "curve-avax-ren",
@@ -12438,7 +12119,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xD9d297aFb10705A679BeebE9350F805DaF5E3946",
     lastHarvest: 1653999584,
-    startBlock: 14750070,
   },
   {
     id: "joe-wavax-savax",
@@ -12477,7 +12157,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x709eCD8310A72b069034721D8C5975553Dc27Feb",
     lastHarvest: 1654052672,
-    startBlock: 11006078,
   },
   {
     id: "png-luna-wavax",
@@ -12516,7 +12195,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x7cd5A83891c42aE7dDD3eaAea9D9D54CF4bCb472",
     lastHarvest: 1654000309,
-    startBlock: 10730040,
   },
   {
     id: "joe-wavax-domi",
@@ -12555,7 +12233,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xfa6C93288250c67Ca620Efb096e9D23C8ECc587D",
     lastHarvest: 1654000314,
-    startBlock: 10692512,
   },
   {
     id: "joe-wavax-ime-eol",
@@ -12595,7 +12272,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xF5842421dB1C97EEa804D9564816A310343ca1Ea",
     lastHarvest: 1652992319,
-    startBlock: 10317296,
   },
   {
     id: "joe-wavax-pefi2-eol",
@@ -12635,7 +12311,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x2Bd855B43C04404019b369026515d710925cB8Ff",
     lastHarvest: 1645432289,
-    startBlock: 10473725,
   },
   {
     id: "joe-link.e-usdc.e-eol",
@@ -12675,7 +12350,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xb8c18929EFEd0A5F4fC73686B3342ebf4ab6e702",
     lastHarvest: 1645677037,
-    startBlock: 10473805,
   },
   {
     id: "png-mim-usdc.e-eol",
@@ -12715,7 +12389,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x06f77FA8AB2B26c9c0515d6FB41c31C158B2a40E",
     lastHarvest: 1648758720,
-    startBlock: 10214270,
   },
   {
     id: "png-ust-wavax",
@@ -12755,7 +12428,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x5B9Dfe69F95E04017e3A9cF62A3c49b4B442F7A3",
     lastHarvest: 1653107503,
-    startBlock: 10402937,
   },
   {
     id: "png-ust-usdc",
@@ -12794,7 +12466,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x5f69e5870f2C25cEA61622e932A46aDAbCFb3981",
     lastHarvest: 1653107517,
-    startBlock: 10404546,
   },
   {
     id: "grape-grape-mim",
@@ -12833,7 +12504,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x29D9E421e4e4a7f151C00f7BFF808a2B5f62f227",
     lastHarvest: 1654077905,
-    startBlock: 10341973,
   },
   {
     id: "grape-wine-mim",
@@ -12872,7 +12542,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xD01fB5bfdc3320dC31914737c6020739c42E7bbb",
     lastHarvest: 1654076146,
-    startBlock: 10342796,
   },
   {
     id: "png-usdc.e-wavax",
@@ -12911,7 +12580,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xE497A9B4761e5359BA1C8E68116BD979f2273896",
     lastHarvest: 1654072242,
-    startBlock: 10210905,
   },
   {
     id: "png-png-usdc.e-eol",
@@ -12951,7 +12619,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x838CF719bd6c5536625306467b015a14f76c500B",
     lastHarvest: 1648758731,
-    startBlock: 10216565,
   },
   {
     id: "png-png-wavax-eol",
@@ -12991,7 +12658,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x87F322dD9c327B4F91A7D620EE6ED7FA883Af62f",
     lastHarvest: 1651134750,
-    startBlock: 10214644,
   },
   {
     id: "joe-wavax-xava",
@@ -13030,7 +12696,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x4737a4d9112347937a9b03f449678Ba01A0AcEae",
     lastHarvest: 1654000319,
-    startBlock: 10176751,
   },
   {
     id: "joe-wavax-cook-eol",
@@ -13070,7 +12735,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x1B85cc576e97Fd55369e05a424fE3b8dcAEE57B9",
     lastHarvest: 1647491602,
-    startBlock: 10172198,
   },
   {
     id: "joe-wavax-dcau",
@@ -13109,7 +12773,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x16eAD2Dc01946A7AD21017963f93c72EE102F58A",
     lastHarvest: 1653480959,
-    startBlock: 10174792,
   },
   {
     id: "joe-wavax-hec-eol",
@@ -13149,7 +12812,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xE960198c5B6B2756e674965cA1718b7B8e2Ce2B9",
     lastHarvest: 1653395546,
-    startBlock: 10175714,
   },
   {
     id: "png-wavax-frax-eol",
@@ -13189,7 +12851,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x8CCD6516D75b876509D7aE5B186873A7b95Ba199",
     lastHarvest: 1651134806,
-    startBlock: 10203092,
   },
   {
     id: "png-link.e-wavax",
@@ -13228,7 +12889,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x4229Bedd0D680fDd7E7B2d52002edbc87a1fCB81",
     lastHarvest: 1654000332,
-    startBlock: 10202870,
   },
   {
     id: "png-jewel-wavax",
@@ -13267,7 +12927,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x73c14fFB1F7C0447072fA28876CE70020D6F8DA0",
     lastHarvest: 1654000338,
-    startBlock: 10197401,
   },
   {
     id: "joe-ust-wavax-eol",
@@ -13307,7 +12966,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6113C5389125fa2b3E561670670FcD03CCf4c258",
     lastHarvest: 1648110651,
-    startBlock: 10138332,
   },
   {
     id: "joe-wavax-more",
@@ -13346,7 +13004,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x29d729Af90D0e348B3F7Aee076fD7F3aeee3142D",
     lastHarvest: 1654000347,
-    startBlock: 10138516,
   },
   {
     id: "joe-gmx-wavax",
@@ -13385,7 +13042,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x06d063C347a0f97cA4535398025E6e60CBc2F255",
     lastHarvest: 1654077304,
-    startBlock: 10138614,
   },
   {
     id: "png-png",
@@ -13423,7 +13079,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x23d3c50DF5ebcfdAc6B1C5D10506E1183c54B826",
     lastHarvest: 1654067183,
-    startBlock: 9831845,
   },
   {
     id: "joe-usdc.e-usdc",
@@ -13462,7 +13117,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xEa83105a7E7Dd261E3AFbC4c02F9c6d663E263f3",
     lastHarvest: 1654000351,
-    startBlock: 8362416,
   },
   {
     id: "joe-usdt-usdt.e",
@@ -13501,7 +13155,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x826B9d7Aaa2C597ec06efE4f0753C4D7A57b5eBF",
     lastHarvest: 1654000357,
-    startBlock: 10097385,
   },
   {
     id: "joe-wavax-frax-eol",
@@ -13541,7 +13194,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xdE6590ee7fde7b1d615894Bc6876e73a46c3D852",
     lastHarvest: 1644019422,
-    startBlock: 10136613,
   },
   {
     id: "joe-wavax-cly-eol",
@@ -13581,7 +13233,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xD2307A2F555fe2D56aA1Bbb21994c9fE5db5D7fe",
     lastHarvest: 1646253090,
-    startBlock: 8360992,
   },
   {
     id: "joe-ptp-wavax",
@@ -13620,7 +13271,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x822856E9433e7b4C268286Bf004b8c8ecf559d64",
     lastHarvest: 1654075286,
-    startBlock: 8359912,
   },
   {
     id: "joe-awool-wavax-eol",
@@ -13660,7 +13310,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x8326978b457Df83e1BE95597D0D756DC831F1aea",
     lastHarvest: 1642046766,
-    startBlock: 8191077,
   },
   {
     id: "joe-klo-wavax-eol",
@@ -13700,7 +13349,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x4ce28E6aA9bDa98AA64711000203c71CCC54Ecbc",
     lastHarvest: 1646253098,
-    startBlock: 8190660,
   },
   {
     id: "joe-craft-wavax-eol",
@@ -13740,7 +13388,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x653B205f0ceB4dF38DBFBfEAcaacC2003C553883",
     lastHarvest: 1652992365,
-    startBlock: 8190156,
   },
   {
     id: "joe-melt-wavax-eol",
@@ -13780,7 +13427,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xD0CbC822a186c8E9fe4E66dC140b061aF42ff306",
     lastHarvest: 1651135075,
-    startBlock: 8189627,
   },
   {
     id: "joe-gohm-wavax",
@@ -13819,7 +13465,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6B2CFabf0703D807784D11eEE07759559EDeFF6A",
     lastHarvest: 1654072252,
-    startBlock: 7661410,
   },
   {
     id: "synapse-nusdlp",
@@ -13858,7 +13503,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x66D85bAB9286FC0aA5dd607e61F2ed0d2FA53A6e",
     lastHarvest: 1654000363,
-    startBlock: 7372065,
   },
   {
     id: "blizz-avax-pause",
@@ -13896,7 +13540,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x7D5bDbA328c659f5D28C6451be790DC67f5a7CA3",
     lastHarvest: 1652387920,
-    startBlock: 7277848,
   },
   {
     id: "blizz-eth-pause",
@@ -13935,7 +13578,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xeefF390037c6630240ac5e575a19bd7DAde2cEC1",
     lastHarvest: 1652387925,
-    startBlock: 7281955,
   },
   {
     id: "blizz-wbtc-pause",
@@ -13974,7 +13616,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0c3cCeb581A6C83280D45b7CB3fBbAA3D21FAaE7",
     lastHarvest: 1652387993,
-    startBlock: 7282902,
   },
   {
     id: "blizz-blzz-avax",
@@ -14014,7 +13655,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x344C421f2698C2aA12cE013f085cb6C65b475bbC",
     lastHarvest: 1654014664,
-    startBlock: 6677072,
   },
   {
     id: "joe-cra-wavax",
@@ -14053,7 +13693,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x9eCA684321ec265CA7b601871f629e77ad9f1EbB",
     lastHarvest: 1654000373,
-    startBlock: 7282605,
   },
   {
     id: "joe-wavax-boo-eol",
@@ -14093,7 +13732,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x06B515128cac164C63ba4Fd48229839Ba769f71F",
     lastHarvest: 1649233864,
-    startBlock: 7114463,
   },
   {
     id: "spell-avax-mim-crv-eol",
@@ -14132,7 +13770,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x4e713AD07ad300897dAe4ac2D31fFd60db9f4BA1",
     lastHarvest: 1643055746,
-    startBlock: 7061954,
   },
   {
     id: "bankerjoe-avax",
@@ -14170,7 +13807,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xe1526210f125c30227dfc398073896eC0a6eA9B9",
     lastHarvest: 1651114191,
-    startBlock: 6728543,
   },
   {
     id: "bankerjoe-weth.e",
@@ -14209,7 +13845,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x88303643BFAb794fbDDbAf4cB6bc3F4004B2E1E8",
     lastHarvest: 1653062680,
-    startBlock: 6726664,
   },
   {
     id: "bankerjoe-wbtc.e",
@@ -14248,7 +13883,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x054a8e3c11268591E048F7206937C8b74b6B7b97",
     lastHarvest: 1649752396,
-    startBlock: 6724052,
   },
   {
     id: "bankerjoe-usdc.e",
@@ -14287,7 +13921,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0649F6e5fDcf5DFb077B3448a71FB5bABe508906",
     lastHarvest: 1650345859,
-    startBlock: 6727081,
   },
   {
     id: "bankerjoe-usdt.e",
@@ -14326,7 +13959,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x9A6f8f5aA6A19dd474BA384A06fD120eD25F7335",
     lastHarvest: 1650345873,
-    startBlock: 6727844,
   },
   {
     id: "bankerjoe-link.e-eol",
@@ -14366,7 +13998,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6ea31CEFA0e508D9C484d22518A8a664bc630fB3",
     lastHarvest: 1647693265,
-    startBlock: 6722093,
   },
   {
     id: "bankerjoe-mim-eol",
@@ -14406,7 +14037,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x50d6e8216bb5D4018BA6ad6e7118716eF292A184",
     lastHarvest: 1643414594,
-    startBlock: 6720785,
   },
   {
     id: "joe-wavax-bifi-eol",
@@ -14445,7 +14075,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xbFa24f7C2376c28407504Fb8512797dD8D316aBf",
     lastHarvest: 1640359360,
-    startBlock: 4655268,
   },
   {
     id: "curve-avax-av3crv",
@@ -14483,7 +14112,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xB6476Fed6Df900ea9bf4cd74456d3d317D2054d6",
     lastHarvest: 1654043453,
-    startBlock: 14750070,
   },
   {
     id: "joe-mai-wavax-v2-eol",
@@ -14522,7 +14150,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xa45dd07dC52caCe34185298187E7d399717F2550",
     lastHarvest: 1646872741,
-    startBlock: 6649425,
   },
   {
     id: "joe-ampl-wavax-eol",
@@ -14561,7 +14188,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xCE069a70925409DB10F5df617D947b6b4A4A4202",
     lastHarvest: 1644019505,
-    startBlock: 6648850,
   },
   {
     id: "sing-usdt.e-sing-eol",
@@ -14592,7 +14218,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0ab24Bfc2503bB536ad667c00685BBB70fA90433",
     lastHarvest: 1646353992,
-    startBlock: 5375171,
   },
   {
     id: "aave-usdc.e-eol",
@@ -14633,7 +14258,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xBAe259b1190F4935E24e6b21B46693c19063Db3b",
     lastHarvest: 1650530084,
-    startBlock: 5282144,
   },
   {
     id: "aave-usdt.e-eol",
@@ -14674,7 +14298,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xBE1B3cc702dE62A586464465d9147835Dac0D904",
     lastHarvest: 1646354016,
-    startBlock: 5290612,
   },
   {
     id: "aave-aave.e-eol",
@@ -14715,7 +14338,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6828741Be1244253a334134351dCf9eeD0c85Cc2",
     lastHarvest: 1650530102,
-    startBlock: 5287932,
   },
   {
     id: "joe-joe-usdc.e-eol",
@@ -14754,7 +14376,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x81f2c701dB19a255B0BBc557D1d86FBf92dA8A78",
     lastHarvest: 1646861882,
-    startBlock: 4958416,
   },
   {
     id: "joe-wavax-aave.e-eol",
@@ -14793,7 +14414,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x80F9d8B1B4BC0f28CA7086f63479410e6CC9a111",
     lastHarvest: 1645648283,
-    startBlock: 4959023,
   },
   {
     id: "joe-mai-wavax-eol",
@@ -14831,7 +14451,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0084faF81F776F5135d05BF6573eC92A4380C40A",
     lastHarvest: 1636067762,
-    startBlock: 4959494,
   },
   {
     id: "joe-weth.e-usdc.e-eol",
@@ -14870,7 +14489,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xcf6D72677da46c608563E9B6B538185E1cDb8b23",
     lastHarvest: 1647491744,
-    startBlock: 4959964,
   },
   {
     id: "joe-wbtc.e-usdc.e-eol",
@@ -14909,7 +14527,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x39566eab4c73c30be2c76E8a4fB1206C8a526e06",
     lastHarvest: 1647491750,
-    startBlock: 4960748,
   },
   {
     id: "joe-bnb-wavax",
@@ -14947,7 +14564,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x00B8D786BBe42d090399eD46bD9520981654Ae7D",
     lastHarvest: 1654000377,
-    startBlock: 4655473,
   },
   {
     id: "joe-usdc.e-usdt.e-eol",
@@ -14986,7 +14602,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x625cCb753fc64A1cbC30C351e69549bc0bA64279",
     lastHarvest: 1639592616,
-    startBlock: 4612815,
   },
   {
     id: "joe-usdt.e-dai.e-eol",
@@ -15025,7 +14640,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x932009984bd2a7dA8C6396694E811Da5C0952d05",
     lastHarvest: 1639177124,
-    startBlock: 4599294,
   },
   {
     id: "joe-wavax-usdt.e-eol",
@@ -15064,7 +14678,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x27dAE93fd6EED5BE6d7C8BbdD639A448c7039721",
     lastHarvest: 1653496391,
-    startBlock: 4597303,
   },
   {
     id: "joe-link.e-wavax",
@@ -15102,7 +14715,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x768e36F0B40341758f5D06d4f96D54B01D335c90",
     lastHarvest: 1654000387,
-    startBlock: 4595505,
   },
   {
     id: "joe-wavax-spell-eol",
@@ -15141,7 +14753,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xC0907E0e29f6576E864492D6ec12716dc1d21A87",
     lastHarvest: 1645056648,
-    startBlock: 4473477,
   },
   {
     id: "joe-frax-wavax-eol",
@@ -15180,7 +14791,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x5006B88C2FC9E6193773F6766CC82648bc99F21C",
     lastHarvest: 1637217334,
-    startBlock: 4328370,
   },
   {
     id: "joe-time-wavax-eol",
@@ -15219,7 +14829,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xc38b6ffFf4A60d76223aFEB9ceeC1cc9fBb87Ba4",
     lastHarvest: 1635818683,
-    startBlock: 4327309,
   },
   {
     id: "pangolin-png-pause-eol",
@@ -15259,7 +14868,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xb2E8EB58EB46CE850d5A1490cd6bF8b20af1a0Ec",
     lastHarvest: 1643241908,
-    startBlock: 4162789,
   },
   {
     id: "joe-mai-usdc.e-eol",
@@ -15298,7 +14906,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x020Bf7360352D0387D2eea7Bc823d958cD63dFff",
     lastHarvest: 1644846127,
-    startBlock: 4127394,
   },
   {
     id: "joe-joe-wavax",
@@ -15336,7 +14943,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xb2713bf39Bafbc3B93a4E68f1bd74644b839F4E0",
     lastHarvest: 1654054614,
-    startBlock: 4022698,
   },
   {
     id: "joe-joe-usdt.e-eol",
@@ -15375,7 +14981,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x435626d62a49454988bd4B523D67F3e5804154f2",
     lastHarvest: 1643544274,
-    startBlock: 4022900,
   },
   {
     id: "joe-mim-wavax",
@@ -15413,7 +15018,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x873d2b4B57143FD6B99A99d63C50F46B96740E94",
     lastHarvest: 1654000393,
-    startBlock: 3802183,
   },
   {
     id: "joe-qi-wavax-eol",
@@ -15452,7 +15056,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x055Fd27eCCF8aF2724FB3EAE95273ed26a010e5D",
     lastHarvest: 1653496405,
-    startBlock: 3802129,
   },
   {
     id: "joe-syn-wavax-eol",
@@ -15491,7 +15094,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0D5376e471605AaE08144DcF48f3bB6D7127cd05",
     lastHarvest: 1640351193,
-    startBlock: 3802354,
   },
   {
     id: "joe-wbtc.e-usdt.e-eol",
@@ -15530,7 +15132,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x7F348Faa50Ee41cD9edcFcb31816FAf6b1cc132e",
     lastHarvest: 1635109022,
-    startBlock: 3710621,
   },
   {
     id: "joe-wbtc.e-wavax",
@@ -15568,7 +15169,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xe744dF11a036abC219e28Dd11ba4923784515125",
     lastHarvest: 1654014670,
-    startBlock: 3710719,
   },
   {
     id: "joe-weth.e-wavax",
@@ -15606,7 +15206,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x16C419E3937006ace7a72a3ccaed2a6C1E889ff6",
     lastHarvest: 1654057365,
-    startBlock: 3710799,
   },
   {
     id: "joe-usdc.e-dai.e-eol",
@@ -15645,7 +15244,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x165F290c9861249C59D2C1302A5C120A6A102F71",
     lastHarvest: 1639656236,
-    startBlock: 3474511,
   },
   {
     id: "joe-usdc.e-wavax-eol",
@@ -15684,7 +15282,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xD84A652dAB01D1C735Ea70b7061b48D7986417b0",
     lastHarvest: 1651833873,
-    startBlock: 3474437,
   },
   {
     id: "joe-wavax-dai.e-eol",
@@ -15723,7 +15320,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x8D6136A1c1a4F96516B47b1FF43bDc796d0952b1",
     lastHarvest: 1639609293,
-    startBlock: 3466890,
   },
   {
     id: "pangolin-usdc.e-wavax-eol",
@@ -15763,7 +15359,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x931D97002Ba2a315Af4A51b9a9BFdB79A74dFf9e",
     lastHarvest: 1637811744,
-    startBlock: 3585352,
   },
   {
     id: "olive-dai.e-usdt.e",
@@ -15802,7 +15397,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x2Eb92E2882030B8e153370d208462D4dDf7041d2",
     lastHarvest: 1654000399,
-    startBlock: 3457260,
   },
   {
     id: "olive-busd.e-usdt.e",
@@ -15841,7 +15435,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x0ff26aa85A44b16e3c42A9c6d3e141B0e823B617",
     lastHarvest: 1654000405,
-    startBlock: 3455782,
   },
   {
     id: "pangolin-png-qi-eol",
@@ -15881,7 +15474,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x16a7285514ca6dDcf2093dF3CE5FF45d25196723",
     lastHarvest: 1642489315,
-    startBlock: 3118065,
   },
   {
     id: "pangolin-qi-wavax-eol",
@@ -15921,7 +15513,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x528CF803D9224e309dbe96A644484752613675f7",
     lastHarvest: 1642126440,
-    startBlock: 3118020,
   },
   {
     id: "pangolin-uni.e-wavax-eol",
@@ -15961,7 +15552,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xC733253d45909f84D36e6e9D9f8Ee81DeEd12045",
     lastHarvest: 1637811946,
-    startBlock: 3117975,
   },
   {
     id: "pangolin-aave.e-wavax-eol",
@@ -16001,7 +15591,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xe1209Afd5B595eBca109b001a34400cCB5171B45",
     lastHarvest: 1642126448,
-    startBlock: 3117884,
   },
   {
     id: "pangolin-wavax-xava-eol",
@@ -16041,7 +15630,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xfdD7a9541f4d7afD2c30ca98B94e77792990fCc7",
     lastHarvest: 1637811958,
-    startBlock: 3052202,
   },
   {
     id: "pangolin-png-usdt.e-eol",
@@ -16081,7 +15669,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x1Bd6E3e7a955F21514D49f525A98D195F2Ac77eB",
     lastHarvest: 1642262474,
-    startBlock: 3052507,
   },
   {
     id: "pangolin-weth.e-png-eol",
@@ -16121,7 +15708,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xc2394A5B78c6208fb87AbEC3C452DC0a033F5610",
     lastHarvest: 1642395739,
-    startBlock: 3052467,
   },
   {
     id: "pangolin-wavax-dai.e-eol",
@@ -16161,7 +15747,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x281A38643783fCb7DF16f24978b95A2FA2C741dE",
     lastHarvest: 1642126467,
-    startBlock: 3052334,
   },
   {
     id: "pangolin-link.e-wavax-eol",
@@ -16201,7 +15786,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x81d951a94C031d5560af609E9F12E9506AFDb5cA",
     lastHarvest: 1637812000,
-    startBlock: 3052303,
   },
   {
     id: "pangolin-weth.e-wavax-eol",
@@ -16241,7 +15825,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x8D8aff1998e8279Fd224E5505CF17Ce905e32A8E",
     lastHarvest: 1637812016,
-    startBlock: 3051992,
   },
   {
     id: "pangolin-wavax-usdt.e-eol",
@@ -16281,7 +15864,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x5e3D76bfCF6783846B9F4497A23D410FEdFa5E43",
     lastHarvest: 1637812062,
-    startBlock: 3051916,
   },
   {
     id: "pangolin-wbtc.e-wavax-eol",
@@ -16321,7 +15903,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xEE3fa2ec6053a427B9768b2B481AFA31e5b555D4",
     lastHarvest: 1642126471,
-    startBlock: 3048473,
   },
   {
     id: "gondola-usdt-zusdt-eol",
@@ -16351,7 +15932,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x68eB8692882544419d9a363D593d2803f76e78d5",
     lastHarvest: 0,
-    startBlock: 1791563,
   },
   {
     id: "lyd-lyd-usdt-eol",
@@ -16383,7 +15963,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xbE5370a50d11D10475089222497A4172bdC600a4",
     lastHarvest: 0,
-    startBlock: 1308158,
   },
   {
     id: "lyd-lyd-avax-eol",
@@ -16415,7 +15994,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x3B289DcCd55B46596FbBAFfEd6469a85d69426Dc",
     lastHarvest: 0,
-    startBlock: 1308151,
   },
   {
     id: "olive-olive-avax-eol",
@@ -16456,7 +16034,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x6bBdC5cacB4e72884432E3d63745cc8e7A4392Ca",
     lastHarvest: 0,
-    startBlock: 1012707,
   },
   {
     id: "olive-olive-usdt-eol",
@@ -16487,7 +16064,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xDcdb088f53dBcC63f600299867F8b6eE6BC7a6cE",
     lastHarvest: 0,
-    startBlock: 1013054,
   },
   {
     id: "snob-3pool-eol",
@@ -16516,7 +16092,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x12a7738315624f6e112452E0eCFf29cE08d4992D",
     lastHarvest: 0,
-    startBlock: 985771,
   },
   {
     id: "com-eth-avax-eol",
@@ -16548,7 +16123,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xF933075ae4e39aa789555c2bEBA710130E41Ed32",
     lastHarvest: 0,
-    startBlock: 683886,
   },
   {
     id: "com-png-avax-eol",
@@ -16579,7 +16153,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xBceD1CF7259e8fc7BF34F55F05aF88d78bd91FEC",
     lastHarvest: 0,
-    startBlock: 683898,
   },
   {
     id: "snob-snob-avax-eol",
@@ -16611,7 +16184,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xED3a4BA78079804B75e462727E033C1F1887093D",
     lastHarvest: 0,
-    startBlock: 653247,
   },
   {
     id: "com-com-avax-eol",
@@ -16643,7 +16215,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x44e67bCDf95aE53b60ab20929626274640998FDB",
     lastHarvest: 0,
-    startBlock: 653046,
   },
   {
     id: "png-sushi-avax-eol",
@@ -16674,7 +16245,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xF913f07b0B19DA83B1D7FB8BCbc54eFA39D5dA6e",
     lastHarvest: 0,
-    startBlock: 623614,
   },
   {
     id: "png-wbtc-avax-eol",
@@ -16705,7 +16275,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xc8a59Fb425796dcF5F50E7Fa6DBbb2E68276CD8F",
     lastHarvest: 0,
-    startBlock: 623308,
   },
   {
     id: "png-link-avax-eol",
@@ -16736,7 +16305,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x29f034B3c5Ffe34E975ACA63D48C0d5Bd8A5d7a4",
     lastHarvest: 0,
-    startBlock: 623556,
   },
   {
     id: "png-uni-avax-eol",
@@ -16767,7 +16335,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x2CBBD9157899680E2475E4C172Dd2a9921dBa9ae",
     lastHarvest: 0,
-    startBlock: 623668,
   },
   {
     id: "png-usdt-png-eol",
@@ -16798,7 +16365,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x697aC228808CAb8DB149C8c43D5086d9a698CC58",
     lastHarvest: 0,
-    startBlock: 623736,
   },
   {
     id: "png-eth-avax-eol",
@@ -16829,7 +16395,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xd14a7e95B4C57BeD5a36721a0702E90FceE7CEa8",
     lastHarvest: 0,
-    startBlock: 591665,
   },
   {
     id: "png-usdt-avax-eol",
@@ -16860,7 +16425,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0x1326f4648F4c64fc1D15d94a5910787cAf569d70",
     lastHarvest: 0,
-    startBlock: 591702,
   },
   {
     id: "png-png-avax-eol",
@@ -16900,7 +16464,6 @@ const vaults = [
     chain: "avalanche",
     strategy: "0xa0580866d70A33DcF8d053504a55a7e2138cEace",
     lastHarvest: 0,
-    startBlock: 591620,
   },
   {
     id: "aurora-bifi-maxi",
@@ -16939,7 +16502,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x22b3d90BDdC3Ad5F2948bE3914255C64Ebc8c9b3",
     lastHarvest: 1654078328,
-    startBlock: 59389088,
   },
   {
     id: "tri-tri-usdt",
@@ -16978,7 +16540,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x9f6A5a5cA08086AE367BaE92995296f5cB039f38",
     lastHarvest: 1654066811,
-    startBlock: 65020246,
   },
   {
     id: "tri-aurora-near",
@@ -17017,7 +16578,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x9105181007d4A2d8894Db1fD52Ea1ddfB98C860A",
     lastHarvest: 1654067051,
-    startBlock: 64904859,
   },
   {
     id: "tri-bstn-near",
@@ -17056,7 +16616,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x29aCBD4f45C024760Ad3240ed7359F3D6DF179a2",
     lastHarvest: 1654067293,
-    startBlock: 64105248,
   },
   {
     id: "tri-linear-near",
@@ -17095,7 +16654,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x19AA09c70cF09308bA3700BDd120e281655e2aD2",
     lastHarvest: 1654067535,
-    startBlock: 64477469,
   },
   {
     id: "rose-mai-3pool",
@@ -17131,7 +16689,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x19917c01653558C1EfA8Fcd419fa7BC15b9e9Bde",
     lastHarvest: 1654067548,
-    startBlock: 63860340,
   },
   {
     id: "rose-ust-3pool-eol",
@@ -17168,7 +16725,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x2ABB0ea3A5C038f60E677Bf14d2F6095786650Ae",
     lastHarvest: 1653396102,
-    startBlock: 63525409,
   },
   {
     id: "tri-ausdo-usdt",
@@ -17207,7 +16763,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x3caE5c23bfcA0A1e2834FA6fFd2C55a32c11DdC9",
     lastHarvest: 1654067568,
-    startBlock: 61690793,
   },
   {
     id: "tri-stnear-near",
@@ -17246,7 +16801,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x31Ec843A264e58309a814e8da10F21b0B897b2c8",
     lastHarvest: 1654064900,
-    startBlock: 60056161,
   },
   {
     id: "tri-mecha-near-eol",
@@ -17286,7 +16840,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x0953529F07Ffef4F41f285Fba22Df80454D7155f",
     lastHarvest: 1648579572,
-    startBlock: 59369197,
   },
   {
     id: "tri-near-flx",
@@ -17325,7 +16878,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x3BEefdC5fE6BbC928BBBf6A412EA17b68065341E",
     lastHarvest: 1654067587,
-    startBlock: 59369027,
   },
   {
     id: "tri-avax-near-eol",
@@ -17365,7 +16917,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x7f7F1A9F946A43Ac1aD8b3949E79d677DAa4d78f",
     lastHarvest: 1648068505,
-    startBlock: 59368777,
   },
   {
     id: "solace-solace",
@@ -17403,7 +16954,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x672584379Ae3082b25F794E7224057E1b8b3553d",
     lastHarvest: 1654062743,
-    startBlock: 59175915,
   },
   {
     id: "tri-solace-near-eol",
@@ -17443,7 +16993,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0xa66DfCBdAfbe4B4D62535f64f1C2Fb50FF42E4C6",
     lastHarvest: 1653396373,
-    startBlock: 59177599,
   },
   {
     id: "tri-atust-near-eol",
@@ -17484,7 +17033,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0xD34A51815892368fE96D9730376b2CEdE99F83D8",
     lastHarvest: 1649865310,
-    startBlock: 58826598,
   },
   {
     id: "tri-near-atluna-eol",
@@ -17524,7 +17072,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x278f3A75C1508a4521aE41EDc816b26ffE4E7271",
     lastHarvest: 1649870601,
-    startBlock: 58820602,
   },
   {
     id: "tri-aurora-tri",
@@ -17563,7 +17110,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x5Bd44cA9A31bb95080234322c138e085e2CA3202",
     lastHarvest: 1654066139,
-    startBlock: 58747284,
   },
   {
     id: "tri-aurora-weth",
@@ -17602,7 +17148,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0xAfe54A0e3AB5C19aeac473B326239a714823E71A",
     lastHarvest: 1654065906,
-    startBlock: 58738821,
   },
   {
     id: "trisolaris-near-tri",
@@ -17641,7 +17186,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x5ef08a4555125fcafC10a0faEFb63562e06e68b8",
     lastHarvest: 1654062037,
-    startBlock: 58619603,
   },
   {
     id: "trisolaris-near-wbtc",
@@ -17680,7 +17224,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x8B20EbE6B3b5BE888bA815c37724150D17083633",
     lastHarvest: 1654062521,
-    startBlock: 58617098,
   },
   {
     id: "trisolaris-usdt-usdc",
@@ -17719,7 +17262,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0xD5e8D34dE3B1A6fd54e87B5d4a857CBB762d0C8A",
     lastHarvest: 1654078365,
-    startBlock: 58615118,
   },
   {
     id: "trisolaris-usdt-near-eol",
@@ -17759,7 +17301,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x016CB650b6C97dCe80e31f7E26fE4a1B7cFe18f4",
     lastHarvest: 1651595217,
-    startBlock: 58617808,
   },
   {
     id: "trisolaris-usdc-near-eol",
@@ -17799,7 +17340,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0x70CBc8B3a74A857056a6acE7e994229A24D4ab94",
     lastHarvest: 1651595236,
-    startBlock: 58618017,
   },
   {
     id: "trisolaris-near-weth",
@@ -17838,7 +17378,6 @@ const vaults = [
     chain: "aurora",
     strategy: "0xBCbAF3ce95E479E03D4D4fB27EFE3f8f8179c1Fc",
     lastHarvest: 1654062544,
-    startBlock: 58618176,
   },
   {
     id: "polygon-bifi-maxi",
@@ -17877,7 +17416,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD126BA764D2fA052Fc14Ae012Aef590Bc6aE0C4f",
     lastHarvest: 0,
-    startBlock: 14692984,
   },
   {
     id: "quick-wbtc-cxbtc",
@@ -17918,7 +17456,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7a20f3d9a95C07130078DB77484AC2DD694cB9d9",
     lastHarvest: 1654078723,
-    startBlock: 28787588,
   },
   {
     id: "quick-weth-tel",
@@ -17958,7 +17495,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7C45D71Ad822Fa9a7bfBd03536d5E01B91450C82",
     lastHarvest: 1654040910,
-    startBlock: 28787588,
   },
   {
     id: "quick-usdc-tel",
@@ -17998,7 +17534,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x836102E0Af7E9F55E780747a5A63108345c7B789",
     lastHarvest: 1654057858,
-    startBlock: 28788025,
   },
   {
     id: "jarvis-2nzd",
@@ -18037,7 +17572,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xe10199F521ca6f7E7c50bf0a042794de7E30C709",
     lastHarvest: 1654014651,
-    startBlock: 28679842,
   },
   {
     id: "jarvis-2jpy2",
@@ -18076,7 +17610,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8171D97Ac65B07A09385530Baa0Dd7C7409Bd422",
     lastHarvest: 1654066738,
-    startBlock: 28676824,
   },
   {
     id: "jarvis-2eur",
@@ -18114,7 +17647,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x68d2177D146F524e6B51d52123A6e630014A0028",
     lastHarvest: 1654077333,
-    startBlock: 28633243,
   },
   {
     id: "quick-eth-newquick",
@@ -18154,7 +17686,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x84602F119ebDBedEB3bA7c6E23FF398cb61c609F",
     lastHarvest: 1654061946,
-    startBlock: 28224644,
   },
   {
     id: "quick-usdc-newquick",
@@ -18194,7 +17725,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x510d494211895a32B5d933686AcE077bA6c4E624",
     lastHarvest: 1654069027,
-    startBlock: 28224644,
   },
   {
     id: "quick-newquick",
@@ -18233,7 +17763,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x042215e7E93F4e4D42d84DEd5C33b4e1f7d3E988",
     lastHarvest: 1654077307,
-    startBlock: 28148919,
   },
   {
     id: "quick-wmatic-maticx",
@@ -18273,7 +17802,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2aB8add4e367cb2AD9a497155031dAD49a2432ed",
     lastHarvest: 1654077535,
-    startBlock: 27649131,
   },
   {
     id: "beefy-beqi",
@@ -18312,7 +17840,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xBC3Df9A5879432135f4A976795b1fC1728279012",
     lastHarvest: 1654069783,
-    startBlock: 27407735,
   },
   {
     id: "sushi-jrt-eth",
@@ -18353,7 +17880,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA81ef4627471AC434b784C4efa271Fba1C53Be04",
     lastHarvest: 1653611480,
-    startBlock: 20371187,
   },
   {
     id: "quick-stmatic-matic",
@@ -18393,7 +17919,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xED5c4150F867b278866bbAD33e947287cc5a2Ef1",
     lastHarvest: 1654076773,
-    startBlock: 27156874,
   },
   {
     id: "quick-matic-near-eol",
@@ -18434,7 +17959,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB2385DF6d76Bed9F8163037eCab5A8A38dd3FD22",
     lastHarvest: 1652313866,
-    startBlock: 27165735,
   },
   {
     id: "quick-wone-matic-eol",
@@ -18475,7 +17999,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB574bcAbc4f9b98B13E599d44F98e3c1642E525B",
     lastHarvest: 1651091245,
-    startBlock: 27167421,
   },
   {
     id: "quick-wmetis-matic-eol",
@@ -18516,7 +18039,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1592550E083286C35282E53732FDE11800A187E1",
     lastHarvest: 1652307474,
-    startBlock: 27167993,
   },
   {
     id: "quick-wmatic-cel",
@@ -18556,7 +18078,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x845b0456c8eA0C674Daa7211A2B2D8c729263DdB",
     lastHarvest: 1654043452,
-    startBlock: 27136959,
   },
   {
     id: "quick-ixt-usdt",
@@ -18596,7 +18117,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x52043542e153E079779e1D21B1458ee3faE8c586",
     lastHarvest: 1654043456,
-    startBlock: 26817482,
   },
   {
     id: "jarvis-2sgd",
@@ -18627,7 +18147,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xd5598958715C7cd6DD0E0e23F2396FfB5cb85c00",
     lastHarvest: 1654017395,
-    startBlock: 28679807,
   },
   {
     id: "quick-eth-fuse-eol",
@@ -18668,7 +18187,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x02A0c97BE6D8f4F144AFE5f41C51b5cef192480C",
     lastHarvest: 1651149065,
-    startBlock: 26006871,
   },
   {
     id: "quick-usdc-orbs",
@@ -18708,7 +18226,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x894206e3efAd85C49b2B042A6b44b33ad7107acd",
     lastHarvest: 1654077759,
-    startBlock: 25950507,
   },
   {
     id: "quick-eth-cxeth",
@@ -18749,7 +18266,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x876ab6493B42a630f5FB2eD98d8AD23f0629b068",
     lastHarvest: 1654070311,
-    startBlock: 25362050,
   },
   {
     id: "quick-cxada-cxeth",
@@ -18790,7 +18306,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x456eAea680B8D8E5dAE6F5bfdeE8484E0D2accD6",
     lastHarvest: 1654072251,
-    startBlock: 25386994,
   },
   {
     id: "quick-cxdoge-cxeth",
@@ -18831,7 +18346,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x42D4EfA605eE2433918e7C9ae1Fc32494b217c12",
     lastHarvest: 1654029051,
-    startBlock: 25392853,
   },
   {
     id: "quick-kiro-matic",
@@ -18871,7 +18385,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x22F8365a9d689Fe32aAD7B455c9D14F04b395419",
     lastHarvest: 1654076108,
-    startBlock: 23636658,
   },
   {
     id: "quick-genesis-quick-eol",
@@ -18912,7 +18425,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE44000972e7C737a2D43609c2254a8F7B646BF9D",
     lastHarvest: 1647600003,
-    startBlock: 25044042,
   },
   {
     id: "quick-bico-eth",
@@ -18952,7 +18464,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x70c6AF9Dff8C19B3db576E5E199B22A883874f05",
     lastHarvest: 1654050914,
-    startBlock: 25044042,
   },
   {
     id: "quick-fodl-matic-eol",
@@ -18993,7 +18504,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2D48D94ABfaD5a95b5fCA0fAB9cD37dd722C84A4",
     lastHarvest: 1646255331,
-    startBlock: 24656906,
   },
   {
     id: "quick-quick-tel-eol",
@@ -19034,7 +18544,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xf9bd7bcdD8c5B6dE4Af7Dff0A9aF6f9494e6AA83",
     lastHarvest: 1651163873,
-    startBlock: 24657114,
   },
   {
     id: "quick-bnb-usdc-eol",
@@ -19075,7 +18584,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xd23A1FEE38B63464ded77Dd21A35ae514A7f21Db",
     lastHarvest: 1651125205,
-    startBlock: 24656658,
   },
   {
     id: "quick-book-matic-eol",
@@ -19116,7 +18624,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1B85cc576e97Fd55369e05a424fE3b8dcAEE57B9",
     lastHarvest: 1652318388,
-    startBlock: 24656779,
   },
   {
     id: "sushi-eth-mana",
@@ -19156,7 +18663,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xBaBaC5560Aa4CA3C5290DfcC5C159EdC0a51c316",
     lastHarvest: 1654005130,
-    startBlock: 24438117,
   },
   {
     id: "quick-sand-matic-eol",
@@ -19197,7 +18703,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc04f79B751C470b5c53705BB3813B173DC8ab19B",
     lastHarvest: 1645054064,
-    startBlock: 24097852,
   },
   {
     id: "popsicle-ice-eth",
@@ -19236,7 +18741,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x22f72e86A9CA2CDD3Cdc94012E9901D93E3d90F8",
     lastHarvest: 1654019263,
-    startBlock: 23922496,
   },
   {
     id: "jarvis-2cad",
@@ -19275,7 +18779,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA30a5631AdcF7a1Ae1Ab991cBEf23d4381031660",
     lastHarvest: 1654017189,
-    startBlock: 28677619,
   },
   {
     id: "quick-ustw-matic-eol",
@@ -19317,7 +18820,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7fe0dd3D7259092A3ae4709b1598C7eD502DaaBB",
     lastHarvest: 1652311982,
-    startBlock: 23608910,
   },
   {
     id: "quick-psp-matic-eol",
@@ -19358,7 +18860,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x3da758e2be3183fed8604FE0D23EC22bA15786A2",
     lastHarvest: 1648925225,
-    startBlock: 23569890,
   },
   {
     id: "quick-gns-dai-eol",
@@ -19399,7 +18900,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE85c4A30e55255ef3B7880777256c128C25367fd",
     lastHarvest: 1647829537,
-    startBlock: 23531278,
   },
   {
     id: "jarvis-2jpy-eol",
@@ -19439,7 +18939,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE13fDa9D26961954E95a02a825A304dBB58f3B47",
     lastHarvest: 1652078779,
-    startBlock: 23269153,
   },
   {
     id: "jarvis-5eur-eol",
@@ -19478,7 +18977,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8c5c1A7695E9450d21Cd3041614F2bbdca1134D6",
     lastHarvest: 1648339570,
-    startBlock: 23061512,
   },
   {
     id: "quick-tomb-mimatic-eol",
@@ -19519,7 +19017,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xb19482B4f628Fa1218a637232D91e761053eC70D",
     lastHarvest: 1645048158,
-    startBlock: 22876141,
   },
   {
     id: "quick-hbar[0x]-mimatic-eol",
@@ -19560,7 +19057,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8BCEff0f5143A04D85893433a04a8C94d6f2d8b6",
     lastHarvest: 1645052140,
-    startBlock: 22876204,
   },
   {
     id: "quick-mimatic-clam-eol",
@@ -19601,7 +19097,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x17720F863DA01Bc9e266e4eE872E3c98fA1FeAA8",
     lastHarvest: 1645072328,
-    startBlock: 22876026,
   },
   {
     id: "sushi-bct-klima-eol",
@@ -19643,7 +19138,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x825B726fc5DEb89b42352458C28f9F2ce20AEc13",
     lastHarvest: 1647092430,
-    startBlock: 22809869,
   },
   {
     id: "sushi-usdc-bct",
@@ -19684,7 +19178,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1F9871133c8E093e9e1E2815Ca76B75CC7bB8c11",
     lastHarvest: 1654029055,
-    startBlock: 22810434,
   },
   {
     id: "sushi-eth-gohm",
@@ -19725,7 +19218,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xbD9238a23C7D88aaaF18a188191f57bB5D99AAfb",
     lastHarvest: 1654014657,
-    startBlock: 22632678,
   },
   {
     id: "sushi-eth2x-eth",
@@ -19766,7 +19258,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x937B63dB07929Cbc27a72C4A7A2999Ae3Cc1cAfF",
     lastHarvest: 1654016319,
-    startBlock: 22605898,
   },
   {
     id: "sushi-fxs-frax",
@@ -19807,7 +19298,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc60693d8e3e2B8aB28C5CE9Dc38c87414A924B23",
     lastHarvest: 1654057862,
-    startBlock: 22606941,
   },
   {
     id: "jarvis-4eur",
@@ -19846,7 +19336,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc0c198742Bb0724ee1141F61eDD492eefe48495a",
     lastHarvest: 1654078551,
-    startBlock: 28680079,
   },
   {
     id: "curve-poly-eurt",
@@ -19885,7 +19374,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc1662Ea590b3ad990d77be487FBDeBb7bedF0C39",
     lastHarvest: 1654044036,
-    startBlock: 28369183,
   },
   {
     id: "kyber-usdc-jeur-eol",
@@ -19927,7 +19415,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF4e2d1413917AA0b3e26a7203b95FB58Bc48a7d3",
     lastHarvest: 1650256254,
-    startBlock: 20098936,
   },
   {
     id: "curve-am3crv",
@@ -19966,7 +19453,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xb8EB11aff4AFA5987940c665E393EF905A098486",
     lastHarvest: 1654063052,
-    startBlock: 28369183,
   },
   {
     id: "quick-matic-wcro-eol",
@@ -20007,7 +19493,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x04a7D46df890fc20664217301850dadeEBDB7b38",
     lastHarvest: 1652344276,
-    startBlock: 21897429,
   },
   {
     id: "quick-matic-mana-eol",
@@ -20048,7 +19533,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB6ca7D8F93a2eb0CcBC83b38d4d94B4b0FB6811c",
     lastHarvest: 1646249053,
-    startBlock: 21898409,
   },
   {
     id: "quick-shib-matic-eol",
@@ -20089,7 +19573,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD771f9711b863c0d1CE007fd6b613a69b16CFA41",
     lastHarvest: 1643824091,
-    startBlock: 20596158,
   },
   {
     id: "quick-dpi-eth-eol",
@@ -20130,7 +19613,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xC3F4f41cC874146b1fA7F4a0A35168eb8C0E3761",
     lastHarvest: 1638985065,
-    startBlock: 20596090,
   },
   {
     id: "quick-ftm-matic-eol",
@@ -20171,7 +19653,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE7c85f80fA04f013241a7509FBbCb613bbCc50c2",
     lastHarvest: 1651091871,
-    startBlock: 20595801,
   },
   {
     id: "quick-quick",
@@ -20211,7 +19692,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x21068F35fffC2BadE50Defc33261782d3e5Afa6D",
     lastHarvest: 1653542028,
-    startBlock: 18626599,
   },
   {
     id: "sushi-usdc-bifi",
@@ -20251,7 +19731,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x703372131e77aE0c69B51e41A901315087A314D2",
     lastHarvest: 0,
-    startBlock: 15829285,
   },
   {
     id: "ape-wmatic-crystl-eol",
@@ -20282,7 +19761,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xBBf720404ba3F71d03fBda851F30267156c2cec2",
     lastHarvest: 1647392280,
-    startBlock: 20143173,
   },
   {
     id: "kyber-usdc-jgbp-eol",
@@ -20322,7 +19800,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF21893aa7C4AA97C0327D7275176F6A88871f706",
     lastHarvest: 1650241862,
-    startBlock: 20136445,
   },
   {
     id: "kyber-usdc-jchf-eol",
@@ -20362,7 +19839,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xb95F2f442F0640cDE238CA1d2a370fe889B5e375",
     lastHarvest: 1650241868,
-    startBlock: 20137282,
   },
   {
     id: "curve-poly-ren",
@@ -20401,7 +19877,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9cA8109453cADbbA8B072951e9eb5c7fc39d0299",
     lastHarvest: 1654074030,
-    startBlock: 28369183,
   },
   {
     id: "polysage-usdc-sage-eol",
@@ -20431,7 +19906,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x17F9352c4bf06cD29395bd0C98D28c28e626d93a",
     lastHarvest: 1635026891,
-    startBlock: 20034009,
   },
   {
     id: "polysage-wmatic-sage-eol",
@@ -20461,7 +19935,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7Ea5eed1E90A52D29a4bF2051703c6802cEEA7fD",
     lastHarvest: 1635041824,
-    startBlock: 20033880,
   },
   {
     id: "cafe-pbrew-matic-eol",
@@ -20492,7 +19965,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF00b3BE39C94f5f5dE7AfA5ebC1a36E6D2D91f82",
     lastHarvest: 1653846142,
-    startBlock: 19982976,
   },
   {
     id: "cafe-pbrew-usdc-eol",
@@ -20523,7 +19995,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1D6B0510D3863879AfA39534719A3B3A6A69eEeB",
     lastHarvest: 1646283279,
-    startBlock: 19983119,
   },
   {
     id: "sing-usdc-sing-eol",
@@ -20554,7 +20025,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5FaDa24d37A27323D74af57Bd01786866e950550",
     lastHarvest: 1646283323,
-    startBlock: 19947128,
   },
   {
     id: "ape-banana-matic",
@@ -20594,7 +20064,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x453054B9C2CD3dF1c57E0866241f460B78eE3ebB",
     lastHarvest: 0,
-    startBlock: 16005517,
   },
   {
     id: "curve-poly-atricrypto3",
@@ -20633,7 +20102,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x41D7529b4C9245a50ca6A169d39719DFF117f6CA",
     lastHarvest: 1654069679,
-    startBlock: 28369183,
   },
   {
     id: "sushi-wmatic-ghst-eol",
@@ -20674,7 +20142,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x42844d785816e53adfFBdFc66d6BFC2E3E83d8FD",
     lastHarvest: 1647830617,
-    startBlock: 19645639,
   },
   {
     id: "polywise-usdc-wise-eol",
@@ -20704,7 +20171,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2b92996787D7aB695FAb545ccb984b3895409619",
     lastHarvest: 1633762279,
-    startBlock: 19472197,
   },
   {
     id: "polywise-wmatic-wise-eol",
@@ -20735,7 +20201,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5cC78F9FE3DaDeccAaeF83726c1864996D1FAb49",
     lastHarvest: 1633766829,
-    startBlock: 19469863,
   },
   {
     id: "polyalpha-alpha-matic-eol",
@@ -20764,7 +20229,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xAC074B7515011E08828821d53A3b71fB643773aB",
     lastHarvest: 1632823736,
-    startBlock: 19344782,
   },
   {
     id: "polyalpha-alpha-usdc-eol",
@@ -20793,7 +20257,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xf88c19c035756fd280c0683cca4c358C69932ba9",
     lastHarvest: 1632751994,
-    startBlock: 19344893,
   },
   {
     id: "sandman-delirium-matic-eol",
@@ -20822,7 +20285,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF212621976dB35c9fA4f7579D684fe2E66e577F1",
     lastHarvest: 1633210995,
-    startBlock: 19318288,
   },
   {
     id: "sandman-delirium-usdc-eol",
@@ -20851,7 +20313,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x3922459D97e663c09ea611170d795c83727F224A",
     lastHarvest: 1633173915,
-    startBlock: 19318116,
   },
   {
     id: "mai-qi-matic",
@@ -20883,7 +20344,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x464893e1A23026de87fd487A25341553B0f9cf03",
     lastHarvest: 1654065994,
-    startBlock: 19097361,
   },
   {
     id: "quick-qi-eth-eol",
@@ -20924,7 +20384,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x528e01637aaE1c5CAa3c34b0295958Cc8f382C09",
     lastHarvest: 1640226375,
-    startBlock: 18917127,
   },
   {
     id: "quick-mai-usdt",
@@ -20963,7 +20422,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa69D35C1b1b66B6e977294C76542e2C86617Adb7",
     lastHarvest: 1654058116,
-    startBlock: 18915870,
   },
   {
     id: "quick-dai-mai",
@@ -21002,7 +20460,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x23C28C24cb57F7b7D82cbf4788cdAD132051F1FD",
     lastHarvest: 1653985850,
-    startBlock: 18914993,
   },
   {
     id: "quick-mai-matic-eol",
@@ -21042,7 +20499,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x51F68538944B1cbE15A8144F3e1053F1820D5702",
     lastHarvest: 1640274198,
-    startBlock: 18785459,
   },
   {
     id: "quick-usdt-matic",
@@ -21082,7 +20538,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7BB5e5fb8b2843C2f94265eFe94B4F448eB916Ff",
     lastHarvest: 1654071280,
-    startBlock: 18784953,
   },
   {
     id: "wexpoly-usdc-wusd-eol",
@@ -21123,7 +20578,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF93f69d9F768100D2641e6ddC04012E76D1C8Dfd",
     lastHarvest: 1637034150,
-    startBlock: 18734684,
   },
   {
     id: "ape-watch-matic",
@@ -21163,7 +20617,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa8232bdd730Edf961BCa6aEa3F26887bc0eDa107",
     lastHarvest: 1654057870,
-    startBlock: 18614619,
   },
   {
     id: "wexpoly-usdc-wex-eol",
@@ -21204,7 +20657,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x83394Ee753450920222327F4eCBB4b747f235659",
     lastHarvest: 1644503202,
-    startBlock: 18594918,
   },
   {
     id: "sushi-axs-eth-eol",
@@ -21245,7 +20697,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE166AaF67DC8FA9607B2F34Ac4057e98E6197462",
     lastHarvest: 1647092764,
-    startBlock: 18492436,
   },
   {
     id: "ironswap-ice-iron-eol",
@@ -21276,7 +20727,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD4610a11680e9b5d0FC80D65008C577CBe45090e",
     lastHarvest: 1646350154,
-    startBlock: 18453842,
   },
   {
     id: "ape-usdc-dai",
@@ -21317,7 +20767,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6EFE2a7cD607A2e0D84Ab87E7A7E57E19B50148F",
     lastHarvest: 1654076212,
-    startBlock: 18449513,
   },
   {
     id: "sushi-avax-weth",
@@ -21357,7 +20806,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x44831fc132CbFa5099335517B9A83f817bFE41ee",
     lastHarvest: 1654038734,
-    startBlock: 18422796,
   },
   {
     id: "ironswap-iron",
@@ -21396,7 +20844,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA11C1200c06f1B3e10137e551783ba01b8AD1b88",
     lastHarvest: 1654072263,
-    startBlock: 18384129,
   },
   {
     id: "quick-eth-rendoge-eol",
@@ -21438,7 +20885,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5f2484F24a3134D6AcC5145AEDABf0Cd25223b53",
     lastHarvest: 1640283921,
-    startBlock: 18268434,
   },
   {
     id: "polypup-ball-ball-eol",
@@ -21469,7 +20915,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x969D6b814303DAe5a05485a5957C8c181d7FC8d7",
     lastHarvest: 1632295153,
-    startBlock: 18105454,
   },
   {
     id: "polypup-ball-usdc-ball-eol",
@@ -21500,7 +20945,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD556A69d7f37FeCe0C025bd4934Da2799cD48234",
     lastHarvest: 1632315870,
-    startBlock: 18107999,
   },
   {
     id: "polypup-ball-wmatic-ball-eol",
@@ -21532,7 +20976,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x4750Efcdc3809b624515A78794777a7F64051362",
     lastHarvest: 1632331637,
-    startBlock: 18106485,
   },
   {
     id: "quick-usdc-quick",
@@ -21573,7 +21016,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2f57815D41fb365064878b6405856Eb9aB49d70A",
     lastHarvest: 1654072271,
-    startBlock: 18063554,
   },
   {
     id: "quick-wmatic-avax-eol",
@@ -21615,7 +21057,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9C1c20a777EB616efcD420679E2aA02776a9729c",
     lastHarvest: 1651177885,
-    startBlock: 18063779,
   },
   {
     id: "pearzap-pear-usdc",
@@ -21646,7 +21087,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x585b4c8C0D4C62f663DF6945524E59F69273f1Df",
     lastHarvest: 0,
-    startBlock: 17834999,
   },
   {
     id: "pearzap-pear-matic",
@@ -21677,7 +21117,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9616eD357812ddc14bE3833fEc37F6Ce76eB5D1e",
     lastHarvest: 0,
-    startBlock: 17835276,
   },
   {
     id: "polygonfarm-spade-matic-eol",
@@ -21708,7 +21147,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA54f5470D3C03BF088372F31dD0a69Cf6c262478",
     lastHarvest: 0,
-    startBlock: 17828731,
   },
   {
     id: "polygonfarm-spade-usdc-eol",
@@ -21739,7 +21177,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2DE7e25b19dbff36d92B62d6692eb568Bba29c3c",
     lastHarvest: 0,
-    startBlock: 17828782,
   },
   {
     id: "cometh-eth-wbtc-eol",
@@ -21770,7 +21207,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xd0AEd4Bb2050b4E4b8F5C9A4bcC5D1C46D4b397b",
     lastHarvest: 0,
-    startBlock: 17453422,
   },
   {
     id: "cometh-eth-usdc-eol",
@@ -21801,7 +21237,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x33b35C38Ae0a3c2c4C9262217cb34DAdfB37a985",
     lastHarvest: 0,
-    startBlock: 17794993,
   },
   {
     id: "quick-sol-matic-eol",
@@ -21842,7 +21277,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0A866E75963d6EEc4EdA1e8E8b91F76228f2348e",
     lastHarvest: 1642622934,
-    startBlock: 17646264,
   },
   {
     id: "quick-uni-eth-eol",
@@ -21883,7 +21317,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xfDE3FAa7D40B6F1417d9000bE6028638E4Df0F2b",
     lastHarvest: 1639046301,
-    startBlock: 17573122,
   },
   {
     id: "quick-guard-usdc-eol",
@@ -21914,7 +21347,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x54b1FE5f9162141740A2cF0e2044D82b8F570e08",
     lastHarvest: 0,
-    startBlock: 17578836,
   },
   {
     id: "dinoswap-dino-eth-eol",
@@ -21945,7 +21377,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xd85BAF8b9Ab657921c6D2700AA0e78928dC2922C",
     lastHarvest: 0,
-    startBlock: 17568542,
   },
   {
     id: "dinoswap-dfyn-ust-usdt-eol",
@@ -21987,7 +21418,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6ed82Aaa6D421404D43389a4F497923912De0916",
     lastHarvest: 0,
-    startBlock: 17464826,
   },
   {
     id: "dinoswap-dfyn-eth-dfyn-eol",
@@ -22018,7 +21448,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x680fFd9E16a3f18576be2A0a03c528a353D6B622",
     lastHarvest: 0,
-    startBlock: 17464716,
   },
   {
     id: "quick-quick-yamp-eol",
@@ -22049,7 +21478,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xed28adB653C55B63997C6f576DAcFaB2b1c94f17",
     lastHarvest: 0,
-    startBlock: 17426573,
   },
   {
     id: "quick-quick-rendgb-eol",
@@ -22080,7 +21508,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA4352F2eCC3DDDb85CCfEaDf2ab991dB2Eb5bbf2",
     lastHarvest: 0,
-    startBlock: 17427651,
   },
   {
     id: "quick-quick-polydoge-eol",
@@ -22111,7 +21538,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x78b8C22A2FbB6C4Bf9E9570DCAC3b1F5EFB7D6a5",
     lastHarvest: 0,
-    startBlock: 17364417,
   },
   {
     id: "farmhero-quick-usdc-honor-eol",
@@ -22142,7 +21568,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9ab0f5b4504A9Ee0b2c830BC84dc78Aae54F4DD9",
     lastHarvest: 0,
-    startBlock: 17348058,
   },
   {
     id: "farmhero-wault-usdc-honor-eol",
@@ -22173,7 +21598,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8699D5a2DFDd48Ea7333E9069125e7EfDe4AfF91",
     lastHarvest: 0,
-    startBlock: 17348163,
   },
   {
     id: "dfyn-matic-dfyn-eol",
@@ -22204,7 +21628,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x717593C671183b8af2981A5d1b190bc9978962DA",
     lastHarvest: 0,
-    startBlock: 17408718,
   },
   {
     id: "dfyn-luna-dfyn-eol",
@@ -22235,7 +21658,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x67A3bD5F88f9cFD186179b50dFA2B698Ab99D734",
     lastHarvest: 0,
-    startBlock: 17409061,
   },
   {
     id: "dfyn-uni-dfyn-eol",
@@ -22266,7 +21688,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x969e3201ecb6A3Ed9662e75E8436d24B02f7E9Bb",
     lastHarvest: 0,
-    startBlock: 17409338,
   },
   {
     id: "dfyn-crv-dfyn-eol",
@@ -22297,7 +21718,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD9c67fa57AaDf12F39D8340901F7BD7b337bf761",
     lastHarvest: 0,
-    startBlock: 17409386,
   },
   {
     id: "polyyeld-xyeld-quick-wmatic-xyeld-eol",
@@ -22327,7 +21747,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x459beC2474D88D6fCf50071E36124b9c420aa9e0",
     lastHarvest: 0,
-    startBlock: 16972675,
   },
   {
     id: "polycracker-lith-eol",
@@ -22356,7 +21775,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc2f3338847D05A9A28b763c77556cD693f7f6C7e",
     lastHarvest: 0,
-    startBlock: 17326922,
   },
   {
     id: "polycracker-lith-usdc-eol",
@@ -22386,7 +21804,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa6984233aD18987de3dbDAF37Bc0F0C4070F5faC",
     lastHarvest: 0,
-    startBlock: 17326790,
   },
   {
     id: "dinoswap-xmark-usdc-eol",
@@ -22417,7 +21834,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6048e8BC353bCEe221e11Cde2359E3b34ee9a726",
     lastHarvest: 0,
-    startBlock: 17249472,
   },
   {
     id: "dinoswap-dino-usdc-eol",
@@ -22448,7 +21864,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF00Fd3EAAc684fDcdB5a740550ceAbF7e580E8D5",
     lastHarvest: 0,
-    startBlock: 16997753,
   },
   {
     id: "dinoswap-usdc-mimatic-eol",
@@ -22490,7 +21905,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xC42908F4C14E01379C0D16cF07dcBB413D2f6a2A",
     lastHarvest: 0,
-    startBlock: 16996253,
   },
   {
     id: "dinoswap-usdc-usdt-eol",
@@ -22520,7 +21934,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8e1097A2374C81D17E0589cbD935957329bbC331",
     lastHarvest: 0,
-    startBlock: 16996817,
   },
   {
     id: "jetswap-poly-usdc-usdt",
@@ -22549,7 +21962,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x986B6a9097D1B3fb01BC593cD63784B750401Fe4",
     lastHarvest: 0,
-    startBlock: 16676050,
   },
   {
     id: "mai-usdc-mimatic",
@@ -22590,7 +22002,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xECB07aB9E318d55f8018Bc1d01effe1680d1f68c",
     lastHarvest: 0,
-    startBlock: 15886644,
   },
   {
     id: "polypup-usdc-bone-eol",
@@ -22621,7 +22032,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x315324Bcd724b8CF01FfE6d04F029328f595e126",
     lastHarvest: 0,
-    startBlock: 16344500,
   },
   {
     id: "polyyeld-xyeld-xyeld-eol",
@@ -22650,7 +22060,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB8cb0958B3943E63917Bdfe4b93201Cf5cC7De18",
     lastHarvest: 0,
-    startBlock: 16972165,
   },
   {
     id: "polyyeld-xyeld-yeld-eol",
@@ -22679,7 +22088,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x59d6200BD6E5c3326Ab2A3784bce65EfDD36f8BD",
     lastHarvest: 0,
-    startBlock: 16971767,
   },
   {
     id: "polyyeld-xyeld-quick-wmatic-yeld-eol",
@@ -22709,7 +22117,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xdeAdcbc04D78440612dC4Ed0651C2698695C2AD2",
     lastHarvest: 0,
-    startBlock: 16972737,
   },
   {
     id: "quick-nexo-eth-eol",
@@ -22750,7 +22157,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA8d2F663dA905dB94684da5E7955239B80085171",
     lastHarvest: 1638984995,
-    startBlock: 16886005,
   },
   {
     id: "telxchange-quick-quick-tel-eol",
@@ -22782,7 +22188,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x968Eb3feCFEE8310C035CdAE07F6eD804b460c45",
     lastHarvest: 0,
-    startBlock: 16860135,
   },
   {
     id: "telxchange-quick-wmatic-tel",
@@ -22812,7 +22217,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8C0410A6C1fF46be696E5aCC6b3cA977AD5b176A",
     lastHarvest: 0,
-    startBlock: 16873663,
   },
   {
     id: "telxchange-quick-eth-tel-eol",
@@ -22844,7 +22248,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9D78991a30f9822f6b5cBc521D5Ba203f0930c0E",
     lastHarvest: 0,
-    startBlock: 16867009,
   },
   {
     id: "telxchange-quick-aave-tel",
@@ -22874,7 +22277,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x83ee18Af41163e6889C502Fa3c876366E53D15DA",
     lastHarvest: 0,
-    startBlock: 16875772,
   },
   {
     id: "telxchange-quick-wbtc-tel",
@@ -22904,7 +22306,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xAa4EFbd9a98503844036306A6510B7DA59EfEaB3",
     lastHarvest: 0,
-    startBlock: 16875845,
   },
   {
     id: "curve-poly-atricrypto",
@@ -22933,7 +22334,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0C0C75AF434519AB96E34EB3bbEea726324d6264",
     lastHarvest: 0,
-    startBlock: 16363597,
   },
   {
     id: "dfyn-ice-dfyn-eol",
@@ -22964,7 +22364,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6ef302f46543d1045F3c93D2eE77AcD58d3854C4",
     lastHarvest: 0,
-    startBlock: 16852425,
   },
   {
     id: "ironswap-ice-eth-eol",
@@ -22995,7 +22394,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x57e07d6958fd38AA2f46699744e322d3fB3db60f",
     lastHarvest: 0,
-    startBlock: 16806215,
   },
   {
     id: "ironswap-ice-usdc-eol",
@@ -23026,7 +22424,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x40e51fc986405684ca3E4f049426a78c20A1BC03",
     lastHarvest: 0,
-    startBlock: 16810107,
   },
   {
     id: "ironswap-3usd",
@@ -23055,7 +22452,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6195187d06948fB14b20FD3c639F8cb8a335c29c",
     lastHarvest: 0,
-    startBlock: 16782402,
   },
   {
     id: "wexpoly-wbtc-wex-eol",
@@ -23097,7 +22493,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x476be63e41f8E47910eDa5F50507EF49aC75A8a3",
     lastHarvest: 0,
-    startBlock: 16738380,
   },
   {
     id: "dfyn-bifi-dfyn-eol",
@@ -23127,7 +22522,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0010cB56ABF8969EA3885950CcAADB2300cd5C7d",
     lastHarvest: 0,
-    startBlock: 16706654,
   },
   {
     id: "jetswap-poly-pwings-eol",
@@ -23157,7 +22551,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xCFa03c845437ED660eaA38dD18316f6451410488",
     lastHarvest: 0,
-    startBlock: 16706925,
   },
   {
     id: "jetswap-poly-pwings-usdc-eol",
@@ -23187,7 +22580,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x77092b29492163c0695Af17e94d29E73Dcba8743",
     lastHarvest: 0,
-    startBlock: 16674481,
   },
   {
     id: "jetswap-poly-pwings-matic-eol",
@@ -23218,7 +22610,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x80F442b0207Fbc58efBd55da37F2fCc134CAEE7B",
     lastHarvest: 0,
-    startBlock: 16675355,
   },
   {
     id: "mai-qi-mimatic-eol",
@@ -23251,7 +22642,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xd55745876d04E45F7CB32bf816BAbf670A9F260b",
     lastHarvest: 0,
-    startBlock: 15885519,
   },
   {
     id: "quick-qi-quick-eol",
@@ -23282,7 +22672,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa145e4b08969b344Eb9478E89e351cc6b5c7D5EF",
     lastHarvest: 0,
-    startBlock: 15885295,
   },
   {
     id: "quick-usdc-mimatic-eol",
@@ -23314,7 +22703,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9ED77C14DE83a24c9E1Ca97472a22a86d90EEA0c",
     lastHarvest: 0,
-    startBlock: 15686239,
   },
   {
     id: "quick-polybunny-eth-eol",
@@ -23345,7 +22733,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa6a9da7890DeD8FEcc3be2f8b13ca424689fc413",
     lastHarvest: 0,
-    startBlock: 16618560,
   },
   {
     id: "quick-polybunny-quick-eol",
@@ -23376,7 +22763,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA58f0953261EcB55A128F721841416717B327833",
     lastHarvest: 0,
-    startBlock: 16618482,
   },
   {
     id: "boneswap-quick-wmatic-bone-eol",
@@ -23407,7 +22793,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xC32CCCfF0777C145e7d658081D141ec8A38f8133",
     lastHarvest: 0,
-    startBlock: 16558765,
   },
   {
     id: "boneswap-sushi-wmatic-bone-eol",
@@ -23438,7 +22823,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x3dE892BBc1cC1D22F069a4A985F58052244Acc5e",
     lastHarvest: 0,
-    startBlock: 16559828,
   },
   {
     id: "boneswap-ape-wmatic-bone-eol",
@@ -23469,7 +22853,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5a2448b0306D24C2ed3AE3186f32bbB023B8dCf9",
     lastHarvest: 0,
-    startBlock: 16559988,
   },
   {
     id: "boneswap-quick-usdc-bone-eol",
@@ -23500,7 +22883,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7207E31f503981DC0D57cC04AD4713DCBD5C0010",
     lastHarvest: 0,
-    startBlock: 16560516,
   },
   {
     id: "polyyeld-quick-wmatic-yeld-eol",
@@ -23530,7 +22912,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8F9f69ac6aD32Fd6394DDC414f724C534B60F877",
     lastHarvest: 0,
-    startBlock: 15960162,
   },
   {
     id: "dfyn-route-dfyn-eol",
@@ -23561,7 +22942,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x09b379B9008BF69a06A5ed8D97FEd39Bc830784E",
     lastHarvest: 1632345480,
-    startBlock: 16534325,
   },
   {
     id: "dfyn-sx-dfyn-eol",
@@ -23592,7 +22972,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x827D4f4f92281690aD0591aFa0F90450A785199F",
     lastHarvest: 0,
-    startBlock: 16534199,
   },
   {
     id: "dfyn-ez-dfyn-eol",
@@ -23623,7 +23002,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF68536DA80F58c3dEF57fB06ADA7998a1E2Cee97",
     lastHarvest: 0,
-    startBlock: 16534341,
   },
   {
     id: "dfyn-uft-dfyn-eol",
@@ -23653,7 +23031,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8c5E402F3F43958Ecb83b10aD9bE98Fd026C52c6",
     lastHarvest: 0,
-    startBlock: 16534466,
   },
   {
     id: "polycat-dfyn-fish-matic-eol",
@@ -23684,7 +23061,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xcd170fa0C80Ea060a9Df6bf91BfF24cBDC4e0f30",
     lastHarvest: 0,
-    startBlock: 16377127,
   },
   {
     id: "polypup-bone-eol",
@@ -23714,7 +23090,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xf2F5C13686b79b92dC73F6Bb1D2663329658EC87",
     lastHarvest: 0,
-    startBlock: 16342569,
   },
   {
     id: "polypup-pup-eol",
@@ -23744,7 +23119,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x21a9b464DAD1c10985eB8B735A3918fFf24034bc",
     lastHarvest: 0,
-    startBlock: 16140055,
   },
   {
     id: "polypup-wmatic-bone-eol",
@@ -23775,7 +23149,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xF8f071033bfF4100B4b010cE11F95c95950F69b6",
     lastHarvest: 0,
-    startBlock: 16335843,
   },
   {
     id: "polypup-usdc-pup-eol",
@@ -23806,7 +23179,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0F5cdA7EaFC6dc0D10a131c9BD946C1F6634F9d0",
     lastHarvest: 0,
-    startBlock: 16337528,
   },
   {
     id: "polypup-wmatic-pup-eol",
@@ -23837,7 +23209,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1Fb8021FcAB1b54B3f2C6D9D8562DC16CF1fAe21",
     lastHarvest: 0,
-    startBlock: 16113584,
   },
   {
     id: "ape-matic-usdt",
@@ -23877,7 +23248,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB63e910A2DcD6362f7F631542a700C3139b6185a",
     lastHarvest: 0,
-    startBlock: 16215200,
   },
   {
     id: "ape-matic-dai",
@@ -23917,7 +23287,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0603141F2D39264BCE263a2107fA2045cC435b47",
     lastHarvest: 0,
-    startBlock: 16215078,
   },
   {
     id: "polypup-weth-pup-eol",
@@ -23947,7 +23316,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xeBD96C075Eb7D2a968b4479aA1CC9b2808e0029e",
     lastHarvest: 0,
-    startBlock: 16112951,
   },
   {
     id: "quick-eth-ramp-eol",
@@ -23978,7 +23346,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa7377CDb25BfA2889B6e4c9463Cd0858A57aB315",
     lastHarvest: 0,
-    startBlock: 16120049,
   },
   {
     id: "quick-usdc-rusd-eol",
@@ -24020,7 +23387,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xEccBDD3fA855c75eD0D7Dbd8E24aAFcde62a81ce",
     lastHarvest: 1640268460,
-    startBlock: 16139001,
   },
   {
     id: "polyyeld-ape-wmatic-yeld-eol",
@@ -24050,7 +23416,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA82b0a53Dc044C7B885D32FA4EEaA4FeD7528773",
     lastHarvest: 0,
-    startBlock: 16116863,
   },
   {
     id: "sushi-wbtc-ibbtc",
@@ -24090,7 +23455,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x46FfF3f004afeE180CF96cCa92560a94A696044B",
     lastHarvest: 0,
-    startBlock: 16007085,
   },
   {
     id: "ape-eth-matic",
@@ -24130,7 +23494,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xebcAD445f52231887c493995F4413A57c09f5f00",
     lastHarvest: 0,
-    startBlock: 16022519,
   },
   {
     id: "ape-btc-matic",
@@ -24170,7 +23533,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE81436bdf7162e46cac9D58CfAC5ec31e9475446",
     lastHarvest: 0,
-    startBlock: 16021911,
   },
   {
     id: "ape-bnb-matic",
@@ -24210,7 +23572,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x35D578CBeFf8F7A4e1c3Beed0D8CC42D71A08A27",
     lastHarvest: 0,
-    startBlock: 16021289,
   },
   {
     id: "polyyeld-sushi-wmatic-yeld-eol",
@@ -24240,7 +23601,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x966fC9Ee8500b470C653c339c8fa0a68520CC3ea",
     lastHarvest: 0,
-    startBlock: 16021419,
   },
   {
     id: "polyyeld-quick-usdc-yeld-eol",
@@ -24270,7 +23630,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7593747a19a50451bBe6E0f1D427D4F80796f684",
     lastHarvest: 0,
-    startBlock: 15960315,
   },
   {
     id: "quick-pbnb-quick-eol",
@@ -24301,7 +23660,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1a09FD524D6a7c99903648Bfa8535D43B4F215c2",
     lastHarvest: 0,
-    startBlock: 15869841,
   },
   {
     id: "quick-usdc-pbnb-eol",
@@ -24332,7 +23690,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x47c1772E850F627Bf41f52e44219d9bDab66D963",
     lastHarvest: 0,
-    startBlock: 15846014,
   },
   {
     id: "quick-dai-usdt-eol",
@@ -24374,7 +23731,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x18c52B6dCe0D65ddB2F9EB482163956a28818C18",
     lastHarvest: 1643933077,
-    startBlock: 15812220,
   },
   {
     id: "quick-eth-fff-eol",
@@ -24405,7 +23761,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x401Fa12777e303CBbFa0Ce8c95014d3CA1ee02c0",
     lastHarvest: 0,
-    startBlock: 15755980,
   },
   {
     id: "wexpoly-wbtc-usdc-eol",
@@ -24444,7 +23799,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xaf9DD4c1d755402868fFE2A0B7C0E8a6664a0f2F",
     lastHarvest: 0,
-    startBlock: 15790391,
   },
   {
     id: "wexpoly-wbtc-eth-eol",
@@ -24483,7 +23837,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8E82b1A03698d0597D3414F6CC5C57005480DEf4",
     lastHarvest: 0,
-    startBlock: 15790455,
   },
   {
     id: "wexpoly-matic-eth-eol",
@@ -24523,7 +23876,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE91262c6Cf7B28948EF6f8a6B554758791c31340",
     lastHarvest: 0,
-    startBlock: 15783082,
   },
   {
     id: "wexpoly-polydoge-matic-eol",
@@ -24552,7 +23904,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xC0F43f3d242fEDd9FD82e5a5856E577d908a083A",
     lastHarvest: 0,
-    startBlock: 15872225,
   },
   {
     id: "wexpoly-snx-eth-eol",
@@ -24591,7 +23942,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x156463c7a644726994b658B5164edA0B6D68544E",
     lastHarvest: 0,
-    startBlock: 15876597,
   },
   {
     id: "wexpoly-link-eth-eol",
@@ -24630,7 +23980,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x038A80FA19191FF6A1788cEb6f503FB0FDf83aE8",
     lastHarvest: 0,
-    startBlock: 15877218,
   },
   {
     id: "wexpoly-aave-eth-eol",
@@ -24669,7 +24018,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x23679B038eb6f090f9b0f121A1F29b7cA3993F77",
     lastHarvest: 0,
-    startBlock: 15878095,
   },
   {
     id: "wexpoly-dai-eth-eol",
@@ -24708,7 +24056,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1C5e120604537B44B635f9c932A26Abf7bb97E4E",
     lastHarvest: 0,
-    startBlock: 15880091,
   },
   {
     id: "wexpoly-usdc-dai-eol",
@@ -24748,7 +24095,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x107711a7f61c2867B72E0Dd926755dDeEe75F9f0",
     lastHarvest: 0,
-    startBlock: 15878626,
   },
   {
     id: "wexpoly-matic-usdc-eol",
@@ -24788,7 +24134,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xea025B73A536F876d63022629B1d4a2271556056",
     lastHarvest: 0,
-    startBlock: 15783338,
   },
   {
     id: "wexpoly-usdc-usdt-eol",
@@ -24829,7 +24174,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0B7FEA4506006f1bA0718585cFAb638424A86d94",
     lastHarvest: 0,
-    startBlock: 15741525,
   },
   {
     id: "wexpoly-wex-usdc-eol",
@@ -24871,7 +24215,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6a440102015bf4D81D56fBc2fd4F27797D183931",
     lastHarvest: 0,
-    startBlock: 15741248,
   },
   {
     id: "wexpoly-wex-eol",
@@ -24911,7 +24254,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xcb6e386Ad643a6D77C940BF69303cEBD34c04757",
     lastHarvest: 0,
-    startBlock: 15713101,
   },
   {
     id: "wexpoly-wex-matic-eol",
@@ -24953,7 +24295,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0D62f1b1BF511E155e357184dcfC1e8D54B41a5f",
     lastHarvest: 0,
-    startBlock: 15711957,
   },
   {
     id: "wexpoly-bifi-matic-eol",
@@ -24995,7 +24336,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xb15B8E50b79b4D6723DC297aD6313B9Dc3c51Db3",
     lastHarvest: 0,
-    startBlock: 15712388,
   },
   {
     id: "sushi-eth-wfil-eol",
@@ -25037,7 +24377,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x12B5EC1cFa07732540F3d9D4eCF040328bc1EEdC",
     lastHarvest: 0,
-    startBlock: 15639428,
   },
   {
     id: "quick-usdc-dai",
@@ -25079,7 +24418,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1885b6281Ff3F43df54bD61513B80b6fd64B45aC",
     lastHarvest: 1654072283,
-    startBlock: 15633202,
   },
   {
     id: "quick-quick-uni-eol",
@@ -25120,7 +24458,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x4b0e4CDEA00C90F786bd817751159f46EA38A58D",
     lastHarvest: 0,
-    startBlock: 15633148,
   },
   {
     id: "quick-link-quick-eol",
@@ -25152,7 +24489,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD208C42cd08a5CaD8C53add2365153e8e24EbdF9",
     lastHarvest: 0,
-    startBlock: 15632961,
   },
   {
     id: "polycat-fish-eol",
@@ -25182,7 +24518,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x53F816063523D9883C83863CbD5D8EAF9Ffc4641",
     lastHarvest: 0,
-    startBlock: 15526554,
   },
   {
     id: "quick-usdc-eth",
@@ -25223,7 +24558,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5c912a5C6ABFa927E8104f48dCFf4C97900426ec",
     lastHarvest: 1654050548,
-    startBlock: 15268792,
   },
   {
     id: "quick-dai-eth",
@@ -25264,7 +24598,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5F8e043670412e2C8Eb2A01f6382Faf91922BfF8",
     lastHarvest: 1654012215,
-    startBlock: 15259995,
   },
   {
     id: "quick-fff-quick-eol",
@@ -25296,7 +24629,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x4E0e85692b239e57128103b4Ad6f39Ac3BBE0c15",
     lastHarvest: 0,
-    startBlock: 15416193,
   },
   {
     id: "aave-wbtc-eol",
@@ -25337,7 +24669,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x3777a06B71B2Aaf105e855693C56768117712B6F",
     lastHarvest: 0,
-    startBlock: 14437952,
   },
   {
     id: "aave-eth-eol",
@@ -25378,7 +24709,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x55a10618c7E9489ceE047705cD003df6d9e09195",
     lastHarvest: 0,
-    startBlock: 14286296,
   },
   {
     id: "quick-titan-eth-eol",
@@ -25409,7 +24739,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8136C5EE816fD80b80C9679e785F37EBdf2199eE",
     lastHarvest: 0,
-    startBlock: 15285934,
   },
   {
     id: "iron-iron-usdc-quick-eol",
@@ -25440,7 +24769,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x099CE8F12D9824F7441950759d2999022b717ff2",
     lastHarvest: 0,
-    startBlock: 15284889,
   },
   {
     id: "polycat-sushi-fish-matic-eol",
@@ -25471,7 +24799,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2ABB0ea3A5C038f60E677Bf14d2F6095786650Ae",
     lastHarvest: 0,
-    startBlock: 15251691,
   },
   {
     id: "polycat-quick-fish-matic-eol",
@@ -25502,7 +24829,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x92E586d7dB14483C103c2e0FE6A596F8b55DA752",
     lastHarvest: 0,
-    startBlock: 15251677,
   },
   {
     id: "sushi-grt-eth",
@@ -25543,7 +24869,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x441b8Ad6Cfa6707E7A8F1398c2067996611fbc66",
     lastHarvest: 0,
-    startBlock: 15181714,
   },
   {
     id: "sushi-frax-fxs-eol",
@@ -25586,7 +24911,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x3bb6D727622A35816916C3e04920ADd7800BAB0E",
     lastHarvest: 0,
-    startBlock: 15181637,
   },
   {
     id: "sushi-frax-usdc-eol",
@@ -25628,7 +24952,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xE4cd42e17bbc54455c5855eCF4Bd46D51dA5133C",
     lastHarvest: 0,
-    startBlock: 15181561,
   },
   {
     id: "sushi-wmatic-woofy-eol",
@@ -25670,7 +24993,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x7fB420eB7D5B19131f40E8D0422202cF0B46d458",
     lastHarvest: 0,
-    startBlock: 15181300,
   },
   {
     id: "sushi-usdc-dai",
@@ -25712,7 +25034,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xeb38761E6b58Bb9acB4F52077d9eEbFf7D0248Bd",
     lastHarvest: 0,
-    startBlock: 15019328,
   },
   {
     id: "sushi-snx-eth-eol",
@@ -25754,7 +25075,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x98F332EC4D39fB943080813B381b88D57b432124",
     lastHarvest: 0,
-    startBlock: 15179065,
   },
   {
     id: "iron-titan-eol",
@@ -25783,7 +25103,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6cBaEBC1333E72206FC326e810972D28f8250485",
     lastHarvest: 0,
-    startBlock: 15153255,
   },
   {
     id: "iron-titan-iron-eol",
@@ -25814,7 +25133,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa3c2E189a3c809a04d52DD1FfF1610439798887c",
     lastHarvest: 0,
-    startBlock: 15152001,
   },
   {
     id: "quick-bifi-eth-eol",
@@ -25846,7 +25164,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa425DeadFf443f3574F02585CE5154BBd5D14213",
     lastHarvest: 0,
-    startBlock: 14960372,
   },
   {
     id: "quick-bifi-quick-eol",
@@ -25878,7 +25195,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA9319b8F327dBB744c63e6b9FfaDf9A93C30687c",
     lastHarvest: 0,
-    startBlock: 14960351,
   },
   {
     id: "quick-degen-quick-eol",
@@ -25910,7 +25226,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x658F5577b5a161A4aC2F0bb513af49ece812f077",
     lastHarvest: 0,
-    startBlock: 14976684,
   },
   {
     id: "quick-cc10-quick-eol",
@@ -25942,7 +25257,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x05b6e52227985C401eDd5d1635DcEa204857a81d",
     lastHarvest: 0,
-    startBlock: 14976727,
   },
   {
     id: "quick-defi5-quick-eol",
@@ -25974,7 +25288,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x1848FBA9Ac7B4783F513d336171037941a637c55",
     lastHarvest: 0,
-    startBlock: 14976770,
   },
   {
     id: "quick-btc-usdc",
@@ -26015,7 +25328,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc231e28ceC2C44E774d40499CE255843CAF35E1e",
     lastHarvest: 1654014669,
-    startBlock: 14957780,
   },
   {
     id: "iron-titan-matic-eol",
@@ -26046,7 +25358,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x83c6e9C6119D0a7C1ac4fF86b970e54278140D45",
     lastHarvest: 0,
-    startBlock: 14948664,
   },
   {
     id: "iron-iron-usdc-eol",
@@ -26077,7 +25388,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x402ee2A54138465D19EFdEFA60c1d9ffDFfF41eC",
     lastHarvest: 0,
-    startBlock: 14949310,
   },
   {
     id: "quick-matic-usdc",
@@ -26118,7 +25428,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x736Ea4A3a0143986B8cc8bCcD077F93052231996",
     lastHarvest: 1654073584,
-    startBlock: 14929176,
   },
   {
     id: "quick-vision-eth-eol",
@@ -26150,7 +25459,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB682a2F1e6C87819e9aDEdBe366548B59Ab122E8",
     lastHarvest: 0,
-    startBlock: 14919429,
   },
   {
     id: "quick-degen-eth-eol",
@@ -26182,7 +25490,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xaEaF5294Cc6FAcB023c0999A0b1786C4C0b3d520",
     lastHarvest: 0,
-    startBlock: 14899209,
   },
   {
     id: "quick-cc10-eth-eol",
@@ -26214,7 +25521,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9e6d524b000066e60284E2Ee14437d071B6b498F",
     lastHarvest: 0,
-    startBlock: 14893259,
   },
   {
     id: "pzap-pzap-usdc-eol",
@@ -26246,7 +25552,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x9E75f8298e458B76382870982788988A0799195b",
     lastHarvest: 0,
-    startBlock: 14644692,
   },
   {
     id: "pzap-pzap-matic-eol",
@@ -26278,7 +25583,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x6677c03B2c7Da09dfbD869daeec3ccFd4eCC4B5F",
     lastHarvest: 0,
-    startBlock: 14681395,
   },
   {
     id: "cometh-bifi-eth-eol",
@@ -26319,7 +25623,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc7506185DD847346B34e495C3Ffd8F9d34824F5F",
     lastHarvest: 0,
-    startBlock: 14606459,
   },
   {
     id: "cometh-bifi-must-eol",
@@ -26360,7 +25663,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xd8d7DB8272C02fcf784a6794b4e51647258c0660",
     lastHarvest: 0,
-    startBlock: 14606466,
   },
   {
     id: "aave-matic-eol",
@@ -26400,7 +25702,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x57FdEB65b71e6aD212088E63E85825e314F2Ea62",
     lastHarvest: 0,
-    startBlock: 14532334,
   },
   {
     id: "aave-aave-eol",
@@ -26441,7 +25742,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8F755873546F4D0EDf7d41fF8604C8A632113eB7",
     lastHarvest: 0,
-    startBlock: 14530803,
   },
   {
     id: "aave-dai-eol",
@@ -26482,7 +25782,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xb29cCE04365400409d476e95410547275D1F86Cf",
     lastHarvest: 0,
-    startBlock: 14438272,
   },
   {
     id: "aave-usdc-eol",
@@ -26523,7 +25822,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x4Dcbd7A18d04343aFa534f945ad13E096ebd9Ae1",
     lastHarvest: 0,
-    startBlock: 14272075,
   },
   {
     id: "sushi-crv-eth",
@@ -26564,7 +25862,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xCF0354f8dAB741b889e753cCe1656327fe6ce474",
     lastHarvest: 0,
-    startBlock: 14490093,
   },
   {
     id: "sushi-usdc-usdt",
@@ -26606,7 +25903,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5FCcFcd07D03FfdDa3A560d3af15d2bd7AaeE21d",
     lastHarvest: 0,
-    startBlock: 14490667,
   },
   {
     id: "sushi-link-eth",
@@ -26647,7 +25943,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0536984a70BE296A35feD83DC8fF5d30338AbeA1",
     lastHarvest: 0,
-    startBlock: 14490700,
   },
   {
     id: "quick-mocean-matic-eol",
@@ -26679,7 +25974,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xe1B9EB8eAf3F278800AcE13a815DDdc24673F0C6",
     lastHarvest: 0,
-    startBlock: 14373851,
   },
   {
     id: "quick-any-quick-eol",
@@ -26711,7 +26005,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x5E70Ad3438Fe87e0ec89CF15a53aFb2caC39cC6C",
     lastHarvest: 0,
-    startBlock: 14378334,
   },
   {
     id: "quick-frax-quick-eol",
@@ -26742,7 +26035,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x57b3D28fe4824d42c1F8d2786B89bC89e8c68d66",
     lastHarvest: 0,
-    startBlock: 14379257,
   },
   {
     id: "sushi-aave-eth",
@@ -26783,7 +26075,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x71e2c040F3B9670C693215509A0c0846D221756a",
     lastHarvest: 0,
-    startBlock: 14214804,
   },
   {
     id: "polygon-sushi-eth-dai",
@@ -26824,7 +26115,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB982421883c5c022181b67cBC6b4709A564A6728",
     lastHarvest: 0,
-    startBlock: 14326194,
   },
   {
     id: "polygon-sushi-btc-eth",
@@ -26865,7 +26155,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x170712B04A24FdBCC021Dd461Afd048c8cF2348d",
     lastHarvest: 0,
-    startBlock: 14326949,
   },
   {
     id: "sushi-eth-usdt",
@@ -26906,7 +26195,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc4cb1Dc51eAD37fD19d0C24EC6136Dbb639789cA",
     lastHarvest: 0,
-    startBlock: 14327138,
   },
   {
     id: "sushi-usdc-eth",
@@ -26947,7 +26235,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xB4cc236af16e8FBEf8600C2D482901E84AB723c4",
     lastHarvest: 0,
-    startBlock: 14327328,
   },
   {
     id: "sushi-matic-eth",
@@ -26988,7 +26275,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x8A8E3aBAb418671bdb7A47E45d2Fcd7726e46D74",
     lastHarvest: 0,
-    startBlock: 14327468,
   },
   {
     id: "cometh-azuki-eth-eol",
@@ -27020,7 +26306,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa54e6dc91FCb22a24437e8650266BfE9590a2820",
     lastHarvest: 0,
-    startBlock: 14337276,
   },
   {
     id: "cometh-doki-eth-eol",
@@ -27052,7 +26337,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xfb7344a4cF25CDe5aaF6415107a8deF769FC200B",
     lastHarvest: 0,
-    startBlock: 14337289,
   },
   {
     id: "quick-usdc-usdt",
@@ -27093,7 +26377,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xa5487C4eECDc72742b1704f4C6C89b92850f460B",
     lastHarvest: 1654018507,
-    startBlock: 13935365,
   },
   {
     id: "cometh-must-eth-eol",
@@ -27125,7 +26408,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0BF58A328C7739D8b097B1d4199f48AA3F1b2788",
     lastHarvest: 0,
-    startBlock: 14049777,
   },
   {
     id: "quick-eth-btc",
@@ -27166,7 +26448,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x089eb06FF6b02155580a9Be04FF117387829ABEF",
     lastHarvest: 1654072303,
-    startBlock: 13922117,
   },
   {
     id: "quick-ubt-eth-eol",
@@ -27198,7 +26479,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x470052FEd23A2887e3e679c3D8544529DA8B272f",
     lastHarvest: 0,
-    startBlock: 14040013,
   },
   {
     id: "quick-defi5-eth-eol",
@@ -27230,7 +26510,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xc1C1eB984218B9570beA53C0Dad14283a6E9E81C",
     lastHarvest: 0,
-    startBlock: 14039949,
   },
   {
     id: "quick-wise-eth-eol",
@@ -27262,7 +26541,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x88F2ADA49F24fF14005633e66050f763b2E07b7f",
     lastHarvest: 0,
-    startBlock: 14039902,
   },
   {
     id: "quick-cel-eth-eol",
@@ -27294,7 +26572,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x06A1f520555222758eaE4dA0573351FdaD1e7843",
     lastHarvest: 0,
-    startBlock: 14039891,
   },
   {
     id: "quick-quick-eth",
@@ -27335,7 +26612,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xDC73067A6E2c6BEE8e5BC0d916b84A95b5B3cA4B",
     lastHarvest: 1654072315,
-    startBlock: 14039879,
   },
   {
     id: "quick-aave-eth-eol",
@@ -27377,7 +26653,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x0B2798c89EfeC9BcFB7730e7A42c75ce6D5b6254",
     lastHarvest: 1647459042,
-    startBlock: 13922147,
   },
   {
     id: "quick-link-eth-eol",
@@ -27419,7 +26694,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x3E96fb641967F9A8fBa8DdAcf19d11790A264C44",
     lastHarvest: 1646327328,
-    startBlock: 13922135,
   },
   {
     id: "krill-krill-usdc-eol",
@@ -27450,7 +26724,6 @@ const vaults = [
     chain: "matic",
     strategy: "0x2BDA70d1DcE6b0855e812daaBB096F3DaaEBd4Bc",
     lastHarvest: 0,
-    startBlock: 13805617,
   },
   {
     id: "quick-eth-usdt",
@@ -27491,7 +26764,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xeC94C5F7b9dcAe393D4Ab87821eAd4e934d89619",
     lastHarvest: 1654058460,
-    startBlock: 13884766,
   },
   {
     id: "quick-eth-matic",
@@ -27531,7 +26803,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xe14bA7aa3f5c76c3B77a5F8a29B1aB9CCB11b9F5",
     lastHarvest: 1654073422,
-    startBlock: 13884749,
   },
   {
     id: "quick-quick-matic",
@@ -27572,7 +26843,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xD621e3Bb2Aa579E4D41A998dE119b4F85f190428",
     lastHarvest: 1654064582,
-    startBlock: 13884734,
   },
   {
     id: "cometh-eth-matic-eol",
@@ -27604,7 +26874,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xb0F9c6FBcfE226EEAD3AE8b019ce4666cE223a78",
     lastHarvest: 0,
-    startBlock: 13795275,
   },
   {
     id: "cometh-matic-must-eol",
@@ -27636,7 +26905,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xA338D34c5de06B88197609956a2dEAAfF7Af46c8",
     lastHarvest: 0,
-    startBlock: 13795265,
   },
   {
     id: "cometh-usdc-must-eol",
@@ -27668,7 +26936,6 @@ const vaults = [
     chain: "matic",
     strategy: "0xf6fD90FE8f057a63F0368B0B551D5e52C7Ae821F",
     lastHarvest: 0,
-    startBlock: 13795240,
   },
   {
     id: "fantom-bifi-maxi",
@@ -27707,7 +26974,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x230691a28C8290A553BFBC911Ab2AbA0b2df152D",
     lastHarvest: 0,
-    startBlock: 8539814,
   },
   {
     id: "beefy-beFTM",
@@ -27747,7 +27013,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2dc8683F752305659ff7F97A7CB4291B1c0Df37b",
     lastHarvest: 1654078500,
-    startBlock: 32297760,
   },
   {
     id: "curve-ftm-geist",
@@ -27785,7 +27050,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xFFf1F2F16A6ae418F0DD368De20e92a89Dd940EE",
     lastHarvest: 1654078482,
-    startBlock: 39096016,
   },
   {
     id: "tomb-treeb-usdc",
@@ -27824,7 +27088,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0A14C63D2d81690C2519aAca77CfC4018EE82E10",
     lastHarvest: 1653837055,
-    startBlock: 39325324,
   },
   {
     id: "tomb-fusd-usdc",
@@ -27864,7 +27127,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4BbA74DD4941c79CE88E7Ab55564E5B7b98897D2",
     lastHarvest: 1654058846,
-    startBlock: 39017267,
   },
   {
     id: "tomb-tomb-treeb",
@@ -27904,7 +27166,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xD09A9E40990B557eA4f2E24B64664788d68db93e",
     lastHarvest: 1654063407,
-    startBlock: 39017134,
   },
   {
     id: "tomb-tomb-zoo",
@@ -27944,7 +27205,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xeA358eA9238F1f604527128B9055D7B4360C4b21",
     lastHarvest: 1654066956,
-    startBlock: 39016935,
   },
   {
     id: "tomb-tomb-scream",
@@ -27984,7 +27244,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x807dF28C2867080FC51e7B441651Ebf18a7E7433",
     lastHarvest: 1654065168,
-    startBlock: 39017056,
   },
   {
     id: "spirit-wftm-midas",
@@ -28023,7 +27282,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x040Ef70D1CaCEB2cCa319E27f25160cAECFe7545",
     lastHarvest: 1653957095,
-    startBlock: 38960798,
   },
   {
     id: "hector-tor-crv",
@@ -28062,7 +27320,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xf74DE2c34a89ceC902A427514a5494649037e8A5",
     lastHarvest: 1654078445,
-    startBlock: 36242453,
   },
   {
     id: "boo-wftm-tor",
@@ -28102,7 +27359,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa1f710D51c9e08BbD322E7B3fe42F26C4e94c94e",
     lastHarvest: 1654067782,
-    startBlock: 37662310,
   },
   {
     id: "based-based-usdc",
@@ -28142,7 +27398,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x536193E2009d203613F55b53b0346E342440b6D8",
     lastHarvest: 1654073185,
-    startBlock: 39379687,
   },
   {
     id: "tomb-usdc-wftm",
@@ -28181,7 +27436,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1E214f5E1aFcdf2F6D17E46505b23aDD5F0764Ab",
     lastHarvest: 1654077831,
-    startBlock: 38625415,
   },
   {
     id: "tomb-usdc-tshare",
@@ -28220,7 +27474,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xCD139b50f08fE8059460F8968353A7C825536bb4",
     lastHarvest: 1654073288,
-    startBlock: 38627321,
   },
   {
     id: "tomb-usdc-tomb",
@@ -28260,7 +27513,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xEa00376c28b9bCe199EceAbd44416ce49d2b695d",
     lastHarvest: 1654077405,
-    startBlock: 38627683,
   },
   {
     id: "tomb-usdc-fusdt",
@@ -28299,7 +27551,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xc0bC10C1C5D598d81608DeC614247E0a964C8A48",
     lastHarvest: 1654076606,
-    startBlock: 38671341,
   },
   {
     id: "tomb-usdc-mim",
@@ -28338,7 +27589,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x33Aaa949D7CEef9ab35dF994C55cDb237Ca5B0A1",
     lastHarvest: 1654076642,
-    startBlock: 38627804,
   },
   {
     id: "tomb-usdc-mai",
@@ -28377,7 +27627,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x450234989C0822fFB6CEcEe1f0BaA37b1D51E044",
     lastHarvest: 1654077423,
-    startBlock: 38627861,
   },
   {
     id: "tomb-tshare-weth",
@@ -28416,7 +27665,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0B496FCEB5362662610aDB8017d99B2471D0689E",
     lastHarvest: 1654076224,
-    startBlock: 38627956,
   },
   {
     id: "curve-ftm-f-4pool",
@@ -28453,7 +27701,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xFBEF474c7412617786D88F1d24233cAa5566dcC9",
     lastHarvest: 1653527982,
-    startBlock: 37145611,
   },
   {
     id: "spirit-sftmx-ftm",
@@ -28493,7 +27740,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4F9eC57361B076284b9A2C5db1a304B64aA64E7F",
     lastHarvest: 1654073939,
-    startBlock: 37137171,
   },
   {
     id: "tomb-btc-tshare",
@@ -28532,7 +27778,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xfa4b24ceE70C920b79118cbFd00086cAD797F2B4",
     lastHarvest: 1654074934,
-    startBlock: 37583968,
   },
   {
     id: "spirit-orkan-ftm",
@@ -28572,7 +27817,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xE13b65C9d37aF3666A4640AE4Fd5202bd630d8cD",
     lastHarvest: 1654038980,
-    startBlock: 37084278,
   },
   {
     id: "beets-daiabolical-balance",
@@ -28610,7 +27854,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x9F12B811d3fAc99fbf2c72906E02B646749D4782",
     lastHarvest: 1653870665,
-    startBlock: 37525566,
   },
   {
     id: "boo-usdc-dei",
@@ -28650,7 +27893,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4cc45a80a57e60b28f5761Aa6D705580AB329fAf",
     lastHarvest: 1654077051,
-    startBlock: 36051795,
   },
   {
     id: "boo-wftm-sftmx",
@@ -28690,7 +27932,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xB42D2009211E11eD5Ad14C6Cc0314c20964f543F",
     lastHarvest: 1654075500,
-    startBlock: 36994394,
   },
   {
     id: "boo-wftm-deus",
@@ -28730,7 +27971,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7549b90F096ac4f03761430cC8BF38219Fc57C73",
     lastHarvest: 1654074956,
-    startBlock: 36051794,
   },
   {
     id: "beets-two-gods-one-pool",
@@ -28768,7 +28008,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1082648C1d397CF232d3a3eBd25dB88848FA3DF5",
     lastHarvest: 1651683296,
-    startBlock: 35979034,
   },
   {
     id: "beets-clair-de-lune-eol",
@@ -28808,7 +28047,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7097D6357E077C264d3933a6179663132D4be3eD",
     lastHarvest: 1652472143,
-    startBlock: 35633136,
   },
   {
     id: "boo-wftm-luna-eol",
@@ -28849,7 +28087,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7Cf6c7549A5c0e9500d697a5b19F7745F272Dc72",
     lastHarvest: 1652365252,
-    startBlock: 35559748,
   },
   {
     id: "boo-wftm-ust-eol",
@@ -28891,7 +28128,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x78653345ccd5E22A122B6d2A439425e6F9eA5433",
     lastHarvest: 1652392409,
-    startBlock: 35615610,
   },
   {
     id: "curve-ftm-f-usdl",
@@ -28929,7 +28165,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xAFa67A3e7E9fa2B62f39B2A3Fe55038F0153C346",
     lastHarvest: 1651104610,
-    startBlock: 35466825,
   },
   {
     id: "beets-ust-ust-eol",
@@ -28969,7 +28204,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x19AC7e5a17d2AfBCc8591800fbA389845F5C48C0",
     lastHarvest: 1652385619,
-    startBlock: 35529433,
   },
   {
     id: "curve-ftm-f-ftml",
@@ -29007,7 +28241,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xd6479545171d5D9c360129D820cC060f9A063bc8",
     lastHarvest: 1653611467,
-    startBlock: 35466825,
   },
   {
     id: "beefy-binspirit",
@@ -29047,7 +28280,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xfA9c8FCda731b92FC0B6aB0ABFF4CDeE1AC67B33",
     lastHarvest: 1654077145,
-    startBlock: 29722752,
   },
   {
     id: "tomb-tshare-mai",
@@ -29086,7 +28318,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4ca0a1eff8D2B3234Bc79a9A0A84b316384d000C",
     lastHarvest: 1654041958,
-    startBlock: 34713692,
   },
   {
     id: "stargate-fantom-usdc",
@@ -29126,7 +28357,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6DeDE244d7DD73Aa4967B3d7D400271ec746e28B",
     lastHarvest: 1654058994,
-    startBlock: 34808051,
   },
   {
     id: "boo-wftm-beftm",
@@ -29166,7 +28396,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x814F0A1502fb884B22B7a476BE519cB010ef0476",
     lastHarvest: 1654076350,
-    startBlock: 34923989,
   },
   {
     id: "tomb-tomb-wftm",
@@ -29206,7 +28435,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6f3C8A229C38022458f5a0998AFBd7F94171E7b9",
     lastHarvest: 1654078340,
-    startBlock: 34826892,
   },
   {
     id: "based-based-bshare",
@@ -29248,7 +28476,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xBbf3F8A756c0c46319B39819190720b7929d5ee8",
     lastHarvest: 1654068047,
-    startBlock: 34287337,
   },
   {
     id: "beets-god-between-stables-eol",
@@ -29287,7 +28514,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x62159EAae3Cec9a447AEf1d0400c8596AC9FDA27",
     lastHarvest: 1652035596,
-    startBlock: 34282334,
   },
   {
     id: "beets-exploding-shrapnel-eol",
@@ -29326,7 +28552,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7f7Fb573CBdbc2a7E349E5184bC39fB8eAEB88ce",
     lastHarvest: 1650401155,
-    startBlock: 34131802,
   },
   {
     id: "boo-wftm-ape",
@@ -29366,7 +28591,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x99C719c26C64A371be84bAF0821fA89a1FEd459a",
     lastHarvest: 1654071205,
-    startBlock: 34386373,
   },
   {
     id: "boo-usdc-boo",
@@ -29406,7 +28630,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xeC0a417fDa83A8f7FeE014ACf21e7f0e06228f73",
     lastHarvest: 1654077381,
-    startBlock: 34386292,
   },
   {
     id: "based-tomb-based",
@@ -29447,7 +28670,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8945130ef1F1429A2B25Dc2976cc51c5B22aF917",
     lastHarvest: 1654076747,
-    startBlock: 34448480,
   },
   {
     id: "wigo-wigo",
@@ -29486,7 +28708,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xf394C044c133157B8114F381850Cb3d1b6Ef7b44",
     lastHarvest: 1654054859,
-    startBlock: 34261332,
   },
   {
     id: "spirit-ust-ftm",
@@ -29525,7 +28746,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA53A8BAB06c389d4cD3D33c8a24beA164817588f",
     lastHarvest: 1654053006,
-    startBlock: 33676844,
   },
   {
     id: "based-based-mai",
@@ -29566,7 +28786,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x43D1dbfb4367A8fd9ffB4F74981999673Fe8C4E2",
     lastHarvest: 1654078493,
-    startBlock: 33520967,
   },
   {
     id: "tomb-tomb-mai",
@@ -29605,7 +28824,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xc8161F9a900363529E7709AeB1EC88280cfA328E",
     lastHarvest: 1654008294,
-    startBlock: 33142703,
   },
   {
     id: "spirit-hnd-ftm",
@@ -29644,7 +28862,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3bdaf23aa958401Ba84a180AC5149B0e6c110765",
     lastHarvest: 1653870709,
-    startBlock: 33047765,
   },
   {
     id: "beets-cre8r-f-major-eol",
@@ -29682,7 +28899,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA931d0B72B317e01965b22B50f563de6136B1A4f",
     lastHarvest: 1647953333,
-    startBlock: 32428789,
   },
   {
     id: "spirit-ftm-treeb",
@@ -29721,7 +28937,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA7e2363455159101a0Ee0BDF4028Bd611D19Fb57",
     lastHarvest: 1654076530,
-    startBlock: 32432506,
   },
   {
     id: "spirit-ftm-beftm",
@@ -29760,7 +28975,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x768620Ee33313D9711857D122a8d60Dd062b7bD3",
     lastHarvest: 1653997039,
-    startBlock: 33000220,
   },
   {
     id: "beets-beefy-tale",
@@ -29797,7 +29011,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x50461Ad58C124B979174A0eaCfC7b4336503766B",
     lastHarvest: 1654075951,
-    startBlock: 32998642,
   },
   {
     id: "spirit-binspirit-spirit",
@@ -29837,7 +29050,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xBCB4c9107561a8c52b9C8f691C60e6A83C4499c3",
     lastHarvest: 1654076072,
-    startBlock: 29896857,
   },
   {
     id: "based-based-tomb",
@@ -29878,7 +29090,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6c716360C67daC182ff8f4404738ECD07e6892F9",
     lastHarvest: 1654078514,
-    startBlock: 32531842,
   },
   {
     id: "based-bshare-ftm",
@@ -29918,7 +29129,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4056BeF729b6c99277C5bd6dA7ED8A6974c3A386",
     lastHarvest: 1654078546,
-    startBlock: 32531842,
   },
   {
     id: "spirit-ftm-atlas",
@@ -29957,7 +29167,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4e8cB6D3B91FE48Df8060310CC9635De15E199c7",
     lastHarvest: 1653870728,
-    startBlock: 32432506,
   },
   {
     id: "spirit-ftm-bifi",
@@ -29996,7 +29205,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xcADC8887e232285D9d764F9f91D83383d624C193",
     lastHarvest: 1654077042,
-    startBlock: 32363790,
   },
   {
     id: "beets-statera-duet-eol",
@@ -30035,7 +29243,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x814703d5Eb7D6ecdDC039f78053ac69e4AdD7Aa5",
     lastHarvest: 1651664772,
-    startBlock: 32289007,
   },
   {
     id: "wigo-wigo-ftm",
@@ -30075,7 +29282,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x9cF294C67B388E28C1EE5bd75ffa319D83d22722",
     lastHarvest: 1654074825,
-    startBlock: 32089116,
   },
   {
     id: "wigo-usdc-wigo",
@@ -30115,7 +29321,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1125C7733b9468C9158D490E669d19610A09E6bA",
     lastHarvest: 1654078588,
-    startBlock: 32083167,
   },
   {
     id: "wigo-solid-wigo-eol",
@@ -30156,7 +29361,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6Ce8ea674BAE5B861e7665cAF93BAAC5069Bf4aC",
     lastHarvest: 1646868263,
-    startBlock: 32136930,
   },
   {
     id: "wigo-tomb-ftm-eol",
@@ -30198,7 +29402,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x329A6B7715e100fAeEC74e828f60B6E7D40BFeBC",
     lastHarvest: 1646699338,
-    startBlock: 31290512,
   },
   {
     id: "wigo-beets-ftm-eol",
@@ -30239,7 +29442,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xfc9AdA56D1Cd5B6D901A1F46825089430bb2c623",
     lastHarvest: 1646767964,
-    startBlock: 31298006,
   },
   {
     id: "wigo-geist-ftm-eol",
@@ -30280,7 +29482,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xaa19b48F35880706984886b7763890330a6C944c",
     lastHarvest: 1646646949,
-    startBlock: 31302428,
   },
   {
     id: "wigo-treeb-ftm",
@@ -30320,7 +29521,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x935983116Dd2088f4A323BA097aC68f6ec8759f3",
     lastHarvest: 1654057618,
-    startBlock: 31302305,
   },
   {
     id: "wigo-crv-ftm",
@@ -30360,7 +29560,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5a5af2FB4DADFAcEeb560ffD464e118c941a5eFf",
     lastHarvest: 1654042523,
-    startBlock: 32083167,
   },
   {
     id: "wigo-dai-ftm",
@@ -30400,7 +29599,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1F580683322C0E9B7111620030d88111E359aB4e",
     lastHarvest: 1653999599,
-    startBlock: 31302692,
   },
   {
     id: "wigo-usdc-ftm",
@@ -30440,7 +29638,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA31184D2031ddFf2C2000B29B31593e82bCDa60C",
     lastHarvest: 1654075692,
-    startBlock: 32083167,
   },
   {
     id: "wigo-fusdt-ftm-eol",
@@ -30481,7 +29678,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5508222678C5337e76D93A3005dC008056715655",
     lastHarvest: 1646408776,
-    startBlock: 32083167,
   },
   {
     id: "wigo-eth-ftm",
@@ -30521,7 +29717,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2814a0b84b6B8f4DE0a539952df9219b29cF683e",
     lastHarvest: 1654057072,
-    startBlock: 32083167,
   },
   {
     id: "wigo-eth-btc",
@@ -30561,7 +29756,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x21760a6C448E05FB3cCd0Ab805e58Ddfe5b02145",
     lastHarvest: 1654074903,
-    startBlock: 32083167,
   },
   {
     id: "wigo-usdc-dai",
@@ -30601,7 +29795,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x61E93C5019448eAf5Aa9fB13363a450ff83443f0",
     lastHarvest: 1654057446,
-    startBlock: 31298068,
   },
   {
     id: "wigo-usdc-fusdt",
@@ -30641,7 +29834,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5B84022fE2522969746C6c70A0379D03C5997716",
     lastHarvest: 1653810929,
-    startBlock: 31303450,
   },
   {
     id: "wigo-usdc-frax",
@@ -30681,7 +29873,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x86faf1830ff5f83504ad36b5773E4BcfBE2F022f",
     lastHarvest: 1654057448,
-    startBlock: 32083167,
   },
   {
     id: "boo-kae-wftm",
@@ -30721,7 +29912,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x620BAbf9A83CBF596D29a12f08d057ef35e995F1",
     lastHarvest: 1647106603,
-    startBlock: 32025668,
   },
   {
     id: "beets-beardhemian-brushsody-eol",
@@ -30761,7 +29951,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x72A6F8E2510B9332Eaf744FEb1F7c19E3aCB2201",
     lastHarvest: 1650263891,
-    startBlock: 30955564,
   },
   {
     id: "boo-ftm-multi",
@@ -30801,7 +29990,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7dC9B0220953f9d1E66506E795f443aE6d0f37dF",
     lastHarvest: 1653996314,
-    startBlock: 31174492,
   },
   {
     id: "spirit-usdc-dei",
@@ -30841,7 +30029,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x239C89335bd1A296622513b320142E4e39bf7E52",
     lastHarvest: 1654057734,
-    startBlock: 31158248,
   },
   {
     id: "spirit-ftm-deus",
@@ -30881,7 +30068,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x745118dF65873f6fdBF5E89EEB102785EB058203",
     lastHarvest: 1653853938,
-    startBlock: 31158248,
   },
   {
     id: "spirit-ftm-cre8r",
@@ -30921,7 +30107,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x07AD4d794074ed5490eBDa753B332482b3AA2f3A",
     lastHarvest: 1654061961,
-    startBlock: 31158248,
   },
   {
     id: "beets-treeb-me-bro-eol",
@@ -30960,7 +30145,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x47DC3506849024CC19daBA0e89e72FFeB8C334eE",
     lastHarvest: 1646900169,
-    startBlock: 30955564,
   },
   {
     id: "ripae-pftm-ftm",
@@ -31000,7 +30184,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xf0A4fC334F84D342d84BD73B4f9a74c89fdC7deE",
     lastHarvest: 1654078745,
-    startBlock: 30537404,
   },
   {
     id: "ripae-pae-ftm",
@@ -31040,7 +30223,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x57E7e4a9fB2F93288d0cb309339fE8Fe22Fb6c47",
     lastHarvest: 1654078531,
-    startBlock: 30537905,
   },
   {
     id: "boo-mst-wftm-eol",
@@ -31081,7 +30263,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xF86732c48f2681B286aa81BEAbb689AfB183C7f4",
     lastHarvest: 1650871179,
-    startBlock: 30909301,
   },
   {
     id: "sushi-yfi-eth-eol",
@@ -31121,7 +30302,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x38fca41486E78013A951812C137Cd4A0702B8701",
     lastHarvest: 1648843809,
-    startBlock: 30384359,
   },
   {
     id: "spirit-ftm-dai-eol",
@@ -31162,7 +30342,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x56274fEa6E3192fE650C405315dD275A4B4531f3",
     lastHarvest: 1652021862,
-    startBlock: 30376971,
   },
   {
     id: "spirit-ftm-wshec",
@@ -31202,7 +30381,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x341e7B8a5106A48Db164a11cD0490d4c8BB4DfE8",
     lastHarvest: 1653853197,
-    startBlock: 30373271,
   },
   {
     id: "spirit-ftm-multi-eol",
@@ -31243,7 +30421,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa7830E768ed668488201b7Cbf4CB9B2055B939FD",
     lastHarvest: 1652022356,
-    startBlock: 30374054,
   },
   {
     id: "sushi-wftm-link-eol",
@@ -31283,7 +30460,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xF6075D0815d2a540651127cBCDdC01b5AA20672c",
     lastHarvest: 1648843930,
-    startBlock: 29775385,
   },
   {
     id: "spirit-ftm-spell-eol",
@@ -31324,7 +30500,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xEde8c7fd0C39fF391DB449118CAfd958A394ff3d",
     lastHarvest: 1651983539,
-    startBlock: 30193169,
   },
   {
     id: "spirit-ftm-jewel",
@@ -31364,7 +30539,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xE4141CEF7f1eB1f395c23E3eB4Cf274b19295131",
     lastHarvest: 1653811397,
-    startBlock: 30194440,
   },
   {
     id: "spirit-ftm-pills-eol",
@@ -31405,7 +30579,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x51C0040803e3C74E1690E0567199c3B03b3FB8E2",
     lastHarvest: 1651983340,
-    startBlock: 30279523,
   },
   {
     id: "spirit-ftm-eth-eol",
@@ -31446,7 +30619,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x79Bad4e7FEa8E71783cA80AdA0edb4b1EedB7268",
     lastHarvest: 1652021811,
-    startBlock: 30280447,
   },
   {
     id: "boo-usdc-fs-eol",
@@ -31487,7 +30659,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xFDD5a06832742c8C066aD1D4c3bd476628297A6D",
     lastHarvest: 1651094383,
-    startBlock: 30308603,
   },
   {
     id: "boo-font-ftm-eol",
@@ -31527,7 +30698,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xB2AB7cB4ab00DF7582877f658ba2De3431130D27",
     lastHarvest: 1648843871,
-    startBlock: 30679193,
   },
   {
     id: "spirit-ftm-frax",
@@ -31567,7 +30737,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xbAedf8C3D38640fc33ee5bB93194025D534Aa456",
     lastHarvest: 1653853922,
-    startBlock: 30003615,
   },
   {
     id: "spirit-ftm-mai",
@@ -31607,7 +30776,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2a964E14676861766727Dbbd7C655C3294C9aa35",
     lastHarvest: 1654052400,
-    startBlock: 30008133,
   },
   {
     id: "spirit-ftm-gohm",
@@ -31647,7 +30815,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x600C500684aca1c5aFc9582B74bb96c8E737C17e",
     lastHarvest: 1654052995,
-    startBlock: 30015998,
   },
   {
     id: "2omb-2omb-2share-eol",
@@ -31688,7 +30855,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2F02Fe612a9A723bC82842874A53e32E3a0F33f1",
     lastHarvest: 1649423296,
-    startBlock: 30011913,
   },
   {
     id: "spirit-ftm-spirit",
@@ -31728,7 +30894,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x10bcb7145c08F04aA7cCa356FAEE0A5ac3cCa860",
     lastHarvest: 1653811547,
-    startBlock: 29714726,
   },
   {
     id: "beets-demeters-degree-eol",
@@ -31767,7 +30932,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xe3F9B82d899a0f74a8693619BE03413De373c05f",
     lastHarvest: 1650927477,
-    startBlock: 29830704,
   },
   {
     id: "0xdao-xscream-eol",
@@ -31808,7 +30972,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x20273eB6D8ff3eE270E353dce599b453526B3E16",
     lastHarvest: 1644798283,
-    startBlock: 29558347,
   },
   {
     id: "0xdao-xboo-eol",
@@ -31849,7 +31012,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1Ce9640991f793800C5d278d105fd947E6D4C577",
     lastHarvest: 1644795543,
-    startBlock: 28990096,
   },
   {
     id: "scream-ftm",
@@ -31886,7 +31048,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6d8CA0589702F30cED94C0D5c5d33b9e40D05C31",
     lastHarvest: 0,
-    startBlock: 14382811,
   },
   {
     id: "0xdao-oxd-eol",
@@ -31926,7 +31087,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3DA796c4F3A1124E94AE5940731f260A9557763a",
     lastHarvest: 1644795243,
-    startBlock: 28995027,
   },
   {
     id: "sushi-usdc-wftm",
@@ -31966,7 +31126,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xB17857c6c382680140Eb4EB1aAC4EB1184987D47",
     lastHarvest: 1653726306,
-    startBlock: 28822837,
   },
   {
     id: "sushi-wftm-eth",
@@ -32006,7 +31165,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xec10AaC4A445d28Eebd50F908cfc69816C8E9d7d",
     lastHarvest: 1653728375,
-    startBlock: 28823673,
   },
   {
     id: "sushi-fusdt-wftm",
@@ -32046,7 +31204,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xafD558197FE33AAd1D653cc57B712d9A97752084",
     lastHarvest: 1653712329,
-    startBlock: 28824433,
   },
   {
     id: "sushi-eth-dai",
@@ -32086,7 +31243,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6ffFA724b231610e6C99b3F41b26c4aBF94F05F8",
     lastHarvest: 1653702207,
-    startBlock: 28824923,
   },
   {
     id: "sushi-usdc-mim",
@@ -32126,7 +31282,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x67E7cC5405429D9D7b468c836989B849b5D66543",
     lastHarvest: 1653714653,
-    startBlock: 28825117,
   },
   {
     id: "sushi-btc-eth",
@@ -32166,7 +31321,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa5F6387fB58AC5268F130bFc2d0A5e53343fB798",
     lastHarvest: 1653690536,
-    startBlock: 28825289,
   },
   {
     id: "sushi-wftm-sushi",
@@ -32206,7 +31360,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xC67c5F7F4aAA34E3e94051e22Fce83C455a2562C",
     lastHarvest: 1653684780,
-    startBlock: 28826030,
   },
   {
     id: "0xdao-wftm-eol",
@@ -32244,7 +31397,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xe7B675CC0B240857fCD8b8Fcc7B17cBF31444eF5",
     lastHarvest: 1645371685,
-    startBlock: 28759532,
   },
   {
     id: "0xdao-usdc-eol",
@@ -32284,7 +31436,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x65322319417991B8bcb6befc8dF0d5b84a4c31a5",
     lastHarvest: 1643099723,
-    startBlock: 28748317,
   },
   {
     id: "0xdao-dai-eol",
@@ -32324,7 +31475,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x726b227A8dEA2dbDF790c59c932eBfE408Cc44D2",
     lastHarvest: 1643099775,
-    startBlock: 28748607,
   },
   {
     id: "0xdao-mim-eol",
@@ -32364,7 +31514,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xb1aA61aBb55480d010FB96584C3dB8006ec9Ef34",
     lastHarvest: 1643099918,
-    startBlock: 28752060,
   },
   {
     id: "0xdao-tomb-eol",
@@ -32404,7 +31553,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x48523832Cef18F78161dD59066c6A0200e95538B",
     lastHarvest: 1644795565,
-    startBlock: 28736265,
   },
   {
     id: "0xdao-wbtc-eol",
@@ -32444,7 +31592,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xe82acC86fF20c28e1965be8Ff37E2e88e72a1aFB",
     lastHarvest: 1643100768,
-    startBlock: 28746049,
   },
   {
     id: "0xdao-weth-eol",
@@ -32484,7 +31631,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa3bD813824b5e4AF5C30812366B88F2681B1cc36",
     lastHarvest: 1643099517,
-    startBlock: 28731719,
   },
   {
     id: "oxd-oxd-usdc-eol",
@@ -32525,7 +31671,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xD21026fF33908789cB98652ccC56fe6789fcb9Cd",
     lastHarvest: 1644795626,
-    startBlock: 28681529,
   },
   {
     id: "beets-spooky-tempered-clavier-eol",
@@ -32565,7 +31710,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x89c39450B30188BBbFd53b0e3e3BB332d0171353",
     lastHarvest: 1649490623,
-    startBlock: 28553673,
   },
   {
     id: "boo-btc-eth",
@@ -32605,7 +31749,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7f32C0b25f565E4e9F9e6Ec78108775C9b9db298",
     lastHarvest: 1654067814,
-    startBlock: 28531886,
   },
   {
     id: "boo-wftm-beets",
@@ -32645,7 +31788,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x75508947376118D6Ab20dba8316A852ce2543D77",
     lastHarvest: 1654057262,
-    startBlock: 28485987,
   },
   {
     id: "spirit-fusdt-usdc",
@@ -32685,7 +31827,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xf2e24273821835D177eB7A6C222c5AfE5de38e87",
     lastHarvest: 1654078540,
-    startBlock: 28397112,
   },
   {
     id: "spirit-frax-usdc",
@@ -32726,7 +31867,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5ef24da9a51a577FE17a9385Ca9206A7266161B0",
     lastHarvest: 1654077304,
-    startBlock: 28399697,
   },
   {
     id: "spirit-mim-usdc",
@@ -32766,7 +31906,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA7Ba5D21CE2E9F002fa0348aA71f228a8974273B",
     lastHarvest: 1654057818,
-    startBlock: 28399940,
   },
   {
     id: "2omb-2omb-ftm-eol",
@@ -32807,7 +31946,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3b5a1eAbDAeC99cb6abceB8740876D9dCAD048d5",
     lastHarvest: 1649145506,
-    startBlock: 27919151,
   },
   {
     id: "2omb-2share-ftm-eol",
@@ -32848,7 +31986,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xD586d0125590F3390Fde37DcD123f84913b20cC1",
     lastHarvest: 1649167647,
-    startBlock: 27921088,
   },
   {
     id: "boo-wftm-brush",
@@ -32888,7 +32025,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8dD82D887a5B0C970F42bE8691203ABa22F832A3",
     lastHarvest: 1654057408,
-    startBlock: 28084362,
   },
   {
     id: "boo-kek-ftm-eol",
@@ -32929,7 +32065,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5D2E7cF86b374506A9d65370F5f0D94271bb2979",
     lastHarvest: 1652030442,
-    startBlock: 27906587,
   },
   {
     id: "boo-inv-wftm-eol",
@@ -32970,7 +32105,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xb47C95d1E5Fe7e50dd68d76f7214f43F337B0Deb",
     lastHarvest: 1644884483,
-    startBlock: 27857505,
   },
   {
     id: "beets-steady-beets-2",
@@ -33008,7 +32142,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8a1F4b25556AB28FD0529A53Ed7b3f10caCB0b98",
     lastHarvest: 1654042492,
-    startBlock: 27732540,
   },
   {
     id: "beets-two-became-one",
@@ -33047,7 +32180,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2C48732c190eea8df5515B6EcCC9E112929303BD",
     lastHarvest: 1652968981,
-    startBlock: 27092277,
   },
   {
     id: "beets-dante-symphony",
@@ -33086,7 +32218,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x53bCc69Ef22deA7c65af915D117586A2481adFa5",
     lastHarvest: 1653810828,
-    startBlock: 27739510,
   },
   {
     id: "beets-ode-to-joy-eol",
@@ -33125,7 +32256,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x37020a164ebdc68D73abaAC98Fc12F5FB4C611c1",
     lastHarvest: 1643215388,
-    startBlock: 27741143,
   },
   {
     id: "beets-wagmi-index-eol",
@@ -33165,7 +32295,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xF462051dA59cFbB3b55a5b3375002C85c20a8A22",
     lastHarvest: 1644373249,
-    startBlock: 27743925,
   },
   {
     id: "boo-hnd-wftm-eol",
@@ -33206,7 +32335,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xF665527AfD5e7156cd1b7eF922FfDF8983508fdB",
     lastHarvest: 1648299929,
-    startBlock: 27275579,
   },
   {
     id: "spartacadabra-lambda-crv-eol",
@@ -33245,7 +32373,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x350119De8e903d5667a702d9345fa7EEDCE67393",
     lastHarvest: 1652022205,
-    startBlock: 27249180,
   },
   {
     id: "spartacadabra-charm-usdc-eol",
@@ -33286,7 +32413,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1b59e6A4286E2ac2663459a7A641052B1A13FD2D",
     lastHarvest: 1652021863,
-    startBlock: 27251097,
   },
   {
     id: "beets-guqin-qi-2",
@@ -33325,7 +32451,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa623c28f64A429baE0426Aa8AEbE64d307A38cC0",
     lastHarvest: 1654075506,
-    startBlock: 20283162,
   },
   {
     id: "boo-wftm-matic",
@@ -33365,7 +32490,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xfE1683FD5cE7f27314Fc00B17FD648E055402ee9",
     lastHarvest: 1654067789,
-    startBlock: 26597884,
   },
   {
     id: "popsicle-ice-ftm",
@@ -33405,7 +32529,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8Bd61713C6417BA30E335ADFffC18068AB72a510",
     lastHarvest: 1654053080,
-    startBlock: 26371856,
   },
   {
     id: "beets-variation-theme-eol",
@@ -33445,7 +32568,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0B8caAc3898E28165Ba8fBB34f558b5464e0cf76",
     lastHarvest: 1650989623,
-    startBlock: 26215200,
   },
   {
     id: "scream-spell",
@@ -33486,7 +32608,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xe880e3705db6B13ca1DE77901d2D3a2dCC9a89B2",
     lastHarvest: 1652154252,
-    startBlock: 26236175,
   },
   {
     id: "spirit-dai-usdc",
@@ -33526,7 +32647,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xBDFeDfCCc2729C114fe7F3E97e18E173E3cb526F",
     lastHarvest: 1654069493,
-    startBlock: 25588844,
   },
   {
     id: "spirit-yfi-ftm-eol",
@@ -33567,7 +32687,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2f8983663ebc66236Eea075f75527698595a9626",
     lastHarvest: 1642179750,
-    startBlock: 25947181,
   },
   {
     id: "geist-mim",
@@ -33606,7 +32725,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2910BC3AB8835d0B94dfCa46Ee4556216540f3DA",
     lastHarvest: 1653870736,
-    startBlock: 25611891,
   },
   {
     id: "beets-battle-bands-eol",
@@ -33646,7 +32764,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xD6cdE9d8f8Ca97eB362A1103cd143dC8BA602CAc",
     lastHarvest: 1652471911,
-    startBlock: 25530380,
   },
   {
     id: "geist-crv",
@@ -33685,7 +32802,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x01873b6e4CEdA2A752FEadA7B370A372840bA2cd",
     lastHarvest: 1653921594,
-    startBlock: 25218662,
   },
   {
     id: "boo-wftm-avax",
@@ -33725,7 +32841,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x44baEbEB626f1aD048F0c15e84BB24196f214c23",
     lastHarvest: 1654053945,
-    startBlock: 25424467,
   },
   {
     id: "boo-wftm-woo",
@@ -33765,7 +32880,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7e4b8AFE26a20fb93561C811F1121bc1210bDe37",
     lastHarvest: 1654037381,
-    startBlock: 25424593,
   },
   {
     id: "boo-wftm-ooe",
@@ -33805,7 +32919,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x34834D9179c2E7012d3C36485ed4f3Cd5101cfFc",
     lastHarvest: 1651070071,
-    startBlock: 24867830,
   },
   {
     id: "boo-wftm-wshec",
@@ -33845,7 +32958,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x999F5390108B211AEA6A29fc556f6D0F0E56C3f3",
     lastHarvest: 1653966753,
-    startBlock: 24867692,
   },
   {
     id: "boo-wftm-wsspa-eol",
@@ -33886,7 +32998,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xc234E183A152A163235Fd3895D78c66D2099C4AA",
     lastHarvest: 1644549923,
-    startBlock: 24867513,
   },
   {
     id: "boo-wftm-yoshi",
@@ -33926,7 +33037,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xeB3c00fe42e2518293719e3fB0041BCEc98a25D0",
     lastHarvest: 1653853275,
-    startBlock: 24867383,
   },
   {
     id: "beets-double-dollar-fugue-eol",
@@ -33966,7 +33076,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x9FE2921Fe00E48B88bdE16102627E750924b96bb",
     lastHarvest: 1650912871,
-    startBlock: 23877054,
   },
   {
     id: "beets-solana-sonata",
@@ -34005,7 +33114,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xFbe1d176888798A51FAe70a06ABeb84C81FC16bD",
     lastHarvest: 1654073238,
-    startBlock: 23500140,
   },
   {
     id: "scream-tusd",
@@ -34046,7 +33154,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x15B43B012f0e2fceC064d3D4330a937504Fbc571",
     lastHarvest: 1653308943,
-    startBlock: 23124358,
   },
   {
     id: "beets-phantom-dai-opera-eol",
@@ -34085,7 +33192,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xEc72A27121a5B639550bf096369D99f39de0A8b4",
     lastHarvest: 1651276692,
-    startBlock: 22934793,
   },
   {
     id: "boo-usdc-tusd",
@@ -34125,7 +33231,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x97A3d559d62E8668e1b4644C2A6F4E4147898552",
     lastHarvest: 1654057428,
-    startBlock: 22882976,
   },
   {
     id: "boo-wftm-joe",
@@ -34165,7 +33270,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6259f854125a6af8E6cfC2f9c5BF5a6BdD24B3A5",
     lastHarvest: 1651082054,
-    startBlock: 22802784,
   },
   {
     id: "spirit-spell-sspell-eol",
@@ -34206,7 +33310,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xDb16Ad11a58111D8875eB179B19BBad17Dc69c07",
     lastHarvest: 1643071159,
-    startBlock: 22349904,
   },
   {
     id: "beets-baron-von-binance",
@@ -34245,7 +33348,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xBA324B52F9C270DED056c214B198783F387c6503",
     lastHarvest: 1654042372,
-    startBlock: 22397428,
   },
   {
     id: "boo-usdc-mai",
@@ -34285,7 +33387,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xeFb235A125193b25F7989E5E564CF276375fA74d",
     lastHarvest: 1654074748,
-    startBlock: 21876271,
   },
   {
     id: "geist-ftm",
@@ -34322,7 +33423,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x212a9507CE6D0aC42990Bf42Db14d922a2A6bEed",
     lastHarvest: 1653957149,
-    startBlock: 21144587,
   },
   {
     id: "geist-wbtc",
@@ -34361,7 +33461,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa6B1D1a9BA26874199CBCecb3382011Ac23890b9",
     lastHarvest: 1653957166,
-    startBlock: 21140698,
   },
   {
     id: "geist-eth",
@@ -34400,7 +33499,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x739c33C453f6449810B2997a320E5Ea0B79Fa438",
     lastHarvest: 1653957179,
-    startBlock: 21134019,
   },
   {
     id: "geist-fusdt-eol",
@@ -34440,7 +33538,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xcbe4F4342c8DEBf2908aD26f04C02A9e9dCa3c02",
     lastHarvest: 1651019544,
-    startBlock: 21136669,
   },
   {
     id: "geist-usdc",
@@ -34479,7 +33576,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5a712EF5cF210B97eA20e54849409CB527D5f968",
     lastHarvest: 1653957194,
-    startBlock: 21157294,
   },
   {
     id: "geist-dai-eol",
@@ -34519,7 +33615,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1f533AD4232F52dA09CBDC3778DF8404A010A7Db",
     lastHarvest: 1645083824,
-    startBlock: 21127854,
   },
   {
     id: "beets-song-ice-fire",
@@ -34558,7 +33653,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0410d614BCD5A1dD8614C8F0a7D508A2D3aFd110",
     lastHarvest: 1654068019,
-    startBlock: 21034406,
   },
   {
     id: "beets-tubular-bells",
@@ -34597,7 +33691,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0cC32B91B165d25a3CB2906D636883d306a8F1dd",
     lastHarvest: 1654013193,
-    startBlock: 21032998,
   },
   {
     id: "beets-late-quartet",
@@ -34636,7 +33729,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x00f23196eA5a1a94d24a56402DC12e043A0A0Cc0",
     lastHarvest: 1654063653,
-    startBlock: 20667603,
   },
   {
     id: "boo-wftm-dola-eol",
@@ -34677,7 +33769,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xB2aC5329D7D78Cb208964C566c35f0eF8C6572f6",
     lastHarvest: 1648261545,
-    startBlock: 20342375,
   },
   {
     id: "scream-dola",
@@ -34716,7 +33807,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x12F1A8C91Ffdb0aF421b703A75b8E9f57ADDF0b9",
     lastHarvest: 1652441373,
-    startBlock: 20387174,
   },
   {
     id: "beets-fantom-conservatory",
@@ -34755,7 +33845,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xd88c449c1F68480316f3e3A48bD37186e58217A8",
     lastHarvest: 1654011957,
-    startBlock: 20290261,
   },
   {
     id: "summit-summit-eol",
@@ -34795,7 +33884,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4C315EeE595071584D79BD7d3E5e1388DB066104",
     lastHarvest: 1644736849,
-    startBlock: 20252460,
   },
   {
     id: "summit-summit-ftm-eol",
@@ -34836,7 +33924,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x79eD0206F9849d0bd109e566B4995aFd65222B8e",
     lastHarvest: 1645036994,
-    startBlock: 20254968,
   },
   {
     id: "beets-sound-of-moosic",
@@ -34875,7 +33962,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x50A80d9BF5960a5d10891FCe5A937662b3EfBDC1",
     lastHarvest: 1653853483,
-    startBlock: 19774053,
   },
   {
     id: "pearzap-fpear-ftm-eol",
@@ -34915,7 +34001,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xeaE2Db34817C3658ae5f2F4A6106Db3d88C36cA2",
     lastHarvest: 1639684623,
-    startBlock: 19740203,
   },
   {
     id: "pearzap-fpear-usdc-eol",
@@ -34955,7 +34040,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0A54B1e0A7873818b5EcFa72112ebC6A049EAC37",
     lastHarvest: 1639684626,
-    startBlock: 19740491,
   },
   {
     id: "beets-ftm-sonata-eol",
@@ -34995,7 +34079,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x421098D70348C98A5e3E26A89F7468D0a443cec6",
     lastHarvest: 1645744308,
-    startBlock: 19769474,
   },
   {
     id: "beets-dance-of-degens-eol",
@@ -35035,7 +34118,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3c68a70C4ab49522Aac5d7e138e431983a0D025a",
     lastHarvest: 1635527167,
-    startBlock: 19772271,
   },
   {
     id: "beets-magic-touch-daniele-eol",
@@ -35075,7 +34157,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1B1F7fc5B17c450655BB46cb351b7010d2b12a2e",
     lastHarvest: 1644397438,
-    startBlock: 19773474,
   },
   {
     id: "beets-classic-trio-eol",
@@ -35115,7 +34196,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x458dfE38ea064FA624fC4B736EC00294591d1de9",
     lastHarvest: 1650005893,
-    startBlock: 19761631,
   },
   {
     id: "beets-e-major",
@@ -35153,7 +34233,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x38c5DF15117c195B8736F3a5fbEfC1b3A2082880",
     lastHarvest: 1654048835,
-    startBlock: 19763970,
   },
   {
     id: "beets-b-major",
@@ -35191,7 +34270,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x9efD024ab9bBd5C3ce17e567040A8EF1ecd55e26",
     lastHarvest: 1654001879,
-    startBlock: 19767149,
   },
   {
     id: "beets-ziggy-mim",
@@ -35230,7 +34308,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x054a8e3c11268591E048F7206937C8b74b6B7b97",
     lastHarvest: 1653853664,
-    startBlock: 19768320,
   },
   {
     id: "beets-fidelio-duetto",
@@ -35268,7 +34345,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1fca24C62367654B8aC79a5045A9A10F21726A67",
     lastHarvest: 1654074980,
-    startBlock: 19665531,
   },
   {
     id: "beets-symphony-nr-10-eol",
@@ -35307,7 +34383,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x69Ee6efa98D8053cD75DFb21880B5a684c4F69a6",
     lastHarvest: 1640165417,
-    startBlock: 19668023,
   },
   {
     id: "beets-grand-orchestra",
@@ -35346,7 +34421,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0A6bC5F2650E03C00D8c8D8Ef61991c780174468",
     lastHarvest: 1654067897,
-    startBlock: 19595392,
   },
   {
     id: "beets-fantom-of-opera",
@@ -35384,7 +34458,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7A2303aB59536E6e80cF6Bd8f6EDb4A9fc712156",
     lastHarvest: 1654074883,
-    startBlock: 19661207,
   },
   {
     id: "beets-steady-beets-eol",
@@ -35423,7 +34496,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x133fBAc050138f7A0e3Ef8C60FdDfeaEd174e39e",
     lastHarvest: 1641971963,
-    startBlock: 19662723,
   },
   {
     id: "scream-frax",
@@ -35461,7 +34533,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7434583cdf49E56206193908F599aA62177a1497",
     lastHarvest: 1652432587,
-    startBlock: 19356862,
   },
   {
     id: "scream-mim",
@@ -35500,7 +34571,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xc1A77cE3707d19b5aa6D62438bF7BD86078E1146",
     lastHarvest: 1652073689,
-    startBlock: 19310947,
   },
   {
     id: "spirit-wmemo-mim",
@@ -35540,7 +34610,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xC62A7f0a2994E727B665225653e2C248B945476e",
     lastHarvest: 1654059763,
-    startBlock: 19168495,
   },
   {
     id: "spell-ftm-mim-crv",
@@ -35578,7 +34647,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xb49bD30Ba7533C597D700843Ca385Ac1Dca1e876",
     lastHarvest: 1654074567,
-    startBlock: 18760753,
   },
   {
     id: "geist-geist-ftm",
@@ -35618,7 +34686,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x39262E38b93982Ce551582753cF3780e8870c812",
     lastHarvest: 1654069887,
-    startBlock: 18516168,
   },
   {
     id: "boo-wftm-spell",
@@ -35658,7 +34725,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x31F5eec2719eAc3A61a8B76ed9ceFF13437BE65a",
     lastHarvest: 1654037892,
-    startBlock: 18986268,
   },
   {
     id: "spirit-link-ftm-eol",
@@ -35699,7 +34765,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xC0907E0e29f6576E864492D6ec12716dc1d21A87",
     lastHarvest: 1642534310,
-    startBlock: 18272327,
   },
   {
     id: "spirit-any-ftm-eol",
@@ -35740,7 +34805,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x61897e8D22651341D12632a244d5F4f7718b98c7",
     lastHarvest: 1642044223,
-    startBlock: 18272639,
   },
   {
     id: "curve-ftm-tricrypto",
@@ -35778,7 +34842,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6e4C6bFCedb2fe4A30Da61A7C5076F41b489fe48",
     lastHarvest: 1654076796,
-    startBlock: 38330691,
   },
   {
     id: "sing-ftm-usdc-sing-eol",
@@ -35819,7 +34882,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1A10a5B868CBb1aCA7e393423c8D0fC1f1683A33",
     lastHarvest: 1652021325,
-    startBlock: 18984867,
   },
   {
     id: "spirit-ftm-usdc",
@@ -35859,7 +34921,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xdcb989e3537cDdC075A17f94ff24E338678FC4d6",
     lastHarvest: 1654048672,
-    startBlock: 18140091,
   },
   {
     id: "spirit-fusdt-ftm-eol",
@@ -35900,7 +34961,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x883171A2DE2e70355017662cd06720946a7fF38D",
     lastHarvest: 1642743762,
-    startBlock: 18141379,
   },
   {
     id: "spirit-ftm-mim-eol",
@@ -35940,7 +35000,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x05C8eD17BD03965a5A773fD6E97a796993eb4679",
     lastHarvest: 1644250225,
-    startBlock: 18142954,
   },
   {
     id: "spirit-crv-ftm",
@@ -35980,7 +35039,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x40726C4A019f356904191829BDC0a02E77F30686",
     lastHarvest: 1654049745,
-    startBlock: 18154857,
   },
   {
     id: "spirit-zoo-ftm-eol",
@@ -36020,7 +35078,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x9D9d1E36ce80E16E56182fcfD42044eB232cED84",
     lastHarvest: 1642045783,
-    startBlock: 18161352,
   },
   {
     id: "spirit-ftm-ice-eol",
@@ -36061,7 +35118,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xDD456D6fc0e42bF41Be76fB0f84f39d93CA187b5",
     lastHarvest: 1644169981,
-    startBlock: 18160728,
   },
   {
     id: "jetswap-fantom-eth-btc-eol",
@@ -36099,7 +35155,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3BaD499212125Db1e8199C24Fc55492CA5496d55",
     lastHarvest: 1652022179,
-    startBlock: 17974486,
   },
   {
     id: "jetswap-fantom-eth-usdc-eol",
@@ -36137,7 +35192,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xb52baF0FF3312b3b786fB14fF5DEE3559CE1A955",
     lastHarvest: 1652030426,
-    startBlock: 17974686,
   },
   {
     id: "jetswap-fantom-btc-usdc",
@@ -36174,7 +35228,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0D9d59F1BB5e52dE04f66c7C228c47C3836BA1e7",
     lastHarvest: 1653738994,
-    startBlock: 17974773,
   },
   {
     id: "jetswap-fantom-fwings-ftm-eol",
@@ -36214,7 +35267,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xc3ab8928b6B53d91183d80f2713f47caB047ee4B",
     lastHarvest: 1653731979,
-    startBlock: 17917991,
   },
   {
     id: "jetswap-fantom-fwings-usdc-eol",
@@ -36254,7 +35306,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6677c03B2c7Da09dfbD869daeec3ccFd4eCC4B5F",
     lastHarvest: 1653812978,
-    startBlock: 17918212,
   },
   {
     id: "jetswap-fantom-fwings-eol",
@@ -36294,7 +35345,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x184DC721a1C1D594E17161Ff5310cF42025dA798",
     lastHarvest: 1653780777,
-    startBlock: 17921861,
   },
   {
     id: "tomb-tshare-ftm-eol",
@@ -36335,7 +35385,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x6719022AdAD7051e86fd0E8758535f8A4F98b82F",
     lastHarvest: 0,
-    startBlock: 9659816,
   },
   {
     id: "tomb-tomb-ftm",
@@ -36375,7 +35424,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4b5f7De737531673B23ceB43D45ea3f1297e4C6d",
     lastHarvest: 0,
-    startBlock: 9657622,
   },
   {
     id: "spirit-ftm-just-eol",
@@ -36416,7 +35464,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xE72201bfca2035fD90139B2f500a678d3D112C90",
     lastHarvest: 1642178135,
-    startBlock: 18277287,
   },
   {
     id: "spirit-ftm-sushi-eol",
@@ -36457,7 +35504,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1b4b6fC90DF3D2ca267020B4aA81f6b52e784751",
     lastHarvest: 1642178138,
-    startBlock: 18271828,
   },
   {
     id: "spirit-fusdt-spell-eol",
@@ -36498,7 +35544,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xc5122cACbb46358f85D7B2c52e74ab133265674C",
     lastHarvest: 1642178141,
-    startBlock: 18277900,
   },
   {
     id: "boo-wftm-shade-eol",
@@ -36539,7 +35584,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xC0E74E2929BFa1233803e05CcADc8fE3ee03E019",
     lastHarvest: 1636786149,
-    startBlock: 17193868,
   },
   {
     id: "boo-wftm-treeb",
@@ -36579,7 +35623,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA58f0953261EcB55A128F721841416717B327833",
     lastHarvest: 1654053943,
-    startBlock: 17193679,
   },
   {
     id: "scream-crv",
@@ -36618,7 +35661,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xA1CFCE884357EF0dFBaED4265299c950c058Ce4c",
     lastHarvest: 0,
-    startBlock: 17097823,
   },
   {
     id: "scream-link",
@@ -36657,7 +35699,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3E25CcCD4aC11d4F417b992285188714E80BAE8C",
     lastHarvest: 0,
-    startBlock: 17097183,
   },
   {
     id: "boo-boo",
@@ -36696,7 +35737,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x13b42b5Ff8533540e28FA1F20e1ce7766D6d26bb",
     lastHarvest: 1654073937,
-    startBlock: 6388172,
   },
   {
     id: "stakesteak-fusd-usdc-eol",
@@ -36737,7 +35777,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x72cE4D7bB0fDeC6c973232E2DE97B48F857c132d",
     lastHarvest: 1633338697,
-    startBlock: 16882630,
   },
   {
     id: "boo-steak-wftm-eol",
@@ -36778,7 +35817,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x37f9eA01FB0979E001591464Ab6eef3759106470",
     lastHarvest: 1633340779,
-    startBlock: 16629492,
   },
   {
     id: "boo-wftm-foo-eol",
@@ -36819,7 +35857,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8B5EE04919C22c7eb5B650f1B699ebd4fc1653C8",
     lastHarvest: 1647736301,
-    startBlock: 16628058,
   },
   {
     id: "boo-ftm-scream-eol",
@@ -36859,7 +35896,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x15373a95f420D44d17A1C98e4F23cC4FEe9FE8E8",
     lastHarvest: 1653808792,
-    startBlock: 15922300,
   },
   {
     id: "boo-zoo-ftm-eol",
@@ -36899,7 +35935,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x5591E68aD3843B2a8B840C7d83389CB4d2C12f88",
     lastHarvest: 1639888633,
-    startBlock: 15821363,
   },
   {
     id: "steakhouse-scream-ftm",
@@ -36940,7 +35975,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xaD9b17cBD600980F95F4dd6DEB180aDF401AFc6d",
     lastHarvest: 0,
-    startBlock: 14520022,
   },
   {
     id: "scream-usdc",
@@ -36979,7 +36013,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xC34be9A93a3De0256BBf16141591D11b91b249EB",
     lastHarvest: 0,
-    startBlock: 14281888,
   },
   {
     id: "scream-wbtc",
@@ -37018,7 +36051,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x4374207377C1A36e386A757B774D53a0B6Ff2cEE",
     lastHarvest: 0,
-    startBlock: 14388038,
   },
   {
     id: "scream-dai",
@@ -37057,7 +36089,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x96d66427C18e12Ec77B5bC195c9Bf1D6d01B204a",
     lastHarvest: 0,
-    startBlock: 14387803,
   },
   {
     id: "scream-eth",
@@ -37096,7 +36127,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x328bDD271F8987037D935d87cd36d8AcE58dBD34",
     lastHarvest: 0,
-    startBlock: 14387908,
   },
   {
     id: "scream-fusdt",
@@ -37135,7 +36165,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x044eb51f376A6C8D172ce6C279529a60a2185894",
     lastHarvest: 0,
-    startBlock: 14387693,
   },
   {
     id: "boo-yfi-eth",
@@ -37174,7 +36203,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x490701fb9DCC30B89734F934120B24Dd90317BB7",
     lastHarvest: 0,
-    startBlock: 13847536,
   },
   {
     id: "curve-ftm-2pool",
@@ -37212,7 +36240,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1d23ecC0645B07791b7D99349e253ECEbe43f614",
     lastHarvest: 0,
-    startBlock: 12673023,
   },
   {
     id: "curve-ftm-fusdt-eol",
@@ -37251,7 +36278,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xDcdb088f53dBcC63f600299867F8b6eE6BC7a6cE",
     lastHarvest: 0,
-    startBlock: 12678448,
   },
   {
     id: "curve-ftm-ren",
@@ -37289,7 +36315,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x40484C1782FEca9215100773d4723428FeaBF27e",
     lastHarvest: 1654044360,
-    startBlock: 38330691,
   },
   {
     id: "boo-mim-ftm",
@@ -37328,7 +36353,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x567FF0A6067C9021DBd50D09bA747F78aEfAB9c2",
     lastHarvest: 0,
-    startBlock: 11532305,
   },
   {
     id: "boo-boo-ftm",
@@ -37367,7 +36391,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x98d3913474fccEDeB63077237914be00202fB007",
     lastHarvest: 0,
-    startBlock: 5541638,
   },
   {
     id: "boo-bifi-ftm",
@@ -37406,7 +36429,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xD5ff0aCA943C918EEE069b1E80Ee0D9d016b2F98",
     lastHarvest: 0,
-    startBlock: 8531533,
   },
   {
     id: "boo-ftm-ice",
@@ -37445,7 +36467,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8F35521cf1B9145E2C5231B8B3E1c3AEadDc4027",
     lastHarvest: 0,
-    startBlock: 8352986,
   },
   {
     id: "boo-ftm-sushi",
@@ -37484,7 +36505,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3C180c415332999Fa7e5a65E8490A57fe8Fd7fdb",
     lastHarvest: 0,
-    startBlock: 8354364,
   },
   {
     id: "boo-ftm-usdc",
@@ -37523,7 +36543,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xf5d76A33953365e4f074AE58e34C39A52B8E9671",
     lastHarvest: 0,
-    startBlock: 5541602,
   },
   {
     id: "boo-any-ftm",
@@ -37562,7 +36581,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8EA5Da4115150219cC73e2Df2d8aBc533a39A50C",
     lastHarvest: 0,
-    startBlock: 7877273,
   },
   {
     id: "boo-dai-ftm",
@@ -37601,7 +36619,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x2cC364255206A7e14bF59ADB1fc5770DbA48CB3f",
     lastHarvest: 0,
-    startBlock: 7877317,
   },
   {
     id: "ester-est-ftm-eol",
@@ -37641,7 +36658,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7bA322C00372037De54797B0449a4157CaB81BB4",
     lastHarvest: 0,
-    startBlock: 7029407,
   },
   {
     id: "ester-est-eol",
@@ -37680,7 +36696,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xBceD1CF7259e8fc7BF34F55F05aF88d78bd91FEC",
     lastHarvest: 0,
-    startBlock: 7032507,
   },
   {
     id: "boo-woofy-ftm-eol",
@@ -37720,7 +36735,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x0BF58A328C7739D8b097B1d4199f48AA3F1b2788",
     lastHarvest: 0,
-    startBlock: 6726155,
   },
   {
     id: "boo-bnb-ftm",
@@ -37759,7 +36773,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x9D55cAEE108aBdd4C47E42088C97ecA43510E969",
     lastHarvest: 0,
-    startBlock: 6280720,
   },
   {
     id: "froyo-3pool-eol",
@@ -37797,7 +36810,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x15fd34559B0508F4C8504aC4c1122b4AD35d2660",
     lastHarvest: 0,
-    startBlock: 5892393,
   },
   {
     id: "froyo-froyo-ftm-eol",
@@ -37837,7 +36849,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x3C9C884eFAB85c44D675039de227b3Dd275c360e",
     lastHarvest: 0,
-    startBlock: 5881949,
   },
   {
     id: "boo-link-ftm",
@@ -37876,7 +36887,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xa1Dfd44c90B7cE937FC450Fe19B691e72EE3a7D2",
     lastHarvest: 0,
-    startBlock: 5703361,
   },
   {
     id: "boo-cover-ftm-eol",
@@ -37907,7 +36917,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xCCcEBC4551FF20acA4e0356DAD8875806CE8df10",
     lastHarvest: 0,
-    startBlock: 5703322,
   },
   {
     id: "boo-snx-ftm-eol",
@@ -37947,7 +36956,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xF47B1d1b23621dbc519033399C9fFf25B7fBFA2A",
     lastHarvest: 0,
-    startBlock: 5703267,
   },
   {
     id: "boo-usdt-ftm",
@@ -37986,7 +36994,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x8F769621E63acE71132987Ec4DB14cc3d06AA684",
     lastHarvest: 0,
-    startBlock: 5702954,
   },
   {
     id: "boo-btc-ftm",
@@ -38025,7 +37032,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x1433c4a55449c8B96cf5Ac0cF395cBd8dc8e5f60",
     lastHarvest: 0,
-    startBlock: 5702912,
   },
   {
     id: "boo-eth-ftm",
@@ -38064,7 +37070,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x7c7B7FbccA5699175003ecbe1B41E79F40385469",
     lastHarvest: 0,
-    startBlock: 5541764,
   },
   {
     id: "boo-aave-ftm-eol",
@@ -38104,7 +37109,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0x28A12F017d0D843d43C71235F4F58535B8BE8563",
     lastHarvest: 0,
-    startBlock: 5541714,
   },
   {
     id: "boo-crv-ftm",
@@ -38143,7 +37147,6 @@ const vaults = [
     chain: "fantom",
     strategy: "0xC3821F0b56FA4F4794d5d760f94B812DE261361B",
     lastHarvest: 0,
-    startBlock: 5541676,
   },
   {
     id: "bifi-maxi",
@@ -38180,7 +37183,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xbCF1e02ac0c45729dC85F290C4A6AB35c4801cB1",
     lastHarvest: 1654076005,
-    startBlock: 16454704,
   },
   {
     id: "baby-bnb-usdt",
@@ -38219,7 +37221,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb023e00F5b34DA63392F552f08a6cebEf2f2ef5e",
     lastHarvest: 1654057866,
-    startBlock: 18099021,
   },
   {
     id: "ellipsis-usdd2pool",
@@ -38260,7 +37261,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4dC2914F297303BD0f8953f0618C917d69A05a63",
     lastHarvest: 1654076317,
-    startBlock: 17961902,
   },
   {
     id: "banana-usdt-busd",
@@ -38299,7 +37299,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDC26b339b2F26B3CFE47dcE747d6adA7Ba04515b",
     lastHarvest: 1654072272,
-    startBlock: 17881687,
   },
   {
     id: "ellipsis-usdd",
@@ -38340,7 +37339,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x828E045481155D86E3535b4f0C0F348d3B67c982",
     lastHarvest: 1654072281,
-    startBlock: 17851407,
   },
   {
     id: "biswap-usdt-btcb",
@@ -38379,7 +37377,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa531D6A67Cfdb889fDCC0F21Bbf5390751e2B31e",
     lastHarvest: 1654057875,
-    startBlock: 17537209,
   },
   {
     id: "cakev2-gal-bnb",
@@ -38418,7 +37415,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7841Eab11b60663Bc2E0a53fdce776619FC60a90",
     lastHarvest: 1654000277,
-    startBlock: 17567677,
   },
   {
     id: "ripae-pbnb-bnb",
@@ -38457,7 +37453,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB0542BadE752966CEFF26CaB5a63C5Be683fc664",
     lastHarvest: 1654076671,
-    startBlock: 17571015,
   },
   {
     id: "ripae-pae-bnb",
@@ -38496,7 +37491,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE5970DBF2015587baF7bA2c485F15EbFE990c6e3",
     lastHarvest: 1654077773,
-    startBlock: 17571015,
   },
   {
     id: "biswap-btcb-wbnb",
@@ -38535,7 +37529,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x86E018A313651084A8DE04F028E4934E52845C05",
     lastHarvest: 1654000286,
-    startBlock: 17537545,
   },
   {
     id: "biswap-wbnb-busd",
@@ -38574,7 +37567,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xeAED45F9AD64FD823e1e056CA3a12dCD69F3A8BF",
     lastHarvest: 1654000298,
-    startBlock: 17537733,
   },
   {
     id: "biswap-eth-usdt",
@@ -38613,7 +37605,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xACAe06b242DCCd900383d6EA3d00fA2B2017Fcb4",
     lastHarvest: 1654000310,
-    startBlock: 17537919,
   },
   {
     id: "biswap-eth-wbnb",
@@ -38652,7 +37643,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3a52e01ae7a8d1c309b9fD6b4c9046c4Bd4bdF0b",
     lastHarvest: 1654057884,
-    startBlock: 17538139,
   },
   {
     id: "biswap-ust-busd-eol",
@@ -38692,7 +37682,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xEDFBeC807304951785b581dB401fDf76b4bAd1b0",
     lastHarvest: 1652387499,
-    startBlock: 17538322,
   },
   {
     id: "biswap-cake-wbnb",
@@ -38731,7 +37720,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x94DD89F0FE0C6d92718055Ff55619bd8F7EC8F99",
     lastHarvest: 1654000322,
-    startBlock: 17538549,
   },
   {
     id: "biswap-usdt-busd",
@@ -38770,7 +37758,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x46dcAFBb2C9d479827F69BeC9314E13741f21058",
     lastHarvest: 1654057893,
-    startBlock: 16936380,
   },
   {
     id: "cakev2-wbnb-abnbc",
@@ -38809,7 +37796,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x15C69945eFc60135aAf96ce8adE7d1f188a70759",
     lastHarvest: 1654014655,
-    startBlock: 17290504,
   },
   {
     id: "cakev2-wbnb-ceek",
@@ -38848,7 +37834,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7F11e506cfceA905e176A5C37196d9Ef42371F93",
     lastHarvest: 1654077622,
-    startBlock: 17290152,
   },
   {
     id: "cakev2-pex-wbnb",
@@ -38887,7 +37872,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC9B00462330E7a1342de75aB70764EAD7aBD1A0c",
     lastHarvest: 1654029051,
-    startBlock: 17290367,
   },
   {
     id: "cakev2-wbnb-froyo",
@@ -38926,7 +37910,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1F39644e92B7EacF1860c3C0c82b367d95bED70F",
     lastHarvest: 1654029060,
-    startBlock: 17290268,
   },
   {
     id: "cakev2-cake-froyo",
@@ -38965,7 +37948,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x49533F15B95521dee641A2a4086B55E147583a9C",
     lastHarvest: 1654029069,
-    startBlock: 17290472,
   },
   {
     id: "bomb-bshare-wbnb",
@@ -39005,7 +37987,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4342c2ebDEE5907C1A9D021df0f7172e09B1745A",
     lastHarvest: 1654057905,
-    startBlock: 17367868,
   },
   {
     id: "bomb-bomb-btcb",
@@ -39044,7 +38025,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xEeBcd7E1f008C52fe5804B306832B7DD317e163D",
     lastHarvest: 1654062242,
-    startBlock: 17366936,
   },
   {
     id: "bomb-busm-busd",
@@ -39083,7 +38063,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4C6c2Aa430617f72e32B3f9db89B8e7c8cb4517d",
     lastHarvest: 1654043558,
-    startBlock: 17366902,
   },
   {
     id: "valas-valas-bnb",
@@ -39121,7 +38100,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF919C323AbC7cbEBa9315bC88B7A3a63cBAdF02a",
     lastHarvest: 1654072287,
-    startBlock: 16997226,
   },
   {
     id: "valas-wbtc",
@@ -39160,7 +38138,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x247A85139E0DF5857D0D7610804064F5F45A9DEC",
     lastHarvest: 1654057917,
-    startBlock: 17000709,
   },
   {
     id: "valas-eth",
@@ -39199,7 +38176,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa78f18E184174a01800d57FD2f7FCD9eB50e2953",
     lastHarvest: 1654072299,
-    startBlock: 17000974,
   },
   {
     id: "valas-busd",
@@ -39238,7 +38214,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x865741adfE3D6Ee5a5DEa87Ca1EfA36976b2C333",
     lastHarvest: 1654057926,
-    startBlock: 17001186,
   },
   {
     id: "valas-usdt",
@@ -39277,7 +38252,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8e65d23B19B44CCE1992Bb60e9B2164F9844cFb3",
     lastHarvest: 1654057935,
-    startBlock: 17001348,
   },
   {
     id: "valas-usdc",
@@ -39316,7 +38290,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xEb1F9853b49B7fA623CCe4Ad944F1A38AE2fC2aE",
     lastHarvest: 1654057947,
-    startBlock: 17060645,
   },
   {
     id: "valas-dai",
@@ -39355,7 +38328,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6E649F47083756f9c59c04F95D79fC3e170ec577",
     lastHarvest: 1654072311,
-    startBlock: 17060755,
   },
   {
     id: "valas-tusd",
@@ -39394,7 +38366,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2536019ac760be1517A5e3dEbF8B70D539D8cD6a",
     lastHarvest: 1654072317,
-    startBlock: 17060912,
   },
   {
     id: "biswap-bsw",
@@ -39433,7 +38404,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe6f9C74b60C6275616Eb532Ed7222F9738b58c31",
     lastHarvest: 1654029778,
-    startBlock: 16920537,
   },
   {
     id: "biswap-bsw-wbnb",
@@ -39472,7 +38442,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x48bF3a071098a09C7D00379b4DBC69Ab6Da83a36",
     lastHarvest: 1654072326,
-    startBlock: 16920537,
   },
   {
     id: "biswap-usdt-bsw",
@@ -39511,7 +38480,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDf29382141059afD25Deb624E6c8f13A051012Be",
     lastHarvest: 1653985851,
-    startBlock: 16920536,
   },
   {
     id: "biswap-eth-btcb",
@@ -39550,7 +38518,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x10facc26e182E071CD2FF1B218C1664697B8592D",
     lastHarvest: 1654057956,
-    startBlock: 16920536,
   },
   {
     id: "biswap-usdt-wbnb",
@@ -39589,7 +38556,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x610430492388F91f0Cb831e7E96eD7193814Bc89",
     lastHarvest: 1654072341,
-    startBlock: 16920535,
   },
   {
     id: "biswap-wbnb-bifi",
@@ -39628,7 +38594,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x09d13bB083226b34a2AC44e74aEEC411984f2423",
     lastHarvest: 1654072347,
-    startBlock: 16920535,
   },
   {
     id: "emp-emp-eth",
@@ -39667,7 +38632,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC74A709473344d09B0446f845501ABbA703362E6",
     lastHarvest: 1654077892,
-    startBlock: 16569228,
   },
   {
     id: "emp-eshare-wbnb",
@@ -39706,7 +38670,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8945130ef1F1429A2B25Dc2976cc51c5B22aF917",
     lastHarvest: 1654077773,
-    startBlock: 16551988,
   },
   {
     id: "bifi-maxi-eol",
@@ -39744,7 +38707,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x87056F5E8Dce0fD71605E6E291C6a3B53cbc3818",
     lastHarvest: 0,
-    startBlock: 2612276,
   },
   {
     id: "stargate-bsc-busd",
@@ -39784,7 +38746,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x592b28a148D937e41f59892C53d2a294b7dF1C0E",
     lastHarvest: 1654056477,
-    startBlock: 16518461,
   },
   {
     id: "stargate-bsc-usdt",
@@ -39824,7 +38785,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x72A6F8E2510B9332Eaf744FEb1F7c19E3aCB2201",
     lastHarvest: 1654072359,
-    startBlock: 16519700,
   },
   {
     id: "banana-ape-wbnb",
@@ -39863,7 +38823,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x22E277Cb2961Bdf00FDC6b2Cb351D4413Ae6ba30",
     lastHarvest: 1654036643,
-    startBlock: 16313024,
   },
   {
     id: "cakev2-cake-duet",
@@ -39902,7 +38861,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1d0D8847E13a22715B0Cb51D0A30c43dBB7F02Fa",
     lastHarvest: 1650357052,
-    startBlock: 16261311,
   },
   {
     id: "cakev2-era-wbnb",
@@ -39941,7 +38899,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x92F44893D5f22bDc8540CEb83B0b3E3112951bEe",
     lastHarvest: 1650357061,
-    startBlock: 16261333,
   },
   {
     id: "cakev2-bsw-wbnb",
@@ -39980,7 +38937,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc1d8b41403d9B15Ab96d5f417b46D538385447ef",
     lastHarvest: 1653985861,
-    startBlock: 7720265,
   },
   {
     id: "cakev2-gmt-usdc",
@@ -40019,7 +38975,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA57FdaffC88c4911078F29C6e2F118d86e7a425e",
     lastHarvest: 1654000334,
-    startBlock: 16204120,
   },
   {
     id: "cakev2-raca-busd",
@@ -40057,7 +39012,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc4e98b78dEFd909725c060fb47C842488b49454b",
     lastHarvest: 1654014664,
-    startBlock: 15597417,
   },
   {
     id: "baby-avax-usdt",
@@ -40096,7 +39050,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9b9634ae6877068467b05b7a0D7466C7BF2C0615",
     lastHarvest: 1654050322,
-    startBlock: 15240587,
   },
   {
     id: "charge-static-busd-eol",
@@ -40137,7 +39090,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x26671D2A11E6AD3bdDB0F9cb4a66AbcCf0533808",
     lastHarvest: 1645697837,
-    startBlock: 13123611,
   },
   {
     id: "charge-charge-busd",
@@ -40177,7 +39129,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xdB9E24c78d68c87bEF858Aa489D112e88Bff3A14",
     lastHarvest: 1654076296,
-    startBlock: 13123342,
   },
   {
     id: "baby-ftm-usdt",
@@ -40216,7 +39167,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xca8d52b329dBC06A3D8e75d4F3eCaE6f6a284037",
     lastHarvest: 1654014439,
-    startBlock: 14856800,
   },
   {
     id: "banana-sushi-eth",
@@ -40255,7 +39205,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB6AB6BD4D12C20aeC43aebE82255CdEe3BA3D890",
     lastHarvest: 1654072368,
-    startBlock: 14777902,
   },
   {
     id: "cakev2-cake-bnb",
@@ -40294,7 +39243,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDE238C509bcCBCd91B90dE40dF3e25B43A131311",
     lastHarvest: 1654078165,
-    startBlock: 6883072,
   },
   {
     id: "cakev2-ertha-wbnb-eol",
@@ -40334,7 +39282,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x70138ee964eA3a65A92c121EEE14e76c01c6cEF7",
     lastHarvest: 1650415070,
-    startBlock: 14727394,
   },
   {
     id: "cakev2-fuse-wbnb-eol",
@@ -40374,7 +39321,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3E7977aB38B18017c51027e4e35f029DDB54C2DB",
     lastHarvest: 1653366779,
-    startBlock: 14567322,
   },
   {
     id: "baby-aot-usdt-eol",
@@ -40414,7 +39360,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x49c791784d36f3fE8Af25f216df19E47AcdB04Fe",
     lastHarvest: 1643522468,
-    startBlock: 14043558,
   },
   {
     id: "mdex-lac-busd-eol",
@@ -40454,7 +39399,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xcF476c15C9c8d5469Fcc3BF54fd3dcB59Df6F9c0",
     lastHarvest: 1649838660,
-    startBlock: 14388140,
   },
   {
     id: "dibs-dibs-bnb",
@@ -40494,7 +39438,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x246e59Ef95599A267D444ad5E612760825Df0494",
     lastHarvest: 1654051143,
-    startBlock: 14238965,
   },
   {
     id: "dibs-dshare-bnb",
@@ -40534,7 +39477,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3D4ea9a26EAF6f89DBF6B383AAa7f7eBC654FB75",
     lastHarvest: 1654052301,
-    startBlock: 14239135,
   },
   {
     id: "banana-nfty-wbnb",
@@ -40573,7 +39515,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xAc73e203ACd060202165dd51BE2aC27BAB032196",
     lastHarvest: 1654072377,
-    startBlock: 11682351,
   },
   {
     id: "cakev2-insur-wbnb-eol",
@@ -40613,7 +39554,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2Bc71D99D7dFC14C1bAb6817937195B94fFDA03A",
     lastHarvest: 1648816278,
-    startBlock: 14161597,
   },
   {
     id: "cakev2-wbnb-gm-eol",
@@ -40653,7 +39593,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x996D1c38fC633806b392c361a4de98cD2F1eA3c6",
     lastHarvest: 1647808249,
-    startBlock: 14161515,
   },
   {
     id: "cakev2-woop-wbnb-eol",
@@ -40693,7 +39632,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd462A02365B62a364F21D01E62A2e87B822a56C1",
     lastHarvest: 1650486315,
-    startBlock: 14161456,
   },
   {
     id: "cakev2-high-busd",
@@ -40732,7 +39670,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF0a71715B9a455f59ED68707E3F1B8DB76799dA8",
     lastHarvest: 1650430666,
-    startBlock: 14161396,
   },
   {
     id: "cakev2-ccar-wbnb-eol",
@@ -40772,7 +39709,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xbf12C00E94Cc12F1142eb00b9Ba10fb4F246adA4",
     lastHarvest: 1643126505,
-    startBlock: 14161265,
   },
   {
     id: "cakev2-wbnb-dpt-eol",
@@ -40812,7 +39748,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x11cdfAea2dF94E4d6d1e971F28f66025a94499ef",
     lastHarvest: 1647793864,
-    startBlock: 14161215,
   },
   {
     id: "cakev2-thg-wbnb",
@@ -40851,7 +39786,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc6996B2B6Af713Def362e2f0800186f105B5cfEC",
     lastHarvest: 1654072395,
-    startBlock: 14161151,
   },
   {
     id: "baby-usdt-milk",
@@ -40890,7 +39824,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa2242a4145449C7B95B4DCC375cb616a06f3a9aE",
     lastHarvest: 1654072404,
-    startBlock: 13670903,
   },
   {
     id: "ellipsis-renbtc-eol",
@@ -40928,7 +39861,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xdd71720cdB91dD4e94A5f7F57B3E1418Db54103f",
     lastHarvest: 0,
-    startBlock: 6644348,
   },
   {
     id: "banana-banana-busd",
@@ -40959,7 +39891,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7687867eCD824674f5a220391520E1B1e83b011f",
     lastHarvest: 0,
-    startBlock: 5355554,
   },
   {
     id: "banana-crush-wbnb-eol",
@@ -40999,7 +39930,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x937AB8d5069eeD68f20eb380e27b3537A06FB4F8",
     lastHarvest: 1644971557,
-    startBlock: 13550914,
   },
   {
     id: "banana-bnb-stars",
@@ -41029,7 +39959,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb7313844d9c57552e334e77f1203979765BC035e",
     lastHarvest: 0,
-    startBlock: 9591798,
   },
   {
     id: "bison-bison-bnb-eol",
@@ -41069,7 +39998,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4583fAC48BdD776096559514A42a957e3DF93C1A",
     lastHarvest: 1643443299,
-    startBlock: 12893704,
   },
   {
     id: "cakev2-nabox-busd-eol",
@@ -41109,7 +40037,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf4cd3E9119bfEaE8aa69f21669C055195Ae6Ba43",
     lastHarvest: 1644366807,
-    startBlock: 13246831,
   },
   {
     id: "cakev2-santos-wbnb-eol",
@@ -41149,7 +40076,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7934CB368017ae6092125ef65B33eE96caa0CafF",
     lastHarvest: 1647793894,
-    startBlock: 13246968,
   },
   {
     id: "cakev2-quidd-wbnb-eol",
@@ -41189,7 +40115,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6c0D796ced093b1fd7ecbd89814d3a84A4487780",
     lastHarvest: 1646137889,
-    startBlock: 13247248,
   },
   {
     id: "cakev2-zoo-wbnb-eol",
@@ -41229,7 +40154,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc64Ea56904cd32996F18E3a57115421F49ffaa2b",
     lastHarvest: 1644366831,
-    startBlock: 13247997,
   },
   {
     id: "banana-wbnb-ceek",
@@ -41268,7 +40192,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC847c35CC6632a30E46C5Cb62a776d81f822330F",
     lastHarvest: 1654057974,
-    startBlock: 11790058,
   },
   {
     id: "belt-beltbtc",
@@ -41306,7 +40229,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xaBf0cDd827aB1902213269fc4427c3A8655e60c2",
     lastHarvest: 1654072422,
-    startBlock: 6956138,
   },
   {
     id: "banana-bananav2",
@@ -41345,7 +40267,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf3995BB32dFd21865D0dA03782D888fa454F3dB1",
     lastHarvest: 0,
-    startBlock: 9992028,
   },
   {
     id: "banana-banana-bnb",
@@ -41385,7 +40306,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x17566271FEBF4E7e0E72a7D1E3eF2E915d642cCe",
     lastHarvest: 0,
-    startBlock: 5355084,
   },
   {
     id: "alpaca-ibalpaca-eol",
@@ -41417,7 +40337,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8F5555623C61d5adD046206007a42766C74086b6",
     lastHarvest: 0,
-    startBlock: 9963213,
   },
   {
     id: "1inch-1inch-eol",
@@ -41456,7 +40375,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe807517273De0161D8309BC9363193f2162b9B65",
     lastHarvest: 0,
-    startBlock: 6067953,
   },
   {
     id: "banana-oasis-wbnb",
@@ -41495,7 +40413,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe723E67bd24405aCeed8972a2330FA17130d89D3",
     lastHarvest: 1654072431,
-    startBlock: 12718627,
   },
   {
     id: "bison-bison-eol",
@@ -41535,7 +40452,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x914B22a365155DC7fe869Ec8dF60334df15d9f86",
     lastHarvest: 1641627520,
-    startBlock: 12966442,
   },
   {
     id: "blockmine-nugget-goldcoin-eol",
@@ -41575,7 +40491,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD67f4A698eA6a251148F39AA3CF5dDab47E2Dd5f",
     lastHarvest: 1646281927,
-    startBlock: 12945652,
   },
   {
     id: "cakev2-qi-wbnb",
@@ -41614,7 +40529,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1393195Ac2f44592a765041D4AA5c4C477F7A610",
     lastHarvest: 1650458795,
-    startBlock: 12836562,
   },
   {
     id: "cakev2-kart-wbnb-eol",
@@ -41654,7 +40568,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7E8137cE890BF44952957eE9085F8D8f62D53F50",
     lastHarvest: 1646224307,
-    startBlock: 12837054,
   },
   {
     id: "cakev2-porto-wbnb-eol",
@@ -41694,7 +40607,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0A97C58502fa5347b5A8dCaCa78345D2288CB188",
     lastHarvest: 1647851472,
-    startBlock: 12836694,
   },
   {
     id: "cakev2-wbnb-eternal-eol",
@@ -41734,7 +40646,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x81f44F6487Ce33d6E6E0f56C6ea7323c626080c9",
     lastHarvest: 1643220112,
-    startBlock: 12835843,
   },
   {
     id: "cakev2-xwg-usdc",
@@ -41773,7 +40684,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe22244AfA605DFB44554ae55F101bead04E9eF18",
     lastHarvest: 1650371458,
-    startBlock: 12835694,
   },
   {
     id: "banana-frax-busd",
@@ -41812,7 +40722,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8e3bc200860052F23Ad4E36094165eaC5df90Ff0",
     lastHarvest: 1654072443,
-    startBlock: 12756554,
   },
   {
     id: "banana-wbnb-fxs",
@@ -41851,7 +40760,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x50D58cC2293ED8e6849EddD8395F749137e12646",
     lastHarvest: 1654072455,
-    startBlock: 12728831,
   },
   {
     id: "betu-betu",
@@ -41890,7 +40798,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa07704e69fa64408BEfb3ac1891166d8bbC2585c",
     lastHarvest: 1654071611,
-    startBlock: 12697338,
   },
   {
     id: "cakev2-dar-wbnb",
@@ -41929,7 +40836,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5B0C4E1e246c4B6f7F86Bd4625c21625C4730249",
     lastHarvest: 1650400316,
-    startBlock: 12601723,
   },
   {
     id: "nfty-nfty",
@@ -41967,7 +40873,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF143589e8e9c23D1bE09F2a5543196823FF4218c",
     lastHarvest: 1654062317,
-    startBlock: 12526267,
   },
   {
     id: "banana-exp-wbnb-eol",
@@ -42007,7 +40912,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC51123B5243bFc073ac10f85065546585C059146",
     lastHarvest: 1636572433,
-    startBlock: 12357224,
   },
   {
     id: "cakev2-lazio-wbnb",
@@ -42046,7 +40950,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa4705A35E240340faA126e1fF33008f0A666896C",
     lastHarvest: 1650529944,
-    startBlock: 12280482,
   },
   {
     id: "cakev2-dkt-wbnb-eol",
@@ -42086,7 +40989,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x778130B980a13F000182E0Bb79eC49718C27E8a6",
     lastHarvest: 1646339502,
-    startBlock: 12280439,
   },
   {
     id: "cakev2-rusd-busd",
@@ -42125,7 +41027,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2dfDF46FcfA36dA8f7A3846eeE6bB2E3a0A765AF",
     lastHarvest: 1650458813,
-    startBlock: 10251082,
   },
   {
     id: "cakev2-bmon-wbnb-eol",
@@ -42165,7 +41066,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x01aC8038c88Ca42e36E2B4BEbaF602264C3Cba0f",
     lastHarvest: 0,
-    startBlock: 9723964,
   },
   {
     id: "belt-beltbnb",
@@ -42203,7 +41103,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x20b601bd94A5407f6dCA36b73262Aad59ed6839d",
     lastHarvest: 1654072461,
-    startBlock: 6934967,
   },
   {
     id: "belt-belteth",
@@ -42241,7 +41140,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x176be8Db9c5a6B32A2362d02A1B4aee80462AD54",
     lastHarvest: 1654072470,
-    startBlock: 6956220,
   },
   {
     id: "banana-bifi-bnb",
@@ -42279,7 +41177,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x58d44b967bDc31e04be0fDc15F520c2C0C049b7C",
     lastHarvest: 0,
-    startBlock: 6519574,
   },
   {
     id: "wsg-wsg",
@@ -42318,7 +41215,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0EF7CFA64406C124C0b8C44c519c3f7bCeE6a06E",
     lastHarvest: 1654070661,
-    startBlock: 12075648,
   },
   {
     id: "wsg-wsg-bnb",
@@ -42357,7 +41253,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE13EA948c542b2da6F5DAd1C38f082B83C0f5E31",
     lastHarvest: 1654029078,
-    startBlock: 12075389,
   },
   {
     id: "mdex-bsc-bifi-usdt",
@@ -42397,7 +41292,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE90c9627c1DD49B73691bfCDE0141B387EF57908",
     lastHarvest: 0,
-    startBlock: 7373946,
   },
   {
     id: "banana-tusd-busd-eol",
@@ -42437,7 +41331,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDDa38712B0753843857D53C9eDFDbf02152EC13c",
     lastHarvest: 1641367576,
-    startBlock: 12048372,
   },
   {
     id: "banana-fil-wbnb",
@@ -42476,7 +41369,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xeEF09b4Ad74d44925745CBffB15e2904C3779da0",
     lastHarvest: 1654072500,
-    startBlock: 12047969,
   },
   {
     id: "banana-wbnb-dep",
@@ -42515,7 +41407,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD7Cae2ECaC077B002754e27347309ee8C7A1dB32",
     lastHarvest: 1654072506,
-    startBlock: 11874929,
   },
   {
     id: "wex-wusd-dep-eol",
@@ -42555,7 +41446,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xEb8Fb5ddc33279bd923E02a29219B7b9AB300B58",
     lastHarvest: 1637012485,
-    startBlock: 11882475,
   },
   {
     id: "cakev2-rpg-busd-eol",
@@ -42595,7 +41485,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF3Ae190E817c0250fe259dbeF2798611C2cCB6f0",
     lastHarvest: 1643133747,
-    startBlock: 11864294,
   },
   {
     id: "cakev2-mcb-wbnb-eol",
@@ -42635,7 +41524,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x13E3be3F2165A3084554f7aAf6fc8a2c957F10d6",
     lastHarvest: 1641972363,
-    startBlock: 11864231,
   },
   {
     id: "baby-baby",
@@ -42674,7 +41562,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1582c28Fb47F559be62F35387f9d2787347532B2",
     lastHarvest: 1654012417,
-    startBlock: 11704369,
   },
   {
     id: "baby-baby-usdt",
@@ -42713,7 +41600,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xba1073e98872edd9B9F3548261d3b2bbaaC28E95",
     lastHarvest: 1654053891,
-    startBlock: 11704135,
   },
   {
     id: "baby-baby-bnb",
@@ -42752,7 +41638,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6b6BD5772fe6D72BbF9F0c9b69DCb5eD22396678",
     lastHarvest: 1654061236,
-    startBlock: 11703951,
   },
   {
     id: "cakev2-wbnb-beta",
@@ -42791,7 +41676,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7fdaB5Db39a04670F8185A7dDf6f723293F96091",
     lastHarvest: 1650458822,
-    startBlock: 11652726,
   },
   {
     id: "sing-sing-busd-eol",
@@ -42822,7 +41706,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xfF15cd15Aabd3a2903Bc792C698970db097Ce84B",
     lastHarvest: 1646281954,
-    startBlock: 11590408,
   },
   {
     id: "cafev2-brew-bnb-eol",
@@ -42853,7 +41736,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x64FDf7FCE025cA2fB5Dbd6e73235302259C8AC8D",
     lastHarvest: 1646281963,
-    startBlock: 11592306,
   },
   {
     id: "cafev2-brew-busd-eol",
@@ -42884,7 +41766,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB8A1b9dafC120E703390eA622F86cB647F8BC5D5",
     lastHarvest: 1646281972,
-    startBlock: 11592483,
   },
   {
     id: "cakev2-nft-wbnb-eol",
@@ -42915,7 +41796,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x16768F2A980567dC1F7175918d300988F88d99C8",
     lastHarvest: 1646339523,
-    startBlock: 11253837,
   },
   {
     id: "banana-ong-bnb-eol",
@@ -42946,7 +41826,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa0BFfE175052E6984368B9234b610d598eBd267F",
     lastHarvest: 1646339532,
-    startBlock: 11229545,
   },
   {
     id: "pacoca-pacoca-bnb",
@@ -42984,7 +41863,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x33B2eF1B148257f34fAc406Ebb9868b9D96eBBeE",
     lastHarvest: 1654072518,
-    startBlock: 11191455,
   },
   {
     id: "pacoca-pacoca",
@@ -43022,7 +41900,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x85F91D46e0065B98898E67A30365E0fA74529853",
     lastHarvest: 1654049995,
-    startBlock: 11191339,
   },
   {
     id: "annex-ann-busd-eol",
@@ -43053,7 +41930,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x567A855a9d426bb0450c5A60d2897a9A6Ae4979d",
     lastHarvest: 1645432394,
-    startBlock: 11131839,
   },
   {
     id: "annex-ann-eol",
@@ -43083,7 +41959,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xceBdeAaac3F44BceF25136b6Da74aE553f49A9fF",
     lastHarvest: 1645432409,
-    startBlock: 11131913,
   },
   {
     id: "belt-4belt",
@@ -43121,7 +41996,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x25B86d36DC4D9d09d41415DaF31bA7FFA7143F35",
     lastHarvest: 1654072524,
-    startBlock: 6922057,
   },
   {
     id: "pearzap-pear-bnb-eol",
@@ -43152,7 +42026,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x49A2F8F28585BA73b87Eb1664EAC088A7659e654",
     lastHarvest: 1638739664,
-    startBlock: 10931898,
   },
   {
     id: "pearzap-pear-busd-eol",
@@ -43183,7 +42056,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2dBaEEE5fe63119BFD0ea83a3C1f1F100F279b38",
     lastHarvest: 1638369418,
-    startBlock: 10932094,
   },
   {
     id: "czf-czf-bnb",
@@ -43213,7 +42085,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x58b302082Cb6eDf437F842106A49D990F98Ef3d2",
     lastHarvest: 1654072533,
-    startBlock: 10930859,
   },
   {
     id: "czf-czf-busd-eol",
@@ -43244,7 +42115,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x40f95692B01a7c7d6C4b92a0510B930837a07fdd",
     lastHarvest: 1646339547,
-    startBlock: 10929900,
   },
   {
     id: "long-long-wbnb-eol",
@@ -43275,7 +42145,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9D6BcfCDfeA506c4088aFCF374E03679C234DD08",
     lastHarvest: 1646281993,
-    startBlock: 10876757,
   },
   {
     id: "cakev2-dvi-wbnb-eol",
@@ -43305,7 +42174,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb0d18CA4fb070e14f263eD9Cb81DB3979eE32689",
     lastHarvest: 0,
-    startBlock: 8931278,
   },
   {
     id: "cakev2-mcrn-wbnb-eol",
@@ -43336,7 +42204,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3081ab1E19320e93CcA9817Eca037813BbDB64c1",
     lastHarvest: 0,
-    startBlock: 9724052,
   },
   {
     id: "banana-pots-bnb",
@@ -43376,7 +42243,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x59f822b216663e1b5EB6fC6D544CFB732Eb8693D",
     lastHarvest: 1654072545,
-    startBlock: 9736415,
   },
   {
     id: "cakev2-pots-busd-eol",
@@ -43417,7 +42283,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x97a92bb98567C508068eD3b972c0d0F9E63177DC",
     lastHarvest: 0,
-    startBlock: 9887812,
   },
   {
     id: "cakev2-tlos-wbnb-eol",
@@ -43448,7 +42313,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xFa330aFad331D3d7a6754E0af59e9d919e97Bf3f",
     lastHarvest: 1641972402,
-    startBlock: 10765637,
   },
   {
     id: "honeyfarm-moon-bnb-eol",
@@ -43478,7 +42342,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD337d7b9D45c9Efd090aFbdE5BF52a0a296bE244",
     lastHarvest: 1634624949,
-    startBlock: 10762513,
   },
   {
     id: "honeyfarm-moon-busd-eol",
@@ -43508,7 +42371,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb9Ce0C18069497d415bF79ea77B465Ac06B70D41",
     lastHarvest: 1634445059,
-    startBlock: 10762646,
   },
   {
     id: "mdex-usdt-btcb",
@@ -43538,7 +42400,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x375bc0460491d500f7Fa47eD51c1aD3A81e09a9D",
     lastHarvest: 1654072557,
-    startBlock: 10595961,
   },
   {
     id: "mdex-bsc-rabbit-busd-eol",
@@ -43569,7 +42430,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x913C32f531f1484FabAb331aeac81dE912E627A2",
     lastHarvest: 1640569719,
-    startBlock: 10595525,
   },
   {
     id: "cakev2-bscdefi-wbnb-eol",
@@ -43600,7 +42460,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x16037b031182d55B0EF7BDb8fAb992b64bdEE03B",
     lastHarvest: 1635893127,
-    startBlock: 10592241,
   },
   {
     id: "cakev2-bp-wbnb",
@@ -43630,7 +42489,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB6AEa87A1F3e97C0b0e2F0f7Ab896302C731b2C9",
     lastHarvest: 1650529992,
-    startBlock: 10251212,
   },
   {
     id: "cakev2-qbt-wbnb-eol",
@@ -43661,7 +42519,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd01b0e498ad4F41D8293755E343b189eD9Cdd178",
     lastHarvest: 1635886141,
-    startBlock: 10520413,
   },
   {
     id: "auro-auro-busd-eol",
@@ -43692,7 +42549,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB488C64A79F21D84F9e489793cC4e93175B264DA",
     lastHarvest: 1652808261,
-    startBlock: 10394759,
   },
   {
     id: "auro-auro-bnb-eol",
@@ -43723,7 +42579,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x87F05230AB80a8dE476cc73477a5d31b2E223D0C",
     lastHarvest: 1646282002,
-    startBlock: 10394823,
   },
   {
     id: "elk-elk-bnb-eol",
@@ -43754,7 +42609,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4fF3Bc86dd9DeCd7bd27b6553B1E3E83c3145166",
     lastHarvest: 1635244862,
-    startBlock: 10447064,
   },
   {
     id: "elk-elk-dai-eol",
@@ -43785,7 +42639,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x262fC7130808DE679247f33B7Ab22D49B2067B81",
     lastHarvest: 1635244892,
-    startBlock: 10450861,
   },
   {
     id: "wex-wusd-wex-eol",
@@ -43816,7 +42669,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x224f3ceC2C7aF306be378282Aefd7B9C341a09b9",
     lastHarvest: 1637251619,
-    startBlock: 10400057,
   },
   {
     id: "cakev2-naos-wbnb-eol",
@@ -43847,7 +42699,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6693687f1d5bb8A1c9d11ee590B6B2FAAD9Fb142",
     lastHarvest: 1635280799,
-    startBlock: 10393238,
   },
   {
     id: "cakev2-pha-busd-eol",
@@ -43878,7 +42729,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x16b2172853fA6126Ede6002E9E65F1a39c6236f7",
     lastHarvest: 1635042760,
-    startBlock: 10393316,
   },
   {
     id: "omnifarm-usdo-busd-ot-eol",
@@ -43907,7 +42757,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDfaC95290937e402e61A12b6fe75B9A1c3096814",
     lastHarvest: 1645778008,
-    startBlock: 10463419,
   },
   {
     id: "omnifarm-usdo-busd-eol",
@@ -43938,7 +42787,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x820d674C18782578c1f1491827D24f84162186Ff",
     lastHarvest: 1641824876,
-    startBlock: 10361356,
   },
   {
     id: "omnifarm-usdo-wbnb-eol",
@@ -43969,7 +42817,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDA56E69Fe5fD277f6894559BCd40e0e1B2F64430",
     lastHarvest: 1646037170,
-    startBlock: 10358699,
   },
   {
     id: "omnifarm-usdo-bdp-eol",
@@ -44000,7 +42847,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2c7f2ce72dd3aB583E4c69271A00BFB2aBCDf60D",
     lastHarvest: 1644669321,
-    startBlock: 10361656,
   },
   {
     id: "omnifarm-usdo-popen-eol",
@@ -44031,7 +42877,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x58029C8e2c58dd7BAf3237728c06d52d88BE838B",
     lastHarvest: 1646037179,
-    startBlock: 10362348,
   },
   {
     id: "omnifarm-usdo-anymtlx-eol",
@@ -44062,7 +42907,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD0F33cc3d640AD559020a872F63c237facf67c00",
     lastHarvest: 1645432469,
-    startBlock: 10363008,
   },
   {
     id: "omnifarm-fet-usdo-eol",
@@ -44093,7 +42937,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6453466B5852b28037a302eEE91547aB4E429B88",
     lastHarvest: 1645432478,
-    startBlock: 10363626,
   },
   {
     id: "omnifarm-ocp-usdo-eol",
@@ -44124,7 +42967,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xfC66e6d29C1DD14Ce345B0e298eb6CF36515c4D6",
     lastHarvest: 1646037188,
-    startBlock: 10364150,
   },
   {
     id: "tosdisbsc-dis-wbnb-eol",
@@ -44155,7 +42997,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD315BA5a98F698A1cBCFE62678e1396A6C621547",
     lastHarvest: 1632360578,
-    startBlock: 10317428,
   },
   {
     id: "banana-ont-bnb",
@@ -44186,7 +43027,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x739B8b50fC28267D92233954C189aF5Ad7C55A71",
     lastHarvest: 0,
-    startBlock: 6964744,
   },
   {
     id: "wex-bnb-ont-eol",
@@ -44217,7 +43057,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x76F3D8204CF10E3382d93C9243f4f244e4666C27",
     lastHarvest: 0,
-    startBlock: 9525059,
   },
   {
     id: "cake-cakev2-eol",
@@ -44255,7 +43094,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5448C07cb55Adb7Ee19185144108b09Ed291fDEd",
     lastHarvest: 0,
-    startBlock: 8204181,
   },
   {
     id: "yel-yel",
@@ -44285,7 +43123,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2c5D8824454fDc0A3c84f4963f1CAf6f4C86f99D",
     lastHarvest: 1653985882,
-    startBlock: 10304916,
   },
   {
     id: "yel-yel-wbnb",
@@ -44315,7 +43152,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x99265e31ecC2993Ab37fD7F8290779e367535Dd8",
     lastHarvest: 1654072575,
-    startBlock: 10306525,
   },
   {
     id: "banana-bhc-bnb-eol",
@@ -44346,7 +43182,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x921A885D9c7B3Ac3D8BC93f4D371A01e2f0be98E",
     lastHarvest: 1641353206,
-    startBlock: 10192460,
   },
   {
     id: "banana-caps-bnb-eol",
@@ -44377,7 +43212,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5CE19115DA9Df4FA1c9271702cE0F918cC98b617",
     lastHarvest: 1641324446,
-    startBlock: 10163264,
   },
   {
     id: "honeyfarm-bear-bnb-eol",
@@ -44407,7 +43241,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4A3a8B2DF03e07DeF9058289758A5ED2EEAF142d",
     lastHarvest: 1631147481,
-    startBlock: 10080525,
   },
   {
     id: "honeyfarm-bear-busd-eol",
@@ -44437,7 +43270,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1569Ec2aE07945A5E8ff8aDf5D525321A7F4682D",
     lastHarvest: 1631143705,
-    startBlock: 10080361,
   },
   {
     id: "honeyfarm-honey-bnb-eol2",
@@ -44467,7 +43299,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf622490Dd4464e7AB437c3d7931a70b002B1473A",
     lastHarvest: 1630798464,
-    startBlock: 10080177,
   },
   {
     id: "honeyfarm-honey-busd-eol2",
@@ -44497,7 +43328,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xAFb4ebc2C8820b256Bf2560a248bFEDa7501A772",
     lastHarvest: 1630841353,
-    startBlock: 10080065,
   },
   {
     id: "banana-hotcross-busd-eol",
@@ -44528,7 +43358,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6806EBf8092603dfA124B322B24065378b07EFa4",
     lastHarvest: 1647793957,
-    startBlock: 10081801,
   },
   {
     id: "banana-eth-bnb",
@@ -44558,7 +43387,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5A7a59704BD1aC93a1629a1a5830aEB65307CE60",
     lastHarvest: 0,
-    startBlock: 10052767,
   },
   {
     id: "banana-busd-bnb",
@@ -44598,7 +43426,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA6aE241fE32Ed678122ADf26fCFCad8d4BBFAc7a",
     lastHarvest: 0,
-    startBlock: 10052849,
   },
   {
     id: "banana-sxp-bnb",
@@ -44628,7 +43455,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x321cEc4ca87Fd95f7CA4fE5A4c952970e2FcCcb7",
     lastHarvest: 0,
-    startBlock: 10052903,
   },
   {
     id: "banana-bake-bnb-eol",
@@ -44659,7 +43485,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x643E5dbd9Ca9bDd70E3AFEd8821333A577C51d9E",
     lastHarvest: 0,
-    startBlock: 10052950,
   },
   {
     id: "wex-wusd-busd-eol",
@@ -44690,7 +43515,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa86194eDe8A852508Ef90627955CdBA8beB9bAaC",
     lastHarvest: 0,
-    startBlock: 9718463,
   },
   {
     id: "banana-cake-bnb",
@@ -44720,7 +43544,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC664B2Cc5CE23ed7C22291B80343e85281aB0D7F",
     lastHarvest: 0,
-    startBlock: 9997930,
   },
   {
     id: "banana-btcb-bnb",
@@ -44760,7 +43583,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x133F45baE4E3C32A346aEc225614d82937Ca8F01",
     lastHarvest: 0,
-    startBlock: 9997860,
   },
   {
     id: "banana-banana-eol",
@@ -44789,7 +43611,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE5B8Bce75247d1B5aEC2F367803443887bD7c6D6",
     lastHarvest: 0,
-    startBlock: 5497271,
   },
   {
     id: "banana-guard-bnb-eol",
@@ -44821,7 +43642,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2e424d2Cb390fac4311Bc2422707091E2A5d7271",
     lastHarvest: 0,
-    startBlock: 9750972,
   },
   {
     id: "banana-land-bnb-eol",
@@ -44852,7 +43672,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD062f938F9AB7C88b987FDC60A3fDc4889F56B88",
     lastHarvest: 0,
-    startBlock: 9848567,
   },
   {
     id: "honeyfarm-honey-busd-eol",
@@ -44883,7 +43702,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6A559D3dB54926900923c3A5f8846d8dea1cd81f",
     lastHarvest: 0,
-    startBlock: 9796419,
   },
   {
     id: "honeyfarm-honey-bnb-eol",
@@ -44914,7 +43732,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x362C5251Ea02dDfaCcF38034d89C70AbA723727e",
     lastHarvest: 0,
-    startBlock: 9796406,
   },
   {
     id: "banana-cyt-bnb",
@@ -44944,7 +43761,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4460ab68B3531ce1527A2dd9615Ae47e144eC4D4",
     lastHarvest: 0,
-    startBlock: 9855160,
   },
   {
     id: "cakev2-btt-busd-eol",
@@ -44985,7 +43801,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x33E4532f3aca53d9e4806DD0408e42Ea55cc51eC",
     lastHarvest: 0,
-    startBlock: 9767069,
   },
   {
     id: "cakev2-trx-busd",
@@ -45025,7 +43840,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF98B505fb14FC1DD845Ebee72F5F68fd467fb521",
     lastHarvest: 0,
-    startBlock: 9767040,
   },
   {
     id: "cakev2-win-busd",
@@ -45055,7 +43869,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd62938936C8ec78bFf00390F10a6c735C1E4EA4b",
     lastHarvest: 0,
-    startBlock: 9767003,
   },
   {
     id: "cakev2-revv-bnb-eol",
@@ -45087,7 +43900,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xEBA5082def68C8A86D2DE828fbd05359a7b1766E",
     lastHarvest: 0,
-    startBlock: 9691149,
   },
   {
     id: "cakev2-wsg-wbnb-eol",
@@ -45118,7 +43930,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7D800E70FEA730d1853c204682BCbaD8537b87F9",
     lastHarvest: 0,
-    startBlock: 9724000,
   },
   {
     id: "banana-bnb-sista-eol",
@@ -45149,7 +43960,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xcD3C21e3f8dAdDf753B2f355825FF7A307f88756",
     lastHarvest: 0,
-    startBlock: 9688633,
   },
   {
     id: "wex-bnb-dep-eol",
@@ -45181,7 +43991,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x29C215679d3B17C7Cff71277256eA7987db724c9",
     lastHarvest: 0,
-    startBlock: 9607770,
   },
   {
     id: "jetswap-btcb-bnb",
@@ -45211,7 +44020,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1D8d4172afD6EBa8b026107C59FECF0E81A25F74",
     lastHarvest: 0,
-    startBlock: 9687625,
   },
   {
     id: "pera-pera-bnb-eol",
@@ -45242,7 +44050,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8f817ED8DC70aF64F542f1B43e24442a811abf7d",
     lastHarvest: 0,
-    startBlock: 9552044,
   },
   {
     id: "banana-tape-bnb-eol",
@@ -45273,7 +44080,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5647F220Ac59B238e81Ba495E0195BC5F21ffedf",
     lastHarvest: 0,
-    startBlock: 9602777,
   },
   {
     id: "banana-axs-bnb",
@@ -45303,7 +44109,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe2775529f67C1006eeb22a98BEF0bFcd550102aa",
     lastHarvest: 0,
-    startBlock: 9578435,
   },
   {
     id: "cakev2-if-busd-eol",
@@ -45335,7 +44140,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x064151dB662Dd686Eec6f42aF09AD3F8EBd3A406",
     lastHarvest: 0,
-    startBlock: 9567530,
   },
   {
     id: "cakev2-skill-wbnb-eol",
@@ -45367,7 +44171,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA629AE82cAE7Cf0e860E626C63DF2c20cF0b98E4",
     lastHarvest: 0,
-    startBlock: 9595334,
   },
   {
     id: "farmhero-pancake-hero-wbnb-eol",
@@ -45398,7 +44201,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB96594B252eF1b489Df9af706DdcF9D770F81F02",
     lastHarvest: 0,
-    startBlock: 9539521,
   },
   {
     id: "farmhero-pancake-hero-busd-eol",
@@ -45429,7 +44231,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd47D7d71ebA7c7d05cCb478dFa1AF5C659d18cac",
     lastHarvest: 0,
-    startBlock: 9539650,
   },
   {
     id: "cakev2-sps-wbnb-eol",
@@ -45460,7 +44261,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9d6534cec46D253dC1fdd2B892816a8A863Db079",
     lastHarvest: 0,
-    startBlock: 9532243,
   },
   {
     id: "cakev2-c98-wbnb",
@@ -45491,7 +44291,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xae148598c77856bbf9A6F4ACfBF60DCecD3eF683",
     lastHarvest: 1654000352,
-    startBlock: 9412677,
   },
   {
     id: "mdex-bsc-mdx",
@@ -45521,7 +44320,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2B1e1d46a3497379e2F338F956Ea2dC3e5857539",
     lastHarvest: 0,
-    startBlock: 7574941,
   },
   {
     id: "wex-tusd-usdt-eol",
@@ -45553,7 +44351,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB8817AC5F57d69524196eD7EaD69430e78621763",
     lastHarvest: 0,
-    startBlock: 9472885,
   },
   {
     id: "cakev2-axs-wbnb",
@@ -45583,7 +44380,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x30f19CC8249f81fad6154eF58469a4AFEB9c4816",
     lastHarvest: 0,
-    startBlock: 9376825,
   },
   {
     id: "ellipsis-usdn-eol",
@@ -45612,7 +44408,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4daBaD460651673d5662112F57046146f0Ab79Ce",
     lastHarvest: 0,
-    startBlock: 9322183,
   },
   {
     id: "fruit-fruit-cake-eol",
@@ -45643,7 +44438,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x882Da13F22479Ea576999B300ACc5Ded4e1A6459",
     lastHarvest: 0,
-    startBlock: 9318633,
   },
   {
     id: "fruit-fruit-xvs-eol",
@@ -45674,7 +44468,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x554b4f9C3f54B02A264d65d4286730762C622b0C",
     lastHarvest: 0,
-    startBlock: 9318768,
   },
   {
     id: "banana-fruit-bnb-eol",
@@ -45705,7 +44498,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x46a0F73198192951C746B4b7a9E91E6edef38d9E",
     lastHarvest: 0,
-    startBlock: 9293251,
   },
   {
     id: "stablequant-quant-busd-eol",
@@ -45737,7 +44529,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1245549819F6E0c95109cC2fF3C75C12Fc0a4B92",
     lastHarvest: 0,
-    startBlock: 9667500,
   },
   {
     id: "rabbit-carrot-busd",
@@ -45768,7 +44559,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x88c924Eb1CAEE0260a16de22078A5015e5Bf1115",
     lastHarvest: 0,
-    startBlock: 9206025,
   },
   {
     id: "kingdefi-krown-bnb-eol",
@@ -45799,7 +44589,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDeb8Fca869d5A1ED5E003ef1Eabf74E1233EB5Fe",
     lastHarvest: 0,
-    startBlock: 9152951,
   },
   {
     id: "kingdefi-krown-eol",
@@ -45829,7 +44618,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xbF4bC77Bb1eBA1b2f8a3Aa1219b792C2F217c221",
     lastHarvest: 0,
-    startBlock: 9154062,
   },
   {
     id: "ooe-ooe-bnb",
@@ -45858,7 +44646,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDD891BA224a4a63094b4599abb2f007fB2E41ee5",
     lastHarvest: 0,
-    startBlock: 9097001,
   },
   {
     id: "ooe-ooe-busd",
@@ -45887,7 +44674,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4B69c421748B8b9ED5974694F34c99C5Ab3D389a",
     lastHarvest: 0,
-    startBlock: 9096596,
   },
   {
     id: "banana-yfi-bnb",
@@ -45917,7 +44703,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF0Eee33F9382cC5C93B833765189e085E0B81BaD",
     lastHarvest: 0,
-    startBlock: 9068857,
   },
   {
     id: "wex-wex-btcb-eol",
@@ -45948,7 +44733,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb563Df6c2a33816e92DF6f7E3e62F894aaFB1446",
     lastHarvest: 0,
-    startBlock: 9009752,
   },
   {
     id: "cakev2-chess-usdc",
@@ -45978,7 +44762,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb436bfFC6DEac17271Ae9A886f66633DC6D64039",
     lastHarvest: 1654072668,
-    startBlock: 9086252,
   },
   {
     id: "cakev2-mask-wbnb-eol",
@@ -46009,7 +44792,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC28B8B7DB4F4A2481576472A73FFA6C7B5c0FFeB",
     lastHarvest: 0,
-    startBlock: 8959232,
   },
   {
     id: "ellipsis-pbtc-eol",
@@ -46038,7 +44820,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF3fd55054e031761176DDE4F593d6f2b8298eDb5",
     lastHarvest: 0,
-    startBlock: 8924582,
   },
   {
     id: "banana-sfp-bnb",
@@ -46069,7 +44850,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x96f31d39cCf8906344Ae8cD050816e274d251Ca2",
     lastHarvest: 0,
-    startBlock: 8923199,
   },
   {
     id: "banana-eps-bnb-eol",
@@ -46101,7 +44881,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x07cB4dA1E8B2e77cF333c390D8dc8561399386E8",
     lastHarvest: 0,
-    startBlock: 8923274,
   },
   {
     id: "banana-xvs-bnb",
@@ -46132,7 +44911,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9356898BD15CC9506c5339DDB03f091261395144",
     lastHarvest: 0,
-    startBlock: 8923335,
   },
   {
     id: "banana-twt-bnb",
@@ -46163,7 +44941,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x11134Cc913A99df0cA59f70fFdb4eEb480e2Ae43",
     lastHarvest: 0,
-    startBlock: 8923405,
   },
   {
     id: "cakev2-titan-busd-eol",
@@ -46195,7 +44972,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xbAD401fA02EeE77F81dd5E23b95723D4B6f278ED",
     lastHarvest: 0,
-    startBlock: 9003910,
   },
   {
     id: "cakev2-one-wbnb",
@@ -46225,7 +45001,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf915D05299cfE1567c833945342D611c05AEFAd4",
     lastHarvest: 1654000370,
-    startBlock: 9003260,
   },
   {
     id: "wex-watch-bnb-eol",
@@ -46257,7 +45032,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5A7b4eb232287955981331b384fd6D2d24f68213",
     lastHarvest: 0,
-    startBlock: 8720910,
   },
   {
     id: "cakev2-form-busd-eol",
@@ -46288,7 +45062,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA90d33E66B341da01b309Ffe4a63ca803630e2A1",
     lastHarvest: 0,
-    startBlock: 8938106,
   },
   {
     id: "cakev2-busd-orbs-eol",
@@ -46319,7 +45092,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0bb0d708B2BdBE8185a6b55092826E77bf979366",
     lastHarvest: 0,
-    startBlock: 8928884,
   },
   {
     id: "cakev2-bscpad-wbnb",
@@ -46349,7 +45121,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5F0c93cA90B338Fb4B57786f436F6040A2cD2d36",
     lastHarvest: 0,
-    startBlock: 8902124,
   },
   {
     id: "cakev2-adx-busd-eol",
@@ -46380,7 +45151,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1be592f6Ab06a3ff4392dC50e4AA5A3a31295531",
     lastHarvest: 0,
-    startBlock: 8758645,
   },
   {
     id: "cakev2-usdt-usdc",
@@ -46410,7 +45180,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc83aE721681B472bCefc944B65f27B72A3b78EFd",
     lastHarvest: 0,
-    startBlock: 8703359,
   },
   {
     id: "cakev2-cake-usdt",
@@ -46440,7 +45209,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7FA8e647d160Cd745c49b1399569A229554726b2",
     lastHarvest: 1654000379,
-    startBlock: 8703202,
   },
   {
     id: "merlin-merlin-eol",
@@ -46468,7 +45236,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x63C268F2a283fFfE6fC58C8c2fBc6AdA96156b0C",
     lastHarvest: 0,
-    startBlock: 8346414,
   },
   {
     id: "cakev2-rabbit-wbnb-eol",
@@ -46500,7 +45267,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD6410179133254222fBbeE2fF575ad38a8F0bF1D",
     lastHarvest: 0,
-    startBlock: 8586758,
   },
   {
     id: "cakev2-htb-bnb-eol",
@@ -46531,7 +45297,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x066D968c831C3B8B8a3EA9b2909e459C23B72A81",
     lastHarvest: 0,
-    startBlock: 8493910,
   },
   {
     id: "cakev2-wex-wbnb-eol",
@@ -46563,7 +45328,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5A1DC57b48586Aa2D997f0f426297b758CA62BAF",
     lastHarvest: 0,
-    startBlock: 8585088,
   },
   {
     id: "cakev2-waultx-wbnb-eol",
@@ -46594,7 +45358,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x21eF8614113B234F50F367167370a1f8D5FaC182",
     lastHarvest: 0,
-    startBlock: 8585037,
   },
   {
     id: "cakev2-woo-bnb",
@@ -46624,7 +45387,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF0cA7E203dc545bE28Bd858a1988a5f9c0097848",
     lastHarvest: 0,
-    startBlock: 8493916,
   },
   {
     id: "ica-zbtc-eol",
@@ -46654,7 +45416,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDAC16532E9d6d632999b6e1CC17D2E83bE74E970",
     lastHarvest: 0,
-    startBlock: 8428229,
   },
   {
     id: "ica-zeth-eol",
@@ -46684,7 +45445,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7dBB1A0BcB8029cf0471c4e3478Cfcf05c8c1f52",
     lastHarvest: 0,
-    startBlock: 8405051,
   },
   {
     id: "cakev2-boring-bn-eol",
@@ -46715,7 +45475,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2D9843f2437BB3AE190b099e6408124A0E75aF05",
     lastHarvest: 0,
-    startBlock: 8384412,
   },
   {
     id: "cakev2-marsh-bnb-eol",
@@ -46746,7 +45505,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6d1bE82278a8C24DCddd3c0653Ff1ea1C2019EAB",
     lastHarvest: 0,
-    startBlock: 8384422,
   },
   {
     id: "cakev2-hai-bnb-eol",
@@ -46777,7 +45535,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x77D1dd705eE757b1C2f57Eb35807F64Be3f7c432",
     lastHarvest: 0,
-    startBlock: 8384406,
   },
   {
     id: "cakev2-o3-busd-eol",
@@ -46808,7 +45565,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x61c6344dA8d6d6308E082616BD347354DFDfa155",
     lastHarvest: 0,
-    startBlock: 8384468,
   },
   {
     id: "wex-eth-beth-eol",
@@ -46840,7 +45596,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xBBC4277DfA909baaC81f0A674f8c39610EeBE9ce",
     lastHarvest: 0,
-    startBlock: 8316542,
   },
   {
     id: "iron-steel-iron",
@@ -46871,7 +45626,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x10d82E0BcAAaAEDdfC770bEa3D3F1D79E0fc7eA6",
     lastHarvest: 0,
-    startBlock: 7403029,
   },
   {
     id: "iron-steel",
@@ -46900,7 +45654,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCC87C7c5372Cd11Ca0c39F7Fba970fdf4A9dDeC7",
     lastHarvest: 0,
-    startBlock: 8295020,
   },
   {
     id: "memefarmv2-ape-bnb-eol",
@@ -46931,7 +45684,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5A11a47C3c6C9Ee92B9Ba7892Ccb2246D4D76204",
     lastHarvest: 0,
-    startBlock: 8317111,
   },
   {
     id: "cakev2-ampl-bsc-mp-busd-eol",
@@ -46963,7 +45715,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x657B91259e3d612D683A201b5B30fb706677B205",
     lastHarvest: 0,
-    startBlock: 8287623,
   },
   {
     id: "wex-eth-bnb-eol",
@@ -46995,7 +45746,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8a683A57f292A1889Cc84892E0AA2B87b11726ce",
     lastHarvest: 0,
-    startBlock: 8150958,
   },
   {
     id: "wex-usdt-alpaca-eol",
@@ -47027,7 +45777,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA5E1B41a4B96b474699Dc424882b8d3B10931F1f",
     lastHarvest: 0,
-    startBlock: 8150337,
   },
   {
     id: "wex-usdt-matic-eol",
@@ -47059,7 +45808,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA2b86F76E6Cce6FC1899F539974d7c1b544f4dD0",
     lastHarvest: 0,
-    startBlock: 8150279,
   },
   {
     id: "wex-ada-busd-eol",
@@ -47091,7 +45839,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDFE80211789A4C298Cb3Ae505e6c6C65f2e99809",
     lastHarvest: 0,
-    startBlock: 8216318,
   },
   {
     id: "wex-xrp-busd-eol",
@@ -47124,7 +45871,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x61c35FC2Dd6128071BB41dB5877E3bBfC26A57D7",
     lastHarvest: 0,
-    startBlock: 8215687,
   },
   {
     id: "wex-alpaca-bnb-eol",
@@ -47156,7 +45902,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x40EcBbF121c40042CF0E3f529ef1d348faB4Aad8",
     lastHarvest: 0,
-    startBlock: 8146447,
   },
   {
     id: "wex-usdt-wex-eol",
@@ -47188,7 +45933,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD01d4635E243C60df164452464346ca75Ea0ceA7",
     lastHarvest: 0,
-    startBlock: 8146360,
   },
   {
     id: "wex-wex-bnb-eol",
@@ -47220,7 +45964,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4884012E35e069ACb6ca132E7afB8eD80B97cb96",
     lastHarvest: 0,
-    startBlock: 8151033,
   },
   {
     id: "cakev2-btcb-eth",
@@ -47251,7 +45994,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x18A181860Bc95282CD3Ee1616b9087d4E199d03B",
     lastHarvest: 0,
-    startBlock: 8186265,
   },
   {
     id: "cakev2-eth-usdc",
@@ -47282,7 +46024,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb16F57c644850439DC6072Bf951a69E405bA41Bf",
     lastHarvest: 1654072710,
-    startBlock: 8188206,
   },
   {
     id: "banana-typh-bnb-eol",
@@ -47314,7 +46055,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x02aeDd0d8dE62aEf91aE41E78EfCD0A4d6D70807",
     lastHarvest: 0,
-    startBlock: 8168113,
   },
   {
     id: "tenfi-tenfi-bnb",
@@ -47345,7 +46085,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc211F209b437206C7293CD3F60179155F0FFF01d",
     lastHarvest: 0,
-    startBlock: 8146210,
   },
   {
     id: "tenfi-tenfi-busd",
@@ -47376,7 +46115,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1c04cAf119Bc1367923d9DeE8B119d8d3735ea82",
     lastHarvest: 0,
-    startBlock: 8146334,
   },
   {
     id: "cakev2-mbox-bnb-eol",
@@ -47408,7 +46146,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x96381e55A9376057d7F015AE91Cd0a17bbb5E716",
     lastHarvest: 0,
-    startBlock: 8121418,
   },
   {
     id: "banana-celr-bnb",
@@ -47439,7 +46176,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x46d44d6B242884ee587513a892e05c133C8fe3aB",
     lastHarvest: 0,
-    startBlock: 8098825,
   },
   {
     id: "banana-shib-bnb",
@@ -47470,7 +46206,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7963f31845293943F828264EE02823672eD2B745",
     lastHarvest: 0,
-    startBlock: 8098421,
   },
   {
     id: "cakev2-ata-bnb-eol",
@@ -47502,7 +46237,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xBAf13A54507d41b6b4f31C49db2c0dE6ACa9aD14",
     lastHarvest: 0,
-    startBlock: 8087744,
   },
   {
     id: "panther-panther-busd-eol",
@@ -47534,7 +46268,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x98798cFf9D3a208A8E4e0661C3708Aacfe38b1eD",
     lastHarvest: 0,
-    startBlock: 7999006,
   },
   {
     id: "panther-panther-bnb-eol",
@@ -47566,7 +46299,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x07f35757Fb1057a3c4b184af58312B1EB7eB5e26",
     lastHarvest: 0,
-    startBlock: 7999494,
   },
   {
     id: "garuda-garuda-bnb",
@@ -47597,7 +46329,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA4bF615396bf919FC424822a72431cDB0ABF2DEb",
     lastHarvest: 0,
-    startBlock: 7402068,
   },
   {
     id: "cakev2-mtrg-busd-eol",
@@ -47629,7 +46360,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x10804eF940f6258378f73cC48Be9e3d55592674c",
     lastHarvest: 0,
-    startBlock: 8002596,
   },
   {
     id: "cakev2-qkc-busd-eol",
@@ -47661,7 +46391,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4Fa2E74E3bE13cc9B3a68237E84A82Ef03E50019",
     lastHarvest: 0,
-    startBlock: 8002513,
   },
   {
     id: "cakev2-mx-busd-eol",
@@ -47693,7 +46422,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6352206e5E056A71eE83838b27F63f1d8236D4C3",
     lastHarvest: 0,
-    startBlock: 8000202,
   },
   {
     id: "cakev2-ktn-bnb-eol",
@@ -47725,7 +46453,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE2fE9501c5D0C7823Ad9f15081df8FD0d8a85755",
     lastHarvest: 0,
-    startBlock: 7944436,
   },
   {
     id: "ellipsis-eps-eol",
@@ -47755,7 +46482,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1F88694dE93983aea55E2e3C8e0bA46Cf7b3b047",
     lastHarvest: 0,
-    startBlock: 7897761,
   },
   {
     id: "dopple-dop-lp",
@@ -47784,7 +46510,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x39126B7E783f299E0Bbe58d3ff0781b3e169104A",
     lastHarvest: 0,
-    startBlock: 7685712,
   },
   {
     id: "cakev2-tusd-busd-eol",
@@ -47816,7 +46541,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x31a0eDa9758c11b0639fFbb3F10c27E580AA58bd",
     lastHarvest: 0,
-    startBlock: 7926658,
   },
   {
     id: "mdex-bsc-bnb-usdt-eol",
@@ -47848,7 +46572,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD82Ba12777422D88b8D38518804F9C2Aa2888049",
     lastHarvest: 0,
-    startBlock: 7890198,
   },
   {
     id: "mdex-bsc-fil-usdt-eol",
@@ -47880,7 +46603,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf219CFD4D0D32A3C1204fD7323e0ACFDD505302F",
     lastHarvest: 0,
-    startBlock: 7830743,
   },
   {
     id: "cakev2-vrt-bnb-eol",
@@ -47911,7 +46633,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1daC7dfAFD2388c28464476420ffD875fa340bFB",
     lastHarvest: 0,
-    startBlock: 7830330,
   },
   {
     id: "cakev2-ez-bnb-eol",
@@ -47943,7 +46664,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x10B655116b9E7677945D74027cAd51cC16ff7d53",
     lastHarvest: 0,
-    startBlock: 7830273,
   },
   {
     id: "cakev2-kalm-bnb-eol",
@@ -47976,7 +46696,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2E92EE2670E21C5d9e1e49eFb4BB9868134Fe010",
     lastHarvest: 0,
-    startBlock: 7830344,
   },
   {
     id: "jetswap-wings-eol",
@@ -48006,7 +46725,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xeAFfC400B7220e19Ed23aa753D3723915bFD3Cf3",
     lastHarvest: 0,
-    startBlock: 7598784,
   },
   {
     id: "dopple-ust-lp",
@@ -48035,7 +46753,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xbF50324fE8be7Dc33914EF72394fae035e6d5A4C",
     lastHarvest: 0,
-    startBlock: 7796981,
   },
   {
     id: "cakev2-bifi-bnb",
@@ -48075,7 +46792,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0a19cD4372EAc4156C08Ca97C631A52Db7bDfcF7",
     lastHarvest: 1654000394,
-    startBlock: 6866501,
   },
   {
     id: "banana-sushi-bnb",
@@ -48106,7 +46822,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA349d04BFE6215D97a8a6350EEE0A3f00fb7ddF1",
     lastHarvest: 0,
-    startBlock: 7780143,
   },
   {
     id: "banana-dot-bnb",
@@ -48137,7 +46852,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4BC5a4199C61F907D9dBeE36F93bA3dD1F770C1E",
     lastHarvest: 0,
-    startBlock: 7779709,
   },
   {
     id: "banana-xrp-bnb",
@@ -48168,7 +46882,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb3C630f032041D3e45855a44B7bCF459D8b226f8",
     lastHarvest: 0,
-    startBlock: 7778891,
   },
   {
     id: "banana-snx-bnb",
@@ -48199,7 +46912,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x13e331298934985D15ac6e4dC82E8788fc2A1945",
     lastHarvest: 0,
-    startBlock: 7776150,
   },
   {
     id: "banana-blz-bnb-eol",
@@ -48231,7 +46943,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb45B685970efB70705Ef0cF9e39ef74F9a7a7893",
     lastHarvest: 0,
-    startBlock: 7778588,
   },
   {
     id: "banana-ltc-bnb",
@@ -48262,7 +46973,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF6Cb4d2Ca247A53F6Fd52641e0372EFbE68f5a82",
     lastHarvest: 0,
-    startBlock: 7715034,
   },
   {
     id: "cakev2-cake-busd",
@@ -48292,7 +47002,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8c994F258c84578c5c2D17643c689bbc420770b5",
     lastHarvest: 1654025442,
-    startBlock: 7688127,
   },
   {
     id: "cakev2-chr-busd",
@@ -48323,7 +47032,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8a3400BdD3cC555465b8Fe6a588CD8C7dCBFc35a",
     lastHarvest: 1654041206,
-    startBlock: 7733181,
   },
   {
     id: "cakev2-deri-busd-eol",
@@ -48355,7 +47063,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0bb686a137D60710f9b5bE0122A5d690d6854166",
     lastHarvest: 0,
-    startBlock: 7731523,
   },
   {
     id: "hps-hps",
@@ -48384,7 +47091,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x48A7390823398d09b67948316839c76ce2c59007",
     lastHarvest: 0,
-    startBlock: 6101190,
   },
   {
     id: "dopple-dolly-lp",
@@ -48413,7 +47119,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9aBdA120556178C9d0Bfeb98253153BCadc96aAE",
     lastHarvest: 0,
-    startBlock: 7684917,
   },
   {
     id: "cakev2-xend-bnb-eol",
@@ -48445,7 +47150,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF352a938f0bC11B2c8B2E95e5817979373d03b15",
     lastHarvest: 0,
-    startBlock: 7690730,
   },
   {
     id: "cakev2-cyc-bnb-eol",
@@ -48477,7 +47181,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc6d3114514536acD80B63D26264F294f648A1C65",
     lastHarvest: 0,
-    startBlock: 7690723,
   },
   {
     id: "banana-near-bnb",
@@ -48508,7 +47211,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3EA0c78334bfac892A78a8AB3a04aA7308Ea75d3",
     lastHarvest: 0,
-    startBlock: 7690611,
   },
   {
     id: "banana-coti-bnb",
@@ -48539,7 +47241,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x598618b12181D54BD71d12bB412fb82E54Ca674B",
     lastHarvest: 0,
-    startBlock: 7690604,
   },
   {
     id: "banana-etc-bnb-eol",
@@ -48571,7 +47272,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x13ca3AfcA271CFcb7D17860F21660992d75598C6",
     lastHarvest: 0,
-    startBlock: 7690596,
   },
   {
     id: "banana-zec-bnb",
@@ -48602,7 +47302,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0fE2D6D2a32d432B26251cAf6104c216AF23c7D5",
     lastHarvest: 0,
-    startBlock: 7690591,
   },
   {
     id: "garuda-garuda-usdc",
@@ -48633,7 +47332,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF275971e8A06Ef493Ef38b71aA0b2C6B9d0bA8A5",
     lastHarvest: 0,
-    startBlock: 7680990,
   },
   {
     id: "jetswap-wings-bnb",
@@ -48664,7 +47362,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x735cA7E490e7086aeA15ca8b72d3CE4beb92f97d",
     lastHarvest: 0,
-    startBlock: 7594599,
   },
   {
     id: "jetswap-wings-busd-eol",
@@ -48696,7 +47393,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8783f4D85aC64c2d0b3245425B6e4Eb73C6b0ad8",
     lastHarvest: 0,
-    startBlock: 7595804,
   },
   {
     id: "jetswap-busd-bnb",
@@ -48725,7 +47421,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB946c0956C0Db9937728cBA230e63797aDE31773",
     lastHarvest: 0,
-    startBlock: 7596058,
   },
   {
     id: "grand-grand-eol",
@@ -48754,7 +47449,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd9898f080d8322fB6892B1Eb02466c952a967794",
     lastHarvest: 0,
-    startBlock: 7601486,
   },
   {
     id: "grand-grand-bnb-eol",
@@ -48785,7 +47479,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD91CF07574D4d9039E400347F2636E5Ffc27A243",
     lastHarvest: 0,
-    startBlock: 7600421,
   },
   {
     id: "dumpling-sdump-bnb-eol",
@@ -48816,7 +47509,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4080875874457d5B2617Cb4a70d602DF2488b967",
     lastHarvest: 0,
-    startBlock: 7596937,
   },
   {
     id: "dumpling-sdump-busd-eol",
@@ -48847,7 +47539,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8Edb024A5a551B5E51213E687765662a1A5FF850",
     lastHarvest: 0,
-    startBlock: 7597049,
   },
   {
     id: "satis-xsat-busd-eol",
@@ -48878,7 +47569,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD033C1A265850F360400BF68A2E286e600CC4150",
     lastHarvest: 0,
-    startBlock: 7571918,
   },
   {
     id: "satis-xsat-bnb-eol",
@@ -48909,7 +47599,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x72742EB56084d914d5D9eC666FA9d0fCD3F23260",
     lastHarvest: 0,
-    startBlock: 7572166,
   },
   {
     id: "iron-dnd",
@@ -48938,7 +47627,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x793D305e3b98951925d52382536188596F3fd81F",
     lastHarvest: 0,
-    startBlock: 7542899,
   },
   {
     id: "iron-dnd-bnb",
@@ -48969,7 +47657,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa6f996065E99F179678e76D0Bf68a9cf2e9497c7",
     lastHarvest: 0,
-    startBlock: 7542509,
   },
   {
     id: "cakev2-hotcross-bnb",
@@ -49000,7 +47687,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x83E05C8a4AdEfA875ABe0f30a18bb6F9b54b807e",
     lastHarvest: 1654072866,
-    startBlock: 7586484,
   },
   {
     id: "cakev2-rfox-bnb-eol",
@@ -49033,7 +47719,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x902ccd33607D0cc5cE70A074fAe5323da6BC9480",
     lastHarvest: 0,
-    startBlock: 7589220,
   },
   {
     id: "cakev2-wmass-busd-eol",
@@ -49065,7 +47750,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x99ea3EAF23B9F21bc750049A8fF5D6f433102e86",
     lastHarvest: 0,
-    startBlock: 7540618,
   },
   {
     id: "cakev2-ubxt-busd-eol",
@@ -49097,7 +47781,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc173F8bDf470FE6812E7aD1107050f27DaC8387b",
     lastHarvest: 0,
-    startBlock: 7540629,
   },
   {
     id: "cakev2-btr-busd-eol",
@@ -49129,7 +47812,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE5FA9e049DafE4DE649C782D9C39b13e0111D49A",
     lastHarvest: 0,
-    startBlock: 7540641,
   },
   {
     id: "cakev2-pmon-busd-eol",
@@ -49161,7 +47843,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE5d0bADa3748DB7080E1960f6EbD2837492386FC",
     lastHarvest: 0,
-    startBlock: 7540654,
   },
   {
     id: "cakev2-one-busd-eol",
@@ -49193,7 +47874,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0BdAe1031138B99323324567e6c5591A4e0c9000",
     lastHarvest: 0,
-    startBlock: 7540665,
   },
   {
     id: "cakev2-oin-busd-eol",
@@ -49225,7 +47905,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd428bBC9255863d17bcb439f9634d786644248e2",
     lastHarvest: 0,
-    startBlock: 7540677,
   },
   {
     id: "cakev2-tdoge-bnb-eol",
@@ -49256,7 +47935,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x07bcEDa6eFa0BeD5B8ECa04094453A80eb84F441",
     lastHarvest: 0,
-    startBlock: 7540722,
   },
   {
     id: "cakev2-fine-bnb-eol",
@@ -49289,7 +47967,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2e3a99c45b8ee89aB15f8528CE84d102645cCb04",
     lastHarvest: 0,
-    startBlock: 7540734,
   },
   {
     id: "cakev2-doge-bnb",
@@ -49329,7 +48006,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x827229d96c04A9975B80a1BA8f9A47aA0a9a5c5e",
     lastHarvest: 0,
-    startBlock: 7540746,
   },
   {
     id: "cakev2-hyfi-bnb-eol",
@@ -49361,7 +48037,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x880f32d087a329DFF1b5cb571ef672D89e44440d",
     lastHarvest: 0,
-    startBlock: 7540759,
   },
   {
     id: "banana-avax-bnb",
@@ -49392,7 +48067,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC9BfCFD64d6f55BDDEe70de66e6eBE31157D3d10",
     lastHarvest: 0,
-    startBlock: 7521514,
   },
   {
     id: "garuda-garuda-usdt",
@@ -49423,7 +48097,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf92a7dE75dd3Eb9Ca505D5040D682b8091f707eD",
     lastHarvest: 0,
-    startBlock: 7457943,
   },
   {
     id: "banana-ftm-bnb",
@@ -49454,7 +48127,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x24af8AE18B5336C090546CdEF5630e417B437ca4",
     lastHarvest: 0,
-    startBlock: 7431746,
   },
   {
     id: "banana-comp-bnb",
@@ -49485,7 +48157,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCCc04D8E4db259Eeaf932813527D21cE7eA37a0D",
     lastHarvest: 0,
-    startBlock: 7428845,
   },
   {
     id: "banana-aave-bnb",
@@ -49516,7 +48187,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF56d5E0FA434Be8F8833FF866cEc0D2FC251DBFE",
     lastHarvest: 0,
-    startBlock: 7428227,
   },
   {
     id: "banana-link-bnb",
@@ -49555,7 +48225,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x77BFDfc5e6358B83e9D251Af6dD2611871CEd3Bb",
     lastHarvest: 0,
-    startBlock: 7426444,
   },
   {
     id: "banana-ada-bnb",
@@ -49586,7 +48255,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xBfb6Be9553E676A0a559885262Aee98bC50A6eeE",
     lastHarvest: 0,
-    startBlock: 7410239,
   },
   {
     id: "iron-iron-busd",
@@ -49617,7 +48285,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x411Ff6C7dCa700D7f1867eBF885498Fce4a7d080",
     lastHarvest: 0,
-    startBlock: 7402887,
   },
   {
     id: "iron-steel-bnb",
@@ -49648,7 +48315,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4c36e84cFd0d0917d09847701d21c92114B80FEF",
     lastHarvest: 0,
-    startBlock: 7403001,
   },
   {
     id: "bhc-bhc-eol",
@@ -49677,7 +48343,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x54b083Ca9fD30ae83C47CDd3a59390F00a90E9CC",
     lastHarvest: 0,
-    startBlock: 4147241,
   },
   {
     id: "banana-matic-bnb",
@@ -49708,7 +48373,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7c118E94cC65621db5FA0e38BDC111E81A9Bb72D",
     lastHarvest: 0,
-    startBlock: 7349784,
   },
   {
     id: "bunny-bunny-v2-eol",
@@ -49737,7 +48401,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa41C537d5d2C7caD5264b23d257b581738c4c71E",
     lastHarvest: 0,
-    startBlock: 7348486,
   },
   {
     id: "tofy-tofy-eol",
@@ -49767,7 +48430,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9AE72e62259DEC1c5d01E709DFbB9001f6D6ae91",
     lastHarvest: 0,
-    startBlock: 7348171,
   },
   {
     id: "tofy-tofy-mash-eol",
@@ -49798,7 +48460,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2dea9166765D740617525a2Cb751B73C2Aa61A6A",
     lastHarvest: 0,
-    startBlock: 7347532,
   },
   {
     id: "tofy-tofy-bnb-eol",
@@ -49829,7 +48490,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x421a34E3433fc6485f792BDD74e521ea925220C0",
     lastHarvest: 0,
-    startBlock: 7347209,
   },
   {
     id: "goal-goal-busd-eol",
@@ -49861,7 +48521,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x73B68fe0854e3fF25E2450E0E2791cAB6FBa12ec",
     lastHarvest: 0,
-    startBlock: 7317454,
   },
   {
     id: "cakev2-kun-busd-eol",
@@ -49893,7 +48552,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3698E26b628c9cb257B3506aD00c7304bFe29448",
     lastHarvest: 0,
-    startBlock: 7316782,
   },
   {
     id: "cakev2-mcoin-ust-eol",
@@ -49925,7 +48583,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xaF58a603E6c31d97459f8c3caE56C21006479968",
     lastHarvest: 0,
-    startBlock: 7288904,
   },
   {
     id: "banana-watch-bnb",
@@ -49956,7 +48613,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x95D965048920A9917b079E6Eb53Bf10d1C0F66a0",
     lastHarvest: 0,
-    startBlock: 7265588,
   },
   {
     id: "jetfuel-fts-bnb-eol",
@@ -49987,7 +48643,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8038A8A1765Ae44629Ab74ffDC39Af60b02554f4",
     lastHarvest: 0,
-    startBlock: 7264625,
   },
   {
     id: "banana-bxbtc-bnb-eol",
@@ -50018,7 +48673,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa81Aa01ed8aB5FAc7d4c2524c0c754097a299a7c",
     lastHarvest: 0,
-    startBlock: 7207283,
   },
   {
     id: "cakev2-btt-bnb",
@@ -50049,7 +48703,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1aAaB52Ae2cE49751B052482E9a40d63137F0bd5",
     lastHarvest: 0,
-    startBlock: 7208510,
   },
   {
     id: "cakev2-trx-bnb",
@@ -50080,7 +48733,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd5ACf6DFA0f59c5C5A85d6fACf74F59a721478BA",
     lastHarvest: 0,
-    startBlock: 7208521,
   },
   {
     id: "cakev2-win-bnb",
@@ -50111,7 +48763,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x486b33700c3f67Ba68cdb0D5E0c449A196F48FA8",
     lastHarvest: 0,
-    startBlock: 7208533,
   },
   {
     id: "banana-naut-bnb-eol",
@@ -50143,7 +48794,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x23b7a79777Ae4c7C4D3b8A9f73C36d59C455C767",
     lastHarvest: 0,
-    startBlock: 7207268,
   },
   {
     id: "cakev2-pnt-pbtc-eol",
@@ -50175,7 +48825,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6689be1A9C190227b6Caaaf4F3307867bd148C5a",
     lastHarvest: 0,
-    startBlock: 7182337,
   },
   {
     id: "ica-ica-btcb-eol",
@@ -50206,7 +48855,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF113fbA8B7A409E9C68fd10BaeaE1485906D4F5e",
     lastHarvest: 0,
-    startBlock: 7153471,
   },
   {
     id: "ica-ica-eth-eol",
@@ -50237,7 +48885,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8a18555AB976b8B08D250Ccf48d73B468f8F4f3B",
     lastHarvest: 0,
-    startBlock: 7153243,
   },
   {
     id: "zefiv2-zefi-bnb-eol",
@@ -50269,7 +48916,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x42F47b98845E58a0ad7EB29E9d4087A466cA135e",
     lastHarvest: 0,
-    startBlock: 7133524,
   },
   {
     id: "zefiv2-zefi-busd-eol",
@@ -50301,7 +48947,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6f4bEE6ea731eEa6Cbd80Bde818A4bDAFA34238E",
     lastHarvest: 0,
-    startBlock: 7133429,
   },
   {
     id: "satis-sat-bnb-eol",
@@ -50330,7 +48975,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb0B0a02C6405124C192C2B5DFf52281A23261f76",
     lastHarvest: 0,
-    startBlock: 7101311,
   },
   {
     id: "satis-sat-busd-eol",
@@ -50359,7 +49003,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xfa8aAFB7C459075412dC1cC73A99B35899f342EC",
     lastHarvest: 0,
-    startBlock: 7101199,
   },
   {
     id: "banana-busd-usdc",
@@ -50390,7 +49033,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9e6d68d1Fe1411d3f4DAC7f54A5BfA31156047D1",
     lastHarvest: 0,
-    startBlock: 7105770,
   },
   {
     id: "banana-doge-bnb",
@@ -50430,7 +49072,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1591d2F3b59D294Bd0E98A4187794D848b751369",
     lastHarvest: 0,
-    startBlock: 7014966,
   },
   {
     id: "cakev2-btcb-busd",
@@ -50459,7 +49100,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x85D0f3982959588015b228DF9e4B1Df074c62DAB",
     lastHarvest: 1654072938,
-    startBlock: 6991757,
   },
   {
     id: "banana-keyfi-bnb-eol",
@@ -50491,7 +49131,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCa52393444dee44EbA946EFC1A19C2F0b1572B04",
     lastHarvest: 0,
-    startBlock: 6964755,
   },
   {
     id: "cakev2-lmt-bnb-eol",
@@ -50523,7 +49162,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3Ab896c22fc7CF570c6792f435343a612251c1bB",
     lastHarvest: 0,
-    startBlock: 6953032,
   },
   {
     id: "swampv2-cake-bnb-eol",
@@ -50554,7 +49192,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x595d19abccFAB79f251563117C98a0E1feeD579a",
     lastHarvest: 0,
-    startBlock: 6903383,
   },
   {
     id: "beltv2-belt-bnb",
@@ -50585,7 +49222,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd64B3BD56AFC7aba73634818cd903D73aAd08122",
     lastHarvest: 0,
-    startBlock: 6920810,
   },
   {
     id: "cakev2-dfd-busd-eol",
@@ -50617,7 +49253,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x16fe74dBB09F18BCb0f25a87fbDc9070d69f1586",
     lastHarvest: 0,
-    startBlock: 6925549,
   },
   {
     id: "cakev2-alpaca-busd",
@@ -50648,7 +49283,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xAc12B4D07aA03c512bc50aAF96cBD9692D9EAA89",
     lastHarvest: 0,
-    startBlock: 6920239,
   },
   {
     id: "swampv2-swamp-bnb-eol",
@@ -50681,7 +49315,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3d74614F2b326EbA3616E757bdDA94ED6C5C5b4a",
     lastHarvest: 0,
-    startBlock: 6903365,
   },
   {
     id: "swampv2-swamp-busd-eol",
@@ -50714,7 +49347,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x55eE767682C29E25f2f0BE6E776c6508e3D95857",
     lastHarvest: 0,
-    startBlock: 6903372,
   },
   {
     id: "cakev2-bunny-bnb-eol",
@@ -50746,7 +49378,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd00d64D47977aF8F65aC9706618fE38eF4aA0c39",
     lastHarvest: 0,
-    startBlock: 6900400,
   },
   {
     id: "cakev2-eos-bnb-eol",
@@ -50778,7 +49409,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1e019211562fD2f8542c2E93a092c6a41E9A1111",
     lastHarvest: 0,
-    startBlock: 6895845,
   },
   {
     id: "cakev2-xrp-bnb",
@@ -50809,7 +49439,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x07B8717fc59676Fb1F1bb496b93615Dd2ea7707A",
     lastHarvest: 1654000403,
-    startBlock: 6895860,
   },
   {
     id: "cakev2-uni-bnb",
@@ -50840,7 +49469,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x81ff9cfe2c4fD6D5F1F2C13624ECF9A9e6FBcb73",
     lastHarvest: 1654000412,
-    startBlock: 6895872,
   },
   {
     id: "cakev2-sxp-bnb",
@@ -50871,7 +49499,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x563DE4721532cbFCF004525cD7B17486814A5D75",
     lastHarvest: 1654000424,
-    startBlock: 6895888,
   },
   {
     id: "cakev2-blk-bnb-eol",
@@ -50902,7 +49529,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9855a453cC9E33605612a155700B40285c9CC3ad",
     lastHarvest: 0,
-    startBlock: 6895899,
   },
   {
     id: "cakev2-jgn-bnb-eol",
@@ -50934,7 +49560,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x39844D032b70bcFF899f53e1f2C2AE9Bee00A71b",
     lastHarvest: 0,
-    startBlock: 6894563,
   },
   {
     id: "cakev2-eps-bnb",
@@ -50965,7 +49590,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xdC365803DD60221616b763195d6c3633514a1880",
     lastHarvest: 1654072956,
-    startBlock: 6894576,
   },
   {
     id: "cakev2-nrv-bnb-eol",
@@ -50997,7 +49621,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE95871AFD0366E68e43393506B13EAAB9B70F860",
     lastHarvest: 0,
-    startBlock: 6894587,
   },
   {
     id: "cakev2-bfi-bnb",
@@ -51028,7 +49651,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x98DA1Da3c464b02BA5991BD227388D51A6B536A3",
     lastHarvest: 0,
-    startBlock: 6894611,
   },
   {
     id: "cakev2-bdo-bnb-eol",
@@ -51059,7 +49681,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x904216D58d0Bcd9F025C1C87D109F94623122a83",
     lastHarvest: 0,
-    startBlock: 6894623,
   },
   {
     id: "cakev2-for-busd-eol",
@@ -51091,7 +49712,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6a10dc49f3F643Eb4024ed619453c02205a3A1EE",
     lastHarvest: 0,
-    startBlock: 6894142,
   },
   {
     id: "cakev2-vai-busd-eol",
@@ -51123,7 +49743,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB85db36945De3dAfbaCcBD85059A5658B4Eaf068",
     lastHarvest: 0,
-    startBlock: 6894153,
   },
   {
     id: "cakev2-usdt-busd",
@@ -51153,7 +49772,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x34bdCC066Bf5F36179c7431fcb46aE9362C5bCd0",
     lastHarvest: 1654014700,
-    startBlock: 6896788,
   },
   {
     id: "cakev2-alpha-bnb",
@@ -51184,7 +49802,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1fEF448D0C312936239C39aA07212045737c6C00",
     lastHarvest: 0,
-    startBlock: 6893095,
   },
   {
     id: "cakev2-inj-bnb",
@@ -51215,7 +49832,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb78957976212AEfc11b25f9D74EB0782fD781f2d",
     lastHarvest: 1654072965,
-    startBlock: 6893106,
   },
   {
     id: "cakev2-twt-bnb",
@@ -51246,7 +49862,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3Eca0a398bb0ECc9D277a03031A13B244C1f4ab6",
     lastHarvest: 1654072974,
-    startBlock: 6893117,
   },
   {
     id: "cakev2-xvs-bnb",
@@ -51277,7 +49892,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE5f0b4CC523db681d3e60565b6eb022a71536E4D",
     lastHarvest: 0,
-    startBlock: 6893128,
   },
   {
     id: "cakev2-reef-bnb-eol",
@@ -51309,7 +49923,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xaF16C93f9C212F7Fb07D1c31FfD08180da4fdBEB",
     lastHarvest: 0,
-    startBlock: 6893034,
   },
   {
     id: "cakev2-band-bnb-eol",
@@ -51341,7 +49954,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6d017bBD28A47C3050E8154bb3A799D90965AfCE",
     lastHarvest: 0,
-    startBlock: 6893067,
   },
   {
     id: "cakev2-atom-bnb-eol",
@@ -51373,7 +49985,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1EDcBEE8d91AA0043392fE34E86F3Cacae5AfA9D",
     lastHarvest: 0,
-    startBlock: 6893083,
   },
   {
     id: "cakev2-hget-bnb-eol",
@@ -51404,7 +50015,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa1d7FC8a72Fe3EC9ebB1f0dbF95363F77034828A",
     lastHarvest: 0,
-    startBlock: 6884218,
   },
   {
     id: "cakev2-cgg-bnb-eol",
@@ -51435,7 +50045,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x165046626E334526feeCACFfDCdDddcd3B5dB383",
     lastHarvest: 0,
-    startBlock: 6884082,
   },
   {
     id: "cakev2-xed-bnb-eol",
@@ -51466,7 +50075,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x81DC1F9FFC0042785dDff622CCE11a8b4d5d5408",
     lastHarvest: 0,
-    startBlock: 6884071,
   },
   {
     id: "cakev2-link-bnb",
@@ -51496,7 +50104,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8453468F95eF8cb2f8F33a589AF1992Ef76EbbB0",
     lastHarvest: 1654000433,
-    startBlock: 6884032,
   },
   {
     id: "cakev2-usdt-bnb",
@@ -51526,7 +50133,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x76cDDbBc0E58E078F98851768d248003EAc0349a",
     lastHarvest: 1654072983,
-    startBlock: 6884037,
   },
   {
     id: "cakev2-busd-bnb",
@@ -51556,7 +50162,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x873bE33Cd3DD330063F4F35CeE97012502297406",
     lastHarvest: 1654062386,
-    startBlock: 6884046,
   },
   {
     id: "cakev2-eth-bnb",
@@ -51586,7 +50191,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1C4C39bF4f283264e97486983153f7ee9D978951",
     lastHarvest: 0,
-    startBlock: 6884056,
   },
   {
     id: "cakev2-btcb-bnb",
@@ -51616,7 +50220,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8df06Fc42222B4944b330f206aE2A4Bf97EBb24E",
     lastHarvest: 1654014715,
-    startBlock: 6884063,
   },
   {
     id: "cakev2-hakka-busd-eol",
@@ -51648,7 +50251,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x59852dC94eA42e0F2ac3Dc3067f9F546f8Eb1382",
     lastHarvest: 0,
-    startBlock: 6877880,
   },
   {
     id: "cakev2-hoo-busd-eol",
@@ -51680,7 +50282,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe8C3BE24330DD1E0D4cE0d65D0c2721810692183",
     lastHarvest: 0,
-    startBlock: 6877844,
   },
   {
     id: "cakev2-txl-busd",
@@ -51711,7 +50312,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC9161CD1d18ba9cd2DbcB132FAa57C9299207f5E",
     lastHarvest: 0,
-    startBlock: 6877854,
   },
   {
     id: "cakev2-ust-busd",
@@ -51750,7 +50350,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA26Ff5c46E9e93d085713aDE7681cb7CAD3281a6",
     lastHarvest: 1654058004,
-    startBlock: 6877871,
   },
   {
     id: "cakev2-mnflx-ust-eol",
@@ -51779,7 +50378,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2B73AB553Bfa77bb4D6d41f69d958994cb1ca67c",
     lastHarvest: 0,
-    startBlock: 6885878,
   },
   {
     id: "cakev2-mir-ust-eol",
@@ -51811,7 +50409,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0BfDFEc51Dc02d3b5189BD29d9a5595159Af77f4",
     lastHarvest: 0,
-    startBlock: 6877039,
   },
   {
     id: "cakev2-tbtc-btcb-eol",
@@ -51842,7 +50439,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe26C65A53B4F4f6A5dCA9f7c6Fe08fF790C197E6",
     lastHarvest: 0,
-    startBlock: 6875221,
   },
   {
     id: "cakev2-bbadger-btcb-eol",
@@ -51874,7 +50470,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xed533C9E6366CD3916e32CcDB21cf37d16566d0d",
     lastHarvest: 0,
-    startBlock: 6875256,
   },
   {
     id: "cakev2-bdigg-btcb",
@@ -51905,7 +50500,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x343AFb6d617683cD44b40B91F9DAf44254153891",
     lastHarvest: 0,
-    startBlock: 6875239,
   },
   {
     id: "cakev2-ramp-busd",
@@ -51936,7 +50530,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x23EdD5EeaB1D9F9E7bCBBD8dd50efdF65843b8DF",
     lastHarvest: 0,
-    startBlock: 6873678,
   },
   {
     id: "cakev2-dexe-busd-eol",
@@ -51968,7 +50561,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9622Ce77f45A271fd23da7Aa0Fd35E59BB6d5FE8",
     lastHarvest: 0,
-    startBlock: 6873665,
   },
   {
     id: "cakev2-tpt-busd-eol",
@@ -52000,7 +50592,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1E61C61943Bb84b20D7b2D6C7c80beFbeE0a857D",
     lastHarvest: 0,
-    startBlock: 6873654,
   },
   {
     id: "cakev2-xmark-busd-eol",
@@ -52032,7 +50623,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0579E6eC0d9e3134a0FE66BeB73808AAe4e9aE78",
     lastHarvest: 0,
-    startBlock: 6873643,
   },
   {
     id: "cakev2-iotx-busd",
@@ -52063,7 +50653,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xfcA457Be30EC6B9625ef39680CdD8A39d7280414",
     lastHarvest: 0,
-    startBlock: 6873633,
   },
   {
     id: "cakev2-lina-busd-eol",
@@ -52095,7 +50684,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x32c2c5Ca892EDa53f5E14C6Df236F310258f0503",
     lastHarvest: 0,
-    startBlock: 6873623,
   },
   {
     id: "cakev2-usdc-busd",
@@ -52134,7 +50722,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8E863c44eA7Ad276A66350A658C940B590248A86",
     lastHarvest: 1653985891,
-    startBlock: 6873612,
   },
   {
     id: "cakev2-dai-busd",
@@ -52165,7 +50752,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4Ef138e05Ec328DE92aCc85394F6414eEC246609",
     lastHarvest: 1654072995,
-    startBlock: 6872848,
   },
   {
     id: "cakev2-sushi-eth-eol",
@@ -52197,7 +50783,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x08AD424515EA3C2b03cD53416536582b30C5FF35",
     lastHarvest: 0,
-    startBlock: 6871620,
   },
   {
     id: "cakev2-dego-bnb-eol",
@@ -52229,7 +50814,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x305E548d34724877211802A56b72Ba59E85567F2",
     lastHarvest: 0,
-    startBlock: 6866543,
   },
   {
     id: "cakev2-gum-bnb-eol",
@@ -52261,7 +50845,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x80b7821b018DAeC97a08D93ce253e991b323c666",
     lastHarvest: 0,
-    startBlock: 6866529,
   },
   {
     id: "cakev2-pbtc-bnb-eol",
@@ -52293,7 +50876,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6c3d85A8275c358F29e65460799Ecc4ebDFA069A",
     lastHarvest: 0,
-    startBlock: 6866513,
   },
   {
     id: "cakev2-belt-bnb-eol",
@@ -52325,7 +50907,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x37cf856227Ef3191cf921a55D958f49dCbD5F1d1",
     lastHarvest: 0,
-    startBlock: 6866489,
   },
   {
     id: "cakev2-bel-bnb-eol",
@@ -52357,7 +50938,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8fBF967f6C3B9022a2a588c758eC5fA1d423ec6F",
     lastHarvest: 0,
-    startBlock: 6866478,
   },
   {
     id: "cakev2-bmxx-bnb-eol",
@@ -52389,7 +50969,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x97056D3A29C25aD264c42e99F4b4a035904c06BB",
     lastHarvest: 0,
-    startBlock: 6866468,
   },
   {
     id: "cakev2-swgb-bnb-eol",
@@ -52420,7 +50999,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd97456BBdd4383E68D258B2B715Aa2eAcDACF5C1",
     lastHarvest: 0,
-    startBlock: 6865159,
   },
   {
     id: "cakev2-lit-bnb-eol",
@@ -52452,7 +51030,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5a7a8bB24389a27f7bEEf963A95f4C0F7ee9F9c4",
     lastHarvest: 0,
-    startBlock: 6865135,
   },
   {
     id: "cakev2-ditto-bnb",
@@ -52483,7 +51060,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7ACfB3E7C7a33970b20c4b25f64f7064C4B62227",
     lastHarvest: 0,
-    startBlock: 6865092,
   },
   {
     id: "cakev2-sfp-bnb",
@@ -52514,7 +51090,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDbA250c4AB640b59a270Ee4176EC49C2bDF1A655",
     lastHarvest: 0,
-    startBlock: 6865067,
   },
   {
     id: "cakev2-wsote-bn-eolb",
@@ -52545,7 +51120,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4c05348858C7Ca872a0f9b9D2d78648C5CBc0475",
     lastHarvest: 0,
-    startBlock: 6849999,
   },
   {
     id: "cakev2-front-bnb-eol",
@@ -52577,7 +51151,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xac14f3b1a8a6a14bd006cC410BEF4cE7082E446D",
     lastHarvest: 0,
-    startBlock: 6849984,
   },
   {
     id: "cakev2-btcst-bnb",
@@ -52608,7 +51181,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xaC71F42f4C39597F66ecE7EC6fb6BC2C248C1484",
     lastHarvest: 1654073004,
-    startBlock: 6849951,
   },
   {
     id: "cakev2-ltc-bnb",
@@ -52639,7 +51211,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5853422203D22Fd43b4317ce6eF0E7E3165cC373",
     lastHarvest: 0,
-    startBlock: 6849261,
   },
   {
     id: "cakev2-ada-bnb",
@@ -52670,7 +51241,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc77587496E494C44aB3e3a376bae6fCc56EA7Bd8",
     lastHarvest: 1654073013,
-    startBlock: 6848738,
   },
   {
     id: "cakev2-dot-bnb",
@@ -52701,7 +51271,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x812cF9fB843155459414B72B13e2E505164374B9",
     lastHarvest: 1654073022,
-    startBlock: 6849241,
   },
   {
     id: "cakev2-zil-bnb-eol",
@@ -52733,7 +51302,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb5e4F6ee6ccb99656A0B180b26EC80DE3dBeE22C",
     lastHarvest: 0,
-    startBlock: 6855621,
   },
   {
     id: "cakev2-lto-bnb-eol",
@@ -52765,7 +51333,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5d75Fbf6742b4688cEfC11CA9a86D44020d81cA3",
     lastHarvest: 0,
-    startBlock: 6855632,
   },
   {
     id: "cakev2-trade-bnb",
@@ -52796,7 +51363,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x44a9A3F882b5CAE1e5037905cd2d5Daa267255E5",
     lastHarvest: 0,
-    startBlock: 6855651,
   },
   {
     id: "cakev2-dusk-bnb-eol",
@@ -52828,7 +51394,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3CDE7B7e09696Fe63b808d77f5a2d8609B4e7c71",
     lastHarvest: 0,
-    startBlock: 6855661,
   },
   {
     id: "cakev2-cos-bnb-eol",
@@ -52860,7 +51425,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA3f26Ff86fFF2cbb8175944BEedC77F0337E1FdE",
     lastHarvest: 0,
-    startBlock: 6855670,
   },
   {
     id: "cakev2-watch-bnb-eol",
@@ -52892,7 +51456,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0c9311412aaaE19DE3D47Ae3Fb8ab3C8C406685e",
     lastHarvest: 0,
-    startBlock: 6855680,
   },
   {
     id: "cakev2-bry-bnb",
@@ -52923,7 +51486,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb920a78cDcb0dAC0472b18e61F4Ead0C32Df04ab",
     lastHarvest: 0,
-    startBlock: 6855686,
   },
   {
     id: "cakev2-zee-bnb-eol",
@@ -52955,7 +51517,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x995F8CCa0c564E3Ad86aF1ccCcB30c7F3a42A083",
     lastHarvest: 0,
-    startBlock: 6855694,
   },
   {
     id: "cakev2-dodo-bnb-eol",
@@ -52987,7 +51548,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5497272A93D53ec65FAbDD1B326d9cAa8FDa1FF4",
     lastHarvest: 0,
-    startBlock: 6855703,
   },
   {
     id: "cakev2-swingby-bnb-eol",
@@ -53019,7 +51579,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xFF8ab5771D0802086fe2b6A7c1cCDFFeb2f375d6",
     lastHarvest: 0,
-    startBlock: 6855714,
   },
   {
     id: "cakev2-apys-bnb-eol",
@@ -53051,7 +51610,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x638663B7Bd19A0056406b138637dC8D789bFC3e4",
     lastHarvest: 0,
-    startBlock: 6849874,
   },
   {
     id: "cakev2-oddz-bnb-eol",
@@ -53083,7 +51641,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x46E9bcdB584651482958b0ddD7314bA079432Cf2",
     lastHarvest: 0,
-    startBlock: 6849892,
   },
   {
     id: "cakev2-bondly-bnb-eol",
@@ -53115,7 +51672,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF3937d9d5178994Bb5374Cc6f79876ebAc431EeF",
     lastHarvest: 0,
-    startBlock: 6849903,
   },
   {
     id: "cakev2-itam-bnb-eol",
@@ -53147,7 +51703,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xdaCE1e927cC87f2f20e844214adDf3df7Fb8c32F",
     lastHarvest: 0,
-    startBlock: 6849911,
   },
   {
     id: "cakev2-arpa-bnb=eol",
@@ -53179,7 +51734,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x00D0A37fbB057Ed2eF15a9FADA60e76CAb3aba95",
     lastHarvest: 0,
-    startBlock: 6849920,
   },
   {
     id: "cakev2-dft-bnb-eol",
@@ -53211,7 +51765,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x709735d9fC3730342Ce0FC9976d9832dc0db4109",
     lastHarvest: 0,
-    startBlock: 6849928,
   },
   {
     id: "cakev2-swth-bnb",
@@ -53242,7 +51795,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x037cca289C681425a191123638975a5f4E0fCaAB",
     lastHarvest: 0,
-    startBlock: 6849938,
   },
   {
     id: "cakev2-lien-bnb-eol",
@@ -53274,7 +51826,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa034eaD50E83EC07D084912FB1C69B7B1987a534",
     lastHarvest: 0,
-    startBlock: 6849950,
   },
   {
     id: "cakev2-broobee-bnb",
@@ -53305,7 +51856,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1c125222D303DA1a10edD29ad19554dC86025BA9",
     lastHarvest: 0,
-    startBlock: 6848217,
   },
   {
     id: "cakev2-tko-bnb",
@@ -53336,7 +51886,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc95C59D1E39ea5d2ED74529197A7Fa0f7BD755Ea",
     lastHarvest: 0,
-    startBlock: 6848230,
   },
   {
     id: "cakev2-tlm-bnb",
@@ -53367,7 +51916,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x77354923Be8e6174afB52e659A51Efc185912a07",
     lastHarvest: 0,
-    startBlock: 6848235,
   },
   {
     id: "cakev2-perl-bnb=eol",
@@ -53399,7 +51947,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4F8dF512D226eef6E81c6fC4C4aFEaE26BAc2011",
     lastHarvest: 0,
-    startBlock: 6848242,
   },
   {
     id: "cakev2-alpa-bnb-eol",
@@ -53431,7 +51978,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x683FF6E3CC54533eB19a36181e33F329F6c59369",
     lastHarvest: 0,
-    startBlock: 6848253,
   },
   {
     id: "cakev2-hzn-bnb-eol",
@@ -53463,7 +52009,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3E0EF84Ef230b81821C8E04b0bbF6aa2BD7CbC8B",
     lastHarvest: 0,
-    startBlock: 6848266,
   },
   {
     id: "cakev2-suter-bnb-eol",
@@ -53495,7 +52040,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7C37c80a1918F0066c47E55947fA9E50986394E9",
     lastHarvest: 0,
-    startBlock: 6848276,
   },
   {
     id: "cakev2-ten-bnb-eol",
@@ -53526,7 +52070,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x026357B7CedE56893Add7a08ff9A7A9d754B60bD",
     lastHarvest: 0,
-    startBlock: 6847964,
   },
   {
     id: "cakev2-bscx-bnb-eol",
@@ -53558,7 +52101,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x25052858a29CCE2A969E68Ec682d346226F18D49",
     lastHarvest: 0,
-    startBlock: 6847994,
   },
   {
     id: "cakev2-ctk-bnb-eol",
@@ -53590,7 +52132,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2c6052bd213C6a43B04897C83912c97fD9123bC4",
     lastHarvest: 0,
-    startBlock: 6845991,
   },
   {
     id: "bunny-bunny-eol",
@@ -53620,7 +52161,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x82BD966b7347ce17393b8A559Be60920aB742bd2",
     lastHarvest: 0,
-    startBlock: 6735963,
   },
   {
     id: "auto-eth-v2-eol",
@@ -53647,7 +52187,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd9e363C22F97Afb0092269d98154ab06987252bf",
     lastHarvest: 0,
-    startBlock: 6479269,
   },
   {
     id: "belt-venus-blp-eol",
@@ -53677,7 +52216,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x84759f0d7705B3c8f4554431E6FBCa2ccd63BEc2",
     lastHarvest: 0,
-    startBlock: 5588829,
   },
   {
     id: "mdex-bsc-mdx-bnb",
@@ -53708,7 +52246,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x569074973aC3DC3d5168545fAC988ed79cef8DEa",
     lastHarvest: 0,
-    startBlock: 6438970,
   },
   {
     id: "auto-btc-v2-eol",
@@ -53735,7 +52272,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4c8d2f61017053dab18ac292348b5B3Fae9157A5",
     lastHarvest: 0,
-    startBlock: 6479251,
   },
   {
     id: "cake-broobee-bnb-eol",
@@ -53764,7 +52300,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5D060698F179E7D2233480A44d6D3979e4Ae9e7f",
     lastHarvest: 0,
-    startBlock: 6704055,
   },
   {
     id: "banana-ada-eth",
@@ -53803,7 +52338,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2D9e84B46e97E61415E705852Ba43862aE433059",
     lastHarvest: 0,
-    startBlock: 6703748,
   },
   {
     id: "banana-iota-bnb",
@@ -53834,7 +52368,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xafD558197FE33AAd1D653cc57B712d9A97752084",
     lastHarvest: 0,
-    startBlock: 6703790,
   },
   {
     id: "banana-bat-bnb",
@@ -53865,7 +52398,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xBfC2C7323739A616f555d4410e4a4bF4Dad89e93",
     lastHarvest: 0,
-    startBlock: 6703774,
   },
   {
     id: "ellipsis-fusdt-3eps-eol",
@@ -53894,7 +52426,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8161ee6dB411DD034eAB19815A4e6aD543FF2A25",
     lastHarvest: 0,
-    startBlock: 6643366,
   },
   {
     id: "cake-apys-bnb-eol",
@@ -53923,7 +52454,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4310244DaF7E6cBD6E308415542D38114062F796",
     lastHarvest: 0,
-    startBlock: 6500834,
   },
   {
     id: "auto-eth-beth",
@@ -53955,7 +52485,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe8A27d03f4DABaD8145C7f7B3e824Bb469d3621a",
     lastHarvest: 1654073049,
-    startBlock: 6560335,
   },
   {
     id: "auto-eth-usdt",
@@ -53987,7 +52516,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc1c0eF1946Bb7b3B39526966e62474336754e840",
     lastHarvest: 1654073058,
-    startBlock: 6560202,
   },
   {
     id: "auto-btcb-usdt",
@@ -54019,7 +52547,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xDFE24033f318F7D8BA0aE6180977309565fBf49f",
     lastHarvest: 1654073070,
-    startBlock: 6560192,
   },
   {
     id: "auto-btcb-eth",
@@ -54059,7 +52586,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3ed04d132410c840b31a77f8c9A40b7A8fEf8ad1",
     lastHarvest: 1654073082,
-    startBlock: 6560323,
   },
   {
     id: "auto-usdt-busd",
@@ -54091,7 +52617,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x89dbD789C1bFAb9E06d77C1CAA8A30ba4B089817",
     lastHarvest: 1654073091,
-    startBlock: 6559722,
   },
   {
     id: "mash-mash-busd-eol",
@@ -54122,7 +52647,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5072AFb7A253877333dd5664999298a1DDeE3Dd5",
     lastHarvest: 0,
-    startBlock: 6585404,
   },
   {
     id: "mash-mash-bnb-eol",
@@ -54153,7 +52677,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x07D8bcf7d77c847a920248e887c39b824F75977d",
     lastHarvest: 0,
-    startBlock: 6585383,
   },
   {
     id: "mash-mash-eol",
@@ -54182,7 +52705,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCc747D036DB8ae32fd460631EDf507479d89Bb64",
     lastHarvest: 0,
-    startBlock: 6585316,
   },
   {
     id: "mdex-bsc-mdx-busd",
@@ -54213,7 +52735,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4Ae6D6f9A83508b82A533e1FEBfB052d9cc7e3D4",
     lastHarvest: 0,
-    startBlock: 6530018,
   },
   {
     id: "palm-palm-eol",
@@ -54242,7 +52763,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0F233071Ae1a6847553f275AA75a83663100e0C3",
     lastHarvest: 0,
-    startBlock: 6530512,
   },
   {
     id: "cake-hoo-busd-eol",
@@ -54271,7 +52791,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0849E59F6272b782B1afD244C13e3aDE29D93C67",
     lastHarvest: 0,
-    startBlock: 6501033,
   },
   {
     id: "cake-itam-bnb-eol",
@@ -54300,7 +52819,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc94Ed1f25959356aae7f7f491876B37AE3119C39",
     lastHarvest: 0,
-    startBlock: 6500808,
   },
   {
     id: "mdex-xvs-eol",
@@ -54327,7 +52845,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3F5e61501f73aFf389A6fBE6f5d97E0B78cEC60D",
     lastHarvest: 0,
-    startBlock: 6500276,
   },
   {
     id: "mdex-uni-eol",
@@ -54354,7 +52871,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x15c6063E93c6e56116dF2a63aCaA7785c85B9C41",
     lastHarvest: 0,
-    startBlock: 6500301,
   },
   {
     id: "auto-sxp-v2-eol",
@@ -54381,7 +52897,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf125e40B78029150353973b9Bf33DeBbEB49e760",
     lastHarvest: 0,
-    startBlock: 6501283,
   },
   {
     id: "auto-wbnb-v2-eol",
@@ -54410,7 +52925,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x93BC0B24a7025d7040938c617818fF184a8669ba",
     lastHarvest: 0,
-    startBlock: 4931128,
   },
   {
     id: "auto-busd-v2-eol",
@@ -54437,7 +52951,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1EB0baDDD50BB7e197990b14f18173b6C063D0b9",
     lastHarvest: 0,
-    startBlock: 6449742,
   },
   {
     id: "auto-usdt-v2-eol",
@@ -54464,7 +52977,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF0d6424B253f51F075f26A1569a7E7a0523e887E",
     lastHarvest: 0,
-    startBlock: 6479221,
   },
   {
     id: "auto-usdc-v2-eol",
@@ -54491,7 +53003,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xAe12a3A03055eBadf8385BB69514b75e89f400b5",
     lastHarvest: 0,
-    startBlock: 6479235,
   },
   {
     id: "blizzard-xblzd-bnb-eol",
@@ -54523,7 +53034,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x915b02b1a74C11F059Be8Ae2aB1c2D0801D87dcD",
     lastHarvest: 0,
-    startBlock: 6859915,
   },
   {
     id: "blizzard-xblzd-busd-eol",
@@ -54554,7 +53064,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x831FfE1104D3214d42379768c0a97e8f951b5abF",
     lastHarvest: 0,
-    startBlock: 6859781,
   },
   {
     id: "blizzard-xblzd-bnb-old-eol",
@@ -54584,7 +53093,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8820c4060d9a4b74888D32188d8E4B6Ff2e5d6c0",
     lastHarvest: 0,
-    startBlock: 6405701,
   },
   {
     id: "blizzard-xblzd-busd-old-eol",
@@ -54613,7 +53121,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x78b527B0Af32E8017ad25a3842DcD57da63bcAA9",
     lastHarvest: 0,
-    startBlock: 6406017,
   },
   {
     id: "blizzard-xblzd-eol2",
@@ -54643,7 +53150,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x139f12DA92a1b7c80b160D3967e1f578D7921906",
     lastHarvest: 1643804004,
-    startBlock: 11510400,
   },
   {
     id: "blizzard-xblzd-eol",
@@ -54673,7 +53179,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x79f9f323783f9E21dA0C1c786A6002EfB6B2AB4a",
     lastHarvest: 0,
-    startBlock: 6406088,
   },
   {
     id: "blizzard-blzd-bnb-eol",
@@ -54702,7 +53207,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6A058015A6209EeDFd77693EFEa7419976b8957C",
     lastHarvest: 0,
-    startBlock: 5835662,
   },
   {
     id: "blizzard-blzd-busd-eol",
@@ -54731,7 +53235,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x86adCc7EaD8d432310a0C1DA9fEd07220c242B07",
     lastHarvest: 0,
-    startBlock: 5836492,
   },
   {
     id: "blizzard-blzd",
@@ -54760,7 +53263,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xdd4754CdE461b5F90b79F4797e0D79C9829C5061",
     lastHarvest: 0,
-    startBlock: 5865638,
   },
   {
     id: "auto-cake-bnb-eol",
@@ -54788,7 +53290,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x99bF8be49DcAc945a5754BDc0f5440Dc592D302a",
     lastHarvest: 0,
-    startBlock: 5501382,
   },
   {
     id: "mdex-bsc-eth-usdt",
@@ -54817,7 +53318,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3A00616A14A5C6930c45d7D3E62A385Bd81B4e7D",
     lastHarvest: 0,
-    startBlock: 6438732,
   },
   {
     id: "auto-auto-bnb-eol",
@@ -54847,7 +53347,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF87079AD78f4762b515519B63D4aA19bf0c1470E",
     lastHarvest: 0,
-    startBlock: 5529885,
   },
   {
     id: "typh-typh-bnb",
@@ -54876,7 +53375,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe3E9A165DE6089b25489eF7fDd67dfcEf3B34318",
     lastHarvest: 0,
-    startBlock: 6411562,
   },
   {
     id: "biti-biti-bnb",
@@ -54905,7 +53403,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x95961b99AC14BFAeFABb36c40bCE4631b87b5500",
     lastHarvest: 0,
-    startBlock: 6386647,
   },
   {
     id: "palm-palm-busd-eol",
@@ -54936,7 +53433,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x49942e26B3cb04F878E67c507563197e6626c353",
     lastHarvest: 0,
-    startBlock: 6358671,
   },
   {
     id: "palm-palm-bnb-eol",
@@ -54967,7 +53463,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xccE160252f8a071615e4452d712e8fA11F422f04",
     lastHarvest: 0,
-    startBlock: 6358654,
   },
   {
     id: "swamp-cake-eol",
@@ -54998,7 +53493,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x382aBCe887725490B5FdAc09031a0893f05B9FF7",
     lastHarvest: 0,
-    startBlock: 6361239,
   },
   {
     id: "swamp-swamp-eol",
@@ -55029,7 +53523,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0edf387CDe7f901186834D073c09a7c1D1651000",
     lastHarvest: 0,
-    startBlock: 6362838,
   },
   {
     id: "auto-cake-eol",
@@ -55060,7 +53553,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB40Fc2359563AC63636f4f094C71521dc8aE81cb",
     lastHarvest: 0,
-    startBlock: 4819593,
   },
   {
     id: "swamp-cake-bnb-eol",
@@ -55088,7 +53580,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC2bBEC44Ce17C9FB478Ab899dbeC36032F4b08a0",
     lastHarvest: 0,
-    startBlock: 6333670,
   },
   {
     id: "bingo-bgo-busd",
@@ -55117,7 +53608,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x54D7b75838f60D5F60E63aE3A4EC305f6d24Fa16",
     lastHarvest: 0,
-    startBlock: 6302861,
   },
   {
     id: "bingo-sbgo-busd",
@@ -55146,7 +53636,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x29cA0ab9C14Dec42f11b6270c631c8815DF65AA4",
     lastHarvest: 0,
-    startBlock: 6303168,
   },
   {
     id: "ellipsis-3eps-eol",
@@ -55177,7 +53666,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x713d3F085373141451dE681FA39a233E771Ab787",
     lastHarvest: 0,
-    startBlock: 6046481,
   },
   {
     id: "tndr-tndr-busd-eol",
@@ -55208,7 +53696,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xbd0AB8835704D61Da3C9F4B6fB59eE1637E49f24",
     lastHarvest: 0,
-    startBlock: 6215626,
   },
   {
     id: "tndr-tndr-bnb-eol",
@@ -55239,7 +53726,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2323e34A37b62fE4eCc59cEcd83Cd8Cc9D2BB1bF",
     lastHarvest: 0,
-    startBlock: 6215978,
   },
   {
     id: "swamp-swamp-bnb",
@@ -55268,7 +53754,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa74F0b38079e1fcd0C326f9b166a2E996c532efe",
     lastHarvest: 0,
-    startBlock: 6195004,
   },
   {
     id: "swamp-swamp-busd",
@@ -55297,7 +53782,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x717593C671183b8af2981A5d1b190bc9978962DA",
     lastHarvest: 0,
-    startBlock: 6195291,
   },
   {
     id: "swirl-swirl-bnb",
@@ -55326,7 +53810,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF31Dc91bf0851C662DC853ed02a185c5d2875d79",
     lastHarvest: 0,
-    startBlock: 6159166,
   },
   {
     id: "cake-dft-bnb",
@@ -55355,7 +53838,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xeFEa46e77550F1e83a66213512AC9963dce10f6E",
     lastHarvest: 0,
-    startBlock: 6133118,
   },
   {
     id: "cake-swth-bnb",
@@ -55384,7 +53866,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5dd766E859c4BB01eaBCaFc320dED1A5E8e4a147",
     lastHarvest: 0,
-    startBlock: 6133134,
   },
   {
     id: "zefi-zefi-bnb",
@@ -55413,7 +53894,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7A0Aa7a489d363e44648B9615D0eFBda24dd7A91",
     lastHarvest: 0,
-    startBlock: 6130869,
   },
   {
     id: "zefi-zefi-busd",
@@ -55442,7 +53922,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1FEe59f0Aecb45A5Cd04e7072de9ae11f5A6c1eC",
     lastHarvest: 0,
-    startBlock: 6130849,
   },
   {
     id: "hps-hps-bnb-eol",
@@ -55475,7 +53954,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC0eD05309D5f42f1684B455f370998141db2A23d",
     lastHarvest: 0,
-    startBlock: 6101630,
   },
   {
     id: "ellipsis-eps-bnb-eol",
@@ -55507,7 +53985,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x845eFaF170c89e97b5aa252AAdA4876f81a1cdf6",
     lastHarvest: 0,
-    startBlock: 6038926,
   },
   {
     id: "alpaca-salpaca-eol",
@@ -55536,7 +54013,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x40acfAbe68f3bf55B24c9E21A3Cbc8743EB73F01",
     lastHarvest: 0,
-    startBlock: 5999094,
   },
   {
     id: "naut-naut-bnb",
@@ -55565,7 +54041,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2774162B244361e4EBf90F8c58A94013c8f6F65A",
     lastHarvest: 0,
-    startBlock: 6018089,
   },
   {
     id: "cake-lto-bnb",
@@ -55594,7 +54069,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7DE67148c4907461d8A6EF5DE55b9e541CC8f643",
     lastHarvest: 0,
-    startBlock: 5995365,
   },
   {
     id: "cake-trade-bnb",
@@ -55623,7 +54097,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x49237A7EB71e8D8C1f3498dF5Faa9254ddf29b1d",
     lastHarvest: 0,
-    startBlock: 5995344,
   },
   {
     id: "alpaca-alpaca-bnb",
@@ -55652,7 +54125,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8979041A2d76faF0357b5E66427116bEA58085df",
     lastHarvest: 0,
-    startBlock: 5970949,
   },
   {
     id: "space-space-bnb-eol",
@@ -55682,7 +54154,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3923A7bbB5B5D34FA1182360E9d092BB280f5495",
     lastHarvest: 0,
-    startBlock: 5963753,
   },
   {
     id: "space-space-busd-eol",
@@ -55712,7 +54183,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xaA27487A794f725465679c8B1afc52b37C41Bff1",
     lastHarvest: 0,
-    startBlock: 5964006,
   },
   {
     id: "cake-bdigg-btcb",
@@ -55741,7 +54211,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5936Db923b6E1727DA19d801eC22CeE555b6047b",
     lastHarvest: 0,
-    startBlock: 5936423,
   },
   {
     id: "pumpy-pmp-bnb",
@@ -55772,7 +54241,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xeEeF3d9c3260d01F9763B38BCD0968e04af8f59B",
     lastHarvest: 0,
-    startBlock: 5902280,
   },
   {
     id: "cake-bifi-bnb",
@@ -55801,7 +54269,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xFED46361d00e9881d0D63cdEfba51B11c264CcE2",
     lastHarvest: 0,
-    startBlock: 5751762,
   },
   {
     id: "jul-twt-bnb",
@@ -55830,7 +54297,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xE4b3C2b19Db4FbaAfbE99bd8Ec869fC4C37063ae",
     lastHarvest: 0,
-    startBlock: 5852723,
   },
   {
     id: "venus-eth-eol",
@@ -55859,7 +54325,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x825B59385221be27495056c08c8FE38941126ffa",
     lastHarvest: 0,
-    startBlock: 3165035,
   },
   {
     id: "com-com-bnb-eol",
@@ -55891,7 +54356,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6770B687a7622660b31D0F148033056E0EcE5020",
     lastHarvest: 0,
-    startBlock: 5821597,
   },
   {
     id: "cake-dusk-bnb",
@@ -55920,7 +54384,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x59A5a6591Db950757021DCeC564f47d4754a3B3D",
     lastHarvest: 0,
-    startBlock: 5788365,
   },
   {
     id: "squirrel-nuts-bnb-eol",
@@ -55949,7 +54412,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB65131B5581C91ab900df3e71E8818512977023D",
     lastHarvest: 0,
-    startBlock: 5759679,
   },
   {
     id: "squirrel-nuts-eol",
@@ -55980,7 +54442,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2a9811dDfAA3cA01bD36d9Ed41B9cF954fd01AA2",
     lastHarvest: 0,
-    startBlock: 5760103,
   },
   {
     id: "bakery-bat-bake-eol",
@@ -56012,7 +54473,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2ABB0ea3A5C038f60E677Bf14d2F6095786650Ae",
     lastHarvest: 0,
-    startBlock: 5731806,
   },
   {
     id: "memefarm-mfrm-bnb",
@@ -56041,7 +54501,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5960C72F04232e1093129f08c3f5A3C2D766253a",
     lastHarvest: 0,
-    startBlock: 5695452,
   },
   {
     id: "slime-slime-busd",
@@ -56072,7 +54531,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x790Ad5995eAADb771efe42A20f21ca048A02cD2B",
     lastHarvest: 0,
-    startBlock: 5644224,
   },
   {
     id: "slime-slime-bnb",
@@ -56103,7 +54561,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x61b41A0F29b5a23b18eb28d24eAfc2aA17D3b63a",
     lastHarvest: 0,
-    startBlock: 5643850,
   },
   {
     id: "cakev2-alice-bnb",
@@ -56134,7 +54591,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x359aD5f23F7A01CdB2b993e144bf8617E1d7e7D3",
     lastHarvest: 1654010885,
-    startBlock: 6855871,
   },
   {
     id: "cake-alice-bnb",
@@ -56163,7 +54619,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x39dC8831e8864766E094799933d34AE6D3536681",
     lastHarvest: 0,
-    startBlock: 5693198,
   },
   {
     id: "auto-beth-eth",
@@ -56192,7 +54647,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9aD034009CCADA34baB3f31Fb5010Ad180a417C7",
     lastHarvest: 0,
-    startBlock: 5441778,
   },
   {
     id: "belt-belt-bnb",
@@ -56221,7 +54675,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x448B41d7C82c889e7940b1C958f28302b0E2e2CA",
     lastHarvest: 0,
-    startBlock: 5593620,
   },
   {
     id: "cake-belt-bnb",
@@ -56250,7 +54703,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa1CB1521a75d1f44B961FaA3cE062EE9421932B5",
     lastHarvest: 0,
-    startBlock: 5555316,
   },
   {
     id: "auto-busd-bnb",
@@ -56279,7 +54731,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5D5d360c8529076800dfD9f57bCe514122Da35bB",
     lastHarvest: 0,
-    startBlock: 5501427,
   },
   {
     id: "auto-btc-bnb",
@@ -56308,7 +54759,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x71D322ef2ad9b6b312Cc04A51a03C5f0Da74CaA0",
     lastHarvest: 0,
-    startBlock: 5501448,
   },
   {
     id: "venus-btcb-eol",
@@ -56337,7 +54787,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCA26A1f9d3e6Ec97a555d9444f782d61b64C1B0e",
     lastHarvest: 0,
-    startBlock: 3165025,
   },
   {
     id: "cake-dexe-busd",
@@ -56366,7 +54815,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x24871351440472326538F885FC2CAa30ebe43D65",
     lastHarvest: 0,
-    startBlock: 5496908,
   },
   {
     id: "jul-bifi-bnb-eol",
@@ -56397,7 +54845,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA4FEbF841f26a9dd297d7492cf18D70464c725a4",
     lastHarvest: 0,
-    startBlock: 5360439,
   },
   {
     id: "jul-juld-bnb-eol",
@@ -56428,7 +54875,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2d007d239D39c1d24d4685d845063C2401060559",
     lastHarvest: 0,
-    startBlock: 5416740,
   },
   {
     id: "venus-ada-eol",
@@ -56457,7 +54903,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf9D0e760a71991AC65c9919898c09a3648E62eBB",
     lastHarvest: 0,
-    startBlock: 5336969,
   },
   {
     id: "cake-bel-bnb",
@@ -56486,7 +54931,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7AD32a7a8d6524f0C3Cb8f5FB59693F2B2BeA07c",
     lastHarvest: 0,
-    startBlock: 5446319,
   },
   {
     id: "cake-tpt-busd",
@@ -56515,7 +54959,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0096222E8F5012AA7a8ce9266aD665795f0D4223",
     lastHarvest: 0,
-    startBlock: 5446291,
   },
   {
     id: "cake-watch-bnb",
@@ -56544,7 +54987,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB4b49cF75CA2535e973ab57a01B396cEC7c4D869",
     lastHarvest: 0,
-    startBlock: 5385921,
   },
   {
     id: "cake-xmark-busd",
@@ -56573,7 +55015,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8f34cA39CC26afeEda3159Cf7938a6E6e51803fB",
     lastHarvest: 0,
-    startBlock: 5400886,
   },
   {
     id: "soup-soup-bnb-eol",
@@ -56602,7 +55043,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xC370B3a3958579F2aAFedF4c3548F75DeB43DB11",
     lastHarvest: 0,
-    startBlock: 5381660,
   },
   {
     id: "soup-soups-bnb-eol",
@@ -56631,7 +55071,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6731F513645383c25e36e7a05042B5968E899Dd3",
     lastHarvest: 0,
-    startBlock: 5382982,
   },
   {
     id: "cake-bmxx-bnb",
@@ -56660,7 +55099,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf232bA88cF057031725BFf50De7006435F5a384c",
     lastHarvest: 0,
-    startBlock: 5331840,
   },
   {
     id: "1inch-1inch-bnb-eol",
@@ -56691,7 +55129,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5430033735D32a4f73D1729fc4e005e86e0F1ad3",
     lastHarvest: 0,
-    startBlock: 5330339,
   },
   {
     id: "cake-iotx-busd",
@@ -56720,7 +55157,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x064046815A5FD5F09a3F177bBD2e36Ff9E2ED5Ef",
     lastHarvest: 0,
-    startBlock: 5342774,
   },
   {
     id: "cake-lina-busd",
@@ -56749,7 +55185,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6d10a7bD387c12Fa56AEF9aD53DbB9C14BCbE704",
     lastHarvest: 0,
-    startBlock: 5342749,
   },
   {
     id: "cake-dai-busd",
@@ -56778,7 +55213,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x39e9A7F890b1a7f4251745B84560909f2820c973",
     lastHarvest: 0,
-    startBlock: 5342278,
   },
   {
     id: "sponge-steam-bnb-eol",
@@ -56807,7 +55241,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1aC4f14DDFBC48c4AF99526e9D488CD47D90801E",
     lastHarvest: 0,
-    startBlock: 5251062,
   },
   {
     id: "salt-salt-busd-eol",
@@ -56839,7 +55272,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x85d04ce16C7d20Aa4d63b7520923e9e3b2e89d6e",
     lastHarvest: 0,
-    startBlock: 5323348,
   },
   {
     id: "salt-salt-bnb-eol",
@@ -56871,7 +55303,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x503dc0d4d7582033a9Ac4A5940D3341aE5852CAc",
     lastHarvest: 0,
-    startBlock: 5325136,
   },
   {
     id: "cake-sushi-eth",
@@ -56900,7 +55331,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8f42A75AFfB4c3d30c3423F7BdA2095D68B16232",
     lastHarvest: 0,
-    startBlock: 5219176,
   },
   {
     id: "crow-crow-busd",
@@ -56929,7 +55359,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0E687591C7a0e825bd1dBaf9C0a4ec9a4ED4F434",
     lastHarvest: 0,
-    startBlock: 5277273,
   },
   {
     id: "crow-crow-bnb",
@@ -56958,7 +55387,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x664500A0F63F1Ba17186D8eA970CdfC7B99081fC",
     lastHarvest: 0,
-    startBlock: 5276964,
   },
   {
     id: "ramen-ramen-bnb-eol",
@@ -56990,7 +55418,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd4c89791eF0FAdE72eAAc6475296320b5572b28e",
     lastHarvest: 0,
-    startBlock: 5157920,
   },
   {
     id: "ramen-ramen-busd-eol",
@@ -57022,7 +55449,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x593D569B2C643b529bDFD1b168d6CB1F9171A6B9",
     lastHarvest: 0,
-    startBlock: 5158641,
   },
   {
     id: "cafe-brew-busd",
@@ -57051,7 +55477,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD40021F03bE89D23A8E3c81B008feaF0403Fa867",
     lastHarvest: 0,
-    startBlock: 5122400,
   },
   {
     id: "cafe-bifi-bnb",
@@ -57080,7 +55505,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa7C062cec3EbF04FFf15f94F11e917c2aAE57a06",
     lastHarvest: 0,
-    startBlock: 5251353,
   },
   {
     id: "cake-bry-bnb",
@@ -57109,7 +55533,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF9eBb381dC153D0966B2BaEe776de2F400405755",
     lastHarvest: 0,
-    startBlock: 4940085,
   },
   {
     id: "cake-zee-bnb",
@@ -57138,7 +55561,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc34b9c9DBB39Be0Ef850170127A7b4283484f804",
     lastHarvest: 0,
-    startBlock: 4937892,
   },
   {
     id: "cake-dodo-bnb",
@@ -57167,7 +55589,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe569D4131287FA79123423BC952485F810973609",
     lastHarvest: 0,
-    startBlock: 5165991,
   },
   {
     id: "cake-swingby-bnb",
@@ -57196,7 +55617,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x470052FEd23A2887e3e679c3D8544529DA8B272f",
     lastHarvest: 0,
-    startBlock: 5165232,
   },
   {
     id: "kebab-usdt-busd",
@@ -57227,7 +55647,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD5C4CE5c881574b3CBe9A51117108390F6aA5180",
     lastHarvest: 0,
-    startBlock: 5225431,
   },
   {
     id: "kebab-eth-btcb",
@@ -57258,7 +55677,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCbD729536bfd98Aa2E216055A62103EB9124ab45",
     lastHarvest: 0,
-    startBlock: 5157963,
   },
   {
     id: "monster-msc-busd",
@@ -57287,7 +55705,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xAe2a0F189996DbA008Bce55a3E67c506C742Eed5",
     lastHarvest: 0,
-    startBlock: 4556794,
   },
   {
     id: "monster-msc-bnb",
@@ -57316,7 +55733,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB97F9c6d4d3985E94266510c6a00AE448D44d78b",
     lastHarvest: 0,
-    startBlock: 5100904,
   },
   {
     id: "cake-bts-busd-eol",
@@ -57346,7 +55762,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x22b5c879a821AFC56E564Bc73e3eaa7fC7cf25Cc",
     lastHarvest: 0,
-    startBlock: 4916514,
   },
   {
     id: "cake-btd-busd-eol",
@@ -57376,7 +55791,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA7Da1bF46Bc453075499d42b5396bb9aA7D6A4B1",
     lastHarvest: 0,
-    startBlock: 4914644,
   },
   {
     id: "auto-btc-eol",
@@ -57405,7 +55819,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4F4e3154ca4a9677D90c7557e88e4Fc80Fd2496A",
     lastHarvest: 0,
-    startBlock: 4990915,
   },
   {
     id: "auto-eth-eol",
@@ -57434,7 +55847,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4361e54F3aB2502228d294c705EA9FC334e01929",
     lastHarvest: 0,
-    startBlock: 4990933,
   },
   {
     id: "auto-busd-eol",
@@ -57463,7 +55875,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xded0376BA49B3B09246282c863D490Ad152B64E1",
     lastHarvest: 0,
-    startBlock: 4990875,
   },
   {
     id: "auto-usdt-eol",
@@ -57492,7 +55903,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xa75B2b61aAceB441D106405FCfd362365dd65F3e",
     lastHarvest: 0,
-    startBlock: 4990954,
   },
   {
     id: "kebab-kebab-btc-eol",
@@ -57524,7 +55934,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x85540714bC3D330D8146Bc93700A8653cb2CCBb8",
     lastHarvest: 0,
-    startBlock: 4965607,
   },
   {
     id: "cake-swgb-bnb",
@@ -57553,7 +55962,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3890440541615B15d38ad2E7ceBB1C96Aeef4B04",
     lastHarvest: 0,
-    startBlock: 4847794,
   },
   {
     id: "cake-lit-bnb",
@@ -57582,7 +55990,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf324499766b44D6EaE083013BFC01135c1b334b8",
     lastHarvest: 0,
-    startBlock: 4847769,
   },
   {
     id: "kebab-bifi-busd",
@@ -57622,7 +56029,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xA4a7ab8a4Bc413F3f81Ac894430537dBa12Ab816",
     lastHarvest: 0,
-    startBlock: 4830250,
   },
   {
     id: "cake-ditto-bnb",
@@ -57651,7 +56057,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x19BA65d5e63e417A50dFdB22c6E03B73A4A37779",
     lastHarvest: 0,
-    startBlock: 4764459,
   },
   {
     id: "auto-cake-old-eol",
@@ -57680,7 +56085,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf8d51dd4D9EbE8473646De7402E5CDCd152C646e",
     lastHarvest: 0,
-    startBlock: 4790111,
   },
   {
     id: "auto-busd-old-eol",
@@ -57709,7 +56113,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x1b27b7083a9BdA1aCD04266F61DF646f8296a872",
     lastHarvest: 0,
-    startBlock: 4790009,
   },
   {
     id: "sponge-sponge-bnb-eol",
@@ -57740,7 +56143,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6B32e90a07be49e5b1F622f314292b206CA8ED4f",
     lastHarvest: 0,
-    startBlock: 4714938,
   },
   {
     id: "sponge-soak-bnb-eol",
@@ -57771,7 +56173,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x882c844d8b1075D592aFA3F13a3aaF6A6E9c43c3",
     lastHarvest: 0,
-    startBlock: 4714744,
   },
   {
     id: "cake-sfp-bnb",
@@ -57800,7 +56201,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF704fa78f3b49E21f3420425C88FCc639aA05946",
     lastHarvest: 0,
-    startBlock: 4706518,
   },
   {
     id: "nyacash-nyas-usdt",
@@ -57827,7 +56227,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd9A4E5Cc19AFfe1660Bb4C80771b227F14fCD23f",
     lastHarvest: 0,
-    startBlock: 4675171,
   },
   {
     id: "monster-mss-busd",
@@ -57856,7 +56255,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe1a8EeA58D63Ea64d00365531D266C2AD1f62FC4",
     lastHarvest: 0,
-    startBlock: 4557054,
   },
   {
     id: "jul-juld",
@@ -57885,7 +56283,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2a4B113ac4B5c7cCecB86E293F3FeEbBda18D04A",
     lastHarvest: 0,
-    startBlock: 4620308,
   },
   {
     id: "cake-bdo-bnb",
@@ -57914,7 +56311,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc662244541e857F3D444b5D2D99068CD9254cFd8",
     lastHarvest: 0,
-    startBlock: 4532041,
   },
   {
     id: "kebab-kebab-eol",
@@ -57944,7 +56340,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9386a67ab53fec3afD3Af6dDafAd97Ed3E083C81",
     lastHarvest: 0,
-    startBlock: 4360167,
   },
   {
     id: "kebab-kebab-busd-eol",
@@ -57976,7 +56371,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x9E75f8298e458B76382870982788988A0799195b",
     lastHarvest: 0,
-    startBlock: 4361638,
   },
   {
     id: "kebab-kebab-bnb-eol",
@@ -58008,7 +56402,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7C4b7f588CF7f365C12F245943F729DC1818771f",
     lastHarvest: 0,
-    startBlock: 4361797,
   },
   {
     id: "cake-egld-bnb",
@@ -58037,7 +56430,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xdf47f0845b0e450c09A474F7FfAdfD43a51dad42",
     lastHarvest: 0,
-    startBlock: 4360584,
   },
   {
     id: "cake-mgoogl-ust",
@@ -58066,7 +56458,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x05b3C486C2502E8F6Cb3F6bce2b99C28693eBf02",
     lastHarvest: 0,
-    startBlock: 4339312,
   },
   {
     id: "cake-mtsla-ust",
@@ -58095,7 +56486,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xB68795Fd9125d54064F17DDfa4339F988E9b9CD8",
     lastHarvest: 0,
-    startBlock: 4340066,
   },
   {
     id: "cake-wsote-bnb",
@@ -58124,7 +56514,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xec66b4D4b1963e1DfD644824F59C56EA55Aa0F07",
     lastHarvest: 0,
-    startBlock: 4215934,
   },
   {
     id: "cake-front-bnb",
@@ -58153,7 +56542,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x05040fA951274d1D9bC568C5C684c687322d9307",
     lastHarvest: 0,
-    startBlock: 4215677,
   },
   {
     id: "cake-btcst-bnb",
@@ -58182,7 +56570,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD403FAe0eB11D381C3C62961bAB14d34d60873CE",
     lastHarvest: 0,
-    startBlock: 4215400,
   },
   {
     id: "thugs-drugs-btri",
@@ -58209,7 +56596,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x42d15E12944fadca77f05744E0268ce4dfCF6016",
     lastHarvest: 0,
-    startBlock: 4106855,
   },
   {
     id: "cake-ada-bnb",
@@ -58238,7 +56624,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x57FdEB65b71e6aD212088E63E85825e314F2Ea62",
     lastHarvest: 0,
-    startBlock: 4071503,
   },
   {
     id: "bakery-bake-busd-eol",
@@ -58270,7 +56655,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xF0D037813e4bCC21E4ED38F2fA506522181699Bb",
     lastHarvest: 0,
-    startBlock: 2795008,
   },
   {
     id: "jetfuel-vapor-bnb-eol",
@@ -58299,7 +56683,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf6274138DD2D9eBe768a4220A4089c45d9a26fCa",
     lastHarvest: 0,
-    startBlock: 4033672,
   },
   {
     id: "cake-bdo-bnb-sbdo",
@@ -58330,7 +56713,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD1533fad98479700Dd620852C45FAFe93b04A2B7",
     lastHarvest: 0,
-    startBlock: 4011590,
   },
   {
     id: "cake-bdo-bnb-old",
@@ -58359,7 +56741,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xcaF73D1623f40dFcCB0B6947150BAA613fF4E9d7",
     lastHarvest: 0,
-    startBlock: 3855892,
   },
   {
     id: "cake-sbdo-busd",
@@ -58388,7 +56769,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x5364F346B22EfB14a08b8eCe406e25d9776A0eAE",
     lastHarvest: 0,
-    startBlock: 3882447,
   },
   {
     id: "cake-bdo-busd",
@@ -58417,7 +56797,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xAFd5DF73D0369d3ADB4Db524609ef30039AE22A7",
     lastHarvest: 0,
-    startBlock: 3882103,
   },
   {
     id: "venus-beth-eol",
@@ -58446,7 +56825,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0a350c62f4b8C7dA93fBca469e53a182b5BBD044",
     lastHarvest: 0,
-    startBlock: 3887363,
   },
   {
     id: "venus-dai-eol",
@@ -58475,7 +56853,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3c2C339d05d4911894F08Dd975e89630D7ef4234",
     lastHarvest: 0,
-    startBlock: 3868844,
   },
   {
     id: "venus-fil-eol",
@@ -58504,7 +56881,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd49FD324F041665950EDe4Ed9719924EE37155C3",
     lastHarvest: 0,
-    startBlock: 3869690,
   },
   {
     id: "cake-balbt-bnb",
@@ -58533,7 +56909,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x25DE69dA4469A96974FaE79d0C41366A63317FDC",
     lastHarvest: 0,
-    startBlock: 3862524,
   },
   {
     id: "bakery-btc-bnb-eol",
@@ -58565,7 +56940,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3C9C884eFAB85c44D675039de227b3Dd275c360e",
     lastHarvest: 0,
-    startBlock: 3807633,
   },
   {
     id: "street-bhc-bnb",
@@ -58592,7 +56966,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc1673bD18Ee17a404563c798000e22947406217f",
     lastHarvest: 0,
-    startBlock: 3697783,
   },
   {
     id: "cake-reef-bnb",
@@ -58621,7 +56994,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x431159f856067293e650A02D37390eEe3adfb5c3",
     lastHarvest: 0,
-    startBlock: 3698279,
   },
   {
     id: "cake-nar-cake",
@@ -58650,7 +57022,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc3885d572F672ffCE0dd67CE3430902b6C1bD6aF",
     lastHarvest: 0,
-    startBlock: 3701341,
   },
   {
     id: "cake-nya-cake",
@@ -58677,7 +57048,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x10Df0D812C56D87767210e8ef02edBD9A0a6e17E",
     lastHarvest: 0,
-    startBlock: 3701368,
   },
   {
     id: "thugs-drugs-drugs",
@@ -58704,7 +57074,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x644bF9c6b2774073C1eD41ECebe25A6a4b7732c8",
     lastHarvest: 0,
-    startBlock: 2502913,
   },
   {
     id: "thugs-drugs-bhc",
@@ -58731,7 +57100,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x14A47F1c7be1C5e904EcF68868e97F8b87Cb52B7",
     lastHarvest: 0,
-    startBlock: 3565069,
   },
   {
     id: "thugs-drugs-jgn",
@@ -58758,7 +57126,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x4ab29191006f58a0a966a4703bE2c9bad5028657",
     lastHarvest: 0,
-    startBlock: 3564900,
   },
   {
     id: "jetfuel-fuel-bnb-ss-eol",
@@ -58787,7 +57154,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8f4ca8E2e230b44f46B93db117380bBb8281f841",
     lastHarvest: 0,
-    startBlock: 3482512,
   },
   {
     id: "jetfuel-fuel-bnb-pcs-eol",
@@ -58816,7 +57182,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xCCa9344C12e8f4914CF92bc21DEEBFC48617228D",
     lastHarvest: 0,
-    startBlock: 3482049,
   },
   {
     id: "jetfuel-bhc-bnb-eol",
@@ -58845,7 +57210,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8A91e53cdd652b96655b526656b4DB1141bCc6f6",
     lastHarvest: 0,
-    startBlock: 3482540,
   },
   {
     id: "jetfuel-eth-bnb-eol",
@@ -58874,7 +57238,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb16ceE470632ba94b7d21d2bC56d284ff0b0C04C",
     lastHarvest: 0,
-    startBlock: 3482551,
   },
   {
     id: "jetfuel-cake-bnb-eol",
@@ -58903,7 +57266,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xBF36AF3bfE6C4cD0286C24761060488eB1af2618",
     lastHarvest: 0,
-    startBlock: 3482560,
   },
   {
     id: "jetfuel-uni-bnb-eol",
@@ -58932,7 +57294,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf8B5Cb47232938f1A75546fA5182b8af312Fc380",
     lastHarvest: 0,
-    startBlock: 3482570,
   },
   {
     id: "jetfuel-busd-bnb-eol",
@@ -58961,7 +57322,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x45973436B06e46dc37333e65f98A190A392476a4",
     lastHarvest: 0,
-    startBlock: 3482590,
   },
   {
     id: "cake-smart-eol",
@@ -58991,7 +57351,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2D8ef403d947A8ff27b874ac63af703d884acDFC",
     lastHarvest: 0,
-    startBlock: 2351619,
   },
   {
     id: "venus-dot-eol",
@@ -59020,7 +57379,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xBB0C9d495F555E754ACDb76Ed127a9C115132206",
     lastHarvest: 0,
-    startBlock: 3443668,
   },
   {
     id: "venus-link-eol",
@@ -59049,7 +57407,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x131fE92ff0288915883d6c122Cb76D68c5145D87",
     lastHarvest: 0,
-    startBlock: 3443683,
   },
   {
     id: "cake-atom-bnb",
@@ -59078,7 +57435,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb6f1aF249f8b17ed25B4842007FdD1ee69cC7950",
     lastHarvest: 0,
-    startBlock: 3308934,
   },
   {
     id: "cake-vai-busd",
@@ -59107,7 +57463,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x507c55A7DC12D76dC41f0436f4Bc7f7c6634C68d",
     lastHarvest: 0,
-    startBlock: 3305854,
   },
   {
     id: "cake-broobee-cake",
@@ -59136,7 +57491,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x20ef822E27428D06c80326423Fba8C05cA1BA776",
     lastHarvest: 0,
-    startBlock: 3305872,
   },
   {
     id: "venus-bnb",
@@ -59172,7 +57526,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xFA3CcB086Bf371A2Ff33Db8521Be47c5B4b9d10E",
     lastHarvest: 0,
-    startBlock: 3127485,
   },
   {
     id: "venus-wbnb",
@@ -59211,7 +57564,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xFA3CcB086Bf371A2Ff33Db8521Be47c5B4b9d10E",
     lastHarvest: 0,
-    startBlock: 3127485,
   },
   {
     id: "venus-sxp-eol",
@@ -59240,7 +57592,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8c1244aCCD534025641CFF00D4ee5616FcbeE154",
     lastHarvest: 0,
-    startBlock: 3164990,
   },
   {
     id: "venus-usdc-eol",
@@ -59269,7 +57620,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xe865Ba185895634D094767688aC1c69751cb06aa",
     lastHarvest: 0,
-    startBlock: 3165005,
   },
   {
     id: "venus-usdt-eol",
@@ -59298,7 +57648,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x45640eE6e2BE2bA6752909f2e57C32C4997965d2",
     lastHarvest: 0,
-    startBlock: 3165016,
   },
   {
     id: "venus-busd-eol",
@@ -59327,7 +57676,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x77ed2908e3cE2197882993DF9432E69079b146B6",
     lastHarvest: 0,
-    startBlock: 3164283,
   },
   {
     id: "venus-ltc-eol",
@@ -59356,7 +57704,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x00AF29ddd77ec424f971813303Be7be04f43d588",
     lastHarvest: 0,
-    startBlock: 3165442,
   },
   {
     id: "venus-xrp-eol",
@@ -59385,7 +57732,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x76788df486C07750Ce915D88093872470e5e3E45",
     lastHarvest: 0,
-    startBlock: 3165056,
   },
   {
     id: "cake-twt-bnb",
@@ -59414,7 +57760,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x03368dFCFa37f89ef10Bab2501350FD7e20b2D6a",
     lastHarvest: 0,
-    startBlock: 2902135,
   },
   {
     id: "cake-xvs-bnb",
@@ -59443,7 +57788,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xd4402810E985F0A1AB4cDB15cEc3c6c217F9e730",
     lastHarvest: 0,
-    startBlock: 2902154,
   },
   {
     id: "narwhal-gold-bnb-eol",
@@ -59475,7 +57819,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3661576d5Ecc42b7aA84b0749d8d3180eE6D1Be4",
     lastHarvest: 0,
-    startBlock: 2923016,
   },
   {
     id: "bakery-bake-eol",
@@ -59505,7 +57848,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf35FE19042190C5135D1452E188131FA0243cA81",
     lastHarvest: 0,
-    startBlock: 2794914,
   },
   {
     id: "bakery-bake-bnb-eol",
@@ -59537,7 +57879,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x31bd4354066B48D662aA472A5851FeD51030c147",
     lastHarvest: 0,
-    startBlock: 2794979,
   },
   {
     id: "street-bifi-bnb",
@@ -59566,7 +57907,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6A164e8DF6F554Cb2C9F4CF9a407E799b60fF497",
     lastHarvest: 0,
-    startBlock: 2582917,
   },
   {
     id: "street-drugs-bnb",
@@ -59593,7 +57933,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x87f86C9D9676A77aCC068528AB934B5CbBFe9479",
     lastHarvest: 0,
-    startBlock: 2498479,
   },
   {
     id: "street-thugs-bnb",
@@ -59620,7 +57959,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x82FCd3c30E8353e432c5F2Da10eE586015717B00",
     lastHarvest: 0,
-    startBlock: 2499800,
   },
   {
     id: "street-cred-bnb",
@@ -59647,7 +57985,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xc898F4ee9F3194d6Ed8B8D0E567100cE8038Eb57",
     lastHarvest: 0,
-    startBlock: 2499817,
   },
   {
     id: "street-busd-bnb",
@@ -59674,7 +58011,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x19A246CE9698eEEf9a6C851C034f6f3E71E4902f",
     lastHarvest: 0,
-    startBlock: 2499851,
   },
   {
     id: "street-panacakelp-thugs-bnb",
@@ -59701,7 +58037,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb506bEF03ec669f122c0F276e3848239aB829Dbb",
     lastHarvest: 0,
-    startBlock: 2505958,
   },
   {
     id: "street-dai-bnb",
@@ -59728,7 +58063,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x0042Fb96b4Ef358b65F8d11c8D7d703C41c2d1b3",
     lastHarvest: 0,
-    startBlock: 2499971,
   },
   {
     id: "street-bliq-bnb",
@@ -59755,7 +58089,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7f4deaca74a6aBbc573FB8FDf244D6d0e4c07976",
     lastHarvest: 0,
-    startBlock: 2500033,
   },
   {
     id: "street-drugs-bnb-v1",
@@ -59783,7 +58116,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x8Bc142d8c30280950dA80cf9681311a55eb6EA8b",
     lastHarvest: 0,
-    startBlock: 2329026,
   },
   {
     id: "cake-cake-eol",
@@ -59811,7 +58143,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x229959480e7dc01B0F73d492101f8745EF4d4Ada",
     lastHarvest: 0,
-    startBlock: 2010688,
   },
   {
     id: "cake-twt",
@@ -59839,7 +58170,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xb64A810e2E073293FbaB16ec0f5A948518FB1b8d",
     lastHarvest: 0,
-    startBlock: 2145127,
   },
   {
     id: "cake-hard",
@@ -59867,7 +58197,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x6b7b6742a98287478C701467a4bcd1521D46e984",
     lastHarvest: 0,
-    startBlock: 2123419,
   },
   {
     id: "cake-cake-bnb-eol",
@@ -59897,7 +58226,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf5d90f1b58927DCCedb741C9848c981372e86774",
     lastHarvest: 0,
-    startBlock: 2031899,
   },
   {
     id: "cake-busd-bnb",
@@ -59927,7 +58255,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x320E9bbe84277dcB61B262c47beBEC815eb29431",
     lastHarvest: 0,
-    startBlock: 2031933,
   },
   {
     id: "cake-usdt-busd",
@@ -59957,7 +58284,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x143F7d08B4AEB964662c590d52348BC65E831375",
     lastHarvest: 0,
-    startBlock: 2031963,
   },
   {
     id: "fortube-fil",
@@ -59984,7 +58310,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x201F67420C509Bc135a527D25260e09DFba25C68",
     lastHarvest: 0,
-    startBlock: 1777001,
   },
   {
     id: "fortube-busd",
@@ -60011,7 +58336,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xceeA52d3B8af005e87b309B8620038d5dA4cFCda",
     lastHarvest: 0,
-    startBlock: 1174318,
   },
   {
     id: "fortube-dot",
@@ -60038,7 +58362,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x419795e7743576aaf587bD84631363D577be5153",
     lastHarvest: 0,
-    startBlock: 1174580,
   },
   {
     id: "fortube-usdt",
@@ -60065,7 +58388,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xD3dBcd17d2f48C9BC937D3fADF3Ded5966878dD7",
     lastHarvest: 0,
-    startBlock: 1174545,
   },
   {
     id: "fortube-btcb",
@@ -60092,7 +58414,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x3bb71a7C10Efe5FA47B5fE5B8A9162102F33fEb8",
     lastHarvest: 0,
-    startBlock: 1174619,
   },
   {
     id: "fry-burger-v2",
@@ -60120,7 +58441,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x7FBA53a4DB251C4364998631E6e88b4445bF21C0",
     lastHarvest: 0,
-    startBlock: 1573191,
   },
   {
     id: "cake-syrup-twt",
@@ -60150,7 +58470,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xf5e17d564229101A5cDbc0C340F99bA2837f1731",
     lastHarvest: 0,
-    startBlock: 1717211,
   },
   {
     id: "fry-burger-v1",
@@ -60177,7 +58496,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0x32e6F091Ceb27362094EB2dc455AfE30AA3cbC75",
     lastHarvest: 0,
-    startBlock: 1377288,
   },
   {
     id: "beltv2-4belt",
@@ -60206,7 +58524,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xcDd3Bc7C38C80f5F0d0eaC49B4D2d9aDD0d0B06A",
     lastHarvest: 1651860458,
-    startBlock: 11135756,
   },
   {
     id: "cakev2-idia-busd-eol",
@@ -60246,7 +58563,6 @@ const vaults = [
     chain: "bsc",
     strategy: "0xfE64AE592C53c4d734d4F8feCa12038Fb6fA80d6",
     lastHarvest: 1647822993,
-    startBlock: 13709933,
   },
   {
     id: "cakev2-xcv-busd-eol",
@@ -60286,7 +58602,7 @@ const vaults = [
     chain: "bsc",
     strategy: "0x2BAA70473e61F66c8E0da17669055bE8843A62f3",
     lastHarvest: 1647448547,
-    startBlock: 13903128,
   },
 ];
+
 module.exports = { vaults };

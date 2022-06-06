@@ -1,6 +1,8 @@
 import { Address, TypedMap } from "@graphprotocol/graph-ts";
 
 export const NETWORK_STRING = "mainnet";
+export const NETWORK_CHAIN_ID = 1;
+export const NETWORK_SUFFIX = "-" + NETWORK_CHAIN_ID.toString();
 
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "ethereum-block-by-date": "^1.4.5"
+  }
+}

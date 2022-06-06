@@ -38,6 +38,7 @@ export function createWithdraw(
   withdraw.amount = withdrawnAmount;
   withdraw.amountUSD = getLastPriceUSD(
     strategyContract.want(),
+    networkSuffix,
     event.block.number
   ).times(new BigDecimal(withdrawnAmount));
 
