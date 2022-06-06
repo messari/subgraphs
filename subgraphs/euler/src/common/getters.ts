@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Token,
   LendingProtocol,
@@ -73,17 +73,17 @@ export function getOrCreateRewardToken(address: Address): RewardToken {
 //// Snapshots ////
 ///////////////////
 
-export function getOrCreateFinancials(block: ethereum.Block): FinancialsDailySnapshot {
+export function getOrCreateFinancials(timestamp: BigInt, blockNumber: BigInt): FinancialsDailySnapshot {
   // Number of days since Unix epoch
-  let id: i64 = block.timestamp.toI64() / SECONDS_PER_DAY;
+  let id: i64 = timestamp.toI64() / SECONDS_PER_DAY;
 
   let financialMetrics = FinancialsDailySnapshot.load(id.toString());
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = EULER_ADDRESS;
-    financialMetrics.blockNumber = block.number;
-    financialMetrics.timestamp = block.timestamp;
+    financialMetrics.blockNumber = blockNumber;
+    financialMetrics.timestamp = timestamp;
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;

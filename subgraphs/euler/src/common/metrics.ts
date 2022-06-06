@@ -8,14 +8,14 @@ import {
   getOrCreateUsageDailySnapshot,
   getOrCreateUsageHourlySnapshot,
 } from "./getters";
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { Account, ActiveAccount,  UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
+import { BIGINT_ZERO, SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./constants";
 
 // updates a given FinancialDailySnapshot Entity
 export function updateFinancials(block: ethereum.Block): void {
   // number of days since unix epoch
-  let financialMetrics = getOrCreateFinancials(block);
+  let financialMetrics = getOrCreateFinancials(block.timestamp, block.number);
   let protocol = getOrCreateLendingProtocol();
 
   // update vars
@@ -31,11 +31,35 @@ export function updateFinancials(block: ethereum.Block): void {
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  // Note: daily revenue calculations done in helpers.ts:updatePrevBlockRevenues()
 
   // update the block number and timestamp
   financialMetrics.blockNumber = block.number;
   financialMetrics.timestamp = block.timestamp;
+
+  // update daily metrics
+  const previousDayFinancials = getOrCreateFinancials(
+    block.timestamp.minus(BigInt.fromI32(SECONDS_PER_DAY)),
+    BIGINT_ZERO,
+  );
+
+  financialMetrics.dailyBorrowUSD = financialMetrics.cumulativeBorrowUSD.minus(
+    previousDayFinancials.cumulativeBorrowUSD,
+  );
+  financialMetrics.dailyDepositUSD = financialMetrics.cumulativeDepositUSD.minus(
+    previousDayFinancials.cumulativeDepositUSD,
+  );
+  financialMetrics.dailyLiquidateUSD = financialMetrics.cumulativeLiquidateUSD.minus(
+    previousDayFinancials.cumulativeLiquidateUSD,
+  );
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.cumulativeProtocolSideRevenueUSD.minus(
+    previousDayFinancials.cumulativeProtocolSideRevenueUSD,
+  );
+  financialMetrics.dailySupplySideRevenueUSD = financialMetrics.cumulativeSupplySideRevenueUSD.minus(
+    previousDayFinancials.cumulativeSupplySideRevenueUSD,
+  );
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.cumulativeTotalRevenueUSD.minus(
+    previousDayFinancials.cumulativeTotalRevenueUSD,
+  );
 
   financialMetrics.save();
 }
