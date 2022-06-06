@@ -7,6 +7,7 @@ import {
   ASSET_TYPES,
   BIG_INT_ONE,
   CRYPTO_FACTORY,
+  LENDING_POOLS,
   METAPOOL_FACTORY,
   METAPOOL_FACTORY_ADDRESS,
   STABLE_FACTORY,
@@ -20,13 +21,7 @@ import { getFactory } from "./factory";
 import { CryptoFactory } from "../../generated/templates/CryptoRegistryTemplate/CryptoFactory";
 import { fetchTokenDecimals } from "../common/tokens";
 import { getOrCreateToken, getPoolCoins } from "../common/getters";
-import {
-  setPoolBalances,
-  setPoolFees,
-  setPoolOutputTokenSupply,
-  setPoolTVL,
-  setProtocolTVL,
-} from "../common/setters";
+import { setPoolBalances, setPoolFees, setPoolOutputTokenSupply, setPoolTVL, setProtocolTVL } from "../common/setters";
 import { getLpTokenPriceUSD } from "./snapshots";
 import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
 import { setGaugeData } from "./gauges/helpers";
@@ -109,6 +104,13 @@ export function createNewFactoryPool( // @ts-ignore
       return;
     }
     factoryPool = factoryPoolCall.value;
+    if (factoryPool == ADDRESS_ZERO) {
+      log.error("factoryPool is zero for factory {} at count {}", [
+        factoryContract.toHexString(),
+        poolCount.toString(),
+      ]);
+      return;
+    }
     let gaugeCall = factory.try_get_gauge(factoryPool);
     if (!gaugeCall.reverted) {
       gauge = gaugeCall.value;
@@ -341,4 +343,16 @@ export function getAssetType(pool: LiquidityPool): i32 {
     return assetTypeCall.value.toI32();
   }
   return getAssetTypeCrude(pool.name!, pool.symbol!);
+}
+
+export function isLendingPool(pool: Address): boolean {
+  const testLending = CurveLendingPool.bind(pool);
+  // The test would not work on mainnet because there are no
+  // specific functions for lending pools there.
+  const testLendingResult = testLending.try_offpeg_fee_multiplier();
+  if (!testLendingResult.reverted || LENDING_POOLS.includes(pool)) {
+    log.debug("Newly registered Pool is a lending pool: {}", [pool.toHexString()]);
+    return true;
+  }
+  return false;
 }

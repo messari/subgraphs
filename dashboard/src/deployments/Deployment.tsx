@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -79,7 +79,9 @@ interface DeploymentProps {
 export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing }: DeploymentProps) => {
   const deploymentsContext = useContext(DeploymentsContext);
   const navigate = useNavigate();
-
+  const navigateToSubgraph = (url: string) => () => {
+    navigate(`subgraph?endpoint=${url}&tab=protocol`);
+  };
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
   const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery, {
@@ -112,18 +114,49 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
   if (!status) {
-    return null;
+    let errorMsg = null;
+    if (errorIndexing) {
+      console.log(errorIndexing, Object.values(errorIndexing));
+      errorMsg = (
+        <Box marginTop="10px" gap={2} alignItems="center">
+          <span>Indexing status could not be pulled: "{errorIndexing.message.slice(0, 100)}..."</span>
+        </Box>
+      );
+    }
+    return (
+      <StyledDeployment
+        onClick={navigateToSubgraph(deployment)}
+        sx={{ width: "70%" }}
+        $styleRules={{
+          schemaOutdated,
+          nonFatalErrors: false,
+          fatalError: false,
+          success: false,
+        }}
+      >
+        <DeploymentBackground>
+          <CardContent>
+            <Box display="flex" gap={3} alignItems="center">
+              <NetworkLogo network={networkName} />
+              <Typography variant="h5" align="center">
+                {networkName}
+              </Typography>
+            </Box>
+            <Box marginTop="10px" gap={2} alignItems="center">
+              <span>{deployment}</span>
+            </Box>
+            {errorMsg}
+          </CardContent>
+        </DeploymentBackground>
+      </StyledDeployment>
+    );
   }
   const indexed = synced
     ? 100
     : toPercent(
-        status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
-        status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
-      );
-
-  const navigateToSubgraph = (url: string) => () => {
-    navigate(`subgraph?endpoint=${url}&tab=protocol`);
-  };
+      status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
+      status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
+    );
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();

@@ -1,6 +1,7 @@
 # Convex Protocol Metrics Subgraph Methodology v1.2
 
 
+
 ## Convex Finance Introduction
 
 Convex Finance is a DeFi platform which allows Curve.fi liquidity providers to earn trading fees and claim boosted CRV without locking CRV themselves. 
@@ -114,6 +115,7 @@ Total Revenue generated on Convex Finance is the combination of:
     - CRV token rewards
     - CVX token rewards
     - Additional rewards (if any)
+
 
 The total reward in USD shall be calculated by using this formula: 
 

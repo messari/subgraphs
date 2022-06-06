@@ -1,4 +1,4 @@
-import { log } from "@graphprotocol/graph-ts/index";
+import { Address, log, Bytes, BigInt } from "@graphprotocol/graph-ts/index";
 import {
   Batch_set_liquidity_gaugesCall,
   CryptoRegistry,
@@ -19,15 +19,17 @@ import { LiquidityPool } from "../generated/schema";
 import { setGaugeData } from "./services/gauges/helpers";
 import { LiquidityGaugeDeployed } from "../generated/templates/CryptoFactoryTemplate/CryptoFactory";
 import { ZERO_ADDRESS } from "./common/constants";
+import { handleLiquidityEvent, handleLiquidityRemoveOne } from "./services/liquidity";
 
-export function handleCryptoPoolAdded(event: PoolAdded): void {
-  log.debug("New V2 factory crypto pool {} deployed at {}", [
-    event.params.pool.toHexString(),
-    event.transaction.hash.toHexString(),
-  ]);
-  const cryptoRegistryAddress = event.address;
-  const pool = event.params.pool;
-  let cryptoRegistry = CryptoRegistry.bind(cryptoRegistryAddress);
+export function addCryptoRegistryPool(
+  pool: Address,
+  registry: Address,
+  block: BigInt,
+  timestamp: BigInt,
+  hash: Bytes,
+): void {
+  log.debug("New V2 factory crypto pool {} deployed at {}", [pool.toHexString(), hash.toHexString()]);
+  let cryptoRegistry = CryptoRegistry.bind(registry);
   let gauge = ADDRESS_ZERO;
   let gaugeCall = cryptoRegistry.try_get_gauges(pool);
   if (!gaugeCall.reverted) {
@@ -40,31 +42,45 @@ export function handleCryptoPoolAdded(event: PoolAdded): void {
     createNewRegistryPool(
       pool,
       testMetaPoolResult.value,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       true,
       true,
       REGISTRY_V2,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      cryptoRegistryAddress,
+      registry,
     );
   } else {
     createNewRegistryPool(
       pool,
       ADDRESS_ZERO,
-      getLpToken(pool, event.address),
+      getLpToken(pool, registry),
       false,
       true,
       REGISTRY_V2,
-      event.block.timestamp,
-      event.block.number,
-      event.transaction.hash,
+      timestamp,
+      block,
+      hash,
       gauge,
-      cryptoRegistryAddress,
+      registry,
     );
   }
+}
+
+export function handleCryptoPoolAdded(event: PoolAdded): void {
+  log.debug("New V2 factory crypto pool {} deployed at {}", [
+    event.params.pool.toHexString(),
+    event.transaction.hash.toHexString(),
+  ]);
+  addCryptoRegistryPool(
+    event.params.pool,
+    event.address,
+    event.block.number,
+    event.block.timestamp,
+    event.transaction.hash,
+  );
 }
 
 export function handleCryptoPoolDeployed(event: CryptoPoolDeployed): void {
@@ -99,6 +115,15 @@ export function handleTokenExchangeV2(event: TokenExchange): void {
 
 export function handleAddLiquidityV2(event: AddLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString());
+
+  handleLiquidityEvent(
+    "deposit",
+    pool,
+    event.params.token_supply,
+    event.params.token_amounts,
+    event.params.provider,
+    event,
+  );
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -107,6 +132,15 @@ export function handleAddLiquidityV2(event: AddLiquidity): void {
 
 export function handleRemoveLiquidityV2(event: RemoveLiquidity): void {
   let pool = getLiquidityPool(event.address.toHexString());
+
+  handleLiquidityEvent(
+    "withdraw",
+    pool,
+    event.params.token_supply,
+    event.params.token_amounts,
+    event.params.provider,
+    event,
+  );
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated
@@ -115,6 +149,8 @@ export function handleRemoveLiquidityV2(event: RemoveLiquidity): void {
 
 export function handleRemoveLiquidityOneV2(event: RemoveLiquidityOne): void {
   let pool = getLiquidityPool(event.address.toHexString());
+
+  handleLiquidityRemoveOne(pool, event.params.token_supply, event.params.token_amount, event.params.provider, event);
   updatePool(pool, event); // also updates protocol tvl
   updatePoolMetrics(pool.id, event);
   updateFinancials(event); // call after protocol tvl is updated

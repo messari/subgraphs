@@ -4,10 +4,10 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: AddressProvider
-    network: matic
+    network: mainnet
     source:
       address: "0x0000000022d53366457f9d5e68ec105046fc4383"
-      startBlock: 13549563
+      startBlock: 11153725
       abi: AddressProvider
     mapping:
       kind: ethereum/events
@@ -78,6 +78,10 @@ dataSources:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: ChainlinkAggregator
+          file: ./abis/CLAggregator.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: NewAddressIdentifier(indexed uint256,address,string)
           handler: handleNewAddressIdentifier
@@ -88,7 +92,7 @@ dataSources:
 templates:
   - name: RegistryTemplate
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: MainRegistry
     mapping:
@@ -159,16 +163,18 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: PoolAdded(indexed address,bytes)
           handler: handleMainRegistryPoolAdded
-      
-        
-          
+      callHandlers:
+        - function: set_liquidity_gauges(address,address[10])
+          handler: handleSetLiquidityGauges
       file: ./src/mapping.ts
   - name: StableFactoryTemplate
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: StableFactory
     mapping:
@@ -236,6 +242,8 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: PlainPoolDeployed(address[4],uint256,uint256,address)
           handler: handlePlainPoolDeployed
@@ -243,13 +251,13 @@ templates:
           handler: handleMetaPoolDeployed
         - event: LiquidityGaugeDeployed(address,address)
           handler: handleLiquidityGaugeDeployed
-      
-        
-          
+      callHandlers:
+        - function: add_existing_metapools(address[10])
+          handler: handleAddExistingMetaPools
       file: ./src/mapping.ts
   - name: CryptoRegistryTemplate
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: CryptoRegistry
     mapping:
@@ -319,18 +327,20 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: PoolAdded(indexed address)
           handler: handleCryptoPoolAdded
-      
-        
-          
-        
-          
+      callHandlers:
+        - function: set_liquidity_gauges(address,address[10])
+          handler: handleSetLiquidityGauges
+        - function: batch_set_liquidity_gauges(address[10],address[10])
+          handler: handleBatchSetLiquidityGauges
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplate
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: CurvePool
     mapping:
@@ -405,6 +415,8 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: TokenExchange(indexed address,int128,uint256,int128,uint256)
           handler: handleTokenExchange
@@ -423,7 +435,7 @@ templates:
       file: ./src/mapping.ts
   - name: CryptoFactoryTemplate
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: CryptoFactory
     mapping:
@@ -496,6 +508,8 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: CryptoPoolDeployed(address,address[2],uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleCryptoPoolDeployed
@@ -504,7 +518,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurvePoolTemplateV2
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: CurvePoolV2
     mapping:
@@ -577,6 +591,8 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: TokenExchange(indexed address,uint256,uint256,uint256,uint256)
           handler: handleTokenExchangeV2
@@ -589,7 +605,7 @@ templates:
       file: ./src/mappingV2.ts
   - name: CurveGauge
     kind: ethereum/contract
-    network: matic
+    network: mainnet
     source:
       abi: Gauge
     mapping:
@@ -658,6 +674,8 @@ templates:
           file: ./abis/prices/Atoken.json
         - name: YearnTokenV2
           file: ./abis/prices/YearnTokenV2.json
+        - name: IdleToken
+          file: ./abis/prices/IdleToken.json
       eventHandlers:
         - event: Deposit(indexed address,uint256)
           handler: handleDeposit

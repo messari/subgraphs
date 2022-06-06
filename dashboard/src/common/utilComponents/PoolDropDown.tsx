@@ -1,4 +1,4 @@
-import { Autocomplete, TextField, Typography } from "@mui/material";
+import { Autocomplete, CircularProgress, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ComboBoxInput } from "./ComboBoxInput";
@@ -9,7 +9,7 @@ interface PoolDropDownProps {
   setIssues: React.Dispatch<
     React.SetStateAction<{ message: string; type: string; level: string; fieldName: string }[]>
   >;
-  markets: [];
+  markets: { [x: string]: any }[];
 }
 
 export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
@@ -26,6 +26,7 @@ export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDrop
     inputTextValue = poolId + " / " + pool.name;
   }
   const [textInput, setTextInput] = useState<string>(inputTextValue);
+
   return (
     <>
       <Typography variant="h6">Select a pool</Typography>
