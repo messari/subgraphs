@@ -22,6 +22,11 @@ export function handlePoolAdded(event: PoolAdded): void {
     const lpToken = registryContract.get_lp_token(poolAddress);
     const basePool = registryContract.get_base_pool(poolAddress);
     const lpTokenEntity = getOrCreateToken(lpToken);
+    const isLending =  isLendingPool(poolAddress);
+    let poolType = isLending ? PoolType.LENDING : PoolType.PLAIN;
+    if (!isLending && basePool.equals(ADDRESS_ZERO)){
+        poolType = PoolType.BASEPOOL;
+    }
     createNewPool(
         poolAddress,
         lpToken,
@@ -31,6 +36,6 @@ export function handlePoolAdded(event: PoolAdded): void {
         event.block.timestamp,
         basePool,
         [],
-        isLendingPool(poolAddress) ? PoolType.LENDING : PoolType.BASEPOOL
+        poolType
     )
 }
