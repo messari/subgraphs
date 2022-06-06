@@ -59,6 +59,15 @@ const messagesByLevel = (
         const msgObj = JSON.parse(issuesArray[x].message);
         issuesMsg = `'${issuesArray[x].fieldName}' has ${msgObj.count} negative values. First instance of a negative value is on snapshot ${msgObj.firstSnapshot} with a value of ${msgObj.value}`;
       }
+      if (issuesArray[x].type === "NAN") {
+        issuesMsg = `'${issuesArray[x].fieldName}' is NaN.`;
+      }
+      if (issuesArray[x].type === "RATENEG") {
+        issuesMsg = `'${issuesArray[x].fieldName}' has a negative rate.`;
+      }
+      if (issuesArray[x].type === "RATEZERO") {
+        issuesMsg = `'${issuesArray[x].fieldName}' has a zero rate.`;
+      }
       if (issuesArray[x].type === "EMPTY") {
         issuesMsg = `Entity ${issuesArray[x].fieldName} has no instances. This could mean that the pool was created but no transactions were detected on it.`;
       }

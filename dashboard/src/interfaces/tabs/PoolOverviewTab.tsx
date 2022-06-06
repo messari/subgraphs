@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import IssuesDisplay from "../IssuesDisplay";
 import { TablePoolOverview } from "../../common/chartComponents/TablePoolOverview";
 import { styled } from "../../styled";
@@ -15,12 +15,6 @@ const ChangePageEle = styled("div")`
   padding: ${({ theme }) => theme.spacing(2)};
   margin: 10px 0;
   cursor: pointer;
-`;
-
-const PoolContainer = styled("div")`
-  display: flex;
-  flex-wrap: wrap;
-  gap: ${({ theme }) => theme.spacing(2)};
 `;
 
 interface PoolOverviewTabProps {
@@ -44,11 +38,15 @@ function PoolOverviewTab({
   paginate,
   skipAmt,
 }: PoolOverviewTabProps) {
-  const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
+  const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
+    [],
+  );
+  const issues: { message: string; type: string; level: string; fieldName: string }[] = tableIssues;
+
   const navigate = useNavigate();
   const href = new URL(window.location.href);
   const p = new URLSearchParams(href.search);
-  if (!!poolOverviewRequest.poolOverviewError) {
+  if (!!poolOverviewRequest.poolOverviewError && issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
     issues.push({
       message: poolOverviewRequest?.poolOverviewError?.message + ". Refresh and try again.",
       type: "",
@@ -70,6 +68,7 @@ function PoolOverviewTab({
           paginate(skipAmt + 50);
           p.set("skipAmt", (skipAmt + 50).toString());
           navigate("?" + p.toString());
+          setTableIssues([]);
         }}
       >
         <span>NEXT</span>
@@ -87,6 +86,7 @@ function PoolOverviewTab({
           paginate(0);
           p.delete("skipAmt");
           navigate("?" + p.toString());
+          setTableIssues([]);
         }}
       >
         <ChevronLeftIcon />
@@ -101,6 +101,7 @@ function PoolOverviewTab({
           paginate(skipAmt - 50);
           p.set("skipAmt", (skipAmt - 50).toString());
           navigate("?" + p.toString());
+          setTableIssues([]);
         }}
       >
         <ChevronLeftIcon />
@@ -125,14 +126,18 @@ function PoolOverviewTab({
 
   return (
     <>
-      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+      <IssuesDisplay issuesArrayProps={tableIssues} allLoaded={true} oneLoaded={true} />
       <TablePoolOverview
         datasetLabel=""
         dataTable={pools}
         protocolType={protocolType}
         skipAmt={skipAmt}
+        issueProps={tableIssues}
         setPoolId={(x) => setPoolId(x)}
         handleTabChange={(x, y) => handleTabChange(x, y)}
+        setIssues={(x) => {
+          setTableIssues(x);
+        }}
       />
       <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
         {prevButton}

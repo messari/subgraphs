@@ -1,11 +1,7 @@
 import { Box, CircularProgress, Grid, Typography } from "@mui/material";
-import { Chart } from "../../common/chartComponents/Chart";
-import { TableChart } from "../../common/chartComponents/TableChart";
 import { PoolDropDown } from "../../common/utilComponents/PoolDropDown";
-import { negativeFieldList, PoolName, PoolNames } from "../../constants";
+import { PoolName, PoolNames } from "../../constants";
 import SchemaTable from "../SchemaTable";
-import { convertTokenDecimals } from "../../utils";
-import { StackedChart } from "../../common/chartComponents/StackedChart";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect, useState } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
@@ -13,34 +9,34 @@ import PoolTabEntity from "./PoolTabEntity";
 
 interface PoolTabProps {
   data: any;
+  entitiesData: { [x: string]: { [x: string]: string } };
+  protocolData: { [x: string]: any };
   poolTimeseriesData: any;
   poolTimeseriesError: any;
   poolTimeseriesLoading: any;
-  entitiesData: { [x: string]: { [x: string]: string } };
   poolId: string;
-  setPoolId: React.Dispatch<React.SetStateAction<string>>;
-  protocolData: { [x: string]: any };
   poolData: { [x: string]: string };
   poolsList: { [x: string]: any[] };
   poolListLoading: any;
   poolNames: string;
   poolsListError: any;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function PoolTab({
   data,
+  entitiesData,
+  protocolData,
   poolTimeseriesData,
   poolTimeseriesError,
   poolTimeseriesLoading,
-  entitiesData,
   poolId,
-  setPoolId,
   poolData,
-  protocolData,
   poolsList,
   poolNames,
   poolListLoading,
   poolsListError,
+  setPoolId,
 }: PoolTabProps) {
   const [issuesToDisplay, setIssuesToDisplay] = useState<
     { message: string; type: string; level: string; fieldName: string }[]
@@ -48,7 +44,6 @@ function PoolTab({
   const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
     [],
   );
-
   const issues: { [entityName: string]: { message: string; type: string; level: string; fieldName: string }[] } = {};
   function setIssues(
     issuesSet: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] },
@@ -56,21 +51,22 @@ function PoolTab({
   ) {
     issues[entityName] = issuesSet[entityName];
   }
+
   console.log("DATA", data);
   // Get the key name of the pool specific to the protocol type (singular and plural)
   const poolKeySingular = PoolName[data.protocols[0].type];
   const poolKeyPlural = PoolNames[data.protocols[0].type];
 
   let allLoaded = true;
-  Object.keys(poolTimeseriesLoading).forEach((loading: string) => {
-    if (poolTimeseriesLoading[loading]) {
+  Object.keys(poolTimeseriesLoading).forEach((entity: string) => {
+    if (poolTimeseriesLoading[entity]) {
       allLoaded = false;
     }
   });
 
   let oneLoaded = false;
-  Object.keys(poolTimeseriesLoading).forEach((loading: string) => {
-    if (!poolTimeseriesLoading[loading] && poolTimeseriesData[loading]) {
+  Object.keys(poolTimeseriesLoading).forEach((entity: string) => {
+    if (poolTimeseriesData[entity]) {
       oneLoaded = true;
     }
   });

@@ -1,5 +1,6 @@
 import { Box, Tooltip } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
+import { useEffect } from "react";
 import { useNavigate } from "react-router";
 
 interface TableChartProps {
@@ -9,6 +10,8 @@ interface TableChartProps {
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   skipAmt: number;
+  setIssues: React.Dispatch<{ message: string; type: string; level: string; fieldName: string }[]>;
+  issueProps: { message: string; type: string; level: string; fieldName: string }[];
 }
 
 const tableCellTruncate: any = {
@@ -24,8 +27,16 @@ export const TablePoolOverview = ({
   handleTabChange,
   setPoolId,
   skipAmt,
+  setIssues,
+  issueProps,
 }: TableChartProps) => {
   const navigate = useNavigate();
+  let issues: { message: string; type: string; level: string; fieldName: string }[] = issueProps;
+  useEffect(() => {
+    if (JSON.stringify(issues) !== JSON.stringify(issueProps)) {
+      setIssues(issues);
+    }
+  });
   if (dataTable) {
     const optionalFields = [];
     let baseFieldCol = false;
@@ -53,12 +64,12 @@ export const TablePoolOverview = ({
       {
         field: "name",
         headerName: "Name",
-        width: 200,
+        width: 180,
         renderCell: (params: any) => {
           let nameStr = params.value;
-          if (nameStr.length > 16) {
-            nameStr = `${params.value.slice(0, 7)}...${params.value.slice(
-              params.value.length - 8,
+          if (nameStr.length > 20) {
+            nameStr = `${params.value.slice(0, 9)}...${params.value.slice(
+              params.value.length - 10,
               params.value.length,
             )}`;
           }
@@ -75,8 +86,8 @@ export const TablePoolOverview = ({
         width: 280,
         renderCell: (params: any) => {
           let poolIdStr = params.value;
-          if (poolIdStr.length > 20) {
-            poolIdStr = `${params.value.slice(0, 10)}...${params.value.slice(
+          if (poolIdStr.length > 40) {
+            poolIdStr = `${params.value.slice(0, 14)}...${params.value.slice(
               params.value.length - 15,
               params.value.length,
             )}`;
@@ -99,9 +110,9 @@ export const TablePoolOverview = ({
         width: inputTokenColWidth,
         renderCell: (params: any) => {
           let inputTokenStr = params.value;
-          if (inputTokenStr.length > 15) {
-            inputTokenStr = `${params.value.slice(0, 6)}...${params.value.slice(
-              params.value.length - 7,
+          if (inputTokenStr.length > 23) {
+            inputTokenStr = `${params.value.slice(0, 12)}...${params.value.slice(
+              params.value.length - 12,
               params.value.length,
             )}`;
           }
@@ -117,9 +128,10 @@ export const TablePoolOverview = ({
         headerName: "TVL (USD)",
         width: 180,
         renderCell: (params: any) => {
+          const val = "$" + Number(params.value.toFixed(2)).toLocaleString();
           return (
             <Tooltip title={params.value}>
-              <span style={tableCellTruncate}>{params.value}</span>
+              <span style={tableCellTruncate}>{val}</span>
             </Tooltip>
           );
         },
@@ -150,15 +162,28 @@ export const TablePoolOverview = ({
       if (pool.inputTokens) {
         inputTokenSymbol = pool.inputTokens.map((tok: any) => tok.symbol).join(", ");
       }
-      const returnObj: { [x: string]: string } = {
+
+      const returnObj: { [x: string]: any } = {
         id: i + 1 + skipAmt,
         idx: i + 1 + skipAmt,
         name: pool.name || "N/A",
         poolId: pool.id,
         inputToken: inputTokenSymbol,
-        tvl: "$" + Number(Number(pool.totalValueLockedUSD).toFixed(2)).toLocaleString(),
+        tvl: Number(pool.totalValueLockedUSD),
         rewardTokens: "",
       };
+      if (
+        Number(pool.totalValueLockedUSD) > 1000000000000 &&
+        issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt} - ${pool.name || "N/A"}`).length === 0
+      ) {
+        issues.push({
+          type: "TVL+",
+          message: "",
+          level: "warning",
+          fieldName: `#${i + 1 + skipAmt} - ${pool.name || "N/A"}`,
+        });
+      }
+
       if (pool.rewardTokens?.length > 0) {
         const rewardTokenSymbol = pool.rewardTokens.map((tok: any) => {
           if (tok?.symbol) {
@@ -168,41 +193,90 @@ export const TablePoolOverview = ({
           }
           return "N/A";
         });
-        // returnObj.rewardTokens = `[${rewardTokenSymbol.join(", ")}]`;
+        const tokenFieldDiff = pool.rewardTokens?.length - pool.rewardTokenEmissionsUSD?.length;
+        if (tokenFieldDiff !== 0 && issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt}[${tokenFieldDiff}]` && x.type === "TOK").length === 0
+        ) {
+          issues.push({
+            type: "TOK",
+            level: "error",
+            fieldName: `${pool.name || '#' + i + 1 + skipAmt}[${tokenFieldDiff}]`,
+            message: `rewardTokens [${tokenFieldDiff}]`,
+          });
+        }
+
 
         const rewardAPYs = pool.rewardTokenEmissionsUSD.map((val: string, idx: number) => {
           let apr = 0;
-          if (pool?.totalDepositBalanceUSD && protocolType === "LENDING") {
-            apr = (Number(val) / pool.totalDepositBalanceUSD) * 100 * 365;
-          } else {
+          if (protocolType === "LENDING") {
             if (
-              (!Number(pool?.stakedOutputTokenAmount) || !Number(pool?.outputTokenSupply)) &&
-              Number(pool.totalValueLockedUSD) !== 0
+              !Number(pool.totalDepositBalanceUSD) &&
+              !Number(pool.totalValueLockedUSD) &&
+              issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt}-pool value`).length === 0
             ) {
+              issues.push({
+                type: "VAL",
+                message: `${pool.name || '#' + i + 1 + skipAmt} does not have a valid 'totalDepositBalanceUSD' nor 'totalValueLockedUSD' value. Neither Reward APY nor Base Yield could be properly calculated.`,
+                level: "critical",
+                fieldName: `${pool.name || '#' + i + 1 + skipAmt}-pool value`,
+              });
+            } else if (pool.totalDepositBalanceUSD) {
+              apr = (Number(val) / Number(pool.totalDepositBalanceUSD)) * 100 * 365;
+            } else if (Number(pool.totalValueLockedUSD)) {
               apr = (Number(val) / Number(pool.totalValueLockedUSD)) * 100 * 365;
-            } else {
-              apr =
-                (Number(val) /
-                  (Number(pool.totalValueLockedUSD) *
-                    (Number(pool?.stakedOutputTokenAmount) / Number(pool?.outputTokenSupply)))) *
-                100 *
-                365;
             }
+          } else {
+            let outputStakedFactor = Number(pool?.stakedOutputTokenAmount) / Number(pool?.outputTokenSupply);
+            if (!outputStakedFactor) {
+              outputStakedFactor = 1;
+            }
+            apr = (Number(val) / (Number(pool.totalValueLockedUSD) * outputStakedFactor)) * 100 * 365;
           }
-          if (isNaN(apr)) {
-            apr = 0;
+          if (
+            Number(apr) === 0 &&
+            issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPY`)
+              .length === 0
+          ) {
+            issues.push({
+              type: "RATEZERO",
+              message: "",
+              level: "warning",
+              fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPY`,
+            });
+          }
+          if (
+            isNaN(apr) &&
+            issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPY`)
+              .length === 0
+          ) {
+            issues.push({
+              type: "NAN",
+              message: "",
+              level: "critical",
+              fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPY`,
+            });
+          }
+          if (
+            Number(apr) < 0 &&
+            issues.filter((x) => x.fieldName === `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPY`)
+              .length === 0
+          ) {
+            issues.push({
+              type: "RATENEG",
+              message: "",
+              level: "critical",
+              fieldName: `#${i + 1 + skipAmt}-${rewardTokenSymbol[idx] || "N/A"} RewardAPY`,
+            });
           }
           return Number(apr).toFixed(2) + "%";
         });
         const rewardTokenCell = rewardTokenSymbol.map((tok: string, idx: number) => {
-          let str = `0.00% ${tok}`;
+          let str = `0.00 % ${tok}`;
           if (rewardAPYs[idx]) {
             str = `${rewardAPYs[idx]} ${tok}`;
           }
           return str;
         });
         returnObj.rewardTokens = rewardTokenCell.join(", ");
-        // returnObj.rewardAPY = `[${rewardAPYs.join(", ")}]`;
       } else {
         returnObj.rewardTokens = "No Reward Token";
       }
@@ -221,6 +295,27 @@ export const TablePoolOverview = ({
           let value = ((feePercentage * volumeUSD) / Number(pool.totalValueLockedUSD)) * 100;
           if (!value || !Number(pool.totalValueLockedUSD)) {
             value = 0;
+            if (
+              issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt} Base Yield`).length === 0
+            ) {
+              issues.push({
+                type: "NAN",
+                message: "",
+                level: "critical",
+                fieldName: `${pool.name || '#' + i + 1 + skipAmt} Base Yield`,
+              });
+            }
+          }
+          if (
+            value < 0 &&
+            issues.filter((x) => x.fieldName === `${pool.name || '#' + i + 1 + skipAmt} Base Yield`).length === 0
+          ) {
+            issues.push({
+              type: "RATENEG",
+              message: "",
+              level: "critical",
+              fieldName: `${pool.name || '#' + i + 1 + skipAmt} Base Yield`,
+            });
           }
           returnObj.baseYield = "%" + value.toFixed(2);
         }
@@ -243,7 +338,7 @@ export const TablePoolOverview = ({
           columnBuffer={7}
           initialState={{
             sorting: {
-              sortModel: [{ field: "id", sort: "desc" }],
+              sortModel: [{ field: "tvl", sort: "desc" }],
             },
           }}
           hideFooter={true}
