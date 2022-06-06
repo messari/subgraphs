@@ -103,6 +103,40 @@
         "prepare:constants": true
       }
     },
+    "qidao": {
+      "arbitrum": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "avalanche": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "bsc": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "fantom": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "matic": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "moonriver": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "optimism": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      },
+      "xdai": {
+        "template": "qidao.template.yaml",
+        "deploy-on-merge": false
+      }
+    },
     "quickswap": {
       "matic": {
         "template": "quickswap.template.yaml",
