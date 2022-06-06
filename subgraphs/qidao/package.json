@@ -5,10 +5,10 @@
     "format": "npx prettier --write .",
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ qidao",
     "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
     "prepare:build": "graph codegen && graph build",
     "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+    "deploy": "node --experimental-json-modules --no-warnings ../../deployment/deployment.js",
     "create-local": "graph create --node http://localhost:8020/ qidao",
     "remove-local": "graph remove --node http://localhost:8020/ qidao",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 qidao"
