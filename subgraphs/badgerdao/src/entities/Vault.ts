@@ -6,6 +6,7 @@ import { VaultV4 as VaultContract } from "../../generated/bimBTC/VaultV4";
 import { Vault, VaultFee, _Strategy } from "../../generated/schema";
 import { Strategy as StrategyTemplate } from "../../generated/templates";
 import {
+  BADGER_TOKEN,
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
@@ -16,7 +17,7 @@ import {
 import { readValue } from "../utils/contracts";
 import { enumToPrefix } from "../utils/strings";
 import { getOrCreateProtocol } from "./Protocol";
-import { getOrCreateToken } from "./Token";
+import { getOrCreateReward, getOrCreateToken } from "./Token";
 
 export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   let vault = Vault.load(id.toHex());
@@ -33,7 +34,7 @@ export function getOrCreateVault(id: Address, block: ethereum.Block): Vault {
   vault.symbol = "";
   vault.inputToken = "";
   vault.outputToken = "";
-  vault.rewardTokens = [];
+  vault.rewardTokens = [getOrCreateReward(BADGER_TOKEN).id];
   vault.depositLimit = BIGINT_ZERO;
   vault.fees = [];
   vault.createdTimestamp = block.timestamp;

@@ -78,7 +78,6 @@ export function handleRewards(event: TreeDistribution): void {
       event.params.blockNumber.toString(),
     ]);
 
-    vault.rewardTokens = [rewardToken.id];
     vault.rewardTokenEmissionsAmount = [
       vault.rewardTokenEmissionsAmount![0].plus(event.params.amount),
     ];
