@@ -14,14 +14,16 @@ import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection1
 import {
   TokensDeposited,
   TokensWithdrawn,
-  TradingLiquidityUpdated,
+  TotalLiquidityUpdated,
 } from "../generated/templates/PoolCollection2/PoolCollection2";
 import { PoolCollection2 } from "../generated/templates";
 import {
   TokensDeposited as BNTDeposited,
   TokensWithdrawn as BNTWithdrawn,
+  TotalLiquidityUpdated as BNTTotalLiquidityUpdated,
 } from "../generated/BNTPool/BNTPool";
 import { PoolToken } from "../generated/BancorNetwork/PoolToken";
+import { BancorNetworkInfo } from "../generated/templates/PoolCollection2/BancorNetworkInfo";
 import { ERC20 } from "../generated/BancorNetwork/ERC20";
 import {
   Deposit,
@@ -33,8 +35,8 @@ import {
 } from "../generated/schema";
 import {
   BancorNetworkAddr,
+  BancorNetworkInfoAddr,
   BnBntAddr,
-  BnDaiAddr,
   BntAddr,
   DaiAddr,
   EthAddr,
@@ -44,6 +46,8 @@ import {
   zeroBD,
   zeroBI,
 } from "./constants";
+
+// TODO: get ETH-bnETH rate https://docs.bancor.network/developer-guides/read-functions/pool-token-information/underlyingtopooltoken
 
 export function handlePoolCreatedLegacy(event: PoolCreated__Legacy): void {
   // PoolCreated__Legacy is emitted only on early blocks where we should create BNT token
@@ -101,13 +105,15 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.to = event.params.trader.toHexString();
   swap.tokenIn = sourceTokenID;
   swap.amountIn = event.params.sourceAmount;
-  swap.amountInUSD = zeroBD; // TODO
+  swap.amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
   swap.tokenOut = targetTokenID;
   swap.amountOut = event.params.targetAmount;
   swap.amountOutUSD = zeroBD; // TODO
   swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
 
   swap.save();
+
+  // TODO: swap a to b should increase cumulativeVolumeUSD of a - but should i decrease from b's?
 }
 
 export function handleTokensDeposited(event: TokensDeposited): void {
@@ -208,37 +214,65 @@ export function handleBNTWithdrawn(event: BNTWithdrawn): void {
   );
 }
 
-export function handleTradingLiquidityUpdated(
-  event: TradingLiquidityUpdated
+export function handleTotalLiquidityUpdated(
+  event: TotalLiquidityUpdated
 ): void {
-  let tokenAddress = event.params.token.toHexString();
+  let tokenAddress = event.params.pool.toHexString();
   let token = Token.load(tokenAddress);
   if (!token) {
-    log.warning("[handleTradingLiquidityUpdated] token {} not found", [
+    log.warning("[handleTotalLiquidityUpdated] token {} not found", [
       tokenAddress,
     ]);
     return;
   }
   if (!token._poolToken) {
     log.warning(
-      "[handleTradingLiquidityUpdated] token {} doesn't link to a pool token",
+      "[handleTotalLiquidityUpdated] token {} doesn't link to a pool token",
       [tokenAddress]
     );
     return;
   }
   let liquidityPool = LiquidityPool.load(token._poolToken!);
   if (!liquidityPool) {
-    log.warning("[handleTradingLiquidityUpdated] liquidity pool {} not found", [
+    log.warning("[handleTotalLiquidityUpdated] liquidity pool {} not found", [
       token._poolToken!,
     ]);
     return;
   }
-  liquidityPool.inputTokenBalances = [event.params.newLiquidity];
-  liquidityPool.totalValueLockedUSD = event.params.newLiquidity
-    .toBigDecimal()
-    .div(exponentToBigDecimal(token.decimals))
-    .times(getTokenPriceUSD(token.id));
-  liquidityPool.save();
+
+  _handleTotalLiquidityUpdated(
+    token,
+    liquidityPool,
+    event.params.stakedBalance,
+    event.params.poolTokenSupply
+  );
+}
+
+export function handleBNTTotalLiquidityUpdated(
+  event: BNTTotalLiquidityUpdated
+): void {
+  let bntToken = Token.load(BntAddr);
+  if (!bntToken) {
+    log.warning("[handleBNTTotalLiquidityUpdated] BNT token {} not found", [
+      BntAddr,
+    ]);
+    return;
+  }
+  let bnBntLiquidityPool = LiquidityPool.load(BnBntAddr);
+  if (!bnBntLiquidityPool) {
+    log.warning(
+      "[handleBNTTotalLiquidityUpdated] bnBNT liquidity pool {} not found",
+      [BnBntAddr]
+    );
+    return;
+  }
+
+  _handleTotalLiquidityUpdated(
+    bntToken,
+    bnBntLiquidityPool,
+    event.params.stakedBalance,
+    event.params.poolTokenSupply
+  );
 }
 
 function createBntToken(blockTimestamp: BigInt, blockNumber: BigInt): void {
@@ -439,10 +473,7 @@ function _handleTokensDeposited(
   deposit.inputTokenAmounts = [reserveTokenAmount];
   deposit.outputToken = poolToken.id;
   deposit.outputTokenAmount = poolTokenAmount;
-  deposit.amountUSD = reserveTokenAmount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(reserveToken.decimals))
-    .times(getTokenPriceUSD(reserveToken.id));
+  deposit.amountUSD = getDaiAmount(reserveToken.id, reserveTokenAmount);
   deposit.pool = poolToken.id;
 
   deposit.save();
@@ -473,62 +504,45 @@ function _handleTokensWithdrawn(
   withdraw.inputTokenAmounts = [reserveTokenAmount];
   withdraw.outputToken = poolToken.id;
   withdraw.outputTokenAmount = poolTokenAmount;
-  withdraw.amountUSD = reserveTokenAmount
-    .toBigDecimal()
-    .div(exponentToBigDecimal(reserveToken.decimals))
-    .times(getTokenPriceUSD(reserveToken.id));
+  withdraw.amountUSD = getDaiAmount(reserveToken.id, reserveTokenAmount);
   withdraw.pool = poolToken.id;
 
   withdraw.save();
 }
 
-// reserve token only
-function getTokenPriceUSD(tokenAddress: string): BigDecimal {
-  if (tokenAddress == DaiAddr) {
-    return new BigDecimal(BigInt.fromI32(1));
-  }
+function _handleTotalLiquidityUpdated(
+  reserveToken: Token,
+  liquidityPool: LiquidityPool,
+  stakedBalance: BigInt,
+  poolTokenSupply: BigInt
+): void {
+  liquidityPool.inputTokenBalances = [stakedBalance];
+  liquidityPool.totalValueLockedUSD = getDaiAmount(
+    reserveToken.id,
+    stakedBalance
+  );
+  liquidityPool.outputTokenSupply = poolTokenSupply;
+  liquidityPool.save();
+}
 
-  let token = Token.load(tokenAddress);
-  if (!token) {
-    log.warning("[getTokenPrice] token {} not found", [tokenAddress]);
-    return zeroBD;
+// TODO: figure out why it gets reverted sometimes
+function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
+  if (sourceTokenID == DaiAddr) {
+    return sourceAmount.toBigDecimal().div(exponentToBigDecimal(18));
   }
-  if (!token._poolToken) {
-    log.warning("[getTokenPrice] token {} doesn't link to a pool token", [
-      tokenAddress,
-    ]);
-    return zeroBD;
-  }
-  let tokenLiquidityPool = LiquidityPool.load(token._poolToken!);
-  if (!tokenLiquidityPool) {
-    log.warning("[getTokenPrice] token {} liquidity pool not found", [
-      token._poolToken!,
-    ]);
-    return zeroBD;
-  }
-
-  let daiToken = Token.load(DaiAddr);
-  if (!daiToken) {
-    log.warning("[getTokenPrice] DAI token not found", []);
-    return zeroBD;
-  }
-
-  let daiLiquidityPool = LiquidityPool.load(BnDaiAddr);
-  if (!daiLiquidityPool) {
-    log.warning("[getTokenPrice] DAI liquidity pool not found", [BnDaiAddr]);
-    return zeroBD;
-  }
-
-  if (tokenLiquidityPool.inputTokenBalances[0] == zeroBI) {
-    return zeroBD;
-  }
-
-  return daiLiquidityPool.inputTokenBalances[0]
-    .toBigDecimal()
-    .div(exponentToBigDecimal(daiToken.decimals))
-    .div(
-      tokenLiquidityPool.inputTokenBalances[0]
-        .toBigDecimal()
-        .div(exponentToBigDecimal(token.decimals))
+  let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
+  let targetAmountResult = info.try_tradeOutputBySourceAmount(
+    Address.fromString(sourceTokenID),
+    Address.fromString(DaiAddr),
+    sourceAmount
+  );
+  if (targetAmountResult.reverted) {
+    log.warning(
+      "[getDaiAmount] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
+      [sourceTokenID, DaiAddr, sourceAmount.toString()]
     );
+    return zeroBD;
+  }
+  // dai.decimals = 18
+  return targetAmountResult.value.toBigDecimal().div(exponentToBigDecimal(18));
 }

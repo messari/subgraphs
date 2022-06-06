@@ -59,6 +59,7 @@ export namespace UsageType {
 }
 
 export let BancorNetworkAddr = "0xeEF417e1D5CC832e619ae18D2F140De2999dD4fB";
+export let BancorNetworkInfoAddr = "0x8E303D296851B320e6a697bAcB979d13c9D6E760";
 export let EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export let BntAddr = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";
 export let BnBntAddr = "0xab05cf7c6c3a288cd36326e4f7b8600e7268e344";

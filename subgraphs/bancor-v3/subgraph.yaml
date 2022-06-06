@@ -26,6 +26,8 @@ dataSources:
           file: ./abis/BancorNetwork.json
         - name: PoolToken
           file: ./abis/PoolToken.json
+        - name: BancorNetworkInfo
+          file: ./abis/BancorNetworkInfo.json
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
@@ -69,7 +71,7 @@ dataSources:
     source:
       address: "0x02651E355D26f3506C1E644bA393FDD9Ac95EaCa"
       abi: BNTPool
-      startBlock: 14609379
+      startBlock: 14609387
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -81,11 +83,15 @@ dataSources:
       abis:
         - name: BNTPool
           file: ./abis/BNTPool.json
+        - name: BancorNetworkInfo
+          file: ./abis/BancorNetworkInfo.json
       eventHandlers:
         - event: TokensDeposited(indexed bytes32,indexed address,uint256,uint256,uint256)
           handler: handleBNTDeposited
         - event: TokensWithdrawn(indexed bytes32,indexed address,uint256,uint256,uint256,uint256)
           handler: handleBNTWithdrawn
+        - event: TotalLiquidityUpdated(indexed bytes32,uint256,uint256,uint256)
+          handler: handleBNTTotalLiquidityUpdated
 templates:
   - kind: ethereum/contract
     name: PoolCollection2
@@ -103,10 +109,12 @@ templates:
       abis:
         - name: PoolCollection2
           file: ./abis/PoolCollection2.json
+        - name: BancorNetworkInfo
+          file: ./abis/BancorNetworkInfo.json
       eventHandlers:
         - event: TokensDeposited(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleTokensDeposited
         - event: TokensWithdrawn(indexed bytes32,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256)
           handler: handleTokensWithdrawn
-        - event: TradingLiquidityUpdated(indexed bytes32,indexed address,indexed address,uint256,uint256)
-          handler: handleTradingLiquidityUpdated
+        - event: TotalLiquidityUpdated(indexed bytes32,indexed address,uint256,uint256,uint256)
+          handler: handleTotalLiquidityUpdated
