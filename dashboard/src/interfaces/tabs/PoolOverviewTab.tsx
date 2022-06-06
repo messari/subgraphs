@@ -22,10 +22,10 @@ interface PoolOverviewTabProps {
   protocolType: string;
   subgraphToQueryURL: string;
   poolOverviewRequest: { [x: string]: any };
+  skipAmt: number;
   handleTabChange: (event: any, newValue: string) => void;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
   paginate: React.Dispatch<React.SetStateAction<number>>;
-  skipAmt: number;
 }
 
 // This component is for each individual subgraph
@@ -114,7 +114,7 @@ function PoolOverviewTab({
     if (skipAmt > 0) {
       p.delete("skipAmt");
       window.location.href = `${href.origin}${href.pathname}?${p.toString()}`;
-    } else {
+    } else if (issues.filter((x) => x.fieldName === "PoolOverviewTab").length === 0) {
       issues.push({
         message: "No pools returned in pool overview.",
         type: "POOL",
