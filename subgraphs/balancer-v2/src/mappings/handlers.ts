@@ -15,11 +15,9 @@ import {
   createLiquidityPool,
 } from "../common/creators";
 import { updatePoolMetrics, updateUsageMetrics, updateFinancials } from "../common/updateMetrics";
-import { BIGDECIMAL_ONE, BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
-import { PoolCreated } from "../../generated/WeightedPoolFactory/WeightedPoolFactory";
+import {  BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
 import { updateWeight } from "../common/weight";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
-import { WeightedPool as WeightedPoolTemplate } from "../../generated/templates";
 import { getLiquidityPoolFee, getOrCreateToken } from "../common/getters";
 import { LiquidityPool } from "../../generated/schema";
 import { SwapFeePercentageChanged } from "../../generated/Vault/LinearPool";
@@ -116,7 +114,7 @@ function createPool(event: PoolRegistered): string {
 
   let swapFeeCall = poolContract.try_getSwapFeePercentage();
   let swapFee = BIGINT_ZERO;
-  if (!symbolCall.reverted) {
+  if (!swapFeeCall.reverted) {
     swapFee = swapFeeCall.value;
   }
 
