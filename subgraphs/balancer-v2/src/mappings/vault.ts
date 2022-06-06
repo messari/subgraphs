@@ -81,80 +81,20 @@ export function handleSwap(event: SwapEvent): void {
   updatePoolMetrics(event, poolAddress);
   updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
 }
-
-function createPool(event: PoolRegistered): string {
-  let poolAddress: Address = event.params.poolAddress;
-  let poolContract = WeightedPool.bind(poolAddress);
-  let poolIdCall = poolContract.try_getPoolId();
-  if (poolIdCall.reverted) {
-    return "";
-  }
-  let poolId = poolIdCall.value;
-
-  let nameCall = poolContract.try_name();
-  if (nameCall.reverted) {
-    return "";
-  }
-  let name = nameCall.value;
-
-  let symbolCall = poolContract.try_symbol();
-  if (symbolCall.reverted) {
-    return "";
-  }
-  let symbol = symbolCall.value;
-
-  let vaultContract = Vault.bind(VAULT_ADDRESS);
-
-  let tokensCall = vaultContract.try_getPoolTokens(poolId);
-  let inputTokens: string[] = [];
-  if (!tokensCall.reverted) {
-    let tokens = tokensCall.value.value0;
-    for (let i: i32 = 0; i < tokens.length; i++) {
-      inputTokens.push(tokens[i].toHexString());
-    }
-  }
-
-  let swapFeeCall = poolContract.try_getSwapFeePercentage();
-  let swapFee = BIGINT_ZERO;
-  if (!symbolCall.reverted) {
-    swapFee = swapFeeCall.value;
-  }
-
-  createLiquidityPool(event, poolAddress.toHexString(), name, symbol, inputTokens, swapFee);
-  // Load pool with initial weights
-  return poolAddress.toHexString();
-}
-
-export function handlePoolRegister(event: PoolRegistered): void {
-  createPool(event);
-}
-
-export function handleTokensRegister(event: TokensRegistered): void {
-  let tokens: string[] = new Array<string>();
-  let tokensAmount: BigInt[] = new Array<BigInt>();
-  for (let i = 0; i < event.params.tokens.length; i++) {
-    let token = getOrCreateToken(event.params.tokens[i].toHexString());
-    tokens.push(token.id);
-    tokensAmount.push(BIGINT_ZERO);
-  }
-  let pool = LiquidityPool.load(event.params.poolId.toHexString());
-  if (pool == null) {
+export function handleBalanceChange(event: PoolBalanceChanged): void {
+  log.warning("handleBalanceChange = {}  transaction = {} poolId = {} ", [
+    event.params.deltas.toString(),
+    event.transaction.hash.toHexString(),
+    event.params.poolId.toHexString(),
+  ]);
+  let amounts: BigInt[] = event.params.deltas;
+  if (amounts.length === 0) {
     return;
   }
-  pool.inputTokens = tokens;
-  pool.inputTokenBalances = tokensAmount;
-  pool.save();
-  updateWeight(pool.id);
-}
-
-export function handleSwapFeePercentageChange(event: SwapFeePercentageChanged): void {
-  let poolAddress = event.address;
-  let pool = LiquidityPool.load(poolAddress.toHexString());
-
-  let poolTradingFee = getLiquidityPoolFee(pool!.fees[2]);
-
-  let protocolFeeProportion = scaleDown(event.params.swapFeePercentage, null);
-  // Update protocol and trading fees for this pool
-  poolTradingFee.feePercentage = protocolFeeProportion;
-  poolTradingFee.save();
+  let total: BigInt = amounts.reduce<BigInt>((sum, amount) => sum.plus(amount), new BigInt(0));
+  if (total.gt(BIGINT_ZERO)) {
+    handlePoolJoined(event);
+  } else {
+    handlePoolExited(event);
+  }
 }
