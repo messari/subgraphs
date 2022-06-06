@@ -551,13 +551,11 @@ function updateMarket(
     return;
   }
 
-  let underlyingTokenPriceUSD: BigDecimal;
-  const priceOffset = 6;
-
   // grab prices
-  underlyingTokenPriceUSD = getUsdPricePerToken(
+  let customPrice = getUsdPricePerToken(
     Address.fromString(market.inputToken)
-  ).usdPrice.div(exponentToBigDecimal(priceOffset));
+  );
+  let underlyingTokenPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
@@ -808,10 +806,10 @@ function updateRewards(
     }
 
     // get reward token price
-    const priceOffset = 6;
-    let rewardTokenPriceUSD = getUsdPricePerToken(
+    let customPrice = getUsdPricePerToken(
       Address.fromString(token.id)
-    ).usdPrice.div(exponentToBigDecimal(priceOffset));
+    );
+    let rewardTokenPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
 
     // borrow speeds
     if (!tryBorrowSpeeds.reverted) {
