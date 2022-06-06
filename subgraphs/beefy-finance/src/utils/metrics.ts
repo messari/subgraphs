@@ -1,13 +1,15 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Deposit,
+  FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
   UsageMetricsHourlySnapshot,
   Vault,
   Withdraw,
   YieldAggregator,
 } from "../../generated/schema";
-import { BIGINT_ZERO } from "../prices/common/constants";
+import { getDailyRevenuesUsd, getTvlUsd } from "../mappings/protocol";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
   getDaysSinceEpoch,
   getHoursSinceEpoch,
@@ -203,4 +205,74 @@ function getTransactionCount(
   return getDepositCount(protocol, timeframe).plus(
     getWithdrawCount(protocol, timeframe)
   );
+}
+
+export function updateDailyFinancialSnapshot(
+  block: ethereum.Block,
+  protocol: YieldAggregator
+): FinancialsDailySnapshot {
+  const id = getProtocolDailyId(block, protocol);
+  let dailyFinancialSnapshot = FinancialsDailySnapshot.load(id);
+  if (dailyFinancialSnapshot == null) {
+    dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
+    dailyFinancialSnapshot.protocol = protocol.id;
+  }
+  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
+  const revenues = getDailyRevenuesUsd(protocol, block);
+  dailyFinancialSnapshot.dailySupplySideRevenueUSD = revenues[0];
+  dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = revenues[1];
+  dailyFinancialSnapshot.dailyTotalRevenueUSD = revenues[2];
+  let cumulativeSupplyRevenue = revenues[0];
+  let cumulativeProtocolRevenue = revenues[1];
+  let cumulativeTotalRevenue = revenues[2];
+  let metricsSnapshot: FinancialsDailySnapshot | null;
+  for (let i = 0; i < protocol.financialMetrics.length; i++) {
+    metricsSnapshot = FinancialsDailySnapshot.load(
+      protocol.financialMetrics[i]
+    );
+    if (metricsSnapshot != null && metricsSnapshot.id != id) {
+      cumulativeSupplyRevenue = cumulativeSupplyRevenue.plus(
+        metricsSnapshot.dailySupplySideRevenueUSD
+      );
+      cumulativeProtocolRevenue = cumulativeProtocolRevenue.plus(
+        metricsSnapshot.dailyProtocolSideRevenueUSD
+      );
+      cumulativeTotalRevenue = cumulativeTotalRevenue.plus(
+        metricsSnapshot.dailyTotalRevenueUSD
+      );
+    }
+  }
+  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplyRevenue;
+  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolRevenue;
+  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenue;
+
+  dailyFinancialSnapshot.blockNumber = block.number;
+  dailyFinancialSnapshot.timestamp = block.timestamp;
+
+  dailyFinancialSnapshot.save();
+  return dailyFinancialSnapshot;
+}
+
+export function createFirstDailyFinancialSnapshot(
+  block: ethereum.Block,
+  protocol: YieldAggregator
+): FinancialsDailySnapshot {
+  const id = getProtocolDailyId(block, protocol);
+  const dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
+  dailyFinancialSnapshot.protocol = protocol.id;
+  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
+
+  dailyFinancialSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  dailyFinancialSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+
+  dailyFinancialSnapshot.blockNumber = block.number;
+  dailyFinancialSnapshot.timestamp = block.timestamp;
+
+  dailyFinancialSnapshot.save();
+  return dailyFinancialSnapshot;
 }

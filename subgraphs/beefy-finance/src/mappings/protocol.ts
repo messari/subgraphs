@@ -1,11 +1,14 @@
-import { ethereum } from "@graphprotocol/graph-ts";
-import { YieldAggregator } from "../../generated/schema";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Vault, YieldAggregator } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
+  createFirstDailyFinancialSnapshot,
   getUniqueUsers,
+  updateDailyFinancialSnapshot,
   updateUsageMetricsDailySnapshot,
   updateUsageMetricsHourlySnapshot,
 } from "../utils/metrics";
+import { getVaultDailyRevenues } from "./vault";
 
 export function createBeefyFinance(
   network: string,
@@ -21,16 +24,17 @@ export function createBeefyFinance(
   beefy.network = network.toUpperCase();
   beefy.type = "YIELD";
   beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  // beefy.protocolControlledValueUSD = new BigDecimal(new BigInt(0));
-  // beefy.cumulativeSupplySideRevenueUSD = new BigDecimal(new BigInt(0));
-  // beefy.cumulativeProtocolSideRevenueUSD = new BigDecimal(new BigInt(0));
-  // beefy.cumulativeTotalRevenueUSD = new BigDecimal(new BigInt(0));
+  //beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+  beefy.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO; //todo
+  beefy.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO; //todo
+  beefy.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO; //todo
   beefy.cumulativeUniqueUsers = BIGINT_ZERO;
   beefy.vaults = [vaultId];
   beefy.dailyUsageMetrics = [updateUsageMetricsDailySnapshot(block, beefy).id];
   beefy.hourlyUsageMetrics = [
     updateUsageMetricsHourlySnapshot(block, beefy).id,
   ];
+  beefy.financialMetrics = [createFirstDailyFinancialSnapshot(block, beefy).id];
   beefy.save();
   return beefy;
 }
@@ -39,6 +43,7 @@ export function updateProtocolAndSave(
   protocol: YieldAggregator,
   block: ethereum.Block
 ): YieldAggregator {
+  protocol.totalValueLockedUSD = getTvlUsd(protocol);
   protocol.cumulativeUniqueUsers = getUniqueUsers(protocol, [
     BIGINT_ZERO,
     block.timestamp,
@@ -59,7 +64,62 @@ export function updateProtocolAndSave(
     protocol.hourlyUsageMetrics = protocol.hourlyUsageMetrics.concat([
       hourlySnapshot.id,
     ]);
+
+  const dailyFinancialSnapshot = updateDailyFinancialSnapshot(block, protocol);
+  if (
+    protocol.financialMetrics[protocol.financialMetrics.length - 1] !==
+    dailyFinancialSnapshot.id
+  )
+    protocol.financialMetrics = protocol.financialMetrics.concat([
+      dailyFinancialSnapshot.id,
+    ]);
+  protocol.cumulativeSupplySideRevenueUSD =
+    dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD;
+  protocol.cumulativeProtocolSideRevenueUSD =
+    dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD;
+  protocol.cumulativeTotalRevenueUSD =
+    dailyFinancialSnapshot.cumulativeTotalRevenueUSD;
+
   protocol.save();
 
   return protocol;
+}
+
+export function getTvlUsd(protocol: YieldAggregator): BigDecimal {
+  let tvlUsd = BIGDECIMAL_ZERO;
+  for (let i = 0; i < protocol.vaults.length; i++) {
+    const vault = Vault.load(protocol.vaults[i]);
+    if (vault == null) {
+      continue;
+    } else {
+      tvlUsd = tvlUsd.plus(vault.totalValueLockedUSD);
+    }
+  }
+  return tvlUsd;
+}
+
+export function getDailyRevenuesUsd(
+  protocol: YieldAggregator,
+  block: ethereum.Block
+): BigDecimal[] {
+  let dailyRevenueProtocolSide = BIGDECIMAL_ZERO;
+  let dailyRevenueSupplySide = BIGDECIMAL_ZERO;
+  let dailyTotalRevenueUsd = BIGDECIMAL_ZERO;
+  let revenues: BigDecimal[];
+  for (let i = 0; i < protocol.vaults.length; i++) {
+    const vault = Vault.load(protocol.vaults[i]);
+    if (vault == null) {
+      continue;
+    } else {
+      revenues = getVaultDailyRevenues(vault, block);
+      dailyRevenueProtocolSide = dailyRevenueProtocolSide.plus(revenues[0]);
+      dailyRevenueSupplySide = dailyRevenueSupplySide.plus(revenues[1]);
+      dailyTotalRevenueUsd = dailyTotalRevenueUsd.plus(revenues[2]);
+    }
+  }
+  return [
+    dailyRevenueSupplySide,
+    dailyRevenueProtocolSide,
+    dailyTotalRevenueUsd,
+  ];
 }

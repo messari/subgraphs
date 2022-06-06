@@ -1,6 +1,12 @@
-import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
-import { Vault, VaultFee } from "../../generated/schema";
+import {
+  Vault,
+  VaultDailySnapshot,
+  VaultFee,
+  Deposit as DepositEntity,
+  Withdraw as WithdrawEntity,
+} from "../../generated/schema";
 import {
   BeefyStrategy,
   Deposit,
@@ -91,9 +97,10 @@ export function createVaultFromStrategy(
   vault.deposits = [getOrCreateFirstDeposit(vault, currentBlock).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault, currentBlock).id];
 
+  vault.protocol = getBeefyFinanceOrCreate(network, vault.id, currentBlock).id;
+  log.warning("qualcosa", [vault.id]);
   vault.dailySnapshots = [updateVaultDailySnapshot(currentBlock, vault).id];
   vault.hourlySnapshots = [updateVaultHourlySnapshot(currentBlock, vault).id];
-  vault.protocol = getBeefyFinanceOrCreate(network, vault.id, currentBlock).id;
 
   vault.save();
   return vault;
@@ -244,4 +251,71 @@ export function getFees(
   beefyFee.save();
 
   return [strategistFee.id, withdrawalFee.id, callFee.id, beefyFee.id];
+}
+
+export function getVaultDailyRevenues(
+  vault: Vault,
+  block: ethereum.Block
+): BigDecimal[] {
+  const lastSnapshot = VaultDailySnapshot.load(
+    vault.dailySnapshots[vault.dailySnapshots.length - 1]
+  );
+  let lastTvl = BIGDECIMAL_ZERO;
+  let startBlock = BIGINT_ZERO;
+  if (lastSnapshot) {
+    lastTvl = lastSnapshot.totalValueLockedUSD;
+    startBlock = lastSnapshot.blockNumber;
+  }
+  const currentSnapshot = updateVaultDailySnapshot(block, vault);
+  let currentTotalRevenue = currentSnapshot.totalValueLockedUSD.minus(lastTvl);
+  for (let i = 0; i < vault.deposits.length; i++) {
+    const deposit = DepositEntity.load(vault.deposits[i]);
+    if (!deposit) continue;
+    if (deposit.blockNumber <= startBlock || deposit.blockNumber > block.number)
+      continue;
+    currentTotalRevenue = currentTotalRevenue.minus(deposit.amountUSD);
+  }
+  for (let i = 0; i < vault.withdraws.length; i++) {
+    const withdraw = WithdrawEntity.load(vault.withdraws[i]);
+    if (!withdraw) continue;
+    if (
+      withdraw.blockNumber <= startBlock ||
+      withdraw.blockNumber > block.number
+    )
+      continue;
+    currentTotalRevenue = currentTotalRevenue.plus(withdraw.amountUSD);
+  }
+  let currentRevenueProtocolSide = BIGDECIMAL_ZERO;
+  let currentRevenueSupplySide = currentTotalRevenue;
+  let fee: VaultFee | null;
+  for (let i = 0; i < vault.fees.length; i++) {
+    fee = VaultFee.load(vault.fees[i]);
+    if (fee) {
+      if (fee.id == "PERFORMANCE_FEE-" + vault.id) {
+        currentRevenueProtocolSide = currentTotalRevenue.times(
+          fee.feePercentage
+        );
+        continue;
+      }
+
+      if (fee.id == "STRATEGIST_FEE-" + vault.id) {
+        currentRevenueSupplySide = currentRevenueSupplySide.minus(
+          currentTotalRevenue.times(fee.feePercentage)
+        );
+        continue;
+      }
+
+      if (fee.id == "MANAGEMENT_FEE-" + vault.id) {
+        currentRevenueSupplySide = currentRevenueSupplySide.minus(
+          currentTotalRevenue.times(fee.feePercentage)
+        );
+        continue;
+      }
+    }
+  }
+  return [
+    currentRevenueProtocolSide,
+    currentRevenueSupplySide,
+    currentTotalRevenue,
+  ];
 }
