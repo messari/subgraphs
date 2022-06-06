@@ -40,7 +40,7 @@ export function updatePoolRewards(event: ethereum.Event, poolAddress: Address): 
         ]);
 
         for (let k = 0; k < _asset.rewardTokens!.length; k++) {
-          if (poolRewardTokenEmissionsAmount.length) {
+          if (poolRewardTokenEmissionsAmount.length > k) {
             poolRewardTokenEmissionsAmount[k] = poolRewardTokenEmissionsAmount[k].plus(
               _asset.rewardTokenEmissionsAmount![k],
             );
@@ -86,10 +86,14 @@ export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address,
   }
   if (rts.indexOf(rt.id) < 0) {
     rts.push(rt.id);
+    log.debug("Added Reward {} Token {} to Asset {}", [
+      rt.id.toString(),
+      rtAddress.toHexString(),
+      _asset.id.toString(),
+    ]);
+    _asset.rewardTokens = rts;
+    _asset.save();
   }
-  log.debug("Added Reward {} Token {} to Asset {}", [rt.id.toString(), rtAddress.toHexString(), _asset.id.toString()]);
-  _asset.rewardTokens = rts;
-  _asset.save();
   return rt;
 }
 
