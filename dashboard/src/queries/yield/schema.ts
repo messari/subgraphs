@@ -210,7 +210,20 @@ export const schema100 = (): Schema => {
 
   const events = ["withdraws", "deposits"];
 
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery: "",
+    financialsQuery: "",
+    hourlyUsageQuery: "",
+    dailyUsageQuery: "",
+    protocolTableQuery: "",
+    poolsQuery: "",
+  };
 };
 
 export const schema110 = (): Schema => {
@@ -398,7 +411,20 @@ export const schema110 = (): Schema => {
     totalVolumeUSD: "BigDecimal!",
   };
 
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery: "",
+    financialsQuery: "",
+    hourlyUsageQuery: "",
+    dailyUsageQuery: "",
+    protocolTableQuery: "",
+    poolsQuery: "",
+  };
 };
 
 export const schema120 = (): Schema => {
@@ -518,22 +544,21 @@ export const schema120 = (): Schema => {
     pricePerShare: "BigDecimal",
   };
 
-  const query = `
-    query Data($poolId: String, $protocolId: String){
-      _meta {
-        block {
-          number
-        }
-        deployment
-      }
-      protocols {
-        id
-        methodologyVersion
-        name
-        type
-        schemaVersion
-        subgraphVersion
-      }
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
       yieldAggregator(id: $protocolId) {
         id
         name
@@ -550,6 +575,41 @@ export const schema120 = (): Schema => {
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
       }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        vaults {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+  query Data($poolId: String) {
+    ${vaultDailyQuery}
+    ${vaultHourlyQuery}
+  }
+  `;
+
+  const query = `
+    query Data($poolId: String, $protocolId: String){
+      _meta {
+        block {
+          number
+        }
+        deployment
+      }
+      protocols {
+        id
+        methodologyVersion
+        name
+        type
+        schemaVersion
+        subgraphVersion
+      }
+
       yieldAggregators {
         id
         name
@@ -566,48 +626,7 @@ export const schema120 = (): Schema => {
         cumulativeTotalRevenueUSD
         cumulativeUniqueUsers
       }
-      vaults {
-        id
-        name
-        symbol
-        fees {
-          feeType
-          feePercentage
-        }
-        inputToken {
-          id
-          decimals
-          name
-          symbol
-        }
-        outputToken {
-          id
-          decimals
-          name
-          symbol
-        }
-        rewardTokens {
-          id
-          token {
-            id
-            decimals
-            name
-            symbol
-          }
-        }
-        depositLimit
-        totalValueLockedUSD
-        stakedOutputTokenAmount
-        pricePerShare
-        inputTokenBalance
-        outputTokenSupply
-        outputTokenPriceUSD
-        rewardTokenEmissionsAmount
-        rewardTokenEmissionsUSD
-      }
-      ${finanQuery}
-      ${usageHourlyQuery}
-      ${usageDailyQuery}
+
       ${vaultHourlyQuery}
       ${vaultDailyQuery}
       ${eventsQuery}
@@ -669,5 +688,18 @@ export const schema120 = (): Schema => {
     cumulativeUniqueUsers: "Int!",
   };
 
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery,
+    financialsQuery,
+    hourlyUsageQuery,
+    dailyUsageQuery,
+    protocolTableQuery,
+    poolsQuery,
+  };
 };

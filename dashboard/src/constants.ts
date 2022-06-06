@@ -39,10 +39,16 @@ export const ProtocolTypeEntityNames: Record<string, string> = {
 export interface Schema {
   entities: string[];
   entitiesData: { [x: string]: { [x: string]: string } };
-  query: string;
   poolData: { [x: string]: string };
   events: string[];
   protocolFields: { [x: string]: string };
+  query: string;
+  financialsQuery: string;
+  hourlyUsageQuery: string;
+  dailyUsageQuery: string;
+  protocolTableQuery: string;
+  poolsQuery: string;
+  poolTimeseriesQuery: string;
 }
 export const percentageFieldList = [
   "rates",
@@ -59,9 +65,9 @@ export const percentageFieldList = [
 // negativeFieldList contains field names that can be negative
 export const negativeFieldList = [];
 export const ProtocolsToQuery: { [name: string]: { [network: string]: string } } = {
-  aaveV2: {
-    mainnet: "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum",
-  },
+  // aaveV2: {
+  //   mainnet: "https://api.thegraph.com/subgraphs/name/messari/aave-v2-ethereum",
+  // },
   abracadabra: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-ethereum",
     avalanche: "https://api.thegraph.com/subgraphs/name/messari/abracadabra-money-avalanche",
@@ -87,15 +93,15 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
     arbitrum: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-arbitrum",
     matic: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-polygon",
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-ethereum",
-    bsc: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-bsc"
+    bsc: "https://api.thegraph.com/subgraphs/name/messari/cream-finance-bsc",
   },
   ironbank: {
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-ethereum",
     fantom: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-fantom",
-    avalanche: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-avalanche"
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/iron-bank-avalanche",
   },
   traderjoe: {
-    avalanche: "https://api.thegraph.com/subgraphs/name/messari/trader-joe-avalanche"
+    avalanche: "https://api.thegraph.com/subgraphs/name/messari/trader-joe-avalanche",
   },
   sushiswap: {
     fantom: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-fantom",
@@ -106,13 +112,13 @@ export const ProtocolsToQuery: { [name: string]: { [network: string]: string } }
     mainnet: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-ethereum",
     matic: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-polygon",
     moonriver: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-moonriver",
-    celo: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-celo"
+    celo: "https://api.thegraph.com/subgraphs/name/messari/sushiswap-celo",
   },
   quickswap: {
-    matic: "https://api.thegraph.com/subgraphs/name/messari/quickswap-polygon"
+    matic: "https://api.thegraph.com/subgraphs/name/messari/quickswap-polygon",
   },
   solarbeam: {
-    moonriver: "https://api.thegraph.com/subgraphs/name/messari/solarbeam-moonriver"
+    moonriver: "https://api.thegraph.com/subgraphs/name/messari/solarbeam-moonriver",
   },
   ellipsis: {
     bsc: "https://api.thegraph.com/subgraphs/name/messari/ellipsis-finance-bsc",

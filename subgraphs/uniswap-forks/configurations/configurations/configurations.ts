@@ -12,6 +12,8 @@ import { SushiswapMaticConfigurations } from "../../protocols/sushiswap/config/n
 import { SushiswapMoonbeamConfigurations } from "../../protocols/sushiswap/config/networks/moonbeam/moonbeam";
 import { SushiswapMoonriverConfigurations } from "../../protocols/sushiswap/config/networks/moonriver/moonriver";
 import { SushiswapXdaiConfigurations } from "../../protocols/sushiswap/config/networks/xdai/xdai";
+import { SpookyswapFantomConfigurations } from "../../protocols/spookyswap/config/networks/fantom/fantom";
+import { UbeswapCeloConfigurations } from "../../protocols/ubeswap/config/networks/celo/celo";
 import { SpiritSwapFantomConfigurations } from "../../protocols/spiritswap/config/networks/fantom/fantom";
 import { QuickswapMaticConfigurations } from "../../protocols/quickswap/config/networks/matic/matic";
 import { SolarbeamMoonriverConfigurations } from "../../protocols/solarbeam/config/networks/moonriver/moonriver";
@@ -52,6 +54,8 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
             return new SushiswapXdaiConfigurations();
         } case Deploy.UNISWAP_V2_MAINNET: {
             return new UniswapV2MainnetConfigurations();
+        } case Deploy.SPOOKYSWAP_FANTOM: {
+            return new SpookyswapFantomConfigurations();
         } case Deploy.SPIRITSWAP_FANTOM: {
             return new SpiritSwapFantomConfigurations();
         } case Deploy.QUICKSWAP_MATIC: {
@@ -64,7 +68,9 @@ export function getNetworkConfigurations(deploy: i32): Configurations {
             return new TrisolarisAuroraConfigurations();
         } case Deploy.VVS_FINANCE_CRONOS: {
             return new VSSFinanceCronosConfigurations();
-        } default: {
+        }case Deploy.UBESWAP_CELO: {
+            return new UbeswapCeloConfigurations();
+        }  default: {
             log.critical("No configurations found for deployment protocol/network", []);
             return new SushiswapArbitrumConfigurations();
         }

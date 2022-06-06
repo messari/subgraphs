@@ -39,7 +39,6 @@ function ErrorDisplay({
     }
   }
 
-  console.log("ERR OR", Object.values(errorObject), Object.keys(errorObject), errorObject);
   const subgraphParam = searchParams.get("subgraph");
   const errorMsgs = [];
   let errorTotalCount = 0;
@@ -106,7 +105,7 @@ function ErrorDisplay({
     const errorsToRender = errorMessagesSplit.map((msg) => {
       return { message: msg, type: "DEPLOY", level: "critical", fieldName: "" };
     });
-    return <IssuesDisplay issuesArrayProps={errorsToRender} />;
+    return <IssuesDisplay issuesArrayProps={errorsToRender} allLoaded={true} oneLoaded={true} />;
   }
 
   if (errorMsgs.length >= 1) {

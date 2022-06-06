@@ -7,7 +7,6 @@ import { schema as yieldPoolOverview } from "./yield/poolOverview";
 import { schema as lendingPoolOverview } from "./lending/poolOverview";
 
 export const schema = (type: string, version: string): Schema => {
-  console.log("ROUTING TO SCHEMA ", type, version);
   switch (type) {
     case ProtocolType.EXCHANGE:
       return dexSchema(version);
@@ -21,7 +20,6 @@ export const schema = (type: string, version: string): Schema => {
 };
 
 export const poolOverview = (type: string, version: string): string => {
-  console.log("ROUTING TO POOLOVERVIEW ", type, version);
   switch (type) {
     case ProtocolType.EXCHANGE:
       return dexPoolOverview(version);
