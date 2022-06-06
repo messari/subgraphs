@@ -7,14 +7,25 @@ import fs from 'fs';
  * @param {string} template - Template location that will be used to create subgraph.yaml
  * @param {string} location - Location in the subgraph will be deployed to {e.g. messari/uniswap-v2-ethereum}
 */
-export function scripts(protocol, network, template, location) {
+export function scripts(protocol, network, template, location, constants) {
+    let scripts = [];
     let removeConfig = "rm -rf configurations/configure.ts"
     let removeSubgraphYaml = "rm -rf subgraph.yaml"
     let prepareYaml = "npm run prepare:yaml --PROTOCOL=" + protocol + " --NETWORK=" + network + " --TEMPLATE=" + template
     let prepareConstants = "npm run prepare:constants --PROTOCOL=" + protocol + " --NETWORK=" + network
     let prepareBuild = "graph codegen && graph build"
     let deployment = "npm run deploy:subgraph --LOCATION=" + location
-    return [removeConfig, removeSubgraphYaml, prepareYaml, prepareConstants, prepareBuild, deployment]
+
+    scripts.push(removeConfig)
+    scripts.push(removeSubgraphYaml)
+    scripts.push(prepareYaml)
+    if (constants == true) {
+        scripts.push(prepareConstants)
+    }
+    scripts.push(prepareBuild)
+    scripts.push(deployment)
+    
+    return scripts
 }
 
 export function getDeploymentNetwork(network) {
@@ -67,7 +78,7 @@ export async function runCommands(allScripts, results, callback) {
         });
         } else {
             // all done here
-            fs.writeFile('deployment/results.txt', logs.replace(/\u001b[^m]*?m/g,""), function (err) {
+            fs.writeFile('results.txt', logs.replace(/\u001b[^m]*?m/g,""), function (err) {
                 if (err) throw err;
               });
             console.log(results + "END")

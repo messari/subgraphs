@@ -29,9 +29,8 @@ dataSources:
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      ##callHandlers:
-        ##- function: setFeeTo(address)
-          ##handler: handleFeeTo
+      file: ./src/mappings/factory.ts
+
   - kind: ethereum
     name: Craftsman
     network: mainnet
