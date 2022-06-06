@@ -14,8 +14,6 @@ Sum across all Vaults:
 
 `Total Interest Accrued`
 
-Note: This currently excludes Liquidations
-
 ### Protocol-Side Revenue USD
 
 Portion of the Total Revenue allocated to the Protocol
@@ -50,11 +48,11 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 ### Reward Token Emissions Amount
 
-To be added
+`Not applicable`
 
 ### Protocol Controlled Value
 
-To be added
+`Not applicable`
 
 ## Reference and Useful Links
 
