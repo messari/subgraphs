@@ -1,4 +1,9 @@
-import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  dataSource,
+  BigInt,
+} from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import {
   Vault,
@@ -29,6 +34,7 @@ import { fetchTokenName, fetchTokenSymbol, getLastPriceUSD } from "./token";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
+  BIGINT_TEN,
   BIGINT_ZERO,
   NETWORK_SUFFIX_MAP,
 } from "../prices/common/constants";
@@ -79,14 +85,19 @@ export function createVaultFromStrategy(
   if (call.reverted) {
     vault.pricePerShare = BIGINT_ZERO;
   } else {
-    vault.pricePerShare = call.value;
+    vault.pricePerShare = call.value.div(
+      BigInt.fromI32(vaultContract.decimals())
+    );
   }
 
+  const inputToken = getTokenOrCreate(strategyContract.want(), NETWORK_SUFFIX);
   vault.totalValueLockedUSD = getLastPriceUSD(
     strategyContract.want(),
     NETWORK_SUFFIX,
     currentBlock.number
-  ).times(new BigDecimal(vault.inputTokenBalance));
+  )
+    .times(new BigDecimal(vault.inputTokenBalance))
+    .div(new BigDecimal(BIGINT_TEN.pow(inputToken.decimals as u8)));
 
   const outputSupply = vault.outputTokenSupply;
   if (outputSupply && outputSupply != BIGINT_ZERO)
@@ -171,18 +182,23 @@ export function updateVaultAndSave(
   if (call.reverted) {
     vault.pricePerShare = BIGINT_ZERO;
   } else {
-    vault.pricePerShare = call.value;
+    vault.pricePerShare = call.value.div(
+      BigInt.fromI32(vaultContract.decimals())
+    );
   }
 
   const wantCall = vaultContract.try_want();
   if (wantCall.reverted) {
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
+    const inputToken = getTokenOrCreate(wantCall.value, networkSuffix);
     vault.totalValueLockedUSD = getLastPriceUSD(
       wantCall.value,
       networkSuffix,
       block.number
-    ).times(new BigDecimal(vault.inputTokenBalance));
+    )
+      .times(new BigDecimal(vault.inputTokenBalance))
+      .div(new BigDecimal(BIGINT_TEN.pow(inputToken.decimals as u8)));
   }
 
   const outputSupply = vault.outputTokenSupply;
