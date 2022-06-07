@@ -5,7 +5,7 @@ import {
   UniswapPair as UniswapPairContract,
   UniswapPair__getReservesResult,
 } from "../../../generated/aave-aave-eol/UniswapPair";
-
+import { UniswapFeeRouter as UniswapFeeRouterContract } from "../../../generated/aave-aave-eol/UniswapFeeRouter";
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/aave-aave-eol/UniswapRouter";
 
@@ -99,12 +99,28 @@ export function getPriceFromRouter(
   if (routerAddressV1) {
     const uniswapRouterV1 = UniswapRouterContract.bind(routerAddressV1);
     amountOutArray = uniswapRouterV1.try_getAmountsOut(amountIn, path);
-    if (amountOutArray.reverted && routerAddressV2) {
-      const uniswapRouterV2 = UniswapRouterContract.bind(routerAddressV2);
-      amountOutArray = uniswapRouterV2.try_getAmountsOut(amountIn, path);
-
+    if (amountOutArray.reverted) {
+      const uniswapFeeRouter = UniswapFeeRouterContract.bind(routerAddressV1);
+      amountOutArray = uniswapFeeRouter.try_getAmountsOut(
+        amountIn,
+        path,
+        BigInt.fromI32(3000)
+      );
       if (amountOutArray.reverted) {
-        return new CustomPriceType();
+        const uniswapFeeRouter = UniswapFeeRouterContract.bind(routerAddressV1);
+        amountOutArray = uniswapFeeRouter.try_getAmountsOut(
+          amountIn,
+          path,
+          BigInt.fromI32(500)
+        );
+        if (amountOutArray.reverted && routerAddressV2) {
+          const uniswapRouterV2 = UniswapRouterContract.bind(routerAddressV2);
+          amountOutArray = uniswapRouterV2.try_getAmountsOut(amountIn, path);
+
+          if (amountOutArray.reverted) {
+            return new CustomPriceType();
+          }
+        }
       }
     }
 

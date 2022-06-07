@@ -115,12 +115,13 @@ export function handleDeposit(event: Deposit): void {
     NETWORK_SUFFIX
   );
 
-  const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-  const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
-
   if (vault.deposits[0] === "MockDeposit" + vault.id) {
+    const depositedAmount = event.params.tvl;
+    const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
     vault.deposits = [deposit.id];
   } else {
+    const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
+    const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
     vault.deposits = vault.deposits.concat([deposit.id]);
   }
 

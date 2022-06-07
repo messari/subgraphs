@@ -89,6 +89,10 @@ function createDataSource(contractName, contractAddress, network, startBlock) {
           file: "./abis/Prices/Uniswap/Router.json",
         },
         {
+          name: "UniswapFeeRouter",
+          file: "./abis/Prices/Uniswap/FeeRouter.json",
+        },
+        {
           name: "UniswapFactory",
           file: "./abis/Prices/Uniswap/Factory.json",
         },

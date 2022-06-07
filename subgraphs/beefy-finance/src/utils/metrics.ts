@@ -119,16 +119,13 @@ export function getUniqueUsers(
     user: string;
   let users: string[] = [];
   for (let i = 0; i < protocol.vaults.length; i++) {
-    log.warning("inside the i loop", []);
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
     if (vault == null) {
       continue;
     } else {
       for (let j = 0; j < vault.deposits.length; j++) {
-        log.warning("inside the deposits loop", []);
         deposit = Deposit.load(vault.deposits[j]);
         if (!deposit) {
-          log.warning("deposit is null", []);
           continue;
         } else if (
           deposit.timestamp > timeframe[0] &&
@@ -136,19 +133,15 @@ export function getUniqueUsers(
         ) {
           user = deposit.from;
           if (users.includes(user)) {
-            log.warning("user already exists", []);
             continue;
           } else {
-            log.warning("user added", []);
             users.push(user);
           }
         }
       }
       for (let j = 0; j < vault.withdraws.length; j++) {
-        log.warning("inside the withdraws loop", []);
         withdraw = Withdraw.load(vault.deposits[j]);
         if (!withdraw) {
-          log.warning("withdraw is null", []);
           continue;
         } else if (
           withdraw.timestamp >= timeframe[0] &&
@@ -166,7 +159,6 @@ export function getUniqueUsers(
       }
     }
   }
-  log.warning(`Unique users: ${users.length}`, []);
   return BigInt.fromI32(users.length);
 }
 
