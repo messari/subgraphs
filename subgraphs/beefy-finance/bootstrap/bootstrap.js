@@ -144,7 +144,7 @@ function bootstrap(network) {
   for (let i = 0; i < vaults.length; i++) {
     vaultNetwork = vaults[i].chain;
     if (vaultNetwork === network) {
-      strategyAddress = vaults[i].strategyAddress;
+      strategyAddress = vaults[i].strategy;
       vaultName = vaults[i].id;
       startBlock = vaults[i].startBlock;
 

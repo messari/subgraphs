@@ -32,7 +32,7 @@ export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
+  Address.fromString("0xAA30eF758139ae4a7f798112902Bf6d65612045f")
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
@@ -46,11 +46,11 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x6bD193Ee6D2104F14F94E2cA6efefae561A4334B") //Solarbeam
+  Address.fromString("0xAA30eF758139ae4a7f798112902Bf6d65612045f") //Solarbeam
 );
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0xAA30eF758139ae4a7f798112902Bf6d65612045f")
 );
 
 ///////////////////////////////////////////////////////////////////////////
