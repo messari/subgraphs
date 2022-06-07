@@ -214,7 +214,7 @@ export function createDepositMulti(event: PoolBalanceChanged, poolAddress: strin
         amountUSD = amountUSD.plus(amountConverted.times(token.lastPriceUSD!));
       }
     }
-    let totalConverted = convertTokenToDecimal(pool.inputTokenBalances[i], token.decimals);
+    let totalConverted = convertTokenToDecimal(inputTokenBalances[i], token.decimals);
     pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(totalConverted.times(token.lastPriceUSD!));
     poolAmounts.inputTokenBalances[i] = totalConverted;
   }
@@ -251,6 +251,7 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
   let poolAmounts = getLiquidityPoolAmounts(poolAddress);
   let protocol = getOrCreateDex();
   let amountUSD = BIGDECIMAL_ZERO;
+  let inputTokenBalances = pool.inputTokenBalances;
 
   // reset tvl aggregates until new amounts calculated
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.minus(pool.totalValueLockedUSD);
@@ -266,15 +267,16 @@ export function createWithdrawMulti(event: PoolBalanceChanged, poolAddress: stri
       let tokenAddress = event.params.tokens[j].toHexString();
 
       if (tokenAddress == pool.inputTokens[i]) {
-        pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(amounts[j]);
+        inputTokenBalances[i] = inputTokenBalances[i].plus(amounts[j]);
         let amountConverted = convertTokenToDecimal(amounts[j], token.decimals);
         amountUSD = amountUSD.plus(amountConverted.times(token.lastPriceUSD!));
       }
     }
-    let totalConverted = convertTokenToDecimal(pool.inputTokenBalances[i], token.decimals);
+    let totalConverted = convertTokenToDecimal(inputTokenBalances[i], token.decimals);
     pool.totalValueLockedUSD = pool.totalValueLockedUSD.plus(totalConverted.times(token.lastPriceUSD!));
     poolAmounts.inputTokenBalances[i] = totalConverted;
   }
+  pool.inputTokenBalances = inputTokenBalances;
   // Add pool value back to protocol total value locked
   protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(pool.totalValueLockedUSD);
 
