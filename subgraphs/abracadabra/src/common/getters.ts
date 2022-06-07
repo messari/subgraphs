@@ -194,19 +194,28 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     let protocol = getOrCreateLendingProtocol();
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = getOrCreateLendingProtocol().id;
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
     financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
+
+    // Revenue // 
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-    financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
-    financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+
+    // Lending Activities // 
     financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+    financialMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+    financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+    financialMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+    financialMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-    financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
     financialMetrics.save();
   }
   return financialMetrics;
