@@ -1,18 +1,14 @@
-import { Box, CircularProgress, Grid, Typography } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { useState } from "react";
-import { Chart } from "../../common/chartComponents/Chart";
-import { TableChart } from "../../common/chartComponents/TableChart";
-import { negativeFieldList, ProtocolTypeEntityName, ProtocolTypeEntityNames } from "../../constants";
-import { convertTokenDecimals, toDate } from "../../utils";
+import { ProtocolTypeEntityName } from "../../constants";
 import SchemaTable from "../SchemaTable";
 import IssuesDisplay from "../IssuesDisplay";
 import { useEffect } from "react";
-import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 import ProtocolTabEntity from "./ProtocolTabEntity";
 
 interface ProtocolTabProps {
-  protocolType: string;
   entitiesData: { [x: string]: { [x: string]: string } };
+  protocolType: string;
   protocolFields: { [x: string]: string };
   protocolTableData: { [x: string]: any };
   protocolTimeseriesData: any;
@@ -22,8 +18,8 @@ interface ProtocolTabProps {
 
 // This component is for each individual subgraph
 function ProtocolTab({
-  protocolType,
   entitiesData,
+  protocolType,
   protocolFields,
   protocolTableData,
   protocolTimeseriesData,
@@ -36,7 +32,6 @@ function ProtocolTab({
   const [tableIssues, setTableIssues] = useState<{ message: string; type: string; level: string; fieldName: string }[]>(
     [],
   );
-
   const issues: { [entityName: string]: { message: string; type: string; level: string; fieldName: string }[] } = {};
   function setIssues(
     issuesSet: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] },
@@ -44,8 +39,7 @@ function ProtocolTab({
   ) {
     issues[entityName] = issuesSet[entityName];
   }
-  const list: { [x: string]: any } = {};
-  const protocolEntityNamePlural = ProtocolTypeEntityNames[protocolType];
+
   const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
   let protocolDataRender: any[] = [];
   if (protocolTimeseriesData) {
@@ -54,11 +48,11 @@ function ProtocolTab({
       return (
         <ProtocolTabEntity
           entityName={entityName}
-          protocolType={protocolType}
           entitiesData={entitiesData}
           currentEntityData={currentEntityData}
           currentTimeseriesLoading={protocolTimeseriesLoading[entityName]}
           currentTimeseriesError={protocolTimeseriesError[entityName]}
+          protocolType={protocolType}
           protocolTableData={protocolTableData[protocolEntityNameSingular]}
           issuesProps={issues}
           setIssues={(x) => setIssues(x, entityName)}
@@ -68,15 +62,15 @@ function ProtocolTab({
   }
 
   let allLoaded = true;
-  Object.keys(protocolTimeseriesLoading).forEach((loading: string) => {
-    if (protocolTimeseriesLoading[loading]) {
+  Object.keys(protocolTimeseriesLoading).forEach((entity: string) => {
+    if (protocolTimeseriesLoading[entity]) {
       allLoaded = false;
     }
   });
 
   let oneLoaded = false;
-  Object.keys(protocolTimeseriesLoading).forEach((loading: string) => {
-    if (!protocolTimeseriesLoading[loading] && protocolTimeseriesData[loading]) {
+  Object.keys(protocolTimeseriesLoading).forEach((entity: string) => {
+    if (!protocolTimeseriesLoading[entity] && protocolTimeseriesData[entity]) {
       oneLoaded = true;
     }
   });
@@ -95,15 +89,33 @@ function ProtocolTab({
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
 
+  const tableIssuesInit = tableIssues;
+  if (
+    tableIssues.filter(
+      (x) =>
+        x.fieldName ===
+        `${protocolEntityNameSingular}-totalValueLockedUSD` &&
+        x.type === "TVL-",
+    ).length === 0 &&
+    Number(protocolTableData[protocolEntityNameSingular].totalValueLockedUSD) < 1000
+  ) {
+    tableIssuesInit.push({
+      type: "TVL-",
+      message: "",
+      level: "critical",
+      fieldName: `${protocolEntityNameSingular}-totalValueLockedUSD`,
+    });
+  }
+
   return (
     <>
       <IssuesDisplay issuesArrayProps={issuesToDisplay} oneLoaded={oneLoaded} allLoaded={allLoaded} />
       <SchemaTable
         entityData={protocolTableData[protocolEntityNameSingular]}
-        schemaName={protocolEntityNameSingular}
         dataFields={protocolFields}
+        schemaName={protocolEntityNameSingular}
+        issuesProps={tableIssuesInit}
         setIssues={(x) => setTableIssues(x)}
-        issuesProps={tableIssues}
       />
       {protocolDataRender}
     </>

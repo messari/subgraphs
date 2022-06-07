@@ -8,10 +8,10 @@ interface EventsTabProps {
   data: any;
   events: string[];
   poolId: string;
-  setPoolId: React.Dispatch<React.SetStateAction<string>>;
   poolsList: { [x: string]: any[] };
   poolListLoading: any;
   poolNames: string;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // This component is for each individual subgraph
@@ -29,14 +29,15 @@ function EventsTab({ data, events, poolId, setPoolId, poolsList, poolNames, pool
     poolDropDown = (
       <PoolDropDown
         poolId={poolId}
+        markets={poolsList[poolNames]}
         setPoolId={(x) => setPoolId(x)}
         setIssues={(x) => setIssues(x)}
-        markets={poolsList[poolNames]}
       />
     );
   } else if (poolListLoading) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
+
   return (
     <>
       <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
