@@ -11,6 +11,7 @@ import {
   InterestRate,
   UsageMetricsHourlySnapshot,
   MarketHourlySnapshot,
+  LiquidateProxy,
 } from "../../generated/schema";
 import { LogRepay } from "../../generated/templates/Cauldron/Cauldron";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -266,8 +267,8 @@ export function getMarket(marketId: string): Market | null {
 ///////// Helpers /////////
 ///////////////////////////
 
-export function getLiquidateEvent(event: LogRepay): Liquidate | null {
-  let liquidateEvent = Liquidate.load(
+export function getLiquidateEvent(event: LogRepay): LiquidateProxy | null {
+  let liquidateEvent = LiquidateProxy.load(
     "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
   if (liquidateEvent) {
