@@ -10,33 +10,31 @@ import { useEffect } from "react";
 import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipboard";
 
 interface ProtocolTabEntityProps {
-  protocolType: string;
   entitiesData: { [x: string]: { [x: string]: string } };
+  entityName: string;
+  protocolType: string;
   protocolTableData: { [x: string]: any };
   currentEntityData: any;
   currentTimeseriesLoading: any;
   currentTimeseriesError: any;
-  entityName: string;
-  setIssues: React.Dispatch<{ [x: string]: { message: string; type: string; level: string; fieldName: string }[] }>;
   issuesProps: { [x: string]: { message: string; type: string; level: string; fieldName: string }[] };
+  setIssues: React.Dispatch<{ [x: string]: { message: string; type: string; level: string; fieldName: string }[] }>;
 }
 
 // This component is for each individual subgraph
 function ProtocolTabEntity({
-  protocolType,
   entitiesData,
+  entityName,
+  protocolType,
   protocolTableData,
   currentEntityData,
   currentTimeseriesLoading,
   currentTimeseriesError,
-  entityName,
-  setIssues,
   issuesProps,
+  setIssues,
 }: ProtocolTabEntityProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   const list: { [x: string]: any } = {};
-  const protocolEntityNamePlural = ProtocolTypeEntityNames[protocolType];
-  const protocolEntityNameSingular = ProtocolTypeEntityName[protocolType];
 
   useEffect(() => {
     const issuesToSet = { ...issuesProps };
@@ -74,48 +72,48 @@ function ProtocolTabEntity({
             dataFieldMetrics.capitalEfficiency.sum += value;
           }
         }
-        Object.keys(timeseriesInstance).forEach((entityFieldName: string) => {
+        Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
-          if (entityFieldName === "timestamp" || entityFieldName === "id") {
+          if (fieldName === "timestamp" || fieldName === "id") {
             return;
           }
           // The following section determines whether or not the current field on the entity is a numeric value or an array that contains numeric values
-          const currentInstanceField = timeseriesInstance[entityFieldName];
+          const currentInstanceField = timeseriesInstance[fieldName];
           try {
             if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField)) {
               // If the entity field is a numeric value, push it to the array corresponding to the field name in the dataFields array
               // Add the value to the sum field on the entity field name in the dataFieldMetrics obj
-              if (!dataFields[entityFieldName]) {
-                dataFields[entityFieldName] = [
+              if (!dataFields[fieldName]) {
+                dataFields[fieldName] = [
                   { value: Number(currentInstanceField), date: Number(timeseriesInstance.timestamp) },
                 ];
-                dataFieldMetrics[entityFieldName] = { sum: Number(currentInstanceField) };
+                dataFieldMetrics[fieldName] = { sum: Number(currentInstanceField) };
               } else {
-                dataFields[entityFieldName].push({
+                dataFields[fieldName].push({
                   value: Number(currentInstanceField),
                   date: Number(timeseriesInstance.timestamp),
                 });
-                dataFieldMetrics[entityFieldName].sum += Number(currentInstanceField);
+                dataFieldMetrics[fieldName].sum += Number(currentInstanceField);
               }
               if (Number(currentInstanceField) < 0) {
-                if (!dataFieldMetrics[entityFieldName].negative) {
+                if (!dataFieldMetrics[fieldName].negative) {
                   // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
-                  dataFieldMetrics[entityFieldName].negative = {
+                  dataFieldMetrics[fieldName].negative = {
                     firstSnapshot: timeseriesInstance.id,
                     value: Number(currentInstanceField),
                     count: 0,
                   };
                 }
-                dataFieldMetrics[entityFieldName].negative.count += 1;
+                dataFieldMetrics[fieldName].negative.count += 1;
               }
-              if (entityFieldName.includes("umulative")) {
-                if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-                  dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
+              if (fieldName.includes("umulative")) {
+                if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+                  dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
                 }
-                if (Number(currentInstanceField) < dataFieldMetrics[entityFieldName]?.cumulative?.prevVal) {
-                  dataFieldMetrics[entityFieldName].cumulative.hasLowered = timeseriesInstance.id;
+                if (Number(currentInstanceField) < dataFieldMetrics[fieldName]?.cumulative?.prevVal) {
+                  dataFieldMetrics[fieldName].cumulative.hasLowered = timeseriesInstance.id;
                 }
-                dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(currentInstanceField);
+                dataFieldMetrics[fieldName].cumulative.prevVal = Number(currentInstanceField);
               }
             } else if (Array.isArray(currentInstanceField)) {
               // if the current entity field is an array, loop through it and create separate dataField keys for each index of the array
@@ -123,14 +121,14 @@ function ProtocolTabEntity({
               // currentInstanceField.forEach((val: string, arrayIndex: number) => {
               for (let arrayIndex = 0; arrayIndex < currentInstanceField.length; arrayIndex++) {
                 const val = currentInstanceField[arrayIndex];
-                const dataFieldKey = entityFieldName + " [" + arrayIndex + "]";
+                const dataFieldKey = fieldName + " [" + arrayIndex + "]";
                 let value = Number(val);
                 try {
-                  if (entityFieldName === "mintedTokenSupplies" && protocolTableData?.lendingType === "CDP") {
+                  if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType === "CDP") {
                     if (protocolTableData?.mintedTokens.length > 0) {
                       value = convertTokenDecimals(val, protocolTableData.mintedTokens[arrayIndex]?.decimals);
                     }
-                  } else if (entityFieldName === "mintedTokenSupplies" && protocolTableData?.lendingType !== "CDP") {
+                  } else if (fieldName === "mintedTokenSupplies" && protocolTableData?.lendingType !== "CDP") {
                     continue;
                   }
                 } catch (err) {
@@ -144,15 +142,15 @@ function ProtocolTabEntity({
                   dataFieldMetrics[dataFieldKey].sum += value;
                 }
                 if (Number(value) < 0) {
-                  if (!dataFieldMetrics[entityFieldName].negative) {
+                  if (!dataFieldMetrics[fieldName].negative) {
                     // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
-                    dataFieldMetrics[entityFieldName].negative = {
+                    dataFieldMetrics[fieldName].negative = {
                       firstSnapshot: timeseriesInstance.id,
                       value: Number(value),
                       count: 0,
                     };
                   }
-                  dataFieldMetrics[entityFieldName].negative.count += 1;
+                  dataFieldMetrics[fieldName].negative.count += 1;
                 }
                 if (dataFieldKey.includes("umulative")) {
                   if (!Object.keys(dataFieldMetrics[dataFieldKey]).includes("cumulative")) {
@@ -167,7 +165,7 @@ function ProtocolTabEntity({
             }
           } catch (err) {
             if (
-              issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "JS")?.length === 0
+              issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0
             ) {
               let message = "JAVASCRIPT ERROR";
               if (err instanceof Error) {
@@ -177,7 +175,7 @@ function ProtocolTabEntity({
                 type: "JS",
                 message: message,
                 level: "critical",
-                fieldName: entityName + "-" + entityFieldName,
+                fieldName: entityName + "-" + fieldName,
               });
             }
           }
@@ -185,7 +183,7 @@ function ProtocolTabEntity({
       }
 
       list[entityName] = {};
-      console.log("ENT", entityName);
+      console.log("ENTITY NAME: ", entityName);
       for (let x = 0; x < Object.keys(entitiesData[entityName]).length; x++) {
         const entityField = Object.keys(entitiesData[entityName])[x];
         if (entityField === "timestamp") {
@@ -204,7 +202,7 @@ function ProtocolTabEntity({
             const req =
               "!" ===
               entitiesData[entityName][entityField].split("")[
-                entitiesData[entityName][entityField].split("").length - 1
+              entitiesData[entityName][entityField].split("").length - 1
               ];
             if (req) {
               list[entityName][entityField] = "MISSING AND REQUIRED";

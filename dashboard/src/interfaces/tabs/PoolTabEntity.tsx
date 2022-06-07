@@ -13,35 +13,35 @@ import { CopyLinkToClipboard } from "../../common/utilComponents/CopyLinkToClipb
 function addDataPoint(
   dataFields: { [dataField: string]: { date: Number; value: number }[] },
   dataFieldMetrics: any,
-  entityFieldName: string,
+  fieldName: string,
   value: number,
   timestamp: number,
   id: string,
 ): { [x: string]: any } {
-  dataFields[entityFieldName].push({ value: value, date: Number(timestamp) });
-  dataFieldMetrics[entityFieldName].sum += value;
+  dataFields[fieldName].push({ value: value, date: Number(timestamp) });
+  dataFieldMetrics[fieldName].sum += value;
 
-  if (entityFieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-      dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
+  if (fieldName.includes("umulative")) {
+    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
     }
-    if (value < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
-      dataFieldMetrics[entityFieldName].cumulative.hasLowered = id;
+    if (value < dataFieldMetrics[fieldName].cumulative.prevVal) {
+      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
     }
-    dataFieldMetrics[entityFieldName].cumulative.prevVal = value;
+    dataFieldMetrics[fieldName].cumulative.prevVal = value;
   }
-  if (entityFieldName.includes("umulative")) {
-    if (!Object.keys(dataFieldMetrics[entityFieldName]).includes("cumulative")) {
-      dataFieldMetrics[entityFieldName].cumulative = { prevVal: 0, hasLowered: "" };
+  if (fieldName.includes("umulative")) {
+    if (!Object.keys(dataFieldMetrics[fieldName]).includes("cumulative")) {
+      dataFieldMetrics[fieldName].cumulative = { prevVal: 0, hasLowered: "" };
     }
-    if (Number(value) < dataFieldMetrics[entityFieldName].cumulative.prevVal) {
-      dataFieldMetrics[entityFieldName].cumulative.hasLowered = id;
+    if (Number(value) < dataFieldMetrics[fieldName].cumulative.prevVal) {
+      dataFieldMetrics[fieldName].cumulative.hasLowered = id;
     }
-    dataFieldMetrics[entityFieldName].cumulative.prevVal = Number(value);
+    dataFieldMetrics[fieldName].cumulative.prevVal = Number(value);
   }
   return {
-    currentEntityField: dataFields[entityFieldName],
-    currentEntityFieldMetrics: dataFieldMetrics[entityFieldName],
+    currentEntityField: dataFields[fieldName],
+    currentEntityFieldMetrics: dataFieldMetrics[fieldName],
   };
 }
 
@@ -136,12 +136,12 @@ function PoolTabEntity({
 
       // Take the given timeseries instance and loop thru the fields of the instance (ie totalValueLockedUSD)
       for (let z = 0; z < Object.keys(timeseriesInstance).length; z++) {
-        const entityFieldName = Object.keys(timeseriesInstance)[z];
-        if (entityFieldName === "timestamp" || entityFieldName === "__typename" || entityFieldName === "id") {
+        const fieldName = Object.keys(timeseriesInstance)[z];
+        if (fieldName === "timestamp" || fieldName === "__typename" || fieldName === "id") {
           continue;
         }
-        const capsEntityFieldName = entityFieldName.toUpperCase();
-        const currentInstanceField = timeseriesInstance[entityFieldName];
+        const capsfieldName = fieldName.toUpperCase();
+        const currentInstanceField = timeseriesInstance[fieldName];
         let value: any = currentInstanceField;
         try {
           if (!value && value !== 0 && !Array.isArray(currentInstanceField)) {
@@ -152,41 +152,41 @@ function PoolTabEntity({
             if (isNaN(value)) {
               dataType = "NaN";
             }
-            dataFields[entityFieldName] = [];
-            dataFieldMetrics[entityFieldName] = { sum: 0, invalidDataPlot: dataType };
-            if (capsEntityFieldName === "REWARDTOKENEMISSIONSUSD") {
+            dataFields[fieldName] = [];
+            dataFieldMetrics[fieldName] = { sum: 0, invalidDataPlot: dataType };
+            if (capsfieldName === "REWARDTOKENEMISSIONSUSD") {
               dataFields.rewardAPR = [];
               dataFieldMetrics.rewardAPR = { sum: 0, invalidDataPlot: dataType };
             }
             continue;
           }
           if (!isNaN(currentInstanceField) && !Array.isArray(currentInstanceField) && currentInstanceField) {
-            // Add the data to the array held on the dataField key of the entityFieldName
-            if (!dataFields[entityFieldName]) {
-              dataFields[entityFieldName] = [];
-              dataFieldMetrics[entityFieldName] = { sum: 0 };
+            // Add the data to the array held on the dataField key of the fieldName
+            if (!dataFields[fieldName]) {
+              dataFields[fieldName] = [];
+              dataFieldMetrics[fieldName] = { sum: 0 };
             }
 
             value = currentInstanceField;
             if (value < 0) {
-              if (!dataFieldMetrics[entityFieldName].negative) {
+              if (!dataFieldMetrics[fieldName].negative) {
                 // Capture the first snapshot (if there are multiple) where a value was negative. Count is cumulative
-                dataFieldMetrics[entityFieldName].negative = {
+                dataFieldMetrics[fieldName].negative = {
                   firstSnapshot: timeseriesInstance.id,
                   value: value,
                   count: 0,
                 };
               }
-              dataFieldMetrics[entityFieldName].negative.count += 1;
+              dataFieldMetrics[fieldName].negative.count += 1;
             }
             if (
-              capsEntityFieldName.includes("OUTPUTTOKEN") &&
-              capsEntityFieldName !== "OUTPUTTOKEN" &&
-              !capsEntityFieldName.includes("USD")
+              capsfieldName.includes("OUTPUTTOKEN") &&
+              capsfieldName !== "OUTPUTTOKEN" &&
+              !capsfieldName.includes("USD")
             ) {
               value = convertTokenDecimals(currentInstanceField, data[poolKeySingular]?.outputToken?.decimals);
             }
-            if (entityFieldName === "inputTokenBalance" || entityFieldName === "pricePerShare") {
+            if (fieldName === "inputTokenBalance" || fieldName === "pricePerShare") {
               const dec = data[poolKeySingular].inputToken.decimals;
               value = convertTokenDecimals(currentInstanceField, dec);
             }
@@ -194,32 +194,32 @@ function PoolTabEntity({
             const returnedData = addDataPoint(
               dataFields,
               dataFieldMetrics,
-              entityFieldName,
+              fieldName,
               Number(value),
               timeseriesInstance.timestamp,
               timeseriesInstance.id,
             );
-            dataFields[entityFieldName] = returnedData.currentEntityField;
-            dataFieldMetrics[entityFieldName] = returnedData.currentEntityFieldMetrics;
+            dataFields[fieldName] = returnedData.currentEntityField;
+            dataFieldMetrics[fieldName] = returnedData.currentEntityFieldMetrics;
 
             if (
-              (capsEntityFieldName === "HOURLYLIQUIDATEUSD" || capsEntityFieldName === "DAILYLIQUIDATEUSD") &&
+              (capsfieldName === "HOURLYLIQUIDATEUSD" || capsfieldName === "DAILYLIQUIDATEUSD") &&
               Number(value) > Number(timeseriesInstance.totalValueLockedUSD) &&
-              issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "LIQ").length === 0
+              issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "LIQ").length === 0
             ) {
               issues.push({
                 type: "LIQ",
                 message: timeseriesInstance.id,
                 level: "critical",
-                fieldName: entityName + "-" + entityFieldName,
+                fieldName: entityName + "-" + fieldName,
               });
             }
           }
 
-          if (entityFieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
+          if (fieldName.toUpperCase().includes("REWARDTOKEN") && !currentInstanceField) {
             // Catch the fields for reward token data that is optional but would be handled as an array
             let dataFieldKey = "";
-            let iterateArray = data[poolKeySingular][entityFieldName];
+            let iterateArray = data[poolKeySingular][fieldName];
             if (!Array.isArray(iterateArray)) {
               iterateArray = data[poolKeySingular]?.rewardTokens;
             }
@@ -232,17 +232,17 @@ function PoolTabEntity({
               } else {
                 dataFieldKey = " [" + idx + "]";
               }
-              if (!dataFields[entityFieldName + dataFieldKey]) {
-                dataFields[entityFieldName + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
-                dataFieldMetrics[entityFieldName + dataFieldKey] = { sum: 0 };
+              if (!dataFields[fieldName + dataFieldKey]) {
+                dataFields[fieldName + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
+                dataFieldMetrics[fieldName + dataFieldKey] = { sum: 0 };
               } else {
-                dataFields[entityFieldName + dataFieldKey].push({
+                dataFields[fieldName + dataFieldKey].push({
                   value: 0,
                   date: Number(timeseriesInstance.timestamp),
                 });
-                dataFieldMetrics[entityFieldName + dataFieldKey].sum += 0;
+                dataFieldMetrics[fieldName + dataFieldKey].sum += 0;
               }
-              if (entityFieldName === "rewardTokenEmissionsUSD") {
+              if (fieldName === "rewardTokenEmissionsUSD") {
                 if (!dataFields["rewardAPR" + dataFieldKey]) {
                   dataFields["rewardAPR" + dataFieldKey] = [{ value: 0, date: Number(timeseriesInstance.timestamp) }];
                   dataFieldMetrics["rewardAPR" + dataFieldKey] = { sum: 0 };
@@ -283,11 +283,11 @@ function PoolTabEntity({
                 }
               }
 
-              if (entityFieldName === "rates") {
+              if (fieldName === "rates") {
                 fieldSplitIdentifier = val.id.split("-0x")[0];
               }
 
-              const dataFieldKey = entityFieldName + " [" + fieldSplitIdentifier + "]";
+              const dataFieldKey = fieldName + " [" + fieldSplitIdentifier + "]";
 
               // Save the data to the dataFields object array
               if (!dataFields[dataFieldKey]) {
@@ -308,12 +308,12 @@ function PoolTabEntity({
               }
 
               if (value || value === 0) {
-                if (entityFieldName === "inputTokenBalances" || capsEntityFieldName.includes("VOLUMEBYTOKENAMOUNT")) {
+                if (fieldName === "inputTokenBalances" || capsfieldName.includes("VOLUMEBYTOKENAMOUNT")) {
                   // convert the value with decimals for certain fields
                   value = convertTokenDecimals(val, data[poolKeySingular]?.inputTokens[arrayIndex]?.decimals);
                 }
 
-                if (entityFieldName === "rewardTokenEmissionsAmount") {
+                if (fieldName === "rewardTokenEmissionsAmount") {
                   // If the current field is rewardTokenEmissionsAmount, convert the value with decimals
                   // Conditionals set up to get the decimals depending on how reward tokens are structured on the schema version
 
@@ -327,7 +327,7 @@ function PoolTabEntity({
                   }
                 }
 
-                if (entityFieldName === "rewardTokenEmissionsUSD") {
+                if (fieldName === "rewardTokenEmissionsUSD") {
                   //Convert emissions amount in USD to APY/APR
                   // total reward emission USD / total staked USD * 100 = reward APR
                   let apr = 0;
@@ -393,7 +393,7 @@ function PoolTabEntity({
           }
         } catch (err) {
           if (
-            issues.filter((x) => x.fieldName === entityName + "-" + entityFieldName && x.type === "JS")?.length === 0
+            issues.filter((x) => x.fieldName === entityName + "-" + fieldName && x.type === "JS")?.length === 0
           ) {
             let message = "JAVASCRIPT ERROR";
             if (err instanceof Error) {
@@ -404,7 +404,7 @@ function PoolTabEntity({
               type: "JS",
               message: message,
               level: "critical",
-              fieldName: entityName + "-" + entityFieldName,
+              fieldName: entityName + "-" + fieldName,
             });
           }
         }

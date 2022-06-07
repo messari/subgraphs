@@ -154,7 +154,7 @@ function ProtocolDashboard() {
     ${poolOverview(protocolSchemaData?.protocols[0].type, schemaVersion)}
   `;
 
-  const [getPoolsOverviewData, { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading }] =
+  const [getPoolsOverviewData, { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading, refetch: poolOverviewRefetch }] =
     useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt } });
 
   let tabNum = "1";
@@ -195,10 +195,6 @@ function ProtocolDashboard() {
     setTabValue(newValue);
   };
 
-  let pools: { [x: string]: any }[] = [];
-  if (dataPools && data) {
-    pools = dataPools[PoolNames[data?.protocols[0]?.type]];
-  }
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
@@ -263,6 +259,12 @@ function ProtocolDashboard() {
   }, [poolTimeseriesError]);
 
   useEffect(() => {
+    if (poolOverviewError) {
+      poolOverviewRefetch();
+    }
+  }, [poolOverviewError])
+
+  useEffect(() => {
     if (tabValue === "2") {
       getPoolsOverviewData();
     } else if (tabValue === "3" || tabValue === "4") {
@@ -286,7 +288,6 @@ function ProtocolDashboard() {
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
-  // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
 
   if (protocolSchemaQueryError && !protocolSchemaQueryLoading) {
     // ...includes('has no field') checks if the error is describing a discrepancy between the protocol query and the fields in the protocol entity on the schema
@@ -302,6 +303,11 @@ function ProtocolDashboard() {
     errorDisplayProps = error;
   }
 
+  let pools: { [x: string]: any }[] = [];
+  if (dataPools && data) {
+    pools = dataPools[PoolNames[data?.protocols[0]?.type]];
+  }
+
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader
@@ -315,30 +321,27 @@ function ProtocolDashboard() {
       ) : null}
       <ErrorDisplay
         errorObject={errorDisplayProps}
-        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
         protocolData={data}
         subgraphToQuery={subgraphToQuery}
+        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
       />
       {!!data && (
         <AllDataTabs
           data={data}
           entitiesData={entitiesData}
           tabValue={tabValue}
-          protocolFields={protocolFields}
+          events={events}
+          pools={pools}
           poolsListData={poolsListData}
           poolListLoading={poolListLoading}
           poolsListError={poolsListError}
           poolNames={PoolNames[data.protocols[0].type]}
           poolId={poolId}
           poolData={poolData}
-          events={events}
-          setPoolId={(x) => setPoolId(x)}
-          handleTabChange={(x, y) => handleTabChange(x, y)}
+          protocolFields={protocolFields}
+          protocolTableData={protocolTableData}
           subgraphToQueryURL={subgraphToQuery.url}
-          pools={pools}
-          paginate={(x) => paginate(x)}
           skipAmt={skipAmt}
-          setProtocolId={(x) => setprotocolId(x)}
           poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
           poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
           protocolTimeseriesData={{
@@ -356,7 +359,10 @@ function ProtocolDashboard() {
             usageMetricsDailySnapshots: dailyUsageError,
             usageMetricsHourlySnapshots: hourlyUsageError,
           }}
-          protocolTableData={protocolTableData}
+          setPoolId={(x) => setPoolId(x)}
+          handleTabChange={(x, y) => handleTabChange(x, y)}
+          setProtocolId={(x) => setprotocolId(x)}
+          paginate={(x) => paginate(x)}
         />
       )}
     </div>
