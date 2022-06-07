@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   UsageMetricsDailySnapshot,
@@ -124,12 +124,15 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot {
+export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketMetrics = MarketHourlySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
     let market = getMarket(marketAddress);
+    if (!market){
+      return null;
+    }
     marketMetrics = new MarketHourlySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
@@ -151,12 +154,15 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
   return marketMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
     let market = getMarket(marketAddress);
+    if (!market){
+      return null;
+    }
     marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
@@ -238,26 +244,27 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   return LendingProtocolEntity;
 }
 
-export function getMarket(marketId: string): Market {
+export function getMarket(marketId: string): Market | null {
   let market = Market.load(marketId);
   if (market) {
     return market;
   }
-  return new Market("");
+  log.error('Cannot find market: {}', [marketId]);
+  return null;
 }
 
 ///////////////////////////
 ///////// Helpers /////////
 ///////////////////////////
 
-export function getLiquidateEvent(event: LogRepay): Liquidate {
+export function getLiquidateEvent(event: LogRepay): Liquidate | null {
   let liquidateEvent = Liquidate.load(
     "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
   if (liquidateEvent) {
     return liquidateEvent;
   }
-  return new Liquidate("");
+  return null;
 }
 
 export function getBentoBoxAddress(network: string): string {
