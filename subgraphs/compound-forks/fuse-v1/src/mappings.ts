@@ -39,10 +39,12 @@ import {
   ETH_NAME,
   ETH_SYMBOL,
   getNetworkSpecificConstant,
+  GOHM_ADDRESS,
   METHODOLOGY_VERSION,
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   SCHEMA_VERSION,
+  SOHM_ADDRESS,
   SUBGRAPH_VERSION,
   ZERO_ADDRESS,
 } from "./constants";
@@ -400,15 +402,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     blocksPerYear = ETHEREUM_BLOCKS_PER_YEAR;
   }
 
-  let updateMarketData = new UpdateMarketData(
-    cTokenContract.try_totalSupply(),
-    cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_supplyRatePerBlock(),
-    cTokenContract.try_borrowRatePerBlock(),
-    oracleContract.try_getUnderlyingPrice(marketAddress),
-    blocksPerYear
-  );
-
   //
   // replacing _handleAccrueInterst() to properly derive assetPrice
   //
@@ -419,6 +412,37 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     log.warning("[handleAccrueInterest] Market not found: {}", [marketID]);
     return;
   }
+
+  // Around block 13818884 sOHM pools were updated to gOHM
+  // we need to update these pools to account for this otherwise the underlying currency is wrong
+  if (market.inputToken.toLowerCase() == SOHM_ADDRESS.toLowerCase()) {
+    let underlying = cTokenContract.underlying();
+    if (underlying.toHexString().toLowerCase() == GOHM_ADDRESS.toLowerCase()) {
+      log.warning(
+        "[handleAccrueInterest] sOHM migrated to gOHM in market: {} at block: {}",
+        [marketID, event.block.number.toString()]
+      );
+
+      let newInputToken = new Token(GOHM_ADDRESS);
+      let tokenContract = ERC20.bind(Address.fromString(GOHM_ADDRESS));
+      newInputToken.name = getOrElse(tokenContract.try_name(), "UNKNOWN");
+      newInputToken.symbol = getOrElse(tokenContract.try_symbol(), "UNKOWN");
+      newInputToken.decimals = getOrElse(tokenContract.try_decimals(), -1);
+      newInputToken.save();
+
+      market.inputToken = newInputToken.id;
+      market.save();
+    }
+  }
+
+  let updateMarketData = new UpdateMarketData(
+    cTokenContract.try_totalSupply(),
+    cTokenContract.try_exchangeRateStored(),
+    cTokenContract.try_supplyRatePerBlock(),
+    cTokenContract.try_borrowRatePerBlock(),
+    oracleContract.try_getUnderlyingPrice(marketAddress),
+    blocksPerYear
+  );
 
   // creates and initializes market snapshots
   snapshotMarket(
@@ -679,12 +703,9 @@ function updateMarket(
   let troller = FuseComptroller.bind(comptroller);
   let tryRewardDistributors = troller.try_getRewardsDistributors();
   if (!tryRewardDistributors.reverted) {
-    log.warning("Reward Distributors: {}", [
-      tryRewardDistributors.value.toString(),
-    ]); // TODO: remove this line
     let rewardDistributors = tryRewardDistributors.value;
     for (let i = 0; i < rewardDistributors.length; i++) {
-      updateRewards(rewardDistributors[i], marketID, blocksPerDay);
+      updateRewards(rewardDistributors[i], marketID, blocksPerDay, blockNumber);
     }
   }
 
@@ -739,42 +760,11 @@ function updateMarket(
   snapshot.save();
 }
 
-// this function will "override" the getTokenPrice() function in ../../src/mapping.ts
-// TODO: remove this function
-function getTokenPriceUSD(
-  getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
-  underlyingDecimals: i32
-): BigDecimal {
-  let mantissaDecimalFactor = 18 - underlyingDecimals + 18;
-  let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
-  let priceInETH = getOrElse<BigInt>(getUnderlyingPriceResult, BIGINT_ZERO)
-    .toBigDecimal()
-    .div(bdFactor);
-
-  // grab the price of ETH to find token price
-  if (PROTOCOL_NETWORK == Network.MAINNET) {
-    const priceOffset = 6;
-    let ethPrice = getUsdPricePerToken(
-      Address.fromString(ETH_ADDRESS)
-    ).usdPrice.div(exponentToBigDecimal(priceOffset));
-    let price = ethPrice.times(priceInETH);
-    log.warning("price in eth: {} price of ETH: ${} price of token: ${}", [
-      priceInETH.toString(),
-      ethPrice.toString(),
-      price.toString(),
-    ]);
-    return price;
-  } else {
-    // arbitrum price
-    log.warning("price: {}", [priceInETH.toString()]);
-    return priceInETH; // TODO: verify this is enough to calc price in arb
-  }
-}
-
 function updateRewards(
   rewardDistributor: Address,
   marketID: string,
-  blocksPerDay: BigDecimal
+  blocksPerDay: BigDecimal,
+  blockNumber: BigInt
 ): void {
   let market = Market.load(marketID);
   if (!market) {
@@ -797,9 +787,6 @@ function updateRewards(
   );
   let tryRewardToken = distributor.try_rewardToken();
 
-  if (!tryRewardToken.reverted) {
-    log.warning("reward distribution: {}", [tryRewardToken.value.toHexString()]); // TODO: remove this line
-  }
   // create reward token if available
   if (!tryRewardToken.reverted) {
     let token = Token.load(tryRewardToken.value.toHexString());
@@ -817,6 +804,9 @@ function updateRewards(
     let rewardTokenPriceUSD = customPrice.usdPrice.div(
       customPrice.decimalsBaseTen
     );
+    token.lastPriceUSD = rewardTokenPriceUSD;
+    token.lastPriceBlockNumber = blockNumber;
+    token.save();
 
     // borrow speeds
     if (!tryBorrowSpeeds.reverted) {
@@ -834,6 +824,7 @@ function updateRewards(
         rewardToken = new RewardToken(rewardTokenId);
         rewardToken.token = token.id;
         rewardToken.type = RewardTokenType.BORROW;
+        rewardToken.save();
       }
       rewardTokens.push(rewardToken.id);
     }
@@ -854,6 +845,7 @@ function updateRewards(
         rewardToken = new RewardToken(rewardTokenId);
         rewardToken.token = token.id;
         rewardToken.type = RewardTokenType.DEPOSIT;
+        rewardToken.save();
       }
       rewardTokens.push(rewardToken.id);
     }

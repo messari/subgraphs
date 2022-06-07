@@ -52,12 +52,15 @@ export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 export const ETH_NAME = "Ether";
 export const ETH_SYMBOL = "ETH";
 
+export const SOHM_ADDRESS = "0x04f2694c8fcee23e8fd0dfea1d4f5bb8c352111f";
+export const GOHM_ADDRESS = "0x0ab87046fBb341D058F17CBC4c1133F25a20a52f";
+
 ///////////////////////////
 //// Protocol Specific ////
 ///////////////////////////
 
 export const PROTOCOL_NAME = "Fuse";
 export const PROTOCOL_SLUG = "fuse";
-export const SUBGRAPH_VERSION = "1.0.11";
+export const SUBGRAPH_VERSION = "1.0.12";
 export const SCHEMA_VERSION = "1.2.1";
 export const METHODOLOGY_VERSION = "1.0.0";
