@@ -49,20 +49,22 @@ export function updateProtocolAndSave(
   ]);
   const dailySnapshot = updateUsageMetricsDailySnapshot(block, protocol);
   if (
-    protocol.dailyUsageMetrics[protocol.dailyUsageMetrics.length - 1] !==
+    protocol.dailyUsageMetrics[protocol.dailyUsageMetrics.length - 1] !=
     dailySnapshot.id
-  )
+  ) {
     protocol.dailyUsageMetrics = protocol.dailyUsageMetrics.concat([
       dailySnapshot.id,
     ]);
+  }
   const hourlySnapshot = updateUsageMetricsHourlySnapshot(block, protocol);
   if (
-    protocol.hourlyUsageMetrics[protocol.hourlyUsageMetrics.length - 1] !==
+    protocol.hourlyUsageMetrics[protocol.hourlyUsageMetrics.length - 1] !=
     hourlySnapshot.id
-  )
+  ) {
     protocol.hourlyUsageMetrics = protocol.hourlyUsageMetrics.concat([
       hourlySnapshot.id,
     ]);
+  }
 
   protocol.cumulativeUniqueUsers = getUniqueUsers(protocol, [
     BIGINT_ZERO,
@@ -71,12 +73,13 @@ export function updateProtocolAndSave(
 
   const dailyFinancialSnapshot = updateDailyFinancialSnapshot(block, protocol);
   if (
-    protocol.financialMetrics[protocol.financialMetrics.length - 1] !==
+    protocol.financialMetrics[protocol.financialMetrics.length - 1] !=
     dailyFinancialSnapshot.id
-  )
+  ) {
     protocol.financialMetrics = protocol.financialMetrics.concat([
       dailyFinancialSnapshot.id,
     ]);
+  }
   protocol.cumulativeSupplySideRevenueUSD =
     dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD;
   protocol.cumulativeProtocolSideRevenueUSD =

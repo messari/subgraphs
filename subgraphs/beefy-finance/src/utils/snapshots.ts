@@ -5,6 +5,7 @@ import {
   VaultDailySnapshot,
   VaultHourlySnapshot,
 } from "../../generated/schema";
+import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
 export function getVaultDailyId(block: ethereum.Block, vault: Vault): string {
   const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32());
@@ -34,6 +35,7 @@ export function updateVaultDailySnapshot(
     vaultDailySnapshot = new VaultDailySnapshot(id);
     vaultDailySnapshot.protocol = vault.protocol;
     vaultDailySnapshot.vault = vault.id;
+    vaultDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
   if (vault.outputTokenSupply)

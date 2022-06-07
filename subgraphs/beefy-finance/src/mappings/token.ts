@@ -39,11 +39,10 @@ export function getLastPriceUSD(
   blockNumber: BigInt = BIGINT_ZERO
 ): BigDecimal {
   const token = getTokenOrCreate(tokenAddress);
-  const price = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
-  token.lastPriceUSD = price;
+  token.lastPriceUSD = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
   if (blockNumber != BIGINT_ZERO) {
     token.lastPriceBlockNumber = blockNumber;
   }
   token.save();
-  return price;
+  return token.lastPriceUSD;
 }

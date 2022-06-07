@@ -42,7 +42,7 @@ type Token @entity {
   decimals: Int!
 
   " Optional field to track the price of a token, mostly for caching purposes "
-  lastPriceUSD: BigDecimal
+  lastPriceUSD: BigDecimal!
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
@@ -442,6 +442,9 @@ type VaultDailySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day, in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+
+  " total revenue in USD "
+  dailyTotalRevenueUSD: BigDecimal!
 
   " Block number of this snapshot "
   blockNumber: BigInt!

@@ -229,38 +229,36 @@ export function updateDailyFinancialSnapshot(
 ): FinancialsDailySnapshot {
   const id = getProtocolDailyId(block, protocol);
   let dailyFinancialSnapshot = FinancialsDailySnapshot.load(id);
-  if (dailyFinancialSnapshot == null) {
-    dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
-    dailyFinancialSnapshot.protocol = protocol.id;
+  if (!dailyFinancialSnapshot) {
+    dailyFinancialSnapshot = createFirstDailyFinancialSnapshot(block, protocol);
   }
+
   dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
   const revenues = getDailyRevenuesUsd(protocol, block);
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = revenues[0];
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = revenues[1];
   dailyFinancialSnapshot.dailyTotalRevenueUSD = revenues[2];
-  let cumulativeSupplyRevenue = revenues[0];
-  let cumulativeProtocolRevenue = revenues[1];
-  let cumulativeTotalRevenue = revenues[2];
-  let metricsSnapshot: FinancialsDailySnapshot | null;
+  let cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  let cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  let cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  let dailySnapshot: FinancialsDailySnapshot | null;
   for (let i = 0; i < protocol.financialMetrics.length; i++) {
-    metricsSnapshot = FinancialsDailySnapshot.load(
-      protocol.financialMetrics[i]
-    );
-    if (metricsSnapshot != null && metricsSnapshot.id != id) {
-      cumulativeSupplyRevenue = cumulativeSupplyRevenue.plus(
-        metricsSnapshot.dailySupplySideRevenueUSD
+    dailySnapshot = FinancialsDailySnapshot.load(protocol.financialMetrics[i]);
+    if (dailySnapshot) {
+      cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
+        dailySnapshot.dailySupplySideRevenueUSD
       );
-      cumulativeProtocolRevenue = cumulativeProtocolRevenue.plus(
-        metricsSnapshot.dailyProtocolSideRevenueUSD
+      cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
+        dailySnapshot.dailyProtocolSideRevenueUSD
       );
-      cumulativeTotalRevenue = cumulativeTotalRevenue.plus(
-        metricsSnapshot.dailyTotalRevenueUSD
+      cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
+        dailySnapshot.dailyTotalRevenueUSD
       );
     }
   }
-  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplyRevenue;
-  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolRevenue;
-  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenue;
+  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
+  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
+  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
 
   dailyFinancialSnapshot.blockNumber = block.number;
   dailyFinancialSnapshot.timestamp = block.timestamp;
