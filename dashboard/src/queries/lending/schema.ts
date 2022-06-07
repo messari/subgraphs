@@ -197,7 +197,20 @@ export const schema100 = (): Schema => {
   };
 
   const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery: "",
+    financialsQuery: "",
+    hourlyUsageQuery: "",
+    dailyUsageQuery: "",
+    protocolTableQuery: "",
+    poolsQuery: "",
+  };
 };
 
 export const schema110 = (): Schema => {
@@ -246,6 +259,56 @@ export const schema110 = (): Schema => {
     canBorrowFrom: "Boolean!",
     canUseAsCollateral: "Boolean!",
   };
+
+  const financialsQuery = `
+  query Data {
+    financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
+      totalValueLockedUSD
+      totalVolumeUSD
+      protocolSideRevenueUSD
+      supplySideRevenueUSD
+      timestamp
+    }
+  }`;
+  const dailyUsageQuery = `
+  query Data {
+    usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
+      totalUniqueUsers
+      dailyTransactionCount
+      activeUsers
+      timestamp
+    }
+  }`;
+  const protocolTableQuery = `
+  query Data {
+    lendingProtocol(id: $protocolId) {
+      id
+      name,
+      slug,
+      schemaVersion,
+      subgraphVersion,
+      methodologyVersion,
+      network,
+      type,
+      riskType,
+      lendingType,
+      totalUniqueUsers,
+      totalValueLockedUSD,
+      totalVolumeUSD,
+      totalDepositUSD,
+      totalBorrowUSD
+    }
+  }
+  `;
+
+  const poolsQuery = `
+  query Data {
+    markets {
+      id
+      name
+    }
+  }`;
+
   const query = `
       query Data($poolId: String, $protocolId: String){
         _meta {
@@ -262,23 +325,7 @@ export const schema110 = (): Schema => {
           subgraphVersion
           methodologyVersion
         }
-        lendingProtocol(id: $protocolId) {
-          id
-          name,
-          slug,
-          schemaVersion,
-          subgraphVersion,
-          methodologyVersion,
-          network,
-          type,
-          riskType,
-          lendingType,
-          totalUniqueUsers,
-          totalValueLockedUSD,
-          totalVolumeUSD,
-          totalDepositUSD,
-          totalBorrowUSD
-        }
+
         lendingProtocols {
           id
           name,
@@ -296,54 +343,8 @@ export const schema110 = (): Schema => {
           totalDepositUSD,
           totalBorrowUSD
         }
-        markets {
-          id
-          name
-          inputTokens{
-            id
-            decimals
-            name
-            symbol
-          }
-          outputToken {
-            id
-            decimals
-            name
-            symbol
-          }
-          rewardTokens{
-            id
-            decimals
-            name
-            symbol
-          }
-          inputTokenBalances
-          outputTokenSupply
-         isActive
-         canUseAsCollateral
-         canBorrowFrom
-         maximumLTV
-         liquidationThreshold
-         liquidationPenalty
-         depositRate
-         stableBorrowRate
-         variableBorrowRate
-         rewardTokenEmissionsAmount
-         rewardTokenEmissionsUSD
-        }
-        financialsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
-          totalValueLockedUSD
-          totalVolumeUSD
-          protocolSideRevenueUSD
-          supplySideRevenueUSD
-          timestamp
-        }
-        usageMetricsDailySnapshots(first: 1000, orderBy: timestamp, orderDirection: desc) {
-          totalUniqueUsers
-          dailyTransactionCount
-          activeUsers
-          timestamp
-        }
+
+
         marketDailySnapshots(first:1000, orderBy: timestamp, orderDirection: desc, where: {market: $poolId}) {
           totalValueLockedUSD
           inputTokenBalances
@@ -448,7 +449,20 @@ export const schema110 = (): Schema => {
   };
 
   const events = ["withdraws", "repays", "liquidates", "deposits", "borrows"];
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery: "",
+    financialsQuery,
+    hourlyUsageQuery: dailyUsageQuery,
+    dailyUsageQuery,
+    protocolTableQuery,
+    poolsQuery,
+  };
 };
 
 export const schema120 = (): Schema => {
@@ -619,6 +633,67 @@ export const schema120 = (): Schema => {
     rewardTokenEmissionsUSD: "[BigDecimal!]",
   };
 
+  const financialsQuery = `
+    query Data {
+      ${finanQuery}
+    }`;
+  const hourlyUsageQuery = `
+    query Data {
+      ${usageHourlyQuery}
+    }`;
+  const dailyUsageQuery = `
+    query Data {
+      ${usageDailyQuery}
+    }`;
+
+  const protocolTableQuery = `
+    query Data($protocolId: String) {
+      lendingProtocol(id:$protocolId) {
+        id      
+        name
+        slug
+        schemaVersion
+        subgraphVersion
+        methodologyVersion
+        network
+        type
+        lendingType
+        riskType
+        mintedTokens {
+          id
+          decimals
+        }
+        cumulativeUniqueUsers
+        totalValueLockedUSD
+        protocolControlledValueUSD
+        cumulativeSupplySideRevenueUSD
+        cumulativeProtocolSideRevenueUSD
+        cumulativeTotalRevenueUSD
+        totalDepositBalanceUSD
+        cumulativeDepositUSD
+        totalBorrowBalanceUSD
+        cumulativeBorrowUSD
+        cumulativeLiquidateUSD
+        mintedTokenSupplies
+      }
+    }`;
+
+  const poolsQuery = `
+      query Data {
+        markets {
+          id
+          name
+        }
+      }
+    `;
+
+  const poolTimeseriesQuery = `
+  query Data($poolId: String) {
+    ${marketDailyQuery}
+    ${marketHourlyQuery}
+  }
+  `;
+
   const query = `
   query Data($poolId: String, $protocolId: String){
     _meta {
@@ -635,34 +710,7 @@ export const schema120 = (): Schema => {
       subgraphVersion
       methodologyVersion
     }
-    lendingProtocol(id:$protocolId) {
-      id      
-      name
-      slug
-      schemaVersion
-      subgraphVersion
-      methodologyVersion
-      network
-      type
-      lendingType
-      riskType
-      mintedTokens {
-        id
-        decimals
-      }
-      cumulativeUniqueUsers
-      totalValueLockedUSD
-      protocolControlledValueUSD
-      cumulativeSupplySideRevenueUSD
-      cumulativeProtocolSideRevenueUSD
-      cumulativeTotalRevenueUSD
-      totalDepositBalanceUSD
-      cumulativeDepositUSD
-      totalBorrowBalanceUSD
-      cumulativeBorrowUSD
-      cumulativeLiquidateUSD
-      mintedTokenSupplies
-    }
+    
     lendingProtocols {
       id      
       name
@@ -691,61 +739,7 @@ export const schema120 = (): Schema => {
       cumulativeLiquidateUSD
       mintedTokenSupplies
     }
-    markets {
-      id
-      name
-      inputToken {
-        id
-        decimals
-        name
-        symbol
-      }
-      outputToken {
-        id
-        decimals
-        name
-        symbol
-      }
-      rewardTokens {
-        id
-        token {
-          id
-          decimals
-          name
-          symbol
-        }
-      }
-      rates {
-        id
-        side
-        rate
-        type
-      }
-      isActive
-      canUseAsCollateral
-      canBorrowFrom
-      maximumLTV
-      liquidationThreshold
-      liquidationPenalty
-      totalValueLockedUSD
-      totalDepositBalanceUSD
-      cumulativeDepositUSD
-      totalBorrowBalanceUSD
-      cumulativeBorrowUSD
-      cumulativeLiquidateUSD
-      inputTokenBalance
-      inputTokenPriceUSD
-      outputTokenSupply
-      outputTokenPriceUSD
-      exchangeRate
-      rewardTokenEmissionsAmount
-      rewardTokenEmissionsUSD
-    }
-    ${finanQuery}
-    ${usageHourlyQuery}
-    ${usageDailyQuery}
-    ${marketHourlyQuery}
-    ${marketDailyQuery}
+
     ${eventsQuery}
     market(id:$poolId){
       id
@@ -825,5 +819,18 @@ export const schema120 = (): Schema => {
     mintedTokenSupplies: "[BigInt!]",
   };
 
-  return { entities, entitiesData, query, poolData, events, protocolFields };
+  return {
+    entities,
+    entitiesData,
+    query,
+    poolData,
+    events,
+    protocolFields,
+    poolTimeseriesQuery,
+    financialsQuery,
+    hourlyUsageQuery,
+    dailyUsageQuery,
+    protocolTableQuery,
+    poolsQuery,
+  };
 };

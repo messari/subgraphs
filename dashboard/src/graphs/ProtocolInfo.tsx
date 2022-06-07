@@ -27,6 +27,11 @@ interface ProtocolInfoProps {
 
 // This component is for each individual subgraph
 function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVersion }: ProtocolInfoProps) {
+  const subgraphNameString = subgraphToQueryURL.split("name/")[1];
+  let link = subgraphToQueryURL;
+  if (subgraphNameString) {
+    link = "https://thegraph.com/hosted-service/subgraph/" + subgraphNameString;
+  }
   let protocolSchemaData = protocolData.protocols[0];
   if (protocolData.protocols?.length > 1) {
     const findProto = protocolData.protocols?.find((pro: any) => pro?.id === protocolId);
@@ -37,7 +42,7 @@ function ProtocolInfo({ protocolData, protocolId, subgraphToQueryURL, schemaVers
   return (
     <ProtocolContainer>
       <Box>
-        <Link href={subgraphToQueryURL} target="_blank">
+        <Link href={link} target="_blank">
           <Typography variant="h6">
             <span>{protocolSchemaData?.name} - </span>
             <Typography variant="body1" component="span">

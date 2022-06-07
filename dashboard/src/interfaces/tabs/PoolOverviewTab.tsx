@@ -1,6 +1,6 @@
 import React from "react";
 import IssuesDisplay from "../IssuesDisplay";
-import { Pool } from "../Pool";
+import { TablePoolOverview } from "../../common/chartComponents/TablePoolOverview";
 import { styled } from "../../styled";
 import { CircularProgress } from "@mui/material";
 
@@ -25,7 +25,7 @@ const PoolContainer = styled("div")`
 
 interface PoolOverviewTabProps {
   pools: any[];
-  protocolData: { [x: string]: any };
+  protocolType: string;
   subgraphToQueryURL: string;
   poolOverviewRequest: { [x: string]: any };
   handleTabChange: (event: any, newValue: string) => void;
@@ -38,7 +38,7 @@ interface PoolOverviewTabProps {
 function PoolOverviewTab({
   pools,
   setPoolId,
-  protocolData,
+  protocolType,
   poolOverviewRequest,
   handleTabChange,
   paginate,
@@ -62,62 +62,50 @@ function PoolOverviewTab({
   }
 
   let nextButton = null;
-  if (pools.length === 100) {
+  if (pools.length === 50) {
     nextButton = (
-      <>
-        <ChangePageEle>
-          <span
-            onClick={() => {
-              window.scrollTo(0, 0);
-              paginate(skipAmt + 100);
-              p.set("skipAmt", (skipAmt + 100).toString());
-              navigate("?" + p.toString());
-            }}
-          >
-            NEXT
-          </span>
-          <ChevronRightIcon />
-        </ChangePageEle>
-      </>
+      <ChangePageEle
+        onClick={() => {
+          window.scrollTo(0, 0);
+          paginate(skipAmt + 50);
+          p.set("skipAmt", (skipAmt + 50).toString());
+          navigate("?" + p.toString());
+        }}
+      >
+        <span>NEXT</span>
+        <ChevronRightIcon />
+      </ChangePageEle>
     );
   }
 
-  let prevButton = null;
-  if (skipAmt > 0 && skipAmt <= 100) {
+  let prevButton = <ChangePageEle></ChangePageEle>;
+  if (skipAmt > 0 && skipAmt <= 50) {
     prevButton = (
-      <>
-        <ChangePageEle>
-          <ChevronLeftIcon />
-          <span
-            onClick={() => {
-              window.scrollTo(0, document.body.scrollHeight);
-              paginate(0);
-              p.delete("skipAmt");
-              navigate("?" + p.toString());
-            }}
-          >
-            BACK
-          </span>
-        </ChangePageEle>
-      </>
+      <ChangePageEle
+        onClick={() => {
+          window.scrollTo(0, document.body.scrollHeight);
+          paginate(0);
+          p.delete("skipAmt");
+          navigate("?" + p.toString());
+        }}
+      >
+        <ChevronLeftIcon />
+        <span>BACK</span>
+      </ChangePageEle>
     );
   } else if (skipAmt > 0) {
     prevButton = (
-      <>
-        <ChangePageEle>
-          <ChevronLeftIcon />
-          <span
-            onClick={() => {
-              window.scrollTo(0, document.body.scrollHeight);
-              paginate(skipAmt - 100);
-              p.set("skipAmt", (skipAmt - 100).toString());
-              navigate("?" + p.toString());
-            }}
-          >
-            BACK
-          </span>
-        </ChangePageEle>
-      </>
+      <ChangePageEle
+        onClick={() => {
+          window.scrollTo(0, document.body.scrollHeight);
+          paginate(skipAmt - 50);
+          p.set("skipAmt", (skipAmt - 50).toString());
+          navigate("?" + p.toString());
+        }}
+      >
+        <ChevronLeftIcon />
+        <span>BACK</span>
+      </ChangePageEle>
     );
   }
 
@@ -137,22 +125,19 @@ function PoolOverviewTab({
 
   return (
     <>
-      <IssuesDisplay issuesArrayProps={issues} />
-      {prevButton}
-      <PoolContainer>
-        {pools.map((pool) => {
-          return (
-            <Pool
-              key={pool.id}
-              pool={pool}
-              setPoolId={(x) => setPoolId(x)}
-              protocolData={protocolData}
-              handleTabChange={(x, y) => handleTabChange(x, y)}
-            />
-          );
-        })}
-      </PoolContainer>
-      {nextButton}
+      <IssuesDisplay issuesArrayProps={issues} allLoaded={true} oneLoaded={true} />
+      <TablePoolOverview
+        datasetLabel=""
+        dataTable={pools}
+        protocolType={protocolType}
+        skipAmt={skipAmt}
+        setPoolId={(x) => setPoolId(x)}
+        handleTabChange={(x, y) => handleTabChange(x, y)}
+      />
+      <div style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
+        {prevButton}
+        {nextButton}
+      </div>
     </>
   );
 }

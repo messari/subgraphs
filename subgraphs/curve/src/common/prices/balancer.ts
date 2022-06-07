@@ -51,6 +51,6 @@ export function getBalancerLpPriceUSD(tokenAddr: Address, timestamp: BigInt): Bi
     poolTVL = poolTVL.plus(priceUSD.times(underlyingBalance));
   }
   const priceUSD = poolTVL.div(lpTotalSupply);
-  tokenSnapshot.price = priceUSD
-  return priceUSD
+  tokenSnapshot.price = priceUSD;
+  return priceUSD;
 }

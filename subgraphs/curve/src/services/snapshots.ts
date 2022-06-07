@@ -23,6 +23,7 @@ import { getBalancerLpPriceUSD, isBalancerToken } from "../common/prices/balance
 import { getCtokenPriceUSD, isCtoken } from "../common/prices/compound";
 import { getIearnPriceUSD, getYearnTokenV2PriceUSD, isIearnToken, isYearnTokenV2 } from "../common/prices/yearn";
 import { getAtokenPriceUSD, isAtoken } from "../common/prices/aave";
+import { getIdleTokenPriceUSD, isIdleToken } from "../common/prices/idle";
 
 function isKp3rToken(tokenAddr: Address): boolean {
   if (tokenAddr.equals(RKP3R_ADDRESS)) {
@@ -62,23 +63,31 @@ export function getTokenPriceSnapshot(tokenAddr: Address, timestamp: BigInt, for
   if (tokenSnapshot) {
     return tokenSnapshot.price;
   }
-  if (isKp3rToken(tokenAddr)) { // kp3r token
+  if (isKp3rToken(tokenAddr)) {
+    // kp3r token
     return getRKp3rPrice();
   }
-  if (isBalancerToken(tokenAddr)) { // balancer
+  if (isBalancerToken(tokenAddr)) {
+    // balancer
     return getBalancerLpPriceUSD(tokenAddr, timestamp);
   }
-  if (isCtoken(tokenAddr)) { // ctoken
+  if (isCtoken(tokenAddr)) {
+    // ctoken
     return getCtokenPriceUSD(tokenAddr, timestamp);
   }
-  if (isIearnToken(tokenAddr)) { // yearn v1
+  if (isIearnToken(tokenAddr)) {
+    // yearn v1
     return getIearnPriceUSD(tokenAddr, timestamp);
   }
-  if (isAtoken(tokenAddr)) { // aave
+  if (isAtoken(tokenAddr)) {
+    // aave
     return getAtokenPriceUSD(tokenAddr, timestamp);
   }
   if (isYearnTokenV2(tokenAddr)) {
     return getYearnTokenV2PriceUSD(tokenAddr, timestamp);
+  }
+  if (isIdleToken(tokenAddr)){
+    return getIdleTokenPriceUSD(tokenAddr,timestamp);
   }
   tokenSnapshot = new TokenSnapshot(createTokenSnapshotID(tokenAddr, timestamp));
   let priceUSD = BIGDECIMAL_ZERO;
@@ -174,4 +183,12 @@ export function getLpTokenPriceUSD(pool: LiquidityPool, timestamp: BigInt): BigD
 
 export function createTokenSnapshotID(tokenAddr: Address, timestamp: BigInt): string {
   return tokenAddr.toHexString() + "-" + timestamp.div(BigInt.fromI32(SNAPSHOT_SECONDS)).toString();
+}
+
+export function getTokenPrice(token: Address, pool: LiquidityPool, timestamp: BigInt): BigDecimal {
+  if (!pool.isV2) {
+    const latestPrice = getTokenPriceSnapshot(token, timestamp, FOREX_TOKENS.includes(token.toHexString()));
+    return latestPrice;
+  }
+  return getCryptoTokenPrice(token, timestamp, pool);
 }
