@@ -14,18 +14,22 @@ import { DashboardHeader } from "../graphs/DashboardHeader";
 
 function ProtocolDashboard() {
   const [searchParams] = useSearchParams();
-  const subgraphParam = searchParams.get("endpoint");
+  const subgraphParam = searchParams.get("endpoint") || "";
   const tabString = searchParams.get("tab") || "";
   const poolIdString = searchParams.get("poolId") || "";
   const scrollToView = searchParams.get("view") || "";
-  const protocolIdString = searchParams.get("protocolId") || "";
   const skipAmtParam = Number(searchParams.get("skipAmt")) || 0;
 
   const navigate = useNavigate();
-
-  const [subgraphToQuery, setSubgraphToQuery] = useState({ url: "", version: "" });
+  let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
+  if (subgraphParam) {
+    const parseCheck = isValidHttpUrl(subgraphParam);
+    if (parseCheck) {
+      queryURL = subgraphParam;
+    }
+  }
+  const [subgraphToQuery, setSubgraphToQuery] = useState({ url: queryURL, version: "" });
   const [poolId, setPoolId] = useState<string>(poolIdString);
-  const [protocolId, setprotocolId] = useState<string>(protocolIdString);
   const [skipAmt, paginate] = useState<number>(skipAmtParam);
 
   ChartJS.register(...registerables);
@@ -63,15 +67,22 @@ function ProtocolDashboard() {
   if (!schemaVersion && protocolSchemaData?.protocols[0].schemaVersion) {
     schemaVersion = protocolSchemaData?.protocols[0].schemaVersion;
   }
+  const protocolIdString = searchParams.get("protocolId") || protocolSchemaData?.protocols[0].id;
+  const [protocolId, setprotocolId] = useState<string>(protocolIdString);
 
   // The following section fetches the full data from the subgraph. It routes to query selection and then makes the request
   const {
     entitiesData,
-    entities,
     poolData,
     query: graphQuery,
     events,
     protocolFields,
+    financialsQuery,
+    dailyUsageQuery,
+    hourlyUsageQuery,
+    protocolTableQuery,
+    poolsQuery,
+    poolTimeseriesQuery,
   } = schema(protocolSchemaData?.protocols[0].type, schemaVersion);
 
   const queryMain = gql`
@@ -79,12 +90,79 @@ function ProtocolDashboard() {
   `;
   const [getData, { data, loading, error }] = useLazyQuery(queryMain, { variables: { poolId, protocolId }, client });
 
+  const [
+    getFinancialsData,
+    { data: financialsData, loading: financialsLoading, error: financialsError, refetch: financialsRefetch },
+  ] = useLazyQuery(
+    gql`
+      ${financialsQuery}
+    `,
+    { client },
+  );
+  const [
+    getDailyUsageData,
+    { data: dailyUsageData, loading: dailyUsageLoading, error: dailyUsageError, refetch: dailyUsageRefetch },
+  ] = useLazyQuery(
+    gql`
+      ${dailyUsageQuery}
+    `,
+    { client },
+  );
+  const [
+    getHourlyUsageData,
+    { data: hourlyUsageData, loading: hourlyUsageLoading, error: hourlyUsageError, refetch: hourlyUsageRefetch },
+  ] = useLazyQuery(
+    gql`
+      ${hourlyUsageQuery}
+    `,
+    { client },
+  );
+
+  const [getProtocolTableData, { data: protocolTableData, loading: protocolTableLoading, error: protocolTableError }] =
+    useLazyQuery(
+      gql`
+        ${protocolTableQuery}
+      `,
+      { client, variables: { protocolId: protocolIdString } },
+    );
+
+  const [
+    getPoolsListData,
+    { data: poolsListData, loading: poolListLoading, error: poolsListError, refetch: poolsListRefetch },
+  ] = useLazyQuery(
+    gql`
+      ${poolsQuery}
+    `,
+    { client },
+  );
+  const [
+    getPoolTimeseriesData,
+    {
+      data: poolTimeseriesData,
+      loading: poolTimeseriesLoading,
+      error: poolTimeseriesError,
+      refetch: poolTimeseriesRefetch,
+    },
+  ] = useLazyQuery(
+    gql`
+      ${poolTimeseriesQuery}
+    `,
+    { variables: { poolId }, client },
+  );
+
+  const queryPoolOverview = gql`
+    ${poolOverview(protocolSchemaData?.protocols[0].type, schemaVersion)}
+  `;
+
+  const [getPoolsOverviewData, { data: dataPools, error: poolOverviewError, loading: poolOverviewLoading, refetch: poolOverviewRefetch }] =
+    useLazyQuery(queryPoolOverview, { client: client, variables: { skipAmt } });
+
   let tabNum = "1";
-  if (tabString.toUpperCase() === "POOL" || tabString.toUpperCase() === "MARKET") {
+  if (tabString.toUpperCase() === "POOLOVERVIEW") {
     tabNum = "2";
-  } else if (tabString.toUpperCase() === "EVENTS") {
+  } else if (tabString.toUpperCase() === "POOL") {
     tabNum = "3";
-  } else if (tabString.toUpperCase() === "POOLOVERVIEW") {
+  } else if (tabString.toUpperCase() === "EVENTS") {
     tabNum = "4";
   }
 
@@ -102,57 +180,97 @@ function ProtocolDashboard() {
     let skipAmtParam = "";
     let poolParam = "";
     if (newValue === "2") {
-      poolParam = `&poolId=${poolIdFromParam || poolId}`;
-      tabName = "pool";
-    } else if (newValue === "3") {
-      poolParam = `&poolId=${poolIdFromParam || poolId}`;
-      tabName = "events";
-    } else if (newValue === "4") {
       tabName = "poolOverview";
       if (skipAmt > 0) {
         skipAmtParam = `&skipAmt=${skipAmt}`;
       }
+    } else if (newValue === "3") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "pool";
+    } else if (newValue === "4") {
+      poolParam = `&poolId=${poolIdFromParam || poolId}`;
+      tabName = "events";
     }
     navigate(`?endpoint=${subgraphParam}&tab=${tabName}${protocolParam}${poolParam}${skipAmtParam}`);
     setTabValue(newValue);
   };
 
-  const queryPoolOverview = gql`
-    ${poolOverview(protocolSchemaData?.protocols[0].type, schemaVersion)}
-  `;
-
-  const clientPoolOverview = useMemo(() => NewClient(subgraphToQuery.url), [subgraphToQuery.url]);
-  const {
-    data: dataPools,
-    error: poolOverviewError,
-    loading: poolOverviewLoading,
-  } = useQuery(queryPoolOverview, {
-    client: clientPoolOverview,
-    variables: { skipAmt },
-  });
-
-  let pools: { [x: string]: any }[] = [];
-  if (dataPools && data) {
-    pools = dataPools[PoolNames[data?.protocols[0]?.type]];
-  }
 
   useEffect(() => {
     // If the schema query request was successful, make the full data query
     if (protocolSchemaData) {
       getData();
+      getProtocolTableData();
     }
-  }, [protocolSchemaData, getData]);
+  }, [protocolSchemaData, getData, getProtocolTableData]);
 
   useEffect(() => {
-    if (!subgraphToQuery.url && subgraphParam) {
-      let queryURL = `${SubgraphBaseUrl}${subgraphParam}`;
-      const parseCheck = isValidHttpUrl(subgraphParam);
-      if (parseCheck) {
-        queryURL = subgraphParam;
-      }
-      setSubgraphToQuery({ url: queryURL, version: subgraphToQuery.version });
+    if (protocolTableData) {
+      getFinancialsData();
     }
-  }, [subgraphToQuery.url, subgraphParam, subgraphToQuery.version]);
+  }, [protocolTableData, getFinancialsData]);
+
+  useEffect(() => {
+    if (financialsData) {
+      getDailyUsageData();
+    }
+  }, [financialsData, getDailyUsageData]);
+
+  useEffect(() => {
+    if (dailyUsageData) {
+      getHourlyUsageData();
+    }
+  }, [dailyUsageData, getHourlyUsageData]);
+
+  useEffect(() => {
+    if (poolId) {
+      getPoolTimeseriesData();
+    }
+  }, [poolId]);
+
+  useEffect(() => {
+    if (financialsError) {
+      financialsRefetch();
+    }
+  }, [financialsError]);
+
+  useEffect(() => {
+    if (dailyUsageError) {
+      dailyUsageRefetch();
+    }
+  }, [dailyUsageError]);
+
+  useEffect(() => {
+    if (hourlyUsageError) {
+      hourlyUsageRefetch();
+    }
+  }, [hourlyUsageError]);
+
+  useEffect(() => {
+    if (poolsListError) {
+      poolsListRefetch();
+    }
+  }, [poolsListError]);
+
+  useEffect(() => {
+    if (poolTimeseriesError) {
+      poolTimeseriesRefetch();
+    }
+  }, [poolTimeseriesError]);
+
+  useEffect(() => {
+    if (poolOverviewError) {
+      poolOverviewRefetch();
+    }
+  }, [poolOverviewError])
+
+  useEffect(() => {
+    if (tabValue === "2") {
+      getPoolsOverviewData();
+    } else if (tabValue === "3" || tabValue === "4") {
+      getPoolsListData();
+    }
+  }, [tabValue, getPoolsOverviewData, getPoolsListData]);
 
   useEffect(() => {
     document.getElementById(scrollToView)?.scrollIntoView();
@@ -160,16 +278,16 @@ function ProtocolDashboard() {
 
   // Error logging in case the full data request throws an error
   useEffect(() => {
-    console.log("--------------------Error Start-------------------------");
-    console.log(error, error ? Object.values(error) : null);
-    console.log(protocolSchemaQueryError ? Object.values(protocolSchemaQueryError) : null);
-    console.log("--------------------Error End---------------------------");
+    if (error || protocolSchemaQueryError) {
+      console.log("--------------------Error Start-------------------------");
+      console.log(error, protocolSchemaQueryError);
+      console.log("--------------------Error End---------------------------");
+    }
   }, [error, protocolSchemaQueryError]);
 
   // errorRender is the element to be rendered to display the error
   let errorDisplayProps = null;
   // Conditionals for calling the errorDisplay() function for the various types of errors
-  // Bottom to top priority an 'protocolSchemaQueryError' will override 'warning'
 
   if (protocolSchemaQueryError && !protocolSchemaQueryLoading) {
     // ...includes('has no field') checks if the error is describing a discrepancy between the protocol query and the fields in the protocol entity on the schema
@@ -185,6 +303,11 @@ function ProtocolDashboard() {
     errorDisplayProps = error;
   }
 
+  let pools: { [x: string]: any }[] = [];
+  if (dataPools && data) {
+    pools = dataPools[PoolNames[data?.protocols[0]?.type]];
+  }
+
   return (
     <div className="ProtocolDashboard">
       <DashboardHeader
@@ -198,29 +321,48 @@ function ProtocolDashboard() {
       ) : null}
       <ErrorDisplay
         errorObject={errorDisplayProps}
-        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
         protocolData={data}
         subgraphToQuery={subgraphToQuery}
+        setSubgraphToQuery={(x) => setSubgraphToQuery(x)}
       />
       {!!data && (
         <AllDataTabs
           data={data}
-          entities={entities}
           entitiesData={entitiesData}
           tabValue={tabValue}
-          protocolFields={protocolFields}
+          events={events}
+          pools={pools}
+          poolsListData={poolsListData}
+          poolListLoading={poolListLoading}
+          poolsListError={poolsListError}
           poolNames={PoolNames[data.protocols[0].type]}
           poolId={poolId}
           poolData={poolData}
-          events={events}
+          protocolFields={protocolFields}
+          protocolTableData={protocolTableData}
+          subgraphToQueryURL={subgraphToQuery.url}
+          skipAmt={skipAmt}
+          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
+          poolTimeseriesRequest={{ poolTimeseriesData, poolTimeseriesError, poolTimeseriesLoading }}
+          protocolTimeseriesData={{
+            financialsDailySnapshots: financialsData?.financialsDailySnapshots,
+            usageMetricsDailySnapshots: dailyUsageData?.usageMetricsDailySnapshots,
+            usageMetricsHourlySnapshots: hourlyUsageData?.usageMetricsHourlySnapshots,
+          }}
+          protocolTimeseriesLoading={{
+            financialsDailySnapshots: financialsLoading,
+            usageMetricsDailySnapshots: dailyUsageLoading,
+            usageMetricsHourlySnapshots: hourlyUsageLoading,
+          }}
+          protocolTimeseriesError={{
+            financialsDailySnapshots: financialsError,
+            usageMetricsDailySnapshots: dailyUsageError,
+            usageMetricsHourlySnapshots: hourlyUsageError,
+          }}
           setPoolId={(x) => setPoolId(x)}
           handleTabChange={(x, y) => handleTabChange(x, y)}
-          subgraphToQueryURL={subgraphToQuery.url}
-          pools={pools}
-          paginate={(x) => paginate(x)}
-          skipAmt={skipAmt}
           setProtocolId={(x) => setprotocolId(x)}
-          poolOverviewRequest={{ poolOverviewError, poolOverviewLoading }}
+          paginate={(x) => paginate(x)}
         />
       )}
     </div>

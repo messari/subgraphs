@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const SubgraphStatusQuery = gql`
   query Status($subgraphName: String) {
-    indexingStatusesForSubgraphName(subgraphName: $subgraphName) {
+    indexingStatusForCurrentVersion(subgraphName: $subgraphName) {
       subgraph
       node
       synced

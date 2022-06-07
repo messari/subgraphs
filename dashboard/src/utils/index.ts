@@ -1,5 +1,16 @@
 import moment from "moment";
-import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloError,
+  gql,
+  HttpLink,
+  InMemoryCache,
+  LazyQueryResult,
+  NormalizedCacheObject,
+  QueryTuple,
+  useLazyQuery,
+} from "@apollo/client";
+import { useEffect, useRef, useState } from "react";
 
 export const toDate = (timestamp: number, hour: boolean = false) => {
   let formatString = "YYYY-MM-DD";
@@ -30,6 +41,28 @@ export function NewClient(url: string): ApolloClient<NormalizedCacheObject> {
   });
 }
 
+export function useInterval(callback: any, delay: number) {
+  const savedCallback = useRef<any>();
+
+  // Remember the latest callback.
+  useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
+
+  // Set up the interval.
+  useEffect(() => {
+    function tick() {
+      if (savedCallback) {
+        savedCallback?.current();
+      }
+    }
+    if (delay !== null) {
+      let id = setInterval(tick, delay);
+      return () => clearInterval(id);
+    }
+  }, [delay]);
+}
+
 export function convertTokenDecimals(value: string, decimals: number): number {
   if (isNaN(Number(value)) || !decimals || Number(value) === 0) {
     return 0;
@@ -47,3 +80,24 @@ export const parseSubgraphName = (url: string) => {
 };
 
 export const toPercent = (cur: number, total: number): number => parseFloat(((cur / total) * 100).toFixed(2));
+
+// export default function useRetryableQuery(query: string, options: { [x: string]: any } = {}) {
+//   const [refetchError, setRefetchError] = useState<ApolloError | undefined>(undefined);
+//   const result: Promise<LazyQueryResult<TData, TVariables>> = useLazyQuery(gql`${query}`, options);
+//   const variables = options.variables || {};
+//   useEffect(() => {
+//     setRefetchError(undefined);
+//   }, Object.values(variables));
+//   return {
+//     ...result,
+//     networkStatus: refetchError ? 8 : result.networkStatus,
+//     error: refetchError || result.error,
+//     refetch: () => {
+//       setRefetchError(undefined);
+//       return result.refetch().catch((err: any) => {
+//         setRefetchError(err);
+//         return Promise.reject(err);
+//       });
+//     },
+//   };
+// }

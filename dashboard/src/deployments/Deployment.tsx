@@ -1,13 +1,13 @@
 import React, { MouseEventHandler, useContext, useMemo } from "react";
 import { latestSchemaVersion } from "../constants";
 import { useNavigate } from "react-router";
-import { ApolloClient, HttpLink, InMemoryCache, useQuery } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, NormalizedCacheObject, useQuery } from "@apollo/client";
 import { NewClient, parseSubgraphName, toPercent } from "../utils";
 import { ProtocolQuery } from "../queries/protocolQuery";
 import { SubgraphStatusQuery } from "../queries/subgraphStatusQuery";
 import { useEffect } from "react";
 import { styled } from "../styled";
-import { alpha, Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { alpha, Box, Button, Card, CardContent, CircularProgress, Typography } from "@mui/material";
 import DeploymentsContext from "./DeploymentsContext";
 import { NetworkLogo } from "../common/NetworkLogo";
 
@@ -72,33 +72,26 @@ interface DeploymentProps {
   networkName: string;
   deployment: string;
   subgraphID: string;
+  clientIndexing: ApolloClient<NormalizedCacheObject>;
 }
 
 // This component is for each individual subgraph
-export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentProps) => {
+export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing }: DeploymentProps) => {
   const deploymentsContext = useContext(DeploymentsContext);
   const navigate = useNavigate();
-  const clientIndexing = useMemo(
-    () =>
-      new ApolloClient({
-        link: new HttpLink({
-          uri: "https://api.thegraph.com/index-node/graphql",
-        }),
-        cache: new InMemoryCache(),
-      }),
-    [],
-  );
-
+  const navigateToSubgraph = (url: string) => () => {
+    navigate(`subgraph?endpoint=${url}&tab=protocol`);
+  };
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
   const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery, {
     variables: { subgraphName },
     client: clientIndexing,
   });
-  const { nonFatalErrors, fatalError, synced } = status?.indexingStatusesForSubgraphName[0] ?? {};
+  const { nonFatalErrors, fatalError, synced } = status?.indexingStatusForCurrentVersion ?? {};
 
   const client = useMemo(() => NewClient(deployment), [deployment]);
-  const { data, error } = useQuery(ProtocolQuery, {
+  const { data, error, loading } = useQuery(ProtocolQuery, {
     client,
   });
 
@@ -106,7 +99,9 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
   const { schemaVersion } = protocol ?? {};
 
   useEffect(() => {
-    console.log("DEPLOYMENT ERR?", error, errorIndexing, status, subgraphName);
+    if (error || errorIndexing) {
+      console.log("DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
+    }
   }, [error]);
 
   const { schemaOutdated, indexedSuccess } = useMemo(() => {
@@ -115,20 +110,56 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
       indexedSuccess: synced && schemaVersion === latestSchemaVersion,
     };
   }, [schemaVersion, fatalError, synced]);
-
-  if (!status) {
+  if (loading) {
+    return <CircularProgress sx={{ margin: 6 }} size={50} />;
+  }
+  if (error) {
     return null;
+  }
+  if (!status) {
+    let errorMsg = null;
+    if (errorIndexing) {
+      console.log(errorIndexing, Object.values(errorIndexing));
+      errorMsg = (
+        <Box marginTop="10px" gap={2} alignItems="center">
+          <span>Indexing status could not be pulled: "{errorIndexing.message.slice(0, 100)}..."</span>
+        </Box>
+      );
+    }
+    return (
+      <StyledDeployment
+        onClick={navigateToSubgraph(deployment)}
+        sx={{ width: "70%" }}
+        $styleRules={{
+          schemaOutdated,
+          nonFatalErrors: false,
+          fatalError: false,
+          success: false,
+        }}
+      >
+        <DeploymentBackground>
+          <CardContent>
+            <Box display="flex" gap={3} alignItems="center">
+              <NetworkLogo network={networkName} />
+              <Typography variant="h5" align="center">
+                {networkName}
+              </Typography>
+            </Box>
+            <Box marginTop="10px" gap={2} alignItems="center">
+              <span>{deployment}</span>
+            </Box>
+            {errorMsg}
+          </CardContent>
+        </DeploymentBackground>
+      </StyledDeployment>
+    );
   }
   const indexed = synced
     ? 100
     : toPercent(
-        status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number,
-        status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number,
+        status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
+        status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
       );
-
-  const navigateToSubgraph = (url: string) => () => {
-    navigate(`subgraph?endpoint=${url}&tab=protocol`);
-  };
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
@@ -167,11 +198,11 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
           </CardRow>
           <CardRow>
             <span>Latest Block:</span>{" "}
-            <span>{status.indexingStatusesForSubgraphName[0].chains[0].latestBlock.number}</span>
+            <span>{status.indexingStatusForCurrentVersion.chains[0].latestBlock.number}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>
-            <span>{status.indexingStatusesForSubgraphName[0].chains[0].chainHeadBlock.number}</span>
+            <span>{status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number}</span>
           </CardRow>
           <CardRow $warning={schemaOutdated}>
             <span>Schema version:</span> <span>{protocol?.schemaVersion || "N/A"}</span>
@@ -184,7 +215,7 @@ export const Deployment = ({ networkName, deployment, subgraphID }: DeploymentPr
           </CardRow>
           <CardRow>
             <span>Entity count:</span>{" "}
-            <span>{parseInt(status.indexingStatusesForSubgraphName[0].entityCount).toLocaleString()}</span>
+            <span>{parseInt(status.indexingStatusForCurrentVersion.entityCount).toLocaleString()}</span>
           </CardRow>
         </CardContent>
         {(nonFatalErrors.length > 0 || fatalError) && (
