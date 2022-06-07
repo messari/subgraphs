@@ -552,10 +552,10 @@ function updateMarket(
   }
 
   // grab prices
-  let customPrice = getUsdPricePerToken(
-    Address.fromString(market.inputToken)
+  let customPrice = getUsdPricePerToken(Address.fromString(market.inputToken));
+  let underlyingTokenPriceUSD = customPrice.usdPrice.div(
+    customPrice.decimalsBaseTen
   );
-  let underlyingTokenPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
@@ -679,6 +679,9 @@ function updateMarket(
   let troller = FuseComptroller.bind(comptroller);
   let tryRewardDistributors = troller.try_getRewardsDistributors();
   if (!tryRewardDistributors.reverted) {
+    log.warning("Reward Distributors: {}", [
+      tryRewardDistributors.value.toString(),
+    ]); // TODO: remove this line
     let rewardDistributors = tryRewardDistributors.value;
     for (let i = 0; i < rewardDistributors.length; i++) {
       updateRewards(rewardDistributors[i], marketID, blocksPerDay);
@@ -737,6 +740,7 @@ function updateMarket(
 }
 
 // this function will "override" the getTokenPrice() function in ../../src/mapping.ts
+// TODO: remove this function
 function getTokenPriceUSD(
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
   underlyingDecimals: i32
@@ -793,6 +797,9 @@ function updateRewards(
   );
   let tryRewardToken = distributor.try_rewardToken();
 
+  if (!tryRewardToken.reverted) {
+    log.warning("reward distribution: {}", [tryRewardToken.value.toHexString()]); // TODO: remove this line
+  }
   // create reward token if available
   if (!tryRewardToken.reverted) {
     let token = Token.load(tryRewardToken.value.toHexString());
@@ -806,10 +813,10 @@ function updateRewards(
     }
 
     // get reward token price
-    let customPrice = getUsdPricePerToken(
-      Address.fromString(token.id)
+    let customPrice = getUsdPricePerToken(Address.fromString(token.id));
+    let rewardTokenPriceUSD = customPrice.usdPrice.div(
+      customPrice.decimalsBaseTen
     );
-    let rewardTokenPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
 
     // borrow speeds
     if (!tryBorrowSpeeds.reverted) {
