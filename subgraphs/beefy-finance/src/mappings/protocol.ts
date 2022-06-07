@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import { Vault, YieldAggregator } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
@@ -64,6 +64,11 @@ export function updateProtocolAndSave(
     protocol.hourlyUsageMetrics = protocol.hourlyUsageMetrics.concat([
       hourlySnapshot.id,
     ]);
+
+  protocol.cumulativeUniqueUsers = getUniqueUsers(protocol, [
+    BIGINT_ZERO,
+    block.timestamp,
+  ]);
 
   const dailyFinancialSnapshot = updateDailyFinancialSnapshot(block, protocol);
   if (

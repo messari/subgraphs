@@ -1,4 +1,4 @@
-import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   FinancialsDailySnapshot,
@@ -113,7 +113,10 @@ export function getUniqueUsers(
   protocol: YieldAggregator,
   timeframe: BigInt[]
 ): BigInt {
-  let vault: Vault | null, deposit: Deposit | null, user: string;
+  let vault: Vault | null,
+    deposit: Deposit | null,
+    withdraw: Withdraw | null,
+    user: string;
   let users: string[] = [];
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
@@ -129,6 +132,25 @@ export function getUniqueUsers(
           deposit.timestamp <= timeframe[1]
         ) {
           user = deposit.from;
+          for (let k = 0; k < users.length; k++) {
+            if (users[k] == user) {
+              break;
+            }
+            if (k == users.length - 1) {
+              users.push(user);
+            }
+          }
+        }
+      }
+      for (let j = 0; j < vault.withdraws.length; j++) {
+        withdraw = Withdraw.load(vault.deposits[j]);
+        if (withdraw == null) {
+          continue;
+        } else if (
+          withdraw.timestamp >= timeframe[0] &&
+          withdraw.timestamp <= timeframe[1]
+        ) {
+          user = withdraw.from;
           for (let k = 0; k < users.length; k++) {
             if (users[k] == user) {
               break;
