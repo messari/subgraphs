@@ -273,14 +273,14 @@ export function getVaultDailyRevenues(
   vault: Vault,
   block: ethereum.Block
 ): BigDecimal[] {
-  const lastSnapshot = VaultDailySnapshot.load(
-    vault.dailySnapshots[vault.dailySnapshots.length - 1]
+  const previousSnapshot = VaultDailySnapshot.load(
+    vault.dailySnapshots[vault.dailySnapshots.length - 2]
   );
   let lastTvl = BIGDECIMAL_ZERO;
   let startBlock = BIGINT_ZERO;
-  if (lastSnapshot) {
-    lastTvl = lastSnapshot.totalValueLockedUSD;
-    startBlock = lastSnapshot.blockNumber;
+  if (previousSnapshot) {
+    lastTvl = previousSnapshot.totalValueLockedUSD;
+    startBlock = previousSnapshot.blockNumber;
   }
   const currentSnapshot = updateVaultDailySnapshot(block, vault);
   let currentTotalRevenue = currentSnapshot.totalValueLockedUSD.minus(lastTvl);

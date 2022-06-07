@@ -1,4 +1,4 @@
-import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   FinancialsDailySnapshot,
@@ -149,10 +149,8 @@ export function getUniqueUsers(
         ) {
           user = withdraw.from;
           if (users.includes(user)) {
-            log.warning("user already exists", []);
             continue;
           } else {
-            log.warning("user added", []);
             users.push(user);
           }
         }
