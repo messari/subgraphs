@@ -1,4 +1,4 @@
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Vault, YieldAggregator } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import {
@@ -11,7 +11,6 @@ import {
 import { getVaultDailyRevenues } from "./vault";
 
 export function createBeefyFinance(
-  network: string,
   vaultId: string,
   block: ethereum.Block
 ): YieldAggregator {
@@ -21,7 +20,7 @@ export function createBeefyFinance(
   beefy.schemaVersion = "1.2.1";
   beefy.subgraphVersion = "0.0.2";
   //beefy.methodologyVersion = "Abboh";
-  beefy.network = network.toUpperCase();
+  beefy.network = dataSource.network().toUpperCase();
   beefy.type = "YIELD";
   beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
   //beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;
@@ -117,8 +116,8 @@ export function getDailyRevenuesUsd(
       continue;
     } else {
       revenues = getVaultDailyRevenues(vault, block);
-      dailyRevenueProtocolSide = dailyRevenueProtocolSide.plus(revenues[0]);
-      dailyRevenueSupplySide = dailyRevenueSupplySide.plus(revenues[1]);
+      dailyRevenueSupplySide = dailyRevenueSupplySide.plus(revenues[0]);
+      dailyRevenueProtocolSide = dailyRevenueProtocolSide.plus(revenues[1]);
       dailyTotalRevenueUsd = dailyTotalRevenueUsd.plus(revenues[2]);
     }
   }

@@ -15,18 +15,14 @@ import {
   getTokenOrCreate,
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
-import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { BIGINT_TEN, ZERO_ADDRESS_STRING } from "../prices/common/constants";
 
 export function createWithdraw(
   event: WithdrawEvent,
-  withdrawnAmount: BigInt,
-  networkSuffix: string
+  withdrawnAmount: BigInt
 ): Withdraw {
   const withdraw = new Withdraw(
-    event.transaction.hash
-      .toHexString()
-      .concat(`-${event.transaction.index}`)
-      .concat(networkSuffix)
+    event.transaction.hash.toHexString().concat(`-${event.transaction.index}`)
   );
 
   withdraw.hash = event.transaction.hash.toHexString();
@@ -38,22 +34,19 @@ export function createWithdraw(
   withdraw.timestamp = event.block.timestamp;
 
   const strategyContract = BeefyStrategy.bind(event.address);
-  withdraw.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
+  const asset = getTokenOrCreate(strategyContract.want());
+  withdraw.asset = asset.id;
   withdraw.amount = withdrawnAmount;
   withdraw.amountUSD = getLastPriceUSD(
     strategyContract.want(),
-    networkSuffix,
     event.block.number
-  ).times(new BigDecimal(withdrawnAmount));
+  )
+    .times(new BigDecimal(withdrawnAmount))
+    .div(new BigDecimal(BIGINT_TEN.pow(asset.decimals as u8)));
 
-  withdraw.vault = getVaultFromStrategyOrCreate(
-    event.address,
-    event.block,
-    networkSuffix
-  ).id;
+  withdraw.vault = getVaultFromStrategyOrCreate(event.address, event.block).id;
   withdraw.protocol = getBeefyFinanceOrCreate(
-    dataSource.network(),
-    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    getVaultFromStrategyOrCreate(event.address, event.block).id,
     event.block
   ).id;
 
@@ -71,11 +64,7 @@ export function getOrCreateFirstWithdraw(
 
     withdraw.hash = ZERO_ADDRESS_STRING;
     withdraw.logIndex = 0;
-    withdraw.protocol = getBeefyFinanceOrCreate(
-      dataSource.network(),
-      vault.id,
-      currentBlock
-    ).id;
+    withdraw.protocol = getBeefyFinanceOrCreate(vault.id, currentBlock).id;
     withdraw.from = ZERO_ADDRESS_STRING;
     withdraw.to = ZERO_ADDRESS_STRING;
     withdraw.blockNumber = vault.createdBlockNumber;

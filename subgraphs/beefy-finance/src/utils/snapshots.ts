@@ -8,13 +8,19 @@ import {
 
 export function getVaultDailyId(block: ethereum.Block, vault: Vault): string {
   const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32());
-  const id = vault.id.concat("-").concat(daysSinceEpoch);
+  const id = vault.id
+    .concat("-")
+    .concat(daysSinceEpoch)
+    .concat("d");
   return id;
 }
 
 export function getVaultHourlyId(block: ethereum.Block, vault: Vault): string {
   const daysSinceEpoch = getHoursSinceEpoch(block.timestamp.toI32());
-  const id = vault.id.concat("-").concat(daysSinceEpoch);
+  const id = vault.id
+    .concat("-")
+    .concat(daysSinceEpoch)
+    .concat("h");
   return id;
 }
 

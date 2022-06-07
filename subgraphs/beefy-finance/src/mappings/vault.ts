@@ -1,9 +1,4 @@
-import {
-  Address,
-  BigDecimal,
-  dataSource,
-  BigInt,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import {
   Vault,
@@ -36,33 +31,26 @@ import {
   BIGDECIMAL_ZERO,
   BIGINT_TEN,
   BIGINT_ZERO,
-  NETWORK_SUFFIX_MAP,
 } from "../prices/common/constants";
 
 export function createVaultFromStrategy(
   strategyAddress: Address,
   currentBlock: ethereum.Block
 ): Vault {
-  let network = dataSource.network();
-  let NETWORK_SUFFIX = NETWORK_SUFFIX_MAP.get(network);
-  if (!NETWORK_SUFFIX) NETWORK_SUFFIX = "";
   const strategyContract = BeefyStrategy.bind(strategyAddress);
   const vaultAddress = strategyContract.vault();
-  let vault = Vault.load(vaultAddress.toHexString() + NETWORK_SUFFIX);
+  let vault = Vault.load(vaultAddress.toHexString());
   if (!vault) {
-    vault = new Vault(vaultAddress.toHexString() + NETWORK_SUFFIX);
+    vault = new Vault(vaultAddress.toHexString());
   }
   const vaultContract = BeefyVault.bind(vaultAddress);
 
   vault.name = fetchTokenName(vaultAddress);
   vault.symbol = fetchTokenSymbol(vaultAddress);
-  vault.strategy = strategyAddress.toHexString() + NETWORK_SUFFIX;
+  vault.strategy = strategyAddress.toHexString();
 
-  vault.inputToken = getTokenOrCreate(
-    strategyContract.want(),
-    NETWORK_SUFFIX
-  ).id;
-  vault.outputToken = getTokenOrCreate(vaultAddress, NETWORK_SUFFIX).id;
+  vault.inputToken = getTokenOrCreate(strategyContract.want()).id;
+  vault.outputToken = getTokenOrCreate(vaultAddress).id;
 
   vault.fees = getFees(vault.id, strategyContract);
 
@@ -90,10 +78,9 @@ export function createVaultFromStrategy(
     );
   }
 
-  const inputToken = getTokenOrCreate(strategyContract.want(), NETWORK_SUFFIX);
+  const inputToken = getTokenOrCreate(strategyContract.want());
   vault.totalValueLockedUSD = getLastPriceUSD(
     strategyContract.want(),
-    NETWORK_SUFFIX,
     currentBlock.number
   )
     .times(new BigDecimal(vault.inputTokenBalance))
@@ -108,7 +95,7 @@ export function createVaultFromStrategy(
   vault.deposits = [getOrCreateFirstDeposit(vault, currentBlock).id];
   vault.withdraws = [getOrCreateFirstWithdraw(vault, currentBlock).id];
 
-  vault.protocol = getBeefyFinanceOrCreate(network, vault.id, currentBlock).id;
+  vault.protocol = getBeefyFinanceOrCreate(vault.id, currentBlock).id;
   vault.dailySnapshots = [updateVaultDailySnapshot(currentBlock, vault).id];
   vault.hourlySnapshots = [updateVaultHourlySnapshot(currentBlock, vault).id];
 
@@ -117,39 +104,25 @@ export function createVaultFromStrategy(
 }
 
 export function handleDeposit(event: Deposit): void {
-  let network = dataSource.network();
-  let NETWORK_SUFFIX = NETWORK_SUFFIX_MAP.get(network);
-  if (!NETWORK_SUFFIX) NETWORK_SUFFIX = "";
-  const vault = getVaultFromStrategyOrCreate(
-    event.address,
-    event.block,
-    NETWORK_SUFFIX
-  );
+  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
 
   if (vault.deposits[0] === "MockDeposit" + vault.id) {
     const depositedAmount = event.params.tvl;
-    const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
+    const deposit = createDeposit(event, depositedAmount);
     vault.deposits = [deposit.id];
   } else {
     const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-    const deposit = createDeposit(event, depositedAmount, NETWORK_SUFFIX);
+    const deposit = createDeposit(event, depositedAmount);
     vault.deposits = vault.deposits.concat([deposit.id]);
   }
 
-  updateVaultAndSave(vault, event.block, NETWORK_SUFFIX);
+  updateVaultAndSave(vault, event.block);
 }
 
 export function handleWithdraw(event: Withdraw): void {
-  let network = dataSource.network();
-  let NETWORK_SUFFIX = NETWORK_SUFFIX_MAP.get(network);
-  if (!NETWORK_SUFFIX) NETWORK_SUFFIX = "";
-  const vault = getVaultFromStrategyOrCreate(
-    event.address,
-    event.block,
-    NETWORK_SUFFIX
-  );
+  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
   const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
-  const withdraw = createWithdraw(event, withdrawnAmount, NETWORK_SUFFIX);
+  const withdraw = createWithdraw(event, withdrawnAmount);
 
   if (vault.withdraws[0] === "MockWithdraw" + vault.id) {
     vault.withdraws = [withdraw.id];
@@ -157,15 +130,13 @@ export function handleWithdraw(event: Withdraw): void {
     vault.withdraws = vault.withdraws.concat([withdraw.id]);
   }
 
-  updateVaultAndSave(vault, event.block, NETWORK_SUFFIX);
+  updateVaultAndSave(vault, event.block);
 }
 
-export function updateVaultAndSave(
-  vault: Vault,
-  block: ethereum.Block,
-  networkSuffix: string
-): void {
-  const vaultContract = BeefyVault.bind(getAddressFromId(vault.id));
+export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
+  const vaultContract = BeefyVault.bind(
+    Address.fromString(vault.id.split("x")[1])
+  );
   let call = vaultContract.try_balance();
   if (call.reverted) {
     vault.inputTokenBalance = BIGINT_ZERO;
@@ -191,12 +162,8 @@ export function updateVaultAndSave(
   if (wantCall.reverted) {
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
-    const inputToken = getTokenOrCreate(wantCall.value, networkSuffix);
-    vault.totalValueLockedUSD = getLastPriceUSD(
-      wantCall.value,
-      networkSuffix,
-      block.number
-    )
+    const inputToken = getTokenOrCreate(wantCall.value);
+    vault.totalValueLockedUSD = getLastPriceUSD(wantCall.value, block.number)
       .times(new BigDecimal(vault.inputTokenBalance))
       .div(new BigDecimal(BIGINT_TEN.pow(inputToken.decimals as u8)));
   }
@@ -209,15 +176,16 @@ export function updateVaultAndSave(
 
   const dailySnapshot = updateVaultDailySnapshot(block, vault);
   if (
-    vault.dailySnapshots[vault.dailySnapshots.length - 1] !== dailySnapshot.id
-  )
+    vault.dailySnapshots[vault.dailySnapshots.length - 1] != dailySnapshot.id
+  ) {
     vault.dailySnapshots = vault.dailySnapshots.concat([dailySnapshot.id]);
+  }
   const hourlySnapshot = updateVaultHourlySnapshot(block, vault);
   if (
-    vault.hourlySnapshots[vault.hourlySnapshots.length - 1] !==
-    hourlySnapshot.id
-  )
+    vault.hourlySnapshots[vault.hourlySnapshots.length - 1] != hourlySnapshot.id
+  ) {
     vault.hourlySnapshots = vault.hourlySnapshots.concat([hourlySnapshot.id]);
+  }
 
   vault.save();
 }
@@ -273,65 +241,87 @@ export function getVaultDailyRevenues(
   vault: Vault,
   block: ethereum.Block
 ): BigDecimal[] {
-  const previousSnapshot = VaultDailySnapshot.load(
-    vault.dailySnapshots[vault.dailySnapshots.length - 2]
-  );
+  updateVaultAndSave(vault, block);
   let lastTvl = BIGDECIMAL_ZERO;
   let startBlock = BIGINT_ZERO;
-  if (previousSnapshot) {
-    lastTvl = previousSnapshot.totalValueLockedUSD;
-    startBlock = previousSnapshot.blockNumber;
-  }
-  const currentSnapshot = updateVaultDailySnapshot(block, vault);
-  let currentTotalRevenue = currentSnapshot.totalValueLockedUSD.minus(lastTvl);
-  for (let i = 0; i < vault.deposits.length; i++) {
-    const deposit = DepositEntity.load(vault.deposits[i]);
-    if (!deposit) continue;
-    if (deposit.blockNumber <= startBlock || deposit.blockNumber > block.number)
-      continue;
-    currentTotalRevenue = currentTotalRevenue.minus(deposit.amountUSD);
-  }
-  for (let i = 0; i < vault.withdraws.length; i++) {
-    const withdraw = WithdrawEntity.load(vault.withdraws[i]);
-    if (!withdraw) continue;
-    if (
-      withdraw.blockNumber <= startBlock ||
-      withdraw.blockNumber > block.number
-    )
-      continue;
-    currentTotalRevenue = currentTotalRevenue.plus(withdraw.amountUSD);
-  }
-  let currentRevenueProtocolSide = BIGDECIMAL_ZERO;
-  let currentRevenueSupplySide = currentTotalRevenue;
-  let fee: VaultFee | null;
-  for (let i = 0; i < vault.fees.length; i++) {
-    fee = VaultFee.load(vault.fees[i]);
-    if (fee) {
-      if (fee.id == "PERFORMANCE_FEE-" + vault.id) {
-        currentRevenueProtocolSide = currentTotalRevenue.times(
-          fee.feePercentage
-        );
-        continue;
-      }
-
-      if (fee.id == "STRATEGIST_FEE-" + vault.id) {
-        currentRevenueSupplySide = currentRevenueSupplySide.minus(
-          currentTotalRevenue.times(fee.feePercentage)
-        );
-        continue;
-      }
-
-      if (fee.id == "MANAGEMENT_FEE-" + vault.id) {
-        currentRevenueSupplySide = currentRevenueSupplySide.minus(
-          currentTotalRevenue.times(fee.feePercentage)
-        );
-        continue;
+  const currentSnapshot = VaultDailySnapshot.load(
+    vault.dailySnapshots[vault.dailySnapshots.length - 1]
+  );
+  if (currentSnapshot) {
+    if (vault.dailySnapshots.length - 2 >= 0) {
+      const previousSnapshot = VaultDailySnapshot.load(
+        vault.dailySnapshots[vault.dailySnapshots.length - 2]
+      );
+      if (previousSnapshot) {
+        log.warning(currentSnapshot.id + "!=" + previousSnapshot.id, []);
+        lastTvl = previousSnapshot.totalValueLockedUSD;
+        startBlock = previousSnapshot.blockNumber;
       }
     }
+    let currentTotalRevenue = currentSnapshot.totalValueLockedUSD.minus(
+      lastTvl
+    );
+    log.warning("lastTvl: " + lastTvl.toString(), []);
+    log.warning(
+      "currentTvl: " + currentSnapshot.totalValueLockedUSD.toString(),
+      []
+    );
+    log.warning("currentTotalRevenue: " + currentTotalRevenue.toString(), []);
+    for (let j = 0; j < vault.withdraws.length; j++) {
+      const withdraw = WithdrawEntity.load(vault.withdraws[j]);
+      if (
+        withdraw &&
+        withdraw.blockNumber > startBlock &&
+        withdraw.blockNumber <= block.number
+      ) {
+        log.warning("adding usd: " + withdraw.amountUSD.toString(), []);
+        currentTotalRevenue = currentTotalRevenue.plus(withdraw.amountUSD);
+      }
+      for (let i = 0; i < vault.deposits.length; i++) {
+        const deposit = DepositEntity.load(vault.deposits[i]);
+        if (
+          deposit &&
+          deposit.blockNumber > startBlock &&
+          deposit.blockNumber <= block.number
+        ) {
+          log.warning("subtracting usd: " + deposit.amountUSD.toString(), []);
+          currentTotalRevenue = currentTotalRevenue.minus(deposit.amountUSD);
+        }
+      }
+    }
+    let currentRevenueProtocolSide = BIGDECIMAL_ZERO;
+    let currentRevenueSupplySide = currentTotalRevenue;
+    let fee: VaultFee | null;
+    for (let k = 0; k < vault.fees.length; k++) {
+      fee = VaultFee.load(vault.fees[k]);
+      if (fee) {
+        if (fee.id == "PERFORMANCE_FEE-" + vault.id) {
+          currentRevenueProtocolSide = currentRevenueProtocolSide.plus(
+            currentTotalRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
+          );
+          continue;
+        }
+
+        if (fee.id == "STRATEGIST_FEE-" + vault.id) {
+          currentRevenueSupplySide = currentRevenueSupplySide.minus(
+            currentTotalRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
+          );
+          continue;
+        }
+
+        if (fee.id == "MANAGEMENT_FEE-" + vault.id) {
+          currentRevenueSupplySide = currentRevenueSupplySide.minus(
+            currentTotalRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
+          );
+          continue;
+        }
+      }
+    }
+    return [
+      currentRevenueSupplySide.minus(currentRevenueProtocolSide),
+      currentRevenueProtocolSide,
+      currentTotalRevenue,
+    ];
   }
-  return [
-    currentRevenueProtocolSide,
-    currentRevenueSupplySide,
-    currentTotalRevenue,
-  ];
+  return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 }

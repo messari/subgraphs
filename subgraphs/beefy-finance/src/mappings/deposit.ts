@@ -15,18 +15,15 @@ import {
   getTokenOrCreate,
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
-import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { BIGINT_TEN, ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import { ERC20 } from "../../generated/ExampleVault/ERC20";
 
 export function createDeposit(
   event: DepositEvent,
-  depositedAmount: BigInt,
-  networkSuffix: string
+  depositedAmount: BigInt
 ): Deposit {
   const deposit = new Deposit(
-    event.transaction.hash
-      .toHexString()
-      .concat(`-${event.transaction.index}`)
-      .concat(networkSuffix)
+    event.transaction.hash.toHexString().concat(`-${event.transaction.index}`)
   );
 
   deposit.hash = event.transaction.hash.toHexString();
@@ -38,23 +35,20 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
 
   const strategyContract = BeefyStrategy.bind(event.address);
-  deposit.asset = getTokenOrCreate(strategyContract.want(), networkSuffix).id;
+  const asset = getTokenOrCreate(strategyContract.want());
+  deposit.asset = asset.id;
   deposit.amount = depositedAmount;
   deposit.amountUSD = getLastPriceUSD(
     strategyContract.want(),
-    networkSuffix,
     event.block.number
-  ).times(new BigDecimal(depositedAmount));
+  )
+    .times(new BigDecimal(depositedAmount))
+    .div(new BigDecimal(BIGINT_TEN.pow(asset.decimals as u8)));
 
-  deposit.vault = getVaultFromStrategyOrCreate(
-    event.address,
-    event.block,
-    networkSuffix
-  ).id;
+  deposit.vault = getVaultFromStrategyOrCreate(event.address, event.block).id;
 
   deposit.protocol = getBeefyFinanceOrCreate(
-    dataSource.network(),
-    getVaultFromStrategyOrCreate(event.address, event.block, networkSuffix).id,
+    getVaultFromStrategyOrCreate(event.address, event.block).id,
     event.block
   ).id;
 
@@ -72,11 +66,7 @@ export function getOrCreateFirstDeposit(
 
     deposit.hash = ZERO_ADDRESS_STRING;
     deposit.logIndex = 0;
-    deposit.protocol = getBeefyFinanceOrCreate(
-      dataSource.network(),
-      vault.id,
-      currentBlock
-    ).id;
+    deposit.protocol = getBeefyFinanceOrCreate(vault.id, currentBlock).id;
     deposit.from = ZERO_ADDRESS_STRING;
     deposit.to = ZERO_ADDRESS_STRING;
     deposit.blockNumber = vault.createdBlockNumber;
