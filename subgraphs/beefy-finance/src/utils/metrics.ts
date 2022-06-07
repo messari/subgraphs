@@ -1,4 +1,4 @@
-import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   FinancialsDailySnapshot,
@@ -113,7 +113,10 @@ export function getUniqueUsers(
   protocol: YieldAggregator,
   timeframe: BigInt[]
 ): BigInt {
-  let vault: Vault | null, deposit: Deposit | null, user: string;
+  let vault: Vault | null,
+    deposit: Deposit | null,
+    withdraw: Withdraw | null,
+    user: string;
   let users: string[] = [];
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
@@ -122,26 +125,39 @@ export function getUniqueUsers(
     } else {
       for (let j = 0; j < vault.deposits.length; j++) {
         deposit = Deposit.load(vault.deposits[j]);
-        if (deposit == null) {
+        if (!deposit) {
           continue;
         } else if (
-          deposit.timestamp >= timeframe[0] &&
+          deposit.timestamp > timeframe[0] &&
           deposit.timestamp <= timeframe[1]
         ) {
           user = deposit.from;
-          for (let k = 0; k < users.length; k++) {
-            if (users[k] == user) {
-              break;
-            }
-            if (k == users.length - 1) {
-              users.push(user);
-            }
+          if (users.includes(user)) {
+            continue;
+          } else {
+            users.push(user);
+          }
+        }
+      }
+      for (let j = 0; j < vault.withdraws.length; j++) {
+        withdraw = Withdraw.load(vault.deposits[j]);
+        if (!withdraw) {
+          continue;
+        } else if (
+          withdraw.timestamp >= timeframe[0] &&
+          withdraw.timestamp <= timeframe[1]
+        ) {
+          user = withdraw.from;
+          if (users.includes(user)) {
+            continue;
+          } else {
+            users.push(user);
           }
         }
       }
     }
   }
-  return new BigInt(users.length);
+  return BigInt.fromI32(users.length);
 }
 
 function getDepositCount(

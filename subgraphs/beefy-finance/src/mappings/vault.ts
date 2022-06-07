@@ -1,4 +1,4 @@
-import { Address, BigDecimal, dataSource, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import {
   Vault,
@@ -98,7 +98,6 @@ export function createVaultFromStrategy(
   vault.withdraws = [getOrCreateFirstWithdraw(vault, currentBlock).id];
 
   vault.protocol = getBeefyFinanceOrCreate(network, vault.id, currentBlock).id;
-  log.warning("qualcosa", [vault.id]);
   vault.dailySnapshots = [updateVaultDailySnapshot(currentBlock, vault).id];
   vault.hourlySnapshots = [updateVaultHourlySnapshot(currentBlock, vault).id];
 

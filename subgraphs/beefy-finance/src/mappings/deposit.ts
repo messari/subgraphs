@@ -16,7 +16,6 @@ import {
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
 import { ZERO_ADDRESS_STRING } from "../prices/common/constants";
-import { updateProtocolAndSave } from "./protocol";
 
 export function createDeposit(
   event: DepositEvent,
