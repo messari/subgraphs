@@ -7,7 +7,7 @@ import { MasterPlatypus } from "../../generated/MasterPlatypus/MasterPlatypus";
 import { MasterPlatypusOld } from "../../generated/MasterPlatypusOld/MasterPlatypusOld";
 import { SimpleRewarder } from "../../generated/MasterPlatypus/SimpleRewarder";
 
-import { PTPAddress } from "../common/constants";
+import { BIGINT_ZERO, MasterPlatypusOld_ADDRESS, PTPAddress, ZERO_ADDRESS } from "../common/constants";
 import { tokenAmountToUSDAmount } from "../common/utils/numbers";
 import { emissionsPerDay } from "../common/rewards";
 
@@ -99,6 +99,7 @@ export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address,
 
 export function getAssetForRewardsOld<T>(event: T): _Asset {
   let MP = MasterPlatypusOld.bind(event.address);
+
   let pid = event.params.pid;
   let poolInfo = MP.try_poolInfo(pid);
   if (poolInfo.reverted) {
@@ -108,15 +109,18 @@ export function getAssetForRewardsOld<T>(event: T): _Asset {
       event.address.toHexString(),
     ]);
   }
+
   let poolInfoMap = poolInfo.value;
 
   let _asset = _Asset.load(poolInfoMap.value0.toHexString());
+
   if (!_asset) {
     log.error("[HandleRewards][{}]Asset not found {}", [
       event.transaction.hash.toHexString(),
       poolInfoMap.value0.toHexString(),
     ]);
   }
+
   _asset!._index = pid;
   addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
@@ -150,7 +154,7 @@ export function getAssetForRewardsOld<T>(event: T): _Asset {
   // let sumOfFactors = poolInfoMap.value5;
   // let accPtpPerFactorShare = poolInfoMap.value6;
 
-  if (rewarder != Address.fromHexString("0x0000000000000000000000000000000000000000")) {
+  if (rewarder.notEqual(ZERO_ADDRESS)) {
     let bonusRewards = MP.try_rewarderBonusTokenInfo(pid);
     if (bonusRewards.reverted) {
       log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
@@ -161,6 +165,8 @@ export function getAssetForRewardsOld<T>(event: T): _Asset {
     }
     addRewardTokenToAsset(event, bonusRewards.value.value0, _asset!);
   }
+
+  _asset!.save();
 
   let rewardTokenEmissionsAmount = new Array<BigInt>();
   let rewardTokenEmissionsUSD = new Array<BigDecimal>();
@@ -223,6 +229,28 @@ export function getAssetForRewardsNew<T>(event: T): _Asset {
   _asset!._index = pid;
   addRewardTokenToAsset(event, Address.fromString(PTPAddress), _asset!);
 
+  let totalAdjustedAllocPoint_call = MP.try_totalAdjustedAllocPoint();
+  if (totalAdjustedAllocPoint_call.reverted) {
+    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
+      event.transaction.hash.toHexString(),
+      pid.toString(),
+    ]);
+    return _asset!;
+  }
+
+  let totalAdjustedAllocPoint = totalAdjustedAllocPoint_call.value;
+
+  let ptpPerSecond_call = MP.try_ptpPerSec();
+  if (ptpPerSecond_call.reverted) {
+    log.error("[HandleRewards][{}]error fetching Ptp per second for pid {} old master plat", [
+      event.transaction.hash.toHexString(),
+      pid.toString(),
+    ]);
+    return _asset!;
+  }
+
+  let ptpPerSecond = ptpPerSecond_call.value;
+
   // // Get info for PTP rewards
   // let baseAllocPoint = poolInfoMap.value1;
   // let lastRewardTimestamp = poolInfoMap.value2;
@@ -234,7 +262,7 @@ export function getAssetForRewardsNew<T>(event: T): _Asset {
   // Only exists in masterPlatypusv3 contract
   let adjustedAllocPoint = poolInfoMap.value7;
 
-  if (rewarder != Address.fromHexString("0x0000000000000000000000000000000000000000")) {
+  if (rewarder.notEqual(ZERO_ADDRESS)) {
     let bonusRewards = MP.try_rewarderBonusTokenInfo(pid);
     if (bonusRewards.reverted) {
       log.error("[HandleRewards][{}]error fetching bonusRewards for pid {}", [
@@ -256,8 +284,21 @@ export function getAssetForRewardsNew<T>(event: T): _Asset {
     let rewardToken = RewardToken.load(_asset!.rewardTokens![k])!;
     let token = getOrCreateToken(event, Address.fromString(rewardToken.token));
 
+    log.debug("[HandleRewards][{}] Asset: {}, RT: {}, rewarder: {}", [
+      event.transaction.hash.toHexString(),
+      _asset!.id.toString(),
+      rewardToken.id.toString(),
+      rewarder.toHexString(),
+    ]);
+
     if (token.id == PTPAddress) {
-      tps = adjustedAllocPoint;
+      tps = ptpPerSecond.div(totalAdjustedAllocPoint).times(adjustedAllocPoint);
+      log.debug("PPS/TAAP*AAP=tps {}/{}*{}={}", [
+        ptpPerSecond.toString(),
+        totalAdjustedAllocPoint.toString(),
+        adjustedAllocPoint.toString(),
+        tps.toString(),
+      ]);
     } else {
       let rewarderContract = SimpleRewarder.bind(rewarder);
       tps = getTPS(rewarderContract);
@@ -275,6 +316,10 @@ export function getAssetForRewardsNew<T>(event: T): _Asset {
 }
 
 export function getTPS(rewarderContract: SimpleRewarder): BigInt {
+  if (rewarderContract._address.equals(ZERO_ADDRESS)) {
+    return BIGINT_ZERO;
+  }
+
   let tps = rewarderContract.try_tokenPerSec();
   if (tps.reverted) {
     log.error("[HandleRewards]error fetching simplerewarder {} getting tps ", [
@@ -286,7 +331,7 @@ export function getTPS(rewarderContract: SimpleRewarder): BigInt {
 
 export function handleDeposit(event: Deposit): void {
   let _asset: _Asset;
-  if (event.address == Address.fromString("0xB0523f9F473812FB195Ee49BC7d2ab9873a98044")) {
+  if (event.address.equals(MasterPlatypusOld_ADDRESS)) {
     _asset = getAssetForRewardsOld<Deposit>(event);
   } else {
     _asset = getAssetForRewardsNew<Deposit>(event);
@@ -298,7 +343,7 @@ export function handleDeposit(event: Deposit): void {
 
 export function handleWithdraw(event: Withdraw): void {
   let _asset: _Asset;
-  if (event.address == Address.fromString("0xB0523f9F473812FB195Ee49BC7d2ab9873a98044")) {
+  if (event.address.equals(MasterPlatypusOld_ADDRESS)) {
     _asset = getAssetForRewardsOld<Withdraw>(event);
   } else {
     _asset = getAssetForRewardsNew<Withdraw>(event);
@@ -310,7 +355,7 @@ export function handleWithdraw(event: Withdraw): void {
 
 export function handleDepositFor(event: DepositFor): void {
   let _asset: _Asset;
-  if (event.address == Address.fromString("0xB0523f9F473812FB195Ee49BC7d2ab9873a98044")) {
+  if (event.address.equals(MasterPlatypusOld_ADDRESS)) {
     _asset = getAssetForRewardsOld<DepositFor>(event);
   } else {
     _asset = getAssetForRewardsNew<DepositFor>(event);

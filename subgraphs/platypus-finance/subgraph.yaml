@@ -3,8 +3,8 @@ repository: https://github.com/messari/subgraphs
 features:
   - grafting
 graft:
-  base: QmcTWVW8F48DsKErPvgKrckbzBwZ6NTdroxnUa3D8sh81c
-  block: 13060650
+  base: QmTJa152Co4hSEekdtxw7WXgtKn1uHHp4KSWx8pjPzyRnj
+  block: 14599000
 schema:
   file: ./schema.graphql
 dataSources:
