@@ -139,7 +139,6 @@ export class MarketListedData {
 export class UpdateMarketData {
   totalSupplyResult: ethereum.CallResult<BigInt>;
   exchangeRateStoredResult: ethereum.CallResult<BigInt>;
-  totalBorrowsResult: ethereum.CallResult<BigInt>;
   supplyRateResult: ethereum.CallResult<BigInt>;
   borrowRateResult: ethereum.CallResult<BigInt>;
   getUnderlyingPriceResult: ethereum.CallResult<BigInt>;
@@ -147,7 +146,6 @@ export class UpdateMarketData {
   constructor(
     totalSupplyResult: ethereum.CallResult<BigInt>,
     exchangeRateStoredResult: ethereum.CallResult<BigInt>,
-    totalBorrowsResult: ethereum.CallResult<BigInt>,
     supplyRateResult: ethereum.CallResult<BigInt>,
     borrowRateResult: ethereum.CallResult<BigInt>,
     getUnderlyingPriceResult: ethereum.CallResult<BigInt>,
@@ -155,7 +153,6 @@ export class UpdateMarketData {
   ) {
     this.totalSupplyResult = totalSupplyResult;
     this.exchangeRateStoredResult = exchangeRateStoredResult;
-    this.totalBorrowsResult = totalBorrowsResult;
     this.supplyRateResult = supplyRateResult;
     this.borrowRateResult = borrowRateResult;
     this.getUnderlyingPriceResult = getUnderlyingPriceResult;
@@ -421,9 +418,6 @@ export function _handleMint(comptrollerAddr: Address, event: Mint): void {
   deposit.amountUSD = depositUSD;
   deposit.save();
 
-  market.inputTokenBalance = market.inputTokenBalance.plus(
-    event.params.mintAmount
-  );
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositUSD);
   market.save();
 
@@ -493,9 +487,6 @@ export function _handleRedeem(comptrollerAddr: Address, event: Redeem): void {
   );
   withdraw.save();
 
-  market.inputTokenBalance = market.inputTokenBalance.minus(
-    event.params.redeemAmount
-  );
   market.save();
 
   snapshotUsage(
@@ -792,6 +783,7 @@ export function _handleAccrueInterest(
     updateMarketData,
     marketID,
     event.params.interestAccumulated,
+    event.params.totalBorrows,
     event.block.number,
     event.block.timestamp
   );
@@ -960,7 +952,7 @@ export function snapshotFinancials(
     let marketDailySnapshot = MarketDailySnapshot.load(marketDailySnapshotID);
     if (!marketDailySnapshot) {
       // this is okay - no MarketDailySnapshot means no transactions in that market during that day
-      log.warning(
+      log.info(
         "[snapshotFinancials] MarketDailySnapshot not found (ie, no transactions in that market during this day): {}",
         [marketDailySnapshotID]
       );
@@ -1179,6 +1171,7 @@ export function updateMarket(
   updateMarketData: UpdateMarketData,
   marketID: string,
   interestAccumulatedMantissa: BigInt,
+  newTotalBorrow: BigInt,
   blockNumber: BigInt,
   blockTimestamp: BigInt
 ): void {
@@ -1215,12 +1208,18 @@ export function updateMarket(
     market.outputTokenSupply = updateMarketData.totalSupplyResult.value;
   }
 
-  let underlyingSupplyUSD = market.inputTokenBalance
-    .toBigDecimal()
-    .div(exponentToBigDecimal(underlyingToken.decimals))
-    .times(underlyingTokenPriceUSD);
-  market.totalValueLockedUSD = underlyingSupplyUSD;
-  market.totalDepositBalanceUSD = underlyingSupplyUSD;
+  // get correct outputTokenDecimals for generic exchangeRate calculation
+  let outputTokenDecimals = cTokenDecimals;
+  if (market.outputToken) {
+    let outputToken = Token.load(market.outputToken!);
+    if (!outputToken) {
+      log.warning("[updateMarket] Output token not found: {}", [
+        market.outputToken!,
+      ]);
+    } else {
+      outputTokenDecimals = outputToken.decimals;
+    }
+  }
 
   if (updateMarketData.exchangeRateStoredResult.reverted) {
     log.warning(
@@ -1233,25 +1232,57 @@ export function updateMarket(
       .toBigDecimal()
       .div(
         exponentToBigDecimal(
-          mantissaFactor + underlyingToken.decimals - cTokenDecimals
+          mantissaFactor + underlyingToken.decimals - outputTokenDecimals
         )
       );
     market.exchangeRate = oneCTokenInUnderlying;
     market.outputTokenPriceUSD = oneCTokenInUnderlying.times(
       underlyingTokenPriceUSD
     );
+
+    // calculate inputTokenBalance only if exchangeRate is updated properly
+    // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
+    // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
+    if (underlyingToken.decimals > outputTokenDecimals) {
+      // we want to multiply out the difference to expand BD
+      let mantissaFactorBD = exponentToBigDecimal(
+        underlyingToken.decimals - outputTokenDecimals
+      );
+      let inputTokenBalanceBD = market.outputTokenSupply
+        .toBigDecimal()
+        .times(market.exchangeRate!)
+        .times(mantissaFactorBD)
+        .truncate(0);
+      market.inputTokenBalance = BigInt.fromString(
+        inputTokenBalanceBD.toString()
+      );
+    } else {
+      // we want to divide back the difference to decrease the BD
+      let mantissaFactorBD = exponentToBigDecimal(
+        outputTokenDecimals - underlyingToken.decimals
+      );
+      let inputTokenBalanceBD = market.outputTokenSupply
+        .toBigDecimal()
+        .times(market.exchangeRate!)
+        .div(mantissaFactorBD)
+        .truncate(0);
+      market.inputTokenBalance = BigInt.fromString(
+        inputTokenBalanceBD.toString()
+      );
+    }
   }
 
-  if (updateMarketData.totalBorrowsResult.reverted) {
-    log.warning("[updateMarket] Failed to get totalBorrows of Market {}", [
-      marketID,
-    ]);
-  } else {
-    market.totalBorrowBalanceUSD = updateMarketData.totalBorrowsResult.value
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingToken.decimals))
-      .times(underlyingTokenPriceUSD);
-  }
+  let underlyingSupplyUSD = market.inputTokenBalance
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
+  market.totalValueLockedUSD = underlyingSupplyUSD;
+  market.totalDepositBalanceUSD = underlyingSupplyUSD;
+
+  market.totalBorrowBalanceUSD = newTotalBorrow
+    .toBigDecimal()
+    .div(exponentToBigDecimal(underlyingToken.decimals))
+    .times(underlyingTokenPriceUSD);
 
   if (updateMarketData.supplyRateResult.reverted) {
     log.warning("[updateMarket] Failed to get supplyRate of Market {}", [
