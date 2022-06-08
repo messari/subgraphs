@@ -64,7 +64,6 @@ export let EthAddr = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 export let BntAddr = "0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c";
 export let BnBntAddr = "0xab05cf7c6c3a288cd36326e4f7b8600e7268e344";
 export let DaiAddr = "0x6b175474e89094c44da98b954eedeac495271d0f";
-export let BnDaiAddr = "0x06cd589760da4616a0606da1367855808196c352";
 
 export let zeroBD = BigDecimal.zero();
 export let zeroBI = BigInt.zero();
