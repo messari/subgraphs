@@ -43,6 +43,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -102,6 +104,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -161,6 +165,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -220,6 +226,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -279,6 +287,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -338,6 +348,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -397,6 +409,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -456,6 +470,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -515,6 +531,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -574,6 +592,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -633,6 +653,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -692,6 +714,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -751,6 +775,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -810,6 +836,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -869,6 +897,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -928,6 +958,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -987,6 +1019,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1046,6 +1080,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1105,6 +1141,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1164,6 +1202,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1223,6 +1263,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1282,6 +1324,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1341,6 +1385,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1400,6 +1446,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1459,6 +1507,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1518,6 +1568,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1577,6 +1629,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1636,6 +1690,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1695,6 +1751,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1754,6 +1812,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1813,6 +1873,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1872,6 +1934,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1931,6 +1995,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -1990,6 +2056,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2049,6 +2117,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2108,6 +2178,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2167,6 +2239,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2226,6 +2300,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2285,6 +2361,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2344,6 +2422,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2403,6 +2483,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2462,6 +2544,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2521,6 +2605,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2580,6 +2666,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2639,6 +2727,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2698,6 +2788,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2757,6 +2849,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2816,6 +2910,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2875,6 +2971,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2934,6 +3032,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -2993,6 +3093,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3052,6 +3154,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3111,6 +3215,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3170,6 +3276,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3229,6 +3337,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3288,6 +3398,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3347,6 +3459,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
@@ -3406,6 +3520,8 @@ dataSources:
           file: ./abis/Prices/ChainLink.json
         - name: UniswapRouter
           file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFeeRouter
+          file: ./abis/Prices/Uniswap/FeeRouter.json
         - name: UniswapFactory
           file: ./abis/Prices/Uniswap/Factory.json
         - name: UniswapPair
