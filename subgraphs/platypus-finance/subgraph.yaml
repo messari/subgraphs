@@ -200,6 +200,10 @@ dataSources:
           handler: handleWithdraw
         - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
           handler: handleSwap
+        - event: HaircutRateUpdated(unit256,uint256)
+          handler: handleHaircutRateUpdated
+        - event: RetentionRatioUpdated(unit256,uint256)
+          handler: handleRetentionRatioUpdated
         - event: AssetAdded(indexed address,indexed address)
           handler: handleAssetAdded
 

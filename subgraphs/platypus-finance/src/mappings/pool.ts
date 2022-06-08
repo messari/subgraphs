@@ -1,5 +1,13 @@
-import { Deposit, Withdraw, Swap, AssetAdded } from "../../generated/Pool/Pool";
+import {
+  Deposit,
+  Withdraw,
+  Swap,
+  AssetAdded,
+  HaircutRateUpdated,
+  RetentionRatioUpdated,
+} from "../../generated/Pool/Pool";
 import { TransactionType } from "../common/constants";
+import { getOrCreateLiquidityPoolParamsHelper } from "../common/getters";
 
 import {
   updateFinancials,
@@ -65,52 +73,18 @@ export function handleAssetAdded(event: AssetAdded): void {
   updatePoolMetrics(event);
 }
 
-// export function handleDevUpdated(event: DevUpdated): void {
-//   // Get LiquidtiyPoolParamsHelper
-//   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
-//   // Update LiquidityPoolParamsHelper
-//   liquidityPoolParams.Dev = event.params.newDev.toHexString();
-//   liquidityPoolParams.save();
-// }
-// export function handleSlippageParamsUpdated(event: SlippageParamsUpdated): void {
-//   // Get LiquidtiyPoolParamsHelper
-//   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
-//   // Update LiquidityPoolParamsHelper
-//   liquidityPoolParams.SlippageParamsXThreshold = event.params.newXThreshold.toBigDecimal();
-//   liquidityPoolParams.SlippageParamsC1 = event.params.newC1.toBigDecimal();
-//   liquidityPoolParams.SlippageParamsK = event.params.newK.toBigDecimal();
-//   liquidityPoolParams.SlippageParamsN = event.params.newN.toBigDecimal();
-//   liquidityPoolParams.save();
-// }
-// export function handleOracleUpdated(event: OracleUpdated): void {
-//   // Get LiquidtiyPoolParamsHelper
-//   log.debug("event to update oracle from {} to {}", [
-//     event.params.previousOracle.toHexString(),
-//     event.params.newOracle.toHexString(),
-//   ]);
-//   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
-//   // Update LiquidityPoolParamsHelper
-//   liquidityPoolParams.Oracle = event.params.newOracle.toHexString();
-//   liquidityPoolParams.save();
-// }
-// export function handleRetentionRatioUpdated(event: RetentionRatioUpdated): void {
-//   // Get LiquidtiyPoolParamsHelper
-//   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
-//   // Update LiquidityPoolParamsHelper
-//   liquidityPoolParams.RetentionRatio = event.params.newRetentionRatio.toBigDecimal();
-//   liquidityPoolParams.save();
-// }
-// export function handlePriceDeviationUpdated(event: PriceDeviationUpdated): void {
-//   // Get LiquidtiyPoolParamsHelper
-//   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
-//   // Update LiquidityPoolParamsHelper
-//   liquidityPoolParams.PriceDeviation = event.params.newPriceDeviation.toBigDecimal();
-//   liquidityPoolParams.save();
-// }
-// export function handleHaircutRateUpdated(event: HaircutRateUpdated): void {
-//   // Get LiquidtiyPoolParamsHelper
-//   let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
-//   // Update LiquidityPoolParamsHelper
-//   liquidityPoolParams.HaircutRate = event.params.newHaircut.toBigDecimal();
-//   liquidityPoolParams.save();
-// }
+export function handleRetentionRatioUpdated(event: RetentionRatioUpdated): void {
+  // Get LiquidtiyPoolParamsHelper
+  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
+  // Update LiquidityPoolParamsHelper
+  liquidityPoolParams.RetentionRatio = event.params.newRetentionRatio.toBigDecimal();
+  liquidityPoolParams.save();
+}
+
+export function handleHaircutRateUpdated(event: HaircutRateUpdated): void {
+  // Get LiquidtiyPoolParamsHelper
+  let liquidityPoolParams = getOrCreateLiquidityPoolParamsHelper(event.address);
+  // Update LiquidityPoolParamsHelper
+  liquidityPoolParams.HaircutRate = event.params.newHaircut.toBigDecimal();
+  liquidityPoolParams.save();
+}
