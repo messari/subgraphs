@@ -3,6 +3,7 @@ import {
   Address,
   BigDecimal,
   dataSource,
+  log,
 } from "@graphprotocol/graph-ts";
 import * as utils from "../common/utils";
 import * as constants from "../common/constants";
