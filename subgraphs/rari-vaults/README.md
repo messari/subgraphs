@@ -54,6 +54,15 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 
 `Not applicable`
 
+## Known Issues
+
+- Eth vault revenues are weird
+- Big spike in revenues around 10/21/2020 (may be okay since there is also a big spike in activity)
+- *Note*: `OutputTokenSupply/Price` should be the same for each vault with the same contract addresses (ie, USDC pool mStable and USDC)
+  - However, `pricePerShare` is a function of each individual vaults `inputTokenBalance` and the overall Pool's `outputTokenSupply`
+- `DEFAULT_DECIMALS` is used in places where the `BigInt` value is offset by a factor of 1e18 on the contract-level
+- *Note*: `pricePerShare` is very small for some vaults b/c the `outputTokenSupply` is aggregated and there is little of the `inputToken`
+
 ## Reference and Useful Links
 
 Protocol: https://rari.capital/

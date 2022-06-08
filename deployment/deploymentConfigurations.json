@@ -222,7 +222,7 @@
     }, "rari-vaults": {
       "mainnet": {
         "template": "rari-vaults.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       }
     }
   }
