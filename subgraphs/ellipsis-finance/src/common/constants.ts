@@ -7,7 +7,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 export const PROTOCOL_NAME = "Ellipsis Finance";
 export const PROTOCOL_SLUG = "ellipses-finance";
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
-export const PROTOCOL_SUBGRAPH_VERSION = "1.0.0";
+export const PROTOCOL_SUBGRAPH_VERSION = "1.0.1";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
 ////////////////////////
@@ -118,6 +118,7 @@ export const USDC_DENOMINATOR = BigDecimal.fromString("1000000");
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
 export const BIGINT_ONE = BigInt.fromI32(1);
+export const BIGINT_NEG_ONE = BigInt.fromI32(-1);
 export const BIGINT_TWO = BigInt.fromI32(2);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_THOUSAND = BigInt.fromI32(1000);
