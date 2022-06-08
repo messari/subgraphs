@@ -5,7 +5,7 @@ import {
     RewardAdded as RewardAddedEvent,
     RewardsDurationUpdated as RewardsDurationUpdatedEvent,
     UpdatePeriodFinishCall
-} from "../../generated/templates/MplRewards/MplRewards";
+} from "../../generated/templates/MplReward/MplReward";
 
 import { StakeType, ZERO_BI } from "../common/constants";
 import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";

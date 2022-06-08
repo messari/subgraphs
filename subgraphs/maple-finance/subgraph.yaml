@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
     file: ./schema.graphql
@@ -106,7 +106,7 @@ templates:
               - _StakeLocker
               - Token
               - InterestRate
-              - _MplRewards
+              - _MplReward
           abis:
               - name: Pool
                 file: ./abis/Pool.json
@@ -154,7 +154,7 @@ templates:
               - _Unstake
               - Market
               - Token
-              - _MplRewards
+              - _MplReward
           abis:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
@@ -195,7 +195,7 @@ templates:
               - Liquidate
               - Market
               - _StakeLocker
-              - _MplRewards
+              - _MplReward
               - Token
           abis:
               - name: Loan
