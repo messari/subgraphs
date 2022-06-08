@@ -80,9 +80,6 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   // update cToken supply
   market.outputTokenSupply = market.outputTokenSupply.plus(mintTokens);
 
-  // update inputTokensBalance
-  market.inputTokenBalance = market.inputTokenBalance.plus(amount);
-
   // update protocol totalDepositUSD
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(deposit.amountUSD);
   protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(deposit.amountUSD);
@@ -101,8 +98,7 @@ export function createDeposit(event: ethereum.Event, amount: BigInt, mintTokens:
   protocol.save();
   market.save();
   deposit.save();
-  updateTotalDepositUSD(event);
-  updateProtocolTVL(event); // also updates market TVL
+  updateProtocolTVL(event); // also updates market TVL/inputTokenBalance/totalDepositUSD
   return true;
 }
 
@@ -150,13 +146,11 @@ export function createWithdraw(
   withdraw.amountUSD = market.inputTokenPriceUSD.times(decimalAmount);
 
   // update token supplies
-  market.inputTokenBalance = market.inputTokenBalance.minus(underlyingAmount);
   market.outputTokenSupply = market.outputTokenSupply.minus(cTokenAmount);
 
   withdraw.save();
   market.save();
-  updateTotalDepositUSD(event);
-  updateProtocolTVL(event); // also updates market TVL
+  updateProtocolTVL(event); // also updates market TVL/inputTokenBalance/totalDepositUSD
   return true;
 }
 
@@ -417,6 +411,8 @@ export function updateMarketPrices(market: Market, event: ethereum.Event): void 
   market.save();
 }
 
+// also updates market.inputTokenBalance
+// TVL is equivalent to totalDepositUSD
 export function updateProtocolTVL(event: ethereum.Event): void {
   let protocol = getOrCreateLendingProtcol();
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
@@ -424,16 +420,43 @@ export function updateProtocolTVL(event: ethereum.Event): void {
   // loop through each market
   for (let i = 0; i < protocol._marketIds.length; i++) {
     let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
+    let underlyingToken = getOrCreateToken(market.inputToken);
+
+    // mantissaFactor = (inputTokenDecimals - outputTokenDecimals)  (Note: can be negative)
+    // inputTokenBalance = (outputSupply * exchangeRate) * (10 ^ mantissaFactor)
+    if (underlyingToken.decimals > COMPOUND_DECIMALS) {
+      // we want to multiply out the difference to expand BD
+      let mantissaFactorBD = exponentToBigDecimal(underlyingToken.decimals - COMPOUND_DECIMALS);
+      let inputTokenBalanceBD = market.outputTokenSupply
+        .toBigDecimal()
+        .times(market.exchangeRate)
+        .times(mantissaFactorBD)
+        .truncate(0);
+      market.inputTokenBalance = BigInt.fromString(inputTokenBalanceBD.toString());
+    } else {
+      // we want to divide back the difference to decrease the BD
+      let mantissaFactorBD = exponentToBigDecimal(COMPOUND_DECIMALS - underlyingToken.decimals);
+      let inputTokenBalanceBD = market.outputTokenSupply
+        .toBigDecimal()
+        .times(market.exchangeRate)
+        .div(mantissaFactorBD)
+        .truncate(0);
+      market.inputTokenBalance = BigInt.fromString(inputTokenBalanceBD.toString());
+    }
+
+    // calculate inputTokenBalance in USD
     market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
-    let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
-    market.totalValueLockedUSD = market.inputTokenBalance
+    let supplyUSD = market.inputTokenBalance
       .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingDecimals))
+      .div(exponentToBigDecimal(underlyingToken.decimals))
       .times(market.inputTokenPriceUSD);
-    totalValueLockedUSD = totalValueLockedUSD.plus(market.totalValueLockedUSD);
+    market.totalValueLockedUSD = supplyUSD;
+    market.totalDepositBalanceUSD = supplyUSD;
+    totalValueLockedUSD = totalValueLockedUSD.plus(supplyUSD);
     market.save();
   }
   protocol.totalValueLockedUSD = totalValueLockedUSD;
+  protocol.totalDepositBalanceUSD = totalValueLockedUSD;
   protocol.save();
 }
 
@@ -463,26 +486,6 @@ export function updateTotalBorrowUSD(event: ethereum.Event, newTotalBorrow: BigI
   protocol.save();
 
   return totalBorrowUSD;
-}
-
-export function updateTotalDepositUSD(event: ethereum.Event): void {
-  let protocol = getOrCreateLendingProtcol();
-  let totalDepositUSD = BIGDECIMAL_ZERO;
-
-  for (let i = 0; i < protocol._marketIds.length; i++) {
-    let market = getOrCreateMarket(event, Address.fromString(protocol._marketIds[i]));
-    market.inputTokenPriceUSD = getUSDPriceOfToken(market, event.block.number.toI32());
-    let underlyingDecimals = getOrCreateToken(market.inputToken).decimals;
-    market.totalDepositBalanceUSD = market.inputTokenBalance
-      .toBigDecimal()
-      .div(exponentToBigDecimal(underlyingDecimals))
-      .times(market.inputTokenPriceUSD)
-      .truncate(DEFAULT_DECIMALS);
-    totalDepositUSD = totalDepositUSD.plus(market.totalDepositBalanceUSD);
-    market.save();
-  }
-  protocol.totalDepositBalanceUSD = totalDepositUSD;
-  protocol.save();
 }
 
 export function updateRewards(event: ethereum.Event, market: Market): void {

@@ -288,3 +288,7 @@ export function getPoolFromLpToken(lpToken: Address): string {
   }
   return lptokenPool.pool;
 }
+
+export function createEventID(eventType: string, event: ethereum.Event): string {
+  return eventType + "-" + event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+}

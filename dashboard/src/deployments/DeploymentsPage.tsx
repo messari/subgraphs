@@ -1,18 +1,38 @@
 import { styled } from "../styled";
-import { ProtocolsToQuery } from "../constants";
 import { SubgraphDeployments } from "./SubgraphDeployments";
 import { useNavigate } from "react-router";
 import { SearchInput } from "../common/utilComponents/SearchInput";
 import { DeploymentsContextProvider } from "./DeploymentsContextProvider";
 import { Typography } from "@mui/material";
-import LazyLoad from "react-lazyload";
 import { NewClient } from "../utils";
+import { useEffect, useState } from "react";
 
 const DeploymentsLayout = styled("div")`
   padding: ${({ theme }) => theme.spacing(4)};
 `;
 
 function DeploymentsPage() {
+  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{ [name: string]: { [network: string]: string } }>({})
+  const getData = () => {
+    fetch('/deployments.json'
+      , {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      }
+    )
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (json) {
+        setProtocolsToQuery(json);
+      });
+  }
+  useEffect(() => {
+    getData()
+  }, [])
+
   const navigate = useNavigate();
   const clientIndexing = NewClient("https://api.thegraph.com/index-node/graphql");
   window.scrollTo(0, 0);

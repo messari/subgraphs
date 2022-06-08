@@ -1,0 +1,10 @@
+{
+  "deployment": "SPOOKYSWAP_FANTOM",
+  "network": "fantom",
+  "address": "0x152ee697f2e276fa89e96742e9bb9ab1f2e61be3",
+  "startBlock": 3795376,
+  "masterChefAddress": "0x2b2929e785374c651a81a63878ab22742656dcdd",
+  "masterChefV2Address": "0x18b4f774fdc7bf685daeef66c2990b1ddd9ea6ad",
+  "masterChefStartBlock": 4267037,
+  "masterChefV2StartBlock": 34757343
+}
