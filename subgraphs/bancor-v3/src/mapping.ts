@@ -103,7 +103,8 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.to = event.params.trader.toHexString();
   swap.tokenIn = sourceTokenID;
   swap.amountIn = event.params.sourceAmount;
-  swap.amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
+  let amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
+  swap.amountInUSD = amountInUSD;
   swap.tokenOut = targetTokenID;
   swap.amountOut = event.params.targetAmount;
   swap.amountOutUSD = getDaiAmount(targetToken.id, event.params.targetAmount);
@@ -111,7 +112,22 @@ export function handleTokensTraded(event: TokensTraded): void {
 
   swap.save();
 
-  // TODO: swap a to b should increase cumulativeVolumeUSD of a - but should i decrease from b's?
+  if (!sourceToken._poolToken) {
+    log.warning("[handleTokensTraded] reserve token {} has no pool token", [
+      sourceToken.id,
+    ]);
+    return;
+  }
+  let liquidityPool = LiquidityPool.load(sourceToken._poolToken!);
+  if (!liquidityPool) {
+    log.warning("[handleTokensTraded] liquidity pool {} not found", [
+      sourceToken._poolToken!,
+    ]);
+    return;
+  }
+  liquidityPool.cumulativeVolumeUSD =
+    liquidityPool.cumulativeVolumeUSD.plus(amountInUSD);
+  liquidityPool.save();
 }
 
 export function handleTokensDeposited(event: TokensDeposited): void {
@@ -224,10 +240,9 @@ export function handleTotalLiquidityUpdated(
     return;
   }
   if (!token._poolToken) {
-    log.warning(
-      "[handleTotalLiquidityUpdated] token {} doesn't link to a pool token",
-      [tokenAddress]
-    );
+    log.warning("[handleTotalLiquidityUpdated] token {} has no pool token", [
+      tokenAddress,
+    ]);
     return;
   }
   let liquidityPool = LiquidityPool.load(token._poolToken!);
