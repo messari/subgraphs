@@ -1,6 +1,6 @@
 import * as MAINNET from "../config/mainnet";
 import * as FANTOM from "../config/fantom";
-import * as ARBITRUM_ONE from "../config/arbitrum_one";
+import * as ARBITRUM_ONE from "../config/arbitrumOne";
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
 import { UniswapPair__getReservesResult } from "../../../generated/Vault/UniswapPair";
