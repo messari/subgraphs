@@ -431,6 +431,8 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
+
+  _cumulativeTradingFeeAmountUSD: BigDecimal!
 }
 
 #################################
@@ -718,6 +720,9 @@ type Swap implements Event @entity {
 
   " The pool involving this transaction "
   pool: LiquidityPool!
+
+  _tradingFeeAmount: BigInt!
+  _tradingFeeAmountUSD: BigDecimal!
 }
 
 # An account is a unique Ethereum address

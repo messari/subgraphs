@@ -109,6 +109,12 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.amountOut = event.params.targetAmount;
   swap.amountOutUSD = getDaiAmount(targetToken.id, event.params.targetAmount);
   swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
+  swap._tradingFeeAmount = event.params.targetFeeAmount;
+  let tradingFeeAmountuSD = getDaiAmount(
+    targetToken.id,
+    event.params.targetFeeAmount
+  );
+  swap._tradingFeeAmountUSD = tradingFeeAmountuSD;
 
   swap.save();
 
@@ -127,6 +133,8 @@ export function handleTokensTraded(event: TokensTraded): void {
   }
   liquidityPool.cumulativeVolumeUSD =
     liquidityPool.cumulativeVolumeUSD.plus(amountInUSD);
+  liquidityPool._cumulativeTradingFeeAmountUSD =
+    liquidityPool._cumulativeTradingFeeAmountUSD.plus(tradingFeeAmountuSD);
   liquidityPool.save();
 }
 
@@ -457,6 +465,7 @@ function createLiquidityPool(
   liquidityPool.stakedOutputTokenAmount = zeroBI;
   liquidityPool.rewardTokenEmissionsAmount = []; // reward is not yet live
   liquidityPool.rewardTokenEmissionsUSD = []; // reward is not yet live
+  liquidityPool._cumulativeTradingFeeAmountUSD = zeroBD;
 
   liquidityPool.save();
 }
