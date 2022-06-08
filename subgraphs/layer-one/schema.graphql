@@ -2,6 +2,46 @@
 # Version: 1.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
+enum Network {
+  ARBITRUM_ONE
+  AURORA
+  AVALANCHE
+  BSC # aka BNB Chain
+  CELO
+  MAINNET # Ethereum Mainnet
+  FANTOM
+  FUSE
+  MOONBEAM
+  MOONRIVER
+  NEAR_MAINNET
+  OPTIMISM
+  MATIC # aka Polygon
+  XDAI # aka Gnosis Chain
+}
+
+type Blockchain @entity {
+  " Native token address (ie, ETH = 0xeeE...eeE)"
+  id: ID!
+
+  " Decimals of the native asset "
+  decimals: Int!
+
+  " The name of the blockchain (ie, the network name) "
+  name: String!
+
+  " Max supply of the native asset "
+  maxSupply: BigInt!
+
+  " Current supply of the native asset "
+  currentSupply: BigInt!
+
+  " The total number of blocks in the blockchain "
+  totalBlocks: Int!
+
+  " Current blocks per day emission "
+  blocksPerDay: BigDecimal!
+}
+
 type Block @entity {
   " hash of the block "
   id: ID!
@@ -12,6 +52,26 @@ type Block @entity {
   " Timestamp of the block "
   timestamp: BigInt!
 
-  " price of the native asset in this block "
-  price: BigDecimal!
+  " Miner of this block "
+  author: Miner!
+
+  " Data size of the block in bytes (TODO; checks)"
+  size: BigInt!
+
+  " Total amount of native asset rewarded to the miner for this block "
+  reward: BigInt!
+}
+
+type Miner @entity {
+  " Address of the miner "
+  id: ID!
+
+  " Number of blocks mined "
+  blocksMined: Int!
+
+  " Total amount of native asset mined "
+  totalRewards: BigInt!
+
+  " A mapping to every block that this miner has mined"
+  blocks: [Block!]! @derivedFrom(field: "author")
 }
