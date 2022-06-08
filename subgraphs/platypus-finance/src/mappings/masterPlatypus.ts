@@ -177,11 +177,11 @@ export function getAssetForRewardsOld<T>(event: T): _Asset {
     let token = getOrCreateToken(event, Address.fromString(rewardToken.token));
 
     if (token.id == PTPAddress) {
-      tps = ptpPerSecond.div(totalAllocPoint).times(allocPoint);
-      log.debug("PPS/TAP*AP {}/{}*{}={}", [
+      tps = ptpPerSecond.times(allocPoint).div(totalAllocPoint);
+      log.debug("PPS*AP/TAP=tps {}*{}/{}={}", [
         ptpPerSecond.toString(),
-        totalAllocPoint.toString(),
         allocPoint.toString(),
+        totalAllocPoint.toString(),
         tps.toString(),
       ]);
     } else {
@@ -292,11 +292,11 @@ export function getAssetForRewardsNew<T>(event: T): _Asset {
     ]);
 
     if (token.id == PTPAddress) {
-      tps = ptpPerSecond.div(totalAdjustedAllocPoint).times(adjustedAllocPoint);
-      log.debug("PPS/TAAP*AAP=tps {}/{}*{}={}", [
+      tps = ptpPerSecond.times(adjustedAllocPoint).div(totalAdjustedAllocPoint);
+      log.debug("PPS*AAP/TAAP=tps {}*{}/{}={}", [
         ptpPerSecond.toString(),
-        totalAdjustedAllocPoint.toString(),
         adjustedAllocPoint.toString(),
+        totalAdjustedAllocPoint.toString(),
         tps.toString(),
       ]);
     } else {
