@@ -7,8 +7,8 @@ import {
 } from "@graphprotocol/graph-ts";
 
 import {
-  _Account,
-  _DailyActiveAccount,
+  Account,
+  ActiveAccount,
   LiquidityPoolFee,
   DexAmmProtocol
 } from "../../generated/schema";
@@ -130,7 +130,7 @@ export function updateUsageMetrics(
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let accountId = from.toHexString();
-  let account = _Account.load(accountId);
+  let account = Account.load(accountId);
   let protocol = getOrCreateDexAmm(event.address);
 
   let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
@@ -139,7 +139,7 @@ export function updateUsageMetrics(
   let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
 
   if (!account) {
-    account = new _Account(accountId);
+    account = new Account(accountId);
     account.save();
     protocol.cumulativeUniqueUsers += 1;
     dvmP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
@@ -175,9 +175,9 @@ export function updateUsageMetrics(
 
   // Combine the id and the user address to generate a unique user id for the day
   let dailyActiveAccountId = id.toString() + "-" + from.toHexString();
-  let dailyActiveAccount = _DailyActiveAccount.load(dailyActiveAccountId);
+  let dailyActiveAccount = ActiveAccount.load(dailyActiveAccountId);
   if (!dailyActiveAccount) {
-    dailyActiveAccount = new _DailyActiveAccount(dailyActiveAccountId);
+    dailyActiveAccount = new ActiveAccount(dailyActiveAccountId);
     dailyActiveAccount.save();
   }
 
@@ -215,8 +215,6 @@ export function updatePoolMetrics(
 
   let t1 = getOrCreateToken(tokenAdds[0]);
   let t2 = getOrCreateToken(tokenAdds[1]);
-
-  let lpToken = ERC20.bind(Address.fromString(pool.outputToken));
 
   let poolInstance = DVM.bind(poolAdd);
 
@@ -282,9 +280,7 @@ export function updateFees(
   amount: BigInt,
   trader: Address
 ): BigDecimal {
-  let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-
-  let poolFee = new LiquidityPoolFee(id.toString());
+  let poolFee = new LiquidityPoolFee("TIERED_TRADING_FEE --" + poolAdd.toString());
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
   let poolInstance = DVM.bind(poolAdd);
   let tradeValReceived = ZERO_BI;
@@ -312,7 +308,6 @@ export function updateFees(
   poolFee.pool = pool.id;
   poolFee.feePercentage = safeDiv(bigIntToBigDecimal(tradeValReceived), bigIntToBigDecimal(mtFee));
   poolFee.feeType = "TIERED_TRADING_FEE";
-  poolFee.usdValueOfFee = usdValOfFees;
 
   poolFee.save();
 

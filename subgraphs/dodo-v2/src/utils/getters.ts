@@ -390,8 +390,8 @@ export function getOrCreateDexAmmADD(protoAdd: Address): DexAmmProtocol {
     }
     protocol.name = name;
     protocol.slug = "messari-dodo";
-    protocol.schemaVersion = "1.2.0";
-    protocol.subgraphVersion = "0.2.1";
+    protocol.schemaVersion = "1.2.1";
+    protocol.subgraphVersion = "0.1.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.EXCHANGE;
