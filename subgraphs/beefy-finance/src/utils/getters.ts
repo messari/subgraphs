@@ -7,7 +7,7 @@ import {
   fetchTokenName,
   fetchTokenSymbol,
 } from "../mappings/token";
-import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import { BIGDECIMAL_ZERO, PROTOCOL_ID } from "../prices/common/constants";
 import {
   createBeefyFinance,
   updateProtocolAndSave,
@@ -44,11 +44,11 @@ export function getBeefyFinanceOrCreate(
   vaultId: string,
   currentBlock: ethereum.Block
 ): YieldAggregator {
-  let beefy = YieldAggregator.load("BeefyFinance");
+  let beefy = YieldAggregator.load(PROTOCOL_ID);
   if (!beefy) {
     beefy = createBeefyFinance(vaultId, currentBlock);
   } else {
-    updateProtocolAndSave(beefy, currentBlock);
+    updateProtocolAndSave(beefy, currentBlock, vaultId);
   }
   return beefy;
 }

@@ -17,10 +17,10 @@ export function getVaultDailyId(block: ethereum.Block, vault: Vault): string {
 }
 
 export function getVaultHourlyId(block: ethereum.Block, vault: Vault): string {
-  const daysSinceEpoch = getHoursSinceEpoch(block.timestamp.toI32());
+  const hoursSinceEpoch = getHoursSinceEpoch(block.timestamp.toI32());
   const id = vault.id
     .concat("-")
-    .concat(daysSinceEpoch)
+    .concat(hoursSinceEpoch)
     .concat("h");
   return id;
 }

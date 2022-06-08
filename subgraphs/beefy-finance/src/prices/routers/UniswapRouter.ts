@@ -86,7 +86,7 @@ export function getPriceFromRouter(
   }
 
   let token0Decimals = utils.getTokenDecimals(token0Address);
-  let amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
+  let amountIn = constants.BIGINT_TEN.pow(token0Decimals.toI32() as u8);
 
   let routerAddressV1 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
     network

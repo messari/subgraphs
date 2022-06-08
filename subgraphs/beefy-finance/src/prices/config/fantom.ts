@@ -50,7 +50,7 @@ SPOOKY_SWAP_ROUTER_ADDRESS.set(
 );
 SPOOKY_SWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0x16327E3FbDaCA3bcF7E38F5Af2599D2DDc33aE52") //spiritswap
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ export const CHAIN_LINK_CONTRACT_ADDRESS = Address.fromString(
 export const WHITELIST_TOKENS = new TypedMap<string, Address>();
 WHITELIST_TOKENS.set(
   "WETH",
-  Address.fromString("0x658b0c7613e890ee50b8c4bc6a3f41ef411208ad") // fETH
+  Address.fromString("0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83") // wFTM
 );
 WHITELIST_TOKENS.set(
   "ETH",

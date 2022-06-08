@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Deposit,
   FinancialsDailySnapshot,
@@ -120,37 +120,29 @@ export function getUniqueUsers(
   let users: string[] = [];
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
-    if (vault == null) {
-      continue;
-    } else {
+    if (vault) {
       for (let j = 0; j < vault.deposits.length; j++) {
         deposit = Deposit.load(vault.deposits[j]);
-        if (!deposit) {
-          continue;
-        } else if (
+        if (
+          deposit &&
           deposit.timestamp > timeframe[0] &&
           deposit.timestamp <= timeframe[1]
         ) {
           user = deposit.from;
-          if (users.includes(user)) {
-            continue;
-          } else {
+          if (!users.includes(user)) {
             users.push(user);
           }
         }
       }
-      for (let j = 0; j < vault.withdraws.length; j++) {
-        withdraw = Withdraw.load(vault.deposits[j]);
-        if (!withdraw) {
-          continue;
-        } else if (
-          withdraw.timestamp >= timeframe[0] &&
+      for (let k = 0; k < vault.withdraws.length; k++) {
+        withdraw = Withdraw.load(vault.withdraws[k]);
+        if (
+          withdraw &&
+          withdraw.timestamp > timeframe[0] &&
           withdraw.timestamp <= timeframe[1]
         ) {
           user = withdraw.from;
-          if (users.includes(user)) {
-            continue;
-          } else {
+          if (!users.includes(user)) {
             users.push(user);
           }
         }
@@ -233,7 +225,9 @@ export function updateDailyFinancialSnapshot(
     dailyFinancialSnapshot = createFirstDailyFinancialSnapshot(block, protocol);
   }
 
-  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
+  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol, block);
+  dailyFinancialSnapshot.protocolControlledValueUSD =
+    dailyFinancialSnapshot.totalValueLockedUSD;
   const revenues = getDailyRevenuesUsd(protocol, block);
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = revenues[0];
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = revenues[1];
@@ -286,7 +280,9 @@ export function createFirstDailyFinancialSnapshot(
   const id = getProtocolDailyId(block, protocol);
   const dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
   dailyFinancialSnapshot.protocol = protocol.id;
-  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
+  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol, block);
+  dailyFinancialSnapshot.protocolControlledValueUSD =
+    dailyFinancialSnapshot.totalValueLockedUSD;
 
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

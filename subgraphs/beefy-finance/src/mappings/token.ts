@@ -1,7 +1,7 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/ExampleVault/ERC20";
-import { getUsdPrice } from "../prices";
-import { BIGINT_ZERO } from "../prices/common/constants";
+import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import { getTokenOrCreate } from "../utils/getters";
 
 export function fetchTokenDecimals(tokenAddress: Address): number {
@@ -39,7 +39,13 @@ export function getLastPriceUSD(
   blockNumber: BigInt = BIGINT_ZERO
 ): BigDecimal {
   const token = getTokenOrCreate(tokenAddress);
-  token.lastPriceUSD = getUsdPrice(tokenAddress, BigDecimal.fromString("1"));
+  const price = getUsdPricePerToken(tokenAddress);
+  if (!price.reverted) {
+    token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+  } else {
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+  }
+
   if (blockNumber != BIGINT_ZERO) {
     token.lastPriceBlockNumber = blockNumber;
   }

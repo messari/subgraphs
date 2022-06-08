@@ -10,12 +10,15 @@ import {
   Withdraw as WithdrawEvent,
 } from "../../generated/ExampleVault/BeefyStrategy";
 import {
-  getBeefyFinanceOrCreate,
   getVaultFromStrategyOrCreate,
   getTokenOrCreate,
 } from "../utils/getters";
 import { getLastPriceUSD } from "./token";
-import { BIGINT_TEN, ZERO_ADDRESS_STRING } from "../prices/common/constants";
+import {
+  BIGINT_TEN,
+  PROTOCOL_ID,
+  ZERO_ADDRESS_STRING,
+} from "../prices/common/constants";
 
 export function createWithdraw(
   event: WithdrawEvent,
@@ -45,26 +48,20 @@ export function createWithdraw(
     .div(new BigDecimal(BIGINT_TEN.pow(asset.decimals as u8)));
 
   withdraw.vault = getVaultFromStrategyOrCreate(event.address, event.block).id;
-  withdraw.protocol = getBeefyFinanceOrCreate(
-    getVaultFromStrategyOrCreate(event.address, event.block).id,
-    event.block
-  ).id;
+  withdraw.protocol = PROTOCOL_ID;
 
   withdraw.save();
   return withdraw;
 }
 
-export function getOrCreateFirstWithdraw(
-  vault: Vault,
-  currentBlock: ethereum.Block
-): Withdraw {
+export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
   let withdraw = Withdraw.load("MockWithdraw" + vault.id);
   if (!withdraw) {
     withdraw = new Withdraw("MockWithdraw" + vault.id);
 
     withdraw.hash = ZERO_ADDRESS_STRING;
     withdraw.logIndex = 0;
-    withdraw.protocol = getBeefyFinanceOrCreate(vault.id, currentBlock).id;
+    withdraw.protocol = PROTOCOL_ID;
     withdraw.from = ZERO_ADDRESS_STRING;
     withdraw.to = ZERO_ADDRESS_STRING;
     withdraw.blockNumber = vault.createdBlockNumber;
