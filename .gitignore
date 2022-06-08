@@ -53,7 +53,7 @@ node_modules/
 jspm_packages/
 
 # Text generating from running deployment scripts
-deployment/results.txt
+results.txt
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

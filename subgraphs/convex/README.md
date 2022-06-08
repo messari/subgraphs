@@ -1,63 +1,201 @@
-# Convox Yield Protocol Subgraph
-## Calculation Methodology v1.0.0
-
-### Total Value Locked (TVL) USD
-
-cvxCRV Market Cap + Sum across all Vaults:
-
-`LP Pool TVL`
-
-Note: Locked CRV from cvxCRV mints - regardless of whether the cvxCRV is staked or not, the CRV locked is utilized by the protocol to earn boosted CRV rewards so therefore should count as TVL. This is not standard.
-
-### Total Revenue USD
-
-Sum across all Vaults:
-
-`Yield Generated`
+# Convex Protocol Metrics Subgraph Methodology v1.1
 
 
-### Protocol-Side Revenue USD
-Portion of the Total Revenue allocated to the Protocol
+## Convex Finance Introduction
 
-Sum across all Vaults:
+Convex Finance is a DeFi platform which allows Curve.fi liquidity providers to earn trading fees and claim boosted CRV without locking CRV themselves. 
 
-`Yield Generated * Protocol Side Fees`
+Convex Finance has a similar operating model like group buy startups while small Curve.fi liquidity providers can enjoy a better boosted CRV rewards by staking their LP tokens together on Convex Finance.
 
-- This is split between CVX Stakers, locked CVX and Harvestors
+Besides the native token rewards from Curve.fi, liquidity providers on Convex Finance also receive rewards in the form of CVX token.
 
-### Supply-Side Revenue USD
-Portion of the Total Revenue allocated to the Supply-Side
-
-Sum across all Vaults
-
-`Yield Generated * (1 - Protocol Side Fees)`
-
-Note: This is the remaining yield/revenue after the protocol fees
-
-### Total Unique Users
-
-Count of  Unique Addresses which have interacted with the protocol via any transaction
-
-`Deposits`
-
-`Withdrawals`
-
-###  Reward Token Emissions Amount
-
-To be added
-
-###  Protocol Controlled Value
-
-To be added
-
-## Useful links
-
-Existing Subgraph
-
-https://thegraph.com/hosted-service/subgraph/convex-community/curve-pools
-
-https://github.com/convex-community/convex-subgraph
+Note:
 
 
-## Convex Contract Interaction Diagram
-![Convex Subgraph](/docs/images/protocols/convex.png)
+
+* Convex is currently running on Ethereum.
+* Convex is supporting Curve Finance and Frax Finance
+
+
+## Useful Links
+
+
+
+* Protocol
+    * [https://www.convexfinance.com/](https://www.convexfinance.com/)
+* Docs
+    * [https://docs.convexfinance.com/](https://docs.convexfinance.com/)
+* Smart contracts
+    * [https://docs.convexfinance.com/convexfinance/faq/contract-addresses](https://docs.convexfinance.com/convexfinance/faq/contract-addresses)
+* Tokenomics
+    * [https://docs.convexfinance.com/convexfinance/general-information/tokenomics](https://docs.convexfinance.com/convexfinance/general-information/tokenomics)
+* Fees
+    * [https://docs.convexfinance.com/convexfinance/faq/fees](https://docs.convexfinance.com/convexfinance/faq/fees)
+* Governance forum
+    * [https://vote.convexfinance.com/#/](https://vote.convexfinance.com/#/)
+* Medium
+    * [https://convexfinance.medium.com](https://convexfinance.medium.com)
+
+
+## Usage Metrics
+
+**Active Users, Total Unique Users & Daily Transaction Count**
+
+Transactions of interest on Convex Finance include:
+
+
+
+1. Staking Curve LP Tokens
+2. Converting CRV to cvxCRV
+3. Staking cvxCRV
+4. Staking CVX
+5. Vote Locking CVX
+6. Claiming Rewards
+7. Claiming Airdrop
+8. Converting FXS to cvxFXS
+9. Staking cvxFXS
+10. Staking Frax LP Tokens
+11. Providing liquidity on Curve
+
+Any address which conducts one of the transactions above should be considered a User.
+
+
+## Financial Metrics
+
+**Total Value Locked USD**
+
+The Total Value Locked (TVL) on Convex Finance can be calculated by summing:
+
+
+
+1. The TVL of cvxCRV pool
+2. The TVL across Curve LP pools
+3. The TVL of CVX pool
+4. The TVL of CVX Vote Locking pool
+5. The TVL of cvxFXS
+6. The TVL of across Frax LP pools
+
+Obviously, to calculate the TVL of each pool, we need to use this formula:
+
+
+```
+TVL (in USD) = The number of token in pool * the price of each token in USD
+```
+
+
+**Protocol Controlled Value USD**
+
+Convex Finance has a Treasury but not Protocol Controlled Value.
+
+**Total Revenue USD**
+
+Total Revenue generated on Convex Finance is the combination of:
+
+
+
+1. Yield generated and harvested from Curve LP pools (excluding base Curve yield)
+    1. CRV token rewards
+    2. CVX token rewards
+    3. Additional rewards (if any)
+2. Yield generated and harvested from staked cvxCRV
+    4. CRV token rewards
+    5. CVX token rewards
+    6. 3crv token rewards
+3. Yield generated and harvested from staked CVX
+    7. cvxCRV token rewards
+4. Yield generated and harvested from Locked CVX
+    8. cvxCRV token rewards
+5. Yield generated and harvested from Frax LP pools (excluding base Curve yield if any)
+    9. CRV token rewards (if applicable)
+    10. CVX token rewards (if applicable)
+    11. FXS token rewards
+    12. Other token rewards (depend on the pool)
+6. Yield generated and harvested from cvxFXS/FXS liquidity pool (excluding base Curve yield if any)
+    13. CRV token rewards
+    14. CVX token rewards
+    15. Additional rewards (if any)
+
+The total reward in USD shall be calculated by using this formula: 
+
+
+```
+Rewards (in USD) = The number of token * the price of each token in USD
+```
+
+
+The total revenue in USD shall be calculated by using this formula: 
+
+
+```
+Total Revenue = 1+2+3+4+5+6
+```
+
+
+**Supply Side Revenue USD**
+
+Supply-side revenue on Convex Finance is the total revenue minus the performance fee. The performance fee is only applied for CRV revenue generated by Curve LP pool and Frax LP pool on the platform.
+
+
+```
+Supply Side Revenue = Total Revenue - (Performance fee rate * CRV token rewards from Curve LP pool and Frax LP pool)
+```
+
+
+**Protocol Revenue USD**
+
+Protocol revenue on Convex Finance is the sum of performance fees on all CRV revenue generated by Curve LP pool and Frax LP pool on the platform.
+
+
+```
+Protocol Revenue = Performance fee rate * CRV token rewards from Curve LPs
+```
+
+
+The current performance fee is 17% for all pools.
+
+The structure of the performance fee for Curve LP pool is as below:
+
+
+
+1. 10% goes to cvxCRV stakers. This is paid out as CRV.
+2. 5% goes to CVX stakers, which includes vote-locked CVX. This is paid out as cvxCRV.
+3. 1% goes exclusively to vote-locked CVX. This is paid out as cvxCRV. 
+4. 1% goes to the harvest caller. This is paid out as CRV.
+
+The structure of the performance fee for Frax LP pool is as below:
+
+
+
+1. 10% goes to cvxFXS/FXS stakers
+2. 7% goes to CVX lockers
+
+
+## Pool-Level Metrics
+
+**Pool Total Value Locked USD**
+
+The TVL of a Curve LP pool shall be calculated by using this formula: 
+
+
+```
+Number of LP token* Price of the LP token
+```
+
+
+On the Convex Finance UI, this is shown as “TVL” by Pool
+
+**Reward Tokens & Reward Token Emissions Amount**
+
+For Curve Finance
+
+
+
+* veCRV holders as of block 12296676 are entitled to a portion of the $CVX token supply in the form of an airdrop.
+* Additionally, all veCRV holders who voted to whitelist Convex Finance on the Curve.fi platform are entitled to an additional portion of the $CVX token supply.
+* Start date: April 23rd, 2021
+* End date: No end date
+* References:
+
+[https://docs.convexfinance.com/convexfinance/guides/claiming-your-airdrop](https://docs.convexfinance.com/convexfinance/guides/claiming-your-airdrop)
+
+[https://convexfinance.medium.com/cvx-airdrop-details-a20ff7448075](https://convexfinance.medium.com/cvx-airdrop-details-a20ff7448075)

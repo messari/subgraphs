@@ -6,7 +6,7 @@
 // Issue may appear again in the future or on sidechain, so more functions
 // might be added in the future.
 
-import { Address, log } from "@graphprotocol/graph-ts";
+import { Address, log, Bytes } from "@graphprotocol/graph-ts";
 import {
   CATCHUP_BLOCK,
   TRICRYPTO2_POOL_ADDRESS,
@@ -20,12 +20,21 @@ import {
   CATCHUP_POOLS,
   CURVE_REGISTRY_V1_AVAX,
   CATCHUP_REGISTRIES,
+  ADDRESS_ZERO,
+  BIG_INT_ONE,
+  UNKNOWN_METAPOOLS,
 } from "../common/constants/index";
 import { createNewFactoryPool, createNewPool } from "./pools";
 import { MetaPool } from "../../generated/templates/RegistryTemplate/MetaPool";
 import { BigInt } from "@graphprotocol/graph-ts/index";
 import { CurvePoolTemplate } from "../../generated/templates";
 import { ERC20 } from "../../generated/templates/CurvePoolTemplate/ERC20";
+import { StableFactory } from "../../generated/AddressProvider/StableFactory";
+import { MainRegistry } from "../../generated/AddressProvider/MainRegistry";
+import { CryptoFactory } from "../../generated/templates/CryptoRegistryTemplate/CryptoFactory";
+import { Factory, LiquidityPool } from "../../generated/schema";
+import { addRegistryPool } from "../mapping";
+import { addCryptoRegistryPool } from "../mappingV2";
 
 export function catchUpRegistryMainnet(): void {
   log.info("Catching up registry...", []);
@@ -52,7 +61,7 @@ export function catchUpRegistryMainnet(): void {
     );
   }
 }
-
+/*
 export function catchUpAvax(): void {
   const POOLS = [
     Address.fromString("0xF72beaCc6fD334E14a7DDAC25c3ce1Eb8a827E10"),
@@ -67,17 +76,16 @@ export function catchUpAvax(): void {
   ];
   for (let i = 0; i < POOLS.length; i++) {
     log.info("Manually adding pool {}", [POOLS[i].toHexString()]);
-    const testMetaPool = MetaPool.bind(POOLS[i]);
-    const testMetaPoolResult = testMetaPool.try_base_pool();
+    const basePool = getAvaxBasePool(POOLS[i]);
     CurvePoolTemplate.create(POOLS[i]);
     createNewFactoryPool(
-      1,
-      Address.fromString("0xb17b674d9c5cb2e441f8e196a2f048a81355d031"),
-      !testMetaPoolResult.reverted,
-      testMetaPoolResult.reverted ? POOLS[i] : testMetaPoolResult.value,
-      POOLS[i],
-      BigInt.fromI32(1641737222),
-      CATCHUP_BLOCK,
+      1, // version
+      Address.fromString("0xb17b674d9c5cb2e441f8e196a2f048a81355d031"), // factory
+      basePool==POOLS[i] ? false : true, // is metapool if it has a base pool, otherwise basepool is itself
+      getAvaxBasePool(POOLS[i]), // basepool
+      POOLS[i], // lptoken
+      BigInt.fromI32(1641737222), // start time
+      CATCHUP_BLOCK, // start block
     );
   }
   // Adding tricrypto because crypto registry was also added late
@@ -96,4 +104,98 @@ export function catchUpAvax(): void {
     TRYCRYPTO2_POOL_AVAX_GAUGE,
     CURVE_REGISTRY_V1_AVAX,
   );
+}
+*/
+function getAvaxBasePool(poolAddress: Address): Address {
+  const testMetaPool = MetaPool.bind(poolAddress);
+  const testMetaPoolResult = testMetaPool.try_base_pool();
+  if (testMetaPoolResult.reverted) {
+    const stableFactory = StableFactory.bind(Address.fromString("0xb17b674d9c5cb2e441f8e196a2f048a81355d031"));
+    const stableFactoryResult = stableFactory.try_get_base_pool(poolAddress);
+    return stableFactoryResult.reverted ? poolAddress : stableFactoryResult.value;
+  }
+  return testMetaPoolResult.value;
+}
+
+export function catchUp(
+  registryAddress: Address,
+  factory: boolean, // @ts-ignore
+  version: i32,
+  block: BigInt,
+  timestamp: BigInt,
+  hash: Bytes,
+): void {
+  log.info("Adding missing pools on registry {} at block {}", [registryAddress.toHexString(), block.toString()]);
+  // ABI should also work for factories since we're only using pool_count/pool_list
+  const registry = MainRegistry.bind(registryAddress);
+  const cryptoFactory = CryptoFactory.bind(registryAddress);
+  const poolCount = registry.try_pool_count();
+  if (poolCount.reverted) {
+    log.error("Error calling pool count on registry {}", [registryAddress.toHexString()]);
+    return;
+  }
+  log.error("Found {} pools when registry added to address provider", [poolCount.value.toString()]);
+  for (let i = 0; i < poolCount.value.toI32(); i++) {
+    const poolAddress = registry.try_pool_list(BigInt.fromI32(i));
+    if (poolAddress.reverted) {
+      log.error("Unable to get pool {} on registry {}", [i.toString(), registryAddress.toHexString()]);
+      continue;
+    }
+    const pool = LiquidityPool.load(poolAddress.value.toHexString());
+    if (pool || poolAddress.value == ADDRESS_ZERO) {
+      log.warning("Pool {} already exists {} or is zero", [poolAddress.value.toHexString(), pool ? "y" : "n"]);
+      // still need to increase pool count because pool will be registered
+      if (factory) {
+        const factoryEntity = Factory.load(registryAddress.toHexString());
+        if (!factoryEntity) {
+          return;
+        }
+        factoryEntity.poolCount = factoryEntity.poolCount.plus(BIG_INT_ONE);
+        factoryEntity.save();
+      }
+      continue;
+    }
+    if (!factory) {
+      if (version == 1) {
+        log.info("Retro adding stable registry pool: {}", [poolAddress.value.toHexString()]);
+        addRegistryPool(poolAddress.value, registryAddress, block, timestamp, hash);
+      } else {
+        log.info("Retro adding crypto registry pool: {}", [poolAddress.value.toHexString()]);
+        addCryptoRegistryPool(poolAddress.value, registryAddress, block, timestamp, hash);
+      }
+    } else {
+      // crypto factories are straightforward
+      if (version == 2) {
+        log.info("Retro adding crypto factory pool: {}", [poolAddress.value.toHexString()]);
+        createNewFactoryPool(
+          2,
+          registryAddress,
+          false,
+          ADDRESS_ZERO,
+          cryptoFactory.get_token(poolAddress.value),
+          timestamp,
+          block,
+        );
+      } else {
+        log.info("Retro adding stable factory pool: {}", [poolAddress.value.toHexString()]);
+        const testMetaPool = MetaPool.bind(poolAddress.value);
+        const testMetaPoolResult = testMetaPool.try_base_pool();
+        const unknownMetapool = UNKNOWN_METAPOOLS.has(poolAddress.value.toHexString());
+        const basePool = unknownMetapool
+          ? UNKNOWN_METAPOOLS[poolAddress.value.toHexString()]
+          : testMetaPoolResult.reverted
+          ? ADDRESS_ZERO
+          : testMetaPoolResult.value;
+        createNewFactoryPool(
+          1,
+          registryAddress,
+          !testMetaPoolResult.reverted || unknownMetapool,
+          basePool,
+          ADDRESS_ZERO,
+          timestamp,
+          block,
+        );
+      }
+    }
+  }
 }
