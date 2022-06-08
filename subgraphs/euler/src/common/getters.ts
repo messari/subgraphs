@@ -277,8 +277,8 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
     protocol.network = Network.MAINNET;
     protocol.type = ProtocolType.LENDING;
-    protocol.lendingType = LendingType.CDP;
-    protocol.riskType = RiskType.ISOLATED;
+    protocol.lendingType = LendingType.POOLED;
+    protocol.riskType = RiskType.GLOBAL;
     protocol.cumulativeUniqueUsers = 0;
     protocol.totalValueLockedUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
