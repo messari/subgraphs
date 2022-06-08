@@ -99,38 +99,6 @@ export function createVaultFromStrategy(
   return vault;
 }
 
-export function handleDeposit(event: Deposit): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
-
-  if (vault.deposits[0] == "MockDeposit" + vault.id) {
-    const depositedAmount = event.params.tvl;
-    const deposit = createDeposit(event, depositedAmount);
-    vault.deposits = [deposit.id];
-  } else {
-    const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
-    const deposit = createDeposit(event, depositedAmount);
-    vault.deposits = vault.deposits.concat([deposit.id]);
-  }
-
-  updateVaultAndSave(vault, event.block);
-  getBeefyFinanceOrCreate(vault.id, event.block);
-}
-
-export function handleWithdraw(event: Withdraw): void {
-  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
-  const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
-  const withdraw = createWithdraw(event, withdrawnAmount);
-
-  if (vault.withdraws[0] == "MockWithdraw" + vault.id) {
-    vault.withdraws = [withdraw.id];
-  } else {
-    vault.withdraws = vault.withdraws.concat([withdraw.id]);
-  }
-
-  updateVaultAndSave(vault, event.block);
-  getBeefyFinanceOrCreate(vault.id, event.block);
-}
-
 export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   const vaultContract = BeefyVault.bind(
     Address.fromString(vault.id.split("x")[1])
@@ -277,6 +245,38 @@ export function getVaultDailyRevenues(vault: Vault): BigDecimal[] {
   }
 
   return [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+}
+
+export function handleDeposit(event: Deposit): void {
+  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
+
+  if (vault.deposits[0] == "MockDeposit" + vault.id) {
+    const depositedAmount = event.params.tvl;
+    const deposit = createDeposit(event, depositedAmount, vault.id);
+    vault.deposits = [deposit.id];
+  } else {
+    const depositedAmount = event.params.tvl.minus(vault.inputTokenBalance);
+    const deposit = createDeposit(event, depositedAmount, vault.id);
+    vault.deposits = vault.deposits.concat([deposit.id]);
+  }
+
+  updateVaultAndSave(vault, event.block);
+  getBeefyFinanceOrCreate(vault.id, event.block);
+}
+
+export function handleWithdraw(event: Withdraw): void {
+  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
+  const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
+  const withdraw = createWithdraw(event, withdrawnAmount, vault.id);
+
+  if (vault.withdraws[0] == "MockWithdraw" + vault.id) {
+    vault.withdraws = [withdraw.id];
+  } else {
+    vault.withdraws = vault.withdraws.concat([withdraw.id]);
+  }
+
+  updateVaultAndSave(vault, event.block);
+  getBeefyFinanceOrCreate(vault.id, event.block);
 }
 
 export function handleStratHarvest(event: StratHarvest): void {

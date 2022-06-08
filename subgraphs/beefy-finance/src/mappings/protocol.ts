@@ -113,7 +113,6 @@ export function getTvlUsd(
   for (let i = 0; i < protocol.vaults.length; i++) {
     const vault = Vault.load(protocol.vaults[i]);
     if (vault) {
-      updateVaultAndSave(vault, block);
       tvlUsd = tvlUsd.plus(vault.totalValueLockedUSD);
     }
   }

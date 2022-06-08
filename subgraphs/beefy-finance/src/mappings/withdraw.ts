@@ -17,7 +17,8 @@ import {
 
 export function createWithdraw(
   event: WithdrawEvent,
-  withdrawnAmount: BigInt
+  withdrawnAmount: BigInt,
+  vaultId: string
 ): Withdraw {
   const withdraw = new Withdraw(
     event.transaction.hash.toHexString().concat(`-${event.transaction.index}`)
@@ -42,7 +43,7 @@ export function createWithdraw(
     .times(new BigDecimal(withdrawnAmount))
     .div(new BigDecimal(BIGINT_TEN.pow(asset.decimals as u8)));
 
-  withdraw.vault = getVaultFromStrategyOrCreate(event.address, event.block).id;
+  withdraw.vault = vaultId;
   withdraw.protocol = PROTOCOL_ID;
 
   withdraw.save();

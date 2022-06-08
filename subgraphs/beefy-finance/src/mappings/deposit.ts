@@ -17,7 +17,8 @@ import {
 
 export function createDeposit(
   event: DepositEvent,
-  depositedAmount: BigInt
+  depositedAmount: BigInt,
+  vaultId: string
 ): Deposit {
   const deposit = new Deposit(
     event.transaction.hash.toHexString().concat(`-${event.transaction.index}`)
@@ -42,7 +43,7 @@ export function createDeposit(
     .times(depositedAmount.toBigDecimal())
     .div(BIGINT_TEN.pow(asset.decimals as u8).toBigDecimal());
 
-  deposit.vault = getVaultFromStrategyOrCreate(event.address, event.block).id;
+  deposit.vault = vaultId;
 
   deposit.protocol = PROTOCOL_ID;
 
