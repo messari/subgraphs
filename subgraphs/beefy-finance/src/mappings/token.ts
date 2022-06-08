@@ -1,6 +1,6 @@
 import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/ExampleVault/ERC20";
-import { getUsdPrice, getUsdPricePerToken } from "../prices";
+import { getUsdPricePerToken } from "../prices";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
 import { getTokenOrCreate } from "../utils/getters";
 

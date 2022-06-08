@@ -130,10 +130,8 @@ export function getDailyRevenuesUsd(
   let revenues: BigDecimal[];
   for (let i = 0; i < protocol.vaults.length; i++) {
     const vault = Vault.load(protocol.vaults[i]);
-    if (vault == null) {
-      continue;
-    } else {
-      revenues = getVaultDailyRevenues(vault, block);
+    if (vault) {
+      revenues = getVaultDailyRevenues(vault);
       dailyRevenueSupplySide = dailyRevenueSupplySide.plus(revenues[0]);
       dailyRevenueProtocolSide = dailyRevenueProtocolSide.plus(revenues[1]);
       dailyTotalRevenueUsd = dailyTotalRevenueUsd.plus(revenues[2]);

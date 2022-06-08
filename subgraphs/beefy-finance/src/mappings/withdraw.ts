@@ -1,9 +1,4 @@
-import {
-  BigDecimal,
-  BigInt,
-  dataSource,
-  ethereum,
-} from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Vault, Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,

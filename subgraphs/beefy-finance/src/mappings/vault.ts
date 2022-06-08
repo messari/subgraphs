@@ -27,7 +27,6 @@ import {
   BIGINT_ZERO,
   PROTOCOL_ID,
 } from "../prices/common/constants";
-import { updateProtocolAndSave } from "./protocol";
 
 export function createVaultFromStrategy(
   strategyAddress: Address,
@@ -236,10 +235,7 @@ export function getFees(
   return [strategistFee.id, withdrawalFee.id, callFee.id, beefyFee.id];
 }
 
-export function getVaultDailyRevenues(
-  vault: Vault,
-  block: ethereum.Block
-): BigDecimal[] {
+export function getVaultDailyRevenues(vault: Vault): BigDecimal[] {
   let fee: VaultFee | null;
   let lastSnapshot = VaultDailySnapshot.load(
     vault.dailySnapshots[vault.dailySnapshots.length - 1]
