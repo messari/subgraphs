@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.0.0
+# Version: 1.2.0
 
 enum Network {
   ARBITRUM_ONE
@@ -90,8 +90,6 @@ type LiquidityPoolFee @entity {
   pool: LiquidityPool!
   # dodo specific
   usdValueOfFee: BigDecimal
-  # dodo specific
-  lpMTRatio: BigDecimal
 }
 
 #############################

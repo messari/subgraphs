@@ -1,119 +1,13 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { bigIntToBigDecimal, safeDiv, modulateDecimals } from "./numbers";
 
 import { Deposit, Withdraw, Swap } from "../../generated/schema";
 
 import { getOrCreatePool, getUSDprice, getOrCreateToken } from "./getters";
 
-import { ZERO_BD } from "../constants/constant";
-
 import { Address, BigDecimal } from "@graphprotocol/graph-ts";
 
 import { ERC20 } from "../../generated/DVMFactory/ERC20";
-
-export function setUSDprice(
-  event: ethereum.Event,
-  tokenAdd: Address,
-  amount: BigInt,
-  stableCoin: Address,
-  scAmount: BigInt
-): void {
-  //get token
-  let token = getOrCreateToken(tokenAdd);
-  let sc = getOrCreateToken(stableCoin);
-
-  //retreive token decimals
-  let decT = token.decimals;
-  let decSC = sc.decimals;
-
-  let modSC = modulateDecimals(scAmount, decSC);
-  let modT = modulateDecimals(amount, decT);
-  let pricePerToken = safeDiv(modSC, modT);
-
-  token.lastPriceUSD = pricePerToken;
-  token.lastPriceBlockNumber = event.block.number;
-  token.save();
-}
-
-/////////////////////////////////////////////////
-
-export function setUSDpriceTokenToToken(
-  event: ethereum.Event,
-  priceTokenAdd: Address,
-  settingTokenAdd: Address,
-  amountOfPriceToken: BigInt,
-  amountOfSetToken: BigInt
-): void {
-  //get tokens
-  let priceToken = getOrCreateToken(priceTokenAdd);
-  let settingtoken = getOrCreateToken(settingTokenAdd);
-
-  //retreive token decimals
-  let decPT = priceToken.decimals;
-  let decST = settingtoken.decimals;
-
-  //get last priceToken USD price which should be 100 in tests
-  let lastprice = priceToken.lastPriceUSD;
-
-  // //for whatever dumb reason the graph insists priceToken.lastPriceUSD can be null so
-  if (!lastprice) {
-    lastprice = ZERO_BD;
-  }
-  // //get current USD value of the input amount of priceToken(currentwETHval = 100(1 * 100))
-  let currentPriceval = modulateDecimals(amountOfPriceToken, decPT) * lastprice;
-  //
-  // // get USD val per input ERC20 token(100 / 100)
-  let currentSeetingTokenval = safeDiv(
-    currentPriceval,
-    modulateDecimals(amountOfSetToken, decST)
-  );
-
-  settingtoken.lastPriceUSD = currentSeetingTokenval;
-  settingtoken.lastPriceBlockNumber = event.block.number;
-  settingtoken.save();
-}
-
-/////////////////////////////////////////////////
-
-export function setPriceLP(
-  timestamp: BigInt,
-  blockNumber: BigInt,
-  poolAdd: Address
-): void {
-  let token = getOrCreateToken(poolAdd);
-
-  let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, blockNumber, timestamp);
-
-  let tokens = pool.inputTokens;
-
-  let token1 = ERC20.bind(Address.fromString(tokens[0]));
-  let token2 = ERC20.bind(Address.fromString(tokens[1]));
-  let lpToken = ERC20.bind(poolAdd);
-
-  let tokenBal1 = token1.try_balanceOf(poolAdd);
-  if (tokenBal1.reverted) {
-    return;
-  }
-
-  let tokenBal2 = token2.try_balanceOf(poolAdd);
-  if (tokenBal2.reverted) {
-    return;
-  }
-
-  let tokeBal1Val = getUSDprice(Address.fromString(tokens[0]), tokenBal1.value);
-
-  let tokeBal2Val = getUSDprice(Address.fromString(tokens[1]), tokenBal2.value);
-
-  let totalValPool = tokeBal1Val + tokeBal2Val;
-  let totalSupplyLP = lpToken.totalSupply();
-  let valueOfOneLP = safeDiv(totalValPool, bigIntToBigDecimal(totalSupplyLP));
-  token.lastPriceUSD = valueOfOneLP;
-  token.lastPriceBlockNumber = blockNumber;
-
-  token.save();
-}
-
 /////////////////////////////////
 
 export function createDeposit(
@@ -143,19 +37,27 @@ export function createDeposit(
   let token1 = ERC20.bind(Address.fromString(tokens[0]));
   let token2 = ERC20.bind(Address.fromString(tokens[1]));
 
+  let tokenBal1Val = BigInt.fromString("0");
+  let tokenBal2Val = BigInt.fromString("0");
+
   let tokenBal1 = token1.try_balanceOf(poolAdd);
   if (tokenBal1.reverted) {
-    return;
+    tokenBal1Val = BigInt.fromString("0");
+  } else {
+    tokenBal1Val = tokenBal1.value;
   }
+
 
   let tokenBal2 = token2.try_balanceOf(poolAdd);
   if (tokenBal2.reverted) {
-    return;
+    tokenBal2Val = BigInt.fromString("0");
+  } else {
+    tokenBal2Val = tokenBal2.value;
   }
 
-  let difToken1 = tokenBal1.value - priorBalance[0];
+  let difToken1 = tokenBal1Val - priorBalance[0];
 
-  let difToken2 = tokenBal2.value - priorBalance[1];
+  let difToken2 = tokenBal2Val - priorBalance[1];
 
   let priceUSDtoken1 = BigDecimal.fromString("0");
   let priceUSDtoken2 = BigDecimal.fromString("0");
@@ -189,7 +91,7 @@ export function createDeposit(
   deposit.amountUSD = usdTotal;
   deposit.pool = pool.id;
 
-  pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
+  pool.inputTokenBalances = [tokenBal1Val, tokenBal2Val];
   pool.outputTokenSupply += shareAmount;
 
   deposit.save();
@@ -221,18 +123,26 @@ export function createWithdraw(
   let token1 = ERC20.bind(Address.fromString(tokens[0]));
   let token2 = ERC20.bind(Address.fromString(tokens[1]));
 
+  let tokenBal1Val = BigInt.fromString("0");
+  let tokenBal2Val = BigInt.fromString("0");
+
   let tokenBal1 = token1.try_balanceOf(poolAdd);
   if (tokenBal1.reverted) {
-    return;
+    tokenBal1Val = BigInt.fromString("0");
+  } else {
+    tokenBal1Val = tokenBal1.value;
   }
+
 
   let tokenBal2 = token2.try_balanceOf(poolAdd);
   if (tokenBal2.reverted) {
-    return;
+    tokenBal2Val = BigInt.fromString("0");
+  } else {
+    tokenBal2Val = tokenBal2.value;
   }
 
-  let difToken1 = priorBalance[0] - tokenBal1.value;
-  let difToken2 = priorBalance[1] - tokenBal2.value;
+  let difToken1 = priorBalance[0] - tokenBal1Val;
+  let difToken2 = priorBalance[1] - tokenBal2Val;
 
   let priceUSDtoken1 = BigDecimal.fromString("0");
   let priceUSDtoken2 = BigDecimal.fromString("0");
@@ -266,7 +176,7 @@ export function createWithdraw(
   withdraw.amountUSD = usdTotal;
   withdraw.pool = pool.id;
 
-  pool.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
+  pool.inputTokenBalances = [tokenBal1Val, tokenBal2Val];
   pool.outputTokenSupply -= shareAmount;
 
   withdraw.save();

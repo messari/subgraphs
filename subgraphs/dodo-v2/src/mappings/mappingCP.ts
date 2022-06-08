@@ -5,7 +5,7 @@ import {
 } from "../utils/metrics";
 
 import { createDeposit, createWithdraw } from "../utils/setters";
-import { updateCPpoolMetrics } from "../utils/metrics";
+// import { updateCPpoolMetrics } from "../utils/metrics";
 
 
 // event Bid(address to, uint256 amount, uint256 fee);
@@ -21,5 +21,5 @@ export function handleCancel(event: Cancel): void {
 }
 
 export function handleSettle(event: Settle): void {
-  updateCPpoolMetrics(event, event.address);
+  // updateCPpoolMetrics(event, event.address);
 }

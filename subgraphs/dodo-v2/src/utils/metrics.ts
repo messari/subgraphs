@@ -9,7 +9,8 @@ import {
 import {
   _Account,
   _DailyActiveAccount,
-  LiquidityPoolFee
+  LiquidityPoolFee,
+  DexAmmProtocol
 } from "../../generated/schema";
 
 import {
@@ -18,6 +19,7 @@ import {
   ZERO_BD,
   ZERO_BI,
   ONE_BI,
+  ONE_BD,
   STABLE_COINS,
   FEE_MODEL_INSTANCE,
   DVMFactory_ADDRESS,
@@ -26,7 +28,8 @@ import {
   DSPFactory_ADDRESS
 } from "../constants/constant";
 
-import { bigIntToBigDecimal } from "./numbers";
+import { bigIntToBigDecimal, safeDiv } from "./numbers";
+
 
 import {
   getOrCreateDexAmm,
@@ -37,15 +40,11 @@ import {
   getOrCreateFinancials,
   getOrCreatePool,
   getOrCreateToken,
-  getUSDprice
+  getUSDprice,
+  getOrCreateDexAmmADD
 } from "./getters";
 
-import {
-  setUSDprice,
-  setUSDpriceTokenToToken,
-  setPriceLP,
-  createSwap
-} from "./setters";
+
 
 import { ERC20 } from "../../generated/DVMFactory/ERC20";
 import { DVM } from "../../generated/DVM/DVM";
@@ -57,197 +56,58 @@ export function updateFinancials(
   event: ethereum.Event,
   usdTVL: BigDecimal,
   usdTVolume: BigDecimal,
-  feesArray: BigDecimal[]
+  usdValOfFees: BigDecimal
 ): void {
+  let usdValLP = usdValOfFees * BigDecimal.fromString(".25");
+  let usdValMT = usdValOfFees - usdValLP;
+
+  let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
+  let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
+  let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
+  let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
+
+  dvmP.totalValueLockedUSD += usdTVL;
+  dvmP.protocolControlledValueUSD += usdTVL;
+  dvmP.cumulativeSupplySideRevenueUSD += usdValLP;
+  dvmP.cumulativeProtocolSideRevenueUSD += usdValMT;
+  dvmP.cumulativeTotalRevenueUSD += usdValOfFees;
+  dvmP.cumulativeVolumeUSD += usdTVolume;
+  dvmP.save();
+
+  cpP.totalValueLockedUSD += usdTVL;
+  cpP.protocolControlledValueUSD += usdTVL;
+  cpP.cumulativeSupplySideRevenueUSD += usdValLP;
+  cpP.cumulativeProtocolSideRevenueUSD += usdValMT;
+  cpP.cumulativeTotalRevenueUSD += usdValOfFees;
+  cpP.cumulativeVolumeUSD += usdTVolume;
+  cpP.save();
+
+  dppP.totalValueLockedUSD += usdTVL;
+  dppP.protocolControlledValueUSD += usdTVL;
+  dppP.cumulativeSupplySideRevenueUSD += usdValLP;
+  dppP.cumulativeProtocolSideRevenueUSD += usdValMT;
+  dppP.cumulativeTotalRevenueUSD += usdValOfFees;
+  dppP.cumulativeVolumeUSD += usdTVolume;
+  dppP.save();
+
+  dspP.totalValueLockedUSD += usdTVL;
+  dspP.protocolControlledValueUSD += usdTVL;
+  dspP.cumulativeSupplySideRevenueUSD += usdValLP;
+  dspP.cumulativeProtocolSideRevenueUSD += usdValMT;
+  dspP.cumulativeTotalRevenueUSD += usdValOfFees;
+  dspP.cumulativeVolumeUSD += usdTVolume;
+  dspP.save();
+
   let protocol = getOrCreateDexAmm(event.address);
-
-  let dvmP = getOrCreateDexAmm(Address.fromString(DVMFactory_ADDRESS));
-  let cpP = getOrCreateDexAmm(Address.fromString(CPFactory_ADDRESS));
-  let dppP = getOrCreateDexAmm(Address.fromString(DPPFactory_ADDRESS));
-  let dspP = getOrCreateDexAmm(Address.fromString(DSPFactory_ADDRESS));
-
-  let dvmCumulativeSupplySideRevenueUSD = dvmP.cumulativeSupplySideRevenueUSD;
-  let dvmCumulativeProtocolSideRevenueUSD =
-    dvmP.cumulativeProtocolSideRevenueUSD;
-  let dvmCumulativeTotalRevenueUSD = dvmP.cumulativeTotalRevenueUSD;
-  let dvmCumulativeVolumeUSD = dvmP.cumulativeVolumeUSD;
-
-  let cpCumulativeSupplySideRevenueUSD = cpP.cumulativeSupplySideRevenueUSD;
-  let cpCumulativeProtocolSideRevenueUSD = cpP.cumulativeProtocolSideRevenueUSD;
-  let cpCumulativeTotalRevenueUSD = cpP.cumulativeTotalRevenueUSD;
-  let cpCumulativeVolumeUSD = cpP.cumulativeVolumeUSD;
-
-  let dppCumulativeSupplySideRevenueUSD = dppP.cumulativeSupplySideRevenueUSD;
-  let dppCumulativeProtocolSideRevenueUSD =
-    dppP.cumulativeProtocolSideRevenueUSD;
-  let dppCumulativeTotalRevenueUSD = dppP.cumulativeTotalRevenueUSD;
-  let dppCumulativeVolumeUSD = dppP.cumulativeVolumeUSD;
-
-  let dspCumulativeSupplySideRevenueUSD = dspP.cumulativeSupplySideRevenueUSD;
-  let dspCumulativeProtocolSideRevenueUSD =
-    dspP.cumulativeProtocolSideRevenueUSD;
-  let dspCumulativeTotalRevenueUSD = dspP.cumulativeTotalRevenueUSD;
-  let dspCumulativeVolumeUSD = dspP.cumulativeVolumeUSD;
-
-  let prevCumulativeSupplySideRevenueUSD = ZERO_BD;
-  let prevCumulativeProtocolSideRevenueUSD = ZERO_BD;
-  let prevCumulativeTotalRevenueUSD = ZERO_BD;
-  let prevCumulativeVolumeUSD = ZERO_BD;
-
-  //if DVM is biggest
-  if (
-    dvmCumulativeSupplySideRevenueUSD > cpCumulativeSupplySideRevenueUSD &&
-    dvmCumulativeSupplySideRevenueUSD > dppCumulativeSupplySideRevenueUSD &&
-    dvmCumulativeSupplySideRevenueUSD > dspCumulativeSupplySideRevenueUSD
-  ) {
-    prevCumulativeSupplySideRevenueUSD = dvmCumulativeSupplySideRevenueUSD;
-  }
-
-  if (
-    dvmCumulativeProtocolSideRevenueUSD > cpCumulativeProtocolSideRevenueUSD &&
-    dvmCumulativeProtocolSideRevenueUSD > dppCumulativeProtocolSideRevenueUSD &&
-    dvmCumulativeProtocolSideRevenueUSD > dspCumulativeProtocolSideRevenueUSD
-  ) {
-    prevCumulativeProtocolSideRevenueUSD = dvmCumulativeProtocolSideRevenueUSD;
-  }
-
-  if (
-    dvmCumulativeTotalRevenueUSD > cpCumulativeTotalRevenueUSD &&
-    dvmCumulativeTotalRevenueUSD > dppCumulativeTotalRevenueUSD &&
-    dvmCumulativeTotalRevenueUSD > dspCumulativeTotalRevenueUSD
-  ) {
-    prevCumulativeTotalRevenueUSD = dvmCumulativeTotalRevenueUSD;
-  }
-
-  if (
-    dvmCumulativeVolumeUSD > cpCumulativeVolumeUSD &&
-    dvmCumulativeVolumeUSD > dppCumulativeVolumeUSD &&
-    dvmCumulativeVolumeUSD > dspCumulativeVolumeUSD
-  ) {
-    prevCumulativeVolumeUSD = dvmCumulativeVolumeUSD;
-  }
-  //if CP is biggest
-
-  if (
-    cpCumulativeSupplySideRevenueUSD > dvmCumulativeSupplySideRevenueUSD &&
-    cpCumulativeSupplySideRevenueUSD > dppCumulativeSupplySideRevenueUSD &&
-    cpCumulativeSupplySideRevenueUSD > dspCumulativeSupplySideRevenueUSD
-  ) {
-    prevCumulativeSupplySideRevenueUSD = cpCumulativeSupplySideRevenueUSD;
-  }
-
-  if (
-    cpCumulativeProtocolSideRevenueUSD > dvmCumulativeProtocolSideRevenueUSD &&
-    cpCumulativeProtocolSideRevenueUSD > dppCumulativeProtocolSideRevenueUSD &&
-    cpCumulativeProtocolSideRevenueUSD > dspCumulativeProtocolSideRevenueUSD
-  ) {
-    prevCumulativeProtocolSideRevenueUSD = cpCumulativeProtocolSideRevenueUSD;
-  }
-
-  if (
-    cpCumulativeTotalRevenueUSD > dvmCumulativeTotalRevenueUSD &&
-    cpCumulativeTotalRevenueUSD > dppCumulativeTotalRevenueUSD &&
-    cpCumulativeTotalRevenueUSD > dspCumulativeTotalRevenueUSD
-  ) {
-    prevCumulativeTotalRevenueUSD = cpCumulativeTotalRevenueUSD;
-  }
-
-  if (
-    cpCumulativeVolumeUSD > dvmCumulativeVolumeUSD &&
-    cpCumulativeVolumeUSD > dppCumulativeVolumeUSD &&
-    cpCumulativeVolumeUSD > dspCumulativeVolumeUSD
-  ) {
-    prevCumulativeVolumeUSD = cpCumulativeVolumeUSD;
-  }
-  //if DPP is biggest
-
-  if (
-    dppCumulativeSupplySideRevenueUSD > dvmCumulativeSupplySideRevenueUSD &&
-    dppCumulativeSupplySideRevenueUSD > cpCumulativeSupplySideRevenueUSD &&
-    dppCumulativeSupplySideRevenueUSD > dspCumulativeSupplySideRevenueUSD
-  ) {
-    prevCumulativeSupplySideRevenueUSD = dppCumulativeSupplySideRevenueUSD;
-  }
-
-  if (
-    dppCumulativeProtocolSideRevenueUSD > cpCumulativeProtocolSideRevenueUSD &&
-    dppCumulativeProtocolSideRevenueUSD > dvmCumulativeProtocolSideRevenueUSD &&
-    dppCumulativeProtocolSideRevenueUSD > dspCumulativeProtocolSideRevenueUSD
-  ) {
-    prevCumulativeProtocolSideRevenueUSD = dppCumulativeProtocolSideRevenueUSD;
-  }
-
-  if (
-    dppCumulativeTotalRevenueUSD > cpCumulativeTotalRevenueUSD &&
-    dppCumulativeTotalRevenueUSD > dvmCumulativeTotalRevenueUSD &&
-    dppCumulativeTotalRevenueUSD > dspCumulativeTotalRevenueUSD
-  ) {
-    prevCumulativeTotalRevenueUSD = dppCumulativeTotalRevenueUSD;
-  }
-
-  if (
-    dppCumulativeVolumeUSD > cpCumulativeVolumeUSD &&
-    dppCumulativeVolumeUSD > dvmCumulativeVolumeUSD &&
-    dppCumulativeVolumeUSD > dspCumulativeVolumeUSD
-  ) {
-    prevCumulativeVolumeUSD = dppCumulativeVolumeUSD;
-  }
-  //if DSP is biggest
-
-  if (
-    dspCumulativeSupplySideRevenueUSD > dvmCumulativeSupplySideRevenueUSD &&
-    dspCumulativeSupplySideRevenueUSD > cpCumulativeSupplySideRevenueUSD &&
-    dspCumulativeSupplySideRevenueUSD > dppCumulativeSupplySideRevenueUSD
-  ) {
-    prevCumulativeSupplySideRevenueUSD = dspCumulativeSupplySideRevenueUSD;
-  }
-
-  if (
-    dspCumulativeProtocolSideRevenueUSD > cpCumulativeProtocolSideRevenueUSD &&
-    dspCumulativeProtocolSideRevenueUSD > dppCumulativeProtocolSideRevenueUSD &&
-    dspCumulativeProtocolSideRevenueUSD > dvmCumulativeProtocolSideRevenueUSD
-  ) {
-    prevCumulativeProtocolSideRevenueUSD = dspCumulativeProtocolSideRevenueUSD;
-  }
-
-  if (
-    dspCumulativeTotalRevenueUSD > cpCumulativeTotalRevenueUSD &&
-    dspCumulativeTotalRevenueUSD > dppCumulativeTotalRevenueUSD &&
-    dspCumulativeTotalRevenueUSD > dvmCumulativeTotalRevenueUSD
-  ) {
-    prevCumulativeTotalRevenueUSD = dspCumulativeTotalRevenueUSD;
-  }
-
-  if (
-    dspCumulativeVolumeUSD > cpCumulativeVolumeUSD &&
-    dspCumulativeVolumeUSD > dppCumulativeVolumeUSD &&
-    dspCumulativeVolumeUSD > dvmCumulativeVolumeUSD
-  ) {
-    prevCumulativeVolumeUSD = dspCumulativeVolumeUSD;
-  }
-
-  let usdValFees = feesArray[0];
-  let lpMTRatio = feesArray[1];
-
-  let usdValLP = usdValFees * lpMTRatio;
-  let usdValMT = usdValFees - usdValLP;
-
-  prevCumulativeSupplySideRevenueUSD += usdValLP;
-  prevCumulativeProtocolSideRevenueUSD += usdValMT;
-  prevCumulativeTotalRevenueUSD += usdValLP + usdValMT;
-  prevCumulativeVolumeUSD += usdTVolume;
-  protocol.totalValueLockedUSD += usdTVL;
-  protocol.protocolControlledValueUSD += usdTVL;
-
-  protocol.cumulativeSupplySideRevenueUSD = prevCumulativeSupplySideRevenueUSD;
-  protocol.cumulativeProtocolSideRevenueUSD = prevCumulativeProtocolSideRevenueUSD;
-  protocol.cumulativeTotalRevenueUSD = prevCumulativeTotalRevenueUSD;
-  protocol.cumulativeVolumeUSD = prevCumulativeVolumeUSD;
 
   let financialMetrics = getOrCreateFinancials(event);
   financialMetrics.protocol = protocol.id;
 
-  financialMetrics.cumulativeVolumeUSD += protocol.cumulativeVolumeUSD;
+  financialMetrics.dailyVolumeUSD += usdTVL;
+  financialMetrics.dailySupplySideRevenueUSD += usdValLP;
+  financialMetrics.dailyProtocolSideRevenueUSD += usdValMT;
+  financialMetrics.dailyTotalRevenueUSD += usdValOfFees;
+  financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
   financialMetrics.totalValueLockedUSD += usdTVL;
   financialMetrics.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
@@ -259,7 +119,6 @@ export function updateFinancials(
   financialMetrics.timestamp = event.block.timestamp;
 
   financialMetrics.save();
-  protocol.save();
 }
 
 export function updateUsageMetrics(
@@ -274,61 +133,24 @@ export function updateUsageMetrics(
   let account = _Account.load(accountId);
   let protocol = getOrCreateDexAmm(event.address);
 
-  let dvmP = getOrCreateDexAmm(Address.fromString(DVMFactory_ADDRESS));
-  let cpP = getOrCreateDexAmm(Address.fromString(CPFactory_ADDRESS));
-  let dppP = getOrCreateDexAmm(Address.fromString(DPPFactory_ADDRESS));
-  let dspP = getOrCreateDexAmm(Address.fromString(DSPFactory_ADDRESS));
-
-  let dvmCumulativeUniqueUsers = dvmP.cumulativeUniqueUsers;
-  let cpCumulativeUniqueUsers = cpP.cumulativeUniqueUsers;
-  let dppCumulativeUniqueUsers = dppP.cumulativeUniqueUsers;
-  let dspCumulativeUniqueUsers = dspP.cumulativeUniqueUsers;
-
-  let prevCumulativeUniqueUsers = 0;
-
-  //if DVM is biggest
-  if (
-    dvmCumulativeUniqueUsers > cpCumulativeUniqueUsers &&
-    dvmCumulativeUniqueUsers > dppCumulativeUniqueUsers &&
-    dvmCumulativeUniqueUsers > dspCumulativeUniqueUsers
-  ) {
-    prevCumulativeUniqueUsers = dvmCumulativeUniqueUsers;
-  }
-
-  //if CP is biggest
-  if (
-    cpCumulativeUniqueUsers > dvmCumulativeUniqueUsers &&
-    cpCumulativeUniqueUsers > dppCumulativeUniqueUsers &&
-    cpCumulativeUniqueUsers > dspCumulativeUniqueUsers
-  ) {
-    prevCumulativeUniqueUsers = cpCumulativeUniqueUsers;
-  }
-
-  //if DPP is biggest
-  if (
-    dppCumulativeUniqueUsers > cpCumulativeUniqueUsers &&
-    dppCumulativeUniqueUsers > dvmCumulativeUniqueUsers &&
-    dppCumulativeUniqueUsers > dspCumulativeUniqueUsers
-  ) {
-    prevCumulativeUniqueUsers = dppCumulativeUniqueUsers;
-  }
-
-  //if DSP is biggest
-  if (
-    dspCumulativeUniqueUsers > cpCumulativeUniqueUsers &&
-    dspCumulativeUniqueUsers > dppCumulativeUniqueUsers &&
-    dspCumulativeUniqueUsers > dvmCumulativeUniqueUsers
-  ) {
-    prevCumulativeUniqueUsers = dspCumulativeUniqueUsers;
-  }
-
-  prevCumulativeUniqueUsers += 1;
+  let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
+  let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
+  let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
+  let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
 
   if (!account) {
     account = new _Account(accountId);
     account.save();
-    protocol.cumulativeUniqueUsers = prevCumulativeUniqueUsers;
+    protocol.cumulativeUniqueUsers += 1;
+    dvmP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    cpP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    dppP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    dspP.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
     protocol.save();
+    dvmP.save();
+    cpP.save();
+    dppP.save();
+    dspP.save();
   }
 
   let usageMetricsDaily = getOrCreateDailyUsageSnapshot(
@@ -398,61 +220,37 @@ export function updatePoolMetrics(
 
   let poolInstance = DVM.bind(poolAdd);
 
+  let tokenBal1Val = BigInt.fromString("0");
+  let tokenBal2Val = BigInt.fromString("0");
+  let lpSupplyVal = BigInt.fromString("0");
+
   let tokenBal1 = token1.try_balanceOf(poolAdd);
   if (tokenBal1.reverted) {
-    return;
+    tokenBal1Val = BigInt.fromString("0");
+  } else {
+    tokenBal1Val = tokenBal1.value;
   }
+
 
   let tokenBal2 = token2.try_balanceOf(poolAdd);
   if (tokenBal2.reverted) {
-    return;
+    tokenBal2Val = BigInt.fromString("0");
+  } else {
+    tokenBal2Val = tokenBal2.value;
   }
+
 
   let lpSupply = poolInstance.try_totalSupply();
   if (lpSupply.reverted) {
-    return;
+    lpSupplyVal = BigInt.fromString("0")
+  } else {
+    lpSupplyVal = lpSupply.value
   }
 
-  //check to see if either token in the transaction is a stablecoin(DAI, USDC, USDT)
-  //If either tokens are call the setUSDprice function to set a price for the other token
-  if (
-    tokenAdds[0] == Address.fromString(STABLE_COINS[0]) ||
-    tokenAdds[0] == Address.fromString(STABLE_COINS[1]) ||
-    tokenAdds[0] == Address.fromString(STABLE_COINS[2])
-  ) {
-    setUSDprice(event, tokenAdds[1], amount[1], tokenAdds[0], amount[0]);
-  }
-  if (
-    tokenAdds[1] == Address.fromString(STABLE_COINS[0]) ||
-    tokenAdds[1] == Address.fromString(STABLE_COINS[1]) ||
-    tokenAdds[1] == Address.fromString(STABLE_COINS[2])
-  ) {
-    setUSDprice(event, tokenAdds[0], amount[0], tokenAdds[1], amount[1]);
-  }
-  if (t1.lastPriceUSD > BigDecimal.fromString("0")) {
-    setUSDpriceTokenToToken(
-      event,
-      tokenAdds[0],
-      tokenAdds[1],
-      amount[0],
-      amount[1]
-    );
-  } else if (t2.lastPriceUSD > BigDecimal.fromString("0")) {
-    setUSDpriceTokenToToken(
-      event,
-      tokenAdds[1],
-      tokenAdds[0],
-      amount[1],
-      amount[0]
-    );
-  }
+  let usdValueOfTransaction = getUSDprice(tokenAdds[0], amount[0]);
+  let usdValueOfToken1 = getUSDprice(tokenAdds[0], tokenBal1Val);
+  let usdValueOfToken2 = getUSDprice(tokenAdds[1], tokenBal2Val);
 
-  let usdValueOfTransaction: BigDecimal = BigDecimal.fromString("0");
-
-  usdValueOfTransaction = getUSDprice(tokenAdds[0], amount[0]);
-
-  let usdValueOfToken1 = getUSDprice(tokenAdds[0], tokenBal1.value);
-  let usdValueOfToken2 = getUSDprice(tokenAdds[1], tokenBal2.value);
   let usdValofPool = usdValueOfToken1 + usdValueOfToken2;
   let lpTokenUSD = getUSDprice(
     Address.fromString(pool.outputToken),
@@ -463,17 +261,16 @@ export function updatePoolMetrics(
   pool.totalValueLockedUSD = usdValofPool;
   poolMetrics.totalValueLockedUSD = usdValofPool;
   poolMetrics.cumulativeVolumeUSD += usdValueOfTransaction;
-  poolMetrics.inputTokenBalances = [tokenBal1.value, tokenBal2.value];
-  poolMetrics.outputTokenSupply = lpSupply.value;
+  poolMetrics.inputTokenBalances = [tokenBal1Val, tokenBal2Val];
+  poolMetrics.outputTokenSupply = lpSupplyVal;
   poolMetrics.outputTokenPriceUSD = lpTokenUSD;
   poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetrics.blockNumber = event.block.number;
   poolMetrics.timestamp = event.block.timestamp;
 
-  let feesArray = updateFees(event, poolAdd, usdValueOfTransaction, trader);
-  updateFinancials(event, usdValofPool, usdValueOfTransaction, feesArray);
-  setPriceLP(event.block.timestamp, event.block.number, poolAdd);
+  let usdValOfFees = updateFees(event, poolAdd, tokenAdds[0], amount[0], trader);
+  updateFinancials(event, usdValofPool, usdValueOfTransaction, usdValOfFees);
   poolMetrics.save();
   pool.save();
 }
@@ -481,82 +278,43 @@ export function updatePoolMetrics(
 export function updateFees(
   event: ethereum.Event,
   poolAdd: Address,
-  usdValOfTrade: BigDecimal,
+  tokenAdd: Address,
+  amount: BigInt,
   trader: Address
-): BigDecimal[] {
+): BigDecimal {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
   let poolFee = new LiquidityPoolFee(id.toString());
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
-  let poolInstance = DSP.bind(poolAdd);
-  let lpmtr = BigDecimal.fromString(".25");
+  let poolInstance = DVM.bind(poolAdd);
+  let tradeValReceived = ZERO_BI;
+  let mtFee = ZERO_BI;
 
-  let feeMInstance = FeeRateModel.bind(Address.fromString(FEE_MODEL_INSTANCE));
 
-  let callResult1 = feeMInstance.try_feeRateImpl();
-  if (callResult1.reverted) {
-    log.info("feeRateImpl reverted", []);
-  }
-  let feeImpAdd = callResult1.value;
+   let vaultReserveDVM = poolInstance.try_querySellBase(trader, amount);
+   if (vaultReserveDVM.reverted) {
+     log.warning("[UpdateFees] pool query reverted, tradeValReceived && mtFee was set to ZERO_BI", []);
+   } else {
+     let returnVal = vaultReserveDVM.value;
+     tradeValReceived = returnVal.value0;
+     mtFee = returnVal.value1;
+     log.debug("[UpdateFees] pool query successful, pool address is: {} ", [poolAdd.toHexString()]);
+     log.debug("[UpdateFees] pool query successful, amount of token traded is: {} ", [amount.toString()]);
+     log.debug("[UpdateFees] pool query successful, tradeValReceived is: {} ", [tradeValReceived.toString()]);
+     log.debug("[UpdateFees] pool query successful, mtFee are: {}", [mtFee.toString()]);
+   }
 
-  let feeImpInstance = FeeRateModel.bind(feeImpAdd);
-
-  let callResult = feeImpInstance.try_getFeeRate(poolAdd, trader);
-  if (callResult.reverted) {
-    log.info("getFeeRate reverted", []);
-  }
-
-  let fr = callResult.value;
-
-  let usdValOfFees = usdValOfTrade * bigIntToBigDecimal(fr);
+  let usdValOfTrade = getUSDprice(tokenAdd, amount);
+  log.debug("[UpdateFees] USD Value of amount being traded: {}", [usdValOfTrade.toString()]);
+  let usdValOfFees = getUSDprice(tokenAdd, mtFee);
+  log.debug("[UpdateFees] USD Value of Fees from trade is: {}", [usdValOfFees.toString()]);
 
   poolFee.pool = pool.id;
-  poolFee.feePercentage = BigDecimal.fromString("0");
+  poolFee.feePercentage = safeDiv(bigIntToBigDecimal(tradeValReceived), bigIntToBigDecimal(mtFee));
   poolFee.feeType = "TIERED_TRADING_FEE";
   poolFee.usdValueOfFee = usdValOfFees;
-  poolFee.lpMTRatio = lpmtr;
 
-  return [usdValOfFees, lpmtr];
-}
+  poolFee.save();
 
-export function updateCPpoolMetrics(
-  event: ethereum.Event,
-  poolAdd: Address
-): void {
-  let cpPool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
-  let tokens = cpPool.inputTokens;
-
-  let token1 = ERC20.bind(Address.fromString(tokens[0]));
-  let token2 = ERC20.bind(Address.fromString(tokens[1]));
-
-  let tokenBal1 = token1.try_balanceOf(poolAdd);
-  if (tokenBal1.reverted) {
-    return;
-  }
-
-  let tokenBal2 = token2.try_balanceOf(poolAdd);
-  if (tokenBal2.reverted) {
-    return;
-  }
-
-  let amount = [tokenBal1.value, tokenBal2.value];
-  let token = [Address.fromString(tokens[0]), Address.fromString(tokens[1])];
-
-  updatePoolMetrics(
-    event,
-    poolAdd,
-    token,
-    Address.fromString(ADDRESS_ZERO),
-    amount
-  );
-
-  createSwap(
-    event,
-    Address.fromString(ADDRESS_ZERO),
-    poolAdd,
-    token[0],
-    token[1],
-    amount[0],
-    amount[1]
-  );
+  return usdValOfFees;
 }

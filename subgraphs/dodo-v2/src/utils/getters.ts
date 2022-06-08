@@ -1,7 +1,7 @@
 // import { log } from "@graphprotocol/graph-ts"
 import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
-import { bigIntToBigDecimal } from "./numbers";
+import { bigIntToBigDecimal, modulateDecimals } from "./numbers";
 
 import {
   Token,
@@ -44,7 +44,8 @@ import { CP } from "../../generated/CP/CP";
 import { DSP } from "../../generated/DSP/DSP";
 import { DPP } from "../../generated/DPP/DPP";
 
-import { setPriceLP } from "./setters";
+import { getUsdPrice, getUSDPricePerToken } from "../prices";
+
 
 export function getOrCreateRewardToken(rewardToken: Address): Token {
   let token = getOrCreateToken(rewardToken);
@@ -77,11 +78,6 @@ export function getOrCreateToken(tokenAddress: Address): Token {
 export function getOrCreateDexAmm(poolAdd: Address): DexAmmProtocol {
   let proto = getProtocolFromPool(poolAdd);
   let protocol = DexAmmProtocol.load(proto);
-
-  let dvmP = DexAmmProtocol.load(DVMFactory_ADDRESS);
-  let cpP = DexAmmProtocol.load(CPFactory_ADDRESS);
-  let dppP = DexAmmProtocol.load(DPPFactory_ADDRESS);
-  let dspP = DexAmmProtocol.load(DSPFactory_ADDRESS);
 
   let name = "";
 
@@ -338,16 +334,16 @@ export function getLiquidityPoolHourlySnapshot(
   return poolMetrics;
 }
 
-function getProtocolFromPool(poolAddress: Address): string {
+export function getProtocolFromPool(poolAddress: Address): string {
   let pool = DVM.bind(poolAddress);
   let callResult = pool.try_version();
   let version = "";
 
   if (callResult.reverted) {
-    log.info("pool get version reverted", []);
+    log.warning("[getProtocolFromPool] pool get version reverted, pool address of failed call: {}", [poolAddress.toHexString()]);
   } else {
     version = callResult.value;
-    log.info("pool get version returned", [version]);
+    log.info("[getProtocolFromPool] pool get version returned: {}", [version]);
   }
 
   let factoryAdd = "";
@@ -369,13 +365,45 @@ function getProtocolFromPool(poolAddress: Address): string {
 
 export function getUSDprice(tokenAddress: Address, amount: BigInt): BigDecimal {
   let token = getOrCreateToken(tokenAddress);
-  //get last price
-  let lastprice = token.lastPriceUSD;
-  //dont know why but it insists lastprice can be empty even tho there is no way it can
-  if (!lastprice) {
-    lastprice = ZERO_BD;
-  }
-  //usd price amount of tokens
-  let price = bigIntToBigDecimal(amount) * lastprice;
+  let modAmount = bigIntToBigDecimal(amount)
+  let price = getUsdPrice(tokenAddress, modAmount);
+  token.lastPriceUSD = getUSDPricePerToken(tokenAddress);
+  token.save();
   return price;
+}
+
+export function getOrCreateDexAmmADD(protoAdd: Address): DexAmmProtocol {
+  let protocol = DexAmmProtocol.load(protoAdd.toHexString());
+
+  let name = "";
+
+  if (!protocol) {
+    protocol = new DexAmmProtocol(protoAdd.toHexString());
+    if (protoAdd.toHexString() == DVMFactory_ADDRESS) {
+      name = "DODO V2 - DVM Factory";
+    } else if (protoAdd.toHexString() == CPFactory_ADDRESS) {
+      name = "DODO V2 - CrowdPool Factory";
+    } else if (protoAdd.toHexString() == DPPFactory_ADDRESS) {
+      name = "DODO V2 - DPP Factory";
+    } else if (protoAdd.toHexString() == DSPFactory_ADDRESS) {
+      name = "DODO V2 - DSP Factory";
+    }
+    protocol.name = name;
+    protocol.slug = "messari-dodo";
+    protocol.schemaVersion = "1.2.0";
+    protocol.subgraphVersion = "0.2.1";
+    protocol.methodologyVersion = "1.0.0";
+    protocol.network = Network.MAINNET;
+    protocol.type = ProtocolType.EXCHANGE;
+    protocol.totalValueLockedUSD = ZERO_BD;
+    protocol.protocolControlledValueUSD = ZERO_BD;
+    protocol.cumulativeVolumeUSD = ZERO_BD;
+    protocol.cumulativeSupplySideRevenueUSD = ZERO_BD;
+    protocol.cumulativeProtocolSideRevenueUSD = ZERO_BD;
+    protocol.cumulativeTotalRevenueUSD = ZERO_BD;
+    protocol.cumulativeUniqueUsers = 0;
+
+    protocol.save();
+  }
+  return protocol;
 }
