@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 import { BasePoolAdded, MetaPoolDeployed, PlainPoolDeployed } from "../../generated/Factory/Factory";
 import { LiquidityPool } from "../../generated/schema";
 import { FactoryPools } from "../../generated/templates";
@@ -21,6 +21,10 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
   const lp_token = event.params.lp_token;
   const lpTokenEntity = getOrCreateToken(lp_token);
   let pool = event.params.pool;
+  if (!pool || pool == ADDRESS_ZERO) {
+    log.error('Plain pool deployed with invalid pool address: {}', [pool.toHexString()]);
+    return;
+  }
   createNewPool(
     pool,
     lp_token,
@@ -33,6 +37,7 @@ export function handlePlainPoolDeployed(event: PlainPoolDeployed): void {
   );
   // Create a new pool
   FactoryPools.create(pool);
+  log.info('New plain pool deployed: {}', [pool.toHexString()]);
 }
 
 export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
@@ -40,6 +45,10 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
   let lp_token = event.params.lp_token;
   const lpTokenEntity = getOrCreateToken(lp_token);
   let pool = event.params.pool;
+  if (!pool || pool == ADDRESS_ZERO) {
+    log.error('Meta pool deployed with invalid pool address: {}', [pool.toHexString()]);
+    return;
+  }
   createNewPool(
     pool,
     lp_token,
@@ -53,6 +62,7 @@ export function handleMetaPoolDeployed(event: MetaPoolDeployed): void {
   );
   // Create a new pool
   FactoryPools.create(pool);
+  log.info('New meta pool deployed: {}', [pool.toHexString()]);
 }
 
 export function handleBasePoolAdded(event: BasePoolAdded): void {

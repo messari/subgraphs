@@ -88,25 +88,25 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | **Lending Protocols** |    | |
 | [Aave v2](https://aave.com/) | 🛠 | 1.1.0 / 1.1.30 / 1.0.0 | [![Aave V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/aave-v2-ethereum) |
 | Aave v3 |  | | |
-| [Aurigami](https://www.aurigami.finance/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0  | [![Aurigami Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/aurigami-aurora) |
-| [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.2.1 / 1.0.3 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
-| [Banker Joe](https://traderjoexyz.com/lending#/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Banker Joe Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/banker-joe-avalanche) |
-| [BENQI](https://benqi.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![BENQI Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/benqi-avalanche) |
-| [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.3 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
-| [CREAM Finance](https://cream.finance/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![CREAM Finance Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-arbitrum) [![CREAM Finance Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-polygon) [![CREAM Finance BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-bsc) [![CREAM Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-ethereum)|
+| [Aurigami](https://www.aurigami.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0  | [![Aurigami Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/aurigami-aurora) |
+| [Bastion Protocol](https://bastionprotocol.com/) | 🛠 | 1.2.1 / 1.0.5 / 1.0.0 | [![Bastion Protocol Aurora](./docs/images/chains/aurora.png)](https://thegraph.com/hosted-service/subgraph/messari/bastion-protocol-aurora) |
+| [Banker Joe](https://traderjoexyz.com/lending#/) | 🛠 | 1.2.1 / 1.0.1 / 1.0.0 | [![Banker Joe Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/banker-joe-avalanche) |
+| [BENQI](https://benqi.fi/) | 🛠 | 1.2.1 / 1.0.3 / 1.0.0 | [![BENQI Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/benqi-avalanche) |
+| [Compound](https://compound.finance/) | 🛠 | 1.2.1 / 1.5.7 / 1.0.0 | [![Compund Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/compound-ethereum) |
+| [CREAM Finance](https://cream.finance/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![CREAM Finance Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-arbitrum) [![CREAM Finance Polygon](./docs/images/chains/matic.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-polygon) [![CREAM Finance BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-bsc) [![CREAM Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/cream-finance-ethereum)|
 | dForce | 🔨 | | |
 | Euler Finance | 🔨 | | |
 | Geist | 🔨 | | |
 | Hundred Finance | 🔨 | | |
-| [Iron Bank](https://app.ib.xyz/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Iron Bank Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-fantom) [![Iron Bank Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-avalanche) [![Iron Bank Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-ethereum) |
+| [Iron Bank](https://app.ib.xyz/) | 🛠 | 1.2.1 / 1.0.4 / 1.0.0 | [![Iron Bank Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-fantom) [![Iron Bank Avalanche](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-avalanche) [![Iron Bank Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/iron-bank-ethereum) |
 | Maple Finance | 🔨 | | |
 | Moola Market | 🔨 | | |
-| [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
+| [Moonwell Finance](https://moonwell.fi/) | 🛠 | 1.2.1 / 1.0.5 / 1.0.0 | [![Moonwell Moonriver](./docs/images/chains/moonriver.png)](https://thegraph.com/hosted-service/subgraph/messari/moonwell-moonriver)  |
 | Notional Finance | 🔨 | | |
 | [Rari Fuse](https://app.rari.capital/fuse) | 🔨 | | |
-| [SCREAM](https://scream.sh/) | 🛠 | 1.2.1 / 1.0.1 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom)  |
+| [SCREAM](https://scream.sh/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![SCREAM Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/scream-fantom)  |
 | TrueFi |   | | |
-| [Venus Protocol](https://venus.io/) | 🛠 | 1.2.1 / 1.0.1 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
+| [Venus Protocol](https://venus.io/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0 | [![Venus Protocol BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/venus-protocol-bsc) |
 | Yeti Finance |  | | |
 | **CDPs** |    | |
 | [Abracadabra](https://abracadabra.money/) | 🛠 | 1.2.1 / 1.0.2 / 1.0.0| [![Abracadabra Money](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-ethereum) [![Abracadabra Money](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-bsc) [![Abracadabra Money](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-arbitrum) [![Abracadabra Money](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-fantom) [![Abracadabra Money](./docs/images/chains/avalanche.png)](https://thegraph.com/hosted-service/subgraph/messari/abracadabra-money-avalanche) |

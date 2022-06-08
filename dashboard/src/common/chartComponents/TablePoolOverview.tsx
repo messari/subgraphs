@@ -50,9 +50,10 @@ export const TablePoolOverview = ({
         headerName: "Base Yield %",
         width: 180,
         renderCell: (params: any) => {
+          let value = "%" + params.value.toFixed(2);
           return (
-            <Tooltip title={params.value}>
-              <span style={tableCellTruncate}>{params.value}</span>
+            <Tooltip title={value}>
+              <span style={tableCellTruncate}>{value}</span>
             </Tooltip>
           );
         },
@@ -281,7 +282,7 @@ export const TablePoolOverview = ({
         returnObj.rewardTokens = "No Reward Token";
       }
       if (baseFieldCol) {
-        returnObj.baseYield = "%0.00";
+        returnObj.baseYield = 0;
         if (Object.keys(pool?.fees)?.length > 0 && pool?.totalValueLockedUSD) {
           // CURRENTLY THE FEE IS BASED OFF OF THE POOL RATHER THAN THE TIME SERIES. THIS IS TEMPORARY
           const supplierFee = pool.fees.find((fee: { [x: string]: string }) => {
@@ -317,7 +318,7 @@ export const TablePoolOverview = ({
               fieldName: `${pool.name || '#' + i + 1 + skipAmt} Base Yield`,
             });
           }
-          returnObj.baseYield = "%" + value.toFixed(2);
+          returnObj.baseYield = value;
         }
       }
       return returnObj;
