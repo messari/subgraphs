@@ -23,7 +23,7 @@ import {
   TotalLiquidityUpdated as BNTTotalLiquidityUpdated,
 } from "../generated/BNTPool/BNTPool";
 import { PoolToken } from "../generated/BancorNetwork/PoolToken";
-import { BancorNetworkInfo } from "../generated/templates/PoolCollection2/BancorNetworkInfo";
+import { BancorNetworkInfo } from "../generated/BancorNetwork/BancorNetworkInfo";
 import { ERC20 } from "../generated/BancorNetwork/ERC20";
 import {
   Deposit,
@@ -46,8 +46,6 @@ import {
   zeroBD,
   zeroBI,
 } from "./constants";
-
-// TODO: get ETH-bnETH rate https://docs.bancor.network/developer-guides/read-functions/pool-token-information/underlyingtopooltoken
 
 export function handlePoolCreatedLegacy(event: PoolCreated__Legacy): void {
   // PoolCreated__Legacy is emitted only on early blocks where we should create BNT token
@@ -108,7 +106,7 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
   swap.tokenOut = targetTokenID;
   swap.amountOut = event.params.targetAmount;
-  swap.amountOutUSD = zeroBD; // TODO
+  swap.amountOutUSD = getDaiAmount(targetToken.id, event.params.targetAmount);
   swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
 
   swap.save();
@@ -522,6 +520,10 @@ function _handleTotalLiquidityUpdated(
     stakedBalance
   );
   liquidityPool.outputTokenSupply = poolTokenSupply;
+  liquidityPool.outputTokenPriceUSD = getDaiAmount(
+    reserveToken.id,
+    getReserveTokenAmount(reserveToken.id, poolTokenSupply)
+  );
   liquidityPool.save();
 }
 
@@ -543,6 +545,35 @@ function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
     );
     return zeroBD;
   }
+  log.warning("[getDaiAmount] try_tradeOutputBySourceAmount({}, {}, {}) ok", [
+    sourceTokenID,
+    DaiAddr,
+    sourceAmount.toString(),
+  ]);
   // dai.decimals = 18
   return targetAmountResult.value.toBigDecimal().div(exponentToBigDecimal(18));
+}
+
+// TODO: figure out why it 100% reverts
+function getReserveTokenAmount(
+  reserveTokenID: string,
+  poolTokenAmount: BigInt
+): BigInt {
+  let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
+  let reserveTokenAmountResult = info.try_poolTokenToUnderlying(
+    Address.fromString(reserveTokenID),
+    poolTokenAmount
+  );
+  if (!reserveTokenAmountResult.reverted) {
+    log.warning(
+      "[getReserveTokenAmount] try_poolTokenToUnderlying({}, {}) reverted",
+      [reserveTokenID, poolTokenAmount.toString()]
+    );
+    return zeroBI;
+  }
+  log.warning("[getReserveTokenAmount] try_poolTokenToUnderlying({}, {}) ok", [
+    reserveTokenID,
+    poolTokenAmount.toString(),
+  ]);
+  return reserveTokenAmountResult.value;
 }
