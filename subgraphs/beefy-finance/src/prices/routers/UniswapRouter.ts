@@ -42,6 +42,16 @@ export function getPriceFromRouterUsdc(
   tokenAddress: Address,
   network: string
 ): CustomPriceType {
+  if (
+    tokenAddress == constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!
+  ) {
+    return CustomPriceType.initialize(
+      constants.BIGINT_TEN.pow(
+        constants.DEFAULT_USDC_DECIMALS as u8
+      ).toBigDecimal(),
+      constants.DEFAULT_USDC_DECIMALS
+    );
+  }
   return getPriceFromRouter(
     tokenAddress,
     constants.WHITELIST_TOKENS_MAP.get(network)!.get("USDC")!,
