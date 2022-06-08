@@ -219,6 +219,11 @@
         "sevenshi": "sevenshi/ubeswap_celo",
         "prepare:constants": true
       }
+    }, "rari-vaults": {
+      "mainnet": {
+        "template": "rari-vaults.template.yaml",
+        "deploy-on-merge": true
+      }
     }
   }
 }
