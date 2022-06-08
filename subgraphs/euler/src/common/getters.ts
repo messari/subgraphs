@@ -398,6 +398,7 @@ export function getOrCreateMarketUtility(id: string): _MarketUtility {
   if (!entity) {
     entity = new _MarketUtility(id);
     entity.market = id;
+    entity.lastUpdateTimestamp = BIGINT_ZERO;
     entity.reserveFee = BIGINT_ZERO;
     entity.twapPrice = BIGDECIMAL_ZERO;
     entity.twap = BIGINT_ZERO;

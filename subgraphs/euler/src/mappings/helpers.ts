@@ -39,6 +39,8 @@ import {
   DECIMAL_PRECISION,
   USDC_ERC20_ADDRESS,
   INTEREST_RATE_PRECISION,
+  SECONDS_PER_YEAR,
+  RESERVE_FEE_SCALE,
 } from "../common/constants";
 import { getEthPriceUsd, getUnderlyingPrice } from "../common/pricing";
 import { amountToUsd } from "../common/conversions";
@@ -76,17 +78,8 @@ export function updateAsset(event: AssetStatus): void {
   const market = getOrCreateMarket(tokenAddress);
 
   token.lastPriceUSD = twapPrice;
+  token.lastPriceBlockNumber = event.block.number;
   marketUtility.twapPrice = twapPrice;
-
-  // Cumulated interest between last update and now.
-  const cumulatedInterest = event.params.interestAccumulator.minus(marketUtility.interestAccumulator);
-
-  updateCumulativeSupplySideRevenue(cumulatedInterest, market);
-
-  // More information about interest accumulator
-  // https://github.com/euler-xyz/euler-contracts/blob/60114fafd99ee6a57d53c069660e0a976874819d/docs/limits.md#interestaccumulator
-  // https://docs.euler.finance/developers/architecture#external-access-to-interest-accumulators
-  marketUtility.interestAccumulator = event.params.interestAccumulator;
 
   market.totalDepositBalanceUSD = amountToUsd(event.params.totalBalances, marketUtility.twap, marketUtility.twapPrice);
   market.totalBorrowBalanceUSD = amountToUsd(event.params.totalBorrows, marketUtility.twap, marketUtility.twapPrice);
@@ -369,8 +362,6 @@ export function syncWithEulerGeneralView(
     market.inputTokenBalance = eulerViewMarket.totalBalances;
     market.inputTokenPriceUSD = currPriceUsd;
 
-    const previousReserveBalance = marketUtility.reserveBalance;
-
     /**
      * The following fields are always equal to 0:
      * - eulerMarketView.eTokenBalance
@@ -411,28 +402,43 @@ export function syncWithEulerGeneralView(
 
     market.save();
 
-    const reserveBalanceDiff = eulerViewMarket.reserveBalance.minus(previousReserveBalance);
+    // const reserveBalanceDelta = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
 
-    // Ignore case where tokens are pulled out of the reserve.
-    if (reserveBalanceDiff.gt(BIGINT_ZERO) && eToken.lastPriceUSD) {
-      const marketRevenueDiffUsd = reserveBalanceDiff
-        .toBigDecimal()
-        .div(eTokenPrecision)
-        .times(eToken.lastPriceUSD!);
-      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(marketRevenueDiffUsd);
-      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(marketRevenueDiffUsd);
-    }
+    // let protocolSideRevenueSinceLastUpdate = BIGDECIMAL_ZERO;
+    // // Ignore case where tokens are pulled out of the reserve.
+    // if (reserveBalanceDelta.gt(BIGINT_ZERO) && eToken.lastPriceUSD) {
+    //   protocolSideRevenueSinceLastUpdate = reserveBalanceDelta
+    //     .toBigDecimal()
+    //     .div(eTokenPrecision)
+    //     .times(eToken.lastPriceUSD!);
+    // }
 
+    const secondsSinceLastUpdate = block.timestamp.minus(marketUtility.lastUpdateTimestamp);
+
+    const supplyAPY = lendingRate.rate.div(BigDecimal.fromString("100"));
+    const supplyYield = supplyAPY.times(secondsSinceLastUpdate.toBigDecimal()).div(SECONDS_PER_YEAR);
+    const supplySideRevenueSinceLastUpdate = supplyYield.times(market.totalDepositBalanceUSD);
+    
+    const reserveAPY = supplyAPY.div(BIGDECIMAL_ONE.minus(eulerViewMarket.reserveFee.toBigDecimal().div(RESERVE_FEE_SCALE))).minus(supplyAPY);
+    const reserveYield = reserveAPY.times(secondsSinceLastUpdate.toBigDecimal()).div(SECONDS_PER_YEAR);
+    const protocolSideRevenueSinceLastUpdate = reserveYield.times(market.totalDepositBalanceUSD);
+
+    protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenueSinceLastUpdate);
+    protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenueSinceLastUpdate);
+    protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD
+      .plus(supplySideRevenueSinceLastUpdate)
+      .plus(protocolSideRevenueSinceLastUpdate);
     protocol.totalValueLockedUSD = protocol.totalValueLockedUSD.plus(market.totalValueLockedUSD);
     protocol.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD.plus(market.totalBorrowBalanceUSD);
     protocol.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD.plus(market.totalDepositBalanceUSD);
-
+    
+    marketUtility.lastUpdateTimestamp = block.timestamp;
     marketUtility.market = market.id;
     marketUtility.twap = eulerViewMarket.twap;
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
     marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
     marketUtility.save();
-
+    
     updateMarketDailyMetrics(block, market.id);
     updateMarketHourlyMetrics(block, market.id);
   }

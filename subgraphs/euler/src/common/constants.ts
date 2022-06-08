@@ -150,6 +150,7 @@ export const SECONDS_PER_DAY = 60 * 60 * 24; // 86400
 export const SECONDS_PER_HOUR = 60 * 60; // 3600
 export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const DAYS_PER_YEAR = new BigDecimal(BigInt.fromI32(365));
+export const SECONDS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60)));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
 ////////////////
@@ -165,6 +166,7 @@ export const USDC_SYMBOL = "USDC";
 //////////////////////////
 
 export const CONFIG_FACTOR_SCALE = BigDecimal.fromString("4e9");
+export const RESERVE_FEE_SCALE = BigDecimal.fromString("4e9");
 export const EXEC_START_BLOCK_NUMBER = BigInt.fromI32(13711556);
 export const INITIAL_INTEREST_ACCUMULATOR = BigInt.fromI32(10).pow(27);
 export const UNISWAP_Q192 = BigDecimal.fromString(

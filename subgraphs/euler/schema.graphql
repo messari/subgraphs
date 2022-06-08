@@ -962,6 +962,8 @@ type _MarketUtility @entity {
   " { Address of underlying token (== market id) } "
   id: ID!
 
+  lastUpdateTimestamp: BigInt!
+
   " Market which this configuration relates to"
   market: Market!
 
