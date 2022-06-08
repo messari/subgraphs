@@ -15,7 +15,11 @@ import {
   getOrCreateVaultHourlySnapshot,
   getOrCreateYieldAggregator,
 } from "./getters";
-import { SECONDS_PER_DAY, SECONDS_PER_HOUR, TransactionType } from "./utils/constants";
+import {
+  SECONDS_PER_DAY,
+  SECONDS_PER_HOUR,
+  TransactionType,
+} from "./utils/constants";
 
 ///////////////////////////
 //// Snapshot Entities ////
@@ -28,9 +32,12 @@ export function updateFinancials(event: ethereum.Event): void {
   let protocol = getOrCreateYieldAggregator();
 
   financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
-  financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
 
   // update the block number and timestamp
   financialMetrics.blockNumber = event.block.number;
@@ -40,10 +47,15 @@ export function updateFinancials(event: ethereum.Event): void {
 }
 
 // update a given UsageMetricDailySnapshot
-export function updateUsageMetrics(event: ethereum.Event, from: Address, transaction: string): void {
+export function updateUsageMetrics(
+  event: ethereum.Event,
+  from: Address,
+  transaction: string
+): void {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
-  let hour: i64 = (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
+  let hour: i64 =
+    (event.block.timestamp.toI64() - id * SECONDS_PER_DAY) / SECONDS_PER_HOUR;
   let dailyMetrics = getOrCreateUsageDailySnapshot(event);
   let hourlyMetrics = getOrCreateUsageHourlySnapshot(event);
 
@@ -96,7 +108,10 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, transac
 }
 
 // update vault daily metrics
-export function updateVaultDailyMetrics(event: ethereum.Event, vaultId: string): void {
+export function updateVaultDailyMetrics(
+  event: ethereum.Event,
+  vaultId: string
+): void {
   let vaultMetrics = getOrCreateVaultDailySnapshot(event, vaultId);
   let vault = Vault.load(vaultId);
 
@@ -114,7 +129,10 @@ export function updateVaultDailyMetrics(event: ethereum.Event, vaultId: string):
 }
 
 // update vault hourly metrics
-export function updateVaultHourlyMetrics(event: ethereum.Event, vaultId: string): void {
+export function updateVaultHourlyMetrics(
+  event: ethereum.Event,
+  vaultId: string
+): void {
   let vaultMetrics = getOrCreateVaultHourlySnapshot(event, vaultId);
   let vault = Vault.load(vaultId);
 
@@ -138,7 +156,7 @@ export function updateVaultHourlyMetrics(event: ethereum.Event, vaultId: string)
 function updateTransactionCount(
   dailyUsage: UsageMetricsDailySnapshot,
   hourlyUsage: UsageMetricsHourlySnapshot,
-  transaction: string,
+  transaction: string
 ): void {
   if (transaction == TransactionType.DEPOSIT) {
     hourlyUsage.hourlyDepositCount += 1;

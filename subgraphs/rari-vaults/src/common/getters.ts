@@ -53,7 +53,9 @@ import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 //// Snapshots ////
 ///////////////////
 
-export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
+export function getOrCreateUsageDailySnapshot(
+  event: ethereum.Event
+): UsageMetricsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -77,7 +79,9 @@ export function getOrCreateUsageDailySnapshot(event: ethereum.Event): UsageMetri
   return usageMetrics;
 }
 
-export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetricsHourlySnapshot {
+export function getOrCreateUsageHourlySnapshot(
+  event: ethereum.Event
+): UsageMetricsHourlySnapshot {
   // Number of days since Unix epoch
   let hour: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
 
@@ -102,7 +106,10 @@ export function getOrCreateUsageHourlySnapshot(event: ethereum.Event): UsageMetr
 }
 
 // get vault daily snapshot with default values
-export function getOrCreateVaultDailySnapshot(event: ethereum.Event, vaultAddress: string): VaultDailySnapshot {
+export function getOrCreateVaultDailySnapshot(
+  event: ethereum.Event,
+  vaultAddress: string
+): VaultDailySnapshot {
   let days: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let id = vaultAddress + "-" + days.toString();
   let vaultMetrics = VaultDailySnapshot.load(id);
@@ -123,7 +130,10 @@ export function getOrCreateVaultDailySnapshot(event: ethereum.Event, vaultAddres
   return vaultMetrics;
 }
 
-export function getOrCreateVaultHourlySnapshot(event: ethereum.Event, vaultAddress: string): VaultHourlySnapshot {
+export function getOrCreateVaultHourlySnapshot(
+  event: ethereum.Event,
+  vaultAddress: string
+): VaultHourlySnapshot {
   let hours: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let id = vaultAddress + "-" + hours.toString();
   let vaultMetrics = VaultHourlySnapshot.load(id);
@@ -144,7 +154,9 @@ export function getOrCreateVaultHourlySnapshot(event: ethereum.Event, vaultAddre
   return vaultMetrics;
 }
 
-export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySnapshot {
+export function getOrCreateFinancials(
+  event: ethereum.Event
+): FinancialsDailySnapshot {
   // Number of days since Unix epoch
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
 
@@ -196,13 +208,20 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
   return protocol;
 }
 
-export function getOrCreateVault(event: ethereum.Event, vaultAddress: string, inputToken: string): Vault {
+export function getOrCreateVault(
+  event: ethereum.Event,
+  vaultAddress: string,
+  inputToken: string
+): Vault {
   let id = vaultAddress + "-" + inputToken;
   let vault = Vault.load(id);
 
   if (!vault) {
     vault = new Vault(id);
-    vault._vaultInterest = getOrCreateVaultInterest(vaultAddress, event.block.number).id;
+    vault._vaultInterest = getOrCreateVaultInterest(
+      vaultAddress,
+      event.block.number
+    ).id;
 
     // set protocol fields
     let protocol = getOrCreateYieldAggregator();
@@ -249,7 +268,9 @@ export function getOrCreateVault(event: ethereum.Event, vaultAddress: string, in
         getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id,
       ];
     } else {
-      vault.fees = [getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id];
+      vault.fees = [
+        getOrCreateVaultFee(VaultFeeType.PERFORMANCE_FEE, vaultAddress).id,
+      ];
     }
 
     vault.createdTimestamp = event.block.timestamp;
@@ -298,7 +319,10 @@ export function getOrCreateVaultFee(type: string, vault: string): VaultFee {
   return vaultFee;
 }
 
-export function getOrCreateVaultInterest(vaultAddress: string, blockNumber: BigInt): _VaultInterest {
+export function getOrCreateVaultInterest(
+  vaultAddress: string,
+  blockNumber: BigInt
+): _VaultInterest {
   let vaultHelper = _VaultInterest.load(vaultAddress);
   if (vaultHelper == null) {
     vaultHelper = new _VaultInterest(vaultAddress);

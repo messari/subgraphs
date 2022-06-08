@@ -34,7 +34,9 @@ export function getAssetSymbol(address: Address): string {
     return symbolBytesCall.value.toString();
   }
 
-  log.error("symbol() call (string or bytes) reverted for {}", [address.toHex()]);
+  log.error("symbol() call (string or bytes) reverted for {}", [
+    address.toHex(),
+  ]);
   return "UNKNOWN";
 }
 

@@ -56,9 +56,11 @@ export function handleUSDCDeposit(event: USDCDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    event.params.amountUsd
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     assetAddress,
-    USDC_VAULT_ADDRESS,
+    USDC_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
@@ -82,10 +84,12 @@ export function handleUSDCWithdrawal(event: USDCWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    event.params.amountUsd
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     BIGINT_ZERO,
     assetAddress,
-    USDC_VAULT_ADDRESS,
+    USDC_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
@@ -112,9 +116,11 @@ export function handleYieldDeposit(event: YieldDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    event.params.amountUsd
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     assetAddress,
-    YIELD_VAULT_ADDRESS,
+    YIELD_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
@@ -137,10 +143,12 @@ export function handleYieldWithdrawal(event: YieldWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    event.params.amountUsd
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     event.params.amountTransferred,
     assetAddress,
-    YIELD_VAULT_ADDRESS,
+    YIELD_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
@@ -167,9 +175,11 @@ export function handleDAIDeposit(event: DAIDeposit): void {
   createDeposit(
     event,
     event.params.amount,
-    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    event.params.amountUsd
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     assetAddress,
-    DAI_VAULT_ADDRESS,
+    DAI_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
@@ -192,10 +202,12 @@ export function handleDAIWithdrawal(event: DAIWithdrawal): void {
   createWithdraw(
     event,
     event.params.amount,
-    event.params.amountUsd.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+    event.params.amountUsd
+      .toBigDecimal()
+      .div(exponentToBigDecimal(DEFAULT_DECIMALS)),
     BIGINT_ZERO,
     assetAddress,
-    DAI_VAULT_ADDRESS,
+    DAI_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
@@ -215,10 +227,12 @@ export function handleEtherDeposit(event: EtherDeposit): void {
     event.params.amount,
     getUsdPrice(
       Address.fromString(ETH_ADDRESS),
-      event.params.amount.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+      event.params.amount
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     ),
     ETH_ADDRESS, // only token in this pool
-    ETHER_VAULT_ADDRESS,
+    ETHER_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.DEPOSIT);
   updateFinancials(event);
@@ -234,11 +248,13 @@ export function handleEtherWithdrawal(event: EtherWithdrawal): void {
     event.params.amount,
     getUsdPrice(
       Address.fromString(ETH_ADDRESS),
-      event.params.amount.toBigDecimal().div(exponentToBigDecimal(DEFAULT_DECIMALS)),
+      event.params.amount
+        .toBigDecimal()
+        .div(exponentToBigDecimal(DEFAULT_DECIMALS))
     ),
     BIGINT_ZERO,
     ETH_ADDRESS,
-    ETHER_VAULT_ADDRESS,
+    ETHER_VAULT_ADDRESS
   );
   updateUsageMetrics(event, event.params.sender, TransactionType.WITHDRAW);
   updateFinancials(event);
