@@ -13,10 +13,5 @@ export function getTokenDecimals(tokenAddr: Address): BigInt {
   const token = ERC20.bind(tokenAddr);
 
   let decimals = token.decimals();
-  // if (decimals.reverted) {
-  //   return constants.DEFAULT_DECIMALS;
-  // } else {
-  //   return BigInt.fromI32(decimals.value);
-  // }
   return BigInt.fromI32(decimals);
 }

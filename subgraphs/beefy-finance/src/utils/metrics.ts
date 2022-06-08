@@ -256,9 +256,21 @@ export function updateDailyFinancialSnapshot(
       );
     }
   }
-  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
-  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
-  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
+  if (protocol.financialMetrics.includes(id)) {
+    dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
+    dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
+    dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
+  } else {
+    dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
+      dailyFinancialSnapshot.dailySupplySideRevenueUSD
+    );
+    dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
+      dailyFinancialSnapshot.dailyProtocolSideRevenueUSD
+    );
+    dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
+      dailyFinancialSnapshot.dailyTotalRevenueUSD
+    );
+  }
 
   dailyFinancialSnapshot.blockNumber = block.number;
   dailyFinancialSnapshot.timestamp = block.timestamp;
