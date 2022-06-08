@@ -106,35 +106,35 @@
     "qidao": {
       "arbitrum": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "avalanche": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "bsc": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "fantom": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "matic": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "moonriver": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "optimism": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "xdai": {
         "template": "qidao.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       }
     },
     "quickswap": {
