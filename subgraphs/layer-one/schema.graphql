@@ -1,1 +1,17 @@
-# TODO
+# Subgraph Schema: Layer One
+# Version: 1.0.0
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+
+type Block @entity {
+  " hash of the block "
+  id: ID!
+
+  " Block number of the block "
+  blockNumber: BigInt!
+
+  " Timestamp of the block "
+  timestamp: BigInt!
+
+  " price of the native asset in this block "
+  price: BigDecimal!
+}

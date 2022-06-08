@@ -3,7 +3,8 @@
   "license": "MIT",
   "description": "A subgraph that gathers L1 data for EVM chains",
   "scripts": {
-    "format": "npx prettier --write ."
+    "format": "npx prettier --write .",
+    "prepare:mainnet": "echo TODO"
   },
   "dependencies": {
     "@graphprotocol/graph-ts": "^0.27.0"
