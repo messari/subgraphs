@@ -19,16 +19,12 @@ interface AllDataTabsProps {
   entitiesData: { [x: string]: { [x: string]: string } };
   protocolFields: { [x: string]: string };
   tabValue: string;
-  handleTabChange: (event: any, newValue: string) => void;
+  pools: any[];
   poolId: string;
   poolData: { [x: string]: string };
-  events: string[];
-  setPoolId: React.Dispatch<React.SetStateAction<string>>;
-  setProtocolId: React.Dispatch<React.SetStateAction<string>>;
   poolNames: string;
+  events: string[];
   subgraphToQueryURL: string;
-  pools: any[];
-  paginate: React.Dispatch<React.SetStateAction<number>>;
   skipAmt: number;
   poolOverviewRequest: { [x: string]: any };
   poolTimeseriesRequest: { [x: string]: any };
@@ -39,6 +35,10 @@ interface AllDataTabsProps {
   poolsListData: { [x: string]: any };
   poolListLoading: any;
   poolsListError: any;
+  handleTabChange: (event: any, newValue: string) => void;
+  setPoolId: React.Dispatch<React.SetStateAction<string>>;
+  setProtocolId: React.Dispatch<React.SetStateAction<string>>;
+  paginate: React.Dispatch<React.SetStateAction<number>>;
 }
 
 // This component is for each individual subgraph
@@ -47,16 +47,12 @@ function AllDataTabs({
   entitiesData,
   protocolFields,
   tabValue,
-  handleTabChange,
+  pools,
+  poolNames,
   poolId,
   poolData,
   events,
-  setPoolId,
-  poolNames,
   subgraphToQueryURL,
-  pools,
-  paginate,
-  setProtocolId,
   skipAmt,
   poolOverviewRequest,
   poolTimeseriesRequest,
@@ -67,9 +63,11 @@ function AllDataTabs({
   protocolTimeseriesLoading,
   protocolTimeseriesError,
   poolsListError,
+  handleTabChange,
+  setPoolId,
+  setProtocolId,
+  paginate
 }: AllDataTabsProps) {
-  const protocolEntityName = ProtocolTypeEntityName[data.protocols[0].type];
-  const protocolEntityNames = ProtocolTypeEntityNames[data.protocols[0].type];
 
   let protocolDropDown = null;
   if (data.protocols.length > 1) {
@@ -102,10 +100,10 @@ function AllDataTabs({
         <TabPanel value="1">
           {/* PROTOCOL TAB */}
           <ProtocolTab
-            protocolType={data.protocols[0].type}
-            protocolTableData={protocolTableData}
             entitiesData={entitiesData}
             protocolFields={protocolFields}
+            protocolType={data.protocols[0].type}
+            protocolTableData={protocolTableData}
             protocolTimeseriesData={protocolTimeseriesData}
             protocolTimeseriesLoading={protocolTimeseriesLoading}
             protocolTimeseriesError={protocolTimeseriesError}
@@ -114,13 +112,13 @@ function AllDataTabs({
         <TabPanel value="2">
           {/* POOLOVERVIEW TAB */}
           <PoolOverviewTab
+            skipAmt={skipAmt}
             pools={pools}
-            subgraphToQueryURL={subgraphToQueryURL}
             protocolType={data.protocols[0].type}
             poolOverviewRequest={poolOverviewRequest}
+            subgraphToQueryURL={subgraphToQueryURL}
             setPoolId={(x) => setPoolId(x)}
             paginate={(x) => paginate(x)}
-            skipAmt={skipAmt}
             handleTabChange={(x, y) => handleTabChange(x, y)}
           />
         </TabPanel>
@@ -128,18 +126,18 @@ function AllDataTabs({
           {/* POOL TAB */}
           <PoolTab
             data={data}
+            entitiesData={entitiesData}
             poolTimeseriesData={poolTimeseriesRequest.poolTimeseriesData}
             poolTimeseriesLoading={poolTimeseriesRequest.poolTimeseriesLoading}
             poolTimeseriesError={poolTimeseriesRequest.poolTimeseriesError}
-            entitiesData={entitiesData}
             poolId={poolId}
-            setPoolId={(x) => setPoolId(x)}
             poolData={poolData}
-            protocolData={protocolTableData}
             poolsListError={poolsListError}
             poolsList={poolsListData}
             poolListLoading={poolListLoading}
             poolNames={poolNames}
+            protocolData={protocolTableData}
+            setPoolId={(x) => setPoolId(x)}
           />
         </TabPanel>
         <TabPanel value="4">
@@ -148,10 +146,10 @@ function AllDataTabs({
             data={data}
             events={events}
             poolId={poolId}
-            setPoolId={(x) => setPoolId(x)}
             poolsList={poolsListData}
             poolListLoading={poolListLoading}
             poolNames={poolNames}
+            setPoolId={(x) => setPoolId(x)}
           />
         </TabPanel>
       </TabContext>

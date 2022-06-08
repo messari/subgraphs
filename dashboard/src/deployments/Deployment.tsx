@@ -100,7 +100,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
 
   useEffect(() => {
     if (error || errorIndexing) {
-      console.log("DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
+      console.log(deployment, "DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
     }
   }, [error]);
 
@@ -113,10 +113,10 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   if (loading) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
+
   if (!status) {
     let errorMsg = null;
     if (errorIndexing) {
-      console.log(errorIndexing, Object.values(errorIndexing));
       errorMsg = (
         <Box marginTop="10px" gap={2} alignItems="center">
           <span>Indexing status could not be pulled: "{errorIndexing.message.slice(0, 100)}..."</span>

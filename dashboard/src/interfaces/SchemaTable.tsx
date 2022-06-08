@@ -7,16 +7,18 @@ import { CopyLinkToClipboard } from "../common/utilComponents/CopyLinkToClipboar
 function checkValueFalsey(
   value: any,
   schemaName: string,
-  entityField: string,
+  fieldName: string,
   fieldDataType: string[],
   issues: { message: string; type: string; level: string; fieldName: string }[],
 ): { message: string; type: string; level: string; fieldName: string } | undefined {
+
   if (!fieldDataType || fieldDataType.length === 0) {
     return undefined;
   }
   if (fieldDataType[fieldDataType.length - 1] !== "!" && !value) {
     return undefined;
   }
+
   let valueMsg = "";
   let level = "warning";
   if (value === "" || value?.length === 0) {
@@ -27,9 +29,10 @@ function checkValueFalsey(
     valueMsg = "negative";
     level = "critical";
   }
-  const message = schemaName + "-" + entityField + " is " + valueMsg + ". Verify that this data is correct";
+
+  const message = schemaName + "-" + fieldName + " is " + valueMsg + ". Verify that this data is correct";
   if (issues.filter((x) => x.message === message).length === 0 && valueMsg) {
-    return { type: "VAL", message, level, fieldName: schemaName + "-" + entityField };
+    return { type: "VAL", message, level, fieldName: schemaName + "-" + fieldName };
   } else {
     return undefined;
   }
@@ -38,37 +41,43 @@ function checkValueFalsey(
 interface SchemaTableProps {
   entityData: { [x: string]: any };
   schemaName: string;
+  dataFields: { [x: string]: string };
+  issuesProps: { message: string; type: string; level: string; fieldName: string }[];
   setIssues: React.Dispatch<
     React.SetStateAction<{ message: string; type: string; level: string; fieldName: string }[]>
   >;
-  dataFields: { [x: string]: string };
-  issuesProps: { message: string; type: string; level: string; fieldName: string }[];
 }
 
-function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProps }: SchemaTableProps) {
+function SchemaTable({
+  entityData,
+  schemaName,
+  dataFields,
+  issuesProps,
+  setIssues
+}: SchemaTableProps) {
   const issues: { message: string; type: string; level: string; fieldName: string }[] = [];
   let schema: (JSX.Element | null)[] = [];
   if (entityData) {
-    schema = Object.keys(entityData).map((entityField: string) => {
-      if (entityField === "__typename") {
+    schema = Object.keys(entityData).map((fieldName: string) => {
+      if (fieldName === "__typename") {
         return null;
       }
-      let dataType = dataFields[entityField];
-      let value = entityData[entityField];
+      let dataType = dataFields[fieldName];
+      let value = entityData[fieldName];
       try {
         const isPercentageField = percentageFieldList.find((x) => {
-          return entityField.toUpperCase().includes(x.toUpperCase());
+          return fieldName.toUpperCase().includes(x.toUpperCase());
         });
-        const fieldDataTypeChars = dataFields[entityField]?.split("");
-        const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
+        const fieldDataTypeChars = dataFields[fieldName]?.split("");
+        const issueReturned = checkValueFalsey(value, schemaName, fieldName, fieldDataTypeChars, issues);
         if (issueReturned) {
           issues.push(issueReturned);
         }
         if (!value && fieldDataTypeChars[fieldDataTypeChars.length - 1] !== "!") {
           return (
-            <TableRow key={entityField}>
+            <TableRow key={fieldName}>
               <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-                {entityField}: <b>{dataType}</b>
+                {fieldName}: <b>{dataType}</b>
               </TableCell>
               <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
                 {value}
@@ -76,6 +85,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
             </TableRow>
           );
         }
+
         if (typeof value === "boolean") {
           if (value) {
             value = "True";
@@ -84,38 +94,33 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           }
         }
 
-        if (entityField.toUpperCase() === "TOTALVALUELOCKEDUSD") {
-          if (
-            issues.filter((x) => x.fieldName === `${schemaName}-${entityField}` && x.type === "TVL-").length === 0 &&
-            Number(value) < 1000
-          ) {
-            issues.push({ type: "TVL-", message: "", level: "critical", fieldName: `${schemaName}-${entityField}` });
-          } else if (
-            issues.filter((x) => x.fieldName === `${schemaName}-${entityField}` && x.type === "TVL+").length === 0 &&
-            Number(value) > 1_000_000_000_000
-          ) {
-            issues.push({ type: "TVL+", message: "", level: "critical", fieldName: `${schemaName}-${entityField}` });
-          }
+        if (
+          fieldName.toUpperCase() === "TOTALVALUELOCKEDUSD" &&
+          issues.filter((x) => x.fieldName === `${schemaName}-${fieldName}` && x.type === "TVL+").length === 0 &&
+          Number(value) > 1_000_000_000_000
+        ) {
+          issues.push({ type: "TVL+", message: "", level: "critical", fieldName: `${schemaName}-${fieldName}` });
         }
 
-        if (entityField.toUpperCase().includes("OUTPUTTOKEN")) {
-          if (entityField === "outputTokenSupply" || entityField === "stakedOutputTokenAmount") {
+        if (fieldName.toUpperCase().includes("OUTPUTTOKEN")) {
+          if (fieldName === "outputTokenSupply" || fieldName === "stakedOutputTokenAmount") {
             value = convertTokenDecimals(value, entityData?.outputToken?.decimals).toString();
           }
-          const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
+          const issueReturned = checkValueFalsey(value, schemaName, fieldName, fieldDataTypeChars, issues);
           if (issueReturned) {
             issues.push(issueReturned);
           }
           dataType += " [" + (entityData?.outputToken?.name || "N/A") + "]";
         }
-        if (entityField === "inputTokenBalances") {
+
+        if (fieldName.toUpperCase() === "INPUTTOKENBALANCES") {
           const tokenNames: string[] = [];
           const decimalMapped = value.map((val: string, idx: number) => {
             tokenNames.push(entityData.inputTokens[idx].name || "TOKEN [" + idx + "]");
             const issueReturned = checkValueFalsey(
               val,
               schemaName,
-              entityField + " [" + idx + "]",
+              fieldName + " [" + idx + "]",
               fieldDataTypeChars,
               issues,
             );
@@ -127,19 +132,19 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           dataType += " [" + tokenNames.join(",") + "]";
           value = "[ " + decimalMapped.join(", ") + " ]";
         } else if (
-          entityField === "inputTokenBalance" ||
-          entityField === "pricePerShare" ||
-          entityField === "depositLimit"
+          fieldName.toUpperCase() === "INPUTTOKENBALANCE" ||
+          fieldName.toUpperCase() === "PRICEPERSHARE" ||
+          fieldName.toUpperCase() === "DEPOSITLIMIT"
         ) {
           value = convertTokenDecimals(value, entityData.inputToken.decimals);
           dataType += " [" + entityData.inputToken.name + "]";
-          const issueReturned = checkValueFalsey(value, schemaName, entityField, fieldDataTypeChars, issues);
+          const issueReturned = checkValueFalsey(value, schemaName, fieldName, fieldDataTypeChars, issues);
           if (issueReturned) {
             issues.push(issueReturned);
           }
-        } else if (entityField === "inputTokenPriceUSD") {
+        } else if (fieldName.toUpperCase() === "INPUTTOKENPRICEUSD") {
           dataType += " [" + entityData.inputToken.name + "]";
-        } else if (entityField.toUpperCase().includes("REWARDTOKENEMISSIONS")) {
+        } else if (fieldName.toUpperCase().includes("REWARDTOKENEMISSIONS")) {
           const tokenNames: string[] = [];
           const decimalMapped = value.map((val: string, idx: number) => {
             let decimals = 18;
@@ -153,20 +158,20 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
             return convertTokenDecimals(val, decimals).toString();
           });
           dataType += " [" + tokenNames.join(",") + "]";
-          if (entityField === "rewardTokenEmissionsAmount") {
+          if (fieldName.toUpperCase() === "REWARDTOKENEMISSIONSAMOUNT") {
             value = "[ " + decimalMapped.join(", ") + " ]";
-          } else if (entityField === "rewardTokenEmissionsUSD") {
+          } else if (fieldName.toUpperCase() === "REWARDTOKENEMISSIONSUSD") {
             value = value.map((val: string) => {
               return "$" + Number(Number(val).toFixed(2)).toLocaleString();
             });
             value = "[" + value.join(", ") + "]";
           }
-        } else if (entityField === "mintedTokenSupplies") {
-          const decimalMapped = entityData[entityField].map((val: string, idx: number) => {
+        } else if (fieldName.toUpperCase() === "MINTEDTOKENSUPPLIES") {
+          const decimalMapped = entityData[fieldName].map((val: string, idx: number) => {
             const issueReturned = checkValueFalsey(
               val,
               schemaName,
-              entityField + " [" + idx + "]",
+              fieldName + " [" + idx + "]",
               fieldDataTypeChars,
               issues,
             );
@@ -177,7 +182,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
               fieldDataTypeChars,
               issues,
             );
-            const label = schemaName + "-" + entityField + " [" + idx + "]";
+            const label = schemaName + "-" + fieldName + " [" + idx + "]";
             if (issueReturned) {
               issues.push(issueReturned);
             }
@@ -195,8 +200,8 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           });
           value = "[ " + decimalMapped.join(", ") + " ]";
         } else if (typeof value === "object" && !Array.isArray(value)) {
-          const label = schemaName + "-" + entityField;
-          if (entityField === "inputToken" || entityField === "outputToken") {
+          const label = schemaName + "-" + fieldName;
+          if (fieldName.toUpperCase() === "INPUTTOKEN" || fieldName.toUpperCase() === "OUTPUTTOKEN") {
             if (!Number(value.decimals) && issues.filter((x) => x.fieldName === label).length === 0) {
               issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
             }
@@ -206,15 +211,15 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
               symbol: value.symbol || "N/A",
               decimals: value.decimals || 0,
             };
-          } else if (entityField.toUpperCase().includes("INPUTTOKEN")) {
+          } else if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
             dataType += " [" + entityData.inputToken.name + "]";
           }
           value = JSON.stringify(value);
           value = value.split(", ").join(",").split(",").join(", ").split('"').join("");
         } else if (Array.isArray(value)) {
-          if (entityField === "inputTokens") {
+          if (fieldName.toUpperCase() === "INPUTTOKENS") {
             value = value.map((val: { [x: string]: string }, idx: number) => {
-              const label = schemaName + "-" + entityField + " " + (val.symbol || idx);
+              const label = schemaName + "-" + fieldName + " " + (val.symbol || idx);
               if (
                 !Number(val.decimals) &&
                 Number(val.decimals) !== 0 &&
@@ -229,10 +234,10 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
                 decimals: val.decimals || 0,
               };
             });
-          } else if (entityField === "rewardTokens") {
+          } else if (fieldName.toUpperCase() === "REWARDTOKENS") {
             value = value.map((val: { [x: string]: any }, idx: number) => {
               if (val?.token) {
-                const label = schemaName + "-" + entityField + " " + (val.token?.symbol || idx);
+                const label = schemaName + "-" + fieldName + " " + (val.token?.symbol || idx);
 
                 if (!Number(val.token?.decimals) && issues.filter((x) => x.fieldName === label).length === 0) {
                   issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
@@ -244,7 +249,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
                   decimals: val.token?.decimals || 0,
                 };
               } else {
-                const label = schemaName + "-" + entityField + " " + (val.symbol || idx);
+                const label = schemaName + "-" + fieldName + " " + (val.symbol || idx);
 
                 if (!Number(val.decimals) && issues.filter((x) => x.fieldName === label).length === 0) {
                   issues.push({ message: "", type: "DEC", level: "critical", fieldName: label });
@@ -257,7 +262,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
                 };
               }
             });
-          } else if (entityField.toUpperCase().includes("INPUTTOKEN")) {
+          } else if (fieldName.toUpperCase().includes("INPUTTOKEN")) {
             const tokenNames = value.map((val, idx) => {
               return entityData.inputTokens[idx].name || "TOKEN [" + idx + "]";
             });
@@ -278,7 +283,7 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
           value = value.split(", ").join(",").split(",").join(", ").split('"').join("");
         }
         if (!isNaN(Number(value))) {
-          if (entityField.includes("USD")) {
+          if (fieldName.includes("USD")) {
             value = Number(value).toFixed(2);
             value = "$" + Number(value).toLocaleString();
           }
@@ -289,18 +294,18 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
       } catch (err) {
         if (err instanceof Error) {
           console.log("CATCH,", Object.keys(err), Object.values(err), err);
-          if (issues.filter((x) => x.fieldName === schemaName + "-" + entityField && x.type === "JS")?.length === 0) {
+          if (issues.filter((x) => x.fieldName === schemaName + "-" + fieldName && x.type === "JS")?.length === 0) {
             issues.push({
               type: "JS",
               message: err.message,
               level: "critical",
-              fieldName: schemaName + "-" + entityField,
+              fieldName: schemaName + "-" + fieldName,
             });
           }
           return (
-            <TableRow key={entityField} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
+            <TableRow key={fieldName} style={{ borderTop: "2px solid #B8301C", borderBottom: "2px solid #B8301C" }}>
               <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-                {entityField}: <b>{dataType}</b>
+                {fieldName}: <b>{dataType}</b>
               </TableCell>
               <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
                 JavaScript Error - {err?.message}
@@ -312,9 +317,9 @@ function SchemaTable({ entityData, schemaName, setIssues, dataFields, issuesProp
         }
       }
       return (
-        <TableRow key={entityField}>
+        <TableRow key={fieldName}>
           <TableCell component="th" scope="row" style={{ minWidth: "30vw", padding: "2px" }}>
-            {entityField}: <b>{dataType}</b>
+            {fieldName}: <b>{dataType}</b>
           </TableCell>
           <TableCell align="right" style={{ maxWidth: "55vw", padding: "2px" }}>
             {value}

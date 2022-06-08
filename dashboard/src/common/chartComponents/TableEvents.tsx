@@ -29,28 +29,28 @@ export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps)
     for (let i = 0; i < dataTable.length; i++) {
       const currentData = { ...dataTable[i] };
       if (currentData?.amountInUSD) {
-        currentData.amountInUSD = "$" + Number(Number(currentData.amountInUSD).toFixed(2)).toLocaleString();
+        currentData.amountInUSD = Number(currentData.amountInUSD);
       }
       if (currentData?.amountOutUSD) {
-        currentData.amountOutUSD = "$" + Number(Number(currentData.amountOutUSD).toFixed(2)).toLocaleString();
+        currentData.amountOutUSD = Number(currentData.amountOutUSD);
       }
       if (currentData?.amountUSD) {
-        currentData.amountUSD = "$" + Number(Number(currentData.amountUSD).toFixed(2)).toLocaleString();
+        currentData.amountUSD = Number(currentData.amountUSD);
       }
       if (data[poolName]?.inputToken) {
         const convertedAmt = convertTokenDecimals(currentData.amount, data[poolName].inputToken.decimals);
         currentData.amount = convertedAmt;
-        tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData });
+        tableData.push({ id: `${eventName}-${i}`, date: toDate(dataTable[i].timestamp), ...currentData });
       }
       if (data[poolName]?.inputTokens) {
         if (currentData.inputTokenAmounts) {
           const inputTokensDecimal = currentData.inputTokenAmounts.map((amt: string, idx: number) => {
-            return convertTokenDecimals(amt, currentData.inputTokens[idx].decimals);
+            return convertTokenDecimals(amt, currentData.inputTokens[idx].decimals).toFixed(2);
           });
           const outputTokenDecimal = convertTokenDecimals(
             currentData.outputTokenAmount,
             currentData.outputToken.decimals,
-          );
+          ).toFixed(2);
           currentData.inputTokenAmounts = inputTokensDecimal;
           currentData.outputTokenAmount = outputTokenDecimal;
           currentData.inputTokens = currentData.inputTokens
@@ -62,16 +62,24 @@ export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps)
         } else if (currentData.amount) {
           currentData.amount = convertTokenDecimals(currentData.amount, data[poolName].inputTokens[0].decimals);
         }
-        tableData.push({ id: i, date: toDate(dataTable[i].timestamp), ...currentData });
-      }
-      if (currentData?.tokenIn) {
-        const amountIn = convertTokenDecimals(currentData.amountIn, currentData.tokenIn.decimals);
-        const amountOut = convertTokenDecimals(currentData.amountOut, currentData.tokenOut.decimals);
-        currentData.amountIn = amountIn.toFixed(2);
-        currentData.amountOut = amountOut.toFixed(2);
-        currentData.tokenIn = currentData.tokenIn.id;
-        currentData.tokenOut = currentData.tokenOut.id;
-        tableData.push({ id: i, date: toDate(currentData.timestamp), ...currentData });
+        console.log(currentData.tokenIn)
+        if (currentData?.tokenIn) {
+          const amountIn = convertTokenDecimals(currentData.amountIn, currentData?.tokenIn?.decimals);
+          currentData.tokenIn = currentData?.tokenIn?.id;
+          currentData.amountIn = amountIn.toFixed(2);
+        } else {
+          currentData.tokenIn = 'N/A';
+          currentData.amountIn = "0";
+        }
+        if (currentData?.tokenOut) {
+          const amountOut = convertTokenDecimals(currentData.amountOut, currentData?.tokenOut?.decimals);
+          currentData.tokenOut = currentData?.tokenOut?.id;
+          currentData.amountOut = amountOut.toFixed(2);
+        } else {
+          currentData.tokenOut = 'N/A';
+          currentData.amountOut = "0";
+        }
+        tableData.push({ id: `${eventName}-${i}`, date: toDate(currentData.timestamp), ...currentData });
       }
     }
     const columns = Object.entries(dataTable[0])
@@ -104,6 +112,9 @@ export const TableEvents = ({ datasetLabel, data, eventName }: TableEventsProps)
             }
             if (k.toUpperCase() === "HASH") {
               onClick = () => (window.location.href = "https://etherscan.io/tx/" + params.value);
+            }
+            if (k.toUpperCase().includes('USD')) {
+              valueStr = "$" + Number(Number(params.value).toFixed(2)).toLocaleString();
             }
             return (
               <Tooltip title={params.value}>

@@ -1,3 +1,7 @@
+# used for deployments
+# full command sequence for successful deployment
+all: codegen deploy
+
 .PHONY: codegen
 codegen:
 	graph codegen $(subgraph)/subgraph.yaml -o $(subgraph)/generated
