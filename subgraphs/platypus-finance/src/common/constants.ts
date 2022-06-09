@@ -84,7 +84,10 @@ export const ZERO_ADDRESS_STRING = "0x0000000000000000000000000000000000000000";
 export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 export const ZERO_ADDRESS = Address.fromString(ZERO_ADDRESS_STRING);
+
+export const MasterPlatypus_ADDRESS = Address.fromString("0x68c5f4374228BEEdFa078e77b5ed93C28a2f713E");
 export const MasterPlatypusOld_ADDRESS = Address.fromString("0xB0523f9F473812FB195Ee49BC7d2ab9873a98044");
+export const MasterPlatypusFactory_ADDRESS = Address.fromString("0x7125B4211357d7C3a90F796c956c12c681146EbB");
 
 export const UNISWAP_V2_FACTORY = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f";
 export const WETH_ADDRESS = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";

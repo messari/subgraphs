@@ -3,8 +3,8 @@ repository: https://github.com/messari/subgraphs
 features:
   - grafting
 graft:
-  base: QmTJa152Co4hSEekdtxw7WXgtKn1uHHp4KSWx8pjPzyRnj
-  block: 14599000
+  base: Qmbii3txWiK8uEfVo8P6ubgrKQAaUxuzaJyEKMPvf8MMkw
+  block: 15381740
 schema:
   file: ./schema.graphql
 dataSources:
@@ -28,6 +28,73 @@ dataSources:
         - RewardToken
         - _Asset
       abis:
+        - name: SimpleRewarder
+          file: ./abis/simpleRewarder.json
+        - name: MasterPlatypus
+          file: ./abis/masterPlatypus.json
+        - name: Asset
+          file: ./abis/asset.json
+        - name: Pool
+          file: ./abis/pool.json
+        - name: SecondaryPool
+          file: ./abis/secondaryPool.json
+        - name: Router
+          file: ./abis/router.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: ERC20SymbolBytes
+          file: ./abis/ERC20SymbolBytes.json
+        - name: ERC20NameBytes
+          file: ./abis/ERC20NameBytes.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        # TraderJOE Contracts
+        - name: TraderJoeRouter
+          file: ./abis/Prices/TraderJoe/Router.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256)
+          handler: handleDeposit
+        - event: DepositFor(indexed address,indexed uint256,uint256)
+          handler: handleDepositFor
+        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
+          handler: handleEmergencyWithdraw
+        # - event: UpdatePool(indexed uint256,uint256,uint256,uint256)
+        # handler: handleUpdatePool
+        - event: Withdraw(indexed address,indexed uint256,uint256)
+          handler: handleWithdraw
+  - kind: ethereum/contract
+    name: MasterPlatypusFactory
+    network: avalanche
+    source:
+      address: "0x7125B4211357d7C3a90F796c956c12c681146EbB"
+      abi: MasterPlatypusFactory
+      startBlock: 15381744
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/masterPlatypus.ts
+      entities:
+        - Protocol
+        - DexAmmProtocol
+        - LiquidityPool
+        - Token
+        - RewardToken
+        - _Asset
+      abis:
+        - name: MasterPlatypusFactory
+          file: ./abis/masterPlatypusFactory.json
         - name: SimpleRewarder
           file: ./abis/simpleRewarder.json
         - name: MasterPlatypus
@@ -200,9 +267,9 @@ dataSources:
           handler: handleWithdraw
         - event: Swap(indexed address,address,address,uint256,uint256,indexed address)
           handler: handleSwap
-        - event: HaircutRateUpdated(unit256,uint256)
+        - event: HaircutRateUpdated(uint256,uint256)
           handler: handleHaircutRateUpdated
-        - event: RetentionRatioUpdated(unit256,uint256)
+        - event: RetentionRatioUpdated(uint256,uint256)
           handler: handleRetentionRatioUpdated
         - event: AssetAdded(indexed address,indexed address)
           handler: handleAssetAdded
