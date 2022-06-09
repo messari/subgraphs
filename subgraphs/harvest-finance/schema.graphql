@@ -92,6 +92,8 @@ type VaultFee @entity {
   feeType: VaultFeeType!
 }
 
+# TODO PR to re order schema definition to group by simmilarities ie Valut and ValutFee should be together
+
 #############################
 ##### Protocol Metadata #####
 #############################
@@ -604,6 +606,7 @@ type Account @entity {
 }
 
 # Helper entity for calculating daily/hourly active users
+# TODO  I don't understand this, ask Tomas
 type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
