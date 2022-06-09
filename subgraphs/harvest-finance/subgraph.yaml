@@ -1,0 +1,130 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: ControllerListener
+    network: mainnet
+    source:
+      address: "0x222412af183BCeAdEFd72e4Cb1b71f1889953b1C"
+      startBlock: 10770087
+      abi: ControllerContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: &entities
+        - Token
+        - RewardToken
+        - YieldAggregator
+        - UsageMetricsDailySnapshot
+        - FinancialsDailySnapshot
+        - VaultFee
+        - Vault
+        - VaultDailySnapshot
+        - Strategy
+        - Deposit
+        - Withdraw
+        - ActiveAccount
+        - UsageMetricsHourlySnapshot
+        - UsageMetricsDailySnapshot
+      abis: &abis
+        - name: ControllerContract
+          file: ./abis/contracts_manual/Controller.json
+        - name: ERC20DetailedContract
+          file: ./abis/@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol/ERC20Detailed.json
+        - name: VaultContract
+          file: ./abis/contracts/base/Vault.sol/Vault.json
+        - name: Vault
+          file: ./abis/Vault.json
+        - name: Strategy
+          file: ./abis/Vault.json
+        - name: StrategyContract
+          file: ./abis/contracts_manual/Strategy.json
+        - name: ERC20
+          file: ./abis/Prices/ERC20.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: SharePriceChangeLog(indexed address,indexed address,uint256,uint256,uint256)
+          handler: handleSharePriceChangeLog
+      callHandlers:
+        - function: addVaultAndStrategy(address,address)
+          handler: handleAddVaultAndStrategy
+      file: ./src/mappings/ControllerListener.ts
+templates:
+  - kind: ethereum/contract
+    name: VaultListener
+    network: mainnet
+    source:
+      abi: VaultContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: *entities
+      abis: *abis
+      eventHandlers:
+        - event: Deposit(indexed address,uint256)
+          handler: handleDeposit
+        - event: StrategyAnnounced(address,uint256)
+          handler: handleStrategyAnnounced
+        - event: StrategyChanged(address,address)
+          handler: handleStrategyChanged
+        - event: Withdraw(indexed address,uint256)
+          handler: handleWithdraw
+      callHandlers:
+        - function: doHardWork()
+          handler: handleDoHardWorkCall
+      file: ./src/mappings/VaultListener.ts
+
+  - kind: ethereum/contract
+    name: StrategyListener
+    network: mainnet
+    source:
+      abi: StrategyContract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities: *entities
+      abis: *abis
+      eventHandlers:
+        - event: ProfitAndBuybackLog(uint256,uint256,uint256)
+          handler: handleProfitAndBuybackLog
+        - event: ProfitLogInReward(uint256,uint256,uint256)
+          handler: handleProfitLogInReward
+      file: ./src/mappings/StrategyListener.ts

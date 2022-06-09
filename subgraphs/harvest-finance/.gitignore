@@ -1,0 +1,8 @@
+# Ignore truffle stuff
+build/
+
+generated/
+node_modules/
+.bin
+
+ignore.*

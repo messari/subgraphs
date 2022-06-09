@@ -1,0 +1,48 @@
+[
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_underlying",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_toInvestNumerator",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_toInvestDenominator",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_underlyingUnit",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_implementationChangeDelay",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_strategyChangeDelay",
+        "type": "uint256"
+      }
+    ],
+    "name": "initialize",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

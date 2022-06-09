@@ -1,0 +1,33 @@
+[
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "asset",
+        "type": "address"
+      }
+    ],
+    "name": "getReserveTokensAddresses",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "aTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "stableDebtTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "variableDebtTokenAddress",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
+]

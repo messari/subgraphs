@@ -1,0 +1,18 @@
+{
+	"name": "protofire-messari-harvest-finance-subgraph",
+	"license": "MIT",
+	"scripts": {
+		"test": "rm -rf ./tests/.bin && npx graph test index",
+		"codegen": "npx graph codegen",
+		"build": "npx graph build",
+		"deploy": "npx graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ cold-briu/mago"
+	},
+	"dependencies": {
+		"@graphprotocol/graph-ts": "0.24.1",
+		"@protofire/subgraph-toolkit": "0.1.2",
+		"matchstick-as": "0.2.0"
+	},
+	"devDependencies": {
+		"@graphprotocol/graph-cli": "0.27.0"
+	}
+}
