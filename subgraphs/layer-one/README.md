@@ -37,4 +37,7 @@ This is network specific:
 
 - https://github.com/stakewise/subgraphs/tree/main/subgraphs/ethereum
 - https://github.com/graphprotocol/example-subgraph
+
+### Resources
+
 - https://ethereum.org/en/developers/docs/gas/
