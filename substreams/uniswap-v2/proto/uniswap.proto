@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package eth.messari.uniswap.v1;
+
+// Subgraph Schema: DEX AMM
+// Version: 1.2.1
+// See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
+
+message Pairs {
+    repeated Pair pairs = 1;
+}
+
+message Pair {
+    string name = 1;
+    string address = 2;
+    string token0 = 3;
+    string token1 = 4;
+}
