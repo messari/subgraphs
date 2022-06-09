@@ -181,7 +181,7 @@ type HourlySnapshot @entity {
   currentSupply: BigInt
 
   " All of the blocks mined during this day "
-  blocks: [Block!]! @derivedFrom(field: "day")
+  blocks: [Block!]! @derivedFrom(field: "hour")
 }
 
 ##########################
@@ -252,5 +252,5 @@ type Miner @entity {
   totalRewards: BigInt
 
   " A mapping to every block that this miner has mined"
-  blocks: [Block!]! @derivedFrom(field: "author")
+  blocks: [Block!]! @derivedFrom(field: "miner")
 }
