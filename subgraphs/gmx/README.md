@@ -1,5 +1,5 @@
 
-# GMX Protocol Subgraph Metrics Methodology v1.0
+# GMX Protocol Subgraph Metrics Methodology v1.0.0
 
 Introduction:
 

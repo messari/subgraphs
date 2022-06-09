@@ -12,7 +12,7 @@ const DeploymentsLayout = styled("div")`
 `;
 
 function DeploymentsPage() {
-  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{ [name: string]: { [network: string]: string } }>({})
+  const [ProtocolsToQuery, setProtocolsToQuery] = useState<{ [type: string]: { [proto: string]: { [network: string]: string } } }>({})
   const getData = () => {
     fetch('/deployments.json'
       , {
@@ -27,6 +27,26 @@ function DeploymentsPage() {
       })
       .then(function (json) {
         setProtocolsToQuery(json);
+      })
+      .catch((err) => {
+        console.log(err)
+        fetch('/deployments.json'
+          , {
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          }
+        )
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (json) {
+            setProtocolsToQuery(json);
+          })
+          .catch((err) => {
+            window.location.reload();
+          });
       });
   }
   useEffect(() => {
@@ -54,12 +74,15 @@ function DeploymentsPage() {
           Deployed Subgraphs
         </Typography>
         {Object.keys(ProtocolsToQuery).map((key) => (
-          <SubgraphDeployments
-            clientIndexing={clientIndexing}
-            key={key}
-            protocol={{ name: key, deploymentMap: ProtocolsToQuery[key] }}
-          />
-        ))}
+          <>
+            {Object.keys(ProtocolsToQuery[key]).map((prot) => (
+              <SubgraphDeployments
+                clientIndexing={clientIndexing}
+                key={key + '-' + prot}
+                protocol={{ name: prot, deploymentMap: ProtocolsToQuery[key][prot] }}
+              />
+            ))}
+          </>))}
       </DeploymentsLayout>
     </DeploymentsContextProvider>
   );

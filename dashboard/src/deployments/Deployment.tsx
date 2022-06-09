@@ -53,7 +53,7 @@ const StyledDeployment = styled(Card)<{
   `;
 });
 
-const CardRow = styled("div")<{ $warning?: boolean }>`
+const CardRow = styled("div") <{ $warning?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -100,7 +100,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
 
   useEffect(() => {
     if (error || errorIndexing) {
-      console.log("DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
+      console.log(deployment, "DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
     }
   }, [error]);
 
@@ -113,13 +113,10 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   if (loading) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
-  if (error) {
-    return null;
-  }
+
   if (!status) {
     let errorMsg = null;
     if (errorIndexing) {
-      console.log(errorIndexing, Object.values(errorIndexing));
       errorMsg = (
         <Box marginTop="10px" gap={2} alignItems="center">
           <span>Indexing status could not be pulled: "{errorIndexing.message.slice(0, 100)}..."</span>
@@ -157,9 +154,9 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   const indexed = synced
     ? 100
     : toPercent(
-        status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
-        status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
-      );
+      status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
+      status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
+    );
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
