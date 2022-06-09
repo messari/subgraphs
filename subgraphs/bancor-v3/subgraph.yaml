@@ -37,6 +37,28 @@ dataSources:
           handler: handlePoolCollectionAdded
         - event: TokensTraded(indexed bytes32,indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,address)
           handler: handleTokensTraded
+  - kind: ethereum/contract
+    name: NetworkSettings
+    network: mainnet
+    source:
+      address: "0x83E1814ba31F7ea95D216204BB45FE75Ce09b14F"
+      abi: NetworkSettings
+      startBlock: 14609373
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      entities:
+        - DexAmmProtocol
+      abis:
+        - name: NetworkSettings
+          file: ./abis/NetworkSettings.json
+      eventHandlers:
+        - event: NetworkFeePPMUpdated(uint32,uint32)
+          handler: handleNetworkFeePPMUpdated
+        - event: WithdrawalFeePPMUpdated(uint32,uint32)
+          handler: handleWithdrawalFeePPMUpdated
   # PoolCreated was emitted by a certain PoolCollection prior to https://github.com/bancorprotocol/contracts-v3/commit/1431415230bcee2b81d39dfc9c26438ebd613c97
   # It is currently emitted by BancorNetwork but we need this
   - kind: ethereum/contract

@@ -10,6 +10,10 @@ import {
   PoolCreated,
   TokensTraded,
 } from "../generated/BancorNetwork/BancorNetwork";
+import {
+  NetworkFeePPMUpdated,
+  WithdrawalFeePPMUpdated,
+} from "../generated/NetworkSettings/NetworkSettings";
 import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection1/PoolCollection1";
 import {
   TokensDeposited,
@@ -68,6 +72,24 @@ export function handlePoolCreated(event: PoolCreated): void {
 
 export function handlePoolCollectionAdded(event: PoolCollectionAdded): void {
   PoolCollection2.create(event.params.poolCollection);
+}
+
+export function handleNetworkFeePPMUpdated(event: NetworkFeePPMUpdated): void {
+  let protocol = getOrCreateProtocol();
+  protocol._networkFeeRate = event.params.newFeePPM
+    .toBigDecimal()
+    .div(exponentToBigDecimal(6));
+  protocol.save();
+}
+
+export function handleWithdrawalFeePPMUpdated(
+  event: WithdrawalFeePPMUpdated
+): void {
+  let protocol = getOrCreateProtocol();
+  protocol._withdrawalFeeRate = event.params.newFeePPM
+    .toBigDecimal()
+    .div(exponentToBigDecimal(6));
+  protocol.save();
 }
 
 export function handleTokensTraded(event: TokensTraded): void {
@@ -436,6 +458,8 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = zeroBD;
     protocol.cumulativeTotalRevenueUSD = zeroBD;
     protocol.cumulativeUniqueUsers = 0;
+    protocol._networkFeeRate = zeroBD;
+    protocol._withdrawalFeeRate = zeroBD;
     protocol.save();
   }
   return protocol;
@@ -468,7 +492,7 @@ function createLiquidityPool(
   liquidityPool.rewardTokenEmissionsAmount = []; // reward is not yet live
   liquidityPool.rewardTokenEmissionsUSD = []; // reward is not yet live
   liquidityPool._cumulativeTradingFeeAmountUSD = zeroBD;
-  liquidityPool._cumulativeWithdrawalFeeAmountUSD = zeroBD
+  liquidityPool._cumulativeWithdrawalFeeAmountUSD = zeroBD;
 
   liquidityPool.save();
 }

@@ -235,6 +235,9 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
+
+  _networkFeeRate: BigDecimal!
+  _withdrawalFeeRate: BigDecimal!
 }
 
 ###############################
