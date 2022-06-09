@@ -10,7 +10,7 @@ Sum across all Markets:
 
 ### Cumulative Total Revenue USD
 
-`(Cumulative supply-side revenue + Cumulative protocol-side revenue)`
+`Cumulative supply-side revenue + Cumulative protocol-side revenue`
 
 Note: This currently excludes Liquidations
 
@@ -18,9 +18,9 @@ Note: This currently excludes Liquidations
 
 Portion of the Total Revenue allocated to the Protocol
 
-Sum across all Markets:
+Sum across all Markets, calculated every 50 blocks (~10min):
 
-`Cumulative protocol-side revenue = Cumulative protocol-side revenue + (Reserve balance increase since last update * Current eTokenPrice)`
+`Cumulative protocol-side revenue = Cumulative protocol-side revenue + Market Deposits Balance * ((Market Supply APY / (1 - Market Reserve Fee)) - Market Supply APY)`
 
 Note: This currently excludes Liquidations
 
@@ -28,9 +28,9 @@ Note: This currently excludes Liquidations
 
 Portion of the Total Revenue allocated to the Supply-Side
 
-Sum across all Pools
+Sum across all Markets, calculated every 50 blocks (~10min):
 
-`Cumulative supply-side revenue = Cumulative supply-side revenue + (Interest accumulator increase since last update * Total deposit balance)`
+`Cumulative supply-side revenue = Cumulative supply-side revenue + Market Supply APY * Market Deposits Balance`
 
 Note: This currently excludes Liquidations
 
