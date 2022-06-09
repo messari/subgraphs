@@ -14,6 +14,7 @@ import {
   NetworkFeePPMUpdated,
   WithdrawalFeePPMUpdated,
 } from "../generated/NetworkSettings/NetworkSettings";
+import { ProgramCreated } from "../generated/StandardRewards/StandardRewards";
 import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection1/PoolCollection1";
 import {
   TokensDeposited,
@@ -47,6 +48,7 @@ import {
   exponentToBigDecimal,
   Network,
   ProtocolType,
+  secondsPerDay,
   zeroBD,
   zeroBI,
 } from "./constants";
@@ -320,6 +322,48 @@ export function handleBNTTotalLiquidityUpdated(
   );
 }
 
+// currently each pool only has 1 reward program
+// TODO: change this if it is no longer the case
+// TODO: also handle ProgramTerminated and ProgramEnabled
+export function handleProgramCreated(event: ProgramCreated): void {
+  let reserveTokenId = event.params.pool.toHexString();
+  let reserveToken = Token.load(reserveTokenId);
+  if (!reserveToken) {
+    log.warning("[handleProgramCreated] reserve token {} not found", [
+      reserveTokenId,
+    ]);
+    return;
+  }
+  if (!reserveToken._poolToken) {
+    log.warning("[handleProgramCreated] reserve token {} has no pool token", [
+      reserveTokenId,
+    ]);
+    return;
+  }
+
+  let liquidityPool = LiquidityPool.load(reserveToken._poolToken!);
+  if (!liquidityPool) {
+    log.warning("[handleProgramCreated] liquidity pool {} not found", [
+      reserveToken._poolToken!,
+    ]);
+    return;
+  }
+
+  // TODO: liquidityPool.rewardTokens = ???
+  // TODO: each reward program has a start and end time
+  let rewardRate = event.params.totalRewards.div(
+    event.params.endTime.minus(event.params.startTime)
+  );
+  let rewardAmountInDay = rewardRate.times(BigInt.fromI32(secondsPerDay));
+  let rewardAmountUSD = getDaiAmount(
+    event.params.rewardsToken.toHexString(),
+    rewardAmountInDay
+  );
+  liquidityPool.rewardTokenEmissionsAmount = [rewardAmountInDay];
+  liquidityPool.rewardTokenEmissionsUSD = [rewardAmountUSD];
+  liquidityPool.save();
+}
+
 function createBntToken(blockTimestamp: BigInt, blockNumber: BigInt): void {
   let bnBntToken = Token.load(BnBntAddr);
   if (bnBntToken) {
@@ -478,7 +522,7 @@ function createLiquidityPool(
   liquidityPool.symbol = poolToken.symbol;
   liquidityPool.inputTokens = [reserveToken.id];
   liquidityPool.outputToken = poolToken.id;
-  liquidityPool.rewardTokens = []; // reward is not yet live
+  liquidityPool.rewardTokens = [];
   liquidityPool.fees = []; // TODO
   liquidityPool.createdTimestamp = blockTimestamp;
   liquidityPool.createdBlockNumber = blockNumber;
@@ -489,8 +533,8 @@ function createLiquidityPool(
   liquidityPool.outputTokenSupply = zeroBI;
   liquidityPool.outputTokenPriceUSD = zeroBD;
   liquidityPool.stakedOutputTokenAmount = zeroBI;
-  liquidityPool.rewardTokenEmissionsAmount = []; // reward is not yet live
-  liquidityPool.rewardTokenEmissionsUSD = []; // reward is not yet live
+  liquidityPool.rewardTokenEmissionsAmount = [];
+  liquidityPool.rewardTokenEmissionsUSD = [];
   liquidityPool._cumulativeTradingFeeAmountUSD = zeroBD;
   liquidityPool._cumulativeWithdrawalFeeAmountUSD = zeroBD;
 

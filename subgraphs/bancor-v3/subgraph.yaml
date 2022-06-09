@@ -59,6 +59,28 @@ dataSources:
           handler: handleNetworkFeePPMUpdated
         - event: WithdrawalFeePPMUpdated(uint32,uint32)
           handler: handleWithdrawalFeePPMUpdated
+  - kind: ethereum/contract
+    name: StandardRewards
+    network: mainnet
+    source:
+      address: "0xb0B958398ABB0b5DB4ce4d7598Fb868f5A00f372"
+      abi: StandardRewards
+      startBlock: 14609468
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mapping.ts
+      entities:
+        - LiquidityPool
+      abis:
+        - name: StandardRewards
+          file: ./abis/StandardRewards.json
+        - name: BancorNetworkInfo
+          file: ./abis/BancorNetworkInfo.json
+      eventHandlers:
+        - event: ProgramCreated(indexed address,indexed uint256,indexed address,uint256,uint32,uint32)
+          handler: handleProgramCreated
   # PoolCreated was emitted by a certain PoolCollection prior to https://github.com/bancorprotocol/contracts-v3/commit/1431415230bcee2b81d39dfc9c26438ebd613c97
   # It is currently emitted by BancorNetwork but we need this
   - kind: ethereum/contract
