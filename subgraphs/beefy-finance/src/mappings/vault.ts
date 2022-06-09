@@ -279,7 +279,7 @@ export function handleWithdraw(event: Withdraw): void {
   getBeefyFinanceOrCreate(vault.id, event.block);
 }
 
-export function handleStratHarvest(event: StratHarvest): void {
+export function handleStratHarvestWithAmount(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event.block);
   updateVaultAndSave(vault, event.block);
   const dailySnapshot = VaultDailySnapshot.load(
@@ -297,6 +297,34 @@ export function handleStratHarvest(event: StratHarvest): void {
           .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
       );
       dailySnapshot.save();
+    }
+  }
+  getBeefyFinanceOrCreate(vault.id, event.block);
+}
+
+export function handleStratHarvest(event: StratHarvest): void {
+  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
+  const vaultContract = BeefyVault.bind(event.address);
+  const balance = vaultContract.try_balance();
+  if (!balance.reverted) {
+    const amountHarvested = balance.value.minus(vault.inputTokenBalance);
+    updateVaultAndSave(vault, event.block);
+    const dailySnapshot = VaultDailySnapshot.load(
+      vault.dailySnapshots[vault.dailySnapshots.length - 1]
+    );
+    if (dailySnapshot && amountHarvested > BIGINT_ZERO) {
+      const token = getTokenOrCreate(
+        Address.fromString(vault.inputToken.split("x")[1])
+      );
+      const priceUsd = token.lastPriceUSD;
+      if (priceUsd) {
+        dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
+          priceUsd
+            .times(amountHarvested.toBigDecimal())
+            .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+        );
+        dailySnapshot.save();
+      }
     }
   }
   getBeefyFinanceOrCreate(vault.id, event.block);

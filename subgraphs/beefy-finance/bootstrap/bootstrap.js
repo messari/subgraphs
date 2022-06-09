@@ -128,6 +128,10 @@ function createDataSource(contractName, contractAddress, network, startBlock) {
         },
         {
           event: "StratHarvest(indexed address,uint256,uint256)",
+          handler: "handleStratHarvestWithAmount",
+        },
+        {
+          event: "StratHarvest(indexed address)",
           handler: "handleStratHarvest",
         },
       ],

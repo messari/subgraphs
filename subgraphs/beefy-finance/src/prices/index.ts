@@ -4,13 +4,7 @@ import { getCurvePriceUsdc } from "./routers/CurveRouter";
 import { getTokenPriceFromChainLink } from "./oracles/ChainLinkFeed";
 import { getTokenPriceFromYearnLens } from "./oracles/YearnLensOracle";
 import { getPriceUsdc as getPriceUsdcUniswap } from "./routers/UniswapRouter";
-import {
-  log,
-  Address,
-  BigDecimal,
-  dataSource,
-  BigInt,
-} from "@graphprotocol/graph-ts";
+import { log, Address, BigDecimal, dataSource } from "@graphprotocol/graph-ts";
 import { getPriceUsdc as getPriceUsdcSushiswap } from "./routers/SushiSwapRouter";
 import { getTokenPriceFromSushiSwap } from "./calculations/CalculationsSushiswap";
 import { getTokenPriceFromCalculationCurve } from "./calculations/CalculationsCurve";
@@ -22,6 +16,30 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   }
 
   let network = dataSource.network();
+
+  // 6. Uniswap Router
+  let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
+  if (!uniswapPrice.reverted) {
+    log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString(),
+    ]);
+    return uniswapPrice;
+  }
+
+  // 7. SushiSwap Router
+  let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
+  if (!sushiswapPrice.reverted) {
+    log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
+      tokenAddr.toHexString(),
+      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
+    ]);
+    return sushiswapPrice;
+  }
+
+  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
+    tokenAddr.toHexString(),
+  ]);
 
   // 1. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
@@ -82,30 +100,6 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
     ]);
     return curvePrice;
   }
-
-  // 6. Uniswap Router
-  let uniswapPrice = getPriceUsdcUniswap(tokenAddr, network);
-  if (!uniswapPrice.reverted) {
-    log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString(),
-    ]);
-    return uniswapPrice;
-  }
-
-  // 7. SushiSwap Router
-  let sushiswapPrice = getPriceUsdcSushiswap(tokenAddr, network);
-  if (!sushiswapPrice.reverted) {
-    log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
-      tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
-    ]);
-    return sushiswapPrice;
-  }
-
-  log.warning("[Oracle] Failed to Fetch Price, tokenAddr: {}", [
-    tokenAddr.toHexString(),
-  ]);
 
   return new CustomPriceType();
 }
