@@ -2,3 +2,4 @@
 node_modules
 generated
 build
+./configurations/configure.ts

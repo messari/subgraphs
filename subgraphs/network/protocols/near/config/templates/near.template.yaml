@@ -1,0 +1,19 @@
+specVersion: 0.0.2
+description: EVM L1 Subgraph
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: near
+    name: Gravity
+    network: near-mainnet
+    source:
+      account: app.good-morning.near
+    mapping:
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Block
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/mapping.ts
