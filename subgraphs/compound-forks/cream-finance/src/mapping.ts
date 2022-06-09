@@ -101,17 +101,18 @@ export function handleMarketListed(event: MarketListed): void {
     new MarketListedData(
       protocol,
       new TokenData(
-        cTokenAddr,
-        getOrElse<string>(cTokenContract.try_name(), "unknown"),
-        getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals
-      ),
-      new TokenData(
         underlyingTokenAddr,
         getOrElse<string>(underlyingTokenContract.try_name(), "unknown"),
         getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown"),
         getOrElse<i32>(underlyingTokenContract.try_decimals(), 0)
       ),
+      new TokenData(
+        cTokenAddr,
+        getOrElse<string>(cTokenContract.try_name(), "unknown"),
+        getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
+        cTokenDecimals
+      ),
+
       cTokenReserveFactorMantissa
     ),
     event
