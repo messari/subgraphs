@@ -7,17 +7,14 @@ import {
   fetchTokenName,
   fetchTokenSymbol,
 } from "../mappings/token";
-import { BIGDECIMAL_ZERO } from "../prices/common/constants";
+import { BIGDECIMAL_ZERO, PROTOCOL_ID } from "../prices/common/constants";
 import {
   createBeefyFinance,
   updateProtocolAndSave,
 } from "../mappings/protocol";
 
-export function getTokenOrCreate(
-  tokenAddress: Address,
-  networkSuffix: string
-): Token {
-  const tokenId = tokenAddress.toHexString() + networkSuffix;
+export function getTokenOrCreate(tokenAddress: Address): Token {
+  const tokenId = tokenAddress.toHexString();
   let token = Token.load(tokenId);
   if (!token) {
     token = new Token(tokenId);
@@ -32,11 +29,10 @@ export function getTokenOrCreate(
 
 export function getVaultFromStrategyOrCreate(
   strategyAddress: Address,
-  currentBlock: ethereum.Block,
-  networkSuffix: string
+  currentBlock: ethereum.Block
 ): Vault {
   const strategyContract = BeefyStrategy.bind(strategyAddress);
-  const vaultId = strategyContract.vault().toHexString() + networkSuffix;
+  const vaultId = strategyContract.vault().toHexString();
   let vault = Vault.load(vaultId);
   if (!vault) {
     vault = createVaultFromStrategy(strategyAddress, currentBlock);
@@ -45,15 +41,14 @@ export function getVaultFromStrategyOrCreate(
 }
 
 export function getBeefyFinanceOrCreate(
-  network: string,
   vaultId: string,
   currentBlock: ethereum.Block
 ): YieldAggregator {
-  let beefy = YieldAggregator.load("BeefyFinance");
+  let beefy = YieldAggregator.load(PROTOCOL_ID);
   if (!beefy) {
-    beefy = createBeefyFinance(network, vaultId, currentBlock);
+    beefy = createBeefyFinance(vaultId, currentBlock);
   } else {
-    updateProtocolAndSave(beefy, currentBlock);
+    updateProtocolAndSave(beefy, currentBlock, vaultId);
   }
   return beefy;
 }

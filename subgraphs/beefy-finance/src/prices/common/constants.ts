@@ -59,6 +59,8 @@ export const WHITELIST_TOKENS_LIST: string[] = [
   "CRV",
 ];
 
+export const PROTOCOL_ID: string = "BeefyFinance";
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CURVE CONTRACT //////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
@@ -202,8 +204,8 @@ CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
   FANTOM.CURVE_POOL_REGISTRY_ADDRESS
 );
 CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
-  FANTOM.NETWORK_STRING,
-  FANTOM.CURVE_POOL_REGISTRY_ADDRESS
+  ARBITRUM_ONE.NETWORK_STRING,
+  ARBITRUM_ONE.CURVE_POOL_REGISTRY_ADDRESS
 );
 CURVE_POOL_REGISTRY_ADDRESS_MAP.set(
   MATIC.NETWORK_STRING,

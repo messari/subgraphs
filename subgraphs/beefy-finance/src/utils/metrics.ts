@@ -120,37 +120,29 @@ export function getUniqueUsers(
   let users: string[] = [];
   for (let i = 0; i < protocol.vaults.length; i++) {
     vault = Vault.load(protocol.vaults[i]); //already initialized if are in vaults field
-    if (vault == null) {
-      continue;
-    } else {
+    if (vault) {
       for (let j = 0; j < vault.deposits.length; j++) {
         deposit = Deposit.load(vault.deposits[j]);
-        if (!deposit) {
-          continue;
-        } else if (
+        if (
+          deposit &&
           deposit.timestamp > timeframe[0] &&
           deposit.timestamp <= timeframe[1]
         ) {
           user = deposit.from;
-          if (users.includes(user)) {
-            continue;
-          } else {
+          if (!users.includes(user)) {
             users.push(user);
           }
         }
       }
-      for (let j = 0; j < vault.withdraws.length; j++) {
-        withdraw = Withdraw.load(vault.deposits[j]);
-        if (!withdraw) {
-          continue;
-        } else if (
-          withdraw.timestamp >= timeframe[0] &&
+      for (let k = 0; k < vault.withdraws.length; k++) {
+        withdraw = Withdraw.load(vault.withdraws[k]);
+        if (
+          withdraw &&
+          withdraw.timestamp > timeframe[0] &&
           withdraw.timestamp <= timeframe[1]
         ) {
           user = withdraw.from;
-          if (users.includes(user)) {
-            continue;
-          } else {
+          if (!users.includes(user)) {
             users.push(user);
           }
         }
@@ -229,38 +221,50 @@ export function updateDailyFinancialSnapshot(
 ): FinancialsDailySnapshot {
   const id = getProtocolDailyId(block, protocol);
   let dailyFinancialSnapshot = FinancialsDailySnapshot.load(id);
-  if (dailyFinancialSnapshot == null) {
-    dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
-    dailyFinancialSnapshot.protocol = protocol.id;
+  if (!dailyFinancialSnapshot) {
+    dailyFinancialSnapshot = createFirstDailyFinancialSnapshot(block, protocol);
   }
-  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
+
+  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol, block);
+  dailyFinancialSnapshot.protocolControlledValueUSD =
+    dailyFinancialSnapshot.totalValueLockedUSD;
   const revenues = getDailyRevenuesUsd(protocol, block);
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = revenues[0];
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = revenues[1];
   dailyFinancialSnapshot.dailyTotalRevenueUSD = revenues[2];
-  let cumulativeSupplyRevenue = revenues[0];
-  let cumulativeProtocolRevenue = revenues[1];
-  let cumulativeTotalRevenue = revenues[2];
-  let metricsSnapshot: FinancialsDailySnapshot | null;
+  let cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  let cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  let cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  let dailySnapshot: FinancialsDailySnapshot | null;
   for (let i = 0; i < protocol.financialMetrics.length; i++) {
-    metricsSnapshot = FinancialsDailySnapshot.load(
-      protocol.financialMetrics[i]
-    );
-    if (metricsSnapshot != null && metricsSnapshot.id != id) {
-      cumulativeSupplyRevenue = cumulativeSupplyRevenue.plus(
-        metricsSnapshot.dailySupplySideRevenueUSD
+    dailySnapshot = FinancialsDailySnapshot.load(protocol.financialMetrics[i]);
+    if (dailySnapshot) {
+      cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
+        dailySnapshot.dailySupplySideRevenueUSD
       );
-      cumulativeProtocolRevenue = cumulativeProtocolRevenue.plus(
-        metricsSnapshot.dailyProtocolSideRevenueUSD
+      cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
+        dailySnapshot.dailyProtocolSideRevenueUSD
       );
-      cumulativeTotalRevenue = cumulativeTotalRevenue.plus(
-        metricsSnapshot.dailyTotalRevenueUSD
+      cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
+        dailySnapshot.dailyTotalRevenueUSD
       );
     }
   }
-  dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplyRevenue;
-  dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolRevenue;
-  dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenue;
+  if (protocol.financialMetrics.includes(id)) {
+    dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
+    dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
+    dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
+  } else {
+    dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
+      dailyFinancialSnapshot.dailySupplySideRevenueUSD
+    );
+    dailyFinancialSnapshot.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
+      dailyFinancialSnapshot.dailyProtocolSideRevenueUSD
+    );
+    dailyFinancialSnapshot.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
+      dailyFinancialSnapshot.dailyTotalRevenueUSD
+    );
+  }
 
   dailyFinancialSnapshot.blockNumber = block.number;
   dailyFinancialSnapshot.timestamp = block.timestamp;
@@ -276,7 +280,9 @@ export function createFirstDailyFinancialSnapshot(
   const id = getProtocolDailyId(block, protocol);
   const dailyFinancialSnapshot = new FinancialsDailySnapshot(id);
   dailyFinancialSnapshot.protocol = protocol.id;
-  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol);
+  dailyFinancialSnapshot.totalValueLockedUSD = getTvlUsd(protocol, block);
+  dailyFinancialSnapshot.protocolControlledValueUSD =
+    dailyFinancialSnapshot.totalValueLockedUSD;
 
   dailyFinancialSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
   dailyFinancialSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;

@@ -1,6 +1,10 @@
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Vault, YieldAggregator } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../prices/common/constants";
+import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  PROTOCOL_ID,
+} from "../prices/common/constants";
 import {
   createFirstDailyFinancialSnapshot,
   getUniqueUsers,
@@ -8,23 +12,25 @@ import {
   updateUsageMetricsDailySnapshot,
   updateUsageMetricsHourlySnapshot,
 } from "../utils/metrics";
-import { getVaultDailyRevenues } from "./vault";
+import { getVaultDailyRevenues, updateVaultAndSave } from "./vault";
 
 export function createBeefyFinance(
-  network: string,
   vaultId: string,
   block: ethereum.Block
 ): YieldAggregator {
-  const beefy = new YieldAggregator("BeefyFinance");
+  const beefy = new YieldAggregator(PROTOCOL_ID);
   beefy.name = "Beefy Finance";
   beefy.slug = "beefy-finance";
   beefy.schemaVersion = "1.2.1";
-  beefy.subgraphVersion = "0.0.2";
-  //beefy.methodologyVersion = "Abboh";
-  beefy.network = network.toUpperCase();
+  beefy.subgraphVersion = "1.0.2";
+  beefy.methodologyVersion = "1.1.0";
+  beefy.network = dataSource
+    .network()
+    .toUpperCase()
+    .replace("-", "_");
   beefy.type = "YIELD";
   beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
-  //beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+  beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;
   beefy.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO; //todo
   beefy.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO; //todo
   beefy.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO; //todo
@@ -41,29 +47,37 @@ export function createBeefyFinance(
 
 export function updateProtocolAndSave(
   protocol: YieldAggregator,
-  block: ethereum.Block
+  block: ethereum.Block,
+  vault: string
 ): YieldAggregator {
-  protocol.totalValueLockedUSD = getTvlUsd(protocol);
+  if (!protocol.vaults.includes(vault)) {
+    protocol.vaults = protocol.vaults.concat([vault]);
+  }
+  protocol.save();
+  protocol.totalValueLockedUSD = getTvlUsd(protocol, block);
+  protocol.protocolControlledValueUSD = protocol.totalValueLockedUSD;
   protocol.cumulativeUniqueUsers = getUniqueUsers(protocol, [
     BIGINT_ZERO,
     block.timestamp,
   ]);
   const dailySnapshot = updateUsageMetricsDailySnapshot(block, protocol);
   if (
-    protocol.dailyUsageMetrics[protocol.dailyUsageMetrics.length - 1] !==
+    protocol.dailyUsageMetrics[protocol.dailyUsageMetrics.length - 1] !=
     dailySnapshot.id
-  )
+  ) {
     protocol.dailyUsageMetrics = protocol.dailyUsageMetrics.concat([
       dailySnapshot.id,
     ]);
+  }
   const hourlySnapshot = updateUsageMetricsHourlySnapshot(block, protocol);
   if (
-    protocol.hourlyUsageMetrics[protocol.hourlyUsageMetrics.length - 1] !==
+    protocol.hourlyUsageMetrics[protocol.hourlyUsageMetrics.length - 1] !=
     hourlySnapshot.id
-  )
+  ) {
     protocol.hourlyUsageMetrics = protocol.hourlyUsageMetrics.concat([
       hourlySnapshot.id,
     ]);
+  }
 
   protocol.cumulativeUniqueUsers = getUniqueUsers(protocol, [
     BIGINT_ZERO,
@@ -72,12 +86,13 @@ export function updateProtocolAndSave(
 
   const dailyFinancialSnapshot = updateDailyFinancialSnapshot(block, protocol);
   if (
-    protocol.financialMetrics[protocol.financialMetrics.length - 1] !==
+    protocol.financialMetrics[protocol.financialMetrics.length - 1] !=
     dailyFinancialSnapshot.id
-  )
+  ) {
     protocol.financialMetrics = protocol.financialMetrics.concat([
       dailyFinancialSnapshot.id,
     ]);
+  }
   protocol.cumulativeSupplySideRevenueUSD =
     dailyFinancialSnapshot.cumulativeSupplySideRevenueUSD;
   protocol.cumulativeProtocolSideRevenueUSD =
@@ -90,13 +105,14 @@ export function updateProtocolAndSave(
   return protocol;
 }
 
-export function getTvlUsd(protocol: YieldAggregator): BigDecimal {
+export function getTvlUsd(
+  protocol: YieldAggregator,
+  block: ethereum.Block
+): BigDecimal {
   let tvlUsd = BIGDECIMAL_ZERO;
   for (let i = 0; i < protocol.vaults.length; i++) {
     const vault = Vault.load(protocol.vaults[i]);
-    if (vault == null) {
-      continue;
-    } else {
+    if (vault) {
       tvlUsd = tvlUsd.plus(vault.totalValueLockedUSD);
     }
   }
@@ -113,12 +129,10 @@ export function getDailyRevenuesUsd(
   let revenues: BigDecimal[];
   for (let i = 0; i < protocol.vaults.length; i++) {
     const vault = Vault.load(protocol.vaults[i]);
-    if (vault == null) {
-      continue;
-    } else {
-      revenues = getVaultDailyRevenues(vault, block);
-      dailyRevenueProtocolSide = dailyRevenueProtocolSide.plus(revenues[0]);
-      dailyRevenueSupplySide = dailyRevenueSupplySide.plus(revenues[1]);
+    if (vault) {
+      revenues = getVaultDailyRevenues(vault);
+      dailyRevenueSupplySide = dailyRevenueSupplySide.plus(revenues[0]);
+      dailyRevenueProtocolSide = dailyRevenueProtocolSide.plus(revenues[1]);
       dailyTotalRevenueUsd = dailyTotalRevenueUsd.plus(revenues[2]);
     }
   }
