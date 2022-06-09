@@ -4,7 +4,6 @@ import {
   Borrow,
   Deposit,
   GovSetAssetConfig,
-  GovSetReserveFee,
   Liquidation,
   MarketActivated,
   Repay,
@@ -35,7 +34,6 @@ import {
   InterestRateType,
   CONFIG_FACTOR_SCALE,
   USDC_SYMBOL,
-  INITIAL_INTEREST_ACCUMULATOR,
   DECIMAL_PRECISION,
   USDC_ERC20_ADDRESS,
   INTEREST_RATE_PRECISION,
@@ -48,20 +46,9 @@ import {
   updateMarketDailyMetrics,
   updateMarketHourlyMetrics,
 } from "../common/metrics";
-import { Market, _MarketUtility } from "../../generated/schema";
+import { _MarketUtility } from "../../generated/schema";
 import { BigInt } from "@graphprotocol/graph-ts";
 import { getAssetTotalSupply } from "../common/tokens";
-
-function updateCumulativeSupplySideRevenue(cumulatedInterest: BigInt, market: Market): void {
-  const cumulatedInterestDelta = cumulatedInterest.toBigDecimal().div(INITIAL_INTEREST_ACCUMULATOR.toBigDecimal());
-  const supplySideRevenueDelta = market.totalDepositBalanceUSD.times(cumulatedInterestDelta);
-  const lendingProtocol = getOrCreateLendingProtocol();
-  lendingProtocol.cumulativeSupplySideRevenueUSD = lendingProtocol.cumulativeSupplySideRevenueUSD.plus(
-    supplySideRevenueDelta,
-  );
-  lendingProtocol.cumulativeTotalRevenueUSD = lendingProtocol.cumulativeTotalRevenueUSD.plus(supplySideRevenueDelta);
-  lendingProtocol.save();
-}
 
 export function updateAsset(event: AssetStatus): void {
   const tokenAddress = event.params.underlying.toHexString();
@@ -267,12 +254,6 @@ export function updateLendingFactors(event: GovSetAssetConfig): void {
   }
 }
 
-export function updateReserveFee(event: GovSetReserveFee): void {
-  const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
-  marketUtility.reserveFee = event.params.newReserveFee;
-  marketUtility.save();
-}
-
 export function createMarket(event: MarketActivated): void {
   const market = getOrCreateMarket(event.params.underlying.toHexString());
   const marketUtility = getOrCreateMarketUtility(event.params.underlying.toHexString());
@@ -402,17 +383,6 @@ export function syncWithEulerGeneralView(
 
     market.save();
 
-    // const reserveBalanceDelta = eulerViewMarket.reserveBalance.minus(marketUtility.reserveBalance);
-
-    // let protocolSideRevenueSinceLastUpdate = BIGDECIMAL_ZERO;
-    // // Ignore case where tokens are pulled out of the reserve.
-    // if (reserveBalanceDelta.gt(BIGINT_ZERO) && eToken.lastPriceUSD) {
-    //   protocolSideRevenueSinceLastUpdate = reserveBalanceDelta
-    //     .toBigDecimal()
-    //     .div(eTokenPrecision)
-    //     .times(eToken.lastPriceUSD!);
-    // }
-
     const secondsSinceLastUpdate = block.timestamp.minus(marketUtility.lastUpdateTimestamp);
 
     const supplyAPY = lendingRate.rate.div(BigDecimal.fromString("100"));
@@ -436,7 +406,6 @@ export function syncWithEulerGeneralView(
     marketUtility.market = market.id;
     marketUtility.twap = eulerViewMarket.twap;
     marketUtility.twapPeriod = eulerViewMarket.twapPeriod;
-    marketUtility.reserveBalance = eulerViewMarket.reserveBalance;
     marketUtility.save();
     
     updateMarketDailyMetrics(block, market.id);

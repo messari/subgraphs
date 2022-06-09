@@ -17,9 +17,7 @@ dataSources:
         - AssetStatus
         - Borrow
         - Deposit
-        - GovConvertReserves
         - GovSetAssetConfig
-        - GovSetReserveFee
         - Liquidation
         - MarketActivated
         - Repay
@@ -48,12 +46,8 @@ dataSources:
           handler: handleBorrow
         - event: Deposit(indexed address,indexed address,uint256)
           handler: handleDeposit
-        - event: GovConvertReserves(indexed address,indexed address,uint256)
-          handler: handleGovConvertReserves
         - event: GovSetAssetConfig(indexed address,(address,bool,uint32,uint32,uint24))
           handler: handleGovSetAssetConfig
-        - event: GovSetReserveFee(indexed address,uint32)
-          handler: handleGovSetReserveFee
         - event: Liquidation(indexed address,indexed address,indexed address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleLiquidation
         - event: MarketActivated(indexed address,indexed address,indexed address)

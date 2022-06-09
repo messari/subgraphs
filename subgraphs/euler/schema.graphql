@@ -967,11 +967,6 @@ type _MarketUtility @entity {
   " Market which this configuration relates to"
   market: Market!
 
-  " Amount of interest that is redirected to the reserves, as a fraction scaled by RESERVE_FEE_SCALE (4e9) "
-  reserveFee: BigInt!
-
-  reserveBalance: BigInt!
-
   " Time-weighted average price, in underlying"
   twap: BigInt!
 
@@ -980,12 +975,6 @@ type _MarketUtility @entity {
 
   " Time-weighted averege price, in USD"
   twapPrice: BigDecimal!
-
-  " Cumulated interest on the reserve balance. Starts at 1e27, multiplied by (1e27 + interestRate) every second. "
-  interestAccumulator: BigInt!
-
-  " Cumulated govenance reserves conversions. Used for protocol revenue calculation."
-  cumulatedGovConvertReservesUSD: BigDecimal!
 
   " Borrow factor for max LTV and liquidation threshold calculation. Number between 0 and 1, scaled by 4e9."
   borrowFactor: BigInt!

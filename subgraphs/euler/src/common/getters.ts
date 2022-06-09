@@ -36,7 +36,6 @@ import {
   PROTOCOL_METHODOLOGY_VERSION,
   LendingType,
   RiskType,
-  INITIAL_INTEREST_ACCUMULATOR
 } from "../common/constants";
 
 
@@ -399,11 +398,9 @@ export function getOrCreateMarketUtility(id: string): _MarketUtility {
     entity = new _MarketUtility(id);
     entity.market = id;
     entity.lastUpdateTimestamp = BIGINT_ZERO;
-    entity.reserveFee = BIGINT_ZERO;
     entity.twapPrice = BIGDECIMAL_ZERO;
     entity.twap = BIGINT_ZERO;
     entity.twapPeriod = BIGINT_ZERO;
-    entity.interestAccumulator = INITIAL_INTEREST_ACCUMULATOR;
     entity.borrowFactor = BIGINT_ZERO;
     entity.collateralFactor = BIGINT_ZERO;
     entity.save();

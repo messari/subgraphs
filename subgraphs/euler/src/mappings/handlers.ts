@@ -4,7 +4,6 @@ import {
   Borrow,
   Deposit,
   GovSetAssetConfig,
-  GovSetReserveFee,
   Liquidation,
   MarketActivated,
   Repay,
@@ -40,7 +39,6 @@ import {
   syncWithEulerGeneralView,
   updateAsset,
   updateLendingFactors,
-  updateReserveFee,
 } from "./helpers";
 
 export function handleAssetStatus(event: AssetStatus): void {
@@ -94,10 +92,6 @@ export function handleLiquidation(event: Liquidation): void {
 
 export function handleGovSetAssetConfig(event: GovSetAssetConfig): void {
  updateLendingFactors(event);
-}
-
-export function handleGovSetReserveFee(event: GovSetReserveFee): void {
-  updateReserveFee(event);
 }
 
 export function handleMarketActivated(event: MarketActivated): void {
