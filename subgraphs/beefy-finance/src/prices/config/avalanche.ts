@@ -1,6 +1,6 @@
 import { Address, TypedMap } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "avax";
+export const NETWORK_STRING = "avalanche";
 export const NETWORK_CHAIN_ID = 43114;
 export const NETWORK_SUFFIX = "-" + NETWORK_CHAIN_ID.toString();
 

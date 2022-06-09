@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultDailySnapshot, VaultFee } from "../../generated/schema";
 import {
@@ -7,7 +7,7 @@ import {
   StratHarvest,
   Withdraw,
 } from "../../generated/ExampleVault/BeefyStrategy";
-import { BeefyVault } from "../../generated/ExampleVault/BeefyVault";
+import { BeefyVault } from "../../generated/aave-aave-eol/BeefyVault";
 import {
   getBeefyFinanceOrCreate,
   getTokenOrCreate,
@@ -26,6 +26,7 @@ import {
   BIGINT_TEN,
   BIGINT_ZERO,
   PROTOCOL_ID,
+  ZERO_ADDRESS,
 } from "../prices/common/constants";
 
 export function createVaultFromStrategy(
@@ -44,7 +45,27 @@ export function createVaultFromStrategy(
   vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHex();
 
-  vault.inputToken = getTokenOrCreate(strategyContract.want()).id;
+  let call = vaultContract.try_balance();
+  if (call.reverted) {
+    vault.inputTokenBalance = BIGINT_ZERO;
+  } else {
+    vault.inputTokenBalance = call.value;
+  }
+
+  let want = strategyContract.try_want();
+  if (want.reverted) {
+    want = vaultContract.try_token();
+  }
+  if (want.reverted) {
+    vault.inputToken = getTokenOrCreate(ZERO_ADDRESS).id;
+    vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  } else {
+    const inputToken = getTokenOrCreate(want.value);
+    vault.inputToken = inputToken.id;
+    vault.totalValueLockedUSD = getLastPriceUSD(want.value, currentBlock.number)
+      .times(vault.inputTokenBalance.toBigDecimal())
+      .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
+  }
   vault.outputToken = getTokenOrCreate(vaultAddress).id;
 
   vault.fees = getFees(vault.id, strategyContract);
@@ -52,12 +73,6 @@ export function createVaultFromStrategy(
   vault.createdTimestamp = currentBlock.timestamp;
   vault.createdBlockNumber = currentBlock.number;
 
-  let call = vaultContract.try_balance();
-  if (call.reverted) {
-    vault.inputTokenBalance = BIGINT_ZERO;
-  } else {
-    vault.inputTokenBalance = call.value;
-  }
   call = vaultContract.try_totalSupply();
   if (call.reverted) {
     vault.outputTokenSupply = BIGINT_ZERO;
@@ -72,14 +87,6 @@ export function createVaultFromStrategy(
       BigInt.fromI32(vaultContract.decimals())
     );
   }
-
-  const inputToken = getTokenOrCreate(strategyContract.want());
-  vault.totalValueLockedUSD = getLastPriceUSD(
-    strategyContract.want(),
-    currentBlock.number
-  )
-    .times(vault.inputTokenBalance.toBigDecimal())
-    .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
 
   const outputSupply = vault.outputTokenSupply;
   if (outputSupply && outputSupply != BIGINT_ZERO)
@@ -304,8 +311,8 @@ export function handleStratHarvestWithAmount(event: StratHarvest): void {
 
 export function handleStratHarvest(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event.block);
-  const vaultContract = BeefyVault.bind(event.address);
-  const balance = vaultContract.try_balance();
+  const strategyContract = BeefyStrategy.bind(event.address);
+  const balance = strategyContract.try_balanceOf();
   if (!balance.reverted) {
     const amountHarvested = balance.value.minus(vault.inputTokenBalance);
     updateVaultAndSave(vault, event.block);
