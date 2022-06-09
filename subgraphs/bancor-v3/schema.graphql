@@ -433,6 +433,7 @@ type LiquidityPool @entity {
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
   _cumulativeTradingFeeAmountUSD: BigDecimal!
+  _cumulativeWithdrawalFeeAmountUSD: BigDecimal!
 }
 
 #################################
@@ -673,6 +674,9 @@ type Withdraw implements Event @entity {
 
   " The pool involving this transaction "
   pool: LiquidityPool!
+
+  _withdrawalFeeAmount: BigInt!
+  _withdrawalFeeAmountUSD: BigDecimal!
 }
 
 type Swap implements Event @entity {

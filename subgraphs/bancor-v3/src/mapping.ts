@@ -210,7 +210,8 @@ export function handleTokensWithdrawn(event: TokensWithdrawn): void {
     reserveToken,
     event.params.tokenAmount,
     poolToken,
-    event.params.poolTokenAmount
+    event.params.poolTokenAmount,
+    event.params.withdrawalFeeAmount
   );
 }
 
@@ -232,7 +233,8 @@ export function handleBNTWithdrawn(event: BNTWithdrawn): void {
     bntToken,
     event.params.bntAmount,
     bnBntToken,
-    event.params.poolTokenAmount
+    event.params.poolTokenAmount,
+    event.params.withdrawalFeeAmount
   );
 }
 
@@ -466,6 +468,7 @@ function createLiquidityPool(
   liquidityPool.rewardTokenEmissionsAmount = []; // reward is not yet live
   liquidityPool.rewardTokenEmissionsUSD = []; // reward is not yet live
   liquidityPool._cumulativeTradingFeeAmountUSD = zeroBD;
+  liquidityPool._cumulativeWithdrawalFeeAmountUSD = zeroBD
 
   liquidityPool.save();
 }
@@ -507,7 +510,8 @@ function _handleTokensWithdrawn(
   reserveToken: Token,
   reserveTokenAmount: BigInt,
   poolToken: Token,
-  poolTokenAmount: BigInt
+  poolTokenAmount: BigInt,
+  withdrawalFeeAmount: BigInt
 ): void {
   let withdraw = new Withdraw(
     "withdraw-"
@@ -528,8 +532,28 @@ function _handleTokensWithdrawn(
   withdraw.outputTokenAmount = poolTokenAmount;
   withdraw.amountUSD = getDaiAmount(reserveToken.id, reserveTokenAmount);
   withdraw.pool = poolToken.id;
+  withdraw._withdrawalFeeAmount = withdrawalFeeAmount;
+  let withdrawalFeeAmountUSD = getDaiAmount(
+    reserveToken.id,
+    withdrawalFeeAmount
+  );
+  withdraw._withdrawalFeeAmountUSD = withdrawalFeeAmountUSD;
 
   withdraw.save();
+
+  let liquidityPool = LiquidityPool.load(poolToken.id);
+  if (!liquidityPool) {
+    log.warning("[handleTokensWithdrawn] liquidity pool {} not found", [
+      poolToken.id,
+    ]);
+    return;
+  }
+  liquidityPool._cumulativeWithdrawalFeeAmountUSD =
+    liquidityPool._cumulativeWithdrawalFeeAmountUSD.plus(
+      withdrawalFeeAmountUSD
+    );
+
+  liquidityPool.save();
 }
 
 function _handleTotalLiquidityUpdated(
