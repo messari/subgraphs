@@ -1,5 +1,7 @@
 # Harvest Finance Subgraph
 
+_"Made with love by protofire.io"_
+
 ## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
