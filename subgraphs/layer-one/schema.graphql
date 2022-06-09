@@ -19,47 +19,223 @@ enum Network {
   XDAI # aka Gnosis Chain
 }
 
+#############################
+#### Blockchain Metadata ####
+#############################
+
 type Blockchain @entity {
   " Native token address (ie, ETH = 0xeeE...eeE)"
   id: ID!
+
+  " The verison of the schema "
+  schemaVersion: String!
+
+  " The version of the subgraph "
+  subgraphVersion: String!
+
+  " The version of the methodology "
+  methodologyVersion: String!
 
   " Decimals of the native asset "
   decimals: Int!
 
   " The name of the blockchain (ie, the network name) "
-  name: String!
+  name: Network!
+
+  #### Quantitative Data ####
 
   " Max supply of the native asset "
-  maxSupply: BigInt!
+  maxSupply: BigInt
 
   " Current supply of the native asset "
-  currentSupply: BigInt!
+  currentSupply: BigInt
 
   " The total number of blocks in the blockchain "
-  totalBlocks: Int!
+  totalBlocksMined: Int!
+
+  " Total difficulty to reach the current block "
+  totalDifficulty: BigInt!
+
+  " Total gas used "
+  totalGasUsed: BigInt!
+
+  " Current gas limit "
+  currentGasLimit: BigInt!
+
+  " Total burnt fees on the network in native asset "
+  totalBurntFees: BigInt!
+
+  " Total rewards emitted on the network in native asset "
+  totalRewards: BigInt
 
   " Current blocks per day emission "
   blocksPerDay: BigDecimal!
+
+  #### Snapshots ####
+
+  " Daily metrics for this blockchain "
+  dailySnapshots: [DailySnapshot!]! @derivedFrom(field: "blockchain")
+
+  " Hourly metrics for this blockchain "
+  hourlySnapshots: [HourlySnapshot!]! @derivedFrom(field: "blockchain")
 }
 
-type Block @entity {
-  " hash of the block "
+###############################
+#### Blockchain Timeseries ####
+###############################
+
+type DailySnapshot @entity {
+  " { number of days since UNIX epoch time } "
   id: ID!
 
-  " Block number of the block "
-  blockNumber: BigInt!
+  " ID of the blockchain this snapshot belongs to "
+  blockchain: Blockchain!
+
+  " Block height at this day (aka, blockNumber) "
+  totalBlocksMined: Int!
+
+  " Blocks mined during this day (note, this is different from blocksPerDay) "
+  dailyBlocksMined: Int!
+
+  " Blocks/day calculated at the last block mined "
+  blocksPerDay: BigDecimal!
+
+  " Total difficulty up until this day "
+  totalDifficulty: BigInt!
+
+  " Difficulty mined during this day "
+  dailyDifficulty: BigInt!
+
+  " Average difficulty for this day "
+  averageDailyDifficulty: BigInt!
+
+  " Daily gas used "
+  dailyGasUsed: BigInt!
+
+  " Gas limit during this day "
+  dailyGasLimit: BigInt!
+
+  " Total amount of fees burned "
+  totalBurntFees: BigInt!
+
+  " Amount of burnt fees for this day "
+  dailyBurntFees: BigInt!
+
+  " Total rewards emitted up until this day "
+  totalRewards: BigInt
+
+  " Rewards emitted for this day (ie, new supply this day) "
+  dailyRewards: BigInt
+
+  " Current supply of native asset until this day "
+  currentSupply: BigInt
+
+  " All of the blocks mined during this day "
+  blocks: [Block!]! @derivedFrom(field: "day")
+}
+
+type HourlySnapshot @entity {
+  " { number of hours since UNIX epoch time } "
+  id: ID!
+
+  " ID of the blockchain this snapshot belongs to "
+  blockchain: Blockchain!
+
+  " Block height at this hour (ie, blockNumber) "
+  totalBlocksMined: Int!
+
+  " Blocks mined during this hour "
+  hourlyBlocksMined: Int!
+
+  " Blocks/day calculated at the last block mined "
+  blocksPerDay: BigDecimal!
+
+  " Total difficulty up until this hour "
+  totalDifficulty: BigInt!
+
+  " Difficulty mined during this hour "
+  hourlyDifficulty: BigInt!
+
+  " Average difficulty for this hour "
+  averageHourlyDifficulty: BigInt!
+
+  " Hourly gas used "
+  hourlyGasUsed: BigInt!
+
+  " Gas limit during this hour "
+  hourlyGasLimit: BigInt!
+
+  " Total amount of fees burned "
+  totalBurntFees: BigInt!
+
+  " Amount of burnt fees for this hour "
+  hourlyBurntFees: BigInt!
+
+  " Total rewards emitted up until this hour "
+  totalRewards: BigInt
+
+  " Rewards emitted for this hour (ie, new supply this hour) "
+  hourlyRewards: BigInt
+
+  " Current supply of native asset until this hour "
+  currentSupply: BigInt
+
+  " All of the blocks mined during this day "
+  blocks: [Block!]! @derivedFrom(field: "day")
+}
+
+##########################
+#### Block-level Data ####
+##########################
+
+type Block @entity {
+  " { block number } "
+  id: ID!
+
+  " Hash of this block "
+  hash: String!
 
   " Timestamp of the block "
   timestamp: BigInt!
 
   " Miner of this block "
-  author: Miner!
+  miner: Miner!
 
-  " Data size of the block in bytes (TODO; checks)"
+  " Data size of the block in bytes "
   size: BigInt!
 
-  " Total amount of native asset rewarded to the miner for this block "
-  reward: BigInt!
+  " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
+  baseFeePerGas: BigInt
+
+  " Amount of effort required to mine this block "
+  difficulty: BigInt!
+
+  " Total difficulty on chain until this block "
+  totalDifficulty: BigInt!
+
+  " Total gas limit provided from all transactions this block "
+  gasLimit: BigInt!
+
+  " Total gas used in this block "
+  gasUsed: BigInt!
+
+  " Percentage of gas filled in this block (0-100)"
+  gasFilledPercentage: BigDecimal!
+
+  " Reward in native asset for this block "
+  reward: BigInt
+
+  " Hash of the previous block (TODO: is this necessary??) "
+  parentHash: String!
+
+  " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
+  amountBurntFees: BigInt!
+
+  " The day this block was mined (in days since UNIX epoch time) "
+  day: DailySnapshot!
+
+  " The hour this block was mined (in hours since UNIX epoch time) "
+  hour: HourlySnapshot!
 }
 
 type Miner @entity {
@@ -69,8 +245,11 @@ type Miner @entity {
   " Number of blocks mined "
   blocksMined: Int!
 
+  " Total difficulty secured on blockchain "
+  totalDifficulty: BigInt!
+
   " Total amount of native asset mined "
-  totalRewards: BigInt!
+  totalRewards: BigInt
 
   " A mapping to every block that this miner has mined"
   blocks: [Block!]! @derivedFrom(field: "author")
