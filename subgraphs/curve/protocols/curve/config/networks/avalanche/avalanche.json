@@ -25,7 +25,7 @@
   "transactionHash": "LENDING",
   "factoryAddress": "'0x0000000000000000000000000000000000000001'",
   "unknownMetapoolType": "STABLE_FACTORY",
-  "catchup_block": 9384780,
+  "catchup_block": 0,
   "catchup_pools": [],
   "catchup_lp_tokens": [],
   "catchup_start_blocks": [],
@@ -34,13 +34,13 @@
   "catchup_asset_types": [],
   "catchup_pool_types": [],
   "catchup_registries": [],
-  "importCatchupFunction": "import { catchUpAvax } from './services/catchup'",
-  "executeCatchupFunction": "catchUpAvax()",
+  "importCatchupFunction": "",
+  "executeCatchupFunction": "",
   "gaugeController": false,
   "curveToken": "0x249848BeCA43aC405b8102Ec90Dd5F22CA513c06",
   "abiName": "",
   "abiPath": "",
-  "graftEnabled": false,
-  "subgraphId": "QmdMgoRCMfrV7F3puQm8gmPh8JRHkVyEwjKghEPAVxNFwg",
-  "graftStartBlock": 9384782
+  "graftEnabled": true,
+  "subgraphId": "QmNZQBGizE6LJpCa282SRwJSgczTobQeieNnwzqNnYSRxv",
+  "graftStartBlock": 7636794
 }

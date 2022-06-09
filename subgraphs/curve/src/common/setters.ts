@@ -5,8 +5,14 @@ import { CurvePool } from "../../generated/templates/CryptoFactoryTemplate/Curve
 import { CURVE_ADMIN_FEE, CURVE_POOL_FEE } from "./constants/index";
 import { getOrCreateDexAmm, getOrCreateToken, getPoolFee } from "./getters";
 import { bigIntToBigDecimal } from "./utils/numbers";
-import { BIGDECIMAL_ONE_HUNDRED, BIGDECIMAL_ZERO, FEE_DENOMINATOR_DECIMALS, LiquidityPoolFeeType } from "./constants";
-import { getCryptoTokenPrice, getPoolAssetPrice } from "../services/snapshots";
+import {
+  BIGDECIMAL_ONE_HUNDRED,
+  BIGDECIMAL_ZERO,
+  FEE_DENOMINATOR_DECIMALS,
+  LiquidityPoolFeeType,
+  MISPRICE_TOKENS,
+} from "./constants";
+import { getCryptoTokenPrice, getPoolAssetPrice, getTokenPrice } from "../services/snapshots";
 import { getPlatform } from "../services/platform";
 import { CurvePoolV2 } from "../../generated/AddressProvider/CurvePoolV2";
 
@@ -136,11 +142,17 @@ export function setPoolTVL(pool: LiquidityPool, timestamp: BigInt): BigDecimal {
   let totalValueLockedUSD = BIGDECIMAL_ZERO;
   for (let j = 0; j < pool.inputTokens.length; j++) {
     let balance = pool.inputTokenBalances[j];
-    let token = getOrCreateToken(Address.fromString(pool.inputTokens[j]));
-    const priceUSD = pool.isV2
+    let tokenAddress = Address.fromString(pool.inputTokens[j]);
+    let token = getOrCreateToken(tokenAddress);
+    //let priceUSD = getTokenPrice(tokenAddress, pool, timestamp);
+    //if (priceUSD == BIGDECIMAL_ZERO && !MISPRICE_TOKENS.includes(token.id)) {
+    log.warning("Could not get price for token = {} during tvl calculation", [tokenAddress.toHexString()]);
+    let priceUSD = pool.isV2
       ? getCryptoTokenPrice(Address.fromString(token.id), timestamp, pool)
       : getPoolAssetPrice(pool, timestamp);
-    totalValueLockedUSD = totalValueLockedUSD.plus(bigIntToBigDecimal(balance, token.decimals).times(priceUSD));
+    //}
+    let amountUSD = bigIntToBigDecimal(balance, token.decimals).times(priceUSD);
+    totalValueLockedUSD = totalValueLockedUSD.plus(amountUSD);
   }
   pool.totalValueLockedUSD = totalValueLockedUSD;
   pool.save();

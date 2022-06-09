@@ -73,6 +73,10 @@ export function handleWithdraw(event: Withdraw): void {
     const poolInfo = poolInfoCall.value;
     const lptoken = poolInfo.value0;
     let poolAddress = getPoolFromLpToken(lptoken);
+    if (poolAddress == ZERO_ADDRESS) {
+      log.error('pool address not found for lpToken: {}', [lptoken.toHexString()]);
+      return;
+    }
     let pool = getOrCreatePool(Address.fromString(poolAddress), event);
     handleLpStaking(pool, poolInfo, lpstakingContract, event.block.timestamp);
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.minus(event.params.amount);
@@ -91,6 +95,10 @@ export function handleEmergencyWithdraw(event: EmergencyWithdraw): void {
     const poolInfo = poolInfoCall.value;
     const lptoken = poolInfo.value0;
     let poolAddress = getPoolFromLpToken(lptoken);
+    if (poolAddress == ZERO_ADDRESS) {
+      log.error('pool address not found for lpToken: {}', [lptoken.toHexString()]);
+      return;
+    }
     let pool = getOrCreatePool(Address.fromString(poolAddress), event);
     handleLpStaking(pool, poolInfo, lpstakingContract, event.block.timestamp);
     pool.stakedOutputTokenAmount = pool.stakedOutputTokenAmount.minus(event.params.amount);

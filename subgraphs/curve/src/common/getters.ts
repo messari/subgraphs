@@ -255,7 +255,7 @@ export function getPoolCoins(pool: LiquidityPool): string[] {
     // some pools require an int128 for coins and will revert with the
     // regular abi. e.g. 0x7fc77b5c7614e1533320ea6ddc2eb61fa00a9714
     //log.warning("Call to coins reverted for pool ({}: {}), attempting 128 bytes call", [pool.name!, pool.id]);
-    return getPoolCoins128(pool)
+    return getPoolCoins128(pool);
   }
   while (!coinResult.reverted) {
     inputTokens.push(getOrCreateToken(coinResult.value).id);
@@ -301,4 +301,8 @@ export function getRewardtoken(rewardTokenId: string): RewardToken {
     return new RewardToken(rewardTokenId);
   }
   return rewardToken;
+}
+
+export function createEventID(eventType: string, event: ethereum.Event): string {
+  return eventType + "-" + event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
 }
