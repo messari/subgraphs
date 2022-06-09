@@ -26,6 +26,8 @@ export namespace tokens {
 		return entity as Token
 	}
 
+	// TODO loadOrCreateRewardToken
+
 	export function getValuesForToken(address: Address): TokenValuesresult {
 		let erc20Contract = ERC20.bind(address)
 		return new TokenValuesresult(
