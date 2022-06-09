@@ -44,6 +44,9 @@ type Blockchain @entity {
 
   #### Quantitative Data ####
 
+  " Number of cumulative unique authors "
+  cumulativeUniqueAuthors: Int!
+
   " Max supply of the native asset "
   maxSupply: BigInt
 
@@ -51,22 +54,22 @@ type Blockchain @entity {
   currentSupply: BigInt
 
   " The total number of blocks in the blockchain "
-  totalBlocksMined: Int!
+  blockHeight: Int!
 
   " Total difficulty to reach the current block "
-  totalDifficulty: BigInt!
+  cumulativeDifficulty: BigInt!
 
   " Total gas used "
-  totalGasUsed: BigInt!
+  cumulativeGasUsed: BigInt!
 
   " Current gas limit "
   currentGasLimit: BigInt!
 
   " Total burnt fees on the network in native asset "
-  totalBurntFees: BigInt!
+  cumulativeBurntFees: BigInt!
 
   " Total rewards emitted on the network in native asset "
-  totalRewards: BigInt
+  cumulativeRewards: BigInt
 
   " Current blocks per day emission "
   blocksPerDay: BigDecimal!
@@ -91,38 +94,50 @@ type DailySnapshot @entity {
   " ID of the blockchain this snapshot belongs to "
   blockchain: Blockchain!
 
+  " Number of cumulative ununique authors "
+  cumulativeUniqueAuthors: Int!
+
+  " Number of unique daily active authors "
+  dailyActiveAuthors: Int!
+
   " Block height at this day (aka, blockNumber) "
-  totalBlocksMined: Int!
+  blockHeight: Int!
 
-  " Blocks mined during this day (note, this is different from blocksPerDay) "
-  dailyBlocksMined: Int!
+  " Blocks created during this day (note, this is different from blocksPerDay) "
+  dailyBlocks: Int!
 
-  " Blocks/day calculated at the last block mined "
+  " Blocks/day calculated at the last block this day "
   blocksPerDay: BigDecimal!
 
   " Total difficulty up until this day "
-  totalDifficulty: BigInt!
+  cumulativeDifficulty: BigInt!
 
-  " Difficulty mined during this day "
+  " Difficulty during this day "
   dailyDifficulty: BigInt!
 
   " Average difficulty for this day "
   averageDailyDifficulty: BigInt!
 
-  " Daily gas used "
-  dailyGasUsed: BigInt!
+  " Sum of all gas used during this day "
+  dailyCumulativeGasUsed: BigInt!
 
-  " Gas limit during this day "
-  dailyGasLimit: BigInt!
+  " Sum of all gas limit during this day "
+  dailyCumulativeGasLimit: BigInt!
+
+  " Mean of gas used per block during this day "
+  dailyMeanGasUsed: BigDecimal!
+
+  " Mean of gas limit per block during this day "
+  dailyMeanGasLimit: BigDecimal!
 
   " Total amount of fees burned "
-  totalBurntFees: BigInt!
+  cumulativeBurntFees: BigInt!
 
   " Amount of burnt fees for this day "
   dailyBurntFees: BigInt!
 
   " Total rewards emitted up until this day "
-  totalRewards: BigInt
+  cumulativeRewards: BigInt
 
   " Rewards emitted for this day (ie, new supply this day) "
   dailyRewards: BigInt
@@ -130,7 +145,19 @@ type DailySnapshot @entity {
   " Current supply of native asset until this day "
   currentSupply: BigInt
 
-  " All of the blocks mined during this day "
+  " First timestamp of this entity (used to calculate averages) "
+  firstTimestamp: BigInt!
+
+  " Daily mean block interval time during this hour "
+  dailyMeanBlockInterval: BigDecimal!
+
+  " Cumulative size of all blocks created in this day "
+  dailyCumulativeSize: BigInt!
+
+  " Hourly mean size of a block during this day "
+  dailyMeanBlockSize: BigDecimal!
+
+  " All of the blocks created during this day "
   blocks: [Block!]! @derivedFrom(field: "day")
 }
 
@@ -141,38 +168,50 @@ type HourlySnapshot @entity {
   " ID of the blockchain this snapshot belongs to "
   blockchain: Blockchain!
 
+  " Number of cumulative ununique authors "
+  cumulativeUniqueAuthors: Int!
+
+  " Number of unique hourly active authors "
+  hourlyActiveAuthors: Int!
+
   " Block height at this hour (ie, blockNumber) "
-  totalBlocksMined: Int!
+  blockHeight: Int!
 
-  " Blocks mined during this hour "
-  hourlyBlocksMined: Int!
+  " Blocks created during this hour "
+  hourlyBlocks: Int!
 
-  " Blocks/day calculated at the last block mined "
+  " Blocks/day calculated at the last block this hour "
   blocksPerDay: BigDecimal!
 
   " Total difficulty up until this hour "
-  totalDifficulty: BigInt!
+  cumulativeDifficulty: BigInt!
 
-  " Difficulty mined during this hour "
+  " Difficulty during this hour "
   hourlyDifficulty: BigInt!
 
   " Average difficulty for this hour "
   averageHourlyDifficulty: BigInt!
 
-  " Hourly gas used "
-  hourlyGasUsed: BigInt!
+  " Sum of all gas used during this hour "
+  hourlyCumulativeGasUsed: BigInt!
 
-  " Gas limit during this hour "
-  hourlyGasLimit: BigInt!
+  " Sum of all gas limit during this hour "
+  hourlyCumulativeGasLimit: BigInt!
+
+  " Mean of gas used per block during this hour "
+  hourlyMeanGasUsed: BigDecimal!
+
+  " Mean of gas limit per block during this hour "
+  hourlyMeanGasLimit: BigDecimal!
 
   " Total amount of fees burned "
-  totalBurntFees: BigInt!
+  cumulativeBurntFees: BigInt!
 
   " Amount of burnt fees for this hour "
   hourlyBurntFees: BigInt!
 
   " Total rewards emitted up until this hour "
-  totalRewards: BigInt
+  cumulativeRewards: BigInt
 
   " Rewards emitted for this hour (ie, new supply this hour) "
   hourlyRewards: BigInt
@@ -180,7 +219,19 @@ type HourlySnapshot @entity {
   " Current supply of native asset until this hour "
   currentSupply: BigInt
 
-  " All of the blocks mined during this day "
+  " First timestamp of this entity (used to calculate averages) "
+  firstTimestamp: BigInt!
+
+  " Hourly mean block interval time during this hour "
+  hourlyMeanBlockInterval: BigDecimal!
+
+  " Cumulative size of all blocks created in this hour "
+  hourlyCumulativeSize: BigInt!
+
+  " Hourly mean size of a block during this hour "
+  hourlyMeanBlockSize: BigDecimal!
+
+  " All of the blocks created during this day "
   blocks: [Block!]! @derivedFrom(field: "hour")
 }
 
@@ -198,8 +249,8 @@ type Block @entity {
   " Timestamp of the block "
   timestamp: BigInt!
 
-  " Miner of this block "
-  miner: Miner!
+  " Author of this block "
+  author: Author!
 
   " Data size of the block in bytes "
   size: BigInt!
@@ -207,11 +258,11 @@ type Block @entity {
   " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
   baseFeePerGas: BigInt
 
-  " Amount of effort required to mine this block "
+  " Amount of effort required to create this block "
   difficulty: BigInt!
 
   " Total difficulty on chain until this block "
-  totalDifficulty: BigInt!
+  cumulativeDifficulty: BigInt!
 
   " Total gas limit provided from all transactions this block "
   gasLimit: BigInt!
@@ -231,26 +282,27 @@ type Block @entity {
   " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
   amountBurntFees: BigInt!
 
-  " The day this block was mined (in days since UNIX epoch time) "
+  " The day this block was created (in days since UNIX epoch time) "
   day: DailySnapshot!
 
-  " The hour this block was mined (in hours since UNIX epoch time) "
+  " The hour this block was created (in hours since UNIX epoch time) "
   hour: HourlySnapshot!
 }
 
-type Miner @entity {
-  " Address of the miner "
+# This is the entity that found the next block (ie, in mainnet this is a miner)
+type Author @entity {
+  " Address of the author "
   id: ID!
 
-  " Number of blocks mined "
-  blocksMined: Int!
+  " Number of blocks created "
+  cumulativeBlocksCreated: Int!
 
   " Total difficulty secured on blockchain "
-  totalDifficulty: BigInt!
+  cumulativeDifficulty: BigInt!
 
-  " Total amount of native asset mined "
-  totalRewards: BigInt
+  " Total amount of native asset created "
+  cumulativeRewards: BigInt
 
-  " A mapping to every block that this miner has mined"
-  blocks: [Block!]! @derivedFrom(field: "miner")
+  " A mapping to every block that this author has generated "
+  blocks: [Block!]! @derivedFrom(field: "author")
 }
