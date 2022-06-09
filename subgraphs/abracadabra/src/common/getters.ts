@@ -1,5 +1,5 @@
 // import { log } from "@graphprotocol/graph-ts"
-import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import {
   Token,
   UsageMetricsDailySnapshot,
@@ -11,6 +11,7 @@ import {
   InterestRate,
   UsageMetricsHourlySnapshot,
   MarketHourlySnapshot,
+  LiquidateProxy,
 } from "../../generated/schema";
 import { LogRepay } from "../../generated/templates/Cauldron/Cauldron";
 import { fetchTokenSymbol, fetchTokenName, fetchTokenDecimals } from "./tokens";
@@ -124,12 +125,15 @@ export function getOrCreateUsageMetricsDailySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot {
+export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAddress: string): MarketHourlySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_HOUR;
   let marketMetrics = MarketHourlySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
     let market = getMarket(marketAddress);
+    if (!market){
+      return null;
+    }
     marketMetrics = new MarketHourlySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
@@ -151,12 +155,15 @@ export function getOrCreateMarketHourlySnapshot(event: ethereum.Event, marketAdd
   return marketMetrics;
 }
 
-export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot {
+export function getOrCreateMarketDailySnapshot(event: ethereum.Event, marketAddress: string): MarketDailySnapshot | null {
   let id: i64 = event.block.timestamp.toI64() / SECONDS_PER_DAY;
   let marketMetrics = MarketDailySnapshot.load(marketAddress.concat("-").concat(id.toString()));
 
   if (!marketMetrics) {
     let market = getMarket(marketAddress);
+    if (!market){
+      return null;
+    }
     marketMetrics = new MarketDailySnapshot(marketAddress.concat("-").concat(id.toString()));
     marketMetrics.protocol = getOrCreateLendingProtocol().id;
     marketMetrics.market = marketAddress;
@@ -188,19 +195,28 @@ export function getOrCreateFinancials(event: ethereum.Event): FinancialsDailySna
     let protocol = getOrCreateLendingProtocol();
     financialMetrics = new FinancialsDailySnapshot(id.toString());
     financialMetrics.protocol = getOrCreateLendingProtocol().id;
+    financialMetrics.blockNumber = event.block.number;
+    financialMetrics.timestamp = event.block.timestamp;
     financialMetrics.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
+
+    // Revenue // 
     financialMetrics.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
     financialMetrics.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
     financialMetrics.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-    financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
-    financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+
+    // Lending Activities // 
     financialMetrics.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+    financialMetrics.dailyDepositUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+    financialMetrics.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+    financialMetrics.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    financialMetrics.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+    financialMetrics.dailyLiquidateUSD = BIGDECIMAL_ZERO;
     financialMetrics.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
-    financialMetrics.mintedTokenSupplies = protocol.mintedTokenSupplies;
     financialMetrics.save();
   }
   return financialMetrics;
@@ -238,26 +254,27 @@ export function getOrCreateLendingProtocol(): LendingProtocol {
   return LendingProtocolEntity;
 }
 
-export function getMarket(marketId: string): Market {
+export function getMarket(marketId: string): Market | null {
   let market = Market.load(marketId);
   if (market) {
     return market;
   }
-  return new Market("");
+  log.error('Cannot find market: {}', [marketId]);
+  return null;
 }
 
 ///////////////////////////
 ///////// Helpers /////////
 ///////////////////////////
 
-export function getLiquidateEvent(event: LogRepay): Liquidate {
-  let liquidateEvent = Liquidate.load(
+export function getLiquidateEvent(event: LogRepay): LiquidateProxy | null {
+  let liquidateEvent = LiquidateProxy.load(
     "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.minus(BIGINT_ONE).toString(),
   );
   if (liquidateEvent) {
     return liquidateEvent;
   }
-  return new Liquidate("");
+  return null;
 }
 
 export function getBentoBoxAddress(network: string): string {
