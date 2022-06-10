@@ -12,8 +12,12 @@ import {
   createBeefyFinance,
   updateProtocolAndSave,
 } from "../mappings/protocol";
+import { getUsdPricePerToken } from "../prices";
 
-export function getTokenOrCreate(tokenAddress: Address): Token {
+export function getTokenOrCreate(
+  tokenAddress: Address,
+  block: ethereum.Block
+): Token {
   const tokenId = tokenAddress.toHexString();
   let token = Token.load(tokenId);
   if (!token) {
@@ -21,9 +25,15 @@ export function getTokenOrCreate(tokenAddress: Address): Token {
     token.name = fetchTokenName(tokenAddress);
     token.symbol = fetchTokenSymbol(tokenAddress);
     token.decimals = fetchTokenDecimals(tokenAddress) as i32;
-    token.lastPriceUSD = BIGDECIMAL_ZERO;
-    token.save();
   }
+  const price = getUsdPricePerToken(tokenAddress);
+  if (price.reverted) {
+    token.lastPriceUSD = BIGDECIMAL_ZERO;
+  } else {
+    token.lastPriceUSD = price.usdPrice.div(price.decimalsBaseTen);
+  }
+  token.lastPriceBlockNumber = block.number;
+  token.save();
   return token;
 }
 

@@ -19,7 +19,7 @@ import {
   updateVaultDailySnapshot,
   updateVaultHourlySnapshot,
 } from "../utils/snapshots";
-import { fetchTokenName, fetchTokenSymbol, getLastPriceUSD } from "./token";
+import { fetchTokenName, fetchTokenSymbol } from "./token";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
@@ -57,16 +57,16 @@ export function createVaultFromStrategy(
     want = vaultContract.try_token();
   }
   if (want.reverted) {
-    vault.inputToken = getTokenOrCreate(ZERO_ADDRESS).id;
+    vault.inputToken = getTokenOrCreate(ZERO_ADDRESS, currentBlock).id;
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
-    const inputToken = getTokenOrCreate(want.value);
+    const inputToken = getTokenOrCreate(want.value, currentBlock);
     vault.inputToken = inputToken.id;
-    vault.totalValueLockedUSD = getLastPriceUSD(want.value, currentBlock.number)
+    vault.totalValueLockedUSD = inputToken.lastPriceUSD
       .times(vault.inputTokenBalance.toBigDecimal())
       .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
   }
-  vault.outputToken = getTokenOrCreate(vaultAddress).id;
+  vault.outputToken = getTokenOrCreate(vaultAddress, currentBlock).id;
 
   vault.fees = getFees(vault.id, strategyContract);
 
@@ -135,8 +135,8 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   if (wantCall.reverted) {
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
-    const inputToken = getTokenOrCreate(wantCall.value);
-    vault.totalValueLockedUSD = getLastPriceUSD(wantCall.value, block.number)
+    const inputToken = getTokenOrCreate(wantCall.value, block);
+    vault.totalValueLockedUSD = inputToken.lastPriceUSD
       .times(vault.inputTokenBalance.toBigDecimal())
       .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
   }
@@ -294,17 +294,16 @@ export function handleStratHarvestWithAmount(event: StratHarvest): void {
   );
   if (dailySnapshot) {
     const token = getTokenOrCreate(
-      Address.fromString(vault.inputToken.split("x")[1])
+      Address.fromString(vault.inputToken.split("x")[1]),
+      event.block
     );
-    const priceUsd = token.lastPriceUSD;
-    if (priceUsd) {
-      dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
-        priceUsd
-          .times(event.params.wantHarvested.toBigDecimal())
-          .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-      );
-      dailySnapshot.save();
-    }
+
+    dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
+      token.lastPriceUSD
+        .times(event.params.wantHarvested.toBigDecimal())
+        .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+    );
+    dailySnapshot.save();
   }
   getBeefyFinanceOrCreate(vault.id, event.block);
 }
@@ -321,17 +320,15 @@ export function handleStratHarvest(event: StratHarvest): void {
     );
     if (dailySnapshot && amountHarvested > BIGINT_ZERO) {
       const token = getTokenOrCreate(
-        Address.fromString(vault.inputToken.split("x")[1])
+        Address.fromString(vault.inputToken.split("x")[1]),
+        event.block
       );
-      const priceUsd = token.lastPriceUSD;
-      if (priceUsd) {
-        dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
-          priceUsd
-            .times(amountHarvested.toBigDecimal())
-            .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
-        );
-        dailySnapshot.save();
-      }
+      dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
+        token.lastPriceUSD
+          .times(amountHarvested.toBigDecimal())
+          .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+      );
+      dailySnapshot.save();
     }
   }
   getBeefyFinanceOrCreate(vault.id, event.block);

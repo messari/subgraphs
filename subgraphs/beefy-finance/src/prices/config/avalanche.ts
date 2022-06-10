@@ -32,7 +32,7 @@ export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
+  Address.fromString("0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106")
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",

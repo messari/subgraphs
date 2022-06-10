@@ -6,7 +6,7 @@ import {
   UniswapPair__getReservesResult,
 } from "../../../generated/aave-aave-eol/UniswapPair";
 import { UniswapFeeRouter as UniswapFeeRouterContract } from "../../../generated/aave-aave-eol/UniswapFeeRouter";
-import { Address, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { UniswapRouter as UniswapRouterContract } from "../../../generated/aave-aave-eol/UniswapRouter";
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
@@ -16,7 +16,7 @@ export function isLpToken(tokenAddress: Address, network: string): bool {
     return false;
   }
 
-  const lpToken = UniswapRouterContract.bind(tokenAddress);
+  const lpToken = UniswapPairContract.bind(tokenAddress);
   let isFactoryAvailable = utils.readValue(
     lpToken.try_factory(),
     constants.ZERO_ADDRESS
@@ -32,12 +32,9 @@ export function getPriceUsdc(
   tokenAddress: Address,
   network: string
 ): CustomPriceType {
-  log.warning("checking if LP", []);
   if (isLpToken(tokenAddress, network)) {
-    log.warning("LP Token", []);
     return getLpTokenPriceUsdc(tokenAddress, network);
   }
-  log.warning("not LP Token", []);
   return getPriceFromRouterUsdc(tokenAddress, network);
 }
 
