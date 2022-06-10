@@ -19,10 +19,12 @@ enum Network {
   JUNO
   MOONBEAM
   MOONRIVER
+  MUMBAI
   NEAR_MAINNET
   OPTIMISM
   OSMOSIS
   MATIC # aka Polygon
+  POA # aka Proof of Authority 
   XDAI # aka Gnosis Chain
 }
 

@@ -1,0 +1,20 @@
+specVersion: 0.0.5
+repository: https://github.com/messari/subgraphs
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: cosmos
+    name: CosmosHub
+    network: {{ network }} # This will change for each cosmos-based blockchain. In this case, the example uses the CosmosHub mainnet.
+    source:
+      startBlock: 0 # Required for Cosmos, set this to 0 to start indexing from chain genesis
+    mapping:
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Network
+        - Block
+        - Author
+      blockHandlers:
+        - handler: handleBlock
+      file: ./src/mapping.ts

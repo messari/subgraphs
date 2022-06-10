@@ -3,23 +3,18 @@ import {
   ActiveAuthor,
   Author,
   Block,
-  Blockchain,
+  Network,
   DailySnapshot,
   HourlySnapshot,
 } from "../generated/schema";
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
-  BLOCKCHAIN_NAME,
-  INITIAL_SUPPLY,
   IntervalType,
-  INT_NEGATIVE_ONE,
   INT_TWO,
   INT_ZERO,
-  MAX_SUPPLY,
   METHODOLOGY_VERSION,
-  NATIVE_TOKEN,
-  NATIVE_TOKEN_DECIMALS,
+  NETWORK_NAME,
   SCHEMA_VERSION,
   SECONDS_PER_DAY,
   SECONDS_PER_HOUR,
@@ -27,11 +22,15 @@ import {
 } from "./constants";
 import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
 
-export function handleBlock(block: ethereum.Block): void {
-  let blockEntity = createBlock(block);
+///////////////////////
+//// Block Handler ////
+///////////////////////
 
-  // update blockchain entity
-  let blockchain = updateBlockchain(block);
+export function handleBlock(block: ethereum.Block): void {
+  createBlock(block);
+
+  // update network entity
+  let network = updateNetwork(block);
 
   // update author entity
   let authorId = block.author.toHexString();
@@ -44,8 +43,8 @@ export function handleBlock(block: ethereum.Block): void {
     author.save();
 
     // update unique authors
-    blockchain.cumulativeUniqueAuthors++;
-    blockchain.save();
+    network.cumulativeUniqueAuthors++;
+    network.save();
   }
   author.cumulativeBlocksCreated++;
   author.cumulativeDifficulty = author.cumulativeDifficulty.plus(
@@ -54,55 +53,52 @@ export function handleBlock(block: ethereum.Block): void {
   author.save();
 
   // create/update daily/hourly metrics
-  updateMetrics(block, blockchain);
+  updateMetrics(block, network);
 }
 
 //////////////////
 //// Updaters ////
 //////////////////
 
-function updateBlockchain(block: ethereum.Block): Blockchain {
-  let blockchain = getOrCreateBlockchain(NATIVE_TOKEN);
-  blockchain.blockHeight = block.number.toI32();
-  blockchain.cumulativeDifficulty = block.totalDifficulty;
-  blockchain.cumulativeGasUsed = blockchain.cumulativeGasUsed.plus(
-    block.gasUsed
-  );
-  blockchain.gasLimit = block.gasLimit;
+function updateNetwork(block: ethereum.Block): Network {
+  let network = getOrCreateNetwork(NETWORK_NAME);
+  network.blockHeight = block.number.toI32();
+  network.cumulativeDifficulty = block.totalDifficulty;
+  network.cumulativeGasUsed = network.cumulativeGasUsed.plus(block.gasUsed);
+  network.gasLimit = block.gasLimit;
   if (block.baseFeePerGas) {
-    blockchain.cumulativeBurntFees = blockchain.cumulativeBurntFees.plus(
+    network.cumulativeBurntFees = network.cumulativeBurntFees.plus(
       block.baseFeePerGas!.times(block.gasUsed)
     );
   }
-  blockchain.blocksPerDay = getBlocksPerDay(block.timestamp, block.number);
-  blockchain.save();
+  network.blocksPerDay = getBlocksPerDay(block.timestamp, block.number);
+  network.save();
 
-  return blockchain;
+  return network;
 }
 
-function updateMetrics(block: ethereum.Block, blockchain: Blockchain): void {
+function updateMetrics(block: ethereum.Block, network: Network): void {
   let dailySnapshot = getOrCreateDailySnapshot(block.timestamp);
   let hourlySnapshot = getOrCreateHourlySnapshot(block.timestamp);
 
   // update snapshots
-  updateDailySnapshot(dailySnapshot, block, blockchain);
-  updateHourlySnapshot(hourlySnapshot, block, blockchain);
+  updateDailySnapshot(dailySnapshot, block, network);
+  updateHourlySnapshot(hourlySnapshot, block, network);
 }
 
 function updateDailySnapshot(
   snapshot: DailySnapshot,
   block: ethereum.Block,
-  blockchain: Blockchain
+  network: Network
 ): void {
   // update overlapping fields for snapshot
-  snapshot.cumulativeUniqueAuthors = blockchain.cumulativeUniqueAuthors;
-  snapshot.blockHeight = blockchain.blockHeight;
+  snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
+  snapshot.blockHeight = network.blockHeight;
   snapshot.timestamp = block.timestamp;
-  snapshot.blocksPerDay = blockchain.blocksPerDay;
-  snapshot.cumulativeDifficulty = blockchain.cumulativeDifficulty;
-  snapshot.cumulativeBurntFees = blockchain.cumulativeBurntFees;
-  snapshot.cumulativeRewards = blockchain.cumulativeRewards;
-  snapshot.supply = blockchain.supply;
+  snapshot.blocksPerDay = network.blocksPerDay;
+  snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
+  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+  snapshot.cumulativeRewards = network.cumulativeRewards;
 
   // check for new author
   let id =
@@ -149,8 +145,8 @@ function updateDailySnapshot(
     .div(dailyBlocksBD);
 
   // calc mean block interval
-  // mean = (firstTimestamp - timestamp) / dailyBlocks
-  let timestampDiff = snapshot.firstTimestamp.minus(block.timestamp);
+  // mean = (timestamp - firstTimestamp) / dailyBlocks
+  let timestampDiff = block.timestamp.minus(snapshot.firstTimestamp);
   snapshot.dailyMeanBlockInterval = timestampDiff
     .toBigDecimal()
     .div(dailyBlocksBD);
@@ -161,17 +157,16 @@ function updateDailySnapshot(
 function updateHourlySnapshot(
   snapshot: HourlySnapshot,
   block: ethereum.Block,
-  blockchain: Blockchain
+  network: Network
 ): void {
   // update overlapping fields for snapshot
-  snapshot.cumulativeUniqueAuthors = blockchain.cumulativeUniqueAuthors;
-  snapshot.blockHeight = blockchain.blockHeight;
+  snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
+  snapshot.blockHeight = network.blockHeight;
   snapshot.timestamp = block.timestamp;
-  snapshot.blocksPerDay = blockchain.blocksPerDay;
-  snapshot.cumulativeDifficulty = blockchain.cumulativeDifficulty;
-  snapshot.cumulativeBurntFees = blockchain.cumulativeBurntFees;
-  snapshot.cumulativeRewards = blockchain.cumulativeRewards;
-  snapshot.supply = blockchain.supply;
+  snapshot.blocksPerDay = network.blocksPerDay;
+  snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
+  snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
+  snapshot.cumulativeRewards = network.cumulativeRewards;
 
   // check for new author
   let id =
@@ -218,8 +213,8 @@ function updateHourlySnapshot(
     .div(hourlyBlocksBD);
 
   // calc mean block interval
-  // mean = (firstTimestamp - timestamp) / hourlyBlocks
-  let timestampDiff = snapshot.firstTimestamp.minus(block.timestamp);
+  // mean = (timestamp - firstTimestamp) / hourlyBlocks
+  let timestampDiff = block.timestamp.minus(snapshot.firstTimestamp);
   snapshot.hourlyMeanBlockInterval = timestampDiff
     .toBigDecimal()
     .div(hourlyBlocksBD);
@@ -236,7 +231,7 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
   let dailySnapshot = DailySnapshot.load(id);
   if (!dailySnapshot) {
     dailySnapshot = new DailySnapshot(id);
-    dailySnapshot.blockchain = NATIVE_TOKEN;
+    dailySnapshot.network = NETWORK_NAME;
     dailySnapshot.cumulativeUniqueAuthors = INT_ZERO;
     dailySnapshot.dailyActiveAuthors = INT_ZERO;
     dailySnapshot.blockHeight = INT_ZERO;
@@ -267,7 +262,7 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
   let hourlySnapshot = HourlySnapshot.load(id);
   if (!hourlySnapshot) {
     hourlySnapshot = new HourlySnapshot(id);
-    hourlySnapshot.blockchain = NATIVE_TOKEN;
+    hourlySnapshot.network = NETWORK_NAME;
     hourlySnapshot.cumulativeUniqueAuthors = INT_ZERO;
     hourlySnapshot.hourlyActiveAuthors = INT_ZERO;
     hourlySnapshot.blockHeight = INT_ZERO;
@@ -293,7 +288,7 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
   return hourlySnapshot;
 }
 
-function createBlock(block: ethereum.Block): Block {
+function createBlock(block: ethereum.Block): void {
   let blockEntity = new Block(block.number.toString());
 
   blockEntity.hash = block.hash.toHexString();
@@ -318,38 +313,24 @@ function createBlock(block: ethereum.Block): Block {
   blockEntity.day = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
   blockEntity.hour = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
   blockEntity.save();
-
-  return blockEntity;
 }
 
-function getOrCreateBlockchain(id: string): Blockchain {
-  let blockchain = Blockchain.load(id);
-  if (!blockchain) {
-    blockchain = new Blockchain(id);
-    blockchain.schemaVersion = SCHEMA_VERSION;
-    blockchain.subgraphVersion = SUBGRAPH_VERSION;
-    blockchain.methodologyVersion = METHODOLOGY_VERSION;
-    blockchain.decimals = NATIVE_TOKEN_DECIMALS;
-    blockchain.name = BLOCKCHAIN_NAME;
-    blockchain.cumulativeUniqueAuthors = INT_ZERO;
-    if (MAX_SUPPLY != BIGINT_ZERO) {
-      blockchain.maxSupply = MAX_SUPPLY;
-    }
-    if (INITIAL_SUPPLY != INT_NEGATIVE_ONE) {
-      blockchain.supply = BigInt.fromI32(INITIAL_SUPPLY);
-    }
-    blockchain.blockHeight = INT_ZERO;
-    blockchain.cumulativeDifficulty = BIGINT_ZERO;
-    blockchain.cumulativeGasUsed = BIGINT_ZERO;
-    blockchain.gasLimit = BIGINT_ZERO;
-    blockchain.cumulativeBurntFees = BIGINT_ZERO;
-    blockchain.blocksPerDay = BIGDECIMAL_ZERO;
+function getOrCreateNetwork(id: string): Network {
+  let network = Network.load(id);
+  if (!network) {
+    network = new Network(id);
+    network.schemaVersion = SCHEMA_VERSION;
+    network.subgraphVersion = SUBGRAPH_VERSION;
+    network.methodologyVersion = METHODOLOGY_VERSION;
+    network.cumulativeUniqueAuthors = INT_ZERO;
+    network.blockHeight = INT_ZERO;
+    network.cumulativeDifficulty = BIGINT_ZERO;
+    network.cumulativeGasUsed = BIGINT_ZERO;
+    network.gasLimit = BIGINT_ZERO;
+    network.cumulativeBurntFees = BIGINT_ZERO;
+    network.blocksPerDay = BIGDECIMAL_ZERO;
 
-    blockchain.save();
+    network.save();
   }
-  return blockchain;
+  return network;
 }
-
-/////////////////
-//// Helpers ////
-/////////////////
