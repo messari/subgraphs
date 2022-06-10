@@ -73,3 +73,5 @@ Existing Subgraph in Studio: N/A
 Explanation of lending metrics: https://docs.euler.finance/risk-framework/methodology
 
 Dune Dashboard for Testing: https://dune.com/shippooordao/Euler-Finance-Dashboard https://dune.com/altooptimo/Euler-Finance
+
+Other dashboads: https://tokenterminal.com/terminal/projects/euler
