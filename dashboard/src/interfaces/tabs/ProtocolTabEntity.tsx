@@ -62,16 +62,6 @@ function ProtocolTabEntity({
         const timeseriesInstance: { [x: string]: any } = currentEntityData[x];
         // On the entity instance, loop through all of the entity fields within it
         // create the base yield field for DEXs
-        if (timeseriesInstance.dailySupplySideRevenueUSD && timeseriesInstance.totalValueLockedUSD) {
-          const value = (timeseriesInstance.dailySupplySideRevenueUSD / timeseriesInstance.totalValueLockedUSD) * 100;
-          if (!dataFields.capitalEfficiency) {
-            dataFields.capitalEfficiency = [{ value, date: Number(timeseriesInstance.timestamp) }];
-            dataFieldMetrics.capitalEfficiency = { sum: value };
-          } else {
-            dataFields.capitalEfficiency.push({ value, date: Number(timeseriesInstance.timestamp) });
-            dataFieldMetrics.capitalEfficiency.sum += value;
-          }
-        }
         Object.keys(timeseriesInstance).forEach((fieldName: string) => {
           // skip the timestamp field on each entity instance
           if (fieldName === "timestamp" || fieldName === "id") {
@@ -213,12 +203,6 @@ function ProtocolTabEntity({
         }
       }
       console.log("LIST", list);
-
-      if (dataFields.protocolControlledValueUSD) {
-        const capitalEfficiency = dataFields.capitalEfficiency;
-        delete dataFields.capitalEfficiency;
-        dataFields.capitalEfficiency = capitalEfficiency;
-      }
 
       if (dataFields.protocolControlledValueUSD) {
         const protocolControlledValueUSD = dataFields.protocolControlledValueUSD;

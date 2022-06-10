@@ -27,6 +27,11 @@ const subgraphLogoMap: Record<string, string> = {
   "iron-bank": "https://assets.coingecko.com/coins/images/22902/small/ironbank.png?1642872464",
   "trader-joe": "https://assets.coingecko.com/markets/images/692/small/traderjoe.png?1628152581",
   sushiswap: "https://assets.coingecko.com/markets/images/576/small/2048x2048_Logo.png?1609208464",
+  spookyswap: "https://storage.googleapis.com/subgraph-images/1653189196580spookyswap.png",
+  venus: "https://storage.googleapis.com/subgraph-images/1654009958968venus.jpg",
+  scream: "https://storage.googleapis.com/subgraph-images/1654009711828scream.png",
+  spiritswap: "https://storage.googleapis.com/subgraph-images/1653965925262spiritiswap.png",
+  "banker-joe": "https://storage.googleapis.com/subgraph-images/1654009863071banker-joe.png",
   quickswap: "https://assets.coingecko.com/coins/images/25393/small/quickswap.jpg?1651680141",
   solarbeam: "https://assets.coingecko.com/coins/images/18260/small/solarbeamlogo.png?1636080005",
 };
