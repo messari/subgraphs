@@ -119,6 +119,8 @@ export const LENDING_POOLS = [
   Address.fromString('0x8925d9d9b4569d737a48499def3f67baa5a144b9'),
   // FANTOM
   Address.fromString('0x4fc8d635c3cb1d0aa123859e2b2587d0ff2707b1'),
+  // Matic 
+  Address.fromString('0x445fe580ef8d70ff569ab36e80c647af338db351')
 ]
 
 // some v2 pools can have Forex : Crypto pairs for which we need
@@ -222,4 +224,16 @@ export const CURVE_TOKEN = Address.fromString("{{curveToken}}")
 export const CTOKEN_DECIMALS = 8;
 
 export const LP_TOKEN_POOL_MAP = new Map<string, Address>()
-LP_TOKEN_POOL_MAP.set("0x445FE580eF8d70FF569aB36e80c647af338db351".toLowerCase(),Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))
+LP_TOKEN_POOL_MAP.set("0x445fe580ef8d70ff569ab36e80c647af338db351",Address.fromString("0xE7a24EF0C5e95Ffb0f6684b813A78F2a3AD7D171"))
+
+export const POOL_REGISTRY_ID_MAP = new Map<string, BigInt>()
+POOL_REGISTRY_ID_MAP.set("0xf72beacc6fd334e14a7ddac25c3ce1eb8a827e10",BigInt.fromI32(8))
+POOL_REGISTRY_ID_MAP.set("0xb0d2eb3c2ca3c6916fab8dcbf9d9c165649231ae",BigInt.fromI32(7))
+POOL_REGISTRY_ID_MAP.set("0x065f44cd602cc6680e82e516125839b9bbbbe57e",BigInt.fromI32(6))
+POOL_REGISTRY_ID_MAP.set("0x850c7cc8757ce1fa8ced709f297d842e12e61759",BigInt.fromI32(5))
+POOL_REGISTRY_ID_MAP.set("0xaea2e71b631fa93683bcf256a8689dfa0e094fcd",BigInt.fromI32(4))
+POOL_REGISTRY_ID_MAP.set("0x6041631c566eb8dc6258a75fa5370761d4873990",BigInt.fromI32(3))
+POOL_REGISTRY_ID_MAP.set("0xf92c2a3c91bf869f77f9cb221c5ab1b1ada8a586",BigInt.fromI32(2))
+POOL_REGISTRY_ID_MAP.set("0xe9dcf2d2a17ead11fab8b198578b20535370be6a",BigInt.fromI32(1))
+POOL_REGISTRY_ID_MAP.set("0x30df229cefa463e991e29d42db0bae2e122b2ac7",BigInt.fromI32(0))
+

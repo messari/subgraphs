@@ -203,7 +203,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerTimestamp(),
     cTokenContract.try_borrowRatePerTimestamp(),
     oracleContract.try_getUnderlyingPrice(marketAddress),

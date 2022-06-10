@@ -6,27 +6,12 @@
     "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts}\"",
     "codegen": "graph codegen",
     "build": "graph build",
-    "prepare:mainnet": "mustache ./config/mainnet.json subgraph.template.yaml > subgraph.yaml && mustache ./config/mainnet.json src/mapping.template.ts > src/mapping.ts && mustache ./config/mainnet.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "prepare:avalanche": "mustache ./config/avalanche.json subgraph.template.yaml > subgraph.yaml && mustache ./config/avalanche.json src/mapping.template.ts > src/mapping.ts && mustache ./config/avalanche.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "prepare:fantom": "mustache ./config/fantom.json subgraph.template.yaml > subgraph.yaml && mustache ./config/fantom.json src/mapping.template.ts > src/mapping.ts && mustache ./config/fantom.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "prepare:arbitrum": "mustache ./config/arbitrum.json subgraph.template.yaml > subgraph.yaml && mustache ./config/arbitrum.json src/mapping.template.ts > src/mapping.ts && mustache ./config/arbitrum.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "prepare:matic": "mustache ./config/matic.json subgraph.template.yaml > subgraph.yaml && mustache ./config/matic.json src/mapping.template.ts > src/mapping.ts && mustache ./config/matic.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "prepare:xdai": "mustache ./config/xdai.json subgraph.template.yaml > subgraph.yaml && mustache ./config/xdai.json src/mapping.template.ts > src/mapping.ts && mustache ./config/xdai.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "prepare:optimism": "mustache ./config/optimism.json subgraph.template.yaml > subgraph.yaml && mustache ./config/optimism.json src/mapping.template.ts > src/mapping.ts && mustache ./config/optimism.json src/common/constants/index.template.ts > src/common/constants/index.ts",
-    "build:mainnet": "yarn prepare:mainnet && yarn codegen && graph build",
-    "build:avalanche": "yarn prepare:avalanche && yarn codegen && graph build",
-    "build:fantom": "yarn prepare:fantom && yarn codegen && graph build",
-    "build:arbitrum": "yarn prepare:arbitrum && yarn codegen && graph build",
-    "build:matic": "yarn prepare:matic && yarn codegen && graph build",
-    "build:xdai": "yarn prepare:xdai && yarn codegen && graph build",
-    "build:optimism": "yarn prepare:optimism && yarn codegen && graph build",
-    "deploy:mainnet": "yarn build:mainnet && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-mainnet",
-    "deploy:avalanche": "yarn build:avalanche && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-avalanche",
-    "deploy:fantom": "yarn build:fantom && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-fantom",
-    "deploy:arbitrum": "yarn build:arbitrum && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-arbitrum",
-    "deploy:matic": "yarn build:matic && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-matic",
-    "deploy:xdai": "yarn build:xdai && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-xdai",
-    "deploy:optimism": "yarn build:optimism && graph deploy --node https://api.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ tannishmango/curve-optimism"
+  
+    "prepare:yaml": "mustache protocols/${npm_config_protocol}/config/networks/${npm_config_network}/${npm_config_network}.json protocols/${npm_config_protocol}/config/templates/${npm_config_template} > subgraph.yaml",
+    "prepare:build": "graph codegen && graph build",
+    "deploy:subgraph": "graph deploy --product hosted-service ${npm_config_location}",
+  
+    "deploy": "node  --experimental-json-modules --no-warnings ../../deployment/deployment.js"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.27.0",
