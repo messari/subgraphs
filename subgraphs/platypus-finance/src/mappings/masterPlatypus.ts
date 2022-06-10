@@ -94,8 +94,7 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset {
     if (token.id == PTPAddress) {
       tps = ptpPerSecond.times(poolPoints).div(totalPoints);
     } else {
-      let rewarderContract = SimpleRewarder.bind(rewarder);
-      tps = getTPS(rewarderContract);
+      tps = getBonusRewardTPS(rewarder);
     }
 
     log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
@@ -184,8 +183,7 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset {
     if (token.id == PTPAddress) {
       tps = ptpPerSecond.times(poolPoints).div(totalPoints);
     } else {
-      let rewarderContract = SimpleRewarder.bind(rewarder);
-      tps = getTPS(rewarderContract);
+      tps = getBonusRewardTPS(rewarder);
     }
 
     log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
@@ -274,8 +272,7 @@ export function handlePlatypus<T>(event: T, pid: BigInt): _Asset {
     if (token.id == PTPAddress) {
       tps = ptpPerSecond.times(poolPoints).div(totalPoints);
     } else {
-      let rewarderContract = SimpleRewarder.bind(rewarder);
-      tps = getTPS(rewarderContract);
+      tps = getBonusRewardTPS(rewarder);
     }
 
     log.debug("rt {} tps {}", [rewardToken.id.toString(), tps.toString()]);
@@ -375,10 +372,11 @@ export function addRewardTokenToAsset(event: ethereum.Event, rtAddress: Address,
   return rt;
 }
 
-export function getTPS(rewarderContract: SimpleRewarder): BigInt {
-  if (rewarderContract._address.equals(ZERO_ADDRESS)) {
+export function getBonusRewardTPS(rewarder: Address): BigInt {
+  if (rewarder.equals(ZERO_ADDRESS)) {
+    return BIGINT_ZERO;
   }
-
+  let rewarderContract = SimpleRewarder.bind(rewarder);
   let tps = rewarderContract.try_tokenPerSec();
   if (tps.reverted) {
     log.error("[HandleRewards]error fetching simplerewarder {} getting tps ", [
