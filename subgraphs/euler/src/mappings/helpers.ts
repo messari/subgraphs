@@ -270,6 +270,7 @@ export function createMarket(event: MarketActivated): void {
   const dToken = getOrCreateToken(event.params.dToken);
   const eToken = getOrCreateToken(event.params.eToken);
 
+  market.name = token.symbol;
   market.outputToken = eToken.id;
   market.inputToken = token.id;
   market.save();
