@@ -205,8 +205,7 @@ export const TablePoolOverview = ({
           });
         }
 
-
-        const rewardAPYs = pool.rewardTokenEmissionsUSD.map((val: string, idx: number) => {
+        let rewardAPYs: string[] = pool?.rewardTokenEmissionsUSD?.map((val: string, idx: number) => {
           let apr = 0;
           if (protocolType === "LENDING") {
             if (
@@ -270,6 +269,9 @@ export const TablePoolOverview = ({
           }
           return Number(apr).toFixed(2) + "%";
         });
+        if (!rewardAPYs) {
+          rewardAPYs = [];
+        }
         const rewardTokenCell = rewardTokenSymbol.map((tok: string, idx: number) => {
           let str = `0.00 % ${tok}`;
           if (rewardAPYs[idx]) {
