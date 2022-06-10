@@ -25,11 +25,37 @@ export namespace Network {
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BSC = "bnb";
+  export const CELO = "celo";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
+}
+
+export namespace IntervalType {
+  export const DAILY = "DAILY";
+  export const HOURLY = "HOURLY";
+}
+
 /////////////////
 //// Numbers ////
 /////////////////
 
+export const INT_NEGATIVE_ONE = -1;
 export const INT_ZERO = 0;
+export const INT_ONE = 1;
+export const INT_TWO = 2;
+export const INT_FOUR = 4;
 
 export const BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
 
@@ -55,12 +81,13 @@ export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
 export const SCHEMA_VERSION = "1.0.0";
 export const METHODOLOGY_VERSION = "1.0.0";
-export const SUBGRAPH_VERSION = "1.0.0";
+export const SUBGRAPH_VERSION = "1.0.1";
 
 // TODO:
 // name, decimals, maxSupply, native token address
-// ETH constants
+// mainnet constants
 export const NATIVE_TOKEN = ETH_ADDRESS;
 export const NATIVE_TOKEN_DECIMALS = 18;
 export const BLOCKCHAIN_NAME = Network.MAINNET;
 export const MAX_SUPPLY = BIGINT_ZERO;
+export const INITIAL_SUPPLY = INT_NEGATIVE_ONE;
