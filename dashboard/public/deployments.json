@@ -56,7 +56,7 @@
         },
         "uniswap-v3": {
             "arbitrum": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-arbitrum",
-            "mainnet": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-ethereum",
+            "mainnet": "https://api.thegraph.com/subgraphs/id/QmUvxBUcZchQ4wbWtMgE9CMqeZ8R139JKfsXxPqBoxHCC7",
             "matic": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-polygon",
             "optimism": "https://api.thegraph.com/subgraphs/name/messari/uniswap-v3-optimism"
         }

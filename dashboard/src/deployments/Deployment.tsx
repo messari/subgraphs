@@ -84,11 +84,19 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   };
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
-  const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery, {
-    variables: { subgraphName },
+  const deploymentId = deployment.split("id/")[1];
+  const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery(deployment), {
+    variables: { subgraphName, deploymentIds: [deploymentId ? deploymentId : ""] },
     client: clientIndexing,
   });
-  const { nonFatalErrors, fatalError, synced } = status?.indexingStatusForCurrentVersion ?? {};
+  let statusData = status?.indexingStatusForCurrentVersion;
+  let { nonFatalErrors, fatalError, synced } = statusData ?? {};
+  if (status?.indexingStatuses) {
+    statusData = status?.indexingStatuses[0];
+    synced = statusData?.synced ?? null;
+    fatalError = statusData?.fatalError ?? null;
+    nonFatalErrors = statusData?.nonFatalErrors ?? [];
+  }
 
   const client = useMemo(() => NewClient(deployment), [deployment]);
   const { data, error, loading } = useQuery(ProtocolQuery, {
@@ -100,7 +108,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
 
   useEffect(() => {
     if (error || errorIndexing) {
-      console.log(deployment, "DEPLOYMENT ERR", error, errorIndexing, status, subgraphName);
+      console.log(deployment, "DEPLOYMENT ERR", error, errorIndexing, status, statusData, subgraphName);
     }
   }, [error]);
 
@@ -114,7 +122,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
 
-  if (!status) {
+  if (!statusData) {
     let errorMsg = null;
     if (errorIndexing) {
       errorMsg = (
@@ -154,8 +162,8 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   const indexed = synced
     ? 100
     : toPercent(
-      status.indexingStatusForCurrentVersion.chains[0].latestBlock.number,
-      status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number,
+      statusData.chains[0].latestBlock.number,
+      statusData.chains[0].chainHeadBlock.number,
     );
 
   const showErrorModal: MouseEventHandler<HTMLButtonElement> = (e) => {
@@ -195,11 +203,11 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
           </CardRow>
           <CardRow>
             <span>Latest Block:</span>{" "}
-            <span>{status.indexingStatusForCurrentVersion.chains[0].latestBlock.number}</span>
+            <span>{statusData.chains[0].latestBlock.number}</span>
           </CardRow>
           <CardRow>
             <span>Current chain block:</span>
-            <span>{status.indexingStatusForCurrentVersion.chains[0].chainHeadBlock.number}</span>
+            <span>{statusData.chains[0].chainHeadBlock.number}</span>
           </CardRow>
           <CardRow $warning={schemaOutdated}>
             <span>Schema version:</span> <span>{protocol?.schemaVersion || "N/A"}</span>
@@ -212,7 +220,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
           </CardRow>
           <CardRow>
             <span>Entity count:</span>{" "}
-            <span>{parseInt(status.indexingStatusForCurrentVersion.entityCount).toLocaleString()}</span>
+            <span>{parseInt(statusData.entityCount).toLocaleString()}</span>
           </CardRow>
         </CardContent>
         {(nonFatalErrors.length > 0 || fatalError) && (
