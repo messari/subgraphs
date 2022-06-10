@@ -12,6 +12,12 @@ export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
+export const PROTOCOL_NAME = "beethovenx"
+export const PROTOCOL_SLUG = "beethovenx"
+
+
+
+
 // The network names corresponding to the Network enum in the schema.
 // They also correspond to the ones in `dataSource.network()` after converting to lower case.
 // See below for a complete list:
@@ -126,14 +132,20 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 ///// Protocol Specific /////
 /////////////////////////////
 
-export let VAULT_ADDRESS = Address.fromString('0xBA12222222228d8Ba445958a75a0704d566BF2C8')
-export let WETH: Address = Address.fromString('0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2');
-export let WMATIC: Address = Address.fromString('0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0');
-export let WBTC: Address = Address.fromString('0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599');
-export let USDC: Address = Address.fromString('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48');
-export let USDT: Address = Address.fromString('0xdAC17F958D2ee523a2206206994597C13D831ec7');
-export let BAL: Address = Address.fromString('0xba100000625a3754423978a60c9317c58a424e3D');
-export let DAI: Address = Address.fromString('0x6B175474E89094C44Da98b954EedeAC495271d0F');
+export let DEFAULTNETWORK =  "FANTOM" 
 
-export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT];
-export let BASE_ASSETS: Address[] = [WETH, WMATIC, WBTC, BAL];
+export let VAULT_ADDRESS = Address.fromString('0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce')
+export let DAI: Address = Address.fromString('0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E');
+export let USDC: Address = Address.fromString('0x04068DA6C83AFCFA0e13ba15A6696662335D5B75');
+export let USDT: Address = Address.fromString('0x049d68029688eAbF473097a2fC38ef61633A3C7A');
+export let MIM: Address = Address.fromString('0x82f0B8B456c1A451378467398982d4834b6829c1');
+export let WFTM: Address = Address.fromString('0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83');
+export let WBTC: Address = Address.fromString('0x321162Cd933E2Be498Cd2267a90534A804051b11');
+export let WETH: Address = Address.fromString('0x74b23882a30290451A17c44f4F05243b6b58C76d');
+export let BEETS: Address = Address.fromString('0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e');
+
+export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT,MIM];
+export let BASE_ASSETS: Address[] = [WETH, WFTM, WBTC, BEETS];
+
+
+

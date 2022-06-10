@@ -1,16 +1,6 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal, ethereum, BigInt, Address, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/paramConfig";
-import {
-  UsageMetricsDailySnapshot,
-  Account,
-  Token,
-  ActiveAccount,
-  UsageMetricsHourlySnapshot,
-  _HelperStore,
-  DexAmmProtocol,
-  LiquidityPool,
-} from "../../generated/schema";
+import { Account, Token, ActiveAccount, _HelperStore, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
 import { getUsdPrice } from "../prices";
 import {
   SECONDS_PER_DAY,

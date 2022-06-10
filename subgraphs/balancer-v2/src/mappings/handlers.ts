@@ -15,7 +15,7 @@ import {
   createLiquidityPool,
 } from "../common/creators";
 import { updatePoolMetrics, updateUsageMetrics, updateFinancials } from "../common/updateMetrics";
-import {  BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
+import { BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
 import { updateWeight } from "../common/weight";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
 import { getLiquidityPoolFee, getOrCreateToken } from "../common/getters";

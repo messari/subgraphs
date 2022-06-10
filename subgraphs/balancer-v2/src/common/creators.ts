@@ -12,7 +12,6 @@ import {
 } from "../../generated/schema";
 
 import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateToken } from "./getters";
-import { NetworkConfigs } from "../../config/paramConfig";
 import {
   BIGDECIMAL_NEG_ONE,
   BIGDECIMAL_ONE,
@@ -25,6 +24,7 @@ import {
   INT_ZERO,
   LiquidityPoolFeeType,
   PROTOCOL_FEE_TO_OFF,
+  VAULT_ADDRESS,
 } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./updateMetrics";
 import { valueInUSD } from "./pricing";
@@ -65,7 +65,6 @@ export function createLiquidityPool(
   pool.inputTokenBalances = inputTokenBalances;
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
-  pool.rewardTokens = NetworkConfigs.REWARD_TOKENS;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
   pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
   pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
@@ -89,13 +88,13 @@ export function createLiquidityPool(
 
 function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
   // LP Fee
-  // These fees were activated by a governance vote and were later raised to 50% by a subsequent proposal. 
+  // These fees were activated by a governance vote and were later raised to 50% by a subsequent proposal.
   //https://vote.balancer.fi/#/proposal/0xf6238d70f45f4dacfc39dd6c2d15d2505339b487bbfe014457eba1d7e4d603e3
   let poolLpFee = new LiquidityPoolFee("lp-fee-" + poolAddressString);
   poolLpFee.feeType = LiquidityPoolFeeType.FIXED_LP_FEE;
   poolLpFee.feePercentage = BigDecimal.fromString("0.5");
 
-  // These fees were activated by a governance vote and were later raised to 50% by a subsequent proposal. 
+  // These fees were activated by a governance vote and were later raised to 50% by a subsequent proposal.
   //https://vote.balancer.fi/#/proposal/0xf6238d70f45f4dacfc39dd6c2d15d2505339b487bbfe014457eba1d7e4d603e3
   // Protocol Fee
   let poolProtocolFee = new LiquidityPoolFee("protocol-fee-" + poolAddressString);

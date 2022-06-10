@@ -1,6 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { Address, BigDecimal, bigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/paramConfig";
+import { Address, BigDecimal, bigDecimal, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Vault/ERC20";
 import {
   DexAmmProtocol,
@@ -28,16 +27,24 @@ import {
   PROTOCOL_SCHEMA_VERSION,
   PROTOCOL_SUBGRAPH_VERSION,
   PROTOCOL_METHODOLOGY_VERSION,
+  VAULT_ADDRESS,
+  PROTOCOL_NAME,
+  PROTOCOL_SLUG,
+  DEFAULTNETWORK,
 } from "./constants";
 import { fetchPrice } from "./pricing";
+import { createLiquidityPool } from "./creators";
+
+
+
 
 export function getOrCreateDex(): DexAmmProtocol {
-  let protocol = DexAmmProtocol.load(NetworkConfigs.FACTORY_ADDRESS);
+  let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
 
   if (!protocol) {
-    protocol = new DexAmmProtocol(NetworkConfigs.FACTORY_ADDRESS);
-    protocol.name = NetworkConfigs.PROTOCOL_NAME;
-    protocol.slug = NetworkConfigs.PROTOCOL_SLUG;
+    protocol = new DexAmmProtocol(VAULT_ADDRESS.toHexString());
+    protocol.name = PROTOCOL_NAME;
+    protocol.slug = PROTOCOL_SLUG;
     protocol.schemaVersion = PROTOCOL_SCHEMA_VERSION;
     protocol.subgraphVersion = PROTOCOL_SUBGRAPH_VERSION;
     protocol.methodologyVersion = PROTOCOL_METHODOLOGY_VERSION;
@@ -47,7 +54,7 @@ export function getOrCreateDex(): DexAmmProtocol {
     protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = INT_ZERO;
-    protocol.network = NetworkConfigs.NETWORK;
+    protocol.network = DEFAULTNETWORK;
     protocol.type = ProtocolType.EXCHANGE;
     protocol.save();
   }
@@ -113,7 +120,7 @@ export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): Usag
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsDailySnapshot(dayId);
-    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    usageMetrics.protocol = VAULT_ADDRESS.toHexString();
 
     usageMetrics.dailyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -140,7 +147,7 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
 
   if (!usageMetrics) {
     usageMetrics = new UsageMetricsHourlySnapshot(hourId);
-    usageMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    usageMetrics.protocol = VAULT_ADDRESS.toHexString();
 
     usageMetrics.hourlyActiveUsers = INT_ZERO;
     usageMetrics.cumulativeUniqueUsers = INT_ZERO;
@@ -165,7 +172,7 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolDailySnapshot(event.address.toHexString().concat("-").concat(dayId));
-    poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    poolMetrics.protocol = VAULT_ADDRESS.toHexString();
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
@@ -192,7 +199,7 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): L
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolHourlySnapshot(event.address.toHexString().concat("-").concat(hourId));
-    poolMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    poolMetrics.protocol = VAULT_ADDRESS.toHexString();
     poolMetrics.pool = event.address.toHexString();
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
@@ -220,7 +227,7 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
 
   if (!financialMetrics) {
     financialMetrics = new FinancialsDailySnapshot(id);
-    financialMetrics.protocol = NetworkConfigs.FACTORY_ADDRESS;
+    financialMetrics.protocol = VAULT_ADDRESS.toHexString();
 
     financialMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     financialMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
