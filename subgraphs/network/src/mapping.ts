@@ -250,6 +250,8 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
     dailySnapshot.dailyCumulativeGasLimit = BIGINT_ZERO;
     dailySnapshot.dailyMeanGasUsed = BIGDECIMAL_ZERO;
     dailySnapshot.dailyMeanGasLimit = BIGDECIMAL_ZERO;
+    dailySnapshot.cumulativeBurntFees = BIGINT_ZERO;
+    dailySnapshot.dailyBurntFees = BIGINT_ZERO;
     dailySnapshot.firstTimestamp = timestamp;
     dailySnapshot.dailyMeanBlockInterval = BIGDECIMAL_ZERO;
     dailySnapshot.dailyCumulativeSize = BIGINT_ZERO;
@@ -279,6 +281,8 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
     hourlySnapshot.hourlyCumulativeGasLimit = BIGINT_ZERO;
     hourlySnapshot.hourlyMeanGasUsed = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyMeanGasLimit = BIGDECIMAL_ZERO;
+    hourlySnapshot.cumulativeBurntFees = BIGINT_ZERO;
+    hourlySnapshot.hourlyBurntFees = BIGINT_ZERO;
     hourlySnapshot.firstTimestamp = timestamp;
     hourlySnapshot.hourlyMeanBlockInterval = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyCumulativeSize = BIGINT_ZERO;
@@ -327,6 +331,7 @@ function getOrCreateBlockchain(id: string): Blockchain {
     blockchain.methodologyVersion = METHODOLOGY_VERSION;
     blockchain.decimals = NATIVE_TOKEN_DECIMALS;
     blockchain.name = BLOCKCHAIN_NAME;
+    blockchain.cumulativeUniqueAuthors = INT_ZERO;
     if (MAX_SUPPLY != BIGINT_ZERO) {
       blockchain.maxSupply = MAX_SUPPLY;
     }
