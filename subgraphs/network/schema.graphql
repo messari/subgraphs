@@ -2,29 +2,35 @@
 # Version: 1.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
-enum Network {
+enum SubgraphNetwork {
   ARBITRUM_ONE
   AURORA
   AVALANCHE
+  BOBA
   BSC # aka BNB Chain
   CELO
+  CHAPEL
+  CLOVER
+  COSMOS
   MAINNET # Ethereum Mainnet
   FANTOM
   FUSE
   MOONBEAM
   MOONRIVER
+  MUMBAI
   NEAR_MAINNET
   OPTIMISM
   MATIC # aka Polygon
+  POA # aka Proof of Authority (poa-core)
   XDAI # aka Gnosis Chain
 }
 
-#############################
-#### Blockchain Metadata ####
-#############################
+##########################
+#### Network Metadata ####
+##########################
 
-type Blockchain @entity {
-  " Native token address (ie, ETH = 0xeeE...eeE)"
+type Network @entity {
+  " Name of the network being indexed "
   id: ID!
 
   " The verison of the schema "
@@ -36,22 +42,10 @@ type Blockchain @entity {
   " The version of the methodology "
   methodologyVersion: String!
 
-  " Decimals of the native asset "
-  decimals: Int!
-
-  " The name of the blockchain (ie, the network name) "
-  name: Network!
-
   #### Quantitative Data ####
 
   " Number of cumulative unique authors "
   cumulativeUniqueAuthors: Int!
-
-  " Max supply of the native asset "
-  maxSupply: BigInt
-
-  " Current supply of the native asset "
-  supply: BigInt
 
   " The total number of blocks in the blockchain "
   blockHeight: Int!
@@ -77,10 +71,10 @@ type Blockchain @entity {
   #### Snapshots ####
 
   " Daily metrics for this blockchain "
-  dailySnapshots: [DailySnapshot!]! @derivedFrom(field: "blockchain")
+  dailySnapshots: [DailySnapshot!]! @derivedFrom(field: "network")
 
   " Hourly metrics for this blockchain "
-  hourlySnapshots: [HourlySnapshot!]! @derivedFrom(field: "blockchain")
+  hourlySnapshots: [HourlySnapshot!]! @derivedFrom(field: "network")
 }
 
 ###############################
@@ -91,8 +85,8 @@ type DailySnapshot @entity {
   " { number of days since UNIX epoch time } "
   id: ID!
 
-  " ID of the blockchain this snapshot belongs to "
-  blockchain: Blockchain!
+  " ID of the network this snapshot belongs to "
+  network: Network!
 
   " Number of cumulative ununique authors "
   cumulativeUniqueAuthors: Int!
@@ -145,19 +139,16 @@ type DailySnapshot @entity {
   " Rewards emitted for this day (ie, new supply this day) "
   dailyRewards: BigInt
 
-  " Current supply of native asset until this day "
-  supply: BigInt
-
   " First timestamp of this entity (used to calculate averages) "
   firstTimestamp: BigInt!
 
-  " Daily mean block interval time during this hour "
+  " Daily mean block interval time in seconds during this hour "
   dailyMeanBlockInterval: BigDecimal!
 
   " Cumulative size of all blocks created in this day "
   dailyCumulativeSize: BigInt!
 
-  " Daily mean size of a block during this day "
+  " Daily mean size in bytes of a block during this day "
   dailyMeanBlockSize: BigDecimal!
 
   " All of the blocks created during this day "
@@ -168,8 +159,8 @@ type HourlySnapshot @entity {
   " { number of hours since UNIX epoch time } "
   id: ID!
 
-  " ID of the blockchain this snapshot belongs to "
-  blockchain: Blockchain!
+  " ID of the network this snapshot belongs to "
+  network: Network!
 
   " Number of cumulative ununique authors "
   cumulativeUniqueAuthors: Int!
@@ -222,13 +213,10 @@ type HourlySnapshot @entity {
   " Rewards emitted for this hour (ie, new supply this hour) "
   hourlyRewards: BigInt
 
-  " Current supply of native asset until this hour "
-  supply: BigInt
-
   " First timestamp of this entity (used to calculate averages) "
   firstTimestamp: BigInt!
 
-  " Hourly mean block interval time during this hour "
+  " Hourly mean block interval time in seconds during this hour "
   hourlyMeanBlockInterval: BigDecimal!
 
   " Cumulative size of all blocks created in this hour "

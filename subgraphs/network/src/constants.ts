@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 
 /////////////////////////
 //// Enums / Classes ////
@@ -12,33 +12,46 @@ export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
   export const AVALANCHE = "AVALANCHE";
   export const AURORA = "AURORA";
+  export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
+  export const CHAPEL = "CHAPEL";
+  export const CLOVER = "CLOVER";
+  export const COSMOS = "COSMOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
+  export const MUMBAI = "MUMBAI";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
+  export const POA = "POA"; // aka Proof of Authority (poa-core)
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 
+// This is how the Network displays on thegraph.com
 export namespace SubgraphNetwork {
   export const ARBITRUM = "arbitrum-one";
   export const AVALANCHE = "avalanche";
   export const AURORA = "aurora";
-  export const BSC = "bnb";
+  export const BOBA = "boba";
+  export const BSC = "bsc";
   export const CELO = "celo";
+  export const CHAPEL = "chapel";
+  export const CLOVER = "clover";
+  export const COSMOS = "cosmoshub";
   export const ETHEREUM = "mainnet";
   export const FANTOM = "fantom";
   export const FUSE = "fuse";
   export const MOONBEAM = "moonbeam";
   export const MOONRIVER = "moonriver";
+  export const MUMBAI = "mumbai";
   export const NEAR = "near-mainnet";
   export const OPTIMISM = "optimism";
   export const POLYGON = "matic";
+  export const POA = "poa-core";
   export const XDAI = "xdai";
 }
 
@@ -73,21 +86,12 @@ export const SECONDS_PER_DAY = SECONDS_PER_HOUR * 24; // 86400
 ///////////////////
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const ETH_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 
-//////////////////////////////////
-//// Chain-specific constants ////
-//////////////////////////////////
+///////////////////////////
+//// Network constants ////
+///////////////////////////
 
+export const NETWORK_NAME = dataSource.network();
 export const SCHEMA_VERSION = "1.0.0";
 export const METHODOLOGY_VERSION = "1.0.0";
-export const SUBGRAPH_VERSION = "1.0.1";
-
-// TODO:
-// name, decimals, maxSupply, native token address
-// mainnet constants
-export const NATIVE_TOKEN = ETH_ADDRESS;
-export const NATIVE_TOKEN_DECIMALS = 18;
-export const BLOCKCHAIN_NAME = Network.MAINNET;
-export const MAX_SUPPLY = BIGINT_ZERO;
-export const INITIAL_SUPPLY = INT_NEGATIVE_ONE;
+export const SUBGRAPH_VERSION = "1.0.2";
