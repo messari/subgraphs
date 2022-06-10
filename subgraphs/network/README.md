@@ -6,7 +6,7 @@ This subgraph and schema will gather a standard set of L1 data metrics that matt
 
 The timeseries data is important, and it follows our `Blockchain` data in addition to hourly and daily metrics.
 
-The following data is collected:
+The following data is collected: TODO: add new things
 
 - `totalBlocksMined` is the current block height
 - Blocks mined during this day/hour
@@ -23,20 +23,22 @@ The following data is collected:
 - The reward emissions for a given timeseries entity
 - The supply of the native asset at a given timeseries entity
 
-### Calculating Reward Emissions
+### Block Handlers
 
-Reward emissions refers to the amount of rewards in the native asset rewarded to the miner for mining a block.
+There are 4 different types of networks supported by thegraph. Each one has a different set of returning values for block handlers. We will explore each one below: TODO
 
-This is network specific:
-
-- Mainnet:
-  - Prior to London upgrade: Not possible b/c we do not have gas price
-  - Post London upgrade: Not possible b/c we do not have tip amount
+- EVM:
+- Arweave:
+- Cosmos:
+- NEAR:
 
 ### Reference Subgraphs
 
 - https://github.com/stakewise/subgraphs/tree/main/subgraphs/ethereum
 - https://github.com/graphprotocol/example-subgraph
+- Arweave: https://github.com/hepnerthomas/arweave-revenues
+- Near: https://github.com/linear-protocol/linear-subgraph
+- Cosmos: `NA`
 
 ### Resources
 
