@@ -51,7 +51,7 @@ type Blockchain @entity {
   maxSupply: BigInt
 
   " Current supply of the native asset "
-  currentSupply: BigInt
+  supply: BigInt
 
   " The total number of blocks in the blockchain "
   blockHeight: Int!
@@ -63,7 +63,7 @@ type Blockchain @entity {
   cumulativeGasUsed: BigInt!
 
   " Current gas limit "
-  currentGasLimit: BigInt!
+  gasLimit: BigInt!
 
   " Total burnt fees on the network in native asset "
   cumulativeBurntFees: BigInt!
@@ -103,6 +103,9 @@ type DailySnapshot @entity {
   " Block height at this day (aka, blockNumber) "
   blockHeight: Int!
 
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
   " Blocks created during this day (note, this is different from blocksPerDay) "
   dailyBlocks: Int!
 
@@ -116,7 +119,7 @@ type DailySnapshot @entity {
   dailyDifficulty: BigInt!
 
   " Average difficulty for this day "
-  averageDailyDifficulty: BigInt!
+  dailyMeanDifficulty: BigDecimal!
 
   " Sum of all gas used during this day "
   dailyCumulativeGasUsed: BigInt!
@@ -143,7 +146,7 @@ type DailySnapshot @entity {
   dailyRewards: BigInt
 
   " Current supply of native asset until this day "
-  currentSupply: BigInt
+  supply: BigInt
 
   " First timestamp of this entity (used to calculate averages) "
   firstTimestamp: BigInt!
@@ -154,7 +157,7 @@ type DailySnapshot @entity {
   " Cumulative size of all blocks created in this day "
   dailyCumulativeSize: BigInt!
 
-  " Hourly mean size of a block during this day "
+  " Daily mean size of a block during this day "
   dailyMeanBlockSize: BigDecimal!
 
   " All of the blocks created during this day "
@@ -177,6 +180,9 @@ type HourlySnapshot @entity {
   " Block height at this hour (ie, blockNumber) "
   blockHeight: Int!
 
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
   " Blocks created during this hour "
   hourlyBlocks: Int!
 
@@ -190,7 +196,7 @@ type HourlySnapshot @entity {
   hourlyDifficulty: BigInt!
 
   " Average difficulty for this hour "
-  averageHourlyDifficulty: BigInt!
+  hourlyMeanDifficulty: BigDecimal!
 
   " Sum of all gas used during this hour "
   hourlyCumulativeGasUsed: BigInt!
@@ -217,7 +223,7 @@ type HourlySnapshot @entity {
   hourlyRewards: BigInt
 
   " Current supply of native asset until this hour "
-  currentSupply: BigInt
+  supply: BigInt
 
   " First timestamp of this entity (used to calculate averages) "
   firstTimestamp: BigInt!
@@ -253,7 +259,7 @@ type Block @entity {
   author: Author!
 
   " Data size of the block in bytes "
-  size: BigInt!
+  size: BigInt
 
   " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
   baseFeePerGas: BigInt
@@ -280,7 +286,7 @@ type Block @entity {
   parentHash: String!
 
   " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
-  amountBurntFees: BigInt!
+  burntFees: BigInt!
 
   " The day this block was created (in days since UNIX epoch time) "
   day: DailySnapshot!
@@ -305,4 +311,27 @@ type Author @entity {
 
   " A mapping to every block that this author has generated "
   blocks: [Block!]! @derivedFrom(field: "author")
+}
+
+enum IntervalType {
+  " For daily snapshot identifying "
+  DAILY
+
+  " For hourly snapshot identifying "
+  HOULRY
+}
+
+# Helper entity for calculating daily/hourly active authors
+type ActiveAuthor @entity {
+  " { daily/hourly }-{ Address of the author }-{ Days/hours since Unix epoch } "
+  id: ID!
+}
+
+type _CircularBuffer @entity {
+  id: ID!
+  blocks: [Int!]!
+  windowStartIndex: Int!
+  nextIndex: Int!
+  bufferSize: Int!
+  blocksPerDay: BigDecimal!
 }
