@@ -1,5 +1,4 @@
 {
-  "dependencies": {
-    "ethereum-block-by-date": "^1.4.5"
-  }
+  "license": "MIT",
+  "type": "module"
 }

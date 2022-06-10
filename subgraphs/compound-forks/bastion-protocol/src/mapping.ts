@@ -5,6 +5,7 @@ import {
   MarketListed,
   NewCollateralFactor,
   NewLiquidationIncentive,
+  ActionPaused1,
 } from "../../generated/Comptroller/Comptroller";
 import {
   Mint,
@@ -40,6 +41,7 @@ import {
   UpdateMarketData,
   _handleAccrueInterest,
   getOrElse,
+  _handleActionPaused,
 } from "../../src/mapping";
 // otherwise import from the specific subgraph root
 import { CToken } from "../generated/Comptroller/CToken";
@@ -123,6 +125,10 @@ export function handleNewLiquidationIncentive(
   _handleNewLiquidationIncentive(protocol, event);
 }
 
+export function handleActionPaused(event: ActionPaused1): void {
+  _handleActionPaused(event);
+}
+
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   _handleNewReserveFactor(event);
 }
@@ -157,7 +163,6 @@ export function handleAccrueInterest(event: AccrueInterest): void {
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
-    cTokenContract.try_totalBorrows(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
@@ -173,10 +178,11 @@ function getOrCreateProtocol(): LendingProtocol {
     "Bastion Protocol",
     "bastion-protocol",
     "1.2.1",
-    "1.0.2",
+    "1.0.5",
     "1.0.0",
     Network.AURORA,
-    comptroller.try_liquidationIncentiveMantissa()
+    comptroller.try_liquidationIncentiveMantissa(),
+    comptroller.try_oracle()
   );
   return _getOrCreateProtocol(protocolData);
 }

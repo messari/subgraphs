@@ -1,4 +1,4 @@
-import { MenuItem, Select, SelectChangeEvent, Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, CircularProgress, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ComboBoxInput } from "./ComboBoxInput";
@@ -6,66 +6,51 @@ import { ComboBoxInput } from "./ComboBoxInput";
 interface PoolDropDownProps {
   poolId: string;
   setPoolId: React.Dispatch<React.SetStateAction<string>>;
-  setWarning: React.Dispatch<React.SetStateAction<{ message: string, type: string }[]>>;
-  markets: [];
+  setIssues: React.Dispatch<
+    React.SetStateAction<{ message: string; type: string; level: string; fieldName: string }[]>
+  >;
+  markets: { [x: string]: any }[];
 }
 
-export const PoolDropDown = ({ poolId, setPoolId, setWarning, markets }: PoolDropDownProps) => {
+export const PoolDropDown = ({ poolId, setPoolId, setIssues, markets }: PoolDropDownProps) => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const scrollToView = searchParams.get("view") || "";
+  // Create the array of pool selections in the drop down
   const options = markets.map((market: any) => {
-    return market.id + '-' + market.name;
+    return market.id + " / " + market.name;
   });
+  // Get the array entry for the current selected pool
   const pool = markets.find((m: any) => m.id === poolId) || { name: "Selected Pool" };
   let inputTextValue = "Select a pool";
   if (poolId) {
-    inputTextValue = poolId + '-' + pool.name;
+    inputTextValue = poolId + " / " + pool.name;
   }
   const [textInput, setTextInput] = useState<string>(inputTextValue);
+
   return (
     <>
-      <h3 style={{ marginLeft: "16px" }}>Select a pool</h3>
-      {/* <Select
-        fullWidth
-        sx={{ maxWidth: 1000, margin: 2 }}
-        labelId="demo-simple-select-filled-label"
-        id="demo-simple-select-filled"
-        value={poolId}
-        onChange={(event: SelectChangeEvent) => {
-          setWarning([]);
-          setPoolId(event.target.value)
-        }}
-      >
-        <MenuItem value="">
-          <em>No Pool Selected</em>
-        </MenuItem>
-        {
-          markets.map((market: any) => {
-            return (
-              <MenuItem value={market.id}>
-                <em>{market.id} - {market.name}</em>
-              </MenuItem>
-            )
-          })
-        }
-      </Select> */}
+      <Typography variant="h6">Select a pool</Typography>
       <Autocomplete
         options={options}
         inputValue={textInput}
-        sx={{ maxWidth: 1000, margin: 2 }}
+        sx={{ maxWidth: 1000, my: 2 }}
         onChange={(event: React.SyntheticEvent) => {
-          setWarning([]);
-          const targEle = (event?.target as HTMLLIElement);
+          // Upon selecting a pool from the list, get the pool id and navigate to the routing for that pool
+          setIssues([]);
+          const targEle = event?.target as HTMLLIElement;
           setTextInput(targEle.innerText);
-          searchParams.delete('view');
+          searchParams.delete("view");
           if (targEle.innerText) {
-            setPoolId(targEle.innerText?.split("-")[0]);
-            navigate('?subgraph=' + searchParams.get('subgraph') + '&tab=' + searchParams.get('tab') + '&poolId=' + targEle.innerText?.split("-")[0]);
+            setPoolId(targEle.innerText?.split(" / ")[0]);
+            navigate(
+              `?endpoint=${searchParams.get("endpoint")}&tab=${searchParams.get("tab")}&poolId=${
+                targEle.innerText?.split(" / ")[0]
+              }`,
+            );
           }
         }}
-        renderInput={
-          (params) => <ComboBoxInput params={params} setTextInput={setTextInput} />}
+        renderInput={(params) => <ComboBoxInput label="PoolList" params={params} setTextInput={setTextInput} />}
       />
-    </>)
-}
+    </>
+  );
+};

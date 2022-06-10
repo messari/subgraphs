@@ -120,7 +120,7 @@ export function updateDeposit(event: Mint): void {
   //      - cumulativeDepositUSD
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
-  marketDaily.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  marketDaily.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketDaily.blockNumber = event.block.number;
   marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
@@ -130,7 +130,7 @@ export function updateDeposit(event: Mint): void {
   //      - cumulativeDepositUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyDepositUSD = marketDaily.dailyDepositUSD.plus(depositAmountUSD);
-  marketHourly.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+  marketHourly.cumulativeDepositUSD = market.cumulativeDepositUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
@@ -236,7 +236,7 @@ export function updateBorrow(event: Borrow): void {
   //      - cumulativeBorrowUSD
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
-  marketDaily.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  marketDaily.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketDaily.blockNumber = event.block.number;
   marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
@@ -246,7 +246,7 @@ export function updateBorrow(event: Borrow): void {
   //      - cumulativeBorrowUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyBorrowUSD = marketDaily.dailyBorrowUSD.plus(borrowAmountUSD);
-  marketHourly.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+  marketHourly.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
@@ -317,9 +317,12 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   // get exchangeRate for collateral token
   let collateralMarketId = event.params.cTokenCollateral.toHexString();
   let collateralMarket = getOrCreateMarket(collateralMarketId, event);
-  let exchangeRate = collateralMarket.exchangeRate
+  let exchangeRate = collateralMarket.exchangeRate;
   let liquidateAmount = event.params.seizeTokens;
-  let liquidateAmountUSD = liquidateAmount.toBigDecimal().times(exchangeRate!).times(pricePerCollateralToken);
+  let liquidateAmountUSD = liquidateAmount
+    .toBigDecimal()
+    .times(exchangeRate!)
+    .times(pricePerCollateralToken);
 
   if (liquidate == null) {
     liquidate = new Liquidate(liquidateId);
@@ -360,7 +363,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   //      - cumulativeLiquidateUSD
   let marketDaily = getOrCreateMarketDailySnapshot(event);
   marketDaily.dailyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
-  marketDaily.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  marketDaily.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketDaily.blockNumber = event.block.number;
   marketDaily.timestamp = event.block.timestamp;
   marketDaily.save();
@@ -370,7 +373,7 @@ export function updateLiquidate(event: LiquidateBorrow): void {
   //      - cumulativeLiquidateUSD
   let marketHourly = getOrCreateMarketHourlySnapshot(event);
   marketHourly.hourlyLiquidateUSD = marketDaily.dailyLiquidateUSD.plus(liquidateAmountUSD);
-  marketHourly.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+  marketHourly.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketHourly.blockNumber = event.block.number;
   marketHourly.timestamp = event.block.timestamp;
   marketHourly.save();
@@ -478,6 +481,32 @@ export function updateRevenue(
   financialMetrics.save();
 }
 
+// Add fees from Stablizer to protocolSideRevenue and totalRevenue
+//    - protocol.cumulativeProtocolSideRevenueUSD
+//    - protocol.cumulativeTotalRevenueUSD
+//    - FinancialsDailySnapshot.dailyProtocolSideRevenueUSD
+//    - FinancialsDailySnapshot.cumulativeProtocolSideRevenueUSD
+//    - FinancialsDailySnapshot.dailyTotalRevenueUSD
+//    - FinancialsDailySnapshot.cumulativeTotalRevenueUSD
+export function updateStablizerFees(fees: BigDecimal, event: ethereum.Event): void {
+  let protocol = getOrCreateProtocol();
+  let cumulativePRev = protocol.cumulativeProtocolSideRevenueUSD;
+  let cumulativeTRev = protocol.cumulativeTotalRevenueUSD;
+  cumulativePRev = cumulativePRev.plus(fees);
+  cumulativeTRev = cumulativeTRev.plus(fees);
+
+  protocol.cumulativeProtocolSideRevenueUSD = cumulativePRev;
+  protocol.cumulativeTotalRevenueUSD = cumulativeTRev;
+  protocol.save();
+
+  let financialMetrics = getOrCreateFinancialsDailySnapshot(event);
+  financialMetrics.cumulativeProtocolSideRevenueUSD = cumulativePRev;
+  financialMetrics.cumulativeTotalRevenueUSD = cumulativeTRev;
+  financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(fees);
+  financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(fees);
+  financialMetrics.save();
+}
+
 // Update MarketDailySnapshot and MarketHourlySnapshot
 export function updateMarketMetrics(event: ethereum.Event): void {
   let marketId = event.address.toHexString();
@@ -551,7 +580,7 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     // To get the price of the underlying (input) token
     let inputTokenPriceUSD = getUnderlyingTokenPrice(event.address);
     let decimals = getOrCreateUnderlyingToken(event.address).decimals;
-    let inputTokenPriceUSDperAmount = inputTokenPriceUSD.div(decimalsToBigDecimal(decimals))
+    let inputTokenPriceUSDperAmount = inputTokenPriceUSD.div(decimalsToBigDecimal(decimals));
     let inputTokenBalance = tokenContract.getCash();
     market.inputTokenBalance = inputTokenBalance;
     market.inputTokenPriceUSD = inputTokenPriceUSD;
@@ -582,8 +611,8 @@ export function updateMarket(event: ethereum.Event, borrowAmount: BigInt = BIGIN
     }
 
     // derive outputToken (cToken) price from exchange rate and inputTokenPriceUSD
-    if ( market.exchangeRate ) {
-      market.outputTokenPriceUSD = inputTokenPriceUSD.div(market.exchangeRate!)
+    if (market.exchangeRate) {
+      market.outputTokenPriceUSD = inputTokenPriceUSD.div(market.exchangeRate!);
     }
 
     //

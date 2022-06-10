@@ -7,9 +7,9 @@ dataSources:
     name: Registry_v1
     network: mainnet
     source:
-      abi: Registry_v1
-      address: "0xe15461b18ee31b7379019dc523231c57d1cbc18c"
       startBlock: 11563389
+      address: '0xe15461b18ee31b7379019dc523231c57d1cbc18c'
+      abi: Registry_v1
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -23,16 +23,24 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -69,7 +77,7 @@ dataSources:
     network: mainnet
     source:
       abi: Registry_v2
-      address: "0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804"
+      address: '0x50c1a2eA0a861A967D9d0FFE2AE4012c2E053804'
       startBlock: 12045550
     mapping:
       kind: ethereum/events
@@ -85,16 +93,24 @@ dataSources:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -125,11 +141,13 @@ dataSources:
         - event: NewExperimentalVault(indexed address,indexed address,address,string)
           handler: handleNewExperimentalVault
       file: ./src/mappings/registryMappings.ts
-templates:
-  - name: Vault
+
+  - name: YvWBTCVault
     kind: ethereum/contract
     network: mainnet
     source:
+      startBlock: 12185980
+      address: '0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E'
       abi: Vault
     mapping:
       kind: ethereum/events
@@ -146,16 +164,24 @@ templates:
           file: ./abis/Ethereum/Vaults/_vault_.json
         - name: Strategy
           file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
         
         ###########################################
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -182,6 +208,11 @@ templates:
           file: ./abis/Prices/Calculations/SushiSwap.json
         
       eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositEvent
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawEvent
+
         - event: UpdatePerformanceFee(uint256)
           handler: handleUpdatePerformanceFee
         - event: UpdateManagementFee(uint256)
@@ -196,7 +227,7 @@ templates:
           handler: handleStrategyReported_v1
         - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleStrategyReported_v2
-
+        
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -210,6 +241,106 @@ templates:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
+
+templates:
+  - name: Vault
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: Vault
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/vaultMappings.ts
+      entities:
+        - Vault
+        - Deposit
+        - Transaction
+        - Token
+      abis:
+        - name: Vault
+          file: ./abis/Ethereum/Vaults/_vault_.json
+        - name: Strategy
+          file: ./abis/Ethereum/Strategies/_strategy_.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
+        - name: ERC20
+          file: ./abis/Ethereum/ERC20.json
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: PriceOracleERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+        
+      eventHandlers:
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositEvent
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawEvent
+        - event: UpdatePerformanceFee(uint256)
+          handler: handleUpdatePerformanceFee
+        - event: UpdateManagementFee(uint256)
+          handler: handleUpdateManagementFee
+        
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
+          handler: handleStrategyAdded_v1
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleStrategyAdded_v2
+
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReported_v1
+        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleStrategyReported_v2
+      callHandlers:
+        - function: deposit()
+          handler: handleDeposit
+        - function: deposit(uint256)
+          handler: handleDepositWithAmount
+        - function: deposit(uint256,address)
+          handler: handleDepositWithAmountAndRecipient
+
+        - function: withdraw()
+          handler: handleWithdraw
+        - function: withdraw(uint256)
+          handler: handleWithdrawWithShares
+        - function: withdraw(uint256,address)
+          handler: handleWithdrawWithSharesAndRecipient
+        - function: withdraw(uint256,address,uint256)
+          handler: handleWithdrawWithSharesAndRecipientAndLoss
   
   - name: Strategy
     kind: ethereum/contract
@@ -233,16 +364,22 @@ templates:
           file: ./abis/Ethereum/Strategies/_strategy_.json
         - name: ERC20
           file: ./abis/Ethereum/ERC20.json
+        - name: VaultStrategies_v1
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v1.json
+        - name: VaultStrategies_v2
+          file: ./abis/Ethereum/Vaults/vaultStrategies_v2.json
         
         ###########################################
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts

@@ -6,6 +6,7 @@ export const ProtocolQuery = gql`
       type
       schemaVersion
       subgraphVersion
+      methodologyVersion
       name
       id
     }

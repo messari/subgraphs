@@ -1,7 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const SubgraphStatusQuery = gql`query Status($deploymentIds: [String]){
-    indexingStatuses(subgraphs: $deploymentIds) {
+export const SubgraphStatusQuery = gql`
+  query Status($subgraphName: String) {
+    indexingStatusForCurrentVersion(subgraphName: $subgraphName) {
       subgraph
       node
       synced
@@ -39,4 +40,5 @@ export const SubgraphStatusQuery = gql`query Status($deploymentIds: [String]){
       }
       entityCount
     }
-  }`
+  }
+`;

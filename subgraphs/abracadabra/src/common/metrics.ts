@@ -146,8 +146,14 @@ export function updateUsageMetrics(event: ethereum.Event, from: Address, to: Add
 // Update MarketDailySnapshot entity
 export function updateMarketMetrics(event: ethereum.Event): void {
   let market = getMarket(event.address.toHexString());
+  if (!market) {
+    return
+  }
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return
+  }
   let protocol = getOrCreateLendingProtocol();
 
   marketHourlySnapshot.protocol = protocol.id;
@@ -198,6 +204,9 @@ export function updateTVL(event: ethereum.Event): void {
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
+    if (!market) {
+      return
+    }
     let inputToken = getOrCreateToken(Address.fromString(market.inputToken));
     let bentoBoxCall: BigInt = readValue<BigInt>(
       bentoBoxContract.try_balanceOf(Address.fromString(inputToken.id), Address.fromString(marketAddress)),
@@ -235,6 +244,9 @@ export function updateTotalBorrows(event: ethereum.Event): void {
   for (let i: i32 = 0; i < marketIDList.length; i++) {
     let marketAddress = marketIDList[i];
     let market = getMarket(marketAddress);
+    if (!market) {
+      return
+    }
     protocolMintedTokenSupply = protocolMintedTokenSupply.plus(market.outputTokenSupply);
     totalBorrowBalanceUSD = totalBorrowBalanceUSD.plus(
       bigIntToBigDecimal(market.outputTokenSupply, DEFAULT_DECIMALS).times(mimPriceUSD),
@@ -256,14 +268,21 @@ export function updateMarketStats(
   event: ethereum.Event,
 ): void {
   let market = getMarket(marketId);
+  if (!market) {
+    return
+  }
   let token = getOrCreateToken(Address.fromString(asset));
   let usageHourlySnapshot = getOrCreateUsageMetricsHourlySnapshot(event);
   let usageDailySnapshot = getOrCreateUsageMetricsDailySnapshot(event);
   let marketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market.id);
   let marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market.id);
+  if (!marketHourlySnapshot || !marketDailySnapshot) {
+    return
+  }
   let financialsDailySnapshot = getOrCreateFinancials(event);
   let protocol = getOrCreateLendingProtocol();
   let priceUSD = token.lastPriceUSD;
+  let amountUSD = bigIntToBigDecimal(amount, token.decimals).times(priceUSD);
   usageHourlySnapshot.blockNumber = event.block.number;
   usageHourlySnapshot.timestamp = event.block.timestamp;
   usageDailySnapshot.blockNumber = event.block.number;
@@ -281,18 +300,14 @@ export function updateMarketStats(
     market.totalDepositBalanceUSD = bigIntToBigDecimal(inputTokenBalance, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyDepositCount += 1;
     usageDailySnapshot.dailyDepositCount += 1;
-    marketHourlySnapshot.cumulativeDepositUSD = marketHourlySnapshot.cumulativeDepositUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
-    marketDailySnapshot.cumulativeDepositUSD = marketDailySnapshot.cumulativeDepositUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
-    financialsDailySnapshot.cumulativeDepositUSD = financialsDailySnapshot.cumulativeDepositUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
-    protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
+    
+    marketHourlySnapshot.cumulativeDepositUSD = marketHourlySnapshot.cumulativeDepositUSD.plus(amountUSD);
+    marketDailySnapshot.cumulativeDepositUSD = marketDailySnapshot.cumulativeDepositUSD.plus(amountUSD);
+    financialsDailySnapshot.cumulativeDepositUSD = financialsDailySnapshot.cumulativeDepositUSD.plus(amountUSD);
+    protocol.cumulativeDepositUSD = protocol.cumulativeDepositUSD.plus(amountUSD);
+    marketHourlySnapshot.hourlyDepositUSD = marketHourlySnapshot.hourlyDepositUSD.plus(amountUSD);
+    marketDailySnapshot.dailyDepositUSD = marketDailySnapshot.dailyDepositUSD.plus(amountUSD);
+    financialsDailySnapshot.dailyDepositUSD = financialsDailySnapshot.dailyDepositUSD.plus(amountUSD);
   } else if (eventType == "WITHDRAW") {
     let inputTokenBalance = market.inputTokenBalance.minus(amount);
     market.inputTokenBalance = inputTokenBalance;
@@ -306,18 +321,14 @@ export function updateMarketStats(
     market.totalBorrowBalanceUSD = bigIntToBigDecimal(outputTokenSupply, token.decimals).times(priceUSD);
     usageHourlySnapshot.hourlyBorrowCount += 1;
     usageDailySnapshot.dailyBorrowCount += 1;
-    marketHourlySnapshot.cumulativeBorrowUSD = marketHourlySnapshot.cumulativeBorrowUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
-    marketDailySnapshot.cumulativeBorrowUSD = marketDailySnapshot.cumulativeBorrowUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
-    financialsDailySnapshot.cumulativeBorrowUSD = financialsDailySnapshot.cumulativeBorrowUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
-    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(
-      bigIntToBigDecimal(amount, token.decimals).times(priceUSD),
-    );
+    
+    marketHourlySnapshot.cumulativeBorrowUSD = marketHourlySnapshot.cumulativeBorrowUSD.plus(amountUSD);
+    marketDailySnapshot.cumulativeBorrowUSD = marketDailySnapshot.cumulativeBorrowUSD.plus(amountUSD);
+    financialsDailySnapshot.cumulativeBorrowUSD = financialsDailySnapshot.cumulativeBorrowUSD.plus(amountUSD);
+    protocol.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD.plus(amountUSD);
+    marketHourlySnapshot.hourlyBorrowUSD = marketHourlySnapshot.hourlyBorrowUSD.plus(amountUSD);
+    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(amountUSD);
+    financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(amountUSD);
   } else if (eventType == "REPAY") {
     let outputTokenSupply = market.outputTokenSupply.minus(amount);
     market.outputTokenSupply = outputTokenSupply;
