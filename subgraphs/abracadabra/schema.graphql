@@ -955,3 +955,9 @@ type ActiveAccount @entity {
   " { Address of the account }-{ Days since Unix epoch }-{ [Optional] HH: hour of the day } "
   id: ID!
 }
+
+type LiquidateProxy @entity {
+  " { Transaction hash }-{ Log index } "
+  id: ID!
+  amount: BigInt!
+}
