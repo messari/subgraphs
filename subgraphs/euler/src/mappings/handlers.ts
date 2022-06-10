@@ -84,7 +84,7 @@ export function handleWithdraw(event: Withdraw): void {
 export function handleLiquidation(event: Liquidation): void {
   createLiquidation(event);
   const marketId = event.params.underlying.toHexString();
-  updateUsageMetrics(event, event.params.liquidator, TransactionType.WITHDRAW);
+  updateUsageMetrics(event, event.params.liquidator, TransactionType.LIQUIDATE);
   updateFinancials(event.block);
   updateMarketDailyMetrics(event.block, marketId);
   updateMarketHourlyMetrics(event.block, marketId);
