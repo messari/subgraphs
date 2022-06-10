@@ -9,8 +9,8 @@
     "create-local": "graph create --node http://localhost:8020/ beefy-finance",
     "remove-local": "graph remove --node http://localhost:8020/ beefy-finance",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 beefy-finance",
-    "write-yaml": "node ./bootstrap/bootstrap.js",
-    "get-start-blocks": "node ./bootstrap/setup/getStartBlock.js"
+    "write-yaml": "node ./setup/setup.js",
+    "get-start-blocks": "node ./setup/scripts/getStartBlock.js"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.29.2",

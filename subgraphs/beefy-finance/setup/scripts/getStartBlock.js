@@ -53,7 +53,7 @@ async function writeStartBlock() {
   }
   console.log("Writing start blocks to file...");
   fs.writeFileSync(
-    `./bootstrap/vaults.js`,
+    `./setup/vaults.js`,
     string + "]\nmodule.exports = {vaults}"
   );
 }

@@ -61,9 +61,19 @@ Sum across all valuts:
 - https://api.beefy.finance/
 - https://defillama.com/protocol/beefy-finance
 
-### Testing
+## Deploying
 
-## Setup
+Before deploying, run
+
+`yarn write-yaml ${network}`
+
+to build the yaml file for the correct chain; than you can deploy using
+
+`yarn deploy ${githubuser/subgraphname}`
+
+## Testing
+
+### Setup
 
 The release binary comes in two flavours - for МacOS and Linux. To add Matchstick to your subgraph project just open up a terminal, navigate to the root folder of your project and simply run graph test - it downloads the latest Matchstick binary and runs the specified test or all tests in a test folder (or all existing tests if no datasource flag is specified).
 Example usage:
@@ -73,6 +83,6 @@ graph test gravity
 
 ```
 
-# More info here
+## More info here
 
 https://thegraph.com/docs/en/developer/matchstick/

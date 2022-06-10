@@ -164,16 +164,6 @@ function bootstrap(network) {
       vaultName = vaults[i].id;
       startBlock = vaults[i].startBlock;
 
-      console.log(
-        "Adding " +
-          vaultName +
-          " on " +
-          network +
-          " with starting block " +
-          startBlock +
-          "..."
-      );
-
       // Add the datasource
       subgraphYamlDoc["dataSources"].push(
         createDataSource(vaultName, strategyAddress, network, startBlock)
@@ -193,10 +183,8 @@ function bootstrap(network) {
         MONITORED_VAULTS
     You can now deploy your subgraph and start indexing :)
     Run: 
-        yarn deploy RiccardoGalbusera/beefy-finance-network
-`
-      .replace("MONITORED_VAULTS", monitoredVaults.join(", "))
-      .replace("network", network)
+        yarn deploy yourgithubusername/yourrepositoryname
+`.replace("MONITORED_VAULTS", monitoredVaults.join(", "))
   );
 }
 
