@@ -8,7 +8,6 @@ import {
   getVaultFromStrategyOrCreate,
   getTokenOrCreate,
 } from "../utils/getters";
-import { getLastPriceUSD } from "./token";
 import {
   BIGINT_TEN,
   PROTOCOL_ID,
@@ -33,13 +32,10 @@ export function createDeposit(
   deposit.timestamp = event.block.timestamp;
 
   const strategyContract = BeefyStrategy.bind(event.address);
-  const asset = getTokenOrCreate(strategyContract.want());
+  const asset = getTokenOrCreate(strategyContract.want(), event.block);
   deposit.asset = asset.id;
   deposit.amount = depositedAmount;
-  deposit.amountUSD = getLastPriceUSD(
-    strategyContract.want(),
-    event.block.number
-  )
+  deposit.amountUSD = asset.lastPriceUSD
     .times(depositedAmount.toBigDecimal())
     .div(BIGINT_TEN.pow(asset.decimals as u8).toBigDecimal());
 

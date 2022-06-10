@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultDailySnapshot, VaultFee } from "../../generated/schema";
 import {
@@ -7,7 +7,7 @@ import {
   StratHarvest,
   Withdraw,
 } from "../../generated/ExampleVault/BeefyStrategy";
-import { BeefyVault } from "../../generated/ExampleVault/BeefyVault";
+import { BeefyVault } from "../../generated/aave-aave-eol/BeefyVault";
 import {
   getBeefyFinanceOrCreate,
   getTokenOrCreate,
@@ -19,13 +19,14 @@ import {
   updateVaultDailySnapshot,
   updateVaultHourlySnapshot,
 } from "../utils/snapshots";
-import { fetchTokenName, fetchTokenSymbol, getLastPriceUSD } from "./token";
+import { fetchTokenName, fetchTokenSymbol } from "./token";
 import {
   BIGDECIMAL_HUNDRED,
   BIGDECIMAL_ZERO,
   BIGINT_TEN,
   BIGINT_ZERO,
   PROTOCOL_ID,
+  ZERO_ADDRESS,
 } from "../prices/common/constants";
 
 export function createVaultFromStrategy(
@@ -44,20 +45,34 @@ export function createVaultFromStrategy(
   vault.symbol = fetchTokenSymbol(vaultAddress);
   vault.strategy = strategyAddress.toHex();
 
-  vault.inputToken = getTokenOrCreate(strategyContract.want()).id;
-  vault.outputToken = getTokenOrCreate(vaultAddress).id;
-
-  vault.fees = getFees(vault.id, strategyContract);
-
-  vault.createdTimestamp = currentBlock.timestamp;
-  vault.createdBlockNumber = currentBlock.number;
-
   let call = vaultContract.try_balance();
   if (call.reverted) {
     vault.inputTokenBalance = BIGINT_ZERO;
   } else {
     vault.inputTokenBalance = call.value;
   }
+
+  let want = strategyContract.try_want();
+  if (want.reverted) {
+    want = vaultContract.try_token();
+  }
+  if (want.reverted) {
+    vault.inputToken = getTokenOrCreate(ZERO_ADDRESS, currentBlock).id;
+    vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
+  } else {
+    const inputToken = getTokenOrCreate(want.value, currentBlock);
+    vault.inputToken = inputToken.id;
+    vault.totalValueLockedUSD = inputToken.lastPriceUSD
+      .times(vault.inputTokenBalance.toBigDecimal())
+      .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
+  }
+  vault.outputToken = getTokenOrCreate(vaultAddress, currentBlock).id;
+
+  vault.fees = getFees(vault.id, strategyContract);
+
+  vault.createdTimestamp = currentBlock.timestamp;
+  vault.createdBlockNumber = currentBlock.number;
+
   call = vaultContract.try_totalSupply();
   if (call.reverted) {
     vault.outputTokenSupply = BIGINT_ZERO;
@@ -72,14 +87,6 @@ export function createVaultFromStrategy(
       BigInt.fromI32(vaultContract.decimals())
     );
   }
-
-  const inputToken = getTokenOrCreate(strategyContract.want());
-  vault.totalValueLockedUSD = getLastPriceUSD(
-    strategyContract.want(),
-    currentBlock.number
-  )
-    .times(vault.inputTokenBalance.toBigDecimal())
-    .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
 
   const outputSupply = vault.outputTokenSupply;
   if (outputSupply && outputSupply != BIGINT_ZERO)
@@ -128,8 +135,8 @@ export function updateVaultAndSave(vault: Vault, block: ethereum.Block): void {
   if (wantCall.reverted) {
     vault.totalValueLockedUSD = BIGDECIMAL_ZERO;
   } else {
-    const inputToken = getTokenOrCreate(wantCall.value);
-    vault.totalValueLockedUSD = getLastPriceUSD(wantCall.value, block.number)
+    const inputToken = getTokenOrCreate(wantCall.value, block);
+    vault.totalValueLockedUSD = inputToken.lastPriceUSD
       .times(vault.inputTokenBalance.toBigDecimal())
       .div(BIGINT_TEN.pow(inputToken.decimals as u8).toBigDecimal());
   }
@@ -279,7 +286,7 @@ export function handleWithdraw(event: Withdraw): void {
   getBeefyFinanceOrCreate(vault.id, event.block);
 }
 
-export function handleStratHarvest(event: StratHarvest): void {
+export function handleStratHarvestWithAmount(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event.block);
   updateVaultAndSave(vault, event.block);
   const dailySnapshot = VaultDailySnapshot.load(
@@ -287,13 +294,38 @@ export function handleStratHarvest(event: StratHarvest): void {
   );
   if (dailySnapshot) {
     const token = getTokenOrCreate(
-      Address.fromString(vault.inputToken.split("x")[1])
+      Address.fromString(vault.inputToken.split("x")[1]),
+      event.block
     );
-    const priceUsd = token.lastPriceUSD;
-    if (priceUsd) {
+
+    dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
+      token.lastPriceUSD
+        .times(event.params.wantHarvested.toBigDecimal())
+        .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
+    );
+    dailySnapshot.save();
+  }
+  getBeefyFinanceOrCreate(vault.id, event.block);
+}
+
+export function handleStratHarvest(event: StratHarvest): void {
+  const vault = getVaultFromStrategyOrCreate(event.address, event.block);
+  const strategyContract = BeefyStrategy.bind(event.address);
+  const balance = strategyContract.try_balanceOf();
+  if (!balance.reverted) {
+    const amountHarvested = balance.value.minus(vault.inputTokenBalance);
+    updateVaultAndSave(vault, event.block);
+    const dailySnapshot = VaultDailySnapshot.load(
+      vault.dailySnapshots[vault.dailySnapshots.length - 1]
+    );
+    if (dailySnapshot && amountHarvested > BIGINT_ZERO) {
+      const token = getTokenOrCreate(
+        Address.fromString(vault.inputToken.split("x")[1]),
+        event.block
+      );
       dailySnapshot.dailyTotalRevenueUSD = dailySnapshot.dailyTotalRevenueUSD.plus(
-        priceUsd
-          .times(event.params.wantHarvested.toBigDecimal())
+        token.lastPriceUSD
+          .times(amountHarvested.toBigDecimal())
           .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal())
       );
       dailySnapshot.save();

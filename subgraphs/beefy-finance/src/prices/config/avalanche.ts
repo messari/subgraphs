@@ -1,6 +1,6 @@
 import { Address, TypedMap } from "@graphprotocol/graph-ts";
 
-export const NETWORK_STRING = "avax";
+export const NETWORK_STRING = "avalanche";
 export const NETWORK_CHAIN_ID = 43114;
 export const NETWORK_SUFFIX = "-" + NETWORK_CHAIN_ID.toString();
 
@@ -26,17 +26,17 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+  "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
+  Address.fromString("0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106")
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -46,11 +46,11 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0xE592427A0AEce92De3Edee1F18E0157C05861564")
+  Address.fromString("0x60aE616a2155Ee3d9A68541Ba4544862310933d4") //Trader Joe
 );
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45")
+  Address.fromString("0xE54Ca86531e17Ef3616d22Ca28b0D458b6C89106") //Pangolin
 );
 
 ///////////////////////////////////////////////////////////////////////////

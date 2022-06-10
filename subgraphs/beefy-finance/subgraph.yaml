@@ -63,6 +63,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -126,6 +130,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -189,6 +197,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -252,6 +264,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -315,6 +331,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -378,6 +398,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -441,6 +465,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -504,6 +532,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -567,6 +599,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -630,6 +666,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -693,6 +733,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -756,6 +800,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -819,6 +867,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -882,6 +934,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -945,6 +1001,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1008,6 +1068,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1071,6 +1135,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1134,6 +1202,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1197,6 +1269,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1260,6 +1336,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1323,6 +1403,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1386,6 +1470,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1449,6 +1537,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1512,6 +1604,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1575,6 +1671,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1638,6 +1738,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1701,6 +1805,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1764,6 +1872,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1827,6 +1939,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1890,6 +2006,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -1953,6 +2073,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2016,6 +2140,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2079,6 +2207,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2142,6 +2274,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2205,6 +2341,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2268,6 +2408,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2331,6 +2475,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2394,6 +2542,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2457,6 +2609,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2520,6 +2676,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2583,6 +2743,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2646,6 +2810,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2709,6 +2877,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2772,6 +2944,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2835,6 +3011,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2898,6 +3078,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -2961,6 +3145,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3024,6 +3212,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3087,6 +3279,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3150,6 +3346,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3213,6 +3413,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3276,6 +3480,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3339,6 +3547,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3402,6 +3614,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3465,6 +3681,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3528,6 +3748,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3591,6 +3815,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3654,6 +3882,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3717,6 +3949,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3780,6 +4016,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3843,6 +4083,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3906,6 +4150,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -3969,6 +4217,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4032,6 +4284,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4095,6 +4351,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4158,6 +4418,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4221,6 +4485,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4284,6 +4552,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4347,6 +4619,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4410,6 +4686,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4473,6 +4753,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4536,6 +4820,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4599,6 +4887,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4662,6 +4954,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4725,6 +5021,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4788,6 +5088,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4851,6 +5155,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4914,6 +5222,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -4977,6 +5289,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5040,6 +5356,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5103,6 +5423,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5166,6 +5490,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5229,6 +5557,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5292,6 +5624,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5355,6 +5691,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5418,6 +5758,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5481,6 +5825,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5544,6 +5892,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5607,6 +5959,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5670,6 +6026,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5733,6 +6093,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5796,6 +6160,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5859,6 +6227,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5922,6 +6294,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -5985,6 +6361,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6048,6 +6428,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6111,6 +6495,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6174,6 +6562,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6237,6 +6629,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6300,6 +6696,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6363,6 +6763,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6426,6 +6830,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6489,6 +6897,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6552,6 +6964,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6615,6 +7031,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6678,6 +7098,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6741,6 +7165,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6804,6 +7232,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6867,6 +7299,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6930,6 +7366,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -6993,6 +7433,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7056,6 +7500,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7119,6 +7567,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7182,6 +7634,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7245,6 +7701,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7308,6 +7768,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7371,6 +7835,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7434,6 +7902,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7497,6 +7969,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7560,6 +8036,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7623,6 +8103,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7686,6 +8170,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7749,6 +8237,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7812,6 +8304,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7875,6 +8371,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -7938,6 +8438,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8001,6 +8505,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8064,6 +8572,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8127,6 +8639,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8190,6 +8706,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8253,6 +8773,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8316,6 +8840,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8379,6 +8907,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8442,6 +8974,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8505,6 +9041,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8568,6 +9108,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8631,6 +9175,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8694,6 +9242,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8757,6 +9309,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8820,6 +9376,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8883,6 +9443,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -8946,6 +9510,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9009,6 +9577,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9072,6 +9644,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9135,6 +9711,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9198,6 +9778,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9261,6 +9845,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9324,6 +9912,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9387,6 +9979,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9450,6 +10046,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9513,6 +10113,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9576,6 +10180,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9639,6 +10247,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9702,6 +10314,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9765,6 +10381,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9828,6 +10448,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9891,6 +10515,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -9954,6 +10582,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10017,6 +10649,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10080,6 +10716,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10143,6 +10783,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10206,6 +10850,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10269,6 +10917,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10332,6 +10984,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10395,6 +11051,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10458,6 +11118,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10521,6 +11185,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10584,6 +11252,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10647,6 +11319,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10710,6 +11386,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10773,6 +11453,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10836,6 +11520,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10899,6 +11587,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -10962,6 +11654,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11025,6 +11721,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11088,6 +11788,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11151,6 +11855,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11214,6 +11922,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11277,6 +11989,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11340,6 +12056,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11403,6 +12123,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11466,6 +12190,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11529,6 +12257,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11592,6 +12324,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11655,6 +12391,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11718,6 +12458,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11781,6 +12525,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11844,6 +12592,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11907,6 +12659,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -11970,6 +12726,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12033,6 +12793,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12096,6 +12860,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12159,6 +12927,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12222,6 +12994,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12285,6 +13061,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12348,6 +13128,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12411,6 +13195,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12474,6 +13262,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12537,6 +13329,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12600,6 +13396,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12663,6 +13463,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12726,6 +13530,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12789,6 +13597,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12852,6 +13664,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12915,6 +13731,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -12978,6 +13798,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13041,6 +13865,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13104,6 +13932,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13167,6 +13999,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13230,6 +14066,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13293,6 +14133,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13356,6 +14200,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13419,6 +14267,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13482,6 +14334,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13545,6 +14401,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13608,6 +14468,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13671,6 +14535,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13734,6 +14602,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13797,6 +14669,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13860,6 +14736,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13923,6 +14803,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -13986,6 +14870,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14049,6 +14937,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14112,6 +15004,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14175,6 +15071,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14238,6 +15138,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14301,6 +15205,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14364,6 +15272,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14427,6 +15339,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14490,6 +15406,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14553,6 +15473,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14616,6 +15540,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14679,6 +15607,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14742,6 +15674,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14805,6 +15741,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14868,6 +15808,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14931,6 +15875,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -14994,6 +15942,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15057,6 +16009,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15120,6 +16076,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15183,6 +16143,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15246,6 +16210,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15309,6 +16277,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15372,6 +16344,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15435,6 +16411,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15498,6 +16478,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15561,6 +16545,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15624,6 +16612,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15687,6 +16679,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15750,6 +16746,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15813,6 +16813,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15876,6 +16880,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -15939,6 +16947,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16002,6 +17014,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16065,6 +17081,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16128,6 +17148,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16191,6 +17215,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16254,6 +17282,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16317,6 +17349,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16380,6 +17416,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16443,6 +17483,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16506,6 +17550,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16569,6 +17617,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16632,6 +17684,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16695,6 +17751,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16758,6 +17818,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16821,6 +17885,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16884,6 +17952,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -16947,6 +18019,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -17010,6 +18086,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -17073,6 +18153,10 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts
   - kind: ethereum/contract
@@ -17136,5 +18220,9 @@ dataSources:
         - event: Withdraw(uint256)
           handler: handleWithdraw
         - event: StratHarvest(indexed address,uint256,uint256)
+          handler: handleStratHarvestWithAmount
+        - event: StratHarvest(indexed address)
+          handler: handleStratHarvest
+        - event: StratHarvest(indexed address,indexed uint256)
           handler: handleStratHarvest
       file: ./src/mappings/vault.ts

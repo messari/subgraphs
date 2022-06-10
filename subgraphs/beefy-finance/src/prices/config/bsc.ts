@@ -26,17 +26,17 @@ export const SUSHISWAP_CALCULATIONS_ADDRESS = Address.fromString(
   "0x0000000000000000000000000000000000000000"
 );
 export const SUSHISWAP_WETH_ADDRESS = Address.fromString(
-  "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+  "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
 );
 
 export const SUSHISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506")
+  Address.fromString("0x3a6d8cA21D1CF76F653A67577FA0D27453350dD8") //biswap
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506") //sushiswap
 );
 
 ///////////////////////////////////////////////////////////////////////////
@@ -46,11 +46,11 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 export const UNISWAP_ROUTER_ADDRESS = new TypedMap<string, Address>();
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV1",
-  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E")
+  Address.fromString("0x10ED43C718714eb63d5aA57B78B54704E256024E") //pancakeswap
 );
 UNISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0xcF0feBd3f17CEf5b47b0cD257aCf6025c5BFf3b7") //apeswap
 );
 
 ///////////////////////////////////////////////////////////////////////////

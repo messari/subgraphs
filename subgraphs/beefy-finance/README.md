@@ -1,29 +1,18 @@
 # Beefy Finance - Yield Protocol Subgraph
 
-## Useful Links
-
-- https://beefy.finance/
-- https://app.beefy.com/#/
-- https://docs.beefy.com/
-- Add here
-
-## Calculation Methodology v0.0.1
+## Calculation Methodology v1.0.0
 
 ### Total Value Locked (TVL) USD
 
 Sum across all Vaults:
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`Vault total value locked`
 
 ### Total Revenue USD
 
 Sum across all Vaults:
 
-`Insert Calculation`
-
-<Add notes to consider if any - delete if none>
+`Amount harvested * price of token harvested`
 
 ### Protocol-Side Revenue USD
 
@@ -31,9 +20,9 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Vaults:
 
-`Insert Calculation`
+`Total revenue * performanceFee / 100`
 
-<Add notes to consider if any - delete if none>
+PerformanceFee is set as maxFee of the vault (which is usually 10%) minus strategist and harvester fee (which are set by the deployer)
 
 ### Supply-Side Revenue USD
 
@@ -41,9 +30,9 @@ Portion of the Total Revenue allocated to the Supply-Side
 
 Sum across all Vaults
 
-`Insert Calculation`
+`Total revenue * (1 - performanceFee/100 - strategistFee/100 - harvesterFee/100)`
 
-<Add notes to consider if any - delete if none>
+PerformanceFee is set as maxFee of the vault (which is usually 10%) minus strategist and harvester fee (which are set by the deployer)
 
 ### Total Unique Users
 
@@ -59,20 +48,25 @@ To be added
 
 ### Protocol Controlled Value
 
-To be added
+Sum across all valuts:
 
-### Testing
+`Vault controlled value`
 
-## Setup
+## Useful Links and references
 
-The release binary comes in two flavours - for МacOS and Linux. To add Matchstick to your subgraph project just open up a terminal, navigate to the root folder of your project and simply run graph test - it downloads the latest Matchstick binary and runs the specified test or all tests in a test folder (or all existing tests if no datasource flag is specified).
-Example usage:
+- https://beefy.finance/
+- https://app.beefy.com/#/
+- https://docs.beefy.com/
+- https://dashboard.beefy.finance/
+- https://api.beefy.finance/
+- https://defillama.com/protocol/beefy-finance
 
-```
-graph test gravity
+## Deploying
 
-```
+Before deploying, run
 
-# More info here
+`yarn write-yaml ${network}`
 
-https://thegraph.com/docs/en/developer/matchstick/
+to build the yaml file for the correct chain; than you can deploy using
+
+`yarn deploy ${githubuser/subgraphname}`

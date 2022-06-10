@@ -16,7 +16,7 @@ export function isLpToken(tokenAddress: Address, network: string): bool {
     return false;
   }
 
-  const lpToken = UniswapRouterContract.bind(tokenAddress);
+  const lpToken = UniswapPairContract.bind(tokenAddress);
   let isFactoryAvailable = utils.readValue(
     lpToken.try_factory(),
     constants.ZERO_ADDRESS
