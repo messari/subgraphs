@@ -1,4 +1,4 @@
-import { ethereum, BigInt } from "@graphprotocol/graph-ts";
+import { ethereum, BigInt, BigDecimal } from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
   Author,
@@ -71,7 +71,7 @@ function updateBlockchain(block: ethereum.Block): Blockchain {
   blockchain.gasLimit = block.gasLimit;
   if (block.baseFeePerGas) {
     blockchain.cumulativeBurntFees = blockchain.cumulativeBurntFees.plus(
-      block.baseFeePerGas.times(block.gasUsed)
+      block.baseFeePerGas!.times(block.gasUsed)
     );
   }
   blockchain.blocksPerDay = getBlocksPerDay(block.timestamp, block.number);
@@ -94,7 +94,6 @@ function updateDailySnapshot(
   block: ethereum.Block,
   blockchain: Blockchain
 ): void {
-
   // update overlapping fields for snapshot
   snapshot.cumulativeUniqueAuthors = blockchain.cumulativeUniqueAuthors;
   snapshot.blockHeight = blockchain.blockHeight;
@@ -117,10 +116,12 @@ function updateDailySnapshot(
 
   // update daily metrics
   snapshot.dailyBlocks++;
+  let dailyBlocksBD = BigDecimal.fromString(snapshot.dailyBlocks.toString());
+
   snapshot.dailyDifficulty = snapshot.dailyDifficulty.plus(block.difficulty);
   snapshot.dailyMeanDifficulty = snapshot.dailyDifficulty
     .toBigDecimal()
-    .div(snapshot.dailyBlocks.toBigDecimal());
+    .div(dailyBlocksBD);
   snapshot.dailyCumulativeGasUsed = snapshot.dailyCumulativeGasUsed.plus(
     block.gasUsed
   );
@@ -129,30 +130,30 @@ function updateDailySnapshot(
   );
   snapshot.dailyMeanGasUsed = snapshot.dailyCumulativeGasUsed
     .toBigDecimal()
-    .div(snapshot.dailyBlocks.toBigDecimal());
+    .div(dailyBlocksBD);
   snapshot.dailyMeanGasLimit = snapshot.dailyCumulativeGasLimit
     .toBigDecimal()
-    .div(snapshot.dailyBlocks.toBigDecimal());
+    .div(dailyBlocksBD);
   if (block.baseFeePerGas) {
     snapshot.dailyBurntFees = snapshot.dailyBurntFees.plus(
-      block.baseFeePerGas.times(block.gasUsed)
+      block.baseFeePerGas!.times(block.gasUsed)
     );
   }
   if (block.size) {
     snapshot.dailyCumulativeSize = snapshot.dailyCumulativeSize.plus(
-      block.size
+      block.size!
     );
   }
   snapshot.dailyMeanBlockSize = snapshot.dailyCumulativeSize
     .toBigDecimal()
-    .div(snapshot.dailyBlocks.toBigDecimal());
+    .div(dailyBlocksBD);
 
   // calc mean block interval
   // mean = (firstTimestamp - timestamp) / dailyBlocks
   let timestampDiff = snapshot.firstTimestamp.minus(block.timestamp);
   snapshot.dailyMeanBlockInterval = timestampDiff
     .toBigDecimal()
-    .div(snapshot.dailyBlocks.toBigDecimal());
+    .div(dailyBlocksBD);
 
   snapshot.save();
 }
@@ -162,7 +163,6 @@ function updateHourlySnapshot(
   block: ethereum.Block,
   blockchain: Blockchain
 ): void {
-
   // update overlapping fields for snapshot
   snapshot.cumulativeUniqueAuthors = blockchain.cumulativeUniqueAuthors;
   snapshot.blockHeight = blockchain.blockHeight;
@@ -185,10 +185,12 @@ function updateHourlySnapshot(
 
   // update hourly metrics
   snapshot.hourlyBlocks++;
+  let hourlyBlocksBD = BigDecimal.fromString(snapshot.hourlyBlocks.toString());
+
   snapshot.hourlyDifficulty = snapshot.hourlyDifficulty.plus(block.difficulty);
   snapshot.hourlyMeanDifficulty = snapshot.hourlyDifficulty
     .toBigDecimal()
-    .div(snapshot.hourlyBlocks);
+    .div(hourlyBlocksBD);
   snapshot.hourlyCumulativeGasUsed = snapshot.hourlyCumulativeGasUsed.plus(
     block.gasUsed
   );
@@ -197,30 +199,30 @@ function updateHourlySnapshot(
   );
   snapshot.hourlyMeanGasUsed = snapshot.hourlyCumulativeGasUsed
     .toBigDecimal()
-    .div(snapshot.hourlyBlocks);
+    .div(hourlyBlocksBD);
   snapshot.hourlyMeanGasLimit = snapshot.hourlyCumulativeGasLimit
     .toBigDecimal()
-    .div(snapshot.hourlyBlocks);
+    .div(hourlyBlocksBD);
   if (block.baseFeePerGas) {
     snapshot.hourlyBurntFees = snapshot.hourlyBurntFees.plus(
-      block.baseFeePerGas.times(block.gasUsed)
+      block.baseFeePerGas!.times(block.gasUsed)
     );
   }
   if (block.size) {
     snapshot.hourlyCumulativeSize = snapshot.hourlyCumulativeSize.plus(
-      block.size
+      block.size!
     );
   }
   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
     .toBigDecimal()
-    .div(snapshot.hourlyBlocks);
+    .div(hourlyBlocksBD);
 
   // calc mean block interval
   // mean = (firstTimestamp - timestamp) / hourlyBlocks
   let timestampDiff = snapshot.firstTimestamp.minus(block.timestamp);
   snapshot.hourlyMeanBlockInterval = timestampDiff
     .toBigDecimal()
-    .div(snapshot.hourlyBlocks);
+    .div(hourlyBlocksBD);
 
   snapshot.save();
 }
@@ -305,7 +307,7 @@ function createBlock(block: ethereum.Block): Block {
     .times(exponentToBigDecimal(INT_TWO));
   blockEntity.parentHash = block.parentHash.toHexString();
   if (block.baseFeePerGas) {
-    blockEntity.burntFees = block.baseFeePerGas.times(block.gasUsed);
+    blockEntity.burntFees = block.baseFeePerGas!.times(block.gasUsed);
   } else {
     blockEntity.burntFees = BIGINT_ZERO;
   }
