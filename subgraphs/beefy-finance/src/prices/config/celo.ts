@@ -36,7 +36,7 @@ SUSHISWAP_ROUTER_ADDRESS.set(
 );
 SUSHISWAP_ROUTER_ADDRESS.set(
   "routerV2",
-  Address.fromString("0x0000000000000000000000000000000000000000")
+  Address.fromString("0x1421bDe4B10e8dd459b3BCb598810B1337D56842")
 );
 
 ///////////////////////////////////////////////////////////////////////////

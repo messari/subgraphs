@@ -134,6 +134,10 @@ function createDataSource(contractName, contractAddress, network, startBlock) {
           event: "StratHarvest(indexed address)",
           handler: "handleStratHarvest",
         },
+        {
+          event: "StratHarvest(indexed address,indexed uint256)",
+          handler: "handleStratHarvest",
+        },
       ],
       file: "./src/mappings/vault.ts",
     },
