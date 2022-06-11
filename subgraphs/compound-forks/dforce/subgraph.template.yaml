@@ -1,34 +1,40 @@
-specVersion: 0.0.4
+specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+  file: ../schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Factory
-    network: mainnet
+    name: Comptroller
+    network: {{ network }}
     source:
-      address: "0x8B53Ab2c0Df3230EA327017C91Eb909f815Ad113"
-      abi: Factory
-      startBlock: 11927175
+      address: "{{ comptrollerAddr }}"
+      abi: Comptroller
+      startBlock: {{ startBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/factory.ts
       entities:
-        - LendingProtocol
+        - Protocol
         - Market
+        - Token
       abis:
-        - name: Factory
-          file: ./abis/Controller.json
-        - name: iToken
-          file: ./abis/iToken.json
+        - name: Comptroller
+          file: ./abis/Comptroller.json
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: ERC20
+          file: ../abis/ERC20.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
-        - name: ERC20
-          file: ./abis/ERC20.json
       eventHandlers:
         - event: MarketAdded(address,uint256,uint256,uint256,uint256,uint256)
           handler: handleMarketAdded
+        - event: NewPriceOracle(address,address)
+          handler: handleNewPriceOracle
+        - event: NewCollateralFactor(address,uint256,uint256)
+          handler: handleNewCollateralFactor
+        - event: NewLiquidationIncentive(uint256,uint256)
+          handler: handleNewLiquidationIncentive
         - event: MintPaused(address,bool)
           handler: handleMintPaused
         - event: RedeemPaused(address,bool)
@@ -37,12 +43,9 @@ dataSources:
           handler: handleDistributedBorrowerComp
         - event: TransferPaused(bool)
           handler: handleTransferPaused
-        - event: NewCollateralFactor(address,uint256,uint256)
-          handler: handleNewCollateralFactor
-        - event: NewLiquidationIncentive(uint256,uint256)
-          handler: handleNewLiquidationIncentive
         - event: NewRewardDistributor(address,address)
           handler: handleNewRewardDistributor
+      file: ./src/mapping.ts
 
   - kind: ethereum/contract
     name: USX
@@ -55,16 +58,18 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/stablecoin.ts
       entities:
         - LendingProtocol
         - FinancialsDailySnapshot
       abis:
+        - name: Comptroller
+          file: ./abis/Comptroller.json
         - name: stablecoin
           file: ./abis/stablecoin.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+          handler: handleStablecoinTransfer
+      file: ./src/mapping.ts
 
   - kind: ethereum/contract
     name: EUX
@@ -77,48 +82,40 @@ dataSources:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/stablecoin.ts
       entities:
         - LendingProtocol
         - FinancialsDailySnapshot
       abis:
+        - name: Comptroller
+          file: ./abis/Comptroller.json
         - name: stablecoin
           file: ./abis/stablecoin.json
       eventHandlers:
         - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
+          handler: handleStablecoinTransfer
+      file: ./src/mapping.ts
 
 templates:
-  - kind: ethereum/contract
-    name: iToken
-    network: mainnet
+  - name: CToken
+    kind: ethereum/contract
+    network: {{ network }}
     source:
-      abi: iToken
+      abi: CToken
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/core.ts
       entities:
-        - Market
-        - Token
         - Deposit
         - Withdraw
         - Borrow
         - Repay
         - Liquidate
-        - Account
-        - ActiveAccount
-        - UsageMetricsDailySnapshot
-        - FinancialsDailySnapshot
-        - MarketDailySnapshot
       abis:
-        - name: Factory
-          file: ./abis/Controller.json
-        - name: iToken
-          file: ./abis/iToken.json
-        - name: ERC20
-          file: ./abis/ERC20.json
+        - name: CToken
+          file: ./abis/CToken.json
+        - name: Comptroller
+          file: ./abis/Comptroller.json
         - name: PriceOracle
           file: ./abis/PriceOracle.json
       eventHandlers:
@@ -136,24 +133,26 @@ templates:
           handler: handleFlashload
         - event: UpdateInterest(uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleUpdateInterest
+        - event: NewReserveRatio(uint256,uint256)
+          handler: handleNewReserveFactor
+      file: ./src/mapping.ts
 
   - kind: ethereum/contract
     name: Reward
-    network: mainnet
+    network: {{ network }}
     source:
       abi: RewardDistributor
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
       language: wasm/assemblyscript
-      file: ./src/rewards.ts
       entities:
         - Market
         - MarketDailySnapshot
         - MarketHourlySnapshot
       abis:
-        - name: Factory
-          file: ./abis/Controller.json
+        - name: Comptroller
+          file: ./abis/Comptroller.json
         - name: RewardDistributor
           file: ./abis/RewardDistributor.json
       eventHandlers:
@@ -161,3 +160,4 @@ templates:
           handler: handleRewardDistributed
         - event: NewRewardToken(address,address)
           handler: handleNewRewardToken
+      file: ./src/mapping.ts

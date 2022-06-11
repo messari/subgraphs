@@ -1074,3 +1074,16 @@ type _CircularBuffer @entity {
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
 }
+
+# Helper entity for determining market.isActive status (dforce)
+# market.isActive = false if either mintPaused, redeemPaused, transferPaused = true
+type _MarketStatus @entity {
+  " Smart contract address of the market "
+  id: ID!
+  " Is mint paused for the market "
+  mintPaused: Boolean!
+  " Is redeem paused for the market "
+  redeemPaused: Boolean!
+  " Is transfer paused for the market "
+  transferPaused: Boolean!
+}

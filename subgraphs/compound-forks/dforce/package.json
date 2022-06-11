@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:mainnet": "graph deploy --studio dforce-subgraph-mainnet"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.30.1",
+    "mustache": "^4.2.0",
+    "prettier": "^2.6.0"
+  }
+}

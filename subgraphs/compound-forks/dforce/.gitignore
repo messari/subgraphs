@@ -1,5 +1,5 @@
 node_modules/
 build/
 generated/
-_build/
-_generated/
+subgraph.yaml
+yarn.lock
