@@ -35,6 +35,8 @@ import {
   Deposit,
   DexAmmProtocol,
   LiquidityPool,
+  LiquidityPoolDailySnapshot,
+  LiquidityPoolHourlySnapshot,
   Swap,
   Token,
   UsageMetricsDailySnapshot,
@@ -52,6 +54,7 @@ import {
   Network,
   ProtocolType,
   secondsPerDay,
+  secondsPerHour,
   zeroBD,
   zeroBI,
 } from "./constants";
@@ -212,6 +215,7 @@ export function handleTokensTraded(event: TokensTraded): void {
   );
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
+  // TODO: hardcode this id
   swap.protocol = getOrCreateProtocol().id;
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
@@ -261,6 +265,18 @@ export function handleTokensTraded(event: TokensTraded): void {
     event.block.timestamp,
     event.params.trader.toHexString(),
     EventType.Swap
+  );
+  snapshotLiquidityPool(
+    sourceToken._poolToken!,
+    event.block.number,
+    event.block.timestamp
+  );
+  updateLiquidityPoolSnapshot(
+    sourceToken._poolToken!,
+    event.params.sourceAmount,
+    amountInUSD,
+    event.block.number,
+    event.block.timestamp
   );
 }
 
@@ -566,6 +582,11 @@ function _handleTokensDeposited(
     depositer.toHexString(),
     EventType.Deposit
   );
+  snapshotLiquidityPool(
+    poolToken.id,
+    event.block.number,
+    event.block.timestamp
+  );
 }
 
 function _handleTokensWithdrawn(
@@ -626,6 +647,11 @@ function _handleTokensWithdrawn(
     event.block.timestamp,
     withdrawer.toHexString(),
     EventType.Withdraw
+  );
+  snapshotLiquidityPool(
+    poolToken.id,
+    event.block.number,
+    event.block.timestamp
   );
 }
 
@@ -744,7 +770,9 @@ function snapshotUsage(
     protocol.save();
   }
 
+  //
   // daily snapshot
+  //
   let dailySnapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
   let dailySnapshot = UsageMetricsDailySnapshot.load(dailySnapshotID);
   if (!dailySnapshot) {
@@ -827,4 +855,192 @@ function snapshotUsage(
   hourlySnapshot.blockNumber = blockNumber;
   hourlySnapshot.timestamp = blockTimestamp;
   hourlySnapshot.save();
+}
+
+function snapshotLiquidityPool(
+  liquidityPoolID: string,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt
+): void {
+  let liquidityPool = LiquidityPool.load(liquidityPoolID);
+  if (!liquidityPool) {
+    log.warning("[snapshotLiquidityPool] liquidity pool {} not found", [
+      liquidityPoolID,
+    ]);
+    return;
+  }
+
+  //
+  // daily snapshot
+  //
+  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+    liquidityPoolID,
+    blockTimestamp,
+    blockNumber
+  );
+  dailySnapshot.totalValueLockedUSD = liquidityPool.totalValueLockedUSD;
+  dailySnapshot.cumulativeVolumeUSD = liquidityPool.cumulativeVolumeUSD;
+  dailySnapshot.inputTokenBalances = [liquidityPool.inputTokenBalances[0]];
+  dailySnapshot.inputTokenWeights = [liquidityPool.inputTokenWeights[0]];
+  dailySnapshot.outputTokenSupply = liquidityPool.outputTokenSupply;
+  dailySnapshot.outputTokenPriceUSD = liquidityPool.outputTokenPriceUSD;
+  dailySnapshot.stakedOutputTokenAmount = liquidityPool.stakedOutputTokenAmount;
+  dailySnapshot.rewardTokenEmissionsAmount = [
+    liquidityPool.rewardTokenEmissionsAmount![0],
+  ];
+  dailySnapshot.rewardTokenEmissionsUSD = liquidityPool.rewardTokenEmissionsUSD;
+  dailySnapshot.save();
+
+  //
+  // hourly snapshot
+  //
+  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+    liquidityPoolID,
+    blockTimestamp,
+    blockNumber
+  );
+  hourlySnapshot.totalValueLockedUSD = liquidityPool.totalValueLockedUSD;
+  hourlySnapshot.cumulativeVolumeUSD = liquidityPool.cumulativeVolumeUSD;
+  hourlySnapshot.inputTokenBalances = [liquidityPool.inputTokenBalances[0]];
+  hourlySnapshot.inputTokenWeights = [liquidityPool.inputTokenWeights[0]];
+  hourlySnapshot.outputTokenSupply = liquidityPool.outputTokenSupply;
+  hourlySnapshot.outputTokenPriceUSD = liquidityPool.outputTokenPriceUSD;
+  hourlySnapshot.stakedOutputTokenAmount =
+    liquidityPool.stakedOutputTokenAmount;
+  hourlySnapshot.rewardTokenEmissionsAmount = [
+    liquidityPool.rewardTokenEmissionsAmount![0],
+  ];
+  hourlySnapshot.rewardTokenEmissionsUSD =
+    liquidityPool.rewardTokenEmissionsUSD;
+  hourlySnapshot.save();
+}
+
+function updateLiquidityPoolSnapshot(
+  liquidityPoolID: string,
+  amount: BigInt,
+  amountUSD: BigDecimal,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt
+): void {
+  //
+  // daily snapshot
+  //
+  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+    liquidityPoolID,
+    blockTimestamp,
+    blockNumber
+  );
+  dailySnapshot.dailyVolumeByTokenAmount = [
+    dailySnapshot.dailyVolumeByTokenAmount[0].plus(amount),
+  ];
+  dailySnapshot.dailyVolumeByTokenUSD = [
+    dailySnapshot.dailyVolumeByTokenUSD[0].plus(amountUSD),
+  ];
+  dailySnapshot.dailyVolumeUSD = dailySnapshot.dailyVolumeByTokenUSD[0];
+  dailySnapshot.save();
+
+  //
+  // hourly snapshot
+  //
+  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+    liquidityPoolID,
+    blockTimestamp,
+    blockNumber
+  );
+  hourlySnapshot.hourlyVolumeByTokenAmount = [
+    hourlySnapshot.hourlyVolumeByTokenAmount[0].plus(amount),
+  ];
+  hourlySnapshot.hourlyVolumeByTokenUSD = [
+    hourlySnapshot.hourlyVolumeByTokenUSD[0].plus(amountUSD),
+  ];
+  hourlySnapshot.hourlyVolumeUSD = hourlySnapshot.hourlyVolumeByTokenUSD[0];
+  hourlySnapshot.save();
+}
+
+function getOrCreateLiquidityPoolDailySnapshot(
+  liquidityPoolID: string,
+  blockTimestamp: BigInt,
+  blockNumber: BigInt
+): LiquidityPoolDailySnapshot {
+  let snapshotID = getLiquidityPoolDailySnapshotID(
+    liquidityPoolID,
+    blockTimestamp.toI32()
+  );
+  let snapshot = LiquidityPoolDailySnapshot.load(snapshotID);
+  if (!snapshot) {
+    snapshot = new LiquidityPoolDailySnapshot(snapshotID);
+    snapshot.blockNumber = blockNumber;
+    snapshot.timestamp = blockTimestamp;
+
+    snapshot.protocol = BancorNetworkAddr;
+    snapshot.pool = liquidityPoolID;
+    snapshot.totalValueLockedUSD = zeroBD;
+    snapshot.cumulativeVolumeUSD = zeroBD;
+    snapshot.inputTokenBalances = [zeroBI];
+    snapshot.inputTokenWeights = [zeroBD];
+    snapshot.outputTokenSupply = zeroBI;
+    snapshot.outputTokenPriceUSD = zeroBD;
+    snapshot.stakedOutputTokenAmount = zeroBI;
+    snapshot.rewardTokenEmissionsAmount = [zeroBI];
+    snapshot.rewardTokenEmissionsUSD = [zeroBD];
+
+    snapshot.dailyVolumeUSD = zeroBD;
+    snapshot.dailyVolumeByTokenAmount = [zeroBI];
+    snapshot.dailyVolumeByTokenUSD = [zeroBD];
+  }
+
+  return snapshot;
+}
+
+function getOrCreateLiquidityPoolHourlySnapshot(
+  liquidityPoolID: string,
+  blockTimestamp: BigInt,
+  blockNumber: BigInt
+): LiquidityPoolHourlySnapshot {
+  let snapshotID = getLiquidityPoolHourlySnapshotID(
+    liquidityPoolID,
+    blockTimestamp.toI32()
+  );
+  let snapshot = LiquidityPoolHourlySnapshot.load(snapshotID);
+  if (!snapshot) {
+    snapshot = new LiquidityPoolHourlySnapshot(snapshotID);
+    snapshot.blockNumber = blockNumber;
+    snapshot.timestamp = blockTimestamp;
+
+    snapshot.protocol = BancorNetworkAddr;
+    snapshot.pool = liquidityPoolID;
+    snapshot.totalValueLockedUSD = zeroBD;
+    snapshot.cumulativeVolumeUSD = zeroBD;
+    snapshot.inputTokenBalances = [zeroBI];
+    snapshot.inputTokenWeights = [zeroBD];
+    snapshot.outputTokenSupply = zeroBI;
+    snapshot.outputTokenPriceUSD = zeroBD;
+    snapshot.stakedOutputTokenAmount = zeroBI;
+    snapshot.rewardTokenEmissionsAmount = [zeroBI];
+    snapshot.rewardTokenEmissionsUSD = [zeroBD];
+
+    snapshot.hourlyVolumeUSD = zeroBD;
+    snapshot.hourlyVolumeByTokenAmount = [zeroBI];
+    snapshot.hourlyVolumeByTokenUSD = [zeroBD];
+  }
+
+  return snapshot;
+}
+
+function getLiquidityPoolDailySnapshotID(
+  liquidityPoolID: string,
+  timestamp: i32
+): string {
+  return liquidityPoolID
+    .concat("-")
+    .concat((timestamp / secondsPerDay).toString());
+}
+
+function getLiquidityPoolHourlySnapshotID(
+  liquidityPoolID: string,
+  timestamp: i32
+): string {
+  return liquidityPoolID
+    .concat("-")
+    .concat((timestamp / secondsPerHour).toString());
 }
