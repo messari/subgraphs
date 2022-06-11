@@ -30,7 +30,7 @@ export function handleOldPlatypus<T>(event: T, pid: BigInt): _Asset {
     ]);
   }
   let poolInfoMap = poolInfo.value;
-  let poolPoints = poolInfoMap.value2;
+  let poolPoints = poolInfoMap.value1;
 
   let _asset = _Asset.load(poolInfoMap.value0.toHexString());
   if (!_asset) {
@@ -120,7 +120,7 @@ export function handleFactoryPlatypus<T>(event: T, pid: BigInt): _Asset {
     ]);
   }
   let poolInfoMap = poolInfo.value;
-  let poolPoints = poolInfoMap.value2;
+  let poolPoints = poolInfoMap.value1;
   let _asset = _Asset.load(poolInfoMap.value0.toHexString());
   if (!_asset) {
     log.error("[HandleRewards][{}]Asset not found {}", [
