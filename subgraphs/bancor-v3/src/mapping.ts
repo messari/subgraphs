@@ -7,7 +7,6 @@ import {
 } from "@graphprotocol/graph-ts";
 import {
   PoolCollectionAdded,
-  PoolCreated,
   TokensTraded,
 } from "../generated/BancorNetwork/BancorNetwork";
 import {
@@ -15,13 +14,13 @@ import {
   WithdrawalFeePPMUpdated,
 } from "../generated/NetworkSettings/NetworkSettings";
 import { ProgramCreated } from "../generated/StandardRewards/StandardRewards";
-import { PoolCreated as PoolCreated__Legacy } from "../generated/PoolCollection1/PoolCollection1";
+import { PoolTokenCreated } from "../generated/PoolTokenFactory/PoolTokenFactory";
 import {
   TokensDeposited,
   TokensWithdrawn,
   TotalLiquidityUpdated,
-} from "../generated/templates/PoolCollection2/PoolCollection2";
-import { PoolCollection2 } from "../generated/templates";
+} from "../generated/templates/PoolCollection/PoolCollection";
+import { PoolCollection } from "../generated/templates";
 import {
   TokensDeposited as BNTDeposited,
   TokensWithdrawn as BNTWithdrawn,
@@ -53,28 +52,112 @@ import {
   zeroBI,
 } from "./constants";
 
-export function handlePoolCreatedLegacy(event: PoolCreated__Legacy): void {
-  // PoolCreated__Legacy is emitted only on early blocks where we should create BNT token
-  // since there's no Create Pool op on BNT
-  createBntToken(event.block.timestamp, event.block.number);
-  _handlePoolCreated(
-    event.params.poolToken,
-    event.block.timestamp,
-    event.block.number
-  );
-}
+export function handlePoolTokenCreated(event: PoolTokenCreated): void {
+  let poolTokenAddress = event.params.poolToken;
+  let reserveTokenAddress = event.params.token;
 
-export function handlePoolCreated(event: PoolCreated): void {
-  _handlePoolCreated(
-    event.params.pool,
+  let poolTokenID = poolTokenAddress.toHexString();
+  let poolToken = Token.load(poolTokenID);
+  if (poolToken != null) {
+    log.warning("[handlePoolTokenCreated] pool token {} already exists", [
+      poolTokenID,
+    ]);
+    return;
+  }
+
+  // pool token
+  poolToken = new Token(poolTokenID);
+  let poolTokenContract = PoolToken.bind(poolTokenAddress);
+
+  let poolTokenNameResult = poolTokenContract.try_name();
+  if (poolTokenNameResult.reverted) {
+    log.warning("[handlePoolTokenCreated] try_name on {} reverted", [
+      poolTokenID,
+    ]);
+    poolToken.name = "unknown name";
+  } else {
+    poolToken.name = poolTokenNameResult.value;
+  }
+
+  let poolTokenSymbolResult = poolTokenContract.try_symbol();
+  if (poolTokenSymbolResult.reverted) {
+    log.warning("[handlePoolTokenCreated] try_symbol on {} reverted", [
+      poolTokenID,
+    ]);
+    poolToken.symbol = "unknown symbol";
+  } else {
+    poolToken.symbol = poolTokenSymbolResult.value;
+  }
+
+  let poolTokenDecimalsResult = poolTokenContract.try_decimals();
+  if (poolTokenDecimalsResult.reverted) {
+    log.warning("[handlePoolTokenCreated] try_decimals on {} reverted", [
+      poolTokenID,
+    ]);
+    poolToken.decimals = 0;
+  } else {
+    poolToken.decimals = poolTokenDecimalsResult.value;
+  }
+
+  poolToken.save();
+
+  // reserve token
+  let reserveTokenID = reserveTokenAddress.toHexString();
+  let reserveToken = new Token(reserveTokenID);
+  reserveToken._poolToken = poolTokenID;
+
+  if (reserveTokenAddress == Address.fromString(EthAddr)) {
+    reserveToken.name = "Ether";
+    reserveToken.symbol = "ETH";
+    reserveToken.decimals = 18;
+  } else {
+    let tokenContract = ERC20.bind(Address.fromString(reserveTokenID));
+
+    let tokenNameResult = tokenContract.try_name();
+    if (tokenNameResult.reverted) {
+      log.warning("[handlePoolTokenCreated] try_name on {} reverted", [
+        reserveTokenID,
+      ]);
+      reserveToken.name = "unknown name";
+    } else {
+      reserveToken.name = tokenNameResult.value;
+    }
+
+    let tokenSymbolResult = tokenContract.try_symbol();
+    if (tokenSymbolResult.reverted) {
+      log.warning("[handlePoolTokenCreated] try_symbol on {} reverted", [
+        reserveTokenID,
+      ]);
+      reserveToken.symbol = "unknown symbol";
+    } else {
+      reserveToken.symbol = tokenSymbolResult.value;
+    }
+
+    let tokenDecimalsResult = tokenContract.try_decimals();
+    if (tokenDecimalsResult.reverted) {
+      log.warning("[handlePoolTokenCreated] try_decimals on {} reverted", [
+        reserveTokenID,
+      ]);
+      reserveToken.decimals = 0;
+    } else {
+      reserveToken.decimals = tokenDecimalsResult.value;
+    }
+  }
+  reserveToken.save();
+
+  createLiquidityPool(
+    reserveToken,
+    poolToken,
     event.block.timestamp,
     event.block.number
   );
 }
 
 export function handlePoolCollectionAdded(event: PoolCollectionAdded): void {
-  PoolCollection2.create(event.params.poolCollection);
+  PoolCollection.create(event.params.poolCollection);
 }
+
+// TODO: TradingFeePPMUpdated?
 
 export function handleNetworkFeePPMUpdated(event: NetworkFeePPMUpdated): void {
   let protocol = getOrCreateProtocol();
@@ -171,6 +254,14 @@ export function handleTokensDeposited(event: TokensDeposited): void {
     ]);
     return;
   }
+
+  if (!reserveToken._poolToken) {
+    log.warning("[handleTokensDeposited] reserve token {} has no pool token", [
+      reserveTokenID,
+    ]);
+    return;
+  }
+
   let poolToken = Token.load(reserveToken._poolToken!);
   if (!poolToken) {
     log.warning("[handleTokensDeposited] pool token {} not found", [
@@ -362,127 +453,6 @@ export function handleProgramCreated(event: ProgramCreated): void {
   liquidityPool.rewardTokenEmissionsAmount = [rewardAmountInDay];
   liquidityPool.rewardTokenEmissionsUSD = [rewardAmountUSD];
   liquidityPool.save();
-}
-
-function createBntToken(blockTimestamp: BigInt, blockNumber: BigInt): void {
-  let bnBntToken = Token.load(BnBntAddr);
-  if (bnBntToken) {
-    return;
-  }
-  bnBntToken = new Token(BnBntAddr);
-  bnBntToken.name = "Bancor BNT Pool Token";
-  bnBntToken.symbol = "bnBNT";
-  bnBntToken.decimals = 18;
-  bnBntToken.save();
-
-  let bntToken = new Token(BntAddr);
-  bntToken.name = "Bancor Network Token";
-  bntToken.symbol = "BNT";
-  bntToken.decimals = 18;
-  bntToken._poolToken = BnBntAddr;
-  bntToken.save();
-
-  createLiquidityPool(bntToken, bnBntToken, blockTimestamp, blockNumber);
-}
-
-function _handlePoolCreated(
-  pool: Address,
-  blockTimestamp: BigInt,
-  blockNumber: BigInt
-): void {
-  let poolTokenAddr = pool.toHexString();
-  let poolToken = Token.load(poolTokenAddr);
-  if (poolToken != null) {
-    log.warning("[handlePoolCreated] pool token {} exists", [poolTokenAddr]);
-    return;
-  }
-
-  // pool token
-  poolToken = new Token(poolTokenAddr);
-  let poolTokenContract = PoolToken.bind(pool);
-
-  let poolTokenNameResult = poolTokenContract.try_name();
-  if (poolTokenNameResult.reverted) {
-    log.warning("[handlePoolCreated] try_name on {} reverted", [poolTokenAddr]);
-    poolToken.name = "unknown name";
-  } else {
-    poolToken.name = poolTokenNameResult.value;
-  }
-
-  let poolTokenSymbolResult = poolTokenContract.try_symbol();
-  if (poolTokenSymbolResult.reverted) {
-    log.warning("[handlePoolCreated] try_symbol on {} reverted", [
-      poolTokenAddr,
-    ]);
-    poolToken.symbol = "unknown symbol";
-  } else {
-    poolToken.symbol = poolTokenSymbolResult.value;
-  }
-
-  let poolTokenDecimalsResult = poolTokenContract.try_decimals();
-  if (poolTokenDecimalsResult.reverted) {
-    log.warning("[handlePoolCreated] try_decimals on {} reverted", [
-      poolTokenAddr,
-    ]);
-    poolToken.decimals = 0;
-  } else {
-    poolToken.decimals = poolTokenDecimalsResult.value;
-  }
-
-  poolToken.save();
-
-  // token
-  let reserveTokenAddrResult = poolTokenContract.try_reserveToken();
-  if (reserveTokenAddrResult.reverted) {
-    log.warning("[handlePoolCreated] try_reserveToken on {} reverted", [
-      poolTokenAddr,
-    ]);
-    return;
-  }
-  let reserveTokenAddr = reserveTokenAddrResult.value.toHexString();
-  let reserveToken = new Token(reserveTokenAddr);
-  reserveToken._poolToken = poolTokenAddr;
-
-  if (reserveTokenAddrResult.value == Address.fromString(EthAddr)) {
-    reserveToken.name = "Ether";
-    reserveToken.symbol = "ETH";
-    reserveToken.decimals = 18;
-  } else {
-    let tokenContract = ERC20.bind(Address.fromString(reserveTokenAddr));
-
-    let tokenNameResult = tokenContract.try_name();
-    if (tokenNameResult.reverted) {
-      log.warning("[handlePoolCreated] try_name on {} reverted", [
-        reserveTokenAddr,
-      ]);
-      reserveToken.name = "unknown name";
-    } else {
-      reserveToken.name = tokenNameResult.value;
-    }
-
-    let tokenSymbolResult = tokenContract.try_symbol();
-    if (tokenSymbolResult.reverted) {
-      log.warning("[handlePoolCreated] try_symbol on {} reverted", [
-        reserveTokenAddr,
-      ]);
-      reserveToken.symbol = "unknown symbol";
-    } else {
-      reserveToken.symbol = tokenSymbolResult.value;
-    }
-
-    let tokenDecimalsResult = tokenContract.try_decimals();
-    if (tokenDecimalsResult.reverted) {
-      log.warning("[handlePoolCreated] try_decimals on {} reverted", [
-        reserveTokenAddr,
-      ]);
-      reserveToken.decimals = 0;
-    } else {
-      reserveToken.decimals = tokenDecimalsResult.value;
-    }
-  }
-  reserveToken.save();
-
-  createLiquidityPool(reserveToken, poolToken, blockTimestamp, blockNumber);
 }
 
 function getOrCreateProtocol(): DexAmmProtocol {
