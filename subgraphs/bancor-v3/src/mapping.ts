@@ -52,6 +52,11 @@ import {
   zeroBI,
 } from "./constants";
 
+enum EventType {
+  Swap,
+  Withdraw,
+}
+
 export function handlePoolTokenCreated(event: PoolTokenCreated): void {
   let poolTokenAddress = event.params.poolToken;
   let reserveTokenAddress = event.params.token;
@@ -217,11 +222,11 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.amountOutUSD = getDaiAmount(targetToken.id, event.params.targetAmount);
   swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
   swap._tradingFeeAmount = event.params.targetFeeAmount;
-  let tradingFeeAmountuSD = getDaiAmount(
+  let tradingFeeAmountUSD = getDaiAmount(
     targetToken.id,
     event.params.targetFeeAmount
   );
-  swap._tradingFeeAmountUSD = tradingFeeAmountuSD;
+  swap._tradingFeeAmountUSD = tradingFeeAmountUSD;
 
   swap.save();
 
@@ -241,8 +246,10 @@ export function handleTokensTraded(event: TokensTraded): void {
   liquidityPool.cumulativeVolumeUSD =
     liquidityPool.cumulativeVolumeUSD.plus(amountInUSD);
   liquidityPool._cumulativeTradingFeeAmountUSD =
-    liquidityPool._cumulativeTradingFeeAmountUSD.plus(tradingFeeAmountuSD);
+    liquidityPool._cumulativeTradingFeeAmountUSD.plus(tradingFeeAmountUSD);
   liquidityPool.save();
+
+  updateProtocolLevelFee(EventType.Swap, tradingFeeAmountUSD);
 }
 
 export function handleTokensDeposited(event: TokensDeposited): void {
@@ -592,6 +599,8 @@ function _handleTokensWithdrawn(
     );
 
   liquidityPool.save();
+
+  updateProtocolLevelFee(EventType.Withdraw, withdrawalFeeAmountUSD);
 }
 
 function _handleTotalLiquidityUpdated(
@@ -662,4 +671,29 @@ function getReserveTokenAmount(
     poolTokenAmount.toString(),
   ]);
   return reserveTokenAmountResult.value;
+}
+
+function updateProtocolLevelFee(
+  eventType: EventType,
+  amountUSD: BigDecimal
+): void {
+  let protocol = getOrCreateProtocol();
+  protocol.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD.plus(amountUSD);
+  switch (eventType) {
+    case EventType.Swap:
+      let protocolSideRevenue = amountUSD.times(protocol._networkFeeRate);
+      let supplySideRevenue = amountUSD.minus(protocolSideRevenue);
+      protocol.cumulativeSupplySideRevenueUSD =
+        protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
+      protocol.cumulativeProtocolSideRevenueUSD =
+        protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenue);
+      break;
+    case EventType.Withdraw:
+      protocol.cumulativeProtocolSideRevenueUSD =
+        protocol.cumulativeProtocolSideRevenueUSD.plus(amountUSD);
+      break;
+    default:
+  }
+  protocol.save();
 }
