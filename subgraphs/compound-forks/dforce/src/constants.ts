@@ -1,19 +1,34 @@
-import { Address, dataSource, log, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  dataSource,
+  log,
+  BigDecimal,
+  BigInt,
+} from "@graphprotocol/graph-ts";
 import {
   AVALANCHE_BLOCKS_PER_YEAR,
   ETHEREUM_BLOCKS_PER_YEAR,
+  BSC_BLOCKS_PER_YEAR,
+  ARBITRUM_BLOCKS_PER_YEAR,
   FANTOM_BLOCKS_PER_YEAR,
   Network,
 } from "../../src/constants";
 
-const ETHEREUM_BLOCKS_PER_DAY = 6570 as i32; // blocks every 13.15 seconds
+const ETHEREUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_YEAR / 365;
+const BSC_BLOCKS_PER_DAY = BSC_BLOCKS_PER_YEAR / 365;
+const ARBITRUM_BLOCKS_PER_DAY = ARBITRUM_BLOCKS_PER_YEAR / 365;
 
 export class NetworkSpecificConstant {
   comptrollerAddr: Address;
   network: string;
   unitPerDay: i32;
   unitPerYear: i32;
-  constructor(comptrollerAddr: Address, network: string, unitPerDay: i32, unitPerYear: i32) {
+  constructor(
+    comptrollerAddr: Address,
+    network: string,
+    unitPerDay: i32,
+    unitPerYear: i32
+  ) {
     this.comptrollerAddr = comptrollerAddr;
     this.network = network;
     this.unitPerDay = unitPerDay;
@@ -28,11 +43,37 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Address.fromString("0x8B53Ab2c0Df3230EA327017C91Eb909f815Ad113"),
       Network.MAINNET,
       ETHEREUM_BLOCKS_PER_DAY,
-      ETHEREUM_BLOCKS_PER_YEAR,
+      ETHEREUM_BLOCKS_PER_YEAR
     );
-  } else {
+  } else if (equalsIgnoreCase(network, Network.BSC)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x0b53E608bD058Bb54748C35148484fD627E6dc0A"),
+      Network.BSC,
+      BSC_BLOCKS_PER_DAY,
+      BSC_BLOCKS_PER_YEAR
+    );
+  } else if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x8E7e9eA9023B81457Ae7E6D2a51b003D421E5408"),
+      Network.ARBITRUM_ONE,
+      ARBITRUM_BLOCKS_PER_DAY,
+      ARBITRUM_BLOCKS_PER_YEAR
+    );
+  } /* else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0xA300A84D8970718Dac32f54F61Bd568142d8BCF4"),
+      Network.OPTIMISM,
+      OPTIMISM_BLOCKS_PER_DAY,
+      OPTIMISM_BLOCKS_PER_YEAR
+    );
+  }*/ else {
     log.error("[getNetworkSpecificConstant] Unsupported network {}", [network]);
-    return new NetworkSpecificConstant(Address.fromString("0x0000000000000000000000000000000000000000"), "", 0, 0);
+    return new NetworkSpecificConstant(
+      Address.fromString("0x0000000000000000000000000000000000000000"),
+      "",
+      0,
+      0
+    );
   }
 }
 
@@ -53,7 +94,11 @@ export function enumToPrefix(snake: string): string {
 
 // Prefix an ID with a enum string in order to differentiate IDs
 // e.g. combine XPOOL, TRADING_FEE and 0x1234 into xpool-trading-fee-0x1234
-export function prefixID(ID: string, enumString1: string, enumString2: string | null = null): string {
+export function prefixID(
+  ID: string,
+  enumString1: string,
+  enumString2: string | null = null
+): string {
   let prefix = enumToPrefix(enumString1);
   if (enumString2 != null) {
     prefix += enumToPrefix(enumString2!);
