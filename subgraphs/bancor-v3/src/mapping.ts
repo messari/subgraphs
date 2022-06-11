@@ -30,11 +30,15 @@ import { PoolToken } from "../generated/BancorNetwork/PoolToken";
 import { BancorNetworkInfo } from "../generated/BancorNetwork/BancorNetworkInfo";
 import { ERC20 } from "../generated/BancorNetwork/ERC20";
 import {
+  Account,
+  ActiveAccount,
   Deposit,
   DexAmmProtocol,
   LiquidityPool,
   Swap,
   Token,
+  UsageMetricsDailySnapshot,
+  UsageMetricsHourlySnapshot,
   Withdraw,
 } from "../generated/schema";
 import {
@@ -55,6 +59,7 @@ import {
 enum EventType {
   Swap,
   Withdraw,
+  Deposit,
 }
 
 export function handlePoolTokenCreated(event: PoolTokenCreated): void {
@@ -250,6 +255,13 @@ export function handleTokensTraded(event: TokensTraded): void {
   liquidityPool.save();
 
   updateProtocolLevelFee(EventType.Swap, tradingFeeAmountUSD);
+
+  snapshotUsage(
+    event.block.number,
+    event.block.timestamp,
+    event.params.trader.toHexString(),
+    EventType.Swap
+  );
 }
 
 export function handleTokensDeposited(event: TokensDeposited): void {
@@ -547,6 +559,13 @@ function _handleTokensDeposited(
   deposit.pool = poolToken.id;
 
   deposit.save();
+
+  snapshotUsage(
+    event.block.number,
+    event.block.timestamp,
+    depositer.toHexString(),
+    EventType.Deposit
+  );
 }
 
 function _handleTokensWithdrawn(
@@ -601,6 +620,13 @@ function _handleTokensWithdrawn(
   liquidityPool.save();
 
   updateProtocolLevelFee(EventType.Withdraw, withdrawalFeeAmountUSD);
+
+  snapshotUsage(
+    event.block.number,
+    event.block.timestamp,
+    withdrawer.toHexString(),
+    EventType.Withdraw
+  );
 }
 
 function _handleTotalLiquidityUpdated(
@@ -696,4 +722,109 @@ function updateProtocolLevelFee(
     default:
   }
   protocol.save();
+}
+
+function snapshotUsage(
+  blockNumber: BigInt,
+  blockTimestamp: BigInt,
+  accountID: string,
+  eventType: EventType
+): void {
+  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  if (!protocol) {
+    log.error("[snapshotUsage] Protocol not found, this SHOULD NOT happen", []);
+    return;
+  }
+  let account = Account.load(accountID);
+  if (!account) {
+    account = new Account(accountID);
+    account.save();
+
+    protocol.cumulativeUniqueUsers += 1;
+    protocol.save();
+  }
+
+  // daily snapshot
+  let dailySnapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
+  let dailySnapshot = UsageMetricsDailySnapshot.load(dailySnapshotID);
+  if (!dailySnapshot) {
+    dailySnapshot = new UsageMetricsDailySnapshot(dailySnapshotID);
+    dailySnapshot.protocol = protocol.id;
+    dailySnapshot.dailyActiveUsers = 0;
+    dailySnapshot.cumulativeUniqueUsers = 0;
+    dailySnapshot.dailyTransactionCount = 0;
+    dailySnapshot.dailyDepositCount = 0;
+    dailySnapshot.dailyWithdrawCount = 0;
+    dailySnapshot.dailySwapCount = 0;
+    dailySnapshot.blockNumber = blockNumber;
+    dailySnapshot.timestamp = blockTimestamp;
+  }
+  let dailyAccountID = accountID.concat("-").concat(dailySnapshotID);
+  let dailyActiveAccount = ActiveAccount.load(dailyAccountID);
+  if (!dailyActiveAccount) {
+    dailyActiveAccount = new ActiveAccount(dailyAccountID);
+    dailyActiveAccount.save();
+
+    dailySnapshot.dailyActiveUsers += 1;
+  }
+  dailySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  dailySnapshot.dailyTransactionCount += 1;
+  switch (eventType) {
+    case EventType.Deposit:
+      dailySnapshot.dailyDepositCount += 1;
+      break;
+    case EventType.Withdraw:
+      dailySnapshot.dailyWithdrawCount += 1;
+      break;
+    case EventType.Swap:
+      dailySnapshot.dailySwapCount += 1;
+      break;
+    default:
+  }
+  dailySnapshot.blockNumber = blockNumber;
+  dailySnapshot.timestamp = blockTimestamp;
+  dailySnapshot.save();
+
+  //
+  // hourly snapshot
+  //
+  let hourlySnapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
+  let hourlySnapshot = UsageMetricsHourlySnapshot.load(hourlySnapshotID);
+  if (!hourlySnapshot) {
+    hourlySnapshot = new UsageMetricsHourlySnapshot(hourlySnapshotID);
+    hourlySnapshot.protocol = protocol.id;
+    hourlySnapshot.hourlyActiveUsers = 0;
+    hourlySnapshot.cumulativeUniqueUsers = 0;
+    hourlySnapshot.hourlyTransactionCount = 0;
+    hourlySnapshot.hourlyDepositCount = 0;
+    hourlySnapshot.hourlyWithdrawCount = 0;
+    hourlySnapshot.hourlySwapCount = 0;
+    hourlySnapshot.blockNumber = blockNumber;
+    hourlySnapshot.timestamp = blockTimestamp;
+  }
+  let hourlyAccountID = accountID.concat("-").concat(hourlySnapshotID);
+  let hourlyActiveAccount = ActiveAccount.load(hourlyAccountID);
+  if (!hourlyActiveAccount) {
+    hourlyActiveAccount = new ActiveAccount(hourlyAccountID);
+    hourlyActiveAccount.save();
+
+    hourlySnapshot.hourlyActiveUsers += 1;
+  }
+  hourlySnapshot.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+  hourlySnapshot.hourlyTransactionCount += 1;
+  switch (eventType) {
+    case EventType.Deposit:
+      hourlySnapshot.hourlyDepositCount += 1;
+      break;
+    case EventType.Withdraw:
+      hourlySnapshot.hourlyWithdrawCount += 1;
+      break;
+    case EventType.Swap:
+      hourlySnapshot.hourlySwapCount += 1;
+      break;
+    default:
+  }
+  hourlySnapshot.blockNumber = blockNumber;
+  hourlySnapshot.timestamp = blockTimestamp;
+  hourlySnapshot.save();
 }
