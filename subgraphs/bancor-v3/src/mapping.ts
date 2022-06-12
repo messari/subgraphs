@@ -233,16 +233,25 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap.to = event.params.trader.toHexString();
   swap.tokenIn = sourceTokenID;
   swap.amountIn = event.params.sourceAmount;
-  let amountInUSD = getDaiAmount(sourceToken.id, event.params.sourceAmount);
+  let amountInUSD = getDaiAmount(
+    sourceToken.id,
+    event.params.sourceAmount,
+    event.block.number
+  );
   swap.amountInUSD = amountInUSD;
   swap.tokenOut = targetTokenID;
   swap.amountOut = event.params.targetAmount;
-  swap.amountOutUSD = getDaiAmount(targetToken.id, event.params.targetAmount);
+  swap.amountOutUSD = getDaiAmount(
+    targetToken.id,
+    event.params.targetAmount,
+    event.block.number
+  );
   swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
   swap._tradingFeeAmount = event.params.targetFeeAmount;
   let tradingFeeAmountUSD = getDaiAmount(
     targetToken.id,
-    event.params.targetFeeAmount
+    event.params.targetFeeAmount,
+    event.block.number
   );
   swap._tradingFeeAmountUSD = tradingFeeAmountUSD;
 
@@ -433,7 +442,8 @@ export function handleTotalLiquidityUpdated(
     token,
     liquidityPool,
     event.params.stakedBalance,
-    event.params.poolTokenSupply
+    event.params.poolTokenSupply,
+    event.block.number
   );
 }
 
@@ -460,7 +470,8 @@ export function handleBNTTotalLiquidityUpdated(
     bntToken,
     bnBntLiquidityPool,
     event.params.stakedBalance,
-    event.params.poolTokenSupply
+    event.params.poolTokenSupply,
+    event.block.number
   );
 }
 
@@ -499,7 +510,8 @@ export function handleProgramCreated(event: ProgramCreated): void {
   let rewardAmountInDay = rewardRate.times(BigInt.fromI32(secondsPerDay));
   let rewardAmountUSD = getDaiAmount(
     event.params.rewardsToken.toHexString(),
-    rewardAmountInDay
+    rewardAmountInDay,
+    event.block.number
   );
   liquidityPool.rewardTokenEmissionsAmount = [rewardAmountInDay];
   liquidityPool.rewardTokenEmissionsUSD = [rewardAmountUSD];
@@ -590,7 +602,11 @@ function _handleTokensDeposited(
   deposit.inputTokenAmounts = [reserveTokenAmount];
   deposit.outputToken = poolToken.id;
   deposit.outputTokenAmount = poolTokenAmount;
-  deposit.amountUSD = getDaiAmount(reserveToken.id, reserveTokenAmount);
+  deposit.amountUSD = getDaiAmount(
+    reserveToken.id,
+    reserveTokenAmount,
+    event.block.number
+  );
   deposit.pool = poolToken.id;
 
   deposit.save();
@@ -635,12 +651,17 @@ function _handleTokensWithdrawn(
   withdraw.inputTokenAmounts = [reserveTokenAmount];
   withdraw.outputToken = poolToken.id;
   withdraw.outputTokenAmount = poolTokenAmount;
-  withdraw.amountUSD = getDaiAmount(reserveToken.id, reserveTokenAmount);
+  withdraw.amountUSD = getDaiAmount(
+    reserveToken.id,
+    reserveTokenAmount,
+    event.block.number
+  );
   withdraw.pool = poolToken.id;
   withdraw._withdrawalFeeAmount = withdrawalFeeAmount;
   let withdrawalFeeAmountUSD = getDaiAmount(
     reserveToken.id,
-    withdrawalFeeAmount
+    withdrawalFeeAmount,
+    event.block.number
   );
   withdraw._withdrawalFeeAmountUSD = withdrawalFeeAmountUSD;
 
@@ -686,17 +707,24 @@ function _handleTotalLiquidityUpdated(
   reserveToken: Token,
   liquidityPool: LiquidityPool,
   stakedBalance: BigInt,
-  poolTokenSupply: BigInt
+  poolTokenSupply: BigInt,
+  blockNumber: BigInt
 ): void {
   let prevTotalValueLockedUSD = liquidityPool.totalValueLockedUSD;
-  let currTotalValueLockedUSD = getDaiAmount(reserveToken.id, stakedBalance);
+  let currTotalValueLockedUSD = getDaiAmount(
+    reserveToken.id,
+    stakedBalance,
+    blockNumber
+  );
 
   liquidityPool.inputTokenBalances = [stakedBalance];
   liquidityPool.totalValueLockedUSD = currTotalValueLockedUSD;
   liquidityPool.outputTokenSupply = poolTokenSupply;
+  // TODO: should be price per share
   liquidityPool.outputTokenPriceUSD = getDaiAmount(
     reserveToken.id,
-    getReserveTokenAmount(reserveToken.id, poolTokenSupply)
+    getReserveTokenAmount(reserveToken.id, poolTokenSupply, blockNumber),
+    blockNumber
   );
   liquidityPool.save();
 
@@ -712,7 +740,11 @@ function _handleTotalLiquidityUpdated(
 }
 
 // TODO: figure out why it gets reverted sometimes
-function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
+function getDaiAmount(
+  sourceTokenID: string,
+  sourceAmount: BigInt,
+  blockNumber: BigInt
+): BigDecimal {
   if (sourceTokenID == DaiAddr) {
     return sourceAmount.toBigDecimal().div(exponentToBigDecimal(18));
   }
@@ -723,9 +755,15 @@ function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
     sourceAmount
   );
   if (targetAmountResult.reverted) {
+    // TODO: remove blockno from logs
     log.warning(
-      "[getDaiAmount] try_tradeOutputBySourceAmount({}, {}, {}) reverted",
-      [sourceTokenID, DaiAddr, sourceAmount.toString()]
+      "[getDaiAmount] #{} try_tradeOutputBySourceAmount({}, {}, {}) reverted",
+      [
+        blockNumber.toI32().toString(),
+        sourceTokenID,
+        DaiAddr,
+        sourceAmount.toString(),
+      ]
     );
     return zeroBD;
   }
@@ -733,27 +771,27 @@ function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
   return targetAmountResult.value.toBigDecimal().div(exponentToBigDecimal(18));
 }
 
-// TODO: figure out why it 100% reverts
 function getReserveTokenAmount(
   reserveTokenID: string,
-  poolTokenAmount: BigInt
+  poolTokenAmount: BigInt,
+  blockNumber: BigInt
 ): BigInt {
   let info = BancorNetworkInfo.bind(Address.fromString(BancorNetworkInfoAddr));
   let reserveTokenAmountResult = info.try_poolTokenToUnderlying(
     Address.fromString(reserveTokenID),
     poolTokenAmount
   );
-  if (!reserveTokenAmountResult.reverted) {
+  if (reserveTokenAmountResult.reverted) {
     log.warning(
-      "[getReserveTokenAmount] try_poolTokenToUnderlying({}, {}) reverted",
-      [reserveTokenID, poolTokenAmount.toString()]
+      "[getReserveTokenAmount] #{} try_poolTokenToUnderlying({}, {}) reverted",
+      [
+        blockNumber.toI32().toString(),
+        reserveTokenID,
+        poolTokenAmount.toString(),
+      ]
     );
     return zeroBI;
   }
-  log.warning("[getReserveTokenAmount] try_poolTokenToUnderlying({}, {}) ok", [
-    reserveTokenID,
-    poolTokenAmount.toString(),
-  ]);
   return reserveTokenAmountResult.value;
 }
 
@@ -1032,7 +1070,6 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
   snapshot.timestamp = blockTimestamp;
   snapshot.blockNumber = blockNumber;
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
-  snapshot.protocolControlledValueUSD = zeroBD; // TODO
   snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   snapshot.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD;
@@ -1074,7 +1111,32 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
 
   snapshot.cumulativeVolumeUSD = cumulativeVolumeUSD;
   snapshot.dailyVolumeUSD = dailyVolumeUSD;
+  snapshot.save();
 
+  // protocol controlled value usd = bnt_amount * bnt_price
+  let bntLiquidityPool = LiquidityPool.load(BnBntAddr);
+  if (!bntLiquidityPool) {
+    log.warning("[snapshotFinancials] bnBNT liquidity pool not found", []);
+    return;
+  }
+  if (!bntLiquidityPool.outputTokenSupply) {
+    log.warning(
+      "[snapshotFinancials] bnBNT liquidity pool has no outputTokenSupply",
+      []
+    );
+    return;
+  }
+
+  let bntAmount = getReserveTokenAmount(
+    BntAddr,
+    bntLiquidityPool.outputTokenSupply!,
+    blockNumber
+  );
+  snapshot.protocolControlledValueUSD = getDaiAmount(
+    BntAddr,
+    bntAmount,
+    blockNumber
+  );
   snapshot.save();
 }
 
