@@ -85,7 +85,7 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
   // Pull the subgraph name to use as the variable input for the indexing status query
   const subgraphName = parseSubgraphName(deployment);
   const deploymentId = deployment.split("id/")[1];
-  const { data: status, error: errorIndexing } = useQuery(SubgraphStatusQuery(deployment), {
+  const { data: status, error: errorIndexing, loading: statusLoading } = useQuery(SubgraphStatusQuery(deployment), {
     variables: { subgraphName, deploymentIds: [deploymentId ? deploymentId : ""] },
     client: clientIndexing,
   });
@@ -118,11 +118,11 @@ export const Deployment = ({ networkName, deployment, subgraphID, clientIndexing
       indexedSuccess: synced && schemaVersion === latestSchemaVersion,
     };
   }, [schemaVersion, fatalError, synced]);
-  if (loading) {
+  if (loading || statusLoading) {
     return <CircularProgress sx={{ margin: 6 }} size={50} />;
   }
 
-  if (!statusData) {
+  if (!statusData && !statusLoading) {
     let errorMsg = null;
     if (errorIndexing) {
       errorMsg = (
