@@ -99,7 +99,7 @@
       "mainnet": {
         "template": "uniswap.v2.template.yaml",
         "steegecs": "steegecs/uniswap-v2",
-        "deploy-on-merge": false,
+        "deploy-on-merge": true,
         "prepare:constants": true
       }
     },

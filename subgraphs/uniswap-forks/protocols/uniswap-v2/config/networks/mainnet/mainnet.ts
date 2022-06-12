@@ -115,7 +115,52 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       "0x4ddebdae4d2c0d6d8044dd2a9845fc68d1bad40d", // MDS
       "0x4c6e796bbfe5eb37f9e3e0f66c009c8bf2a5f428", // FC Bitcoin
       "0x956f47f50a910163d8bf957cf5846d573e7f87ca", // Fei USD
-
+      "0xad6a626ae2b43dcb1b39430ce496d2fa0365ba9c", // PieDAO DEFI Small Cap
+      "0x6e10aacb89a28d6fa0fe68790777fec7e7f01890", // Sav3Token
+      "0xda6cb58a0d0c01610a29c5a65c303e13e885887c", // cVToken
+      "0x3896eac50598ce7c27d921c71710b5824780a4c1", // Ape.cash
+      "0x61bfc979ea8160ede9b862798b7833a97bafa02a", // RELEASE COIN
+      "0xe5f166c0d8872b68790061317bb6cca04582c912", // TE-FOOD
+      "0xaf30d2a7e90d7dc361c8c4585e9bb7d2f6f15bc7", // FirstBlood Token
+      "0x89b51360dbb970d34059d27ed438d0c06cfaa5cb", // Orb Finance V3
+      "0x83aab16807b55413bc633a2b67a28cd3898cc10f", // Fake Taxi 2
+      "0xea26c4ac16d4a5a106820bc8aee85fd0b7b2b664", // QuarkChain Token
+      "0x41dbecc1cdc5517c6f76f6a6e836adbee2754de3", // MedToken
+      "0x49d716dfe60b37379010a75329ae09428f17118d", // Pool Dai
+      "0xf4a7452f87486504f9ee9d911a1c488127f4f6e7", // LiquidityBomberA
+      "0xdb33d49b5a41a97d296b7242a96ebd8ac77b3bb8", // CY Finance
+      "0x69b148395ce0015c13e36bffbad63f49ef874e03", // Data Token
+      "0x33490ab0464ab2ae206c635b9c646f7031fa6c60", // GORDON
+      "0x1ceb05a055c635695fb6b7b28b330f21a8b6afa9", // Greenpump
+      "0x75a1169e51a3c6336ef854f76cde949f999720b1", // 88mph.app
+      "0xa645264c5603e96c3b0b078cdab68733794b0a71", // Mysterium
+      "0x36e220b053f4639a61effc07ee0627f94b4a2fa9", // FM Gallery
+      "0x080fa7af7a5cb15f257c3d29f364b347a573e640", // EthereumSafe
+      "0x5848bb3be5e3b51c7c3aaf15d7b2b1f034e7713f", // Zero Collateral Dai: V2
+      "0x5bc25f649fc4e26069ddf4cf4010f9f706c23831", // DefiDollar
+      "0x002eded60c6faf61b5dcfa8fb5832a388fc38523", // DogeStop
+      "0x08389495d7456e1951ddf7c3a1314a4bfb646d8b", // CRPT
+      "0x8a6aca71a218301c7081d4e96d64292d3b275ce0", // Stable FInance Gov Token
+      "0x265ba42daf2d20f3f358a7361d9f69cb4e28f0e6", // UniBombV3
+      "0x2229d9054495ac0f0a479a4904d96f2dbb5a9008", // RocChain Token
+      "0x3aa8869dc8df33f2bbb7447c9164572da6bd7341", // Degenerate Platform
+      "0xfb1e5f5e984c28ad7e228cdaa1f8a0919bb6a09b", // Galaxy solutions
+      "0x0d05f8db99423638fbb69c6208d76c678df0f3a5", // GOAT
+      "0x77cf1a5c2b2e2b2442acdbe53d1f6fd95419e597", // KeepDAO.com
+      "0x177d7a75b9e73d12d49451b03494768a17e33f61", // Tinker Bell
+      "0xa9fbb83a2689f4ff86339a4b96874d718673b627", // FireAnts,
+      "0x1ceb05a055c635695fb6b7b28b330f21a8b6afa9", // Greenpump
+      "0xcca0c9c383076649604ee31b20248bc04fdf61ca", // Bitmax
+      "0xbc6e3cfde888e215bf7e425ee88cb133b1210be9",
+      "0xd881a753ee98e7d91eb384a8e69ec998ffaa5a33", // IdexTools
+      "0x976287ccb0c0f2b7bc0759c1cbaba3c39571f648", // Galaxy Shiba Inu
+      "0xd794dd1cada4cf79c9eebaab8327a1b0507ef7d4", // HYVE
+      "0x2b467594fe0ba4048f2148e64e47ff8373c6d73e", // Unipower X
+      "0x7bb594b3c757801346801f025699e39e7aaf5a49", // Orb
+      "0xcfb72ed3647cc8e7fa52e4f121ecdabefc305e7f", // FLAPP
+      "0xe6a2dd48d0b604a2fcb447840078e0643659d864", // Dickorn
+      "0x278923f10b7e575e129e62b747ee25db6e7bcf6b", // BitFuture
+      "0x64f0d720ce8b97ba44cd002005d2dfa3186c0580", // YYFI.finance
     ];
   }
 }
