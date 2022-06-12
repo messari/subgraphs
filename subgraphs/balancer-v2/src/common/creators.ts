@@ -26,7 +26,7 @@ import {
   PROTOCOL_FEE_TO_OFF,
   VAULT_ADDRESS,
 } from "./constants";
-import { updateTokenPrice, updateVolumeAndFee } from "./updateMetrics";
+import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
 import { PoolBalanceChanged } from "../../generated/Vault/Vault";

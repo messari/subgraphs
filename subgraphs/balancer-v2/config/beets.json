@@ -13,8 +13,8 @@
     "beets": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e"
   },
 
-  "protocolName": "beethovenx",
-  "protocolSlug": "beethovenx",
+  "protocolName": "Beethoven X",
+  "protocolSlug": "beethoven-x",
   "defaultNetwork": "FANTOM",
-  "isBeest": true
+  "isBeets": true
 }

@@ -14,7 +14,7 @@ import {
   createSwapHandleVolume,
   createLiquidityPool,
 } from "../common/creators";
-import { updatePoolMetrics, updateUsageMetrics, updateFinancials } from "../common/updateMetrics";
+import { updatePoolMetrics, updateUsageMetrics, updateFinancials } from "../common/metrics";
 import { BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
 import { updateWeight } from "../common/weight";
 import { WeightedPool } from "../../generated/Vault/WeightedPool";
