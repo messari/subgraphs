@@ -52,34 +52,34 @@
         "prepare:constants": true
       }
     },
-    "curve": {
+    "curve-finance": {
       "arbitrum": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "avalanche": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "fantom": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "mainnet": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "matic": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "optimism": {
         "template": "curve.template.yaml",
-        "deploy-on-merge": false
+        "deploy-on-merge": true
       },
       "xdai": {
-        "template": "apeswap.template.yaml",
-        "deploy-on-merge": false
+        "template": "curve.template.yaml",
+        "deploy-on-merge": true
       }
     },
     "ellipsis-finance": {
