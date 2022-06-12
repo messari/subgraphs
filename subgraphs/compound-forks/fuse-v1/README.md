@@ -61,10 +61,10 @@ Count of Unique Addresses which have interacted with the protocol via any transa
 ## Known Issues
 
 - Ethereum:
-  - *Note*: When OHM moved migrated to v2, pools that started with an `inputToken` of `sOHM` were migrated to `gOHM`. This is handled in `./src/mappings.ts`
+  - _Note_: When OHM moved migrated to v2, pools that started with an `inputToken` of `sOHM` were migrated to `gOHM`. This is handled in `./src/mappings.ts`
 - Arbitrum One:
   - Market `0xc0c997227922004da3a47185ac2be1d648db0062` has a very high TVL (~$100m). This is likely due to the fact that 10% of the total supply of the `inputToken` is in this vault and there are only 5 holders. Price of this asset is probably hard to calculate.
-    - A potential fix is to recalculate TVL in every market each time `AccrueInterest` emits. This would slow down syncing as lots of contract calls would be introduced. 
+    - A potential fix is to recalculate TVL in every market each time `AccrueInterest` emits. This would slow down syncing as lots of contract calls would be introduced.
 
 ## Reference and Useful Links
 

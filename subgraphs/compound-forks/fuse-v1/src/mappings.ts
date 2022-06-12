@@ -100,7 +100,7 @@ import {
   _FusePool,
 } from "../generated/schema";
 import { PriceOracle } from "../generated/templates/CToken/PriceOracle";
-import { getUsdPricePerToken } from "./prices";
+import { getUsdPrice, getUsdPricePerToken } from "./prices";
 import {
   getOrCreateCircularBuffer,
   getRewardsPerDay,
@@ -575,11 +575,29 @@ function updateMarket(
     return;
   }
 
-  // grab prices
-  let customPrice = getUsdPricePerToken(Address.fromString(market.inputToken));
-  let underlyingTokenPriceUSD = customPrice.usdPrice.div(
-    customPrice.decimalsBaseTen
-  );
+  // grab price of ETH then multiply by underlying price
+  let customPrice = getUsdPricePerToken(Address.fromString(ETH_ADDRESS));
+  let ethPriceUSD = customPrice.usdPrice.div(customPrice.decimalsBaseTen);
+
+  let underlyingTokenPriceUSD: BigDecimal;
+  if (updateMarketData.getUnderlyingPriceResult.reverted) {
+    log.warning("[updateMarket] Underlying price not found for market: {}", [
+      marketID,
+    ]);
+    let backupPrice = getUsdPricePerToken(
+      Address.fromString(market.inputToken)
+    );
+    underlyingTokenPriceUSD = backupPrice.usdPrice.div(
+      backupPrice.decimalsBaseTen
+    );
+  } else {
+    let mantissaDecimalFactor = 18 - underlyingToken.decimals + 18;
+    let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
+    let priceInEth = updateMarketData.getUnderlyingPriceResult.value
+      .toBigDecimal()
+      .div(bdFactor);
+    underlyingTokenPriceUSD = priceInEth.times(ethPriceUSD); // get price in USD
+  }
 
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;

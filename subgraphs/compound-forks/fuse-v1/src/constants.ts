@@ -61,6 +61,6 @@ export const GOHM_ADDRESS = "0x0ab87046fBb341D058F17CBC4c1133F25a20a52f";
 
 export const PROTOCOL_NAME = "Fuse";
 export const PROTOCOL_SLUG = "fuse";
-export const SUBGRAPH_VERSION = "1.0.12";
+export const SUBGRAPH_VERSION = "1.0.13";
 export const SCHEMA_VERSION = "1.2.1";
 export const METHODOLOGY_VERSION = "1.0.0";
