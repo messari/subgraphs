@@ -4,7 +4,7 @@ schema:
   file: ./schema.graphql
 description: ...
 graft:
-  base: QmQk2XRUnYSMajsiUoBQ7TXxJCxGFEzAQvb6TAZKftZMe8 # Subgraph ID of base subgraph
+  base: QmbGu3LzNxQDs8JBMGjedPptTTupYFRdSM6ipvM8yYdWV6 # Subgraph ID of base subgraph
   block: 10000839 # Block number
 dataSources:
   - kind: ethereum/contract

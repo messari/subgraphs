@@ -134,4 +134,3 @@ export const MS_PER_DAY = new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000));
 export const MS_PER_YEAR = DAYS_PER_YEAR.times(new BigDecimal(BigInt.fromI32(24 * 60 * 60 * 1000)));
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
-export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = BigDecimal.fromString("400000");

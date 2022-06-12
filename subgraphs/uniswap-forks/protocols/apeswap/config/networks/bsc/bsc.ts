@@ -94,4 +94,7 @@ export class ApeswapBscConfigurations implements Configurations {
   getUntrackedTokens(): string[] {
     return [];
   }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return BigDecimal.fromString("100000");
+  }
 }

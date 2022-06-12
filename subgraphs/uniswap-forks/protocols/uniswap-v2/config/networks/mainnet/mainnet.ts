@@ -176,4 +176,7 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       "0xbba477999ed5b067fddbb1fe1797ba026d89eb23", // SPARK
     ];
   }
+  getMinimumLiquidityThreshold(): BigDecimal {
+    return BigDecimal.fromString("400000");
+  }
 }
