@@ -1,4 +1,4 @@
-import * as protocolNetworkData from './deploymentConfigurations.json' assert {type: "json"}
+import * as protocolNetworkData from './deploymentConfigurations.json'
 import {getDeploymentNetwork, runCommands, scripts} from './execution.js'
 
 const protocolNetworkMap = JSON.parse(JSON.stringify(protocolNetworkData))['default']['protocols'] 

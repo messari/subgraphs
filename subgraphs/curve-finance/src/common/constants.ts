@@ -5,7 +5,7 @@ import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 ////////////////////
 
 export const PROTOCOL_NAME = "Curve Finance";
-export const PROTOCOL_SLUG = "curve";
+export const PROTOCOL_SLUG = "curve-finance";
 export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.0.2";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
