@@ -169,7 +169,7 @@ interface Protocol {
   " Current PCV (Protocol Controlled Value). Only relevant for protocols with PCV. "
   protocolControlledValueUSD: BigDecimal
 
-  " # of cumulative unique users "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Revenue claimed by suppliers to the protocol. LPs on DEXs (e.g. 0.25% of the swap fee in Sushiswap). Depositors on Lending Protocols. NFT sellers on OpenSea. "
@@ -229,7 +229,7 @@ type LendingProtocol implements Protocol @entity {
 
   ##### Quantitative Data #####
 
-  " # of cumulative unique users "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Current TVL (Total Value Locked) of the entire protocol "
@@ -293,10 +293,10 @@ type UsageMetricsDailySnapshot @entity {
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
 
-  " # of unique daily active users "
+  " Number of unique daily active users "
   dailyActiveUsers: Int!
 
-  " # of cumulative unique users "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
@@ -331,10 +331,10 @@ type UsageMetricsHourlySnapshot @entity {
   " Protocol this snapshot is associated with "
   protocol: LendingProtocol!
 
-  " # of unique hourly active users "
+  " Number of unique hourly active users "
   hourlyActiveUsers: Int!
 
-  " # of cumulative unique users "
+  " Number of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
   " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
