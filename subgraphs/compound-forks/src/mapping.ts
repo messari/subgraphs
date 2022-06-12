@@ -1196,12 +1196,6 @@ export function updateMarket(
     underlyingToken.decimals
   );
 
-  log.warning("Updated price for {}, mantissa: {}, price: ${}", [
-    market.name!,
-    updateMarketData.getUnderlyingPriceResult.value.toString(),
-    underlyingTokenPriceUSD.toString(),
-  ]);
-
   underlyingToken.lastPriceUSD = underlyingTokenPriceUSD;
   underlyingToken.lastPriceBlockNumber = blockNumber;
   underlyingToken.save();
