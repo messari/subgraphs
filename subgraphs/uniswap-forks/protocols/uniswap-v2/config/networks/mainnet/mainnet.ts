@@ -161,6 +161,19 @@ export class UniswapV2MainnetConfigurations implements Configurations {
       "0xe6a2dd48d0b604a2fcb447840078e0643659d864", // Dickorn
       "0x278923f10b7e575e129e62b747ee25db6e7bcf6b", // BitFuture
       "0x64f0d720ce8b97ba44cd002005d2dfa3186c0580", // YYFI.finance
+      "0x1453dbb8a29551ade11d89825ca812e05317eaeb", // Tendies Token
+      "0x1e053d89e08c24aa2ce5c5b4206744dc2d7bd8f5", // Eth-Peg Thunder
+      "0x8bcb77a5e9726d291ebe20b69d660b1afe6b7c26", // we
+      "0xcb3df3108635932d912632ef7132d03ecfc39080", // Wings
+      "0x9224b7a393bdad6a7d04f0d618057012a6ef5f38", // Jelly
+      "0xcdcfc0f66c522fd086a1b725ea3c0eeb9f9e8814", // Aurora DAO
+      "0x767fe9edc9e0df98e07454847909b5e959d7ca0e", // Illuviuk
+      "0x75a1169e51a3c6336ef854f76cde949f999720b1", // 86mph.app
+      "0x74559bf30696c65e7374561e7638361dca9e3709", // HooliganCar
+      "0x56150c3845c15df287a5ec4878f707ddc273b4e0", // FreeGaza
+      "0xe31debd7abff90b06bca21010dd860d8701fd901", // UniBomb
+      "0x1fc6ab5e2b4ebb09c37807f988b22b38f3e1c228", // Flamingo.finance
+      "0xbba477999ed5b067fddbb1fe1797ba026d89eb23", // SPARK
     ];
   }
 }
