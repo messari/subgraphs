@@ -1,5 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { Address, BigDecimal, bigDecimal, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, bigDecimal, BigInt, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Vault/ERC20";
 import {
   DexAmmProtocol,
@@ -165,22 +165,34 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): LiquidityPoolDailySnapshot {
+export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event,poolAddress:string): LiquidityPoolDailySnapshot {
   let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let dayId = day.toString();
-  let poolMetrics = LiquidityPoolDailySnapshot.load(event.address.toHexString().concat("-").concat(dayId));
+  let pool = LiquidityPool.load(poolAddress);
+  let poolMetrics = LiquidityPoolDailySnapshot.load(poolAddress.concat("-").concat(dayId));
+
 
   if (!poolMetrics) {
-    poolMetrics = new LiquidityPoolDailySnapshot(event.address.toHexString().concat("-").concat(dayId));
+    poolMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(dayId));
     poolMetrics.protocol = VAULT_ADDRESS.toHexString();
-    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.pool = poolAddress;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
-    poolMetrics.dailyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
-    poolMetrics.dailyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    let dailyVolumeByTokenAmount :BigInt[] = []
+    let dailyVolumeByTokenUSD:BigDecimal[] = [];
+    let inputTokenBalances:BigInt[] = [];
+    let inputTokenWeights:BigDecimal[] = [];
+    for (let index = 0; index < pool!.inputTokens.length; index++) {
+      dailyVolumeByTokenAmount.push(BIGINT_ZERO);
+      dailyVolumeByTokenUSD .push(BIGDECIMAL_ZERO);
+      inputTokenBalances.push(BIGINT_ZERO);
+      inputTokenWeights .push(BIGDECIMAL_ZERO);
+    }
+    poolMetrics.dailyVolumeByTokenAmount  = dailyVolumeByTokenAmount;
+    poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
+    poolMetrics.inputTokenBalances = inputTokenBalances;
+    poolMetrics.inputTokenWeights = inputTokenWeights;
 
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;
@@ -191,23 +203,33 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event): Li
   return poolMetrics;
 }
 
-export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event): LiquidityPoolHourlySnapshot {
+export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event,poolAddress:string): LiquidityPoolHourlySnapshot {
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
-
+  let pool = LiquidityPool.load(poolAddress);
   let hourId = hour.toString();
-  let poolMetrics = LiquidityPoolHourlySnapshot.load(event.address.toHexString().concat("-").concat(hourId));
+  let poolMetrics = LiquidityPoolHourlySnapshot.load(poolAddress.concat("-").concat(hourId));
 
   if (!poolMetrics) {
-    poolMetrics = new LiquidityPoolHourlySnapshot(event.address.toHexString().concat("-").concat(hourId));
+    poolMetrics = new LiquidityPoolHourlySnapshot(poolAddress.concat("-").concat(hourId));
     poolMetrics.protocol = VAULT_ADDRESS.toHexString();
-    poolMetrics.pool = event.address.toHexString();
+    poolMetrics.pool = poolAddress;
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
-    poolMetrics.hourlyVolumeByTokenAmount = [BIGINT_ZERO, BIGINT_ZERO];
-    poolMetrics.hourlyVolumeByTokenUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    poolMetrics.inputTokenBalances = [BIGINT_ZERO, BIGINT_ZERO];
-    poolMetrics.inputTokenWeights = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    let hourlyVolumeByTokenAmount :BigInt[] = []
+    let hourlyVolumeByTokenUSD:BigDecimal[] = [];
+    let inputTokenBalances:BigInt[] = [];
+    let inputTokenWeights:BigDecimal[] = [];
+    for (let index = 0; index < pool!.inputTokens.length; index++) {
+      hourlyVolumeByTokenAmount.push(BIGINT_ZERO);
+      hourlyVolumeByTokenUSD .push(BIGDECIMAL_ZERO);
+      inputTokenBalances.push(BIGINT_ZERO);
+      inputTokenWeights .push(BIGDECIMAL_ZERO);
+    }
+    poolMetrics.hourlyVolumeByTokenAmount  = hourlyVolumeByTokenAmount;
+    poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
+    poolMetrics.inputTokenBalances = inputTokenBalances;
+    poolMetrics.inputTokenWeights = inputTokenWeights;
 
     poolMetrics.blockNumber = event.block.number;
     poolMetrics.timestamp = event.block.timestamp;

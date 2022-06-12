@@ -11,7 +11,7 @@ import {
   LiquidityPoolFee,
 } from "../../generated/schema";
 
-import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateToken } from "./getters";
+import { getLiquidityPool, getLiquidityPoolAmounts, getOrCreateDex, getOrCreateLiquidityPoolDailySnapshot, getOrCreateLiquidityPoolHourlySnapshot, getOrCreateToken } from "./getters";
 import {
   BIGDECIMAL_NEG_ONE,
   BIGDECIMAL_ONE,
@@ -132,6 +132,8 @@ export function createSwapHandleVolume(
   let poolAmounts = getLiquidityPoolAmounts(poolAddress);
   let _tokenIn = getOrCreateToken(tokenIn);
   let _tokenOut = getOrCreateToken(tokenOut);
+  let poolMetricsDaily = getOrCreateLiquidityPoolDailySnapshot(event,poolAddress);
+  let poolMetricsHourly = getOrCreateLiquidityPoolHourlySnapshot(event,poolAddress);
 
   // Convert tokens according to decimals
   let amountInConverted = convertTokenToDecimal(amountIn, _tokenIn.decimals);
@@ -139,22 +141,42 @@ export function createSwapHandleVolume(
 
   let tokenInIndex: i32 = 0;
   let tokenOutIndex: i32 = 0;
+
+  let inputTokenBalances:BigInt[] =  pool.inputTokenBalances;
+  let inputTokenAmountBalances :BigDecimal[] =  poolAmounts.inputTokenBalances;
+  let dailyVolumeByTokenAmount :BigInt[] = poolMetricsDaily.dailyVolumeByTokenAmount;
+  let dailyVolumeByTokenUSD:BigDecimal[] =  poolMetricsDaily.dailyVolumeByTokenUSD;
+  let hourlyVolumeByTokenAmount :BigInt[] = poolMetricsHourly.hourlyVolumeByTokenAmount;
+  let hourlyVolumeByTokenUSD:BigDecimal[] = poolMetricsHourly.hourlyVolumeByTokenUSD;
   for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
     if (tokenIn == pool.inputTokens[i]) {
-      pool.inputTokenBalances[i] = pool.inputTokenBalances[i].plus(amountIn);
-      poolAmounts.inputTokenBalances[i] = poolAmounts.inputTokenBalances[i].plus(amountInConverted);
+      inputTokenBalances[i] = pool.inputTokenBalances[i].plus(amountIn);
+      inputTokenAmountBalances[i] = poolAmounts.inputTokenBalances[i].plus(amountInConverted);
+      dailyVolumeByTokenAmount[i] = poolMetricsDaily.dailyVolumeByTokenAmount[i].plus(amountIn);
+      hourlyVolumeByTokenAmount [i] = poolMetricsHourly.hourlyVolumeByTokenAmount[i].plus(amountIn);
+      dailyVolumeByTokenUSD[i] = poolMetricsDaily.dailyVolumeByTokenUSD[i].plus(amountInConverted);
+      hourlyVolumeByTokenUSD[i] = poolMetricsHourly.hourlyVolumeByTokenUSD[i].plus(amountInConverted);
       tokenInIndex = i;
     }
 
     if (tokenOut == pool.inputTokens[i]) {
-      pool.inputTokenBalances[i] = pool.inputTokenBalances[i].minus(amountOut);
-      poolAmounts.inputTokenBalances[i] = poolAmounts.inputTokenBalances[i].minus(amountOutConverted);
+      inputTokenBalances[i] = pool.inputTokenBalances[i].minus(amountOut);
+      inputTokenAmountBalances[i] = poolAmounts.inputTokenBalances[i].minus(amountOutConverted);
+      poolMetricsDaily.dailyVolumeByTokenAmount[i] = dailyVolumeByTokenAmount[i].plus(amountOut);
+      hourlyVolumeByTokenAmount [i] = hourlyVolumeByTokenAmount[i].plus(amountOut);
+      dailyVolumeByTokenUSD[i] = dailyVolumeByTokenUSD[i].plus(amountOutConverted);
+      hourlyVolumeByTokenUSD[i] = hourlyVolumeByTokenUSD[i].plus(amountOutConverted);
       tokenOutIndex = i;
     }
   }
+  poolMetricsDaily.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount ;
+  poolMetricsDaily.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
+  poolMetricsHourly.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
+  poolMetricsHourly.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
+  pool.inputTokenBalances = inputTokenBalances;
+  poolAmounts.inputTokenBalances = inputTokenAmountBalances;
 
-  poolAmounts.save();
-
+  
   updateTokenPrice(
     pool,
     Address.fromString(tokenIn),
@@ -185,6 +207,12 @@ export function createSwapHandleVolume(
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = swap.amountInUSD;
   updateVolumeAndFee(event, protocol, pool, trackedAmountUSD);
+
+  poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(trackedAmountUSD);
+  poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(trackedAmountUSD);
+  poolAmounts.save();
+  poolMetricsHourly.save();
+  poolMetricsDaily.save();
   swap.save();
 }
 
