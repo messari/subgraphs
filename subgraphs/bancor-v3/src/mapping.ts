@@ -181,8 +181,6 @@ export function handlePoolCollectionAdded(event: PoolCollectionAdded): void {
   PoolCollection.create(event.params.poolCollection);
 }
 
-// TODO: TradingFeePPMUpdated?
-
 export function handleNetworkFeePPMUpdated(event: NetworkFeePPMUpdated): void {
   let protocol = getOrCreateProtocol();
   protocol._networkFeeRate = event.params.newFeePPM
@@ -731,11 +729,6 @@ function getDaiAmount(sourceTokenID: string, sourceAmount: BigInt): BigDecimal {
     );
     return zeroBD;
   }
-  log.warning("[getDaiAmount] try_tradeOutputBySourceAmount({}, {}, {}) ok", [
-    sourceTokenID,
-    DaiAddr,
-    sourceAmount.toString(),
-  ]);
   // dai.decimals = 18
   return targetAmountResult.value.toBigDecimal().div(exponentToBigDecimal(18));
 }
