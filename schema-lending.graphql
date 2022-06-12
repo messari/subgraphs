@@ -4,13 +4,14 @@
 
 enum Network {
   ARBITRUM_ONE
+  ARWEAVE_MAINNET
   AURORA
   AVALANCHE
   BOBA
   BSC # aka BNB Chain
   CELO
-  CRONOS
   COSMOS
+  CRONOS
   MAINNET # Ethereum Mainnet
   FANTOM
   FUSE
@@ -96,8 +97,8 @@ enum InterestRateType {
   " Variable interest rate (e.g. Compound) "
   VARIABLE
 
-  " Fixed term interest rate (e.g. Notional) "
-  FIXED_TERM
+  " Fixed interest rate (e.g. Notional) "
+  FIXED
 }
 
 enum InterestRateSide {

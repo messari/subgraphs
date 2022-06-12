@@ -4,13 +4,14 @@
 
 enum Network {
   ARBITRUM_ONE
+  ARWEAVE_MAINNET
   AURORA
   AVALANCHE
   BOBA
   BSC # aka BNB Chain
   CELO
-  CRONOS
   COSMOS
+  CRONOS
   MAINNET # Ethereum Mainnet
   FANTOM
   FUSE
