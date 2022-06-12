@@ -72,9 +72,5 @@ export let zeroBD = BigDecimal.zero();
 export let zeroBI = BigInt.zero();
 
 export function exponentToBigDecimal(n: i32): BigDecimal {
-  let a = BigInt.fromI32(1);
-  for (let i = 0; i < n; i++) {
-    a = a.times(BigInt.fromI32(10));
-  }
-  return a.toBigDecimal();
+  return BigDecimal.fromString(Math.pow(10, n).toString());
 }

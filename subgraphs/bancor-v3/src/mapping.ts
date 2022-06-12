@@ -419,17 +419,28 @@ export function handleTotalLiquidityUpdated(
   let tokenAddress = event.params.pool.toHexString();
   let token = Token.load(tokenAddress);
   if (!token) {
-    log.warning("[handleTotalLiquidityUpdated] token {} not found", [
+    log.warning("[handleTotalLiquidityUpdated] reserve token {} not found", [
       tokenAddress,
     ]);
     return;
   }
+
   if (!token._poolToken) {
-    log.warning("[handleTotalLiquidityUpdated] token {} has no pool token", [
-      tokenAddress,
+    log.warning(
+      "[handleTotalLiquidityUpdated] reserve token {} has no pool token",
+      [tokenAddress]
+    );
+    return;
+  }
+
+  let poolToken = Token.load(token._poolToken!);
+  if (!poolToken) {
+    log.warning("[handleTotalLiquidityUpdated] pool token {} not found", [
+      token._poolToken!,
     ]);
     return;
   }
+
   let liquidityPool = LiquidityPool.load(token._poolToken!);
   if (!liquidityPool) {
     log.warning("[handleTotalLiquidityUpdated] liquidity pool {} not found", [
@@ -439,10 +450,11 @@ export function handleTotalLiquidityUpdated(
   }
 
   _handleTotalLiquidityUpdated(
-    token,
     liquidityPool,
+    token.id,
     event.params.stakedBalance,
     event.params.poolTokenSupply,
+    poolToken.decimals,
     event.block.number
   );
 }
@@ -450,13 +462,14 @@ export function handleTotalLiquidityUpdated(
 export function handleBNTTotalLiquidityUpdated(
   event: BNTTotalLiquidityUpdated
 ): void {
-  let bntToken = Token.load(BntAddr);
-  if (!bntToken) {
-    log.warning("[handleBNTTotalLiquidityUpdated] BNT token {} not found", [
-      BntAddr,
+  let bnBntToken = Token.load(BnBntAddr);
+  if (!bnBntToken) {
+    log.warning("[handleBNTTotalLiquidityUpdated] bnBNT token {} not found", [
+      BnBntAddr,
     ]);
     return;
   }
+
   let bnBntLiquidityPool = LiquidityPool.load(BnBntAddr);
   if (!bnBntLiquidityPool) {
     log.warning(
@@ -467,10 +480,11 @@ export function handleBNTTotalLiquidityUpdated(
   }
 
   _handleTotalLiquidityUpdated(
-    bntToken,
     bnBntLiquidityPool,
+    BntAddr,
     event.params.stakedBalance,
     event.params.poolTokenSupply,
+    bnBntToken.decimals,
     event.block.number
   );
 }
@@ -704,15 +718,16 @@ function _handleTokensWithdrawn(
 }
 
 function _handleTotalLiquidityUpdated(
-  reserveToken: Token,
   liquidityPool: LiquidityPool,
+  reserveTokenID: string,
   stakedBalance: BigInt,
   poolTokenSupply: BigInt,
+  poolTokenDecimals: i32,
   blockNumber: BigInt
 ): void {
   let prevTotalValueLockedUSD = liquidityPool.totalValueLockedUSD;
   let currTotalValueLockedUSD = getDaiAmount(
-    reserveToken.id,
+    reserveTokenID,
     stakedBalance,
     blockNumber
   );
@@ -720,10 +735,13 @@ function _handleTotalLiquidityUpdated(
   liquidityPool.inputTokenBalances = [stakedBalance];
   liquidityPool.totalValueLockedUSD = currTotalValueLockedUSD;
   liquidityPool.outputTokenSupply = poolTokenSupply;
-  // TODO: should be price per share
   liquidityPool.outputTokenPriceUSD = getDaiAmount(
-    reserveToken.id,
-    getReserveTokenAmount(reserveToken.id, poolTokenSupply, blockNumber),
+    reserveTokenID,
+    getReserveTokenAmount(
+      reserveTokenID,
+      BigInt.fromI32(10).pow(poolTokenDecimals as u8), // 1 share of pool token
+      blockNumber
+    ),
     blockNumber
   );
   liquidityPool.save();
