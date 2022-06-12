@@ -1,5 +1,5 @@
 import { Address, BigInt, dataSource } from "@graphprotocol/graph-ts";
-import { Market, Liquidate } from "../../generated/schema";
+import { Market, Liquidate, LiquidateProxy } from "../../generated/schema";
 import { Cauldron, LogRemoveCollateral } from "../../generated/templates/Cauldron/Cauldron";
 import { getMIMAddress, getOrCreateInterestRate, getOrCreateLendingProtocol, getOrCreateToken } from "./getters";
 import {
@@ -189,7 +189,7 @@ export function createMarket(marketAddress: string, blockNumber: BigInt, blockTi
 }
 
 export function createLiquidateEvent(event: LogRemoveCollateral): void {
-  let liquidation = new Liquidate(
+  let liquidation = new LiquidateProxy(
     "liquidate-" + event.transaction.hash.toHexString() + "-" + event.transactionLogIndex.toString(),
   );
   liquidation.amount = event.params.share;

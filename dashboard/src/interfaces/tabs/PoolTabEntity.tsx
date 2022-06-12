@@ -589,7 +589,7 @@ function PoolTabEntity({
               <StackedChart
                 tokens={data[poolKeySingular].inputTokens}
                 tokenWeightsArray={currentTokenWeightArray}
-                poolTitle={tokenWeightFieldName}
+                poolTitle={entityName + "-" + tokenWeightFieldName}
               />
             </Grid>
           </div>

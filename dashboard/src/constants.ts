@@ -53,7 +53,6 @@ export interface Schema {
 export const percentageFieldList = [
   "rates",
   "rewardAPR",
-  "capitalEfficiency",
   "maximumLTV",
   "liquidationThreshold",
   "liquidationPenalty",
