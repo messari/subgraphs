@@ -81,4 +81,7 @@ export class SushiswapAvalancheConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

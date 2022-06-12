@@ -97,4 +97,25 @@ export class UniswapV2MainnetConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return ["0x9ea3b5b4ec044b70375236a281986106457b20ef"];
   }
+  getUntrackedTokens(): string[] {
+    return [
+      "0x77dc1f32a15f0c255b7ae0a1f67fc0b46e7b8bba", // TheOnlyInu
+      "0x5dbcf33d8c2e976c6b560249878e6f1491bca25c", // yearn Curve.fi
+      "0xe0bcc5246e1561e6f6562fcecc2db910d1af0e6f", // BUSD
+      "0x48fb253446873234f2febbf9bdeaa72d9d387f94", // Bancor governance token
+      "0xf8b20370896e6f6e5331bdae18081eda9d6854e8", // Akash Network
+      "0xcd5a1ff8202ecbad7a2baa3cc4996bebe938146c", // Bit Chinese Yuan
+      "0x495b0f097ae25adb5c042cba6a5633175599969d", // UrSa Jugmersu
+      "0x186a33d4dbcd700086a26188dcb74e69be463665", // 7Eleven
+      "0x35bd8472ed2da9eed980e49b8b92ccbcf625adbd", // Enreich
+      "0xb611920d44324655335b5e11ebc9c929faddfbaf", // Lawa USD
+      "0xf2bae67cc0b4642b9bc71264cc878598cb0722bd", // Nicaragua Canal
+      "0x975ce667d59318e13da8acd3d2f534be5a64087b", // The Whale of Blockchain
+      "0x73da99602949c1e333b536889f925e7f4460dea7", // SEOUL.cityswap.io
+      "0x4ddebdae4d2c0d6d8044dd2a9845fc68d1bad40d", // MDS
+      "0x4c6e796bbfe5eb37f9e3e0f66c009c8bf2a5f428", // FC Bitcoin
+      "0x956f47f50a910163d8bf957cf5846d573e7f87ca", // Fei USD
+
+    ];
+  }
 }

@@ -91,4 +91,7 @@ export class ApeswapBscConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return [];
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

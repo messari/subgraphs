@@ -85,4 +85,7 @@ export class ApeswapMaticConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return [];
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

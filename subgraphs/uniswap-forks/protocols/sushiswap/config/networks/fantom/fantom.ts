@@ -85,4 +85,7 @@ export class SushiswapFantomConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

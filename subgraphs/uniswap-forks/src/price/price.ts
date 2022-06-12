@@ -49,6 +49,8 @@ export function findNativeTokenPerToken(token: Token, nativeToken: Token): BigDe
   // if whitelist includes token - get the safe price
   if (NetworkConfigs.getStableCoins().includes(token.id)) {
     priceSoFar = BIGDECIMAL_ONE;
+  } else if (NetworkConfigs.getUntrackedTokens().includes(token.id)) {
+    priceSoFar = BIGDECIMAL_ZERO;
   } else {
     for (let i = 0; i < whiteList.length; ++i) {
       let poolAddress = whiteList[i];

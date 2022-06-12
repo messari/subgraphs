@@ -86,4 +86,7 @@ export class SushiswapCeloConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

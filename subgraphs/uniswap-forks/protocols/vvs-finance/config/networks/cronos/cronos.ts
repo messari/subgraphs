@@ -82,4 +82,7 @@ export class VSSFinanceCronosConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return [];
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

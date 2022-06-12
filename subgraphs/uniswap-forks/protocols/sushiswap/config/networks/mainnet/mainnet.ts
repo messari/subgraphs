@@ -107,4 +107,7 @@ export class SushiswapMainnetConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

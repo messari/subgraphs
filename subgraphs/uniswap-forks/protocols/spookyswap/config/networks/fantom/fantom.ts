@@ -83,4 +83,7 @@ export class SpookyswapFantomConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return [];
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

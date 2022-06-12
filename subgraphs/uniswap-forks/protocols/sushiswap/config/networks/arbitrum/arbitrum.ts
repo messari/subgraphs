@@ -82,4 +82,7 @@ export class SushiswapArbitrumConfigurations implements Configurations {
   getUntrackedPairs(): string[] {
     return toLowerCaseList([]);
   }
+  getUntrackedTokens(): string[] {
+    return [];
+  }
 }

@@ -23,4 +23,5 @@ export interface Configurations {
   getStableCoins(): string[];
   getStableOraclePools(): string[];
   getUntrackedPairs(): string[];
+  getUntrackedTokens(): string[];
 }
