@@ -1012,3 +1012,20 @@ type _CircularBuffer @entity {
   " The current calculated number of blocks per day based on calculated block speed "
   blocksPerDay: BigDecimal!
 }
+
+type _FusePool @entity {
+  " {Comptroller implementation} "
+  id: ID!
+
+  " Fuse pool  number "
+  poolNumber: String!
+
+  " Price oracle for the "
+  priceOracle: String!
+
+  " Liquidation incentive for the pool "
+  liquidationIncentive: BigDecimal!
+
+  " IDs of all the markets in this fuse pool "
+  marketIDs: [String!]!
+}
