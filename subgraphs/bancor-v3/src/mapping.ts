@@ -690,17 +690,27 @@ function _handleTotalLiquidityUpdated(
   stakedBalance: BigInt,
   poolTokenSupply: BigInt
 ): void {
+  let prevTotalValueLockedUSD = liquidityPool.totalValueLockedUSD;
+  let currTotalValueLockedUSD = getDaiAmount(reserveToken.id, stakedBalance);
+
   liquidityPool.inputTokenBalances = [stakedBalance];
-  liquidityPool.totalValueLockedUSD = getDaiAmount(
-    reserveToken.id,
-    stakedBalance
-  );
+  liquidityPool.totalValueLockedUSD = currTotalValueLockedUSD;
   liquidityPool.outputTokenSupply = poolTokenSupply;
   liquidityPool.outputTokenPriceUSD = getDaiAmount(
     reserveToken.id,
     getReserveTokenAmount(reserveToken.id, poolTokenSupply)
   );
   liquidityPool.save();
+
+  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  if (!protocol) {
+    log.warning("[_handleTotalLiquidityUpdated] protocol not found", []);
+    return;
+  }
+  protocol.totalValueLockedUSD = protocol.totalValueLockedUSD
+    .plus(currTotalValueLockedUSD)
+    .minus(prevTotalValueLockedUSD);
+  protocol.save();
 }
 
 // TODO: figure out why it gets reverted sometimes
