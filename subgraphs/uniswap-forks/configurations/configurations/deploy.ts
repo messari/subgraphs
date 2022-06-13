@@ -20,4 +20,5 @@ export namespace Deploy {
     export const SOLARBEAM_MOONRIVER = 18;
     export const VVS_FINANCE_CRONOS = 19;
     export const UBESWAP_CELO = 20;
+    export const PANGOLIN_AVALANCHE = 21;
   }
