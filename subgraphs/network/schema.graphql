@@ -41,7 +41,7 @@ type Network @entity {
 
   #### Quantitative Data ####
 
-  " Number of cumulative unique authors "
+  " Number of cumulative unique authors (see type Author for explanation) "
   cumulativeUniqueAuthors: Int!
 
   " The total number of blocks in the blockchain "
@@ -85,7 +85,7 @@ type DailySnapshot @entity {
   " ID of the network this snapshot belongs to "
   network: Network!
 
-  " Number of cumulative ununique authors "
+  " Number of cumulative unique authors (see type Author for explanation) "
   cumulativeUniqueAuthors: Int!
 
   " Number of unique daily active authors "
@@ -159,7 +159,7 @@ type HourlySnapshot @entity {
   " ID of the network this snapshot belongs to "
   network: Network!
 
-  " Number of cumulative ununique authors "
+  " Number of cumulative ununique authors (see type Author for explanation) "
   cumulativeUniqueAuthors: Int!
 
   " Number of unique hourly active authors "
@@ -240,7 +240,7 @@ type Block @entity {
   " Timestamp of the block "
   timestamp: BigInt!
 
-  " Author of this block "
+  " Author of this block (the entity that successfully found this block) "
   author: Author!
 
   " Data size of the block in bytes "
@@ -305,6 +305,10 @@ enum IntervalType {
   " For hourly snapshot identifying "
   HOULRY
 }
+
+#################
+#### Helpers ####
+################# 
 
 # Helper entity for calculating daily/hourly active authors
 type ActiveAuthor @entity {
