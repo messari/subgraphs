@@ -828,11 +828,13 @@ function updateRewards(
 
     // borrow speeds
     if (!tryBorrowSpeeds.reverted) {
-      rewardEmissions.push(tryBorrowSpeeds.value);
       let borrowRewardsBD = tryBorrowSpeeds.value
         .toBigDecimal()
         .div(exponentToBigDecimal(token.decimals));
       let rewardsPerDay = borrowRewardsBD.times(blocksPerDay);
+      rewardEmissions.push(
+        BigInt.fromString(rewardsPerDay.truncate(0).toString())
+      );
       rewardEmissionsUSD.push(rewardsPerDay.times(rewardTokenPriceUSD));
 
       // create borrow reward token
@@ -849,11 +851,13 @@ function updateRewards(
 
     // supply speeds
     if (!trySupplySpeeds.reverted) {
-      rewardEmissions.push(trySupplySpeeds.value);
       let supplyRewardsBD = trySupplySpeeds.value
         .toBigDecimal()
         .div(exponentToBigDecimal(token.decimals));
       let rewardsPerDay = supplyRewardsBD.times(blocksPerDay);
+      rewardEmissions.push(
+        BigInt.fromString(rewardsPerDay.truncate(0).toString())
+      );
       rewardEmissionsUSD.push(rewardsPerDay.times(rewardTokenPriceUSD));
 
       // create supply reward token
