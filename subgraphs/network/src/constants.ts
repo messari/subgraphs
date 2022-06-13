@@ -15,7 +15,6 @@ export namespace Network {
   export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CHAPEL = "CHAPEL";
   export const CLOVER = "CLOVER";
   export const COSMOS = "COSMOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
@@ -23,11 +22,9 @@ export namespace Network {
   export const FUSE = "FUSE";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
-  export const MUMBAI = "MUMBAI";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
-  export const POA = "POA"; // aka Proof of Authority (poa-core)
   export const XDAI = "XDAI"; // aka Gnosis Chain
 }
 

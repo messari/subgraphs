@@ -9,7 +9,6 @@ enum SubgraphNetwork {
   BOBA
   BSC # aka BNB Chain
   CELO
-  CHAPEL
   CLOVER
   COSMOS
   MAINNET # Ethereum Mainnet
@@ -17,11 +16,9 @@ enum SubgraphNetwork {
   FUSE
   MOONBEAM
   MOONRIVER
-  MUMBAI
   NEAR_MAINNET
   OPTIMISM
   MATIC # aka Polygon
-  POA # aka Proof of Authority (poa-core)
   XDAI # aka Gnosis Chain
 }
 
