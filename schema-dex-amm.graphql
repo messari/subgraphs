@@ -99,6 +99,12 @@ enum LiquidityPoolFeeType {
 
   " Some protocols use dynamic protocol fees (e.g., Bancor v2). Set `feePercentage` as 0 but handle the dynamic fees in the mapping code. "
   DYNAMIC_PROTOCOL_FEE
+
+  " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
+  DEPOSIT_FEE
+
+  " One-time fee charged by the protocol (e.g. Bancor) during withdrawal, in percentages of the withdrawal token "
+  WITHDRAWAL_FEE
 }
 
 type LiquidityPoolFee @entity {
@@ -378,6 +384,9 @@ type LiquidityPool @entity {
 
   " Fees per trade incurred to the user. Should include all fees that apply to a pool (e.g. Curve has a trading fee AND an admin fee, which is a portion of the trading fee. Uniswap only has a trading fee and no protocol fee. ) "
   fees: [LiquidityPoolFee!]!
+
+  " Whether this pool is single-sided (e.g. Bancor, Platypus's Alternative Pool). The specifics of the implementation depends on the protocol. "
+  isSingleSided: Boolean!
 
   " Creation timestamp "
   createdTimestamp: BigInt!
