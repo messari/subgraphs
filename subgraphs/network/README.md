@@ -6,7 +6,7 @@ This subgraph and schema will gather a standard set of L1 data metrics that matt
 
 The timeseries data is important, and it follows our `Blockchain` data in addition to hourly and daily metrics.
 
-The following data is collected: TODO: add new things
+The following data is collected: TODO: add new things once schema is finalized
 
 - `totalBlocksMined` is the current block height
 - Blocks mined during this day/hour
@@ -23,6 +23,10 @@ The following data is collected: TODO: add new things
 - The reward emissions for a given timeseries entity
 - The supply of the native asset at a given timeseries entity
 
+### Networks Supported
+
+TODO: talk about which networks are supported and link to each one
+
 ### Block Handlers
 
 There are 4 different types of networks supported by thegraph. Each one has a different set of returning values for block handlers. We will explore each one below: TODO
@@ -36,6 +40,7 @@ There are 4 different types of networks supported by thegraph. Each one has a di
 
 - https://github.com/stakewise/subgraphs/tree/main/subgraphs/ethereum
 - https://github.com/graphprotocol/example-subgraph
+- https://thegraph.com/explorer/subgraph?id=3WFXNz46rk4iuVgsBybcGtxMa4cbHkBLfuSjUvvqs2MD&view=Overview
 - Arweave: https://github.com/hepnerthomas/arweave-revenues
 - Near: https://github.com/linear-protocol/linear-subgraph
 - Cosmos: `NA`

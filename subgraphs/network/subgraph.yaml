@@ -8,7 +8,7 @@ dataSources:
     network: xdai
     source:
       address: "0x731a10897d267e19b34503ad902d0a29173ba4b1"
-      abi: Gravity
+      abi:
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

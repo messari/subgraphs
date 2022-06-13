@@ -1,4 +1,11 @@
-import { ethereum, BigInt, BigDecimal, arweave, cosmos, near } from "@graphprotocol/graph-ts";
+import {
+  ethereum,
+  BigInt,
+  BigDecimal,
+  arweave,
+  cosmos,
+  near,
+} from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
   Author,
