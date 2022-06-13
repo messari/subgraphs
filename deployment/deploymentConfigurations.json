@@ -108,6 +108,21 @@
         "template": "uniswap.v3.template.yaml",
         "deploy-on-merge": false,
         "prepare:constants": true
+      },
+      "arbitrum": {
+        "template": "uniswap.v3.template.yaml",
+        "deploy-on-merge": false,
+        "prepare:constants": true
+      },
+      "optimism": {
+        "template": "uniswap.v3.template.yaml",
+        "deploy-on-merge": false,
+        "prepare:constants": true
+      },
+      "matic": {
+        "template": "uniswap.v3.template.yaml",
+        "deploy-on-merge": false,
+        "prepare:constants": true
       }
     },
     "qidao": {
