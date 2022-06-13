@@ -1,4 +1,5 @@
 {
     "network": "optimism",
-    "startBlock": 0
+    "startBlock": 0,
+    "deployment": "UNISWAP_V3_OPTIMISM"
 }

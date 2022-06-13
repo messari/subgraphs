@@ -1,4 +1,5 @@
 {
     "network": "arbitrum-one",
-    "startBlock": 163
+    "startBlock": 163,
+    "deployment": "UNISWAP_V3_ARBITRUM"
   }

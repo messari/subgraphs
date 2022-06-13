@@ -235,8 +235,8 @@ export function updateVolumeAndFees(
   pool.cumulativeVolumeUSD = pool.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
   protocol.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD.plus(trackedAmountUSD[INT_TWO]);
 
-  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(supplyFee.feePercentage!));
-  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(protocolFee.feePercentage!));
+  let supplyFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(supplyFee.feePercentage));
+  let protocolFeeAmountUSD = trackedAmountUSD[INT_TWO].times(percToDec(protocolFee.feePercentage));
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
@@ -267,7 +267,7 @@ export function updateProtocolFees(event: ethereum.Event): void {
   let protocolFee = getLiquidityPoolFee(pool.fees[1]);
 
   // Get the total proportion of swap value collected as a fee
-  let totalPoolFee = tradingFee.feePercentage!.plus(protocolFee.feePercentage!);
+  let totalPoolFee = tradingFee.feePercentage.plus(protocolFee.feePercentage);
 
   // Value5 is the feeProtocol variabe in the slot0 struct of the pool contract
   let feeProtocol = poolContract.slot0().value5;
