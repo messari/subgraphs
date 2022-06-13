@@ -1,19 +1,21 @@
 import { Address, BigInt, ethereum, BigDecimal, log } from "@graphprotocol/graph-ts";
 
-export let DVMFactory_ADDRESS = '0x790b4a80fb1094589a3c0efc8740aa9b0c1733fb'
-export let CPFactory_ADDRESS = '0x778df5b12170e8af8df94356bfc864e57ce185dc'
-export let DPPFactory_ADDRESS = '0x9b64c81ba54ea51e1f6b7fefb3cff8aa6f1e2a09'
-export let DSPFactory_ADDRESS = '0x0fb9815938ad069bf90e14fe6c596c514bede767'
-export let MINE_PROXY = '0xe5e9b0Cab984b58b7e7AE17707d633295d5a4C4d'
-export let DODOLpToken_ADDRESS = '0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2'
-export let vDODOToken_ADDRESS = '0x4D6A41C682874E5dd1BBD58184eE8FF145C89202'
+export let DVMFactory_ADDRESS = '0x72d220ce168c4f361dd4dee5d826a01ad8598f6c'
+export let CPFactory_ADDRESS = '0xe8c9a78725d0451fa19878d5f8a3dc0d55fecf25'
+export let DPPFactory_ADDRESS = '0x5336ede8f971339f6c0e304c66ba16f1296a2fbe'
+export let DSPFactory_ADDRESS = '0x6fddb76c93299d985f4d3fc7ac468f9a168577a4'
+export let MINE_PROXY = '0x0d9685D4037580F68D9F77B08971f17E1000bBdc'
+export let DODOLpToken_ADDRESS = '0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd'
+export let vDODOToken_ADDRESS = '0xc4436fbae6eba5d95bf7d53ae515f8a707bd402a'
 export let FEE_MODEL_INSTANCE = '0x5e84190a270333aCe5B9202a3F4ceBf11b81bB01'
+export let TOKEN_CREATION_FEE = '20000000000000000'
+export let WRAPPED_FEE_TOKEN = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
 export const STABLE_COINS: string[] = [
-  '0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3',
-  '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
-  '0x55d398326f99059ff775485246999027b3197955'
+  '0x6b175474e89094c44da98b954eedeac495271d0f',
+  '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+  '0xdac17f958d2ee523a2206206994597c13d831ec7'
 ];
 
 export let ZERO_BI = BigInt.fromI32(0);

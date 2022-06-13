@@ -15,7 +15,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDVM
-        - RemoveDVM
       abis:
         - name: DVMFactory
           file: ./abis/DVMFactory.json
@@ -75,8 +74,6 @@ dataSources:
       eventHandlers:
         - event: NewDVM(address,address,address,address)
           handler: handleNewDVM
-        - event: RemoveDVM(address)
-          handler: handleRemoveDVM
       file:
         ../src/mappings/mappingFactory.ts
         # blank
@@ -167,7 +164,6 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - NewDPP
-        - RemoveDPP
       abis:
         - name: DVMFactory
           file: ./abis/DVMFactory.json
@@ -227,8 +223,6 @@ dataSources:
       eventHandlers:
         - event: NewDPP(address,address,address,address)
           handler: handleNewDPP
-        - event: RemoveDPP(address)
-          handler: handleRemoveDPP
       file: ../src/mappings/mappingFactory.ts
     # blank
   - kind: ethereum
@@ -304,8 +298,82 @@ dataSources:
       eventHandlers:
         - event: NewDSP(address,address,address,address)
           handler: handleNewDSP
-        - event: RemoveDSP(address)
-          handler: handleRemoveDSP
+      file: ../src/mappings/mappingFactory.ts
+    # blank
+  - kind: ethereum
+    name: ERC20V3Factory
+    network: {{ network }}
+    source:
+      address: "{{tokenFactory}}"
+      abi: ERC20V3Factory
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - NewERC20
+      abis:
+        - name: ERC20V3Factory
+          file: ./abis/ERC20V3Factory.json
+        - name: DVMFactory
+          file: ./abis/DVMFactory.json
+        - name: CrowdPoolingFactory
+          file: ./abis/CrowdPoolingFactory.json
+        - name: DPPFactory
+          file: ./abis/DPPFactory.json
+        - name: DSPFactory
+          file: ./abis/DSPFactory.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: DVM
+          file: ./abis/DVM.json
+        - name: CP
+          file: ./abis/CP.json
+        - name: DPP
+          file: ./abis/DPP.json
+        - name: DSP
+          file: ./abis/DSP.json
+        - name: FeeRateModel
+          file: ./abis/FeeRateModel.json
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # ERC20
+        - name: _ERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: NewERC20(address,address,uint256)
+          handler: handleNewERC20
       file: ../src/mappings/mappingFactory.ts
     # blank
   - kind: ethereum

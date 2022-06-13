@@ -97,6 +97,7 @@ type LiquidityPoolFee @entity {
 
   "DODO specific"
   pool: LiquidityPool!
+
 }
 
 #############################

@@ -25,10 +25,12 @@ import {
   DVMFactory_ADDRESS,
   CPFactory_ADDRESS,
   DPPFactory_ADDRESS,
-  DSPFactory_ADDRESS
+  DSPFactory_ADDRESS,
+  TOKEN_CREATION_FEE,
+  WRAPPED_FEE_TOKEN
 } from "../constants/constant";
 
-import { bigIntToBigDecimal, safeDiv } from "./numbers";
+import { bigIntToBigDecimal, modulateDecimals, safeDiv } from "./numbers";
 
 
 import {
@@ -55,60 +57,77 @@ import { FeeRateModel } from "../../generated/DVMFactory/FeeRateModel";
 export function updateFinancials(
   event: ethereum.Event,
   usdTVL: BigDecimal,
-  usdTVolume: BigDecimal,
-  usdValOfFees: BigDecimal
+  change: BigDecimal,
+  gainedVal: bool,
+  usdTranVal: BigDecimal,
+  usdValOfFees: BigDecimal[]// 0 is mtfee, 1 is lpFee %
 ): void {
-  let usdValLP = usdValOfFees * BigDecimal.fromString(".25");
-  let usdValMT = usdValOfFees - usdValLP;
+  let supplySideRevb4 = usdTranVal * usdValOfFees[1]
+  let protoSideRevb4 = usdTranVal * usdValOfFees[0];
+  let protoSideRev = protoSideRevb4 * BigDecimal.fromString(".05");
+  let supplySideRev = supplySideRevb4 + (protoSideRevb4 * BigDecimal.fromString(".95"));
+
+  let totalRev = supplySideRev + protoSideRev;
 
   let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
   let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
   let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
   let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
 
-  dvmP.totalValueLockedUSD += usdTVL;
-  dvmP.protocolControlledValueUSD += usdTVL;
-  dvmP.cumulativeSupplySideRevenueUSD += usdValLP;
-  dvmP.cumulativeProtocolSideRevenueUSD += usdValMT;
-  dvmP.cumulativeTotalRevenueUSD += usdValOfFees;
-  dvmP.cumulativeVolumeUSD += usdTVolume;
+  let prevTotalValueLockedUSD = dvmP.totalValueLockedUSD;
+  let newTotalValueLockedUSD = ZERO_BD;
+
+
+  if(gainedVal) {
+     newTotalValueLockedUSD = prevTotalValueLockedUSD + change;
+  } else {
+    newTotalValueLockedUSD = prevTotalValueLockedUSD - change;
+  }
+
+
+  dvmP.totalValueLockedUSD = newTotalValueLockedUSD;
+  dvmP.protocolControlledValueUSD = ZERO_BD;
+  dvmP.cumulativeSupplySideRevenueUSD += supplySideRev;
+  dvmP.cumulativeProtocolSideRevenueUSD += protoSideRev;
+  dvmP.cumulativeTotalRevenueUSD += totalRev;
+  dvmP.cumulativeVolumeUSD += usdTranVal;
   dvmP.save();
 
-  cpP.totalValueLockedUSD += usdTVL;
-  cpP.protocolControlledValueUSD += usdTVL;
-  cpP.cumulativeSupplySideRevenueUSD += usdValLP;
-  cpP.cumulativeProtocolSideRevenueUSD += usdValMT;
-  cpP.cumulativeTotalRevenueUSD += usdValOfFees;
-  cpP.cumulativeVolumeUSD += usdTVolume;
+  cpP.totalValueLockedUSD = newTotalValueLockedUSD;
+  cpP.protocolControlledValueUSD = ZERO_BD;
+  cpP.cumulativeSupplySideRevenueUSD += supplySideRev;
+  cpP.cumulativeProtocolSideRevenueUSD += protoSideRev;
+  cpP.cumulativeTotalRevenueUSD += totalRev;
+  cpP.cumulativeVolumeUSD += usdTranVal;
   cpP.save();
 
-  dppP.totalValueLockedUSD += usdTVL;
-  dppP.protocolControlledValueUSD += usdTVL;
-  dppP.cumulativeSupplySideRevenueUSD += usdValLP;
-  dppP.cumulativeProtocolSideRevenueUSD += usdValMT;
-  dppP.cumulativeTotalRevenueUSD += usdValOfFees;
-  dppP.cumulativeVolumeUSD += usdTVolume;
+  dppP.totalValueLockedUSD = newTotalValueLockedUSD;
+  dppP.protocolControlledValueUSD = ZERO_BD;
+  dppP.cumulativeSupplySideRevenueUSD += supplySideRev;
+  dppP.cumulativeProtocolSideRevenueUSD += protoSideRev;
+  dppP.cumulativeTotalRevenueUSD += totalRev;
+  dppP.cumulativeVolumeUSD += usdTranVal;
   dppP.save();
 
-  dspP.totalValueLockedUSD += usdTVL;
-  dspP.protocolControlledValueUSD += usdTVL;
-  dspP.cumulativeSupplySideRevenueUSD += usdValLP;
-  dspP.cumulativeProtocolSideRevenueUSD += usdValMT;
-  dspP.cumulativeTotalRevenueUSD += usdValOfFees;
-  dspP.cumulativeVolumeUSD += usdTVolume;
+  dspP.totalValueLockedUSD = newTotalValueLockedUSD;
+  dspP.protocolControlledValueUSD = ZERO_BD;
+  dspP.cumulativeSupplySideRevenueUSD += supplySideRev;
+  dspP.cumulativeProtocolSideRevenueUSD += protoSideRev;
+  dspP.cumulativeTotalRevenueUSD += totalRev;
+  dspP.cumulativeVolumeUSD += usdTranVal;
   dspP.save();
 
   let protocol = getOrCreateDexAmm(event.address);
 
   let financialMetrics = getOrCreateFinancials(event);
   financialMetrics.protocol = protocol.id;
-
+  financialMetrics.protocolControlledValueUSD = ZERO_BD;
   financialMetrics.dailyVolumeUSD += usdTVL;
-  financialMetrics.dailySupplySideRevenueUSD += usdValLP;
-  financialMetrics.dailyProtocolSideRevenueUSD += usdValMT;
-  financialMetrics.dailyTotalRevenueUSD += usdValOfFees;
+  financialMetrics.dailySupplySideRevenueUSD += supplySideRev;
+  financialMetrics.dailyProtocolSideRevenueUSD += protoSideRev;
+  financialMetrics.dailyTotalRevenueUSD += totalRev;
   financialMetrics.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
-  financialMetrics.totalValueLockedUSD += usdTVL;
+  financialMetrics.totalValueLockedUSD = newTotalValueLockedUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD =
@@ -207,17 +226,10 @@ export function updatePoolMetrics(
 ): void {
   let poolMetrics = getOrCreatePoolDailySnapshot(event);
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
-
   let protocol = getOrCreateDexAmm(event.address);
-
   let token1 = ERC20.bind(tokenAdds[0]);
   let token2 = ERC20.bind(tokenAdds[1]);
-
-  let t1 = getOrCreateToken(tokenAdds[0]);
-  let t2 = getOrCreateToken(tokenAdds[1]);
-
   let poolInstance = DVM.bind(poolAdd);
-
   let tokenBal1Val = BigInt.fromString("0");
   let tokenBal2Val = BigInt.fromString("0");
   let lpSupplyVal = BigInt.fromString("0");
@@ -245,30 +257,55 @@ export function updatePoolMetrics(
     lpSupplyVal = lpSupply.value
   }
 
+  let lpToken = getOrCreateToken(poolAdd);
+
+  let modLPsupply = modulateDecimals(lpSupplyVal, lpToken.decimals)
   let usdValueOfTransaction = getUSDprice(tokenAdds[0], amount[0]);
   let usdValueOfToken1 = getUSDprice(tokenAdds[0], tokenBal1Val);
   let usdValueOfToken2 = getUSDprice(tokenAdds[1], tokenBal2Val);
 
   let usdValofPool = usdValueOfToken1 + usdValueOfToken2;
-  let lpTokenUSD = getUSDprice(
-    Address.fromString(pool.outputToken),
-    BigInt.fromString("1000000000000000000")
-  );
+  let usdValLp = safeDiv(usdValofPool, modLPsupply);
+
+  let token = getOrCreateToken(poolAdd);
+  token.lastPriceUSD = usdValLp;
+  token.save();
+
+
+  let prevCumulativeVolumeUSD = pool.totalValueLockedUSD;
+  let gainedVal = false;
+  let change = ZERO_BD;
+
+  if(prevCumulativeVolumeUSD > usdValofPool) {
+     change = prevCumulativeVolumeUSD - usdValofPool;
+  } else {
+    change = usdValofPool - prevCumulativeVolumeUSD;
+    gainedVal = true;
+  }
 
   pool.cumulativeVolumeUSD += usdValueOfTransaction;
   pool.totalValueLockedUSD = usdValofPool;
+  pool.outputTokenSupply = lpSupplyVal;
+  pool.outputTokenPriceUSD = usdValLp;
   poolMetrics.totalValueLockedUSD = usdValofPool;
   poolMetrics.cumulativeVolumeUSD += usdValueOfTransaction;
   poolMetrics.inputTokenBalances = [tokenBal1Val, tokenBal2Val];
   poolMetrics.outputTokenSupply = lpSupplyVal;
-  poolMetrics.outputTokenPriceUSD = lpTokenUSD;
+  poolMetrics.outputTokenPriceUSD = usdValLp;
   poolMetrics.rewardTokenEmissionsAmount = pool.rewardTokenEmissionsAmount;
   poolMetrics.rewardTokenEmissionsUSD = pool.rewardTokenEmissionsUSD;
   poolMetrics.blockNumber = event.block.number;
   poolMetrics.timestamp = event.block.timestamp;
 
-  let usdValOfFees = updateFees(event, poolAdd, tokenAdds[0], amount[0], trader);
-  updateFinancials(event, usdValofPool, usdValueOfTransaction, usdValOfFees);
+  let usdValOfFees = updateFees(event, poolAdd, tokenAdds, amount[0], trader);
+  updateFinancials(
+    event,
+    usdValofPool,
+    change,
+    gainedVal,
+    usdValueOfTransaction,
+    usdValOfFees
+  );
   poolMetrics.save();
   pool.save();
 }
@@ -276,40 +313,90 @@ export function updatePoolMetrics(
 export function updateFees(
   event: ethereum.Event,
   poolAdd: Address,
-  tokenAdd: Address,
+  tokenAdd: Address[],
   amount: BigInt,
   trader: Address
-): BigDecimal {
-  let poolFee = new LiquidityPoolFee("TIERED_TRADING_FEE --" + poolAdd.toString());
+): BigDecimal[] {
+  let poolFee = new LiquidityPoolFee("TIERED_TRADING_FEE --" + poolAdd.toHexString());
   let pool = getOrCreatePool(poolAdd, poolAdd, poolAdd, ONE_BI, ONE_BI);
   let poolInstance = DVM.bind(poolAdd);
   let tradeValReceived = ZERO_BI;
   let mtFee = ZERO_BI;
-
+  let token = getOrCreateToken(tokenAdd[0]);
+  let mtFeePercentage = ZERO_BD;
+  let lpFeePercentage = ZERO_BD;
 
    let vaultReserveDVM = poolInstance.try_querySellBase(trader, amount);
    if (vaultReserveDVM.reverted) {
-     log.warning("[UpdateFees] pool query reverted, tradeValReceived && mtFee was set to ZERO_BI", []);
+     log.error("[UpdateFees] pool query reverted, tradeValReceived && mtFee was set to ZERO_BI", []);
    } else {
      let returnVal = vaultReserveDVM.value;
      tradeValReceived = returnVal.value0;
      mtFee = returnVal.value1;
-     log.debug("[UpdateFees] pool query successful, pool address is: {} ", [poolAdd.toHexString()]);
-     log.debug("[UpdateFees] pool query successful, amount of token traded is: {} ", [amount.toString()]);
-     log.debug("[UpdateFees] pool query successful, tradeValReceived is: {} ", [tradeValReceived.toString()]);
-     log.debug("[UpdateFees] pool query successful, mtFee are: {}", [mtFee.toString()]);
+     log.warning("[UpdateFees] pool query successful, pool address is: {} ", [poolAdd.toHexString()]);
+     log.warning("[UpdateFees] pool query successful, amount of token traded is: {} ", [amount.toString()]);
+     log.warning("[UpdateFees] pool query successful, tradeValReceived is: {} ", [tradeValReceived.toString()]);
+     log.warning("[UpdateFees] pool query successful, mtFee is: {}", [mtFee.toString()]);
    }
 
-  let usdValOfTrade = getUSDprice(tokenAdd, amount);
-  log.debug("[UpdateFees] USD Value of amount being traded: {}", [usdValOfTrade.toString()]);
-  let usdValOfFees = getUSDprice(tokenAdd, mtFee);
-  log.debug("[UpdateFees] USD Value of Fees from trade is: {}", [usdValOfFees.toString()]);
+  let call = poolInstance.try__LP_FEE_RATE_();
+
+  if (call.reverted) {
+    log.error("[UpdateFees] pool LP_FEE_RATE reverted", []);
+  } else {
+    lpFeePercentage = bigIntToBigDecimal(call.value);
+  }
+
+  if(mtFee > ZERO_BI) {
+    let mv = bigIntToBigDecimal(tradeValReceived) + bigIntToBigDecimal(mtFee);
+    let tv = mv + (mv * lpFeePercentage)
+    mtFeePercentage = safeDiv(bigIntToBigDecimal(mtFee), tv)
+  }
 
   poolFee.pool = pool.id;
-  poolFee.feePercentage = safeDiv(bigIntToBigDecimal(tradeValReceived), bigIntToBigDecimal(mtFee));
+  poolFee.feePercentage = mtFeePercentage + lpFeePercentage;
   poolFee.feeType = "TIERED_TRADING_FEE";
 
   poolFee.save();
 
-  return usdValOfFees;
+  return [mtFeePercentage, lpFeePercentage];
+}
+
+export function updateFinancialsERC20(
+    event: ethereum.Event
+): void {
+
+  let dvmP = getOrCreateDexAmmADD(Address.fromString(DVMFactory_ADDRESS));
+  let cpP = getOrCreateDexAmmADD(Address.fromString(CPFactory_ADDRESS));
+  let dppP = getOrCreateDexAmmADD(Address.fromString(DPPFactory_ADDRESS));
+  let dspP = getOrCreateDexAmmADD(Address.fromString(DSPFactory_ADDRESS));
+
+  let usdVal = getUSDprice(Address.fromString(WRAPPED_FEE_TOKEN), BigInt.fromString(TOKEN_CREATION_FEE));
+  dvmP.cumulativeTotalRevenueUSD += usdVal;
+  dvmP.save();
+
+  cpP.cumulativeTotalRevenueUSD += usdVal;
+  cpP.save();
+
+  dppP.cumulativeTotalRevenueUSD += usdVal;
+  dppP.save();
+
+  dspP.cumulativeTotalRevenueUSD += usdVal;
+  dspP.save();
+
+  let protocol = getOrCreateDexAmm(event.address);
+
+  let financialMetrics = getOrCreateFinancials(event);
+  financialMetrics.protocol = protocol.id;
+  financialMetrics.dailyTotalRevenueUSD += usdVal;
+  financialMetrics.cumulativeSupplySideRevenueUSD =
+    protocol.cumulativeSupplySideRevenueUSD;
+  financialMetrics.cumulativeProtocolSideRevenueUSD =
+    protocol.cumulativeProtocolSideRevenueUSD;
+  financialMetrics.cumulativeTotalRevenueUSD =
+    protocol.cumulativeTotalRevenueUSD;
+  financialMetrics.blockNumber = event.block.number;
+  financialMetrics.timestamp = event.block.timestamp;
+
+  financialMetrics.save();
 }

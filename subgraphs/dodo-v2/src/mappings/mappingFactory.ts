@@ -21,7 +21,11 @@ import { DODOMine } from "../../generated/DODOMineV3Proxy/DODOMine";
 
 import { getUSDprice } from "../utils/getters";
 
-import { DODOLpToken_ADDRESS, ZERO_BI } from "../constants/constant";
+import { ERC20V3Factory, NewERC20 } from "../../generated/ERC20V3Factory/ERC20V3Factory";
+
+import { DODOLpToken_ADDRESS, ZERO_BI, TOKEN_CREATION_FEE } from "../constants/constant";
+
+import { updateFinancialsERC20 } from "../utils/metrics";
 
 export function handleNewDVM(event: NewDVM): void {
   getOrCreatePool(
@@ -91,4 +95,9 @@ export function handleDepositRewardToMine(event: DepositRewardToMine): void {
   );
   pool.rewardTokenEmissionsUSD = [usdPricePerBlock];
   pool.save();
+}
+
+export function handleNewERC20(event: NewERC20): void {
+  //NewERC20 (address erc20, address creator, uint256 erc20Type)
+  updateFinancialsERC20(event);
 }

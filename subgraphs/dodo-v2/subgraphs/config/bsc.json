@@ -5,11 +5,14 @@
   "cpFactory": "0x778df5b12170e8af8df94356bfc864e57ce185dc",
   "dppFactory": "0x9b64c81ba54ea51e1f6b7fefb3cff8aa6f1e2a09",
   "dspFactory": "0x0fb9815938ad069bf90e14fe6c596c514bede767",
+  "tokenFactory": "0x5eD22a48Fee263207f5cAAE1A1f1a27011e7Dc92",
   "mineproxy": "0xe5e9b0Cab984b58b7e7AE17707d633295d5a4C4d",
   "dodo": "0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2",
   "vdodo": "0x4D6A41C682874E5dd1BBD58184eE8FF145C89202",
   "feeModelI": "0x5e84190a270333aCe5B9202a3F4ceBf11b81bB01",
   "dai": "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3",
   "usdc": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
-  "usdt": "0x55d398326f99059ff775485246999027b3197955"
+  "usdt": "0x55d398326f99059ff775485246999027b3197955",
+  "tokenFee": "50000000000000000",
+  "wrappedChainToken": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"
 }

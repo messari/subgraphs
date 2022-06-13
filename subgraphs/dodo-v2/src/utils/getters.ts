@@ -134,7 +134,7 @@ export function getOrCreatePool(
     pool.symbol = fetchTokenSymbol(poolAddress);
     pool.inputTokens = [it.id, ot.id];
     pool.outputToken = lpToken.id;
-    pool.rewardTokens = [dodoLp.id, vdodo.id];
+    pool.rewardTokens = [dodoLp.id];
     pool.totalValueLockedUSD = ZERO_BD;
     pool.cumulativeVolumeUSD = ZERO_BD;
     pool.inputTokenBalances = [ZERO_BI, ZERO_BI];
@@ -365,7 +365,7 @@ export function getProtocolFromPool(poolAddress: Address): string {
 
 export function getUSDprice(tokenAddress: Address, amount: BigInt): BigDecimal {
   let token = getOrCreateToken(tokenAddress);
-  let modAmount = bigIntToBigDecimal(amount)
+  let modAmount = modulateDecimals(amount, token.decimals)
   let price = getUsdPrice(tokenAddress, modAmount);
   token.lastPriceUSD = getUSDPricePerToken(tokenAddress);
   token.save();
