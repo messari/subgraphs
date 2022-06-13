@@ -1,7 +1,7 @@
 // import { log } from '@graphprotocol/graph-ts'
 import { BigDecimal, ethereum, BigInt, Address } from "@graphprotocol/graph-ts";
-import { NetworkConfigs } from "../../config/paramConfig";
-import { UsageMetricsDailySnapshot, Account, Token, ActiveAccount, UsageMetricsHourlySnapshot, _HelperStore, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
+import { NetworkConfigs } from "../../configurations/configure";
+import { Account, Token, ActiveAccount, _HelperStore, DexAmmProtocol, LiquidityPool } from "../../generated/schema";
 import { Pool } from "../../generated/templates/Pool/Pool";
 import { SECONDS_PER_DAY, INT_ZERO, INT_ONE, BIGDECIMAL_ONE, UsageType, SECONDS_PER_HOUR, INT_TWO, BIGINT_ZERO, BIGINT_NEG_ONE } from "./constants";
 import {
@@ -139,14 +139,14 @@ export function updateTokenWhitelists(token0: Token, token1: Token, poolAddress:
   let tokenWhitelist1 = getOrCreateTokenWhitelist(token1.id);
 
   // update white listed pools
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist0.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist0.id)) {
     let newPools = tokenWhitelist1.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist1.whitelistPools = newPools;
     tokenWhitelist1.save();
   }
 
-  if (NetworkConfigs.WHITELIST_TOKENS.includes(tokenWhitelist1.id)) {
+  if (NetworkConfigs.getWhitelistTokens().includes(tokenWhitelist1.id)) {
     let newPools = tokenWhitelist0.whitelistPools;
     newPools.push(poolAddress);
     tokenWhitelist0.whitelistPools = newPools;
