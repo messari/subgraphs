@@ -159,7 +159,7 @@ type HourlySnapshot @entity {
   " ID of the network this snapshot belongs to "
   network: Network!
 
-  " Number of cumulative ununique authors (see type Author for explanation) "
+  " Number of cumulative unique authors (see type Author for explanation) "
   cumulativeUniqueAuthors: Int!
 
   " Number of unique hourly active authors "
