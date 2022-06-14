@@ -763,6 +763,9 @@ interface Event {
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
@@ -788,6 +791,9 @@ type Deposit implements Event @entity {
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -828,6 +834,9 @@ type Withdraw implements Event @entity {
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
@@ -874,6 +883,9 @@ type Borrow implements Event @entity {
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
@@ -915,6 +927,9 @@ type Repay implements Event @entity {
   " Transaction hash of the transaction that emitted this event "
   hash: String!
 
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
+
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
@@ -954,6 +969,9 @@ type Liquidate implements Event @entity {
 
   " Transaction hash of the transaction that emitted this event "
   hash: String!
+
+  " Nonce of the transaction that emitted this event "
+  nonce: Int!
 
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
