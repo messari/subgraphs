@@ -135,7 +135,7 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 export let DEFAULTNETWORK =  "{{defaultNetwork}}" 
 
 export let VAULT_ADDRESS = Address.fromString('{{vault}}')
-{{#isBeest}}
+{{#isBeets}}
 export let DAI: Address = Address.fromString('{{knownAssets.dai}}');
 export let USDC: Address = Address.fromString('{{knownAssets.usdc}}');
 export let USDT: Address = Address.fromString('{{knownAssets.fusdt}}');
@@ -148,7 +148,7 @@ export let BEETS: Address = Address.fromString('{{knownAssets.beets}}');
 export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT,MIM];
 export let BASE_ASSETS: Address[] = [WETH, WFTM, WBTC, BEETS];
 
-{{/isBeest}}
+{{/isBeets}}
 
 
 {{#isBalancer}}
