@@ -152,8 +152,8 @@ dataSources:
         - name: CalculationsSushiSwap
           file: ./abis/Prices/Calculations/SushiSwap.json
       eventHandlers:
-        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
-          handler: handleTroveUpdated
+        - event: Redemption(uint256,uint256,uint256,address[],uint256[])
+          handler: handleRedemption
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
