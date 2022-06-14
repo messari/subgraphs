@@ -1060,7 +1060,7 @@ function snapshotUsage(
   //
   // hourly snapshot
   //
-  let hourlySnapshotID = (blockTimestamp.toI32() / secondsPerDay).toString();
+  let hourlySnapshotID = (blockTimestamp.toI32() / secondsPerHour).toString();
   let hourlySnapshot = UsageMetricsHourlySnapshot.load(hourlySnapshotID);
   if (!hourlySnapshot) {
     hourlySnapshot = new UsageMetricsHourlySnapshot(hourlySnapshotID);
