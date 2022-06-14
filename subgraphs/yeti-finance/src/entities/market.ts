@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   Market,
   MarketDailySnapshot,
@@ -8,6 +8,9 @@ import {
   ACTIVE_POOL,
   ACTIVE_POOL_CREATED_BLOCK,
   ACTIVE_POOL_CREATED_TIMESTAMP,
+  BIGDECIMAL_ONE,
+  BIGDECIMAL_TEN,
+  BIGINT_TEN,
   LIQUIDATION_FEE,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
@@ -19,14 +22,15 @@ import {
   addProtocolLiquidateVolume,
   getOrCreateYetiProtocol,
   updateProtocolBorrowBalance,
-  updateProtocoyUSDLocked,
+  updateProtocolUSDLocked,
 } from "./protocol";
-import { getETHToken, getCurrentETHPrice } from "./token";
+import { getOrCreateToken } from "./token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
+import { getUsdPrice, getUsdPricePerToken } from "../Prices";
 
-export function getOrCreateMarket(): Market {
-  let market = Market.load(ACTIVE_POOL);
+export function getOrCreateMarket(token: Address): Market {
+  let market = Market.load(ACTIVE_POOL + "-" + token.toHexString());
   if (!market) {
     market = new Market(ACTIVE_POOL);
     market.protocol = getOrCreateYetiProtocol().id;
@@ -37,7 +41,7 @@ export function getOrCreateMarket(): Market {
     market.maximumLTV = MAXIMUM_LTV;
     market.liquidationThreshold = MAXIMUM_LTV;
     market.liquidationPenalty = LIQUIDATION_FEE;
-    market.inputToken = getETHToken().id;
+    market.inputToken = getOrCreateToken(token).id;
     market.rates = [getOrCreateStableBorrowerInterestRate(ACTIVE_POOL).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
@@ -106,36 +110,37 @@ export function setMarketYUSDDebt(
   debtYUSD: BigInt
 ): void {
   const debtUSD = bigIntToBigDecimal(debtYUSD);
-  const market = getOrCreateMarket();
-  market.totalBorrowBalanceUSD = debtUSD;
-  market.save();
-  getOrCreateMarketSnapshot(event, market);
-  getOrCreateMarketHourlySnapshot(event, market);
   updateProtocolBorrowBalance(event, debtUSD, debtYUSD);
 }
 
-export function setMarketETHBalance(
+export function setMarketAssetBalance(
   event: ethereum.Event,
-  balanceETH: BigInt
+  balance: BigInt,
+  tokenAddr: Address
 ): void {
-  const balanceUSD = bigIntToBigDecimal(balanceETH).times(getCurrentETHPrice());
-  const market = getOrCreateMarket();
+  const tokenPrice = getUsdPrice(tokenAddr,BIGDECIMAL_ONE);
+  const token = getOrCreateToken(tokenAddr)
+  const balanceUSD = tokenPrice.times(balance.toBigDecimal()).div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
+  const market = getOrCreateMarket(tokenAddr);
   const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = balanceUSD;
   market.totalDepositBalanceUSD = balanceUSD;
-  market.inputTokenBalance = balanceETH;
-  market.inputTokenPriceUSD = getCurrentETHPrice();
+  market.inputTokenBalance = balance;
+  market.inputTokenPriceUSD = tokenPrice;
+
   market.save();
   getOrCreateMarketSnapshot(event, market);
   getOrCreateMarketHourlySnapshot(event, market);
-  updateProtocoyUSDLocked(event, netChangeUSD);
+  updateProtocolUSDLocked(event, netChangeUSD);
 }
+
 
 export function addMarketDepositVolume(
   event: ethereum.Event,
-  depositedUSD: BigDecimal
+  depositedUSD: BigDecimal,
+  token: Address
 ): void {
-  const market = getOrCreateMarket();
+  const market = getOrCreateMarket(token)
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositedUSD);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
@@ -151,9 +156,10 @@ export function addMarketDepositVolume(
 
 export function addMarketLiquidateVolume(
   event: ethereum.Event,
-  liquidatedUSD: BigDecimal
+  liquidatedUSD: BigDecimal,
+  token: Address
 ): void {
-  const market = getOrCreateMarket();
+  const market = getOrCreateMarket(token)
   market.cumulativeLiquidateUSD =
     market.cumulativeLiquidateUSD.plus(liquidatedUSD);
   market.save();
@@ -170,9 +176,10 @@ export function addMarketLiquidateVolume(
 
 export function addMarketBorrowVolume(
   event: ethereum.Event,
-  borrowedUSD: BigDecimal
+  borrowedUSD: BigDecimal,
+  token: Address
 ): void {
-  const market = getOrCreateMarket();
+  const market = getOrCreateMarket(token);
   market.cumulativeBorrowUSD = market.cumulativeBorrowUSD.plus(borrowedUSD);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);

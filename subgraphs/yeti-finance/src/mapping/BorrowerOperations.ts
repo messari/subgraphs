@@ -8,10 +8,10 @@ import {
   createRepay,
   createWithdraw,
 } from "../entities/event";
-import { getOrCreateTrove } from "../entities/trove";
-import { getCurrentETHPrice } from "../entities/token";
+import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
 import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
+import { getUSDPriceWithoutDecimals } from "../Prices";
 
 /**
  * Emitted when YUSD is borrowed from trove and a dynamic fee (0.5-5%) is charged (added to debt)
@@ -31,25 +31,29 @@ export function handleYUSDBorrowingFeePaid(event: YUSDBorrowingFeePaid): void {
  */
 export function handleTroveUpdated(event: TroveUpdated): void {
   const borrower = event.params._borrower;
-  const newCollateral = event.params._coll;
   const newDebt = event.params._debt;
   const trove = getOrCreateTrove(borrower);
+ 
+  for(let i = 0;i < event.params._tokens.length;i++){
+    const token = event.params._tokens[i];
+    const amount = event.params._amounts[i];
 
-  if (newCollateral == trove.collateral && newDebt == trove.debt) {
-    return;
-  }
-  if (newCollateral > trove.collateral) {
-    const depositAmountETH = newCollateral.minus(trove.collateral);
-    const depositAmountUSD = bigIntToBigDecimal(depositAmountETH).times(
-      getCurrentETHPrice()
-    );
-    createDeposit(event, depositAmountETH, depositAmountUSD, borrower);
-  } else if (newCollateral < trove.collateral) {
-    const withdrawAmountETH = trove.collateral.minus(newCollateral);
-    const withdrawAmountUSD = bigIntToBigDecimal(withdrawAmountETH).times(
-      getCurrentETHPrice()
-    );
-    createWithdraw(event, withdrawAmountETH, withdrawAmountUSD, borrower);
+    const troveToken = getOrCreateTroveToken(trove, token)
+    
+    if (amount == troveToken.collateral && newDebt == trove.debt) {
+      return;
+    }
+    if (amount > troveToken.collateral) {
+      const depositAmount = amount.minus(troveToken.collateral);
+      const depositAmountUSD = getUSDPriceWithoutDecimals(token,depositAmount.toBigDecimal())
+      createDeposit(event, depositAmount, depositAmountUSD, borrower,token);
+    } else if (amount < troveToken.collateral) {
+      const withdrawAmount = troveToken.collateral.minus(amount);
+      const withdrawAmountUSD =  getUSDPriceWithoutDecimals(token,withdrawAmount.toBigDecimal())
+      createWithdraw(event, withdrawAmount, withdrawAmountUSD, borrower,token);
+    }
+    troveToken.collateral = amount;
+    troveToken.save()
   }
 
   if (newDebt > trove.debt) {
@@ -62,7 +66,6 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     createRepay(event, repayAmountYUSD, repayAmountUSD, borrower);
   }
 
-  trove.collateral = newCollateral;
   trove.debt = newDebt;
   trove.save();
 }

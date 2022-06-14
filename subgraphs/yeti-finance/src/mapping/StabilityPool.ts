@@ -1,11 +1,34 @@
 import {
   StabilityPool,
+  StabilityPoolBalancesUpdated,
   StabilityPoolETHBalanceUpdated,
   StabilityPoolYUSDBalanceUpdated,
 } from "../../generated/StabilityPool/StabilityPool";
-import { updateProtocoyUSDLockedStabilityPool } from "../entities/protocol";
+import { getOrCreateYetiProtocol, updateProtocolLockedUSD } from "../entities/protocol";
+import { getUSDPriceWithoutDecimals } from "../Prices";
+import { BIGDECIMAL_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 
+/**
+ * Assets balance was updated
+ *
+ * @param event StabilityPoolETHBalanceUpdated event
+ */
+ export function handleStabilityPoolETHBalanceUpdated(
+  event: StabilityPoolBalancesUpdated
+): void {
+  const protocol = getOrCreateYetiProtocol()
+  const oldAssetUSDLocked = protocol.totalStablePoolAssetUSD;
+  let totalAssetLocked = BIGDECIMAL_ZERO;
+  for(let i = 0; i < event.params.amounts.length; i++) {
+    const asset = event.params.assets[i];
+    const amount = event.params.amounts[i];
+    totalAssetLocked = totalAssetLocked.plus(getUSDPriceWithoutDecimals(asset, amount.toBigDecimal()));
+  }
+  const totalValueLocked = protocol.totalValueLockedUSD.plus(totalAssetLocked.minus(oldAssetUSDLocked))
+  
+  updateProtocolLockedUSD(event, totalValueLocked);
+}
 
 /**
  * YUSD balance was updated
@@ -15,11 +38,14 @@ import { bigIntToBigDecimal } from "../utils/numbers";
 export function handleStabilityPoolYUSDBalanceUpdated(
   event: StabilityPoolYUSDBalanceUpdated
 ): void {
-  const stabilityPool = StabilityPool.bind(event.address);
   const totalYUSDLocked = event.params._newBalance;
-  const totalETHLocked = stabilityPool.getETH();
-  const totalValueLocked = bigIntToBigDecimal(totalETHLocked)
-    .times(getCurrentETHPrice())
-    .plus(bigIntToBigDecimal(totalYUSDLocked));
-  updateProtocoyUSDLockedStabilityPool(event, totalValueLocked);
+
+  const protocol = getOrCreateYetiProtocol()
+  const oldYUSDLockded = protocol.totalYUSDLocked
+  const totalValueLockedUSD = protocol.totalValueLockedUSD.plus(bigIntToBigDecimal(totalYUSDLocked.minus(oldYUSDLockded)))
+ 
+  updateProtocolLockedUSD(event, totalValueLockedUSD);
+
+  protocol.totalYUSDLocked = totalYUSDLocked
+  protocol.save()
 }

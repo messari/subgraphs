@@ -46,6 +46,8 @@ type Token @entity {
 
   " Optional field to track the block number of the last token price "
   lastPriceBlockNumber: BigInt
+
+
 }
 
 enum RewardTokenType {
@@ -278,6 +280,13 @@ type LendingProtocol implements Protocol @entity {
 
   " All markets that belong to this protocol "
   markets: [Market!]! @derivedFrom(field: "protocol")
+
+
+  " YUSD Locked in Stable Pools for caching purposes"
+  totalYUSDLocked: BigInt!
+
+  " Total Asset Value Locked in Stable Pools for caching purposes"
+  totalStablePoolAssetUSD: BigDecimal!
 }
 
 ###############################
@@ -462,7 +471,7 @@ type Market @entity {
   liquidationPenalty: BigDecimal!
 
   " Token that need to be deposited to take a position in protocol "
-  inputToken: [Token!]
+  inputToken: Token!
 
   " Token that is minted to track ownership of position in protocol (e.g. aToken, cToken). Leave as null if doesn't exist "
   outputToken: Token
@@ -496,7 +505,7 @@ type Market @entity {
   ##### Token Balances #####
 
   " Amount of input tokens in the market "
-  inputTokenBalance: [BigInt!]
+  inputTokenBalance: BigInt!
 
   " Price per share of input token in USD "
   inputTokenPriceUSD: BigDecimal!
@@ -963,12 +972,25 @@ type ActiveAccount @entity {
 type _Trove @entity {
   " Trove owner's address "
   id: ID!
-  " Amount of ETH owner has deposited "
-  collateral: BigInt!
-  " Amount of YUSD owner has withdrawn "
+
+    " Amount of YUSD owner has withdrawn "
   debt: BigInt!
+
+  tokens: [_TroveToken!] @derivedFrom(field: "trove")
+}
+
+type _TroveToken @entity{
+  " Trove id + token id "
+  id: ID!
+
+  trove: _Trove!
+    " Amount of  owner has deposited "
+  collateral: BigInt!
+
   " Total amount of ETH surplus owner can claim "
   collateralSurplus: BigInt!
   " Last change to collateralSurplus "
   collateralSurplusChange: BigInt!
 }
+
+

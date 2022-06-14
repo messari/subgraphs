@@ -1,9 +1,8 @@
-import { CollBalanceUpdated } from "../../generated/CollSurplusPool/CollSurplusPool";
+import { CollBalanceUpdated, CollSurplusPool } from "../../generated/CollSurplusPool/CollSurplusPool";
 import { createWithdraw } from "../entities/event";
-import { getCurrentETHPrice } from "../entities/token";
-import { getOrCreateTrove } from "../entities/trove";
+import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
+import { getUSDPriceWithoutDecimals } from "../Prices";
 import { BIGINT_ZERO } from "../utils/constants";
-import { bigIntToBigDecimal } from "../utils/numbers";
 
 /**
  * Whenever a borrower's trove is closed by a non-owner address because of either:
@@ -16,24 +15,32 @@ import { bigIntToBigDecimal } from "../utils/numbers";
  */
 export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
   const borrower = event.params._account;
-  const collateralSurplusETH = event.params._newBalance;
   const trove = getOrCreateTrove(borrower);
-  if (collateralSurplusETH > trove.collateralSurplus) {
-    trove.collateralSurplusChange = collateralSurplusETH.minus(
-      trove.collateralSurplus
+  const collSurplusPool = CollSurplusPool.bind(event.address);
+  const collateralsSurplus = collSurplusPool.getAmountsClaimable(borrower)
+
+  for(let i = 0; i < collateralsSurplus.value0.length; i++) {
+    const token = collateralsSurplus.value0[i];
+    const amount = collateralsSurplus.value1[i];
+    const troveToken = getOrCreateTroveToken(trove, token);
+if (amount > troveToken.collateralSurplus) {
+  troveToken.collateralSurplusChange = amount.minus(
+    troveToken.collateralSurplus
     );
-    const collateralSurplusUSD = bigIntToBigDecimal(
-      trove.collateralSurplusChange
-    ).times(getCurrentETHPrice());
+    const collateralSurplusUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal());
     createWithdraw(
       event,
-      trove.collateralSurplusChange,
+      troveToken.collateralSurplusChange,
       collateralSurplusUSD,
-      borrower
+      borrower,
+      token
     );
   } else {
-    trove.collateralSurplusChange = BIGINT_ZERO;
+    troveToken.collateralSurplusChange = BIGINT_ZERO;
   }
-  trove.collateralSurplus = collateralSurplusETH;
+  troveToken.collateralSurplus = amount;
+  troveToken.save()
+}
+  
   trove.save();
 }

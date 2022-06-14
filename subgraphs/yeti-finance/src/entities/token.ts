@@ -6,7 +6,7 @@ import {
 } from "../utils/constants";
 import { bigIntToBigDecimal, readValue } from "../utils/numbers";
 
-import {ERC20Contract} from '../../generated/TroveManager/ERC20Contract'
+import {ERC20Contract} from '../../generated/ActivePool/ERC20Contract'
 export function getOrCreateToken(address: Address): Token {
   let token = Token.load(address.toHexString());
 

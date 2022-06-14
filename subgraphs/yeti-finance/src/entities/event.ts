@@ -31,18 +31,18 @@ import {
   addMarketLiquidateVolume,
   getOrCreateMarket,
 } from "./market";
-import { getETHToken, getOrCreateToken, getYUSDToken } from "./token";
+import { getOrCreateToken, getYUSDToken } from "./token";
 import { prefixID } from "../utils/strings";
 
 export function createDeposit(
   event: ethereum.Event,
-  amountETH: BigInt,
+  amount: BigInt,
   amountUSD: BigDecimal,
   sender: Address,
   asset: Address
 ): void {
-  if (amountETH.le(BIGINT_ZERO)) {
-    log.critical("Invalid deposit amount: {}", [amountETH.toString()]);
+  if (amount.le(BIGINT_ZERO)) {
+    log.critical("Invalid deposit amount: {}", [amount.toString()]);
   }
   const deposit = new Deposit(
     prefixID(
@@ -57,24 +57,24 @@ export function createDeposit(
   deposit.from = sender.toHexString();
   deposit.blockNumber = event.block.number;
   deposit.timestamp = event.block.timestamp;
-  deposit.market = getOrCreateMarket().id;
+  deposit.market = getOrCreateMarket(asset).id;
   deposit.asset = getOrCreateToken(asset).id;
-  deposit.amount = amountETH;
+  deposit.amount = amount;
   deposit.amountUSD = amountUSD;
   deposit.save();
   updateUsageMetrics(event, sender);
-  addMarketDepositVolume(event, amountUSD);
+  addMarketDepositVolume(event, amountUSD, asset);
 }
 
 export function createWithdraw(
   event: ethereum.Event,
-  amountETH: BigInt,
+  amount: BigInt,
   amountUSD: BigDecimal,
   recipient: Address,
   asset: Address
 ): void {
-  if (amountETH.le(BIGINT_ZERO)) {
-    log.critical("Invalid withdraw amount: {}", [amountETH.toString()]);
+  if (amount.le(BIGINT_ZERO)) {
+    log.critical("Invalid withdraw amount: {}", [amount.toString()]);
   }
   const withdraw = new Withdraw(
     prefixID(
@@ -89,9 +89,9 @@ export function createWithdraw(
   withdraw.from = ACTIVE_POOL;
   withdraw.blockNumber = event.block.number;
   withdraw.timestamp = event.block.timestamp;
-  withdraw.market = getOrCreateMarket().id;
+  withdraw.market = getOrCreateMarket(asset).id;
   withdraw.asset = getOrCreateToken(asset).id;
-  withdraw.amount = amountETH;
+  withdraw.amount = amount;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
   updateUsageMetrics(event, recipient);
@@ -102,8 +102,7 @@ export function createBorrow(
   event: ethereum.Event,
   amountYUSD: BigInt,
   amountUSD: BigDecimal,
-  recipient: Address,
-  asset: Address
+  recipient: Address
 
 ): void {
   if (amountYUSD.le(BIGINT_ZERO)) {
@@ -122,13 +121,11 @@ export function createBorrow(
   borrow.from = ZERO_ADDRESS; // YUSD is minted
   borrow.blockNumber = event.block.number;
   borrow.timestamp = event.block.timestamp;
-  borrow.market = getOrCreateMarket().id;
   borrow.asset = getYUSDToken().id;
   borrow.amount = amountYUSD;
   borrow.amountUSD = amountUSD;
   borrow.save();
   updateUsageMetrics(event, recipient);
-  addMarketBorrowVolume(event, amountUSD);
 }
 
 export function createRepay(
@@ -153,7 +150,6 @@ export function createRepay(
   repay.from = sender.toHexString();
   repay.blockNumber = event.block.number;
   repay.timestamp = event.block.timestamp;
-  repay.market = getOrCreateMarket().id;
   repay.asset = getYUSDToken().id;
   repay.amount = amountYUSD;
   repay.amountUSD = amountUSD;
@@ -184,13 +180,13 @@ export function createLiquidate(
   liquidate.from = liquidator.toHexString();
   liquidate.blockNumber = event.block.number;
   liquidate.timestamp = event.block.timestamp;
-  liquidate.market = getOrCreateMarket().id;
+  liquidate.market = getOrCreateMarket(asset).id;
   liquidate.asset = getOrCreateToken(asset).id;
   liquidate.amount = amountLiquidated;
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
   updateUsageMetrics(event, liquidator);
-  addMarketLiquidateVolume(event, amountLiquidatedUSD);
+  addMarketLiquidateVolume(event, amountLiquidatedUSD, asset);
   incrementProtocolLiquidateCount(event);
 }

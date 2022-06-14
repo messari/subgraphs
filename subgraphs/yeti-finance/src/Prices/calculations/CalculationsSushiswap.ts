@@ -2,7 +2,7 @@ import * as utils from "../common/utils";
 import * as constants from "../common/constants";
 import { CustomPriceType } from "../common/types";
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
-import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/templates/Vault/CalculationsSushiSwap";
+import { CalculationsSushiSwap as CalculationsSushiContract } from "../../../generated/ActivePool/CalculationsSushiSwap";
 
 export function getSushiSwapContract(
   network: string

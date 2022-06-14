@@ -4,12 +4,12 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: TroveManager
+    name: TroveManagerLiquidations
     network: mainnet
     source:
-      address: "0x000000000000614c27530d24B5f039EC15A61d8d"
-      abi: TroveManager
-      startBlock: 13441808
+      address: "0x0000000000aDCd24b833604068cBbbb2EEb3a2a3"
+      abi: TroveManagerLiquidations
+      startBlock: 13441817
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -32,20 +32,26 @@ dataSources:
         - Account
         - FinancialsDailySnapshot
       abis:
-        - name: TroveManager
-          file: ./abis/TroveManager.json
+        - name: TroveManagerLiquidations
+          file: ./abis/TroveManagerLiquidations.json
         - name: ERC20Contract
           file: ./abis/ERC20.json   
                 
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # Yeti Controller
+        - name: YetiController
+          file: ./abis/Prices/YetiController.json
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -73,10 +79,83 @@ dataSources:
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
           handler: handleTroveUpdated
-        - event: Redemption(uint256,uint256,uint256,address[],uint256[])
-          handler: handleRedemption
-        - event: TroveLiquidated(indexed address,uint256,uint256,uint8)
-          handler: handleTroveLiquidated
+      file: ./src/mapping/TroveManager.ts
+  - kind: ethereum/contract
+    name: TroveManagerRedemptions
+    network: mainnet
+    source:
+      address: "0x00000000000d9c2f60d8e82F2d1C2bed5008DD7d"
+      abi: TroveManagerRedemptions
+      startBlock: 13441808
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - _Trove
+        - Deposit
+        - Withdraw
+        - Borrow
+        - Repay
+        - Liquidate
+        - LendingProtocol
+        - Market
+        - MarketDailySnapshot
+        - MarketHourlySnapshot
+        - Token
+        - UsageMetricsDailySnapshot
+        - UsageMetricsHourlySnapshot
+        - ActiveAccount
+        - Account
+        - FinancialsDailySnapshot
+      abis:
+        - name: TroveManagerRedemptions
+          file: ./abis/TroveManagerRedemptions.json
+        - name: ERC20Contract
+          file: ./abis/ERC20.json   
+                
+        
+        ###########################################
+        ############## Price Oracle ###############
+        ###########################################
+        # Yeti Controller
+        - name: YetiController
+          file: ./abis/Prices/YetiController.json
+        # ERC20
+        - name: PriceOracleERC20
+          file: ./abis/Prices/ERC20.json
+        # Curve Contracts
+        - name: CurveRegistry
+          file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
+        - name: CalculationsCurve
+          file: ./abis/Prices/Calculations/Curve.json
+        # YearnLens Contracts
+        - name: YearnLensContract
+          file: ./abis/Prices/YearnLens.json
+        # ChainLink Contracts
+        - name: ChainLinkContract
+          file: ./abis/Prices/ChainLink.json
+        # Uniswap Contracts
+        - name: UniswapRouter
+          file: ./abis/Prices/Uniswap/Router.json
+        - name: UniswapFactory
+          file: ./abis/Prices/Uniswap/Factory.json
+        - name: UniswapPair
+          file: ./abis/Prices/Uniswap/Pair.json
+        # SushiSwap Contracts
+        - name: SushiSwapRouter
+          file: ./abis/Prices/SushiSwap/Router.json
+        - name: SushiSwapFactory
+          file: ./abis/Prices/SushiSwap/Factory.json
+        - name: SushiSwapPair
+          file: ./abis/Prices/SushiSwap/Pair.json
+        - name: CalculationsSushiSwap
+          file: ./abis/Prices/Calculations/SushiSwap.json
+      eventHandlers:
+        - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
+          handler: handleTroveUpdated
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
@@ -111,15 +190,18 @@ dataSources:
         - name: ERC20Contract
           file: ./abis/ERC20.json   
                 
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -174,15 +256,21 @@ dataSources:
         - name: ERC20Contract
           file: ./abis/ERC20.json   
                 
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # Yeti Controller
+        - name: YetiController
+          file: ./abis/Prices/YetiController.json
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -237,16 +325,21 @@ dataSources:
           file: ./abis/CollSurplusPool.json
         - name: ERC20Contract
           file: ./abis/ERC20.json   
-                
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # Yeti Controller
+        - name: YetiController
+          file: ./abis/Prices/YetiController.json
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -296,16 +389,21 @@ dataSources:
           file: ./abis/StabilityPool.json
         - name: ERC20Contract
           file: ./abis/ERC20.json   
-                
+        
         ###########################################
         ############## Price Oracle ###############
         ###########################################
+        # Yeti Controller
+        - name: YetiController
+          file: ./abis/Prices/YetiController.json
         # ERC20
-        - name: ERC20
+        - name: PriceOracleERC20
           file: ./abis/Prices/ERC20.json
         # Curve Contracts
         - name: CurveRegistry
           file: ./abis/Prices/Curve/Registry.json
+        - name: CurvePoolRegistry
+          file: ./abis/Prices/Curve/PoolRegistry.json
         - name: CalculationsCurve
           file: ./abis/Prices/Calculations/Curve.json
         # YearnLens Contracts
@@ -333,4 +431,6 @@ dataSources:
       eventHandlers:
         - event: StabilityPoolYUSDBalanceUpdated(uint256)
           handler: handleStabilityPoolYUSDBalanceUpdated
+        - event: StabilityPoolBalancesUpdated(address[],uint256[])
+          handler: handleStabilityPoolBalancesUpdated
       file: ./src/mapping/StabilityPool.ts

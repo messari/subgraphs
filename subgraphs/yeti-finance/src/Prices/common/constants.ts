@@ -3,8 +3,8 @@ import * as FANTOM from "../config/fantom";
 import * as ARBITRUM_ONE from "../config/arbitrum_one";
 
 import { Address, BigDecimal, BigInt, TypedMap } from "@graphprotocol/graph-ts";
-import { UniswapPair__getReservesResult } from "../../../generated/TroveManager/UniswapPair";
-import { SushiSwapPair__getReservesResult } from "../../../generated/TroveManager/SushiSwapPair";
+import { UniswapPair__getReservesResult } from "../../../generated/ActivePool/UniswapPair";
+import { SushiSwapPair__getReservesResult } from "../../../generated/ActivePool/SushiSwapPair";
 
 ///////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// COMMON ////////////////////////////////
@@ -190,6 +190,7 @@ YEARN_LENS_CONTRACT_ADDRESS.set(
   ARBITRUM_ONE.YEARN_LENS_CONTRACT_ADDRESS
 );
 
+export const YETI_CONTROLLER = "0xcCCCcCccCCCc053fD8D1fF275Da4183c2954dBe3"
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CHAINLINK CONTRACT //////////////////////////
 ///////////////////////////////////////////////////////////////////////////

@@ -8,6 +8,8 @@ import {
   UsageMetricsHourlySnapshot,
 } from "../../generated/schema";
 import {
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
   LendingType,
   Network,
   ProtocolType,
@@ -38,6 +40,8 @@ export function getOrCreateYetiProtocol(): LendingProtocol {
     protocol.lendingType = LendingType.CDP;
     protocol.riskType = RiskType.ISOLATED;
     protocol.mintedTokens = [getYUSDToken().id];
+    protocol.totalYUSDLocked = BIGINT_ZERO;
+    protocol.totalStablePoolAssetUSD = BIGDECIMAL_ZERO;
     protocol.save();
   }
   return protocol;
@@ -279,7 +283,7 @@ export function addProtocolLiquidateVolume(
   financialsSnapshot.save();
 }
 
-export function updateProtocoyUSDLocked(
+export function updateProtocolUSDLocked(
   event: ethereum.Event,
   netChangeUSD: BigDecimal
 ): void {
@@ -292,13 +296,11 @@ export function updateProtocoyUSDLocked(
   financialsSnapshot.save();
 }
 
-export function updateProtocoyUSDLockedStabilityPool(
+export function updateProtocolLockedUSD(
   event: ethereum.Event,
-  stabilityPoolTVL: BigDecimal
+  totalValueLocked: BigDecimal
 ): void {
   const protocol = getOrCreateYetiProtocol();
-  const market = getOrCreateMarket();
-  const totalValueLocked = market.totalValueLockedUSD.plus(stabilityPoolTVL);
   protocol.totalValueLockedUSD = totalValueLocked;
   protocol.totalDepositBalanceUSD = totalValueLocked;
   protocol.save();
