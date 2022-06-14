@@ -11,16 +11,18 @@ export function getOrCreateTrove(owner: Address): _Trove {
   return trove;
 }
 
-
-export function getOrCreateTroveToken(trove: _Trove, token: Address): _TroveToken {
+export function getOrCreateTroveToken(
+  trove: _Trove,
+  token: Address
+): _TroveToken {
   const id = trove.id + "-" + token.toHexString();
 
   let troveToken = _TroveToken.load(id);
-  if(troveToken == null) {
+  if (troveToken == null) {
     troveToken = new _TroveToken(id);
     troveToken.trove = trove.id;
     troveToken.save();
   }
-  
-  return troveToken
+
+  return troveToken;
 }

@@ -1,12 +1,9 @@
-import {Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { Token } from "../../generated/schema";
-import {
-  YUSD_ADDRESS,
-  BIGINT_ZERO
-} from "../utils/constants";
+import { YUSD_ADDRESS, BIGINT_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal, readValue } from "../utils/numbers";
 
-import {ERC20Contract} from '../../generated/ActivePool/ERC20Contract'
+import { ERC20Contract } from "../../generated/ActivePool/ERC20Contract";
 export function getOrCreateToken(address: Address): Token {
   let token = Token.load(address.toHexString());
 
@@ -17,8 +14,10 @@ export function getOrCreateToken(address: Address): Token {
 
     token.name = readValue<string>(contract.try_name(), "");
     token.symbol = readValue<string>(contract.try_symbol(), "");
-    token.decimals = readValue<BigInt>(contract.try_decimals(), BIGINT_ZERO)
-      .toI32() as u8;
+    token.decimals = readValue<BigInt>(
+      contract.try_decimals(),
+      BIGINT_ZERO
+    ).toI32() as u8;
 
     token.save();
   }
@@ -34,4 +33,3 @@ export function getYUSDToken(): Token {
   token.save();
   return token;
 }
-

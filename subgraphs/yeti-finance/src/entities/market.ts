@@ -118,9 +118,11 @@ export function setMarketAssetBalance(
   balance: BigInt,
   tokenAddr: Address
 ): void {
-  const tokenPrice = getUsdPrice(tokenAddr,BIGDECIMAL_ONE);
-  const token = getOrCreateToken(tokenAddr)
-  const balanceUSD = tokenPrice.times(balance.toBigDecimal()).div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
+  const tokenPrice = getUsdPrice(tokenAddr, BIGDECIMAL_ONE);
+  const token = getOrCreateToken(tokenAddr);
+  const balanceUSD = tokenPrice
+    .times(balance.toBigDecimal())
+    .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
   const market = getOrCreateMarket(tokenAddr);
   const netChangeUSD = balanceUSD.minus(market.totalValueLockedUSD);
   market.totalValueLockedUSD = balanceUSD;
@@ -134,13 +136,12 @@ export function setMarketAssetBalance(
   updateProtocolUSDLocked(event, netChangeUSD);
 }
 
-
 export function addMarketDepositVolume(
   event: ethereum.Event,
   depositedUSD: BigDecimal,
   token: Address
 ): void {
-  const market = getOrCreateMarket(token)
+  const market = getOrCreateMarket(token);
   market.cumulativeDepositUSD = market.cumulativeDepositUSD.plus(depositedUSD);
   market.save();
   const dailySnapshot = getOrCreateMarketSnapshot(event, market);
@@ -159,7 +160,7 @@ export function addMarketLiquidateVolume(
   liquidatedUSD: BigDecimal,
   token: Address
 ): void {
-  const market = getOrCreateMarket(token)
+  const market = getOrCreateMarket(token);
   market.cumulativeLiquidateUSD =
     market.cumulativeLiquidateUSD.plus(liquidatedUSD);
   market.save();

@@ -86,7 +86,6 @@ export namespace InterestRateSide {
   export const BORROWER = "BORROWER";
 }
 
-
 ////////////////////////
 ///// Type Helpers /////
 ////////////////////////

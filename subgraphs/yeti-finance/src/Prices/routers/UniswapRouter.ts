@@ -88,12 +88,10 @@ export function getPriceFromRouter(
   let token0Decimals = utils.getTokenDecimals(token0Address);
   let amountIn = BigInt.fromI32(10).pow(token0Decimals.toI32() as u8);
 
-  let routerAddressV1 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
-    network
-  )!.get("routerV1");
-  let routerAddressV2 = constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(
-    network
-  )!.get("routerV2");
+  let routerAddressV1 =
+    constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(network)!.get("routerV1");
+  let routerAddressV2 =
+    constants.UNISWAP_ROUTER_CONTRACT_ADDRESSES.get(network)!.get("routerV2");
 
   let amountOutArray: ethereum.CallResult<BigInt[]>;
   if (routerAddressV1) {

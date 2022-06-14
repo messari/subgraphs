@@ -26,12 +26,14 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
 
   let network = dataSource.network();
 
-  // 1. YetiController 
+  // 1. YetiController
   let yetiControllerPrice = getTokenPriceFromYetiController(tokenAddr, network);
   if (!yetiControllerPrice.reverted) {
     log.warning("[YetiControllerFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      yetiControllerPrice.usdPrice.div(yetiControllerPrice.decimalsBaseTen).toString()
+      yetiControllerPrice.usdPrice
+        .div(yetiControllerPrice.decimalsBaseTen)
+        .toString(),
     ]);
     return yetiControllerPrice;
   }
@@ -41,21 +43,20 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!chainLinkPrice.reverted) {
     log.warning("[ChainLinkFeed] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString()
+      chainLinkPrice.usdPrice.div(chainLinkPrice.decimalsBaseTen).toString(),
     ]);
     return chainLinkPrice;
   }
-  
+
   // 3. Yearn Lens Oracle
   let yearnLensPrice = getTokenPriceFromYearnLens(tokenAddr, network);
   if (!yearnLensPrice.reverted) {
     log.warning("[YearnLensOracle] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString()
+      yearnLensPrice.usdPrice.div(yearnLensPrice.decimalsBaseTen).toString(),
     ]);
     return yearnLensPrice;
   }
-
 
   // 4. CalculationsCurve
   let calculationsCurvePrice = getTokenPriceFromCalculationCurve(
@@ -67,7 +68,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       calculationsCurvePrice.usdPrice
         .div(calculationsCurvePrice.decimalsBaseTen)
-        .toString()
+        .toString(),
     ]);
     return calculationsCurvePrice;
   }
@@ -82,7 +83,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
       tokenAddr.toHexString(),
       calculationsSushiSwapPrice.usdPrice
         .div(calculationsSushiSwapPrice.decimalsBaseTen)
-        .toString()
+        .toString(),
     ]);
     return calculationsSushiSwapPrice;
   }
@@ -92,7 +93,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!curvePrice.reverted) {
     log.warning("[CurveRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString()
+      curvePrice.usdPrice.div(curvePrice.decimalsBaseTen).toString(),
     ]);
     return curvePrice;
   }
@@ -102,7 +103,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!uniswapPrice.reverted) {
     log.warning("[UniswapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString()
+      uniswapPrice.usdPrice.div(uniswapPrice.decimalsBaseTen).toString(),
     ]);
     return uniswapPrice;
   }
@@ -112,7 +113,7 @@ export function getUsdPricePerToken(tokenAddr: Address): CustomPriceType {
   if (!sushiswapPrice.reverted) {
     log.warning("[SushiSwapRouter] tokenAddress: {}, Price: {}", [
       tokenAddr.toHexString(),
-      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString()
+      sushiswapPrice.usdPrice.div(sushiswapPrice.decimalsBaseTen).toString(),
     ]);
     return sushiswapPrice;
   }
@@ -129,7 +130,7 @@ export function getUsdPrice(
   amount: BigDecimal
 ): BigDecimal {
   let tokenPrice = getUsdPricePerToken(tokenAddr);
-  const decimals = getTokenDecimals(tokenAddr)
+  const decimals = getTokenDecimals(tokenAddr);
   if (!tokenPrice.reverted) {
     return tokenPrice.usdPrice.times(amount).div(tokenPrice.decimalsBaseTen);
   }
@@ -141,7 +142,9 @@ export function getUSDPriceWithoutDecimals(
   tokenAddr: Address,
   amount: BigDecimal
 ): BigDecimal {
-  let tokenPrice = getUsdPrice(tokenAddr,amount);
-  const decimals = getTokenDecimals(tokenAddr)
-  return tokenPrice.div(constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal());
+  let tokenPrice = getUsdPrice(tokenAddr, amount);
+  const decimals = getTokenDecimals(tokenAddr);
+  return tokenPrice.div(
+    constants.BIGINT_TEN.pow(decimals.toI32() as u8).toBigDecimal()
+  );
 }

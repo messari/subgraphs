@@ -1,4 +1,7 @@
-import { CollBalanceUpdated, CollSurplusPool } from "../../generated/CollSurplusPool/CollSurplusPool";
+import {
+  CollBalanceUpdated,
+  CollSurplusPool,
+} from "../../generated/CollSurplusPool/CollSurplusPool";
 import { createWithdraw } from "../entities/event";
 import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
 import { getUSDPriceWithoutDecimals } from "../Prices";
@@ -17,30 +20,33 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
   const borrower = event.params._account;
   const trove = getOrCreateTrove(borrower);
   const collSurplusPool = CollSurplusPool.bind(event.address);
-  const collateralsSurplus = collSurplusPool.getAmountsClaimable(borrower)
+  const collateralsSurplus = collSurplusPool.getAmountsClaimable(borrower);
 
-  for(let i = 0; i < collateralsSurplus.value0.length; i++) {
+  for (let i = 0; i < collateralsSurplus.value0.length; i++) {
     const token = collateralsSurplus.value0[i];
     const amount = collateralsSurplus.value1[i];
     const troveToken = getOrCreateTroveToken(trove, token);
-if (amount > troveToken.collateralSurplus) {
-  troveToken.collateralSurplusChange = amount.minus(
-    troveToken.collateralSurplus
-    );
-    const collateralSurplusUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal());
-    createWithdraw(
-      event,
-      troveToken.collateralSurplusChange,
-      collateralSurplusUSD,
-      borrower,
-      token
-    );
-  } else {
-    troveToken.collateralSurplusChange = BIGINT_ZERO;
+    if (amount > troveToken.collateralSurplus) {
+      troveToken.collateralSurplusChange = amount.minus(
+        troveToken.collateralSurplus
+      );
+      const collateralSurplusUSD = getUSDPriceWithoutDecimals(
+        token,
+        amount.toBigDecimal()
+      );
+      createWithdraw(
+        event,
+        troveToken.collateralSurplusChange,
+        collateralSurplusUSD,
+        borrower,
+        token
+      );
+    } else {
+      troveToken.collateralSurplusChange = BIGINT_ZERO;
+    }
+    troveToken.collateralSurplus = amount;
+    troveToken.save();
   }
-  troveToken.collateralSurplus = amount;
-  troveToken.save()
-}
-  
+
   trove.save();
 }

@@ -10,7 +10,9 @@ import { SushiSwapRouter as SushiSwapRouterContract } from "../../../generated/A
 
 export function isLpToken(tokenAddress: Address, network: string): bool {
   if (
-    tokenAddress.equals(constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!)
+    tokenAddress.equals(
+      constants.WHITELIST_TOKENS_MAP.get(network)!.get("ETH")!
+    )
   ) {
     return false;
   }

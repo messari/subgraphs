@@ -103,7 +103,6 @@ export function createBorrow(
   amountYUSD: BigInt,
   amountUSD: BigDecimal,
   recipient: Address
-
 ): void {
   if (amountYUSD.le(BIGINT_ZERO)) {
     log.critical("Invalid borrow amount: {}", [amountYUSD.toString()]);

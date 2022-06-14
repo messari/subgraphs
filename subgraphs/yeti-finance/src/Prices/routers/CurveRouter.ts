@@ -161,11 +161,13 @@ export function isBasicToken(tokenAddress: Address, network: string): bool {
     basicTokenIdx++
   ) {
     let basicTokenName = constants.WHITELIST_TOKENS_LIST[basicTokenIdx];
-    let basicTokenAddress = constants.WHITELIST_TOKENS_MAP.get(network)!.get(
-      basicTokenName
-    );
+    let basicTokenAddress =
+      constants.WHITELIST_TOKENS_MAP.get(network)!.get(basicTokenName);
 
-    if (basicTokenAddress && tokenAddress.toHex() == basicTokenAddress.toHex()) {
+    if (
+      basicTokenAddress &&
+      tokenAddress.toHex() == basicTokenAddress.toHex()
+    ) {
       return true;
     }
   }

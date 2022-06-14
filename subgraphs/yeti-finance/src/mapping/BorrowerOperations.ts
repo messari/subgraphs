@@ -33,27 +33,33 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   const borrower = event.params._borrower;
   const newDebt = event.params._debt;
   const trove = getOrCreateTrove(borrower);
- 
-  for(let i = 0;i < event.params._tokens.length;i++){
+
+  for (let i = 0; i < event.params._tokens.length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
 
-    const troveToken = getOrCreateTroveToken(trove, token)
-    
+    const troveToken = getOrCreateTroveToken(trove, token);
+
     if (amount == troveToken.collateral && newDebt == trove.debt) {
       return;
     }
     if (amount > troveToken.collateral) {
       const depositAmount = amount.minus(troveToken.collateral);
-      const depositAmountUSD = getUSDPriceWithoutDecimals(token,depositAmount.toBigDecimal())
-      createDeposit(event, depositAmount, depositAmountUSD, borrower,token);
+      const depositAmountUSD = getUSDPriceWithoutDecimals(
+        token,
+        depositAmount.toBigDecimal()
+      );
+      createDeposit(event, depositAmount, depositAmountUSD, borrower, token);
     } else if (amount < troveToken.collateral) {
       const withdrawAmount = troveToken.collateral.minus(amount);
-      const withdrawAmountUSD =  getUSDPriceWithoutDecimals(token,withdrawAmount.toBigDecimal())
-      createWithdraw(event, withdrawAmount, withdrawAmountUSD, borrower,token);
+      const withdrawAmountUSD = getUSDPriceWithoutDecimals(
+        token,
+        withdrawAmount.toBigDecimal()
+      );
+      createWithdraw(event, withdrawAmount, withdrawAmountUSD, borrower, token);
     }
     troveToken.collateral = amount;
-    troveToken.save()
+    troveToken.save();
   }
 
   if (newDebt > trove.debt) {

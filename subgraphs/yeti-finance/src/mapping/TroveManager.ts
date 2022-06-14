@@ -1,10 +1,6 @@
-import {
-  TroveUpdated,
-} from "../../generated/TroveManagerLiquidations/TroveManagerLiquidations";
+import { TroveUpdated } from "../../generated/TroveManagerLiquidations/TroveManagerLiquidations";
 
-import {
-  Redemption
-} from "../../generated/TroveManagerRedemptions/TroveManagerRedemptions";
+import { Redemption } from "../../generated/TroveManagerRedemptions/TroveManagerRedemptions";
 import {
   createBorrow,
   createDeposit,
@@ -33,7 +29,7 @@ enum TroveManagerOperation {
   applyPendingRewards,
   liquidateInNormalMode,
   liquidateInRecoveryMode,
-  redeemCollateral
+  redeemCollateral,
 }
 
 export function handleRedemption(event: Redemption): void {
@@ -62,33 +58,41 @@ export function handleTroveUpdated(event: TroveUpdated): void {
       liquidateTrove(event, trove);
       break;
   }
-  for(let i = 0; i < event.params._tokens.length; i++) {
+  for (let i = 0; i < event.params._tokens.length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
     const troveToken = getOrCreateTroveToken(trove, token);
-    troveToken.collateral = amount
-    troveToken.save()
+    troveToken.collateral = amount;
+    troveToken.save();
   }
   trove.debt = event.params._debt;
   trove.save();
 }
-
 
 // Treat applyPendingRewards as deposit + borrow
 function applyPendingRewards(event: TroveUpdated, trove: _Trove): void {
   const borrower = event.params._borrower;
   const newDebt = event.params._debt;
 
-  for(let i = 0; i < event.params._tokens.toString().length; i++) {
+  for (let i = 0; i < event.params._tokens.toString().length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
 
-    const troveToken = getOrCreateTroveToken(trove, token)
+    const troveToken = getOrCreateTroveToken(trove, token);
     const collateralReward = amount.minus(troveToken.collateral);
 
-    const collateralRewardUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal())
-    createDeposit(event, collateralReward, collateralRewardUSD, borrower,token);
-    troveToken.save()
+    const collateralRewardUSD = getUSDPriceWithoutDecimals(
+      token,
+      amount.toBigDecimal()
+    );
+    createDeposit(
+      event,
+      collateralReward,
+      collateralRewardUSD,
+      borrower,
+      token
+    );
+    troveToken.save();
   }
 
   const borrowAmountYUSD = newDebt.minus(trove.debt);
@@ -100,23 +104,25 @@ function applyPendingRewards(event: TroveUpdated, trove: _Trove): void {
 function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
   const newDebt = event.params._debt;
 
-  
   const repayAmountYUSD = trove.debt.minus(newDebt);
   const repayAmountUSD = bigIntToBigDecimal(repayAmountYUSD);
   createRepay(event, repayAmountYUSD, repayAmountUSD, event.transaction.from);
 
-  for(let i = 0; i < event.params._tokens.toString().length; i++) {
+  for (let i = 0; i < event.params._tokens.toString().length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
 
-    const troveToken = getOrCreateTroveToken(trove, token)
+    const troveToken = getOrCreateTroveToken(trove, token);
     let withdrawAmount = troveToken.collateral.minus(amount);
     // If trove was closed, then extra collateral is sent to CollSurplusPool to be withdrawn by trove owner
     if (troveToken.collateral.equals(BIGINT_ZERO)) {
-      withdrawAmount= withdrawAmount.minus(troveToken.collateralSurplusChange);
+      withdrawAmount = withdrawAmount.minus(troveToken.collateralSurplusChange);
       troveToken.collateralSurplusChange = BIGINT_ZERO;
     }
-    const withdrawAmountUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal())
+    const withdrawAmountUSD = getUSDPriceWithoutDecimals(
+      token,
+      amount.toBigDecimal()
+    );
     createWithdraw(
       event,
       withdrawAmount,
@@ -124,23 +130,21 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
       event.transaction.from,
       token
     );
-    troveToken.save()
-
+    troveToken.save();
   }
-  
 }
 
 function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
-  let supplySideRevenueUSD = BIGDECIMAL_ZERO
-  let profit = BIGDECIMAL_ZERO
-  
-  for(let i = 0; i < event.params._tokens.length; i++) {
+  let supplySideRevenueUSD = BIGDECIMAL_ZERO;
+  let profit = BIGDECIMAL_ZERO;
+
+  for (let i = 0; i < event.params._tokens.length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
-    const amountUSD = getUSDPriceWithoutDecimals(token,amount.toBigDecimal())
+    const amountUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal());
     const profitUSD = amountUSD
-    .times(LIQUIDATION_FEE)
-    .plus(LIQUIDATION_RESERVE_YUSD);
+      .times(LIQUIDATION_FEE)
+      .plus(LIQUIDATION_RESERVE_YUSD);
     createLiquidate(
       event,
       amount,
@@ -149,14 +153,13 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
       event.transaction.from,
       token
     );
-      profit = profit.plus(profitUSD);
-    supplySideRevenueUSD = supplySideRevenueUSD.plus(amountUSD
-      .times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
-      )
+    profit = profit.plus(profitUSD);
+    supplySideRevenueUSD = supplySideRevenueUSD.plus(
+      amountUSD.times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
+    );
   }
   const liquidatedDebtUSD = bigIntToBigDecimal(trove.debt);
-   supplySideRevenueUSD = supplySideRevenueUSD
-    .minus(liquidatedDebtUSD);
+  supplySideRevenueUSD = supplySideRevenueUSD.minus(liquidatedDebtUSD);
   addSupplySideRevenue(event, supplySideRevenueUSD);
   addProtocolSideRevenue(event, profit);
 }

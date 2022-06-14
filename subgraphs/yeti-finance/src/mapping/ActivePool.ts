@@ -3,18 +3,22 @@ import {
   ActivePoolBalanceUpdated,
   ActivePoolYUSDDebtUpdated,
 } from "../../generated/ActivePool/ActivePool";
-import {  setMarketAssetBalance, setMarketYUSDDebt } from "../entities/market";
+import { setMarketAssetBalance, setMarketYUSDDebt } from "../entities/market";
 
 /**
  * Total Assets collateral was updated
  *
  * @param event ActivePoolETHBalanceUpdated event
  */
- export function handleActivePoolAssetsBalanceUpdated(
+export function handleActivePoolAssetsBalanceUpdated(
   event: ActivePoolBalancesUpdated
 ): void {
-  for(let i = 0; i < event.params._amounts.length; i++) {
-    setMarketAssetBalance(event, event.params._amounts[i], event.params._collaterals[i]);
+  for (let i = 0; i < event.params._amounts.length; i++) {
+    setMarketAssetBalance(
+      event,
+      event.params._amounts[i],
+      event.params._collaterals[i]
+    );
   }
 }
 
@@ -23,10 +27,10 @@ import {  setMarketAssetBalance, setMarketYUSDDebt } from "../entities/market";
  *
  * @param event ActivePoolETHBalanceUpdated event
  */
- export function handleActivePoolAssetBalanceUpdated(
+export function handleActivePoolAssetBalanceUpdated(
   event: ActivePoolBalanceUpdated
 ): void {
-    setMarketAssetBalance(event, event.params._amount, event.params._collateral);
+  setMarketAssetBalance(event, event.params._amount, event.params._collateral);
 }
 
 /**
