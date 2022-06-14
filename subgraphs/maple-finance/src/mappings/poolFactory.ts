@@ -1,10 +1,8 @@
 import { PoolCreated as PoolCreatedEvent } from "../../generated/templates/PoolFactory/PoolFactory";
 import { Pool as PoolTemplate, StakeLocker as StakeLockerTemplate } from "../../generated/templates";
-
-import { getOrCreateMarket } from "../common/mapping_helpers/market";
-import { getOrCreatePoolFactory } from "../common/mapping_helpers/poolFactory";
-import { getOrCreateStakeLocker } from "../common/mapping_helpers/stakeLocker";
-import { getOrCreateToken } from "../common/mapping_helpers/token";
+import { getOrCreatePoolFactory } from "../common/mappingHelpers/getOrCreate/spawners";
+import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
+import { getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 
 export function handlePoolCreated(event: PoolCreatedEvent): void {
     const poolAddress = event.params.pool;
@@ -14,31 +12,19 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     PoolTemplate.create(poolAddress);
     StakeLockerTemplate.create(stakeLockerAddress);
 
-    const marketName = event.params.name;
     const poolFactoryAddress = event.address;
-    const delegateAddresss = event.params.delegate;
     const inputTokenAddress = event.params.liquidityAsset;
     const outputTokenAddress = poolAddress;
     const stakeTokenAddress = event.params.stakeAsset;
 
     // Create the things the market references
-    getOrCreatePoolFactory(poolFactoryAddress);
+    getOrCreatePoolFactory(event, poolFactoryAddress);
     getOrCreateToken(inputTokenAddress);
     getOrCreateToken(outputTokenAddress);
     getOrCreateToken(stakeTokenAddress);
 
-    getOrCreateMarket(
-        poolAddress,
-        marketName,
-        poolFactoryAddress,
-        delegateAddresss,
-        stakeLockerAddress,
-        inputTokenAddress,
-        outputTokenAddress,
-        event.block.timestamp,
-        event.block.number
-    );
+    // getOrCreateMarket(event, poolAddress);
 
     // Create the stake locker for this market
-    getOrCreateStakeLocker(stakeLockerAddress, poolAddress, stakeTokenAddress, event.block.number);
+    getOrCreateStakeLocker(event, stakeLockerAddress);
 }

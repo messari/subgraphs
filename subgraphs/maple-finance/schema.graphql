@@ -112,6 +112,11 @@ enum InterestRateSide {
     BORROWER
 }
 
+enum LoanVersion {
+    V1
+    V2_OR_V3
+}
+
 # Most markets only have a single interest rate given a specific type.
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
@@ -342,6 +347,9 @@ type UsageMetricsDailySnapshot @entity {
 
     " Total number of unstakes in a day "
     _dailyUnstakeCount: Int!
+
+    " Total number of claims in a day "
+    _dailyClaimCount: Int!
 }
 
 type UsageMetricsHourlySnapshot @entity {
@@ -388,6 +396,9 @@ type UsageMetricsHourlySnapshot @entity {
 
     " Total number of unstakes in an hour "
     _hourlyUnstakeCount: Int!
+
+    " Total number of claims in a day "
+    _hourlyClaimCount: Int!
 }
 
 type FinancialsDailySnapshot @entity {
@@ -661,6 +672,9 @@ type Market @entity {
 
     " All loans that have been taken out of this market "
     _loans: [_Loan!]! @derivedFrom(field: "market")
+
+    " Amount of input token per full share of output token at market creation "
+    _initialExchangeRate: BigDecimal!
 }
 
 #################################
@@ -1168,9 +1182,6 @@ type _StakeLocker @entity {
     " Price of the stake token in USD "
     stakeTokenPriceUSD: BigDecimal!
 
-    " Last block the price was updated "
-    priceLastUpdatedBlock: BigInt!
-
     " Amount of stake tokens the pool lost to covering loan defaults "
     cumulativeStakeDefault: BigInt!
 
@@ -1187,7 +1198,47 @@ type _StakeLocker @entity {
     creationBlock: BigInt!
 
     " Block the stake locker was last updated "
-    lastUpdatedBlock: BigInt!
+    lastUpdatedBlockNumber: BigInt!
+}
+
+type _Claim implements Event @entity {
+    " { Transaction hash }-{ Log index } "
+    id: ID!
+
+    " Transaction hash of the transaction that emitted this event "
+    hash: String!
+
+    " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
+    logIndex: Int!
+
+    " The protocol this transaction belongs to "
+    protocol: LendingProtocol!
+
+    " Market that tokens are repaid to "
+    to: String!
+
+    " Address that carried out the liquidation "
+    from: String!
+
+    " Block number of this event "
+    blockNumber: BigInt!
+
+    " Timestamp of this event "
+    timestamp: BigInt!
+
+    ##### Lending-Specific #####
+
+    " The market the stake is being added to "
+    market: Market!
+
+    " Stake token "
+    asset: Token!
+
+    " Amount of asset being claimed "
+    amount: BigInt!
+
+    " Amount of stake tokens being staked in USD "
+    amountUSD: BigDecimal
 }
 
 enum StakeType {
@@ -1312,6 +1363,12 @@ type _Loan @entity {
 
     " Amount of default remaining after liquidations that the stake and pool must cover in market input tokens "
     defaultSuffered: BigInt!
+
+    " Block number this loan was originally funded "
+    creationBlockNumber: BigInt!
+
+    " Version of the loan "
+    version: LoanVersion!
 }
 
 type _MplReward @entity {
@@ -1343,8 +1400,8 @@ type _MplReward @entity {
     rewardTokenEmissionsUSDPerDay: BigDecimal!
 
     " Block the mpl rewards was created "
-    creationBlock: BigInt!
+    creationBlockNumber: BigInt!
 
     " Block the mpl rewards was last updated "
-    lastUpdatedBlock: BigInt!
+    lastUpdatedBlockNumber: BigInt!
 }

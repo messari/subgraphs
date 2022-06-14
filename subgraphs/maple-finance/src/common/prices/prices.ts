@@ -1,10 +1,11 @@
-import { BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { Token } from "../../../generated/schema";
 
 import { chainlinkOracleGetTokenPriceInUSD } from "./oracles/chainlink";
 import { mapleOracleGetTokenPriceInUSD } from "./oracles/maple";
 import { yearnOracleGetTokenPriceInUSD } from "./oracles/yearn";
 import { ZERO_BD, OracleType } from "../constants";
+import { parseUnits } from "../utils";
 
 /**
  * Get the token price in USD, this will try to get price from:
@@ -14,7 +15,7 @@ import { ZERO_BD, OracleType } from "../constants";
  *
  * If all fail, it will return ZERO_BI, and log and error
  */
-export function getTokenPriceInUSD(token: Token, event: ethereum.Event): BigDecimal {
+export function getTokenPriceInUSD(event: ethereum.Event, token: Token): BigDecimal {
     // Only update if it hasn't already been updated this block
     if (token.lastPriceBlockNumber != event.block.number) {
         let price = mapleOracleGetTokenPriceInUSD(token);
@@ -44,4 +45,10 @@ export function getTokenPriceInUSD(token: Token, event: ethereum.Event): BigDeci
 
     token.save();
     return token.lastPriceUSD;
+}
+
+export function getTokenAmountInUSD(event: ethereum.Event, token: Token, amount: BigInt): BigDecimal {
+    const tokenPrice = getTokenPriceInUSD(event, token);
+
+    return parseUnits(amount, token.decimals).times(tokenPrice);
 }
