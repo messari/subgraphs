@@ -1,7 +1,13 @@
 {
   "scripts": {
     "prepare:mainnet": "YARN_SILENT=1 yarn mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:mainnet": "graph deploy --studio dforce-subgraph-mainnet"
+    "deploy:mainnet": "graph deploy --studio dforce-subgraph-mainnet",
+    "prepare:bsc": "YARN_SILENT=1 yarn mustache config/bsc.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:bsc": "graph deploy --studio dforce-subgraph-bsc",
+    "prepare:arb": "YARN_SILENT=1 yarn mustache config/arbitrum_one.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:arb": "graph deploy --studio dforce-subgraph-arbitrum_one",
+    "prepare:optimism": "YARN_SILENT=1 yarn mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:optimism": "graph deploy --studio dforce-subgraph-optimism"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.30.1",
