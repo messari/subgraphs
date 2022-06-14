@@ -254,7 +254,6 @@ export function handleTokensTraded(event: TokensTraded): void {
     event.block.number
   );
   swap._tradingFeeAmountUSD = tradingFeeAmountUSD;
-
   swap.save();
 
   if (!sourceToken._poolToken) {
@@ -270,14 +269,24 @@ export function handleTokensTraded(event: TokensTraded): void {
     ]);
     return;
   }
+
+  let protocol = getOrCreateProtocol();
+  let protocolSideRevenue = tradingFeeAmountUSD.times(protocol._networkFeeRate);
+  let supplySideRevenue = tradingFeeAmountUSD.minus(protocolSideRevenue);
+  liquidityPool.cumulativeTotalRevenueUSD =
+    liquidityPool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  liquidityPool.cumulativeProtocolSideRevenueUSD =
+    liquidityPool.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  liquidityPool.cumulativeSupplySideRevenueUSD =
+    liquidityPool.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
   liquidityPool.cumulativeVolumeUSD =
     liquidityPool.cumulativeVolumeUSD.plus(amountInUSD);
   liquidityPool._cumulativeTradingFeeAmountUSD =
     liquidityPool._cumulativeTradingFeeAmountUSD.plus(tradingFeeAmountUSD);
   liquidityPool.save();
 
-  updateProtocol(EventType.Swap, tradingFeeAmountUSD);
-
+  updateProtocolRevenue();
+  updateProtocolVolume();
   snapshotUsage(
     event.block.number,
     event.block.timestamp,
@@ -289,20 +298,21 @@ export function handleTokensTraded(event: TokensTraded): void {
     event.block.number,
     event.block.timestamp
   );
-  updateLiquidityPoolSnapshot(
+  updateLiquidityPoolSnapshotVolume(
     sourceToken._poolToken!,
     event.params.sourceAmount,
     amountInUSD,
     event.block.number,
     event.block.timestamp
   );
-  snapshotFinancials(event.block.timestamp, event.block.number);
-  updateFinancialsSnapshot(
-    EventType.Swap,
-    amountInUSD,
-    event.block.timestamp,
-    event.block.number
+  updateLiquidityPoolSnapshotRevenue(
+    sourceToken._poolToken!,
+    tradingFeeAmountUSD,
+    protocol._networkFeeRate,
+    event.block.number,
+    event.block.timestamp
   );
+  snapshotFinancials(event.block.timestamp, event.block.number);
 }
 
 export function handleTokensDeposited(event: TokensDeposited): void {
@@ -538,7 +548,7 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol = new DexAmmProtocol(BancorNetworkAddr);
     protocol.name = "Bancor V3";
     protocol.slug = "bancor-v3";
-    protocol.schemaVersion = "1.2.1";
+    protocol.schemaVersion = "1.3.0";
     protocol.subgraphVersion = "1.0.0";
     protocol.methodologyVersion = "1.0.0";
     protocol.network = Network.MAINNET;
@@ -572,9 +582,13 @@ function createLiquidityPool(
   liquidityPool.outputToken = poolToken.id;
   liquidityPool.rewardTokens = [];
   liquidityPool.fees = []; // TODO
+  liquidityPool.isSingleSided = true;
   liquidityPool.createdTimestamp = blockTimestamp;
   liquidityPool.createdBlockNumber = blockNumber;
   liquidityPool.totalValueLockedUSD = zeroBD;
+  liquidityPool.cumulativeTotalRevenueUSD = zeroBD;
+  liquidityPool.cumulativeProtocolSideRevenueUSD = zeroBD;
+  liquidityPool.cumulativeSupplySideRevenueUSD = zeroBD;
   liquidityPool.cumulativeVolumeUSD = zeroBD;
   liquidityPool.inputTokenBalances = [zeroBI];
   liquidityPool.inputTokenWeights = [new BigDecimal(BigInt.fromI32(1))];
@@ -622,7 +636,6 @@ function _handleTokensDeposited(
     event.block.number
   );
   deposit.pool = poolToken.id;
-
   deposit.save();
 
   snapshotUsage(
@@ -678,7 +691,6 @@ function _handleTokensWithdrawn(
     event.block.number
   );
   withdraw._withdrawalFeeAmountUSD = withdrawalFeeAmountUSD;
-
   withdraw.save();
 
   let liquidityPool = LiquidityPool.load(poolToken.id);
@@ -688,6 +700,10 @@ function _handleTokensWithdrawn(
     ]);
     return;
   }
+  liquidityPool.cumulativeTotalRevenueUSD =
+    liquidityPool.cumulativeTotalRevenueUSD.plus(withdrawalFeeAmountUSD);
+  liquidityPool.cumulativeProtocolSideRevenueUSD =
+    liquidityPool.cumulativeProtocolSideRevenueUSD.plus(withdrawalFeeAmountUSD);
   liquidityPool._cumulativeWithdrawalFeeAmountUSD =
     liquidityPool._cumulativeWithdrawalFeeAmountUSD.plus(
       withdrawalFeeAmountUSD
@@ -695,8 +711,7 @@ function _handleTokensWithdrawn(
 
   liquidityPool.save();
 
-  updateProtocol(EventType.Withdraw, withdrawalFeeAmountUSD);
-
+  updateProtocolRevenue();
   snapshotUsage(
     event.block.number,
     event.block.timestamp,
@@ -709,12 +724,6 @@ function _handleTokensWithdrawn(
     event.block.timestamp
   );
   snapshotFinancials(event.block.timestamp, event.block.number);
-  updateFinancialsSnapshot(
-    EventType.Withdraw,
-    withdrawalFeeAmountUSD,
-    event.block.timestamp,
-    event.block.number
-  );
 }
 
 function _handleTotalLiquidityUpdated(
@@ -811,62 +820,6 @@ function getReserveTokenAmount(
     return zeroBI;
   }
   return reserveTokenAmountResult.value;
-}
-
-function updateProtocol(eventType: EventType, amountUSD: BigDecimal): void {
-  let protocol = getOrCreateProtocol();
-  protocol.cumulativeTotalRevenueUSD =
-    protocol.cumulativeTotalRevenueUSD.plus(amountUSD);
-  switch (eventType) {
-    case EventType.Swap:
-      let protocolSideRevenue = amountUSD.times(protocol._networkFeeRate);
-      let supplySideRevenue = amountUSD.minus(protocolSideRevenue);
-      protocol.cumulativeSupplySideRevenueUSD =
-        protocol.cumulativeSupplySideRevenueUSD.plus(supplySideRevenue);
-      protocol.cumulativeProtocolSideRevenueUSD =
-        protocol.cumulativeProtocolSideRevenueUSD.plus(protocolSideRevenue);
-      break;
-    case EventType.Withdraw:
-      protocol.cumulativeProtocolSideRevenueUSD =
-        protocol.cumulativeProtocolSideRevenueUSD.plus(amountUSD);
-      break;
-    default:
-  }
-  protocol.save();
-}
-
-function updateFinancialsSnapshot(
-  eventType: EventType,
-  amountUSD: BigDecimal,
-  blockTimestamp: BigInt,
-  blockNumber: BigInt
-): void {
-  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
-  if (!protocol) {
-    log.warning("[updateFinancialsSnapshot] protocol not found", []);
-    return;
-  }
-  let snapshot = getOrCreateFinancialsDailySnapshot(blockTimestamp);
-  snapshot.timestamp = blockTimestamp;
-  snapshot.blockNumber = blockNumber;
-  snapshot.dailyTotalRevenueUSD = snapshot.dailyTotalRevenueUSD.plus(amountUSD);
-
-  switch (eventType) {
-    case EventType.Swap:
-      let protocolSideRevenue = amountUSD.times(protocol._networkFeeRate);
-      let supplySideRevenue = amountUSD.minus(protocolSideRevenue);
-      snapshot.dailySupplySideRevenueUSD =
-        snapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
-      snapshot.dailyProtocolSideRevenueUSD =
-        snapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenue);
-      break;
-    case EventType.Withdraw:
-      snapshot.dailyProtocolSideRevenueUSD =
-        snapshot.dailyProtocolSideRevenueUSD.plus(amountUSD);
-      break;
-    default:
-  }
-  snapshot.save();
 }
 
 function snapshotUsage(
@@ -998,6 +951,12 @@ function snapshotLiquidityPool(
     blockNumber
   );
   dailySnapshot.totalValueLockedUSD = liquidityPool.totalValueLockedUSD;
+  dailySnapshot.cumulativeTotalRevenueUSD =
+    liquidityPool.cumulativeTotalRevenueUSD;
+  dailySnapshot.cumulativeProtocolSideRevenueUSD =
+    liquidityPool.cumulativeProtocolSideRevenueUSD;
+  dailySnapshot.cumulativeSupplySideRevenueUSD =
+    liquidityPool.cumulativeSupplySideRevenueUSD;
   dailySnapshot.cumulativeVolumeUSD = liquidityPool.cumulativeVolumeUSD;
   dailySnapshot.inputTokenBalances = [liquidityPool.inputTokenBalances[0]];
   dailySnapshot.inputTokenWeights = [liquidityPool.inputTokenWeights[0]];
@@ -1019,6 +978,12 @@ function snapshotLiquidityPool(
     blockNumber
   );
   hourlySnapshot.totalValueLockedUSD = liquidityPool.totalValueLockedUSD;
+  hourlySnapshot.cumulativeTotalRevenueUSD =
+    liquidityPool.cumulativeTotalRevenueUSD;
+  hourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    liquidityPool.cumulativeProtocolSideRevenueUSD;
+  hourlySnapshot.cumulativeSupplySideRevenueUSD =
+    liquidityPool.cumulativeSupplySideRevenueUSD;
   hourlySnapshot.cumulativeVolumeUSD = liquidityPool.cumulativeVolumeUSD;
   hourlySnapshot.inputTokenBalances = [liquidityPool.inputTokenBalances[0]];
   hourlySnapshot.inputTokenWeights = [liquidityPool.inputTokenWeights[0]];
@@ -1034,7 +999,7 @@ function snapshotLiquidityPool(
   hourlySnapshot.save();
 }
 
-function updateLiquidityPoolSnapshot(
+function updateLiquidityPoolSnapshotVolume(
   liquidityPoolID: string,
   amount: BigInt,
   amountUSD: BigDecimal,
@@ -1076,6 +1041,113 @@ function updateLiquidityPoolSnapshot(
   hourlySnapshot.save();
 }
 
+function updateLiquidityPoolSnapshotRevenue(
+  liquidityPoolID: string,
+  revenue: BigDecimal,
+  networkFeeRate: BigDecimal,
+  blockNumber: BigInt,
+  blockTimestamp: BigInt
+): void {
+  let protocolSideRevenue = revenue.times(networkFeeRate);
+  let supplySideRevenue = revenue.minus(protocolSideRevenue);
+
+  //
+  // daily snapshot
+  //
+  let dailySnapshot = getOrCreateLiquidityPoolDailySnapshot(
+    liquidityPoolID,
+    blockTimestamp,
+    blockNumber
+  );
+  dailySnapshot.dailyTotalRevenueUSD =
+    dailySnapshot.dailyTotalRevenueUSD.plus(revenue);
+  dailySnapshot.dailyProtocolSideRevenueUSD =
+    dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  dailySnapshot.dailySupplySideRevenueUSD =
+    dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  dailySnapshot.save();
+
+  //
+  // hourly snapshot
+  //
+  let hourlySnapshot = getOrCreateLiquidityPoolHourlySnapshot(
+    liquidityPoolID,
+    blockTimestamp,
+    blockNumber
+  );
+  hourlySnapshot.dailyTotalRevenueUSD =
+    dailySnapshot.dailyTotalRevenueUSD.plus(revenue);
+  hourlySnapshot.dailyProtocolSideRevenueUSD =
+    dailySnapshot.dailyProtocolSideRevenueUSD.plus(protocolSideRevenue);
+  hourlySnapshot.dailySupplySideRevenueUSD =
+    dailySnapshot.dailySupplySideRevenueUSD.plus(supplySideRevenue);
+  hourlySnapshot.save();
+}
+
+function updateProtocolRevenue(): void {
+  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  if (!protocol) {
+    log.warning("[updateProtocolRevenue] protocol not found", []);
+    return;
+  }
+
+  let cumulativeTotalRevenueUSD = zeroBD;
+  let cumulativeProtocolSideRevenueUSD = zeroBD;
+  let cumulativeSupplySideRevenueUSD = zeroBD;
+
+  for (let i = 0; i < protocol._poolIDs.length; i++) {
+    let liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
+    if (!liquidityPool) {
+      log.warning("[updateProtocolRevenue] liqudity pool {} not found", [
+        protocol._poolIDs[i],
+      ]);
+      return;
+    }
+
+    cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD.plus(
+      liquidityPool.cumulativeTotalRevenueUSD
+    );
+    cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD.plus(
+      liquidityPool.cumulativeProtocolSideRevenueUSD
+    );
+    cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD.plus(
+      liquidityPool.cumulativeSupplySideRevenueUSD
+    );
+  }
+
+  protocol.cumulativeTotalRevenueUSD = cumulativeTotalRevenueUSD;
+  protocol.cumulativeProtocolSideRevenueUSD = cumulativeProtocolSideRevenueUSD;
+  protocol.cumulativeSupplySideRevenueUSD = cumulativeSupplySideRevenueUSD;
+  protocol.save();
+}
+
+function updateProtocolVolume(): void {
+  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  if (!protocol) {
+    log.warning("[updateProtocolVolume] protocol not found", []);
+    return;
+  }
+
+  let cumulativeVolumeUSD = zeroBD;
+
+  for (let i = 0; i < protocol._poolIDs.length; i++) {
+    let liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
+    if (!liquidityPool) {
+      log.warning("[updateProtocolVolume] liqudity pool {} not found", [
+        protocol._poolIDs[i],
+      ]);
+      return;
+    }
+
+    cumulativeVolumeUSD = cumulativeVolumeUSD.plus(
+      liquidityPool.cumulativeVolumeUSD
+    );
+  }
+
+  protocol.cumulativeVolumeUSD = cumulativeVolumeUSD;
+  protocol.save();
+}
+
 function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
   let protocol = DexAmmProtocol.load(BancorNetworkAddr);
   if (!protocol) {
@@ -1088,14 +1160,18 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
   snapshot.timestamp = blockTimestamp;
   snapshot.blockNumber = blockNumber;
   snapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+  snapshot.cumulativeVolumeUSD = protocol.cumulativeVolumeUSD;
   snapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   snapshot.cumulativeProtocolSideRevenueUSD =
     protocol.cumulativeProtocolSideRevenueUSD;
   snapshot.cumulativeSupplySideRevenueUSD =
     protocol.cumulativeSupplySideRevenueUSD;
 
-  let cumulativeVolumeUSD = zeroBD;
   let dailyVolumeUSD = zeroBD;
+  let dailyTotalRevenueUSD = zeroBD;
+  let dailyProtocolSideRevenueUSD = zeroBD;
+  let dailySupplySideRevenueUSD = zeroBD;
+
   for (let i = 0; i < protocol._poolIDs.length; i++) {
     let liquidityPool = LiquidityPool.load(protocol._poolIDs[i]);
     if (!liquidityPool) {
@@ -1104,9 +1180,6 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
       ]);
       return;
     }
-    cumulativeVolumeUSD = cumulativeVolumeUSD.plus(
-      liquidityPool.cumulativeVolumeUSD
-    );
 
     let liquidityPoolDailySnapshotID = getLiquidityPoolDailySnapshotID(
       liquidityPool.id,
@@ -1125,10 +1198,21 @@ function snapshotFinancials(blockTimestamp: BigInt, blockNumber: BigInt): void {
     dailyVolumeUSD = dailyVolumeUSD.plus(
       liquidityPoolDailySnapshot.dailyVolumeUSD
     );
+    dailyTotalRevenueUSD = dailyTotalRevenueUSD.plus(
+      liquidityPoolDailySnapshot.dailyTotalRevenueUSD
+    );
+    dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD.plus(
+      liquidityPoolDailySnapshot.dailyProtocolSideRevenueUSD
+    );
+    dailySupplySideRevenueUSD = dailySupplySideRevenueUSD.plus(
+      liquidityPoolDailySnapshot.dailySupplySideRevenueUSD
+    );
   }
 
-  snapshot.cumulativeVolumeUSD = cumulativeVolumeUSD;
   snapshot.dailyVolumeUSD = dailyVolumeUSD;
+  snapshot.dailyTotalRevenueUSD = dailyTotalRevenueUSD;
+  snapshot.dailyProtocolSideRevenueUSD = dailyProtocolSideRevenueUSD;
+  snapshot.dailySupplySideRevenueUSD = dailySupplySideRevenueUSD;
   snapshot.save();
 
   // protocol controlled value usd = bnt_amount * bnt_price
@@ -1203,6 +1287,12 @@ function getOrCreateLiquidityPoolDailySnapshot(
     snapshot.protocol = BancorNetworkAddr;
     snapshot.pool = liquidityPoolID;
     snapshot.totalValueLockedUSD = zeroBD;
+    snapshot.cumulativeTotalRevenueUSD = zeroBD;
+    snapshot.cumulativeProtocolSideRevenueUSD = zeroBD;
+    snapshot.cumulativeSupplySideRevenueUSD = zeroBD;
+    snapshot.dailyTotalRevenueUSD = zeroBD;
+    snapshot.dailyProtocolSideRevenueUSD = zeroBD;
+    snapshot.dailySupplySideRevenueUSD = zeroBD;
     snapshot.cumulativeVolumeUSD = zeroBD;
     snapshot.inputTokenBalances = [zeroBI];
     snapshot.inputTokenWeights = [zeroBD];
@@ -1238,6 +1328,12 @@ function getOrCreateLiquidityPoolHourlySnapshot(
     snapshot.protocol = BancorNetworkAddr;
     snapshot.pool = liquidityPoolID;
     snapshot.totalValueLockedUSD = zeroBD;
+    snapshot.cumulativeTotalRevenueUSD = zeroBD;
+    snapshot.cumulativeProtocolSideRevenueUSD = zeroBD;
+    snapshot.cumulativeSupplySideRevenueUSD = zeroBD;
+    snapshot.dailyTotalRevenueUSD = zeroBD;
+    snapshot.dailyProtocolSideRevenueUSD = zeroBD;
+    snapshot.dailySupplySideRevenueUSD = zeroBD;
     snapshot.cumulativeVolumeUSD = zeroBD;
     snapshot.inputTokenBalances = [zeroBI];
     snapshot.inputTokenWeights = [zeroBD];
