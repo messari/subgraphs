@@ -40,7 +40,7 @@ export function handleExchange(
   }
   const soldId = sold_id.toI32();
   const boughtId = bought_id.toI32();
-  let tokenSold: String, tokenBought: String;
+  let tokenSold: string, tokenBought: string;
   let tokenSoldDecimals: BigInt, tokenBoughtDecimals: BigInt;
   let addTokenSoldAmt: boolean = false,
     addTokenBoughtAmt: boolean = false;
@@ -110,7 +110,7 @@ export function handleExchange(
     tokenBoughtDecimals = BigInt.fromI32(getOrCreateToken(Address.fromString(pool.coins[boughtId])).decimals);
     addTokenBoughtAmt = true;
   }
-
+  log.warning("txhash :{}   pool.coins.length:{}   tokenBought:{}  tokenSold:{} ",[txhash,pool.coins.length.toString(), tokenBought, tokenSold]);
   const amountSold = tokens_sold.toBigDecimal().div(exponentToBigDecimal(tokenSoldDecimals.toI32()));
   const amountBought = tokens_bought.toBigDecimal().div(exponentToBigDecimal(tokenBoughtDecimals.toI32()));
   let amountBoughtUSD: BigDecimal, amountSoldUSD: BigDecimal;
