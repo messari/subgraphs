@@ -77,6 +77,14 @@ Entity IDs are usually defined by either an address, a transaction hash, a log i
 
 Note that entity types that derive from the same interface cannot have the same IDs. For example, a `Withdraw` entity and a `Deposit` entity cannot have the same ID since they both implement the `Event` interface. In this case, we prefix the ID by `withdraw-` or `deposit-` in order to make them unique. You can use the helper function `prefixID(string, string)` in `common/utils/strings.ts` to make this easier.
 
+Certain protocols may require adjustments to the ID of specific entities to handle edge cases (e.g. single-sided liquidity pools or single-sided staking). Feel free to make adjustments necessary to best fit the situation. Make sure these are documented in the README of the specific subgraphs.
+
+Here are some examples:
+
+- Convex doesn't have vault contracts for individual vaults. The Vault IDs for Convex is stored as { the Booster contract address }-{ pool ID }.
+- Bancor v3 creates a reward program that has start and end date for a few tokens deposited (DAI, ETH, etc). The reward is always in BNT. So the ID is being stored as " { Reward token type }-{ Smart contract address of the deposited token }-{ start }-{ end } " such as `DEPOSIT-<DAI ADDRESS>-16xxxxxx-16xxxxxxx`.
+- For pools that support single-sided staking, we can store each side as a separate pool, set `isSingleSided` as true, and differentiate with their ID (e.g. { Address of parent pool }- { Address/pid of staking pool }).
+
 ## Transaction vs. Event
 
 The most granular data we index in the subgraphs are Event entities. They are very similar to the events in Ethereum event logs but not exactly the same. Conceptually, an Event entity uniquely represents a user action that has occurred in a protocol.
