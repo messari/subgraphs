@@ -31,8 +31,6 @@ dataSources:
           file: ./abis/WeightedPool.json
         - name: ConvergentCurvePool
           file: ./abis/ConvergentCurvePool.json
-        - name: ProtocolFeesCollector
-          file: ./abis/ProtocolFeesCollector.json
         - name: LinearPool
           file: ./abis/LinearPool.json
 
