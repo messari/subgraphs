@@ -3,6 +3,7 @@
 ## Schema Update 1.3.0
 
 Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
+Fixes: [#320](https://github.com/messari/subgraphs/pull/320)
 
 ### Common
 
@@ -17,6 +18,7 @@ Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
 ### Lending
 
 - Changed `fixed_term` to `fixed` in `InterestRateType` entity to be more precise.
+- Added daily/hourly withdraw/repay aggregates into snapshots.
 
 ## Schema Update 1.2.1
 

@@ -430,6 +430,12 @@ type FinancialsDailySnapshot @entity {
 
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
+
+  " Total assets withdrawn on a given day, in USD. "
+  dailyWithdrawUSD: BigDecimal!
+
+  " Total assets repaid on a given day, in USD. "
+  dailyRepayUSD: BigDecimal!
 }
 
 ###############################
@@ -630,6 +636,12 @@ type MarketDailySnapshot @entity {
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
 
+  " Total assets withdrawn on a given day, in USD. "
+  dailyWithdrawUSD: BigDecimal!
+
+  " Total assets repaid on a given day, in USD. "
+  dailyRepayUSD: BigDecimal!
+
   ##### Token Balances #####
 
   " Amount of input token in the market. "
@@ -719,6 +731,12 @@ type MarketHourlySnapshot @entity {
 
   " Sum of all historical liquidations in USD "
   cumulativeLiquidateUSD: BigDecimal!
+
+  " Total assets withdrawn on a given hour, in USD. "
+  hourlyWithdrawUSD: BigDecimal!
+
+  " Total assets repaid on a given hour, in USD. "
+  hourlyRepayUSD: BigDecimal!
 
   ##### Token Balances #####
 
