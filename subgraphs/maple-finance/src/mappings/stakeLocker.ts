@@ -1,15 +1,16 @@
 import { Address } from "@graphprotocol/graph-ts";
-import { Stake as StakeEvent, Unstake as UnstakeEvent } from "../../generated/templates/StakeLocker/StakeLocker";
-import { StakeType } from "../common/constants";
 
-import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";
-import { getOrCreateStakeLocker } from "../common/mapping_helpers/stakeLocker";
-import { getOrCreateToken } from "../common/mapping_helpers/token";
-import { createStake, createUnstake } from "../common/mapping_helpers/transactions";
+import { Stake as StakeEvent, Unstake as UnstakeEvent } from "../../generated/templates/StakeLocker/StakeLocker";
+
+import { StakeType } from "../common/constants";
+import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
+import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
+import { createStake, createUnstake } from "../common/mappingHelpers/getOrCreate/transactions";
+import { marketTick } from "../common/mappingHelpers/update/market";
 
 export function handleStake(event: StakeEvent): void {
-    const stakeLocker = getOrCreateStakeLocker(event.address);
-    const market = getOrCreateMarket(Address.fromString(stakeLocker.market));
+    const stakeLocker = getOrCreateStakeLocker(event, event.address);
+    const market = getOrCreateMarket(event, Address.fromString(stakeLocker.market));
     const stakeToken = getOrCreateToken(Address.fromString(stakeLocker.stakeToken));
     createStake(event, market, stakeToken, event.params.amount, StakeType.STAKE_LOCKER);
 
@@ -22,8 +23,8 @@ export function handleStake(event: StakeEvent): void {
 }
 
 export function handleUnstake(event: UnstakeEvent): void {
-    const stakeLocker = getOrCreateStakeLocker(event.address);
-    const market = getOrCreateMarket(Address.fromString(stakeLocker.market));
+    const stakeLocker = getOrCreateStakeLocker(event, event.address);
+    const market = getOrCreateMarket(event, Address.fromString(stakeLocker.market));
     const stakeToken = getOrCreateToken(Address.fromString(stakeLocker.stakeToken));
     createUnstake(event, market, stakeToken, event.params.amount, StakeType.STAKE_LOCKER);
 

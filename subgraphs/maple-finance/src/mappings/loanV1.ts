@@ -1,18 +1,19 @@
 import { Address } from "@graphprotocol/graph-ts";
+
 import {
     Drawdown as DrawdownEvent,
     PaymentMade as PaymentMadeEvent,
     Liquidation as LiquidationEvent
 } from "../../generated/templates/Loan/Loan";
 
-import { getOrCreateLoan } from "../common/mapping_helpers/loan";
-import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";
-import { getOrCreateProtocol } from "../common/mapping_helpers/protocol";
-import { createBorrow, createLiquidate, createRepay } from "../common/mapping_helpers/transactions";
+import { getOrCreateLoan, getOrCreateMarket } from "../common/mappingHelpers/getOrCreate/markets";
+import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/spawners";
+import { createBorrow, createLiquidate, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
+import { marketTick } from "../common/mappingHelpers/update/market";
 import { bigDecimalToBigInt } from "../common/utils";
 
 export function handleDrawdown(event: DrawdownEvent): void {
-    const loan = getOrCreateLoan(event.address);
+    const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.drawdownAmount;
     createBorrow(event, loan, drawdownAmount);
 
@@ -22,9 +23,9 @@ export function handleDrawdown(event: DrawdownEvent): void {
 
     // Update market
     const protocol = getOrCreateProtocol();
-    const market = getOrCreateMarket(Address.fromString(loan.market));
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     market._treasuryRevenue = market._treasuryRevenue.plus(
-        bigDecimalToBigInt(event.params.drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
+        bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
     market.save();
 
@@ -33,7 +34,7 @@ export function handleDrawdown(event: DrawdownEvent): void {
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
-    const loan = getOrCreateLoan(event.address);
+    const loan = getOrCreateLoan(event, event.address);
     createRepay(
         event,
         loan,
@@ -49,12 +50,12 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     loan.save();
 
     // Trigger market tick
-    const market = getOrCreateMarket(Address.fromString(loan.market));
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     marketTick(market, event);
 }
 
 export function handleLiquidation(event: LiquidationEvent): void {
-    const loan = getOrCreateLoan(event.address);
+    const loan = getOrCreateLoan(event, event.address);
     createLiquidate(
         event,
         loan,
@@ -70,7 +71,7 @@ export function handleLiquidation(event: LiquidationEvent): void {
     loan.save();
 
     // Update market
-    const market = getOrCreateMarket(Address.fromString(loan.market));
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     market._cumulativeCollatoralLiquidationInPoolInputTokens = market._cumulativeCollatoralLiquidationInPoolInputTokens.plus(
         collatoralLiquidated
     );

@@ -1,4 +1,5 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
+
 import {
     Borrow,
     Deposit,
@@ -7,38 +8,43 @@ import {
     Repay,
     Token,
     Withdraw,
+    _Claim,
     _Loan,
     _Stake,
-    _StakeLocker,
     _Unstake
-} from "../../../generated/schema";
+} from "../../../../generated/schema";
 
-import { PROTOCOL_ID, TransactionType } from "../constants";
-import { bigDecimalToBigInt } from "../utils";
-import { getOrCreateMarket } from "./market";
-import { updateUsageMetrics } from "./protocol";
+import { PROTOCOL_ID, TransactionType } from "../../constants";
+import { getTokenAmountInUSD } from "../../prices/prices";
+import { bigDecimalToBigInt } from "../../utils";
+import { updateUsageMetrics } from "../update/snapshots";
+import { getOrCreateMarket } from "./markets";
+import { getOrCreateToken } from "./supporting";
 
 export function createDeposit(event: ethereum.Event, market: Market, amountMPTMinted: BigInt): Deposit {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const deposit = new Deposit(id);
-    const account = event.transaction.from;
+
+    const asset = getOrCreateToken(Address.fromString(market.inputToken));
+    const accountAddress = event.transaction.from;
 
     deposit.hash = event.transaction.hash.toHexString();
     deposit.logIndex = event.logIndex.toI32();
     deposit.protocol = PROTOCOL_ID;
-    deposit.to = market.id;
-    deposit.from = account.toHexString();
     deposit.blockNumber = event.block.number;
     deposit.timestamp = event.block.timestamp;
+
     deposit.market = market.id;
-    deposit.asset = market.inputToken;
+    deposit.asset = asset.id;
+    deposit.from = accountAddress.toHexString();
+    deposit.to = market.id;
     deposit._amountMPT = amountMPTMinted;
-    deposit.amount = bigDecimalToBigInt(deposit._amountMPT.toBigDecimal().times(market.exchangeRate));
-    deposit.amountUSD = deposit.amount.toBigDecimal().times(market.inputTokenPriceUSD);
+    deposit.amount = bigDecimalToBigInt(deposit._amountMPT.toBigDecimal().times(market._initialExchangeRate));
+    deposit.amountUSD = getTokenAmountInUSD(event, asset, deposit.amount);
 
     deposit.save();
 
-    updateUsageMetrics(event, account, TransactionType.DEPOSIT);
+    updateUsageMetrics(event, accountAddress, TransactionType.DEPOSIT);
 
     return deposit;
 }
@@ -51,14 +57,15 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
     withdraw.hash = event.transaction.hash.toHexString();
     withdraw.logIndex = event.logIndex.toI32();
     withdraw.protocol = PROTOCOL_ID;
-    withdraw.to = account.toHexString(); // from since its a burn
-    withdraw.from = market.id;
     withdraw.blockNumber = event.block.number;
     withdraw.timestamp = event.block.timestamp;
+
+    withdraw.to = account.toHexString(); // from since its a burn
+    withdraw.from = market.id;
     withdraw.market = market.id;
     withdraw.asset = market.inputToken;
     withdraw._amountMPT = amountMPTBurned;
-    withdraw.amount = bigDecimalToBigInt(withdraw._amountMPT.toBigDecimal().times(market.exchangeRate));
+    withdraw.amount = bigDecimalToBigInt(withdraw._amountMPT.toBigDecimal().times(market._initialExchangeRate));
     withdraw.amountUSD = withdraw.amount.toBigDecimal().times(market.inputTokenPriceUSD);
 
     withdraw.save();
@@ -68,19 +75,45 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
     return withdraw;
 }
 
+export function createClaim(event: ethereum.Event, market: Market, amount: BigInt): _Claim {
+    const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
+    const claim = new _Claim(id);
+    const account = event.transaction.from;
+
+    claim.hash = event.transaction.hash.toHexString();
+    claim.logIndex = event.logIndex.toI32();
+    claim.protocol = PROTOCOL_ID;
+    claim.blockNumber = event.block.number;
+    claim.timestamp = event.block.timestamp;
+
+    claim.to = account.toHexString();
+    claim.from = market.id;
+    claim.market = market.id;
+    claim.asset = market.inputToken;
+    claim.amount = amount;
+    claim.amountUSD = amount.toBigDecimal().times(market.inputTokenPriceUSD);
+
+    claim.save();
+
+    updateUsageMetrics(event, account, TransactionType.CLAIM);
+
+    return claim;
+}
+
 export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt): Borrow {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const borrow = new Borrow(id);
-    const market = getOrCreateMarket(Address.fromString(loan.market));
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     const account = event.transaction.from;
 
     borrow.hash = event.transaction.hash.toHexString();
     borrow.logIndex = event.logIndex.toI32();
     borrow.protocol = PROTOCOL_ID;
-    borrow.to = account.toHexString(); // They were the ones that triggered the drawdown
-    borrow.from = loan.id;
     borrow.blockNumber = event.block.number;
     borrow.timestamp = event.block.timestamp;
+
+    borrow.to = account.toHexString(); // They were the ones that triggered the drawdown
+    borrow.from = loan.id;
     borrow.market = market.id;
     borrow.asset = market.inputToken;
     borrow.amount = amount;
@@ -103,16 +136,17 @@ export function createRepay(
 ): Repay {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const repay = new Repay(id);
-    const market = getOrCreateMarket(Address.fromString(loan.market));
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     const account = event.transaction.from;
 
     repay.hash = event.transaction.hash.toHexString();
     repay.logIndex = event.logIndex.toI32();
     repay.protocol = PROTOCOL_ID;
-    repay.to = loan.id;
-    repay.from = account.toHexString();
     repay.blockNumber = event.block.number;
     repay.timestamp = event.block.timestamp;
+
+    repay.to = loan.id;
+    repay.from = account.toHexString();
     repay.market = market.id;
     repay.asset = market.inputToken;
     repay.amount = amount;
@@ -137,15 +171,16 @@ export function createLiquidate(
 ): Liquidate {
     const id = event.transaction.hash.toHexString() + "-" + event.logIndex.toString();
     const liquidate = new Liquidate(id);
-    const market = getOrCreateMarket(Address.fromString(loan.market));
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
 
     liquidate.hash = event.transaction.hash.toHexString();
     liquidate.logIndex = event.logIndex.toI32();
     liquidate.protocol = PROTOCOL_ID;
-    liquidate.to = market.id; // Funds sent to pool (after swapping)
-    liquidate.from = loan.id; // Funds sent from loan
     liquidate.blockNumber = event.block.number;
     liquidate.timestamp = event.block.timestamp;
+
+    liquidate.to = market.id; // Funds sent to pool (after swapping)
+    liquidate.from = loan.id; // Funds sent from loan
     liquidate.market = market.id;
     liquidate.asset = market.inputToken;
     liquidate._amountRecoveredFromCollatoral = amountRecoveredFromCollatoral;
@@ -177,10 +212,11 @@ export function createStake(
     stake.hash = event.transaction.hash.toHexString();
     stake.logIndex = event.logIndex.toI32();
     stake.protocol = PROTOCOL_ID;
-    stake.to = event.address.toHexString(); // to whatever emitted this event (stakeLocker or mplReward)
-    stake.from = account.toHexString();
     stake.blockNumber = event.block.number;
     stake.timestamp = event.block.timestamp;
+
+    stake.to = event.address.toHexString(); // to whatever emitted this event (stakeLocker or mplReward)
+    stake.from = account.toHexString();
     stake.market = market.id;
     stake.asset = stakeToken.id;
     stake.amount = amount;
@@ -208,10 +244,11 @@ export function createUnstake(
     unstake.hash = event.transaction.hash.toHexString();
     unstake.logIndex = event.logIndex.toI32();
     unstake.protocol = PROTOCOL_ID;
-    unstake.to = account.toHexString();
-    unstake.from = event.address.toHexString(); // from whatever emitted this event (stakeLocker or mplReward)
     unstake.blockNumber = event.block.number;
     unstake.timestamp = event.block.timestamp;
+
+    unstake.to = account.toHexString();
+    unstake.from = event.address.toHexString(); // from whatever emitted this event (stakeLocker or mplReward)
     unstake.market = market.id;
     unstake.asset = stakeToken.id;
     unstake.amount = amount;

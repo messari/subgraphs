@@ -1,4 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts";
+
 import {
     Staked as StakedEvent,
     Withdrawn as WithdrawnEvent,
@@ -8,16 +9,17 @@ import {
 } from "../../generated/templates/MplReward/MplReward";
 
 import { StakeType, ZERO_BI } from "../common/constants";
-import { getOrCreateMarket, marketTick } from "../common/mapping_helpers/market";
-import { getOrCreateMplReward } from "../common/mapping_helpers/mplReward";
-import { getOrCreateToken } from "../common/mapping_helpers/token";
-import { createStake, createUnstake } from "../common/mapping_helpers/transactions";
+import { getOrCreateMarket, getOrCreateMplReward } from "../common/mappingHelpers/getOrCreate/markets";
+import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
+import { createStake, createUnstake } from "../common/mappingHelpers/getOrCreate/transactions";
+import { marketTick } from "../common/mappingHelpers/update/market";
+import { createEventFromCall } from "../common/utils";
 
 export function handleStaked(event: StakedEvent): void {
     const mplRewardsAddress = event.address;
-    const mplRewards = getOrCreateMplReward(mplRewardsAddress);
+    const mplRewards = getOrCreateMplReward(event, mplRewardsAddress);
     const stakeToken = getOrCreateToken(Address.fromString(mplRewards.stakeToken));
-    const market = getOrCreateMarket(Address.fromString(mplRewards.market));
+    const market = getOrCreateMarket(event, Address.fromString(mplRewards.market));
     const stakeType = market.id == stakeToken.id ? StakeType.MPL_LP_REWARDS : StakeType.MPL_STAKE_REWARDS;
     createStake(event, market, stakeToken, event.params.amount, stakeType);
 
@@ -27,9 +29,9 @@ export function handleStaked(event: StakedEvent): void {
 
 export function handleWidthdrawn(event: WithdrawnEvent): void {
     const mplRewardsAddress = event.address;
-    const mplRewards = getOrCreateMplReward(mplRewardsAddress);
+    const mplRewards = getOrCreateMplReward(event, mplRewardsAddress);
     const stakeToken = getOrCreateToken(Address.fromString(mplRewards.stakeToken));
-    const market = getOrCreateMarket(Address.fromString(mplRewards.market));
+    const market = getOrCreateMarket(event, Address.fromString(mplRewards.market));
     const stakeType = market.id == stakeToken.id ? StakeType.MPL_LP_REWARDS : StakeType.MPL_STAKE_REWARDS;
     createUnstake(event, market, stakeToken, event.params.amount, stakeType);
 
@@ -38,7 +40,7 @@ export function handleWidthdrawn(event: WithdrawnEvent): void {
 }
 
 export function handleRewardAdded(event: RewardAddedEvent): void {
-    const mplReward = getOrCreateMplReward(event.address);
+    const mplReward = getOrCreateMplReward(event, event.address);
 
     // Update rate
     if (mplReward.rewardDurationSec.gt(ZERO_BI)) {
@@ -60,23 +62,24 @@ export function handleRewardAdded(event: RewardAddedEvent): void {
         mplReward.save();
 
         // Trigger market tick
-        const market = getOrCreateMarket(Address.fromString(mplReward.market));
+        const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
         marketTick(market, event);
     }
 }
 
 export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {
-    const mplReward = getOrCreateMplReward(event.address);
+    const mplReward = getOrCreateMplReward(event, event.address);
     mplReward.rewardDurationSec = event.params.newDuration;
     mplReward.save();
 
     // Trigger market tick
-    const market = getOrCreateMarket(Address.fromString(mplReward.market));
+    const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
     marketTick(market, event);
 }
 
 export function handleUpdatePeriodFinish(call: UpdatePeriodFinishCall): void {
-    const mplReward = getOrCreateMplReward(call.to);
+    const eventFromCall = createEventFromCall(call);
+    const mplReward = getOrCreateMplReward(eventFromCall, call.to); // TODO:
     mplReward.periodFinishedTimestamp = call.inputs.timestamp;
     mplReward.save();
 }

@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/templates/PoolFactory/ERC20";
 import { ERC20NameBytes } from "../../generated/templates/PoolFactory/ERC20NameBytes";
 import { ERC20SymbolBytes } from "../../generated/templates/PoolFactory/ERC20SymbolBytes";
@@ -111,4 +111,31 @@ export function computeNewAverage(oldAvg: BigDecimal, oldCount: BigInt, newVal: 
         .times(oldCount.toBigDecimal())
         .plus(newVal)
         .div(oldCount.plus(ONE_BI).toBigDecimal());
+}
+
+/**
+ * Read a contract call result, logging a warning and returing defaultValue if the call is reverted
+ * @param callResult call result from contract call
+ * @param defaultValue default value to use if the call reverts
+ * @param functionName function name for debugging if the call fails
+ * @returns call value or default if reverted
+ */
+export function readCallResult<T>(
+    callResult: ethereum.CallResult<T>,
+    defaultValue: T,
+    functionName: string = "NOT_PROVIDED"
+): T {
+    if (callResult.reverted) {
+        log.warning("Contact call reverted: {}", [functionName]);
+    }
+    return callResult.reverted ? defaultValue : callResult.value;
+}
+
+/**
+ * Create an event from a call that has the same transaction and block info
+ * This is used to track everything internally in terms of events
+ * @param call call to create the event from
+ */
+export function createEventFromCall(call: ethereum.Call): ethereum.Event {
+    return new ethereum.Event(call.from, ZERO_BI, ZERO_BI, null, call.block, call.transaction, []);
 }

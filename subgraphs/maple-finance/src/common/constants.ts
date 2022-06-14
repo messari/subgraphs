@@ -70,6 +70,7 @@ export namespace InterestRateSide {
 export namespace TransactionType {
     export const DEPOSIT = "DEPOSIT";
     export const WITHDRAW = "WITHDRAW";
+    export const CLAIM = "CLAIM";
     export const BORROW = "BORROW";
     export const REPAY = "REPAY";
     export const LIQUIDATE = "LIQUIDATE";
@@ -88,6 +89,11 @@ export namespace OracleType {
     export const MAPLE = "MAPLE";
     export const CHAIN_LINK = "CHAIN_LINK";
     export const YEARN_LENS = "YEARN_LENS";
+}
+
+export namespace LoanVersion {
+    export const V1 = "V1";
+    export const V2_OR_V3 = "V2_OR_V3";
 }
 
 ////////////////////////////
