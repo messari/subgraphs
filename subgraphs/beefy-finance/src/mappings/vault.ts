@@ -157,7 +157,7 @@ export function getFees(
 ): string[] {
   let fees: string[] = [];
   let call = strategyContract.try_STRATEGIST_FEE();
-  if (call.reverted) {
+  if (!call.reverted) {
     const strategistFee = new VaultFee("STRATEGIST_FEE-" + vaultId);
     strategistFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
     strategistFee.feeType = "STRATEGIST_FEE";
@@ -167,7 +167,7 @@ export function getFees(
   }
 
   call = strategyContract.try_withdrawalFee();
-  if (call.reverted) {
+  if (!call.reverted) {
     const withdrawalFee = new VaultFee("WITHDRAWAL_FEE-" + vaultId);
     withdrawalFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
     withdrawalFee.feeType = "WITHDRAWAL_FEE";
