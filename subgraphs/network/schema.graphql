@@ -2,8 +2,9 @@
 # Version: 1.0.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
-enum SubgraphNetwork {
+enum Network {
   ARBITRUM_ONE
+  ARWEAVE_MAINNET
   AURORA
   AVALANCHE
   BOBA
@@ -11,13 +12,17 @@ enum SubgraphNetwork {
   CELO
   CLOVER
   COSMOS
+  CRONOS
   MAINNET # Ethereum Mainnet
   FANTOM
   FUSE
+  HARMONY
+  JUNO
   MOONBEAM
   MOONRIVER
   NEAR_MAINNET
   OPTIMISM
+  OSMOSIS
   MATIC # aka Polygon
   XDAI # aka Gnosis Chain
 }
@@ -147,9 +152,6 @@ type DailySnapshot @entity {
 
   " Daily mean size in bytes of a block during this day "
   dailyMeanBlockSize: BigDecimal!
-
-  " All of the blocks created during this day "
-  blocks: [Block!]! @derivedFrom(field: "day")
 }
 
 type HourlySnapshot @entity {
@@ -221,21 +223,18 @@ type HourlySnapshot @entity {
 
   " Hourly mean size of a block during this hour "
   hourlyMeanBlockSize: BigDecimal!
-
-  " All of the blocks created during this day "
-  blocks: [Block!]! @derivedFrom(field: "hour")
 }
 
 ##########################
 #### Block-level Data ####
 ##########################
 
-type Block @entity {
+type Block @entity (immutable: true) {
   " { block number } "
   id: ID!
 
   " Hash of this block "
-  hash: String!
+  hash: Bytes!
 
   " Timestamp of the block "
   timestamp: BigInt!
@@ -261,29 +260,23 @@ type Block @entity {
   " Total gas used in this block "
   gasUsed: BigInt!
 
-  " Percentage of gas filled in this block (0-100)"
-  gasFilledPercentage: BigDecimal!
+  " Percentage of gas filled in this block (e.g. gasUsed / gasLimit) "
+  blockUtilization: BigDecimal!
 
   " Reward in native asset for this block "
   reward: BigInt
 
   " Hash of the previous block (TODO: is this necessary??) "
-  parentHash: String!
+  parentHash: Bytes!
 
   " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
   burntFees: BigInt!
-
-  " The day this block was created (in days since UNIX epoch time) "
-  day: DailySnapshot!
-
-  " The hour this block was created (in hours since UNIX epoch time) "
-  hour: HourlySnapshot!
 }
 
 # This is the entity that found the next block (ie, in mainnet this is a miner)
 type Author @entity {
   " Address of the author "
-  id: ID!
+  id: Bytes!
 
   " Number of blocks created "
   cumulativeBlocksCreated: Int!
@@ -298,20 +291,12 @@ type Author @entity {
   blocks: [Block!]! @derivedFrom(field: "author")
 }
 
-enum IntervalType {
-  " For daily snapshot identifying "
-  DAILY
-
-  " For hourly snapshot identifying "
-  HOULRY
-}
-
 #################
 #### Helpers ####
 ################# 
 
 # Helper entity for calculating daily/hourly active authors
-type ActiveAuthor @entity {
+type ActiveAuthor @entity (immutable: true) {
   " { daily/hourly }-{ Address of the author }-{ Days/hours since Unix epoch } "
   id: ID!
 }
