@@ -243,14 +243,14 @@ function isNewHourlyActiveUser(user: Address, block: ethereum.Block): BigInt {
 function findPreviousFinancialSnapshot(
   block: ethereum.Block
 ): FinancialsDailySnapshot | null {
-  let days = getDaysSinceEpoch(block.timestamp.toI32());
+  let day = getDaysSinceEpoch(block.timestamp.toI32()) - 1;
   let previousSnapshot = FinancialsDailySnapshot.load(
-    PROTOCOL_ID.concat("-").concat(days.toString())
+    PROTOCOL_ID.concat("-").concat(day.toString())
   );
-  while (!previousSnapshot && days > 0) {
-    days--;
+  while (!previousSnapshot && day > 0) {
+    day--;
     previousSnapshot = FinancialsDailySnapshot.load(
-      PROTOCOL_ID.concat("-").concat(days.toString())
+      PROTOCOL_ID.concat("-").concat(day.toString())
     );
   }
   return previousSnapshot;
