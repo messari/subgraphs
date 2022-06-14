@@ -27,7 +27,7 @@ export function handleDepositEvent(
   let inputTokenAmounts = liquidityEvent.inputTokenAmounts;
   let inputTokenBalances = pool.inputTokenBalances;
   let amountUSD = BIGDECIMAL_ZERO;
-  if( !pool.coins || tokenAmounts.length != pool.coins.length ){
+  if(  tokenAmounts.length != pool.coins.length ){
      log.warning("ERROR ERROR ERROR  handleDepositEvent  ERROR   poolid:{} ",[pool.id]);
      return
   }
