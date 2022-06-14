@@ -216,6 +216,13 @@ export function handleTokensTraded(event: TokensTraded): void {
     ]);
     return;
   }
+
+  if (!sourceToken._poolToken) {
+    log.warning("[handleTokensTraded] reserve token {} has no pool token", [
+      sourceToken.id,
+    ]);
+    return;
+  }
   let swap = new Swap(
     "swap-"
       .concat(event.transaction.hash.toHexString())
@@ -224,13 +231,11 @@ export function handleTokensTraded(event: TokensTraded): void {
   );
   swap.hash = event.transaction.hash.toHexString();
   swap.logIndex = event.logIndex.toI32();
-  // TODO: hardcode this id
-  swap.protocol = getOrCreateProtocol().id;
+  swap.protocol = BancorNetworkAddr;
   swap.blockNumber = event.block.number;
   swap.timestamp = event.block.timestamp;
   swap.from = event.params.trader.toHexString();
-  // TODO: use pool token id
-  swap.to = event.params.trader.toHexString();
+  swap.to = sourceToken._poolToken!;
   swap.tokenIn = sourceTokenID;
   swap.amountIn = event.params.sourceAmount;
   let amountInUSD = getDaiAmount(
@@ -246,7 +251,7 @@ export function handleTokensTraded(event: TokensTraded): void {
     event.params.targetAmount,
     event.block.number
   );
-  swap.pool = sourceTokenID; // TODO: maybe 2 pools involved, but the field only allows one
+  swap.pool = sourceToken._poolToken!;
   swap._tradingFeeAmount = event.params.targetFeeAmount;
   let tradingFeeAmountUSD = getDaiAmount(
     targetToken.id,
@@ -256,12 +261,6 @@ export function handleTokensTraded(event: TokensTraded): void {
   swap._tradingFeeAmountUSD = tradingFeeAmountUSD;
   swap.save();
 
-  if (!sourceToken._poolToken) {
-    log.warning("[handleTokensTraded] reserve token {} has no pool token", [
-      sourceToken.id,
-    ]);
-    return;
-  }
   let liquidityPool = LiquidityPool.load(sourceToken._poolToken!);
   if (!liquidityPool) {
     log.warning("[handleTokensTraded] liquidity pool {} not found", [
