@@ -458,6 +458,7 @@ type LiquidityPool @entity {
   _tradingFeeRate: BigDecimal!
   _cumulativeTradingFeeAmountUSD: BigDecimal!
   _cumulativeWithdrawalFeeAmountUSD: BigDecimal!
+  _latestRewardProgramID: BigInt!
 }
 
 #################################
@@ -800,4 +801,14 @@ type Account @entity {
 type ActiveAccount @entity {
   " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
+}
+
+type RewardProgram @entity {
+  id: ID!
+  pool: LiquidityPool!
+  enabled: Boolean!
+  totalRewards: BigInt!
+  startTime: BigInt!
+  endTime: BigInt!
+  rewardsRate: BigInt!
 }

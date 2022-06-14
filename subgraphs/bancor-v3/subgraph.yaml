@@ -105,6 +105,10 @@ dataSources:
       eventHandlers:
         - event: ProgramCreated(indexed address,indexed uint256,indexed address,uint256,uint32,uint32)
           handler: handleProgramCreated
+        - event: ProgramTerminated(indexed address,indexed uint256,uint32,uint256)
+          handler: handleProgramTerminated
+        - event: ProgramEnabled(indexed address,indexed uint256,bool,uint256)
+          handler: handleProgramEnabled
   - kind: ethereum/contract
     name: BNTPool
     network: mainnet

@@ -13,7 +13,11 @@ import {
   NetworkFeePPMUpdated,
   WithdrawalFeePPMUpdated,
 } from "../generated/NetworkSettings/NetworkSettings";
-import { ProgramCreated } from "../generated/StandardRewards/StandardRewards";
+import {
+  ProgramCreated,
+  ProgramEnabled,
+  ProgramTerminated,
+} from "../generated/StandardRewards/StandardRewards";
 import { PoolTokenCreated } from "../generated/PoolTokenFactory/PoolTokenFactory";
 import {
   DefaultTradingFeePPMUpdated,
@@ -41,6 +45,8 @@ import {
   LiquidityPoolDailySnapshot,
   LiquidityPoolFee,
   LiquidityPoolHourlySnapshot,
+  RewardProgram,
+  RewardToken,
   Swap,
   Token,
   UsageMetricsDailySnapshot,
@@ -60,6 +66,7 @@ import {
   Network,
   oneBD,
   ProtocolType,
+  RewardTokenType,
   secondsPerDay,
   secondsPerHour,
   zeroBD,
@@ -350,6 +357,33 @@ export function handleTokensTraded(event: TokensTraded): void {
     liquidityPool.cumulativeVolumeUSD.plus(amountInUSD);
   liquidityPool._cumulativeTradingFeeAmountUSD =
     liquidityPool._cumulativeTradingFeeAmountUSD.plus(tradingFeeAmountUSD);
+
+  // update reward emission
+  if (liquidityPool._latestRewardProgramID.gt(zeroBI)) {
+    let programID = liquidityPool._latestRewardProgramID.toString();
+    let rewardProgram = RewardProgram.load(programID);
+    if (!rewardProgram) {
+      log.warning(
+        "[_handleTotalLiquidityUpdated] reward program {} not found",
+        [programID]
+      );
+    } else if (
+      rewardProgram.startTime.le(event.block.timestamp) &&
+      rewardProgram.endTime.ge(event.block.timestamp) &&
+      rewardProgram.enabled
+    ) {
+      let rewardAmountInDay = rewardProgram.rewardsRate.times(
+        BigInt.fromI32(secondsPerDay)
+      );
+      let rewardAmountUSD = getDaiAmount(
+        BntAddr,
+        rewardAmountInDay,
+        event.block.number
+      );
+      liquidityPool.rewardTokenEmissionsAmount = [rewardAmountInDay];
+      liquidityPool.rewardTokenEmissionsUSD = [rewardAmountUSD];
+    }
+  }
   liquidityPool.save();
 
   updateProtocolRevenue();
@@ -567,8 +601,6 @@ export function handleBNTTotalLiquidityUpdated(
 }
 
 // currently each pool only has 1 reward program
-// TODO: change this if it is no longer the case
-// TODO: also handle ProgramTerminated and ProgramEnabled
 export function handleProgramCreated(event: ProgramCreated): void {
   let reserveTokenId = event.params.pool.toHexString();
   let reserveToken = Token.load(reserveTokenId);
@@ -593,20 +625,48 @@ export function handleProgramCreated(event: ProgramCreated): void {
     return;
   }
 
-  // TODO: liquidityPool.rewardTokens = ???
-  // TODO: each reward program has a start and end time
-  let rewardRate = event.params.totalRewards.div(
+  let rewardProgramID = event.params.programId.toString();
+  let rewardProgram = new RewardProgram(rewardProgramID);
+  rewardProgram.pool = liquidityPool.id;
+  rewardProgram.enabled = true;
+  rewardProgram.totalRewards = event.params.totalRewards;
+  rewardProgram.startTime = event.params.startTime;
+  rewardProgram.endTime = event.params.endTime;
+  rewardProgram.rewardsRate = event.params.totalRewards.div(
     event.params.endTime.minus(event.params.startTime)
   );
-  let rewardAmountInDay = rewardRate.times(BigInt.fromI32(secondsPerDay));
-  let rewardAmountUSD = getDaiAmount(
-    event.params.rewardsToken.toHexString(),
-    rewardAmountInDay,
-    event.block.number
-  );
-  liquidityPool.rewardTokenEmissionsAmount = [rewardAmountInDay];
-  liquidityPool.rewardTokenEmissionsUSD = [rewardAmountUSD];
+  rewardProgram.save();
+
+  liquidityPool._latestRewardProgramID = event.params.programId;
   liquidityPool.save();
+}
+
+export function handleProgramTerminated(event: ProgramTerminated): void {
+  let programID = event.params.programId.toString();
+  let rewardProgram = RewardProgram.load(programID);
+  if (!rewardProgram) {
+    log.warning("[handleProgramTerminated] reward program {} not found", [
+      programID,
+    ]);
+    return;
+  }
+
+  rewardProgram.endTime = event.params.endTime;
+  rewardProgram.save();
+}
+
+export function handleProgramEnabled(event: ProgramEnabled): void {
+  let programID = event.params.programId.toString();
+  let rewardProgram = RewardProgram.load(programID);
+  if (!rewardProgram) {
+    log.warning("[handleProgramTerminated] reward program {} not found", [
+      programID,
+    ]);
+    return;
+  }
+
+  rewardProgram.enabled = event.params.status;
+  rewardProgram.save();
 }
 
 function getOrCreateProtocol(): DexAmmProtocol {
@@ -672,13 +732,20 @@ function createLiquidityPool(
   lpFee.feeType = LiquidityPoolFeeType.DYNAMIC_LP_FEE;
   lpFee.save();
 
+  let rewardToken = new RewardToken(
+    RewardTokenType.DEPOSIT.concat("-").concat(BntAddr)
+  );
+  rewardToken.token = BnBntAddr;
+  rewardToken.type = RewardTokenType.DEPOSIT;
+  rewardToken.save();
+
   let liquidityPool = new LiquidityPool(poolToken.id);
   liquidityPool.protocol = protocol.id;
   liquidityPool.name = poolToken.name;
   liquidityPool.symbol = poolToken.symbol;
   liquidityPool.inputTokens = [reserveToken.id];
   liquidityPool.outputToken = poolToken.id;
-  liquidityPool.rewardTokens = [];
+  liquidityPool.rewardTokens = [rewardToken.id];
   liquidityPool.fees = [
     withdrawalFee.id,
     tradingFee.id,
@@ -703,6 +770,7 @@ function createLiquidityPool(
   liquidityPool._tradingFeeRate = protocol._defaultTradingFeeRate;
   liquidityPool._cumulativeTradingFeeAmountUSD = zeroBD;
   liquidityPool._cumulativeWithdrawalFeeAmountUSD = zeroBD;
+  liquidityPool._latestRewardProgramID = zeroBI;
   liquidityPool.save();
 
   updateLiquidityPoolFees(poolToken.id);
@@ -871,7 +939,6 @@ function _handleTotalLiquidityUpdated(
   protocol.save();
 }
 
-// TODO: figure out why it gets reverted sometimes
 function getDaiAmount(
   sourceTokenID: string,
   sourceAmount: BigInt,
