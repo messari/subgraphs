@@ -1,5 +1,5 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.2.2
+# Version: 1.3.0
 # See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
@@ -103,7 +103,7 @@ enum LiquidityPoolFeeType {
   " One-time fee charged by the protocol during deposit, in percentages of the deposit token "
   DEPOSIT_FEE
 
-  " One-time fee charged by the protocol (e.g. Bancor) during withdrawal, in percentages of the withdrawal token "
+  " One-time fee charged by the protocol (e.g. Bancor v3) during withdrawal, in percentages of the withdrawal token "
   WITHDRAWAL_FEE
 }
 
