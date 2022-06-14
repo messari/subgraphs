@@ -1,13 +1,10 @@
-import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Deposit, Vault } from "../../generated/schema";
+import { BigInt } from "@graphprotocol/graph-ts";
+import { Deposit } from "../../generated/schema";
 import {
   BeefyStrategy,
   Deposit as DepositEvent,
 } from "../../generated/ExampleVault/BeefyStrategy";
-import {
-  getVaultFromStrategyOrCreate,
-  getTokenOrCreate,
-} from "../utils/getters";
+import { getTokenOrCreate } from "../utils/getters";
 import {
   BIGINT_TEN,
   PROTOCOL_ID,
@@ -44,28 +41,5 @@ export function createDeposit(
   deposit.protocol = PROTOCOL_ID;
 
   deposit.save();
-  return deposit;
-}
-
-export function getOrCreateFirstDeposit(vault: Vault): Deposit {
-  let deposit = Deposit.load("MockDeposit" + vault.id);
-  if (!deposit) {
-    deposit = new Deposit("MockDeposit" + vault.id);
-
-    deposit.hash = ZERO_ADDRESS_STRING;
-    deposit.logIndex = 0;
-    deposit.protocol = PROTOCOL_ID;
-    deposit.from = ZERO_ADDRESS_STRING;
-    deposit.to = ZERO_ADDRESS_STRING;
-    deposit.blockNumber = vault.createdBlockNumber;
-    deposit.timestamp = vault.createdTimestamp;
-    deposit.asset = vault.inputToken;
-    deposit.amount = new BigInt(0);
-    deposit.amountUSD = new BigDecimal(new BigInt(0));
-    deposit.vault = vault.id;
-
-    deposit.save();
-  }
-
   return deposit;
 }

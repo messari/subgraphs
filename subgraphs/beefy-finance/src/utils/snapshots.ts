@@ -7,21 +7,23 @@ import {
 } from "../../generated/schema";
 import { BIGDECIMAL_ZERO } from "../prices/common/constants";
 
-export function getVaultDailyId(block: ethereum.Block, vault: Vault): string {
-  const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32());
-  const id = vault.id
-    .concat("-")
-    .concat(daysSinceEpoch)
-    .concat("d");
+export function getVaultDailyId(
+  block: ethereum.Block,
+  vaultId: string
+): string {
+  const daysSinceEpoch = getDaysSinceEpoch(block.timestamp.toI32()).toString();
+  const id = vaultId.concat("-").concat(daysSinceEpoch);
   return id;
 }
 
-export function getVaultHourlyId(block: ethereum.Block, vault: Vault): string {
-  const hoursSinceEpoch = getHoursSinceEpoch(block.timestamp.toI32());
-  const id = vault.id
-    .concat("-")
-    .concat(hoursSinceEpoch)
-    .concat("h");
+export function getVaultHourlyId(
+  block: ethereum.Block,
+  vaultId: string
+): string {
+  const hoursSinceEpoch = getHoursSinceEpoch(
+    block.timestamp.toI32()
+  ).toString();
+  const id = vaultId.concat("-").concat(hoursSinceEpoch);
   return id;
 }
 
@@ -29,7 +31,7 @@ export function updateVaultDailySnapshot(
   block: ethereum.Block,
   vault: Vault
 ): VaultDailySnapshot {
-  const id = getVaultDailyId(block, vault);
+  const id = getVaultDailyId(block, vault.id);
   let vaultDailySnapshot = VaultDailySnapshot.load(id);
   if (vaultDailySnapshot == null) {
     vaultDailySnapshot = new VaultDailySnapshot(id);
@@ -38,17 +40,18 @@ export function updateVaultDailySnapshot(
     vaultDailySnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   vaultDailySnapshot.inputTokenBalance = vault.inputTokenBalance;
-  if (vault.outputTokenSupply)
+  if (vault.outputTokenSupply) {
     vaultDailySnapshot.outputTokenSupply = vault.outputTokenSupply;
-  if (vault.pricePerShare)
+  }
+  if (vault.pricePerShare) {
     vaultDailySnapshot.pricePerShare = vault.pricePerShare;
+  }
   vaultDailySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultDailySnapshot.outputTokenPriceUSD = vault.outputTokenPriceUSD;
 
   vaultDailySnapshot.blockNumber = block.number;
   vaultDailySnapshot.timestamp = block.timestamp;
   vaultDailySnapshot.save();
-
   return vaultDailySnapshot;
 }
 
@@ -56,7 +59,7 @@ export function updateVaultHourlySnapshot(
   block: ethereum.Block,
   vault: Vault
 ): VaultHourlySnapshot {
-  const id = getVaultHourlyId(block, vault);
+  const id = getVaultHourlyId(block, vault.id);
   let vaultHourlySnapshot = VaultHourlySnapshot.load(id);
   if (vaultHourlySnapshot == null) {
     vaultHourlySnapshot = new VaultHourlySnapshot(id);
@@ -65,13 +68,14 @@ export function updateVaultHourlySnapshot(
   }
   vaultHourlySnapshot.totalValueLockedUSD = vault.totalValueLockedUSD;
   vaultHourlySnapshot.inputTokenBalance = vault.inputTokenBalance;
-  if (vault.outputTokenSupply)
+  if (vault.outputTokenSupply) {
     vaultHourlySnapshot.outputTokenSupply = vault.outputTokenSupply;
-  if (vault.pricePerShare)
+  }
+  if (vault.pricePerShare) {
     vaultHourlySnapshot.pricePerShare = vault.pricePerShare;
+  }
   vaultHourlySnapshot.blockNumber = block.number;
   vaultHourlySnapshot.timestamp = block.timestamp;
   vaultHourlySnapshot.save();
-
   return vaultHourlySnapshot;
 }

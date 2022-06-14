@@ -1,5 +1,5 @@
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
-import { Vault, Withdraw } from "../../generated/schema";
+import { Withdraw } from "../../generated/schema";
 import {
   BeefyStrategy,
   Withdraw as WithdrawEvent,
@@ -40,27 +40,5 @@ export function createWithdraw(
   withdraw.protocol = PROTOCOL_ID;
 
   withdraw.save();
-  return withdraw;
-}
-
-export function getOrCreateFirstWithdraw(vault: Vault): Withdraw {
-  let withdraw = Withdraw.load("MockWithdraw" + vault.id);
-  if (!withdraw) {
-    withdraw = new Withdraw("MockWithdraw" + vault.id);
-
-    withdraw.hash = ZERO_ADDRESS_STRING;
-    withdraw.logIndex = 0;
-    withdraw.protocol = PROTOCOL_ID;
-    withdraw.from = ZERO_ADDRESS_STRING;
-    withdraw.to = ZERO_ADDRESS_STRING;
-    withdraw.blockNumber = vault.createdBlockNumber;
-    withdraw.timestamp = vault.createdTimestamp;
-    withdraw.asset = vault.inputToken;
-    withdraw.amount = new BigInt(0);
-    withdraw.amountUSD = new BigDecimal(new BigInt(0));
-    withdraw.vault = vault.id;
-
-    withdraw.save();
-  }
   return withdraw;
 }

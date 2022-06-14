@@ -147,15 +147,15 @@ interface Protocol {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
-  #  @derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
-  #  @derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
-  financialMetrics: [FinancialsDailySnapshot!]! #@derivedFrom(field: "protocol")
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
 }
 
 type YieldAggregator implements Protocol @entity {
@@ -206,19 +206,20 @@ type YieldAggregator implements Protocol @entity {
   ##### Snapshots #####
 
   " Daily usage metrics for this protocol "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]!
-  #@derivedFrom(field: "protocol")
+  dailyUsageMetrics: [UsageMetricsDailySnapshot!]
+    @derivedFrom(field: "protocol")
 
   " Hourly usage metrics for this protocol "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
-  #@derivedFrom(field: "protocol")
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]
+    @derivedFrom(field: "protocol")
 
   " Daily financial metrics for this protocol "
-  financialMetrics: [FinancialsDailySnapshot!]! #@derivedFrom(field: "protocol")
+  financialMetrics: [FinancialsDailySnapshot!]! @derivedFrom(field: "protocol")
+
   ##### Vaults #####
 
   " All vaults that belong to this protocol "
-  vaults: [Vault!]! #@derivedFrom(field: "protocol")
+  vaults: [Vault!]!
 }
 
 ###############################
@@ -339,7 +340,7 @@ type Vault @entity {
   symbol: String
 
   " Strategy of the vault "
-  strategy: String
+  strategy: String!
 
   " Token that need to be deposited to take a position in protocol "
   inputToken: Token!
@@ -391,18 +392,18 @@ type Vault @entity {
   ##### Snapshots #####
 
   " Vault daily snapshots "
-  dailySnapshots: [VaultDailySnapshot!]!
+  dailySnapshots: [VaultDailySnapshot!] @derivedFrom(field: "vault")
 
   " Vault hourly snapshots "
-  hourlySnapshots: [VaultHourlySnapshot!]!
+  hourlySnapshots: [VaultHourlySnapshot!] @derivedFrom(field: "vault")
 
   ##### Events #####
 
   " All deposits made to this Vault "
-  deposits: [Deposit!]!
+  deposits: [Deposit!] @derivedFrom(field: "vault")
 
   " All withdrawals made from this Vault "
-  withdraws: [Withdraw!]!
+  withdraws: [Withdraw!] @derivedFrom(field: "vault")
 }
 
 #################################
@@ -606,4 +607,14 @@ type Withdraw implements Event @entity {
 
   " The vault involving this transaction "
   vault: Vault!
+}
+
+type User @entity {
+  " { Address } "
+  id: ID!
+}
+
+type ActiveUser @entity {
+  " { hourly/daily }-{ Address }-{ hours/days from epoch } "
+  id: ID!
 }

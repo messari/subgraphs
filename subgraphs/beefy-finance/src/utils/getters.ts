@@ -1,4 +1,4 @@
-import { Address, ethereum } from "@graphprotocol/graph-ts";
+import { Address, dataSource, ethereum } from "@graphprotocol/graph-ts";
 import { Token, Vault, YieldAggregator } from "../../generated/schema";
 import { createVaultFromStrategy } from "../mappings/vault";
 import { BeefyStrategy } from "../../generated/ExampleVault/BeefyStrategy";
@@ -7,11 +7,11 @@ import {
   fetchTokenName,
   fetchTokenSymbol,
 } from "../mappings/token";
-import { BIGDECIMAL_ZERO, PROTOCOL_ID } from "../prices/common/constants";
 import {
-  createBeefyFinance,
-  updateProtocolAndSave,
-} from "../mappings/protocol";
+  BIGDECIMAL_ZERO,
+  BIGINT_ZERO,
+  PROTOCOL_ID,
+} from "../prices/common/constants";
 import { getUsdPricePerToken } from "../prices";
 
 export function getTokenOrCreate(
@@ -39,26 +39,39 @@ export function getTokenOrCreate(
 
 export function getVaultFromStrategyOrCreate(
   strategyAddress: Address,
-  currentBlock: ethereum.Block
+  event: ethereum.Event
 ): Vault {
   const strategyContract = BeefyStrategy.bind(strategyAddress);
   const vaultId = strategyContract.vault().toHexString();
   let vault = Vault.load(vaultId);
   if (!vault) {
-    vault = createVaultFromStrategy(strategyAddress, currentBlock);
+    vault = createVaultFromStrategy(strategyAddress, event);
   }
   return vault;
 }
 
-export function getBeefyFinanceOrCreate(
-  vaultId: string,
-  currentBlock: ethereum.Block
-): YieldAggregator {
+export function getBeefyFinanceOrCreate(vaultId: string): YieldAggregator {
   let beefy = YieldAggregator.load(PROTOCOL_ID);
   if (!beefy) {
-    beefy = createBeefyFinance(vaultId, currentBlock);
-  } else {
-    updateProtocolAndSave(beefy, currentBlock, vaultId);
+    beefy = new YieldAggregator(PROTOCOL_ID);
+    beefy.name = "Beefy Finance";
+    beefy.slug = "beefy-finance";
+    beefy.schemaVersion = "1.2.1";
+    beefy.subgraphVersion = "1.0.2";
+    beefy.methodologyVersion = "1.1.0";
+    beefy.network = dataSource
+      .network()
+      .toUpperCase()
+      .replace("-", "_");
+    beefy.type = "YIELD";
+    beefy.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    beefy.protocolControlledValueUSD = BIGDECIMAL_ZERO;
+    beefy.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    beefy.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    beefy.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    beefy.cumulativeUniqueUsers = BIGINT_ZERO;
+    beefy.vaults = [vaultId];
+    beefy.save();
   }
   return beefy;
 }

@@ -24,6 +24,7 @@ import { SushiSwapPair__getReservesResult } from "../../../generated/aave-aave-e
 ///////////////////////////////////////////////////////////////////////////
 
 export const BIGINT_ZERO = BigInt.fromI32(0);
+export const BIGINT_ONE = BigInt.fromI32(1);
 export const BIGINT_TEN = BigInt.fromI32(10);
 export const BIGINT_HUNDRED = BigInt.fromI32(100);
 export const BIGINT_TEN_THOUSAND = BigInt.fromI32(10000);
