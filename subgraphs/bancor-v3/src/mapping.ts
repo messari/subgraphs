@@ -16,9 +16,11 @@ import {
 import { ProgramCreated } from "../generated/StandardRewards/StandardRewards";
 import { PoolTokenCreated } from "../generated/PoolTokenFactory/PoolTokenFactory";
 import {
+  DefaultTradingFeePPMUpdated,
   TokensDeposited,
   TokensWithdrawn,
   TotalLiquidityUpdated,
+  TradingFeePPMUpdated,
 } from "../generated/templates/PoolCollection/PoolCollection";
 import { PoolCollection } from "../generated/templates";
 import {
@@ -37,6 +39,7 @@ import {
   FinancialsDailySnapshot,
   LiquidityPool,
   LiquidityPoolDailySnapshot,
+  LiquidityPoolFee,
   LiquidityPoolHourlySnapshot,
   Swap,
   Token,
@@ -52,13 +55,21 @@ import {
   DaiAddr,
   EthAddr,
   exponentToBigDecimal,
+  hundredBD,
+  LiquidityPoolFeeType,
   Network,
+  oneBD,
   ProtocolType,
   secondsPerDay,
   secondsPerHour,
   zeroBD,
   zeroBI,
 } from "./constants";
+
+let withdrawFeeIdx = 0;
+let tradingFeeIdx = 1;
+let protocolFeeIdx = 2;
+let lpFeeIdx = 3;
 
 enum EventType {
   Swap,
@@ -181,12 +192,65 @@ export function handlePoolCollectionAdded(event: PoolCollectionAdded): void {
   PoolCollection.create(event.params.poolCollection);
 }
 
+export function handleDefaultTradingFeePPMUpdated(
+  event: DefaultTradingFeePPMUpdated
+): void {
+  let protocol = getOrCreateProtocol();
+  protocol._defaultTradingFeeRate = event.params.newFeePPM
+    .toBigDecimal()
+    .div(exponentToBigDecimal(6));
+  protocol.save();
+
+  for (let i = 0; i < protocol._poolIDs.length; i++) {
+    updateLiquidityPoolFees(protocol._poolIDs[i]);
+  }
+}
+
+export function handleTradingFeePPMUpdated(event: TradingFeePPMUpdated): void {
+  let reserveTokenID = event.params.pool.toHexString();
+  let reserveToken = Token.load(reserveTokenID);
+  if (!reserveToken) {
+    log.warning("[handleTradingFeePPMUpdated] reserve token {} not found", [
+      reserveTokenID,
+    ]);
+    return;
+  }
+
+  if (!reserveToken._poolToken) {
+    log.warning(
+      "[handleTradingFeePPMUpdated] reserve token {} has no pool token",
+      [reserveTokenID]
+    );
+    return;
+  }
+
+  let liquidityPoolID = reserveToken._poolToken!;
+  let liquidityPool = LiquidityPool.load(liquidityPoolID);
+  if (!liquidityPool) {
+    log.warning("[handleTradingFeePPMUpdated] liquidity pool {} not found", [
+      liquidityPoolID,
+    ]);
+    return;
+  }
+
+  liquidityPool._tradingFeeRate = event.params.newFeePPM
+    .toBigDecimal()
+    .div(exponentToBigDecimal(6));
+  liquidityPool.save();
+
+  updateLiquidityPoolFees(liquidityPoolID);
+}
+
 export function handleNetworkFeePPMUpdated(event: NetworkFeePPMUpdated): void {
   let protocol = getOrCreateProtocol();
   protocol._networkFeeRate = event.params.newFeePPM
     .toBigDecimal()
     .div(exponentToBigDecimal(6));
   protocol.save();
+
+  for (let i = 0; i < protocol._poolIDs.length; i++) {
+    updateLiquidityPoolFees(protocol._poolIDs[i]);
+  }
 }
 
 export function handleWithdrawalFeePPMUpdated(
@@ -197,6 +261,10 @@ export function handleWithdrawalFeePPMUpdated(
     .toBigDecimal()
     .div(exponentToBigDecimal(6));
   protocol.save();
+
+  for (let i = 0; i < protocol._poolIDs.length; i++) {
+    updateLiquidityPoolFees(protocol._poolIDs[i]);
+  }
 }
 
 export function handleTokensTraded(event: TokensTraded): void {
@@ -559,6 +627,7 @@ function getOrCreateProtocol(): DexAmmProtocol {
     protocol.cumulativeTotalRevenueUSD = zeroBD;
     protocol.cumulativeUniqueUsers = 0;
     protocol._poolIDs = [];
+    protocol._defaultTradingFeeRate = zeroBD;
     protocol._networkFeeRate = zeroBD;
     protocol._withdrawalFeeRate = zeroBD;
     protocol.save();
@@ -572,15 +641,50 @@ function createLiquidityPool(
   blockTimestamp: BigInt,
   blockNumber: BigInt
 ): LiquidityPool {
-  let liquidityPool = new LiquidityPool(poolToken.id);
+  let protocol = getOrCreateProtocol();
 
-  liquidityPool.protocol = getOrCreateProtocol().id;
+  // init fees
+  let withdrawalFee = new LiquidityPoolFee(
+    LiquidityPoolFeeType.WITHDRAWAL_FEE.concat("-").concat(poolToken.id)
+  );
+  withdrawalFee.feePercentage = zeroBD;
+  withdrawalFee.feeType = LiquidityPoolFeeType.WITHDRAWAL_FEE;
+  withdrawalFee.save();
+
+  let tradingFee = new LiquidityPoolFee(
+    LiquidityPoolFeeType.DYNAMIC_TRADING_FEE.concat("-").concat(poolToken.id)
+  );
+  tradingFee.feePercentage = zeroBD;
+  tradingFee.feeType = LiquidityPoolFeeType.DYNAMIC_TRADING_FEE;
+  tradingFee.save();
+
+  let protocolFee = new LiquidityPoolFee(
+    LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE.concat("-").concat(poolToken.id)
+  );
+  protocolFee.feePercentage = zeroBD;
+  protocolFee.feeType = LiquidityPoolFeeType.DYNAMIC_PROTOCOL_FEE;
+  protocolFee.save();
+
+  let lpFee = new LiquidityPoolFee(
+    LiquidityPoolFeeType.DYNAMIC_LP_FEE.concat("-").concat(poolToken.id)
+  );
+  lpFee.feePercentage = zeroBD;
+  lpFee.feeType = LiquidityPoolFeeType.DYNAMIC_LP_FEE;
+  lpFee.save();
+
+  let liquidityPool = new LiquidityPool(poolToken.id);
+  liquidityPool.protocol = protocol.id;
   liquidityPool.name = poolToken.name;
   liquidityPool.symbol = poolToken.symbol;
   liquidityPool.inputTokens = [reserveToken.id];
   liquidityPool.outputToken = poolToken.id;
   liquidityPool.rewardTokens = [];
-  liquidityPool.fees = []; // TODO
+  liquidityPool.fees = [
+    withdrawalFee.id,
+    tradingFee.id,
+    protocolFee.id,
+    lpFee.id,
+  ];
   liquidityPool.isSingleSided = true;
   liquidityPool.createdTimestamp = blockTimestamp;
   liquidityPool.createdBlockNumber = blockNumber;
@@ -596,10 +700,12 @@ function createLiquidityPool(
   liquidityPool.stakedOutputTokenAmount = zeroBI;
   liquidityPool.rewardTokenEmissionsAmount = [zeroBI];
   liquidityPool.rewardTokenEmissionsUSD = [zeroBD];
+  liquidityPool._tradingFeeRate = protocol._defaultTradingFeeRate;
   liquidityPool._cumulativeTradingFeeAmountUSD = zeroBD;
   liquidityPool._cumulativeWithdrawalFeeAmountUSD = zeroBD;
-
   liquidityPool.save();
+
+  updateLiquidityPoolFees(poolToken.id);
 
   return liquidityPool;
 }
@@ -1366,4 +1472,63 @@ function getLiquidityPoolHourlySnapshotID(
   return liquidityPoolID
     .concat("-")
     .concat((timestamp / secondsPerHour).toString());
+}
+
+function updateLiquidityPoolFees(liquidityPoolID: string): void {
+  let protocol = DexAmmProtocol.load(BancorNetworkAddr);
+  if (!protocol) {
+    log.warning("[updateLiquidityPoolFees] protocol not found", []);
+    return;
+  }
+  let liquidityPool = LiquidityPool.load(liquidityPoolID);
+  if (!liquidityPool) {
+    log.warning("[updateLiquidityPoolFees] liquidity pool {} not found", [
+      liquidityPoolID,
+    ]);
+    return;
+  }
+
+  let withdrawFee = LiquidityPoolFee.load(liquidityPool.fees[withdrawFeeIdx]);
+  if (!withdrawFee) {
+    log.warning("[updateLiquidityPoolFees] fee {} not found", [
+      liquidityPool.fees[withdrawFeeIdx],
+    ]);
+  } else {
+    withdrawFee.feePercentage = protocol._withdrawalFeeRate.times(hundredBD);
+    withdrawFee.save();
+  }
+
+  let tradingFee = LiquidityPoolFee.load(liquidityPool.fees[tradingFeeIdx]);
+  if (!tradingFee) {
+    log.warning("[updateLiquidityPoolFees] fee {} not found", [
+      liquidityPool.fees[tradingFeeIdx],
+    ]);
+  } else {
+    tradingFee.feePercentage = liquidityPool._tradingFeeRate.times(hundredBD);
+    tradingFee.save();
+  }
+
+  let protocolFee = LiquidityPoolFee.load(liquidityPool.fees[protocolFeeIdx]);
+  if (!protocolFee) {
+    log.warning("[updateLiquidityPoolFees] fee {} not found", [
+      liquidityPool.fees[protocolFeeIdx],
+    ]);
+  } else {
+    protocolFee.feePercentage = liquidityPool._tradingFeeRate
+      .times(protocol._networkFeeRate)
+      .times(hundredBD);
+    protocolFee.save();
+  }
+
+  let lpFee = LiquidityPoolFee.load(liquidityPool.fees[lpFeeIdx]);
+  if (!lpFee) {
+    log.warning("[updateLiquidityPoolFees] fee {} not found", [
+      liquidityPool.fees[lpFeeIdx],
+    ]);
+  } else {
+    lpFee.feePercentage = liquidityPool._tradingFeeRate
+      .times(oneBD.minus(protocol._networkFeeRate))
+      .times(hundredBD);
+    lpFee.save();
+  }
 }

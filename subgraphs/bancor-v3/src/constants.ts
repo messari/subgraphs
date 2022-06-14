@@ -34,6 +34,8 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_LP_FEE = "DYNAMIC_LP_FEE";
   export const FIXED_PROTOCOL_FEE = "FIXED_PROTOCOL_FEE";
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
+  export const DEPOSIT_FEE = "DEPOSIT_FEE";
+  export const WITHDRAWAL_FEE = "WITHDRAWAL_FEE";
 }
 
 export namespace RewardTokenType {
@@ -70,6 +72,8 @@ export let secondsPerHour = 60 * 60;
 
 export let zeroBD = BigDecimal.zero();
 export let zeroBI = BigInt.zero();
+export let oneBD = new BigDecimal(BigInt.fromI32(1));
+export let hundredBD = new BigDecimal(BigInt.fromI32(100));
 
 export function exponentToBigDecimal(n: i32): BigDecimal {
   return BigDecimal.fromString(Math.pow(10, n).toString());

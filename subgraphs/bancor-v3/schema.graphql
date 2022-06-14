@@ -243,6 +243,7 @@ type DexAmmProtocol implements Protocol @entity {
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
 
   _poolIDs: [ID!]!
+  _defaultTradingFeeRate: BigDecimal!
   _networkFeeRate: BigDecimal!
   _withdrawalFeeRate: BigDecimal!
 }
@@ -454,6 +455,7 @@ type LiquidityPool @entity {
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
 
+  _tradingFeeRate: BigDecimal!
   _cumulativeTradingFeeAmountUSD: BigDecimal!
   _cumulativeWithdrawalFeeAmountUSD: BigDecimal!
 }
