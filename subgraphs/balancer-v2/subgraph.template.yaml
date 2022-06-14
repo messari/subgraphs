@@ -75,6 +75,37 @@ dataSources:
           handler: handlePoolBalanceChanged
         - event: Swap(indexed bytes32,indexed address,indexed address,uint256,uint256)
           handler: handleSwap
+{{#isBeets}}
+  - kind: ethereum/contract
+    name: MasterChefV2
+    network: {{ network }}
+    source:
+      address: "{{masterChefV2}}"
+      abi: MasterChefV2
+      startBlock: {{masterChefV2StartBlock}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      file: ./src/mappings/masterchef.ts
+      entities:
+        - MasterChefV2
+        - Pool
+        - User
+        - Rewarder
+      abis:
+        - name: MasterChefV2
+          file: ./abis/masterchef/MasterChefV2.json
+      eventHandlers:
+        - event: Deposit(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleDeposit
+        - event: Withdraw(indexed address,indexed uint256,uint256,indexed address)
+          handler: handleWithdraw
+        - event: LogSetPool(indexed uint256,uint256,indexed address,bool)
+          handler: handleLogSetPool
+        - event: LogUpdatePool(indexed uint256,uint256,uint256,uint256)
+          handler: handleLogUpdatePool
+{{/isBeets}}
 templates:
   - kind: ethereum/contract
     name: WeightedPool

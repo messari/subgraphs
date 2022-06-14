@@ -13,6 +13,8 @@
     "beets": "0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e"
   },
 
+  "masterChefV2": "0x8166994d9ebBe5829EC86Bd81258149B87faCfd3",
+  "masterChefV2StartBlock": "18508300",
   "protocolName": "Beethoven X",
   "protocolSlug": "beethoven-x",
   "defaultNetwork": "FANTOM",

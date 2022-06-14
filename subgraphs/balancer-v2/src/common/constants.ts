@@ -12,8 +12,8 @@ export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
-export const PROTOCOL_NAME = "beethovenx"
-export const PROTOCOL_SLUG = "beethovenx"
+export const PROTOCOL_NAME = "Beethoven X"
+export const PROTOCOL_SLUG = "beethoven-x"
 
 
 
@@ -135,6 +135,9 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 export let DEFAULTNETWORK =  "FANTOM" 
 
 export let VAULT_ADDRESS = Address.fromString('0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce')
+
+export let MASTERCHEFV2_ADDRESS = Address.fromString('0x8166994d9ebBe5829EC86Bd81258149B87faCfd3')
+
 export let DAI: Address = Address.fromString('0x8D11eC38a3EB5E956B052f67Da8Bdc9bef8Abf3E');
 export let USDC: Address = Address.fromString('0x04068DA6C83AFCFA0e13ba15A6696662335D5B75');
 export let USDT: Address = Address.fromString('0x049d68029688eAbF473097a2fC38ef61633A3C7A');

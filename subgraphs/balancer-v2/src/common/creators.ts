@@ -43,16 +43,12 @@ export function createLiquidityPool(
   let protocol = getOrCreateDex();
   let inputTokenBalances: BigInt[] = [];
   let inputTokenBalancesAmount: BigDecimal[] = [];
-  let rewardTokenEmissionsAmount: BigInt[] = [];
-  let rewardTokenEmissionsUSD: BigDecimal[] = [];
 
   for (let index = 0; index < inputTokens.length; index++) {
     //create token if null
     getOrCreateToken(inputTokens[index]);
     inputTokenBalances.push(BIGINT_ZERO);
     inputTokenBalancesAmount.push(BIGDECIMAL_ZERO);
-    rewardTokenEmissionsAmount.push(BIGINT_ZERO);
-    rewardTokenEmissionsUSD.push(BIGDECIMAL_ZERO);
   }
 
   let pool = new LiquidityPool(poolAddress);
@@ -66,8 +62,8 @@ export function createLiquidityPool(
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.rewardTokenEmissionsAmount = rewardTokenEmissionsAmount;
-  pool.rewardTokenEmissionsUSD = rewardTokenEmissionsUSD;
+  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   pool.fees = createPoolFees(poolAddress, fees);
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
