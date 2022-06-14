@@ -1,4 +1,4 @@
-import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts/index";
+import { BigInt, ethereum, Address, log } from "@graphprotocol/graph-ts/index";
 import { Deposit, LiquidityPool, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { createEventID, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
@@ -27,6 +27,10 @@ export function handleDepositEvent(
   let inputTokenAmounts = liquidityEvent.inputTokenAmounts;
   let inputTokenBalances = pool.inputTokenBalances;
   let amountUSD = BIGDECIMAL_ZERO;
+  if( !pool.coins || tokenAmounts.length != pool.coins.length ){
+     log.warning("ERROR ERROR ERROR  handleDepositEvent  ERROR   poolid:{} ",[pool.id]);
+     return
+  }
   for (let i = 0; i < tokenAmounts.length; i++) {
     let inputTokenAddress = Address.fromString(pool.coins[i]);
     let inputToken = getOrCreateToken(inputTokenAddress);
@@ -41,7 +45,6 @@ export function handleDepositEvent(
   liquidityEvent.inputTokens = inputTokens;
   liquidityEvent.inputTokenAmounts = inputTokenAmounts;
   liquidityEvent.amountUSD = amountUSD;
-
   //pool.inputTokenBalances = inputTokenBalances;
   pool.outputTokenSupply = tokenSupply;
 
