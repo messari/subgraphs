@@ -5,7 +5,7 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: TroveManagerLiquidations
-    network: mainnet
+    network: avalanche
     source:
       address: "0x0000000000aDCd24b833604068cBbbb2EEb3a2a3"
       abi: TroveManagerLiquidations
@@ -81,7 +81,7 @@ dataSources:
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: TroveManagerRedemptions
-    network: mainnet
+    network: avalanche
     source:
       address: "0x00000000000d9c2f60d8e82F2d1C2bed5008DD7d"
       abi: TroveManagerRedemptions
@@ -157,7 +157,7 @@ dataSources:
       file: ./src/mapping/TroveManager.ts
   - kind: ethereum/contract
     name: BorrowerOperations
-    network: mainnet
+    network: avalanche
     source:
       address: "0xBBbbbbbBBBBeC8bF32635374c0717C44B5c535eF"
       abi: BorrowerOperations
@@ -231,7 +231,7 @@ dataSources:
       file: ./src/mapping/BorrowerOperations.ts
   - kind: ethereum/contract
     name: ActivePool
-    network: mainnet
+    network: avalanche
     source:
       address: "0xAAAaaAaaAaDd4AA719f0CF8889298D13dC819A15"
       abi: ActivePool
@@ -297,7 +297,7 @@ dataSources:
       file: ./src/mapping/ActivePool.ts
   - kind: ethereum/contract
     name: CollSurplusPool
-    network: mainnet
+    network: avalanche
     source:
       address: "0x5555555598B91C1df1C065E8E3a50fF846653968"
       abi: CollSurplusPool
@@ -366,7 +366,7 @@ dataSources:
       file: ./src/mapping/CollSurplusPool.ts
   - kind: ethereum/contract
     name: StabilityPool
-    network: mainnet
+    network: avalanche
     source:
       address: "0xFFffFfffFff5d3627294FeC5081CE5C5D7fA6451"
       abi: StabilityPool
