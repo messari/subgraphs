@@ -431,7 +431,7 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
-  
+
   "use to calculate the share of pool"
   allocPoint: BigInt!
 
@@ -738,6 +738,30 @@ type ActiveAccount @entity {
 }
 
 #Added Entities
+
+type _LiquidityPoolAmount @entity {
+  " Smart contract address of the pool "
+  id: ID!
+
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigDecimal!]!
+
+  tokenPrices: [BigDecimal!]!
+}
+
+"  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
+type _HelperStore @entity {
+  id: ID!
+
+  " price of ETH/TVL in USD "
+  valueDecimal: BigDecimal
+
+  " # of deposits, # of unique users "
+  valueInt: Int
+}
 
 type _LiquidityPoolAmount @entity {
   " Smart contract address of the pool "

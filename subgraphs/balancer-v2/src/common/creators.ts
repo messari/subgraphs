@@ -43,7 +43,6 @@ export function createLiquidityPool(
   let protocol = getOrCreateDex();
   let inputTokenBalances: BigInt[] = [];
   let inputTokenBalancesAmount: BigDecimal[] = [];
-
   for (let index = 0; index < inputTokens.length; index++) {
     //create token if null
     getOrCreateToken(inputTokens[index]);

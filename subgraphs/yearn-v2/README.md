@@ -19,7 +19,7 @@ Portion of the Total Revenue allocated to the Protocol
 
 Sum across all Vaults:
 
-`(Vault TVL * Management Fees) * (Harvested Yield * Performance Fees)`
+`(Vault TVL * Management Fees) + (Harvested Yield * Performance Fees)`
 
 Partly shared with Strategist / Referring Protocol but to be included in Protocol-Side Revenue
 
