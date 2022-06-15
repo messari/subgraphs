@@ -83,8 +83,10 @@ export function updateVaultSnapshots(
   vaultDailySnapshots.inputTokenBalance = vault.inputTokenBalance;
   vaultHourlySnapshots.inputTokenBalance = vault.inputTokenBalance;
 
-  vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply;
-  vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply;
+  if (vault.outputTokenSupply) {
+    vaultDailySnapshots.outputTokenSupply = vault.outputTokenSupply!;
+    vaultHourlySnapshots.outputTokenSupply = vault.outputTokenSupply!;
+  }
 
   vaultDailySnapshots.pricePerShare = vault.pricePerShare;
   vaultHourlySnapshots.pricePerShare = vault.pricePerShare;
@@ -166,4 +168,50 @@ export function updateFinancialsAfterReport(
 
   financialMetrics.save();
   protocol.save();
+}
+
+export function updateVaultSnapshotsAfterReport(
+  vault: VaultStore,
+  block: ethereum.Block,
+  totalRevenueUSD: BigDecimal,
+  supplySideRevenueUSD: BigDecimal,
+  protocolSideRevenueUSD: BigDecimal
+): void {
+  let vaultDailySnapshot = getOrCreateVaultsDailySnapshots(vault.id, block);
+  let vaultHourlySnapshot = getOrCreateVaultsHourlySnapshots(vault.id, block);
+
+  vaultDailySnapshot.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultDailySnapshot.dailySupplySideRevenueUSD = vaultDailySnapshot.dailySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD
+  );
+  vaultDailySnapshot.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultDailySnapshot.dailyProtocolSideRevenueUSD = vaultDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD
+  );
+  vaultDailySnapshot.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
+  vaultDailySnapshot.dailyTotalRevenueUSD = vaultDailySnapshot.dailyTotalRevenueUSD.plus(
+    totalRevenueUSD
+  );
+
+  vaultHourlySnapshot.cumulativeSupplySideRevenueUSD =
+    vault.cumulativeSupplySideRevenueUSD;
+  vaultHourlySnapshot.hourlySupplySideRevenueUSD = vaultHourlySnapshot.hourlySupplySideRevenueUSD.plus(
+    supplySideRevenueUSD
+  );
+  vaultHourlySnapshot.cumulativeProtocolSideRevenueUSD =
+    vault.cumulativeProtocolSideRevenueUSD;
+  vaultHourlySnapshot.hourlyProtocolSideRevenueUSD = vaultHourlySnapshot.hourlyProtocolSideRevenueUSD.plus(
+    protocolSideRevenueUSD
+  );
+  vaultHourlySnapshot.cumulativeTotalRevenueUSD =
+    vault.cumulativeTotalRevenueUSD;
+  vaultHourlySnapshot.hourlyTotalRevenueUSD = vaultHourlySnapshot.hourlyTotalRevenueUSD.plus(
+    totalRevenueUSD
+  );
+
+  vaultHourlySnapshot.save();
+  vaultDailySnapshot.save();
 }
