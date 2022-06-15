@@ -922,7 +922,7 @@ type Borrow implements Event @entity {
   amount: BigInt!
 
   " Amount of token borrowed in USD "
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal!
 }
 
 # For CDPs, use this for burn events
@@ -963,7 +963,7 @@ type Repay implements Event @entity {
   amount: BigInt!
 
   " Amount of token repaid in USD "
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal!
 }
 
 type Liquidate implements Event @entity {
@@ -1003,10 +1003,10 @@ type Liquidate implements Event @entity {
   amount: BigInt!
 
   " Amount of collateral liquidated in USD "
-  amountUSD: BigDecimal
+  amountUSD: BigDecimal!
 
   " Amount of profit from liquidation in USD "
-  profitUSD: BigDecimal
+  profitUSD: BigDecimal!
 }
 
 # An account is a unique Ethereum address
