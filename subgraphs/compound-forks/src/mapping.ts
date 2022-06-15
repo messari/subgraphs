@@ -638,7 +638,7 @@ export function _handleRepayBorrow(
   updateMarketSnapshots(
     marketID,
     event.block.timestamp.toI32(),
-    repay.amountUSD!,
+    repay.amountUSD,
     EventType.Repay
   );
 
