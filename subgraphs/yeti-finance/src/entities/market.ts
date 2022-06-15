@@ -12,6 +12,7 @@ import {
   BIGDECIMAL_TEN,
   BIGDECIMAL_ZERO,
   BIGINT_TEN,
+  BIGINT_ZERO,
   LIQUIDATION_FEE,
   MAXIMUM_LTV,
   SECONDS_PER_DAY,
@@ -43,10 +44,19 @@ export function getOrCreateMarket(token: Address): Market {
     market.liquidationThreshold = MAXIMUM_LTV;
     market.liquidationPenalty = LIQUIDATION_FEE;
     market.inputToken = getOrCreateToken(token).id;
+    market.inputTokenBalance = BIGINT_ZERO;
+    market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
+    market.outputTokenSupply = BIGINT_ZERO;
     market.rates = [getOrCreateStableBorrowerInterestRate(ACTIVE_POOL).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
     market.totalValueLockedUSD = BIGDECIMAL_ZERO;
+    market.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    market.cumulativeBorrowUSD = BIGDECIMAL_ZERO
+    market.cumulativeDepositUSD = BIGDECIMAL_ZERO
+    market.cumulativeLiquidateUSD = BIGDECIMAL_ZERO
+    market.totalBorrowBalanceUSD = BIGDECIMAL_ZERO
+    market.outputTokenPriceUSD = BIGDECIMAL_ZERO
     market.save();
   }
   return market;
@@ -64,6 +74,9 @@ export function getOrCreateMarketSnapshot(
     marketSnapshot.protocol = market.protocol;
     marketSnapshot.market = market.id;
     marketSnapshot.rates = market.rates;
+    marketSnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
   }
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
@@ -73,8 +86,12 @@ export function getOrCreateMarketSnapshot(
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
   marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
+
+
   marketSnapshot.save();
   return marketSnapshot;
 }
@@ -92,6 +109,9 @@ export function getOrCreateMarketHourlySnapshot(
     marketSnapshot.protocol = market.protocol;
     marketSnapshot.market = market.id;
     marketSnapshot.rates = market.rates;
+    marketSnapshot.hourlyDepositUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyBorrowUSD = BIGDECIMAL_ZERO;
+    marketSnapshot.hourlyLiquidateUSD = BIGDECIMAL_ZERO;
   }
   marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
   marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
@@ -101,6 +121,8 @@ export function getOrCreateMarketHourlySnapshot(
   marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
   marketSnapshot.inputTokenBalance = market.inputTokenBalance;
   marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+  marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+  marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
   marketSnapshot.blockNumber = event.block.number;
   marketSnapshot.timestamp = event.block.timestamp;
   marketSnapshot.save();

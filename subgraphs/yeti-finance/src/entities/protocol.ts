@@ -69,6 +69,14 @@ export function getOrCreateUsageMetricsSnapshot(
     usageMetrics = new UsageMetricsDailySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+    usageMetrics.dailyActiveUsers = INT_ZERO;
+    usageMetrics.cumulativeUniqueUsers = INT_ZERO;
+    usageMetrics.dailyTransactionCount = INT_ZERO;
+    usageMetrics.dailyDepositCount = INT_ZERO;
+    usageMetrics.dailyWithdrawCount = INT_ZERO;
+    usageMetrics.dailyBorrowCount = INT_ZERO;
+    usageMetrics.dailyRepayCount = INT_ZERO;
+    usageMetrics.dailyLiquidateCount = INT_ZERO;
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
@@ -87,6 +95,15 @@ export function getOrCreateUsageMetricsHourlySnapshot(
     usageMetrics = new UsageMetricsHourlySnapshot(id);
     usageMetrics.protocol = protocol.id;
     usageMetrics.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
+
+    usageMetrics.hourlyActiveUsers = INT_ZERO;
+    usageMetrics.hourlyBorrowCount = INT_ZERO;
+    usageMetrics.hourlyTransactionCount = INT_ZERO;
+    usageMetrics.hourlyDepositCount = INT_ZERO;
+    usageMetrics.hourlyWithdrawCount = INT_ZERO;
+    usageMetrics.hourlyRepayCount = INT_ZERO;
+    usageMetrics.hourlyLiquidateCount = INT_ZERO;
+
   }
   usageMetrics.blockNumber = event.block.number;
   usageMetrics.timestamp = event.block.timestamp;
@@ -103,6 +120,12 @@ export function getOrCreateFinancialsSnapshot(
   if (!financialsSnapshot) {
     financialsSnapshot = new FinancialsDailySnapshot(id);
     financialsSnapshot.protocol = protocol.id;
+    financialsSnapshot.dailyBorrowUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyDepositUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyLiquidateUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailySupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    financialsSnapshot.dailyTotalRevenueUSD = BIGDECIMAL_ZERO;
   }
   financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
   financialsSnapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;

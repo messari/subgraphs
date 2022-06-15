@@ -853,7 +853,7 @@ type Borrow implements Event @entity {
   ##### Lending-Specific #####
 
   " The market this transaction interacted with "
-  market: Market!
+  market: Market
 
   " Token borrowed "
   asset: Token!
@@ -894,7 +894,7 @@ type Repay implements Event @entity {
   ##### Lending-Specific #####
 
   " The market this transaction interacted with "
-  market: Market!
+  market: Market
 
   " Token repaid "
   asset: Token!
