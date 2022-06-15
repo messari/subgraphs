@@ -18,19 +18,16 @@ type Token @entity {
   " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 
-  " If token transfers are paused, derived from paused event "
-  isPaused: Boolean
-
   " Number of unique token holders "
   holderCount: BigInt!
 
-  " Total number of token transfer transactions "
+  " Total number of token transfer events "
   transferCount: BigInt!
 
-  " Total number of token mint transactions "
+  " Total number of token mint events "
   mintCount: BigInt!
 
-  " Total number of token burn transactions "
+  " Total number of token burn events "
   burnCount: BigInt!
 
   " Total token supply "
@@ -50,25 +47,26 @@ type Token @entity {
 
   ##### Snapshots #####
 
-  " Daily usage metrics for this token "
-  dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "token")
-
-  " Hourly usage metrics for this token "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "token")
-
+  " Daily snapshot for this token "
   dailyTokenSnapshot: [TokenDailySnapshot!]! @derivedFrom(field: "token")
+
+  " Hourly snapshot for this token "
+  hourlyTokenSnapshot: [TokenHourlySnapshot!]! @derivedFrom(field: "token")
 }
 
 ###############################
 ####### Token Timeseries ######
 ###############################
 
-type UsageMetricsDailySnapshot @entity {
-  " { Token Address } - { # of days since Unix epoch time } "
+type TokenDailySnapshot @entity {
+  " { Token Address } - {# of days since Unix epoch time} "
   id: ID!
 
   " Token this snapshot is associated with "
   token: Token!
+
+  " Daily total Supply of the token "
+  dailyTotalSupply: BigInt!
 
   " # of accounts holding this token "
   dailyHolderCount: Int!
@@ -79,8 +77,8 @@ type UsageMetricsDailySnapshot @entity {
   " # of cumulative unique users/holders "
   cumulativeUniqueUsers: Int!
 
-  " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
-  dailyTransactionCount: Int!
+  " Total number of events occurred in a day "
+  dailyEventCount: Int!
 
   " Total number of mints in a day "
   dailyMintCount: Int!
@@ -101,12 +99,15 @@ type UsageMetricsDailySnapshot @entity {
   timestamp: BigInt!
 }
 
-type UsageMetricsHourlySnapshot @entity {
+type TokenHourlySnapshot @entity {
   " { Token Address } - {# of hours since Unix epoch time} "
   id: ID!
 
   " Token this snapshot is associated with "
   token: Token!
+
+  " Hourly total Supply of the token "
+  hourlyTotalSupply: BigInt!
 
   " # of accounts holding this token "
   hourlyHolderCount: Int!
@@ -117,8 +118,8 @@ type UsageMetricsHourlySnapshot @entity {
   " # of cumulative unique users "
   cumulativeUniqueUsers: Int!
 
-  " Total number of transactions occurred in an hour. Transactions include all entities that implement the Event interface. "
-  hourlyTransactionCount: Int!
+  " Total number of events occurred in an hour "
+  hourlyEventCount: Int!
 
   " Total number of mints in a hour "
   hourlyMintCount: Int!
@@ -131,23 +132,6 @@ type UsageMetricsHourlySnapshot @entity {
 
   " Total number of token burnt in a hour "
   hourlyBurnAmount: BigInt!
-
-  " Block number of this snapshot "
-  blockNumber: BigInt!
-
-  " Timestamp of this snapshot "
-  timestamp: BigInt!
-}
-
-type TokenDailySnapshot @entity {
-  " { Token Address } - {# of hours since Unix epoch time} "
-  id: ID!
-
-  " Token this snapshot is associated with "
-  token: Token!
-
-  " Daily total Supply of the token "
-  dailyTotalSupply: BigInt!
 
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -181,6 +165,7 @@ interface Event {
   " The token this transaction belongs to "
   token: Token!
 
+  " Nonce of the transaction that emitted this event "
   nonce: Int!
 
   " Address that received the tokens "
@@ -234,7 +219,7 @@ type Account @entity {
   " Address of the account "
   id: ID!
 
-  " Token transfers by this account "
+  " Token transfers to this account "
   transferTo: [Transfer!]! @derivedFrom(field: "to")
 
   " Token transfers from this account "
@@ -248,7 +233,7 @@ type Account @entity {
 }
 
 type AccountBalance @entity {
-  " { Address Of the Account } - {Address of the Token}"
+  " { Address Of the Account } - { Address of the Token }"
   id: ID!
 
   " Account address "
