@@ -1,5 +1,5 @@
-import { exec } from 'child_process';
-import fs from 'fs';
+const exec = require('child_process').exec;
+const fs = require('fs');
 
 /**
  * @param {string} protocol - Protocol that is being deployed
@@ -7,7 +7,7 @@ import fs from 'fs';
  * @param {string} template - Template location that will be used to create subgraph.yaml
  * @param {string} location - Location in the subgraph will be deployed to {e.g. messari/uniswap-v2-ethereum}
 */
-export function scripts(protocol, network, template, location, constants) {
+function scripts(protocol, network, template, location, constants) {
     let scripts = [];
     let removeConfig = "rm -rf configurations/configure.ts"
     let removeSubgraphYaml = "rm -rf subgraph.yaml"
@@ -28,7 +28,7 @@ export function scripts(protocol, network, template, location, constants) {
     return scripts
 }
 
-export function getDeploymentNetwork(network) {
+function getDeploymentNetwork(network) {
     let deployNetwork = "";
     switch (network) {
         case "mainnet":
@@ -50,7 +50,7 @@ export function getDeploymentNetwork(network) {
  * @param {string[]} array - Protocol that is being deployed
  * @param {string} callback 
 */
-export async function runCommands(allScripts, results, callback) {
+async function runCommands(allScripts, results, args, callback) {
 
     let logs = ""
     var index = 0;
@@ -82,7 +82,12 @@ export async function runCommands(allScripts, results, callback) {
             fs.writeFile('results.txt', logs.replace(/\u001b[^m]*?m/g,""), function (err) {
                 if (err) throw err;
               });
-            console.log(results + "END")
+
+            // Print the logs if printlogs is 't' or 'true'
+            if (['true', 't'].includes(args.printlogs.toLowerCase())) {
+                console.log(logs)
+            }
+            console.log(results + "END" + '\n')
             callback(results);
         }
     }
@@ -90,3 +95,5 @@ export async function runCommands(allScripts, results, callback) {
     // start the first iteration
     next();
 }
+
+module.exports = { scripts, getDeploymentNetwork, runCommands };
