@@ -98,7 +98,7 @@ export function _Withdraw(
     // contract address
     withdrawAmount = vault.inputTokenBalance
       .times(sharesBurnt)
-      .div(vault.outputTokenSupply);
+      .div(vault.outputTokenSupply!);
   }
 
   let inputToken = Token.load(vault.inputToken);
@@ -109,7 +109,7 @@ export function _Withdraw(
   ).toBigDecimal();
 
   vault.inputTokenBalance = vault.inputTokenBalance.minus(withdrawAmount);
-  vault.outputTokenSupply = vault.outputTokenSupply.minus(sharesBurnt);
+  vault.outputTokenSupply = vault.outputTokenSupply!.minus(sharesBurnt);
 
   const withdrawalFees = utils
     .readValue<BigInt>(
