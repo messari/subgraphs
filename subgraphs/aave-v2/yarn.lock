@@ -1144,6 +1144,7 @@
     "typedarray" "^0.0.6"
 
 "concat-stream@github:hugomrdias/concat-stream#feat/smaller":
+  "resolved" "git+ssh://git@github.com/hugomrdias/concat-stream.git#057bc7b5d6d8df26c8cf00a3f151b6721a0a8034"
   "version" "2.0.0"
   dependencies:
     "inherits" "^2.0.3"
@@ -3212,6 +3213,11 @@
   "resolved" "https://registry.npmjs.org/murmurhash3js/-/murmurhash3js-3.0.1.tgz"
   "version" "3.0.1"
 
+"mustache@^4.2.0":
+  "integrity" "sha512-71ippSywq5Yb7/tVYyGbkBggbU8H3u5Rz56fH60jGFgr8uHwxs+aSKeqmluIVzM0m0kB7xQjKS6qPfd0b2ZoqQ=="
+  "resolved" "https://registry.npmjs.org/mustache/-/mustache-4.2.0.tgz"
+  "version" "4.2.0"
+
 "mute-stream@0.0.8":
   "integrity" "sha512-nnbWWOkoWyUsTjKrhgD0dcz22mdkSnpYqbEjIm2nhwhuxlSkpywJmBo8h0ZqJdkp73mb90SssHkN4rsRaBAfAA=="
   "resolved" "https://registry.npmjs.org/mute-stream/-/mute-stream-0.0.8.tgz"
@@ -3228,6 +3234,7 @@
   "version" "1.4.0"
 
 "ndjson@github:hugomrdias/ndjson#feat/readable-stream3":
+  "resolved" "git+ssh://git@github.com/hugomrdias/ndjson.git#4db16da6b42e5b39bf300c3a7cde62abb3fa3a11"
   "version" "1.5.0"
   dependencies:
     "json-stringify-safe" "^5.0.1"
@@ -3515,8 +3522,10 @@
   "resolved" "https://registry.npmjs.org/prelude-ls/-/prelude-ls-1.2.1.tgz"
   "version" "1.2.1"
 
-"prettier@@protofire/subgraph-prettier-config", "prettier@>=1.17.0":
-  "resolved" "file:@protofire/subgraph-prettier-config"
+"prettier@>=1.17.0":
+  "integrity" "sha512-nwoX4GMFgxoPC6diHvSwmK/4yU8FFH3V8XWtLQrbj4IBsK2pkYhG4kf/ljF/haaZ/aii+wNJqISrCDPgxGWDVQ=="
+  "resolved" "https://registry.npmjs.org/prettier/-/prettier-2.7.0.tgz"
+  "version" "2.7.0"
 
 "prettier@1.19.1":
   "integrity" "sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew=="
