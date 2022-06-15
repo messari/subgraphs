@@ -530,6 +530,13 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
     if (event.block.number.toI32() > 10960099) {
       let compMarket = getOrCreateMarket(event, Address.fromString(CCOMP_ADDRESS));
       compPriceUSD = compMarket.inputTokenPriceUSD;
+
+      // backup pricing
+      if (compPriceUSD == BIGDECIMAL_ZERO) {
+        compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS), event.block.number.toI32()).usdPrice.div(
+          exponentToBigDecimal(USDC_DECIMALS),
+        );
+      }
     } else {
       // try to get COMP price between blocks 10271924 - 10960099 using price oracle library
       compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS), event.block.number.toI32()).usdPrice.div(
@@ -537,19 +544,14 @@ export function updateRewards(event: ethereum.Event, market: Market): void {
       );
     }
 
-    // ensure we have a price
-    if (compPriceUSD == BIGDECIMAL_ZERO) {
-      compPriceUSD = getUsdPricePerToken(Address.fromString(COMP_ADDRESS), event.block.number.toI32()).usdPrice.div(
-        exponentToBigDecimal(USDC_DECIMALS),
-      );
-    }
-
     let borrowCompPerDayUSD = borrowCompPerDay
       .toBigDecimal()
-      .div(exponentToBigDecimal(rewardDecimals).times(compPriceUSD));
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(compPriceUSD);
     let supplyCompPerDayUSD = supplyCompPerDay
       .toBigDecimal()
-      .div(exponentToBigDecimal(rewardDecimals).times(compPriceUSD));
+      .div(exponentToBigDecimal(rewardDecimals))
+      .times(compPriceUSD);
     market.rewardTokenEmissionsAmount = [borrowCompPerDay, supplyCompPerDay]; // same order as market.rewardTokens
     market.rewardTokenEmissionsUSD = [borrowCompPerDayUSD, supplyCompPerDayUSD];
     market.save();
