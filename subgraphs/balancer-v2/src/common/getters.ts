@@ -1,16 +1,13 @@
 // import { log } from '@graphprotocol/graph-ts'
-import { Address, BigDecimal, bigDecimal, BigInt, dataSource, ethereum, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import { ERC20 } from "../../generated/Vault/ERC20";
 import {
   DexAmmProtocol,
   LiquidityPool,
-  _HelperStore,
   FinancialsDailySnapshot,
   UsageMetricsDailySnapshot,
-  _LiquidityPoolAmount,
   LiquidityPoolFee,
   Token,
-  _TokenWhitelist,
   LiquidityPoolHourlySnapshot,
   LiquidityPoolDailySnapshot,
   UsageMetricsHourlySnapshot,
@@ -19,7 +16,6 @@ import {
   INT_ZERO,
   BIGDECIMAL_ZERO,
   ProtocolType,
-  HelperStoreType,
   DEFAULT_DECIMALS,
   SECONDS_PER_DAY,
   BIGINT_ZERO,
@@ -33,10 +29,6 @@ import {
   DEFAULTNETWORK,
 } from "./constants";
 import { fetchPrice } from "./pricing";
-import { createLiquidityPool } from "./creators";
-
-
-
 
 export function getOrCreateDex(): DexAmmProtocol {
   let protocol = DexAmmProtocol.load(VAULT_ADDRESS.toHexString());
@@ -86,29 +78,8 @@ export function getLiquidityPool(poolAddress: string): LiquidityPool {
   return LiquidityPool.load(poolAddress)!;
 }
 
-export function getLiquidityPoolAmounts(poolAddress: string): _LiquidityPoolAmount {
-  return _LiquidityPoolAmount.load(poolAddress)!;
-}
-
 export function getLiquidityPoolFee(id: string): LiquidityPoolFee {
   return LiquidityPoolFee.load(id)!;
-}
-
-export function getFeeTier(event: ethereum.Event): _HelperStore {
-  return _HelperStore.load(event.address.toHexString().concat("-FeeTier"))!;
-}
-
-export function getOrCreateTokenWhitelist(tokenAddress: string): _TokenWhitelist {
-  let tokenTracker = _TokenWhitelist.load(tokenAddress);
-  // fetch info if null
-  if (!tokenTracker) {
-    tokenTracker = new _TokenWhitelist(tokenAddress);
-
-    tokenTracker.whitelistPools = [];
-    tokenTracker.save();
-  }
-
-  return tokenTracker;
 }
 
 export function getOrCreateUsageMetricDailySnapshot(event: ethereum.Event): UsageMetricsDailySnapshot {
@@ -165,12 +136,14 @@ export function getOrCreateUsageMetricHourlySnapshot(event: ethereum.Event): Usa
   return usageMetrics;
 }
 
-export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event,poolAddress:string): LiquidityPoolDailySnapshot {
+export function getOrCreateLiquidityPoolDailySnapshot(
+  event: ethereum.Event,
+  poolAddress: string,
+): LiquidityPoolDailySnapshot {
   let day = event.block.timestamp.toI32() / SECONDS_PER_DAY;
   let dayId = day.toString();
   let pool = LiquidityPool.load(poolAddress);
   let poolMetrics = LiquidityPoolDailySnapshot.load(poolAddress.concat("-").concat(dayId));
-
 
   if (!poolMetrics) {
     poolMetrics = new LiquidityPoolDailySnapshot(poolAddress.concat("-").concat(dayId));
@@ -179,17 +152,17 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event,pool
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.dailyVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    let dailyVolumeByTokenAmount :BigInt[] = []
-    let dailyVolumeByTokenUSD:BigDecimal[] = [];
-    let inputTokenBalances:BigInt[] = [];
-    let inputTokenWeights:BigDecimal[] = [];
+    let dailyVolumeByTokenAmount: BigInt[] = [];
+    let dailyVolumeByTokenUSD: BigDecimal[] = [];
+    let inputTokenBalances: BigInt[] = [];
+    let inputTokenWeights: BigDecimal[] = [];
     for (let index = 0; index < pool!.inputTokens.length; index++) {
       dailyVolumeByTokenAmount.push(BIGINT_ZERO);
-      dailyVolumeByTokenUSD .push(BIGDECIMAL_ZERO);
+      dailyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
       inputTokenBalances.push(BIGINT_ZERO);
-      inputTokenWeights .push(BIGDECIMAL_ZERO);
+      inputTokenWeights.push(BIGDECIMAL_ZERO);
     }
-    poolMetrics.dailyVolumeByTokenAmount  = dailyVolumeByTokenAmount;
+    poolMetrics.dailyVolumeByTokenAmount = dailyVolumeByTokenAmount;
     poolMetrics.dailyVolumeByTokenUSD = dailyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
     poolMetrics.inputTokenWeights = inputTokenWeights;
@@ -203,7 +176,10 @@ export function getOrCreateLiquidityPoolDailySnapshot(event: ethereum.Event,pool
   return poolMetrics;
 }
 
-export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event,poolAddress:string): LiquidityPoolHourlySnapshot {
+export function getOrCreateLiquidityPoolHourlySnapshot(
+  event: ethereum.Event,
+  poolAddress: string,
+): LiquidityPoolHourlySnapshot {
   let hour = event.block.timestamp.toI32() / SECONDS_PER_HOUR;
   let pool = LiquidityPool.load(poolAddress);
   let hourId = hour.toString();
@@ -216,17 +192,17 @@ export function getOrCreateLiquidityPoolHourlySnapshot(event: ethereum.Event,poo
     poolMetrics.totalValueLockedUSD = BIGDECIMAL_ZERO;
     poolMetrics.hourlyVolumeUSD = BIGDECIMAL_ZERO;
     poolMetrics.cumulativeVolumeUSD = BIGDECIMAL_ZERO;
-    let hourlyVolumeByTokenAmount :BigInt[] = []
-    let hourlyVolumeByTokenUSD:BigDecimal[] = [];
-    let inputTokenBalances:BigInt[] = [];
-    let inputTokenWeights:BigDecimal[] = [];
+    let hourlyVolumeByTokenAmount: BigInt[] = [];
+    let hourlyVolumeByTokenUSD: BigDecimal[] = [];
+    let inputTokenBalances: BigInt[] = [];
+    let inputTokenWeights: BigDecimal[] = [];
     for (let index = 0; index < pool!.inputTokens.length; index++) {
       hourlyVolumeByTokenAmount.push(BIGINT_ZERO);
-      hourlyVolumeByTokenUSD .push(BIGDECIMAL_ZERO);
+      hourlyVolumeByTokenUSD.push(BIGDECIMAL_ZERO);
       inputTokenBalances.push(BIGINT_ZERO);
-      inputTokenWeights .push(BIGDECIMAL_ZERO);
+      inputTokenWeights.push(BIGDECIMAL_ZERO);
     }
-    poolMetrics.hourlyVolumeByTokenAmount  = hourlyVolumeByTokenAmount;
+    poolMetrics.hourlyVolumeByTokenAmount = hourlyVolumeByTokenAmount;
     poolMetrics.hourlyVolumeByTokenUSD = hourlyVolumeByTokenUSD;
     poolMetrics.inputTokenBalances = inputTokenBalances;
     poolMetrics.inputTokenWeights = inputTokenWeights;
@@ -268,14 +244,4 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
     financialMetrics.save();
   }
   return financialMetrics;
-}
-
-export function getOrCreateUsersHelper(): _HelperStore {
-  let uniqueUsersTotal = _HelperStore.load(HelperStoreType.USERS);
-  if (uniqueUsersTotal === null) {
-    uniqueUsersTotal = new _HelperStore(HelperStoreType.USERS);
-    uniqueUsersTotal.valueDecimal = BIGDECIMAL_ZERO;
-    uniqueUsersTotal.save();
-  }
-  return uniqueUsersTotal;
 }

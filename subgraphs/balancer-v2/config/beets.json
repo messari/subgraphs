@@ -1,5 +1,5 @@
 {
-  "startBlock": "16896080", 
+  "startBlock": "16896080",
   "network": "fantom",
   "vault": "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce",
   "knownAssets": {
