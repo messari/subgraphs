@@ -43,8 +43,7 @@
       "aave-v2": {
         "mainnet": {
           "template": "aave-v2.template.yaml",
-          "steegecs": "steegecs/aave-v2-mainnet",
-          "messari": "messari/aave-v2-mainnet",
+          "messari": "messari/aave-v2-ethereum",
           "deploy-on-merge": true
         }
       }
