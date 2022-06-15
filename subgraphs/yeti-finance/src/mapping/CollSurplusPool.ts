@@ -12,7 +12,7 @@ import { BIGINT_ZERO } from "../utils/constants";
  *   1. Redemption
  *   2. Liquidation in recovery mode with collateral ratio > 110%
  * the remaining collateral is sent to CollSurplusPool to be claimed (withdrawn) by the owner.
- * Because ETH price is not updated during the actual withdrawal, the Withdraw event is instead created upon collateral deposit
+ * Because Asset price is not updated during the actual withdrawal, the Withdraw event is instead created upon collateral deposit
  *
  * @param event CollBalanceUpdated event
  */

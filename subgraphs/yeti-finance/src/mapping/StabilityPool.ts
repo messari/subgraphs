@@ -1,7 +1,5 @@
 import {
-  StabilityPool,
   StabilityPoolBalancesUpdated,
-  StabilityPoolETHBalanceUpdated,
   StabilityPoolYUSDBalanceUpdated,
 } from "../../generated/StabilityPool/StabilityPool";
 import {
@@ -15,9 +13,9 @@ import { bigIntToBigDecimal } from "../utils/numbers";
 /**
  * Assets balance was updated
  *
- * @param event StabilityPoolETHBalanceUpdated event
+ * @param event handleStabilityPoolBalancesUpdated event
  */
-export function handleStabilityPoolETHBalanceUpdated(
+export function handleStabilityPoolBalancesUpdated (
   event: StabilityPoolBalancesUpdated
 ): void {
   const protocol = getOrCreateYetiProtocol();

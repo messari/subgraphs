@@ -8,7 +8,7 @@ import { setMarketAssetBalance, setMarketYUSDDebt } from "../entities/market";
 /**
  * Total Assets collateral was updated
  *
- * @param event ActivePoolETHBalanceUpdated event
+ * @param event ActivePoolAssetsBalanceUpdated event
  */
 export function handleActivePoolAssetsBalanceUpdated(
   event: ActivePoolBalancesUpdated
@@ -25,7 +25,7 @@ export function handleActivePoolAssetsBalanceUpdated(
 /**
  * Total Asset collateral was updated
  *
- * @param event ActivePoolETHBalanceUpdated event
+ * @param event ActivePoolAssetBalanceUpdated event
  */
 export function handleActivePoolAssetBalanceUpdated(
   event: ActivePoolBalanceUpdated
