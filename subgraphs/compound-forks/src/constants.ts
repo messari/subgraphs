@@ -23,6 +23,7 @@ export namespace Network {
   export const OPTIMISM = "OPTIMISM";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
+  export const CRONOS = "CRONOS" // Crypto.com Cronos chain
 }
 
 export namespace ProtocolType {
