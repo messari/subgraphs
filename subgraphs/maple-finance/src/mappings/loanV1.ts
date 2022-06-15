@@ -5,9 +5,10 @@ import {
     PaymentMade as PaymentMadeEvent,
     Liquidation as LiquidationEvent
 } from "../../generated/templates/Loan/Loan";
+import { ZERO_BD, ZERO_BI } from "../common/constants";
 
 import { getOrCreateLoan, getOrCreateMarket } from "../common/mappingHelpers/getOrCreate/markets";
-import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/spawners";
+import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 import { createBorrow, createLiquidate, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { marketTick } from "../common/mappingHelpers/update/market";
 import { bigDecimalToBigInt } from "../common/utils";
@@ -38,10 +39,9 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     createRepay(
         event,
         loan,
-        event.params.totalPaid,
         event.params.principalPaid,
         event.params.interestPaid,
-        event.params.latePayment
+        ZERO_BI // Treasury establishment fee happens on drawfown for V1 loans
     );
 
     // Update loan
@@ -56,13 +56,6 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 
 export function handleLiquidation(event: LiquidationEvent): void {
     const loan = getOrCreateLoan(event, event.address);
-    createLiquidate(
-        event,
-        loan,
-        event.params.liquidityAssetReturned,
-        event.params.defaultSuffered,
-        event.params.liquidationExcess
-    );
 
     // Update loan
     const collatoralLiquidated = event.params.liquidityAssetReturned.minus(event.params.defaultSuffered);

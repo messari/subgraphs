@@ -139,3 +139,35 @@ export function readCallResult<T>(
 export function createEventFromCall(call: ethereum.Call): ethereum.Event {
     return new ethereum.Event(call.from, ZERO_BI, ZERO_BI, null, call.block, call.transaction, []);
 }
+
+/**
+ * Compute the max between a and b
+ * Will return a if they are equal
+ */
+export function maxBigDecimal(a: BigDecimal, b: BigDecimal): BigDecimal {
+    return b.gt(a) ? b : a;
+}
+
+/**
+ * Compute the max between a and b
+ * Will return a if they are equal
+ */
+export function minBigDecimal(a: BigDecimal, b: BigDecimal): BigDecimal {
+    return b.lt(a) ? b : a;
+}
+
+/**
+ * Compute the max between a and b
+ * Will return a if they are equal
+ */
+export function maxBigInt(a: BigInt, b: BigInt): BigInt {
+    return b.gt(a) ? b : a;
+}
+
+/**
+ * Compute the max between a and b
+ * Will return a if they are equal
+ */
+export function minBigInt(a: BigInt, b: BigInt): BigInt {
+    return b.lt(a) ? b : a;
+}

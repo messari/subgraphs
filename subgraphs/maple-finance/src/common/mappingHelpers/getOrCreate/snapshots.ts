@@ -10,7 +10,7 @@ import {
 } from "../../../../generated/schema";
 
 import { PROTOCOL_ID, SEC_PER_DAY, SEC_PER_HOUR, ZERO_BD, ZERO_BI, ZERO_I32 } from "../../constants";
-import { getOrCreateProtocol } from "./spawners";
+import { getOrCreateProtocol } from "./protocol";
 
 export function getOrCreateFinancialDailyMetric(event: ethereum.Event): FinancialsDailySnapshot {
     const dayNumber = event.block.timestamp.div(SEC_PER_DAY);

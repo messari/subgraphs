@@ -8,7 +8,7 @@ import {
 
 import { ZERO_BI } from "../common/constants";
 import { getOrCreateLoan, getOrCreateMarket } from "../common/mappingHelpers/getOrCreate/markets";
-import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/spawners";
+import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 import { createBorrow, createLiquidate, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { marketTick } from "../common/mappingHelpers/update/market";
 import { bigDecimalToBigInt } from "../common/utils";
@@ -41,7 +41,9 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     const loan = getOrCreateLoan(event, event.address);
     const principalPaid = event.params.principalPaid_;
     const interestPaid = event.params.interestPaid_;
-    createRepay(event, loan, principalPaid.plus(interestPaid), principalPaid, interestPaid, false);
+
+    // TODO: V3 has param for treasury fee paid
+    createRepay(event, loan, principalPaid, interestPaid, ZERO_BI);
 
     // Update loan
     loan.principalPaid = loan.principalPaid.plus(principalPaid);
@@ -55,9 +57,6 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 
 export function handleRepossessed(event: RepossessedEvent): void {
     const loan = getOrCreateLoan(event, event.address);
-
-    // TODO (spennyp): fix this
-    createLiquidate(event, loan, ZERO_BI, ZERO_BI, ZERO_BI);
 
     // Update loan
     // const collatoralLiquidated = event.params.liquidityAssetReturned.minus(event.params.defaultSuffered);

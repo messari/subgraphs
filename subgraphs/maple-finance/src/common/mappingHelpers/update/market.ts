@@ -8,7 +8,7 @@ import { getTokenAmountInUSD, getTokenPriceInUSD } from "../../prices/prices";
 import { bigDecimalToBigInt, computeNewAverage, powBigDecimal } from "../../utils";
 import { getOrCreateMarket, getOrCreateMplReward, getOrCreateStakeLocker } from "../getOrCreate/markets";
 import { getOrCreateMarketDailySnapshot } from "../getOrCreate/snapshots";
-import { getOrCreateProtocol } from "../getOrCreate/spawners";
+import { getOrCreateProtocol } from "../getOrCreate/protocol";
 import { getOrCreateToken } from "../getOrCreate/supporting";
 import { updateFinancialMetrics, updateMarketHourlySnapshots } from "./snapshots";
 

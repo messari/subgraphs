@@ -9,7 +9,7 @@ import { _PoolFactory } from "../../generated/schema";
 
 import { PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY } from "../common/constants";
 import { createEventFromCall } from "../common/utils";
-import { getOrCreatePoolFactory, getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/spawners";
+import { getOrCreatePoolFactory, getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 
 export function handleGlobalsParamSet(event: GlobalsParamSetEvent): void {
     if (PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY == event.params.which.toString()) {
