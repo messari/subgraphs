@@ -137,8 +137,3 @@ npm run deploy --SUBGRAPH=uniswap-forks --LOCATION=steegecs
                         - true/false/null
                         - Set to true if you are configuring constants in the configurations/ folder.
                         - Does not use unless true
-
-
-
-
-    
