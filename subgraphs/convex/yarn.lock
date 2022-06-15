@@ -237,10 +237,10 @@
     which "2.0.2"
     yaml "1.9.2"
 
-"@graphprotocol/graph-ts@0.24.1":
-  version "0.24.1"
-  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.24.1.tgz#50961b52b5383f9c5cf5e6e23fa039f24e729ddf"
-  integrity sha512-2vU4m5ZPQIqMlMce/z5vmOtGHRlRmcRhMfemS3NIwxCSxSBGVnX2zb7QBTzzdQKGwsAZdbz6V0okkOtvohELfQ==
+"@graphprotocol/graph-ts@0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@graphprotocol/graph-ts/-/graph-ts-0.25.0.tgz#74b11effe1d96957004b3f5f0361562ba2b80019"
+  integrity sha512-/R++19dAtqPhd/Bv3l09ubcc8SWrm+akeyYG4yqkg5fk+b5Bm2Bi4Y+CK8B4l3C9mcc2mzJ7s7YisDMmGclqzw==
   dependencies:
     assemblyscript "0.19.10"
 
@@ -1390,9 +1390,9 @@ glob@^7.1.3:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-"gluegun@git+https://github.com/edgeandnode/gluegun.git#v4.3.1-pin-colors-dep":
+"gluegun@https://github.com/edgeandnode/gluegun#v4.3.1-pin-colors-dep":
   version "4.3.1"
-  resolved "git+https://github.com/edgeandnode/gluegun.git#b34b9003d7bf556836da41b57ef36eb21570620a"
+  resolved "https://github.com/edgeandnode/gluegun#b34b9003d7bf556836da41b57ef36eb21570620a"
   dependencies:
     apisauce "^1.0.1"
     app-module-path "^2.2.0"
