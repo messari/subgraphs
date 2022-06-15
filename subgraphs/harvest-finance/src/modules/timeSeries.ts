@@ -1,13 +1,38 @@
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { decimal, integer } from "@protofire/subgraph-toolkit";
-import { FinancialsDailySnapshot, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot } from "../../generated/schema"
+import { FinancialsDailySnapshot, UsageMetricsDailySnapshot, UsageMetricsHourlySnapshot, VaultHourlySnapshot } from "../../generated/schema"
 import { protocol } from "./protocol";
 import { shared } from "./shared";
 
 export namespace timeSeries {
 
+	export namespace vaults {
+
+		export function loadOrCreateHourlySnapshot(id: string, vault: string): VaultHourlySnapshot {
+			let entity = VaultHourlySnapshot.load(id)
+			if (entity == null) {
+				entity = new VaultHourlySnapshot(id)
+				entity.protocol = protocol.getProtocolId(shared.constants.PROTOCOL_ID);
+				entity.vault = vault
+				entity.totalValueLockedUSD = decimal.ZERO
+				entity.inputTokenBalance = integer.ZERO
+				entity.outputTokenSupply = integer.ZERO
+				entity.outputTokenPriceUSD = decimal.ZERO
+				entity.pricePerShare = decimal.ZERO
+				entity.stakedOutputTokenAmount = integer.ZERO
+				entity.rewardTokenEmissionsAmount = new Array<BigInt>()
+				entity.rewardTokenEmissionsUSD = new Array<BigDecimal>()
+				entity.blockNumber = integer.ZERO
+				entity.timestamp = integer.ZERO
+			}
+			return entity as VaultHourlySnapshot
+		}
+
+	}
+
 	export namespace financials {
 
-		export function loadOrCreateFinancialDailySnapshot(id: string): FinancialsDailySnapshot {
+		export function loadOrCreateDailySnapshot(id: string): FinancialsDailySnapshot {
 			let entity = FinancialsDailySnapshot.load(id)
 			if (entity == null) {
 				entity = new FinancialsDailySnapshot(id)
