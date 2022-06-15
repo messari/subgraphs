@@ -84,7 +84,6 @@
         "mainnet": {
           "template": "makerdao.template.yaml",
           "deploy-on-merge": false
-
         }
       }
     },

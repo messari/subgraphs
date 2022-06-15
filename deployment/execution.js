@@ -65,6 +65,7 @@ async function runCommands(allScripts, results, args, callback) {
             if (error !== null) {
                 logs = logs + "Exec error: "  + error
                 results += 'Deployment Failed: ' + protocols[index] + '\n'
+                console.log(error)
                 index++;
                 index2 = 0;
             } else if (index2 == allScripts.get(protocols[index]).length) {
