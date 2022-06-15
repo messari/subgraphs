@@ -59,7 +59,7 @@ type Token @entity {
 ###############################
 
 type TokenDailySnapshot @entity {
-  " { Token Address } - {# of days since Unix epoch time} "
+  " { Token Address }-{ # of days since Unix epoch time } "
   id: ID!
 
   " Token this snapshot is associated with "
@@ -100,7 +100,7 @@ type TokenDailySnapshot @entity {
 }
 
 type TokenHourlySnapshot @entity {
-  " { Token Address } - {# of hours since Unix epoch time} "
+  " { Token Address }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " Token this snapshot is associated with "
@@ -141,17 +141,9 @@ type TokenHourlySnapshot @entity {
 }
 
 ##################################
-##### Transaction-Level Data #####
+##### Event-Level Data #####
 ##################################
 
-"""
-An event is any user action that occurs in a token. Generally, they are Ethereum events
-emitted by a function in the smart contracts, stored in transaction receipts as event logs.
-However, some user actions of interest are function calls that don't emit events. For example,
-the deposit and withdraw functions in Yearn do not emit any events. In our subgraphs, we still
-store them as events, although they are not technically Ethereum events emitted by smart
-contracts.
-"""
 interface Event {
   " { Token ID }-{ Transaction hash }-{ Log index } "
   id: ID!
@@ -162,7 +154,7 @@ interface Event {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The token this transaction belongs to "
+  " The token this event belongs to "
   token: Token!
 
   " Nonce of the transaction that emitted this event "
@@ -191,7 +183,7 @@ type Transfer implements Event @entity {
   " Event log index. For transactions that don't emit event, create arbitrary index starting from 0 "
   logIndex: Int!
 
-  " The token this transaction belongs to "
+  " The token this event belongs to "
   token: Token!
 
   " Nonce of the transaction that emitted this event "
@@ -233,7 +225,7 @@ type Account @entity {
 }
 
 type AccountBalance @entity {
-  " { Address Of the Account } - { Address of the Token }"
+  " { Address Of the Account }-{ Address of the Token }"
   id: ID!
 
   " Account address "
@@ -257,7 +249,7 @@ type AccountBalance @entity {
 ###############################
 
 type AccountBalanceDailySnapshot @entity {
-  " { Address Of the Account } - {Address of the Token} - {# of hours since Unix epoch time} "
+  " { Address Of the Account }-{ Address of the Token }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " Account address "
