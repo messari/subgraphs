@@ -70,6 +70,7 @@ export function createNewPool(
   pool.gauge = gaugeAddress.toHexString();
   const inputTokens = getPoolCoins(pool);
   pool.coins = inputTokens;
+  pool.inputTokens = inputTokens;
   // pool.inputTokens = inputTokens.sort();
   pool.save();
   setPoolBalances(pool);
