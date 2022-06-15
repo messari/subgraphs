@@ -56,7 +56,9 @@ export function createLiquidityPool(
   pool.createdBlockNumber = event.block.number;
   pool.name = protocol.name + " " + name;
   pool.symbol = symbol;
-
+  pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+  pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
   pool.save();
 }
 
