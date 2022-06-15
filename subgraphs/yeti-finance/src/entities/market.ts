@@ -34,7 +34,7 @@ import { getUSDPrice } from "../utils/price";
 export function getOrCreateMarket(token: Address): Market {
   let market = Market.load(ACTIVE_POOL + "-" + token.toHexString());
   if (!market) {
-    market = new Market(ACTIVE_POOL);
+    market = new Market(ACTIVE_POOL + "-" + token.toHexString());
     market.protocol = getOrCreateYetiProtocol().id;
     market.name = "Yeti Finance";
     market.isActive = true;
