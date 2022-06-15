@@ -11,6 +11,7 @@ import {
   LiquidityPoolHourlySnapshot,
   LiquidityPoolDailySnapshot,
   UsageMetricsHourlySnapshot,
+  RewardToken,
 } from "../../generated/schema";
 import {
   INT_ZERO,
@@ -27,6 +28,7 @@ import {
   PROTOCOL_NAME,
   PROTOCOL_SLUG,
   DEFAULTNETWORK,
+  RewardTokenType,
 } from "./constants";
 import { fetchPrice } from "./pricing";
 
@@ -244,4 +246,19 @@ export function getOrCreateFinancialsDailySnapshot(event: ethereum.Event): Finan
     financialMetrics.save();
   }
   return financialMetrics;
+}
+
+
+export function getOrCreateRewardToken(address: string): RewardToken {
+  let rewardToken = RewardToken.load(address);
+  if (rewardToken == null) {
+    let token = getOrCreateToken(address);
+    rewardToken = new RewardToken(address);
+    rewardToken.token = token.id;
+    rewardToken.type = RewardTokenType.DEPOSIT;
+    rewardToken.save();
+
+    return rewardToken as RewardToken;
+  }
+  return rewardToken as RewardToken;
 }

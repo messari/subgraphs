@@ -64,10 +64,9 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
-export namespace HelperStoreType {
-  export const NATIVE_TOKEN = "NATIVE_TOKEN";
-  export const USERS = "USERS";
-  // Pool addresses are also stored in the HelperStore
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
 }
 
 export namespace UsageType {
@@ -134,6 +133,9 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 export let DEFAULTNETWORK =  "{{defaultNetwork}}" 
 
 export let VAULT_ADDRESS = Address.fromString('{{vault}}')
+
+export let REWARDTOKEN = "{{rewardToken}}" 
+
 {{#isBeets}}
 
 export let MASTERCHEFV2_ADDRESS = Address.fromString('{{masterChefV2}}')

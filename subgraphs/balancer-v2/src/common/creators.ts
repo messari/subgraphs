@@ -7,6 +7,7 @@ import {
   getOrCreateDex,
   getOrCreateLiquidityPoolDailySnapshot,
   getOrCreateLiquidityPoolHourlySnapshot,
+  getOrCreateRewardToken,
   getOrCreateToken,
 } from "./getters";
 import {
@@ -14,6 +15,7 @@ import {
   BIGINT_ONE,
   BIGINT_ZERO,
   LiquidityPoolFeeType,
+  REWARDTOKEN,
 } from "./constants";
 import { updateTokenPrice, updateVolumeAndFee } from "./metrics";
 import { valueInUSD } from "./pricing";
@@ -49,8 +51,6 @@ export function createLiquidityPool(
   pool.outputTokenSupply = BIGINT_ZERO;
   pool.outputTokenPriceUSD = BIGDECIMAL_ZERO;
   pool.stakedOutputTokenAmount = BIGINT_ZERO;
-  pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
-  pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
   pool.fees = createPoolFees(poolAddress, fees);
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
@@ -59,6 +59,13 @@ export function createLiquidityPool(
   pool.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
   pool.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+  if(REWARDTOKEN != ""){
+    let  rewardToken = getOrCreateRewardToken(REWARDTOKEN);
+    pool.rewardTokens = [rewardToken.id];
+    pool.rewardTokenEmissionsAmount = [BIGINT_ZERO];
+    pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO];
+  }
+
   pool.save();
 }
 

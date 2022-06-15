@@ -8,11 +8,12 @@ import {
 } from "../../generated/MasterChefV2/MasterChefV2";
 
 import { BigInt, log } from "@graphprotocol/graph-ts";
-import { getLiquidityPool, getOrCreateDex } from "../common/getters";
+import { getLiquidityPool, getOrCreateDex, getOrCreateRewardToken } from "../common/getters";
 import { BEETS, MASTERCHEFV2_ADDRESS, SECONDS_PER_DAY } from "../common/constants";
 import { getUsdPricePerToken } from "../prices";
 import { DEFAULT_DECIMALS } from "../prices/common/constants";
 import { convertTokenToDecimal } from "../common/utils/utils";
+import { RewardToken } from "../../generated/schema";
 
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
   log.info("[MasterChef] Log update emission rate {} {}", [
@@ -38,7 +39,9 @@ export function handleLogSetPool(event: LogSetPool): void {
     return;
   }
   let pool = getLiquidityPool(poolAddress.value.toHexString());
-
+  
+  let rewardToken = getOrCreateRewardToken(BEETS.toHexString());
+  pool.rewardTokens = [rewardToken.id];
   let protocol = getOrCreateDex();
   protocol.totalAllocPoint = protocol.totalAllocPoint.plus(event.params.allocPoint.minus(pool.allocPoint));
   protocol.save();

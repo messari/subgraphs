@@ -17,5 +17,9 @@
   "protocolName": "Beethoven X",
   "protocolSlug": "beethoven-x",
   "defaultNetwork": "FANTOM",
-  "isBeets": true
+  "isBeets": true,
+  "rewardToken":"0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
+  "graftEnabled" : false,
+  "subgraphId" : "QmPrgkZhD6jsqoGEG5iGB3Hbq7YcCMs91LHofTGmYVk2x6",
+  "graftStartBlock" : "18508300"
 }

@@ -1,5 +1,10 @@
 specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
+{{#graftEnabled}}
+graft:
+  base: {{subgraphId}} # Subgraph ID of base subgraph
+  block: {{graftStartBlock}} # Block number
+{{/graftEnabled}}
 schema:
   file: ./schema.graphql
 dataSources:
