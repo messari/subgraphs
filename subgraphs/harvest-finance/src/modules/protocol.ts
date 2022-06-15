@@ -1,9 +1,14 @@
+import { Address } from "@graphprotocol/graph-ts";
 import { decimal } from "@protofire/subgraph-toolkit";
 import { YieldAggregator } from "../../generated/schema"
 import { shared } from "./"
 
 export namespace protocol {
-	export function loadOrCreateYieldAggregator(id: string): YieldAggregator {
+	export function getProtocolId(id: Address): string {
+		return id.toHexString()
+	}
+	export function loadOrCreateYieldAggregator(): YieldAggregator {
+		let id = getProtocolId(shared.constants.PROTOCOL_ID)
 		let entity = YieldAggregator.load(id)
 		if (entity == null) {
 			entity = new YieldAggregator(id)
