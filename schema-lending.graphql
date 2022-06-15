@@ -183,7 +183,7 @@ interface Protocol {
   cumulativeTotalRevenueUSD: BigDecimal!
 
   " Total number of pools "
-  cumulativePoolCount: Int!
+  totalPoolCount: Int!
 
   ##### Snapshots #####
 
@@ -270,7 +270,7 @@ type LendingProtocol implements Protocol @entity {
   mintedTokenSupplies: [BigInt!]
 
   " Total number of pools "
-  cumulativePoolCount: Int!
+  totalPoolCount: Int!
 
   ##### Snapshots #####
 
@@ -325,7 +325,7 @@ type UsageMetricsDailySnapshot @entity {
   dailyLiquidateCount: Int!
 
   " Total number of pools "
-  cumulativePoolCount: Int!
+  totalPoolCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!

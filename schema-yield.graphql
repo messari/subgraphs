@@ -149,7 +149,7 @@ interface Protocol {
   cumulativeUniqueUsers: Int!
 
   " Total number of pools "
-  cumulativePoolCount: Int!
+  totalPoolCount: Int!
 
   ##### Snapshots #####
 
@@ -209,7 +209,7 @@ type YieldAggregator implements Protocol @entity {
   cumulativeUniqueUsers: Int!
 
   " Total number of pools "
-  cumulativePoolCount: Int!
+  totalPoolCount: Int!
 
   ##### Snapshots #####
 
@@ -255,7 +255,7 @@ type UsageMetricsDailySnapshot @entity {
   dailyWithdrawCount: Int!
 
   " Total number of pools "
-  cumulativePoolCount: Int!
+  totalPoolCount: Int!
 
   " Block number of this snapshot "
   blockNumber: BigInt!

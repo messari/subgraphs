@@ -10,7 +10,7 @@ Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://git
 - Added revenue data to pools.
 - Added more networks.
 - Fixed markdown formatting issue in comments (# gets interpreted as heading).
-- Added pool count `cumulativePoolCount` to the `Protocol` entity and daily usage metrics.
+- Added pool count `totalPoolCount` to the `Protocol` entity and daily usage metrics.
 
 ### DEXes
 
