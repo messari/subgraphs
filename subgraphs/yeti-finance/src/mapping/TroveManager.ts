@@ -23,7 +23,7 @@ import {
   addSupplySideRevenue,
 } from "../entities/protocol";
 import { log } from "@graphprotocol/graph-ts";
-import { getUSDPriceWithoutDecimals } from "../Prices";
+import { getUSDPriceWithoutDecimals } from "../utils/price";
 
 enum TroveManagerOperation {
   applyPendingRewards,

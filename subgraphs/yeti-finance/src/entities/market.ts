@@ -10,6 +10,7 @@ import {
   ACTIVE_POOL_CREATED_TIMESTAMP,
   BIGDECIMAL_ONE,
   BIGDECIMAL_TEN,
+  BIGDECIMAL_ZERO,
   BIGINT_TEN,
   LIQUIDATION_FEE,
   MAXIMUM_LTV,
@@ -27,7 +28,7 @@ import {
 import { getOrCreateToken } from "./token";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
-import { getUsdPrice, getUsdPricePerToken } from "../Prices";
+import { getUSDPrice } from "../utils/price";
 
 export function getOrCreateMarket(token: Address): Market {
   let market = Market.load(ACTIVE_POOL + "-" + token.toHexString());
@@ -45,6 +46,7 @@ export function getOrCreateMarket(token: Address): Market {
     market.rates = [getOrCreateStableBorrowerInterestRate(ACTIVE_POOL).id];
     market.createdTimestamp = ACTIVE_POOL_CREATED_TIMESTAMP;
     market.createdBlockNumber = ACTIVE_POOL_CREATED_BLOCK;
+    market.totalValueLockedUSD = BIGDECIMAL_ZERO;
     market.save();
   }
   return market;
@@ -118,7 +120,7 @@ export function setMarketAssetBalance(
   balance: BigInt,
   tokenAddr: Address
 ): void {
-  const tokenPrice = getUsdPrice(tokenAddr, BIGDECIMAL_ONE);
+  const tokenPrice = getUSDPrice(tokenAddr);
   const token = getOrCreateToken(tokenAddr);
   const balanceUSD = tokenPrice
     .times(balance.toBigDecimal())

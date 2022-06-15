@@ -8,7 +8,7 @@ import {
   getOrCreateYetiProtocol,
   updateProtocolLockedUSD,
 } from "../entities/protocol";
-import { getUSDPriceWithoutDecimals } from "../Prices";
+import { getUSDPriceWithoutDecimals } from "../utils/price";
 import { BIGDECIMAL_ZERO } from "../utils/constants";
 import { bigIntToBigDecimal } from "../utils/numbers";
 

@@ -11,7 +11,7 @@ import {
 import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
 import { addProtocolSideRevenue } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
-import { getUSDPriceWithoutDecimals } from "../Prices";
+import { getUSDPriceWithoutDecimals } from "../utils/price";
 
 /**
  * Emitted when YUSD is borrowed from trove and a dynamic fee (0.5-5%) is charged (added to debt)

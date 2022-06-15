@@ -4,7 +4,7 @@ import {
 } from "../../generated/CollSurplusPool/CollSurplusPool";
 import { createWithdraw } from "../entities/event";
 import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
-import { getUSDPriceWithoutDecimals } from "../Prices";
+import { getUSDPriceWithoutDecimals } from "../utils/price";
 import { BIGINT_ZERO } from "../utils/constants";
 
 /**

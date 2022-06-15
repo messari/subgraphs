@@ -1,11 +1,13 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { _Trove, _TroveToken } from "../../generated/schema";
+import { BIGINT_ZERO } from "../utils/constants";
 
 export function getOrCreateTrove(owner: Address): _Trove {
   const id = owner.toHexString();
   let trove = _Trove.load(id);
   if (trove == null) {
     trove = new _Trove(id);
+    trove.debt = BIGINT_ZERO;
     trove.save();
   }
   return trove;
@@ -21,6 +23,9 @@ export function getOrCreateTroveToken(
   if (troveToken == null) {
     troveToken = new _TroveToken(id);
     troveToken.trove = trove.id;
+    troveToken.collateral = BIGINT_ZERO
+    troveToken.collateralSurplus = BIGINT_ZERO
+    troveToken.collateralSurplusChange = BIGINT_ZERO
     troveToken.save();
   }
 

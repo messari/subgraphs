@@ -10,6 +10,7 @@ import {
 import {
   BIGDECIMAL_ZERO,
   BIGINT_ZERO,
+  INT_ZERO,
   LendingType,
   Network,
   ProtocolType,
@@ -42,6 +43,16 @@ export function getOrCreateYetiProtocol(): LendingProtocol {
     protocol.mintedTokens = [getYUSDToken().id];
     protocol.totalYUSDLocked = BIGINT_ZERO;
     protocol.totalStablePoolAssetUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeUniqueUsers = INT_ZERO;
+    protocol.totalValueLockedUSD = BIGDECIMAL_ZERO
+    protocol.cumulativeSupplySideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeProtocolSideRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeTotalRevenueUSD = BIGDECIMAL_ZERO;
+    protocol.totalDepositBalanceUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeBorrowUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeLiquidateUSD = BIGDECIMAL_ZERO;
+    protocol.cumulativeDepositUSD = BIGDECIMAL_ZERO;
+    protocol.totalBorrowBalanceUSD = BIGDECIMAL_ZERO;
     protocol.save();
   }
   return protocol;
