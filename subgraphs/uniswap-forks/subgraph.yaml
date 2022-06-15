@@ -2,14 +2,18 @@ specVersion: 0.0.2
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
+description: ...
+graft:
+  base: QmbGu3LzNxQDs8JBMGjedPptTTupYFRdSM6ipvM8yYdWV6 # Subgraph ID of base subgraph
+  block: 10000839 # Block number
 dataSources:
   - kind: ethereum/contract
     name: Factory
     network: mainnet
     source:
-      address: "0x3b44b2a187a7b3824131f8db5a74194d0a42fc15"
+      address: "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
       abi: Factory
-      startBlock: 4100
+      startBlock: 10000834
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -23,39 +27,15 @@ dataSources:
         - Protocol
       abis:
         - name: Factory
-          file: ./abis/vvs-finance/Factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
-          file: ./abis/vvs-finance/ERC20.json
+          file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
         - event: PairCreated(indexed address,indexed address,address,uint256)
           handler: handlePairCreated
-      file: ./src/mappings/factory.ts
-
-  - kind: ethereum
-    name: Craftsman
-    network: mainnet
-    source:
-      address: "0xDccd6455AE04b03d785F12196B492b18129564bc"
-      abi: Craftsman
-      startBlock: 4100
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities: []
-      abis:
-        - name: Craftsman
-          file: ./abis/vvs-finance/Craftsman.json
-        - name: TokenABI
-          file: ./abis/vvs-finance/ERC20.json
-      eventHandlers:
-        - event: Deposit(indexed address,indexed uint256,uint256)
-          handler: handleDeposit
-        - event: Withdraw(indexed address,indexed uint256,uint256)
-          handler: handleWithdraw
-        - event: EmergencyWithdraw(indexed address,indexed uint256,uint256)
-          handler: handleEmergencyWithdraw
-      file: ./protocols/vvs-finance/src/mappings/craftsman/reward.ts
+      ##callHandlers:
+        ##- function: setFeeTo(address)
+          ##handler: handleFeeTo
 templates:
   - kind: ethereum/contract
     name: Pair
@@ -89,11 +69,11 @@ templates:
         - _TokenTracker
       abis:
         - name: Pair
-          file: ./abis/vvs-finance/Pair.json
+          file: ./abis/uniswap-v2/Pair.json
         - name: Factory
-          file: ./abis/vvs-finance/Factory.json
+          file: ./abis/uniswap-v2/Factory.json
         - name: TokenABI
-          file: ./abis/vvs-finance/ERC20.json
+          file: ./abis/uniswap-v2/ERC20.json
       eventHandlers:
         - event: Mint(indexed address,uint256,uint256)
           handler: handleMint
@@ -105,3 +85,4 @@ templates:
           handler: handleTransfer
         - event: Sync(uint112,uint112)
           handler: handleSync
+          

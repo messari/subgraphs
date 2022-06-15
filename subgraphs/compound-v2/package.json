@@ -11,7 +11,7 @@
     "create-local": "graph create --node http://localhost:8020/ compound-v2",
     "remove-local": "graph remove --node http://localhost:8020/ compound-v2",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 compound-v2",
-    "deploy-local-fork": "graph deploy compound-v2 --node http://localhost:8020/ --ipfs http://localhost:5001 --debug-fork QmNUAu43xbQ61DCmB1Ya6RvS7BtGq3tVkpa9kAjMdsdYRh"
+    "deploy-local-fork": "graph deploy compound-v2 --node http://localhost:8020/ --ipfs http://localhost:5001 --debug-fork QmPPiJ4Ecwoo1GMKDL2hgRUjJWWWdg3w7N3M1q5eeM4nEp"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.28.1",

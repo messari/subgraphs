@@ -8,5 +8,8 @@
   "masterChefAddress": "0xc2edad668740f1aa35e4d8f227fb8e17dca888cd",
   "masterChefStartBlock": 10794230,
   "masterChefV2Address": "0xef0881ec094552b2e128cf945ef17a6752b4ec5d",
-  "masterChefV2StartBlock": 12428169
+  "masterChefV2StartBlock": 12428169,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
 }
