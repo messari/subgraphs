@@ -3,7 +3,7 @@
 ## Schema Update 1.3.0
 
 Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
-Fixes: [#320](https://github.com/messari/subgraphs/pull/320)
+Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://github.com/messari/subgraphs/pull/325)
 
 ### Common
 
@@ -19,6 +19,7 @@ Fixes: [#320](https://github.com/messari/subgraphs/pull/320)
 
 - Changed `fixed_term` to `fixed` in `InterestRateType` entity to be more precise.
 - Added daily/hourly withdraw/repay aggregates into snapshots.
+- Fixed a couple `AmountUSD` fields (they were accidentally left as nullable before).
 
 ## Schema Update 1.2.1
 
