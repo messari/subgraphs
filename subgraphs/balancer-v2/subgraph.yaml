@@ -5,11 +5,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Vault
-    network: arbitrum-one
+    network: fantom
     source:
-      address: "0xBA12222222228d8Ba445958a75a0704d566BF2C8"
+      address: "0x20dd72Ed959b6147912C2e529F0a0C651c33c9ce"
       abi: Vault
-      startBlock: 222832
+      startBlock: 16896080
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -31,8 +31,6 @@ dataSources:
           file: ./abis/WeightedPool.json
         - name: ConvergentCurvePool
           file: ./abis/ConvergentCurvePool.json
-        - name: ProtocolFeesCollector
-          file: ./abis/ProtocolFeesCollector.json
         - name: LinearPool
           file: ./abis/LinearPool.json
 
@@ -80,7 +78,7 @@ dataSources:
 templates:
   - kind: ethereum/contract
     name: WeightedPool
-    network: arbitrum-one
+    network: fantom
     source:
       abi: WeightedPool
     mapping:

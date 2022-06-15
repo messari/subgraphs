@@ -205,10 +205,10 @@ function ProtocolDashboard() {
   }, [protocolSchemaData, getData, getProtocolTableData]);
 
   useEffect(() => {
-    if (protocolTableData) {
+    if (protocolTableData && tabValue === "1") {
       getFinancialsData();
     }
-  }, [protocolTableData, getFinancialsData]);
+  }, [protocolTableData, getFinancialsData, tabValue]);
 
   useEffect(() => {
     if (financialsData) {

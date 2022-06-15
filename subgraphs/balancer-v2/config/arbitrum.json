@@ -11,5 +11,9 @@
     "wbtc": "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
     "wmatic": "0x0000000000000000000000000000000000000000",
     "bal": "0x040d1EdC9569d4Bab2D15287Dc5A4F10F56a56B8"
-  }
+  },
+  "protocolName": "Balancer v2",
+  "protocolSlug": "balancer-v2",
+  "defaultNetwork": "ARBITRUM_ONE",
+  "isBalancer": true
 }
