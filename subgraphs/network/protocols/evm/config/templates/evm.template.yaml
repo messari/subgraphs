@@ -21,5 +21,5 @@ dataSources:
         - name: Placeholder
           file: ./abis/Placeholder.json
       blockHandlers:
-        - handler: handleBlock
+        - handler: handleEvmBlock
       file: ./src/mapping.ts

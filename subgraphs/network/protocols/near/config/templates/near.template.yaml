@@ -4,10 +4,10 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: near
-    name: Placeholder
+    name: blocks
     network: {{ network }}
     source:
-      account: app.good-morning.near
+      startBlock: 0
     mapping:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
@@ -16,5 +16,5 @@ dataSources:
         - Block
         - Author
       blockHandlers:
-        - handler: handleBlock
-      file: ./src/mapping.ts
+        - handler: handleNearBlock
+      file: ./src/nearMapping.ts
