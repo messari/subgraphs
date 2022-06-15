@@ -36,6 +36,33 @@ There are 4 different types of networks supported by thegraph. Each one has a di
 - Cosmos:
 - NEAR:
 
+### Hosted Service Endpoints
+
+Testing endpoints for all network level subgraphs.
+
+- Arbitrum One: https://thegraph.com/hosted-service/subgraph/dmelotik/network-arbitrum-one
+- Aurora: https://thegraph.com/hosted-service/subgraph/dmelotik/network-aurora
+- Avalanche: https://thegraph.com/hosted-service/subgraph/dmelotik/network-avalanche
+- Boba: https://thegraph.com/hosted-service/subgraph/dmelotik/network-boba
+- BSC: https://thegraph.com/hosted-service/subgraph/dmelotik/network-bsc
+- Celo: https://thegraph.com/hosted-service/subgraph/dmelotik/network-celo
+- Clover: https://thegraph.com/hosted-service/subgraph/dmelotik/network-clover
+- Cronos: https://thegraph.com/hosted-service/subgraph/dmelotik/network-cronos
+- Fantom: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fantom
+- Fuse: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fuse
+- Harmony: https://thegraph.com/hosted-service/subgraph/dmelotik/network-harmony
+- Mainnet: https://thegraph.com/hosted-service/subgraph/dmelotik/network-mainnet
+- Matic: https://thegraph.com/hosted-service/subgraph/dmelotik/network-matic
+- Moonbeam: https://thegraph.com/hosted-service/subgraph/dmelotik/network-optimism
+- Moonriver: https://thegraph.com/hosted-service/subgraph/dmelotik/network-moonriver
+- Optimism: https://thegraph.com/hosted-service/subgraph/dmelotik/network-optimism
+- xDai: https://thegraph.com/hosted-service/subgraph/dmelotik/network-xdai
+- Arweave: https://thegraph.com/hosted-service/subgraph/dmelotik/network-arweave-mainnet
+- Cosmos: https://thegraph.com/hosted-service/subgraph/dmelotik/network-cosmoshub
+- Juno: https://thegraph.com/hosted-service/subgraph/dmelotik/network-juno
+- Osmosis: https://thegraph.com/hosted-service/subgraph/dmelotik/network-osmosis
+- NEAR: https://thegraph.com/hosted-service/subgraph/dmelotik/network-near-mainnet
+
 ### Reference Subgraphs
 
 - https://github.com/stakewise/subgraphs/tree/main/subgraphs/ethereum
