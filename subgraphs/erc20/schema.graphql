@@ -21,10 +21,7 @@ type Token @entity {
   " If token transfers are paused, derived from paused event "
   isPaused: Boolean
 
-  " Token Holders Balance "
-  holdersBalance: [AccountBalance!]! @derivedFrom(field: "token")
-
-  " Number of token holders "
+  " Number of unique token holders "
   holderCount: BigInt!
 
   " Total number of token transfer transactions "
@@ -48,14 +45,16 @@ type Token @entity {
   " List of token transfers "
   transfers: [Transfer!]! @derivedFrom(field: "token")
 
+  " Token holder's balance "
+  holdersBalance: [AccountBalance!]! @derivedFrom(field: "token")
+
   ##### Snapshots #####
 
-  " Daily usage metrics for this Token "
+  " Daily usage metrics for this token "
   dailyUsageMetrics: [UsageMetricsDailySnapshot!]! @derivedFrom(field: "token")
 
-  " Hourly usage metrics for this Token "
-  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]!
-    @derivedFrom(field: "token")
+  " Hourly usage metrics for this token "
+  hourlyUsageMetrics: [UsageMetricsHourlySnapshot!]! @derivedFrom(field: "token")
 
   dailyTokenSnapshot: [TokenDailySnapshot!]! @derivedFrom(field: "token")
 }
@@ -65,7 +64,7 @@ type Token @entity {
 ###############################
 
 type UsageMetricsDailySnapshot @entity {
-  " { Token Address } - {# of days since Unix epoch time} "
+  " { Token Address } - { # of days since Unix epoch time } "
   id: ID!
 
   " Token this snapshot is associated with "
@@ -74,10 +73,10 @@ type UsageMetricsDailySnapshot @entity {
   " # of accounts holding this token "
   dailyHolderCount: Int!
 
-  " # of unique daily active users "
+  " # of unique daily active users/holders "
   dailyActiveUsers: Int!
 
-  " # of cumulative unique users "
+  " # of cumulative unique users/holders "
   cumulativeUniqueUsers: Int!
 
   " Total number of transactions occurred in a day. Transactions include all entities that implement the Event interface. "
@@ -210,6 +209,7 @@ type Transfer implements Event @entity {
   " The token this transaction belongs to "
   token: Token!
 
+  " Nonce of the transaction that emitted this event "
   nonce: Int!
 
   " Account that received the tokens "
@@ -234,18 +234,17 @@ type Account @entity {
   " Address of the account "
   id: ID!
 
-  " Token Transfers by this account "
+  " Token transfers by this account "
   transferTo: [Transfer!]! @derivedFrom(field: "to")
 
-  " Token Transfers from this account "
+  " Token transfers from this account "
   transferFrom: [Transfer!]! @derivedFrom(field: "from")
 
   " Token balances that this account holds "
   balances: [AccountBalance!]! @derivedFrom(field: "account")
 
   " Token balances snapshot that this account holds "
-  balancesSnapshot: [AccountBalanceDailySnapshot!]!
-    @derivedFrom(field: "account")
+  balancesSnapshot: [AccountBalanceDailySnapshot!]! @derivedFrom(field: "account")
 }
 
 type AccountBalance @entity {
