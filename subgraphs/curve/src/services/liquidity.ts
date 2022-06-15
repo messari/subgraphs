@@ -31,6 +31,7 @@ export function handleDepositEvent(
      log.warning("ERROR ERROR ERROR  handleDepositEvent  ERROR   poolid:{} ",[pool.id]);
      return
   }
+  log.warning(" handleDepositEvent tokenAmounts:{}  pool.coins:{}      poolid:{} ",[pool.id,tokenAmounts.length.toString(),pool.coins.length.toString()]);
   for (let i = 0; i < tokenAmounts.length; i++) {
     let inputTokenAddress = Address.fromString(pool.coins[i]);
     let inputToken = getOrCreateToken(inputTokenAddress);
