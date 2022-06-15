@@ -3,7 +3,7 @@
 ## Schema Update 1.3.0
 
 Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
-Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://github.com/messari/subgraphs/pull/325)
+Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://github.com/messari/subgraphs/pull/325), [#330](https://github.com/messari/subgraphs/pull/330)
 
 ### Common
 
