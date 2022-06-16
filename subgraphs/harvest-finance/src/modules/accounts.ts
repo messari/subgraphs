@@ -1,5 +1,5 @@
 import { Address } from "@graphprotocol/graph-ts"
-import { Account } from "../../generated/schema"
+import { Account, ActiveAccount } from "../../generated/schema"
 
 export namespace accounts {
 
@@ -14,5 +14,14 @@ export namespace accounts {
 			entity = new Account(id)
 		}
 		return entity as Account
+	}
+
+	export function loadOrCreateActiveAccount(address: Address): ActiveAccount {
+		let id = parseAccountId(address)
+		let entity = ActiveAccount.load(id)
+		if (entity == null) {
+			entity = new ActiveAccount(id)
+		}
+		return entity as ActiveAccount
 	}
 }
