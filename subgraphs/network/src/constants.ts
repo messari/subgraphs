@@ -10,46 +10,26 @@ import { BigDecimal, BigInt, dataSource } from "@graphprotocol/graph-ts";
 // https://thegraph.com/docs/en/hosted-service/what-is-hosted-service/#supported-networks-on-the-hosted-service
 export namespace Network {
   export const ARBITRUM_ONE = "ARBITRUM_ONE";
-  export const AVALANCHE = "AVALANCHE";
+  export const ARWEAVE_MAINNET = "ARWEAVE_MAINNET";
   export const AURORA = "AURORA";
+  export const AVALANCHE = "AVALANCHE";
   export const BOBA = "BOBA";
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
-  export const CLOVER = "CLOVER";
   export const COSMOS = "COSMOS";
+  export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
   export const FUSE = "FUSE";
+  export const HARMONY = "HARMONY";
+  export const JUNO = "JUNO";
   export const MOONBEAM = "MOONBEAM";
   export const MOONRIVER = "MOONRIVER";
   export const NEAR_MAINNET = "NEAR_MAINNET";
   export const OPTIMISM = "OPTIMISM";
+  export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
-}
-
-// This is how the Network displays on thegraph.com
-export namespace SubgraphNetwork {
-  export const ARBITRUM = "arbitrum-one";
-  export const AVALANCHE = "avalanche";
-  export const AURORA = "aurora";
-  export const BOBA = "boba";
-  export const BSC = "bsc";
-  export const CELO = "celo";
-  export const CHAPEL = "chapel";
-  export const CLOVER = "clover";
-  export const COSMOS = "cosmoshub";
-  export const ETHEREUM = "mainnet";
-  export const FANTOM = "fantom";
-  export const FUSE = "fuse";
-  export const MOONBEAM = "moonbeam";
-  export const MOONRIVER = "moonriver";
-  export const MUMBAI = "mumbai";
-  export const NEAR = "near-mainnet";
-  export const OPTIMISM = "optimism";
-  export const POLYGON = "matic";
-  export const POA = "poa-core";
-  export const XDAI = "xdai";
 }
 
 export namespace IntervalType {

@@ -67,6 +67,9 @@ type Network @entity {
   " Total rewards emitted on the network in native asset "
   cumulativeRewards: BigInt
 
+  " Total number of transactions that have occured on this network "
+  cumulativeTransactions: Int
+
   " Current supply of the native asset "
   totalSupply: BigInt
 
@@ -161,6 +164,9 @@ type DailySnapshot @entity {
 
   " Daily chunk count "
   dailyChunkCount: Int
+
+  " Number of transactions during this day "
+  dailyTransactionCount: Int
 }
 
 type HourlySnapshot @entity {
@@ -238,6 +244,9 @@ type HourlySnapshot @entity {
 
   " Hourly chunk count "
   hourlyChunkCount: Int
+
+  " Number of transactions during this day "
+  hourlyTransactionCount: Int
 }
 
 ##########################
@@ -289,9 +298,12 @@ type Block @entity(immutable: true) {
 
   " Number of chunks in this block (e.g. shards on NEAR) "
   chunkCount: Int
+
+  " Number of transactions in this block "
+  transactionCount: Int
 }
 
-# This is the entity that found the next block (e.g. in ethereum this is a miner)
+# This is the node that found the next block (e.g. miner or validator)
 type Author @entity {
   " Address of the author "
   id: Bytes!

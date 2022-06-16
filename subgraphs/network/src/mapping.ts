@@ -30,11 +30,22 @@ import {
 } from "./constants";
 import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
 
-///////////////////////
-//// Block Handler ////
-///////////////////////
+/////////////////
+//// Classes ////
+/////////////////
 
-export function handleBlock(block: ethereum.Block): void {
+// TODO add classes for passing into helper functions
+
+////////////////////////
+//// Block Handlers ////
+////////////////////////
+
+export function handleNearBlock(block: cosmos.Block): void {
+  log.warning("handleNearBlock {}", [block.header.height.toString()]);
+  getOrCreateNetwork(NETWORK_NAME);
+}
+
+export function handleEvmBlock(block: ethereum.Block): void {
   createBlock(block);
 
   // update network entity
