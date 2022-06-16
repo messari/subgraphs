@@ -6,22 +6,6 @@ import {
   log,
 } from "@graphprotocol/graph-ts";
 import {
-  MarketListed,
-  NewCollateralFactor,
-  NewLiquidationIncentive,
-  NewPriceOracle,
-  ActionPaused1,
-} from "../generated/Comptroller/Comptroller";
-import {
-  Mint,
-  Redeem,
-  Borrow as BorrowEvent,
-  RepayBorrow,
-  LiquidateBorrow,
-  AccrueInterest,
-  NewReserveFactor,
-} from "../generated/templates/CToken/CToken";
-import {
   Account,
   Borrow,
   ActiveAccount,
