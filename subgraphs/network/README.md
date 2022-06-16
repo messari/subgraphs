@@ -23,22 +23,128 @@ The following data is collected: TODO: add new things once schema is finalized
 - The reward emissions for a given timeseries entity
 - The supply of the native asset at a given timeseries entity
 
-### Networks Supported
+## Block-specific Data
 
-TODO: talk about which networks are supported and link to each one
+There are 4 different types of networks supported by [thegraph](https://thegraph.com/). Each one has a different set of returning values for block handlers. All of the data in this subgraph is derived from the metrics listed below. Some networks have a different set of metrics than others.
 
-### Block Handlers
+### EVM or Ethereum Virtual Machine supported networks
 
-There are 4 different types of networks supported by thegraph. Each one has a different set of returning values for block handlers. We will explore each one below: TODO
+```ts
+class Block {
+      author: Address,
+      baseFeePerGas: BigInt | null,
+      difficulty: BigInt,
+      gasLimit: BigInt,
+      gasUsed: BigInt,
+      hash: Bytes,
+      number: BigInt,
+      parentHash: Bytes,
+      receiptsRoot: Bytes,
+      size: BigInt | null,
+      stateRoot: ,
+      timestamp: BigInt,
+      totalDifficulty: BigInt,
+      transactionsRoot: Bytes,
+      unclesHash: Bytes,
+}
+```
 
-- EVM:
-- Arweave:
-- Cosmos:
-- NEAR:
+### Arweave
 
-### Hosted Service Endpoints
+```ts
+class Block {
+     timestamp: u64,
+     lastRetarget: u64,
+     height: u64,
+     indepHash: Bytes,
+     nonce: Bytes,
+     previousBlock: Bytes,
+     diff: Bytes,
+     hash: Bytes,
+     txRoot: Bytes,
+     txs: Bytes[],
+     walletList: Bytes,
+     rewardAddr: Bytes,
+     tags: Tag[],
+     rewardPool: Bytes,
+     weaveSize: Bytes,
+     blockSize: Bytes,
+     cumulativeDiff: Bytes,
+     hashListMerkle: Bytes,
+     poa: ProofOfAccess,
+}
+```
 
-Testing endpoints for all network level subgraphs.
+### Cosmos
+
+```ts
+class Block {
+      header: Header,
+      evidence: EvidenceList,
+      resultBeginBlock: ResponseBeginBlock,
+      resultEndBlock: ResponseEndBlock,
+      transactions: Array<TxResult>,
+      validatorUpdates: Array<Validator>,
+}
+
+class Header {
+      version: Consensus,
+      chainId: string,
+      height: u64,
+      time: Timestamp,
+      lastBlockId: BlockID,
+      lastCommitHash: Bytes,
+      dataHash: Bytes,
+      validatorsHash: Bytes,
+      nextValidatorsHash: Bytes,
+      consensusHash: Bytes,
+      appHash: Bytes,
+      lastResultsHash: Bytes,
+      evidenceHash: Bytes,
+      proposerAddress: Bytes,
+      hash: Bytes,
+}
+```
+
+### NEAR
+
+```ts
+class BlockHeader {
+      height: u64,
+      prevHeight: u64, // Always zero when version < V3
+      epochId: Bytes,
+      nextEpochId: Bytes,
+      chunksIncluded: u64,
+      hash: Bytes,
+      prevHash: Bytes,
+      timestampNanosec: u64,
+      randomValue: Bytes,
+      gasPrice: BigInt,
+      totalSupply: BigInt,
+      latestProtocolVersion: u32,
+  }
+
+class ChunkHeader {
+      gasUsed: u64,
+      gasLimit: u64,
+      shardId: u64,
+      chunkHash: Bytes,
+      prevBlockHash: Bytes,
+      balanceBurnt: BigInt,
+  }
+
+class Block {
+      author: string,
+      header: BlockHeader,
+      chunks: Array<ChunkHeader>,
+  }
+```
+
+## Resources and Links
+
+<details>
+<summary>See hosted service testing endpoints</summary>
+<br>
 
 - Arbitrum One: https://thegraph.com/hosted-service/subgraph/dmelotik/network-arbitrum-one
 - Aurora: https://thegraph.com/hosted-service/subgraph/dmelotik/network-aurora
@@ -63,7 +169,11 @@ Testing endpoints for all network level subgraphs.
 - Osmosis: https://thegraph.com/hosted-service/subgraph/dmelotik/network-osmosis
 - NEAR: https://thegraph.com/hosted-service/subgraph/dmelotik/network-near-mainnet
 
-### Reference Subgraphs
+</details>
+
+<details>
+<summary>Reference subgraphs</summary>
+<br>
 
 - https://github.com/stakewise/subgraphs/tree/main/subgraphs/ethereum
 - https://github.com/graphprotocol/example-subgraph
@@ -72,6 +182,13 @@ Testing endpoints for all network level subgraphs.
 - Near: https://github.com/linear-protocol/linear-subgraph
 - Cosmos: `NA`
 
-### Resources
+</details>
+
+<details>
+<summary>Resources</summary>
+<br>
 
 - https://ethereum.org/en/developers/docs/gas/
+- https://docs.near.org/docs/develop/basics/getting-started
+
+</details>
