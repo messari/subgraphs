@@ -22,6 +22,7 @@ import { valueInUSD } from "./pricing";
 import { convertTokenToDecimal } from "./utils/utils";
 import { PoolBalanceChanged } from "../../generated/Vault/Vault";
 import { scaleDown } from "./tokens";
+import { updateWeight } from "./weight";
 
 export function createLiquidityPool(
   event: ethereum.Event,
@@ -177,6 +178,7 @@ export function createSwapHandleVolume(
   // get amount that should be tracked only - div 2 because cant count both input and output as volume
   let trackedAmountUSD = swap.amountInUSD;
   updateVolumeAndFee(event, protocol, pool, trackedAmountUSD);
+  updateWeight(pool.id);
 
   poolMetricsDaily.dailyVolumeUSD = poolMetricsDaily.dailyVolumeUSD.plus(trackedAmountUSD);
   poolMetricsHourly.hourlyVolumeUSD = poolMetricsHourly.hourlyVolumeUSD.plus(trackedAmountUSD);
