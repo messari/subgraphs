@@ -5,9 +5,9 @@ schema:
 dataSources:
   - kind: cosmos
     name: CosmosHub
-    network: {{ network }} # This will change for each cosmos-based blockchain. In this case, the example uses the CosmosHub mainnet.
+    network: {{ network }}
     source:
-      startBlock: 0 # Required for Cosmos, set this to 0 to start indexing from chain genesis
+      startBlock: 0
     mapping:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
@@ -16,5 +16,5 @@ dataSources:
         - Block
         - Author
       blockHandlers:
-        - handler: handleBlock
+        - handler: handleCosmosBlock
       file: ./src/mapping.ts
