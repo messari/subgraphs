@@ -1,10 +1,7 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
-graft:
-  base: QmbGu3LzNxQDs8JBMGjedPptTTupYFRdSM6ipvM8yYdWV6 # Subgraph ID of base subgraph
-  block: 10000839 # Block number
 dataSources:
   - kind: ethereum
     name: Registry_v1

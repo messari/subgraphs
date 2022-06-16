@@ -129,13 +129,13 @@ export function calculateStrategistReward_v1(
       ? totalFee
       : totalFee.times(vaultTotalSupply).div(vaultTotalAssets);
 
+    let strategistReward: BigInt = constants.BIGINT_ZERO;
     if (reportStrategistFee.gt(constants.BIGINT_ZERO)) {
-      let strategistReward = reportStrategistFee
+      strategistReward = reportStrategistFee
         .times(totalReward)
         .div(totalFee);
-
-      return new RewardType(strategistReward, totalReward, totalFee);
     }
+    return new RewardType(strategistReward, totalReward, totalFee);
   }
 
   return new RewardType(constants.BIGINT_ZERO, constants.BIGINT_ZERO, totalFee);
@@ -190,13 +190,13 @@ export function calculateStrategistReward_v2(
       ? totalFee
       : totalFee.times(vaultTotalSupply).div(vaultTotalAssets);
 
+    let strategistReward: BigInt = constants.BIGINT_ZERO;
     if (reportStrategistFee.gt(constants.BIGINT_ZERO)) {
-      let strategistReward = reportStrategistFee
+      strategistReward = reportStrategistFee
         .times(totalReward)
         .div(totalFee);
-
-      return new RewardType(strategistReward, totalReward, totalFee);
     }
+    return new RewardType(strategistReward, totalReward, totalFee);
   }
 
   return new RewardType(constants.BIGINT_ZERO, constants.BIGINT_ZERO, totalFee);
@@ -258,13 +258,13 @@ export function calculateStrategistReward_v3(
       ? totalFee
       : totalFee.times(vaultTotalSupply).div(vaultTotalAssets);
 
+    let strategistReward: BigInt = constants.BIGINT_ZERO;
     if (reportStrategistFee.gt(constants.BIGINT_ZERO)) {
-      let strategistReward = reportStrategistFee
+      strategistReward = reportStrategistFee
         .times(totalReward)
         .div(totalFee);
-
-      return new RewardType(strategistReward, totalReward, totalFee);
     }
+    return new RewardType(strategistReward, totalReward, totalFee);
   }
 
   return new RewardType(constants.BIGINT_ZERO, constants.BIGINT_ZERO, totalFee);
@@ -326,13 +326,13 @@ export function calculateStrategistReward_v4(
       ? totalFee
       : totalFee.times(vaultTotalSupply).div(vaultTotalAssets);
 
+    let strategistReward: BigInt = constants.BIGINT_ZERO; 
     if (reportStrategistFee.gt(constants.BIGINT_ZERO)) {
-      let strategistReward = reportStrategistFee
+      strategistReward = reportStrategistFee
         .times(totalReward)
         .div(totalFee);
-
+      }
       return new RewardType(strategistReward, totalReward, totalFee);
-    }
   }
 
   return new RewardType(constants.BIGINT_ZERO, constants.BIGINT_ZERO, totalFee);
@@ -383,8 +383,6 @@ export function strategyReported(
   let inputTokenDecimals = BigInt.fromI32(10)
     .pow(inputToken!.decimals as u8)
     .toBigDecimal();
-
-  let totalSupply = vaultContract.totalSupply();
 
   let strategyInfo = getStrategyInfo(vaultAddress, strategyAddress);
   let strategyPerformanceFee = strategyInfo[0];
