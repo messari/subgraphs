@@ -1,5 +1,5 @@
 {
-  "name": "L1 Subgraph",
+  "name": "Network Subgraph",
   "license": "MIT",
   "description": "A subgraph that gathers L1 data for EVM chains",
   "scripts": {

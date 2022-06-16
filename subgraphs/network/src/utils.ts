@@ -207,6 +207,8 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("2");
   } else if (network == SubgraphNetwork.XDAI) {
     return BigDecimal.fromString("5");
+  } else if (network == SubgraphNetwork.NEAR) {
+    return BigDecimal.fromString("1");
   }
   // Blocks are mined as needed
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")

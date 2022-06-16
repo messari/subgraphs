@@ -5,7 +5,7 @@ import {
   arweave,
   cosmos,
   near,
-  log
+  log,
 } from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
@@ -33,10 +33,6 @@ import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
 ///////////////////////
 //// Block Handler ////
 ///////////////////////
-
-export function handleNearBlock(block: near.Block): void {
-  log.warning("handleNearBlock {}", [block.header.height.toHexString()]);
-}
 
 export function handleBlock(block: ethereum.Block): void {
   createBlock(block);

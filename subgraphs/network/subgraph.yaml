@@ -7,7 +7,7 @@ dataSources:
     name: blocks
     network: near-mainnet
     source:
-      startBlock: 0
+      startBlock: 1
     mapping:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
