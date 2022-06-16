@@ -7,11 +7,13 @@ import {
     Transfer as TransferEvent,
     Claim as ClaimEvent,
     DefaultSuffered as DefaultSufferedEvent,
-    FundsWithdrawn as FundsWithdrawnEvent
+    FundsWithdrawn as FundsWithdrawnEvent,
+    LossesRecognized as LossesRecognizedEvent
 } from "../../generated/templates/Pool/Pool";
 
 import { LoanVersion, PoolState } from "../common/constants";
 import {
+    getOrCreateAccountMarket,
     getOrCreateLoan,
     getOrCreateMarket,
     getOrCreateStakeLocker
@@ -24,6 +26,15 @@ import {
     createWithdraw
 } from "../common/mappingHelpers/getOrCreate/transactions";
 import { marketTick } from "../common/mappingHelpers/update/market";
+
+export function handleLossesRecognized(event: LossesRecognizedEvent): void {
+    const market = getOrCreateMarket(event, event.address);
+    const accountAddress = event.transaction.from;
+    const accountMarket = getOrCreateAccountMarket(event, accountAddress, market);
+
+    accountMarket.unrecognizedLosses = accountMarket.unrecognizedLosses.plus(event.params.lossesRecognized);
+    accountMarket.save();
+}
 
 export function handleTransfer(event: TransferEvent): void {
     if (Address.zero() == event.params.from) {

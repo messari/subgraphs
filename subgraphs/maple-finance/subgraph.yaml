@@ -137,6 +137,8 @@ templates:
               - name: MplReward
                 file: ./abis/MplRewards.json
           eventHandlers:
+              - event: LossesRecognized(indexed address,uint256,uint256)
+                handler: handleLossesRecognized
               - event: Transfer(indexed address,indexed address,uint256)
                 handler: handleTransfer
               - event: PoolStateChanged(uint8)

@@ -43,7 +43,7 @@ export function createDeposit(event: ethereum.Event, market: Market, amountMPTMi
     deposit.market = market.id;
     deposit.asset = asset.id;
     deposit.from = accountAddress.toHexString();
-    deposit.to = market.id;
+    deposit.to = market._liquidityLockerAddress;
     deposit._amountMPT = amountMPTMinted;
     deposit.amount = bigDecimalToBigInt(deposit._amountMPT.toBigDecimal().times(market._initialExchangeRate));
     deposit.amountUSD = getTokenAmountInUSD(event, asset, deposit.amount);
@@ -79,7 +79,7 @@ export function createWithdraw(event: ethereum.Event, market: Market, amountMPTB
 
     withdraw.market = market.id;
     withdraw.asset = asset.id;
-    withdraw.from = market.id;
+    withdraw.from = market._liquidityLockerAddress;
     withdraw.to = accountAddress.toHexString(); // from since its a burn
     withdraw._amountMPT = amountMPTBurned;
     withdraw._losses = minBigInt(accountMarket.unrecognizedLosses, losslessAmount);
@@ -119,7 +119,7 @@ export function createClaim(event: ethereum.Event, market: Market, amount: BigIn
 
     claim.market = market.id;
     claim.asset = market.inputToken;
-    claim.from = market.id;
+    claim.from = market._liquidityLockerAddress;
     claim.to = account.toHexString();
     claim.amount = amount;
     claim.amountUSD = getTokenAmountInUSD(event, asset, claim.amount);
@@ -242,7 +242,7 @@ export function createLiquidate(
     liquidate.market = market.id;
     liquidate.asset = market.inputToken;
     liquidate.from = market._stakeLocker;
-    liquidate.to = market.id;
+    liquidate.to = market._liquidityLockerAddress;
     liquidate._defaultSufferedByStakeLocker = defaultSufferedByStakeLocker;
     liquidate._defaultSufferedByPool = defaultsufferedByPool;
     liquidate.amount = liquidate._defaultSufferedByStakeLocker.plus(liquidate._defaultSufferedByPool);
