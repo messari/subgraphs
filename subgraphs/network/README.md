@@ -56,7 +56,7 @@ class Block {
      timestamp: u64,
      lastRetarget: u64,
      height: u64,
-     indepHash: Bytes,
+     indepHash: Bytes, // block hash
      nonce: Bytes,
      previousBlock: Bytes,
      diff: Bytes,
@@ -64,11 +64,11 @@ class Block {
      txRoot: Bytes,
      txs: Bytes[],
      walletList: Bytes,
-     rewardAddr: Bytes,
+     rewardAddr: Bytes, // miner address
      tags: Tag[],
-     rewardPool: Bytes,
-     weaveSize: Bytes,
-     blockSize: Bytes,
+     rewardPool: Bytes, // rewards for this block (offset by 1e12)
+     weaveSize: Bytes, // total data size in Bytes
+     blockSize: Bytes, // block size in Bytes
      cumulativeDiff: Bytes,
      hashListMerkle: Bytes,
      poa: ProofOfAccess,
@@ -180,7 +180,7 @@ class Block {
 - https://thegraph.com/explorer/subgraph?id=3WFXNz46rk4iuVgsBybcGtxMa4cbHkBLfuSjUvvqs2MD&view=Overview
 - Arweave: https://github.com/hepnerthomas/arweave-revenues
 - Near: https://github.com/linear-protocol/linear-subgraph
-- Cosmos: `NA`
+- Cosmos: https://github.com/graphprotocol/example-subgraph/tree/cosmos-block-filtering
 
 </details>
 

@@ -70,6 +70,9 @@ type Network @entity {
   " Total number of transactions that have occured on this network "
   cumulativeTransactions: Int
 
+  " Total size of the network in native units (e.g. Bytes in Arweave and Ethereum) "
+  cumulativeSize: BigInt
+
   " Current supply of the native asset "
   totalSupply: BigInt
 
@@ -144,6 +147,15 @@ type DailySnapshot @entity {
   " Amount of burnt fees for this day "
   dailyBurntFees: BigInt!
 
+  " New rewards emitted on this day "
+  dailyRewards: BigInt
+
+  " Total amount of rewards emitted "
+  cumulativeRewards: BigInt
+
+  " Daily mean block reward emitted "
+  dailyMeanRewards: BigDecimal
+
   " Total amount of the native asset in circulation during this day "
   totalSupply: BigInt
 
@@ -155,6 +167,9 @@ type DailySnapshot @entity {
 
   " Daily mean block interval time in seconds during this hour "
   dailyMeanBlockInterval: BigDecimal!
+
+  " Total size of the entire network in this day (in native units) "
+  cumulativeSize: BigInt!
 
   " Cumulative size of all blocks created in this day "
   dailyCumulativeSize: BigInt!
@@ -224,6 +239,15 @@ type HourlySnapshot @entity {
   " Amount of burnt fees for this hour "
   hourlyBurntFees: BigInt!
 
+  " New rewards emitted on this hour "
+  hourlyRewards: BigInt
+
+  " Total amount of rewards emitted "
+  cumulativeRewards: BigInt
+
+  " Hourly mean block reward emitted "
+  hourlyMeanRewards: BigDecimal
+
   " Total amount of the native asset in circulation during this day "
   totalSupply: BigInt
 
@@ -235,6 +259,9 @@ type HourlySnapshot @entity {
 
   " Hourly mean block interval time in seconds during this hour "
   hourlyMeanBlockInterval: BigDecimal!
+
+  " Total size of the entire network in this hour (in native units) "
+  cumulativeSize: BigInt!
 
   " Cumulative size of all blocks created in this hour "
   hourlyCumulativeSize: BigInt!
@@ -266,7 +293,7 @@ type Block @entity(immutable: true) {
   " Author of this block (the entity that successfully found this block) "
   author: Author!
 
-  " Data size of the block in bytes "
+  " Data size of the block in Bytes "
   size: BigInt
 
   " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
@@ -301,6 +328,9 @@ type Block @entity(immutable: true) {
 
   " Number of transactions in this block "
   transactionCount: Int
+
+  " Rewards emitted in this block "
+  rewards: BigInt
 }
 
 # This is the node that found the next block (e.g. miner or validator)
