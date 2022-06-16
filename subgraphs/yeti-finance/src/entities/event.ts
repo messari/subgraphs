@@ -19,6 +19,8 @@ import {
   ZERO_ADDRESS,
 } from "../utils/constants";
 import {
+  addProtocolBorrowVolume,
+  addProtocolLiquidateVolume,
   getOrCreateYetiProtocol,
   incrementProtocolLiquidateCount,
   incrementProtocolRepayCount,
@@ -62,7 +64,6 @@ export function createDeposit(
   deposit.amount = amount;
   deposit.amountUSD = amountUSD;
   deposit.save();
-  updateUsageMetrics(event, sender);
   addMarketDepositVolume(event, amountUSD, asset);
 }
 
@@ -94,7 +95,6 @@ export function createWithdraw(
   withdraw.amount = amount;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
-  updateUsageMetrics(event, recipient);
   incrementProtocolWithdrawCount(event);
 }
 
@@ -124,7 +124,6 @@ export function createBorrow(
   borrow.amount = amountYUSD;
   borrow.amountUSD = amountUSD;
   borrow.save();
-  updateUsageMetrics(event, recipient);
 }
 
 export function createRepay(
@@ -153,8 +152,8 @@ export function createRepay(
   repay.amount = amountYUSD;
   repay.amountUSD = amountUSD;
   repay.save();
-  updateUsageMetrics(event, sender);
   incrementProtocolRepayCount(event);
+  addProtocolBorrowVolume(event, amountUSD);
 }
 
 export function createLiquidate(
@@ -185,7 +184,8 @@ export function createLiquidate(
   liquidate.amountUSD = amountLiquidatedUSD;
   liquidate.profitUSD = profitUSD;
   liquidate.save();
-  updateUsageMetrics(event, liquidator);
   addMarketLiquidateVolume(event, amountLiquidatedUSD, asset);
+  addProtocolLiquidateVolume(event, amountLiquidatedUSD);
+
   incrementProtocolLiquidateCount(event);
 }

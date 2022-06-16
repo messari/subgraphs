@@ -150,7 +150,7 @@ dataSources:
         - name: YetiController
           file: ./abis/YetiController.json
       eventHandlers:
-        - event: YUSDBalanceUpdated(uint256)
+        - event: ActivePoolYUSDDebtUpdated(uint256)
           handler: handleActivePoolYUSDDebtUpdated
         - event: ActivePoolBalanceUpdated(address,uint256)
           handler: handleActivePoolAssetBalanceUpdated

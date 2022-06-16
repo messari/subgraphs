@@ -9,7 +9,7 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
-import { addProtocolSideRevenue } from "../entities/protocol";
+import { addProtocolSideRevenue, updateUsageMetrics } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getUSDPriceWithoutDecimals } from "../utils/price";
 
@@ -74,4 +74,5 @@ export function handleTroveUpdated(event: TroveUpdated): void {
 
   trove.debt = newDebt;
   trove.save();
+  updateUsageMetrics(event, borrower);
 }

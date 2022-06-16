@@ -31,19 +31,20 @@ import { bigIntToBigDecimal } from "../utils/numbers";
 import { getOrCreateStableBorrowerInterestRate } from "./rate";
 import { getUSDPrice } from "../utils/price";
 
-export function getOrCreateMarket(token: Address): Market {
-  let market = Market.load(ACTIVE_POOL + "-" + token.toHexString());
+export function getOrCreateMarket(tokenAddr: Address): Market {
+  let market = Market.load(ACTIVE_POOL + "-" + tokenAddr.toHexString());
   if (!market) {
-    market = new Market(ACTIVE_POOL + "-" + token.toHexString());
+    market = new Market(ACTIVE_POOL + "-" + tokenAddr.toHexString());
+    const token = getOrCreateToken(tokenAddr)
     market.protocol = getOrCreateYetiProtocol().id;
-    market.name = "Yeti Finance";
+    market.name = token.name;
     market.isActive = true;
     market.canUseAsCollateral = true;
     market.canBorrowFrom = true;
     market.maximumLTV = MAXIMUM_LTV;
     market.liquidationThreshold = MAXIMUM_LTV;
     market.liquidationPenalty = LIQUIDATION_FEE;
-    market.inputToken = getOrCreateToken(token).id;
+    market.inputToken = token.id;
     market.inputTokenBalance = BIGINT_ZERO;
     market.inputTokenPriceUSD = BIGDECIMAL_ZERO;
     market.outputTokenSupply = BIGINT_ZERO;
