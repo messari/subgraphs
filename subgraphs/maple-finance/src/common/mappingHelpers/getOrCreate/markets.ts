@@ -60,6 +60,12 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
             poolContract.try_liquidityAsset.name
         );
 
+        const liquidityLockerAddress = readCallResult(
+            poolContract.try_liquidityLocker(),
+            ZERO_ADDRESS,
+            poolContract.try_liquidityLocker.name
+        );
+
         const inputToken = getOrCreateToken(inputTokenAddress);
 
         // Following _toWad function
@@ -98,6 +104,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._poolFactory = poolFactoryAddress.toHexString();
         market._delegateAddress = delegateAddress.toHexString();
         market._stakeLocker = stakeLockerAddress.toHexString();
+        market._liquidityLockerAddress = liquidityLockerAddress.toHexString();
         market._cumulativeDeposit = ZERO_BI;
         market._totalBorrowBalance = ZERO_BI;
         market._cumulativeBorrow = ZERO_BI;

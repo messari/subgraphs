@@ -622,6 +622,9 @@ type Market @entity {
     " Stake locker for this market "
     _stakeLocker: _StakeLocker!
 
+    " Address of the liqudity locker for this market "
+    _liquidityLockerAddress: String!
+
     " Sum of all historical market input token deposits (only considers deposits and not withdrawals) "
     _cumulativeDeposit: BigInt!
 
