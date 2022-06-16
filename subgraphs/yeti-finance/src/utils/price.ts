@@ -1,4 +1,4 @@
-import { Address, BigDecimal } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt } from "@graphprotocol/graph-ts";
 import { YetiController } from "../../generated/ActivePool/YetiController";
 import { getOrCreateToken } from "../entities/token";
 import { BIGDECIMAL_TWO, BIGDECIMAL_ZERO, BIGINT_TEN, YETI_CONTROLLER } from "./constants";
@@ -21,4 +21,14 @@ export function getUSDPrice(tokenAddr: Address): BigDecimal {
         return result.value.div(decimals.value).toBigDecimal();
     }
     return BIGDECIMAL_ZERO
+}
+
+export function getAsssetsUSD(tokens: Address[], amounts: BigInt[]): BigDecimal {
+    let totalAmount = BIGDECIMAL_ZERO;
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const amount = amounts[i];
+        totalAmount = totalAmount.plus(getUSDPriceWithoutDecimals(token, amount.toBigDecimal()));
+    }
+    return totalAmount
 }

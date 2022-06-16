@@ -38,6 +38,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: YetiController
           file: ./abis/YetiController.json
+        - name: TroveManager
+          file: ./abis/TroveManager.json
       eventHandlers:
         - event: TroveUpdated(indexed address,uint256,address[],uint256[],uint8)
           handler: handleTroveUpdated
@@ -150,6 +152,10 @@ dataSources:
       eventHandlers:
         - event: YUSDBalanceUpdated(uint256)
           handler: handleActivePoolYUSDDebtUpdated
+        - event: ActivePoolBalanceUpdated(address,uint256)
+          handler: handleActivePoolAssetBalanceUpdated
+        - event: ActivePoolBalancesUpdated(address[],uint256[])
+          handler: handleActivePoolAssetsBalanceUpdated
       file: ./src/mapping/ActivePool.ts
   - kind: ethereum/contract
     name: CollSurplusPool

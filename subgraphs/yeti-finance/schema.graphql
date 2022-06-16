@@ -980,9 +980,14 @@ type _TroveToken @entity {
   " Trove id + token id "
   id: ID!
 
+  " Trove "
   trove: _Trove!
+
   " Amount of  owner has deposited "
   collateral: BigInt!
+
+  " Asset token "
+  token: Token!
 
   " Total amount of ETH surplus owner can claim "
   collateralSurplus: BigInt!

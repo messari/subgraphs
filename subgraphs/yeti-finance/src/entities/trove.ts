@@ -1,6 +1,7 @@
 import { Address } from "@graphprotocol/graph-ts";
 import { _Trove, _TroveToken } from "../../generated/schema";
 import { BIGINT_ZERO } from "../utils/constants";
+import { getOrCreateToken } from "./token";
 
 export function getOrCreateTrove(owner: Address): _Trove {
   const id = owner.toHexString();
@@ -26,6 +27,7 @@ export function getOrCreateTroveToken(
     troveToken.collateral = BIGINT_ZERO
     troveToken.collateralSurplus = BIGINT_ZERO
     troveToken.collateralSurplusChange = BIGINT_ZERO
+    troveToken.token = getOrCreateToken(token).id;
     troveToken.save();
   }
 

@@ -1,4 +1,5 @@
-import { TroveUpdated } from "../../generated/TroveManagerLiquidations/TroveManagerLiquidations";
+import { TroveLiquidated, TroveManagerLiquidations, TroveUpdated } from "../../generated/TroveManagerLiquidations/TroveManagerLiquidations";
+import { TroveManager } from "../../generated/TroveManagerLiquidations/TroveManager";
 
 import { Redemption } from "../../generated/TroveManagerRedemptions/TroveManagerRedemptions";
 import {
@@ -16,14 +17,15 @@ import {
   BIGINT_ZERO,
   LIQUIDATION_FEE,
   LIQUIDATION_RESERVE_YUSD,
+  TROVE_MANAGER,
 } from "../utils/constants";
-import { _Trove } from "../../generated/schema";
+import { _Trove, _TroveToken } from "../../generated/schema";
 import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
 } from "../entities/protocol";
-import { log } from "@graphprotocol/graph-ts";
-import { getUSDPriceWithoutDecimals } from "../utils/price";
+import { Address, log } from "@graphprotocol/graph-ts";
+import { getAsssetsUSD, getUSDPriceWithoutDecimals } from "../utils/price";
 
 enum TroveManagerOperation {
   applyPendingRewards,
@@ -33,9 +35,8 @@ enum TroveManagerOperation {
 }
 
 export function handleRedemption(event: Redemption): void {
-  const feeAmountUSD = event.params.YUSDfee;
-
-  addProtocolSideRevenue(event, feeAmountUSD.toBigDecimal());
+  const feeAmountUSD = bigIntToBigDecimal(event.params.YUSDfee);
+  addProtocolSideRevenue(event, feeAmountUSD);
 }
 
 /**
@@ -69,12 +70,73 @@ export function handleTroveUpdated(event: TroveUpdated): void {
   trove.save();
 }
 
+/**
+ * Emitted for each trove liquidated during batch liquidation flow, right before TroveUpdated event
+ * Used to check for and apply pending rewards, since no event is emitted for this during liquidation
+ *
+ * @param event TroveLiquidated event
+ */
+ export function handleTroveLiquidated(event: TroveLiquidated): void {
+  const trove = getOrCreateTrove(event.params._borrower);
+
+  const borrower = event.params._borrower;
+  const newDebt = event.params._debt;
+
+  if (trove.debt.gt(newDebt)) {
+    log.critical(
+      "Tracked trove debt was less than actual debt in TroveLiquidated, actual: {}, tracked: {}",
+      [trove.debt.toString(), newDebt.toString()]
+    );
+  }
+
+  const troveContract = TroveManager.bind(Address.fromString(TROVE_MANAGER));
+  const entireDebtAndCools = troveContract.try_getEntireDebtAndColls(borrower);
+  if(!entireDebtAndCools.reverted) {
+    for (let i = 0; i < entireDebtAndCools.value.value1.length; i++) {
+      const token = entireDebtAndCools.value.value1[i];
+      const amount = entireDebtAndCools.value.value2[i];
+  
+      const troveToken = getOrCreateTroveToken(trove, token);
+      // Gas compensation already subtracted, only when (MCR <= ICR < TCR & SP.LUSD >= trove.debt)
+      if (troveToken.collateral.gt(amount)) {
+        // Add gas compensation back to liquidated collateral amount
+        troveToken.collateral = troveToken.collateral
+          .divDecimal(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
+          .truncate(0).digits;
+      }
+      // Apply pending rewards if necessary
+      let collateralReward = amount.minus(troveToken.collateral);
+      if (troveToken.collateralSurplusChange.gt(BIGINT_ZERO)) {
+        collateralReward = collateralReward.plus(
+          troveToken.collateralSurplusChange
+        );
+        troveToken.collateralSurplusChange = BIGINT_ZERO;
+      }
+      if (collateralReward.gt(BIGINT_ZERO)) {
+        const collateralRewardUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal());
+        createDeposit(event, collateralReward, collateralRewardUSD, borrower,token);
+      }
+      const borrowAmountLUSD = newDebt.minus(trove.debt);
+      if (borrowAmountLUSD.gt(BIGINT_ZERO)) {
+        const borrowAmountUSD = bigIntToBigDecimal(borrowAmountLUSD);
+        createBorrow(event, borrowAmountLUSD, borrowAmountUSD, borrower);
+      }
+      troveToken.collateral = amount;
+      troveToken.save()
+    }
+  }
+  
+  
+  trove.debt = newDebt;
+  trove.save();
+}
+
 // Treat applyPendingRewards as deposit + borrow
 function applyPendingRewards(event: TroveUpdated, trove: _Trove): void {
   const borrower = event.params._borrower;
   const newDebt = event.params._debt;
 
-  for (let i = 0; i < event.params._tokens.toString().length; i++) {
+  for (let i = 0; i < event.params._tokens.length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
 
@@ -108,7 +170,7 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
   const repayAmountUSD = bigIntToBigDecimal(repayAmountYUSD);
   createRepay(event, repayAmountYUSD, repayAmountUSD, event.transaction.from);
 
-  for (let i = 0; i < event.params._tokens.toString().length; i++) {
+  for (let i = 0; i < event.params._tokens.length; i++) {
     const token = event.params._tokens[i];
     const amount = event.params._amounts[i];
 
@@ -137,11 +199,14 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
 function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
   let supplySideRevenueUSD = BIGDECIMAL_ZERO;
   let profit = BIGDECIMAL_ZERO;
-
-  for (let i = 0; i < event.params._tokens.length; i++) {
-    const token = event.params._tokens[i];
-    const amount = event.params._amounts[i];
-    const amountUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal());
+  if(!trove.tokens){
+    return
+  }
+  for (let i = 0; i < trove.tokens!.length; i++) {
+    const troveToken = _TroveToken.load(trove.tokens!.at(i));
+    const tokenAddr = Address.fromString(troveToken!.token)
+    const amount = troveToken!.collateral;
+    const amountUSD = getUSDPriceWithoutDecimals(tokenAddr, amount.toBigDecimal());
     const profitUSD = amountUSD
       .times(LIQUIDATION_FEE)
       .plus(LIQUIDATION_RESERVE_YUSD);
@@ -151,15 +216,15 @@ function liquidateTrove(event: TroveUpdated, trove: _Trove): void {
       amountUSD,
       profitUSD,
       event.transaction.from,
-      token
+      tokenAddr
     );
     profit = profit.plus(profitUSD);
     supplySideRevenueUSD = supplySideRevenueUSD.plus(
-      amountUSD.times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE))
+      amountUSD
     );
   }
   const liquidatedDebtUSD = bigIntToBigDecimal(trove.debt);
-  supplySideRevenueUSD = supplySideRevenueUSD.minus(liquidatedDebtUSD);
+  supplySideRevenueUSD = supplySideRevenueUSD.times(BIGDECIMAL_ONE.minus(LIQUIDATION_FEE)).minus(liquidatedDebtUSD);
   addSupplySideRevenue(event, supplySideRevenueUSD);
   addProtocolSideRevenue(event, profit);
 }

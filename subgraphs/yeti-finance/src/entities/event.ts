@@ -47,7 +47,7 @@ export function createDeposit(
   const deposit = new Deposit(
     prefixID(
       "deposit",
-      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-${asset.toHexString()}`
     )
   );
   deposit.hash = event.transaction.hash.toHexString();
@@ -79,7 +79,7 @@ export function createWithdraw(
   const withdraw = new Withdraw(
     prefixID(
       "withdraw",
-      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-${asset.toHexString()}`
     )
   );
   withdraw.hash = event.transaction.hash.toHexString();
@@ -168,7 +168,7 @@ export function createLiquidate(
   const liquidate = new Liquidate(
     prefixID(
       "liquidate",
-      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}`
+      `${event.transaction.hash.toHexString()}-${event.logIndex.toString()}-${asset.toHexString()}`
     )
   );
   liquidate.hash = event.transaction.hash.toHexString();
