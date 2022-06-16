@@ -11,6 +11,20 @@ export namespace tokens {
 		// TODO is there some messari parsing standard?
 		return id.toHexString()
 	}
+
+	export function loadOrCreateRewardToken(address: Address, type: string): RewardToken {
+		let tokenId = parseTokenId(address)
+		let id = `${type}-${tokenId}`
+
+		let entity = RewardToken.load(id)
+		if (entity == null) {
+			entity = new RewardToken(id)
+			entity.token = tokenId
+			entity.type = type
+		}
+		return entity as RewardToken
+	}
+
 	export function loadOrCreateToken(address: Address): Token {
 		let id = parseTokenId(address)
 		let entity = Token.load(id)
