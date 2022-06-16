@@ -17,4 +17,4 @@ dataSources:
         - Author
       blockHandlers:
         - handler: handleNearBlock
-      file: ./src/nearMapping.ts
+      file: ./src/mapping.ts
