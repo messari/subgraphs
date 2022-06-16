@@ -17,6 +17,7 @@ export namespace Network {
   export const BSC = "BSC"; // aka BNB Chain
   export const CELO = "CELO";
   export const COSMOS = "COSMOS";
+  export const CLOVER = "CLOVER";
   export const CRONOS = "CRONOS";
   export const MAINNET = "MAINNET"; // Ethereum mainnet
   export const FANTOM = "FANTOM";
@@ -30,6 +31,32 @@ export namespace Network {
   export const OSMOSIS = "OSMOSIS";
   export const MATIC = "MATIC"; // aka Polygon
   export const XDAI = "XDAI"; // aka Gnosis Chain
+}
+
+// This is how the Network displays on thegraph.com
+export namespace SubgraphNetwork {
+  export const ARBITRUM = "arbitrum-one";
+  export const ARWEAVE = "arweave-mainnet";
+  export const AVALANCHE = "avalanche";
+  export const AURORA = "aurora";
+  export const BOBA = "boba";
+  export const BSC = "bsc";
+  export const CELO = "celo";
+  export const CLOVER = "clover";
+  export const CRONOS = "mainnet";
+  export const COSMOS = "cosmoshub";
+  export const ETHEREUM = "mainnet";
+  export const FANTOM = "fantom";
+  export const HARMONY = "harmony";
+  export const JUNO = "juno";
+  export const FUSE = "fuse";
+  export const MOONBEAM = "moonbeam";
+  export const MOONRIVER = "moonriver";
+  export const NEAR = "near-mainnet";
+  export const OPTIMISM = "optimism";
+  export const OSMOSIS = "osmosis";
+  export const POLYGON = "matic";
+  export const XDAI = "xdai";
 }
 
 export namespace IntervalType {

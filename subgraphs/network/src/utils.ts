@@ -195,12 +195,28 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("15");
   } else if (network == SubgraphNetwork.AURORA) {
     return BigDecimal.fromString("1.03");
+  } else if (network == SubgraphNetwork.AVALANCHE) {
+    return BigDecimal.fromString("1"); // avalanche emits blocks as needed
+  } else if (network == SubgraphNetwork.BOBA) {
+    return BigDecimal.fromString("38");
   } else if (network == SubgraphNetwork.BSC) {
     return BigDecimal.fromString("5");
   } else if (network == SubgraphNetwork.CELO) {
     return BigDecimal.fromString("5");
+  } else if (network == SubgraphNetwork.CLOVER) {
+    return BigDecimal.fromString("13");
+  } else if (network == SubgraphNetwork.CRONOS) {
+    return BigDecimal.fromString("5.7");
   } else if (network == SubgraphNetwork.FANTOM) {
     return BigDecimal.fromString("1");
+  } else if (network == SubgraphNetwork.FUSE) {
+    return BigDecimal.fromString("5");
+  } else if (network == SubgraphNetwork.HARMONY) {
+    return BigDecimal.fromString("2");
+  } else if (network == SubgraphNetwork.MOONBEAM) {
+    return BigDecimal.fromString("12.4");
+  } else if (network == SubgraphNetwork.MOONRIVER) {
+    return BigDecimal.fromString("13");
   } else if (network == SubgraphNetwork.OPTIMISM) {
     return BigDecimal.fromString("12.5");
   } else if (network == SubgraphNetwork.POLYGON) {
@@ -209,7 +225,16 @@ function getStartingBlockRate(): BigDecimal {
     return BigDecimal.fromString("5");
   } else if (network == SubgraphNetwork.NEAR) {
     return BigDecimal.fromString("1");
+  } else if (network == SubgraphNetwork.COSMOS) {
+    return BigDecimal.fromString("1");
+  } else if (network == SubgraphNetwork.JUNO) {
+    return BigDecimal.fromString("6.1");
+  } else if (network == SubgraphNetwork.OSMOSIS) {
+    return BigDecimal.fromString("6");
+  } else if (network == SubgraphNetwork.ARWEAVE) {
+    return BigDecimal.fromString("360");
   }
+
   // Blocks are mined as needed
   // else if (network == SubgraphNetwork.AVALANCHE) return BigDecimal.fromString("2.5")
   // else if (dataSource.network() == "cronos") return BigDecimal.fromString("13.39")
