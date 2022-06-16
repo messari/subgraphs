@@ -988,11 +988,14 @@ type Liquidate implements Event @entity {
   " The protocol this transaction belongs to "
   protocol: LendingProtocol!
 
-  " Address that got liquidated "
-  liquidated: String!
+  " Market that tokens are repaid to "
+  to: String!
 
   " Address that carried out the liquidation "
-  liquidator: String!
+  from: String!
+
+  " Address that got liquidated "
+  liquidated: String!
 
   " Block number of this event "
   blockNumber: BigInt!
