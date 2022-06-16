@@ -42,11 +42,11 @@ export function handleWidthdrawn(event: WithdrawnEvent): void {
 export function handleRewardAdded(event: RewardAddedEvent): void {
     const mplReward = getOrCreateMplReward(event, event.address);
 
+    const currentTimestamp = event.block.timestamp;
+    const rewardAdded = event.params.reward;
+
     // Update rate
     if (mplReward.rewardDurationSec.gt(ZERO_BI)) {
-        const currentTimestamp = event.block.timestamp;
-        const rewardAdded = event.params.reward;
-
         mplReward.rewardRatePerSecond =
             currentTimestamp >= mplReward.periodFinishedTimestamp
                 ? rewardAdded.div(mplReward.rewardDurationSec) // No overlap, total reward devided by time
@@ -55,16 +55,18 @@ export function handleRewardAdded(event: RewardAddedEvent): void {
                           mplReward.periodFinishedTimestamp.minus(currentTimestamp).times(mplReward.rewardRatePerSecond)
                       )
                       .div(mplReward.rewardDurationSec); // Overlap with last reward, so account for last reward remainder
-
-        // Update period finished
-        mplReward.periodFinishedTimestamp = currentTimestamp.plus(mplReward.rewardDurationSec);
-
-        mplReward.save();
-
-        // Trigger market tick
-        const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
-        marketTick(market, event);
+    } else {
+        mplReward.rewardRatePerSecond = ZERO_BI;
     }
+
+    // Update period finished
+    mplReward.periodFinishedTimestamp = currentTimestamp.plus(mplReward.rewardDurationSec);
+
+    mplReward.save();
+
+    // Trigger market tick
+    const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
+    marketTick(market, event);
 }
 
 export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {

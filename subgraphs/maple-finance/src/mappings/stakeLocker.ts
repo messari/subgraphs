@@ -14,8 +14,7 @@ export function handleStake(event: StakeEvent): void {
     const stakeToken = getOrCreateToken(Address.fromString(stakeLocker.stakeToken));
     createStake(event, market, stakeToken, event.params.amount, StakeType.STAKE_LOCKER);
 
-    // Update stake token balance
-    stakeLocker.stakeTokenBalance = stakeLocker.stakeTokenBalance.plus(event.params.amount);
+    // Update stakeLocker
     stakeLocker.save();
 
     // Trigger market tick

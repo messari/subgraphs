@@ -289,6 +289,8 @@ templates:
                 handler: handlePaymentMade
               - event: Repossessed(uint256,uint256,indexed address)
                 handler: handleRepossessed
+              - event: NewTermsAccepted(bytes32,address,bytes[])
+                handler: handleNewTermsAccepted
 
     - name: MplReward
       kind: ethereum/contract

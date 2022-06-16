@@ -92,9 +92,6 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
         LoanV2OrV3Template.create(loanAddress);
     }
 
-    // Add interest rate to market
-    createInterestRate(event, loan, loan.interestRate, loan.termDays);
-
     // Update market
     const market = getOrCreateMarket(event, Address.fromString(loan.market));
     market._totalBorrowBalance = market._totalBorrowBalance.plus(event.params.amountFunded);
@@ -107,12 +104,14 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
 
 export function handleClaim(event: ClaimEvent): void {
     // Update stake locker
-    const market = getOrCreateMarket(event, event.address);
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
-    stakeLocker.revenueInPoolInputTokens = stakeLocker.revenueInPoolInputTokens.plus(event.params.stakeLockerPortion);
+    stakeLocker.cumulativeInterestInPoolInputTokens = stakeLocker.cumulativeInterestInPoolInputTokens.plus(
+        event.params.stakeLockerPortion
+    );
     stakeLocker.save();
 
     // Update market
+    const market = getOrCreateMarket(event, event.address);
     market.inputTokenBalance = market.inputTokenBalance.plus(event.params.interest);
     market._totalBorrowBalance = market._totalBorrowBalance.minus(event.params.principal);
     market._poolDelegateRevenue = market._poolDelegateRevenue.plus(event.params.poolDelegatePortion);
@@ -133,9 +132,8 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
 
     // Update stake locker
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
-    stakeLocker.stakeTokenBalance = stakeLocker.stakeTokenBalance.minus(event.params.bptsBurned);
-    stakeLocker.cumulativeStakeDefault = stakeLocker.cumulativeStakeDefault.plus(event.params.bptsBurned);
-    stakeLocker.cumulativeStakeDefaultInPoolInputTokens = stakeLocker.cumulativeStakeDefault.plus(
+    stakeLocker.cumulativeLosses = stakeLocker.cumulativeLosses.plus(event.params.bptsBurned);
+    stakeLocker.cumulativeLossesInPoolInputToken = stakeLocker.cumulativeLosses.plus(
         event.params.liquidityAssetRecoveredFromBurn
     );
     stakeLocker.save();

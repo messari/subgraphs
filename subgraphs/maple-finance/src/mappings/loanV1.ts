@@ -57,19 +57,13 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
 export function handleLiquidation(event: LiquidationEvent): void {
     const loan = getOrCreateLoan(event, event.address);
 
-    // Update loan
-    const collatoralLiquidated = event.params.liquidityAssetReturned.minus(event.params.defaultSuffered);
-    loan.collateralLiquidatedInPoolInputTokens = loan.collateralLiquidatedInPoolInputTokens.plus(collatoralLiquidated);
-    loan.defaultSuffered = loan.defaultSuffered.plus(event.params.defaultSuffered);
+    // Update loan, liqudiation accounted as principal paid
+    loan.principalPaid = loan.principalPaid.plus(
+        event.params.liquidityAssetReturned.minus(event.params.liquidationExcess)
+    );
     loan.save();
 
-    // Update market
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    market._cumulativeCollatoralLiquidationInPoolInputTokens = market._cumulativeCollatoralLiquidationInPoolInputTokens.plus(
-        collatoralLiquidated
-    );
-    market.save();
-
     // Trigger market tick
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
     marketTick(market, event);
 }

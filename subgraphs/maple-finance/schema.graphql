@@ -122,7 +122,7 @@ enum LoanVersion {
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
 type InterestRate @entity {
-    " { Interest rate side }-{ Interest rate type }-{ Market ID } "
+    " { Interest rate side }-{ Interest rate type }-{ Loan ID } "
     id: ID!
 
     " Interest rate in percentage APY. E.g. 5.21% should be stored as 5.21 "
@@ -142,6 +142,9 @@ type InterestRate @entity {
 
     " The loan that this rate exists for "
     _loan: _Loan!
+
+    " The market that this interest rate belongs to "
+    _market: Market!
 }
 
 #############################
@@ -537,7 +540,7 @@ type Market @entity {
     ##### Quantitative Data #####
 
     " All interest rates / fees allowed in the market. Interest rate should be in APY percentage "
-    rates: [InterestRate!]!
+    rates: [InterestRate!]! @derivedFrom(field: "_market")
 
     " Current TVL (Total Value Locked) of this market "
     totalValueLockedUSD: BigDecimal!
@@ -1184,29 +1187,29 @@ type _StakeLocker @entity {
     " Token that the stake locker takes as input "
     stakeToken: Token!
 
+    " Block the stake locker was created "
+    creationBlockNumber: BigInt!
+
+    " Cumulative stake in stakeToken (not including unstakes) "
+    cumulativeStake: BigInt!
+
+    " Cumulative stake in stakeToken "
+    cumulativeUnstake: BigInt!
+
+    " Cumulative losses in stakeToken sustained by the pool "
+    cumulativeLosses: BigInt!
+
+    " Cumulative losses in pool input tokens sustained by the pool "
+    cumulativeLossesInPoolInputToken: BigInt!
+
+    " Cumulative interst earned in pool input tokens "
+    cumulativeInterestInPoolInputTokens: BigInt!
+
     " Amount of stake tokens in the stake locker "
     stakeTokenBalance: BigInt!
 
-    " Amount of stake tokens in the stake locker, in USD "
+    " Amount of pool input token equivilent in the stake locker "
     stakeTokenBalanceInPoolInputTokens: BigInt!
-
-    " Price of the stake token in USD "
-    stakeTokenPriceUSD: BigDecimal!
-
-    " Amount of stake tokens the pool lost to covering loan defaults "
-    cumulativeStakeDefault: BigInt!
-
-    " Amount of stake tokens the pool lost to covering loan defaults in pool inpit equivilent "
-    cumulativeStakeDefaultInPoolInputTokens: BigInt!
-
-    " Revenue of the stake locker in pool input tokens  "
-    revenueInPoolInputTokens: BigInt!
-
-    " Revenue of the stake locker in USD "
-    revenueUSD: BigDecimal!
-
-    " Block the stake locker was created "
-    creationBlock: BigInt!
 
     " Block the stake locker was last updated "
     lastUpdatedBlockNumber: BigInt!
@@ -1351,11 +1354,20 @@ type _Loan @entity {
     " Market the loan is borrowing from "
     market: Market!
 
+    " Version of the loan "
+    version: LoanVersion!
+
+    " Interst rate for the loan "
+    interestRate: InterestRate!
+
+    " Block number this loan was originally funded "
+    creationBlockNumber: BigInt!
+
     " Amount the loan was funded for in market input tokens "
     amountFunded: BigInt!
 
-    " Number of days this loan was taken out for "
-    termDays: BigInt!
+    " Number of times the loan was refinanced (V2 and V3 only) "
+    refinanceCount: BigInt!
 
     " Interest rate in apr of the loan "
     interestRate: BigDecimal!
@@ -1369,17 +1381,8 @@ type _Loan @entity {
     " Amout of interest paid on the loan in market input tokens "
     interestPaid: BigInt!
 
-    " Amout of collatoral recovered from a liquidation in market input tokens "
-    collateralLiquidatedInPoolInputTokens: BigInt!
-
     " Amount of default remaining after liquidations that the stake and pool must cover in market input tokens "
     defaultSuffered: BigInt!
-
-    " Block number this loan was originally funded "
-    creationBlockNumber: BigInt!
-
-    " Version of the loan "
-    version: LoanVersion!
 }
 
 type _MplReward @entity {

@@ -14,11 +14,11 @@ import {
     _Unstake
 } from "../../../../generated/schema";
 
-import { PROTOCOL_ID, TransactionType, ZERO_BD } from "../../constants";
+import { PROTOCOL_ID, StakeType, TransactionType, ZERO_BD } from "../../constants";
 import { getTokenAmountInUSD } from "../../prices/prices";
 import { bigDecimalToBigInt, minBigInt } from "../../utils";
 import { updateUsageMetrics } from "../update/snapshots";
-import { getOrCreateAccountMarket, getOrCreateMarket } from "./markets";
+import { getOrCreateAccountMarket, getOrCreateMarket, getOrCreateStakeLocker } from "./markets";
 import { getOrCreateToken } from "./supporting";
 
 /**
@@ -161,6 +161,10 @@ export function createBorrow(event: ethereum.Event, loan: _Loan, amount: BigInt)
 
     borrow.save();
 
+    // Update loan
+    loan.amountFunded = loan.amountFunded.plus(borrow.amount);
+    loan.save();
+
     updateUsageMetrics(event, accountAddress, TransactionType.BORROW);
 
     return borrow;
@@ -207,6 +211,10 @@ export function createRepay(
 
     repay.save();
 
+    // Update loan
+    loan.interestPaid = repay._interestPaid;
+    loan.save();
+
     updateUsageMetrics(event, accountAddress, TransactionType.REPAY);
 
     return repay;
@@ -251,6 +259,10 @@ export function createLiquidate(
 
     liquidate.save();
 
+    // Update loan
+    loan.defaultSuffered = loan.defaultSuffered.plus(liquidate.amount);
+    loan.save();
+
     updateUsageMetrics(event, accountAddress, TransactionType.LIQUIDATE);
 
     return liquidate;
@@ -292,6 +304,13 @@ export function createStake(
 
     stake.save();
 
+    // Update stake locker
+    if (StakeType.STAKE_LOCKER == type) {
+        const stakeLocker = getOrCreateStakeLocker(event, event.address);
+        stakeLocker.cumulativeStake = stakeLocker.cumulativeStake.plus(stake.amount);
+        stakeLocker.save();
+    }
+
     updateUsageMetrics(event, accountAddress, TransactionType.STAKE);
 
     return stake;
@@ -332,6 +351,13 @@ export function createUnstake(
     unstake.stakeType = type;
 
     unstake.save();
+
+    // Update stake locker
+    if (StakeType.STAKE_LOCKER == type) {
+        const stakeLocker = getOrCreateStakeLocker(event, event.address);
+        stakeLocker.cumulativeUnstake = stakeLocker.cumulativeUnstake.plus(unstake.amount);
+        stakeLocker.save();
+    }
 
     updateUsageMetrics(event, accountAddress, TransactionType.UNSTAKE);
 

@@ -1,6 +1,6 @@
 import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 
-import { Market, _AccountMarket, _Loan, _MplReward, _StakeLocker } from "../../../../generated/schema";
+import { InterestRate, Market, _AccountMarket, _Loan, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { LoanV2OrV3 as LoanV2OrV3Contract } from "../../../../generated/templates/LoanV2OrV3/LoanV2OrV3";
 import { LoanV1 as LoanV1Contract } from "../../../../generated/templates/LoanV1/LoanV1";
 import { Pool as PoolContract } from "../../../../generated/templates/Pool/Pool";
@@ -12,6 +12,8 @@ import {
     MPL_REWARDS_DEFAULT_DURATION_TIME_S,
     POOL_WAD_DECIMALS,
     PROTOCOL_ID,
+    PROTOCOL_INTEREST_RATE_SIDE,
+    PROTOCOL_INTEREST_RATE_TYPE,
     SEC_PER_DAY,
     TEN_BD,
     ZERO_ADDRESS,
@@ -154,20 +156,63 @@ export function getOrCreateStakeLocker(event: ethereum.Event, stakeLockerAddress
 
         stakeLocker.market = marketAddress.toHexString();
         stakeLocker.stakeToken = stakeTokenAddress.toHexString();
+        stakeLocker.creationBlockNumber = event.block.number;
+
+        stakeLocker.cumulativeStake = ZERO_BI;
+        stakeLocker.cumulativeUnstake = ZERO_BI;
+        stakeLocker.cumulativeLosses = ZERO_BI;
+        stakeLocker.cumulativeLossesInPoolInputToken = ZERO_BI;
+        stakeLocker.cumulativeInterestInPoolInputTokens = ZERO_BI;
+
         stakeLocker.stakeTokenBalance = ZERO_BI;
-        stakeLocker.stakeTokenBalanceInPoolInputTokens = ZERO_BI;
-        stakeLocker.stakeTokenPriceUSD = ZERO_BD;
-        stakeLocker.cumulativeStakeDefault = ZERO_BI;
-        stakeLocker.cumulativeStakeDefaultInPoolInputTokens = ZERO_BI;
-        stakeLocker.revenueInPoolInputTokens = ZERO_BI;
-        stakeLocker.revenueUSD = ZERO_BD;
-        stakeLocker.creationBlock = event.block.number;
+        stakeLocker.stakeTokenBalance = ZERO_BI;
         stakeLocker.lastUpdatedBlockNumber = event.block.number;
 
         stakeLocker.save();
     }
 
     return stakeLocker;
+}
+
+/**
+ * Create an interest rate, this also adds it to the market that the loan belongs to.
+ * @param loan loan this interest rate if for
+ * @param rate rate in percentage APY (i.e 5.31% should be stored as 5.31)
+ * @param durationDays number of days for the loan
+ */
+export function getOrCreateInterestRate(
+    event: ethereum.Event,
+    loan: _Loan,
+    rate: BigDecimal = ZERO_BD,
+    durationDays: BigInt = ZERO_BI
+): InterestRate {
+    const id = PROTOCOL_INTEREST_RATE_SIDE + "-" + PROTOCOL_INTEREST_RATE_TYPE + "-" + loan.id;
+    let interestRate = InterestRate.load(id);
+
+    if (!interestRate) {
+        interestRate = new InterestRate(id);
+
+        const market = getOrCreateMarket(event, Address.fromString(loan.market));
+
+        interestRate.rate = rate;
+        interestRate.duration = durationDays.toI32();
+        interestRate.maturityBlock = null; // Doesn't apply here
+        interestRate.side = PROTOCOL_INTEREST_RATE_SIDE;
+        interestRate.type = PROTOCOL_INTEREST_RATE_TYPE;
+        interestRate._loan = loan.id;
+        interestRate._market = market.id;
+
+        interestRate.save();
+
+        if (ZERO_BD == rate || ZERO_BI == durationDays) {
+            log.error("Created interest rate with invalid params: rate={}, durationDays={}", [
+                rate.toString(),
+                durationDays.toString()
+            ]);
+        }
+    }
+
+    return interestRate;
 }
 
 /**
@@ -201,7 +246,9 @@ export function getOrCreateLoan(
             loan.version = LoanVersion.V1;
             loan.termDays = tryTermDays.value;
             const rateFromContract = readCallResult(loanV1Contract.try_apr(), ZERO_BI, loanV1Contract.try_apr.name);
-            loan.interestRate = rateFromContract.toBigDecimal().div(BigDecimal.fromString("100"));
+            const rate = rateFromContract.toBigDecimal().div(BigDecimal.fromString("100"));
+            const interestRate = getOrCreateInterestRate(event, loan, rate, loan.termDays);
+            loan.interestRate = interestRate.id;
         } else {
             // V2 or V3
             loan.version = LoanVersion.V2_OR_V3;
@@ -233,23 +280,24 @@ export function getOrCreateLoan(
                 loanV2OrV3Contract.try_interestRate.name
             );
 
-            loan.interestRate = parseUnits(rateFromContract, 18);
+            const rate = parseUnits(rateFromContract, 18);
+            const interestRate = getOrCreateInterestRate(event, loan, rate, loan.termDays);
+            loan.interestRate = interestRate.id;
         }
 
         loan.market = marketAddress.toHexString();
+        loan.creationBlockNumber = event.block.number;
         loan.amountFunded = amountFunded;
-
+        loan.refinanceCount = ZERO_BI;
         loan.drawnDown = ZERO_BI;
         loan.principalPaid = ZERO_BI;
         loan.interestPaid = ZERO_BI;
-        loan.collateralLiquidatedInPoolInputTokens = ZERO_BI;
         loan.defaultSuffered = ZERO_BI;
-        loan.creationBlockNumber = event.block.number;
 
         loan.save();
 
         if (ZERO_ADDRESS == marketAddress || ZERO_BI == amountFunded) {
-            log.error("Created loan with invalid params: marketAddress={}, amountFunded={}", [
+            log.error("Created loan with invalid params: marketAddress={}, amountFunded={}, interestRate={}", [
                 marketAddress.toHexString(),
                 amountFunded.toString()
             ]);
