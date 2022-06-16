@@ -1,6 +1,6 @@
 import { PoolCreated as PoolCreatedEvent } from "../../generated/templates/PoolFactory/PoolFactory";
 import { Pool as PoolTemplate, StakeLocker as StakeLockerTemplate } from "../../generated/templates";
-import { getOrCreatePoolFactory } from "../common/mappingHelpers/getOrCreate/spawners";
+import { getOrCreatePoolFactory } from "../common/mappingHelpers/getOrCreate/protocol";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 

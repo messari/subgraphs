@@ -983,6 +983,9 @@ type Withdraw implements Event @entity {
 
     " Amount of MPL LP tokens burned "
     _amountMPT: BigInt!
+
+    " Unrecognized losses for the acount that are getting recognized on the withdraw "
+    _losses: BigInt!
 }
 
 # For CDPs, use this for mint events
@@ -1024,6 +1027,11 @@ type Borrow implements Event @entity {
 
     " Amount of token borrowed in USD "
     amountUSD: BigDecimal
+
+    ##### Internal parameters #####
+
+    " Loan the borrow is happening from "
+    _loan: _Loan!
 }
 
 # For CDPs, use this for burn events
@@ -1068,14 +1076,17 @@ type Repay implements Event @entity {
 
     ##### Internal parameters #####
 
+    " Loan the repay is happening to "
+    _loan: _Loan!
+
     " Amount of principal paid in pool input tokens "
     _principalPaid: BigInt!
 
     " Amount of interest paid in pool input tokens "
     _interestPaid: BigInt!
 
-    " If the repayment was late "
-    _late: Boolean!
+    " Amount of treasury fee paid in pool input tokens "
+    _treasuryFeePaid: BigInt!
 }
 
 type Liquidate implements Event @entity {
@@ -1122,14 +1133,11 @@ type Liquidate implements Event @entity {
 
     ##### Internal parameters #####
 
-    " Amount of pool input tokens recovered from collatoral "
-    _amountRecoveredFromCollatoral: BigInt!
+    " Amount of default suffered by the stake locker in pool input tokens "
+    _defaultSufferedByStakeLocker: BigInt!
 
-    " Amount of pool input tokens tokens the pool and stake suffered "
-    _defaultSufferedToPoolAndStake: BigInt!
-
-    " Amount of pool input tokens returned to the borrower "
-    _amountReturnedToBorrower: BigInt!
+    " Amount of default suffered by the pool in pool input tokens "
+    _defaultSufferedByPool: BigInt!
 }
 
 # An account is a unique Ethereum address
@@ -1404,4 +1412,22 @@ type _MplReward @entity {
 
     " Block the mpl rewards was last updated "
     lastUpdatedBlockNumber: BigInt!
+}
+
+# Helper entity for corresponding accounts to markets to accumulate losses
+type _AccountMarket @entity {
+    " { Address of the account }-{ Address of the market } "
+    id: ID!
+
+    " Market the account is connected to "
+    market: Market!
+
+    " Unrecognized losses in the markets input token "
+    unrecognizedLosses: BigInt!
+
+    " Recognized losses in the markets input token "
+    recognizedLosses: BigInt!
+
+    " Block the account market was created "
+    creationBlockNumber: BigInt!
 }

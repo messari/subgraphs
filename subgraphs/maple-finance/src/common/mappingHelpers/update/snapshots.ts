@@ -11,7 +11,7 @@ import {
     getOrCreateUsageDailyMetric,
     getOrCreateUsageHourlyMetric
 } from "../getOrCreate/snapshots";
-import { getOrCreateProtocol } from "../getOrCreate/spawners";
+import { getOrCreateProtocol } from "../getOrCreate/protocol";
 
 /**
  * Update financial metrics, this should be called anytime protocol financials are updated.
