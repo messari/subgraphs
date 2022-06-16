@@ -44,19 +44,30 @@ import { ERC20 } from "../../generated/Comptroller/ERC20";
 import { CToken } from "../generated/Comptroller/CToken";
 import { PriceOracle } from "../generated/Comptroller/PriceOracle";
 import { Comptroller } from "../generated/Comptroller/Comptroller";
-import { CToken as CTokenTemplate, Reward as RewardTemplate } from "../generated/templates";
+import {
+  CToken as CTokenTemplate,
+  Reward as RewardTemplate,
+} from "../generated/templates";
 import {
   getNetworkSpecificConstant,
-  iETH_ADDRESS,
   ZERO_ADDRESS,
   prefixID,
   BigDecimalTruncateToBigInt,
   anyTrue,
   PRICE_BASE,
   DISTRIBUTIONFACTOR_BASE,
+  DF_ADDRESS,
+  MKR_ADDRESS,
 } from "./constants";
-import { RewardDistributor, RewardDistributed, NewRewardToken } from "../generated/templates/Reward/RewardDistributor";
-import { stablecoin, Transfer as StablecoinTransfer } from "../generated/USX/stablecoin";
+import {
+  RewardDistributor,
+  RewardDistributed,
+  NewRewardToken,
+} from "../generated/templates/Reward/RewardDistributor";
+import {
+  stablecoin,
+  Transfer as StablecoinTransfer,
+} from "../generated/USX/stablecoin";
 import {
   NewPriceOracle,
   MarketAdded,
@@ -102,7 +113,10 @@ export function handleMarketAdded(event: MarketAdded): void {
   // this is a new cToken, a new underlying token, and a new market
   let protocol = getOrCreateProtocol();
   let cTokenContract = CToken.bind(event.params.iToken);
-  let cTokenReserveFactorMantissa = getOrElse<BigInt>(cTokenContract.try_reserveRatio(), BIGINT_ZERO);
+  let cTokenReserveFactorMantissa = getOrElse<BigInt>(
+    cTokenContract.try_reserveRatio(),
+    BIGINT_ZERO
+  );
 
   // set defaults
   let underlyingTokenAddr = Address.fromString(ZERO_ADDRESS);
@@ -112,32 +126,59 @@ export function handleMarketAdded(event: MarketAdded): void {
   let underlyingTokenAddrResult = cTokenContract.try_underlying();
   if (!underlyingTokenAddrResult.reverted) {
     underlyingTokenAddr = underlyingTokenAddrResult.value;
-    let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
-    underlyingName = getOrElse<string>(underlyingTokenContract.try_name(), "unknown");
-    underlyingSymbol = getOrElse<string>(underlyingTokenContract.try_symbol(), "unknown");
-    underlyingDecimals = getOrElse<i32>(underlyingTokenContract.try_decimals(), 18);
-  } else if (cTokenAddr.toHexString() == iETH_ADDRESS) {
-    underlyingName = "Ether";
-    underlyingSymbol = "ETH";
-    //underlyingDecimals = 18;
+    if (underlyingTokenAddr.toHexString() == MKR_ADDRESS) {
+      underlyingName = "Maker";
+      underlyingSymbol = "MKR";
+      underlyingDecimals = 18;
+    } else if (underlyingTokenAddr.toHexString() == DF_ADDRESS) {
+      underlyingName = "dForce";
+      underlyingSymbol = "DF";
+      underlyingDecimals = 18;
+    } else if (underlyingTokenAddr.toHexString() == ZERO_ADDRESS) {
+      underlyingName = "Ether";
+      underlyingSymbol = "ETH";
+      underlyingDecimals = 18;
+    } else {
+      let underlyingTokenContract = ERC20.bind(underlyingTokenAddr);
+      underlyingName = getOrElse<string>(
+        underlyingTokenContract.try_name(),
+        "unknown"
+      );
+      underlyingSymbol = getOrElse<string>(
+        underlyingTokenContract.try_symbol(),
+        "unknown"
+      );
+      underlyingDecimals = getOrElse<i32>(
+        underlyingTokenContract.try_decimals(),
+        18
+      );
+    }
   } else {
-    log.error("[handleMarketAdded] could not fetch underlying token of cToken: {}", [cTokenAddr.toHexString()]);
+    log.error(
+      "[handleMarketAdded] could not fetch underlying token of cToken: {}",
+      [cTokenAddr.toHexString()]
+    );
     return;
   }
 
   _handleMarketListed(
     new MarketListedData(
       protocol,
-      new TokenData(underlyingTokenAddr, underlyingName, underlyingSymbol, underlyingDecimals),
+      new TokenData(
+        underlyingTokenAddr,
+        underlyingName,
+        underlyingSymbol,
+        underlyingDecimals
+      ),
       new TokenData(
         cTokenAddr,
         getOrElse<string>(cTokenContract.try_name(), "unknown"),
         getOrElse<string>(cTokenContract.try_symbol(), "unknown"),
-        cTokenDecimals,
+        cTokenDecimals
       ),
-      cTokenReserveFactorMantissa,
+      cTokenReserveFactorMantissa
     ),
-    event,
+    event
   );
 }
 
@@ -147,9 +188,12 @@ export function handleNewCollateralFactor(event: NewCollateralFactor): void {
   _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
 
-export function handleNewLiquidationIncentive(event: NewLiquidationIncentive): void {
+export function handleNewLiquidationIncentive(
+  event: NewLiquidationIncentive
+): void {
   let protocol = getOrCreateProtocol();
-  let newLiquidationIncentiveMantissa = event.params.newLiquidationIncentiveMantissa;
+  let newLiquidationIncentiveMantissa =
+    event.params.newLiquidationIncentiveMantissa;
   _handleNewLiquidationIncentive(protocol, newLiquidationIncentiveMantissa);
 }
 
@@ -166,7 +210,11 @@ export function handleMintPaused(event: MintPaused): void {
 
   _marketStatus.mintPaused = event.params.paused;
   // isActive = false if any one of mint/redeem/transfer is paused
-  market.isActive = !anyTrue([_marketStatus.mintPaused, _marketStatus.redeemPaused, _marketStatus.transferPaused]);
+  market.isActive = !anyTrue([
+    _marketStatus.mintPaused,
+    _marketStatus.redeemPaused,
+    _marketStatus.transferPaused,
+  ]);
 
   market.save();
   _marketStatus.save();
@@ -185,7 +233,11 @@ export function handleRedeemPaused(event: RedeemPaused): void {
 
   _marketStatus.redeemPaused = event.params.paused;
   // isActive = false if any one of mint/redeem/transfer is paused
-  market.isActive = !anyTrue([_marketStatus.mintPaused, _marketStatus.redeemPaused, _marketStatus.transferPaused]);
+  market.isActive = !anyTrue([
+    _marketStatus.mintPaused,
+    _marketStatus.redeemPaused,
+    _marketStatus.transferPaused,
+  ]);
 
   market.save();
   _marketStatus.save();
@@ -207,7 +259,11 @@ export function handleTransferPaused(event: TransferPaused): void {
     let _marketStatus = getOrCreateMarketStatus(marketID);
     _marketStatus.transferPaused = event.params.paused;
     // isActive = false if any one of mint/redeem/transfer is paused
-    market.isActive = !anyTrue([_marketStatus.mintPaused, _marketStatus.redeemPaused, _marketStatus.transferPaused]);
+    market.isActive = !anyTrue([
+      _marketStatus.mintPaused,
+      _marketStatus.redeemPaused,
+      _marketStatus.transferPaused,
+    ]);
 
     market.save();
     _marketStatus.save();
@@ -261,25 +317,42 @@ export function handleLiquidateBorrow(event: LiquidateBorrow): void {
   let liquidator = event.params.liquidator;
   let seizeTokens = event.params.seizeTokens;
   let repayAmount = event.params.repayAmount;
-  _handleLiquidateBorrow(comptrollerAddr, cTokenCollateral, liquidator, seizeTokens, repayAmount, event);
+  _handleLiquidateBorrow(
+    comptrollerAddr,
+    cTokenCollateral,
+    liquidator,
+    seizeTokens,
+    repayAmount,
+    event
+  );
 }
 
 export function handleUpdateInterest(event: AccrueInterest): void {
   let marketAddress = event.address;
   let cTokenContract = CToken.bind(marketAddress);
   let protocol = getOrCreateProtocol();
-  let oracleContract = PriceOracle.bind(Address.fromString(protocol._priceOracle));
+  let oracleContract = PriceOracle.bind(
+    Address.fromString(protocol._priceOracle)
+  );
   let updateMarketData = new UpdateMarketData(
     cTokenContract.try_totalSupply(),
     cTokenContract.try_exchangeRateStored(),
     cTokenContract.try_supplyRatePerBlock(),
     cTokenContract.try_borrowRatePerBlock(),
     oracleContract.try_getUnderlyingPrice(marketAddress),
-    unitPerYear,
+    unitPerYear
   );
-  let accrueInterestData = new AccrueInterestData(event.params.interestAccumulated, event.params.totalBorrows);
+  let accrueInterestData = new AccrueInterestData(
+    event.params.interestAccumulated,
+    event.params.totalBorrows
+  );
 
-  _handleAccrueInterest(updateMarketData, comptrollerAddr, accrueInterestData, event);
+  _handleAccrueInterest(
+    updateMarketData,
+    comptrollerAddr,
+    accrueInterestData,
+    event
+  );
 }
 
 export function handleNewRewardDistributor(event: NewRewardDistributor): void {
@@ -287,18 +360,22 @@ export function handleNewRewardDistributor(event: NewRewardDistributor): void {
   RewardTemplate.create(event.params._newRewardDistributor);
 }
 
-export function handleNewRewardToken(event: NewRewardToken): void {
-  // Add new reward token to the rewardToken entity
-  let tokenAddr = event.params.newRewardToken.toHexString();
-
+function _getOrCreateRewardTokens(tokenAddr: string): string[] {
   // add reward token to Token if not already there
   let token = Token.load(tokenAddr);
   if (token == null) {
     token = new Token(tokenAddr);
-    let tokenContract = ERC20.bind(Address.fromString(tokenAddr));
-    token.name = getOrElse<string>(tokenContract.try_name(), "unknown");
-    token.symbol = getOrElse<string>(tokenContract.try_symbol(), "unknown");
-    token.decimals = getOrElse<i32>(tokenContract.try_decimals(), 18);
+    // speciall handle for DF token since its name and symbol is byte32
+    if (tokenAddr == DF_ADDRESS) {
+      token.name = "dForce";
+      token.symbol = "DF";
+      token.decimals = 18;
+    } else {
+      let tokenContract = ERC20.bind(Address.fromString(tokenAddr));
+      token.name = getOrElse<string>(tokenContract.try_name(), "unknown");
+      token.symbol = getOrElse<string>(tokenContract.try_symbol(), "unknown");
+      token.decimals = getOrElse<i32>(tokenContract.try_decimals(), 18);
+    }
     token.save();
   }
 
@@ -320,6 +397,15 @@ export function handleNewRewardToken(event: NewRewardToken): void {
     depositRewardToken.save();
   }
 
+  return [borrowRewardTokenId, depositRewardTokenId];
+}
+
+export function handleNewRewardToken(event: NewRewardToken): void {
+  // Add new reward token to the rewardToken entity
+  let tokenAddr = event.params.newRewardToken.toHexString();
+
+  let rewardTokenIds = _getOrCreateRewardTokens(tokenAddr);
+
   let protocol = getOrCreateProtocol();
   let markets = protocol._marketIDs;
   for (let i = 0; i < markets.length; i++) {
@@ -329,7 +415,7 @@ export function handleNewRewardToken(event: NewRewardToken): void {
       log.warning("[handleNewReserveFactor] Market not found: {}", [marketID]);
       return;
     }
-    market.rewardTokens = [borrowRewardTokenId, depositRewardTokenId];
+    market.rewardTokens = [rewardTokenIds[0], rewardTokenIds[1]];
     market.save();
   }
 }
@@ -342,35 +428,53 @@ export function handleRewardDistributed(event: RewardDistributed): void {
   // function _updateDistributionState in RewardDistributor.sol
   // It'd be more efficient to handle the DistributionSpeedsUpdated event
   // instead, but it was never emitted for some reason
-  let marketID = event.params.iToken.toHexString();
-
-  let protocol = getOrCreateProtocol();
   let distributorContract = RewardDistributor.bind(event.address);
-  let rewardToken = distributorContract.rewardToken();
-  let token = Token.load(rewardToken.toHexString());
-  if (token == null) {
-    log.warning("[handleRewardDistributed] Token not found: {}", [marketID]);
-    return;
-  }
-  let decimals = token.decimals;
-  let rewardTokenPrice = token.lastPriceUSD;
-  if (!rewardTokenPrice) {
-    let oracleContract = PriceOracle.bind(Address.fromString(protocol._priceOracle));
-    rewardTokenPrice = oracleContract.getAssetPrice(rewardToken).toBigDecimal().div(exponentToBigDecimal(PRICE_BASE));
-  }
 
+  let marketID = event.params.iToken.toHexString();
   let market = Market.load(marketID);
   if (market == null) {
     log.warning("[handleRewardDistributed] Market not found: {}", [marketID]);
     return;
   }
 
+  let rewardTokens = market.rewardTokens;
+  if (rewardTokens == null || rewardTokens.length == 0) {
+    let rewardTokenAddr = distributorContract.rewardToken().toHexString();
+    market.rewardTokens = _getOrCreateRewardTokens(rewardTokenAddr);
+    market.save();
+  }
+
+  let rewardTokenId = RewardToken.load(market.rewardTokens![0])!.token;
+  let rewardToken = Token.load(rewardTokenId);
+  if (rewardToken == null) {
+    log.warning("[handleRewardDistributed] Token not found: {}", [
+      rewardTokenId,
+    ]);
+    return;
+  }
+  let decimals = rewardToken.decimals;
+  let rewardTokenPrice = rewardToken.lastPriceUSD;
+  if (!rewardTokenPrice) {
+    let protocol = getOrCreateProtocol();
+    let oracleContract = PriceOracle.bind(
+      Address.fromString(protocol._priceOracle)
+    );
+    rewardTokenPrice = oracleContract
+      .getAssetPrice(Address.fromString(rewardTokenId))
+      .toBigDecimal()
+      .div(exponentToBigDecimal(PRICE_BASE));
+  }
+
   let rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
   rewardTokenEmissionsAmount =
-    rewardTokenEmissionsAmount != null ? rewardTokenEmissionsAmount : [BIGINT_ZERO, BIGINT_ZERO];
+    rewardTokenEmissionsAmount != null
+      ? rewardTokenEmissionsAmount
+      : [BIGINT_ZERO, BIGINT_ZERO];
   let rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
   rewardTokenEmissionsUSD =
-    rewardTokenEmissionsUSD != null ? rewardTokenEmissionsUSD : [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
+    rewardTokenEmissionsUSD != null
+      ? rewardTokenEmissionsUSD
+      : [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
 
   let marketAddr = Address.fromString(marketID);
   let distributionFactor = distributorContract
@@ -379,8 +483,14 @@ export function handleRewardDistributed(event: RewardDistributed): void {
     .div(exponentToBigDecimal(DISTRIBUTIONFACTOR_BASE));
 
   // rewards is only affected by speed and deltaBlocks
-  let emissionSpeedBorrow = getOrElse<BigInt>(distributorContract.try_distributionSpeed(marketAddr), BIGINT_ZERO);
-  let emissionSpeedSupply = getOrElse<BigInt>(distributorContract.try_distributionSupplySpeed(marketAddr), BIGINT_ZERO);
+  let emissionSpeedBorrow = getOrElse<BigInt>(
+    distributorContract.try_distributionSpeed(marketAddr),
+    BIGINT_ZERO
+  );
+  let emissionSpeedSupply = getOrElse<BigInt>(
+    distributorContract.try_distributionSupplySpeed(marketAddr),
+    BIGINT_ZERO
+  );
 
   let emissionBorrow = emissionSpeedBorrow.toBigDecimal().times(unitPerDay);
   rewardTokenEmissionsAmount[0] = BigDecimalTruncateToBigInt(emissionBorrow);
@@ -406,9 +516,15 @@ export function handleRewardDistributed(event: RewardDistributed): void {
 //    - protocl.mintedTokensSupplies
 //    - FinancialsDailySnapshot.mintedTokensSupplies
 export function handleStablecoinTransfer(event: StablecoinTransfer): void {
-  if (event.params.from.toHexString() != ZERO_ADDRESS && event.params.to.toHexString() != ZERO_ADDRESS) {
+  if (
+    event.params.from.toHexString() != ZERO_ADDRESS &&
+    event.params.to.toHexString() != ZERO_ADDRESS
+  ) {
     // supply won't change for non-minting/burning transfers
-    log.info("[handleStablecoinTransfer] Not a minting or burning event, skipping", []);
+    log.info(
+      "[handleStablecoinTransfer] Not a minting or burning event, skipping",
+      []
+    );
     return;
   }
 
@@ -431,7 +547,9 @@ export function handleStablecoinTransfer(event: StablecoinTransfer): void {
       if (tokenId < protocol.mintedTokens![0]) {
         // insert as the first token into mintedTokens
         protocol.mintedTokens = [tokenId].concat(protocol.mintedTokens!);
-        protocol.mintedTokenSupplies = [supply].concat(protocol.mintedTokenSupplies!);
+        protocol.mintedTokenSupplies = [supply].concat(
+          protocol.mintedTokenSupplies!
+        );
       } else {
         // insert as the last token into mintedTokens
         protocol.mintedTokens!.push(tokenId);
@@ -466,7 +584,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "1.0.0",
     network,
     comptroller.try_liquidationIncentiveMantissa(),
-    comptroller.try_priceOracle(),
+    comptroller.try_priceOracle()
   );
   return _getOrCreateProtocol(protocolData);
 }
