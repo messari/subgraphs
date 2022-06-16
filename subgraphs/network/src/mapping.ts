@@ -1,4 +1,13 @@
-import { ethereum, arweave, cosmos, near, log } from "@graphprotocol/graph-ts";
+import {
+  ethereum,
+  arweave,
+  cosmos,
+  near,
+  log,
+  Bytes,
+  BigInt,
+  BigDecimal,
+} from "@graphprotocol/graph-ts";
 import { Author } from "../generated/schema";
 import { BIGINT_ZERO, INT_ZERO, NETWORK_NAME } from "./constants";
 import {
@@ -12,7 +21,93 @@ import {
 //// Classes ////
 /////////////////
 
-// TODO add classes for passing into helper functions
+export class BlockData {
+  height: BigInt;
+  hash: Bytes;
+  timestamp: BigInt;
+  author: Bytes;
+  size: BigInt | null;
+  baseFeePerGas: BigInt | null;
+  difficulty: BigInt;
+  gasLimit: BigInt;
+  gasUsed: BigInt;
+  gasPrice: BigInt | null;
+  parentHash: Bytes;
+  burntFees: BigInt | null;
+  chunkCount: BigInt | null;
+  transactionCount: BigInt | null;
+  rewards: BigInt | null;
+  constructor(
+    height: BigInt,
+    hash: Bytes,
+    timestamp: BigInt,
+    author: Bytes,
+    difficulty: BigInt,
+    gasLimit: BigInt,
+    gasUsed: BigInt,
+    parentHash: Bytes,
+    size: BigInt | null,
+    gasPrice: BigInt | null,
+    baseFeePerGas: BigInt | null,
+    burntFees: BigInt | null,
+    chunkCount: BigInt | null,
+    transactionCount: BigInt | null,
+    rewards: BigInt | null
+  ) {
+    this.height = height;
+    this.hash = hash;
+    this.timestamp = timestamp;
+    this.author = author;
+    this.size = size;
+    this.baseFeePerGas = baseFeePerGas;
+    this.difficulty = difficulty;
+    this.gasLimit = gasLimit;
+    this.gasUsed = gasUsed;
+    this.gasPrice = gasPrice;
+    this.parentHash = parentHash;
+    this.burntFees = burntFees;
+    this.chunkCount = chunkCount;
+    this.transactionCount = transactionCount;
+    this.rewards = rewards;
+  }
+}
+
+export class UpdateNetworkData {
+  height: BigInt;
+  timestamp: BigInt;
+  newDifficulty: BigInt;
+  newGasUsed: BigInt;
+  gasLimit: BigInt;
+  newBurntFees: BigInt | null;
+  newRewards: BigInt | null;
+  newTransactions: BigInt | null;
+  newSize: BigInt | null;
+  totalSupply: BigInt | null;
+
+  constructor(
+    height: BigInt,
+    timestamp: BigInt,
+    newDifficulty: BigInt,
+    newGasUsed: BigInt,
+    gasLimit: BigInt,
+    newBurntFees: BigInt | null,
+    newRewards: BigInt | null,
+    newTransactions: BigInt | null,
+    newSize: BigInt | null,
+    totalSupply: BigInt | null
+  ) {
+    this.height = height;
+    this.timestamp = timestamp;
+    this.newDifficulty = newDifficulty;
+    this.newGasUsed = newGasUsed;
+    this.gasLimit = gasLimit;
+    this.newBurntFees = newBurntFees;
+    this.newRewards = newRewards;
+    this.newTransactions = newTransactions;
+    this.newSize = newSize;
+    this.totalSupply = totalSupply;
+  }
+}
 
 ////////////////////////
 //// Block Handlers ////
@@ -22,22 +117,56 @@ export function handleArweaveBlock(block: arweave.Block): void {
   log.warning("handleArweaveBlock", []);
 }
 
-export function handleCosmosBlock(block: cosmos.Block): void {}
+export function handleCosmosBlock(block: cosmos.Block): void {
+  log.warning("handleCosmosBlock", []);
+}
 
 export function handleEvmBlock(block: ethereum.Block): void {
-  createBlock(block);
+  let burntFees = block.baseFeePerGas
+    ? block.baseFeePerGas.times(block.gasUsed)
+    : null;
+
+  let blockData = new BlockData(
+    block.number,
+    block.hash,
+    block.timestamp,
+    block.author,
+    block.difficulty,
+    block.gasLimit,
+    block.gasUsed,
+    block.parentHash,
+    block.size,
+    null,
+    block.baseFeePerGas,
+    burntFees,
+    null,
+    null,
+    null
+  );
+  createBlock(blockData);
 
   // update network entity
-  let network = updateNetwork(block);
+  let updateNetworkData = new UpdateNetworkData(
+    block.number,
+    block.timestamp,
+    block.difficulty,
+    block.gasUsed,
+    block.gasLimit,
+    burntFees,
+    null,
+    null,
+    block.size,
+    null
+  );
+  let network = updateNetwork(updateNetworkData);
 
   // update author entity
-  let authorId = block.author.toHexString();
+  let authorId = block.author;
   let author = Author.load(authorId);
   if (!author) {
     author = new Author(authorId);
     author.cumulativeBlocksCreated = INT_ZERO;
     author.cumulativeDifficulty = BIGINT_ZERO;
-    author.cumulativeRewards = BIGINT_ZERO;
     author.save();
 
     // update unique authors
@@ -51,7 +180,7 @@ export function handleEvmBlock(block: ethereum.Block): void {
   author.save();
 
   // create/update daily/hourly metrics
-  updateMetrics(block, network);
+  updateMetrics(blockData, network);
 }
 
 export function handleNearBlock(block: cosmos.Block): void {

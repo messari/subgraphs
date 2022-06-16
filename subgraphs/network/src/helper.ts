@@ -1,4 +1,4 @@
-import { BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
 import {
   ActiveAuthor,
   Block,
@@ -19,55 +19,72 @@ import {
   SECONDS_PER_HOUR,
   SUBGRAPH_VERSION,
 } from "./constants";
-import { getBlocksPerDay } from "./utils";
+import { BlockData, UpdateNetworkData } from "./mapping";
+import { exponentToBigDecimal, getBlocksPerDay } from "./utils";
 
 //////////////////
 //// Updaters ////
 //////////////////
 
-export function updateNetwork(block: ethereum.Block): Network {
+export function updateNetwork(networkData: UpdateNetworkData): Network {
   let network = getOrCreateNetwork(NETWORK_NAME);
-  network.blockHeight = block.number.toI32();
-  network.cumulativeDifficulty = block.totalDifficulty;
-  network.cumulativeGasUsed = network.cumulativeGasUsed.plus(block.gasUsed);
-  network.gasLimit = block.gasLimit;
-  if (block.baseFeePerGas) {
-    network.cumulativeBurntFees = network.cumulativeBurntFees.plus(
-      block.baseFeePerGas!.times(block.gasUsed)
-    );
-  }
-  network.blocksPerDay = getBlocksPerDay(block.timestamp, block.number);
-  network.save();
+  network.blockHeight = networkData.height.toI32();
+  network.cumulativeDifficulty = network.cumulativeDifficulty.plus(
+    networkData.newDifficulty
+  );
+  network.cumulativeGasUsed = network.cumulativeGasUsed.plus(
+    networkData.newGasUsed
+  );
+  network.gasLimit = networkData.gasLimit;
+  network.cumulativeBurntFees = networkData.newBurntFees
+    ? network.cumulativeBurntFees.plus(networkData.newBurntFees)
+    : network.cumulativeBurntFees;
+  network.cumulativeRewards = networkData.newRewards
+    ? network.cumulativeRewards.plus(networkData.newRewards)
+    : network.cumulativeRewards;
+  network.cumulativeTransactions = networkData.newTransactions
+    ? network.cumulativeTransactions.plus(networkData.newTransactions.toI32())
+    : network.cumulativeTransactions;
+  network.cumulativeSize = networkData.newSize
+    ? network.cumulativeSize.plus(networkData.newSize.toI32())
+    : network.cumulativeSize;
+  network.totalSupply = networkData.totalSupply
+    ? networkData.totalSupply
+    : network.totalSupply;
 
+  network.blocksPerDay = getBlocksPerDay(
+    networkData.height,
+    networkData.timestamp
+  );
+
+  network.save();
   return network;
 }
 
-export function updateMetrics(block: ethereum.Block, network: Network): void {
-  let dailySnapshot = getOrCreateDailySnapshot(block.timestamp);
-  let hourlySnapshot = getOrCreateHourlySnapshot(block.timestamp);
-
-  // update snapshots
-  updateDailySnapshot(dailySnapshot, block, network);
-  updateHourlySnapshot(hourlySnapshot, block, network);
+// update snapshots
+export function updateMetrics(blockData: BlockData, network: Network): void {
+  updateDailySnapshot(blockData, network);
+  updateHourlySnapshot(blockData, network);
 }
 
-function updateDailySnapshot(
-  snapshot: DailySnapshot,
-  block: ethereum.Block,
-  network: Network
-): void {
+function updateDailySnapshot(blockData: BlockData, network: Network): void {
+  let snapshot = getOrCreateDailySnapshot(blockData.timestamp);
+
   // update overlapping fields for snapshot
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   snapshot.blockHeight = network.blockHeight;
-  snapshot.timestamp = block.timestamp;
-  snapshot.blocksPerDay = network.blocksPerDay;
+  snapshot.timestamp = blockData.timestamp;
   snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
   snapshot.cumulativeRewards = network.cumulativeRewards;
 
   // check for new author
   let id =
-    IntervalType.DAILY + "-" + block.author.toHexString() + "-" + snapshot.id;
+    IntervalType.DAILY +
+    "-" +
+    blockData.author.toHexString() +
+    "-" +
+    snapshot.id;
   let activeAuthor = ActiveAuthor.load(id);
   if (!activeAuthor) {
     activeAuthor = new ActiveAuthor(id);
@@ -119,23 +136,24 @@ function updateDailySnapshot(
   snapshot.save();
 }
 
-function updateHourlySnapshot(
-  snapshot: HourlySnapshot,
-  block: ethereum.Block,
-  network: Network
-): void {
+function updateHourlySnapshot(blockData: BlockData, network: Network): void {
+  let snapshot = getOrCreateHourlySnapshot(blockData.timestamp);
+
   // update overlapping fields for snapshot
   snapshot.cumulativeUniqueAuthors = network.cumulativeUniqueAuthors;
   snapshot.blockHeight = network.blockHeight;
-  snapshot.timestamp = block.timestamp;
-  snapshot.blocksPerDay = network.blocksPerDay;
+  snapshot.timestamp = blockData.timestamp;
   snapshot.cumulativeDifficulty = network.cumulativeDifficulty;
   snapshot.cumulativeBurntFees = network.cumulativeBurntFees;
   snapshot.cumulativeRewards = network.cumulativeRewards;
 
   // check for new author
   let id =
-    IntervalType.HOURLY + "-" + block.author.toHexString() + "-" + snapshot.id;
+    IntervalType.HOURLY +
+    "-" +
+    blockData.author.toHexString() +
+    "-" +
+    snapshot.id;
   let activeAuthor = ActiveAuthor.load(id);
   if (!activeAuthor) {
     activeAuthor = new ActiveAuthor(id);
@@ -202,20 +220,28 @@ function getOrCreateDailySnapshot(timestamp: BigInt): DailySnapshot {
     dailySnapshot.blockHeight = INT_ZERO;
     dailySnapshot.timestamp = timestamp;
     dailySnapshot.dailyBlocks = INT_ZERO;
-    dailySnapshot.blocksPerDay = BIGDECIMAL_ZERO;
     dailySnapshot.cumulativeDifficulty = BIGINT_ZERO;
     dailySnapshot.dailyDifficulty = BIGINT_ZERO;
     dailySnapshot.dailyMeanDifficulty = BIGDECIMAL_ZERO;
     dailySnapshot.dailyCumulativeGasUsed = BIGINT_ZERO;
     dailySnapshot.dailyCumulativeGasLimit = BIGINT_ZERO;
+    dailySnapshot.dailyBlockUtilization = BIGDECIMAL_ZERO;
     dailySnapshot.dailyMeanGasUsed = BIGDECIMAL_ZERO;
     dailySnapshot.dailyMeanGasLimit = BIGDECIMAL_ZERO;
+    dailySnapshot.gasPrice = BIGDECIMAL_ZERO;
     dailySnapshot.cumulativeBurntFees = BIGINT_ZERO;
     dailySnapshot.dailyBurntFees = BIGINT_ZERO;
+    dailySnapshot.dailyRewards = BIGINT_ZERO;
+    dailySnapshot.cumulativeRewards = BIGINT_ZERO;
+    dailySnapshot.dailyMeanRewards = BIGDECIMAL_ZERO;
+    dailySnapshot.totalSupply = BIGINT_ZERO;
+    dailySnapshot.dailySupplyIncrease = BIGINT_ZERO;
     dailySnapshot.firstTimestamp = timestamp;
     dailySnapshot.dailyMeanBlockInterval = BIGDECIMAL_ZERO;
     dailySnapshot.dailyCumulativeSize = BIGINT_ZERO;
     dailySnapshot.dailyMeanBlockSize = BIGDECIMAL_ZERO;
+    dailySnapshot.dailyChunkCount = INT_ZERO;
+    dailySnapshot.dailyTransactionCount = INT_ZERO;
 
     dailySnapshot.save();
   }
@@ -233,51 +259,61 @@ function getOrCreateHourlySnapshot(timestamp: BigInt): HourlySnapshot {
     hourlySnapshot.blockHeight = INT_ZERO;
     hourlySnapshot.timestamp = timestamp;
     hourlySnapshot.hourlyBlocks = INT_ZERO;
-    hourlySnapshot.blocksPerDay = BIGDECIMAL_ZERO;
     hourlySnapshot.cumulativeDifficulty = BIGINT_ZERO;
     hourlySnapshot.hourlyDifficulty = BIGINT_ZERO;
     hourlySnapshot.hourlyMeanDifficulty = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyCumulativeGasUsed = BIGINT_ZERO;
     hourlySnapshot.hourlyCumulativeGasLimit = BIGINT_ZERO;
+    hourlySnapshot.hourlyBlockUtilization = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyMeanGasUsed = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyMeanGasLimit = BIGDECIMAL_ZERO;
+    hourlySnapshot.gasPrice = BIGDECIMAL_ZERO;
     hourlySnapshot.cumulativeBurntFees = BIGINT_ZERO;
     hourlySnapshot.hourlyBurntFees = BIGINT_ZERO;
+    hourlySnapshot.hourlyRewards = BIGINT_ZERO;
+    hourlySnapshot.cumulativeRewards = BIGINT_ZERO;
+    hourlySnapshot.hourlyMeanRewards = BIGDECIMAL_ZERO;
+    hourlySnapshot.totalSupply = BIGINT_ZERO;
+    hourlySnapshot.hourlySupplyIncrease = BIGINT_ZERO;
     hourlySnapshot.firstTimestamp = timestamp;
     hourlySnapshot.hourlyMeanBlockInterval = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyCumulativeSize = BIGINT_ZERO;
     hourlySnapshot.hourlyMeanBlockSize = BIGDECIMAL_ZERO;
+    hourlySnapshot.hourlyChunkCount = INT_ZERO;
+    hourlySnapshot.hourlyTransactionCount = INT_ZERO;
 
     hourlySnapshot.save();
   }
   return hourlySnapshot;
 }
 
-export function createBlock(block: ethereum.Block): void {
-  let blockEntity = new Block(block.number.toString());
+export function createBlock(blockData: BlockData): void {
+  let block = new Block(blockData.height.toString());
 
-  blockEntity.hash = block.hash.toHexString();
-  blockEntity.timestamp = block.timestamp;
-  blockEntity.author = block.author.toHexString();
-  blockEntity.size = block.size;
-  blockEntity.baseFeePerGas = block.baseFeePerGas;
-  blockEntity.difficulty = block.difficulty;
-  blockEntity.cumulativeDifficulty = block.totalDifficulty;
-  blockEntity.gasLimit = block.gasLimit;
-  blockEntity.gasUsed = block.gasUsed;
-  blockEntity.gasFilledPercentage = block.gasUsed
-    .toBigDecimal()
-    .div(block.gasLimit.toBigDecimal())
-    .times(exponentToBigDecimal(INT_TWO));
-  blockEntity.parentHash = block.parentHash.toHexString();
-  if (block.baseFeePerGas) {
-    blockEntity.burntFees = block.baseFeePerGas!.times(block.gasUsed);
+  block.hash = blockData.hash;
+  block.timestamp = blockData.timestamp;
+  block.author = blockData.author;
+  block.size = blockData.size;
+  block.baseFeePerGas = blockData.baseFeePerGas;
+  block.difficulty = blockData.difficulty;
+  block.gasLimit = blockData.gasLimit;
+  block.gasUsed = blockData.gasUsed;
+  block.parentHash = blockData.parentHash;
+  block.burntFees = blockData.burntFees;
+  block.chunkCount = blockData.chunkCount?.toI32();
+  block.transactionCount = blockData.transactionCount?.toI32();
+  block.rewards = blockData.rewards;
+
+  if (block.gasLimit && block.gasLimit != BIGINT_ZERO) {
+    block.blockUtilization = block.gasUsed
+      .toBigDecimal()
+      .div(block.gasLimit.toBigDecimal())
+      .times(exponentToBigDecimal(INT_TWO));
   } else {
-    blockEntity.burntFees = BIGINT_ZERO;
+    block.blockUtilization = BIGDECIMAL_ZERO;
   }
-  blockEntity.day = (block.timestamp.toI64() / SECONDS_PER_DAY).toString();
-  blockEntity.hour = (block.timestamp.toI64() / SECONDS_PER_HOUR).toString();
-  blockEntity.save();
+
+  block.save();
 }
 
 export function getOrCreateNetwork(id: string): Network {
@@ -293,6 +329,10 @@ export function getOrCreateNetwork(id: string): Network {
     network.cumulativeGasUsed = BIGINT_ZERO;
     network.gasLimit = BIGINT_ZERO;
     network.cumulativeBurntFees = BIGINT_ZERO;
+    network.cumulativeRewards = BIGINT_ZERO;
+    network.cumulativeTransactions = INT_ZERO;
+    network.cumulativeSize = BIGINT_ZERO;
+    network.totalSupply = BIGINT_ZERO;
     network.blocksPerDay = BIGDECIMAL_ZERO;
 
     network.save();
