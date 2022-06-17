@@ -109,6 +109,14 @@ enum InterestRateSide {
   BORROWER
 }
 
+enum PositionSide {
+  " Position opened as a lender "
+  LENDER
+
+  " Position opened as a borrower "
+  BORROWER
+}
+
 # Most markets only have a single interest rate given a specific type.
 # However, fixed term lending protocols can have multiple rates with
 # different duration/maturity per market. You can append a counter
@@ -742,6 +750,70 @@ type MarketHourlySnapshot @entity {
 
   " Per-block reward token emission as of the current block normalized to a day (not hour), in USD value. This should be ideally calculated as the theoretical rate instead of the realized amount. "
   rewardTokenEmissionsUSD: [BigDecimal!]
+}
+
+##############################
+##### Account-Level Data #####
+##############################
+
+type Account @entity {
+  " { Account address } "
+  id: ID!
+
+  " All positions belonging to an account "
+  positions: [Position!]! @derivedFrom(field: "account")
+}
+
+type Position @entity {
+  " { Account address }-{ Market address }-{ Counter } "
+  id: ID!
+
+  " Account that owns this position "
+  account: Account!
+
+  " The market in which this position was opened "
+  market: Market!
+
+  " The hash of the transaction that opened this position "
+  hash: String!
+
+  " Side of the position (either lender or borrower) "
+  side: PositionSide!
+
+  " Whether this position has been closed or not "
+  closed: Boolean!
+
+  " The token in the position "
+  token: Token!
+
+  " Token balance in this position, in native amounts "
+  balance: BigInt!
+  
+  " Block number of when the position was opened "
+  blockNumber: BigInt!
+
+  " Timestamp when the position was opened "
+  timestamp: BigInt!
+
+  " Position daily snapshots "
+  dailySnapshots: [PositionDailySnapshot!]! @derivedFrom(field: "position")
+}
+
+type PositionSnapshot @entity {
+  " { Position ID }-{ # of days since Unix epoch time } "
+  id: ID!
+  
+  " Block number of this snapshot "
+  blockNumber: BigInt!
+
+  " Timestamp of this snapshot "
+  timestamp: BigInt!
+
+  position: Position!
+  transaction: Transaction!
+  outputTokenBalance: BigInt!
+  inputTokenBalances: [String!]!    # TokenBalance string format
+  rewardTokenBalances: [String!]!   # TokenBalance string format
 }
 
 ##################################
