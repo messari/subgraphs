@@ -44,9 +44,9 @@ export function _NewVault(
     let rewardTokens = getRewardTokens(poolId, block, poolInfo.crvRewards);
     vault.rewardTokens = rewardTokens;
 
-    vault.rewardTokenEmissionsAmount = new Array<BigDecimal>(
+    vault.rewardTokenEmissionsAmount = new Array<BigInt>(
       rewardTokens.length
-    ).fill(constants.BIGDECIMAL_ZERO);
+    ).fill(constants.BIGINT_ZERO);
     vault.rewardTokenEmissionsUSD = new Array<BigDecimal>(
       rewardTokens.length
     ).fill(constants.BIGDECIMAL_ZERO);
@@ -66,11 +66,18 @@ export function _NewVault(
 
   vault.protocol = constants.CONVEX_BOOSTER_ADDRESS.toHexString();
   vault.name = utils.readValue<string>(lpTokenContract.try_name(), "");
+  vault.symbol = utils.readValue<string>(lpTokenContract.try_symbol(), "");
+
+  vault.totalValueLockedUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeSupplySideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
+  vault.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
+
 
   const performanceFeeId = utils
     .enumToPrefix(constants.VaultFeeType.PERFORMANCE_FEE)
     .concat(constants.CONVEX_BOOSTER_ADDRESS.toHexString());
-
+  
   let performanceFee = getTotalFees();
   utils.createFeeType(
     performanceFeeId,

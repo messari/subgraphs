@@ -88,7 +88,8 @@ class RewardTokenEmission {
 
 export function handleNewPriceOracle(event: NewPriceOracle): void {
   let protocol = getOrCreateProtocol();
-  _handleNewPriceOracle(protocol, event);
+  let newPriceOracle = event.params.newPriceOracle;
+  _handleNewPriceOracle(protocol, newPriceOracle);
 }
 
 export function handleMarketListed(event: MarketListed): void {
@@ -152,7 +153,9 @@ export function handleMarketListed(event: MarketListed): void {
 }
 
 export function handleNewCollateralFactor(event: NewCollateralFactor): void {
-  _handleNewCollateralFactor(event);
+  let marketID = event.params.cToken.toHexString();
+  let collateralFactorMantissa = event.params.newCollateralFactorMantissa;
+  _handleNewCollateralFactor(marketID, collateralFactorMantissa);
 }
 
 export function handleActionPaused(event: ActionPaused1): void {
@@ -176,31 +179,53 @@ export function handleNewLiquidationIncentive(
   event: NewLiquidationIncentive
 ): void {
   let protocol = getOrCreateProtocol();
-  _handleNewLiquidationIncentive(protocol, event);
+  let newLiquidationIncentive = event.params.newLiquidationIncentiveMantissa;
+  _handleNewLiquidationIncentive(protocol, newLiquidationIncentive);
 }
 
 export function handleNewReserveFactor(event: NewReserveFactor): void {
-  _handleNewReserveFactor(event);
+  let marketID = event.address.toHexString();
+  let newReserveFactorMantissa = event.params.newReserveFactorMantissa;
+  _handleNewReserveFactor(marketID, newReserveFactorMantissa);
 }
 
 export function handleMint(event: Mint): void {
-  _handleMint(comptrollerAddr, event);
+  let minter = event.params.minter;
+  let mintAmount = event.params.mintAmount;
+  _handleMint(comptrollerAddr, minter, mintAmount, event);
 }
 
 export function handleRedeem(event: Redeem): void {
-  _handleRedeem(comptrollerAddr, event);
+  let redeemer = event.params.redeemer;
+  let redeemAmount = event.params.redeemAmount;
+  _handleRedeem(comptrollerAddr, redeemer, redeemAmount, event);
 }
 
 export function handleBorrow(event: BorrowEvent): void {
-  _handleBorrow(comptrollerAddr, event);
+  let borrower = event.params.borrower;
+  let borrowAmount = event.params.borrowAmount;
+  _handleBorrow(comptrollerAddr, borrower, borrowAmount, event);
 }
 
 export function handleRepayBorrow(event: RepayBorrow): void {
-  _handleRepayBorrow(comptrollerAddr, event);
+  let payer = event.params.payer;
+  let repayAmount = event.params.repayAmount;
+  _handleRepayBorrow(comptrollerAddr, payer, repayAmount, event);
 }
 
 export function handleLiquidateBorrow(event: LiquidateBorrow): void {
-  _handleLiquidateBorrow(comptrollerAddr, event);
+  let cTokenCollateral = event.params.cTokenCollateral;
+  let liquidator = event.params.liquidator;
+  let seizeTokens = event.params.seizeTokens;
+  let repayAmount = event.params.repayAmount;
+  _handleLiquidateBorrow(
+    comptrollerAddr,
+    cTokenCollateral,
+    liquidator,
+    seizeTokens,
+    repayAmount,
+    event
+  );
 }
 
 export function handleAccrueInterest(event: AccrueInterest): void {
@@ -221,7 +246,15 @@ export function handleAccrueInterest(event: AccrueInterest): void {
     SECONDS_PER_YEAR
   );
 
-  _handleAccrueInterest(updateMarketData, comptrollerAddr, event);
+  let interestAccumulated = event.params.interestAccumulated;
+  let totalBorrows = event.params.totalBorrows;
+  _handleAccrueInterest(
+    updateMarketData,
+    comptrollerAddr,
+    interestAccumulated,
+    totalBorrows,
+    event
+  );
 }
 
 function getOrCreateProtocol(): LendingProtocol {
@@ -231,7 +264,7 @@ function getOrCreateProtocol(): LendingProtocol {
     "Moonwell",
     "moonwell",
     "1.2.1",
-    "1.0.6",
+    "1.0.7",
     "1.0.0",
     Network.MOONRIVER,
     comptroller.try_liquidationIncentiveMantissa(),
