@@ -31,12 +31,10 @@ export function handleDepositEvent(
      log.warning("ERROR ERROR ERROR  handleDepositEvent  ERROR   poolid:{} ",[pool.id]);
      return
   }
-  log.warning(" handleDepositEvent inputTokens:{} tokenAmounts:{}  pool.coins:{}      poolid:{} ",[pool.inputTokens.length.toString(),tokenAmounts.length.toString(),pool.coins.length.toString(),pool.id]);
   
   for (let i = 0; i < tokenAmounts.length; i++) {
     let inputTokenAddress = Address.fromString(pool.coins[i]);
     let inputToken = getOrCreateToken(inputTokenAddress);
-    log.warning(" handleDepositEvent inputToken.id:{}   pool.coins:{}    poolid:{}   ",[inputToken.id, pool.inputTokens.length.toString(),pool.id]);
     let inputTokenIndex = pool.inputTokens.indexOf(inputToken.id);
     let inputTokenAmount = tokenAmounts[i];
     let inputTokenPrice = getTokenPrice(inputTokenAddress, pool, event.block.timestamp);
