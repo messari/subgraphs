@@ -19,7 +19,7 @@ export function mapleOracleGetTokenPriceInUSD(token: Token): BigDecimal | null {
 
     if (!getLatestPriceCall.reverted) {
         const rawQuote = getLatestPriceCall.value;
-        value = parseUnits(rawQuote, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS);
+        value = parseUnits(rawQuote, MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS.toI32());
     }
 
     return value;

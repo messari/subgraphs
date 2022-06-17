@@ -89,6 +89,12 @@ export namespace OracleType {
     export const MAPLE = "MAPLE";
     export const CHAIN_LINK = "CHAIN_LINK";
     export const YEARN_LENS = "YEARN_LENS";
+    export const CURVE_CALC = "CURVE_CALC";
+    export const SUSHISWAP_CALC = "SUSHISWAP_CALC";
+    export const CURVE_ROUTE = "CURVE_ROUTE";
+    export const UNISWAP_ROUTE = "UNISWAP_ROUTE";
+    export const SUSHISWAP_ROUTE = "SUSHISWAP_ROUTE";
+    export const ERROR_NOT_FOUND = "ERROR_NOT_FOUND";
 }
 
 export namespace LoanVersion {
@@ -128,7 +134,7 @@ export const CHAIN_LINK_ORACLE_QUOTE_DECIMALS = 8;
 export const YEARN_ORACLE_ADDRESS = Address.fromString("0x83d95e0D5f402511dB06817Aff3f9eA88224B030");
 export const YEARN_ORACLE_QUOTE_DECIMALS = 6;
 
-export const MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS = 8;
+export const MAPLE_GLOBALS_ORACLE_QUOTE_DECIMALS: BigInt = BigInt.fromString("8");
 
 export const MAPLE_POOL_LIB_ADDRESS = Address.fromString("0x2c1C30fb8cC313Ef3cfd2E2bBf2da88AdD902C30");
 
