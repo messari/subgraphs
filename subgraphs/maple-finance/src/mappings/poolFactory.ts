@@ -3,6 +3,7 @@ import { Pool as PoolTemplate, StakeLocker as StakeLockerTemplate } from "../../
 import { getOrCreatePoolFactory } from "../common/mappingHelpers/getOrCreate/protocol";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 
 export function handlePoolCreated(event: PoolCreatedEvent): void {
     const poolAddress = event.params.pool;
@@ -30,10 +31,15 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     ////
     // Create market
     ////
-    getOrCreateMarket(event, poolAddress);
+    const market = getOrCreateMarket(event, poolAddress);
 
     ////
     // Create the stake locker for this market
     ////
     getOrCreateStakeLocker(event, stakeLockerAddress);
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }

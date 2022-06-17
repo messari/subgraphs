@@ -24,6 +24,7 @@ import {
     createLiquidate,
     createWithdraw
 } from "../common/mappingHelpers/getOrCreate/transactions";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 
 export function handleLossesRecognized(event: LossesRecognizedEvent): void {
     const market = getOrCreateMarket(event, event.address);
@@ -32,6 +33,11 @@ export function handleLossesRecognized(event: LossesRecognizedEvent): void {
 
     accountMarket.unrecognizedLosses = accountMarket.unrecognizedLosses.plus(event.params.lossesRecognized);
     accountMarket.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleTransfer(event: TransferEvent): void {
@@ -50,6 +56,11 @@ export function handleTransfer(event: TransferEvent): void {
         ////
         market._cumulativeDeposit = market._cumulativeDeposit.plus(deposit.amount);
         market.save();
+
+        ////
+        // Trigger interval update
+        ////
+        intervalUpdate(event, market);
     } else if (Address.zero() == event.params.to) {
         // Withdraw (burn)
         const marketAddress = event.address;
@@ -74,6 +85,11 @@ export function handleTransfer(event: TransferEvent): void {
         ////
         market._cumulativeWithdraw = market._cumulativeWithdraw.plus(withdraw.amount);
         market.save();
+
+        ////
+        // Trigger interval update
+        ////
+        intervalUpdate(event, market);
     }
 }
 
@@ -87,12 +103,15 @@ export function handlePoolStateChanged(event: PoolStateChangedEvent): void {
     market.isActive = active;
     market.canBorrowFrom = active;
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleLoanFunded(event: LoanFundedEvent): void {
     const loanAddress = event.params.loan;
-
-    log.warning("loanAddress: {}, block: {}", [loanAddress.toHexString(), event.block.number.toString()]);
 
     ////
     // Create loan entity
@@ -116,6 +135,11 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
     const market = getOrCreateMarket(event, Address.fromString(loan.market));
     market._cumulativeBorrow = market._cumulativeBorrow.plus(event.params.amountFunded);
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleClaim(event: ClaimEvent): void {
@@ -139,6 +163,11 @@ export function handleClaim(event: ClaimEvent): void {
         event.params.poolDelegatePortion
     );
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
@@ -174,6 +203,11 @@ export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
     ////
     market._cumulativePoolLosses = market._cumulativePoolLosses.plus(liquidate._defaultSufferedByPool);
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
@@ -190,4 +224,9 @@ export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
     ////
     market._cumulativeInterestClaimed = market._cumulativeInterestClaimed.plus(claim.amount);
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }

@@ -685,6 +685,9 @@ type Market @entity {
     " Sum of total revenue in USD "
     _cumulativeTotalRevenueUSD: BigDecimal!
 
+    " Last block when this market was updated "
+    _lastUpdatedBlockNumber: BigInt!
+
     " All loans that have been taken out of this market "
     _loans: [_Loan!]! @derivedFrom(field: "market")
 }
@@ -1401,6 +1404,9 @@ type _MplReward @entity {
     " Token the maple rewards are providing (generally MPL) "
     rewardToken: RewardToken!
 
+    " Block the mpl rewards was created "
+    creationBlockNumber: BigInt!
+
     " Total rewardToken distribution per second "
     rewardRatePerSecond: BigInt!
 
@@ -1412,12 +1418,6 @@ type _MplReward @entity {
 
     " Amount of reward tokens that get emittered per day "
     rewardTokenEmissionAmountPerDay: BigInt!
-
-    " Amount of reward tokens that get emittered per day "
-    rewardTokenEmissionsUSDPerDay: BigDecimal!
-
-    " Block the mpl rewards was created "
-    creationBlockNumber: BigInt!
 
     " Block the mpl rewards was last updated "
     lastUpdatedBlockNumber: BigInt!
