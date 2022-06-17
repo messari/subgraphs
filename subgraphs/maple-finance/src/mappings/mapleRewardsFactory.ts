@@ -4,6 +4,7 @@ import { MplReward as MplRewardTemplate } from "../../generated/templates";
 
 import { getOrCreateMarket, getOrCreateMplReward } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 
 export function handleMplRewardsCreated(event: MplRewardsCreatedEvent): void {
     const mplRewardAddress = event.params.mplRewards;
@@ -47,4 +48,9 @@ export function handleMplRewardsCreated(event: MplRewardsCreatedEvent): void {
         market.rewardTokens = newRewardTokens;
     }
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }

@@ -10,6 +10,7 @@ import { ZERO_BI } from "../common/constants";
 import { getOrCreateLoan, getOrCreateMarket } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { bigDecimalToBigInt } from "../common/utils";
 
 export function handleDrawdown(event: DrawdownEvent): void {
@@ -36,6 +37,11 @@ export function handleDrawdown(event: DrawdownEvent): void {
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
@@ -58,6 +64,12 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
     loan.interestPaid = loan.principalPaid.plus(repay._interestPaid);
     loan.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    intervalUpdate(event, market);
 }
 
 export function handleLiquidation(event: LiquidationEvent): void {
@@ -70,4 +82,10 @@ export function handleLiquidation(event: LiquidationEvent): void {
         event.params.liquidityAssetReturned.minus(event.params.liquidationExcess)
     );
     loan.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    intervalUpdate(event, market);
 }

@@ -16,6 +16,7 @@ import {
 } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { bigDecimalToBigInt, parseUnits, readCallResult } from "../common/utils";
 
 export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
@@ -62,6 +63,12 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
     const rate = parseUnits(rateFromContract, 18);
     interestRate.rate = rate;
     interestRate.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    intervalUpdate(event, market);
 }
 
 export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
@@ -82,6 +89,11 @@ export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
     market.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
@@ -96,6 +108,12 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
     loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
     loan.interestPaid = loan.principalPaid.plus(repay._interestPaid);
     loan.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    intervalUpdate(event, market);
 }
 
 export function handleRepossessed(event: RepossessedEvent): void {
@@ -105,4 +123,10 @@ export function handleRepossessed(event: RepossessedEvent): void {
     // TODO (spennyp): what if collatoral is more than owed?
     loan.principalPaid = loan.principalPaid.plus(event.params.fundsRepossessed_);
     loan.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    intervalUpdate(event, market);
 }
