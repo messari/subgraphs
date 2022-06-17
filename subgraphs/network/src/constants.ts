@@ -73,6 +73,7 @@ export const INT_ZERO = 0;
 export const INT_ONE = 1;
 export const INT_TWO = 2;
 export const INT_FOUR = 4;
+export const INT_NINE = 9; // nano second > second conversion
 
 export const BIGINT_ZERO = BigInt.fromI32(INT_ZERO);
 
