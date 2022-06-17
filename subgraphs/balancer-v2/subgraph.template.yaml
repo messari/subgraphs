@@ -101,6 +101,8 @@ dataSources:
       abis:
         - name: MasterChefV2
           file: ./abis/masterchef/MasterChefV2.json
+        - name: ERC20
+          file: ./abis/ERC20.json
         ###########################################
         ############## Price Oracle ###############
         ###########################################
