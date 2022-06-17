@@ -1,5 +1,28 @@
 # Schema Updates
 
+## Schema Update 1.3.0
+
+Main PR: [#310](https://github.com/messari/subgraphs/pull/310)
+Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://github.com/messari/subgraphs/pull/325), [#330](https://github.com/messari/subgraphs/pull/330), [#331](https://github.com/messari/subgraphs/pull/331)
+
+### Common
+
+- Added revenue data to pools.
+- Added more networks.
+- Fixed markdown formatting issue in comments (# gets interpreted as heading).
+- Added pool count `totalPoolCount` to the `Protocol` entity and daily usage metrics.
+
+### DEXes
+
+- Added `isSingleSided` for single-sided pools. Single-sided pools should be able to reuse/adopt most if not all of the existing fields with minor adaptation. These should be handled on a per protocol basis.
+
+### Lending
+
+- Changed `fixed_term` to `fixed` in `InterestRateType` entity to be more precise.
+- Added daily/hourly withdraw/repay aggregates into snapshots.
+- Fixed a couple `AmountUSD` fields (they were accidentally left as nullable before).
+- Updated `Liquidate` entity to include `liquidatee` (the address that got liquidated).
+
 ## Schema Update 1.2.1
 
 Main commit: [0300919](https://github.com/messari/subgraphs/commit/0300919817079541fe156956912cb06e1efa951c)

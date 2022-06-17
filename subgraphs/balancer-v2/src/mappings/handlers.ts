@@ -1,43 +1,137 @@
-import { Address, BigInt } from "@graphprotocol/graph-ts";
-import { PoolBalanceChanged, PoolRegistered, TokensRegistered, Swap } from "../../generated/Vault/Vault";
+import { BigInt, BigDecimal, Address, log, Bytes, ByteArray, bigInt } from "@graphprotocol/graph-ts";
 import {
-  createPool,
-  getOrCreateToken,
-  getOrCreateSwap,
-  getOrCreateDex,
-  getOrCreateHourlyUsageMetricSnapshot,
-  getOrCreateDailyUsageMetricSnapshot,
-} from "../common/getters";
-import { LiquidityPool, LiquidityPoolFee } from "../../generated/schema";
-import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
-import { updateFinancials, updatePoolMetrics, updateTokenPrice, updateUsageMetrics } from "../common/metrics";
-import { valueInUSD, fetchPrice } from "../common/pricing";
-import { scaleDown } from "../common/tokens";
-import { ERC20 } from "../../generated/Vault/ERC20";
+  Swap as SwapEvent,
+  PoolBalanceChanged,
+  PoolBalanceManaged,
+  InternalBalanceChanged,
+  Vault,
+  PoolRegistered,
+  TokensRegistered,
+} from "../../generated/Vault/Vault";
+import {
+  createWithdrawMulti,
+  createDepositMulti,
+  createSwapHandleVolume,
+  createLiquidityPool,
+} from "../common/creators";
+import { updatePoolMetrics, updateUsageMetrics, updateFinancials } from "../common/metrics";
+import { BIGINT_ZERO, UsageType, VAULT_ADDRESS } from "../common/constants";
 import { updateWeight } from "../common/weight";
-import { SwapFeePercentageChanged, WeightedPool } from "../../generated/Vault/WeightedPool";
+import { WeightedPool } from "../../generated/Vault/WeightedPool";
+import { getLiquidityPoolFee, getOrCreateToken } from "../common/getters";
+import { LiquidityPool } from "../../generated/schema";
+import { SwapFeePercentageChanged } from "../../generated/Vault/LinearPool";
+import { scaleDown } from "../common/tokens";
 
-export function handleSwapFeePercentageChange(event: SwapFeePercentageChanged): void {
-  let poolContract = WeightedPool.bind(event.address);
-  let poolIdCall = poolContract.try_getPoolId();
-  if (!poolIdCall.reverted) {
-    let fee = LiquidityPoolFee.load(poolIdCall.value.toHexString());
-    if (fee) {
-      fee.feePercentage = scaleDown(event.params.swapFeePercentage, null);
-      fee.save();
-    }
+/************************************
+ ****** DEPOSITS & WITHDRAWALS ******
+ ************************************/
+
+export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
+  let amounts: BigInt[] = event.params.deltas;
+  if (amounts.length === 0) {
+    return;
+  }
+  let total: BigInt = amounts.reduce<BigInt>((sum, amount) => sum.plus(amount), new BigInt(0));
+  if (total.gt(BIGINT_ZERO)) {
+    handlePoolJoined(event);
+  } else {
+    handlePoolExited(event);
   }
 }
 
+function handlePoolJoined(event: PoolBalanceChanged): void {
+  let poolId: string = event.params.poolId.toHexString();
+  let amounts: BigInt[] = event.params.deltas;
+
+  //get the contract address
+  let poolAddress: string = poolId.substring(0, 42);
+  createDepositMulti(event, poolAddress, amounts);
+  updateUsageMetrics(event, event.params.liquidityProvider, UsageType.DEPOSIT);
+  updateFinancials(event);
+  updatePoolMetrics(event, poolAddress);
+}
+
+function handlePoolExited(event: PoolBalanceChanged): void {
+  let poolId: string = event.params.poolId.toHexString();
+  let amounts: BigInt[] = event.params.deltas;
+
+  //get the contract address
+  let poolAddress: string = poolId.substring(0, 42);
+  createWithdrawMulti(event, poolAddress, amounts);
+  updateUsageMetrics(event, event.params.liquidityProvider, UsageType.WITHDRAW);
+  updateFinancials(event);
+  updatePoolMetrics(event, poolAddress);
+}
+
+/************************************
+ ************** SWAPS ***************
+ ************************************/
+export function handleSwap(event: SwapEvent): void {
+  let poolId: string = event.params.poolId.toHexString();
+  let tokenIn: string = event.params.tokenIn.toHexString();
+  let tokenOut: string = event.params.tokenOut.toHexString();
+
+  //get the contract address
+  let poolAddress: string = poolId.substring(0, 42);
+  createSwapHandleVolume(event, poolAddress, tokenIn, event.params.amountIn, tokenOut, event.params.amountOut);
+  updateFinancials(event);
+  updatePoolMetrics(event, poolAddress);
+  updateUsageMetrics(event, event.transaction.from, UsageType.SWAP);
+}
+
+function createPool(event: PoolRegistered): string {
+  let poolAddress: Address = event.params.poolAddress;
+  let poolContract = WeightedPool.bind(poolAddress);
+  let poolIdCall = poolContract.try_getPoolId();
+  if (poolIdCall.reverted) {
+    return "";
+  }
+  let poolId = poolIdCall.value;
+
+  let nameCall = poolContract.try_name();
+  if (nameCall.reverted) {
+    return "";
+  }
+  let name = nameCall.value;
+
+  let symbolCall = poolContract.try_symbol();
+  if (symbolCall.reverted) {
+    return "";
+  }
+  let symbol = symbolCall.value;
+
+  let vaultContract = Vault.bind(VAULT_ADDRESS);
+
+  let tokensCall = vaultContract.try_getPoolTokens(poolId);
+  let inputTokens: string[] = [];
+  if (!tokensCall.reverted) {
+    let tokens = tokensCall.value.value0;
+    for (let i: i32 = 0; i < tokens.length; i++) {
+      inputTokens.push(tokens[i].toHexString());
+    }
+  }
+
+  let swapFeeCall = poolContract.try_getSwapFeePercentage();
+  let swapFee = BIGINT_ZERO;
+  if (!swapFeeCall.reverted) {
+    swapFee = swapFeeCall.value;
+  }
+
+  createLiquidityPool(event, poolAddress.toHexString(), name, symbol, inputTokens, swapFee);
+  // Load pool with initial weights
+  return poolAddress.toHexString();
+}
+
 export function handlePoolRegister(event: PoolRegistered): void {
-  createPool(event.params.poolId.toHexString(), event.params.poolAddress, event.block);
+  createPool(event);
 }
 
 export function handleTokensRegister(event: TokensRegistered): void {
   let tokens: string[] = new Array<string>();
   let tokensAmount: BigInt[] = new Array<BigInt>();
   for (let i = 0; i < event.params.tokens.length; i++) {
-    let token = getOrCreateToken(event.params.tokens[i]);
+    let token = getOrCreateToken(event.params.tokens[i].toHexString());
     tokens.push(token.id);
     tokensAmount.push(BIGINT_ZERO);
   }
@@ -51,122 +145,14 @@ export function handleTokensRegister(event: TokensRegistered): void {
   updateWeight(pool.id);
 }
 
-export function handlePoolBalanceChanged(event: PoolBalanceChanged): void {
-  let pool = LiquidityPool.load(event.params.poolId.toHexString());
-  if (pool == null) return;
-  let inputTokenBalances: BigInt[] = new Array<BigInt>();
-  let protocol = getOrCreateDex();
+export function handleSwapFeePercentageChange(event: SwapFeePercentageChanged): void {
+  let poolAddress = event.address;
+  let pool = LiquidityPool.load(poolAddress.toHexString());
 
-  let amounts: BigInt[] = event.params.deltas;
+  let poolTradingFee = getLiquidityPoolFee(pool!.fees[2]);
 
-  if (amounts.length === 0) return;
-  let total: BigInt = amounts.reduce<BigInt>((sum, amount) => sum.plus(amount), new BigInt(0));
-
-  let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event);
-  let dailyUsage = getOrCreateDailyUsageMetricSnapshot(event);
-
-  if (total.gt(BIGINT_ZERO)) {
-    hourlyUsage.hourlyDepositCount += 1;
-    dailyUsage.dailyDepositCount += 1;
-  } else {
-    hourlyUsage.hourlyWithdrawCount += 1;
-    dailyUsage.dailyWithdrawCount += 1;
-  }
-
-  hourlyUsage.save();
-  dailyUsage.save();
-
-  for (let i = 0; i < event.params.deltas.length; i++) {
-    let currentAmount = pool.inputTokenBalances[i];
-    inputTokenBalances.push(currentAmount.plus(event.params.deltas[i]));
-
-    let tokenFee = event.params.protocolFeeAmounts[i];
-    if (tokenFee.gt(BigInt.zero())) {
-      let tokenAddress = event.params.tokens[i];
-      let formattedAmount = scaleDown(tokenFee, tokenAddress);
-      let price = fetchPrice(tokenAddress);
-      if (price.gt(BIGDECIMAL_ZERO)) {
-        pool._protocolGeneratedFee = pool._protocolGeneratedFee.plus(formattedAmount.times(price));
-        protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(formattedAmount.times(price));
-        protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-          formattedAmount.times(price),
-        );
-      }
-    }
-  }
-
-  const outputToken = ERC20.bind(Address.fromString(pool.outputToken));
-  const totalSupplyCall = outputToken.try_totalSupply();
-  if (!totalSupplyCall.reverted) {
-    pool.outputTokenSupply = totalSupplyCall.value;
-  }
-  pool.inputTokenBalances = inputTokenBalances;
-  pool.save();
-  protocol.save();
-
-  updatePoolMetrics(event, pool);
-  updateUsageMetrics(event, event.transaction.from);
-  updateFinancials(event);
-}
-
-export function handleSwap(event: Swap): void {
-  let pool = LiquidityPool.load(event.params.poolId.toHexString());
-  if (pool == null) return;
-  updateWeight(pool.id);
-
-  const tokenIn = event.params.tokenIn;
-  const tokenOut = event.params.tokenOut;
-
-  let tokenInIndex: i32 = 0;
-  let tokenOutIndex: i32 = 0;
-  let newBalances = pool.inputTokenBalances;
-
-  for (let i: i32 = 0; i < pool.inputTokens.length; i++) {
-    if (tokenIn == Address.fromString(pool.inputTokens[i])) {
-      newBalances[i] = pool.inputTokenBalances[i].plus(event.params.amountIn);
-      tokenInIndex = i;
-    }
-
-    if (tokenOut == Address.fromString(pool.inputTokens[i])) {
-      newBalances[i] = pool.inputTokenBalances[i].minus(event.params.amountOut);
-      tokenOutIndex = i;
-    }
-  }
-
-  pool.inputTokenBalances = newBalances;
-  pool.save();
-
-  updateTokenPrice(
-    pool,
-    tokenIn,
-    event.params.amountIn,
-    tokenInIndex,
-    tokenOut,
-    event.params.amountOut,
-    tokenOutIndex,
-    event.block.number,
-  );
-
-  const swap = getOrCreateSwap(event, pool);
-  const amountIn = scaleDown(event.params.amountIn, tokenIn);
-  const amountOut = scaleDown(event.params.amountOut, tokenOut);
-
-  swap.tokenIn = tokenIn.toHexString();
-  swap.tokenOut = tokenOut.toHexString();
-  swap.amountIn = event.params.amountIn;
-  swap.amountOut = event.params.amountOut;
-  swap.amountInUSD = valueInUSD(amountIn, tokenIn);
-  swap.amountOutUSD = valueInUSD(amountOut, tokenOut);
-  swap.save();
-
-  let hourlyUsage = getOrCreateHourlyUsageMetricSnapshot(event);
-  let dailyUsage = getOrCreateDailyUsageMetricSnapshot(event);
-  hourlyUsage.hourlySwapCount += 1;
-  dailyUsage.dailySwapCount += 1;
-  hourlyUsage.save();
-  dailyUsage.save();
-
-  updatePoolMetrics(event, pool);
-  updateUsageMetrics(event, event.transaction.from);
-  updateFinancials(event);
+  let protocolFeeProportion = scaleDown(event.params.swapFeePercentage, null);
+  // Update protocol and trading fees for this pool
+  poolTradingFee.feePercentage = protocolFeeProportion;
+  poolTradingFee.save();
 }

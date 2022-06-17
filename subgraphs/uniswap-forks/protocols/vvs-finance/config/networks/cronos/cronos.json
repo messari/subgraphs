@@ -6,6 +6,9 @@
       "startBlock": 4100
     },
     "CraftsmanAddress": "0xDccd6455AE04b03d785F12196B492b18129564bc",
-    "CraftsmanStartBlock": 4100
+    "CraftsmanStartBlock": 4100,
+    "graftEnabled": false,
+    "subgraphId": "",
+    "graftStartBlock": 0
   }
   

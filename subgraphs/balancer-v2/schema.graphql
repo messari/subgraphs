@@ -1,5 +1,6 @@
 # Subgraph Schema: DEX AMM
-# Version: 1.2.0
+# Version: 1.2.1
+# See https://github.com/messari/subgraphs/blob/master/docs/Schema.md for details
 
 enum Network {
   ARBITRUM_ONE
@@ -31,9 +32,13 @@ type Token @entity {
   " Smart contract address of the token "
   id: ID!
 
-  " Mirrored from the smart contract "
+  " Name of the token, mirrored from the smart contract "
   name: String!
+
+  " Symbol of the token, mirrored from the smart contract "
   symbol: String!
+
+  " The number of decimal places this token uses, default to 18 "
   decimals: Int!
 
   " Optional field to track the price of a token, mostly for caching purposes "
@@ -44,17 +49,21 @@ type Token @entity {
 }
 
 enum RewardTokenType {
+  " For reward tokens awarded to LPs/lenders "
   DEPOSIT
+
+  " For reward tokens awarded to borrowers "
   BORROW
 }
 
 type RewardToken @entity {
-  " Smart contract address of the reward token "
+  " { Reward token type }-{ Smart contract address of the reward token } "
   id: ID!
 
   " Reference to the actual token "
   token: Token!
 
+  " The type of the reward token "
   type: RewardTokenType!
 }
 
@@ -86,10 +95,13 @@ enum LiquidityPoolFeeType {
 }
 
 type LiquidityPoolFee @entity {
+  " { Fee type }-{ Pool address } "
   id: ID!
 
-  feePercentage: BigDecimal!
+  " Fee as a percentage of the trade (swap) amount. Does not always apply "
+  feePercentage: BigDecimal
 
+  " Type of fee this pool uses "
   feeType: LiquidityPoolFeeType!
 }
 
@@ -217,7 +229,6 @@ type DexAmmProtocol implements Protocol @entity {
 
   " All pools that belong to this protocol "
   pools: [LiquidityPool!]! @derivedFrom(field: "protocol")
-  _poolIds: [String!]!
 }
 
 ###############################
@@ -257,7 +268,7 @@ type UsageMetricsDailySnapshot @entity {
 }
 
 type UsageMetricsHourlySnapshot @entity {
-  " { # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { # of hours since Unix epoch time } "
   id: ID!
 
   " Protocol this snapshot is associated with "
@@ -353,7 +364,7 @@ type LiquidityPool @entity {
   inputTokens: [Token!]!
 
   " Token that is minted to track ownership of position in protocol "
-  outputToken: Token!
+  outputToken: Token
 
   " Aditional tokens that are given as reward for position in a protocol, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon, usually in liquidity mining programs. e.g. SUSHI in the Onsen program, MATIC for Aave Polygon "
   rewardTokens: [RewardToken!]
@@ -378,11 +389,11 @@ type LiquidityPool @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
-  outputTokenSupply: BigInt!
+  outputTokenSupply: BigInt
 
   " Price per share of output token in USD "
   outputTokenPriceUSD: BigDecimal
@@ -414,14 +425,6 @@ type LiquidityPool @entity {
 
   " All trade (swap) events occurred in this pool "
   swaps: [Swap!]! @derivedFrom(field: "pool")
-
-  " All swap fee retrieved from this pool "
-  _totalSwapFee: BigDecimal!
-  " All protocol fee generated from this pool "
-  _protocolGeneratedFee: BigDecimal!
-  " All side revenue fee generated from this pool "
-  _sideRevenueGeneratedFee: BigDecimal!
-  _hasVirtualSupply: Boolean!
 }
 
 #################################
@@ -464,7 +467,7 @@ type LiquidityPoolDailySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
@@ -484,7 +487,7 @@ type LiquidityPoolDailySnapshot @entity {
 }
 
 type LiquidityPoolHourlySnapshot @entity {
-  " { Smart contract address of the pool }-{ # of days since Unix epoch time }-{ HH: hour of the day } "
+  " { Smart contract address of the pool }-{ # of hours since Unix epoch time } "
   id: ID!
 
   " The protocol this snapshot belongs to "
@@ -519,7 +522,7 @@ type LiquidityPoolHourlySnapshot @entity {
   " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
   inputTokenBalances: [BigInt!]!
 
-  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 33.3/33.3/33.3 for a Curve pool, 10/10/80 for a Balancer pool "
+  " Weights of input tokens in the liquidity pool in percentage values. For example, 50/50 for Uniswap pools, 48.2/51.8 for a Curve pool, 10/10/80 for a Balancer pool "
   inputTokenWeights: [BigDecimal!]!
 
   " Total supply of output token. Note that certain DEXes don't have an output token (e.g. Bancor) "
@@ -551,7 +554,7 @@ store them as events, although they are not technically Ethereum events emitted 
 contracts.
 """
 interface Event {
-  " { Transaction hash }-{ Log index } "
+  " { Event type }-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -569,13 +572,15 @@ interface Event {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 }
 
 type Deposit implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+  " deposit-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -593,33 +598,33 @@ type Deposit implements Event @entity {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   " Input tokens of the pool. E.g. WETH and USDC to a WETH-USDC pool "
   inputTokens: [Token!]!
 
   " Output token of the pool. E.g. the UNI-LP token "
-  outputToken: Token!
+  outputToken: Token
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmount: BigInt!
+  outputTokenAmount: BigInt
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens deposited into a pool) "
   amountUSD: BigDecimal!
-
-  ##### DexAmm-Specific #####
 
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
 
 type Withdraw implements Event @entity {
-  " { Transaction hash }-{ Log index }"
+  " withdraw-{ Transaction hash }-{ Log index }"
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -637,33 +642,33 @@ type Withdraw implements Event @entity {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
   inputTokens: [Token!]!
 
   " Output token of the pool (not output token of the event/transaction). E.g. the UNI-LP token "
-  outputToken: Token!
+  outputToken: Token
 
   " Amount of input tokens in the token's native unit "
   inputTokenAmounts: [BigInt!]!
 
   " Amount of output tokens in the token's native unit "
-  outputTokenAmount: BigInt!
+  outputTokenAmount: BigInt
 
   " USD-normalized value of the transaction of the underlying (e.g. sum of tokens withdrawn from a pool) "
   amountUSD: BigDecimal!
-
-  ##### DexAmm-Specific #####
 
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
 
 type Swap implements Event @entity {
-  " { Transaction hash }-{ Log index } "
+  " swap-{ Transaction hash }-{ Log index } "
   id: ID!
 
   " Transaction hash of the transaction that emitted this event "
@@ -681,8 +686,10 @@ type Swap implements Event @entity {
   " Address that sent the tokens "
   from: String!
 
+  " Block number of this event "
   blockNumber: BigInt!
 
+  " Timestamp of this event "
   timestamp: BigInt!
 
   " Token deposited into pool "
@@ -703,20 +710,9 @@ type Swap implements Event @entity {
   " Amount of token withdrawn from pool in USD "
   amountOutUSD: BigDecimal!
 
-  ##### DexAmm-Specific #####
-
   " The pool involving this transaction "
   pool: LiquidityPool!
 }
-
-###########################
-##### Helper Entities #####
-###########################
-
-# Helper entities are additional entities created to help with mapping.
-# They are usually used to store internal states that would simplify
-# the mapping logic. All helper entities should be prefixed with an
-# underscore to differentiate them from the common schema.
 
 # An account is a unique Ethereum address
 # Helps to accumulate total unique users
@@ -725,14 +721,42 @@ type Account @entity {
   id: ID!
 }
 
-# Helper entity for calculating daily active users
-type DailyActiveAccount @entity {
-  " { Days since Unix epoch }-{ Address of the account } "
+# Helper entity for calculating daily/hourly active users
+type ActiveAccount @entity {
+  " { daily/hourly }-{ Address of the account }-{ Days/hours since Unix epoch } "
   id: ID!
 }
 
-# Helper entity for calculating daily active users
-type _HourlyActiveAccount @entity {
-  " { Hours since Unix epoch }-{ Address of the account } "
+#Added Entities
+
+type _LiquidityPoolAmount @entity {
+  " Smart contract address of the pool "
   id: ID!
+
+  " Input tokens of the pool (not input tokens of the event/transaction). E.g. WETH and USDC from a WETH-USDC pool "
+  inputTokens: [Token!]!
+
+  " Amount of input tokens in the pool. The ordering should be the same as the pool's `inputTokens` field. "
+  inputTokenBalances: [BigDecimal!]!
+
+  tokenPrices: [BigDecimal!]!
+}
+
+"  Used to keep track of the price of Ether/TVL in USD, pool deposit count, and total unique users "
+type _HelperStore @entity {
+  id: ID!
+
+  " price of ETH/TVL in USD "
+  valueDecimal: BigDecimal
+
+  " # of deposits, # of unique users "
+  valueInt: Int
+}
+
+" This is used to keep tract of the derived price of tokens in ethereum and the whitelisted pools to which it belongs"
+type _TokenWhitelist @entity {
+  " Token Address "
+  id: ID!
+  " pools token is in that are white listed for USD pricing "
+  whitelistPools: [LiquidityPool!]!
 }

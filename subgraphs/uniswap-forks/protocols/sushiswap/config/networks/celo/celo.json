@@ -4,5 +4,8 @@
   "address": "0xc35dadb65012ec5796536bd9864ed8773abc74c4",
   "startBlock": 7253488,
   "miniChefAddress": "0x8084936982D089130e001b470eDf58faCA445008",
-  "miniChefStartBlock": 10186627
+  "miniChefStartBlock": 10186627,
+  "graftEnabled": false,
+  "subgraphId": "",
+  "graftStartBlock": 0
 }
