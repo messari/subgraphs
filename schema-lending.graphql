@@ -995,7 +995,7 @@ type Liquidate implements Event @entity {
   from: String!
 
   " Address that got liquidated "
-  liquidated: String!
+  depositor: String!
 
   " Block number of this event "
   blockNumber: BigInt!
