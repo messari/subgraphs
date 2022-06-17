@@ -1,5 +1,10 @@
 import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { BeefyStrategy } from "../../generated/ExampleVault/BeefyStrategy";
+import { UniswapFeeRouter__removeLiquidityWithPermitResult } from "../../generated/aave-aave-eol/UniswapFeeRouter";
+import {
+  BeefyStrategy,
+  ChargedFees,
+  Withdraw,
+} from "../../generated/ExampleVault/BeefyStrategy";
 import { User, Vault, VaultFee, YieldAggregator } from "../../generated/schema";
 import {
   BIGDECIMAL_HUNDRED,
@@ -34,7 +39,7 @@ export function updateProtocolUsage(
   updateUsageMetricsHourlySnapshot(event, protocol, deposit, withdraw);
 }
 
-export function updateProtocolRevenue(
+export function updateProtocolRevenueFromHarvest(
   event: ethereum.Event,
   amountHarvested: BigInt,
   vault: Vault
@@ -49,53 +54,91 @@ export function updateProtocolRevenue(
     .toBigDecimal()
     .times(token.lastPriceUSD)
     .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
+    transactionRevenue
+  );
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
     transactionRevenue
+  );
+  protocol.save();
+
+  vault.fees = getFees(
+    vault.id,
+    BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
+  );
+  vault.save();
+
+  updateDailyFinancialSnapshot(event.block, protocol);
+}
+
+export function updateProtocolRevenueFromChargedFees(
+  event: ChargedFees,
+  vault: Vault
+): void {
+  updateProtocolUsage(event, vault, false, false);
+  const protocol = getBeefyFinanceOrCreate(vault.id);
+  const token = getTokenOrCreate(
+    Address.fromString(vault.inputToken.split("x")[1]),
+    event.block
   );
   vault.fees = getFees(
     vault.id,
     BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
   );
   vault.save();
-  let fee: VaultFee | null;
-  let currentRevenueProtocolSide = BIGDECIMAL_ZERO;
-  let currentRevenueSupplySide = transactionRevenue;
-  for (let k = 0; k < vault.fees.length; k++) {
-    fee = VaultFee.load(vault.fees[k]);
-    if (fee) {
-      if (fee.id == "PERFORMANCE_FEE-" + vault.id) {
-        currentRevenueProtocolSide = currentRevenueProtocolSide.plus(
-          transactionRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
-        );
-        currentRevenueSupplySide = currentRevenueSupplySide.minus(
-          transactionRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
-        );
-        continue;
-      }
-
-      if (fee.id == "STRATEGIST_FEE-" + vault.id) {
-        currentRevenueSupplySide = currentRevenueSupplySide.minus(
-          transactionRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
-        );
-        continue;
-      }
-
-      if (fee.id == "MANAGEMENT_FEE-" + vault.id) {
-        currentRevenueSupplySide = currentRevenueSupplySide.minus(
-          transactionRevenue.times(fee.feePercentage).div(BIGDECIMAL_HUNDRED)
-        );
-        continue;
-      }
-    }
-  }
+  const transactionRevenue = event.params.beefyFees
+    .plus(event.params.strategistFees)
+    .plus(event.params.callFees)
+    .toBigDecimal()
+    .times(token.lastPriceUSD)
+    .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
-    currentRevenueProtocolSide
+    transactionRevenue
   );
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(
-    currentRevenueSupplySide
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+    transactionRevenue
   );
   protocol.save();
 
+  updateDailyFinancialSnapshot(event.block, protocol);
+}
+
+export function updateProtocolRevenueFromWithdraw(
+  event: Withdraw,
+  vault: Vault,
+  withdrawnAmount: BigInt
+): void {
+  updateProtocolUsage(event, vault, false, true);
+  const protocol = getBeefyFinanceOrCreate(vault.id);
+  const token = getTokenOrCreate(
+    Address.fromString(vault.inputToken.split("x")[1]),
+    event.block
+  );
+  const fees = getFees(
+    vault.id,
+    BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
+  );
+  vault.fees = fees;
+  vault.save();
+  let fee: VaultFee | null;
+  for (let i = 0; i < fees.length; i++) {
+    fee = VaultFee.load(fees[i]);
+    if (fee && fee.feeType == "WITHDRAWAL_FEE") {
+      const revenue = withdrawnAmount
+        .toBigDecimal()
+        .times(fee.feePercentage)
+        .div(BIGDECIMAL_HUNDRED)
+        .div(BIGINT_TEN.pow(token.decimals as u8).toBigDecimal());
+      protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(
+        revenue
+      );
+      protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(
+        revenue
+      );
+      protocol.save();
+      break;
+    }
+  }
   updateDailyFinancialSnapshot(event.block, protocol);
 }
 

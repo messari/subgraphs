@@ -3,6 +3,7 @@ import { ethereum } from "@graphprotocol/graph-ts/chain/ethereum";
 import { Vault, VaultFee } from "../../generated/schema";
 import {
   BeefyStrategy,
+  ChargedFees,
   Deposit,
   StratHarvest,
   Withdraw,
@@ -27,7 +28,12 @@ import {
   BIGINT_ZERO,
   ZERO_ADDRESS,
 } from "../prices/common/constants";
-import { updateProtocolRevenue, updateProtocolUsage } from "./protocol";
+import {
+  updateProtocolRevenueFromChargedFees,
+  updateProtocolRevenueFromHarvest,
+  updateProtocolRevenueFromWithdraw,
+  updateProtocolUsage,
+} from "./protocol";
 
 export function createVaultFromStrategy(
   strategyAddress: Address,
@@ -161,7 +167,6 @@ export function getFees(
     const strategistFee = new VaultFee("STRATEGIST_FEE-" + vaultId);
     strategistFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
     strategistFee.feeType = "STRATEGIST_FEE";
-    strategistFee.vault = vaultId;
     strategistFee.save();
     fees.push(strategistFee.id);
   }
@@ -171,7 +176,6 @@ export function getFees(
     const withdrawalFee = new VaultFee("WITHDRAWAL_FEE-" + vaultId);
     withdrawalFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
     withdrawalFee.feeType = "WITHDRAWAL_FEE";
-    withdrawalFee.vault = vaultId;
     withdrawalFee.save();
     fees.push(withdrawalFee.id);
   }
@@ -181,7 +185,6 @@ export function getFees(
     const callFee = new VaultFee("MANAGEMENT_FEE-" + vaultId);
     callFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
     callFee.feeType = "MANAGEMENT_FEE";
-    callFee.vault = vaultId;
     callFee.save();
     fees.push(callFee.id);
   }
@@ -190,7 +193,6 @@ export function getFees(
   if (!call.reverted) {
     const beefyFee = new VaultFee("PERFORMANCE_FEE-" + vaultId);
     beefyFee.feePercentage = call.value.divDecimal(BIGDECIMAL_HUNDRED);
-    beefyFee.vault = vaultId;
     beefyFee.feeType = "PERFORMANCE_FEE";
     beefyFee.save();
     fees.push(beefyFee.id);
@@ -215,16 +217,18 @@ export function handleDeposit(event: Deposit): void {
 
 export function handleWithdraw(event: Withdraw): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
-  const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl);
+  //const withdrawnAmount = vault.inputTokenBalance.minus(event.params.tvl).abs();
+  const strategyContract = BeefyStrategy.bind(event.address);
+  const withdrawnAmount = event.params.tvl.minus(strategyContract.balanceOf());
   createWithdraw(event, withdrawnAmount, vault.id);
   updateVaultAndSnapshots(vault, event.block);
-  updateProtocolUsage(event, vault, false, true);
+  updateProtocolRevenueFromWithdraw(event, vault, withdrawnAmount);
 }
 
 export function handleStratHarvestWithAmount(event: StratHarvest): void {
   const vault = getVaultFromStrategyOrCreate(event.address, event);
   updateVaultAndSnapshots(vault, event.block);
-  updateProtocolRevenue(event, event.params.wantHarvested, vault);
+  updateProtocolRevenueFromHarvest(event, event.params.wantHarvested, vault);
 }
 
 export function handleStratHarvest(event: StratHarvest): void {
@@ -234,9 +238,15 @@ export function handleStratHarvest(event: StratHarvest): void {
   if (!balance.reverted) {
     const amountHarvested = balance.value.minus(vault.inputTokenBalance);
     updateVaultAndSnapshots(vault, event.block);
-    updateProtocolRevenue(event, amountHarvested, vault);
+    updateProtocolRevenueFromHarvest(event, amountHarvested, vault);
   } else {
     updateVaultAndSnapshots(vault, event.block);
     updateProtocolUsage(event, vault, false, false);
   }
+}
+
+export function handleChargedFees(event: ChargedFees): void {
+  const vault = getVaultFromStrategyOrCreate(event.address, event);
+  updateVaultAndSnapshots(vault, event.block);
+  updateProtocolRevenueFromChargedFees(event, vault);
 }

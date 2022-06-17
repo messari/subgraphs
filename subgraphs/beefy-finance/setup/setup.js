@@ -138,6 +138,10 @@ function createDataSource(contractName, contractAddress, network, startBlock) {
           event: "StratHarvest(indexed address,indexed uint256)",
           handler: "handleStratHarvest",
         },
+        {
+          event: "ChargedFees(uint256,uint256,uint256)",
+          handler: "handleChargedFees",
+        },
       ],
       file: "./src/mappings/vault.ts",
     },
