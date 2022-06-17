@@ -21,7 +21,7 @@ Fixes: [#320](https://github.com/messari/subgraphs/pull/320), [#325](https://git
 - Changed `fixed_term` to `fixed` in `InterestRateType` entity to be more precise.
 - Added daily/hourly withdraw/repay aggregates into snapshots.
 - Fixed a couple `AmountUSD` fields (they were accidentally left as nullable before).
-- Updated `Liquidate` entity to include `depositor` (the address that got liquidated).
+- Updated `Liquidate` entity to include `liquidatee` (the address that got liquidated).
 
 ## Schema Update 1.2.1
 
