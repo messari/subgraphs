@@ -8,7 +8,7 @@ import { BigDecimal, BigInt, Address, dataSource } from "@graphprotocol/graph-ts
 ///// Versions /////
 ////////////////////
 
-export const PROTOCOL_SCHEMA_VERSION = "1.2.1";
+export const PROTOCOL_SCHEMA_VERSION = "1.3.0";
 export const PROTOCOL_SUBGRAPH_VERSION = "1.1.0";
 export const PROTOCOL_METHODOLOGY_VERSION = "1.0.0";
 
@@ -64,10 +64,9 @@ export namespace LiquidityPoolFeeType {
   export const DYNAMIC_PROTOCOL_FEE = "DYNAMIC_PROTOCOL_FEE";
 }
 
-export namespace HelperStoreType {
-  export const NATIVE_TOKEN = "NATIVE_TOKEN";
-  export const USERS = "USERS";
-  // Pool addresses are also stored in the HelperStore
+export namespace RewardTokenType {
+  export const DEPOSIT = "DEPOSIT";
+  export const BORROW = "BORROW";
 }
 
 export namespace UsageType {
@@ -110,7 +109,6 @@ export const BIGDECIMAL_TEN_THOUSAND = new BigDecimal(BIGINT_TEN_THOUSAND);
 export const BIGDECIMAL_MILLION = new BigDecimal(BIGINT_MILLION);
 
 export const Q192 = BigDecimal.fromString("6277101735386680763835789423207666416102355444464034512896");
-
 export const INT_ZERO = 0 as i32;
 export const INT_ONE = 1 as i32;
 export const INT_TWO = 2 as i32;
@@ -135,7 +133,13 @@ export const PROTOCOL_FEE_TO_OFF = BigDecimal.fromString("0");
 export let DEFAULTNETWORK =  "{{defaultNetwork}}" 
 
 export let VAULT_ADDRESS = Address.fromString('{{vault}}')
+
+export let REWARDTOKEN = "{{rewardToken}}" 
+
 {{#isBeets}}
+
+export let MASTERCHEFV2_ADDRESS = Address.fromString('{{masterChefV2}}')
+
 export let DAI: Address = Address.fromString('{{knownAssets.dai}}');
 export let USDC: Address = Address.fromString('{{knownAssets.usdc}}');
 export let USDT: Address = Address.fromString('{{knownAssets.fusdt}}');
@@ -144,9 +148,10 @@ export let WFTM: Address = Address.fromString('{{knownAssets.wftm}}');
 export let WBTC: Address = Address.fromString('{{knownAssets.wbtc}}');
 export let WETH: Address = Address.fromString('{{knownAssets.weth}}');
 export let BEETS: Address = Address.fromString('{{knownAssets.beets}}');
+export let FBEETS: Address = Address.fromString('{{knownAssets.fbeets}}');
 
 export let USD_STABLE_ASSETS: Address[] = [USDC, DAI, USDT,MIM];
-export let BASE_ASSETS: Address[] = [WETH, WFTM, WBTC, BEETS];
+export let BASE_ASSETS: Address[] = [WETH, WFTM, WBTC, BEETS,FBEETS];
 
 {{/isBeets}}
 
