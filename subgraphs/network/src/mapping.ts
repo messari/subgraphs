@@ -3,19 +3,14 @@ import {
   arweave,
   cosmos,
   near,
-  log,
   Bytes,
   BigInt,
   BigDecimal,
+  log,
 } from "@graphprotocol/graph-ts";
 import { Author } from "../generated/schema";
-import { BIGINT_ZERO, INT_NINE, INT_ZERO, NETWORK_NAME } from "./constants";
-import {
-  createBlock,
-  getOrCreateNetwork,
-  updateMetrics,
-  updateNetwork,
-} from "./helper";
+import { BIGINT_ZERO, INT_NINE, INT_ZERO } from "./constants";
+import { createBlock, updateMetrics, updateNetwork } from "./helper";
 import { exponentToBigDecimal } from "./utils";
 
 /////////////////
@@ -27,33 +22,33 @@ export class BlockData {
   hash: Bytes;
   timestamp: BigInt;
   author: Bytes;
-  size: BigInt | null;
-  baseFeePerGas: BigInt | null;
-  difficulty: BigInt | null;
-  gasLimit: BigInt | null;
-  gasUsed: BigInt | null  ;
-  gasPrice: BigInt | null;
+  size: BigInt;
+  baseFeePerGas: BigInt;
+  difficulty: BigInt;
+  gasLimit: BigInt;
+  gasUsed: BigInt;
+  gasPrice: BigInt;
   parentHash: Bytes;
-  burntFees: BigInt | null;
-  chunkCount: BigInt | null;
-  transactionCount: BigInt | null;
-  rewards: BigInt | null;
+  burntFees: BigInt;
+  chunkCount: BigInt;
+  transactionCount: BigInt;
+  rewards: BigInt;
   constructor(
     height: BigInt,
     hash: Bytes,
     timestamp: BigInt,
     author: Bytes,
-    difficulty: BigInt | null,
-    gasLimit: BigInt | null,
-    gasUsed: BigInt | null,
+    difficulty: BigInt,
+    gasLimit: BigInt,
+    gasUsed: BigInt,
     parentHash: Bytes,
-    size: BigInt | null,
-    gasPrice: BigInt | null,
-    baseFeePerGas: BigInt | null,
-    burntFees: BigInt | null,
-    chunkCount: BigInt | null,
-    transactionCount: BigInt | null,
-    rewards: BigInt | null
+    size: BigInt,
+    gasPrice: BigInt,
+    baseFeePerGas: BigInt,
+    burntFees: BigInt,
+    chunkCount: BigInt,
+    transactionCount: BigInt,
+    rewards: BigInt
   ) {
     this.height = height;
     this.hash = hash;
@@ -76,26 +71,26 @@ export class BlockData {
 export class UpdateNetworkData {
   height: BigInt;
   timestamp: BigInt;
-  newDifficulty: BigInt | null;
-  newGasUsed: BigInt | null;
-  gasLimit: BigInt | null;
-  newBurntFees: BigInt | null;
-  newRewards: BigInt | null;
-  newTransactions: BigInt | null;
-  newSize: BigInt | null;
-  totalSupply: BigInt | null;
+  newDifficulty: BigInt;
+  newGasUsed: BigInt;
+  gasLimit: BigInt;
+  newBurntFees: BigInt;
+  newRewards: BigInt;
+  newTransactions: BigInt;
+  newSize: BigInt;
+  totalSupply: BigInt;
 
   constructor(
     height: BigInt,
     timestamp: BigInt,
-    newDifficulty: BigInt | null,
-    newGasUsed: BigInt | null,
-    gasLimit: BigInt | null,
-    newBurntFees: BigInt | null,
-    newRewards: BigInt | null,
-    newTransactions: BigInt | null,
-    newSize: BigInt | null,
-    totalSupply: BigInt | null
+    newDifficulty: BigInt,
+    newGasUsed: BigInt,
+    gasLimit: BigInt,
+    newBurntFees: BigInt,
+    newRewards: BigInt,
+    newTransactions: BigInt,
+    newSize: BigInt,
+    totalSupply: BigInt
   ) {
     this.height = height;
     this.timestamp = timestamp;
@@ -115,42 +110,64 @@ export class UpdateNetworkData {
 ////////////////////////
 
 export function handleArweaveBlock(block: arweave.Block): void {
+  // TODO: check in subgraph to ensure correctness
+  let blockDifficulty = BigInt.fromString(
+    BigDecimal.fromString(parseInt(block.diff.toHexString(), 16).toString())
+      .truncate(0)
+      .toString()
+  );
+
+  let blockSize = BigInt.fromString(
+    BigDecimal.fromString(
+      parseInt(block.blockSize.toHexString(), 16).toString()
+    )
+      .truncate(0)
+      .toString()
+  );
+  let blockRewards = BigInt.fromString(
+    BigDecimal.fromString(
+      parseInt(block.rewardPool.toHexString(), 16).toString()
+    )
+      .truncate(0)
+      .toString()
+  );
+
   let blockData = new BlockData(
-    BigInt.fromI64(block.height), // TODO
-    block.hash,
-    block.timestamp,
-    block.author,
-    block.difficulty,
-    block.gasLimit,
-    block.gasUsed,
-    block.parentHash,
-    block.size,
-    null,
-    block.baseFeePerGas,
-    burntFees,
-    null,
-    null,
-    null
+    BigInt.fromI64(block.height),
+    block.indepHash,
+    BigInt.fromI64(block.timestamp),
+    block.rewardAddr,
+    blockDifficulty,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    block.previousBlock,
+    blockSize,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BigInt.fromI32(block.txs.length),
+    blockRewards
   );
   createBlock(blockData);
 
   // update network entity
   let updateNetworkData = new UpdateNetworkData(
-    block.number,
-    block.timestamp,
-    block.difficulty,
-    block.gasUsed,
-    block.gasLimit,
-    burntFees,
-    null,
-    null,
-    block.size,
-    null
+    BigInt.fromI64(block.height),
+    BigInt.fromI64(block.timestamp),
+    blockDifficulty,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    blockRewards,
+    BigInt.fromI32(block.txs.length),
+    blockSize,
+    BIGINT_ZERO
   );
   let network = updateNetwork(updateNetworkData);
 
   // update author entity
-  let authorId = block.author;
+  let authorId = block.rewardAddr;
   let author = Author.load(authorId);
   if (!author) {
     author = new Author(authorId);
@@ -163,9 +180,8 @@ export function handleArweaveBlock(block: arweave.Block): void {
     network.save();
   }
   author.cumulativeBlocksCreated++;
-  author.cumulativeDifficulty = author.cumulativeDifficulty.plus(
-    block.difficulty
-  );
+  author.cumulativeDifficulty =
+    author.cumulativeDifficulty.plus(blockDifficulty);
   author.save();
 
   // create/update daily/hourly metrics
@@ -180,17 +196,17 @@ export function handleCosmosBlock(block: cosmos.Block): void {
     header.hash,
     BigInt.fromI64(header.time.seconds),
     header.validatorsHash,
-    null,
-    null,
-    null,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
     header.lastCommitHash,
-    null,
-    null,
-    null,
-    null,
-    null,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
     BigInt.fromI32(block.transactions.length),
-    null
+    BIGINT_ZERO
   );
   createBlock(blockData);
 
@@ -198,14 +214,14 @@ export function handleCosmosBlock(block: cosmos.Block): void {
   let updateNetworkData = new UpdateNetworkData(
     BigInt.fromI64(header.height),
     BigInt.fromI64(header.time.seconds),
-    null,
-    null,
-    null,
-    null,
-    null,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
     BigInt.fromI32(block.transactions.length),
-    null,
-    null
+    BIGINT_ZERO,
+    BIGINT_ZERO
   );
   let network = updateNetwork(updateNetworkData);
 
@@ -231,8 +247,8 @@ export function handleCosmosBlock(block: cosmos.Block): void {
 
 export function handleEvmBlock(block: ethereum.Block): void {
   let burntFees = block.baseFeePerGas
-    ? block.baseFeePerGas.times(block.gasUsed)
-    : null;
+    ? block.baseFeePerGas!.times(block.gasUsed)
+    : BIGINT_ZERO;
 
   let blockData = new BlockData(
     block.number,
@@ -243,13 +259,13 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.gasLimit,
     block.gasUsed,
     block.parentHash,
-    block.size,
-    null,
-    block.baseFeePerGas,
+    block.size ? block.size! : BIGINT_ZERO,
+    BIGINT_ZERO,
+    block.baseFeePerGas ? block.baseFeePerGas! : BIGINT_ZERO,
     burntFees,
-    null,
-    null,
-    null
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO
   );
   createBlock(blockData);
 
@@ -261,10 +277,10 @@ export function handleEvmBlock(block: ethereum.Block): void {
     block.gasUsed,
     block.gasLimit,
     burntFees,
-    null,
-    null,
-    block.size,
-    null
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    block.size ? block.size! : BIGINT_ZERO,
+    BIGINT_ZERO
   );
   let network = updateNetwork(updateNetworkData);
 
@@ -296,17 +312,19 @@ export function handleNearBlock(block: near.Block): void {
   let header = block.header;
 
   // get timestamp in seconds (from nano seconds)
-  let timestampBD = header.timestampNanosec.toBigDecimal().div(exponentToBigDecimal(INT_NINE));
+  let timestampBD = BigDecimal.fromString(
+    header.timestampNanosec.toString()
+  ).div(exponentToBigDecimal(INT_NINE));
   let timestamp = BigInt.fromString(timestampBD.truncate(0).toString());
 
   // add up gasLimit / gasUsed / burntFees
   let gasLimit = BIGINT_ZERO;
   let gasUsed = BIGINT_ZERO;
   let burntFees = BIGINT_ZERO;
-  for (let chunk of chunks) {
-    gasLimit = gasLimit.plus(chunk.gasLimit);
-    gasUsed = gasUsed.plus(chunk.gasUsed);
-    burntFees = burntFees.plus(chunk.balanceBurnt);
+  for (let i = 0; i < chunks.length; i++) {
+    gasLimit = gasLimit.plus(BigInt.fromI64(chunks[i].gasLimit));
+    gasUsed = gasUsed.plus(BigInt.fromI64(chunks[i].gasUsed));
+    burntFees = burntFees.plus(chunks[i].balanceBurnt);
   }
 
   let blockData = new BlockData(
@@ -314,17 +332,17 @@ export function handleNearBlock(block: near.Block): void {
     header.hash,
     timestamp,
     Bytes.fromHexString(block.author),
-    null,
+    BIGINT_ZERO,
     gasLimit,
     gasUsed,
     header.prevHash,
-    null,
+    BIGINT_ZERO,
     header.gasPrice,
-    null,
+    BIGINT_ZERO,
     burntFees,
     BigInt.fromI32(chunks.length),
-    null,
-    null
+    BIGINT_ZERO,
+    BIGINT_ZERO
   );
   createBlock(blockData);
 
@@ -332,13 +350,13 @@ export function handleNearBlock(block: near.Block): void {
   let updateNetworkData = new UpdateNetworkData(
     BigInt.fromI64(header.height),
     timestamp,
-    null,
+    BIGINT_ZERO,
     gasUsed,
     gasLimit,
     burntFees,
-    null,
-    null,
-    null,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
+    BIGINT_ZERO,
     header.totalSupply
   );
   let network = updateNetwork(updateNetworkData);

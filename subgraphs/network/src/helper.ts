@@ -36,21 +36,15 @@ export function updateNetwork(networkData: UpdateNetworkData): Network {
     networkData.newGasUsed
   );
   network.gasLimit = networkData.gasLimit;
-  network.cumulativeBurntFees = networkData.newBurntFees
-    ? network.cumulativeBurntFees.plus(networkData.newBurntFees)
-    : network.cumulativeBurntFees;
-  network.cumulativeRewards = networkData.newRewards
-    ? network.cumulativeRewards.plus(networkData.newRewards)
-    : network.cumulativeRewards;
-  network.cumulativeTransactions = networkData.newTransactions
-    ? network.cumulativeTransactions.plus(networkData.newTransactions.toI32())
-    : network.cumulativeTransactions;
-  network.cumulativeSize = networkData.newSize
-    ? network.cumulativeSize.plus(networkData.newSize.toI32())
-    : network.cumulativeSize;
-  network.totalSupply = networkData.totalSupply
-    ? networkData.totalSupply
-    : network.totalSupply;
+  network.cumulativeBurntFees = network.cumulativeBurntFees.plus(
+    networkData.newBurntFees
+  );
+  network.cumulativeRewards = network.cumulativeRewards.plus(
+    networkData.newRewards
+  );
+  network.cumulativeTransactions += networkData.newTransactions.toI32();
+  network.cumulativeSize = network.cumulativeSize.plus(networkData.newSize);
+  network.totalSupply = networkData.totalSupply;
 
   network.blocksPerDay = getBlocksPerDay(
     networkData.height,
@@ -84,7 +78,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   snapshot.cumulativeRewards = network.cumulativeRewards;
   snapshot.totalSupply = network.totalSupply;
   snapshot.cumulativeSize = network.cumulativeSize;
-  snapshot.gasPrice = blockData.gasPrice ? blockData.gasPrice : BIGINT_ZERO;
+  snapshot.gasPrice = blockData.gasPrice;
 
   // check for new daily authors
   let id =
@@ -102,7 +96,7 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
 
   // update daily metrics
   snapshot.dailyBlocks++;
-  let dailyBlocksBD = snapshot.dailyBlocks.toBigDecimal();
+  let dailyBlocksBD = BigDecimal.fromString(snapshot.dailyBlocks.toString());
 
   snapshot.dailyDifficulty = snapshot.dailyDifficulty.plus(
     blockData.difficulty
@@ -116,40 +110,37 @@ function updateDailySnapshot(blockData: BlockData, network: Network): void {
   snapshot.dailyCumulativeGasLimit = snapshot.dailyCumulativeGasLimit.plus(
     blockData.gasLimit
   );
-  snapshot.dailyBlockUtilization = snapshot.dailyCumulativeGasUsed
-    .toBigDecimal()
-    .div(snapshot.dailyCumulativeGasLimit.toBigDecimal())
-    .times(exponentToBigDecimal(INT_TWO));
   snapshot.dailyMeanGasUsed = snapshot.dailyCumulativeGasUsed
     .toBigDecimal()
     .div(dailyBlocksBD);
   snapshot.dailyMeanGasLimit = snapshot.dailyCumulativeGasLimit
     .toBigDecimal()
     .div(dailyBlocksBD);
-  snapshot.dailyBurntFees = blockData.burntFees
-    ? snapshot.dailyBurntFees.plus(blockData.burntFees)
-    : snapshot.dailyBurntFees;
-  snapshot.dailyRewards = blockData.rewards
-    ? snapshot.dailyRewards.plus(blockData.rewards)
-    : snapshot.dailyRewards;
+  snapshot.dailyBurntFees = snapshot.dailyBurntFees.plus(blockData.burntFees);
+  snapshot.dailyRewards = snapshot.dailyRewards.plus(blockData.rewards);
   snapshot.dailyMeanRewards = snapshot.dailyRewards
     .toBigDecimal()
     .div(dailyBlocksBD);
   snapshot.dailyMeanBlockSize = snapshot.dailyCumulativeSize
     .toBigDecimal()
     .div(dailyBlocksBD);
-  snapshot.dailyCumulativeSize = blockData.size
-    ? snapshot.dailyCumulativeSize.plus(blockData.size)
-    : snapshot.dailyCumulativeSize;
+  snapshot.dailyCumulativeSize = snapshot.dailyCumulativeSize.plus(
+    blockData.size
+  );
   snapshot.dailyMeanBlockSize = snapshot.dailyCumulativeSize
     .toBigDecimal()
     .div(dailyBlocksBD);
-  snapshot.dailyChunkCount = blockData.chunkCount
-    ? snapshot.dailyChunkCount.plus(blockData.chunkCount)
-    : snapshot.dailyChunkCount;
-  snapshot.dailyTransactionCount = blockData.transactionCount
-    ? snapshot.dailyTransactionCount.plus(blockData.transactionCount)
-    : snapshot.dailyTransactionCount;
+  snapshot.dailyChunkCount += blockData.chunkCount.toI32();
+  snapshot.dailyTransactionCount += blockData.transactionCount.toI32();
+
+  if (snapshot.dailyCumulativeGasLimit != BIGINT_ZERO) {
+    snapshot.dailyBlockUtilization = snapshot.dailyCumulativeGasUsed
+      .toBigDecimal()
+      .div(snapshot.dailyCumulativeGasLimit.toBigDecimal())
+      .times(exponentToBigDecimal(INT_TWO));
+  } else {
+    snapshot.dailyBlockUtilization = BIGDECIMAL_ZERO;
+  }
 
   if (network.totalSupply != BIGINT_ZERO) {
     // calculate new supply emitted this block
@@ -202,7 +193,7 @@ function updateHourlySnapshot(blockData: BlockData, network: Network): void {
 
   // update hourly metrics
   snapshot.hourlyBlocks++;
-  let hourlyBlocksBD = snapshot.hourlyBlocks.toBigDecimal();
+  let hourlyBlocksBD = BigDecimal.fromString(snapshot.hourlyBlocks.toString());
 
   snapshot.hourlyDifficulty = snapshot.hourlyDifficulty.plus(
     blockData.difficulty
@@ -216,40 +207,37 @@ function updateHourlySnapshot(blockData: BlockData, network: Network): void {
   snapshot.hourlyCumulativeGasLimit = snapshot.hourlyCumulativeGasLimit.plus(
     blockData.gasLimit
   );
-  snapshot.hourlyBlockUtilization = snapshot.hourlyCumulativeGasUsed
-    .toBigDecimal()
-    .div(snapshot.hourlyCumulativeGasLimit.toBigDecimal())
-    .times(exponentToBigDecimal(INT_TWO));
   snapshot.hourlyMeanGasUsed = snapshot.hourlyCumulativeGasUsed
     .toBigDecimal()
     .div(hourlyBlocksBD);
   snapshot.hourlyMeanGasLimit = snapshot.hourlyCumulativeGasLimit
     .toBigDecimal()
     .div(hourlyBlocksBD);
-  snapshot.hourlyBurntFees = blockData.burntFees
-    ? snapshot.hourlyBurntFees.plus(blockData.burntFees)
-    : snapshot.hourlyBurntFees;
-  snapshot.hourlyRewards = blockData.rewards
-    ? snapshot.hourlyRewards.plus(blockData.rewards)
-    : snapshot.hourlyRewards;
+  snapshot.hourlyBurntFees = snapshot.hourlyBurntFees.plus(blockData.burntFees);
+  snapshot.hourlyRewards = snapshot.hourlyRewards.plus(blockData.rewards);
   snapshot.hourlyMeanRewards = snapshot.hourlyRewards
     .toBigDecimal()
     .div(hourlyBlocksBD);
   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
     .toBigDecimal()
     .div(hourlyBlocksBD);
-  snapshot.hourlyCumulativeSize = blockData.size
-    ? snapshot.hourlyCumulativeSize.plus(blockData.size)
-    : snapshot.hourlyCumulativeSize;
+  snapshot.hourlyCumulativeSize = snapshot.hourlyCumulativeSize.plus(
+    blockData.size
+  );
   snapshot.hourlyMeanBlockSize = snapshot.hourlyCumulativeSize
     .toBigDecimal()
     .div(hourlyBlocksBD);
-  snapshot.hourlyChunkCount = blockData.chunkCount
-    ? snapshot.hourlyChunkCount.plus(blockData.chunkCount)
-    : snapshot.hourlyChunkCount;
-  snapshot.hourlyTransactionCount = blockData.transactionCount
-    ? snapshot.hourlyTransactionCount.plus(blockData.transactionCount)
-    : snapshot.hourlyTransactionCount;
+  snapshot.hourlyChunkCount += blockData.chunkCount.toI32();
+  snapshot.hourlyTransactionCount += blockData.transactionCount.toI32();
+
+  if (snapshot.hourlyCumulativeGasLimit != BIGINT_ZERO) {
+    snapshot.hourlyBlockUtilization = snapshot.hourlyCumulativeGasUsed
+      .toBigDecimal()
+      .div(snapshot.hourlyCumulativeGasLimit.toBigDecimal())
+      .times(exponentToBigDecimal(INT_TWO));
+  } else {
+    snapshot.hourlyBlockUtilization = BIGDECIMAL_ZERO;
+  }
 
   if (network.totalSupply != BIGINT_ZERO) {
     // calculate new supply emitted this block
@@ -305,6 +293,7 @@ function getOrCreateDailySnapshot(
     dailySnapshot.dailySupplyIncrease = BIGINT_ZERO;
     dailySnapshot.firstTimestamp = timestamp;
     dailySnapshot.dailyMeanBlockInterval = BIGDECIMAL_ZERO;
+    dailySnapshot.cumulativeSize = BIGINT_ZERO;
     dailySnapshot.dailyCumulativeSize = BIGINT_ZERO;
     dailySnapshot.dailyMeanBlockSize = BIGDECIMAL_ZERO;
     dailySnapshot.dailyChunkCount = INT_ZERO;
@@ -348,6 +337,7 @@ function getOrCreateHourlySnapshot(
     hourlySnapshot.hourlySupplyIncrease = BIGINT_ZERO;
     hourlySnapshot.firstTimestamp = timestamp;
     hourlySnapshot.hourlyMeanBlockInterval = BIGDECIMAL_ZERO;
+    hourlySnapshot.cumulativeSize = BIGINT_ZERO;
     hourlySnapshot.hourlyCumulativeSize = BIGINT_ZERO;
     hourlySnapshot.hourlyMeanBlockSize = BIGDECIMAL_ZERO;
     hourlySnapshot.hourlyChunkCount = INT_ZERO;
@@ -370,10 +360,11 @@ export function createBlock(blockData: BlockData): void {
   block.difficulty = blockData.difficulty;
   block.gasLimit = blockData.gasLimit;
   block.gasUsed = blockData.gasUsed;
+  block.gasPrice = blockData.gasPrice;
   block.parentHash = blockData.parentHash;
   block.burntFees = blockData.burntFees;
-  block.chunkCount = blockData.chunkCount?.toI32();
-  block.transactionCount = blockData.transactionCount?.toI32();
+  block.chunkCount = blockData.chunkCount.toI32();
+  block.transactionCount = blockData.transactionCount.toI32();
   block.rewards = blockData.rewards;
 
   if (block.gasLimit && block.gasLimit != BIGINT_ZERO) {

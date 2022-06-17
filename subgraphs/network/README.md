@@ -153,7 +153,7 @@ class Block {
 - BSC: https://thegraph.com/hosted-service/subgraph/dmelotik/network-bsc
 - Celo: https://thegraph.com/hosted-service/subgraph/dmelotik/network-celo
 - Clover: https://thegraph.com/hosted-service/subgraph/dmelotik/network-clover
-- Cronos: https://thegraph.com/hosted-service/subgraph/dmelotik/network-cronos
+- Cronos: TODO: use cronos protal
 - Fantom: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fantom
 - Fuse: https://thegraph.com/hosted-service/subgraph/dmelotik/network-fuse
 - Harmony: https://thegraph.com/hosted-service/subgraph/dmelotik/network-harmony
