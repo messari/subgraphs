@@ -52,6 +52,8 @@ export function getOrCreateFinancialDailyMetric(event: ethereum.Event): Financia
         financialMetric._initialDepositUSD = protocol.totalDepositBalanceUSD;
         financialMetric._initialBorrowUSD = protocol.totalBorrowBalanceUSD;
         financialMetric._initialLiquidateUSD = protocol.cumulativeLiquidateUSD;
+
+        financialMetric.save();
     }
 
     return financialMetric;
@@ -84,6 +86,8 @@ export function getOrCreateUsageDailyMetric(event: ethereum.Event): UsageMetrics
         usageMetric._dailyStakeCount = ZERO_I32;
         usageMetric._dailyUnstakeCount = ZERO_I32;
         usageMetric._dailyClaimCount = ZERO_I32;
+
+        usageMetric.save();
     }
 
     return usageMetric;
@@ -118,6 +122,8 @@ export function getOrCreateUsageHourlyMetric(event: ethereum.Event): UsageMetric
         usageMetric._hourlyStakeCount = ZERO_I32;
         usageMetric._hourlyUnstakeCount = ZERO_I32;
         usageMetric._hourlyClaimCount = ZERO_I32;
+
+        usageMetric.save();
     }
 
     return usageMetric;
@@ -159,6 +165,8 @@ export function getOrCreateMarketDailySnapshot(market: Market, event: ethereum.E
         marketSnapshot._initialDepositUSD = market.totalDepositBalanceUSD;
         marketSnapshot._initialBorrowUSD = market.totalBorrowBalanceUSD;
         marketSnapshot._initialLiquidateUSD = market.cumulativeLiquidateUSD;
+
+        marketSnapshot.save();
     }
 
     return marketSnapshot;
@@ -200,6 +208,8 @@ export function getOrCreateMarketHourlySnapshot(market: Market, event: ethereum.
         marketSnapshot._initialDepositUSD = market.totalDepositBalanceUSD;
         marketSnapshot._initialBorrowUSD = market.totalBorrowBalanceUSD;
         marketSnapshot._initialLiquidateUSD = market.cumulativeLiquidateUSD;
+
+        marketSnapshot.save();
     }
 
     return marketSnapshot;

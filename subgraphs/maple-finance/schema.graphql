@@ -122,7 +122,7 @@ enum LoanVersion {
 # different duration/maturity per market. You can append a counter
 # to the IDs to differentiate.
 type InterestRate @entity {
-    " { Interest rate side }-{ Interest rate type }-{ Market ID } "
+    " { Interest rate side }-{ Interest rate type }-{ Loan ID } "
     id: ID!
 
     " Interest rate in percentage APY. E.g. 5.21% should be stored as 5.21 "
@@ -142,6 +142,9 @@ type InterestRate @entity {
 
     " The loan that this rate exists for "
     _loan: _Loan!
+
+    " The market that this interest rate belongs to "
+    _market: Market!
 }
 
 #############################
@@ -625,47 +628,8 @@ type Market @entity {
     " Address of the liqudity locker for this market "
     _liquidityLockerAddress: String!
 
-    " Sum of all historical market input token deposits (only considers deposits and not withdrawals) "
-    _cumulativeDeposit: BigInt!
-
-    " Total amount of market input tokens currently borrowered from the market "
-    _totalBorrowBalance: BigInt!
-
-    " Total amount of market input tokens that were borrowed from the market (only considered borrows and not repays) "
-    _cumulativeBorrow: BigInt!
-
-    " Total amount of market inputs tokens that resulted in pool losses from liquidations "
-    _cumulativePoolDefault: BigInt!
-
-    " Total amount of borrowers collatoral liquidated in market input tokens "
-    _cumulativeCollatoralLiquidationInPoolInputTokens: BigInt!
-
-    " Revenue going to the pool delegate in market input tokens "
-    _poolDelegateRevenue: BigInt!
-
-    " Revenue going to the pool delegate in USD "
-    _poolDelegateRevenueUSD: BigDecimal!
-
-    " Revenue going to the maple treasury in market input tokens "
-    _treasuryRevenue: BigInt!
-
-    " Revenue going to the maple treasury in USD "
-    _treasuryRevenueUSD: BigDecimal!
-
-    " Revenue going to the suppliers in market input tokens "
-    _supplierRevenue: BigInt!
-
-    " Revenue going to the suppliers in USD "
-    _supplierRevenueUSD: BigDecimal!
-
-    " Supply side recenue in USD "
-    _supplySideRevenueUSD: BigDecimal!
-
-    " Revenue going to the supply side in USD "
-    _protocolSideRevenueUSD: BigDecimal!
-
-    " Total revenue of the market in USD "
-    _totalRevenueUSD: BigDecimal!
+    " Amount of input token per full share of output token at market creation "
+    _initialExchangeRate: BigDecimal!
 
     " Maple market pool LP rewards "
     _mplRewardMplLp: _MplReward
@@ -673,11 +637,56 @@ type Market @entity {
     " Maple pool LP rewards "
     _mplRewardMplStake: _MplReward
 
+    " Sum of all historical deposits in input token deposits "
+    _cumulativeDeposit: BigInt!
+
+    " Sum of all historical principal withdraws (minus unrecognized losses) in market input tokens "
+    _cumulativeWithdraw: BigInt!
+
+    " Sum of all historical borrows in market input tokens "
+    _cumulativeBorrow: BigInt!
+
+    " Sum of all historical principal repaid in market input tokens "
+    _cumulativePrincipalRepay: BigInt!
+
+    " Sum of all historical pool interest in market input tokens "
+    _cumulativeInterest: BigInt!
+
+    " Sum of all historical pool interest claimed in market input tokens "
+    _cumulativeInterestClaimed: BigInt!
+
+    " Sum of all historical pool losses in market input tokens "
+    _cumulativePoolLosses: BigInt!
+
+    " Sum of all historical pool delegate revenue in market input tokens "
+    _cumulativePoolDelegateRevenue: BigInt!
+
+    " Sum of all historical treasury revenue in market input tokens "
+    _cumulativeTreasuryRevenue: BigInt!
+
+    " Total amount deposited on supply side in market input tokens "
+    _totalDepositBalance: BigInt!
+
+    " Total amount of interest held by market in market input tokens "
+    _totalInterstBalance: BigInt!
+
+    " Total amount of being borrowed in market input tokens"
+    _totalBorrowBalance: BigInt!
+
+    " Sum of all liquidations in market input tokens"
+    _cumulativeLiquidate: BigInt!
+
+    " Sum of all supply side revenue in USD "
+    _cumulativeSupplySideRevenueUSD: BigDecimal!
+
+    " Sum of all protocol side revenue in USD "
+    _cumulativeProtocolSideRevenueUSD: BigDecimal!
+
+    " Sum of total revenue in USD "
+    _cumulativeTotalRevenueUSD: BigDecimal!
+
     " All loans that have been taken out of this market "
     _loans: [_Loan!]! @derivedFrom(field: "market")
-
-    " Amount of input token per full share of output token at market creation "
-    _initialExchangeRate: BigDecimal!
 }
 
 #################################
@@ -1184,29 +1193,29 @@ type _StakeLocker @entity {
     " Token that the stake locker takes as input "
     stakeToken: Token!
 
+    " Block the stake locker was created "
+    creationBlockNumber: BigInt!
+
+    " Cumulative stake in stakeToken (not including unstakes) "
+    cumulativeStake: BigInt!
+
+    " Cumulative stake in stakeToken "
+    cumulativeUnstake: BigInt!
+
+    " Cumulative losses in stakeToken sustained by the pool "
+    cumulativeLosses: BigInt!
+
+    " Cumulative losses in pool input tokens sustained by the pool "
+    cumulativeLossesInPoolInputToken: BigInt!
+
+    " Cumulative interst earned in pool input tokens "
+    cumulativeInterestInPoolInputTokens: BigInt!
+
     " Amount of stake tokens in the stake locker "
     stakeTokenBalance: BigInt!
 
-    " Amount of stake tokens in the stake locker, in USD "
+    " Amount of pool input token equivilent in the stake locker "
     stakeTokenBalanceInPoolInputTokens: BigInt!
-
-    " Price of the stake token in USD "
-    stakeTokenPriceUSD: BigDecimal!
-
-    " Amount of stake tokens the pool lost to covering loan defaults "
-    cumulativeStakeDefault: BigInt!
-
-    " Amount of stake tokens the pool lost to covering loan defaults in pool inpit equivilent "
-    cumulativeStakeDefaultInPoolInputTokens: BigInt!
-
-    " Revenue of the stake locker in pool input tokens  "
-    revenueInPoolInputTokens: BigInt!
-
-    " Revenue of the stake locker in USD "
-    revenueUSD: BigDecimal!
-
-    " Block the stake locker was created "
-    creationBlock: BigInt!
 
     " Block the stake locker was last updated "
     lastUpdatedBlockNumber: BigInt!
@@ -1351,14 +1360,20 @@ type _Loan @entity {
     " Market the loan is borrowing from "
     market: Market!
 
+    " Version of the loan "
+    version: LoanVersion!
+
+    " Interst rate for the loan "
+    interestRate: InterestRate!
+
+    " Block number this loan was originally funded "
+    creationBlockNumber: BigInt!
+
     " Amount the loan was funded for in market input tokens "
     amountFunded: BigInt!
 
-    " Number of days this loan was taken out for "
-    termDays: BigInt!
-
-    " Interest rate in apr of the loan "
-    interestRate: BigDecimal!
+    " Number of times the loan was refinanced (V2 and V3 only) "
+    refinanceCount: BigInt!
 
     " Amount of the loan that was drawn down out of the loan contract in market input tokens "
     drawnDown: BigInt!
@@ -1369,17 +1384,8 @@ type _Loan @entity {
     " Amout of interest paid on the loan in market input tokens "
     interestPaid: BigInt!
 
-    " Amout of collatoral recovered from a liquidation in market input tokens "
-    collateralLiquidatedInPoolInputTokens: BigInt!
-
     " Amount of default remaining after liquidations that the stake and pool must cover in market input tokens "
     defaultSuffered: BigInt!
-
-    " Block number this loan was originally funded "
-    creationBlockNumber: BigInt!
-
-    " Version of the loan "
-    version: LoanVersion!
 }
 
 type _MplReward @entity {

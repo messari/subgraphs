@@ -12,6 +12,9 @@ import { createEventFromCall } from "../common/utils";
 import { getOrCreatePoolFactory, getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
 
 export function handleGlobalsParamSet(event: GlobalsParamSetEvent): void {
+    ////
+    // Update protocol
+    ////
     if (PROTOCOL_GLOBAL_PARAMS_TREASURY_FEE_KEY == event.params.which.toString()) {
         const protocol = getOrCreateProtocol();
 
@@ -28,7 +31,7 @@ export function handleSetValidPoolFactory(call: SetValidPoolFactoryCall): void {
     // Create pool factory template
     PoolFactoryTemplate.create(poolFactoryAddress);
 
-    // Trigger protocol creation here for convienence
+    // Trigger protocol creation
     getOrCreateProtocol();
 
     // Create pool factory entity

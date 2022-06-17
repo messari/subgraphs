@@ -2,13 +2,15 @@ import { PoolCreated as PoolCreatedEvent } from "../../generated/templates/PoolF
 import { Pool as PoolTemplate, StakeLocker as StakeLockerTemplate } from "../../generated/templates";
 import { getOrCreatePoolFactory } from "../common/mappingHelpers/getOrCreate/protocol";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
-import { getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
+import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 
 export function handlePoolCreated(event: PoolCreatedEvent): void {
     const poolAddress = event.params.pool;
     const stakeLockerAddress = event.params.stakeLocker;
 
+    ////
     // Create pool and stake locker templates
+    ////
     PoolTemplate.create(poolAddress);
     StakeLockerTemplate.create(stakeLockerAddress);
 
@@ -17,14 +19,21 @@ export function handlePoolCreated(event: PoolCreatedEvent): void {
     const outputTokenAddress = poolAddress;
     const stakeTokenAddress = event.params.stakeAsset;
 
+    ////
     // Create the things the market references
+    ////
     getOrCreatePoolFactory(event, poolFactoryAddress);
     getOrCreateToken(inputTokenAddress);
     getOrCreateToken(outputTokenAddress);
     getOrCreateToken(stakeTokenAddress);
 
-    // getOrCreateMarket(event, poolAddress);
+    ////
+    // Create market
+    ////
+    getOrCreateMarket(event, poolAddress);
 
+    ////
     // Create the stake locker for this market
+    ////
     getOrCreateStakeLocker(event, stakeLockerAddress);
 }

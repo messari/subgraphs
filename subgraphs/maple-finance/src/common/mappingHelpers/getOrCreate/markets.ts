@@ -1,6 +1,6 @@
 import { Address, ethereum, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 
-import { Market, _AccountMarket, _Loan, _MplReward, _StakeLocker } from "../../../../generated/schema";
+import { InterestRate, Market, _AccountMarket, _Loan, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { LoanV2OrV3 as LoanV2OrV3Contract } from "../../../../generated/templates/LoanV2OrV3/LoanV2OrV3";
 import { LoanV1 as LoanV1Contract } from "../../../../generated/templates/LoanV1/LoanV1";
 import { Pool as PoolContract } from "../../../../generated/templates/Pool/Pool";
@@ -12,6 +12,8 @@ import {
     MPL_REWARDS_DEFAULT_DURATION_TIME_S,
     POOL_WAD_DECIMALS,
     PROTOCOL_ID,
+    PROTOCOL_INTEREST_RATE_SIDE,
+    PROTOCOL_INTEREST_RATE_TYPE,
     SEC_PER_DAY,
     TEN_BD,
     ZERO_ADDRESS,
@@ -105,24 +107,28 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._delegateAddress = delegateAddress.toHexString();
         market._stakeLocker = stakeLockerAddress.toHexString();
         market._liquidityLockerAddress = liquidityLockerAddress.toHexString();
-        market._cumulativeDeposit = ZERO_BI;
-        market._totalBorrowBalance = ZERO_BI;
-        market._cumulativeBorrow = ZERO_BI;
-        market._cumulativePoolDefault = ZERO_BI;
-        market._cumulativeCollatoralLiquidationInPoolInputTokens = ZERO_BI;
-        market._poolDelegateRevenue = ZERO_BI;
-        market._poolDelegateRevenueUSD = ZERO_BD;
-        market._treasuryRevenue = ZERO_BI;
-        market._treasuryRevenueUSD = ZERO_BD;
-        market._supplierRevenue = ZERO_BI;
-        market._supplierRevenueUSD = ZERO_BD;
-        market._supplySideRevenueUSD = ZERO_BD;
-        market._protocolSideRevenueUSD = ZERO_BD;
-        market._totalRevenueUSD = ZERO_BD;
 
         // No maple rewards pools to begin with, they get added on MplRewards.sol->MplRewardsCreated
         market._mplRewardMplLp = null;
         market._mplRewardMplStake = null;
+
+        market._cumulativeDeposit = ZERO_BI;
+        market._cumulativeWithdraw = ZERO_BI;
+        market._cumulativeBorrow = ZERO_BI;
+        market._cumulativePrincipalRepay = ZERO_BI;
+        market._cumulativeInterest = ZERO_BI;
+        market._cumulativeInterestClaimed = ZERO_BI;
+        market._cumulativePoolLosses = ZERO_BI;
+        market._cumulativePoolDelegateRevenue = ZERO_BI;
+        market._cumulativeTreasuryRevenue = ZERO_BI;
+        market._totalDepositBalance = ZERO_BI;
+        market._totalInterstBalance = ZERO_BI;
+        market._totalBorrowBalance = ZERO_BI;
+        market._cumulativeLiquidate = ZERO_BI;
+        market._cumulativeSupplySideRevenueUSD = ZERO_BD;
+        market._cumulativeProtocolSideRevenueUSD = ZERO_BD;
+        market._cumulativeTotalRevenueUSD = ZERO_BD;
+
         market.save();
     }
 
@@ -154,14 +160,16 @@ export function getOrCreateStakeLocker(event: ethereum.Event, stakeLockerAddress
 
         stakeLocker.market = marketAddress.toHexString();
         stakeLocker.stakeToken = stakeTokenAddress.toHexString();
+        stakeLocker.creationBlockNumber = event.block.number;
+
+        stakeLocker.cumulativeStake = ZERO_BI;
+        stakeLocker.cumulativeUnstake = ZERO_BI;
+        stakeLocker.cumulativeLosses = ZERO_BI;
+        stakeLocker.cumulativeLossesInPoolInputToken = ZERO_BI;
+        stakeLocker.cumulativeInterestInPoolInputTokens = ZERO_BI;
+
         stakeLocker.stakeTokenBalance = ZERO_BI;
         stakeLocker.stakeTokenBalanceInPoolInputTokens = ZERO_BI;
-        stakeLocker.stakeTokenPriceUSD = ZERO_BD;
-        stakeLocker.cumulativeStakeDefault = ZERO_BI;
-        stakeLocker.cumulativeStakeDefaultInPoolInputTokens = ZERO_BI;
-        stakeLocker.revenueInPoolInputTokens = ZERO_BI;
-        stakeLocker.revenueUSD = ZERO_BD;
-        stakeLocker.creationBlock = event.block.number;
         stakeLocker.lastUpdatedBlockNumber = event.block.number;
 
         stakeLocker.save();
@@ -171,14 +179,64 @@ export function getOrCreateStakeLocker(event: ethereum.Event, stakeLockerAddress
 }
 
 /**
+ * Create an interest rate, this also adds it to the market that the loan belongs to.
+ * @param loan loan this interest rate if for
+ * @param rate rate in percentage APY (i.e 5.31% should be stored as 5.31)
+ * @param durationDays number of days for the loan
+ */
+export function getOrCreateInterestRate(
+    event: ethereum.Event,
+    loan: _Loan,
+    rate: BigDecimal = ZERO_BD,
+    durationDays: BigInt = ZERO_BI
+): InterestRate {
+    const id = PROTOCOL_INTEREST_RATE_SIDE + "-" + PROTOCOL_INTEREST_RATE_TYPE + "-" + loan.id;
+    let interestRate = InterestRate.load(id);
+
+    if (!interestRate) {
+        interestRate = new InterestRate(id);
+
+        const market = getOrCreateMarket(event, Address.fromString(loan.market));
+        log.warning("{}, {}, {}, {}, {}", [
+            rate.toString(),
+            durationDays.toString(),
+            "null",
+            PROTOCOL_INTEREST_RATE_SIDE,
+            PROTOCOL_INTEREST_RATE_TYPE,
+            loan.id,
+            market.id
+        ]);
+
+        interestRate.rate = rate;
+        interestRate.duration = durationDays.toI32();
+        interestRate.maturityBlock = null; // Doesn't apply here
+        interestRate.side = PROTOCOL_INTEREST_RATE_SIDE;
+        interestRate.type = PROTOCOL_INTEREST_RATE_TYPE;
+        interestRate._loan = loan.id;
+        interestRate._market = market.id;
+
+        interestRate.save();
+
+        if (ZERO_BD == rate || ZERO_BI == durationDays) {
+            log.error("Created interest rate with invalid params: rate={}, durationDays={}", [
+                rate.toString(),
+                durationDays.toString()
+            ]);
+        }
+    }
+
+    return interestRate;
+}
+
+/**
  * Get the loan at loanAddress, or create it if is doesn't already exist.
  * Only loanAddress is required for get, everything should be set for create
+ * On creation, interest rate is also added to the market
  */
 export function getOrCreateLoan(
     event: ethereum.Event,
     loanAddress: Address,
-    marketAddress: Address = ZERO_ADDRESS,
-    amountFunded: BigInt = ZERO_BI
+    marketAddress: Address = ZERO_ADDRESS
 ): _Loan {
     let loan = _Loan.load(loanAddress.toHexString());
 
@@ -194,14 +252,24 @@ export function getOrCreateLoan(
         // termDays                  |       -
         // paymentIntervalSeconds    |  paymentInterval
 
+        loan.market = marketAddress.toHexString();
+        loan.creationBlockNumber = event.block.number;
+        loan.amountFunded = ZERO_BI;
+        loan.refinanceCount = ZERO_BI;
+        loan.drawnDown = ZERO_BI;
+        loan.principalPaid = ZERO_BI;
+        loan.interestPaid = ZERO_BI;
+        loan.defaultSuffered = ZERO_BI;
+
         const tryTermDays = loanV1Contract.try_termDays();
 
         if (!tryTermDays.reverted) {
             // V1
             loan.version = LoanVersion.V1;
-            loan.termDays = tryTermDays.value;
             const rateFromContract = readCallResult(loanV1Contract.try_apr(), ZERO_BI, loanV1Contract.try_apr.name);
-            loan.interestRate = rateFromContract.toBigDecimal().div(BigDecimal.fromString("100"));
+            const rate = rateFromContract.toBigDecimal().div(BigDecimal.fromString("100"));
+            const interestRate = getOrCreateInterestRate(event, loan, rate, tryTermDays.value);
+            loan.interestRate = interestRate.id;
         } else {
             // V2 or V3
             loan.version = LoanVersion.V2_OR_V3;
@@ -219,7 +287,7 @@ export function getOrCreateLoan(
                 loanV2OrV3Contract.try_paymentsRemaining.name
             );
 
-            loan.termDays = bigDecimalToBigInt(
+            const termDays = bigDecimalToBigInt(
                 paymentIntervalSec
                     .times(paymentsRemaining)
                     .toBigDecimal()
@@ -233,26 +301,22 @@ export function getOrCreateLoan(
                 loanV2OrV3Contract.try_interestRate.name
             );
 
-            loan.interestRate = parseUnits(rateFromContract, 18);
+            const rate = parseUnits(rateFromContract, 18);
+            const interestRate = getOrCreateInterestRate(event, loan, rate, termDays);
+            loan.interestRate = interestRate.id;
         }
-
-        loan.market = marketAddress.toHexString();
-        loan.amountFunded = amountFunded;
-
-        loan.drawnDown = ZERO_BI;
-        loan.principalPaid = ZERO_BI;
-        loan.interestPaid = ZERO_BI;
-        loan.collateralLiquidatedInPoolInputTokens = ZERO_BI;
-        loan.defaultSuffered = ZERO_BI;
-        loan.creationBlockNumber = event.block.number;
 
         loan.save();
 
-        if (ZERO_ADDRESS == marketAddress || ZERO_BI == amountFunded) {
-            log.error("Created loan with invalid params: marketAddress={}, amountFunded={}", [
-                marketAddress.toHexString(),
-                amountFunded.toString()
-            ]);
+        // Add the interest rate to market to satisfy the std schema
+        const market = getOrCreateMarket(event, marketAddress);
+        const rates = market.rates;
+        rates.push(loan.interestRate);
+        market.rates = rates;
+        market.save();
+
+        if (ZERO_ADDRESS == marketAddress) {
+            log.error("Created loan with invalid params: marketAddress={}", [marketAddress.toHexString()]);
         }
     }
 
@@ -286,31 +350,13 @@ export function getOrCreateMplReward(event: ethereum.Event, mplRewardAddress: Ad
         const rewardToken = getOrCreateRewardToken(rewardTokenAddress);
         const stakeToken = getOrCreateToken(stakeTokenAddress);
 
-        // Explicity load market, we need to see if it exists
+        // Explicity load market, we need to see if it exists, if so MPL-LP
         let market = Market.load(stakeTokenAddress.toHexString());
 
-        if (market) {
-            // MPL-LP
-            market._mplRewardMplLp = mplReward.id;
-        } else {
+        if (!market) {
             // MPL-STAKE
             const stakeLocker = getOrCreateStakeLocker(event, stakeTokenAddress);
             market = getOrCreateMarket(event, Address.fromString(stakeLocker.market));
-            market._mplRewardMplStake = mplReward.id;
-        }
-
-        // Add reward token to market if it doesn't exist
-        let newRewardTokenForMarket = true;
-        for (let i = 0; i < market.rewardTokens.length; i++) {
-            if (market.rewardTokens[i] == rewardToken.id) {
-                newRewardTokenForMarket = false;
-            }
-        }
-
-        if (newRewardTokenForMarket) {
-            const newRewardTokens = market.rewardTokens;
-            newRewardTokens.push(rewardToken.id);
-            market.rewardTokens = newRewardTokens;
         }
 
         mplReward.market = market.id;
@@ -324,7 +370,6 @@ export function getOrCreateMplReward(event: ethereum.Event, mplRewardAddress: Ad
         mplReward.creationBlockNumber = event.block.number;
         mplReward.lastUpdatedBlockNumber = event.block.number;
 
-        market.save();
         mplReward.save();
     }
 

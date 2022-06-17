@@ -55,7 +55,7 @@ export function marketTick(market: Market, event: ethereum.Event): void {
     ////
     // Trigger stakeLocker tick
     ////
-    const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
+    const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(<string>market._stakeLocker));
     stakeLockerTick(event, stakeLocker);
 
     ////
@@ -88,10 +88,10 @@ export function marketTick(market: Market, event: ethereum.Event): void {
 
     market.cumulativeBorrowUSD = getTokenAmountInUSD(event, inputToken, market._cumulativeBorrow);
 
-    const cumulativeLiquidate = market._cumulativePoolDefault
-        .plus(market._cumulativeCollatoralLiquidationInPoolInputTokens)
-        .plus(stakeLocker.cumulativeStakeDefaultInPoolInputTokens);
-    market.cumulativeLiquidateUSD = getTokenAmountInUSD(event, inputToken, cumulativeLiquidate);
+    // const cumulativeLiquidate = market._cumulativePoolDefault
+    //     .plus(market._cumulativeCollatoralLiquidationInPoolInputTokens)
+    //     .plus(stakeLocker.cumulativeStakeDefaultInPoolInputTokens);
+    // market.cumulativeLiquidateUSD = getTokenAmountInUSD(event, inputToken, cumulativeLiquidate);
 
     market._poolDelegateRevenueUSD = getTokenAmountInUSD(event, inputToken, market._poolDelegateRevenue);
 
@@ -99,9 +99,9 @@ export function marketTick(market: Market, event: ethereum.Event): void {
 
     market._supplierRevenueUSD = getTokenAmountInUSD(event, inputToken, market._supplierRevenue);
 
-    market._supplySideRevenueUSD = market._supplierRevenueUSD
-        .plus(market._poolDelegateRevenueUSD)
-        .plus(stakeLocker.revenueUSD);
+    // market._supplySideRevenueUSD = market._supplierRevenueUSD
+    //     .plus(market._poolDelegateRevenueUSD)
+    //     .plus(stakeLocker.revenueUSD);
 
     market._protocolSideRevenueUSD = market._treasuryRevenueUSD;
 
@@ -196,30 +196,30 @@ export function stakeLockerTick(event: ethereum.Event, stakeLocker: _StakeLocker
         const marketInputToken = getOrCreateToken(Address.fromString(market.inputToken));
 
         const poolLibContract = PoolLib.bind(MAPLE_POOL_LIB_ADDRESS);
-        const swapOutValueCall = poolLibContract.try_getSwapOutValueLocker(
-            Address.fromString(stakeLocker.stakeToken),
-            Address.fromString(market.inputToken),
-            Address.fromString(stakeLocker.id)
-        );
+        // const swapOutValueCall = poolLibContract.try_getSwapOutValueLocker(
+        //     Address.fromString(stakeLocker.stakeToken),
+        //     Address.fromString(market.inputToken),
+        //     Address.fromString(stakeLocker.id)
+        // );
 
-        if (swapOutValueCall.reverted) {
-            log.error("swapOutValueCall({}, {}, {}) reverted", [
-                stakeLocker.stakeToken,
-                market.inputToken,
-                stakeLocker.id
-            ]);
-        } else {
-            stakeLocker.cumulativeStakeDefaultInPoolInputTokens = swapOutValueCall.value;
-        }
+        // if (swapOutValueCall.reverted) {
+        //     log.error("swapOutValueCall({}, {}, {}) reverted", [
+        //         stakeLocker.stakeToken,
+        //         market.inputToken,
+        //         stakeLocker.id
+        //     ]);
+        // } else {
+        //     stakeLocker.cumulativeStakeDefaultInPoolInputTokens = swapOutValueCall.value;
+        // }
 
-        if (stakeLocker.stakeTokenBalance.notEqual(ZERO_BI)) {
-            stakeLocker.stakeTokenPriceUSD = stakeLocker.stakeTokenBalanceInPoolInputTokens
-                .toBigDecimal()
-                .times(market.inputTokenPriceUSD)
-                .div(stakeLocker.stakeTokenBalance.toBigDecimal());
-        }
+        // if (stakeLocker.stakeTokenBalance.notEqual(ZERO_BI)) {
+        //     stakeLocker.stakeTokenPriceUSD = stakeLocker.stakeTokenBalanceInPoolInputTokens
+        //         .toBigDecimal()
+        //         .times(market.inputTokenPriceUSD)
+        //         .div(stakeLocker.stakeTokenBalance.toBigDecimal());
+        // }
 
-        stakeLocker.revenueUSD = getTokenAmountInUSD(event, marketInputToken, stakeLocker.revenueInPoolInputTokens);
+        // stakeLocker.revenueUSD = getTokenAmountInUSD(event, marketInputToken, stakeLocker.revenueInPoolInputTokens);
 
         stakeLocker.lastUpdatedBlockNumber = event.block.number;
         stakeLocker.save();

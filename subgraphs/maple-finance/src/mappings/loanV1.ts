@@ -4,39 +4,47 @@ import {
     Drawdown as DrawdownEvent,
     PaymentMade as PaymentMadeEvent,
     Liquidation as LiquidationEvent
-} from "../../generated/templates/Loan/Loan";
-import { ZERO_BD, ZERO_BI } from "../common/constants";
+} from "../../generated/templates/LoanV1/LoanV1";
+import { ZERO_BI } from "../common/constants";
 
 import { getOrCreateLoan, getOrCreateMarket } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
-import { createBorrow, createLiquidate, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
-import { marketTick } from "../common/mappingHelpers/update/market";
+import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { bigDecimalToBigInt } from "../common/utils";
 
 export function handleDrawdown(event: DrawdownEvent): void {
     const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.drawdownAmount;
+    const protocol = getOrCreateProtocol();
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+
+    ////
+    // Create borrow
+    ////
     createBorrow(event, loan, drawdownAmount);
 
+    ////
     // Update loan
+    ////
     loan.drawnDown = loan.drawnDown.plus(drawdownAmount);
     loan.save();
 
+    ////
     // Update market
-    const protocol = getOrCreateProtocol();
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    market._treasuryRevenue = market._treasuryRevenue.plus(
+    ////
+    market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
     market.save();
-
-    // Trigger market tick
-    marketTick(market, event);
 }
 
 export function handlePaymentMade(event: PaymentMadeEvent): void {
     const loan = getOrCreateLoan(event, event.address);
-    createRepay(
+
+    ////
+    // Create repay
+    ////
+    const repay = createRepay(
         event,
         loan,
         event.params.principalPaid,
@@ -44,32 +52,22 @@ export function handlePaymentMade(event: PaymentMadeEvent): void {
         ZERO_BI // Treasury establishment fee happens on drawfown for V1 loans
     );
 
+    ////
     // Update loan
-    loan.principalPaid = loan.principalPaid.plus(event.params.principalPaid);
-    loan.interestPaid = loan.principalPaid.plus(event.params.interestPaid);
+    ////
+    loan.principalPaid = loan.principalPaid.plus(repay._principalPaid);
+    loan.interestPaid = loan.principalPaid.plus(repay._interestPaid);
     loan.save();
-
-    // Trigger market tick
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    marketTick(market, event);
 }
 
 export function handleLiquidation(event: LiquidationEvent): void {
     const loan = getOrCreateLoan(event, event.address);
 
-    // Update loan
-    const collatoralLiquidated = event.params.liquidityAssetReturned.minus(event.params.defaultSuffered);
-    loan.collateralLiquidatedInPoolInputTokens = loan.collateralLiquidatedInPoolInputTokens.plus(collatoralLiquidated);
-    loan.defaultSuffered = loan.defaultSuffered.plus(event.params.defaultSuffered);
-    loan.save();
-
-    // Update market
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    market._cumulativeCollatoralLiquidationInPoolInputTokens = market._cumulativeCollatoralLiquidationInPoolInputTokens.plus(
-        collatoralLiquidated
+    ////
+    // Update loan, liqudiation accounted as principal paid
+    ////
+    loan.principalPaid = loan.principalPaid.plus(
+        event.params.liquidityAssetReturned.minus(event.params.liquidationExcess)
     );
-    market.save();
-
-    // Trigger market tick
-    marketTick(market, event);
+    loan.save();
 }
