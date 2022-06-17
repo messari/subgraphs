@@ -23,6 +23,7 @@ import { _Trove, _TroveToken } from "../../generated/schema";
 import {
   addProtocolSideRevenue,
   addSupplySideRevenue,
+  incrementProtocolWithdrawCount,
   updateUsageMetrics,
 } from "../entities/protocol";
 import { Address, log } from "@graphprotocol/graph-ts";
@@ -90,14 +91,11 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     );
   }
 
-  const troveContract = TroveManager.bind(Address.fromString(TROVE_MANAGER));
-  const entireDebtAndCools = troveContract.try_getEntireDebtAndColls(borrower);
-  if(!entireDebtAndCools.reverted) {
-    for (let i = 0; i < entireDebtAndCools.value.value1.length; i++) {
-      const token = entireDebtAndCools.value.value1[i];
-      const amount = entireDebtAndCools.value.value2[i];
-  
-      const troveToken = getOrCreateTroveToken(trove, token);
+  if(trove.tokens){
+    for (let i = 0; i < trove.tokens!.length; i++) {
+      const troveToken = _TroveToken.load(trove.tokens!.at(i))!;
+      const tokenAddr = Address.fromString(troveToken.token)
+      const amount = troveToken.collateral;
       // Gas compensation already subtracted, only when (MCR <= ICR < TCR & SP.LUSD >= trove.debt)
       if (troveToken.collateral.gt(amount)) {
         // Add gas compensation back to liquidated collateral amount
@@ -114,8 +112,8 @@ export function handleTroveUpdated(event: TroveUpdated): void {
         troveToken.collateralSurplusChange = BIGINT_ZERO;
       }
       if (collateralReward.gt(BIGINT_ZERO)) {
-        const collateralRewardUSD = getUSDPriceWithoutDecimals(token, amount.toBigDecimal());
-        createDeposit(event, collateralReward, collateralRewardUSD, borrower,token);
+        const collateralRewardUSD = getUSDPriceWithoutDecimals(tokenAddr, amount.toBigDecimal());
+        createDeposit(event, collateralReward, collateralRewardUSD, borrower,tokenAddr);
       }
       const borrowAmountLUSD = newDebt.minus(trove.debt);
       if (borrowAmountLUSD.gt(BIGINT_ZERO)) {
@@ -184,20 +182,25 @@ function redeemCollateral(event: TroveUpdated, trove: _Trove): void {
       withdrawAmount = withdrawAmount.minus(troveToken.collateralSurplusChange);
       troveToken.collateralSurplusChange = BIGINT_ZERO;
     }
-    const withdrawAmountUSD = getUSDPriceWithoutDecimals(
-      token,
-      amount.toBigDecimal()
-    );
-    createWithdraw(
-      event,
-      withdrawAmount,
-      withdrawAmountUSD,
-      event.transaction.from,
-      token
-    );
+    if(withdrawAmount.gt(BIGINT_ZERO)){
+      const withdrawAmountUSD = getUSDPriceWithoutDecimals(
+        token,
+        amount.toBigDecimal()
+      );
+      createWithdraw(
+        event,
+        withdrawAmount,
+        withdrawAmountUSD,
+        event.transaction.from,
+        token
+      );
+    }
+   
     troveToken.save();
   }
   updateUsageMetrics(event, event.transaction.from);
+  incrementProtocolWithdrawCount(event);
+
 }
 
 function liquidateTrove(event: TroveUpdated, trove: _Trove): void {

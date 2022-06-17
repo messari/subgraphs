@@ -6,7 +6,7 @@ import { createWithdraw } from "../entities/event";
 import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
 import { getUSDPriceWithoutDecimals } from "../utils/price";
 import { BIGINT_ZERO } from "../utils/constants";
-import { updateUsageMetrics } from "../entities/protocol";
+import { incrementProtocolWithdrawCount, updateUsageMetrics } from "../entities/protocol";
 
 /**
  * Whenever a borrower's trove is closed by a non-owner address because of either:
@@ -51,4 +51,6 @@ export function handleCollBalanceUpdated(event: CollBalanceUpdated): void {
 
   trove.save();
   updateUsageMetrics(event, borrower);
+  incrementProtocolWithdrawCount(event);
+
 }

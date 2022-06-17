@@ -95,7 +95,6 @@ export function createWithdraw(
   withdraw.amount = amount;
   withdraw.amountUSD = amountUSD;
   withdraw.save();
-  incrementProtocolWithdrawCount(event);
 }
 
 export function createBorrow(
@@ -124,6 +123,7 @@ export function createBorrow(
   borrow.amount = amountYUSD;
   borrow.amountUSD = amountUSD;
   borrow.save();
+  addProtocolBorrowVolume(event, amountUSD);
 }
 
 export function createRepay(
@@ -153,7 +153,7 @@ export function createRepay(
   repay.amountUSD = amountUSD;
   repay.save();
   incrementProtocolRepayCount(event);
-  addProtocolBorrowVolume(event, amountUSD);
+
 }
 
 export function createLiquidate(

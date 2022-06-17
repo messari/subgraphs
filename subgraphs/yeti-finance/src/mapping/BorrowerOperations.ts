@@ -9,7 +9,7 @@ import {
   createWithdraw,
 } from "../entities/event";
 import { getOrCreateTrove, getOrCreateTroveToken } from "../entities/trove";
-import { addProtocolSideRevenue, updateUsageMetrics } from "../entities/protocol";
+import { addProtocolSideRevenue, incrementProtocolWithdrawCount, updateUsageMetrics } from "../entities/protocol";
 import { bigIntToBigDecimal } from "../utils/numbers";
 import { getUSDPriceWithoutDecimals } from "../utils/price";
 
@@ -41,7 +41,7 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     const troveToken = getOrCreateTroveToken(trove, token);
 
     if (amount == troveToken.collateral && newDebt == trove.debt) {
-      return;
+      continue;
     }
     if (amount > troveToken.collateral) {
       const depositAmount = amount.minus(troveToken.collateral);
@@ -70,9 +70,12 @@ export function handleTroveUpdated(event: TroveUpdated): void {
     const repayAmountYUSD = trove.debt.minus(newDebt);
     const repayAmountUSD = bigIntToBigDecimal(repayAmountYUSD);
     createRepay(event, repayAmountYUSD, repayAmountUSD, borrower);
+    
   }
 
   trove.debt = newDebt;
   trove.save();
   updateUsageMetrics(event, borrower);
+  incrementProtocolWithdrawCount(event);
+
 }
