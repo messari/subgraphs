@@ -88,11 +88,16 @@ Not applicable.
 
 ## Hosted Subgraph
 
-- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-lending
+- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce (mainnet)
+- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-bsc (BSC)
+- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-optimism (Optimism)
+- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-arbitrum (Arbitrum-One, empty subgraph)
 
 ## Smart Contracts Interactions
 
 ![dforce-lending](https://lh6.googleusercontent.com/ZEc8wddU1Etx-ay_fwnat2dgje8yGcOd8EK1vo5JSxJp3GM7qK5bD-bCvf3zxv4m1j5ClAfoCKiPzWNcqjS_XRjrThyz7vGA-ACalWb2XmwqEwGcLMQLSxVtySU7NPGjxPNOqqoB "dforce-lending")
+
+(Credit: dForce Network)
 
 ## dForce Network Lending Protocol
 
