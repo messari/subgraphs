@@ -1,4 +1,10 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import {
+  Address,
+  BigDecimal,
+  BigInt,
+  dataSource,
+  ethereum,
+} from "@graphprotocol/graph-ts";
 import { UniswapFeeRouter__removeLiquidityWithPermitResult } from "../../generated/aave-aave-eol/UniswapFeeRouter";
 import {
   BeefyStrategy,
@@ -12,6 +18,7 @@ import {
   BIGINT_ONE,
   BIGINT_TEN,
   BIGINT_ZERO,
+  WHITELIST_TOKENS_MAP,
 } from "../prices/common/constants";
 import { getBeefyFinanceOrCreate, getTokenOrCreate } from "../utils/getters";
 import {
@@ -77,10 +84,10 @@ export function updateProtocolRevenueFromChargedFees(
 ): void {
   updateProtocolUsage(event, vault, false, false);
   const protocol = getBeefyFinanceOrCreate(vault.id);
-  const token = getTokenOrCreate(
-    Address.fromString(vault.inputToken.split("x")[1]),
-    event.block
+  const native = WHITELIST_TOKENS_MAP.mustGet(dataSource.network()).mustGet(
+    "WETH"
   );
+  const token = getTokenOrCreate(native, event.block);
   vault.fees = getFees(
     vault.id,
     BeefyStrategy.bind(Address.fromString(vault.strategy.split("x")[1]))
