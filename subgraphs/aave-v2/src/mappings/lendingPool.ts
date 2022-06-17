@@ -300,9 +300,8 @@ export function handleLiquidationCall(event: LiquidationCall): void {
   const protocol = getOrCreateProtocol(protocolId);
   const token = getOrCreateToken(event.params.collateralAsset);
   const liquidate = new LiquidateEntity(hash + '-' + event.logIndex.toHexString());
-  // liquidate.to is set to the market address
-  liquidate.to = marketAddr;
-  liquidate.market = marketAddr;
+  liquidate.to = event.params.debtAsset.toHexString();
+  liquidate.market = event.params.debtAsset.toHexString();
   liquidate.from = event.params.liquidator.toHexString();
   liquidate.hash = hash;
   liquidate.logIndex = event.logIndex.toI32();

@@ -63,6 +63,7 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   pool.rewardTokenEmissionsAmount = [BIGINT_ZERO, BIGINT_ZERO];
   pool.rewardTokenEmissionsUSD = [BIGDECIMAL_ZERO, BIGDECIMAL_ZERO];
   pool.fees = createPoolFees(poolAddress);
+  pool.isSingleSided = false
   pool.createdTimestamp = event.block.timestamp;
   pool.createdBlockNumber = event.block.number;
   pool.name = protocol.name + " " + LPtoken.symbol;
@@ -152,7 +153,7 @@ export function createWithdraw(event: ethereum.Event, amount0: BigInt, amount1: 
   let withdrawal = new Withdraw(transactionHash.concat("-").concat(event.logIndex.toString()));
 
   withdrawal.hash = transactionHash;
-  withdrawal.logIndex = event.logIndex.toI32();
+  withdrawal.logIndex = logIndexI32;
   withdrawal.protocol = NetworkConfigs.getFactoryAddress();
   withdrawal.to = transfer.sender!;
   withdrawal.from = pool.id;

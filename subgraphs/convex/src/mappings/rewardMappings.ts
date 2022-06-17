@@ -43,9 +43,9 @@ export function handleAddExtraReward(call: AddExtraRewardCall): void {
 
   let emissionAmount = vault.rewardTokenEmissionsAmount;
   if (emissionAmount) {
-    emissionAmount.push(constants.BIGDECIMAL_ZERO);
+    emissionAmount.push(constants.BIGINT_ZERO);
     vault.rewardTokenEmissionsAmount = emissionAmount;
-  } else vault.rewardTokenEmissionsAmount = [constants.BIGDECIMAL_ZERO];
+  } else vault.rewardTokenEmissionsAmount = [constants.BIGINT_ZERO];
 
   let emissionAmountUSD = vault.rewardTokenEmissionsUSD;
   if (emissionAmountUSD) {
