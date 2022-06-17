@@ -1,4 +1,4 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import { LoanV1 as LoanV1Template, LoanV2OrV3 as LoanV2OrV3Template } from "../../generated/templates";
 import {
@@ -18,14 +18,12 @@ import {
     getOrCreateMarket,
     getOrCreateStakeLocker
 } from "../common/mappingHelpers/getOrCreate/markets";
-import { createInterestRate } from "../common/mappingHelpers/getOrCreate/supporting";
 import {
     createClaim,
     createDeposit,
     createLiquidate,
     createWithdraw
 } from "../common/mappingHelpers/getOrCreate/transactions";
-import { marketTick } from "../common/mappingHelpers/update/market";
 
 export function handleLossesRecognized(event: LossesRecognizedEvent): void {
     const market = getOrCreateMarket(event, event.address);
@@ -41,124 +39,155 @@ export function handleTransfer(event: TransferEvent): void {
         // Deposit (mint)
         const marketAddress = event.address;
         const market = getOrCreateMarket(event, marketAddress);
+
+        ////
+        // Create deposit
+        ////
         const deposit = createDeposit(event, market, event.params.value);
 
+        ////
         // Update market
-        market.inputTokenBalance = market.inputTokenBalance.plus(deposit.amount);
-        market.outputTokenSupply = market.outputTokenSupply.plus(deposit._amountMPT);
+        ////
         market._cumulativeDeposit = market._cumulativeDeposit.plus(deposit.amount);
         market.save();
-
-        // Trigger market tick
-        marketTick(market, event);
     } else if (Address.zero() == event.params.to) {
         // Withdraw (burn)
         const marketAddress = event.address;
         const market = getOrCreateMarket(event, marketAddress);
-        const withdraw = createWithdraw(event, market, event.params.value);
+        const accountAddress = event.transaction.from;
+        const accountMarket = getOrCreateAccountMarket(event, accountAddress, market);
 
+        ////
+        // Create withdraw
+        ////
+        const withdraw = createWithdraw(event, market, event.params.value, accountMarket.unrecognizedLosses);
+
+        ////
+        // Update AccountMarket
+        ////
+        accountMarket.recognizedLosses = accountMarket.recognizedLosses.plus(withdraw._losses);
+        accountMarket.unrecognizedLosses = accountMarket.unrecognizedLosses.minus(withdraw._losses);
+        accountMarket.save();
+
+        ////
         // Update market
-        market.inputTokenBalance = market.inputTokenBalance.minus(withdraw.amount);
-        market.outputTokenSupply = market.outputTokenSupply.minus(withdraw._amountMPT);
+        ////
+        market._cumulativeWithdraw = market._cumulativeWithdraw.plus(withdraw.amount);
         market.save();
-
-        // Trigger market tick
-        marketTick(market, event);
     }
 }
 
 export function handlePoolStateChanged(event: PoolStateChangedEvent): void {
     const market = getOrCreateMarket(event, event.address);
 
+    ////
+    // Update market
+    ////
     const active = event.params.state == PoolState.Finalized;
     market.isActive = active;
     market.canBorrowFrom = active;
     market.save();
-
-    // Trigger market tick
-    marketTick(market, event);
 }
 
 export function handleLoanFunded(event: LoanFundedEvent): void {
     const loanAddress = event.params.loan;
 
-    // Create loan entity
-    const loan = getOrCreateLoan(event, loanAddress, event.address, event.params.amountFunded);
+    log.warning("loanAddress: {}, block: {}", [loanAddress.toHexString(), event.block.number.toString()]);
 
+    ////
+    // Create loan entity
+    ////
+    const loan = getOrCreateLoan(event, loanAddress, event.address);
+    loan.amountFunded = loan.amountFunded.plus(event.params.amountFunded);
+    loan.save();
+
+    ////
     // Create loan template
+    ////
     if (LoanVersion.V1 == loan.version) {
         LoanV1Template.create(loanAddress);
     } else {
         LoanV2OrV3Template.create(loanAddress);
     }
 
+    ////
     // Update market
+    ////
     const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    market._totalBorrowBalance = market._totalBorrowBalance.plus(event.params.amountFunded);
     market._cumulativeBorrow = market._cumulativeBorrow.plus(event.params.amountFunded);
     market.save();
-
-    // Trigger market tick
-    marketTick(market, event);
 }
 
 export function handleClaim(event: ClaimEvent): void {
+    const market = getOrCreateMarket(event, event.address);
+
+    ////
     // Update stake locker
+    ////
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
     stakeLocker.cumulativeInterestInPoolInputTokens = stakeLocker.cumulativeInterestInPoolInputTokens.plus(
         event.params.stakeLockerPortion
     );
     stakeLocker.save();
 
+    ////
     // Update market
-    const market = getOrCreateMarket(event, event.address);
-    market.inputTokenBalance = market.inputTokenBalance.plus(event.params.interest);
-    market._totalBorrowBalance = market._totalBorrowBalance.minus(event.params.principal);
-    market._poolDelegateRevenue = market._poolDelegateRevenue.plus(event.params.poolDelegatePortion);
-    market._supplierRevenue = market._supplierRevenue.plus(event.params.interest);
+    ////
+    market._cumulativePrincipalRepay = market._cumulativePrincipalRepay.plus(event.params.principal);
+    market._cumulativeInterest = market._cumulativeInterest.plus(event.params.interest);
+    market._cumulativePoolDelegateRevenue = market._cumulativePoolDelegateRevenue.plus(
+        event.params.poolDelegatePortion
+    );
     market.save();
-
-    // Trigger market tick
-    marketTick(market, event);
 }
 
 export function handleDefaultSuffered(event: DefaultSufferedEvent): void {
-    // Create liquidation
     const market = getOrCreateMarket(event, event.address);
     const loan = getOrCreateLoan(event, event.params.loan);
+
+    ////
+    // Create liquidate
+    ////
     const defaultSufferedByStakeLocker = event.params.liquidityAssetRecoveredFromBurn;
     const defaultSufferedByPool = event.params.defaultSuffered.minus(defaultSufferedByStakeLocker);
-    createLiquidate(event, loan, defaultSufferedByStakeLocker, defaultSufferedByPool);
+    const liquidate = createLiquidate(event, loan, defaultSufferedByStakeLocker, defaultSufferedByPool);
 
+    ////
+    // Update loan
+    ////
+    loan.defaultSuffered = loan.defaultSuffered.plus(liquidate.amount);
+    loan.save();
+
+    ////
     // Update stake locker
+    ////
+    const stakeAssetBurnedAmount = event.params.bptsBurned.minus(event.params.bptsReturned);
     const stakeLocker = getOrCreateStakeLocker(event, Address.fromString(market._stakeLocker));
-    stakeLocker.cumulativeLosses = stakeLocker.cumulativeLosses.plus(event.params.bptsBurned);
+    stakeLocker.cumulativeLosses = stakeLocker.cumulativeLosses.plus(stakeAssetBurnedAmount);
     stakeLocker.cumulativeLossesInPoolInputToken = stakeLocker.cumulativeLosses.plus(
-        event.params.liquidityAssetRecoveredFromBurn
+        liquidate._defaultSufferedByStakeLocker
     );
     stakeLocker.save();
 
+    ////
     // Update market
-    market.inputTokenBalance = market.inputTokenBalance.minus(
-        event.params.defaultSuffered.minus(event.params.liquidityAssetRecoveredFromBurn)
-    );
-    market._totalBorrowBalance = market._totalBorrowBalance.minus(event.params.defaultSuffered);
-    market._cumulativePoolDefault = market._cumulativePoolDefault.plus(
-        event.params.defaultSuffered.minus(event.params.liquidityAssetRecoveredFromBurn)
-    );
+    ////
+    market._cumulativePoolLosses = market._cumulativePoolLosses.plus(liquidate._defaultSufferedByPool);
     market.save();
-
-    // Trigger market tick
-    marketTick(market, event);
 }
 
 export function handleFundsWithdrawn(event: FundsWithdrawnEvent): void {
-    // Claim interest
     const marketAddress = event.address;
     const market = getOrCreateMarket(event, marketAddress);
+
+    ////
+    // Create claim
+    ////
     const claim = createClaim(event, market, event.params.fundsWithdrawn);
 
+    ////
     // Update market
-    market.inputTokenBalance = market.inputTokenBalance.minus(claim.amount);
+    ////
+    market._cumulativeInterestClaimed = market._cumulativeInterestClaimed.plus(claim.amount);
     market.save();
 }

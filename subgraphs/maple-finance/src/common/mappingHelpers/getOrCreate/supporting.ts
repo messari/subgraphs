@@ -1,6 +1,6 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address } from "@graphprotocol/graph-ts";
 
-import { InterestRate, RewardToken, Token, _Loan } from "../../../../generated/schema";
+import { RewardToken, Token, _Loan } from "../../../../generated/schema";
 
 import {
     ETH_ADDRESS,
@@ -8,14 +8,11 @@ import {
     ETH_NAME,
     ETH_SYMBOL,
     OracleType,
-    PROTOCOL_INTEREST_RATE_SIDE,
-    PROTOCOL_INTEREST_RATE_TYPE,
     RewardTokenType,
     ZERO_BD,
     ZERO_BI
 } from "../../constants";
 import { getAssetDecimals, getAssetName, getAssetSymbol } from "../../utils";
-import { getOrCreateMarket } from "./markets";
 
 export function getOrCreateToken(tokenAddress: Address): Token {
     let token = Token.load(tokenAddress.toHexString());

@@ -21,10 +21,11 @@ export function handleStaked(event: StakedEvent): void {
     const stakeToken = getOrCreateToken(Address.fromString(mplRewards.stakeToken));
     const market = getOrCreateMarket(event, Address.fromString(mplRewards.market));
     const stakeType = market.id == stakeToken.id ? StakeType.MPL_LP_REWARDS : StakeType.MPL_STAKE_REWARDS;
-    createStake(event, market, stakeToken, event.params.amount, stakeType);
 
-    // Trigger market tick
-    marketTick(market, event);
+    ////
+    // Create stake
+    ////
+    createStake(event, market, stakeToken, event.params.amount, stakeType);
 }
 
 export function handleWidthdrawn(event: WithdrawnEvent): void {
@@ -33,13 +34,17 @@ export function handleWidthdrawn(event: WithdrawnEvent): void {
     const stakeToken = getOrCreateToken(Address.fromString(mplRewards.stakeToken));
     const market = getOrCreateMarket(event, Address.fromString(mplRewards.market));
     const stakeType = market.id == stakeToken.id ? StakeType.MPL_LP_REWARDS : StakeType.MPL_STAKE_REWARDS;
-    createUnstake(event, market, stakeToken, event.params.amount, stakeType);
 
-    // Trigger market tick
-    marketTick(market, event);
+    ////
+    // Create unstake
+    ////
+    createUnstake(event, market, stakeToken, event.params.amount, stakeType);
 }
 
 export function handleRewardAdded(event: RewardAddedEvent): void {
+    ////
+    // Update mpl reward
+    ////
     const mplReward = getOrCreateMplReward(event, event.address);
 
     const currentTimestamp = event.block.timestamp;
@@ -63,23 +68,21 @@ export function handleRewardAdded(event: RewardAddedEvent): void {
     mplReward.periodFinishedTimestamp = currentTimestamp.plus(mplReward.rewardDurationSec);
 
     mplReward.save();
-
-    // Trigger market tick
-    const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
-    marketTick(market, event);
 }
 
 export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {
+    ////
+    // Update mpl reward
+    ////
     const mplReward = getOrCreateMplReward(event, event.address);
     mplReward.rewardDurationSec = event.params.newDuration;
     mplReward.save();
-
-    // Trigger market tick
-    const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
-    marketTick(market, event);
 }
 
 export function handleUpdatePeriodFinish(call: UpdatePeriodFinishCall): void {
+    ////
+    // Update mpl reward
+    ////
     const eventFromCall = createEventFromCall(call);
     const mplReward = getOrCreateMplReward(eventFromCall, call.to); // TODO:
     mplReward.periodFinishedTimestamp = call.inputs.timestamp;
