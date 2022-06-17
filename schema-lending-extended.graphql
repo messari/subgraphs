@@ -542,6 +542,14 @@ type Market @entity {
   " Creation block number "
   createdBlockNumber: BigInt!
 
+  ##### Account/Position Data #####
+
+  " All open positions in this market "
+  positions: [Positions!]! @derivedFrom(field: "market")
+
+  " Number of open positions in this market "
+  positionCount: Int!
+
   ##### Snapshots #####
 
   " Market daily snapshots "
@@ -788,6 +796,9 @@ type Position @entity {
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
+
+  " Token balance in this position, in USD "
+  balanceUSD: BigInt!
   
   " Block number of when the position was opened "
   blockNumber: BigInt!
@@ -795,25 +806,29 @@ type Position @entity {
   " Timestamp when the position was opened "
   timestamp: BigInt!
 
-  " Position daily snapshots "
+  " Position daily snapshots for open positions "
   dailySnapshots: [PositionDailySnapshot!]! @derivedFrom(field: "position")
 }
 
+# Note that we only take snapshot for open positions
 type PositionSnapshot @entity {
   " { Position ID }-{ # of days since Unix epoch time } "
   id: ID!
+
+  " Position of this snapshot "
+  position: Position!
+
+  " Token balance in this position, in native amounts "
+  balance: BigInt!
+
+  " Token balance in this position, in USD "
+  balanceUSD: BigInt!
   
   " Block number of this snapshot "
   blockNumber: BigInt!
 
   " Timestamp of this snapshot "
   timestamp: BigInt!
-
-  position: Position!
-  transaction: Transaction!
-  outputTokenBalance: BigInt!
-  inputTokenBalances: [String!]!    # TokenBalance string format
-  rewardTokenBalances: [String!]!   # TokenBalance string format
 }
 
 ##################################
