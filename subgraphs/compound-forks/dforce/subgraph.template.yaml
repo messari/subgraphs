@@ -49,11 +49,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: USX
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0x0a5e677a6a24b2f1a2bf4f3bffc443231d2fdec8"
+      address: "{{ USXAddr }}"
       abi: stablecoin
-      startBlock: 12455984
+      startBlock: {{ USXStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -73,11 +73,11 @@ dataSources:
 
   - kind: ethereum/contract
     name: EUX
-    network: mainnet
+    network: {{ network }}
     source:
-      address: "0xb986F3a2d91d3704Dc974A24FB735dCc5E3C1E70"
+      address: "{{ EUXAddr }}"
       abi: stablecoin
-      startBlock: 12456012
+      startBlock: {{ EUXStartBlock }}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6

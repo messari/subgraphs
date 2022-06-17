@@ -19,7 +19,6 @@ import {
   _handleAccrueInterest,
   getOrElse,
   _handleActionPaused,
-  AccrueInterestData,
   snapshotFinancials,
 } from "../../src/mapping";
 import {
@@ -342,15 +341,12 @@ export function handleUpdateInterest(event: AccrueInterest): void {
     oracleContract.try_getUnderlyingPrice(marketAddress),
     unitPerYear
   );
-  let accrueInterestData = new AccrueInterestData(
-    event.params.interestAccumulated,
-    event.params.totalBorrows
-  );
 
   _handleAccrueInterest(
     updateMarketData,
     comptrollerAddr,
-    accrueInterestData,
+    event.params.interestAccumulated,
+    event.params.totalBorrows,
     event
   );
 }

@@ -6,17 +6,22 @@ import {
   BigInt,
 } from "@graphprotocol/graph-ts";
 import {
-  AVALANCHE_BLOCKS_PER_YEAR,
   ETHEREUM_BLOCKS_PER_YEAR,
   BSC_BLOCKS_PER_YEAR,
   ARBITRUM_BLOCKS_PER_YEAR,
-  FANTOM_BLOCKS_PER_YEAR,
   Network,
 } from "../../src/constants";
+
+// optimism does not have constant # blocks/year
+// rewarddistributor is paused on optimism and
+// setting OPTIMISM_BLOCKS_PER_YEAR to 0 will be fine
+const OPTIMISM_BLOCKS_PER_YEAR = 0;
 
 const ETHEREUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_YEAR / 365;
 const BSC_BLOCKS_PER_DAY = BSC_BLOCKS_PER_YEAR / 365;
 const ARBITRUM_BLOCKS_PER_DAY = ARBITRUM_BLOCKS_PER_YEAR / 365;
+
+const OPTIMISM_BLOCKS_PER_DAY = OPTIMISM_BLOCKS_PER_YEAR / 365;
 
 export class NetworkSpecificConstant {
   comptrollerAddr: Address;
@@ -59,14 +64,14 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       ARBITRUM_BLOCKS_PER_DAY,
       ARBITRUM_BLOCKS_PER_YEAR
     );
-  } /* else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
+  } else if (equalsIgnoreCase(network, Network.OPTIMISM)) {
     return new NetworkSpecificConstant(
       Address.fromString("0xA300A84D8970718Dac32f54F61Bd568142d8BCF4"),
       Network.OPTIMISM,
       OPTIMISM_BLOCKS_PER_DAY,
       OPTIMISM_BLOCKS_PER_YEAR
     );
-  }*/ else {
+  } else {
     log.error("[getNetworkSpecificConstant] Unsupported network {}", [network]);
     return new NetworkSpecificConstant(
       Address.fromString("0x0000000000000000000000000000000000000000"),
