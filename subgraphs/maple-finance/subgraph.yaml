@@ -23,6 +23,39 @@ dataSources:
                 file: ./abis/MapleGlobals.json
               - name: PoolFactory
                 file: ./abis/PoolFactory.json
+              - name: ERC20
+                file: ./abis/ERC20.json
+              - name: ERC20NameBytes
+                file: ./abis/ERC20NameBytes.json
+              - name: ERC20SymbolBytes
+                file: ./abis/ERC20SymbolBytes.json
+
+              # Price oracle
+              - name: ChainLinkOracle
+                file: ./abis/ChainLinkOracle.json
+              - name: YearnOracle
+                file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: GlobalsParamSet(indexed bytes32,uint256)
                 handler: handleGlobalsParamSet
@@ -71,10 +104,32 @@ dataSources:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+              # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: MplRewardsCreated(indexed address,indexed address,indexed address,address)
                 handler: handleMplRewardsCreated
@@ -118,10 +173,32 @@ templates:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+              # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: PoolCreated(indexed address,indexed address,address,address,address,address,uint256,uint256,uint256,string,string)
                 handler: handlePoolCreated
@@ -167,10 +244,32 @@ templates:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+              # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: LossesRecognized(indexed address,uint256,uint256)
                 handler: handleLossesRecognized
@@ -226,10 +325,32 @@ templates:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+              # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: Stake(indexed address,uint256)
                 handler: handleStake
@@ -277,10 +398,32 @@ templates:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+              # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: Drawdown(uint256)
                 handler: handleDrawdown
@@ -330,10 +473,32 @@ templates:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+                # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: FundsDrawnDown(uint256,indexed address)
                 handler: handleFundsDrawnDown
@@ -382,10 +547,32 @@ templates:
               - name: StakeLocker
                 file: ./abis/StakeLocker.json
 
+              # Price oracle
               - name: ChainLinkOracle
                 file: ./abis/ChainLinkOracle.json
               - name: YearnOracle
                 file: ./abis/YearnOracle.json
+              - name: CurveRegistry
+                file: ./abis/Curve/Registry.json
+              - name: CurvePoolRegistry
+                file: ./abis/Curve/PoolRegistry.json
+              - name: CalculationsCurve
+                file: ./abis/Calculations/Curve.json
+              - name: UniswapRouter
+                file: ./abis/Uniswap/Router.json
+              - name: UniswapFactory
+                file: ./abis/Uniswap/Factory.json
+              - name: UniswapPair
+                file: ./abis/Uniswap/Pair.json
+              - name: SushiSwapRouter
+                file: ./abis/SushiSwap/Router.json
+              - name: SushiSwapFactory
+                file: ./abis/SushiSwap/Factory.json
+              - name: SushiSwapPair
+                file: ./abis/SushiSwap/Pair.json
+              - name: CalculationsSushiSwap
+                file: ./abis/Calculations/SushiSwap.json
+
           eventHandlers:
               - event: Staked(indexed address,uint256)
                 handler: handleStaked
