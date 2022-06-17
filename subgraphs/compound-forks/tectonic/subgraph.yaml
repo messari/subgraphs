@@ -6,9 +6,9 @@ dataSources:
     name: Comptroller
     network: mainnet
     source:
-      address: "0xE165132FdA537FA89Ca1B52A647240c2B84c8F89"
-      abi: Comptroller
-      startBlock: 1851568
+      address: "0x7De56Bd8b37827c51835e162c867848fE2403a48"
+      abi: Core
+      startBlock: 678408
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.6
@@ -24,6 +24,8 @@ dataSources:
           file: ../abis/CToken.json
         - name: ERC20
           file: ../abis/ERC20.json
+        - name: Core
+          file: ./abis/Core.json
       eventHandlers:
         - event: MarketListed(address)
           handler: handleMarketListed
@@ -61,6 +63,8 @@ templates:
           file: ../abis/ERC20.json
         - name: PriceOracle
           file: ../abis/PriceOracle.json
+        - name: TToken
+          file: ./abis/TToken.json
       eventHandlers:
         - event: Mint(address,uint256,uint256)
           handler: handleMint

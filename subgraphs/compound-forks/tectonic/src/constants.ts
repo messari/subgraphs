@@ -7,11 +7,9 @@ import { TokenData } from "../../src/mapping";
 //////////////////////////////
 
 export let comptrollerAddr = Address.fromString(
-  "0x7De56Bd8b37827c51835e162c867848fE2403a48"
+  "0x6De54724e128274520606f038591A00C5E94a1F6"
 );
 
-
-// should be CRO
 export const nativeToken = new TokenData(
   Address.fromString("0x0000000000000000000000000000000000000000"),
   "Ether",
@@ -19,8 +17,6 @@ export const nativeToken = new TokenData(
   18
 );
 
-
-// Should be tCRO (should it be other t Tokens?)
 export const nativeCToken = new TokenData(
   Address.fromString("0x4E8fE8fd314cFC09BDb0942c5adCC37431abDCD0"),
   "Bastion Ether",

@@ -17,6 +17,7 @@ enum Network {
   OPTIMISM
   MATIC # aka Polygon
   XDAI # aka Gnosis Chain
+  CRONOS
 }
 
 enum ProtocolType {
