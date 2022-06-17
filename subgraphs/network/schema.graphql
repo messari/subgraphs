@@ -142,7 +142,7 @@ type DailySnapshot @entity {
   dailyMeanGasLimit: BigDecimal!
 
   " gas price at the end of this hour in network native gas units "
-  gasPrice: BigDecimal!
+  gasPrice: BigInt!
 
   " Total amount of fees burned "
   cumulativeBurntFees: BigInt!
@@ -163,7 +163,7 @@ type DailySnapshot @entity {
   totalSupply: BigInt!
 
   " New supply added during this day "
-  dailySupplyIncrease: BigInt
+  dailySupplyIncrease: BigInt!
 
   " Daily mean block interval time in seconds during this hour "
   dailyMeanBlockInterval: BigDecimal!
@@ -182,6 +182,11 @@ type DailySnapshot @entity {
 
   " Number of transactions during this day "
   dailyTransactionCount: Int!
+
+  #### Helpers ####
+
+  " Keep track of the first supply of this snapshot "
+  firstSupply: BigInt!
 }
 
 type HourlySnapshot @entity {
@@ -234,7 +239,7 @@ type HourlySnapshot @entity {
   hourlyMeanGasLimit: BigDecimal!
 
   " gas price at the end of this hour in network native gas units "
-  gasPrice: BigDecimal!
+  gasPrice: BigInt!
 
   " Total amount of fees burned "
   cumulativeBurntFees: BigInt!
@@ -274,6 +279,11 @@ type HourlySnapshot @entity {
 
   " Number of transactions during this day "
   hourlyTransactionCount: Int!
+
+  #### Helpers ####
+
+  " Keep track of the first supply of this snapshot "
+  firstSupply: BigInt!
 }
 
 ##########################
@@ -294,10 +304,10 @@ type Block @entity(immutable: true) {
   author: Author!
 
   " Data size of the block in Bytes "
-  size: BigInt
+  size: BigInt!
 
   " Minimum gasUsed multiplier for transaction to be included (note, post London upgrade) "
-  baseFeePerGas: BigInt
+  baseFeePerGas: BigInt!
 
   " Amount of effort required to create this block "
   difficulty: BigInt!
@@ -312,22 +322,22 @@ type Block @entity(immutable: true) {
   blockUtilization: BigDecimal!
 
   " The price of gas in this block in network native gas units "
-  gasPrice: BigInt
+  gasPrice: BigInt!
 
   " Hash of the previous block (TODO: is this necessary??) "
   parentHash: Bytes!
 
   " Burnt fees in native asset (baseFeePerGas * gasUsed) (note, post London upgrade) "
-  burntFees: BigInt
+  burntFees: BigInt!
 
   " Number of chunks in this block (e.g. shards on NEAR) "
-  chunkCount: Int
+  chunkCount: Int!
 
   " Number of transactions in this block "
-  transactionCount: Int
+  transactionCount: Int!
 
   " Rewards emitted in this block "
-  rewards: BigInt
+  rewards: BigInt!
 }
 
 # This is the node that found the next block (e.g. miner or validator)
