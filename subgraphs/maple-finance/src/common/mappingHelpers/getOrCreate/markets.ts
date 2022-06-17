@@ -128,6 +128,7 @@ export function getOrCreateMarket(event: ethereum.Event, marketAddress: Address)
         market._cumulativeSupplySideRevenueUSD = ZERO_BD;
         market._cumulativeProtocolSideRevenueUSD = ZERO_BD;
         market._cumulativeTotalRevenueUSD = ZERO_BD;
+        market._lastUpdatedBlockNumber = event.block.number;
 
         market.save();
     }
@@ -197,15 +198,6 @@ export function getOrCreateInterestRate(
         interestRate = new InterestRate(id);
 
         const market = getOrCreateMarket(event, Address.fromString(loan.market));
-        log.warning("{}, {}, {}, {}, {}", [
-            rate.toString(),
-            durationDays.toString(),
-            "null",
-            PROTOCOL_INTEREST_RATE_SIDE,
-            PROTOCOL_INTEREST_RATE_TYPE,
-            loan.id,
-            market.id
-        ]);
 
         interestRate.rate = rate;
         interestRate.duration = durationDays.toI32();
@@ -362,12 +354,13 @@ export function getOrCreateMplReward(event: ethereum.Event, mplRewardAddress: Ad
         mplReward.market = market.id;
         mplReward.stakeToken = stakeToken.id;
         mplReward.rewardToken = rewardToken.id;
+        mplReward.creationBlockNumber = event.block.number;
+
         mplReward.rewardRatePerSecond = ZERO_BI;
         mplReward.rewardDurationSec = MPL_REWARDS_DEFAULT_DURATION_TIME_S;
         mplReward.periodFinishedTimestamp = ZERO_BI;
+
         mplReward.rewardTokenEmissionAmountPerDay = ZERO_BI;
-        mplReward.rewardTokenEmissionsUSDPerDay = ZERO_BD;
-        mplReward.creationBlockNumber = event.block.number;
         mplReward.lastUpdatedBlockNumber = event.block.number;
 
         mplReward.save();

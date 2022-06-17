@@ -6,6 +6,7 @@ import { StakeType } from "../common/constants";
 import { getOrCreateMarket, getOrCreateStakeLocker } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createStake, createUnstake } from "../common/mappingHelpers/getOrCreate/transactions";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 
 export function handleStake(event: StakeEvent): void {
     const stakeLocker = getOrCreateStakeLocker(event, event.address);
@@ -22,6 +23,11 @@ export function handleStake(event: StakeEvent): void {
     ////
     stakeLocker.cumulativeStake = stakeLocker.cumulativeStake.plus(stake.amount);
     stakeLocker.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleUnstake(event: UnstakeEvent): void {
@@ -39,4 +45,9 @@ export function handleUnstake(event: UnstakeEvent): void {
     ////
     stakeLocker.cumulativeUnstake = stakeLocker.cumulativeUnstake.plus(unstake.amount);
     stakeLocker.save();
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }

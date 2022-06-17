@@ -12,6 +12,7 @@ import { StakeType, ZERO_BI } from "../common/constants";
 import { getOrCreateMarket, getOrCreateMplReward } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createStake, createUnstake } from "../common/mappingHelpers/getOrCreate/transactions";
+import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
 import { marketTick } from "../common/mappingHelpers/update/market";
 import { createEventFromCall } from "../common/utils";
 
@@ -26,6 +27,11 @@ export function handleStaked(event: StakedEvent): void {
     // Create stake
     ////
     createStake(event, market, stakeToken, event.params.amount, stakeType);
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleWidthdrawn(event: WithdrawnEvent): void {
@@ -39,6 +45,11 @@ export function handleWidthdrawn(event: WithdrawnEvent): void {
     // Create unstake
     ////
     createUnstake(event, market, stakeToken, event.params.amount, stakeType);
+
+    ////
+    // Trigger interval update
+    ////
+    intervalUpdate(event, market);
 }
 
 export function handleRewardAdded(event: RewardAddedEvent): void {
@@ -68,6 +79,12 @@ export function handleRewardAdded(event: RewardAddedEvent): void {
     mplReward.periodFinishedTimestamp = currentTimestamp.plus(mplReward.rewardDurationSec);
 
     mplReward.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
+    intervalUpdate(event, market);
 }
 
 export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent): void {
@@ -77,6 +94,12 @@ export function handleRewardsDurationUpdated(event: RewardsDurationUpdatedEvent)
     const mplReward = getOrCreateMplReward(event, event.address);
     mplReward.rewardDurationSec = event.params.newDuration;
     mplReward.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(event, Address.fromString(mplReward.market));
+    intervalUpdate(event, market);
 }
 
 export function handleUpdatePeriodFinish(call: UpdatePeriodFinishCall): void {
@@ -87,4 +110,10 @@ export function handleUpdatePeriodFinish(call: UpdatePeriodFinishCall): void {
     const mplReward = getOrCreateMplReward(eventFromCall, call.to); // TODO:
     mplReward.periodFinishedTimestamp = call.inputs.timestamp;
     mplReward.save();
+
+    ////
+    // Trigger interval update
+    ////
+    const market = getOrCreateMarket(eventFromCall, Address.fromString(mplReward.market));
+    intervalUpdate(eventFromCall, market);
 }
