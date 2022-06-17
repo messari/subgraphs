@@ -99,4 +99,4 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const NETWORK_NAME = dataSource.network();
 export const SCHEMA_VERSION = "1.0.0";
 export const METHODOLOGY_VERSION = "1.0.0";
-export const SUBGRAPH_VERSION = "1.0.2";
+export const SUBGRAPH_VERSION = "1.0.3";
