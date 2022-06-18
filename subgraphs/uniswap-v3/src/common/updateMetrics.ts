@@ -48,6 +48,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   usageMetricsDaily.blockNumber = event.block.number;
   usageMetricsDaily.timestamp = event.block.timestamp;
   usageMetricsDaily.dailyTransactionCount += INT_ONE;
+  usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
 
   usageMetricsHourly.blockNumber = event.block.number;
   usageMetricsHourly.timestamp = event.block.timestamp;
@@ -244,6 +245,12 @@ export function updateVolumeAndFees(
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+
+
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   financialMetrics.dailyProtocolSideRevenueUSD = financialMetrics.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
@@ -251,6 +258,24 @@ export function updateVolumeAndFees(
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+
+  poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+  poolMetricsDaily.dailyTotalRevenueUSD = poolMetricsDaily.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  poolMetricsDaily.dailySupplySideRevenueUSD = poolMetricsDaily.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  poolMetricsDaily.dailyProtocolSideRevenueUSD = poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+
+  poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourly.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
+
+  poolMetricsHourly.hourlyTotalRevenueUSD = poolMetricsHourly.hourlyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  poolMetricsHourly.hourlySupplySideRevenueUSD = poolMetricsHourly.hourlySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  poolMetricsHourly.hourlyProtocolSideRevenueUSD = poolMetricsHourly.hourlyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.save();
   poolMetricsDaily.save();
