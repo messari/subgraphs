@@ -13,6 +13,11 @@ import {
 
 import { LoanVersion, PoolState } from "../common/constants";
 import {
+    getOrCreateFinancialsDailySnapshot,
+    getOrCreateMarketHourlySnapshot
+} from "../common/mappingHelpers/getOrCreate/snapshots";
+import { getOrCreateMarketDailySnapshot } from "../common/mappingHelpers/getOrCreate/snapshots";
+import {
     getOrCreateAccountMarket,
     getOrCreateLoan,
     getOrCreateMarket,
@@ -25,6 +30,8 @@ import {
     createWithdraw
 } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
+import { getTokenAmountInUSD, getTokenPriceInUSD } from "../common/prices/prices";
+import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 
 export function handleLossesRecognized(event: LossesRecognizedEvent): void {
     const market = getOrCreateMarket(event, event.address);
@@ -56,6 +63,24 @@ export function handleTransfer(event: TransferEvent): void {
         ////
         market._cumulativeDeposit = market._cumulativeDeposit.plus(deposit.amount);
         market.save();
+
+        ////
+        // Update market snapshot
+        ////
+        const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+        marketDailySnapshot.dailyDepositUSD = marketDailySnapshot.dailyDepositUSD.plus(deposit.amountUSD);
+        marketDailySnapshot.save();
+
+        const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+        MarketHourlySnapshot.hourlyDepositUSD = MarketHourlySnapshot.hourlyDepositUSD.plus(deposit.amountUSD);
+        MarketHourlySnapshot.save();
+
+        ////
+        // Update financial snapshot
+        ////
+        const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+        financialsDailySnapshot.dailyDepositUSD = financialsDailySnapshot.dailyDepositUSD.plus(deposit.amountUSD);
+        financialsDailySnapshot.save();
 
         ////
         // Trigger interval update
@@ -112,12 +137,15 @@ export function handlePoolStateChanged(event: PoolStateChangedEvent): void {
 
 export function handleLoanFunded(event: LoanFundedEvent): void {
     const loanAddress = event.params.loan;
+    const loan = getOrCreateLoan(event, loanAddress, event.address);
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+    const amountFunded = event.params.amountFunded;
 
     ////
     // Create loan entity
     ////
-    const loan = getOrCreateLoan(event, loanAddress, event.address);
-    loan.amountFunded = loan.amountFunded.plus(event.params.amountFunded);
+    loan.amountFunded = loan.amountFunded.plus(amountFunded);
     loan.save();
 
     ////
@@ -132,9 +160,27 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
     ////
     // Update market
     ////
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-    market._cumulativeBorrow = market._cumulativeBorrow.plus(event.params.amountFunded);
+    market._cumulativeBorrow = market._cumulativeBorrow.plus(amountFunded);
     market.save();
+
+    ////
+    // Update market snapshot
+    ////
+    const amountFundedUSD = getTokenAmountInUSD(event, inputToken, amountFunded);
+    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(amountFundedUSD);
+    marketDailySnapshot.save();
+
+    const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+    MarketHourlySnapshot.hourlyBorrowUSD = MarketHourlySnapshot.hourlyBorrowUSD.plus(amountFundedUSD);
+    MarketHourlySnapshot.save();
+
+    ////
+    // Update financial snapshot
+    ////
+    const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+    financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(amountFundedUSD);
+    financialsDailySnapshot.save();
 
     ////
     // Trigger interval update
@@ -144,6 +190,7 @@ export function handleLoanFunded(event: LoanFundedEvent): void {
 
 export function handleClaim(event: ClaimEvent): void {
     const market = getOrCreateMarket(event, event.address);
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
 
     ////
     // Update stake locker
@@ -163,6 +210,20 @@ export function handleClaim(event: ClaimEvent): void {
         event.params.poolDelegatePortion
     );
     market.save();
+
+    ////
+    // Update financial snapshot
+    ////
+    const supplySideRevenueUSD = getTokenAmountInUSD(
+        event,
+        inputToken,
+        market._cumulativeInterest.plus(market._cumulativePoolDelegateRevenue)
+    );
+    const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+    financialsDailySnapshot.dailySupplySideRevenueUSD = financialsDailySnapshot.dailySupplySideRevenueUSD.plus(
+        supplySideRevenueUSD
+    );
+    financialsDailySnapshot.save();
 
     ////
     // Trigger interval update

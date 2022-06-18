@@ -15,8 +15,15 @@ import {
     getOrCreateMarket
 } from "../common/mappingHelpers/getOrCreate/markets";
 import { getOrCreateProtocol } from "../common/mappingHelpers/getOrCreate/protocol";
+import {
+    getOrCreateFinancialsDailySnapshot,
+    getOrCreateMarketDailySnapshot,
+    getOrCreateMarketHourlySnapshot
+} from "../common/mappingHelpers/getOrCreate/snapshots";
+import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createBorrow, createRepay } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
+import { getTokenAmountInUSD } from "../common/prices/prices";
 import { bigDecimalToBigInt, parseUnits, readCallResult } from "../common/utils";
 
 export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
@@ -74,21 +81,51 @@ export function handleNewTermsAccepted(event: NewTermsAcceptedEvent): void {
 export function handleFundsDrawnDown(event: FundsDrawnDownEvent): void {
     const loan = getOrCreateLoan(event, event.address);
     const drawdownAmount = event.params.amount_;
+    const protocol = getOrCreateProtocol();
+    const market = getOrCreateMarket(event, Address.fromString(loan.market));
+    const treasuryFee = bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee));
+    const inputToken = getOrCreateToken(Address.fromString(market.inputToken));
+
+    ////
+    // Create borrow
+    ////
     const borrow = createBorrow(event, loan, drawdownAmount);
 
+    ////
     // Update loan
+    ////
     loan.drawnDown = loan.drawnDown.plus(borrow.amount);
     loan.save();
 
+    ////
     // Update market
-    const protocol = getOrCreateProtocol();
-    const market = getOrCreateMarket(event, Address.fromString(loan.market));
-
+    ////
     // TODO (spennyp): V3 doesn't work like this
     market._cumulativeTreasuryRevenue = market._cumulativeTreasuryRevenue.plus(
         bigDecimalToBigInt(drawdownAmount.toBigDecimal().times(protocol._treasuryFee))
     );
     market.save();
+
+    ////
+    // Update market snapshot
+    ////
+    const marketDailySnapshot = getOrCreateMarketDailySnapshot(event, market);
+    marketDailySnapshot.dailyBorrowUSD = marketDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
+    marketDailySnapshot.save();
+
+    const MarketHourlySnapshot = getOrCreateMarketHourlySnapshot(event, market);
+    MarketHourlySnapshot.hourlyBorrowUSD = MarketHourlySnapshot.hourlyBorrowUSD.plus(borrow.amountUSD);
+    MarketHourlySnapshot.save();
+
+    ////
+    // Update financial snapshot
+    ////
+    const financialsDailySnapshot = getOrCreateFinancialsDailySnapshot(event);
+    financialsDailySnapshot.dailyProtocolSideRevenueUSD = financialsDailySnapshot.dailyProtocolSideRevenueUSD.plus(
+        getTokenAmountInUSD(event, inputToken, treasuryFee)
+    );
+    financialsDailySnapshot.dailyBorrowUSD = financialsDailySnapshot.dailyBorrowUSD.plus(borrow.amountUSD);
+    financialsDailySnapshot.save();
 
     ////
     // Trigger interval update

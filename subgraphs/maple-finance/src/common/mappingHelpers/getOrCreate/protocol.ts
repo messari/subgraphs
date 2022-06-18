@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
 
-import { Account, LendingProtocol, _PoolFactory } from "../../../../generated/schema";
+import { LendingProtocol, _PoolFactory } from "../../../../generated/schema";
 
 import {
     PROTOCOL_ID,
