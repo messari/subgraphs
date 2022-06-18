@@ -767,9 +767,48 @@ type MarketHourlySnapshot @entity {
 type Account @entity {
   " { Account address } "
   id: ID!
+  
+  " Number of open positions this account has "
+  positionCount: Int!
 
-  " All positions belonging to an account "
+  " All open positions that belong to this account "
   positions: [Position!]! @derivedFrom(field: "account")
+
+  " Number of deposits this account made "
+  depositCount: Int!
+
+  " All deposit events of this account "
+  deposits: [Deposit!]! @derivedFrom(field: "from")
+
+  " Number of withdrawals this account made "
+  withdrawCount: Int!
+
+  " All withdraw events of this account "
+  withdraws: [Withdraw!]! @derivedFrom(field: "to")
+
+  " Number of borrows this account made "
+  borrowCount: Int!
+
+  " All borrow events of this account "
+  borrows: [Borrow!]! @derivedFrom(field: "to")
+
+  " Number of repays this account made "
+  repayCount: Int!
+
+  " All repay events of this account "
+  repays: [Repay!]! @derivedFrom(field: "from")
+
+  " Number of times this account liquidated a position "
+  liquidateCount: Int!
+
+  " All liquidation events where this account was the liquidator "
+  liquidates: [Liquidate!]! @derivedFrom(field: "from")
+
+  " Number of times this account has been liquidated "
+  liquidationCount: Int!
+
+  " All liquidation events where this account got liquidated "
+  liquidations: [Liquidate!]! @derivedFrom(field: "liquidatee")
 }
 
 type Position @entity {
@@ -796,9 +835,6 @@ type Position @entity {
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
-
-  " Token balance in this position, in USD "
-  balanceUSD: BigInt!
   
   " Block number of when the position was opened "
   blockNumber: BigInt!
@@ -820,9 +856,6 @@ type PositionSnapshot @entity {
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
-
-  " Token balance in this position, in USD "
-  balanceUSD: BigInt!
   
   " Block number of this snapshot "
   blockNumber: BigInt!
@@ -1071,6 +1104,9 @@ type Liquidate implements Event @entity {
 
   " Address that carried out the liquidation "
   from: String!
+
+  " Address that got liquidated "
+  liquidatee: String!
 
   " Block number of this event "
   blockNumber: BigInt!
