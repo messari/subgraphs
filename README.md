@@ -119,16 +119,16 @@ This repo contains subgraphs defined using a set of standardized schemas. These 
 | Badger DAO | 🔨 | | |
 | Beefy Finance | 🛠 | | |
 | [Belt Finance](https://belt.fi/landing) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Belt BSC](./docs/images/chains/bsc.png)](https://thegraph.com/hosted-service/subgraph/messari/belt-finance-bsc) |
-| [Convex Finance](https://www.convexfinance.com/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Convex Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/convex-finance-ethereum) |
+| [Convex Finance](https://www.convexfinance.com/) | 🛠 | 1.3.0 / 1.1.1 / 1.0.0 | [![Convex Finance Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/convex-finance-ethereum) |
 | [Gamma Strategy](https://www.gamma.xyz/) | 🔨  | | |
 | Harvest Finance | 🔨  | | |
 | Liquid Driver | 🔨  | | |
 | [Rari Vaults](https://rari.capital/) | 🛠 | 1.2.1 / 1.3.13 / 1.0.0 | [![Rari Vaults Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/rari-vaults-ethereum)|
-| [Stake DAO](https://stakedao.org/) | 🛠 | 1.2.1 / 1.2.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum)|
+| [Stake DAO](https://stakedao.org/) | 🛠 | 1.3.0 / 1.3.0 / 1.0.0 | [![Stake DAO](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/stake-dao-ethereum)|
 | [Tokemak](https://www.tokemak.xyz/) | 🛠 | 1.2.1 / 1.0.0 / 1.0.0 | [![Tokemak](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/tokemak-ethereum) |
 | Vesper Finance | 🔨 | | |
 | Yield Yak | 🔨 | | |
-| [Yearn v2](https://yearn.fi/) | 🛠 | 1.2.0 / 1.0.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
+| [Yearn v2](https://yearn.fi/) | 🛠 | 1.3.0 / 1.2.0 / 1.0.0 | [![Yearn V2 Ethereum](./docs/images/chains/ethereum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-ethereum) [![Yearn V2 Arbitrum](./docs/images/chains/arbitrum.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-arbitrum) [![Yearn V2 Fantom](./docs/images/chains/fantom.png)](https://thegraph.com/hosted-service/subgraph/messari/yearn-v2-fantom) |
 | **Network Subgraph** |    | |
 | EVM | 🔨 | | |
 | Cosmos | 🔨 | | |

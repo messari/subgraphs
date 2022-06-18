@@ -3,7 +3,7 @@ import * as utils from "../common/utils";
 import { getRewardTokens } from "./Tokens";
 import * as constants from "../common/constants";
 import { ERC20 } from "../../generated/Booster/ERC20";
-import { getOrCreateToken } from "../common/initializer";
+import { getOrCreateToken, getOrCreateYieldAggregator } from "../common/initializer";
 import { PoolCrvRewards } from "../../generated/templates";
 import { Vault as VaultStore } from "../../generated/schema";
 import { BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
@@ -90,9 +90,13 @@ export function _NewVault(
   vault._stashVersion = stashVersion;
   vault._lpToken = lpTokenAddress.toHexString();
 
+  const protocol = getOrCreateYieldAggregator();
+  protocol.totalPoolCount += 1;
+
   vault.createdBlockNumber = block.number;
   vault.createdTimestamp = block.timestamp;
 
   vault.fees = [performanceFeeId];
+  protocol.save();
   vault.save();
 }

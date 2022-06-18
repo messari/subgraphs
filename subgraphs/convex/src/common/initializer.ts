@@ -35,6 +35,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.cumulativeProtocolSideRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeTotalRevenueUSD = constants.BIGDECIMAL_ZERO;
     protocol.cumulativeUniqueUsers = 0;
+    protocol.totalPoolCount = 0;
 
     protocol._poolCount = constants.BIGINT_ZERO;
   }
@@ -91,6 +92,9 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyWithdrawCount = 0;
 
+    const protocol = getOrCreateYieldAggregator();
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
+    
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 

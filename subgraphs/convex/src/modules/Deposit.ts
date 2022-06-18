@@ -4,7 +4,6 @@ import {
   Deposit as DepositTransaction,
 } from "../../generated/schema";
 import {
-  log,
   BigInt,
   Address,
   ethereum,
