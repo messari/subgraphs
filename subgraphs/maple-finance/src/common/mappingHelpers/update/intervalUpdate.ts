@@ -1,4 +1,4 @@
-import { Address, BigDecimal, BigInt, ethereum } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, Entity, ethereum, log } from "@graphprotocol/graph-ts";
 import { Market, _MplReward, _StakeLocker } from "../../../../generated/schema";
 import { PoolLib } from "../../../../generated/templates/Pool/PoolLib";
 
@@ -7,6 +7,11 @@ import { getTokenAmountInUSD, getTokenPriceInUSD } from "../../prices/prices";
 import { bigDecimalToBigInt, powBigDecimal, readCallResult } from "../../utils";
 import { getOrCreateMarket, getOrCreateMplReward, getOrCreateStakeLocker } from "../getOrCreate/markets";
 import { getOrCreateProtocol } from "../getOrCreate/protocol";
+import {
+    getOrCreateFinancialsDailySnapshot,
+    getOrCreateMarketDailySnapshot,
+    getOrCreateMarketHourlySnapshot
+} from "../getOrCreate/snapshots";
 import { getOrCreateRewardToken, getOrCreateToken } from "../getOrCreate/supporting";
 
 function intervalUpdateMplReward(event: ethereum.Event, mplReward: _MplReward): void {
@@ -191,6 +196,70 @@ function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, mar
     protocol.save();
 }
 
+export function intervalUpdateMarketHourlySnapshot(event: ethereum.Event, market: Market): void {
+    const marketSnapshot = getOrCreateMarketHourlySnapshot(event, market);
+
+    marketSnapshot.rates = market.rates;
+    marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+    marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+    marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+    marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+    marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+    marketSnapshot.inputTokenBalance = market.inputTokenBalance;
+    marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+    marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+    marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+    marketSnapshot.exchangeRate = market.exchangeRate;
+    marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+    marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+    marketSnapshot.save();
+    // Hourly accumulators are event driven updates
+}
+
+export function intervalUpdateMarketDailySnapshot(event: ethereum.Event, market: Market): void {
+    const marketSnapshot = getOrCreateMarketDailySnapshot(event, market);
+
+    marketSnapshot.rates = market.rates;
+    marketSnapshot.totalValueLockedUSD = market.totalValueLockedUSD;
+    marketSnapshot.totalDepositBalanceUSD = market.totalDepositBalanceUSD;
+    marketSnapshot.cumulativeDepositUSD = market.cumulativeDepositUSD;
+    marketSnapshot.totalBorrowBalanceUSD = market.totalBorrowBalanceUSD;
+    marketSnapshot.cumulativeBorrowUSD = market.cumulativeBorrowUSD;
+    marketSnapshot.cumulativeLiquidateUSD = market.cumulativeLiquidateUSD;
+    marketSnapshot.inputTokenBalance = market.inputTokenBalance;
+    marketSnapshot.inputTokenPriceUSD = market.inputTokenPriceUSD;
+    marketSnapshot.outputTokenSupply = market.outputTokenSupply;
+    marketSnapshot.outputTokenPriceUSD = market.outputTokenPriceUSD;
+    marketSnapshot.exchangeRate = market.exchangeRate;
+    marketSnapshot.rewardTokenEmissionsAmount = market.rewardTokenEmissionsAmount;
+    marketSnapshot.rewardTokenEmissionsUSD = market.rewardTokenEmissionsUSD;
+
+    marketSnapshot.save();
+    // Daily accumulators are event driven updates
+}
+
+export function intervalUpdateFinancialsDailySnapshot(event: ethereum.Event): void {
+    const protocol = getOrCreateProtocol();
+    const financialsSnapshot = getOrCreateFinancialsDailySnapshot(event);
+
+    financialsSnapshot.totalValueLockedUSD = protocol.totalValueLockedUSD;
+    financialsSnapshot.protocolControlledValueUSD = protocol.protocolControlledValueUSD;
+    financialsSnapshot.mintedTokenSupplies = protocol.mintedTokenSupplies;
+    financialsSnapshot.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+    financialsSnapshot.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+    financialsSnapshot.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+    financialsSnapshot.totalDepositBalanceUSD = protocol.totalDepositBalanceUSD;
+    financialsSnapshot.cumulativeDepositUSD = protocol.cumulativeDepositUSD;
+    financialsSnapshot.totalBorrowBalanceUSD = protocol.totalBorrowBalanceUSD;
+    financialsSnapshot.cumulativeBorrowUSD = protocol.cumulativeBorrowUSD;
+    financialsSnapshot.cumulativeLiquidateUSD = protocol.cumulativeLiquidateUSD;
+
+    financialsSnapshot.save();
+    // Daily accumulators are event driven updates
+}
+
 /**
  * Trigger an interval update for this market
  * This does the following
@@ -199,6 +268,8 @@ function intervalUpdateProtocol(event: ethereum.Event, marketBefore: Market, mar
  * 3. update snapshots
  */
 export function intervalUpdate(event: ethereum.Event, market: Market): void {
+    log.warning("Before first: {}", [market._lastUpdatedBlockNumber.toString()]);
+
     ////
     // Interval update MplReward's
     ////
@@ -220,22 +291,26 @@ export function intervalUpdate(event: ethereum.Event, market: Market): void {
     ////
     // Interval update market
     ////
-    const marketAfter = intervalUpdateMarket(event, market);
+    // Use a copy instead of original as to hold before and after for intervalUpdateProtocol
+    const marketAfter = getOrCreateMarket(event, Address.fromString(market.id));
+    intervalUpdateMarket(event, marketAfter);
 
-    ////
-    // Interval update protocol
-    ////
+    // If market hasn't already been updated this block
     if (market._lastUpdatedBlockNumber != event.block.number) {
+        ////
+        // Interval update protocol
+        ////
         intervalUpdateProtocol(event, market, marketAfter);
+
+        ////
+        // Interval update market snapshots
+        ////
+        intervalUpdateMarketDailySnapshot(event, market);
+        intervalUpdateMarketDailySnapshot(event, market);
+
+        ////
+        // Interval update financials snapshot
+        ////
+        intervalUpdateFinancialsDailySnapshot(event);
     }
-
-    ////
-    // Update market snapshots
-    ////
-    // TODO(spperkins)
-
-    ////
-    // Update financials snapshots
-    ////
-    // TODO(spperkins)
 }

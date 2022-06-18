@@ -13,7 +13,6 @@ import { getOrCreateMarket, getOrCreateMplReward } from "../common/mappingHelper
 import { getOrCreateToken } from "../common/mappingHelpers/getOrCreate/supporting";
 import { createStake, createUnstake } from "../common/mappingHelpers/getOrCreate/transactions";
 import { intervalUpdate } from "../common/mappingHelpers/update/intervalUpdate";
-import { marketTick } from "../common/mappingHelpers/update/market";
 import { createEventFromCall } from "../common/utils";
 
 export function handleStaked(event: StakedEvent): void {

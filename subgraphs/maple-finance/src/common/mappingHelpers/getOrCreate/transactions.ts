@@ -1,5 +1,4 @@
 import { Address, BigInt, ethereum } from "@graphprotocol/graph-ts";
-import { LiquidityAssetSet } from "../../../../generated/MapleGlobals/MapleGlobals";
 
 import {
     Borrow,
@@ -15,10 +14,10 @@ import {
     _Unstake
 } from "../../../../generated/schema";
 
-import { PROTOCOL_ID, TransactionType, ZERO_BD } from "../../constants";
+import { PROTOCOL_ID, StakeType, TransactionType, ZERO_BD } from "../../constants";
 import { getTokenAmountInUSD } from "../../prices/prices";
 import { bigDecimalToBigInt, minBigInt } from "../../utils";
-import { updateUsageMetrics } from "../update/snapshots";
+import { updateUsageMetrics } from "../update/usage";
 import { getOrCreateMarket } from "./markets";
 import { getOrCreateToken } from "./supporting";
 
@@ -288,7 +287,13 @@ export function createStake(
     stake.from = accountAddress.toHexString();
     stake.to = event.address.toHexString(); // to whatever emitted this event (stakeLocker or mplReward)
     stake.amount = amount;
-    stake.amountUSD = getTokenAmountInUSD(event, stakeToken, stake.amount);
+
+    if (type == StakeType.STAKE_LOCKER) {
+        stake.amountUSD = getTokenAmountInUSD(event, stakeToken, stake.amount);
+    } else {
+        // Zero for mpl rewards pools pools
+        stake.amountUSD = ZERO_BD;
+    }
     stake.stakeType = type;
 
     stake.save();
