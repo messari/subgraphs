@@ -93,7 +93,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   }
   usageMetricsDaily.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
   usageMetricsHourly.cumulativeUniqueUsers = protocol.cumulativeUniqueUsers;
-
+  usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
   usageMetricsDaily.save();
   usageMetricsHourly.save();
   protocol.save();

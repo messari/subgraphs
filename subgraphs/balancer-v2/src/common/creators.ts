@@ -68,6 +68,9 @@ export function createLiquidityPool(
   }
 
   pool.save();
+  protocol.totalPoolCount = protocol.totalPoolCount +1 ;
+  protocol.save();
+
 }
 
 function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
@@ -93,6 +96,8 @@ function createPoolFees(poolAddressString: string, fee: BigInt): string[] {
   poolLpFee.save();
   poolProtocolFee.save();
   poolTradingFee.save();
+  
+
 
   return [poolLpFee.id, poolProtocolFee.id, poolTradingFee.id];
 }
