@@ -140,6 +140,10 @@ class Block {
   }
 ```
 
+## Development Notes
+
+- `juno` and `osmosis` is not yet supported on the graph (as of 6/18/2022)
+
 ## Resources and Links
 
 <details>
