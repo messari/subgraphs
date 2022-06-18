@@ -62,6 +62,7 @@ export function handleSetVault(call: SetVaultCall): void {
   vaultIds.push(vaultAddress.toHexString())
   
   protocol._vaultIds = vaultIds;
+  protocol.totalPoolCount += 1;
   protocol.save();
 
   log.warning("[SetVault] - TxHash: {}, VaultId: {}, StrategyId: {}", [
