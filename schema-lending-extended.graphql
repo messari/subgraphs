@@ -908,9 +908,6 @@ type Position @entity {
   " Whether this position is being used as a collateral (only applies to LENDER positions) "
   isCollateral: Boolean
 
-  " The token in the position "
-  token: Token!
-
   " Token balance in this position, in native amounts "
   balance: BigInt!
 
