@@ -885,43 +885,10 @@ type Position @entity {
   market: Market!
 
   " The hash of the transaction that opened this position "
-  hash: String!
+  hashOpened: String!
 
-  " Side of the position (either lender or borrower) "
-  side: PositionSide!
-
-  " The token in the position "
-  token: Token!
-
-  " Token balance in this position, in native amounts "
-  balance: BigInt!
-
-  " Number of deposits related to this position "
-  depositCount: Int!
-
-  " All deposit events of this position "
-  deposits: [Deposit!]! @derivedFrom(field: "from")
-
-  " Number of withdrawals related to this position "
-  withdrawCount: Int!
-
-  " All withdraw events of this position "
-  withdraws: [Withdraw!]! @derivedFrom(field: "to")
-
-  " Number of borrows related to this position "
-  borrowCount: Int!
-
-  " All borrow events of this position "
-  borrows: [Borrow!]! @derivedFrom(field: "to")
-
-  " Number of repays related to this position "
-  repayCount: Int!
-
-  " All repay events of this position "
-  repays: [Repay!]! @derivedFrom(field: "from")
-
-  " Liquidation event related to this position (if exists) "
-  liquidation: Liquidate
+  " The hash of the transaction that closed this position "
+  hashClosed: String!
   
   " Block number of when the position was opened "
   blockNumberOpened: BigInt!
@@ -934,6 +901,48 @@ type Position @entity {
 
   " Timestamp when the position was closed (0 if still open) "
   timestampClosed: BigInt!
+
+  " Side of the position (either lender or borrower) "
+  side: PositionSide!
+
+  " Whether this position is being used as a collateral (only applies to LENDER positions) "
+  isCollateral: Boolean
+
+  " The token in the position "
+  token: Token!
+
+  " Token balance in this position, in native amounts "
+  balance: BigInt!
+
+  " Number of deposits related to this position "
+  depositCount: Int!
+
+  " All deposit events of this position "
+  deposits: [Deposit!]!
+
+  " Number of withdrawals related to this position "
+  withdrawCount: Int!
+
+  " All withdraw events of this position "
+  withdraws: [Withdraw!]!
+
+  " Number of borrows related to this position "
+  borrowCount: Int!
+
+  " All borrow events of this position "
+  borrows: [Borrow!]!
+
+  " Number of repays related to this position "
+  repayCount: Int!
+
+  " All repay events of this position "
+  repays: [Repay!]!
+
+  " Number of liquidations related to this position "
+  liquidationCount: Int!
+
+  " Liquidation event related to this position (if exists) "
+  liquidations: [Liquidate!]!
 
   " Position daily snapshots for open positions "
   dailySnapshots: [PositionDailySnapshot!]! @derivedFrom(field: "position")
