@@ -799,7 +799,7 @@ type Account @entity {
   positionCount: Int!
 
   " All open positions that belong to this account "
-  positions: [Position!]! @derivedFrom(field: "account")
+  positions: [Position!]!
 
   " Number of deposits this account made "
   depositCount: Int!
