@@ -20,7 +20,7 @@
   "defaultNetwork": "FANTOM",
   "isBeets": true,
   "rewardToken":"0xF24Bcf4d1e507740041C9cFd2DddB29585aDCe1e",
-  "graftEnabled" : false,
-  "subgraphId" : "QmStcMg9DrT5BgarALkqKfXivJxDRDspsAJsqW9NW3xWuQ",
-  "graftStartBlock" : "22912324"
+  "graftEnabled" : true,
+  "subgraphId" : "QmXytEwqyNqfRgonf1XmxaWWCP1E5PLim4HjCXbpxbXbQT",
+  "graftStartBlock" : "22447043"
 }
