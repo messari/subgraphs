@@ -9,6 +9,8 @@ import {
   ETHEREUM_BLOCKS_PER_YEAR,
   BSC_BLOCKS_PER_YEAR,
   ARBITRUM_BLOCKS_PER_YEAR,
+  MATIC_BLOCKS_PER_YEAR,
+  AVALANCHE_BLOCKS_PER_YEAR,
   Network,
 } from "../../src/constants";
 
@@ -17,10 +19,11 @@ import {
 // setting OPTIMISM_BLOCKS_PER_YEAR to 0 will be fine
 const OPTIMISM_BLOCKS_PER_YEAR = 0;
 
-const ETHEREUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_YEAR / 365;
-const BSC_BLOCKS_PER_DAY = BSC_BLOCKS_PER_YEAR / 365;
 const ARBITRUM_BLOCKS_PER_DAY = ARBITRUM_BLOCKS_PER_YEAR / 365;
-
+const AVALANCHE_BLOCKS_PER_DAY = AVALANCHE_BLOCKS_PER_YEAR / 365;
+const BSC_BLOCKS_PER_DAY = BSC_BLOCKS_PER_YEAR / 365;
+const ETHEREUM_BLOCKS_PER_DAY = ETHEREUM_BLOCKS_PER_YEAR / 365;
+const MATIC_BLOCKS_PER_DAY = MATIC_BLOCKS_PER_YEAR / 365;
 const OPTIMISM_BLOCKS_PER_DAY = OPTIMISM_BLOCKS_PER_YEAR / 365;
 
 export class NetworkSpecificConstant {
@@ -40,6 +43,7 @@ export class NetworkSpecificConstant {
     this.unitPerYear = unitPerYear;
   }
 }
+const ARBITRUM_ONE = "ARBITRUM-ONE";
 
 export function getNetworkSpecificConstant(): NetworkSpecificConstant {
   let network = dataSource.network();
@@ -57,7 +61,7 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       BSC_BLOCKS_PER_DAY,
       BSC_BLOCKS_PER_YEAR
     );
-  } else if (equalsIgnoreCase(network, Network.ARBITRUM_ONE)) {
+  } else if (equalsIgnoreCase(network, ARBITRUM_ONE)) {
     return new NetworkSpecificConstant(
       Address.fromString("0x8E7e9eA9023B81457Ae7E6D2a51b003D421E5408"),
       Network.ARBITRUM_ONE,
@@ -70,6 +74,20 @@ export function getNetworkSpecificConstant(): NetworkSpecificConstant {
       Network.OPTIMISM,
       OPTIMISM_BLOCKS_PER_DAY,
       OPTIMISM_BLOCKS_PER_YEAR
+    );
+  } else if (equalsIgnoreCase(network, Network.MATIC)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x52eacd19e38d501d006d2023c813d7e37f025f37"),
+      Network.MATIC,
+      MATIC_BLOCKS_PER_DAY,
+      MATIC_BLOCKS_PER_YEAR
+    );
+  } else if (equalsIgnoreCase(network, Network.AVALANCHE)) {
+    return new NetworkSpecificConstant(
+      Address.fromString("0x75b9a7b6f55754d4d0e952da4bdb55eaea7df38e"),
+      Network.AVALANCHE,
+      AVALANCHE_BLOCKS_PER_DAY,
+      AVALANCHE_BLOCKS_PER_YEAR
     );
   } else {
     log.error("[getNetworkSpecificConstant] Unsupported network {}", [network]);

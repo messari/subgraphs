@@ -7,7 +7,11 @@
     "prepare:arb": "YARN_SILENT=1 yarn mustache config/arbitrum_one.json subgraph.template.yaml > subgraph.yaml",
     "deploy:arb": "graph deploy --studio dforce-subgraph-arbitrum_one",
     "prepare:optimism": "YARN_SILENT=1 yarn mustache config/optimism.json subgraph.template.yaml > subgraph.yaml",
-    "deploy:optimism": "graph deploy --studio dforce-subgraph-optimism"
+    "deploy:optimism": "graph deploy --studio dforce-subgraph-optimism",
+    "prepare:polygon": "YARN_SILENT=1 yarn mustache config/polygon.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:polygon": "graph deploy --studio dforce-subgraph-polygon",
+    "prepare:avalanche": "YARN_SILENT=1 yarn mustache config/avalanche.json subgraph.template.yaml > subgraph.yaml",
+    "deploy:avalanche": "graph deploy --studio dforce-subgraph-avalanche"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.30.1",

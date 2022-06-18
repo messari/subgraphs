@@ -88,23 +88,25 @@ Not applicable.
 
 ## Hosted Subgraph
 
-- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce (mainnet)
-- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-bsc (BSC)
-- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-optimism (Optimism)
-- Hosted subgraph: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-arbitrum (Arbitrum-One, empty subgraph)
+- Arbitrum: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-arbitrum
+- Avalanche: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-avalanche
+- BSC: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-bsc
+- Mainnet: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce
+- Optimism: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-optimism
+- Polygon: https://thegraph.com/hosted-service/subgraph/tnkrxyz/dforce-polygon
 
 ## Smart Contracts Interactions
 
-![dforce-lending](https://lh6.googleusercontent.com/ZEc8wddU1Etx-ay_fwnat2dgje8yGcOd8EK1vo5JSxJp3GM7qK5bD-bCvf3zxv4m1j5ClAfoCKiPzWNcqjS_XRjrThyz7vGA-ACalWb2XmwqEwGcLMQLSxVtySU7NPGjxPNOqqoB "dforce-lending")
+![dforce-lending](../../docs/images/protocols/dforce.png "dforce-lending")
 
 (Credit: dForce Network)
 
 ## dForce Network Lending Protocol
 
-## Deposit, Borrow, and Liquidate in Markets
+### Deposit, Borrow, and Liquidate in Markets
 
 The dForce Network Lending Protocol is controled by a [controller contract](https://etherscan.io/address/0x8B53Ab2c0Df3230EA327017C91Eb909f815Ad113), which controls 24 lending markets, each represented by an iToken (a dForce ERC20 token) with a corresponding underlying/input token, including iUSX/USX, iETH/ETH, iWBTC/WBTC, etc ([A complete list of all markets/iTokens](https://developers.dforce.network/lend/lend-and-synth/deployed-contracts)). When a user deposits underlying (input) tokens in a market, they mint the corresponding iToken. As a depositor, the user will receive interest and DF token emissions as reward. An depositor can also borrow underlying tokens from any of the (unpaused) markets. The ratio between total borrow amount and collateral amount across all markets must be below a specified collateral factor. If a borrower's loan-to-collateral ratio is above the collateral factor, a liquidator can invoke the `LiquidateBorrow` function, repay all or part of the borrower's debt, and seize the borrower's iTokens (which can then be redeemed for the underlying tokens).
 
-## USX/EUX stablecoin
+### USX/EUX stablecoin
 
 The dForce Network also manages the USX and EUX stablecoin. The USX is pegged to \$1, and the peg is maintained through controling the interest rate via [Protocol-Direct-Liquidity-Provision](https://docs.dforce.network/protocols/usx/price-stability). When the demand for USX is high (price is above \$1), the pool increases the USX supply by minting more USX tokens; vice versa.
