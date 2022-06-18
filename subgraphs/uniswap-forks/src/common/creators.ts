@@ -76,6 +76,10 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   let poolDeposits = new _HelperStore(poolAddress);
   poolDeposits.valueInt = INT_ZERO;
 
+  // update number of pools
+  protocol.totalPoolCount += 1;
+  protocol.save();
+
   // create the tracked contract based on the template
   PairTemplate.create(Address.fromString(poolAddress));
 
