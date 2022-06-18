@@ -241,13 +241,14 @@ export function updateVolumeAndFees(
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
+  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
   pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
   pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
-  protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
-  protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
-  protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
 
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
