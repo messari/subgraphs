@@ -46,6 +46,7 @@ export function getOrCreateYieldAggregator(): YieldAggregator {
     protocol.methodologyVersion = constants.Protocol.METHODOLOGY_VERSION;
     protocol.network = constants.Protocol.NETWORK;
     protocol.type = constants.Protocol.TYPE;
+    protocol.totalPoolCount = 0;
 
     protocol.save();
   }
@@ -134,6 +135,8 @@ export function getOrCreateUsageMetricsDailySnapshot(
     usageMetrics.dailyDepositCount = 0;
     usageMetrics.dailyWithdrawCount = 0;
 
+    const protocol = getOrCreateYieldAggregator();
+    usageMetrics.totalPoolCount = protocol.totalPoolCount;
     usageMetrics.blockNumber = block.number;
     usageMetrics.timestamp = block.timestamp;
 
