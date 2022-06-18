@@ -241,9 +241,14 @@ export function updateVolumeAndFees(
   let tradingFeeAmountUSD = supplyFeeAmountUSD.plus(protocolFeeAmountUSD);
 
   // Update fees collected during swaps
+  pool.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  pool.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  pool.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
   protocol.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD.plus(tradingFeeAmountUSD);
   protocol.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   protocol.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
 
   financialMetrics.dailyTotalRevenueUSD = financialMetrics.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   financialMetrics.dailySupplySideRevenueUSD = financialMetrics.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
@@ -254,18 +259,18 @@ export function updateVolumeAndFees(
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
 
 
-  poolMetricsDaily.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  poolMetricsDaily.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  poolMetricsDaily.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsDaily.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
 
   poolMetricsDaily.dailyTotalRevenueUSD = poolMetricsDaily.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   poolMetricsDaily.dailySupplySideRevenueUSD = poolMetricsDaily.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
   poolMetricsDaily.dailyProtocolSideRevenueUSD = poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
 
-  poolMetricsHourly.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
-  poolMetricsHourly.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
-  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+  poolMetricsHourly.cumulativeTotalRevenueUSD = pool.cumulativeTotalRevenueUSD;
+  poolMetricsHourly.cumulativeSupplySideRevenueUSD = pool.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = pool.cumulativeProtocolSideRevenueUSD;
 
   poolMetricsHourly.hourlyTotalRevenueUSD = poolMetricsHourly.hourlyTotalRevenueUSD.plus(tradingFeeAmountUSD);
   poolMetricsHourly.hourlySupplySideRevenueUSD = poolMetricsHourly.hourlySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
