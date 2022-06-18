@@ -559,11 +559,35 @@ type Market @entity {
 
   ##### Account/Position Data #####
 
-  " All open positions in this market "
+  " All positions in this market "
   positions: [Positions!]! @derivedFrom(field: "market")
 
-  " Number of open positions in this market "
+  " Number of positions in this market "
   positionCount: Int!
+
+  " All open positions in this market "
+  openPositions: [Positions!]!
+
+  " Number of open positions in this market "
+  openPositionCount: Int!
+
+  " All closed positions in this market "
+  closedPositions: [Positions!]!
+
+  " Number of closed positions in this market "
+  closedPositionCount: Int!
+
+  " All lending positions in this market "
+  lendingPositions: [Positions!]!
+
+  " Number of lending positions in this market "
+  lendingPositionCount: Int!
+
+  " All borrowing positions in this market "
+  borrowingPositions: [Positions!]!
+
+  " Number of borrowing positions in this market "
+  borrowingPositionCount: Int!
 
   ##### Snapshots #####
 
@@ -795,11 +819,23 @@ type Account @entity {
   " { Account address } "
   id: ID!
   
-  " Number of open positions this account has "
+  " Number of positions this account has "
   positionCount: Int!
 
-  " All open positions that belong to this account "
-  positions: [Position!]!
+  " All positions that belong to this account "
+  positions: [Position!]! @derivedFrom(field: "account")
+
+  " All open positions this account has "
+  openPositions: [Positions!]!
+
+  " Number of open positions this account has "
+  openPositionCount: Int!
+
+  " All closed positions this account has "
+  closedPositions: [Positions!]!
+
+  " Number of closed positions this account has "
+  closedPositionCount: Int!
 
   " Number of deposits this account made "
   depositCount: Int!
@@ -854,20 +890,50 @@ type Position @entity {
   " Side of the position (either lender or borrower) "
   side: PositionSide!
 
-  " Whether this position has been closed or not "
-  closed: Boolean!
-
   " The token in the position "
   token: Token!
 
   " Token balance in this position, in native amounts "
   balance: BigInt!
+
+  " Number of deposits related to this position "
+  depositCount: Int!
+
+  " All deposit events of this position "
+  deposits: [Deposit!]! @derivedFrom(field: "from")
+
+  " Number of withdrawals related to this position "
+  withdrawCount: Int!
+
+  " All withdraw events of this position "
+  withdraws: [Withdraw!]! @derivedFrom(field: "to")
+
+  " Number of borrows related to this position "
+  borrowCount: Int!
+
+  " All borrow events of this position "
+  borrows: [Borrow!]! @derivedFrom(field: "to")
+
+  " Number of repays related to this position "
+  repayCount: Int!
+
+  " All repay events of this position "
+  repays: [Repay!]! @derivedFrom(field: "from")
+
+  " Liquidation event related to this position (if exists) "
+  liquidation: Liquidate
   
   " Block number of when the position was opened "
-  blockNumber: BigInt!
+  blockNumberOpened: BigInt!
 
   " Timestamp when the position was opened "
-  timestamp: BigInt!
+  timestampOpened: BigInt!
+  
+  " Block number of when the position was closed (0 if still open) "
+  blockNumberClosed: BigInt!
+
+  " Timestamp when the position was closed (0 if still open) "
+  timestampClosed: BigInt!
 
   " Position daily snapshots for open positions "
   dailySnapshots: [PositionDailySnapshot!]! @derivedFrom(field: "position")
