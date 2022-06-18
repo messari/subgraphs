@@ -53,7 +53,7 @@ export function handleLogAddCollateral(event: LogAddCollateral): void {
   let CauldronContract = Cauldron.bind(event.address);
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let tokenPriceUSD = collateralToken.lastPriceUSD;
-  let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
+  let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD!);
 
   depositEvent.hash = event.transaction.hash.toHexString();
   depositEvent.logIndex = event.transactionLogIndex.toI32();
@@ -92,7 +92,7 @@ export function handleLogRemoveCollateral(event: LogRemoveCollateral): void {
   let collateralToken = getOrCreateToken(Address.fromString(market.inputToken));
   let CauldronContract = Cauldron.bind(event.address);
   let tokenPriceUSD = collateralToken.lastPriceUSD;
-  let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD);
+  let amountUSD = bigIntToBigDecimal(event.params.share, collateralToken.decimals).times(tokenPriceUSD!);
 
   withdrawalEvent.hash = event.transaction.hash.toHexString();
   withdrawalEvent.logIndex = event.transactionLogIndex.toI32();
@@ -124,7 +124,7 @@ export function handleLogBorrow(event: LogBorrow): void {
   }
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let mimPriceUSD = mimToken.lastPriceUSD;
-  let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD);
+  let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
 
   borrowEvent.hash = event.transaction.hash.toHexString();
   borrowEvent.logIndex = event.transactionLogIndex.toI32();
@@ -182,9 +182,9 @@ export function handleLiquidation(event: LogRepay): void {
     liquidateEvent.amount,
     false,
   );
-  let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD);
+  let collateralAmountUSD = bigIntToBigDecimal(collateralAmount, collateralToken.decimals).times(tokenPriceUSD!);
   let mimAmountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(
-    getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD,
+    getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD!,
   );
 
   liquidateEvent.hash = event.transaction.hash.toHexString();
@@ -199,6 +199,7 @@ export function handleLiquidation(event: LogRepay): void {
   liquidateEvent.amount = collateralAmount;
   liquidateEvent.amountUSD = collateralAmountUSD;
   liquidateEvent.profitUSD = collateralAmountUSD.minus(mimAmountUSD);
+  liquidateEvent.liquidatee = event.params.to.toHexString();
 
   usageHourlySnapshot.hourlyLiquidateCount += 1;
   usageDailySnapshot.dailyLiquidateCount += 1;
@@ -242,7 +243,7 @@ export function handleLogRepay(event: LogRepay): void {
   }
   let mimToken = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network())));
   let mimPriceUSD = mimToken.lastPriceUSD;
-  let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD);
+  let amountUSD = bigIntToBigDecimal(event.params.amount, DEFAULT_DECIMALS).times(mimPriceUSD!);
 
   repayEvent.hash = event.transaction.hash.toHexString();
   repayEvent.logIndex = event.transactionLogIndex.toI32();
@@ -280,6 +281,6 @@ export function handleLogExchangeRate(event: LogExchangeRate): void {
 
 export function handleLogAccrue(event: LogAccrue): void {
   let mimPriceUSD = getOrCreateToken(Address.fromString(getMIMAddress(dataSource.network()))).lastPriceUSD;
-  let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, DEFAULT_DECIMALS).times(mimPriceUSD);
-  updateFinancials(event, feesUSD);
+  let feesUSD = bigIntToBigDecimal(event.params.accruedAmount, DEFAULT_DECIMALS).times(mimPriceUSD!);
+  updateFinancials(event, feesUSD ,event.address.toHexString());
 }
