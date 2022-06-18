@@ -124,7 +124,8 @@ function createPool(event: PoolRegistered): string {
 }
 
 export function handlePoolRegister(event: PoolRegistered): void {
-  createPool(event);
+  let poolAddress =   createPool(event);
+  updateWeight(poolAddress);
 }
 
 export function handleTokensRegister(event: TokensRegistered): void {

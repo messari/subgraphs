@@ -33,13 +33,13 @@ export function exponentToBigDecimal(decimals: i32): BigDecimal {
   return bd;
 }
 
-export function exponentToBigDecimalBi(decimals: BigInt): BigDecimal {
-  let bd = BIGDECIMAL_ONE;
-  for (let i = BIGINT_ZERO; i.lt(decimals as BigInt); i = i.plus(BIGINT_ONE)) {
-    bd = bd.times(BIGDECIMAL_TEN);
+export function shrinkToBigDecimal(amount: BigInt, exchangeDecimals: i32): BigDecimal {
+  if (exchangeDecimals == INT_ZERO) {
+    return amount.toBigDecimal();
   }
-  return bd;
+  return amount.toBigDecimal().div(exponentToBigDecimal(exchangeDecimals));
 }
+
 
 export function convertTokenToDecimal(tokenAmount: BigInt, exchangeDecimals: i32): BigDecimal {
   if (exchangeDecimals == INT_ZERO) {
