@@ -1,21 +1,25 @@
-specVersion: 0.0.5
+specVersion: 0.0.4
 repository: https://github.com/messari/subgraphs
 schema:
   file: ./schema.graphql
 dataSources:
-  - kind: arweave
-    name: arweave-blocks
-    network: arweave-mainnet
+  - kind: ethereum/contract
+    name: Gravity
+    network: cronos
     source:
-      owner: "ID-OF-AN-OWNER"
-      startBlock: 0
+      address: "0x0000000000000000000000000000000000000000"
+      abi: Placeholder
     mapping:
-      apiVersion: 0.0.5
+      kind: ethereum/events
+      apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
         - Network
         - Block
         - Author
+      abis:
+        - name: Placeholder
+          file: ./abis/Placeholder.json
       blockHandlers:
-        - handler: handleArweaveBlock
+        - handler: handleEvmBlock
       file: ./src/mapping.ts

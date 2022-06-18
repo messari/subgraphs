@@ -34,6 +34,7 @@ export namespace Network {
 }
 
 // This is how the Network displays on thegraph.com
+// These match the network.json config files
 export namespace SubgraphNetwork {
   export const ARBITRUM = "arbitrum-one";
   export const ARWEAVE = "arweave-mainnet";
@@ -44,7 +45,7 @@ export namespace SubgraphNetwork {
   export const CELO = "celo";
   export const CLOVER = "clover";
   export const CRONOS = "mainnet";
-  export const COSMOS = "cosmoshub";
+  export const COSMOS = "cosmoshub-4";
   export const ETHEREUM = "mainnet";
   export const FANTOM = "fantom";
   export const HARMONY = "harmony";
