@@ -1,4 +1,4 @@
-import { BigInt, ethereum, Address, log } from "@graphprotocol/graph-ts/index";
+import { BigInt, ethereum, Address } from "@graphprotocol/graph-ts/index";
 import { Deposit, LiquidityPool, Withdraw } from "../../generated/schema";
 import { BIGDECIMAL_ZERO, BIGINT_ZERO } from "../common/constants";
 import { createEventID, getOrCreateDexAmm, getOrCreateToken } from "../common/getters";
@@ -41,6 +41,7 @@ export function handleDepositEvent(
   liquidityEvent.inputTokens = inputTokens;
   liquidityEvent.inputTokenAmounts = inputTokenAmounts;
   liquidityEvent.amountUSD = amountUSD;
+
   //pool.inputTokenBalances = inputTokenBalances;
   pool.outputTokenSupply = tokenSupply;
 
