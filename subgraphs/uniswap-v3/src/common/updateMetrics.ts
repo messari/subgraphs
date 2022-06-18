@@ -48,6 +48,7 @@ export function updateUsageMetrics(event: ethereum.Event, fromAddress: Address, 
   usageMetricsDaily.blockNumber = event.block.number;
   usageMetricsDaily.timestamp = event.block.timestamp;
   usageMetricsDaily.dailyTransactionCount += INT_ONE;
+  usageMetricsDaily.totalPoolCount = protocol.totalPoolCount;
 
   usageMetricsHourly.blockNumber = event.block.number;
   usageMetricsHourly.timestamp = event.block.timestamp;
@@ -251,6 +252,24 @@ export function updateVolumeAndFees(
   financialMetrics.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
   financialMetrics.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
   financialMetrics.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+
+  poolMetricsDaily.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  poolMetricsDaily.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  poolMetricsDaily.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+  poolMetricsDaily.dailyTotalRevenueUSD = poolMetricsDaily.dailyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  poolMetricsDaily.dailySupplySideRevenueUSD = poolMetricsDaily.dailySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  poolMetricsDaily.dailyProtocolSideRevenueUSD = poolMetricsDaily.dailyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
+
+
+  poolMetricsHourly.cumulativeTotalRevenueUSD = protocol.cumulativeTotalRevenueUSD;
+  poolMetricsHourly.cumulativeSupplySideRevenueUSD = protocol.cumulativeSupplySideRevenueUSD;
+  poolMetricsHourly.cumulativeProtocolSideRevenueUSD = protocol.cumulativeProtocolSideRevenueUSD;
+
+  poolMetricsHourly.hourlyTotalRevenueUSD = poolMetricsHourly.hourlyTotalRevenueUSD.plus(tradingFeeAmountUSD);
+  poolMetricsHourly.hourlySupplySideRevenueUSD = poolMetricsHourly.hourlySupplySideRevenueUSD.plus(supplyFeeAmountUSD);
+  poolMetricsHourly.hourlyProtocolSideRevenueUSD = poolMetricsHourly.hourlyProtocolSideRevenueUSD.plus(protocolFeeAmountUSD);
 
   financialMetrics.save();
   poolMetricsDaily.save();

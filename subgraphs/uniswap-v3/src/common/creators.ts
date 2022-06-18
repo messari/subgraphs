@@ -77,6 +77,8 @@ export function createLiquidityPool(event: ethereum.Event, poolAddress: string, 
   LPtoken.save();
   poolAmounts.save();
   poolDeposits.save();
+  protocol.totalPoolCount =  protocol.totalPoolCount + 1 ;
+  protocol.save;
 }
 
 function createPoolFees(poolAddressString: string, fee: i64): string[] {
