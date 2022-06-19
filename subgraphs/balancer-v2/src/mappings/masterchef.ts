@@ -10,10 +10,10 @@ import {
 import { bigDecimal, BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 import { getLiquidityPool, getOrCreateDex, getOrCreateRewardToken, getOrCreateToken } from "../common/getters";
 import { BEETS, BIGDECIMAL_ONE, BIGDECIMAL_ZERO, BIGINT_ZERO, FBEETS, MASTERCHEFV2_ADDRESS, REWARDTOKEN, SECONDS_PER_DAY } from "../common/constants";
-import { getUsdPricePerToken } from "../prices";
 import { DEFAULT_DECIMALS } from "../prices/common/constants";
 import { convertTokenToDecimal } from "../common/utils/utils";
 import { LiquidityPool, RewardToken } from "../../generated/schema";
+import { fetchPrice } from "../common/pricing";
 
 export function handleUpdateEmissionRate(event: UpdateEmissionRate): void {
   log.info("[MasterChef] Log update emission rate {} {}", [
@@ -53,7 +53,7 @@ export function handleLogSetPool(event: LogSetPool): void {
   pool.rewardTokenEmissionsAmount![0] = BigInt.fromString(
     convertTokenToDecimal(tokenAmount, DEFAULT_DECIMALS.toI32()).toString(),
   );
-  pool.rewardTokenEmissionsUSD![0] = getUsdPricePerToken(BEETS).usdPrice.times(
+  pool.rewardTokenEmissionsUSD![0] = fetchPrice(BEETS).times(
     pool.rewardTokenEmissionsAmount![0].toBigDecimal(),
   );
   pool.save();
@@ -125,6 +125,8 @@ function createLiquidityPool(
   }
   pool.inputTokenWeights = [BIGDECIMAL_ONE];
   pool.save();
+  protocol.totalPoolCount =  protocol.totalPoolCount + 1;
+  protocol.save();
   return pool;
 }
 
