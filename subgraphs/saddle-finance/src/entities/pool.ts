@@ -46,11 +46,11 @@ import {
   getOrCreateTokenFromString,
   getTokenDecimals,
 } from "./token";
-import { NewSwapPool } from "../../generated/USDDeployer/SwapDeployer";
 import { getPriceUSD, getTokenAmountsSumUSD } from "../utils/price";
-import { MiniChefV2 } from "../../generated/MiniChefV2/MiniChefV2";
-import { SimpleRewarder } from "../../generated/MiniChefV2/SimpleRewarder";
 import { prefixID } from "../utils/strings";
+import { MiniChefV2 } from "../../generated/templates/Swap/MiniChefV2";
+import { NewSwapPool } from "../../generated/templates/Swap/SwapDeployer";
+import { SimpleRewarder } from "../../generated/templates/Swap/SimpleRewarder";
 
 export function getOrCreatePool(address: Address): LiquidityPool {
   let pool = LiquidityPool.load(address.toHexString());

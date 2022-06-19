@@ -256,6 +256,12 @@ templates:
           file: ./abis/ERC20NameBytes.json
         - name: ERC20SymbolBytes
           file: ./abis/ERC20SymbolBytes.json
+        - name: MiniChefV2
+          file: ./abis/MiniChefV2.json
+        - name: SwapDeployer
+          file: ./abis/SwapDeployer.json
+        - name: SimpleRewarder
+          file: ./abis/SimpleRewarder.json
         # Prices
         - name: _ERC20
           file: ./abis/Prices/ERC20.json
