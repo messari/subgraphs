@@ -4,24 +4,26 @@ This subgraph and schema will gather a standard set of L1 data metrics that matt
 
 ## About the Schema
 
-The timeseries data is important, and it follows our `Blockchain` data in addition to hourly and daily metrics.
+The timeseries data is important, based off `Network` and adds numerous daily/hourly metrics.
 
-The following data is collected: TODO: add new things once schema is finalized
+The following data is collected:
 
-- `totalBlocksMined` is the current block height
-- Blocks mined during this day/hour
-- `blocksPerDay` is a rolling target at the blocks/day using an algorithm
-- Difficulty, is the amount of effort required to mine a block
-  - `totalDifficulty` captures the difficulty it took to reach a given block
-  - daily/hourly difficulty is the new difficulty added during this day/hour
-- Average difficulty = ( difficulty during that timeseries entity ) / ( blocks mined in that timeseries entity )
-- `daily/hourlyGasUsed` represents the gas used during the day
-- `daily/hourlyGasLimit` is the gasLimit at last block in the timeseries
-- The total amount of fees burnt up until this day/hour
-  - Burnt Fees = `gasUsed` \* `baseFeePerGas`
-- The total rewards emitted up until day/hour
-- The reward emissions for a given timeseries entity
-- The supply of the native asset at a given timeseries entity
+- `blockHeight` is the current block height
+- `dailyBlocks` is the number of blocks mined per day
+- `dailyMeanDifficulty` = `dailyDifficulty` / `dailyBlocks`
+  - Difficulty is the amount of effort required to mine a block
+  - `dailyMeanGasUsed` = `dailyGasUsed` / `dailyBlocks`
+    - Gas used is the amount of gas used in a block for all of the transactions
+  - `dailyMeanGasLimit` = `dailyGasLimit` / `dailyBlocks`
+    - Gas limit is the maximum amount of gas that can be used in a block
+  - `dailyBlockUtilization` = `dailyGasUsed` / `dailGasLimit`
+    - Block utilization is the percentage of the block's gas limit that was used
+  - `dailyMeanRewards` = `dailyRewards` / `dailyBlocks`
+    - Rewards is the amount of native currency rewarded to the author for mining a block (used more for non-PoW networks)
+- `dailyMeanBlockInterval` = `dailyBlocks` / (`timestamp` - `firstTimestamp`)
+- `dailyMeanBlockSize` = `dailySize` / `dailyBlocks`
+  - The size is the amount of data in a block in bytes (in the case of ethereum)
+- Chunks are the number of shards in a single block. This is used in networks where computation is parallelized into shards.
 
 ## Block-specific Data
 
@@ -143,6 +145,8 @@ class Block {
 ## Development Notes
 
 - `juno` and `osmosis` is not yet supported on the graph (as of 6/18/2022)
+- `cronos` needs to have a startBlock of 1 to work, so I had to keep it seperate from the evm chains
+  - Also, the hosted service does not support `cronos` so you have to deploy here: https://portal.cronoslabs.com/
 
 ## Resources and Links
 

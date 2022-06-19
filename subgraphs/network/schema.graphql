@@ -99,11 +99,7 @@ type DailySnapshot @entity {
   " ID of the network this snapshot belongs to "
   network: Network!
 
-  " Number of cumulative unique authors (see type Author for explanation) "
-  cumulativeUniqueAuthors: Int!
-
-  " Number of unique daily active authors "
-  dailyActiveAuthors: Int!
+  #### Quantitative Data ####
 
   " Block height at this day (aka, blockNumber) "
   blockHeight: Int!
@@ -114,11 +110,34 @@ type DailySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  " Blocks created during this day (note, this is different from blocksPerDay) "
-  dailyBlocks: Int!
+  " Number of cumulative unique authors (see type Author for explanation) "
+  cumulativeUniqueAuthors: Int!
 
   " Total difficulty up until this day "
   cumulativeDifficulty: BigInt!
+
+  " Total amount of fees burned "
+  cumulativeBurntFees: BigInt!
+
+  " Total amount of rewards emitted "
+  cumulativeRewards: BigInt!
+
+  " Total size of the entire network in this day (in native units) "
+  cumulativeSize: BigInt!
+
+  " Total amount of the native asset in circulation during this day "
+  totalSupply: BigInt!
+
+  " gas price at the end of this hour in network native gas units "
+  gasPrice: BigInt!
+
+  #### Daily Metrics ####
+
+  " Number of unique daily active authors "
+  dailyActiveAuthors: Int!
+
+  " Blocks created during this day (note, this is different from blocksPerDay) "
+  dailyBlocks: Int!
 
   " Difficulty during this day "
   dailyDifficulty: BigInt!
@@ -141,35 +160,20 @@ type DailySnapshot @entity {
   " Mean of gas limit per block during this day "
   dailyMeanGasLimit: BigDecimal!
 
-  " gas price at the end of this hour in network native gas units "
-  gasPrice: BigInt!
-
-  " Total amount of fees burned "
-  cumulativeBurntFees: BigInt!
-
   " Amount of burnt fees for this day "
   dailyBurntFees: BigInt!
 
   " New rewards emitted on this day "
   dailyRewards: BigInt!
 
-  " Total amount of rewards emitted "
-  cumulativeRewards: BigInt!
-
   " Daily mean block reward emitted "
   dailyMeanRewards: BigDecimal!
-
-  " Total amount of the native asset in circulation during this day "
-  totalSupply: BigInt!
 
   " New supply added during this day "
   dailySupplyIncrease: BigInt!
 
   " Daily mean block interval time in seconds during this hour "
   dailyMeanBlockInterval: BigDecimal!
-
-  " Total size of the entire network in this day (in native units) "
-  cumulativeSize: BigInt!
 
   " Cumulative size of all blocks created in this day "
   dailyCumulativeSize: BigInt!
@@ -196,13 +200,9 @@ type HourlySnapshot @entity {
   " ID of the network this snapshot belongs to "
   network: Network!
 
-  " Number of cumulative unique authors (see type Author for explanation) "
-  cumulativeUniqueAuthors: Int!
+  #### Quantitative Data ####
 
-  " Number of unique hourly active authors "
-  hourlyActiveAuthors: Int!
-
-  " Block height at this hour (e.g. blockNumber) "
+  " Block height at this hour (aka, blockNumber) "
   blockHeight: Int!
 
   " First timestamp of this entity (used to calculate averages) "
@@ -211,11 +211,34 @@ type HourlySnapshot @entity {
   " Timestamp of this snapshot "
   timestamp: BigInt!
 
-  " Blocks created during this hour "
-  hourlyBlocks: Int!
+  " Number of cumulative unique authors (see type Author for explanation) "
+  cumulativeUniqueAuthors: Int!
 
   " Total difficulty up until this hour "
   cumulativeDifficulty: BigInt!
+
+  " Total amount of fees burned "
+  cumulativeBurntFees: BigInt!
+
+  " Total amount of rewards emitted "
+  cumulativeRewards: BigInt!
+
+  " Total size of the entire network in this hour (in native units) "
+  cumulativeSize: BigInt!
+
+  " Total amount of the native asset in circulation during this hour "
+  totalSupply: BigInt!
+
+  " gas price at the end of this hour in network native gas units "
+  gasPrice: BigInt!
+
+  #### Hourly Metrics ####
+
+  " Number of unique hourly active authors "
+  hourlyActiveAuthors: Int!
+
+  " Blocks created during this hour "
+  hourlyBlocks: Int!
 
   " Difficulty during this hour "
   hourlyDifficulty: BigInt!
@@ -229,7 +252,7 @@ type HourlySnapshot @entity {
   " Sum of all gas limit during this hour "
   hourlyCumulativeGasLimit: BigInt!
 
-  " Block utilization throughout this hour "
+  " Block utilization aggregated across this hour "
   hourlyBlockUtilization: BigDecimal!
 
   " Mean of gas used per block during this hour "
@@ -238,26 +261,14 @@ type HourlySnapshot @entity {
   " Mean of gas limit per block during this hour "
   hourlyMeanGasLimit: BigDecimal!
 
-  " gas price at the end of this hour in network native gas units "
-  gasPrice: BigInt!
-
-  " Total amount of fees burned "
-  cumulativeBurntFees: BigInt!
-
   " Amount of burnt fees for this hour "
   hourlyBurntFees: BigInt!
 
   " New rewards emitted on this hour "
   hourlyRewards: BigInt!
 
-  " Total amount of rewards emitted "
-  cumulativeRewards: BigInt!
-
   " Hourly mean block reward emitted "
   hourlyMeanRewards: BigDecimal!
-
-  " Total amount of the native asset in circulation during this day "
-  totalSupply: BigInt!
 
   " New supply added during this hour "
   hourlySupplyIncrease: BigInt!
@@ -265,19 +276,16 @@ type HourlySnapshot @entity {
   " Hourly mean block interval time in seconds during this hour "
   hourlyMeanBlockInterval: BigDecimal!
 
-  " Total size of the entire network in this hour (in native units) "
-  cumulativeSize: BigInt!
-
   " Cumulative size of all blocks created in this hour "
   hourlyCumulativeSize: BigInt!
 
-  " Hourly mean size of a block during this hour "
+  " hourly mean size in bytes of a block during this hour "
   hourlyMeanBlockSize: BigDecimal!
 
   " Hourly chunk count "
   hourlyChunkCount: Int!
 
-  " Number of transactions during this day "
+  " Number of transactions during this hour "
   hourlyTransactionCount: Int!
 
   #### Helpers ####
